@@ -1,0 +1,7 @@
+# Version defaults to "0" if not defined
+version = "0"
+
+[dependency]
+slc_cli="~"
+gcc-arm-none-eabi = { version = "12.2.rel1", user="silabs"}
+platform_nwp_siwx91x = {version = ">=4.0.0 <4.0.1", installer = "conan", user="silabs", prerelease = true}
