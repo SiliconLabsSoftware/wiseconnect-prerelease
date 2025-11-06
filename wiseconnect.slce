@@ -1,7 +1,7 @@
-id: wiseconnect_merged
+id: wiseconnect3_sdk
 label: Wiseconnect
-description: Merged extension for wiseconnect
-version: 4.0.0-alpha.4
+description: Merged extension for wiseconnect3_sdk
+version: 4.0.0
 component: []
 component_path:
  - path: components/device/silabs/si91x/wireless/ble
