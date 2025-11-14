@@ -49,27 +49,30 @@
 
 #define SLI_MAX_SIZE_OF_UINT16_T 65535
 
-#define MAX_FLOW_ID                          7
-#define MAX_WAKE_INTERVAL_EXPONENT           31
-#define MAX_WAKE_INTERVAL_EXPONENT_TOLERANCE 31
-#define MAX_WAKE_DURATION_UNIT               1
-#define MAX_TWT_RETRY_LIMIT                  15
-#define MIN_TWT_RETRY_INTERVAL               5
-#define MAX_TWT_REQ_TYPE                     2
-#define REQUEST_TWT                          0
-#define TWT_WAKE_DURATION_UNIT_1024TU        1024
-#define TWT_WAKE_DURATION_UNIT_256TU         256
-#define ABSOLUTE_POWER_VALUE_TOGGLE          0x80
-#define MAX_2_4G_CHANNEL                     14
-#define PASSIVE_SCAN_ENABLE                  BIT(7)
-#define LP_CHAIN_ENABLE                      BIT(6)
-#define QUICK_SCAN_ENABLE                    1
-#define SCAN_RESULTS_TO_HOST                 2
-#define DEFAULT_LISTEN_INTERVAL_MULTIPLIER   1
-#define ALWAYS_ROAM                          1
-#define MAX_TX_AND_RX_LATENCY_LIMIT          21600000
-#define MAX_TWT_SUSPEND_DURATION             0x5265c00
-#define DEVICE_AVERAGE_THROUGHPUT            20000
+#define MAX_FLOW_ID                              7
+#define MAX_WAKE_INTERVAL_EXPONENT               31
+#define MAX_WAKE_INTERVAL_EXPONENT_TOLERANCE     31
+#define MAX_WAKE_DURATION_UNIT                   1
+#define MAX_TWT_RETRY_LIMIT                      15
+#define MIN_TWT_RETRY_INTERVAL                   5
+#define MAX_TWT_REQ_TYPE                         2
+#define REQUEST_TWT                              0
+#define TWT_WAKE_DURATION_UNIT_1024TU            1024
+#define TWT_WAKE_DURATION_UNIT_256TU             256
+#define ABSOLUTE_POWER_VALUE_TOGGLE              0x80
+#define MAX_2_4G_CHANNEL                         14
+#define PASSIVE_SCAN_ENABLE                      BIT(7)
+#define LP_CHAIN_ENABLE                          BIT(6)
+#define QUICK_SCAN_ENABLE                        1
+#define SCAN_RESULTS_TO_HOST                     2
+#define DEFAULT_LISTEN_INTERVAL_MULTIPLIER       1
+#define ALWAYS_ROAM                              1
+#define MAX_TX_AND_RX_LATENCY_LIMIT              21600000
+#define MAX_TWT_SUSPEND_DURATION                 0x5265c00
+#define DEVICE_AVERAGE_THROUGHPUT                20000
+#define SLI_WIFI_AP_OPT_KEEPALIVE_TYPE_MASK      0x03 // bits 0-1
+#define SLI_WIFI_AP_OPT_BEACON_STOP              BIT(2)
+#define SLI_WIFI_AP_OPT_DYNAMIC_HIDDEN_SSID_CONF BIT(3)
 
 /*=======================================================================*/
 // Enterprise configuration command parameters
@@ -1227,12 +1230,18 @@ sl_status_t sli_wifi_start_ap(sl_wifi_interface_t interface, const sl_wifi_ap_co
   request.dtim_period     = configuration->dtim_beacon_count;
   request.max_sta_support = configuration->maximum_clients;
   if (configuration->keepalive_type) {
-    request.ap_keepalive_type   = configuration->keepalive_type;
+    request.options             = (configuration->keepalive_type & SLI_WIFI_AP_OPT_KEEPALIVE_TYPE_MASK);
     request.ap_keepalive_period = (uint8_t)configuration->client_idle_timeout;
   }
   if (configuration->beacon_stop) {
-    // Using a free bit in ap_keepalive_type since there are no available bits in join feature bitmap.
-    request.ap_keepalive_type |= BIT(2);
+    // if beacon_stop is set, use 2nd bit to indicate that Beacon Stop is enabled.
+    request.options |= SLI_WIFI_AP_OPT_BEACON_STOP;
+  }
+
+  // options in struct sl_wifi_ap_configuration_t is used only for HIDDEN SSID right now, so check only bit 1.
+  if (configuration->options & SL_WIFI_HIDDEN_SSID) {
+    // if HIDDEN_SSID is set, use 3rd bit of options var in sli_wifi_ap_config_request to indicate that dynamic configuration of Hidden SSID is enabled.
+    request.options |= SLI_WIFI_AP_OPT_DYNAMIC_HIDDEN_SSID_CONF;
   }
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_AP_CONFIGURATION,
@@ -1561,20 +1570,13 @@ sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
 sl_status_t sli_wifi_transmit_test_start(sl_wifi_interface_t interface,
                                          const sl_wifi_transmitter_test_info_t *test_tx_info)
 {
+  UNUSED_PARAMETER(interface);
+  // Check if the operation mode is PER imode
+  if (sli_wifi_get_opermode() != SL_WIFI_TRANSMIT_TEST_MODE) {
+    return SL_STATUS_INVALID_MODE;
+  }
   sl_status_t status = SL_STATUS_OK;
-  if (!device_initialized) {
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  if (!sli_wifi_is_interface_up(interface)) {
-    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
-  }
-  if (!((default_interface & interface) == interface)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (interface & SL_WIFI_5GHZ_INTERFACE) {
-    return SL_STATUS_NOT_SUPPORTED;
-  }
-  status = sli_wifi_send_command(SLI_WIFI_REQ_TX_TEST_MODE,
+  status             = sli_wifi_send_command(SLI_WIFI_REQ_TX_TEST_MODE,
                                  SLI_WIFI_WLAN_CMD,
                                  test_tx_info,
                                  sizeof(sl_wifi_request_tx_test_info_t),
@@ -1587,16 +1589,16 @@ sl_status_t sli_wifi_transmit_test_start(sl_wifi_interface_t interface,
 
 sl_status_t sli_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 {
+  UNUSED_PARAMETER(interface);
   sl_status_t status = SL_STATUS_OK;
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
   }
-  if (!((default_interface & interface) == interface)) {
-    return SL_STATUS_INVALID_PARAMETER;
+  // Check if the operation mode is PER imode
+  if (sli_wifi_get_opermode() != SL_WIFI_TRANSMIT_TEST_MODE) {
+    return SL_STATUS_INVALID_MODE;
   }
-  if (interface & SL_WIFI_5GHZ_INTERFACE) {
-    return SL_STATUS_NOT_SUPPORTED;
-  }
+
   sl_wifi_request_tx_test_info_t tx_test_info = { 0 };
   tx_test_info.enable                         = 0;
   // Send the transmit test stop command
@@ -1613,16 +1615,11 @@ sl_status_t sli_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 
 sl_status_t sli_wifi_frequency_offset(sl_wifi_interface_t interface, const sl_wifi_freq_offset_t *frequency_calibration)
 {
+  UNUSED_PARAMETER(interface);
   sl_status_t status = SL_STATUS_OK;
   SL_VERIFY_POINTER_OR_RETURN(frequency_calibration, SL_STATUS_NULL_POINTER);
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
-  }
-  if (!((default_interface & interface) == interface)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (interface & SL_WIFI_5GHZ_INTERFACE) {
-    return SL_STATUS_NOT_SUPPORTED;
   }
   status = sli_wifi_send_command(SLI_WIFI_REQ_FREQ_OFFSET,
                                  SLI_WIFI_WLAN_CMD,
@@ -1637,16 +1634,11 @@ sl_status_t sli_wifi_frequency_offset(sl_wifi_interface_t interface, const sl_wi
 
 sl_status_t sli_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi_dpd_calib_data_t *dpd_calib_data)
 {
+  UNUSED_PARAMETER(interface);
   sl_status_t status = SL_STATUS_OK;
   SL_VERIFY_POINTER_OR_RETURN(dpd_calib_data, SL_STATUS_NULL_POINTER);
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
-  }
-  if (!((default_interface & interface) == interface)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (interface & SL_WIFI_5GHZ_INTERFACE) {
-    return SL_STATUS_NOT_SUPPORTED;
   }
   status = sli_wifi_send_command(SLI_WIFI_REQ_GET_DPD_DATA,
                                  SLI_WIFI_WLAN_CMD,
@@ -1660,19 +1652,9 @@ sl_status_t sli_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wif
 }
 sl_status_t sli_wifi_start_statistic_report(sl_wifi_interface_t interface, sl_wifi_channel_t channel)
 {
+  UNUSED_PARAMETER(interface);
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
-  }
-
-  if (!sli_wifi_is_interface_up(interface)) {
-    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
-  }
-
-  if (!((default_interface & interface) == interface)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (interface & SL_WIFI_5GHZ_INTERFACE) {
-    return SL_STATUS_NOT_SUPPORTED;
   }
   sl_status_t status                   = SL_STATUS_OK;
   sli_wifi_request_rx_stats_t rx_stats = { 0 };
@@ -1694,20 +1676,11 @@ sl_status_t sli_wifi_start_statistic_report(sl_wifi_interface_t interface, sl_wi
 
 sl_status_t sli_wifi_stop_statistic_report(sl_wifi_interface_t interface)
 {
+  UNUSED_PARAMETER(interface);
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  if (!sli_wifi_is_interface_up(interface)) {
-    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
-  }
-
-  if (!((default_interface & interface) == interface)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (interface & SL_WIFI_5GHZ_INTERFACE) {
-    return SL_STATUS_NOT_SUPPORTED;
-  }
   sli_wifi_request_rx_stats_t rx_stats = { 0 };
 
   // Configure to stop RX stats
@@ -2966,6 +2939,130 @@ sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
     memcpy(get_xo_ctune, packet->data, packet->length);
     sli_wifi_memory_manager_free_buffer(buffer);
   }
+  return status;
+}
+
+sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id)
+{
+  sl_status_t status;
+  uint16_t ie_buffer_length                  = 0;
+  uint16_t ie_buffer_size                    = 0;
+  sli_wifi_manage_vendor_ie_packet_t *packet = NULL;
+  sl_wifi_buffer_t *buffer                   = NULL;
+
+  // Validate input parameters
+  if ((vendor_ie == NULL) || (vendor_ie->ie_buffer == NULL)) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
+  ie_buffer_length =
+    vendor_ie->ie_buffer[1]
+    + SLI_WIFI_VENDOR_IE_HEADER_LENGTH;         // Calculate the buffer length from length provided in IE buffer.
+  ie_buffer_size = vendor_ie->ie_buffer_length; // Store the original buffer size
+  if ((ie_buffer_size > SLI_WIFI_MAX_VENDOR_IE_BUFFER_LENGTH) || (ie_buffer_size < ie_buffer_length)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  if (vendor_ie->unique_id > SLI_WIFI_MAX_VENDOR_IE) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  packet = (sli_wifi_manage_vendor_ie_packet_t *)malloc(sizeof(sli_wifi_manage_vendor_ie_packet_t) + ie_buffer_size);
+  if (packet == NULL) {
+    return SL_STATUS_FAIL;
+  }
+
+  // Prepare the packet to send to firmware
+  packet->version           = SLI_WIFI_VENDOR_IE_FRAME_VERSION;
+  packet->action            = SLI_WIFI_VENDOR_IE_ACTION_ADD;
+  packet->unique_id         = vendor_ie->unique_id;
+  packet->mgmt_frame_bitmap = vendor_ie->mgmt_frame_bitmap;
+  memset(packet->reserved, 0, sizeof(packet->reserved));
+  packet->ie_buffer_length = vendor_ie->ie_buffer_length;
+  memcpy(packet->ie_buffer, vendor_ie->ie_buffer, ie_buffer_size);
+
+  // Send the command to firmware
+  status = sli_wifi_send_command(SLI_WIFI_REQ_VENDOR_IE,
+                                 SLI_WIFI_WLAN_CMD,
+                                 packet,
+                                 sizeof(sli_wifi_manage_vendor_ie_packet_t) + ie_buffer_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_VENDOR_IE_CMD_TIMEOUT),
+                                 NULL,
+                                 (void **)&buffer);
+
+  free(packet);
+  if ((status != SL_STATUS_OK) && (NULL != buffer)) {
+    sli_wifi_memory_manager_free_buffer(buffer);
+  }
+  VERIFY_STATUS_AND_RETURN(status);
+  const sl_wifi_system_packet_t *resp_packet =
+    (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
+
+  if ((resp_packet != NULL)) {
+    *fw_unique_id = resp_packet->data[0];
+    SL_DEBUG_LOG("vendor IE added with unique ID: %d\r\n", *fw_unique_id);
+    sli_wifi_memory_manager_free_buffer(buffer);
+  }
+
+  VERIFY_STATUS_AND_RETURN(status);
+  return status;
+}
+
+sl_status_t sli_wifi_remove_vendor_ie(uint8_t unique_id)
+{
+  sl_status_t status;
+  sli_wifi_manage_vendor_ie_packet_t packet = { 0 };
+
+  // Validate unique_id
+  if (unique_id > SLI_WIFI_MAX_VENDOR_IE) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  // Prepare the packet to send to firmware
+  packet.version           = SLI_WIFI_VENDOR_IE_FRAME_VERSION;
+  packet.action            = SLI_WIFI_VENDOR_IE_ACTION_REMOVE;
+  packet.unique_id         = unique_id;
+  packet.mgmt_frame_bitmap = 0;
+  memset(packet.reserved, 0, sizeof(packet.reserved));
+  packet.ie_buffer_length = 0;
+  // Not assigning anything to packet.ie_buffer as it has not been allocated any memory.
+
+  // Send the command to firmware
+  status = sli_wifi_send_command(SLI_WIFI_REQ_VENDOR_IE,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &packet,
+                                 sizeof(packet),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_VENDOR_IE_CMD_TIMEOUT),
+                                 NULL,
+                                 NULL);
+
+  VERIFY_STATUS_AND_RETURN(status);
+  return status;
+}
+
+sl_status_t sli_wifi_remove_all_vendor_ie(void)
+{
+  sl_status_t status;
+  sli_wifi_manage_vendor_ie_packet_t packet = { 0 };
+
+  // Prepare the packet to send to firmware
+  packet.version           = SLI_WIFI_VENDOR_IE_FRAME_VERSION;
+  packet.action            = SLI_WIFI_VENDOR_IE_ACTION_REMOVE_ALL;
+  packet.unique_id         = 0;
+  packet.mgmt_frame_bitmap = 0;
+  memset(packet.reserved, 0, sizeof(packet.reserved));
+  packet.ie_buffer_length = 0;
+  // Not assigning anything to packet.ie_buffer as it has not been allocated any memory.
+
+  // Send the command to firmware
+  status = sli_wifi_send_command(SLI_WIFI_REQ_VENDOR_IE,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &packet,
+                                 sizeof(packet),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_VENDOR_IE_CMD_TIMEOUT),
+                                 NULL,
+                                 NULL);
+
+  VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
 

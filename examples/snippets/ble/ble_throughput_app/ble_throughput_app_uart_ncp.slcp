@@ -3,8 +3,7 @@ package: bluetooth_le_siwx91x_app
 quality: production
 label: BLE - Throughput (UART NCP)
 category: Example|BLE
-description: 'This application demonstrates how to exchange continuous data to the
-  remote  device to measure the On-Air Throughput using a BLE Sniffer.
+description: 'This application demonstrates how to exchange continuous data to the remote  device to measure the On-Air Throughput using a BLE Sniffer.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -76,3 +72,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

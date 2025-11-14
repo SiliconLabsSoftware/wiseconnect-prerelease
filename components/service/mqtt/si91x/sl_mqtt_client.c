@@ -40,6 +40,8 @@
 #include "sl_status.h"
 #include "sli_wifi_constants.h"
 #include "sli_wifi_utility.h"
+#include "sl_rsi_utility.h"
+
 /**
  * MQTT CLIENT STATE MACHINE
 ========================================================================|
@@ -147,8 +149,8 @@ static void sli_si91x_get_subscription(const sl_mqtt_client_t *client,
     char *subscribed_topic_save_ptr = NULL;
     char *received_topic_save_ptr   = NULL;
 
-    char *subscribed_topic_token     = NULL;
-    const char *received_topic_token = NULL;
+    char *subscribed_topic_token = NULL;
+    char *received_topic_token   = NULL;
 
     subscribed_topic_token =
       strtok_r((char *)subscribed_topic, SLI_SI91X_MQTT_CLIENT_TOPIC_DELIMITER, &subscribed_topic_save_ptr);
@@ -170,8 +172,7 @@ static void sli_si91x_get_subscription(const sl_mqtt_client_t *client,
 
       // if subscribed_topic_token isn't wildcard and tokens does not match, break the loop and continue searching with other subscriptions.
       if (!is_wild_card
-          && ((subscribe_topic_length
-               != sl_strnlen((char *)received_topic_token, SI91X_MQTT_CLIENT_TOPIC_MAXIMUM_LENGTH))
+          && ((subscribe_topic_length != sl_strnlen(received_topic_token, SI91X_MQTT_CLIENT_TOPIC_MAXIMUM_LENGTH))
               || memcmp(subscribed_topic_token, received_topic_token, subscribe_topic_length) != 0)) {
         break;
       } else if (is_multi_level_wild_card) {
@@ -1059,4 +1060,53 @@ void sli_mqtt_client_cleanup()
   sli_si91x_remove_and_free_all_subscriptions(mqtt_client);
   memset(mqtt_client, 0, sizeof(sl_mqtt_client_t));
   mqtt_client = NULL;
+}
+
+sl_status_t sl_mqtt_client_connect_v2(sl_mqtt_client_t *client,
+                                      const sl_mqtt_broker_t *broker,
+                                      const sl_mqtt_client_last_will_message_t *last_will_message,
+                                      const sl_mqtt_client_configuration_v2_t *configuration,
+                                      uint32_t connect_timeout)
+{
+  sl_status_t status;
+
+  if (configuration == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  /* If TLS + SNI requested, program SNI into firmware before CONNECT.
+     Use either prebuilt sni_extension or host_name from v2 config. */
+  if (configuration->mqtt_use_sni) {
+    // Convert public socket type to internal TLS extension type
+    sli_si91x_tls_extension_info_t *internal_sni = NULL;
+
+    if (configuration->sni_extension != NULL) {
+      internal_sni = (sli_si91x_tls_extension_info_t *)malloc(sizeof(sli_si91x_tls_extension_info_t)
+                                                              + configuration->sni_extension->length);
+      if (internal_sni == NULL) {
+        return SL_STATUS_ALLOCATION_FAILED;
+      }
+
+      internal_sni->type   = configuration->sni_extension->type;
+      internal_sni->length = configuration->sni_extension->length;
+      memcpy(internal_sni->value, configuration->sni_extension->value, configuration->sni_extension->length);
+    }
+
+    status = sli_configure_sni(internal_sni, configuration->host_name, SI91X_SNI_FOR_MQTT);
+
+    if (internal_sni != NULL) {
+      free(internal_sni);
+    }
+
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+  }
+
+  status = sl_mqtt_client_connect(client,
+                                  broker,
+                                  last_will_message,
+                                  (const sl_mqtt_client_configuration_t *)configuration,
+                                  connect_timeout);
+  return status;
 }

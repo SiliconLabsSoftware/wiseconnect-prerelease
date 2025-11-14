@@ -1,15 +1,11 @@
 project_name: sl_si91x_uart
 package: platform_siwx91x_app
-description: 'This application demonstrates the usage of UART transmits and receives
-  data in full duplex mode.
+description: 'This application demonstrates the usage of UART transmits and receives data in full duplex mode.
 
   '
 category: example|peripheral
 quality: production
 label: SI91x - SL_UART
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -41,3 +37,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

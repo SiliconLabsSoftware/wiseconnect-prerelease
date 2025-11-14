@@ -54,6 +54,15 @@
 #define DMA_INSTANCE 0
 #endif
 #define DMA_CHANNEL 1
+// Define macros for repeated operations
+#define CONFIGURE_ADC_ULP_GPIO(gpio_pin)     \
+  RSI_EGPIO_UlpPadReceiverDisable(gpio_pin); \
+  RSI_EGPIO_SetPinMux(EGPIO1, 0, gpio_pin, ANALOG_MODE)
+
+#define CONFIGURE_ADC_TOP_GPIO(gpio_pin)       \
+  RSI_EGPIO_PadReceiverDisable(gpio_pin);      \
+  RSI_EGPIO_HostPadsGpioModeDisable(gpio_pin); \
+  RSI_EGPIO_SetPinMux(EGPIO, 0, gpio_pin, TGPIO_ANALOG_MODE)
 // ADC internal structure
 adc_inter_config_t adcInterConfig;
 adc_commn_config_t adc_commn_config;
@@ -94,6 +103,10 @@ int16_t __attribute__((section(".adc_multi_ch_buf_ps4_addr"))) adc_output_buf[UD
 extern RSI_UDMA_DESC_T __attribute__((section(".udma_addr1"))) UDMA1_Table[32];
 #endif // defined (__GNUC__)
 #endif
+
+static void ADC_ConfigurePositiveInputPin(uint8_t pos_input_pinsel);
+static void ADC_ConfigureNegativeInputPin(uint8_t neg_input_pinsel);
+
 /** @addtogroup SOC13
 * @{
 */
@@ -1033,7 +1046,31 @@ rsi_error_t ADC_ChannelsDataSort(uint8_t data_select)
 #endif
   return RSI_OK;
 }
-
+/**
+ * @fn     uint8_t is_offset_used_by_channel(uint16_t offset, uint16_t max_factor, uint8_t ch_num)
+ * @brief  Checks if a specific offset value is already used by any channel
+ * 
+ * @param  offset     The offset value to check
+ * @param  max_factor Maximum factor to consider for checking
+ * @param  ch_num     Number of channels to check against
+ * @return 1 if offset is used by any channel, 0 otherwise
+ */
+STATIC INLINE uint8_t is_offset_used_by_channel(uint16_t offset, uint16_t max_factor, uint8_t ch_num)
+{
+  uint8_t used = 0;
+  for (uint16_t n = 0; n < ch_num; n++) {
+    for (uint16_t m = adcInterConfig.ch_offset_val[n]; m < max_factor; m += adcInterConfig.ch_sampling_factor[n]) {
+      if (offset == m) {
+        used = 1;
+        break;
+      }
+    }
+    if (used) {
+      break;
+    }
+  }
+  return used;
+}
 /*==============================================*/
 /**
  * @fn     rsi_error_t cal_adc_channel_offset(void)
@@ -1046,7 +1083,6 @@ rsi_error_t cal_adc_channel_offset(void)
 {
   uint8_t ch_num;
   uint16_t max_chan_swallo_fac = 0;
-  uint16_t cnt;
 
   // Find out max number of channel frequency value
   for (ch_num = 0; ch_num < adc_commn_config.num_of_channel_enable; ch_num++) {
@@ -1055,25 +1091,13 @@ rsi_error_t cal_adc_channel_offset(void)
     }
   }
   // Find out channels offset based on channels frequency value
-  for (ch_num = 0; ch_num < adc_commn_config.num_of_channel_enable; ch_num++) {
-    if (ch_num == 0) {
-      adcInterConfig.ch_offset_val[adc_channel] = ch_num;
-    } else {
-      for (uint16_t i = 0; i < max_chan_swallo_fac; i++) {
-        cnt = 0;
-        for (uint16_t n = 0; n < ch_num; n++) {
-          for (uint16_t m = adcInterConfig.ch_offset_val[n]; m < max_chan_swallo_fac;
-               m += adcInterConfig.ch_sampling_factor[n]) {
-            if (i == m) {
-              cnt++;
-              break;
-            }
-          }
-        }
-        if (!cnt) {
-          adcInterConfig.ch_offset_val[ch_num] = i;
-          break;
-        }
+  adcInterConfig.ch_offset_val[adc_channel] = 0;
+  for (ch_num = 1; ch_num < adc_commn_config.num_of_channel_enable; ch_num++) {
+    for (uint16_t i = 0; i < max_chan_swallo_fac; i++) {
+      // Check if offset 'i' is already used by any previously configured channel
+      if (!is_offset_used_by_channel(i, max_chan_swallo_fac, ch_num)) {
+        adcInterConfig.ch_offset_val[ch_num] = i;
+        break;
       }
     }
   }
@@ -1240,105 +1264,136 @@ float get_min_sampling_time(uint8_t number_of_channel, adc_ch_config_t adcChConf
  */
 rsi_error_t ADC_PinMux(uint8_t pos_input_pinsel, uint8_t neg_input_pinsel, uint8_t input_type)
 {
-  if (pos_input_pinsel == POS0) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO0);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO0, ANALOG_MODE);
+  // Configure positive input pins
+  if (pos_input_pinsel <= POS19) {
+    ADC_ConfigurePositiveInputPin(pos_input_pinsel);
+  } else if (input_type) {
+    // Configure negative input pins (or differential mode inputs)
+    ADC_ConfigureNegativeInputPin(neg_input_pinsel);
   }
-  if (pos_input_pinsel == POS1) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO2);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO2, ANALOG_MODE);
-  }
-  if (pos_input_pinsel == POS2) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO4);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO4, ANALOG_MODE);
-  }
-  if (pos_input_pinsel == POS3) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO6);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO6, ANALOG_MODE);
-  }
-  if (pos_input_pinsel == POS4) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO8);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO8, ANALOG_MODE);
-  }
-  if (pos_input_pinsel == POS5) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO10);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO10, ANALOG_MODE);
-  }
-  if (pos_input_pinsel == POS6) {
-    *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO25);
-    RSI_EGPIO_HostPadsGpioModeDisable(ADC_TOPGPIO25);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO25, TGPIO_ANALOG_MODE);
-  }
-  if (pos_input_pinsel == POS7) {
-    *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO27);
-    RSI_EGPIO_HostPadsGpioModeDisable(ADC_TOPGPIO27);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO27, TGPIO_ANALOG_MODE);
-  }
-  if (pos_input_pinsel == POS8) {
-    *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO29);
-    RSI_EGPIO_HostPadsGpioModeDisable(ADC_TOPGPIO29);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO29, TGPIO_ANALOG_MODE);
-  }
-#ifdef CHIP_9118
-  if (pos_input_pinsel == POS9) {
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO23);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO23, TGPIO_ANALOG_MODE);
-  }
-#endif
-  if ((pos_input_pinsel == POS10) || ((neg_input_pinsel == POS0) && (input_type == POS1))) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO1);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO1, ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS11) || ((neg_input_pinsel == POS1) && (input_type == POS1))) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO3);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO3, ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS12) || ((neg_input_pinsel == POS2) && (input_type == POS1))) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO5);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO5, ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS13) || ((neg_input_pinsel == POS3) && (input_type == POS1))) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO11);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO11, ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS14) || ((neg_input_pinsel == POS4) && (input_type == POS1))) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO9);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO9, ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS15) || ((neg_input_pinsel == POS5) && (input_type == POS1))) {
-    RSI_EGPIO_UlpPadReceiverDisable(ADCGPIO7);
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, ADCGPIO7, ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS16) || ((neg_input_pinsel == POS6) && (input_type == POS1))) {
-    *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO26);
-    RSI_EGPIO_HostPadsGpioModeDisable(ADC_TOPGPIO26);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO26, TGPIO_ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS17) || ((neg_input_pinsel == POS7) && (input_type == POS1))) {
-    *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO28);
-    RSI_EGPIO_HostPadsGpioModeDisable(ADC_TOPGPIO28);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO28, TGPIO_ANALOG_MODE);
-  }
-  if ((pos_input_pinsel == POS18) || ((neg_input_pinsel == POS8) && (input_type == POS1))) {
-    *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO30);
-    RSI_EGPIO_HostPadsGpioModeDisable(ADC_TOPGPIO30);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO30, TGPIO_ANALOG_MODE);
-  }
-#ifdef CHIP_9118
-  if ((pos_input_pinsel == POS19) || ((neg_input_pinsel == POS9) && (input_type == POS1))) {
-    RSI_EGPIO_PadReceiverDisable(ADC_TOPGPIO24);
-    RSI_EGPIO_SetPinMux(EGPIO, 0, ADC_TOPGPIO24, TGPIO_ANALOG_MODE);
-  }
-#endif
+
   return RSI_OK;
 }
 
+static void ADC_ConfigurePositiveInputPin(uint8_t pos_input_pinsel)
+{
+  switch (pos_input_pinsel) {
+    case POS0:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO0);
+      break;
+    case POS1:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO2);
+      break;
+    case POS2:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO4);
+      break;
+    case POS3:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO6);
+      break;
+    case POS4:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO8);
+      break;
+    case POS5:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO10);
+      break;
+    case POS6:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO25);
+      break;
+    case POS7:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO27);
+      break;
+    case POS8:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO29);
+      break;
+#ifdef CHIP_9118
+    case POS9:
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO23);
+      break;
+#endif
+    case POS10:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO1);
+      break;
+    case POS11:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO3);
+      break;
+    case POS12:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO5);
+      break;
+    case POS13:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO11);
+      break;
+    case POS14:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO9);
+      break;
+    case POS15:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO7);
+      break;
+    case POS16:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO26);
+      break;
+    case POS17:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO28);
+      break;
+    case POS18:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO30);
+      break;
+#ifdef CHIP_9118
+    case POS19:
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO24);
+      break;
+#endif
+    default:
+      break;
+  }
+}
+
+static void ADC_ConfigureNegativeInputPin(uint8_t neg_input_pinsel)
+{
+  // Configure negative input pins for differential mode
+  switch (neg_input_pinsel) {
+    case POS0:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO1);
+      break;
+    case POS1:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO3);
+      break;
+    case POS2:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO5);
+      break;
+    case POS3:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO11);
+      break;
+    case POS4:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO9);
+      break;
+    case POS5:
+      CONFIGURE_ADC_ULP_GPIO(ADCGPIO7);
+      break;
+    case POS6:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO26);
+      break;
+    case POS7:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO28);
+      break;
+    case POS8:
+      *(volatile uint32_t *)(SDIO_HOST_CONTROL_IN_M4) = BIT(5);
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO30);
+      break;
+    case POS9:
+      CONFIGURE_ADC_TOP_GPIO(ADC_TOPGPIO24);
+      break;
+    default:
+      break;
+  }
+}
 /*==============================================*/
 /**
  * @fn           rsi_error_t RSI_ADC_PingPongMemoryAdrConfig(AUX_ADC_DAC_COMP_Type *pstcADC, 

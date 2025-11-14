@@ -42,6 +42,25 @@
 // Maximum number of stations associated when running as an AP
 #define SLI_WIFI_MAX_STATIONS 16
 
+// -----------------------------------------------------------------------------
+// Internal macros and enums for vendor-specific IE management
+// -----------------------------------------------------------------------------
+
+/// Defines the maximum number of vendor-specific IEs that can be configured.
+#define SLI_WIFI_MAX_VENDOR_IE 2
+
+// Defines the Header length in vendor-specific IE buffer.
+#define SLI_WIFI_VENDOR_IE_HEADER_LENGTH 2
+
+/// Defines the maximum length of the vendor-specific IE buffer 256 Bytes (254 bytes for data + 2 bytes for header).
+#define SLI_WIFI_MAX_VENDOR_IE_BUFFER_LENGTH (254 + SLI_WIFI_VENDOR_IE_HEADER_LENGTH)
+
+/// Defines the frame version for vendor-specific IE.
+#define SLI_WIFI_VENDOR_IE_FRAME_VERSION 0
+
+/// Timeout for vendor-specific commands (1 sec).
+#define SLI_WIFI_VENDOR_IE_CMD_TIMEOUT 1000
+
 #define SLI_WIFI_COUNTRY_CODE_LENGTH  3
 #define SLI_WIFI_MAX_POSSIBLE_CHANNEL 24
 
@@ -247,8 +266,11 @@ typedef struct {
   /// DTIM period of the access point
   uint16_t dtim_period;
 
-  /// This is the bitmap to enable AP keep alive functionality and to select the keep alive type.
-  uint8_t ap_keepalive_type;
+  /// Bitmap controlling AP keep alive type, and Hidden SSID dynamic configurability.
+  /// 0-1st bit - keepalive type
+  /// 2nd bit - beacon stop
+  /// 3rd bit - Hidden SSID dynamic configurability
+  uint8_t options;
 
   /// Keep alive time after which AP will disconnect the station if there are no wireless exchanges from station to AP.
   uint8_t ap_keepalive_period;
@@ -498,4 +520,27 @@ typedef struct {
   } channel_info[SLI_WIFI_MAX_POSSIBLE_CHANNEL];
 } sli_wifi_set_region_ap_request_t;
 
+/***************************************************************************/ /**
+ * @brief
+ *   Enum to specify the action for vendor-specific IE management.
+ ******************************************************************************/
+typedef enum SL_ATTRIBUTE_PACKED {
+  SLI_WIFI_VENDOR_IE_ACTION_ADD        = 0,   ///< Add a vendor-specific IE
+  SLI_WIFI_VENDOR_IE_ACTION_REMOVE     = 1,   ///< Remove a vendor-specific IE
+  SLI_WIFI_VENDOR_IE_ACTION_REMOVE_ALL = 0xFF ///< Remove all vendor-specific IEs
+} sli_wifi_vendor_ie_action_t;
+
+/***************************************************************************/ /**
+ * @brief
+ *   Packet structure for sending vendor-specific IE to firmware.
+ ******************************************************************************/
+typedef struct {
+  uint16_t version;           ///< Version number for the structure
+  uint8_t action;             ///< Action to perform (Add, Remove, Remove All)
+  uint8_t unique_id;          ///< Unique ID for the IE (must be < SLI_MAX_VENDOR_IE)
+  uint16_t mgmt_frame_bitmap; ///< Bitmap indicating which management frames to include the IE in
+  uint8_t reserved[4];        ///< Reserved for future use
+  uint16_t ie_buffer_length;  ///< Length of the IE buffer (must be < SLI_MAX_VENDOR_IE_BUFFER_LENGTH)
+  uint8_t ie_buffer[];        ///< Flexible array for raw IE buffer
+} sli_wifi_manage_vendor_ie_packet_t;
 #endif

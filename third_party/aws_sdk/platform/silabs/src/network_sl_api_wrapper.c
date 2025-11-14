@@ -365,6 +365,10 @@ IoT_Error_t iot_tls_read(Network *pNetwork, unsigned char *pMsg, size_t len, Tim
       SL_DEBUG_LOG("Error: Semaphore acquisition timed out. Puback not received.\n");
       return MQTT_REQUEST_TIMEOUT_ERROR; // Return an error code indicating that the MQTT request timed out.
   }
+  if (select_status == osErrorParameter) {
+    SL_DEBUG_LOG("Error: Invalid parameter in semaphore acquisition.\n");
+    return NETWORK_SSL_READ_ERROR; // Return a generic failure code for parameter error.
+  }
   qos1_publish_handle = 1;
   pub_state = 0;
   select_given        = 0;

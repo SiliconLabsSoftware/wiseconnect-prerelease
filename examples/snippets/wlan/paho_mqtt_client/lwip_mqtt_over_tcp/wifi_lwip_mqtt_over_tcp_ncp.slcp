@@ -3,9 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Paho LwIP MQTT OVER TCP (NCP)
 category: Example|Wi-Fi
-description: 'Demonstrates how SiWx91x device is configured as an MQTT client over
-  TCP, connects to an MQTT broker, subscribes to a topic, and publishes messages on
-  a particular MQTT topic using the Paho MQTT library with lwip support
+description: 'Demonstrates how SiWx91x device is configured as an MQTT client over TCP, connects to an MQTT broker, subscribes to a topic, and publishes messages on a particular MQTT topic using the Paho MQTT library with lwip support
 
   '
 filter:
@@ -15,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -37,7 +32,34 @@ component:
 - id: freertos_heap_4
 - id: wiseconnect_common
 - id: wifi
-- id: mbedtls
+- id: mbedtls_tls
+- id: mbedtls_x509
+- id: mbedtls_random
+- id: mbedtls_cipher
+- id: mbedtls_hash
+- id: mbedtls_ecdh
+- id: mbedtls_ecc
+- id: mbedtls_asn1
+- id: mbedtls_ecdhe_key_exchange
+- id: mbedtls_sha256
+- id: mbedtls_sha512
+- id: psa_crypto_tls12_prf
+- id: psa_crypto
+- id: psa_crypto_hmac
+- id: psa_crypto_sha256
+- id: psa_crypto_sha384
+- id: mbedtls_hkdf
+- id: mbedtls_source
+- id: mbedtls_oid
+- id: mbedtls_rsa
+- id: mbedtls_cipher_cbc
+- id: mbedtls_ecdsa
+- id: mbedtls_ccm
+- id: mbedtls_gcm
+- id: mbedtls_aes
+- id: mbedtls_md5
+- id: mbedtls_cmac
+- id: mbedtls_config
 - id: sl_si91x_lwip_stack
 - id: wifi_resources
 - id: network_manager
@@ -78,7 +100,20 @@ other_file:
 - path: resources/readme/mqtt_explorer_msg.png
 - path: resources/readme/mqtt_publish_msg_from_explorer.png
 - path: resources/readme/setup_soc_ncp.png
+template_contribution:
+- name: psa_crypto_config
+  value: PSA_WANT_ALG_HKDF_EXTRACT 1
+- name: psa_crypto_config
+  value: PSA_WANT_ALG_HKDF_EXPAND 1
 ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

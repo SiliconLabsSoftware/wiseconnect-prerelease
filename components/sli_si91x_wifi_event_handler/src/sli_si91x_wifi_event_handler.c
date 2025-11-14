@@ -336,6 +336,12 @@ static sl_status_t bus_write_frame(sli_wifi_command_queue_t *queue,
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG("\r\n BUS_WRITE_ERROR \r\n");
     node->frame_status = SL_STATUS_BUS_ERROR;
+#ifdef SLI_SI91X_ENABLE_BLE
+    // Notify BLE stack that transmission is done
+    if (command_type == SLI_SI91X_BT_CMD) {
+      rsi_bt_common_tx_done(packet, status);
+    }
+#endif
     // Flush the current packet
     sli_flush_tx_packet(queue, buffer, node, SL_STATUS_BUS_ERROR, node->event_mask);
     sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_BUS_ERROR);
@@ -374,7 +380,7 @@ static sl_status_t bus_write_frame(sli_wifi_command_queue_t *queue,
 #ifdef SLI_SI91X_ENABLE_BLE
     // Notify BLE stack that transmission is done
     if (command_type == SLI_SI91X_BT_CMD) {
-      rsi_bt_common_tx_done(packet);
+      rsi_bt_common_tx_done(packet, status);
     }
 #endif
     // Free the host packet and buffer after successful transmission
@@ -827,7 +833,8 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
           case SLI_WIFI_RSP_TRANSCEIVER_FLUSH_DATA_Q:
           case SLI_WLAN_RSP_TRANSCEIVER_TX_DATA_STATUS:
           case SLI_WIFI_RSP_HT_CAPABILITIES:
-          case SLI_WIFI_RSP_SET_MULTICAST_FILTER: {
+          case SLI_WIFI_RSP_SET_MULTICAST_FILTER:
+          case SLI_WIFI_RSP_VENDOR_IE: {
             ++cmd_queues[SLI_WIFI_WLAN_CMD].rx_counter;
 
             // Marking a received frame as not in flight when it matches the expected type

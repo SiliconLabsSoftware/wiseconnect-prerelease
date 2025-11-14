@@ -105,8 +105,8 @@ static sl_status_t sli_setup_sni_if_required(uint16_t flags, const uint8_t *host
     return SL_STATUS_NULL_POINTER;
   }
 
-  sl_si91x_socket_type_length_value_t *set_sni = (sl_si91x_socket_type_length_value_t *)malloc(
-    sizeof(sl_si91x_socket_type_length_value_t) + sl_strlen((const char *)host_name));
+  sli_si91x_tls_extension_info_t *set_sni = (sli_si91x_tls_extension_info_t *)malloc(
+    sizeof(sli_si91x_tls_extension_info_t) + sl_strlen((const char *)host_name));
   if (set_sni == NULL) {
     return SL_STATUS_ALLOCATION_FAILED;
   }
@@ -116,7 +116,7 @@ static sl_status_t sli_setup_sni_if_required(uint16_t flags, const uint8_t *host
   set_sni->length = (uint16_t)sl_strlen((const char *)host_name);
   memcpy(set_sni->value, host_name, set_sni->length);
 
-  sl_status_t status = sli_si91x_set_sni_for_embedded_socket(set_sni);
+  sl_status_t status = sli_si91x_set_sni_for_embedded_socket(set_sni, SI91X_SNI_FOR_HTTPS);
   free(set_sni);
 
   return status;

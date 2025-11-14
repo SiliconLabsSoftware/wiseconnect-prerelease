@@ -3,8 +3,7 @@ package: multi_protocol_siwx91x_app
 quality: production
 label: wifi_https_ble_dual_role_ncp
 category: Example|Wi-Fi_BLE
-description: 'This example demonstrates the ability of SiWx91x device connecting and
-  transferring the data simultaneously in BLE/WiFi wireless interfaces.
+description: 'This example demonstrates the ability of SiWx91x device connecting and transferring the data simultaneously in BLE/WiFi wireless interfaces.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Advanced
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 - path: ble_main_task.c
@@ -89,3 +85,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

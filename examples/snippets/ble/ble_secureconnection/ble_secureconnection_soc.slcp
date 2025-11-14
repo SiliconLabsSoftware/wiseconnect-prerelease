@@ -3,8 +3,7 @@ package: bluetooth_le_siwx91x_app
 quality: production
 label: BLE - Secure Connection (SoC)
 category: Example|BLE
-description: 'This application demonstrates the SMP (Security Manager Protocol) pairing
-  and  a secured passkey pairing feature.
+description: 'This application demonstrates the SMP (Security Manager Protocol) pairing and  a secured passkey pairing feature.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -71,3 +67,11 @@ ui_hints:
     focus: true
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

@@ -3,8 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Provisioning via Access Point (NCP)
 category: Example|Wi-Fi
-description: 'Start Wi-Fi provisioning via Access Point, displaying scan results on
-  an HTTP server, and connecting to a third-party Access Point using the STA instance.
+description: 'Start Wi-Fi provisioning via Access Point, displaying scan results on an HTTP server, and connecting to a third-party Access Point using the STA instance.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -74,3 +70,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

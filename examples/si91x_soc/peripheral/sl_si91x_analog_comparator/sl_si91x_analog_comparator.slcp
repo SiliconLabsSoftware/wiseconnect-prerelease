@@ -1,16 +1,11 @@
 project_name: sl_si91x_analog_comparator
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and usage of the Analog
-  Comparator interface  on the Si91x SoC, enabling the comparison of analog input
-  signals for threshold detection  and decision-making in embedded applications.
+description: 'This application demonstrates the configuration and usage of the Analog Comparator interface  on the Si91x SoC, enabling the comparison of analog input signals for threshold detection  and decision-making in embedded applications.
 
   '
 category: example|peripheral
 quality: production
 label: SI91x - SL ANALOG COMPARATOR
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -50,3 +45,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

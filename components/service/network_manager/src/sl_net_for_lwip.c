@@ -475,7 +475,11 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
   VERIFY_STATUS_AND_RETURN(status);
 
   status = set_sta_link_up(&profile);
-  VERIFY_STATUS_AND_RETURN(status);
+  if (status != SL_STATUS_OK) {
+    // Disconnect WiFi on IP configuration failure
+    sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
+    return status;
+  }
 #if LWIP_IPV4 && LWIP_IPV6
   if ((profile.ip.type & SL_IPV4) == SL_IPV4) {
     ip_addr_t *addr;

@@ -14651,7 +14651,7 @@ typedef struct { /*!< (@ 0x24043800) AUX_ADC_DAC_COMP Structure */
                                     when buffer is wake up time (number
                                            of clock cycles) , dependant upon AUX
                                     ADC latency.                        */
-      __IOM unsigned int EN_ADC_TRUN_OFF : 1;  /*!< [26..26] Enable power save mode to turn off
+      __IOM unsigned int EN_ADC_TURN_OFF : 1;  /*!< [26..26] Enable power save mode to turn off
                                    AUX ADC when sampling clock is idle and enable
                                    it before sampling event, programmed by
                                    adc_wake_up_time */

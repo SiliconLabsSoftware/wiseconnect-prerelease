@@ -151,7 +151,7 @@ To enable hardware flow control for the USART:
 >
 ## Configuring higher clock
 
-- To achieve baud rates exceeding 2 million bps, need to modify the clock source to INTF PLL CLK in the UC. 
+- To achieve baud rates exceeding 2 million bps, need to modify the clock source to INTF PLL CLK or SoC PLL CLK in the UC. 
 
 > **Note**:
 >

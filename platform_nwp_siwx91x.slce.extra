@@ -2,8 +2,6 @@ id: platform_nwp_siwx91x
 examples: []
 sample_apps: []
 description: ' '
-dependencies:
-- platform_siwx91x/4.0.0-alpha.4@silabs
 components:
 - sl_si91x_cpc_sdio
 - sl_si91x_cpc_security

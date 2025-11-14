@@ -36,6 +36,10 @@
 #if SL_WIFI_COMPONENT_INCLUDED
 #include "sl_rsi_utility.h"
 #endif
+
+#if defined(SL_LOG_SI91X_PLATFORM_CORE) && (SL_LOG_SI91X_PLATFORM_CORE == 1)
+#include "sl_log_platform_specific.h"
+#endif
 /*******************************************************************************
  ***************************  DEFINES / MACROS   ********************************
  ******************************************************************************/
@@ -243,6 +247,10 @@ sl_status_t sl_si91x_power_manager_sleep(void)
     return SL_STATUS_BUSY;
   }
 #endif
+#if defined(SL_LOG_SI91X_PLATFORM_CORE) && (SL_LOG_SI91X_PLATFORM_CORE == 1)
+  sl_log_api_core_t *sl_log_core_api = sl_log_get_api_core();
+  sl_log_core_api->pre_sleep_process(NULL);
+#endif
   do {
     // Internal function to change active mode to sleep mode is called.
     // It sets the required configurations and goes into sleep mode.
@@ -257,6 +265,9 @@ sl_status_t sl_si91x_power_manager_sleep(void)
   if (status != SL_STATUS_OK) {
     return status;
   }
+#if defined(SL_LOG_SI91X_PLATFORM_CORE) && (SL_LOG_SI91X_PLATFORM_CORE == 1)
+  sl_log_core_api->post_sleep_process(NULL);
+#endif
   // Notifies the state transition who has subscribed to it.
   notify_power_state_transition(SL_SI91X_POWER_MANAGER_SLEEP, current_state);
   // If it reaches here, then returns SL_STATUS_OK

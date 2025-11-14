@@ -34,6 +34,7 @@
 #include "sl_net_constants.h"
 #include "sl_ip_types.h"
 #include "sl_wifi_device.h"
+#include "sl_si91x_socket_utility.h"
 
 typedef enum MQTTStatus {
   MQTTSuccess = 0,     /**< Function completed successfully. */
@@ -165,7 +166,8 @@ typedef enum {
   SL_MQTT_TLS_TLSV_1_2     = BIT(3), ///< Enable TLS version 1.2 for MQTT.
   SL_MQTT_TLS_TLSV_1_3     = BIT(4), ///< Enable TLS version 1.3 for MQTT.
   SL_MQTT_TLS_CERT_INDEX_1 = BIT(5), ///< Use certificate index 1 for MQTT.
-  SL_MQTT_TLS_CERT_INDEX_2 = BIT(6)  ///< Use certificate index 2 for MQTT.
+  SL_MQTT_TLS_CERT_INDEX_2 = BIT(6), ///< Use certificate index 2 for MQTT.
+  SL_MQTT_TLS_SNI_ENABLE   = BIT(7)  ///< Enable Server Name Indication (SNI) extension for MQTT.
 } sl_mqtt_tls_flag_t;
 
 /** @} */
@@ -266,6 +268,33 @@ typedef struct {
     client_id_length; ///< Length of the client ID string. Should not exceed 60 bytes including NULL termination character.
   sl_mqtt_tls_flag_t tls_flags; ///< TLS flags for various MQTT options. See @ref sl_mqtt_tls_flag_t for details.
 } sl_mqtt_client_configuration_t;
+
+/**
+ * @brief 
+ *   MQTT Client Configuration structure v2.
+ * 
+ * @details
+ *   This structure holds the configuration parameters for the MQTT client, that includes connection settings, retry policies, session options, and security credentials.
+ *   It also provides fields for Server Name Indication (SNI) support, allowing the client to specify a hostname or custom SNI extension for secure TLS connections.
+ */
+typedef struct {
+  bool auto_reconnect;            ///< Whether to automatically reconnect to the broker in case of disconnection.
+  uint8_t retry_count;            ///< Maximum number of retry attempts for auto reconnect.
+  uint16_t minimum_back_off_time; ///< Minimum back-off time (in seconds) between two successive reconnect attempts.
+  uint16_t maximum_back_off_time; ///< Maximum back-off time (in seconds) between two successive reconnect attempts.
+  bool is_clean_session;          ///< Clean session flag to send to the broker in the connect request.
+  sl_mqtt_version_t mqt_version;  ///< MQTT protocol version used by the client.
+  uint16_t client_port;           ///< Port number used by the client for the connection.
+  sl_net_credential_id_t
+    credential_id;    ///< Credential ID for the username and password used in the MQTT connect request.
+  uint8_t *client_id; ///< Pointer to the MQTT client ID string.
+  uint8_t
+    client_id_length; ///< Length of the client ID string. Should not exceed 60 bytes including NULL termination character.
+  sl_mqtt_tls_flag_t tls_flags; ///< TLS flags for various MQTT options. See @ref sl_mqtt_tls_flag_t for details.
+  bool mqtt_use_sni;            ///< Enable or disable the use of Server Name Indication (SNI) extension in MQTT.
+  uint8_t *host_name;           ///< Hostname to use in SNI.
+  sl_si91x_socket_type_length_value_t *sni_extension; ///< SNI extension.
+} sl_mqtt_client_configuration_v2_t;
 
 /**
  * @typedef sl_mqtt_client_event_handler_t

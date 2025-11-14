@@ -6,9 +6,6 @@ description: 'demostrate Sysrtc functionality.
 category: example|peripheral
 quality: production
 label: SI91x - SL_SYSRTC
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -41,6 +38,8 @@ other_file:
 - path: resources/readme/setupdiagram.png
 - path: resources/readme/image509d.png
 - path: resources/readme/output.png
+- path: resources/readme/output_prs_out.png
+- path: resources/readme/output_prs_in.png
 ui_hints:
   highlight:
   - path: readme.md
@@ -49,3 +48,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

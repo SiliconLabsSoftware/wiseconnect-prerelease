@@ -150,7 +150,7 @@ sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
       break;
     }
     case SL_NET_WIFI_PMK: {
-      // PMK must be exactly 64 characters
+      // PMK must be exactly 32 bytes in hex format
       if (credential_length != SL_WIFI_MAX_PMK_LENGTH) {
         SL_DEBUG_LOG("\n PMK: Invalid credential length: %ld\n", credential_length);
         return SL_STATUS_INVALID_PARAMETER;

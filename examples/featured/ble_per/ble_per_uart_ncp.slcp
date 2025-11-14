@@ -3,8 +3,7 @@ package: bluetooth_le_siwx91x_app
 quality: production
 label: ble_per
 category: Example|BLE
-description: 'This application demonstrates how to configure the necessary parameters
-  to start transmitting or receiving BLE PER packets.
+description: 'This application demonstrates how to configure the necessary parameters to start transmitting or receiving BLE PER packets.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -71,3 +67,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

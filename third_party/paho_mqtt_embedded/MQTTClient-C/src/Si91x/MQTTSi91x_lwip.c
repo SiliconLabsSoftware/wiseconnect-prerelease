@@ -245,16 +245,12 @@ static int mqtt_tls_init(mqtt_tls_context_t *tls_ctx, int socket_fd, const char 
   // Configure RNG
   mbedtls_ssl_conf_rng(&tls_ctx->conf, mbedtls_ctr_drbg_random, &tls_ctx->ctr_drbg);
 
-  // Increase handshake timeout for better compatibility
-  mbedtls_ssl_conf_handshake_timeout(&tls_ctx->conf,
-                                     MQTT_TLS_HANDSHAKE_TIMEOUT_MIN_MS,
-                                     MQTT_TLS_HANDSHAKE_TIMEOUT_MAX_MS);
-
-  // Disable all optional features to save memory
-  mbedtls_ssl_conf_session_tickets(&tls_ctx->conf, MBEDTLS_SSL_SESSION_TICKETS_DISABLED);
-
-  // Disable renegotiation to save memory
-  mbedtls_ssl_conf_renegotiation(&tls_ctx->conf, MBEDTLS_SSL_RENEGOTIATION_DISABLED);
+  // Note: Optional SSL feature configuration calls removed due to SiSDK mbedTLS limitations
+  // These were used to disable features for memory optimization:
+  // - DTLS handshake timeout configuration (requires MBEDTLS_SSL_PROTO_DTLS support)
+  // - Session tickets disabled (requires MBEDTLS_SSL_SESSION_TICKETS support)
+  // - Renegotiation disabled (requires MBEDTLS_SSL_RENEGOTIATION support)
+  // SiSDK mbedTLS components provide these features in default disabled state
 
   ret = mbedtls_ssl_setup(&tls_ctx->ssl, &tls_ctx->conf);
   if (ret != 0) {

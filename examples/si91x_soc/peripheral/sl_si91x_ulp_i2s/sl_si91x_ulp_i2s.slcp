@@ -1,14 +1,9 @@
 project_name: sl_si91x_ulp_i2s
 package: platform_siwx91x_app
-description: "This application demonstrates how to use the I2S on the SI91x SoC device\
-  \ in Ultra Low Power mode.\nThis will execute in PS4 state then goes to PS2 and\
-  \ vice-versa. \n"
+description: "This application demonstrates how to use the I2S on the SI91x SoC device in Ultra Low Power mode.\nThis will execute in PS4 state then goes to PS2 and vice-versa. \n"
 category: example|peripheral
 quality: production
 label: SI91x - SL_ULP_I2S
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -63,3 +58,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

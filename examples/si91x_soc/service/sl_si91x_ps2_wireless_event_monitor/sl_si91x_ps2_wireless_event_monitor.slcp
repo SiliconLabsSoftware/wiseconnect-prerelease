@@ -6,9 +6,6 @@ description: 'This application demonstrates Wireless Event handling during PS2 s
 category: example|service
 quality: production
 label: SI91x - SL_SI91X_PS2_WIRELESS_EVENT_MONITOR
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: freertos
@@ -73,3 +70,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

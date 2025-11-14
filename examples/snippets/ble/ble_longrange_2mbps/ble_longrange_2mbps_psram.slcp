@@ -3,8 +3,7 @@ package: bluetooth_le_siwx91x_app
 quality: production
 label: BLE - Long Range (PSRAM)
 category: Example|BLE
-description: 'This application demonstrates how to configure/connects BLE device as
-  Central  and can be used to update the PHY rates.
+description: 'This application demonstrates how to configure/connects BLE device as Central  and can be used to update the PHY rates.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -73,3 +69,11 @@ ui_hints:
     focus: true
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

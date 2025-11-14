@@ -48,6 +48,13 @@
 
 //! @cond Doxygen_Suppress
 
+/// Internal structure for representing a TLS extension
+typedef struct {
+  uint16_t type;   ///< Specifies the TLS extension type.
+  uint16_t length; ///< Length of the value[] field.
+  uint8_t value[]; ///< Data corresponding to the specified extension type.
+} sli_si91x_tls_extension_info_t;
+
 /// Low Transmit Power Threshold for Wi-Fi.
 #define SLI_SI91X_LOW_TRANSMIT_POWER_THRESHOLD 6
 
@@ -602,5 +609,61 @@ void sli_flush_tx_packet(sli_wifi_command_queue_t *queue,
                          sli_si91x_queue_packet_t *queue_node,
                          uint16_t frame_status,
                          uint32_t event_mask);
+
+#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
+/**
+ * @brief 
+ *    Configures the Server Name Indication (SNI) extension for a socket.
+ *
+ *  @details
+ *    This function sets up the SNI extension, which is used in TLS communication
+ *    to specify the hostname of the server the client intends to connect to. It prepares
+ *    the necessary request structure and initiates the configuration process for the
+ *    embedded socket.
+ *
+ * @param[in] sni_extension 
+ *    Pointer to the SNI extension data of type `sl_si91x_socket_type_length_value_t`.
+ *    This structure contains the type, length, and value of the SNI extension.
+ * @param[in] sni_target_protocol
+ *    SNI target type (e.g., HTTPS or MQTT).
+ *
+ * @return sl_status_t
+ *    - SL_STATUS_OK: Operation completed successfully.
+ *    - SL_STATUS_WOULD_OVERFLOW: The SNI extension size exceeds the allowed limit.
+ *    - Other error codes: Refer to [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) 
+ *      and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details. 
+ */
+sl_status_t sli_si91x_set_sni_for_embedded_socket(const sli_si91x_tls_extension_info_t *sni_extension,
+                                                  sli_si91x_sni_target_protocol_t sni_target_protocol);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Configure SNI (Server Name Indication) extension for TLS connection.
+ *
+ * @details
+ *   This function configures the SNI extension for embedded socket TLS connections.
+ *   It can either use a pre-configured SNI extension structure or create one from
+ *   a hostname string. Callers using public socket types should convert to internal
+ *   sli_si91x_tls_extension_info_t before calling this function.
+ *
+ * @param[in] sni_extension
+ *   Pointer to internal SNI extension structure. Can be NULL if using hostname.
+ *
+ * @param[in] host_name
+ *   Hostname string to create SNI extension from. Can be NULL if using sni_extension.
+ *
+ * @param[in] sni_target_protocol
+ *   Specifies the protocol type (HTTP/HTTPS/MQTT) for which SNI is configured.
+ *
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *   - SL_STATUS_OK: SNI configured successfully
+ *   - SL_STATUS_ALLOCATION_FAILED: Memory allocation failed
+ *   - Other error codes from underlying API calls
+ ******************************************************************************/
+sl_status_t sli_configure_sni(const sli_si91x_tls_extension_info_t *sni_extension,
+                              const uint8_t *host_name,
+                              sli_si91x_sni_target_protocol_t sni_target_protocol);
+#endif
 
 #endif // _SL_RSI_UTILITY_H_

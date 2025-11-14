@@ -167,6 +167,21 @@ SECTIONS
 	} > ram 
 	{% endif %}	
 	
+  {%- if si91x_platform_core %}
+  .log_fmt :
+	{
+		. = ALIGN(4);
+		__log_start__ = .;
+		*(.log_fmt*)
+		. = ALIGN(4);
+		__log_end__ = .;		
+	{%- if flash_present %}			
+	} > rom 
+	{%- else %}			
+	} > ram 
+	{% endif %}
+	{% endif %}
+	
 	.ARM.extab : 
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)

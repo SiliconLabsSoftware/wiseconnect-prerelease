@@ -272,6 +272,10 @@ sl_status_t sli_wifi_config_xo_ctune(sl_wifi_interface_t interface,
 sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
                                 sl_wifi_response_get_ctune_data_t *get_xo_ctune,
                                 const uint32_t *ctune_data);
+sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id);
+sl_status_t sli_wifi_remove_vendor_ie(uint8_t unique_id);
+sl_status_t sli_wifi_remove_all_vendor_ie(void);
+
 sl_status_t sli_wifi_get_join_configuration(sl_wifi_interface_t interface, uint8_t *join_feature_bitmap);
 sl_status_t sli_wifi_set_join_configuration(sl_wifi_interface_t interface, uint8_t join_feature_bitmap);
 sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,

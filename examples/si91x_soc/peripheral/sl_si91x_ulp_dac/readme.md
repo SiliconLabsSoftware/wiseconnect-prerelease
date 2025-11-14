@@ -91,9 +91,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | DAC | GPIO's |
   | --- | --- |
   | DAC0 | ULP_GPIO_4 |
-  | DAC1 | ULP_GPIO_15 |
+  | DAC1 | GPIO_30 |
 
-- Because of the GPIO workarounds described above, the DAC output in BRD4338a is read internally, supplied to OPAMP1, and allows the user to see the OPAMP1 output on the GPIO_30[P35] pin.
+- Before configuring DAC pins, review your board’s pinout to ensure the necessary GPIOs are available and not assigned to other functions. Assign DAC pins in your project according to your hardware setup, especially when working with different OPNs.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 

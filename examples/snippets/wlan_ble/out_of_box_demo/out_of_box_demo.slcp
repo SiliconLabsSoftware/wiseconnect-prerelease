@@ -3,9 +3,7 @@ package: multi_protocol_siwx91x_app
 quality: production
 label: Out of Box Demo (SoC)
 category: Example|Wi-Fi_BLE
-description: 'This application demonstrates the WLAN, BLE, MCU peripheral features
-  and NWP (network processor) powersave capabilities of SiWG917 with a ready to go,
-  minimal software installation experience.
+description: 'This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.
 
   '
 filter:
@@ -15,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Intermediate
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 - path: ble_app.c
@@ -146,3 +141,11 @@ ui_hints:
     focus: true
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

@@ -854,7 +854,10 @@ typedef struct {
 } sli_si91x_http_client_request_t;
 
 //! SNI for embedded sockets structure
-#define SI91X_SNI_FOR_HTTPS 1
+typedef enum {
+  SI91X_SNI_FOR_HTTPS = 1, ///< SNI target: HTTPS
+  SI91X_SNI_FOR_MQTT  = 2  ///< SNI target: MQTT
+} sli_si91x_sni_target_protocol_t;
 
 /// Si91x specific SNI for embedded socket request
 typedef struct si91x_sni_for_embedded_socket_request_s {
@@ -954,7 +957,8 @@ typedef enum {
 #if defined(SL_SI91X_SIDE_BAND_CRYPTO) || defined(DOXYGEN)
   SL_SI91X_ENABLE_SIDE_BAND = 7, ///< Enables side-band crypto processing if the feature is enabled.
 #endif
-  SL_SI91X_READ_FROM_COMMON_FLASH = 8, ///< Reads data from the common flash memory
+  SL_SI91X_READ_FROM_COMMON_FLASH       = 8, ///< Reads data from the common flash memory
+  SL_SI91X_SET_TIMESTAMP_MEMORY_ADDRESS = 11 ///< Sets the memory address for timestamp storage
 } sl_si91x_ta_m4_commands_t;
 /** @} */
 

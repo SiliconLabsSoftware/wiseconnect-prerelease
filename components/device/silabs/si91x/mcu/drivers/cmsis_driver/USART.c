@@ -1155,6 +1155,29 @@ uint8_t USART_GetInitState(uint8_t usart_peripheral)
   return init_state;
 }
 
+uint8_t USART_GetMode(uint8_t usart_peripheral)
+{
+  uint8_t mode = 0;
+
+  switch (usart_peripheral) {
+    case USART_0:
+      mode = USART0_Resources.info->mode;
+      break;
+
+    case UART_1:
+      mode = UART1_Resources.info->mode;
+      break;
+
+    case ULPUART:
+      mode = ULP_UART_Resources.info->mode;
+      break;
+
+    default:
+      break;
+  }
+  return mode;
+}
+
 //Below set of functions are only used by SL_DMA added as part of Dx improvements
 #ifdef SL_SI91X_USART_DMA
 /*******************************************************************************

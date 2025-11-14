@@ -1,15 +1,9 @@
 project_name: sl_si91x_gpio_uulp_example
 package: platform_siwx91x_app
-description: "This application demonstrates the usage of the UULP (Ultra Ultra Low\
-  \ Power) pin interrupt. \nIt shows how to configure UULP pins to generate interrupts\
-  \ while the system operates in ultra-low power modes, \nallowing for energy-efficient\
-  \ wake-up and event detection.\n"
+description: "This application demonstrates the usage of the UULP (Ultra Ultra Low Power) pin interrupt. \nIt shows how to configure UULP pins to generate interrupts while the system operates in ultra-low power modes, \nallowing for energy-efficient wake-up and event detection.\n"
 category: example|peripheral
 quality: production
 label: SI91x - SL_GPIO_UULP_EXAMPLE
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -38,3 +32,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

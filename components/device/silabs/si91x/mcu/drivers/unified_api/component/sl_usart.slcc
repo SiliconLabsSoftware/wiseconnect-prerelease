@@ -31,6 +31,7 @@ provides:
 define:
   - name: SL_SI91X_USART_DMA
   - name: USART_MODULE
+  - name: SL_SI91X_REQUIRES_INTF_PLL
 requires:
   - name: udma_linker_config
   - name: sl_dma

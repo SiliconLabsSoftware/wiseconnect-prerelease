@@ -105,6 +105,18 @@
 #define SL_WIFI_TRANSCEIVER_DEFAULT_QOS_VO_AIFSN     1  ///< Wi-Fi transceiver default VO aifsn contention param value
 /** @} */
 
+// Vendor-specific IE Auto-Assign identifier. Use this value to request firmware to automatically
+// assign an available memory for the vendor-specific IE. The actual assigned unique id will be returned
+// in the fw_unique_id field of the sl_wifi_vendor_ie_t structure after successful addition.
+#define SL_WIFI_VENDOR_IE_AUTO_ASSIGN 0
+
+// Management frame bitmap for vendor-specific IE feature.
+#define SL_WIFI_VENDOR_IE_IN_BEACON     (1U << 0)
+#define SL_WIFI_VENDOR_IE_IN_PROBE_RESP (1U << 1)
+#define SL_WIFI_VENDOR_IE_IN_ASSOC_RESP (1U << 2)
+#define SL_WIFI_VENDOR_IE_IN_PROBE_REQ  (1U << 3)
+#define SL_WIFI_VENDOR_IE_IN_ASSOC_REQ  (1U << 4)
+
 /** @addtogroup SL_WIFI_TYPES Types
   * @{ */
 
@@ -243,6 +255,13 @@ typedef struct {
  *       after finding the access point.
  * @note The `channel_bitmap_2g4` uses the lower 14 bits to represent channels from 1 to 14,
  *       where channel 1 = (1 << 0), channel 2 = (1 << 1), and so on.
+ * @note When `channel_bitmap_2g4` is not set (value is 0), the device will scan all available channels.
+ * @note periodic_scan_interval is only applicable for SL_WIFI_SCAN_TYPE_ADV_SCAN of type @ref sl_wifi_scan_type_t.
+ * @note To configure active_channel_time and passive_channel_time for active and passive scans, 
+ *       use the sl_wifi_set_advanced_scan_configuration() API with @ref sl_wifi_advanced_scan_configuration_t.
+ * @note Channel scanning behavior:
+ *       - For active scans: Scans the channels specified in channel_bitmap_2g4. If set to 0, scans all available channels. Can be configured as a subset of channels.
+ *       - For background scans (SL_WIFI_SCAN_TYPE_ADV_SCAN): Scans the channels that were originally specified in channel_bitmap_2g4 during the first scan. The channel bitmap cannot be modified for background scans.
  * @note 5GHz is not supported.
  *
  * | Channel Number 2.4 GHz | channel_bitmap_2g4    |
@@ -276,10 +295,21 @@ typedef struct {
  * @brief Wi-Fi advanced scan configuration options.
  *
  * Indicates the configuration parameters for an advanced Wi-Fi scan operation.
+ *
+ * @note active_channel_time and passive_channel_time are applicable for foreground scan (station before connection).
+ * @note If active_channel_time and passive_channel_time are not set or set to 0, default values are used.
+ *       Default value of 100 milliseconds is used for active_channel_time when SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME is passed.
+ *       Default value of 400 milliseconds is used for passive_channel_time when SL_WIFI_DEFAULT_PASSIVE_CHANNEL_SCAN_TIME is passed.
+ * @note trigger_level and trigger_level_change are used for automatic roaming functionality. When connected to an AP:
+ *       - If RSSI drops below trigger_level, a background scan is automatically initiated to find better APs for roaming
+ *       - If RSSI drops by trigger_level_change delta from the previous measurement, a background scan is triggered
+ *       - The background scan operates independently and helps facilitate seamless roaming to better APs when available
  */
 typedef struct {
-  int32_t trigger_level;         ///< RSSI level to trigger advanced scan
-  uint32_t trigger_level_change; ///< RSSI level change to trigger advanced scan
+  int32_t
+    trigger_level; ///< RSSI threshold level to trigger background scan for roaming. When connected to an AP, if the RSSI drops below this level, a background scan is automatically triggered to find better APs for potential roaming.
+  uint32_t
+    trigger_level_change; ///< RSSI delta change threshold to trigger background scan for roaming. If the current RSSI value drops by this delta amount from the previous measurement, a background scan is triggered to find better APs for potential roaming.
   uint16_t active_channel_time;  ///< Time spent on each channel during active scan (milliseconds)
   uint16_t passive_channel_time; ///< Time spent on each channel during passive scan (milliseconds)
   uint8_t enable_instant_scan;   ///< Flag to start advanced scan immediately
@@ -314,7 +344,8 @@ typedef struct {
   sl_wifi_encryption_t encryption;       ///< Encryption mode of the Access Point
   sl_wifi_channel_t channel;             ///< Channel configuration of the Access Point
   sl_wifi_rate_protocol_t rate_protocol; ///< Rate protocol of the Access Point
-  sl_wifi_ap_flag_t options;             ///< Optional flags for AP configuration
+  sl_wifi_ap_flag_t
+    options; ///< Optional flags for AP configuration. @note Dynamic configurability of Hidden SSID is only available in APCONF when it is disabled in opermode.
   sl_wifi_credential_id_t credential_id; ///< ID of secure credentials
   uint8_t
     keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-types#sl-si91x-ap-keepalive-type-t)
@@ -406,10 +437,11 @@ typedef struct {
  * @note  The default beacon missed count is set to 40. A unicast probe request is sent from the module to the Access Point (AP) at the 21st beacon count and again at the 31st beacon count.
  */
 typedef struct {
-  uint32_t max_retry_attempts;      ///< Maximum number of retries before indicating join failure
-  uint32_t scan_interval;           ///< Scan interval in seconds between each retry
-  uint32_t beacon_missed_count;     ///< Number of missed beacons that will trigger rejoin
-  uint32_t first_time_retry_enable; ///< Retry enable or disable for first time joining
+  uint32_t max_retry_attempts;  ///< Maximum number of retries before indicating join failure
+  uint32_t scan_interval;       ///< Scan interval in seconds between each retry
+  uint32_t beacon_missed_count; ///< Number of missed beacons that will trigger rejoin
+  uint32_t
+    first_time_retry_enable; ///< Enable or disable retry attempts for initial join failures. If set to 0 (default), no retry attempts are made for first-time join failures - the API will return failure immediately. If set to 1, retry attempts will be made using max_retry_attempts and scan_interval parameters. Note: This setting only affects initial connection attempts; roaming and background scan disconnections will always use the retry mechanism regardless of this setting.
 } sl_wifi_advanced_client_configuration_t;
 
 /**
@@ -1582,6 +1614,19 @@ typedef struct {
   uint8_t twt_protection;     ///< TWT Protection
   uint8_t twt_flow_id;        ///< TWT flow ID
 } sl_wifi_twt_response_t;
+
+/**
+ * @struct sl_wifi_vendor_ie_t
+ * @brief Structure to configure a vendor-specific IE.
+ *
+ * This structure is used to add or remove a vendor-specific IE.
+ */
+typedef struct {
+  uint8_t unique_id;          ///< Unique ID for the IE (must be < SLI_MAX_VENDOR_IE)
+  uint16_t mgmt_frame_bitmap; ///< Bitmap indicating which management frames to include the IE in
+  uint16_t ie_buffer_length;  ///< Length of the IE buffer (must be < SLI_MAX_VENDOR_IE_BUFFER_LENGTH)
+  uint8_t *ie_buffer;         ///< Pointer to raw IE buffer.
+} sl_wifi_vendor_ie_t;
 
 /// Generic Wi-Fi interface information structure
 typedef struct {

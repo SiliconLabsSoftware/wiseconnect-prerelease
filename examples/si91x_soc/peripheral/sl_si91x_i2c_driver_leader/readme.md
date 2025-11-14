@@ -39,20 +39,20 @@ The application demonstrates the data transfer from Leader to Follower and then 
 
 This example code demonstrates I2C data transfer between a Leader and Follower using Blocking APIs.
 
-- In the example code, the first I2c instance is initialized using [sl_i2c_driver_init](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-init) to configure various init structure parameters.
+- In the example code, the first I2c instance is initialized using [sl_i2c_driver_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-init) to configure various init structure parameters.
 - This structure includes:
-  - [sl_i2c_operating_mode_t](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-operating-mode-t) bus speed, it can be Standard, Fast, Fast plus or High speed.
-  - [sl_i2c_mode_t](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-mode-t) mode, it should be Leader mode for Leader application.
-  - [sl_i2c_transfer_type_t](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-transfer-type-t), using non-DMA.
-  - [sl_i2c_callback_t](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-callback-t) , I2C callback
+  - [sl_i2c_operating_mode_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-operating-mode-t) bus speed, it can be Standard, Fast, Fast plus or High speed.
+  - [sl_i2c_mode_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-mode-t) mode, it should be Leader mode for Leader application.
+  - [sl_i2c_transfer_type_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-transfer-type-t), using non-DMA.
+  - [sl_i2c_callback_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-callback-t) , I2C callback
 - It also initializes I2C clock and configures I2C SDA and SCL pins.
-- Transmit and receive FIFO threshold values are configured using [sl_i2c_driver_configure_fifo_threshold](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-configure-fifo-threshold) API.
-- Repeated start is enabled for data transfer using [sl_i2c_driver_enable_repeated_start](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-enable-repeated-start) API. So that master continue read operation after write operation without releasing line.
+- Transmit and receive FIFO threshold values are configured using [sl_i2c_driver_configure_fifo_threshold](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-configure-fifo-threshold) API.
+- Repeated start is enabled for data transfer using [sl_i2c_driver_enable_repeated_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-enable-repeated-start) API. So that master continue read operation after write operation without releasing line.
 - Now write_buffer is filled with some data which needs to be sent to the Follower.
-- Current_mode enum is set to I2C_SEND_DATA, and it calls send_data API to send data to the the Follower and configures the Follower address through [sl_i2c_driver_send_data_blocking](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-send-data-blocking) for blocking Application.
+- Current_mode enum is set to I2C_SEND_DATA, and it calls send_data API to send data to the the Follower and configures the Follower address through [sl_i2c_driver_send_data_blocking](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-send-data-blocking) for blocking Application.
 - For Blocking use cases: When all bytes are sent, then the mode changes to I2C_RECEIVE_DATA. (The Blocking API will not update any transfer complete flag, as control will be blocked until all bytes are sent).
-- Before receiving data from slave, disabled repeated start using [sl_i2c_driver_enable_repeated_start](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-enable-repeated-start) API. So that stop bit should be added at the end of data transfer.
-- Then it receives data from Follower through [sl_i2c_driver_receive_data_blocking](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-receive-data-blocking) for blocking Application.
+- Before receiving data from slave, disabled repeated start using [sl_i2c_driver_enable_repeated_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-enable-repeated-start) API. So that stop bit should be added at the end of data transfer.
+- Then it receives data from Follower through [sl_i2c_driver_receive_data_blocking](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-receive-data-blocking) for blocking Application.
 - Now it compares the data which is received from the Follower device to the data which it has sent.
 - If the send and receive data is same, it will print "Test Case Passed" on the console.
 - For Blocking use cases: When all bytes are received, the mode changes to I2C_TRANSMISSION_COMPLETED. (The Blocking API will not update any transfer complete flag, as control will be blocked until all bytes are received).
@@ -64,6 +64,7 @@ This example code demonstrates I2C data transfer between a Leader and Follower u
 >- I2C0, I2C1, and I2C2 are the names pre-defined for the I2C instances.
 >- For user-defined instances, you may have to define your hardware-specific definitions in `config.h` file.
 >- A user can directly use APIs in an application by passing appropriate structure members if the user does not want to configure from UC.
+>- It is recommended to install only a single instance that is specifically intended to run this application. If multiple instances are present, the application will automatically select the first one it detects, which may lead to unexpected behavior.
 
 ## Prerequisites/Setup Requirements
 
@@ -102,16 +103,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Open the `sl_si91x_i2c_driver_leader.slcp` project file, select the **Software Component** tab, and search for i2c in the search bar.
 - Click on **I2C2** and configure the ULP_I2C instance as per configuration parameters given in wizard.
 - For using any other I2C instance, the user has to add that I2C instance by clicking on **I2C Instance** from the configuration wizard and then clicking **Add New Instance**
-- For creating I2C instances, write 'I2C0', 'I2C1' or 'I2C2' on the wizard for respective instance and then click on **Done**
+- For creating I2C instances write 'i2c0', 'i2c1' or  'i2c2' (for ulp_i2c) on the wizard for respective instance and then click on **Done**. By default, 'i2c2' (for ulp_i2c) will be created.
 - After creating the instances, separate configuration files are generated in the **config folder**.
 - If the project is built without selecting configurations, it will take default values from UC.
 - Configure mode, operating-mode, and transfer-type of I2C instance using respective instance UC.
 - Change 'Mode' to 'Leader mode' on UC.
 - Change 'Operating Mode' as per bus-speed requirement.
-- After completing the above UC configurations, configure the following macros in [`i2c_leader_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.c) file. Update or modify the following macros, if required.
+- After completing the above UC configurations, configure the following macros in [`i2c_leader_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.c) and [`i2c_leader_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.h) file. Update or modify the following macros, if required.
 
     ```c
-      #define I2C_INSTANCE_USED        // Update it with i2c instance number used for this application: 0 for i2c0, 1 for i2c1 and 2 for i2c2
       #define FOLLOWER_I2C_ADDR        // Update I2C follower address
       #define I2C_SIZE_BUFFERS             // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
     ```

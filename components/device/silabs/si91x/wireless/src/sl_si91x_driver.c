@@ -151,6 +151,19 @@ void sli_siwx917_update_system_core_clock(void);
 void sli_m4_ta_interrupt_init(void);
 #endif
 
+#define SLI_SI91X_XTAL_GOOD_TIME_MIN 600  // XTAL good time lower bound (µs)
+#define SLI_SI91X_XTAL_GOOD_TIME_MAX 5000 // XTAL good time upper bound (µs)
+
+#define SLI_SI91X_PMU_GOOD_TIME_MAX     2000 // PMU good time common upper bound (µs)
+#define SLI_SI91X_PMU_GOOD_TIME_MIN_SOC 900  // PMU good time lower bound for SoC
+#define SLI_SI91X_PMU_GOOD_TIME_MIN_NCP 600  // PMU good time lower bound for NCP
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+#define SLI_SI91X_PMU_GOOD_TIME_MIN SLI_SI91X_PMU_GOOD_TIME_MIN_SOC
+#else
+#define SLI_SI91X_PMU_GOOD_TIME_MIN SLI_SI91X_PMU_GOOD_TIME_MIN_NCP
+#endif
+
 // Structure to hold packet information and payload
 typedef struct {
   uint16_t packet_id;
@@ -205,11 +218,18 @@ sl_wifi_event_handler_t si91x_event_handler = NULL;
 
 // Global variables for device and driver management
 sl_wifi_interface_t default_interface;
-bool device_initialized                           = false;
+bool device_initialized = false;
+
+// XTAL and PMU good time values provided via sl_si91x_set_nwp_config_request().
+// Each may be configured before initialization; both are applied (XTAL first, then PMU) during driver init.
+static uint16_t sli_xtal_good_time_us = 0; // Valid: 600-5000 µs.
+static uint16_t sli_pmu_good_time_us  = 0; // Valid: 900-2000 µs for SoC, 600-2000 µs for NCP.
+
 bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX] = { false, false, false, false, false };
 bool bg_enabled                                   = false;
 uint32_t frontend_switch_control                  = 0;
 static uint32_t feature_bit_map                   = 0;
+static uint32_t config_feature_bit_map            = 0;
 static sli_wifi_efuse_data_t si91x_efuse_data     = { 0 };
 static uint32_t client_listen_interval            = 1000;
 //! Currently, initialized_opermode is used only to handle concurrent mode using sl_net_init()
@@ -517,6 +537,23 @@ sl_status_t sl_si91x_driver_init_wifi_radio(const sl_wifi_device_configuration_t
   return status;
 }
 
+static sl_status_t sli_apply_xtal_pmu_good_time(uint16_t value, uint32_t code)
+{
+  if ((value == 0) || (code == 0)) {
+    return SL_STATUS_OK; // Nothing to apply
+  }
+  sl_si91x_nwp_configuration_t cfg = { 0 };
+  cfg.code                         = code;
+  cfg.values.config_val            = value;
+  return sli_si91x_driver_send_command(SLI_COMMON_REQ_SET_CONFIG,
+                                       SLI_WIFI_COMMON_CMD,
+                                       &cfg,
+                                       sizeof(sl_si91x_nwp_configuration_t),
+                                       SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_SET_CONFIG_WAIT_TIME),
+                                       NULL,
+                                       NULL);
+}
+
 sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, sl_wifi_event_handler_t event_handler)
 {
   sl_status_t status;
@@ -651,6 +688,19 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     return SL_STATUS_CARD_READY_TIMEOUT;
   }
 #endif
+
+  // Apply XTAL and PMU good times (provided via sl_si91x_set_nwp_config_request()). XTAL is applied before PMU.
+  if (sli_xtal_good_time_us != 0) {
+    status = sli_apply_xtal_pmu_good_time(sli_xtal_good_time_us, SL_SI91X_SET_XTAL_GOOD_TIME_FROM_HOST);
+    VERIFY_STATUS_AND_RETURN(status);
+    sli_xtal_good_time_us = 0;
+  }
+  if (sli_pmu_good_time_us != 0) {
+    status = sli_apply_xtal_pmu_good_time(sli_pmu_good_time_us, SL_SI91X_SET_PMU_GOOD_TIME_FROM_HOST);
+    VERIFY_STATUS_AND_RETURN(status);
+    sli_pmu_good_time_us = 0;
+  }
+
   // Send WLAN request to set the operating mode and configuration
   status = sli_si91x_driver_send_command(SLI_WIFI_REQ_OPERMODE,
                                          SLI_WIFI_COMMON_CMD,
@@ -672,7 +722,8 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   VERIFY_STATUS_AND_RETURN(status);
 #endif
 
-  feature_bit_map = config->boot_config.feature_bit_map;
+  feature_bit_map        = config->boot_config.feature_bit_map;
+  config_feature_bit_map = config->boot_config.config_feature_bit_map;
 
 #ifdef SLI_SI91X_ENABLE_BLE
   if (config->boot_config.coex_mode == SL_SI91X_BLE_MODE || config->boot_config.coex_mode == SL_SI91X_WLAN_BLE_MODE) {
@@ -892,6 +943,9 @@ sl_status_t sl_si91x_driver_deinit(void)
   si91x_event_handler  = NULL;
   device_initialized   = false;
   initialized_opermode = SLI_WIFI_INVALID_MODE;
+
+  // Reset config feature bit map
+  config_feature_bit_map = 0;
 
   // Reset all the interfaces
   memset(interface_is_up, 0, sizeof(interface_is_up));
@@ -1938,6 +1992,32 @@ sl_status_t sl_si91x_m4_ta_secure_handshake(uint8_t sub_cmd_type,
   return status;
 }
 
+sl_status_t sl_si91x_configure_timestamp_memory_location(uint8_t addr_len, const uint32_t *address)
+{
+  sli_si91x_ta_m4_handshake_parameters_t *handshake_request = NULL;
+  sl_status_t status                                        = SL_STATUS_OK;
+
+  SL_VERIFY_POINTER_OR_RETURN(address, SL_STATUS_INVALID_PARAMETER);
+
+  handshake_request = malloc(sizeof(sli_si91x_ta_m4_handshake_parameters_t) + addr_len);
+  SL_VERIFY_POINTER_OR_RETURN(handshake_request, SL_STATUS_ALLOCATION_FAILED);
+  memset(handshake_request, 0, sizeof(sli_si91x_ta_m4_handshake_parameters_t) + addr_len);
+  handshake_request->sub_cmd         = SL_SI91X_SET_TIMESTAMP_MEMORY_ADDRESS;
+  handshake_request->input_data_size = addr_len;
+  memcpy(handshake_request->input_data, address, addr_len);
+
+  status = sli_si91x_driver_send_command(SLI_COMMON_REQ_TA_M4_COMMANDS,
+                                         SLI_WIFI_COMMON_CMD,
+                                         handshake_request,
+                                         sizeof(sli_si91x_ta_m4_handshake_parameters_t) + addr_len,
+                                         SLI_COMMON_RSP_TA_M4_COMMANDS_WAIT_TIME,
+                                         NULL,
+                                         NULL);
+  free(handshake_request);
+  VERIFY_STATUS_AND_RETURN(status);
+  return status;
+}
+
 sl_status_t sl_si91x_read_status(sl_si91x_read_status_t read_id, uint8_t *output)
 {
   sl_wifi_buffer_t *buffer              = NULL;
@@ -2548,11 +2628,8 @@ sl_status_t sl_si91x_get_firmware_size(const void *buffer, uint32_t *fw_image_si
 sl_status_t sl_si91x_set_nwp_config_request(sl_si91x_nwp_configuration_t nwp_config)
 {
   sl_status_t status = SL_STATUS_OK;
-
   if ((nwp_config.code & SL_SI91X_XO_CTUNE_FROM_HOST) || (nwp_config.code & SL_SI91X_ENABLE_NWP_WDT_FROM_HOST)
-      || (nwp_config.code & SL_SI91X_DISABLE_NWP_WDT_FROM_HOST)
-      || (nwp_config.code & SL_SI91X_SET_XTAL_GOOD_TIME_FROM_HOST)
-      || (nwp_config.code & SL_SI91X_SET_PMU_GOOD_TIME_FROM_HOST)) {
+      || (nwp_config.code & SL_SI91X_DISABLE_NWP_WDT_FROM_HOST)) {
     status = sli_si91x_driver_send_command(SLI_COMMON_REQ_SET_CONFIG,
                                            SLI_WIFI_COMMON_CMD,
                                            &nwp_config,
@@ -2560,12 +2637,29 @@ sl_status_t sl_si91x_set_nwp_config_request(sl_si91x_nwp_configuration_t nwp_con
                                            SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_SET_CONFIG_WAIT_TIME),
                                            NULL,
                                            NULL);
-    VERIFY_STATUS_AND_RETURN(status);
-  } else {
-    return SL_STATUS_NOT_SUPPORTED;
+    return status;
   }
 
-  return status;
+  if (nwp_config.code & SL_SI91X_SET_XTAL_GOOD_TIME_FROM_HOST) {
+    // Valid range 600 - 5000 microseconds
+    if ((nwp_config.values.config_val < SLI_SI91X_XTAL_GOOD_TIME_MIN)
+        || (nwp_config.values.config_val > SLI_SI91X_XTAL_GOOD_TIME_MAX)) {
+      return SL_STATUS_INVALID_PARAMETER;
+    }
+    sli_xtal_good_time_us = nwp_config.values.config_val;
+    return SL_STATUS_OK;
+  }
+
+  if (nwp_config.code & SL_SI91X_SET_PMU_GOOD_TIME_FROM_HOST) {
+    if ((nwp_config.values.config_val < SLI_SI91X_PMU_GOOD_TIME_MIN)
+        || (nwp_config.values.config_val > SLI_SI91X_PMU_GOOD_TIME_MAX)) {
+      return SL_STATUS_INVALID_PARAMETER;
+    }
+    sli_pmu_good_time_us = nwp_config.values.config_val;
+    return SL_STATUS_OK;
+  }
+
+  return SL_STATUS_NOT_SUPPORTED;
 }
 
 sl_status_t sl_si91x_get_nwp_config(const sl_si91x_nwp_get_configuration_t *nwp_config, uint8_t *response)
@@ -2679,4 +2773,9 @@ sl_status_t sli_get_nwp_timestamp(uint32_t *timestamp)
   sli_si91x_host_free_buffer(buffer);
 
   return status;
+}
+
+uint32_t sli_si91x_get_config_feature_bit_map(void)
+{
+  return config_feature_bit_map;
 }

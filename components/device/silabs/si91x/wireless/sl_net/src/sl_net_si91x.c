@@ -126,12 +126,17 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
   if (interface == SL_NET_WIFI_CLIENT_1_INTERFACE) {
     nmap_client_interface_with_band[0] = client_interface; //Map the Interface with the band
     status                             = sl_si91x_configure_ip_address(&profile.ip, SL_WIFI_CLIENT_VAP_ID);
-    VERIFY_STATUS_AND_RETURN(status);
   } else if (interface == SL_NET_WIFI_CLIENT_2_INTERFACE) {
     nmap_client_interface_with_band[1] = client_interface; //Map the Interface with the band
     status                             = sl_si91x_configure_ip_address(&profile.ip, SL_WIFI_CLIENT_VAP_ID_1);
-    VERIFY_STATUS_AND_RETURN(status);
   }
+
+  // Disconnect WiFi on IP configuration failure
+  if (status != SL_STATUS_OK) {
+    sl_wifi_disconnect(client_interface);
+    return status;
+  }
+
   dhcp_type[SLI_SI91X_CLIENT] = profile.ip.mode;
 
   // Set the client profile

@@ -27,9 +27,6 @@ requires:
   - name: wifi
   - name: sl_si91x_mcu
   - name: wifi_resources
-  - name: freertos
-  - name: freertos_heap_4
-    condition: freertos
 template_contribution:
   - name: littlefs_enable
     value: true

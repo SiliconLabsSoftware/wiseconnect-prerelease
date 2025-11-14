@@ -3,8 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Powersave Standby Associated (SoC)
 category: Example|Wi-Fi
-description: "Start a Wi-Fi client in ASSOCIATED_POWER_SAVE mode and connects to AP\
-  \ and send data to UDP server \n"
+description: "Start a Wi-Fi client in ASSOCIATED_POWER_SAVE mode and connects to AP and send data to UDP server \n"
 filter:
 - name: Wireless Technology
   value:
@@ -12,9 +11,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -90,3 +86,11 @@ ui_hints:
     focus: true
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

@@ -3,8 +3,7 @@ package: multi_protocol_siwx91x_app
 quality: production
 label: Unified app for Bluetooth and Wifi NCP
 category: Example|BLE
-description: 'Bluetooth Low energy supporting 8Peripheral/2Central connections with
-  Coex.
+description: 'Bluetooth Low energy supporting 8Peripheral/2Central connections with Coex.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Advanced
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 - path: root_auto_gen.c
@@ -32,6 +28,9 @@ source:
 - path: utils/rsi_common_utils.c
 - path: wifi/wifi_app.c
 - path: wifi/wifi_tcp_app.c
+- path: btdm_logging_framework/debug_logs_event_hdlr_auto_gen.c
+- path: btdm_logging_framework/debug_logs_task.c
+- path: btdm_logging_framework/debug_logs_user_event_hdlrs.c
 include:
 - path: .
   file_list:
@@ -56,6 +55,9 @@ include:
   - path: generic_command_handling.h
   - path: rsi_common_utils.h
   - path: event_loop.h
+- path: btdm_logging_framework
+  file_list:
+  - path: debug_logs_event_hdlr_auto_gen.h
 component:
 - id: sl_main
 - id: freertos
@@ -109,3 +111,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

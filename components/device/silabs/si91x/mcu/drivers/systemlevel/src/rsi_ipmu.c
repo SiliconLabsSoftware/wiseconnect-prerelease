@@ -531,6 +531,7 @@ void RSI_IPMU_PowerGateSet(uint32_t mask_vlaue)
     ;
   /*Dummy read*/
   impuPowerGate = ULP_SPI_MEM_MAP(POWERGATE_REG_WRITE);
+  (void)impuPowerGate;
   return;
 }
 
