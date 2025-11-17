@@ -6,9 +6,6 @@ description: 'This application demonstrates how to use RTOS based combo applicat
 category: example|peripheral
 quality: production
 label: Si91x - SL_COMBO_APPLICATION
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -75,3 +72,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

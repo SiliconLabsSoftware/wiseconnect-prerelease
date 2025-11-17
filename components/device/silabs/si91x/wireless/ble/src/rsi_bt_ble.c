@@ -146,7 +146,8 @@ uint16_t rsi_bt_get_proto_type(uint16_t rsp_type, rsi_bt_cb_t **bt_cb)
              || ((rsp_type >= RSI_BLE_CONN_PARAM_RESP_CMD) && (rsp_type <= RSI_BLE_CMD_MTU_EXCHANGE_RESP))
              || ((rsp_type >= RSI_BLE_EVENT_GATT_ERROR_RESPONSE) && (rsp_type <= RSI_BLE_EVENT_SCAN_REQ_RECVD))
              || (rsp_type == RSI_BLE_REQ_CONN_ENHANCE) || (rsp_type == RSI_BLE_EVENT_REMOTE_DEVICE_INFORMATION)
-             || ((rsp_type >= RSI_BLE_CMD_READ_TRANSMIT_POWER) && (rsp_type <= RSI_BLE_CMD_WRITE_RF_PATH_COMP))) {
+             || ((rsp_type >= RSI_BLE_CMD_READ_TRANSMIT_POWER) && (rsp_type <= RSI_BLE_CMD_WRITE_RF_PATH_COMP))
+             || (rsp_type == RSI_BT_EVT_CONTROLLER_LOGS)) {
 
     return_value = RSI_PROTO_BLE;
     *bt_cb       = rsi_driver_cb->ble_cb;
@@ -212,7 +213,7 @@ uint32_t rsi_bt_get_timeout(uint16_t cmd_type, uint16_t protocol_type)
  * @return      void
  */
 
-void rsi_bt_common_tx_done(sl_wifi_system_packet_t *pkt)
+void rsi_bt_common_tx_done(const sl_wifi_system_packet_t *pkt, int32_t status)
 {
 
   SL_PRINTF(SL_RSI_BT_COMMON_TX_DONE, BLUETOOTH, LOG_INFO);
@@ -235,9 +236,9 @@ void rsi_bt_common_tx_done(sl_wifi_system_packet_t *pkt)
   }
 
   // If the command is not a synchronous/blocking one
-  if (!bt_cb->sync_rsp) {
+  if (!bt_cb->sync_rsp || status != RSI_SUCCESS) {
     // Set bt_common status as success
-    rsi_bt_set_status(bt_cb, RSI_SUCCESS);
+    rsi_bt_set_status(bt_cb, status);
 
     // Post the semaphore which is waiting on driver_send API
     osSemaphoreRelease(bt_cb->bt_sem);
@@ -983,6 +984,42 @@ void rsi_ble_l2cap_cbsc_register_callbacks(rsi_ble_on_cbfc_conn_req_event_t ble_
   return;
 }
 
+/**
+ * @fn       uint16_t rsi_bt_debug_logs_register_callbacks(uint16_t callback_id, void (*callback_handler_ptr)(uint16_t status,
+ *                                                uint8_t *buffer))
+ * @brief    Register the BT Debug Logs callback functions.
+ * @param[in]  callback_id                       - This is the ID of the callback function. The following IDs are supported:
+ * @param[in]  void (*callback_handler_ptr)(void - This is the callback handler function.
+ * @param[in]  status                            - Status of the asynchronous response.
+ * @param[in]  buffer                            - Payload of the asynchronous response.
+ * @return      0 - Success \n
+ *              -53 - Failure \n
+ *              If callback_id is greater than the maximum callbacks to register, returns RSI_ERROR_BLE_INVALID_CALLBACK_CNT.
+ * @note        In callbacks, the application should not initiate any TX operation to the module.
+ */
+uint32_t rsi_bt_debug_logs_register_callbacks(uint16_t callback_id,
+                                              void (*callback_handler_ptr)(uint16_t status, uint8_t *buffer))
+{
+  // Get bt cb struct pointer
+  rsi_ble_cb_t *ble_specific_cb = rsi_driver_cb->ble_cb->bt_global_cb->ble_specific_cb;
+
+  if (callback_id > RSI_BT_MAX_NUM_DEBUG_LOGS_CALLBACKS) {
+    /*
+  *Return , if the callback number exceeds the RSI_BT_MAX_NUM_DEBUG_LOGS_CALLBACKS ,or
+  * the callback is already registered
+  */
+    return RSI_ERROR_BLE_INVALID_CALLBACK_CNT;
+  }
+  if (callback_id == RSI_BT_ON_CONTROLLER_LOGS) {
+    /* Register controller logs call back handler */
+    ble_specific_cb->bt_on_controller_logs_event = (rsi_bt_on_controller_logs_t)callback_handler_ptr;
+  } else {
+    return RSI_ERROR_BLE_INVALID_CALLBACK_CNT;
+  }
+
+  return RSI_SUCCESS;
+}
+
 /** @addtogroup DRIVER14
 * @{
 */
@@ -1376,6 +1413,11 @@ void rsi_ble_callbacks_handler(rsi_bt_cb_t *ble_cb, uint16_t rsp_type, uint8_t *
         ble_specific_cb->ble_on_rcp_resp_rcvd_event(status, (rsi_ble_event_rcp_rcvd_info_t *)payload);
       }
     } break;
+    case RSI_BT_EVT_CONTROLLER_LOGS: {
+      if (ble_specific_cb->bt_on_controller_logs_event != NULL) {
+        ble_specific_cb->bt_on_controller_logs_event(status, (void *)payload);
+      }
+    } break;
     default:
       break;
   }
@@ -1506,6 +1548,10 @@ uint16_t rsi_bt_prepare_common_pkt(uint16_t cmd_type, void *cmd_struct, sl_wifi_
           break;
         case BLE_VENDOR_ACCEPTLIST_USING_ADV_DATA_PAYLOAD:
           payload_size = sizeof(rsi_ble_req_acceptlist_using_payload_t);
+          memcpy(pkt->data, cmd_struct, payload_size);
+          break;
+        case BLE_VENDOR_ACCEPTLIST_ON_TYPE:
+          payload_size = sizeof(rsi_ble_req_acceptlist_on_type_t);
           memcpy(pkt->data, cmd_struct, payload_size);
           break;
         case BLE_VENDOR_SET_COEX_ROLE_PRIORITY:

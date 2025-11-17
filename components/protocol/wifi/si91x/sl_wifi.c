@@ -70,6 +70,10 @@ extern rsi_m4ta_desc_t crypto_desc[2];
 #include "rsi_wisemcu_hardware_setup.h"
 #endif
 
+#if defined(SLI_CAPTIVE_CORE_PRESENT) && (SLI_CAPTIVE_CORE_PRESENT == 1)
+extern uint32_t sl_si91x_log_host_timesync_address;
+#endif
+
 extern bool device_initialized;
 extern sl_wifi_advanced_scan_configuration_t advanced_scan_configuration;
 sl_status_t sl_wifi_get_associated_client_list(const void *client_list_buffer,
@@ -88,6 +92,12 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
 #endif
   sl_status_t status = SL_STATUS_OK;
   status             = sl_si91x_driver_init(configuration, event_handler);
+#if defined(SLI_CAPTIVE_CORE_PRESENT) && (SLI_CAPTIVE_CORE_PRESENT == 1)
+  status = sl_si91x_configure_timestamp_memory_location(sizeof(uint32_t), &sl_si91x_log_host_timesync_address);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG("\r\nTimestamp Memory Location Configuration Failed\r\n");
+  }
+#endif
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
   if (status == SL_STATUS_OK) {
     uint32_t crypto_desc_ptr = (uint32_t)crypto_desc;
@@ -496,31 +506,50 @@ sl_status_t sl_wifi_get_operational_statistics(sl_wifi_interface_t interface,
 sl_status_t sl_wifi_transmit_test_start(sl_wifi_interface_t interface,
                                         const sl_wifi_transmitter_test_info_t *test_tx_info)
 {
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
   return sli_wifi_transmit_test_start(interface, test_tx_info);
 }
 
 sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 {
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
   return sli_wifi_transmit_test_stop(interface);
 }
 
 sl_status_t sl_wifi_frequency_offset(sl_wifi_interface_t interface, const sl_wifi_freq_offset_t *frequency_calibration)
 {
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+  UNUSED_PARAMETER(interface);
   return sli_wifi_frequency_offset(interface, frequency_calibration);
 }
 
 sl_status_t sl_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi_dpd_calib_data_t *dpd_calib_data)
 {
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
   return sli_wifi_dpd_calibration(interface, dpd_calib_data);
 }
 
 sl_status_t sl_wifi_start_statistic_report(sl_wifi_interface_t interface, sl_wifi_channel_t channel)
 {
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
   return sli_wifi_start_statistic_report(interface, channel);
 }
 
 sl_status_t sl_wifi_stop_statistic_report(sl_wifi_interface_t interface)
 {
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
   return sli_wifi_stop_statistic_report(interface);
 }
 
@@ -916,6 +945,21 @@ sl_status_t sl_wifi_stop_rx(sl_wifi_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
   return SL_STATUS_NOT_SUPPORTED;
+}
+
+sl_status_t sl_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id)
+{
+  return sli_wifi_add_vendor_ie(vendor_ie, fw_unique_id);
+}
+
+sl_status_t sl_wifi_remove_vendor_ie(uint8_t unique_id)
+{
+  return sli_wifi_remove_vendor_ie(unique_id);
+}
+
+sl_status_t sl_wifi_remove_all_vendor_ie(void)
+{
+  return sli_wifi_remove_all_vendor_ie();
 }
 
 sl_status_t sl_wifi_set_join_configuration(sl_wifi_interface_t interface, uint8_t join_feature_bitmap)

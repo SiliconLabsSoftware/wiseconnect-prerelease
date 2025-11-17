@@ -37,11 +37,7 @@ uint8_t mock_state = BUTTON_PRESSED;
  ************************  Test Function Prototypes  ****************************
  ******************************************************************************/
 void test_button_init(void);
-void test_button_state_get(void);
-void test_button_pin_state(void);
 void test_button_set_state(void);
-void test_button_state_toggle(void);
-void test_button_state_set(void);
 void test_button_isr(void);
 void test_button_toggle_state(void);
 void test_button_state(void);
@@ -56,12 +52,8 @@ int app_init()
   UnityBeginGroup("BUTTON");
 
   RUN_TEST(test_button_init, __LINE__);
-  RUN_TEST(test_button_state_set, __LINE__);
   RUN_TEST(test_button_set_state, __LINE__);
   RUN_TEST(test_button_state, __LINE__);
-  RUN_TEST(test_button_state_get, __LINE__);
-  RUN_TEST(test_button_pin_state, __LINE__);
-  RUN_TEST(test_button_state_toggle, __LINE__);
   RUN_TEST(test_button_isr, __LINE__);
   RUN_TEST(test_button_toggle_state, __LINE__);
   RUN_TEST(test_button_get_state, __LINE__);
@@ -89,60 +81,6 @@ void test_button_init(void)
 }
 
 /*******************************************************************************
- * Function to test getting the state of the button
- ******************************************************************************/
-void test_button_state_get(void)
-{
-  UnityPrintf("\n");
-  UnityPrintf("Testing Button State Get \n");
-  int8_t state;
-
-  state = sl_si91x_button_state_get(mock_pin);
-  TEST_ASSERT(state == BUTTON_PRESSED || state == BUTTON_RELEASED || state == BUTTON_STATE_INVALID);
-  UnityPrintf("Button state retrieved successfully \n");
-  UnityPrintf("Button state = %d \n", state);
-
-  state = sl_si91x_button_state_get(2);
-  TEST_ASSERT(state == BUTTON_PRESSED || state == BUTTON_RELEASED || state == BUTTON_STATE_INVALID);
-  UnityPrintf("Button state retrieved successfully \n");
-  UnityPrintf("Button state = %d \n", state);
-
-  state = sl_si91x_button_state_get(11);
-  TEST_ASSERT(state == BUTTON_PRESSED || state == BUTTON_RELEASED || state == BUTTON_STATE_INVALID);
-  UnityPrintf("Button state retrieved successfully \n");
-  UnityPrintf("Button state = %d \n", state);
-
-  UnityPrintf("Button state get completed \n");
-}
-
-/*******************************************************************************
- * Function to test getting the pin state of the button
- ******************************************************************************/
-void test_button_pin_state(void)
-{
-  UnityPrintf("\n");
-  UnityPrintf("Testing Button Pin State \n");
-  int8_t state;
-
-  state = sl_si91x_button_pin_state(mock_pin);
-  TEST_ASSERT(state == BUTTON_PRESSED || state == BUTTON_RELEASED);
-  UnityPrintf("Button pin state retrieved successfully \n");
-  UnityPrintf("Button state = %d \n", state);
-
-  state = sl_si91x_button_pin_state(11);
-  TEST_ASSERT(state == BUTTON_PRESSED || state == BUTTON_RELEASED);
-  UnityPrintf("Button pin state retrieved successfully \n");
-  UnityPrintf("Button state = %d \n", state);
-
-  state = sl_si91x_button_pin_state(2);
-  TEST_ASSERT(state == BUTTON_PRESSED || state == BUTTON_RELEASED);
-  UnityPrintf("Button pin state retrieved successfully \n");
-  UnityPrintf("Button state = %d \n", state);
-
-  UnityPrintf("Button pin state completed \n");
-}
-
-/*******************************************************************************
  * Function to test the button set state.
  ******************************************************************************/
 void test_button_set_state(void)
@@ -157,49 +95,6 @@ void test_button_set_state(void)
   UnityPrintf("Button set pressed state successfully \n");
 
   UnityPrintf("Button set state completed \n");
-}
-
-/*******************************************************************************
- * Function to test toggling the button state
- ******************************************************************************/
-void test_button_state_toggle(void)
-{
-  UnityPrintf("\n");
-  UnityPrintf("Testing Button State Toggle \n");
-
-  sl_si91x_button_state_toggle(mock_pin);
-  UnityPrintf("Button state toggled successfully \n");
-
-  sl_si91x_button_state_toggle(2);
-  UnityPrintf("Button state toggled successfully \n");
-
-  sl_si91x_button_state_toggle(11);
-  UnityPrintf("Button state toggled successfully \n");
-
-  UnityPrintf("Button state toggle completed \n");
-}
-
-/*******************************************************************************
- * Function to test setting the button state
- ******************************************************************************/
-void test_button_state_set(void)
-{
-  UnityPrintf("\n");
-  UnityPrintf("Testing Button State Set \n");
-
-  sl_si91x_button_state_set(mock_pin, mock_state);
-  UnityPrintf("Button state set successfully \n");
-
-  sl_si91x_button_state_set(mock_pin, BUTTON_RELEASED);
-  UnityPrintf("Button state set successfully \n");
-
-  sl_si91x_button_state_set(2, mock_state);
-  UnityPrintf("Button state set successfully \n");
-
-  sl_si91x_button_state_set(11, mock_state);
-  UnityPrintf("Button state set successfully \n");
-
-  UnityPrintf("Button state set completed \n");
 }
 
 /*******************************************************************************

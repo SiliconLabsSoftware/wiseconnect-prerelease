@@ -37,6 +37,7 @@
 #include "sli_net_utility.h"
 #include <string.h>
 #include <sl_string.h>
+#include "sl_utility.h"
 #ifdef SLI_SI91X_INTERNAL_MDNS
 #include "sl_mdns.h"
 #define SLI_MDNS_MAX_PARAM_LENGTH 255
@@ -217,10 +218,12 @@ sl_status_t sli_convert_si91x_mdns_response(sl_mdns_response_t *mdns_result, con
         ptr += SL_IPV4_ADDRESS_LENGTH;
       } else if (addr_type == SL_IPV6_VERSION) {
         mdns_result->addr.addr[i].type = SL_IPV6;
-        memcpy(mdns_result->addr.addr[i].ip.v6.bytes, ptr, SL_IPV6_ADDRESS_LENGTH);
+        sli_big_to_little_endian((const unsigned int *)ptr,
+                                 mdns_result->addr.addr[i].ip.v6.bytes,
+                                 SL_IPV6_ADDRESS_LENGTH);
         ptr += SL_IPV6_ADDRESS_LENGTH;
       } else {
-        return SL_STATUS_INVALID_PARAMETER; // Optional: handle unexpected type
+        return SL_STATUS_INVALID_PARAMETER;
       }
     }
   }

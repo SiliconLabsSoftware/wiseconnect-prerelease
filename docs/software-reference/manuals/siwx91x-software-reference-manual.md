@@ -765,7 +765,7 @@ The virtual COM (VCOM) port is available on the wireless pro kit mainboard (BRD4
 
 **Flash, Erase, and Debug over SWD:**
   * If the ULP UART peripheral is configured, VCOM cannot be used for debug prints because the ULP UART is mapped to the VCOM.
-  * To enable both the ULP UART and VCOM, configure the UART1/UART2 instance for debug prints. In this case, a USB-to-TTL converter is required. See the [Console Input](https://docs.silabs.com/wiseconnect/3.1.0/wiseconnect-getting-started/getting-started-with-soc-mode#enter-the-console-input-for-other-boards) section for the BRD4325 series boards for instructions.
+  * To enable both the ULP UART and VCOM, configure the UART1/UART2 instance for debug prints. In this case, a USB-to-TTL converter is required. See the [Console Input](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-soc-mode#enter-the-console-input-for-other-boards) section for the BRD4325 series boards for instructions.
   * If the ULP UART is functioning in the PS2 state, UART1/UART2 cannot be used for debug prints.
 
 > **Note:**

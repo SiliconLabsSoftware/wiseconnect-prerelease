@@ -581,7 +581,11 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Configure IP based on the management type
   status = sli_set_sta_link_up_by_profile_mode(&profile);
-  VERIFY_STATUS_AND_RETURN(status);
+  if (status != SL_STATUS_OK) {
+    // Disconnect WiFi on IP configuration failure
+    sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
+    return status;
+  }
 
   dhcp_type[SLI_SI91X_CLIENT] = profile.ip.mode;
 

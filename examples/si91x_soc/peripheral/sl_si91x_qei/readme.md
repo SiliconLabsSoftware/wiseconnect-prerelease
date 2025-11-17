@@ -71,8 +71,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio)
 - [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-the-wi-se-connect-extension)
 - [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#connect-si-wx91x-to-computer)
-- [Upgrade your connectivity firmware ](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#update-si-wx91x-connectivity-firmware)
-- [Create a Studio project ](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project)
+- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#update-si-wx91x-connectivity-firmware)
+- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project)
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
@@ -119,6 +119,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ### Pin Configuration
 
 #### QEI Input Pins
+
 | QEI GPIO Pin | Explorer Kit Pin | Description |
 | --- | --- | --- |
 | GPIO_26 [P27] | GPIO_26 | Phase A Input |
@@ -126,12 +127,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | GPIO_25 [P25] | GPIO_25 | Index Input |
 
 #### GPIO Output Pins (for simulating QEI signals)
+
 | GPIO Pin | Explorer Kit Pin | Drives |
 | --- | --- | --- |
-| GPIO_29 [P31] | GPIO_29 | Phase A Signal Output |
-| GPIO_30 [P33] | GPIO_30 | Phase B Signal Output |
+| GPIO_29 [P33] | GPIO_29 | Phase A Signal Output |
+| GPIO_30 [P35] | GPIO_30 | Phase B Signal Output |
 | GPIO_12 [P21] | GPIO_12 | Index Signal Output |
-
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 

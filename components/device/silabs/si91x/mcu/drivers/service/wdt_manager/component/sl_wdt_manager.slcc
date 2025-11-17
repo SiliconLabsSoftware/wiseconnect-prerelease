@@ -43,3 +43,7 @@ template_contribution:
     value: 1
 define:
   - name: SL_WDT_MANAGER_PRESENT
+  - name: SL_WDT_MANAGER_PRESENT_M4_UC_RC
+    condition: [device_is_module]
+  - name: SL_WDT_MANAGER_PRESENT_M4_UC_XTAL
+    condition: [device_has_chip]

@@ -95,10 +95,17 @@ uint8_t rsi_app_resp_get_dev_addr[RSI_DEV_ADDR_LEN] = { 0 };
 #define RSI_BLE_CHAR_SERV_UUID   0x2803
 #define RSI_BLE_CLIENT_CHAR_UUID 0x2902
 
+#if BTDM_DEBUG_LOGGING
+#include "SEGGER_RTT.h"
+
+static uint8_t si91x_application_debug_buffer[1024] = { 0 };
+#endif
+
 osSemaphoreId_t ble_wait_on_connect;
+osSemaphoreId_t bt_debug_logs_sem;
 int32_t rsi_ble_dual_role(void);
 void connect_timeout_handler(TimerHandle_t xTimer);
-
+extern void rsi_task_bt_debug_logs(void);
 /*=======================================================================*/
 //!    Powersave configurations
 /*=======================================================================*/
@@ -189,6 +196,9 @@ static const sl_wifi_device_configuration_t
 #if RSI_BLE_AE_MAX_ADV_SETS
                   | SL_SI91X_BLE_AE_MAX_ADV_SETS(RSI_BLE_AE_MAX_ADV_SETS)
 #endif
+#if BTDM_DEBUG_LOGGING
+                  | BIT(25)
+#endif
                     ),
                .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) } };
 
@@ -235,6 +245,17 @@ const osThreadAttr_t wifi_thread_attributes = {
   .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityNormal,
+  .tz_module  = 0,
+  .reserved   = 0,
+};
+const osThreadAttr_t bt_debug_logs_thread_attributes = {
+  .name       = "bt_debug_logs_thread",
+  .attr_bits  = 0,
+  .cb_mem     = 0,
+  .cb_size    = 0,
+  .stack_mem  = 0,
+  .stack_size = 1024,
+  .priority   = osPriorityBelowNormal3,
   .tz_module  = 0,
   .reserved   = 0,
 };
@@ -1306,6 +1327,9 @@ int32_t rsi_ble_dual_role(void)
   rsi_ble_add_simple_chat_serv2();
   //! adding BLE Custom  Service service
   rsi_ble_add_custom_service_serv();
+#if BTDM_DEBUG_LOGGING
+  osSemaphoreRelease(bt_debug_logs_sem);
+#endif
 
   // callbacks
 
@@ -1403,6 +1427,14 @@ void rsi_wlan_ble_app_init(void)
     return;
   }
   printf("\r\nWi-Fi initialization is successful\n");
+#if BTDM_DEBUG_LOGGING
+  SEGGER_RTT_ConfigUpBuffer(1,
+                            "Si91x_ApplicationDebugBuffer",
+                            si91x_application_debug_buffer,
+                            sizeof(si91x_application_debug_buffer),
+                            SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
+  printf("\r\nrtt config is successful\n");
+#endif
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
@@ -1450,6 +1482,17 @@ void rsi_wlan_ble_app_init(void)
   }
 #endif
 #endif
+#if BTDM_DEBUG_LOGGING
+  bt_debug_logs_sem = osSemaphoreNew(1, 0, NULL);
+  //! Create task for btdm debug logs
+  osThreadId_t bt_debug_logs_thread_id =
+    osThreadNew((osThreadFunc_t)rsi_task_bt_debug_logs, NULL, &bt_debug_logs_thread_attributes);
+  if (bt_debug_logs_thread_id == NULL) {
+    printf("\r\nbt_debug_logs_thread failed to create\r\n");
+    return;
+  }
+#endif
+
   osThreadTerminate(osThreadGetId());
   while (1)
     ;
@@ -1457,5 +1500,10 @@ void rsi_wlan_ble_app_init(void)
 
 void app_init(void)
 {
+#if BTDM_DEBUG_LOGGING
+  // Initialize RTT before any other operations
+  SEGGER_RTT_Init();
+  printf("\r\n RTT Initialization completed\r\n");
+#endif
   osThreadNew((osThreadFunc_t)rsi_wlan_ble_app_init, NULL, &thread_attributes);
 }

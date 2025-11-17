@@ -2,7 +2,6 @@ id: wiseconnect3_sdk
 label: Wiseconnect
 description: Merged extension for wiseconnect3_sdk
 version: 4.0.0
-component: []
 component_path:
  - path: components/device/silabs/si91x/wireless/ble
  - path: components/board/silabs/component
@@ -99,19 +98,18 @@ component_path:
  - path: third_party/azure_freertos_middleware/libraries/coreMQTT
  - path: third_party/iot_socket
  - path: third_party/json_parser
- - path: third_party/mbedtls
  - path: third_party/paho_mqtt_embedded
  - path: third_party/qcbor/component
  - path: third_party/tcose/component
 documentation:
  - docset: bluetooth_le_siwx91x
-   version: 4.0.0-alpha.4
+   version: 4.0.0-beta.1
  - docset: platform_siwx91x
-   version: 4.0.0-alpha.4
+   version: 4.0.0-beta.1
  - docset: platform_nwp_siwx91x
-   version: 4.0.0-alpha.4
+   version: 4.0.0-beta.1
  - docset: wifi
-   version: 4.0.0-alpha.4
+   version: 4.0.0-beta.1
 upgrade_manifest: []
 post_build_profile:
  - path: utilities/postbuild_profile

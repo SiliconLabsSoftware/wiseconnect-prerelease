@@ -3,8 +3,7 @@ package: multi_protocol_siwx91x_app
 quality: production
 label: Wi-Fi Throughtput BLE Dual Role(NCP)
 category: Example|Wi-Fi_BLE
-description: 'This example demonstrates throughput measurements of WLAN/BLE in individual
-  or with protocol combinations in the SiWx91x module.
+description: 'This example demonstrates throughput measurements of WLAN/BLE in individual or with protocol combinations in the SiWx91x module.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Advanced
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 - path: ble_device_info.c
@@ -92,3 +88,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

@@ -159,6 +159,7 @@ typedef enum {
   SLI_WLAN_REQ_SCAN_RESULTS                 = 0xAF, ///< Scan Results
   SLI_WIFI_REQ_TSF                          = 0x65, ///< TSF
   SLI_WIFI_REQ_WIFI_RAIL                    = 0x99, ///< Wi-Fi Rail
+  SLI_WIFI_REQ_VENDOR_IE                    = 0x38, ///< vendor-specific IE Request
   SLI_COMMON_REQ_NWP_LOGGING                = 0x82  ///< NWP Logging
 } sli_wifi_request_commands_t;
 
@@ -210,6 +211,7 @@ typedef enum {
   SLI_WIFI_RSP_CARDREADY                    = 0x89, ///< Card Ready
   SLI_WIFI_RSP_SCAN_RESULTS                 = 0xAF, ///< Scan Results
   SLI_WIFI_RSP_TSF                          = 0x65, ///< TSF
+  SLI_WIFI_RSP_VENDOR_IE                    = 0x38, ///< vendor-specific IE Response
   SLI_COMMON_RSP_NWP_LOGGING                = 0x82  ///< NWP Logging
 } sli_wifi_response_commands_t;
 #endif

@@ -347,6 +347,16 @@ sl_status_t sl_mdns_service_discovery_start(const sl_mdns_t *mdns,
 {
   UNUSED_PARAMETER(mdns);
   UNUSED_PARAMETER(interface);
+
+  // NULL check for service_query
+  if (service_query == NULL || service_query->service_type == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (service_query->service_type[0] == '\0') {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
   sl_si91x_mdns_req_t req = { 0 };
   sl_status_t status      = SL_STATUS_FAIL;
 

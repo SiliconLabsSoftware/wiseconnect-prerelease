@@ -1316,7 +1316,7 @@ sl_status_t sl_si91x_sensorhub_delete_sensor(sl_sensor_id_t sensor_id)
   //!delete sensor
   sensor_list.sl_sensors_st[sensor_index].ctrl_handle =
     (void *)sensor_list.sl_sensors_st[sensor_index].sensor_impl->delete (
-      (void *)&sensor_list.sl_sensors_st[sensor_index].config_st->sensor_id);
+      (void *)&sensor_list.sl_sensors_st[sensor_index].sensor_handle);
   if (sensor_list.sl_sensors_st[sensor_index].ctrl_handle != NULL) {
     sensorhub_em_post_event(sensor_id, SL_SENSOR_DELETE_FAILED, NULL, EM_POST_TIME);
 

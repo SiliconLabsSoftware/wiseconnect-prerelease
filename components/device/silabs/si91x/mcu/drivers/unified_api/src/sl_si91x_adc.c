@@ -206,8 +206,8 @@ sl_status_t sl_si91x_adc_init(sl_adc_channel_config_t adc_channel_config, sl_adc
  ******************************************************************************/
 float sl_si91x_adc_get_chip_voltage(void)
 {
-  volatile float chip_volt = 0;
-  float max_ip_volt_scdc   = (float)2.4;
+  float chip_volt        = 0;
+  float max_ip_volt_scdc = (float)2.4;
   //Get the input voltage of chip.
   chip_volt = RSI_BOD_SoftTriggerGetBatteryStatus();
   //If input to chip less than 2.4V then switch input voltage supply from SCDC to HPLDO

@@ -102,6 +102,7 @@ void print_sl_ipv6_address(const sl_ipv6_address_t *ip_address);
 void print_mac_address(const sl_mac_address_t *mac_address);
 void sli_convert_uint32_to_bytestream(uint16_t data, uint8_t *buffer);
 void sli_little_to_big_endian(const unsigned int *source, unsigned char *result, unsigned int length);
+void sli_big_to_little_endian(const unsigned int *source, unsigned char *result, unsigned int length);
 int sl_inet_pton6(const char *src, const char *src_endp, unsigned char *dst, unsigned int *ptr_result);
 void sli_reverse_digits(unsigned char *xx, int no_digits);
 sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config);

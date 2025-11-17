@@ -2,9 +2,6 @@ id: bluetooth_le_siwx91x
 examples: []
 sample_apps: []
 description: ' '
-dependencies:
-- wifi/4.0.0-alpha.3@silabs
-- platform_siwx91x/4.0.0-alpha.4@silabs
 components:
 - ble
 extra_files:

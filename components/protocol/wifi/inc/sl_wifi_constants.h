@@ -61,7 +61,7 @@
 #define SL_WIFI_MIN_PSK_LENGTH 8
 
 /// Maximum length of the Wi-Fi Pairwise Master Key (PMK) credential.
-#define SL_WIFI_MAX_PMK_LENGTH 64
+#define SL_WIFI_MAX_PMK_LENGTH 32
 
 /// Maximum length of the key in WEP security.
 #define SL_WIFI_WEP_KEY_LENGTH 32
@@ -395,6 +395,10 @@ typedef enum {
 /**
   * @enum sl_wifi_ap_flag_t
   * @brief Option flags for Access Point (AP) interfaces.
+  * 
+  * @note When SL_WIFI_HIDDEN_SSID is enabled, the AP's SSID will not be broadcast in beacon frames.
+  *       Clients must manually enter the exact SSID name to connect to the hidden AP.
+  * @note Hidden SSID dynamic configurability is only available in APCONF when it is disabled in opermode.
   */
 typedef enum {
   SL_WIFI_HIDDEN_SSID = (1 << 0), ///< Hide the SSID of the AP

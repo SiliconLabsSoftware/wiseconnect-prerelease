@@ -45,7 +45,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Test the Application
 
-1. Sets the board state of RGB LED to ON and different set of colours can be observed.
+1. Activates the RGB LED on the board, cycling through various colors at 100ms intervals.
  
 
 > **Note:**

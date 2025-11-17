@@ -176,7 +176,11 @@ static sl_status_t test_initialize_wireless(void)
     .boot_option = LOAD_NWP_FW,
     .mac_address = NULL,
     .band        = SL_WIFI_BAND_MODE_2_4GHZ,
+#ifndef SL_SI91X_ACX_MODULE
     .region_code = SL_WIFI_REGION_US,
+#else
+    .region_code = SL_WIFI_IGNORE_REGION,
+#endif
     .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                      .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                      .feature_bit_map =

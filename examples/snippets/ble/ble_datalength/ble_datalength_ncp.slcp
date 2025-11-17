@@ -3,8 +3,7 @@ package: bluetooth_le_siwx91x_app
 quality: production
 label: BLE - Datalength (NCP)
 category: Example|BLE
-description: 'Start a BLE device in central central role and can be used to set data
-  length  extension with the connected remote device.
+description: 'Start a BLE device in central central role and can be used to set data length  extension with the connected remote device.
 
   '
 filter:
@@ -14,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Beginner
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 include:
@@ -70,3 +66,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

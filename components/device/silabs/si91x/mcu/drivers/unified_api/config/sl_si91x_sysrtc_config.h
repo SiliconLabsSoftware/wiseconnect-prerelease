@@ -123,4 +123,75 @@ sl_sysrtc_group_config_t sysrtc_group_config_handle = {
 // [SYSRTC_SL_SYSRTC]$
 // <<< sl:end pin_tool >>>
 
+// Defines the port and pin for PRS output signal Group 0, channel 0
+#ifdef SL_SYSRTC_PRS_OUT_G0_0_PORT
+sl_si91x_gpio_pin_config_t sysrtc_prs_pin = { { SL_SI91X_UULP_GPIO_3_PORT, SL_SI91X_UULP_GPIO_3_PIN }, GPIO_OUTPUT };
+#endif
+// Defines the port and pin for PRS output signal Group 0, channel 1
+#ifdef SL_SYSRTC_PRS_OUT_G0_1_PORT
+sl_si91x_gpio_pin_config_t sysrtc_prs_pin = { { SL_SI91X_UULP_GPIO_0_PORT, SL_SI91X_UULP_GPIO_0_PIN }, GPIO_OUTPUT };
+
+#endif
+
+// Defines the port and pin for PRS input signal Group 0, channel 0
+#ifdef SL_SYSRTC_PRS_IN_G0_PORT
+sl_si91x_gpio_pin_config_t sysrtc_prs_pin = { { SL_SI91X_UULP_GPIO_0_PORT, SL_SI91X_UULP_GPIO_0_PIN }, GPIO_INPUT };
+#endif
+// Defines the port and pin for PRS output signal Group 1, channel 0
+
+#ifdef SL_SYSRTC_PRS_OUT_G1_0_PORT
+
+sl_si91x_gpio_pin_config_t sysrtc_prs_pin = { { SL_SI91X_UULP_GPIO_1_PORT, SL_SI91X_UULP_GPIO_1_PIN }, GPIO_OUTPUT };
+#endif
+// Defines the port and pin for PRS output signal Group 1, channel 1
+#ifdef SL_SYSRTC_PRS_OUT_G1_1_PORT
+
+sl_si91x_gpio_pin_config_t sysrtc_prs_pin = { { SL_SI91X_UULP_GPIO_2_PORT, SL_SI91X_UULP_GPIO_2_PIN }, GPIO_OUTPUT };
+#endif
+// Defines the port and pin for PRS input signal Group 1, channel 0
+
+#ifdef SL_SYSRTC_PRS_IN_G1_PORT
+sl_si91x_gpio_pin_config_t sysrtc_prs_pin = { { SL_SI91X_UULP_GPIO_1_PORT, SL_SI91X_UULP_GPIO_1_PIN }, GPIO_INPUT };
+#endif
+#if (SL_SYSRTC_GROUP == GROUP_0)
+
+#if (defined(SL_SYSRTC_PRS_IN_G1_PORT) || defined(SL_SYSRTC_PRS_OUT_G1_0_PORT) || defined(SL_SYSRTC_PRS_OUT_G1_1_PORT))
+#warning "Selecting PRS GPIOs from both Group 0 and Group 1 simultaneously is not supported"
+#endif
+#if (defined(SL_SYSRTC_PRS_IN_G0_PORT))
+#if (defined(SL_SYSRTC_PRS_OUT_G0_0_PORT) || defined(SL_SYSRTC_PRS_OUT_G0_1_PORT))
+#warning "Selecting multiple PRS GPIO's at a time is not supported"
+#endif
+#endif
+#if (defined(SL_SYSRTC_PRS_OUT_G0_0_PORT))
+#if (defined(SL_SYSRTC_PRS_OUT_IN_G0_PORT) || defined(SL_SYSRTC_PRS_OUT_G0_1_PORT))
+#warning "Selecting multiple PRS GPIO's at a time is not supported"
+#endif
+#endif
+#if (defined(SL_SYSRTC_PRS_OUT_G0_1_PORT))
+#if (defined(SL_SYSRTC_PRS_OUT_IN_G0_PORT) || defined(SL_SYSRTC_PRS_OUT_G0_0_PORT))
+#warning "Selecting multiple PRS GPIO's at a time is not supported"
+#endif
+#endif
+#endif
+#if (SL_SYSRTC_GROUP == GROUP_1)
+#if (defined(SL_SYSRTC_PRS_IN_G0_PORT) || defined(SL_SYSRTC_PRS_OUT_G0_0_PORT) || defined(SL_SYSRTC_PRS_OUT_G0_1_PORT))
+#warning "Selecting PRS GPIOs from both Group 0 and Group 1 simultaneously is not supported"
+#endif
+#if (defined(SL_SYSRTC_PRS_IN_G1_PORT))
+#if (defined(SL_SYSRTC_PRS_OUT_G1_0_PORT) || defined(SL_SYSRTC_PRS_OUT_G1_1_PORT))
+#warning "Selecting multiple PRS GPIO's at a time is not supported"
+#endif
+#endif
+#if (defined(SL_SYSRTC_PRS_OUT_G1_0_PORT))
+#if (defined(SL_SYSRTC_PRS_OUT_IN_G1_PORT) || defined(SL_SYSRTC_PRS_OUT_G1_1_PORT))
+#warning "Selecting multiple PRS GPIO's at a time is not supported"
+#endif
+#endif
+#if (defined(SL_SYSRTC_PRS_OUT_G1_1_PORT))
+#if (defined(SL_SYSRTC_PRS_OUT_IN_G1_PORT) || defined(SL_SYSRTC_PRS_OUT_G1_0_PORT))
+#warning "Selecting multiple PRS GPIO's at a time is not supported"
+#endif
+#endif
+#endif
 #endif // SL_SYSRTC_CONFIG_H

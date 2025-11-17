@@ -38,6 +38,7 @@
 #include "sl_si91x_protocol_types.h"
 #include "sli_net_utility.h"
 #include "sl_si91x_http_client_callback_framework.h"
+#include "sl_rsi_utility.h"
 #include <sl_string.h>
 
 /******************************************************
@@ -466,35 +467,6 @@ static sli_si91x_http_client_request_t *sli_allocate_and_initialize_request()
   return http_client_request;
 }
 
-static sl_status_t sli_configure_sni(sli_si91x_http_client_request_t *http_client_request,
-                                     const sl_http_client_request_t *request)
-{
-  http_client_request->https_enable |= SL_SI91X_HTTPS_USE_SNI;
-
-  if (request->sni_extension != NULL) {
-    return sli_si91x_set_sni_for_embedded_socket(request->sni_extension);
-  }
-
-  if (request->host_name != NULL && request->ip_address != request->host_name) {
-    size_t host_name_length = sl_strlen((char *)request->host_name);
-    sl_si91x_socket_type_length_value_t *tls_sni =
-      (sl_si91x_socket_type_length_value_t *)malloc(sizeof(sl_si91x_socket_type_length_value_t) + host_name_length);
-    if (tls_sni == NULL) {
-      return SL_STATUS_ALLOCATION_FAILED;
-    }
-
-    tls_sni->type   = SL_SI91X_TLS_EXTENSION_SNI_TYPE;
-    tls_sni->length = (uint16_t)host_name_length;
-    memcpy(tls_sni->value, request->host_name, tls_sni->length);
-
-    sl_status_t status = sli_si91x_set_sni_for_embedded_socket(tls_sni);
-    free(tls_sni);
-    return status;
-  }
-
-  return SL_STATUS_OK;
-}
-
 static sl_status_t sli_configure_https(sli_si91x_http_client_request_t *http_client_request,
                                        const sl_http_client_internal_t *client_internal,
                                        const sl_http_client_request_t *request)
@@ -524,7 +496,33 @@ static sl_status_t sli_configure_https(sli_si91x_http_client_request_t *http_cli
   }
 
   if (client_internal->configuration.https_use_sni) {
-    return sli_configure_sni(http_client_request, request);
+    // Convert public socket type to internal TLS extension type
+    sli_si91x_tls_extension_info_t *internal_sni = NULL;
+
+    if (request->sni_extension != NULL) {
+      // Check for potential buffer overflow
+      if (request->sni_extension->length > SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA) {
+        return SL_STATUS_WOULD_OVERFLOW;
+      }
+
+      internal_sni = (sli_si91x_tls_extension_info_t *)malloc(sizeof(sli_si91x_tls_extension_info_t)
+                                                              + request->sni_extension->length);
+      if (internal_sni == NULL) {
+        return SL_STATUS_ALLOCATION_FAILED;
+      }
+
+      internal_sni->type   = request->sni_extension->type;
+      internal_sni->length = request->sni_extension->length;
+      memcpy(internal_sni->value, request->sni_extension->value, request->sni_extension->length);
+    }
+
+    sl_status_t status = sli_configure_sni(internal_sni, request->host_name, SI91X_SNI_FOR_HTTPS);
+
+    if (internal_sni != NULL) {
+      free(internal_sni);
+    }
+
+    return status;
   }
 
   return SL_STATUS_OK;
@@ -545,6 +543,9 @@ static sl_status_t sli_fill_http_request_common_fields(sli_si91x_http_client_req
 
   // Fill HTTPS feature
   if (client_internal->configuration.https_enable) {
+    if (client_internal->configuration.https_use_sni) {
+      http_client_request->https_enable |= SL_SI91X_HTTPS_USE_SNI;
+    }
     sl_status_t status = sli_configure_https(http_client_request, client_internal, request);
     if (status != SL_STATUS_OK) {
       return status;
@@ -1059,7 +1060,7 @@ sl_status_t sl_http_client_send_request(const sl_http_client_t *client, const sl
     }
   }
 
-  if (status == SL_STATUS_OK) {
+  if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS) {
     // Store request configurations into client_internal structure
     memcpy(&http_client_handle.request, request, sizeof(sl_http_client_request_t));
 

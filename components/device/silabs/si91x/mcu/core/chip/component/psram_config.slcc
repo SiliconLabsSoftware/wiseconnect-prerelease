@@ -18,3 +18,5 @@ config_file:
     component: psram_core
     file_id: psram_pin_config
     vendor: silabs
+  unless:
+  - opn_config

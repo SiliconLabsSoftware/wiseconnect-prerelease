@@ -819,6 +819,7 @@ sl_status_t sl_wifi_set_11ax_config(uint8_t guard_interval);
  *       - Stop Continuous mode
  *       - Start Continuous Wave mode
  * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
 *************************************************************************************************************************************************************************************************************************/
 sl_status_t sl_wifi_transmit_test_start(sl_wifi_interface_t interface,
                                         const sl_wifi_transmitter_test_info_t *tx_test_info);
@@ -864,6 +865,7 @@ sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface);
  *
  * @return
  *   sl_status_t. See [Status Codes] (https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes] (../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
 ******************************************************************************************************************************************************/
 sl_status_t sl_wifi_frequency_offset(sl_wifi_interface_t interface, const sl_wifi_freq_offset_t *frequency_calibration);
 
@@ -923,6 +925,7 @@ sl_status_t sl_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi
  *      In case of SL_WIFI_SCAN_TYPE_EXTENDED scan type, use @ref sl_wifi_get_stored_scan_results() API to get the scan results; after the scan status callback is received. 
  *      This API is not applicable for ADV_SCAN scan_type in AP mode
  *      This API is supported in AP mode, to scan for - to trigger this, send a scan after sl_wifi_start_ap() API with the SL_WIFI_SCAN_TYPE_ACTIVE scan_type.
+ *      After connecting to Wi-Fi, if you want to initiate a background scan, call this API with scan_type set to SL_WIFI_SCAN_TYPE_ADV_SCAN in the @ref sl_wifi_scan_configuration_t.
  ******************************************************************************/
 sl_status_t sl_wifi_start_scan(sl_wifi_interface_t interface,
                                const sl_wifi_ssid_t *optional_ssid,
@@ -1042,17 +1045,19 @@ sl_status_t sl_wifi_wait_for_scan_results(sl_wifi_scan_result_t **scan_result_ar
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
- *   If channel, band, and BSSID are provided, this API attempts to connect without scanning.
  *   If security_type is SL_WIFI_WPA3/SL_WIFI_WPA3_ENTERPRISE then SL_WIFI_JOIN_FEAT_MFP_CAPABLE_REQUIRED join feature is enabled internally by SDK.
  *   If security_type is SL_WIFI_WPA3_TRANSITION/SL_WIFI_WPA3_TRANSITION_ENTERPRISE then SL_WIFI_JOIN_FEAT_MFP_CAPABLE_REQUIRED join feature is disabled and SL_WIFI_JOIN_FEAT_MFP_CAPABLE_ONLY join feature is enabled internally by SDK.
- *   Default Active Channel time is 100 milliseconds. If the user wants to modify the time, sl_wifi_set_advanced_scan_configuration can be called.
+ *   Default Active Channel time is 100 milliseconds. Users can change this default by calling @ref sl_wifi_set_advanced_scan_configuration() before connecting, which allows customization of the active channel scan time for different performance requirements.
  *   Default Authentication timeout and Association timeout is 300 milliseconds. If the user wants to modify the time, sl_wifi_set_advanced_client_configuration can be called.
- *   Default Keep Alive timeout is 30 milliseconds. If the user wants to modify the time, sl_wifi_set_advanced_client_configuration can be called.
+ *   Default Keep Alive timeout is 30 seconds. If the user wants to modify the time, sl_wifi_set_advanced_client_configuration can be called.
  * @note 
  *   In FCC certified module the behavior is as follows
  *      1. Region configuration is not supported and if triggered will return error SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE.
  *      2. STA mode channels 1 to 11 are actively scanned and 12, 13, 14 are passively scanned.
  *      3. Concurrent mode supports only 1 to 11 channels.
+ * @note
+ *   For IC parts (non-FCC certified modules), channels 12, 13, and 14 can be actively scanned by setting the device region 
+ *   to a non-US region using sl_si91x_set_device_region API before calling this API.
  * @note
  *   It is recommended to set the timeout to 120000 milliseconds to cover the worst case timeout scenario.
  * @note
@@ -2262,6 +2267,62 @@ sl_status_t sl_wifi_read_ctune(sl_wifi_interface_t interface,
  *   This API is supported only in PER mode.
  */
 sl_status_t sl_wifi_stop_rx(sl_wifi_interface_t interface);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Add a vendor-specific IE to Wi-Fi management frames.
+ *
+ * @details
+ *   This function blocks until the network processor has added the vendor-specific IE.
+ *   The status returned by the network processor is passed on in the return value of this function.
+ *
+ * @param[in] vendor_ie
+ *   Details of vendor-specific IE to add. See @ref sl_wifi_vendor_ie_t.
+ * @param[out] fw_unique_id
+ *   Pointer to store the firmware-assigned unique ID for the added vendor IE.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *   The following status codes are returned by this API:
+ *     - SL_STATUS_OK: Operation successful.
+ *     - SL_STATUS_INVALID_PARAMETER: Invalid input parameter.
+ *     - SL_STATUS_FAIL: Other failure.
+ ******************************************************************************/
+sl_status_t sl_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Remove a vendor-specific IE from Wi-Fi management frames.
+ *
+ * @details
+ *   This function blocks until the network processor has removed the vendor-specific IE.
+ *   The status returned by the network processor is passed on in the return value of this function.
+ *
+ * @param[in] unique_id
+ *   Unique identifier of vendor-specific IE to remove.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *   The following status codes are returned by this API:
+ *     - SL_STATUS_OK: Operation successful.
+ *     - SL_STATUS_INVALID_PARAMETER: Invalid input parameter.
+ *     - SL_STATUS_FAIL: Other failure.
+ ******************************************************************************/
+sl_status_t sl_wifi_remove_vendor_ie(uint8_t unique_id);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Remove all vendor-specific IEs from Wi-Fi management frames.
+ *
+ * @details
+ *   This function blocks until the network processor has removed all vendor-specific IEs.
+ *   The status returned by the network processor is passed on in the return value of this function.
+ *
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *   The following status codes are returned by this API:
+ *     - SL_STATUS_OK: Operation successful.
+ *     - SL_STATUS_FAIL: Other failure.
+ ******************************************************************************/
+sl_status_t sl_wifi_remove_all_vendor_ie(void);
 
 /***************************************************************************/ /**
  * @brief

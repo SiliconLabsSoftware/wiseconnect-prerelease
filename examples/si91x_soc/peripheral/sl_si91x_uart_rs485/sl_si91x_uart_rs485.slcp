@@ -1,15 +1,11 @@
 project_name: sl_si91x_uart_rs485
 package: platform_siwx91x_app
-description: 'This example project configures UART RS485 in multidrop mode and transmits
-  and receives data.
+description: 'This example project configures UART RS485 in multidrop mode and transmits and receives data.
 
   '
 category: example|peripheral
 quality: production
 label: SI91x - SL_UART_RS485
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -52,3 +48,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

@@ -420,6 +420,28 @@ sl_status_t sl_si91x_m4_ta_secure_handshake(uint8_t sub_cmd_type,
                                             const uint8_t *input_data,
                                             uint8_t output_len,
                                             const uint8_t *output_data);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Configure M4 RAM address for NWP timestamp updates.
+ * 
+ * @details
+ *   This function configures an M4 RAM address where the Network Processor (NWP) 
+ *   will continuously write timestamp updates. The NWP will keep the specified 
+ *   memory location updated with the current timestamp value.
+ * 
+ * @param[in] addr_len
+ *   Length of address data in bytes.
+ * @param[in] address
+ *   Pointer to the variable that holds the M4 RAM address where NWP should write timestamps.
+ * 
+ * @pre Pre-conditions:
+ * - @ref sl_si91x_driver_init should be called before this API.
+ * 
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_si91x_configure_timestamp_memory_location(uint8_t addr_len, const uint32_t *address);
 #endif
 
 /***************************************************************************/ /**
@@ -629,7 +651,7 @@ sl_status_t sl_si91x_get_firmware_size(const void *buffer, uint32_t *fw_image_si
  * 
  * @pre Pre-conditions:
  * - [sl_wifi_init()](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
- * - To set XTAL and PMU good time from host, call this API before setting the opermode in [sl_wifi_init()](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init).
+ * - To set XTAL and PMU good time from host, call this API before [sl_wifi_init()](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init).
  * 
  * @param[in] nwp_config
  *   Configuration as identified by @ref sl_si91x_nwp_configuration_t.
@@ -657,6 +679,8 @@ sl_status_t sl_si91x_get_firmware_size(const void *buffer, uint32_t *fw_image_si
  * @note
  * However, the @ref SI91X_CONFIG_FEATURE_BITMAP supports only a limited set of predefined values: 600, 1000, 2000, and 3000 microseconds. If both this API and
  * the configuration feature bitmap are used, the Network Processor (NWP) prioritizes the value configured via the API.
+ * @note
+ * XTAL (crystal) good time or PMU good time configured through this API is applied once during the subsequent call to sl_net_init()/sl_wifi_init().
  ******************************************************************************/
 sl_status_t sl_si91x_set_nwp_config_request(sl_si91x_nwp_configuration_t nwp_config);
 
@@ -1294,3 +1318,20 @@ sl_status_t sli_command_engine_status_queue_deinit();
  *                     or an appropriate error code otherwise.
  ******************************************************************************/
 sl_status_t sli_get_nwp_timestamp(uint32_t *timestamp);
+
+/***************************************************************************/
+/**
+ * @brief
+ *   Get the config feature bit map that was set during device initialization.
+ *
+ * @details
+ *   This function retrieves the config_feature_bit_map value that was configured
+ *   during sl_wifi_init() call.
+ *
+ * @pre Pre-conditions:
+ * - @ref sl_si91x_driver_init should be called before this API.
+ *
+ * @return
+ *   uint32_t - The config feature bit map value.
+ ******************************************************************************/
+uint32_t sli_si91x_get_config_feature_bit_map(void);

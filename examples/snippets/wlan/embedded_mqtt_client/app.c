@@ -44,10 +44,11 @@
 #ifdef SLI_SI91X_ENABLE_IPV6
 #define MQTT_BROKER_IP "2401:4901:1290:10de::1000"
 #else
-#define MQTT_BROKER_IP "192.168.1.27"
+#define MQTT_BROKER_IP "192.168.0.107"
 #endif
 
 #define MQTT_BROKER_PORT 8886
+#define MQTT_BROKER_HOST "yourmqtthost.com"
 
 #define CLIENT_PORT 1
 
@@ -132,14 +133,17 @@ uint8_t is_execution_completed = 0;
 
 sl_mqtt_client_credentials_t *client_credentails = NULL;
 
-sl_mqtt_client_configuration_t mqtt_client_configuration = { .is_clean_session = IS_CLEAN_SESSION,
-                                                             .client_id        = (uint8_t *)CLIENT_ID,
-                                                             .client_id_length = strlen(CLIENT_ID),
+sl_mqtt_client_configuration_v2_t mqtt_client_configuration = { .is_clean_session = IS_CLEAN_SESSION,
+                                                                .client_id        = (uint8_t *)CLIENT_ID,
+                                                                .client_id_length = strlen(CLIENT_ID),
 #if ENCRYPT_CONNECTION
-                                                             .tls_flags = SL_MQTT_TLS_ENABLE | SL_MQTT_TLS_TLSV_1_2
-                                                                          | SL_MQTT_TLS_CERT_INDEX_1,
+                                                                .tls_flags = SL_MQTT_TLS_ENABLE | SL_MQTT_TLS_TLSV_1_2
+                                                                             | SL_MQTT_TLS_CERT_INDEX_1
+                                                                             | SL_MQTT_TLS_SNI_ENABLE,
+                                                                .mqtt_use_sni = 1, /* enable SNI when using TLS */
+                                                                .host_name    = (uint8_t *)MQTT_BROKER_HOST,
 #endif
-                                                             .client_port = CLIENT_PORT };
+                                                                .client_port = CLIENT_PORT };
 
 sl_mqtt_broker_t mqtt_broker_configuration = {
   .port                    = MQTT_BROKER_PORT,
@@ -421,7 +425,7 @@ sl_status_t mqtt_example()
 #endif
 
   status =
-    sl_mqtt_client_connect(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
+    sl_mqtt_client_connect_v2(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
   if (status != SL_STATUS_IN_PROGRESS) {
     printf("Failed to connect to mqtt broker: 0x%lx\r\n", status);
 

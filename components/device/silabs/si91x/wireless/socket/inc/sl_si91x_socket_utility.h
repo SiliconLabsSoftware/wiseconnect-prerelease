@@ -321,28 +321,6 @@ sl_status_t sli_si91x_udp_connect_if_unconnected(sli_si91x_socket_t *si91x_socke
                                                  int socket_id);
 
 /**
- * @brief 
- *    Configures the Server Name Indication (SNI) extension for a socket.
- *
- *  @details
- *    This function sets up the SNI extension, which is used in TLS communication
- *    to specify the hostname of the server the client intends to connect to. It prepares
- *    the necessary request structure and initiates the configuration process for the
- *    embedded socket.
- *
- * @param[in] sni_extension 
- *    Pointer to the SNI extension data of type `sl_si91x_socket_type_length_value_t`.
- *    This structure contains the type, length, and value of the SNI extension.
- *
- * @return sl_status_t
- *    - SL_STATUS_OK: Operation completed successfully.
- *    - SL_STATUS_SI91X_MEMORY_ERROR: The SNI extension size exceeds the allowed limit.
- *    - Other error codes: Refer to [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) 
- *      and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details. 
- */
-sl_status_t sli_si91x_set_sni_for_embedded_socket(const sl_si91x_socket_type_length_value_t *sni_extension);
-
-/** 
  * @addtogroup SOCKET_CONFIGURATION_FUNCTION
  * @{
  */

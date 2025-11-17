@@ -3,9 +3,7 @@ package: multi_protocol_siwx91x_app
 quality: production
 label: Wi-Fi Coex - Wi-Fi Concurrent NAT with BLE Provisioning (NCP)
 category: Example|Wi-Fi_BLE
-description: 'This application demonstrates how to enable AP+STA interfaces in concurrent
-  mode and how third-party Wi-Fi clients connected to the SiWG917 can access the internet
-  through a third-party AP using NAT.
+description: 'This application demonstrates how to enable AP+STA interfaces in concurrent mode and how third-party Wi-Fi clients connected to the SiWG917 can access the internet through a third-party AP using NAT.
 
   '
 filter:
@@ -15,9 +13,6 @@ filter:
 - name: Project Difficulty
   value:
   - Intermediate
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: app.c
 - path: ble_app.c
@@ -84,3 +79,11 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

@@ -1,15 +1,11 @@
 project_name: sl_si91x_bod
 package: platform_siwx91x_app
-description: 'Demonstrates how to use BOD when the supply voltage is less than the
-  BOD threshold .
+description: 'Demonstrates how to use BOD when the supply voltage is less than the BOD threshold .
 
   '
 category: example|peripheral
 quality: production
 label: SI91x - BOD
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 source:
 - path: bod_example.c
 - path: app.c
@@ -45,3 +41,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

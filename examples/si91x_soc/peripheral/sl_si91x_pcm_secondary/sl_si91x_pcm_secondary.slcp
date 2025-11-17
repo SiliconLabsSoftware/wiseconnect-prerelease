@@ -1,15 +1,11 @@
 project_name: sl_si91x_pcm_secondary
 package: platform_siwx91x_app
-description: 'Demonstrates how to use the PCM secondary interface on the SI91x SoC
-  device.
+description: 'Demonstrates how to use the PCM secondary interface on the SI91x SoC device.
 
   '
 category: example|peripheral
 quality: production
 label: SI91x - SL_PCM_SECONDARY
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -48,3 +44,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

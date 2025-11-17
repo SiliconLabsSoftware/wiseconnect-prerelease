@@ -1,16 +1,9 @@
 project_name: sl_si91x_gpio_ulp_example
 package: platform_siwx91x_app
-description: "This application demonstrates toggling of a ULP GPIO pin for the ULP\
-  \ instance and managing the ULP pin interrupt. \nIt showcases how to configure the\
-  \ ULP GPIO pins for specific tasks and respond to pin interrupt events, \nallowing\
-  \ efficient power management and low-latency interrupt handling in ultra-low-power\
-  \ modes.\n"
+description: "This application demonstrates toggling of a ULP GPIO pin for the ULP instance and managing the ULP pin interrupt. \nIt showcases how to configure the ULP GPIO pins for specific tasks and respond to pin interrupt events, \nallowing efficient power management and low-latency interrupt handling in ultra-low-power modes.\n"
 category: example|peripheral
 quality: production
 label: SI91x - SL_GPIO_ULP_EXAMPLE
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -41,3 +34,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

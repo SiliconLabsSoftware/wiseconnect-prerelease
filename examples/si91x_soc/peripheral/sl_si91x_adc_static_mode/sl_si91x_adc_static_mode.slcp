@@ -1,16 +1,11 @@
 project_name: sl_si91x_adc_static_mode
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and usage of the ADC
-  peripheral  in static mode on the SiWx917 SoC, showcasing its ability to capture
-  and process  analog input signals under fixed settings.
+description: 'This application demonstrates the configuration and usage of the ADC peripheral  in static mode on the SiWx917 SoC, showcasing its ability to capture and process  analog input signals under fixed settings.
 
   '
 category: example|peripheral
 quality: production
 label: SI91x - SL_ADC Static Mode
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -52,3 +47,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

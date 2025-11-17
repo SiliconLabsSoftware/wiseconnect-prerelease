@@ -227,6 +227,9 @@ void wifi_app_task(void *unused)
   int32_t status = SL_STATUS_FAIL;
   UNUSED_PARAMETER(unused);
 
+  select_sem              = NULL;
+  data_received_semaphore = NULL;
+
   while (1) {
     switch (wlan_app_cb) {
       case WIFI_APP_INITIAL_STATE: {
@@ -341,6 +344,15 @@ void wifi_app_task(void *unused)
         break;
     }
   }
+  // Clean up semaphores after MQTT session completes
+  if (select_sem != NULL) {
+    osSemaphoreDelete(select_sem);
+    select_sem = NULL;
+  }
+  if (data_received_semaphore != NULL) {
+    osSemaphoreDelete(data_received_semaphore);
+    data_received_semaphore = NULL;
+  }
 }
 
 sl_status_t start_aws_mqtt(void)
@@ -356,8 +368,17 @@ sl_status_t start_aws_mqtt(void)
   }
   printf("\r\nLoaded certificates\r\n");
 
-  select_sem              = osSemaphoreNew(1, 0, NULL);
+  select_sem = osSemaphoreNew(1, 0, NULL);
+  if (select_sem == NULL) {
+    printf("\r\nFailed to create select_sem semaphore\r\n");
+    return SL_STATUS_FAIL;
+  }
+
   data_received_semaphore = osSemaphoreNew(1, 0, NULL);
+  if (data_received_semaphore == NULL) {
+    printf("\r\nFailed to create data_received_semaphore semaphore\r\n");
+    return SL_STATUS_FAIL;
+  }
 
 #if !(defined(SLI_SI91X_MCU_INTERFACE) && ENABLE_NWP_POWER_SAVE)
   uint32_t start_time         = 0;
@@ -422,7 +443,12 @@ sl_status_t start_aws_mqtt(void)
     switch (wlan_app_cb) {
 
       case WIFI_APP_MQTT_INIT_STATE: {
-        rc = aws_iot_mqtt_init(&mqtt_client, &mqtt_init_params);
+        // Clean up state variables from previous session
+        check_for_recv_data = 0;
+        qos1_publish_handle = 0;
+        pub_state           = 0;
+        select_given        = 0;
+        rc                  = aws_iot_mqtt_init(&mqtt_client, &mqtt_init_params);
         if (SUCCESS != rc) {
           wlan_app_cb = WIFI_APP_MQTT_INIT_STATE;
           printf("\r\nMQTT Initialization failed with error: %d\r\n", rc);

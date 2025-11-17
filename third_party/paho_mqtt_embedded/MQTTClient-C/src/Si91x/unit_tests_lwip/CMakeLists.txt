@@ -1,8 +1,10 @@
 project(MQTTSi91x_lwip)
 
 
-# Define necessary macros for mbedTLS and LwIP
-add_definitions(-DMBEDTLS_CONFIG_FILE="mbedtls_config.h")
+# Disable TLS for unit tests (GSDK mbedtls is used in actual builds)
+add_definitions(-DMQTT_TLS_ENABLE=0)
+
+# Define necessary macros for LwIP
 add_definitions(-DLWIP_SOCKET=1)
 add_definitions(-DLWIP_NETCONN=1)
 
@@ -31,7 +33,6 @@ include_directories(
     ../../../../../../components/lwip
     ../../../../../../components/lwip/hosts/freertos/include
     ../../../../../../components/lwip/src/include/compat/posix
-    ../../../../../../third_party/mbedtls/include
 	../../../../../../components/sli_wifi/inc
 	../../../../../../components/gsdk/common/inc
 	../../../../../../components/protocol/wifi/inc
@@ -43,7 +44,6 @@ include_directories(
 	../../../../../../components/device/silabs/si91x/wireless/socket/inc
 	../../../../../../components/device/silabs/si91x/wireless/sl_net/inc
     ../../../../../../components/sli_wifi/inc
-    ../../../../../../third_party/mbedtls/include/mbedtls
 	../../../../../../components/service/mdns/inc/
 
 )

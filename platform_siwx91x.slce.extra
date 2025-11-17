@@ -2,8 +2,6 @@ id: platform_siwx91x
 examples: []
 sample_apps: []
 description: ' '
-dependencies:
-- platform/6.0.0-alpha.6@silabs
 components:
 - brd4343a_config
 - brd4339a_config

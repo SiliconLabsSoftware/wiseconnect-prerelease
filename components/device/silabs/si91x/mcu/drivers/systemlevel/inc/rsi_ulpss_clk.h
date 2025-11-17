@@ -41,14 +41,14 @@
 #include "rsi_power_save.h"
 
 /*requied delays for turn on the clocks in micro seconds*/
-#define MCU_ULP_40MHZ_CLK_EN_TRUN_ON_DELAY          10   /*  delay to enable the ULP 40MHZ  CLK*/
-#define MCU_ULP_DOUBLER_CLK_EN_TRUN_ON_DELAY        10   /*  delay to enable the ULP DOUBLER CLK*/
-#define MCU_ULP_20MHZ_RING_OSC_CLK_EN_TRUN_ON_DELAY 10   /*  delay to enable the ULP 20MHZ_RING_OSC CLK*/
-#define MCU_ULP_MHZ_RC_CLK_EN_TRUN_ON_DELAY         2    /*  delay to enable the ULP MHZ_RC CLK*/
-#define MCU_ULP_32KHZ_XTAL_CLK_EN_TRUN_ON_DELAY_1   500  /*  delay to enable the ULP 32KHZ_XTAL CLK*/
-#define MCU_ULP_32KHZ_XTAL_CLK_EN_TRUN_ON_DELAY_2   1500 /*  delay to enable the ULP 32KHZ_XTAL CLK*/
-#define MCU_ULP_32KHZ_RO_CLK_EN_TRUN_ON_DELAY       250  /*  32 KHz RO clock is not supported */
-#define MCU_ULP_32KHZ_RC_CLK_EN_TRUN_ON_DELAY       150  /*  delay to enable the ULP 32KHZ_RC CLK*/
+#define MCU_ULP_40MHZ_CLK_EN_TURN_ON_DELAY          10   /*  delay to enable the ULP 40MHZ CLK*/
+#define MCU_ULP_DOUBLER_CLK_EN_TURN_ON_DELAY        10   /*  delay to enable the ULP DOUBLER CLK*/
+#define MCU_ULP_20MHZ_RING_OSC_CLK_EN_TURN_ON_DELAY 10   /*  delay to enable the ULP 20MHZ_RING_OSC CLK*/
+#define MCU_ULP_MHZ_RC_CLK_EN_TURN_ON_DELAY         2    /*  delay to enable the ULP MHZ_RC CLK*/
+#define MCU_ULP_32KHZ_XTAL_CLK_EN_TURN_ON_DELAY_1   500  /*  delay to enable the ULP 32KHZ_XTAL CLK*/
+#define MCU_ULP_32KHZ_XTAL_CLK_EN_TURN_ON_DELAY_2   1500 /*  delay to enable the ULP 32KHZ_XTAL CLK*/
+#define MCU_ULP_32KHZ_RO_CLK_EN_TURN_ON_DELAY       250  /*  delay to enable the ULP 32KHZ_RO CLK*/
+#define MCU_ULP_32KHZ_RC_CLK_EN_TURN_ON_DELAY       150  /*  delay to enable the ULP 32KHZ_RC CLK*/
 
 /*Clock enable Bits */
 #define TOUCH_SENSOR_PCLK_ENABLE        BIT(31) /*  Enables TOUCH_SENSOR_PCLK_ENABLE */

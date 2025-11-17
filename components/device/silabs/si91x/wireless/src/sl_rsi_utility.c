@@ -56,6 +56,7 @@
 #include "sli_wifi_power_profile.h"
 #include "sli_wifi_memory_manager.h"
 #include "sli_wifi.h"
+#include "sl_string.h"
 
 static bool sli_si91x_tx_command_status              = false;
 static volatile bool power_save_sequence_in_progress = false;
@@ -1864,3 +1865,88 @@ bool sl_si91x_is_device_initialized(void)
 {
   return device_initialized;
 }
+
+#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
+// Implementation of SNI extension setting for embedded sockets
+sl_status_t sli_si91x_set_sni_for_embedded_socket(const sli_si91x_tls_extension_info_t *sni_extension,
+                                                  sli_si91x_sni_target_protocol_t sni_target_protocol)
+{
+  sl_status_t status     = SL_STATUS_OK;
+  uint32_t packet_length = 0;
+
+  if (sni_extension == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
+  // Validate SNI extension type
+  if (sni_extension->type != SL_SI91X_TLS_EXTENSION_SNI_TYPE) {
+    return SL_STATUS_INVALID_TYPE;
+  }
+
+  // Validate length before any memory operations
+  if (sni_extension->length == 0
+      || sizeof(sli_si91x_tls_extension_info_t) + sni_extension->length > SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA) {
+    return SL_STATUS_WOULD_OVERFLOW;
+  }
+
+  sli_si91x_sni_for_embedded_socket_request_t *request = (sli_si91x_sni_for_embedded_socket_request_t *)malloc(
+    sizeof(sli_si91x_sni_for_embedded_socket_request_t) + SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA);
+  SLI_VERIFY_MALLOC_AND_RETURN(request);
+
+  memset(request, 0, sizeof(sli_si91x_sni_for_embedded_socket_request_t) + SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA);
+
+  request->protocol = (uint16_t)sni_target_protocol;
+
+  request->offset = sizeof(sli_si91x_tls_extension_info_t);
+  memcpy(&request->tls_extension_data, sni_extension, SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA);
+  request->offset += sni_extension->length;
+  packet_length = sizeof(sli_si91x_sni_for_embedded_socket_request_t) + SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA;
+
+  status = sli_si91x_driver_send_command(SLI_WLAN_REQ_SET_SNI_EMBEDDED,
+                                         SLI_SI91X_NETWORK_CMD,
+                                         request,
+                                         packet_length,
+                                         SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WLAN_RSP_SET_SNI_EMBEDDED_WAIT_TIME),
+                                         NULL,
+                                         NULL);
+  free(request);
+
+  return status;
+}
+
+// Helper function to configure SNI using either extension or hostname
+sl_status_t sli_configure_sni(const sli_si91x_tls_extension_info_t *sni_extension,
+                              const uint8_t *host_name,
+                              sli_si91x_sni_target_protocol_t sni_target_protocol)
+{
+  if (sni_extension != NULL) {
+    return sli_si91x_set_sni_for_embedded_socket(sni_extension, sni_target_protocol);
+  }
+
+  if (host_name != NULL && host_name[0] != '\0') {
+    size_t host_name_length = sl_strlen((const char *)host_name);
+    sl_status_t status      = SL_STATUS_OK;
+
+    // Validate length before allocation
+    if (host_name_length > SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA) {
+      return SL_STATUS_SI91X_MEMORY_ERROR;
+    }
+
+    sli_si91x_tls_extension_info_t *tls_sni =
+      (sli_si91x_tls_extension_info_t *)malloc(sizeof(sli_si91x_tls_extension_info_t) + host_name_length);
+    if (tls_sni == NULL) {
+      return SL_STATUS_ALLOCATION_FAILED;
+    }
+
+    tls_sni->type   = SL_SI91X_TLS_EXTENSION_SNI_TYPE;
+    tls_sni->length = (uint16_t)host_name_length;
+    memcpy(tls_sni->value, host_name, tls_sni->length);
+
+    status = sli_si91x_set_sni_for_embedded_socket(tls_sni, sni_target_protocol);
+    free(tls_sni);
+    return status;
+  }
+
+  return SL_STATUS_OK;
+}
+#endif

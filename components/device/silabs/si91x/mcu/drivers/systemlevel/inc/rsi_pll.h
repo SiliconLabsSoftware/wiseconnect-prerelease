@@ -402,14 +402,14 @@ typedef void (*cdDelay)(uint32_t delay);
 #define MISC_CFG_MISC_CTRL1   (*((uint32_t volatile *)(MISC_CONFIG_BASE + 0x44))) /*  address of MISC_CFG_MISC_CTRL1 */
 #define I2S_MASTER_SLAVE_MODE (1 << 23)                                           /* Sets I2S/I2S PCM master mode  */
 
-#define MCU_ULP_40MHZ_CLK_EN_TRUN_ON_DELAY          10   /*  delay to enable the ULP 40MHZ  CLK*/
-#define MCU_ULP_DOUBLER_CLK_EN_TRUN_ON_DELAY        10   /*  delay to enable the ULP DOUBLER CLK*/
-#define MCU_ULP_20MHZ_RING_OSC_CLK_EN_TRUN_ON_DELAY 10   /*  delay to enable the ULP 20MHZ_RING_OSC CLK*/
-#define MCU_ULP_MHZ_RC_CLK_EN_TRUN_ON_DELAY         2    /*  delay to enable the ULP MHZ_RC CLK*/
-#define MCU_ULP_32KHZ_XTAL_CLK_EN_TRUN_ON_DELAY_1   500  /*  delay to enable the ULP 32KHZ_XTAL CLK*/
-#define MCU_ULP_32KHZ_XTAL_CLK_EN_TRUN_ON_DELAY_2   1500 /*  delay to enable the ULP 32KHZ_XTAL CLK*/
-#define MCU_ULP_32KHZ_RO_CLK_EN_TRUN_ON_DELAY       250  /*  32KHZ RO clock not supported*/
-#define MCU_ULP_32KHZ_RC_CLK_EN_TRUN_ON_DELAY       150  /*  delay to enable the ULP 32KHZ_RC CLK*/
+#define MCU_ULP_40MHZ_CLK_EN_TURN_ON_DELAY          10   /*  delay to enable the ULP 40MHZ  CLK*/
+#define MCU_ULP_DOUBLER_CLK_EN_TURN_ON_DELAY        10   /*  delay to enable the ULP DOUBLER CLK*/
+#define MCU_ULP_20MHZ_RING_OSC_CLK_EN_TURN_ON_DELAY 10   /*  delay to enable the ULP 20MHZ_RING_OSC CLK*/
+#define MCU_ULP_MHZ_RC_CLK_EN_TURN_ON_DELAY         2    /*  delay to enable the ULP MHZ_RC CLK*/
+#define MCU_ULP_32KHZ_XTAL_CLK_EN_TURN_ON_DELAY_1   500  /*  delay to enable the ULP 32KHZ_XTAL CLK*/
+#define MCU_ULP_32KHZ_XTAL_CLK_EN_TURN_ON_DELAY_2   1500 /*  delay to enable the ULP 32KHZ_XTAL CLK*/
+#define MCU_ULP_32KHZ_RO_CLK_EN_TURN_ON_DELAY       250  /*  delay to enable the ULP 32KHZ_RO CLK*/
+#define MCU_ULP_32KHZ_RC_CLK_EN_TURN_ON_DELAY       150  /*  delay to enable the ULP 32KHZ_RC CLK*/
 
 /**
  *@brief Reference clock selection

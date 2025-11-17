@@ -1,16 +1,11 @@
 project_name: sl_si91x_adc_fifo_mode
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and use of the ADC peripheral
-  in FIFO mode  on the SiWx917 SoC, showcasing efficient data handling through the
-  ADC''s FIFO buffer mechanism.
+description: 'This application demonstrates the configuration and use of the ADC peripheral in FIFO mode  on the SiWx917 SoC, showcasing efficient data handling through the ADC''s FIFO buffer mechanism.
 
   '
 category: example|peripheral
 quality: production
 label: SI91x - SL_ADC FIFO Mode
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: sl_main
 - id: status
@@ -45,3 +40,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

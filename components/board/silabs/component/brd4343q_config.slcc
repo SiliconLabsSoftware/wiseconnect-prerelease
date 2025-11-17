@@ -14,6 +14,11 @@ provides:
 - name: brd4343q_config
 config_file:
 - override:
+    component: psram_core
+    file_id: psram_pin_config
+    vendor: silabs
+  path: brd4343q/sl_si91x_psram_pin_config.h
+- override:
     component: board_configuration_headers
     file_id: RTE_Device_917
     vendor: silabs

@@ -42,8 +42,8 @@ The following configurations are used in this example:
 ## About Example Code
 
 - [`opamp_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_opamp/opamp_example.c) - This example file initializes the OPAMP peripheral and configure the OPAMP instances by giving input on non-inverting terminal and inverting terminal of the OPAMP and checking output.
-- In this example, first the OPAMP is initialized by enabling clocks and BOD through [`sl_si91x_opamp_init`](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/opamp#sl-si91x-opamp-init) API.
-- Sets OPAMP instance and OPAMP feature configuration [`sl_si91x_opamp_set_configuration`](https://docs.silabs.com/wiseconnect/3.5.0/wiseconnect-api-reference-guide-si91x-peripherals/opamp#sl-si91x-opamp-set-configuration) API (inputs are configured as per the usecase macros enabled).
+- In this example, first the OPAMP is initialized by enabling clocks and BOD through [`sl_si91x_opamp_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/opamp#sl-si91x-opamp-init) API.
+- Sets OPAMP instance and OPAMP feature configuration [`sl_si91x_opamp_set_configuration`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/opamp#sl-si91x-opamp-set-configuration) API (inputs are configured as per the usecase macros enabled).
 - Optional integration with DAC for external voltage comparison.
 
 ## Prerequisites/Setup Requirements

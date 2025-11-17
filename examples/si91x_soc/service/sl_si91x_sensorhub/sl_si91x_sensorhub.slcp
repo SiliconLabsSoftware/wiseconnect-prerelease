@@ -1,15 +1,11 @@
 project_name: sl_si91x_sensorhub
 package: platform_nwp_siwx91x_app
-description: 'This application demonstrates how to use of the sensorhub in SI91x SoC
-  device.
+description: 'This application demonstrates how to use of the sensorhub in SI91x SoC device.
 
   '
 category: example|si91x_soc|service
 quality: production
 label: SI91x - SoC SL_SI91X_SENSORHUB
-sdk:
-  id: simplicity_sdk
-  version: 2025.12.0
 component:
 - id: freertos
 - id: freertos_heap_4
@@ -104,3 +100,11 @@ readme:
 - path: readme.md
 post_build:
   profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.0.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2025.12.0

@@ -118,7 +118,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - After the above UC configurations, configure following macros in the `i2c_leader_example.c` file and update/modify following macros, if required.
 
     ```C
-      #define I2C_INSTANCE_USED        // Update it with i2c instance number used for this application: 0 for i2c0, 1 for i2c1 and 2 for i2c2
       #define FOLLOWER_I2C_ADDR        // Update I2C follower address
       #define I2C_SIZE_BUFFERS         // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
     ```

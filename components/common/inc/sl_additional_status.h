@@ -379,6 +379,16 @@
 #define SL_STATUS_SI91X_SNMP_INTERNAL_ERROR      ((sl_status_t)0x10100) ///< SNMP internal error.
 #define SL_STATUS_SI91X_SNMP_INVALID_IP_PROTOCOL ((sl_status_t)0x10104) ///< SNMP invalid IP protocol error.
 #define SL_STATUS_SI91X_EFUSE_DATA_INVALID       ((sl_status_t)0x10106) ///< Efuse data is invalid.
+#define SL_STATUS_SI91X_VENDOR_IE_INVALID_IE_LENGTH \
+  ((sl_status_t)0x1010E) ///< Vendor IE buffer length is invalid or exceeds maximum allowed size.
+#define SL_STATUS_SI91X_VENDOR_IE_INVALID_UNIQUE_ID \
+  ((sl_status_t)0x1010F) ///< Vendor IE unique ID is out of valid range or not found.
+#define SL_STATUS_SI91X_VENDOR_IE_INVALID_ACTION \
+  ((sl_status_t)0x10110) ///< Vendor IE operation is not supported or invalid action specified.
+#define SL_STATUS_SI91X_VENDOR_IE_INVALID_PACKET_BITMAP \
+  ((sl_status_t)0x10111) ///< Vendor IE management frame bitmap contains invalid or unsupported frame types.
+#define SL_STATUS_SI91X_VENDOR_IE_NO_SLOTS_AVAILABLE \
+  ((sl_status_t)0x10112) ///< No firmware memory slots available for adding new vendor IE.
 #define SL_STATUS_SI91X_NO_DATA_RECEIVED_OR_RECEIVE_TIMEOUT \
   ((sl_status_t)0x1BB01) ///< No data received or receive timeout.
 #define SL_STATUS_SI91X_INSUFFICIENT_DATA_FOR_TIME_CONVERSION \

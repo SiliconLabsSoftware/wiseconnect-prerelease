@@ -75,12 +75,15 @@ template_contribution:
       user: SL_NET_USER_CREDENTIAL_ID
     cert_type:
       client_cert: SL_NET_CERTIFICATE
-      puiblic_key: SL_NET_PUBLIC_KEY
+      public_key: SL_NET_PUBLIC_KEY
       private_key: SL_NET_PRIVATE_KEY
       ca_cert: SL_NET_SIGNING_CERTIFICATE
       http_client: SL_NET_HTTP_CLIENT_CREDENTIAL
       eap_client: SL_NET_EAP_CLIENT_CREDENTIAL
       mqtt_client: SL_NET_MQTT_CLIENT_CREDENTIAL
+      eap_fast_client: SL_NET_PACK_FILE
+      private_key_cbc_wrap: SL_NET_TLS_PRIVATE_KEY_CBC_WRAP
+      private_key_ecb_wrap: SL_NET_TLS_PRIVATE_KEY_ECB_WRAP
     sl_net_dns_resolution_ip_type_t:
       ipv4: SL_NET_DNS_TYPE_IPV4
       ipv6: SL_NET_DNS_TYPE_IPV6
