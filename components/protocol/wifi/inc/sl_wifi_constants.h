@@ -418,9 +418,31 @@ typedef enum {
   * @brief Enumeration of Wi-Fi WPS (Wi-Fi Protected Setup) modes.
   */
 typedef enum {
-  SL_WIFI_WPS_PIN_MODE, ///< WPS pin mode: Requires a PIN to be entered on the client device.
   SL_WIFI_WPS_PUSH_BUTTON_MODE, ///< WPS push button mode: Requires the user to press a physical or virtual button on both the AP and the client device.
+  SL_WIFI_WPS_PIN_MODE, ///< WPS pin mode: Requires a PIN to be entered on the client device.
 } sl_wifi_wps_mode_t;
+
+/**
+  * @enum sl_wifi_wps_role_t
+  * @brief Enumeration of Wi-Fi WPS (Wi-Fi Protected Setup) modes.
+  * @note The SL_WIFI_WPS_REGISTRAR_ROLE is currently not supported.
+  */
+typedef enum {
+  SL_WIFI_WPS_ENROLLEE_ROLE, ///< With enrollee role configured, the device will join the network.
+  SL_WIFI_WPS_REGISTRAR_ROLE, ///< With registrar role configured, the device will create a Wi-Fi network for other devices to join.
+} sl_wifi_wps_role_t;
+
+/**
+  * @enum sl_wifi_wps_resp_status_error_code_t
+  * @brief Provides definitions for error codes updated in the status field of the sl_wifi_wps_response_t structure.
+  */
+typedef enum {
+  SL_WIFI_WPS_RESP_STATUS_NO_ERROR = 0, ///< Success case - Used in all successful M1, M2 messages
+  SL_WIFI_WPS_RESP_STATUS_MULTIPLE_PBC_DETECTED =
+    12, ///< PBC overlap detected - multiple devices attempting PBC at the same time
+  SL_WIFI_WPS_RESP_STATUS_SETUP_LOCKED = 15, ///< AP setup locked - AP refuses new registrar enrollment when locked
+  SL_WIFI_WPS_RESP_STATUS_MSG_TIMEOUT  = 16, ///< WPS timeout - Operation timed out (2 min PBC_WALK_TIME expired)
+} sl_wifi_wps_resp_status_error_code_t;
 
 /**
   * @enum sl_wifi_event_group_t

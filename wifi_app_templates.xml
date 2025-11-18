@@ -1545,6 +1545,21 @@
     <properties key="readmeFiles" value="examples/snippets/wlan/wifi_net_dual_stack_nwp_m4/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Advanced" />
   </descriptors>
+  <descriptors name="wps_pbc_soc" label="Wi-Fi - WPS PBC (SoC)" description="Start WPS PBC to connect to an Access Point">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/wps_pbc/wps_pbc_soc.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4339b brd4340b brd4343q" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/wps_pbc/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
   <descriptors name="wifi_firmware_flashing_from_host_uart_xmodem_bootloader_ncp" label="Firmware Update via Bootloader using Xmodem (NCP)" description="Firmware flashing of Si91x device using host uart xmodem bootloader.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />

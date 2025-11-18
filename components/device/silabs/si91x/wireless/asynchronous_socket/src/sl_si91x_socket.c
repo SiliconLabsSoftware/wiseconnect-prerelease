@@ -462,7 +462,7 @@ static void sli_si91x_setup_request_address(const sli_si91x_socket_t *si91x_sock
     uint32_t destination_ip =
       (si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len >= sizeof(struct sockaddr_in))
         ? socket_address->sin_addr.s_addr
-        : ((struct sockaddr_in *)&si91x_socket->remote_address)->sin_addr.s_addr;
+        : ((const struct sockaddr_in *)&si91x_socket->remote_address)->sin_addr.s_addr;
 
     memcpy(&request->dest_ip_addr.ipv4_address[0], &destination_ip, SL_IPV4_ADDRESS_LENGTH);
   }

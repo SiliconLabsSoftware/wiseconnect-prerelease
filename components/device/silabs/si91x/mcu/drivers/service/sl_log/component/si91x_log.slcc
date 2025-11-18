@@ -10,7 +10,7 @@ metadata:
     license: Zlib
 provides:
   - name: si91x_log
-  - name: sl_log_platform_core
+  - name: log_platform_core
 requires:
   - name: sl_ulp_timer
 root_path: components/device/silabs/si91x/mcu/drivers/service/sl_log

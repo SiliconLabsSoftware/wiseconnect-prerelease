@@ -57,6 +57,9 @@
  * | SL_NET_OTA_FW_UPDATE_EVENT           | NULL in case of success, else uint16_t chunk number in case of failure |
  * | SL_NET_DHCP_NOTIFICATION_EVENT       | NULL                                   |
  * | SL_NET_IP_ADDRESS_CHANGE_EVENT       | @ref sl_net_ip_configuration_t         |
+ * | SL_NET_AUTO_JOIN_EVENT               | @ref sl_net_auto_join_status_t         |
+ * | SL_NET_CONNECT_EVENT                 | NULL  |
+ * | SL_NET_IP_CONFIG_EVENT               | NULL  |
  * | SL_NET_EVENT_COUNT                   | Not Applicable, Internally used by SDK |
  * 
  * @param status

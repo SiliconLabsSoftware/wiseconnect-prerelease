@@ -30,9 +30,6 @@
 #ifdef SL_SI91X_POWER_MANAGER_UC_AVAILABLE
 #include "sl_si91x_power_manager_wakeup_handler.h"
 #endif
-#if defined(SL_LOG_SI91X_PLATFORM_CORE) && (SL_LOG_SI91X_PLATFORM_CORE == 1)
-#include "sl_log_platform_specific.h"
-#endif
 
 #if (SL_SI91X_TICKLESS_MODE == 1)
 /*******************************************************************************
@@ -190,10 +187,6 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
     __asm volatile("cpsie i" ::: "memory");
 
     XTAL_SleepStart = rsi_sysrtc_get_counter();
-#if defined(SL_LOG_SI91X_PLATFORM_CORE) && (SL_LOG_SI91X_PLATFORM_CORE == 1)
-    sl_log_api_core_t *sl_log_core_api = sl_log_get_api_core();
-    sl_log_core_api->pre_sleep_process(NULL);
-#endif
     // Bypass clock reconfiguration and Xtal turn off request, when the system is in PS1 or standby state.
     if (sl_si91x_power_manager_get_ps1_state_status() == false
         && sl_si91x_power_manager_get_standby_state_status() == false) {
@@ -263,9 +256,6 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 
     sl_sleeptimer_stop_timer(&schedule_wakeup_timer_handle);
     sli_os_schedule_wakeup(1);
-#if defined(SL_LOG_SI91X_PLATFORM_CORE) && (SL_LOG_SI91X_PLATFORM_CORE == 1)
-    sl_log_core_api->post_sleep_process(NULL);
-#endif
     //Checking for PS2 state status
     if (!(M4_ULP_SLP_STATUS_REG & ULP_MODE_SWITCHED_NPSS)) {
       if (frontend_switch_control != 0) {

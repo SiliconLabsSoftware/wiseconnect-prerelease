@@ -97,15 +97,16 @@ uint8_t rsi_app_resp_get_dev_addr[RSI_DEV_ADDR_LEN] = { 0 };
 
 #if BTDM_DEBUG_LOGGING
 #include "SEGGER_RTT.h"
-
+osSemaphoreId_t bt_debug_logs_sem;
 static uint8_t si91x_application_debug_buffer[1024] = { 0 };
+extern void rsi_task_bt_debug_logs(void);
 #endif
 
 osSemaphoreId_t ble_wait_on_connect;
-osSemaphoreId_t bt_debug_logs_sem;
+
 int32_t rsi_ble_dual_role(void);
 void connect_timeout_handler(TimerHandle_t xTimer);
-extern void rsi_task_bt_debug_logs(void);
+
 /*=======================================================================*/
 //!    Powersave configurations
 /*=======================================================================*/
@@ -248,6 +249,8 @@ const osThreadAttr_t wifi_thread_attributes = {
   .tz_module  = 0,
   .reserved   = 0,
 };
+
+#if BTDM_DEBUG_LOGGING
 const osThreadAttr_t bt_debug_logs_thread_attributes = {
   .name       = "bt_debug_logs_thread",
   .attr_bits  = 0,
@@ -259,6 +262,8 @@ const osThreadAttr_t bt_debug_logs_thread_attributes = {
   .tz_module  = 0,
   .reserved   = 0,
 };
+#endif
+
 rsi_ble_att_list_t *rsi_gatt_get_attribute_from_list(rsi_ble_t *p_val, uint16_t handle)
 {
   uint16_t i;

@@ -40,6 +40,8 @@
 #include "sli_wifi_utility.h"
 #include "sli_wifi_memory_manager.h"
 #include <string.h>
+#include "sli_buffer_manager.h"
+
 #ifndef SL_NCP_DEFAULT_COMMAND_WAIT_TIME
 #define SL_NCP_DEFAULT_COMMAND_WAIT_TIME 3000
 #endif
@@ -73,6 +75,7 @@
 #define SLI_WIFI_AP_OPT_KEEPALIVE_TYPE_MASK      0x03 // bits 0-1
 #define SLI_WIFI_AP_OPT_BEACON_STOP              BIT(2)
 #define SLI_WIFI_AP_OPT_DYNAMIC_HIDDEN_SSID_CONF BIT(3)
+#define ETH_MAC_ADR_LEN                          6
 
 /*=======================================================================*/
 // Enterprise configuration command parameters
@@ -616,6 +619,72 @@ static void sli_configure_channel_bitmap(sl_wifi_interface_t interface,
       }
     }
   }
+}
+sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_response_t *wps_response)
+{
+  sl_status_t status;
+  sli_wifi_request_scan_t scan_request = { 0 };
+  sli_wifi_join_request_t join_request = { 0 };
+  sl_wifi_buffer_t *buffer             = NULL;
+  sl_wifi_system_packet_t *packet      = NULL;
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SCAN,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &scan_request,
+                                 sizeof(scan_request),
+                                 SLI_WIFI_WAIT_FOR(60000),
+                                 NULL,
+                                 NULL);
+  SL_DEBUG_LOG("status of scan req : 0x%lx\n", status);
+  VERIFY_STATUS_AND_RETURN(status);
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_JOIN,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &join_request,
+                                 sizeof(join_request),
+                                 SLI_WIFI_WAIT_FOR_OTAF_RESPONSE,
+                                 NULL,
+                                 (void **)&buffer);
+  SL_DEBUG_LOG("status of join req : 0x%lx\n", status);
+
+  if (buffer != NULL) {
+    packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
+    memcpy(wps_response, &packet->data[1], sizeof(sl_wifi_wps_response_t));
+    sli_wifi_memory_manager_free_buffer(buffer);
+  } else {
+    return SL_STATUS_FAIL;
+  }
+
+  if (!(wps_config.auto_connect == 1 && status == SL_STATUS_OK)) {
+    sl_status_t temp_status = sli_wifi_send_command(SLI_WIFI_REQ_INIT,
+                                                    SLI_WIFI_WLAN_CMD,
+                                                    NULL,
+                                                    0,
+                                                    SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
+                                                    NULL,
+                                                    NULL);
+    SL_DEBUG_LOG("status of init req : 0x%lx\n", temp_status);
+    // When auto_connect is disabled and credentials were received, don't fail on INIT errors.
+    // The subsequent logic will handle the credentials case and return appropriate status.
+    if (wps_config.auto_connect == 1 || status != SL_STATUS_SI91X_WPS_CREDENTIALS_RECEIVED_WITHOUT_JOIN_COMMAND) {
+      VERIFY_STATUS_AND_RETURN(temp_status);
+    }
+  }
+
+  if (wps_config.auto_connect == 0 && status != SL_STATUS_OK) {
+    if (status == SL_STATUS_SI91X_WPS_CREDENTIALS_RECEIVED_WITHOUT_JOIN_COMMAND) {
+      // Return SL_STATUS_OK because credentials were received successfully.
+      // Since auto_connect is disabled, joining is not required and the WPS operation is considered successful.
+      return SL_STATUS_OK;
+    }
+  }
+
+  if (wps_config.auto_connect == 1 && status != SL_STATUS_OK) {
+    if (wps_response->ssid_len != 0) {
+      SL_DEBUG_LOG("Receive credential success but join failure\n");
+    }
+  }
+  return status;
 }
 
 sl_status_t sli_wifi_connect(sl_wifi_interface_t interface,
@@ -1903,6 +1972,49 @@ sl_status_t sli_wifi_start_wps(sl_wifi_interface_t interface,
   return status;
 }
 
+sl_status_t sli_wifi_start_wps_v2(sl_wifi_interface_t interface,
+                                  sl_wifi_wps_config_t config,
+                                  sl_wifi_wps_response_t *response)
+{
+  sli_wifi_wps_config_t wps_config = { 0 };
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (config.mode != SL_WIFI_WPS_PUSH_BUTTON_MODE || (interface & SL_WIFI_CLIENT_INTERFACE) == 0
+      || (config.role != SL_WIFI_WPS_ENROLLEE_ROLE)) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  if (!sli_wifi_is_interface_up(interface)) {
+    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
+  }
+
+  if ((config.auto_connect == false || config.auto_connect == true) && response == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  sl_status_t status = SL_STATUS_FAIL;
+
+  wps_config.wps_method   = (uint16_t)config.mode;
+  wps_config.auto_connect = config.auto_connect ? 1 : 0;
+  status                  = sli_wifi_send_command(SLI_WIFI_REQ_WPS_METHOD,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &wps_config,
+                                 sizeof(sli_wifi_wps_config_t),
+                                 SLI_WIFI_RSP_WPS_METHOD_WAIT_TIME,
+                                 NULL,
+                                 NULL);
+  SL_DEBUG_LOG("status of wps method req : 0x%lx\n", status);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  status = sli_wifi_wps_connect(wps_config, response);
+  SL_DEBUG_LOG("status of wps connect API : 0x%lx\n", status);
+  return status;
+}
+
 sl_status_t sli_wifi_set_roam_configuration(sl_wifi_interface_t interface,
                                             const sl_wifi_roam_configuration_t *roam_configuration)
 {
@@ -3187,5 +3299,126 @@ sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
       break;
   }
 
+  return status;
+}
+
+void sli_wifi_prepare_mac_frame_header(const void *buf,
+                                       const uint8_t *addr1,
+                                       const uint8_t *addr2,
+                                       const uint8_t *addr3)
+{
+  if (buf == NULL || addr1 == NULL || addr2 == NULL || addr3 == NULL) {
+    return;
+  }
+
+  sli_ieee80211_hdr_t *hdr = (sli_ieee80211_hdr_t *)buf;
+
+  hdr->frame_control = 0x8;        //Data packet type
+  hdr->frame_control |= 0x01 << 8; //To the Distribution system
+  hdr->duration_id = 0x00;
+  memcpy(hdr->addr1, addr1, ETH_MAC_ADR_LEN);
+  memcpy(hdr->addr2, addr2, ETH_MAC_ADR_LEN);
+  memcpy(hdr->addr3, addr3, ETH_MAC_ADR_LEN);
+}
+
+sl_status_t sli_wifi_send_mac_data_frame(sl_wifi_interface_t interface,
+                                         sl_wifi_transmitter_test_info_t *per_params,
+                                         sl_wifi_system_packet_t *packet,
+                                         uint16_t chunk_length)
+{
+  unsigned int temp_word;
+  uint8_t _11ax_transmit         = 0;
+  unsigned int bbp_info          = 0;
+  unsigned int rate_field_params = 0;
+  unsigned int rate_flags        = 0;
+  unsigned int ch_bw             = 0;
+  unsigned int greenfield        = 0;
+  unsigned char extended_desc    = 4;
+  sl_status_t status;
+
+  // If the packet is not allocated successfully, return an allocation failed error
+  if (packet == NULL) {
+    return SL_STATUS_ALLOCATION_FAILED;
+  }
+
+  if (!device_initialized) {
+    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (!sli_wifi_is_interface_up(interface)) {
+    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
+    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
+  }
+
+  if (chunk_length <= FRAME_DESC_SZ) {
+    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  // Clear the packet descriptor and copy the command data if available
+  memset(packet->desc, 0, sizeof(packet->desc));
+
+  packet->length  = (chunk_length - FRAME_DESC_SZ) & 0xFFF;
+  packet->command = (uint16_t)SLI_SEND_MAC_FRAME;
+
+  // Set the packet's transmitter test information
+  _11ax_transmit = per_params->enable_11ax;
+  if (_11ax_transmit) {
+    bbp_info = (per_params->coding_type << 0) | (per_params->nominal_pe << 1) | (per_params->ul_dl << 3)
+               | (per_params->he_ppdu_type << 4) | (per_params->beam_change << 6) | (per_params->bw << 7)
+               | (per_params->stbc << 8) | (per_params->tx_bf << 9) | (per_params->dcm << 10)
+               | (per_params->gi_ltf << 11) | (per_params->nsts_midamble << 13);
+  }
+  rate_field_params = (per_params->nominal_pe << RATE_OFFSET_NOMINAL_PE)
+                      | (per_params->coding_type << RATE_OFFSET_CODING_TYPE)
+                      | (per_params->gi_ltf << RATE_OFFSET_GI_LTF) | (per_params->dcm << RATE_OFFSET_DCM);
+
+  *(uint32_t *)&packet->desc[4] = (MIN_802_11_HDR_LEN << 8) | (BIT(2) << 16); //MIN_HDR_LEN Insert Seq no
+
+  if (per_params->aggr_enable) {
+    temp_word = ((ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
+    *(uint32_t *)&packet->desc[12] |= (QOS_EN);
+  } else {
+    temp_word = ((BROADCAST_IND | ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
+  }
+  rate_flags = (per_params->rate_flags << 2);
+  ch_bw      = (rate_flags & 0x00F0);
+
+  if (ch_bw & BIT(4))
+    ch_bw = 0;
+  greenfield = (rate_flags & 0x0008);
+  greenfield = (greenfield << 10);
+
+  if (rate_flags & 0x0004) //checking short_GI
+  {
+    per_params->rate |= BIT(9);
+  }
+
+  *(uint32_t *)&packet->desc[4] |= (temp_word | extended_desc);
+
+  if (_11ax_transmit) {
+    *(uint32_t *)&packet->desc[8] = ((per_params->rate & SLI_11AX_BE_RATE_MASK) | BIT(10) | rate_field_params);
+    *(uint32_t *)&packet->desc[8] |= (bbp_info << 16);
+  } else {
+
+    *(uint32_t *)&packet->desc[8] = ((per_params->rate & 0x3ff) | (ch_bw << 12) | greenfield);
+  }
+  *(uint32_t *)&packet->data[0] = (per_params->power) & 0xff;
+  if (per_params->mode == PER_CONT_MODE) {
+    *(uint32_t *)&packet->data[0] |= (3 << 8);
+  }
+
+  // Modify the packet's descriptor to include the firmware queue ID in the length field
+  packet->desc[1] |= (5 << 4);
+  packet->desc[14] |= 1;
+
+  // Calling the routing utility to route the packet
+  status =
+    sli_wifi_send_data_packet((void *)packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
+
+  if (status != SL_STATUS_OK) {
+    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
+  }
   return status;
 }

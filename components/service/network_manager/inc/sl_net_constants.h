@@ -41,10 +41,6 @@
 
 #define AUTO_JOIN_RETRY_COUNT 3 ///< Number of retries for auto-join.
 
-#define NETWORK_MANAGER_CONNECT_CMD         BIT(0) ///< Command to connect the network manager.
-#define NETWORK_MANAGER_DISCONNECT_CMD      BIT(1) ///< Command to disconnect the network manager.
-#define NETWORK_MANAGER_CONNECT_FAILURE_CMD BIT(2) ///< Command for network manager connection failure.
-
 #define AUTO_JOIN_SUCCESS_FLAG 0x01 ///< Flag indicating auto-join success.
 #define AUTO_JOIN_FAILURE_FLAG 0x02 ///< Flag indicating auto-join failure.
 
@@ -115,6 +111,8 @@ typedef enum {
   SL_NET_DHCP_NOTIFICATION_EVENT, ///< Event triggered when a DHCP notification is received.
   SL_NET_IP_ADDRESS_CHANGE_EVENT, ///< Event triggered when there is a DHCP IP address change.
   SL_NET_AUTO_JOIN_EVENT, ///< Event triggered when the auto-join process starts, is in progress, or is completed.
+  SL_NET_CONNECT_EVENT, ///< Event triggered when WiFi connection completes (status: SL_STATUS_OK=success, else=specific error code). @note ONLY for @ref sl_net_up_async().
+  SL_NET_IP_CONFIG_EVENT, ///< Event triggered when IP configuration completes (status: SL_STATUS_OK=success, else=specific error code). @note ONLY for @ref sl_net_up_async().
   SL_NET_MDNS_EVENT,      ///< Event triggered when an mDNS query response is received.
   SL_NET_MDNS_STOP_EVENT, ///< Event triggered when the mDNS service is stopped.
   SL_NET_EVENT_COUNT      ///< Represents the maximum count of events. Used internally by the SDK.
@@ -331,5 +329,15 @@ typedef enum {
  */
 #ifndef SL_NET_NETWORK_MANAGER_THREAD_STACK_SIZE
 #define SL_NET_NETWORK_MANAGER_THREAD_STACK_SIZE 3072
+#endif
+
+/**
+ * @brief Network Manager Thread Priority Configuration
+ * 
+ * Default value is osPriorityNormal.
+ * To use a custom value, define SL_NET_NETWORK_MANAGER_THREAD_PRIORITY in the preprocessor settings of the project.
+ */
+#ifndef SL_NET_NETWORK_MANAGER_THREAD_PRIORITY
+#define SL_NET_NETWORK_MANAGER_THREAD_PRIORITY osPriorityNormal
 #endif
 /** @} */

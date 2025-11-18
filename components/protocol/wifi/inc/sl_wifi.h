@@ -266,12 +266,14 @@ sl_status_t sl_wifi_set_max_tx_power(sl_wifi_interface_t interface, sl_wifi_max_
 
 /***************************************************************************/ /**
  * @brief
- *   Set the Request to Send (RTS) threshold for the specified Wi-Fi interface.
+ *   Configures the RTS (Request-To-Send) threshold in bytes.
+ *   When a frame’s size meets or exceeds this value, the RTS/CTS handshake is initiated to reduce collisions. Frames smaller than the threshold are sent directly, avoiding the extra overhead of control frames.
  * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ *   Note: Applies to all active interfaces; per-interface values are not supported.
  * @param[in] rts_threshold
  *   RTS threshold value to set, in bytes. Valid range: 0 to 2347.
- *   A value of 0 has a special meaning: an RTS frame will precede every transmitted frame.
+ *   Threshold in bytes (0–2347). 0 forces RTS/CTS for every frame;
  * @pre Pre-conditions:
  * -   @ref sl_wifi_init should be called before this API
  * @return
@@ -281,13 +283,14 @@ sl_status_t sl_wifi_set_rts_threshold(sl_wifi_interface_t interface, uint16_t rt
 
 /***************************************************************************/ /**
  * @brief
- *   Get the current Request to Send (RTS) threshold for the specified Wi-Fi interface.
+ *   Get the RTS (Request-To-Send) threshold (in bytes).
  * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @param[out] rts_threshold
- *   Pointer to a variable that will receive the current RTS threshold value.
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ *   Note: Applies to all active interfaces; per-interface values are not supported.
+ * @param[in] rts_threshold
+ *   Pointer to a variable that receives the current RTS threshold value.
  * @pre Pre-conditions:
- * -   @ref sl_wifi_init should be called before this API.
+ * -   @ref sl_wifi_init should be called before this API
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  ******************************************************************************/
@@ -824,6 +827,38 @@ sl_status_t sl_wifi_set_11ax_config(uint8_t guard_interval);
 sl_status_t sl_wifi_transmit_test_start(sl_wifi_interface_t interface,
                                         const sl_wifi_transmitter_test_info_t *tx_test_info);
 
+/**
+ * @brief Start the transmit test with user-defined payload.
+ *
+ * @details This function starts the transmit test using the provided
+ * configuration and user-defined payload. This is a blocking API
+ * and is relevant in PER mode.
+ * 
+ * @pre-Pre-conditions:
+ * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] tx_test_info
+ *  Pointer to @ref sl_wifi_transmitter_test_info_t structure containing the configuration for the transmit test.
+ * @param[in] payload
+ *   Pointer to user-defined payload data.
+ * @param[in] payload_length
+ *   Length of the user-defined payload in bytes. This value must be less than or equal to
+ *   the length specified in `tx_test_info->length` 
+ * 
+ * @return
+ *   sl_status_t. See [Status Codes] (https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes] (../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ * 
+ * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
+ *       - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+ *       - Stop Continuous mode
+ *       - Start Continuous Wave mode
+ * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
+ */
+sl_status_t sl_wifi_transmit_test_start_with_payload(sl_wifi_interface_t interface,
+                                                     const sl_wifi_transmitter_test_info_t *tx_test_info,
+                                                     const uint8_t *payload,
+                                                     uint16_t payload_length);
 /**
  * @brief
  *   Stop the transmit test.
@@ -1752,12 +1787,39 @@ sl_status_t sl_wifi_generate_wps_pin(sl_wifi_wps_pin_t *response);
  *   WPS pin object @ref sl_wifi_wps_pin_t when @ref SL_WIFI_WPS_PIN_MODE is used.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note 
+ * @note
  *   This API is supported only in AP mode.
+ *   Moving forward, this API will be deprecated. Instead use the [sl_wifi_start_wps_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-wps-api#sl-wifi-start-wps-v2) API.
+ *   This is retained for backward compatibility.
  ******************************************************************************/
 sl_status_t sl_wifi_start_wps(sl_wifi_interface_t interface,
                               sl_wifi_wps_mode_t mode,
-                              const sl_wifi_wps_pin_t *optional_wps_pin);
+                              const sl_wifi_wps_pin_t *optional_wps_pin) SL_DEPRECATED_API_WISECONNECT_4_0;
+
+/***************************************************************************/ /**
+ * @brief
+ *   This API initiates the WPS process which allows a device to connect to a Wi-Fi network
+ *   without manually entering the network password.
+ *
+ * @param[in] interface
+ *   Wi-Fi interface as identified by sl_wifi_interface_t. See https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-interface-t
+ *
+ * @param[in] config
+ *   WPS configuration as identified by [sl_wifi_wps_config_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-wps-config-t)
+ *
+ * @param[out] response
+ *   WPS response object [sl_wifi_wps_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-wps-response-t)
+ *   The status field in this structure will be updated with error codes defined in [sl_wifi_wps_resp_status_error_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl_wifi_wps_resp_status_error_code_t).
+ *
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *
+ * @note
+ *   Currently, this API is supported only in STA mode.
+ ******************************************************************************/
+sl_status_t sl_wifi_start_wps_v2(sl_wifi_interface_t interface,
+                                 sl_wifi_wps_config_t config,
+                                 sl_wifi_wps_response_t *response);
 
 /***************************************************************************/ /**
  * @brief

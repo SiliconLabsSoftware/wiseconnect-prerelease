@@ -2779,3 +2779,11 @@ uint32_t sli_si91x_get_config_feature_bit_map(void)
 {
   return config_feature_bit_map;
 }
+
+sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, void *context)
+{
+  UNUSED_PARAMETER(data);
+  UNUSED_PARAMETER(length);
+  UNUSED_PARAMETER(context);
+  return SL_STATUS_NOT_SUPPORTED;
+}

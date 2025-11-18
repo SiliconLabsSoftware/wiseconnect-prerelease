@@ -23,7 +23,7 @@ This application demonstrates the PWM (Pulse Width Modulation) to generate a per
 
 ## Overview
 
-- Supports up to eight PWM outputs with four duty cycle generators. The output pins are grouped in pairs to facilitate driving the low side and high side of a power half bridge. For more details on PWM outputs, see the block diagram in HRM.
+- Supports up to eight PWM outputs with four duty cycle generators. The output pins are grouped in pairs to facilitate driving the low side and high side of a power half bridge.
 - Complementary and Independent output modes are supported.
 - Dead time insertion in Complementary mode.
 - Manual override option for PWM output pins. Output pin polarity is programmable.
@@ -33,7 +33,7 @@ This application demonstrates the PWM (Pulse Width Modulation) to generate a per
 ## About Example Code
 
 - This example demonstrates the generation of periodic pulse waveform with 50% duty cycle and frequency of 25Khz.
-- Four macros are present (that is, DEAD_TIME, OVERRIDE, FAULT,SVT).
+- Four macros are present (that is, DEAD_TIME, OVERRIDE, FAULT, SVT).
 - If **DEAD_TIME** is enabled:
   - DEAD_TIME: To perform correct status change of the power switches in the inverter leg, a PWM generator should insert a small amount of time between required switching edges for top and bottom switch. This time is called dead-time.
   - Dead time mode is applied only in complementary mode.
@@ -109,11 +109,11 @@ This application demonstrates the PWM (Pulse Width Modulation) to generate a per
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-- [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio)
-- [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-the-wi-se-connect-extension)
-- [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#connect-si-wx91x-to-computer)
-- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#update-si-wx91x-connectivity-firmware)
-- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project)
+- [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio)
+- [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-3-extension)
+- [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer)
+- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware)
+- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project)
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
@@ -180,9 +180,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - PWM channel-0 pin configuration.
 
   | Description  | GPIO    | 917 Breakout pin |  Explorer kit Breakout pin |
-  | ------------ | ------- | ---------------- | ------------------------- |
-  | PWM_H        | GPIO_7  |        P20        |            [SCL]          |
-  | PWM_L        | GPIO_6  |        P19        |            [SDA]          |
+  | ------------ | ------- | ---------------- | -------------------------- |
+  | PWM_H        | GPIO_7  |        P20       |            [SCL]           |
+  | PWM_L        | GPIO_6  |        P19       |            [SDA]           |
 
 - PWM channel-1 pin configuration.
 
@@ -201,15 +201,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - PWM channel-3 pin configuration.
 
   | Description   | GPIO        | 917 Breakout pin | Explorer kit Breakout pin|
-  | ------------- | -------     | ---------------- | ---------------- |
-  | PWM_H         | ULP_GPIO_7  |EXP_15          |          [TX]            |
-  | PWM_L         | ULP_GPIO_6  |EXP_16          |          [RX]            |
+  | ------------- | ----------- | ---------------- | ------------------------ |
+  | PWM_H         | ULP_GPIO_7  |EXP_15            |          [TX]            |
+  | PWM_L         | ULP_GPIO_6  |EXP_16            |          [RX]            |
 
 >**Note:** Make sure pin configuration are set in the `RTE_Device_xxx.h` file:
 >
 > - SiWx917: RTE_Device_917.h (path: /$project/config/RTE_Device_917.h)
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 
@@ -225,5 +223,6 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    ![Figure: output2](resources/readme/output2.png)
 
 > **Note:**
+>
 > - Use [sl_si91x_clock_manager_m4_set_core_clk()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/clock-manager#sl-si91x-clock-manager-m4-set-core-clk) API to set system core clock  to 32MHz to achieve PWM frequency between 500Hz to 2700Hz.
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.

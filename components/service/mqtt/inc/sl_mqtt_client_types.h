@@ -217,9 +217,10 @@ typedef struct {
 /**
  * @brief 
  *   MQTT Client broker information structure.
- * 
  * @details
  *   This structure holds the information required to connect to an MQTT broker, that includes the broker's IP address, port number, connection encryption status, connection timeout, keep-alive interval, and keep-alive retries.
+ * @note 
+ *   Moving forward, this structure will be deprecated. Instead, use the [sl-mqtt-broker-v2-t](../wiseconnect-api-reference-guide-mqtt/sl-mqtt-broker-v2-t) structure. This is retained for backward compatibility.
  */
 typedef struct {
   sl_ip_address_t ip; ///< IP address of the broker.
@@ -230,6 +231,37 @@ typedef struct {
   uint16_t keep_alive_interval; ///< Keep-alive interval of the MQTT connection in seconds.
   uint16_t keep_alive_retries;  ///< Number of MQTT ping retries.
 } sl_mqtt_broker_t;
+
+/**
+ * @brief
+ *   MQTT Client broker information structure v2.
+ *
+ * @details
+ *   This structure holds the information required to connect to an MQTT broker, including:
+ *   - Broker's IP address and port
+ *   - MQTT broker hostname
+ *   - Connection encryption status
+ *   - Connection timeout, keep-alive interval, and keep-alive retries
+ *   - SNI support: enable/disable and SNI hostname
+ *
+ *   @note
+ *   - The `host_name` field is reserved for future support of MQTT broker hostname.
+ *   - The `sni_host_name` field is used for SNI (Server Name Indication) when connecting over TLS. This is required for AWS IoT and similar brokers.
+ *   - If SNI is enabled (`enable_sni` is true), `sni_host_name` must be provided and will be programmed into the firmware before connecting.
+ *   - For non-TLS connections, SNI fields are ignored.
+ */
+typedef struct {
+  sl_ip_address_t ip; ///< IP address of the broker.
+  uint8_t *host_name; ///< MQTT broker hostname (not currently supported).
+  uint16_t port;      ///< Port number of the broker.
+  bool
+    is_connection_encrypted; ///< Indicates if the connection is encrypted. This field would be deprecated in future releases. You are recommended to use `tls_flags` in @ref sl_mqtt_client_configuration_t.
+  uint16_t connect_timeout;  ///< MQTT connection timeout in milliseconds.
+  uint16_t keep_alive_interval; ///< Keep-alive interval of the MQTT connection in seconds.
+  uint16_t keep_alive_retries;  ///< Number of MQTT ping retries.
+  bool enable_sni;              ///< Enable or disable the use of Server Name Indication (SNI) extension in MQTT.
+  uint8_t *sni_host_name;       ///< Hostname to use in SNI (required for TLS/SNI connections; e.g., AWS IoT).
+} sl_mqtt_broker_v2_t;
 
 /**
  * @brief 
@@ -268,33 +300,6 @@ typedef struct {
     client_id_length; ///< Length of the client ID string. Should not exceed 60 bytes including NULL termination character.
   sl_mqtt_tls_flag_t tls_flags; ///< TLS flags for various MQTT options. See @ref sl_mqtt_tls_flag_t for details.
 } sl_mqtt_client_configuration_t;
-
-/**
- * @brief 
- *   MQTT Client Configuration structure v2.
- * 
- * @details
- *   This structure holds the configuration parameters for the MQTT client, that includes connection settings, retry policies, session options, and security credentials.
- *   It also provides fields for Server Name Indication (SNI) support, allowing the client to specify a hostname or custom SNI extension for secure TLS connections.
- */
-typedef struct {
-  bool auto_reconnect;            ///< Whether to automatically reconnect to the broker in case of disconnection.
-  uint8_t retry_count;            ///< Maximum number of retry attempts for auto reconnect.
-  uint16_t minimum_back_off_time; ///< Minimum back-off time (in seconds) between two successive reconnect attempts.
-  uint16_t maximum_back_off_time; ///< Maximum back-off time (in seconds) between two successive reconnect attempts.
-  bool is_clean_session;          ///< Clean session flag to send to the broker in the connect request.
-  sl_mqtt_version_t mqt_version;  ///< MQTT protocol version used by the client.
-  uint16_t client_port;           ///< Port number used by the client for the connection.
-  sl_net_credential_id_t
-    credential_id;    ///< Credential ID for the username and password used in the MQTT connect request.
-  uint8_t *client_id; ///< Pointer to the MQTT client ID string.
-  uint8_t
-    client_id_length; ///< Length of the client ID string. Should not exceed 60 bytes including NULL termination character.
-  sl_mqtt_tls_flag_t tls_flags; ///< TLS flags for various MQTT options. See @ref sl_mqtt_tls_flag_t for details.
-  bool mqtt_use_sni;            ///< Enable or disable the use of Server Name Indication (SNI) extension in MQTT.
-  uint8_t *host_name;           ///< Hostname to use in SNI.
-  sl_si91x_socket_type_length_value_t *sni_extension; ///< SNI extension.
-} sl_mqtt_client_configuration_v2_t;
 
 /**
  * @typedef sl_mqtt_client_event_handler_t

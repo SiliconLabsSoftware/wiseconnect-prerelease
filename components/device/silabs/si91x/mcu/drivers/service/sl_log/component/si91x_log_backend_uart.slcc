@@ -10,10 +10,10 @@ metadata:
     license: Zlib
 provides:
   - name: si91x_log_backend_uart
-  - name: sl_log_platform_backend
+  - name: log_backend
 requires:
   - name: sl_ulp_uart
-  - name: sl_log_backend_proprietary
+  - name: log
 root_path: components/device/silabs/si91x/mcu/drivers/service/sl_log
 source:
   - path: src/sl_log_platform_backend.c

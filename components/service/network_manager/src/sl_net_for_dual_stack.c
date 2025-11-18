@@ -568,7 +568,7 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Connect to the Wi-Fi network
   if (profile_id == SL_NET_AUTO_JOIN) {
-    return sli_handle_auto_join(interface, &profile);
+    return sli_network_manager_auto_join_request(interface, profile_id);
   }
 
   // Get the client profile using the provided profile_id

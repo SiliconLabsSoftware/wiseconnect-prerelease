@@ -458,20 +458,18 @@ void sli_get_free_socket(sli_si91x_socket_t **socket, int *socket_fd)
     // NOTE: The 'new_socket' variable is intentionally used to prevent race conditions between allocation and initialization.
     // Removing or optimizing this intermediate variable may lead to unexpected issues.
     sli_si91x_socket_t *new_socket = malloc(sizeof(sli_si91x_socket_t));
-    if (new_socket == NULL) {
-      break;
+    if (new_socket != NULL) {
+      memset(new_socket, 0, sizeof(sli_si91x_socket_t));
+      sli_si91x_sockets[socket_index]                    = new_socket;
+      sli_si91x_sockets[socket_index]->id                = -1;
+      sli_si91x_sockets[socket_index]->index             = socket_index;
+      sli_si91x_sockets[socket_index]->data_buffer_limit = SL_SOCKET_DEFAULT_BUFFER_LIMIT;
+
+      // If a free socket is found, set the socket pointer to point to it
+      *socket = sli_si91x_sockets[socket_index];
+      // Set the socket_fd to the index of the free socket, which can be used as a file descriptor
+      *socket_fd = socket_index;
     }
-
-    memset(new_socket, 0, sizeof(sli_si91x_socket_t));
-    sli_si91x_sockets[socket_index]                    = new_socket;
-    sli_si91x_sockets[socket_index]->id                = -1;
-    sli_si91x_sockets[socket_index]->index             = socket_index;
-    sli_si91x_sockets[socket_index]->data_buffer_limit = SL_SOCKET_DEFAULT_BUFFER_LIMIT;
-
-    // If a free socket is found, set the socket pointer to point to it
-    *socket = sli_si91x_sockets[socket_index];
-    // Set the socket_fd to the index of the free socket, which can be used as a file descriptor
-    *socket_fd = socket_index;
     // Exit the loop because a free socket has been found.
     break;
   }
@@ -950,191 +948,299 @@ int sli_si91x_shutdown(int socket, int how)
   return SLI_SI91X_NO_ERROR;
 }
 
+/**
+ * @brief Helper: Handle socket accept request response
+ */
+static sl_status_t sli_handle_socket_accept_request(sl_wifi_system_packet_t *rx_packet)
+{
+  const sli_si91x_rsp_ltcp_est_t *accept_response = (sli_si91x_rsp_ltcp_est_t *)rx_packet->data;
+  sli_si91x_socket_t *server_socket               = sli_si91x_get_socket_from_port(accept_response->src_port_num);
+
+  if (server_socket == NULL) {
+    return SL_STATUS_FAIL;
+  }
+
+  int32_t client_socket_id          = server_socket->client_id;
+  server_socket->client_id          = -1;
+  sli_si91x_socket_t *client_socket = sli_get_si91x_socket(client_socket_id);
+
+  sli_handle_accept_response(client_socket, accept_response);
+
+  if (server_socket->user_accept_callback != NULL) {
+    server_socket->user_accept_callback(client_socket_id,
+                                        (struct sockaddr *)&server_socket->remote_address,
+                                        (uint8_t)server_socket->type);
+  }
+
+  return SL_STATUS_OK;
+}
+
+/**
+ * @brief Helper: Handle remote socket termination
+ */
+static void sli_handle_remote_terminate(sl_wifi_system_packet_t *rx_packet)
+{
+  const sl_si91x_socket_close_response_t *remote_socket_closure = (sl_si91x_socket_close_response_t *)rx_packet->data;
+
+  // Reset sockets that match the close request
+  for (uint8_t index = 0; index < SLI_NUMBER_OF_SOCKETS; index++) {
+    sli_si91x_socket_t *socket = sli_get_si91x_socket(index);
+
+    if (socket == NULL || remote_socket_closure->socket_id != socket->id || socket->state == LISTEN) {
+      continue;
+    }
+
+    socket->state             = DISCONNECTED;
+    socket->disconnect_reason = SLI_SI91X_BSD_DISCONNECT_REASON_REMOTE_CLOSED;
+    uint16_t frame_status     = sli_get_si91x_frame_status(rx_packet);
+    frame_status = (frame_status == SL_STATUS_OK) ? (SL_STATUS_SI91X_SOCKET_CLOSED & 0xFFFF) : frame_status;
+
+    sli_si91x_flush_socket_command_queues_based_on_queue_type(index, frame_status);
+    sli_si91x_flush_socket_data_queues_based_on_queue_type(index);
+
+    if (user_remote_socket_termination_callback != NULL) {
+      user_remote_socket_termination_callback(socket->id,
+                                              socket->local_address.sin6_port,
+                                              remote_socket_closure->sent_bytes_count);
+    }
+    break;
+  }
+}
+
+/**
+ * @brief Helper: Find host socket index by firmware socket ID with break optimization
+ */
+static int sli_find_host_socket_by_firmware_id(int firmware_socket_id)
+{
+  for (uint8_t host_socket_index = 0; host_socket_index < SLI_NUMBER_OF_SOCKETS; host_socket_index++) {
+    if ((sli_si91x_sockets[host_socket_index] != NULL)
+        && (firmware_socket_id == sli_si91x_sockets[host_socket_index]->id)) {
+      return host_socket_index;
+    }
+  }
+  return -1; // Not found
+}
+
+/**
+ * @brief Helper: Handle raw data receive event
+ */
+static sl_status_t sli_handle_raw_data_receive(sl_wifi_system_packet_t *rx_packet,
+                                               sli_si91x_socket_context_t *sdk_context)
+{
+  const sl_si91x_socket_metadata_t *firmware_socket_response = (sl_si91x_socket_metadata_t *)rx_packet->data;
+  uint8_t *data                                              = (rx_packet->data + firmware_socket_response->offset);
+
+  // Find the host socket corresponding to the received data
+  int32_t host_socket = sli_find_host_socket_by_firmware_id(firmware_socket_response->socket_id);
+
+  // Retrieve the client socket
+  const sli_si91x_socket_t *client_socket = sli_get_si91x_socket(host_socket);
+
+  if (client_socket == NULL) {
+    SL_CLEANUP_MALLOC(sdk_context);
+    return SL_STATUS_FAIL;
+  }
+
+  // Call the user-defined receive data callback
+  client_socket->recv_data_callback(host_socket, data, firmware_socket_response->length, firmware_socket_response);
+  return SL_STATUS_OK;
+}
+
+/**
+ * @brief Helper: Validate select response parameters
+ */
+static bool sli_is_valid_select_response(const sli_si91x_socket_select_rsp_t *response)
+{
+  if (response == NULL) {
+    return false;
+  }
+
+  return (response->select_id < sli_si91x_max_select_count && select_request_table != NULL
+          && select_request_table[response->select_id].in_use);
+}
+
+/**
+ * @brief Helper: Allocate file descriptor sets for select operation
+ */
+static sl_status_t sli_allocate_fd_sets(void **read_fd, void **write_fd, void **exception_fd)
+{
+  // Initialize pointers to NULL for safe cleanup
+  *read_fd      = NULL;
+  *write_fd     = NULL;
+  *exception_fd = NULL;
+
+#ifndef __ZEPHYR__
+  *read_fd      = malloc(sizeof(fd_set));
+  *write_fd     = malloc(sizeof(fd_set));
+  *exception_fd = malloc(sizeof(fd_set));
+#else
+  *read_fd = malloc(sizeof(sl_si91x_fdset_t));
+  *write_fd = malloc(sizeof(sl_si91x_fdset_t));
+  *exception_fd = malloc(sizeof(sl_si91x_fdset_t));
+#endif
+
+  // Check if any allocation failed
+  if (*read_fd == NULL || *write_fd == NULL || *exception_fd == NULL) {
+    return SL_STATUS_ALLOCATION_FAILED;
+  }
+
+  return SL_STATUS_OK;
+}
+
+/**
+ * @brief Helper:Cleanup allocated file descriptor sets safely
+ */
+static void sli_cleanup_fd_sets(void *read_fd, void *write_fd, void *exception_fd)
+{
+  if (read_fd != NULL) {
+    free(read_fd);
+  }
+  if (write_fd != NULL) {
+    free(write_fd);
+  }
+  if (exception_fd != NULL) {
+    free(exception_fd);
+  }
+}
+
+/**
+ * @brief Helper: Handle select request response
+ */
+static sl_status_t sli_handle_select_request(sl_wifi_system_packet_t *rx_packet,
+                                             sli_si91x_socket_context_t *sdk_context)
+{
+  const sli_si91x_socket_select_rsp_t *socket_select_rsp = (sli_si91x_socket_select_rsp_t *)rx_packet->data;
+
+  if (!sli_is_valid_select_response(socket_select_rsp)) {
+    SL_DEBUG_LOG("\r\n INVALID SELECT ID\r\n");
+    return SL_STATUS_OK;
+  }
+
+  sli_si91x_select_request_t *select_request = &select_request_table[socket_select_rsp->select_id];
+  select_request->frame_status               = (uint16_t)(rx_packet->desc[12] + (rx_packet->desc[13] << 8));
+
+  if (select_request->select_callback != NULL) {
+    void *read_fd      = NULL;
+    void *write_fd     = NULL;
+    void *exception_fd = NULL;
+
+    sl_status_t alloc_status = sli_allocate_fd_sets(&read_fd, &write_fd, &exception_fd);
+    if (alloc_status != SL_STATUS_OK) {
+      sli_cleanup_fd_sets(read_fd, write_fd, exception_fd);
+      SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+      sli_si91x_clear_select_id(select_request->select_id);
+      SL_CLEANUP_MALLOC(sdk_context);
+      return SL_STATUS_ALLOCATION_FAILED;
+    }
+
+#ifndef __ZEPHYR__
+    memset(read_fd, 0, sizeof(fd_set));
+    memset(write_fd, 0, sizeof(fd_set));
+    memset(exception_fd, 0, sizeof(fd_set));
+#else
+    memset(read_fd, 0, sizeof(sl_si91x_fdset_t));
+    memset(write_fd, 0, sizeof(sl_si91x_fdset_t));
+    memset(exception_fd, 0, sizeof(sl_si91x_fdset_t));
+#endif
+
+    // This function handles responses received from the SI91X socket driver
+    sli_handle_select_response(socket_select_rsp, read_fd, write_fd, exception_fd);
+
+    // Call the user-defined select callback function with the updated file descriptor sets and status
+    select_request->select_callback(read_fd, write_fd, exception_fd, SL_STATUS_OK);
+
+    sli_si91x_clear_select_id(select_request->select_id);
+    sli_cleanup_fd_sets(read_fd, write_fd, exception_fd);
+  } else {
+    select_request->response_data = malloc(sizeof(sli_si91x_socket_select_rsp_t));
+    if (select_request->response_data == NULL) {
+      SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+    } else {
+      memcpy(select_request->response_data, rx_packet->data, sizeof(sli_si91x_socket_select_rsp_t));
+      osEventFlagsSet(si91x_socket_select_events, BIT(socket_select_rsp->select_id));
+    }
+  }
+
+  return SL_STATUS_OK;
+}
+
+/**
+ * @brief Helper: Handle TCP acknowledgment indication
+ */
+static int sli_handle_tcp_ack_indication(sl_wifi_system_packet_t *rx_packet, sli_si91x_socket_context_t *sdk_context)
+{
+  const sli_si91x_rsp_tcp_ack_t *tcp_ack = (sli_si91x_rsp_tcp_ack_t *)rx_packet->data;
+
+  // Find the host socket associated with the TCP acknowledgment
+  int32_t host_socket = sli_find_host_socket_by_firmware_id(tcp_ack->socket_id);
+
+  // Retrieve the SI91X socket associated with the host socket
+  sli_si91x_socket_t *si91x_socket = sli_get_si91x_socket(host_socket);
+
+  if (si91x_socket == NULL) {
+    SL_CLEANUP_MALLOC(sdk_context);
+    return -1;
+  }
+
+  // Check if the SLI_SI91X_SOCKET_FEAT_TCP_ACK_INDICATION bit is set move the socket to CONNECTED state.
+  if (si91x_socket->socket_bitmap & SLI_SI91X_SOCKET_FEAT_TCP_ACK_INDICATION) {
+    si91x_socket->is_waiting_on_ack = false;
+  }
+
+  // Check if the SI91X socket and its data transfer callback function exist
+  if (si91x_socket->data_transfer_callback != NULL) {
+    si91x_socket->data_transfer_callback(host_socket, (uint8_t)(tcp_ack->length[0] | tcp_ack->length[1] << 8));
+  }
+
+  return 0;
+}
+
 sl_status_t sli_si91x_socket_event_handler(sl_status_t status,
                                            sli_si91x_socket_context_t *sdk_context,
                                            sl_wifi_system_packet_t *rx_packet)
 {
   UNUSED_PARAMETER(status);
 
+  int result = 0;
+
   switch (rx_packet->command) {
       // Handle connection establishment response
     case SLI_WLAN_REQ_SOCKET_ACCEPT: {
-      const sli_si91x_rsp_ltcp_est_t *accept_response = (sli_si91x_rsp_ltcp_est_t *)rx_packet->data;
-      sli_si91x_socket_t *server_socket               = sli_si91x_get_socket_from_port(accept_response->src_port_num);
-      int32_t client_socket_id                        = -1;
-      if (server_socket == NULL) {
+      result = sli_handle_socket_accept_request(rx_packet);
+      if (result != SL_STATUS_OK) {
         return -1;
-      }
-      client_socket_id                  = server_socket->client_id;
-      server_socket->client_id          = -1;
-      sli_si91x_socket_t *client_socket = sli_get_si91x_socket(client_socket_id);
-
-      sli_handle_accept_response(client_socket, accept_response);
-
-      if (server_socket->user_accept_callback != NULL) {
-        // Call the accept callback function with relevant socket information
-        server_socket->user_accept_callback(client_socket_id,
-                                            (struct sockaddr *)&server_socket->remote_address,
-                                            (uint8_t)server_socket->type);
       }
       break;
     }
     // Handle remote socket termination response
     case SLI_WLAN_RSP_REMOTE_TERMINATE: {
-
-      const sl_si91x_socket_close_response_t *remote_socket_closure =
-        (sl_si91x_socket_close_response_t *)rx_packet->data;
-      // Reset sockets that match the close request
-      for (uint8_t index = 0; index < SLI_NUMBER_OF_SOCKETS; index++) {
-        sli_si91x_socket_t *socket = sli_get_si91x_socket(index);
-        //Verifying socket existence
-        if (socket == NULL || remote_socket_closure->socket_id != socket->id || socket->state == LISTEN)
-          continue;
-
-        socket->state             = DISCONNECTED;
-        socket->disconnect_reason = SLI_SI91X_BSD_DISCONNECT_REASON_REMOTE_CLOSED;
-        uint16_t frame_status     = sli_get_si91x_frame_status(rx_packet);
-        frame_status = (frame_status == SL_STATUS_OK) ? (SL_STATUS_SI91X_SOCKET_CLOSED & 0xFFFF) : frame_status;
-        sli_si91x_flush_socket_command_queues_based_on_queue_type(index, frame_status);
-        sli_si91x_flush_socket_data_queues_based_on_queue_type(index);
-
-        if (user_remote_socket_termination_callback != NULL) {
-          user_remote_socket_termination_callback(socket->id,
-                                                  socket->local_address.sin6_port,
-                                                  remote_socket_closure->sent_bytes_count);
-        }
-        break;
-      }
+      sli_handle_remote_terminate(rx_packet);
       break;
     }
 
     case SLI_RECEIVE_RAW_DATA: {
       // Handle the case when raw data is received
-      const sl_si91x_socket_metadata_t *firmware_socket_response = (sl_si91x_socket_metadata_t *)rx_packet->data;
-      uint8_t *data                                              = (rx_packet->data + firmware_socket_response->offset);
-
-      int8_t host_socket = -1;
-
-      // Find the host socket corresponding to the received data
-      for (uint8_t host_socket_index = 0; host_socket_index < SLI_NUMBER_OF_SOCKETS; host_socket_index++) {
-        if ((sli_si91x_sockets[host_socket_index] != NULL)
-            && (firmware_socket_response->socket_id == sli_si91x_sockets[host_socket_index]->id)) {
-          host_socket = host_socket_index;
-        }
-      }
-
-      // Retrieve the client socket
-      const sli_si91x_socket_t *client_socket = sli_get_si91x_socket(host_socket);
-      //Verifying socket existence
-      if (client_socket == NULL) {
-        SL_CLEANUP_MALLOC(sdk_context);
+      result = sli_handle_raw_data_receive(rx_packet, sdk_context);
+      if (result != SL_STATUS_OK) {
         return -1;
       }
-
-      // Call the user-defined receive data callback
-      client_socket->recv_data_callback(host_socket, data, firmware_socket_response->length, firmware_socket_response);
       break;
     }
 
     case SLI_WLAN_RSP_SELECT_REQUEST: {
-      const sli_si91x_socket_select_rsp_t *socket_select_rsp = (sli_si91x_socket_select_rsp_t *)rx_packet->data;
-
-      if (!(socket_select_rsp->select_id < sli_si91x_max_select_count
-            && select_request_table[socket_select_rsp->select_id].in_use)) {
-        SL_DEBUG_LOG("\r\n INVALID SELECT ID\r\n");
-        break;
-      }
-
-      sli_si91x_select_request_t *select_request = &select_request_table[socket_select_rsp->select_id];
-      select_request->frame_status               = (uint16_t)(rx_packet->desc[12] + (rx_packet->desc[13] << 8));
-      if (select_request->select_callback != NULL) {
-#ifndef __ZEPHYR__
-        fd_set *read_fd      = (fd_set *)malloc(sizeof(fd_set));
-        fd_set *write_fd     = (fd_set *)malloc(sizeof(fd_set));
-        fd_set *exception_fd = (fd_set *)malloc(sizeof(fd_set));
-#else
-        sl_si91x_fdset_t *read_fd = (sl_si91x_fdset_t *)malloc(sizeof(sl_si91x_fdset_t));
-        sl_si91x_fdset_t *write_fd = (sl_si91x_fdset_t *)malloc(sizeof(sl_si91x_fdset_t));
-        sl_si91x_fdset_t *exception_fd = (sl_si91x_fdset_t *)malloc(sizeof(sl_si91x_fdset_t));
-#endif
-
-        if (read_fd == NULL || write_fd == NULL || exception_fd == NULL) {
-#ifndef __ZEPHYR__
-          free(read_fd);
-          free(write_fd);
-          free(exception_fd);
-#else
-          free(read_fd);
-          free(write_fd);
-          free(exception_fd);
-#endif
-          SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
-          sli_si91x_clear_select_id(select_request->select_id);
-          SL_CLEANUP_MALLOC(sdk_context);
-          return SL_STATUS_ALLOCATION_FAILED;
-        } else {
-#ifndef __ZEPHYR__
-          memset(read_fd, 0, sizeof(fd_set));
-          memset(write_fd, 0, sizeof(fd_set));
-          memset(exception_fd, 0, sizeof(fd_set));
-#else
-          memset(read_fd, 0, sizeof(sl_si91x_fdset_t));
-          memset(write_fd, 0, sizeof(sl_si91x_fdset_t));
-          memset(exception_fd, 0, sizeof(sl_si91x_fdset_t));
-#endif
-        }
-
-        // This function handles responses received from the SI91X socket driver
-        sli_handle_select_response((sli_si91x_socket_select_rsp_t *)rx_packet->data, read_fd, write_fd, exception_fd);
-
-        // Call the user-defined select callback function with the updated file descriptor sets and status
-        select_request->select_callback(read_fd, write_fd, exception_fd, status);
-
-        sli_si91x_clear_select_id(select_request->select_id);
-        free(read_fd);
-        free(write_fd);
-        free(exception_fd);
-      } else {
-        select_request->response_data = malloc(sizeof(sli_si91x_socket_select_rsp_t));
-        if (select_request->response_data == NULL) {
-          SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
-        } else {
-          memcpy(select_request->response_data, rx_packet->data, sizeof(sli_si91x_socket_select_rsp_t));
-          osEventFlagsSet(si91x_socket_select_events, BIT(socket_select_rsp->select_id));
-        }
+      // Handle select request response
+      result = sli_handle_select_request(rx_packet, sdk_context);
+      if (result != SL_STATUS_OK) {
+        return result;
       }
       break;
     }
 
     // This block of code is executed when a TCP acknowledgment indication is received.
     case SLI_WLAN_RSP_TCP_ACK_INDICATION: {
-      const sli_si91x_rsp_tcp_ack_t *tcp_ack = (sli_si91x_rsp_tcp_ack_t *)rx_packet->data;
-
-      // Initialize a variable to store the host socket ID
-      int8_t host_socket = -1;
-
-      // Iterate through all host sockets to find a matching socket ID
-      for (uint8_t host_socket_index = 0; host_socket_index < SLI_NUMBER_OF_SOCKETS; host_socket_index++) {
-        if ((sli_si91x_sockets[host_socket_index] != NULL)
-            && (tcp_ack->socket_id == sli_si91x_sockets[host_socket_index]->id)) {
-          host_socket = host_socket_index;
-          break;
-        }
-      }
-      // Retrieve the SI91X socket associated with the host socket
-      sli_si91x_socket_t *si91x_socket = sli_get_si91x_socket(host_socket);
-      //Verifying socket existence
-      if (si91x_socket == NULL) {
-        SL_CLEANUP_MALLOC(sdk_context);
+      result = sli_handle_tcp_ack_indication(rx_packet, sdk_context);
+      if (result == -1) {
         return -1;
-      }
-      // Check if the SLI_SI91X_SOCKET_FEAT_TCP_ACK_INDICATION bit is set move the socket to CONNECTED state.
-      if (si91x_socket->socket_bitmap & SLI_SI91X_SOCKET_FEAT_TCP_ACK_INDICATION) {
-        si91x_socket->is_waiting_on_ack = false;
-      }
-      // Check if the SI91X socket and its data transfer callback function exist
-      if (si91x_socket != NULL && si91x_socket->data_transfer_callback != NULL) {
-        si91x_socket->data_transfer_callback(host_socket, (uint8_t)(tcp_ack->length[0] | tcp_ack->length[1] << 8));
       }
       break;
     }
@@ -1308,9 +1414,14 @@ sl_status_t sli_si91x_send_socket_data(sli_si91x_socket_t *si91x_socket,
 
   packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
   if (packet == NULL) {
+    sli_si91x_host_free_buffer(buffer);
     return SL_STATUS_WIFI_BUFFER_ALLOC_FAIL;
   }
+
+  // Atomic protection for data_buffer_count to prevent race condition
+  CORE_irqState_t state1 = CORE_EnterAtomic();
   ++si91x_socket->data_buffer_count;
+  CORE_ExitAtomic(state1);
 
   memset(packet->desc, 0, sizeof(packet->desc));
 
@@ -1328,6 +1439,20 @@ sl_status_t sli_si91x_send_socket_data(sli_si91x_socket_t *si91x_socket,
   CORE_ExitAtomic(state);
 
   return SL_STATUS_OK;
+}
+
+/**
+ * @brief Helper: Find socket ID by port number and LISTEN state
+ * */
+static int sli_find_socket_by_port_and_listen_state(uint16_t port)
+{
+  for (int i = 0; i < SLI_NUMBER_OF_SOCKETS; ++i) {
+    if (sli_si91x_sockets[i] != NULL && sli_si91x_sockets[i]->local_address.sin6_port == port
+        && sli_si91x_sockets[i]->state == LISTEN) {
+      return sli_si91x_sockets[i]->id;
+    }
+  }
+  return -1;
 }
 
 int sli_si91x_get_socket_id(sl_wifi_system_packet_t *packet)
@@ -1350,13 +1475,7 @@ int sli_si91x_get_socket_id(sl_wifi_system_packet_t *packet)
     case SLI_WLAN_RSP_SOCKET_CLOSE:
       if (((sl_si91x_socket_close_response_t *)packet->data)->socket_id == 0) {
         const uint16_t port = ((sl_si91x_socket_close_response_t *)packet->data)->port_number;
-        for (int i = 0; i < SLI_NUMBER_OF_SOCKETS; ++i) {
-          if (sli_si91x_sockets[i] != NULL && sli_si91x_sockets[i]->local_address.sin6_port == port
-              && sli_si91x_sockets[i]->state == LISTEN) {
-            return sli_si91x_sockets[i]->id;
-          }
-        }
-        return -1;
+        return sli_find_socket_by_port_and_listen_state(port);
       } else {
         return ((sl_si91x_socket_close_response_t *)packet->data)->socket_id;
       }

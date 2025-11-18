@@ -512,6 +512,18 @@ sl_status_t sl_wifi_transmit_test_start(sl_wifi_interface_t interface,
   return sli_wifi_transmit_test_start(interface, test_tx_info);
 }
 
+sl_status_t sl_wifi_transmit_test_start_with_payload(sl_wifi_interface_t interface,
+                                                     const sl_wifi_transmitter_test_info_t *tx_test_info,
+                                                     const uint8_t *payload,
+                                                     const uint16_t payload_length)
+{
+  UNUSED_PARAMETER(interface);
+  UNUSED_PARAMETER(tx_test_info);
+  UNUSED_PARAMETER(payload);
+  UNUSED_PARAMETER(payload_length);
+  return SL_STATUS_NOT_SUPPORTED;
+}
+
 sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 {
   if (!device_initialized) {
@@ -649,6 +661,14 @@ sl_status_t sl_wifi_start_wps(sl_wifi_interface_t interface,
 {
   return sli_wifi_start_wps(interface, mode, optional_wps_pin);
 }
+
+sl_status_t sl_wifi_start_wps_v2(sl_wifi_interface_t interface,
+                                 sl_wifi_wps_config_t config,
+                                 sl_wifi_wps_response_t *response)
+{
+  return sli_wifi_start_wps_v2(interface, config, response);
+}
+
 sl_status_t sl_wifi_set_roam_configuration(sl_wifi_interface_t interface,
                                            const sl_wifi_roam_configuration_t *roam_configuration)
 {

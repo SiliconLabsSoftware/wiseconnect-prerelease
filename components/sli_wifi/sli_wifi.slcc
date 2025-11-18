@@ -27,4 +27,5 @@ provides:
     - name: sli_wifi
 requires:
     - name: sli_wifi_power_profile
-    - name: sli_wifi_memory_manager    
+    - name: sli_wifi_memory_manager
+    - name: sli_buffer_manager

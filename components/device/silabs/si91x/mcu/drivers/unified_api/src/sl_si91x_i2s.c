@@ -88,7 +88,6 @@ sl_status_t sl_si91x_i2s_init(uint32_t i2s_instance, sl_i2s_handle_t *i2s_handle
   sl_status_t status = SL_STATUS_OK;
   int32_t error_status;
   sl_i2s_handle_t i2s_temp_handle;
-
   do {
     if (i2s_handle == NULL) {
       status = SL_STATUS_NULL_POINTER;
@@ -129,7 +128,7 @@ sl_status_t sl_si91x_i2s_init(uint32_t i2s_instance, sl_i2s_handle_t *i2s_handle
 }
 
 /*******************************************************************************
- * Uninitialize DMA peripheral used for I2S transfer
+ * Uninitialize DMA peripheral used for I2S transfer, this API is no longer needed.
  ******************************************************************************/
 sl_status_t sl_si91x_i2s_deinit(sl_i2s_handle_t *i2s_handle)
 {
@@ -156,6 +155,39 @@ sl_status_t sl_si91x_i2s_deinit(sl_i2s_handle_t *i2s_handle)
       //Invalid I2S handle
       status = SL_STATUS_INVALID_PARAMETER;
     }
+  }
+
+  return status;
+}
+
+/*******************************************************************************
+ * Uninitialize DMA peripheral used for I2S transfer
+ ******************************************************************************/
+sl_status_t sl_si91x_i2s_deinit_v2(sl_i2s_handle_t i2s_handle)
+{
+  sl_status_t status = SL_STATUS_OK;
+  int32_t error_status;
+
+  if (i2s_handle == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
+  // Check if the handle is valid and unregister callbacks accordingly
+  if (i2s_handle == (sl_i2s_handle_t)&Driver_SAI0 || i2s_handle == (sl_i2s_handle_t)&Driver_SAI1) {
+    if (i2s_handle == (sl_i2s_handle_t)&Driver_SAI0) {
+      i2s0_user_callback = NULL;
+      local_i2s0_handle  = NULL;
+    } else {
+      i2s1_user_callback = NULL;
+      local_i2s1_handle  = NULL;
+    }
+
+    // Call CMSIS uninitialize and convert error code
+    error_status = ((sl_i2s_driver_t *)i2s_handle)->Uninitialize();
+    status       = convert_arm_to_sl_error_code(error_status);
+  } else {
+    // Invalid I2S handle
+    status = SL_STATUS_INVALID_PARAMETER;
   }
 
   return status;
@@ -366,7 +398,7 @@ sl_status_t sl_si91x_i2s_config_transmit_receive(sl_i2s_handle_t i2s_handle, sl_
   return status;
 }
 /*******************************************************************************
- * Configure I2S transmit. After configuring, I2S device generated sampling frequency
+ * Configure I2S transmit. After configuring,I2S device generated sampling frequency
  * and send data on Tx line
  ******************************************************************************/
 sl_status_t sl_si91x_i2s_transmit_data(sl_i2s_handle_t i2s_handle, const void *data, uint32_t size)

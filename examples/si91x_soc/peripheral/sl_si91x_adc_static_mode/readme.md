@@ -41,7 +41,8 @@ This application demonstrates the ADC peripheral, including:
 
 ## About Example Code
 
-- This example demonstrates ADC in static mode of operation. It reads the sampled data from data register of ADC and and converts it into equivalent input voltage.
+- This example demonstrates ADC in static mode of operation. It reads the sampled data from data register of ADC and converts it into equivalent input voltage.
+
 ### Static Mode Channel Operation
 
 - **ADC static mode can be configured for either single-channel or multi-channel operation:**
@@ -86,7 +87,7 @@ This application demonstrates the ADC peripheral, including:
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output)..
+  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
 
 ### Setup Diagram
 
@@ -96,11 +97,11 @@ This application demonstrates the ADC peripheral, including:
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-- [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio)
-- [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-the-wi-se-connect-extension)
-- [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#connect-si-wx91x-to-computer)
-- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#update-si-wx91x-connectivity-firmware)
-- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project)
+- [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio)
+- [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-3-extension)
+- [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer)
+- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware)
+- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project)
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
@@ -122,11 +123,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
        2. Update the `Number of Channel(s)` value in the **ADC Peripheral Common Configuration** section and number of channels should be equal to the number of instances added in UC.
     - The order of instances must be strictly sequential, starting from 1 and increasing consecutively (e.g., 1, 2, 3). Non-sequential orders such as 1, 4, 6 or 1, 5, 2 are not permitted.
 
-
 - **ADC Channel Configuration**
 
-    - Input type: ADC input type can be configured to either single ended (or) differential.
-    - Sampling rate: Sample rate can be configurable to ADC channel, sample rate unit is samples/second. The configuration range from 1sps to 2.5 Msps.
+  - Input type: ADC input type can be configured to either single ended (or) differential.
+  - Sampling rate: The ADC sampling rate is configurable per channel, in units of samples per second. For static mode, the supported range is approximately 39.1 ksps to 2.5 Msps. This is determined by the ADC peripheral clock, which is fixed at 40 MHz, and an effective divider value that can be set from 16 (for maximum rate) up to 1023 (for minimum rate). Although the hardware register allows divider values as low as 4, the ADC driver limits the maximum sampling rate to 2.5 Msps, corresponding to an effective minimum divider of 16. The minimum rate is calculated as 40 MHz / 1023 ≈ 39.1 ksps.
     - Sample length: Set the length of ADC samples, i.e. number of ADC samples collected for operation, it should be minimum value set to 1 and maximum of 1023.
 
       ![Figure: sl_adc_channel_uc_screen](resources/uc_screen/sl_adc_channel_uc_screen.png)

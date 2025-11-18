@@ -38,6 +38,7 @@
 #include "cmsis_compiler.h"
 #include "sl_cmsis_utility.h"
 #include "sl_si91x_core_utilities.h"
+#include "sl_core.h"
 #include <string.h>
 #include "sli_wifi_constants.h"
 #include "sli_wifi_power_profile.h"
@@ -49,6 +50,7 @@
 #include "sl_net_wifi_types.h"
 #include "sli_net_types.h"
 #include "sl_net.h"
+#include "sli_net_constants.h"
 #endif
 
 #include "sli_wifi_utility.h"
@@ -74,7 +76,7 @@
 #include "rsi_bt_common.h"
 #endif
 
-extern osMessageQueueId_t network_manager_queue;
+extern osMessageQueueId_t sli_network_manager_request_queue;
 #define BUS_THREAD_EVENTS \
   (SL_SI91X_ALL_TX_PENDING_COMMAND_EVENTS | SL_SI91X_NCP_HOST_BUS_RX_EVENT | SL_SI91X_TA_BUFFER_FULL_CLEAR_EVENT)
 
@@ -1676,7 +1678,10 @@ static inline void sli_si91x_wifi_handle_tx_event(uint32_t *event)
 
         sl_status_t status = bus_write_data_frame(&sli_si91x_sockets[i]->tx_data_queue);
         if (status == SL_STATUS_OK) {
+          // Atomic protection for data_buffer_count to prevent race condition
+          CORE_irqState_t state1 = CORE_EnterAtomic();
           --sli_si91x_sockets[i]->data_buffer_count;
+          CORE_ExitAtomic(state1);
         }
         if (sli_si91x_buffer_queue_empty(&sli_si91x_sockets[i]->tx_data_queue)) {
           tx_socket_data_queues_status &= ~(1 << i);
@@ -1792,23 +1797,11 @@ extern inline uint32_t sli_wifi_event_handler_get_wait_time(uint32_t *event)
   return sli_get_wait_time(wifi_buffer_full, wifi_tx_queues_pending, ble_buffer_full, ble_tx_queues_pending);
 }
 
-/// Helper function to wait for async events with proper error handling
-static uint32_t sli_si91x_wait_for_async_event(uint32_t event_mask, uint32_t timeout)
-{
-  uint32_t result = osEventFlagsWait(si91x_async_events, event_mask, osFlagsWaitAny, timeout);
-
-  if (result == (uint32_t)osErrorTimeout || result == (uint32_t)osErrorResource) {
-    return 0;
-  }
-  return result;
-}
-
 /// Thread which handles the notification events.
 void sli_si91x_async_rx_event_handler_thread(const void *args)
 {
   UNUSED_PARAMETER(args); // Prevent compiler warning about unused parameters.
-  uint32_t event     = 0; // Event variable to track pending events.
-  uint32_t wait_time = 0; // Variable to set wait time for event flag checking.
+  uint32_t event = 0;     // Event variable to track pending events.
   const uint32_t event_mask =
     (NCP_HOST_COMMON_NOTIFICATION_EVENT | NCP_HOST_WLAN_NOTIFICATION_EVENT | NCP_HOST_NETWORK_NOTIFICATION_EVENT
      | NCP_HOST_SOCKET_NOTIFICATION_EVENT | NCP_HOST_SOCKET_DATA_NOTIFICATION_EVENT | NCP_HOST_BLE_NOTIFICATION_EVENT
@@ -1816,41 +1809,38 @@ void sli_si91x_async_rx_event_handler_thread(const void *args)
 
   // Infinite loop to handle incoming events
   while (1) {
-    // Set wait time to indefinite if no event is set, otherwise do not wait.
-    wait_time = (event == 0) ? osWaitForever : 0;
-    event |= sli_si91x_wait_for_async_event(event_mask, wait_time);
+    event = osEventFlagsWait(si91x_async_events, event_mask, osFlagsWaitAny, osWaitForever);
+
+    // Ignore any error events
+    if (event & osFlagsError) {
+      continue;
+    }
 
     // Check and process common notification events
     if (event & NCP_HOST_COMMON_NOTIFICATION_EVENT) {
       sli_si91x_process_common_events();
-      event &= ~NCP_HOST_COMMON_NOTIFICATION_EVENT;
     }
 
     // Check and process WLAN notification events
     if (event & NCP_HOST_WLAN_NOTIFICATION_EVENT) {
       sli_si91x_process_wifi_events();
-      event &= ~NCP_HOST_WLAN_NOTIFICATION_EVENT; // Clear the event flag after processing.
     }
     // Check and process Network notification events
     if (event & NCP_HOST_NETWORK_NOTIFICATION_EVENT) {
       sli_si91x_process_network_events();
-      event &= ~NCP_HOST_NETWORK_NOTIFICATION_EVENT;
     }
     // Check and process Socket notification events
     if (event & NCP_HOST_SOCKET_NOTIFICATION_EVENT) {
       sli_si91x_process_socket_events();
-      event &= ~NCP_HOST_SOCKET_NOTIFICATION_EVENT;
     }
     // Check and process command engine status notifications
     if (event & SLI_SI91X_NCP_HOST_COMMAND_ENGINE_STATUS_NOTIFICATION_EVENT) {
       sli_si91x_process_command_engine_status_events();
-      event &= ~SLI_SI91X_NCP_HOST_COMMAND_ENGINE_STATUS_NOTIFICATION_EVENT;
     }
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
     // Check and process Socket Data notification events, if network stack offload is enabled
     if (event & NCP_HOST_SOCKET_DATA_NOTIFICATION_EVENT) {
       sli_si91x_process_socket_data_events();
-      event &= ~NCP_HOST_SOCKET_DATA_NOTIFICATION_EVENT;
     }
 #endif
 
@@ -1858,7 +1848,6 @@ void sli_si91x_async_rx_event_handler_thread(const void *args)
     // Check and process BLE notification events, if BLE is enabled
     if (event & NCP_HOST_BLE_NOTIFICATION_EVENT) {
       sli_si91x_process_ble_events();
-      event &= ~NCP_HOST_BLE_NOTIFICATION_EVENT;
     }
 #endif
   }
@@ -1897,12 +1886,15 @@ void sli_si91x_process_wifi_events()
 #ifdef SL_NET_COMPONENT_INCLUDED
       // Check if the command received is a WLAN join response
       if (packet->command == SLI_WIFI_RSP_JOIN) {
-        sli_network_manager_message_t message;            // Create a new message for the network manager
+        sli_network_manager_message_t message = { 0 };    // Create a new message for the network manager
         message.interface = SL_NET_WIFI_CLIENT_INTERFACE; // Specify the network interface as the Wi-Fi client interface
         message.event_flags = frame_status != SL_STATUS_OK
-                                ? NETWORK_MANAGER_DISCONNECT_CMD
-                                : NETWORK_MANAGER_CONNECT_CMD;    // Set the event flags based on the frame status
-        osMessageQueuePut(network_manager_queue, &message, 0, 0); // Add the message to the network manager queue
+                                ? SLI_NET_DISCONNECT_Q_EVENT
+                                : SLI_NET_CONNECT_Q_EVENT; // Set the event flags based on the frame status
+        osMessageQueuePut(sli_network_manager_request_queue,
+                          &message,
+                          SLI_NET_MSG_PRIO_NORMAL,
+                          0); // Add the message to the network manager queue
       }
 #endif // SL_NET_COMPONENT_INCLUDED
       // Invoke registered event handler if it exists

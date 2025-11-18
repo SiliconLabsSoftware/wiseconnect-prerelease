@@ -1063,50 +1063,58 @@ void sli_mqtt_client_cleanup()
 }
 
 sl_status_t sl_mqtt_client_connect_v2(sl_mqtt_client_t *client,
-                                      const sl_mqtt_broker_t *broker,
+                                      const sl_mqtt_broker_v2_t *broker,
                                       const sl_mqtt_client_last_will_message_t *last_will_message,
-                                      const sl_mqtt_client_configuration_v2_t *configuration,
+                                      const sl_mqtt_client_configuration_t *configuration,
                                       uint32_t connect_timeout)
 {
   sl_status_t status;
 
-  if (configuration == NULL) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  /* If TLS + SNI requested, program SNI into firmware before CONNECT.
-     Use either prebuilt sni_extension or host_name from v2 config. */
-  if (configuration->mqtt_use_sni) {
-    // Convert public socket type to internal TLS extension type
-    sli_si91x_tls_extension_info_t *internal_sni = NULL;
-
-    if (configuration->sni_extension != NULL) {
-      internal_sni = (sli_si91x_tls_extension_info_t *)malloc(sizeof(sli_si91x_tls_extension_info_t)
-                                                              + configuration->sni_extension->length);
+  // Only handle SNI and broker conversion if broker is provided
+  sl_mqtt_broker_t *legacy_broker_ptr = NULL;
+  if (broker != NULL) {
+    /* If TLS + SNI requested, program SNI into firmware before CONNECT.
+       Use sni_host_name from v2 config. */
+    if (broker->enable_sni) {
+      // Validate SNI host name presence and length
+      if (broker->sni_host_name == NULL || sl_strlen((const char *)broker->sni_host_name) == 0) {
+        return SL_STATUS_INVALID_PARAMETER; // SNI enabled but no valid host name provided
+      }
+      size_t sni_host_name_len = sl_strlen((const char *)broker->sni_host_name);
+      sli_si91x_tls_extension_info_t *internal_sni =
+        (sli_si91x_tls_extension_info_t *)malloc(sizeof(sli_si91x_tls_extension_info_t) + sni_host_name_len);
       if (internal_sni == NULL) {
         return SL_STATUS_ALLOCATION_FAILED;
       }
-
-      internal_sni->type   = configuration->sni_extension->type;
-      internal_sni->length = configuration->sni_extension->length;
-      memcpy(internal_sni->value, configuration->sni_extension->value, configuration->sni_extension->length);
-    }
-
-    status = sli_configure_sni(internal_sni, configuration->host_name, SI91X_SNI_FOR_MQTT);
-
-    if (internal_sni != NULL) {
+      internal_sni->type   = SL_SI91X_TLS_EXTENSION_SNI_TYPE;
+      internal_sni->length = sni_host_name_len;
+      memcpy(internal_sni->value, broker->sni_host_name, sni_host_name_len);
+      status = sli_configure_sni(internal_sni, broker->sni_host_name, SI91X_SNI_FOR_MQTT);
       free(internal_sni);
+      if (status != SL_STATUS_OK) {
+        return status;
+      }
     }
-
-    if (status != SL_STATUS_OK) {
-      return status;
+    // Convert sl_mqtt_broker_v2_t to sl_mqtt_broker_t for legacy API compatibility
+    legacy_broker_ptr = (sl_mqtt_broker_t *)malloc(sizeof(sl_mqtt_broker_t));
+    if (legacy_broker_ptr == NULL) {
+      return SL_STATUS_ALLOCATION_FAILED;
     }
+    legacy_broker_ptr->ip                      = broker->ip;
+    legacy_broker_ptr->port                    = broker->port;
+    legacy_broker_ptr->is_connection_encrypted = broker->is_connection_encrypted;
+    legacy_broker_ptr->connect_timeout         = broker->connect_timeout;
+    legacy_broker_ptr->keep_alive_interval     = broker->keep_alive_interval;
+    legacy_broker_ptr->keep_alive_retries      = broker->keep_alive_retries;
   }
 
   status = sl_mqtt_client_connect(client,
-                                  broker,
+                                  legacy_broker_ptr,
                                   last_will_message,
                                   (const sl_mqtt_client_configuration_t *)configuration,
                                   connect_timeout);
+  if (legacy_broker_ptr != NULL) {
+    free(legacy_broker_ptr);
+  }
   return status;
 }

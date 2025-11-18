@@ -42,20 +42,24 @@
 
 ## Getting Started
 
-Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) for the following tasks:
+Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-- Install Studio and WiSeConnect extension
-- Connect your device to the computer
-- Upgrade your connectivity firmware
-- Create a Studio project
+- [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio)
+- [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-3-extension)
+- [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer)
+- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware)
+- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project)
 
-For details on the project folder structure, see the [WiSeConnect_Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure/) page.
+For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
 
 ### Application Configuration Parameters
 
 - The application has two configurable parameters:  Polynomial value and Data width.
+**Polynomial value:**Defines the mathematical polynomial used in CRC (Cyclic Redundancy Check) calculations
+**Data width:** Specifies how many bits wide the input data is (e.g., 8-bit, 16-bit, 32-bit)
+- These parameters allow users to customize the CRC implementation for different standards and data types.
 
 - Configure the following parameter in the [`sl_si91x_crc.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_crc.h) file. Update or modify the following macro, if required. The code illustrates the default configurations.
 
@@ -65,9 +69,10 @@ For details on the project folder structure, see the [WiSeConnect_Examples](http
   ```
 
 > **Note:**
-> While changing the data which CRC has to calculate and compare with Software CRC, you need to update the data in file `sw_crc.c` variable  `input[]`  and in `crc_example.c` variable `gcrc_tx_Buf[]`.
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+> - When modifying the input data for CRC calculation and comparison with Software CRC:
+>   - Update the `input[]` variable in the `sw_crc.c` file with your new data
+>   - Update the `gcrc_tx_Buf[]` variable in the `crc_example.c` file with the same data
+> - Ensure both variable lengths match the size of your new data array.
 
 ## Test the Application
 

@@ -309,6 +309,23 @@ typedef struct {
   uint8_t wps_pin[SLI_WIFI_WPS_PIN_LEN];
 } sli_wifi_wps_method_request_t;
 
+#pragma pack(1)
+typedef struct {
+  /// wps method: 0 - push button, 1 - pin method
+  uint16_t wps_method;
+
+  /// If 0 - validate given pin, 1 - generate new pin
+  uint16_t generate_pin;
+
+  /// wps pin for validation
+  uint8_t wps_pin[9];
+
+  uint8_t auto_connect;
+
+  uint16_t reserved;
+} sli_wifi_wps_config_t;
+#pragma pack()
+
 /// per stats command request structure
 typedef struct {
   /// 0 - start , 1 -stop

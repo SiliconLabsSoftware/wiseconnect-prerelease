@@ -151,8 +151,52 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface);
  * The user can define their profile and credential configurations for an interface by calling @ref sl_net_set_profile and @ref sl_net_set_credential APIs before calling @ref sl_net_up API.
  * @note
  * The user is advised to reset the NWP with @ref sl_net_deinit() if this API fails with error SL_STATUS_TIMEOUT.
+ * @note
+ * This API is not atomic. It performs multiple operations (network scanning, connection, IP configuration) sequentially. If any step fails after previous steps have completed, the interface may be left in a partially configured state (e.g., connected to WiFi but without an IP address). In such cases, call @ref sl_net_down to properly clean up before retrying.
  * ******************************************************************************/
 sl_status_t sl_net_up(sl_net_interface_t interface, sl_net_profile_id_t profile_id);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Bring a network interface up asynchronously.
+ * 
+ * @details
+ *   This function initiates bringing the specified network interface up in an asynchronous manner.
+ *   The function returns immediately after posting the request to the network manager thread.
+ *   Progress and completion are reported via the registered event handler set by @ref sl_net_init().
+ * 
+ * @pre Pre-conditions:
+ * - @ref sl_net_init should be called before this API.
+ * - An event handler must be registered via @ref sl_net_init() to receive completion notifications.
+ * 
+ * @param[in] interface
+ *   Interface identified by @ref sl_net_interface_t.
+ * 
+ * @param[in] profile_id
+ *   Network profile identifier for the specific interface of type @ref sl_net_profile_id_t
+ * 
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ *   - SL_STATUS_IN_PROGRESS: Request accepted and processing has started
+ *   - SL_STATUS_BUSY: Another async operation is already in progress for this interface
+ *   - SL_STATUS_INVALID_PARAMETER: Invalid interface or profile_id
+ *   - SL_STATUS_NOT_INITIALIZED: Network manager not initialized
+ *   - SL_STATUS_FAIL: Failed to post request to network manager queue
+ * 
+ * @note
+ * By default, profile and credential configurations in sl_net_defaults.h are used by SDK.
+ * @note
+ * To enable support for both IPv4 and IPv6, the ip.type in the profile should be set to (SL_IPV4|SL_IPV6).
+ * @note
+ * The user can define their profile and credential configurations for an interface by calling @ref sl_net_set_profile and @ref sl_net_set_credential APIs before calling this API.
+ * @note
+ * Only one asynchronous bring-up operation is allowed per interface at a time. Calling this API while an async operation is in progress will return SL_STATUS_BUSY.
+ * @note
+ * The registered event handler will receive events indicating connection progress, success, or failure.
+ * @note
+ * This API does not support auto-join (SL_NET_AUTO_JOIN) profile. Use @ref sl_net_up with SL_NET_AUTO_JOIN for auto-join functionality.
+ * ******************************************************************************/
+sl_status_t sl_net_up_async(sl_net_interface_t interface, sl_net_profile_id_t profile_id);
 
 /***************************************************************************/ /**
  * @brief

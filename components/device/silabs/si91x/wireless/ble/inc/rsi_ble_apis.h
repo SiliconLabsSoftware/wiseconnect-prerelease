@@ -470,6 +470,8 @@ typedef struct rsi_ble_event_le_dev_buf_ind_s {
   uint8_t remote_dev_bd_addr[RSI_DEV_ADDR_LEN];
   /**No. of Available buffer*/
   uint8_t avail_buf_cnt;
+  /** total number of available data buffers*/
+  uint8_t avail_buff_total_cnt;
 } rsi_ble_event_le_dev_buf_ind_t;
 
 /**

@@ -290,6 +290,8 @@
   ((sl_status_t)0x10069) ///< SAE authentication failed due to multiple confirm frames received from the Access Point.
 #define SL_STATUS_SI91X_EC_GROUP_STATION_UNSUPPORTED_BY_AP \
   ((sl_status_t)0x1006A) ///< The Access Point does not support the EC-group set by the station.
+#define SL_STATUS_SI91X_WPS_CREDENTIALS_RECEIVED_WITHOUT_JOIN_COMMAND \
+  ((sl_status_t)0x1006B) ///< WPS credentials have been received, but the device did not join the network.
 #define SL_STATUS_SI91X_NO_11AX_SUPPORT_IN_AP \
   ((sl_status_t)0x1006C) ///< 802.11ax (Wi-Fi 6) is not supported in Access Point mode.
 #define SL_STATUS_SI91X_NON_PREF_CHAN_CONFIG_FAILED \
@@ -818,5 +820,6 @@
 #define SL_STATUS_SI91X_BLE_CONNECTION_SOCK_NOT_AVAILABLE    (0x4D10) ///< BLE Connection Sock not Available.
 #define SL_STATUS_SI91X_BLE_REMOTE_CREDITS_NOT_AVAILABLE     (0x4D11) ///< BLE Remote Credits not Available.
 #define SL_STATUS_SI91X_PARAMETER_OUTOFF_MANADATORY_RANGE    (0x4D14) ///< Parameter is outoff the manadatory range.
+#define SL_STATUS_SI91X_ERROR_BLE_HW_BUF_OVERFLOW            (0x4D16) ///< Sufficient buffers are not available in TA.
 
 /** @} */

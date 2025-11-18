@@ -683,6 +683,43 @@ typedef struct {
 } sl_wifi_wps_pin_t;
 
 /**
+ * @struct sl_wifi_wps_config_t
+ * @brief WPS (Wi-Fi Protected Setup) configuration structure.
+ *
+ * This structure defines the device role, WPS method (PBC or PIN), optional PIN value, and whether to
+ * automatically connect to the network.
+ *
+ */
+typedef struct {
+  sl_wifi_wps_role_t
+    role; ///< Role of the device. Refer [sl_wifi_wps_role_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-wps-role-t)
+  sl_wifi_wps_mode_t
+    mode; ///< WPS mode. Refer [sl_wifi_wps_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-wps-mode-t)
+  char optional_pin[9]; ///< PIN-based WPS configuration. Null-terminated string
+  bool
+    auto_connect; ///< Set to true to enable auto connect after WPS, false to only receive credentials without connecting
+} sl_wifi_wps_config_t;
+
+/**
+ * @struct sl_wifi_wps_response_t
+ * @brief Wi-Fi WPS response structure containing network credentials received from WPS exchange.
+ *
+ * This structure contains all the network information needed to connect to the Wi-Fi network,
+ * including SSID, security type, and network key.
+ */
+#pragma pack(1)
+typedef struct {
+  uint32_t status;       ///< Status of the WPS operation
+  uint8_t ssid[32];      ///< SSID of the connected network
+  uint8_t ssid_len;      ///< Length of the SSID
+  uint8_t security_type; ///< Security type
+  uint8_t key[32];       ///< Network key
+  uint8_t mac_addr[6];   ///< MAC address of the access point
+  uint32_t reserved;     ///< Reserved for future use
+} sl_wifi_wps_response_t;
+#pragma pack()
+
+/**
  * @struct sl_wifi_listen_interval_t
  * @brief Wi-Fi Listen interval structure.
  *

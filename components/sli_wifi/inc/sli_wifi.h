@@ -38,6 +38,24 @@
 #include "sli_wifi_power_profile.h"
 #include "cmsis_os2.h"
 
+#define ENABLE_MAC_INFO          BIT(0)
+#define QOS_EN                   BIT(12)
+#define BROADCAST_IND            BIT(9)
+#define PER_CONT_MODE            1
+#define FRAME_DESC_SZ            16
+#define MIN_802_11_HDR_LEN       24
+#define SLI_WLAN_WIFI_BLOCK_SIZE 1640
+#define SLI_SEND_MAC_FRAME       0x0
+#define SLI_11AX_BE_RATE_MASK    0x18f
+/// Nominal preamble length offset
+#define RATE_OFFSET_NOMINAL_PE 5
+/// Guard interval and LTF offset
+#define RATE_OFFSET_GI_LTF 11
+/// DCM offset
+#define RATE_OFFSET_DCM 13
+/// Coding type offset
+#define RATE_OFFSET_CODING_TYPE 9
+
 /**
  * @enum sli_wifi_rail_cmd_subtype_t
  * @brief Enumeration of Wi-Fi RAIL command subtypes.
@@ -134,8 +152,18 @@ typedef struct {
   int16_t Txpower;
 } sli_wifi_request_tx_power_t;
 
+typedef struct {
+  uint16_t frame_control; // Frame Control field
+  uint16_t duration_id;   // Duration/ID field
+  uint8_t addr1[6];       // Address 1 (Receiver Address - RA)
+  uint8_t addr2[6];       // Address 2 (Transmitter Address - TA)
+  uint8_t addr3[6];       // Address 3 (Destination Address - DA or Source Address - SA)
+  uint16_t seq_ctrl;      // Sequence Control field
+} sli_ieee80211_hdr_t;
+
 sl_status_t sli_wifi_configure_timeout(sli_wifi_timeout_type_t timeout_type, uint16_t timeout_value);
 sl_wifi_interface_t sli_wifi_get_default_interface(void);
+sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_response_t *wps_response);
 sl_status_t sli_wifi_connect(sl_wifi_interface_t interface,
                              const sl_wifi_client_configuration_t *ap,
                              uint32_t timeout_ms);
@@ -200,6 +228,9 @@ sl_status_t sli_wifi_generate_wps_pin(sl_wifi_wps_pin_t *wps_pin);
 sl_status_t sli_wifi_start_wps(sl_wifi_interface_t interface,
                                sl_wifi_wps_mode_t mode,
                                const sl_wifi_wps_pin_t *optional_wps_pin);
+sl_status_t sli_wifi_start_wps_v2(sl_wifi_interface_t interface,
+                                  sl_wifi_wps_config_t config,
+                                  sl_wifi_wps_response_t *response);
 sl_status_t sli_wifi_set_roam_configuration(sl_wifi_interface_t interface,
                                             const sl_wifi_roam_configuration_t *roam_configuration);
 sl_status_t sli_wifi_set_advanced_scan_configuration(const sl_wifi_advanced_scan_configuration_t *configuration);
@@ -281,4 +312,13 @@ sl_status_t sli_wifi_set_join_configuration(sl_wifi_interface_t interface, uint8
 sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
                                        sl_wifi_band_mode_t band,
                                        sl_wifi_region_code_t region_code);
+void sli_wifi_prepare_mac_frame_header(const void *buf,
+                                       const uint8_t *addr1,
+                                       const uint8_t *addr2,
+                                       const uint8_t *addr3);
+sl_status_t sli_wifi_send_mac_data_frame(sl_wifi_interface_t interface,
+                                         sl_wifi_transmitter_test_info_t *per_params,
+                                         sl_wifi_system_packet_t *packet,
+                                         uint16_t chunk_length);
+sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, void *context);
 #endif

@@ -33,6 +33,7 @@
 #include "sli_wifi_memory_manager.h"
 #include "sli_wifi_utility.h"
 #include <string.h>
+#include "sl_wlan_types.h"
 
 extern bool device_initialized;
 extern sl_wifi_interface_t default_interface;

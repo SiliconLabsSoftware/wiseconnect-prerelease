@@ -29,6 +29,9 @@ component:
 - id: sl_gpio
 - id: sl_icm40627
 - id: sl_ssi
+- id: sl_ssi_instance
+  instance:
+  - ulp_primary
 - id: ssi_ulp_component
 - id: sl_si70xx
 - id: sl_si91x_rgb_led_917
@@ -86,7 +89,7 @@ configuration:
 - name: SL_SSI_DEVICE_MODE
   value: SL_SSI_ULP_MASTER_ACTIVE
 - name: SL_SPI_BAUD
-  value: '500000'
+  value: 5000000
 - name: SL_ULP_TIMER_DIRECTION
   value: '1'
 ui_hints:

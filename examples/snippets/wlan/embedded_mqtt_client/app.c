@@ -133,24 +133,30 @@ uint8_t is_execution_completed = 0;
 
 sl_mqtt_client_credentials_t *client_credentails = NULL;
 
-sl_mqtt_client_configuration_v2_t mqtt_client_configuration = { .is_clean_session = IS_CLEAN_SESSION,
-                                                                .client_id        = (uint8_t *)CLIENT_ID,
-                                                                .client_id_length = strlen(CLIENT_ID),
+sl_mqtt_client_configuration_t mqtt_client_configuration = { .is_clean_session = IS_CLEAN_SESSION,
+                                                             .client_id        = (uint8_t *)CLIENT_ID,
+                                                             .client_id_length = strlen(CLIENT_ID),
 #if ENCRYPT_CONNECTION
-                                                                .tls_flags = SL_MQTT_TLS_ENABLE | SL_MQTT_TLS_TLSV_1_2
-                                                                             | SL_MQTT_TLS_CERT_INDEX_1
-                                                                             | SL_MQTT_TLS_SNI_ENABLE,
-                                                                .mqtt_use_sni = 1, /* enable SNI when using TLS */
-                                                                .host_name    = (uint8_t *)MQTT_BROKER_HOST,
+                                                             .tls_flags = SL_MQTT_TLS_ENABLE | SL_MQTT_TLS_TLSV_1_2
+                                                                          | SL_MQTT_TLS_CERT_INDEX_1
+                                                                          | SL_MQTT_TLS_SNI_ENABLE,
 #endif
-                                                                .client_port = CLIENT_PORT };
+                                                             .client_port = CLIENT_PORT };
 
-sl_mqtt_broker_t mqtt_broker_configuration = {
+sl_mqtt_broker_v2_t mqtt_broker_configuration = {
   .port                    = MQTT_BROKER_PORT,
   .is_connection_encrypted = ENCRYPT_CONNECTION,
   .connect_timeout         = MQTT_CONNECT_TIMEOUT,
   .keep_alive_interval     = KEEP_ALIVE_INTERVAL,
   .keep_alive_retries      = MQTT_KEEPALIVE_RETRIES,
+  .host_name               = NULL,
+#if ENCRYPT_CONNECTION
+  .enable_sni    = 1,                           /* enable SNI when using TLS */
+  .sni_host_name = (uint8_t *)MQTT_BROKER_HOST, // SNI hostname for TLS/SNI connections
+#else
+  .enable_sni    = 0,
+  .sni_host_name = NULL,
+#endif
 };
 
 sl_mqtt_client_message_t message_to_be_published = {

@@ -43,6 +43,7 @@
 #include "sli_net_utility.h"
 #include "sl_si91x_core_utilities.h"
 #include "sli_net_common_utility.h"
+#include "sli_net_constants.h"
 #include <stdbool.h>
 #include <string.h>
 #include "sl_wifi_callback_framework.h"
@@ -57,6 +58,8 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
                                         sl_ip_address_t *sl_ip_address);
 static bool sli_si91x_get_dns_mode(const sl_net_dns_address_t *address);
 extern bool device_initialized;
+extern osMessageQueueId_t sli_network_manager_request_queue;
+extern osMessageQueueId_t sli_network_manager_response_queue;
 static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interface,
                                                     const sl_ip_address_t *ip_address,
                                                     uint8_t command_type);
@@ -85,7 +88,6 @@ sl_status_t sl_net_wifi_client_init(sl_net_interface_t interface,
 sl_status_t sl_net_wifi_client_deinit(sl_net_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
-  sli_cleanup_auto_join();
   return sl_wifi_deinit();
 }
 
@@ -102,7 +104,7 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Connect to the Wi-Fi network
   if (profile_id == SL_NET_AUTO_JOIN) {
-    return sli_handle_auto_join(interface, &profile);
+    return sli_network_manager_auto_join_request(interface, profile_id);
   }
 
   // Get the client profile using the provided profile_id

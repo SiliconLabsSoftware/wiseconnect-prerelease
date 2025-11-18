@@ -316,6 +316,7 @@ sl_status_t sl_si91x_opamp_pin_init(sl_opamp_pin_config_t *opamp_config_ptr)
   // Validate the structure pointer
   if (opamp_config_ptr == NULL) {
     status = SL_STATUS_NULL_POINTER; // Return error if pointer is NULL
+    return status;
   }
   fill_opamp_gpio_pin_config(&sl_gpio_pin_vinp, opamp_config_ptr->vin_p_input, GPIO_INPUT);
   fill_opamp_gpio_pin_config(&sl_gpio_pin_vinn, opamp_config_ptr->vin_n_input, GPIO_INPUT);

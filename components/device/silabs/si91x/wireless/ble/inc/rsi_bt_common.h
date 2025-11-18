@@ -275,6 +275,9 @@ typedef struct rsi_remote_ble_info_s {
   uint8_t cmd_in_use;
   /** Flag for checking expected remote response for each procedure */
   uint16_t expected_resp;
+
+#define SMALL_BUFF_MODE 0
+#define BIG_BUFF_MODE   1
   /** Buffer config mode */
   uint8_t mode;
   /** Mutex handle for avail_buf_info update */
@@ -331,6 +334,10 @@ typedef struct rsi_bt_cb_s {
   uint8_t remote_ble_index;
   /** Driver BT control block asynchronous status */
   volatile int32_t async_status;
+  /**to track total number of available data buffers not based on individual connections*/
+  uint8_t ble_buff_total_avail_cnt;
+  /** Mutex handle for avail_buf_info update */
+  osMutexId_t ble_buff_total_mutex;
 } rsi_bt_cb_t;
 
 // Set local name command structure

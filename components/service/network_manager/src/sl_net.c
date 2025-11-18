@@ -55,6 +55,17 @@ bool sl_net_interface_initialized[SL_NET_INTERFACE_MAX] = { false };
 
 extern bool device_initialized;
 
+// Helper function to check if any network interface is initialized
+static bool sli_is_any_interface_initialized(void)
+{
+  for (size_t i = 0; i < SL_NET_INTERFACE_MAX; i++) {
+    if (sl_net_interface_initialized[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_1_INTERFACE) || NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_2_INTERFACE)
 static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
                                                   const void *configuration,
@@ -134,36 +145,53 @@ sl_status_t sl_net_init(sl_net_interface_t interface,
   if (sl_net_interface_initialized[interface]) {
     return SL_STATUS_ALREADY_INITIALIZED;
   }
+
+  // Initialize network manager (shared across all interfaces)
+  // SL_STATUS_ALREADY_INITIALIZED is expected and acceptable when initializing subsequent interfaces
+  status = sli_network_manager_init();
+  if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
+    return status;
+  }
+
   switch (SL_NET_INTERFACE_TYPE(interface)) {
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_1_INTERFACE)
     case SL_NET_WIFI_CLIENT_1_INTERFACE:
       status =
         sli_init_wifi_client_interface(SL_NET_WIFI_CLIENT_1_INTERFACE, configuration, network_context, event_handler);
-      return status;
+      break;
 #endif
 
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_2_INTERFACE)
     case SL_NET_WIFI_CLIENT_2_INTERFACE:
       status =
         sli_init_wifi_client_interface(SL_NET_WIFI_CLIENT_2_INTERFACE, configuration, network_context, event_handler);
-      return status;
+      break;
 #endif
 
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_AP_1_INTERFACE)
     case SL_NET_WIFI_AP_1_INTERFACE:
       status = sli_init_wifi_ap_interface(SL_NET_WIFI_AP_1_INTERFACE, configuration, network_context, event_handler);
-      return status;
+      break;
 #endif
 
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_AP_2_INTERFACE)
     case SL_NET_WIFI_AP_2_INTERFACE:
       status = sli_init_wifi_ap_interface(SL_NET_WIFI_AP_2_INTERFACE, configuration, network_context, event_handler);
-      return status;
+      break;
 #endif
 
     default:
-      return SL_STATUS_NOT_SUPPORTED;
+      status = SL_STATUS_NOT_SUPPORTED;
+      break;
   }
+
+  // Clean up network manager thread if interface initialization failed
+  // Only deinitialize if no other interface is using the network manager
+  if (status != SL_STATUS_OK && !sli_is_any_interface_initialized()) {
+    sli_network_manager_deinit();
+  }
+
+  return status;
 }
 
 sl_status_t sl_net_deinit(sl_net_interface_t interface)
@@ -176,6 +204,7 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface)
   if (!sl_net_interface_initialized[interface]) {
     return SL_STATUS_NOT_INITIALIZED;
   }
+
   switch (SL_NET_INTERFACE_TYPE(interface)) {
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_1_INTERFACE)
     case SL_NET_WIFI_CLIENT_1_INTERFACE:
@@ -203,6 +232,11 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface)
 
   if (status == SL_STATUS_OK) {
     sl_net_interface_initialized[interface] = false;
+
+    // Deinitialize network manager thread only if no other interface is using it
+    if (!sli_is_any_interface_initialized()) {
+      status = sli_network_manager_deinit();
+    }
   }
   return status;
 }
@@ -236,6 +270,25 @@ sl_status_t sl_net_up(sl_net_interface_t interface, sl_net_profile_id_t profile_
     default:
       return SL_STATUS_NOT_SUPPORTED;
   }
+}
+
+sl_status_t sl_net_up_async(sl_net_interface_t interface, sl_net_profile_id_t profile_id)
+{
+  // Check if the interface is valid and initialized
+  if (!(NETWORK_INTERFACE_VALID(interface))) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+  if (!sl_net_interface_initialized[interface]) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  // Auto-join is not supported for async up
+  if (profile_id == SL_NET_AUTO_JOIN) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  // Delegate to the internal helper to post async request
+  return sli_net_up_async_start(interface, profile_id);
 }
 
 sl_status_t sl_net_down(sl_net_interface_t interface)
