@@ -58,6 +58,15 @@
 
 #include <string.h>
 
+/* Additional includes for on-demand timer feature */
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+#include "lwip/sys.h"
+#include "lwip/timeouts.h"
+#if !NO_SYS
+#include "lwip/tcpip.h"  /* For LOCK_TCPIP_CORE() */
+#endif
+#endif /* SL_LWIP_ETHARP_ONDEMAND_TIMER */
+
 #ifdef LWIP_HOOK_FILENAME
 #include LWIP_HOOK_FILENAME
 #endif
@@ -108,6 +117,104 @@ static struct etharp_entry arp_table[ARP_TABLE_SIZE];
 #if !LWIP_NETIF_HWADDRHINT
 static netif_addr_idx_t etharp_cached_entry;
 #endif /* !LWIP_NETIF_HWADDRHINT */
+
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+/** On-demand timer state management */
+static u8_t arp_timer_started;
+static u8_t arp_timer_eco_mode;
+static u32_t last_timer_time_ms;
+
+#ifdef LWIP_TESTMODE
+void
+#else
+static void
+#endif
+etharp_timeout_cb(void *arg)
+{
+  LWIP_UNUSED_ARG(arg);
+  LWIP_ASSERT_CORE_LOCKED();
+  etharp_tmr();
+}
+
+/**
+ * Stop the ARP timer and reset state.
+ */
+static void
+etharp_timer_stop(void)
+{
+  if (arp_timer_started) {
+    sys_untimeout(etharp_timeout_cb, NULL);
+    arp_timer_started = 0;
+    arp_timer_eco_mode = 0;
+    last_timer_time_ms = 0;
+    LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_timer_stop: timer stopped, state reset\n"));
+  }
+}
+
+/**
+ * Schedule the ARP timer with specified timeout.
+ */
+static void
+etharp_timer_schedule(u32_t timeout_ms)
+{
+  LWIP_ASSERT("Timer should not be running", !arp_timer_started);
+  
+  sys_timeout(timeout_ms, etharp_timeout_cb, NULL);
+  arp_timer_started = 1;
+  arp_timer_eco_mode = (timeout_ms > ARP_TMR_INTERVAL) ? 1 : 0;
+  last_timer_time_ms = sys_now();
+  LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_timer_schedule: timeout=%"U32_F"ms, eco_mode=%d\n", 
+                             timeout_ms, arp_timer_eco_mode));
+}
+
+/**
+ * Transition from ECO mode to ACTIVE mode.
+ * Ages entries by elapsed time before switching modes.
+ */
+static void
+etharp_transition_to_active_mode(void)
+{
+  u32_t current_time_ms;
+  u32_t elapsed_seconds;
+  u32_t elapsed_ms;
+  int i;
+  
+  LWIP_ASSERT_CORE_LOCKED();
+  LWIP_ASSERT("Timer should be in eco mode", arp_timer_eco_mode);
+  
+  current_time_ms = sys_now();
+  elapsed_seconds = 0;
+  
+  if (last_timer_time_ms != 0) {
+    elapsed_ms = current_time_ms - last_timer_time_ms;
+    elapsed_seconds = elapsed_ms / 1000;
+  }
+  
+  /* Age all entries by elapsed time */
+  if (elapsed_seconds > 0) {
+    for (i = 0; i < ARP_TABLE_SIZE; i++) {
+      if (arp_table[i].state != ETHARP_STATE_EMPTY
+#if ETHARP_SUPPORT_STATIC_ENTRIES
+          && arp_table[i].state != ETHARP_STATE_STATIC
+#endif
+         ) {
+        if ((u32_t)arp_table[i].ctime + elapsed_seconds > ARP_MAXAGE) {
+          arp_table[i].ctime = ARP_MAXAGE;
+        } else {
+          arp_table[i].ctime += (u16_t)elapsed_seconds;
+        }
+      }
+    }
+  }
+  
+  sys_untimeout(etharp_timeout_cb, NULL);
+  sys_timeout(ARP_TMR_INTERVAL, etharp_timeout_cb, NULL);
+  arp_timer_eco_mode = 0;
+  last_timer_time_ms = current_time_ms;
+  
+  LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_transition_to_active_mode: switched from ECO to ACTIVE, aged entries by %"U32_F"s\n", elapsed_seconds));
+}
+#endif /* SL_LWIP_ETHARP_ONDEMAND_TIMER */
 
 /** Try hard to create a new entry - we want the IP address to appear in
     the cache (even if this means removing an active entry or so). */
@@ -164,6 +271,78 @@ free_etharp_q(struct etharp_q_entry *q)
 
 #endif /* ARP_QUEUEING */
 
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+/**
+ * Calculate next timeout for on-demand timer.
+ * @return Timeout in milliseconds
+ */
+static u32_t
+etharp_calculate_next_timeout(void)
+{
+  u32_t min_timeout_ms = LWIP_UINT32_MAX;
+  u32_t time_left_ms;
+  int i;
+  u8_t state;
+  u16_t ctime;
+  
+  for (i = 0; i < ARP_TABLE_SIZE; i++) {
+    state = arp_table[i].state;
+    ctime = arp_table[i].ctime;
+    
+    if (state == ETHARP_STATE_EMPTY
+#if ETHARP_SUPPORT_STATIC_ENTRIES
+        || state == ETHARP_STATE_STATIC
+#endif
+       ) {
+      continue;
+    }
+    
+    /* Re-requesting states need ACTIVE mode for precise state transitions */
+    if (state == ETHARP_STATE_STABLE_REREQUESTING_1 || 
+        state == ETHARP_STATE_STABLE_REREQUESTING_2) {
+      return ARP_TMR_INTERVAL;
+    }
+    
+    if (state != ETHARP_STATE_STABLE) {
+      return ARP_TMR_INTERVAL;
+    }
+    
+    /* For STABLE entries, calculate next significant event */
+    if (ctime < ARP_AGE_REREQUEST_USED_UNICAST) {
+      /* Time until unicast re-request (270s) */
+      time_left_ms = (ARP_AGE_REREQUEST_USED_UNICAST - ctime) * 1000;
+      if (time_left_ms < min_timeout_ms) {
+        min_timeout_ms = time_left_ms;
+      }
+    } else if (ctime < ARP_AGE_REREQUEST_USED_BROADCAST) {
+      /* Between 270-285s: Time until broadcast re-request */
+      time_left_ms = (ARP_AGE_REREQUEST_USED_BROADCAST - ctime) * 1000;
+      if (time_left_ms < min_timeout_ms) {
+        min_timeout_ms = time_left_ms;
+      }
+    } else if (ctime < ARP_MAXAGE) {
+      /* Between 285-300s: Time until expiry */
+      time_left_ms = (ARP_MAXAGE - ctime) * 1000;
+      if (time_left_ms < min_timeout_ms) {
+        min_timeout_ms = time_left_ms;
+      }
+    } else {
+      /* Entry should be expired, force ACTIVE mode */
+      return ARP_TMR_INTERVAL;
+    }
+  }
+  
+  if (min_timeout_ms == LWIP_UINT32_MAX) {
+    /* No entries found, use default interval */
+    return ARP_TMR_INTERVAL;
+  }
+  
+  /* Ensure minimum timeout for stability, but allow ECO mode timeouts */
+  return (min_timeout_ms < ARP_TMR_INTERVAL) ? ARP_TMR_INTERVAL : min_timeout_ms;
+}
+
+#endif /* SL_LWIP_ETHARP_ONDEMAND_TIMER */
+
 /** Clean up ARP table entries */
 static void
 etharp_free_entry(int i)
@@ -198,9 +377,31 @@ void
 etharp_tmr(void)
 {
   int i;
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+  u32_t elapsed_seconds = 1;
+  u32_t current_time_ms;
+  u32_t elapsed_ms;
+#endif
 
   LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_timer\n"));
   /* remove expired entries from the ARP table */
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+  LWIP_ASSERT_CORE_LOCKED();
+  arp_timer_started = 0;
+  
+  if (arp_timer_eco_mode) {
+    current_time_ms = sys_now();
+    if (last_timer_time_ms != 0) {
+      elapsed_ms = current_time_ms - last_timer_time_ms;
+      elapsed_seconds = elapsed_ms / 1000;
+      if (elapsed_seconds == 0) {
+        elapsed_seconds = 1;
+      }
+    }
+    last_timer_time_ms = current_time_ms;
+  }
+#endif
+
   for (i = 0; i < ARP_TABLE_SIZE; ++i) {
     u8_t state = arp_table[i].state;
     if (state != ETHARP_STATE_EMPTY
@@ -208,6 +409,7 @@ etharp_tmr(void)
         && (state != ETHARP_STATE_STATIC)
 #endif /* ETHARP_SUPPORT_STATIC_ENTRIES */
        ) {
+#if !SL_LWIP_ETHARP_ONDEMAND_TIMER
       arp_table[i].ctime++;
       if ((arp_table[i].ctime >= ARP_MAXAGE) ||
           ((arp_table[i].state == ETHARP_STATE_PENDING)  &&
@@ -228,8 +430,73 @@ etharp_tmr(void)
         /* still pending, resend an ARP query */
         etharp_request(arp_table[i].netif, &arp_table[i].ipaddr);
       }
+#else
+      if ((u32_t)arp_table[i].ctime + elapsed_seconds > ARP_MAXAGE) {
+        arp_table[i].ctime = ARP_MAXAGE;
+      } else {
+        arp_table[i].ctime += (u16_t)elapsed_seconds;
+      }
+      if (((state == ETHARP_STATE_STABLE) && (arp_table[i].ctime >= ARP_MAXAGE)) ||
+          ((state == ETHARP_STATE_PENDING) && (arp_table[i].ctime >= ARP_MAXPENDING)) ||
+          (((state == ETHARP_STATE_STABLE_REREQUESTING_1) || 
+            (state == ETHARP_STATE_STABLE_REREQUESTING_2)) && 
+           (arp_table[i].ctime >= ARP_MAXAGE))) {
+        LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_timer: expired %s entry %d.\n",
+                                   state >= ETHARP_STATE_STABLE ? "stable" : "pending", i));
+        etharp_free_entry(i);
+      } else if (state == ETHARP_STATE_STABLE_REREQUESTING_1) {
+        arp_table[i].state = ETHARP_STATE_STABLE_REREQUESTING_2;
+      } else if (state == ETHARP_STATE_STABLE_REREQUESTING_2) {
+        arp_table[i].state = ETHARP_STATE_STABLE;
+      } else if (state == ETHARP_STATE_PENDING) {
+        etharp_request(arp_table[i].netif, &arp_table[i].ipaddr);
+      }
+#endif
     }
   }
+  
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+  {
+    int j;
+    u8_t has_entries = 0;
+    u8_t has_rerequesting_entries = 0;
+    u8_t state;
+    u32_t next_timeout;
+    
+    /* Check what types of entries we have */
+    for (j = 0; j < ARP_TABLE_SIZE; j++) {
+      state = arp_table[j].state;
+      if (state != ETHARP_STATE_EMPTY
+#if ETHARP_SUPPORT_STATIC_ENTRIES
+          && state != ETHARP_STATE_STATIC
+#endif
+         ) {
+        has_entries = 1;
+        
+        /* Check if we have any entries in re-requesting states */
+        if (state == ETHARP_STATE_STABLE_REREQUESTING_1 || 
+            state == ETHARP_STATE_STABLE_REREQUESTING_2 ||
+            state == ETHARP_STATE_PENDING) {
+          has_rerequesting_entries = 1;
+        }
+      }
+    }
+    
+    if (has_entries) {
+      if (has_rerequesting_entries) {
+        /* Use ACTIVE mode for precise state transitions and PENDING handling */
+        etharp_timer_schedule(ARP_TMR_INTERVAL);
+      } else {
+        /* All entries are STABLE - use ECO mode with calculated timeout */
+        next_timeout = etharp_calculate_next_timeout();
+        etharp_timer_schedule(next_timeout);
+      }
+    } else {
+      /* No entries - stop timer completely */
+      etharp_timer_stop();
+    }
+  }
+#endif
 }
 
 /**
@@ -466,6 +733,24 @@ etharp_update_arp_entry(struct netif *netif, const ip4_addr_t *ipaddr, struct et
   SMEMCPY(&arp_table[i].ethaddr, ethaddr, ETH_HWADDR_LEN);
   /* reset time stamp */
   arp_table[i].ctime = 0;
+
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+  /* Start timer if it's not running and we have a non-static entry */
+#if ETHARP_SUPPORT_STATIC_ENTRIES
+  if (arp_table[i].state != ETHARP_STATE_STATIC) {
+#endif /* ETHARP_SUPPORT_STATIC_ENTRIES */
+    if (!arp_timer_started) {
+      etharp_timer_schedule(ARP_TMR_INTERVAL);
+      LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_update_arp_entry: timer started for new STABLE entry\n"));
+    } else if (arp_timer_eco_mode) {
+      etharp_transition_to_active_mode();
+      LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_update_arp_entry: transitioned from ECO to ACTIVE for STABLE entry\n"));
+    }
+#if ETHARP_SUPPORT_STATIC_ENTRIES
+  }
+#endif /* ETHARP_SUPPORT_STATIC_ENTRIES */
+#endif /* SL_LWIP_ETHARP_ONDEMAND_TIMER */
+
   /* this is where we will send out queued packets! */
 #if ARP_QUEUEING
   while (arp_table[i].q != NULL) {
@@ -968,6 +1253,15 @@ etharp_query(struct netif *netif, const ip4_addr_t *ipaddr, struct pbuf *q)
     arp_table[i].state = ETHARP_STATE_PENDING;
     /* record network interface for re-sending arp request in etharp_tmr */
     arp_table[i].netif = netif;
+#if SL_LWIP_ETHARP_ONDEMAND_TIMER
+    if (!arp_timer_started) {
+      etharp_timer_schedule(ARP_TMR_INTERVAL);
+      LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_query: timer started for PENDING entry\n"));
+    } else if (arp_timer_eco_mode) {
+      etharp_transition_to_active_mode();
+      LWIP_DEBUGF(ETHARP_DEBUG, ("etharp_query: transitioned from ECO to ACTIVE for PENDING entry\n"));
+    }
+#endif
   }
 
   /* { i is either a STABLE or (new or existing) PENDING entry } */
@@ -1247,5 +1541,86 @@ etharp_acd_announce(struct netif *netif, const ip4_addr_t *ipaddr)
                     ipaddr, ARP_REQUEST);
 }
 #endif /* LWIP_ACD */
+
+#if defined(SL_LWIP_ETHARP_ONDEMAND_TIMER) && SL_LWIP_ETHARP_ONDEMAND_TIMER && defined(LWIP_TESTMODE)
+/**
+ * Test helper functions to expose internal state for unit testing
+ */
+
+u8_t
+etharp_test_get_timer_started(void)
+{
+  return arp_timer_started;
+}
+
+void
+etharp_test_set_timer_started(u8_t val)
+{
+  arp_timer_started = val;
+}
+
+u8_t
+etharp_test_get_eco_mode(void)
+{
+  return arp_timer_eco_mode;
+}
+
+void
+etharp_test_set_eco_mode(u8_t val)
+{
+  arp_timer_eco_mode = val;
+}
+
+u32_t
+etharp_test_get_last_timer_time(void)
+{
+  return last_timer_time_ms;
+}
+
+void
+etharp_test_set_last_timer_time(u32_t val)
+{
+  last_timer_time_ms = val;
+}
+
+struct etharp_entry*
+etharp_test_get_table_entry(u8_t idx)
+{
+  if (idx < ARP_TABLE_SIZE) {
+    return &arp_table[idx];
+  }
+  return NULL;
+}
+
+void
+etharp_test_clear_table(void)
+{
+  int i;
+  for (i = 0; i < ARP_TABLE_SIZE; i++) {
+    if (arp_table[i].state != ETHARP_STATE_EMPTY) {
+      etharp_free_entry(i);
+    }
+  }
+}
+
+void
+etharp_test_init_entry(u8_t idx, u8_t state, const ip4_addr_t *ipaddr, 
+                       const struct eth_addr *ethaddr, struct netif *netif, u16_t ctime)
+{
+  if (idx < ARP_TABLE_SIZE) {
+    arp_table[idx].state = state;
+    if (ipaddr) {
+      ip4_addr_copy(arp_table[idx].ipaddr, *ipaddr);
+    }
+    if (ethaddr) {
+      SMEMCPY(&arp_table[idx].ethaddr, ethaddr, ETH_HWADDR_LEN);
+    }
+    arp_table[idx].netif = netif;
+    arp_table[idx].ctime = ctime;
+    arp_table[idx].q = NULL;
+  }
+}
+
+#endif /* SL_LWIP_ETHARP_ONDEMAND_TIMER && LWIP_TESTMODE */
 
 #endif /* LWIP_IPV4 && LWIP_ARP */

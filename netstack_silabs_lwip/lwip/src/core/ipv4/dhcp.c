@@ -80,6 +80,9 @@
 #include "lwip/etharp.h"
 #include "lwip/prot/dhcp.h"
 #include "lwip/prot/iana.h"
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+#include "lwip/timeouts.h"
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
 
 #include <string.h>
 
@@ -252,6 +255,15 @@ static void dhcp_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_a
 static void dhcp_timeout(struct netif *netif);
 static void dhcp_t1_timeout(struct netif *netif);
 static void dhcp_t2_timeout(struct netif *netif);
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+static void dhcp_fine_timer_start(struct netif *netif);
+static void dhcp_fine_timer_stop(struct netif *netif);
+#if LWIP_TESTMODE
+void dhcp_fine_timer_handler(void *arg);
+#else
+static void dhcp_fine_timer_handler(void *arg);
+#endif
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
 
 /* build outgoing messages */
 /* create a DHCP message, fill in common headers */
@@ -368,6 +380,9 @@ dhcp_conflict_callback(struct netif *netif, acd_callback_enum_t state)
        msecs = 10 * 1000;
        dhcp->request_timeout = (u16_t)((msecs + DHCP_FINE_TIMER_MSECS - 1) / DHCP_FINE_TIMER_MSECS);
        LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE, ("dhcp_decline(): set request timeout %"U16_F" msecs\n", msecs));
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+       dhcp_fine_timer_start(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
       break;
     case ACD_DECLINE:
       /* remove IP address from interface
@@ -499,6 +514,9 @@ dhcp_select(struct netif *netif)
   msecs = (u16_t)((dhcp->tries < 6 ? 1 << dhcp->tries : 60) * 1000);
   dhcp->request_timeout = (u16_t)((msecs + DHCP_FINE_TIMER_MSECS - 1) / DHCP_FINE_TIMER_MSECS);
   LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_STATE, ("dhcp_select(): set request timeout %"U16_F" msecs\n", msecs));
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  dhcp_fine_timer_start(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
   return result;
 }
 
@@ -566,6 +584,107 @@ dhcp_fine_tmr(void)
     }
   }
 }
+
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+/**
+ * Per-Interface Self-Reconfigurable Timer Architecture
+ * 
+ * Key Design:
+ * - Each interface has its own timer (dhcp->fine_timer_active flag)
+ * - Timer callback carries netif pointer - no global iteration needed
+ * - Self-destructing: timer auto-stops when request_timeout reaches 0
+ * - Self-reconfiguring: timer only reschedules if still needed
+ * - Scalable: O(1) complexity per interface, no cross-interface dependencies
+ */
+
+/**
+ * Start the fine timer for a specific interface
+ * @param netif The network interface to start timer for
+ */
+static void
+dhcp_fine_timer_start(struct netif *netif)
+{
+  struct dhcp *dhcp = netif_dhcp_data(netif);
+  
+  if (dhcp != NULL && !dhcp->fine_timer_active) {
+    /* Pass netif pointer to timer - enables per-interface handling */
+    sys_timeout(DHCP_FINE_TIMER_MSECS, dhcp_fine_timer_handler, netif);
+    dhcp->fine_timer_active = 1;
+    LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_STATE, 
+               ("DHCP[%c%c%u]: Fine timer STARTED (Active Mode)\n",
+                netif->name[0], netif->name[1], netif->num));
+  }
+}
+
+/**
+ * Stop the fine timer for a specific interface
+ * @param netif The network interface to stop timer for
+ */
+static void
+dhcp_fine_timer_stop(struct netif *netif)
+{
+  struct dhcp *dhcp = netif_dhcp_data(netif);
+  
+  if (dhcp != NULL && dhcp->fine_timer_active) {
+    /* Remove timer using netif pointer - precise targeting */
+    sys_untimeout(dhcp_fine_timer_handler, netif);
+    dhcp->fine_timer_active = 0;
+    LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_STATE, 
+               ("DHCP[%c%c%u]: Fine timer STOPPED (Eco Mode)\n",
+                netif->name[0], netif->name[1], netif->num));
+  }
+}
+
+/**
+ * Per-interface timer handler with self-destruct logic
+ * @param arg The network interface (netif) pointer
+ */
+#if LWIP_TESTMODE
+void
+#else
+static void
+#endif
+dhcp_fine_timer_handler(void *arg)
+{
+  struct netif *netif = (struct netif *)arg;
+  struct dhcp *dhcp = netif_dhcp_data(netif);
+  
+  if (dhcp == NULL) {
+    return;  /* Interface removed or DHCP disabled */
+  }
+  
+  /* Execute timeout logic (same as dhcp_fine_tmr for single interface) */
+  if (dhcp->request_timeout > 1) {
+    dhcp->request_timeout--;
+    
+    /* Self-reconfigure: reschedule timer for next tick */
+    sys_timeout(DHCP_FINE_TIMER_MSECS, dhcp_fine_timer_handler, netif);
+    
+  } else if (dhcp->request_timeout == 1) {
+    dhcp->request_timeout--;
+    
+    /* Timeout reached - trigger DHCP action */
+    LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+               ("DHCP[%c%c%u]: request timeout\n",
+                netif->name[0], netif->name[1], netif->num));
+    
+    /* Mark timer as inactive before calling dhcp_timeout */
+    /* dhcp_timeout may restart timer via dhcp_discover/renew/etc */
+    dhcp->fine_timer_active = 0;
+    dhcp_timeout(netif);
+    
+    /* Self-destruct: timer stops here if dhcp_timeout doesn't restart */
+    /* If dhcp_timeout calls dhcp_discover/renew/etc, they will restart timer */
+    
+  } else {
+    /* request_timeout == 0, self-destruct: timer stops automatically */
+    dhcp->fine_timer_active = 0;
+    LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_STATE,
+               ("DHCP[%c%c%u]: Fine timer auto-stopped (idle)\n",
+                netif->name[0], netif->name[1], netif->num));
+  }
+}
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
 
 /**
  * A DHCP negotiation transaction, or ARP request, has timed out.
@@ -840,6 +959,14 @@ dhcp_start(struct netif *netif)
   } else {
     LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE, ("dhcp_start(): restarting DHCP configuration\n"));
 
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+    /* Stop on-demand timer before clearing structure to prevent timer leaks/duplicates
+     * Critical: memset() below will clear fine_timer_active flag, but if timer is still
+     * scheduled in sys_timeout list, we'd have orphaned timer + new timer = duplicate!
+     */
+    dhcp_fine_timer_stop(netif);
+#endif
+
     if (dhcp->pcb_allocated != 0) {
       dhcp_dec_pcb_refcount(); /* free DHCP PCB if not needed any more */
     }
@@ -1070,6 +1197,9 @@ dhcp_discover(struct netif *netif)
   msecs = DHCP_REQUEST_BACKOFF_SEQUENCE(dhcp->tries);
   dhcp->request_timeout = (u16_t)((msecs + DHCP_FINE_TIMER_MSECS - 1) / DHCP_FINE_TIMER_MSECS);
   LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE, ("dhcp_discover(): set request timeout %"U16_F" msecs\n", msecs));
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  dhcp_fine_timer_start(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
   return result;
 }
 
@@ -1141,6 +1271,10 @@ dhcp_bind(struct netif *netif)
               ip4_addr_get_u32(&dhcp->offered_ip_addr), ip4_addr_get_u32(&sn_mask), ip4_addr_get_u32(&gw_addr)));
   /* netif is now bound to DHCP leased address - set this before assigning the address
      to ensure the callback can use dhcp_supplied_address() */
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  /* Stop fine timer - entering BOUND state (Eco Mode) */
+  dhcp_fine_timer_stop(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
   dhcp_set_state(dhcp, DHCP_STATE_BOUND);
 
   netif_set_addr(netif, &dhcp->offered_ip_addr, &sn_mask, &gw_addr);
@@ -1201,6 +1335,9 @@ dhcp_renew(struct netif *netif)
   msecs = (u16_t)(dhcp->tries < 10 ? dhcp->tries * 2000 : 20 * 1000);
   dhcp->request_timeout = (u16_t)((msecs + DHCP_FINE_TIMER_MSECS - 1) / DHCP_FINE_TIMER_MSECS);
   LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE, ("dhcp_renew(): set request timeout %"U16_F" msecs\n", msecs));
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  dhcp_fine_timer_start(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
   return result;
 }
 
@@ -1255,6 +1392,9 @@ dhcp_rebind(struct netif *netif)
   msecs = (u16_t)(dhcp->tries < 10 ? dhcp->tries * 1000 : 10 * 1000);
   dhcp->request_timeout = (u16_t)((msecs + DHCP_FINE_TIMER_MSECS - 1) / DHCP_FINE_TIMER_MSECS);
   LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE, ("dhcp_rebind(): set request timeout %"U16_F" msecs\n", msecs));
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  dhcp_fine_timer_start(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
   return result;
 }
 
@@ -1312,6 +1452,9 @@ dhcp_reboot(struct netif *netif)
   msecs = (u16_t)(dhcp->tries < 10 ? dhcp->tries * 1000 : 10 * 1000);
   dhcp->request_timeout = (u16_t)((msecs + DHCP_FINE_TIMER_MSECS - 1) / DHCP_FINE_TIMER_MSECS);
   LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE, ("dhcp_reboot(): set request timeout %"U16_F" msecs\n", msecs));
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  dhcp_fine_timer_start(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
   return result;
 }
 
@@ -1337,6 +1480,11 @@ dhcp_release_and_stop(struct netif *netif)
   if (dhcp->state == DHCP_STATE_OFF) {
     return;
   }
+
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  /* Stop fine timer - entering OFF state (Eco Mode) */
+  dhcp_fine_timer_stop(netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
 
   ip_addr_copy(server_ip_addr, dhcp->server_ip_addr);
 

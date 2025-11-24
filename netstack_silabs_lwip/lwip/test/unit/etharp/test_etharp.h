@@ -4,5 +4,6 @@
 #include "../lwip_check.h"
 
 Suite* etharp_suite(void);
+Suite* etharp_ondemand_suite(void);
 
 #endif

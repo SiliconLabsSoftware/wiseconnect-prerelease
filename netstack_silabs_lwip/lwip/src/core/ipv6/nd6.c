@@ -62,7 +62,7 @@
 #include "lwip/ip.h"
 #include "lwip/stats.h"
 #include "lwip/dns.h"
-#if SL_LWIP_ECO_TIMERS
+#if SL_LWIP_ND6_DYNAMIC_TIMER
 #include "lwip/timeouts.h"
 #endif
 
@@ -108,7 +108,7 @@ static netif_addr_idx_t nd6_cached_destination_index;
 /* Multicast address holder. */
 static ip6_addr_t multicast_address;
 
-#if SL_LWIP_ECO_TIMERS
+#if SL_LWIP_ND6_DYNAMIC_TIMER
 static u32_t nd6_tmr_rs_reduction = 0;
 /* Static variables for timer tracking - moved to file scope */
 static u32_t nd6_last_timer_call = 0xFFFFFFFF; /* Sentinel value to detect first call */
@@ -969,7 +969,7 @@ lenerr_drop_free_return:
   pbuf_free(p);
 }
 
-#if SL_LWIP_ECO_TIMERS 
+#if SL_LWIP_ND6_DYNAMIC_TIMER
 /**
  * Initialize the nd6 timer with an initial 1-second callback
  */
@@ -1050,23 +1050,27 @@ nd6_handle_timer(u32_t *timer_value, u32_t timeout_value, u32_t *min_timer_value
 
 void nd6_tmr(void *arg)
 {
-  LWIP_UNUSED_ARG(arg);
-  
   /* Initialize all local variables at the start */
   s8_t i;
   struct netif *netif;
   u8_t eco_mode = 0;
   u8_t active_mode = 0;
-  u32_t next_timeout = ND6_TMR_ECO_INTERVAL; /* Default to 3 seconds (3000ms) */
+  u32_t next_timeout = ND6_TMR_ECO_INTERVAL; /* Default to 30 seconds (30000ms) */
   u32_t min_timer_value_after_processing = next_timeout; /* Track minimum timer value across all cases */
-  u32_t start_time = sys_now();
-  u32_t current_time = sys_now();
+  u32_t start_time = 0;
+  u32_t current_time = 0;
   u32_t elapsed_time_ms = 0;
   u32_t elapsed_time_sec = 0;
   u32_t next_callback_timeout = 0;
   u32_t processing_time = 0;
   u32_t compensated_timeout = 0;
   
+  LWIP_UNUSED_ARG(arg);
+
+  /* Get current time after all declarations */
+  start_time = sys_now();
+  current_time = start_time;
+
   /* Calculate actual elapsed time since last timer call */
   if (nd6_first_call) {
     /* First call - use default interval */
@@ -1112,7 +1116,7 @@ void nd6_tmr(void *arg)
   if (active_mode) {
     next_timeout = ND6_TMR_ACTIVE_INTERVAL; /* 1 second for active states */
   } else if (eco_mode) {
-    next_timeout = ND6_TMR_ECO_INTERVAL; /* 3 seconds for eco states */
+    next_timeout = ND6_TMR_ECO_INTERVAL; /* 30 seconds for eco states */
   }
 
   /* Process neighbor entries. */
@@ -1293,6 +1297,10 @@ void nd6_tmr(void *arg)
       /* Step 2: update DAD state. */
       addr_state = netif_ip6_addr_state(netif, i);
       if (ip6_addr_istentative(addr_state)) {
+        /* DAD in progress - ensure timer runs at 1-second interval for RFC 4862 compliance */
+        if (ND6_TMR_ACTIVE_INTERVAL < min_timer_value_after_processing) {
+          min_timer_value_after_processing = ND6_TMR_ACTIVE_INTERVAL;
+        }
         if ((addr_state & IP6_ADDR_TENTATIVE_COUNT_MASK) >= LWIP_IPV6_DUP_DETECT_ATTEMPTS) {
           /* No NA received in response. Mark address as valid. For dynamic
            * addresses with an expired preferred lifetime, the state is set to
@@ -1321,19 +1329,10 @@ void nd6_tmr(void *arg)
 #if LWIP_IPV6_SEND_ROUTER_SOLICIT
   /* Handle router solicitation timing */
   if (nd6_tmr_rs_reduction <= elapsed_time_sec) {
-    /* Send router solicitations and reset timer */
-    /* Reset timer to full interval - don't decrement in this cycle */
-    if (active_mode) {
-      /* Active mode: use standard interval for responsive behavior */
-      nd6_tmr_rs_reduction = (ND6_RTR_SOLICITATION_INTERVAL / 1000); /* Convert to seconds */
-    } else if (eco_mode) {
-      /* Eco mode: adjust interval for power efficiency */
-      nd6_tmr_rs_reduction = (ND6_RTR_SOLICITATION_INTERVAL / 1000) + ND6_ECO_RS_INTERVAL_ADJUSTMENT;
-    } else {
-      /* Default fallback */
-      nd6_tmr_rs_reduction = (ND6_RTR_SOLICITATION_INTERVAL / 1000);
-    }
+    /* Send router solicitations and reset timer to RFC-compliant 4-second interval */
+    nd6_tmr_rs_reduction = (ND6_RTR_SOLICITATION_INTERVAL / 1000); /* 4 seconds per RFC 4861 */
     
+    /* Send RS messages and schedule next callback if more are pending */
     NETIF_FOREACH(netif) {
       if ((netif->rs_count > 0) && netif_is_up(netif) &&
           netif_is_link_up(netif) &&
@@ -1341,9 +1340,16 @@ void nd6_tmr(void *arg)
           !ip6_addr_isduplicated(netif_ip6_addr_state(netif, 0))) {
         if (nd6_send_rs(netif) == ERR_OK) {
           netif->rs_count--;
+          /* If more RS pending, schedule next callback at 4 seconds */
+          if (netif->rs_count > 0) {
+            if (ND6_RTR_SOLICITATION_INTERVAL < min_timer_value_after_processing) {
+              min_timer_value_after_processing = ND6_RTR_SOLICITATION_INTERVAL;
+            }
+          }
         }
       }
     }
+    /* If no more RS pending, eco mode will use 30 seconds */
   } else {
     /* Use the unified helper function for router solicitation timer (second-based) */
     nd6_handle_timer(&nd6_tmr_rs_reduction, 
@@ -1357,7 +1363,7 @@ void nd6_tmr(void *arg)
   /* min_timer_value_after_processing now contains the global minimum across all timers */
 
   /* Calculate the next timeout for the NEXT timer callback */
-  next_callback_timeout = ND6_TMR_ECO_INTERVAL; /* Default to 3 seconds (3000ms) */
+  next_callback_timeout = ND6_TMR_ECO_INTERVAL; /* Default to 30 seconds (30000ms) */
   
   /* Check if any timer will expire before the dynamic timer */
   if (min_timer_value_after_processing < next_timeout) {
@@ -2484,6 +2490,11 @@ nd6_get_next_hop_entry(const ip6_addr_t *ip6addr, struct netif *netif)
       neighbor_cache[i].state = ND6_INCOMPLETE;
       neighbor_cache[i].counter.probes_sent = 1;
       nd6_send_neighbor_cache_probe(&neighbor_cache[i], ND6_SEND_FLAG_MULTICAST_DEST);
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+      /* Immediately reschedule timer to 1-second interval for INCOMPLETE state processing */
+      sys_untimeout(nd6_tmr, NULL);
+      sys_timeout(ND6_TMR_ACTIVE_INTERVAL, nd6_tmr, NULL);
+#endif
     }
   }
 
@@ -2720,6 +2731,11 @@ nd6_get_next_hop_addr_or_queue(struct netif *netif, struct pbuf *q, const ip6_ad
     /* Switch to delay state. */
     neighbor_cache[i].state = ND6_DELAY;
     neighbor_cache[i].counter.delay_time = LWIP_ND6_DELAY_FIRST_PROBE_TIME / ND6_TMR_INTERVAL;
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+    /* Reschedule timer to service DELAY state promptly - don't wait for eco mode timer */
+    sys_untimeout(nd6_tmr, NULL);
+    sys_timeout(ND6_TMR_ACTIVE_INTERVAL, nd6_tmr, NULL);
+#endif
   }
   /* @todo should we send or queue if PROBE? send for now, to let unicast NS pass. */
   if ((neighbor_cache[i].state == ND6_REACHABLE) ||

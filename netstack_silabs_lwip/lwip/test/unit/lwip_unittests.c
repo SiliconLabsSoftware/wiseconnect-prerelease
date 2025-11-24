@@ -2,6 +2,7 @@
 
 #include "ip4/test_ip4.h"
 #include "ip6/test_ip6.h"
+#include "nd6/test_nd6.h"
 #include "udp/test_udp.h"
 #include "tcp/test_tcp.h"
 #include "tcp/test_tcp_oos.h"
@@ -97,10 +98,14 @@ int main(void)
     pbuf_suite,
     timers_suite,
     etharp_suite,
+    #if SL_LWIP_ETHARP_ONDEMAND_TIMER && defined(LWIP_TESTMODE)
+    etharp_ondemand_suite,
+    #endif
     acd_suite,
     dhcp_suite,
     mdns_suite,
     mqtt_suite,
+    nd6_suite,
     sockets_suite
 #if PPP_SUPPORT && PPPOS_SUPPORT
     , pppos_suite

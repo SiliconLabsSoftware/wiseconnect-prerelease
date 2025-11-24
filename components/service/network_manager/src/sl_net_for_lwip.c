@@ -64,7 +64,9 @@ static osMutexId_t dhcp_monitor_mutex                                        = N
 #endif
 
 // Forward declarations
+#if LWIP_IPV4 && LWIP_DHCP
 static void sli_handle_dhcp_completion(sl_net_interface_t interface);
+#endif
 static void update_profile_from_netif(sl_net_wifi_client_profile_t *profile);
 static void configure_static_ip(const sl_net_wifi_client_profile_t *profile);
 #if LWIP_NETIF_STATUS_CALLBACK
@@ -583,9 +585,9 @@ static sl_status_t set_sta_link_up_async(sl_net_wifi_client_profile_t *profile)
  * @note This function is called by both event-driven (netif callback)
  *       and timer-based (periodic check) DHCP monitoring mechanisms.
  */
+#if LWIP_IPV4 && LWIP_DHCP
 static void sli_handle_dhcp_completion(sl_net_interface_t interface)
 {
-#if LWIP_IPV4 && LWIP_DHCP
   if (wifi_client_context == NULL) {
     SL_DEBUG_LOG("WiFi client context is NULL\n");
     return;
@@ -638,8 +640,8 @@ static void sli_handle_dhcp_completion(sl_net_interface_t interface)
 
   // Notify IP_CONFIG_EVENT with success to app
   sli_notify_net_event_handler(SL_NET_IP_CONFIG_EVENT, SL_STATUS_OK, NULL, 0);
-#endif /* LWIP_IPV4 && LWIP_DHCP */
 }
+#endif /* LWIP_IPV4 && LWIP_DHCP */
 
 #if LWIP_NETIF_STATUS_CALLBACK
 /**
@@ -710,6 +712,8 @@ static void sli_netif_status_callback(struct netif *netif)
  */
 static void sli_dhcp_check_callback(void *argument)
 {
+  // Suppress unused parameter warning when DHCP is disabled at build time
+  (void)argument;
 #if LWIP_IPV4 && LWIP_DHCP
   // Extract interface from timer argument
   sl_net_interface_t interface = (sl_net_interface_t)(uintptr_t)argument;
@@ -827,7 +831,9 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
     if (dhcp_monitor_state[interface].check_timer == NULL) {
       SL_DEBUG_LOG("Failed to create DHCP check timer for interface %d\n", interface);
       // Cleanup: Stop DHCP since we can't monitor it
+#if LWIP_IPV4 && LWIP_DHCP
       dhcp_stop(&(wifi_client_context->netif));
+#endif
       if (dhcp_monitor_mutex != NULL) {
         osMutexAcquire(dhcp_monitor_mutex, osWaitForever);
       }
@@ -842,7 +848,9 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
       SL_DEBUG_LOG("Failed to start DHCP check timer: %d\n", timer_status);
       osTimerDelete(dhcp_monitor_state[interface].check_timer);
       dhcp_monitor_state[interface].check_timer = NULL;
+#if LWIP_IPV4 && LWIP_DHCP
       dhcp_stop(&(wifi_client_context->netif));
+#endif
       if (dhcp_monitor_mutex != NULL) {
         osMutexAcquire(dhcp_monitor_mutex, osWaitForever);
       }

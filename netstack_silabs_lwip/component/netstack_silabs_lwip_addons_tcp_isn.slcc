@@ -10,15 +10,15 @@ description: >
 category: Network Stack|LwIP|Addons
 quality: production
 provides:
-  - name: netstack_silabs_lwip_addons_tcp_isn
+- name: netstack_silabs_lwip_addons_tcp_isn
 requires:
-  - name: netstack_silabs_lwip_core
+- name: netstack_silabs_lwip_core
 source:
-  - path: lwip/contrib/addons/tcp_isn/tcp_isn.c
+- path: lwip/contrib/addons/tcp_isn/tcp_isn.c
 include:
-  - path: lwip/contrib/addons/tcp_isn
-    file_list:
-    - path: tcp_isn.h
+- path: lwip/contrib/addons/tcp_isn
+  file_list:
+  - path: tcp_isn.h
 metadata:
   sbom:
     license: BSD-3-Clause
@@ -29,3 +29,4 @@ metadata:
       url: https://savannah.nongnu.org/projects/lwip/
       package_url: https://github.com/lwip-tcpip/lwip/
       comment: lwIP is a small independent implementation of the TCP/IP protocol suite.
+root_path: netstack_silabs_lwip/

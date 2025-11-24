@@ -1,6 +1,6 @@
 id: wiseconnect3_sdk
 label: Wiseconnect
-description: Merged extension for wiseconnect3_sdk
+description: Wiseconnect3 Sdk extension for the Simplicity SDK
 version: 4.0.0
 component_path:
  - path: components/device/silabs/si91x/wireless/ble
@@ -103,16 +103,16 @@ component_path:
  - path: third_party/paho_mqtt_embedded
  - path: third_party/qcbor/component
  - path: third_party/tcose/component
- - path: component
+ - path: netstack_silabs_lwip/component
 documentation:
  - docset: bluetooth_le_siwx91x
-   version: 4.0.0-beta.2
+   version: 4.0.0-beta.3
  - docset: platform_siwx91x
-   version: 4.0.0-beta.2
+   version: 4.0.0-beta.3
  - docset: platform_nwp_siwx91x
-   version: 4.0.0-beta.2
+   version: 4.0.0-beta.3
  - docset: wifi
-   version: 4.0.0-beta.2
+   version: 4.0.0-beta.3
  - docset: unknown
    version: 0.0.0
 upgrade_manifest: []

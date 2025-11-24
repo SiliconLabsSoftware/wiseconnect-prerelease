@@ -120,24 +120,81 @@
 #if !defined LWIP_TIMERS_CUSTOM || defined __DOXYGEN__
 #define LWIP_TIMERS_CUSTOM              0
 #endif
-
-/**
- * SL_LWIP_ECO_TIMERS==1: Enable Silicon Labs eco-friendly timer optimizations.
- * This option enables power-saving timer optimizations for Silicon Labs platforms.
- */
-
-#if !defined SL_LWIP_ECO_TIMERS || defined __DOXYGEN__
-#define SL_LWIP_ECO_TIMERS              0
-#endif
-
 /**
  * @}
- * SL_LWIP_DNS_ONDEMAND_TIMER==1: Enable Silicon Labs eco-friendly DNS timer optimizations.
- * This option enables power-saving DNS timer optimizations for Silicon Labs platforms.
  */
-#if !defined(SL_LWIP_DNS_ONDEMAND_TIMER) || defined __DOXYGEN__
-#define SL_LWIP_DNS_ONDEMAND_TIMER              0
+
+/*
+   ---------------------------------------------------
+   ----- Silicon Labs Timer Optimizations ------------
+   ---------------------------------------------------
+*/
+/**
+ * @defgroup lwip_opts_sl_timers Silicon Labs Timer Optimizations
+ * @ingroup lwip_opts_infrastructure
+ * @{
+ */
+/**
+ * SL_LWIP_ADAPTIVE_TIMERS: Master switch for all Silicon Labs timer optimizations.
+ * Set to 1 to enable timer optimizations (individually controllable).
+ * Set to 0 to disable all timer optimizations by default.
+ * Individual timers can still be overridden in lwipopts.h.
+ */
+#if !defined SL_LWIP_ADAPTIVE_TIMERS || defined __DOXYGEN__
+#define SL_LWIP_ADAPTIVE_TIMERS         0
 #endif
+
+/**
+ * SL_LWIP_ND6_DYNAMIC_TIMER: Enable ND6 dynamic timer optimizations.
+ * Power-saving timer optimizations for IPv6 Neighbor Discovery.
+ */
+#if !defined SL_LWIP_ND6_DYNAMIC_TIMER || defined __DOXYGEN__
+#define SL_LWIP_ND6_DYNAMIC_TIMER       SL_LWIP_ADAPTIVE_TIMERS
+#endif
+
+/**
+ * SL_LWIP_DHCP_ONDEMAND_TIMER: Enable DHCP on-demand fine timer.
+ * Replaces global cyclic DHCP timer with per-interface on-demand timers.
+ */
+#if !defined SL_LWIP_DHCP_ONDEMAND_TIMER || defined __DOXYGEN__
+#define SL_LWIP_DHCP_ONDEMAND_TIMER     SL_LWIP_ADAPTIVE_TIMERS
+#endif
+
+/**
+ * SL_LWIP_DNS_ONDEMAND_TIMER: Enable DNS on-demand timer optimizations.
+ * Power-saving DNS timer that runs only when queries are active.
+ */
+#if !defined SL_LWIP_DNS_ONDEMAND_TIMER || defined __DOXYGEN__
+#define SL_LWIP_DNS_ONDEMAND_TIMER      SL_LWIP_ADAPTIVE_TIMERS
+#endif
+
+/**
+ * SL_LWIP_ETHARP_ONDEMAND_TIMER: Enable ARP on-demand timer.
+ * Timer runs only when ARP entries need management, stops when table is empty.
+ */
+#if !defined SL_LWIP_ETHARP_ONDEMAND_TIMER || defined __DOXYGEN__
+#define SL_LWIP_ETHARP_ONDEMAND_TIMER   SL_LWIP_ADAPTIVE_TIMERS
+#endif
+
+/**
+ * SL_LWIP_ACD_ONDEMAND_TIMER: Enable ACD on-demand timer.
+ * Timer runs only when ACD is actively probing/announcing/defending addresses.
+ */
+#if !defined SL_LWIP_ACD_ONDEMAND_TIMER || defined __DOXYGEN__
+#define SL_LWIP_ACD_ONDEMAND_TIMER      SL_LWIP_ADAPTIVE_TIMERS
+#endif
+
+/**
+ * SL_LWIP_TCP_DYNAMIC_TIMER: Enable TCP dynamic timer for power savings.
+ * Switches between ACTIVE (250ms) and ECO (up to 30s) modes based on activity.
+ * Requires platform-specific functions: tcp_tmr_set_next_timeout(), tcp_timer_force_wakeup().
+ */
+#if !defined SL_LWIP_TCP_DYNAMIC_TIMER || defined __DOXYGEN__
+#define SL_LWIP_TCP_DYNAMIC_TIMER       SL_LWIP_ADAPTIVE_TIMERS
+#endif
+/**
+ * @}
+ */
 
 /**
  * @defgroup lwip_opts_memcpy memcpy
@@ -1079,13 +1136,6 @@
 #define LWIP_ACD                     0
 #endif /* !LWIP_IPV4 */
 /**
- * SL_LWIP_ACD_ONDEMAND_TIMER==1: Enable Silicon Labs on-demand ACD timer for power optimization.
- * Timer only runs when ACD is actively probing/announcing/defending addresses.
- */
-#if !defined SL_LWIP_ACD_ONDEMAND_TIMER || defined __DOXYGEN__
-#define SL_LWIP_ACD_ONDEMAND_TIMER  0
-#endif
-/**
  * @}
  */
 
@@ -1301,30 +1351,6 @@
  */
 #if !defined LWIP_TCP || defined __DOXYGEN__
 #define LWIP_TCP                        1
-#endif
-
-/*
-   ------------------------------------------------
-   ---------- Silicon Labs TCP extensions ----------
-   ------------------------------------------------
-*/
-
-/**
- * SL_LWIP_TCP_DYNAMIC_TIMER: Enable TCP Dynamic Timer for power savings.
- * 
- * When enabled, TCP timer switches between ACTIVE (250ms, zero overhead) and
- * ECO (up to 30s, power saving) modes based on connection activity.
- * 
- * Benefits: Up to 99% reduction in timer wake-ups during idle periods with
- * zero impact on active transfers. Best for battery-powered IoT devices.
- * 
- * Requires: Platform must implement tcp_tmr_set_next_timeout() and
- * tcp_timer_force_wakeup() functions. Call tcp_tmr_init() during startup.
- * 
- * Default: 0 (disabled - standard lwIP behavior)
- */
-#if !defined SL_LWIP_TCP_DYNAMIC_TIMER || defined __DOXYGEN__
-#define SL_LWIP_TCP_DYNAMIC_TIMER           0
 #endif
 
 /**

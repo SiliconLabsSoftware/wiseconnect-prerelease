@@ -82,5 +82,3 @@ include:
       - path: sl_hfxo_manager_config.h
       - path: sl_power_manager_config.h
       - path: sl_sleeptimer_config.h
-  - path: "config/brd8036a"
-    condition: [brd8036a]

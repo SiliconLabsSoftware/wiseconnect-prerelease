@@ -222,7 +222,7 @@
    * @brief Sets the maximum number of clients supported in AP mode.
    * @details This bit field sets the maximum number of clients that can be supported in Access Point (AP) mode.
    * The value for this field should be provided in the range specified by bits 13 - 16.
-   * @param max_num_of_clients Number of clients to be supported (1 to 15).
+   * @param max_num_of_clients Specifies the number of clients supported: AP-only mode supports (1–8) clients, while concurrent mode supports (1–4) clients.
    */
 #define SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS(max_num_of_clients) (max_num_of_clients << 13)
 
@@ -1105,7 +1105,7 @@
  * @brief Sets the maximum number of clients supported in AP mode.
  * @details This bit field sets the maximum number of clients that can be supported in Access Point (AP) mode.
  * The value for this field should be provided in the range specified by bits 13 - 16.
- * @param max_num_of_clients Number of clients to be supported (1 to 8).
+ * @param max_num_of_clients Specifies the number of clients supported: AP-only mode supports (1–8) clients, while concurrent mode supports (1–4) clients.
  */
 #define SL_SI91X_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS(max_num_of_clients)
 

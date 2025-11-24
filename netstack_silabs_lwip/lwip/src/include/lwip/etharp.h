@@ -100,6 +100,26 @@ err_t etharp_remove_static_entry(const ip4_addr_t *ipaddr);
 
 void etharp_input(struct pbuf *p, struct netif *netif);
 
+#if defined(SL_LWIP_ETHARP_ONDEMAND_TIMER) && SL_LWIP_ETHARP_ONDEMAND_TIMER && defined(LWIP_TESTMODE)
+/* Forward declaration for test mode */
+struct etharp_entry;
+
+/* Test helper functions to expose internal state */
+u8_t etharp_test_get_timer_started(void);
+void etharp_test_set_timer_started(u8_t val);
+u8_t etharp_test_get_eco_mode(void);
+void etharp_test_set_eco_mode(u8_t val);
+u32_t etharp_test_get_last_timer_time(void);
+void etharp_test_set_last_timer_time(u32_t val);
+struct etharp_entry* etharp_test_get_table_entry(u8_t idx);
+void etharp_test_clear_table(void);
+void etharp_test_init_entry(u8_t idx, u8_t state, const ip4_addr_t *ipaddr,
+                            const struct eth_addr *ethaddr, struct netif *netif, u16_t ctime);
+
+/* Expose etharp_timeout_cb for testing */
+void etharp_timeout_cb(void *arg);
+#endif /* SL_LWIP_ETHARP_ONDEMAND_TIMER && LWIP_TESTMODE */
+
 #ifdef __cplusplus
 }
 #endif

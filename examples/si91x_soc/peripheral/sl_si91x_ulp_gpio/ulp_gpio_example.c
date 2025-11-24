@@ -27,7 +27,7 @@
 #include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
 #include "sl_si91x_wireless_shutdown.h"
-
+#include "sl_si91x_clock_manager.h"
 /*******************************************************************************
  ***************************  Defines / Macros  ********************************
  ******************************************************************************/
@@ -49,9 +49,7 @@
 #define PAD_SELECT_9      9      // GPIO PAD selection number
 #define MAX_PAD_SELECT    34     // Maximum GPIO PAD selection number
 #define PINS              0x0c40 // Pins in a port to mask
-#define DELAY             1000   // Delay for 1sec
 #define FIVE_SECOND_DELAY 5000   // Delay for 5 sec
-#define MS_DELAY_COUNTER  4600   // Delay count
 #define UULP_GPIO_INTR_2  2      // UULP GPIO pin interrupt 2
 #define TOGGLE_COUNT      10     // Count for number of times to repeat
 /*******************************************************************************
@@ -87,7 +85,6 @@ uint8_t gpio_toggle_count;
 /*******************************************************************************
  **********************  Local Function prototypes   ***************************
  ******************************************************************************/
-static void delay(uint32_t idelay);
 static void gpio_driver_ulp_initialization(void);
 static void gpio_driver_uulp_initialization(void);
 static void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr);
@@ -303,7 +300,7 @@ void gpio_example_process_action(void)
         // the ram retention and removing the unused peripherals
         configuring_ps2_power_state();
         // giving 5 sec delay for current consumption verification
-        delay(FIVE_SECOND_DELAY);
+        sl_si91x_delay_ms(FIVE_SECOND_DELAY);
         // current power state is updated to PS2
         current_power_state = SL_SI91X_POWER_MANAGER_PS2;
         // current mode is updated with process action for verifying the
@@ -315,7 +312,7 @@ void gpio_example_process_action(void)
         sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
         DEBUGINIT();
         // giving 5 sec delay for current consumption verification
-        delay(FIVE_SECOND_DELAY);
+        sl_si91x_delay_ms(FIVE_SECOND_DELAY);
         // current power state is updated to last enum after the power state cycle
         // is completed
         current_power_state = LAST_ENUM_POWER_STATE;
@@ -337,16 +334,6 @@ void gpio_example_process_action(void)
       break;
     default:
       break;
-  }
-}
-
-/*******************************************************************************
- * Delay function for 1ms
- ******************************************************************************/
-static void delay(uint32_t idelay)
-{
-  for (uint32_t x = 0; x < MS_DELAY_COUNTER * idelay; x++) {
-    __NOP();
   }
 }
 

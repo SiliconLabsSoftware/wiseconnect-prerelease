@@ -12,15 +12,15 @@ description: >
 category: Network Stack|LwIP|Addons
 quality: production
 provides:
-  - name: netstack_silabs_lwip_addons_tcp_md5
+- name: netstack_silabs_lwip_addons_tcp_md5
 requires:
-  - name: netstack_silabs_lwip_core
+- name: netstack_silabs_lwip_core
 source:
-  - path: lwip/contrib/addons/tcp_md5/tcp_md5.c
+- path: lwip/contrib/addons/tcp_md5/tcp_md5.c
 include:
-  - path: lwip/contrib/addons/tcp_md5
-    file_list:
-    - path: tcp_md5.h
+- path: lwip/contrib/addons/tcp_md5
+  file_list:
+  - path: tcp_md5.h
 metadata:
   sbom:
     license: BSD-3-Clause
@@ -31,3 +31,4 @@ metadata:
       url: https://savannah.nongnu.org/projects/lwip/
       package_url: https://github.com/lwip-tcpip/lwip/
       comment: lwIP is a small independent implementation of the TCP/IP protocol suite.
+root_path: netstack_silabs_lwip/

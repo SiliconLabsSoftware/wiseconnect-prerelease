@@ -9,15 +9,15 @@ description: >
 category: Network Stack|LwIP|Addons
 quality: production
 provides:
-  - name: netstack_silabs_lwip_addons_netconn
+- name: netstack_silabs_lwip_addons_netconn
 requires:
-  - name: netstack_silabs_lwip_core
+- name: netstack_silabs_lwip_core
 source:
-  - path: lwip/contrib/addons/netconn/external_resolve/dnssd.c
+- path: lwip/contrib/addons/netconn/external_resolve/dnssd.c
 include:
-  - path: lwip/contrib/addons/netconn/external_resolve
-    file_list:
-    - path: dnssd.h
+- path: lwip/contrib/addons/netconn/external_resolve
+  file_list:
+  - path: dnssd.h
 metadata:
   sbom:
     license: BSD-3-Clause
@@ -28,3 +28,4 @@ metadata:
       url: https://savannah.nongnu.org/projects/lwip/
       package_url: https://github.com/lwip-tcpip/lwip/
       comment: lwIP is a small independent implementation of the TCP/IP protocol suite.
+root_path: netstack_silabs_lwip/

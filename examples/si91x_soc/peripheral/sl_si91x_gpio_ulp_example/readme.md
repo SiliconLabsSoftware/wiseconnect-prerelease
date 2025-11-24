@@ -147,7 +147,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   ```c
     #define DELAY            1000 // Delay for 1sec
-    #define MS_DELAY_COUNTER 4600 // Delay count
     #define ULP_INT_CH       0      // ULP GPIO Pin interrupt 0
     #define AVL_INTR_NO      0      // available interrupt number
   ```

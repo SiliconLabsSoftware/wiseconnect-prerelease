@@ -387,7 +387,7 @@ lwip_init(void)
 #if LWIP_TIMERS
   sys_timeouts_init();
 #endif /* LWIP_TIMERS */
-#if LWIP_IPV6 && SL_LWIP_ECO_TIMERS
+#if LWIP_IPV6 && SL_LWIP_ND6_DYNAMIC_TIMER
   nd6_tmr_init(); 
-#endif /* LWIP_IPV6 && SL_LWIP_ECO_TIMERS */
+#endif /* LWIP_IPV6 && SL_LWIP_ND6_DYNAMIC_TIMER */
 }

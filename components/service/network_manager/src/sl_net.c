@@ -124,7 +124,22 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
   }
 
   sl_net_profile_id_t profile_id = SL_NET_DEFAULT_WIFI_AP_PROFILE_ID;
-  status                         = sl_net_set_profile(interface, profile_id, &DEFAULT_WIFI_ACCESS_POINT_PROFILE);
+
+  sl_net_wifi_ap_profile_t ap_profile = DEFAULT_WIFI_ACCESS_POINT_PROFILE;
+
+  sl_wifi_device_configuration_t device_config = *(const sl_wifi_device_configuration_t *)configuration;
+
+  uint32_t max_clients = ((device_config.boot_config.custom_feature_bit_map >> 13) & 0x0Fu);
+
+  // If the SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS(x) bit is enabled in the device configuration,
+  // the AP profile must be set to support fewer or equal to 'x ' clients. If the configured number of clients
+  // exceeds this limit, the sl_net_set_profile function will return an error.
+  if (max_clients != 0 && max_clients < ap_profile.config.maximum_clients) {
+    ap_profile.config.maximum_clients = (uint8_t)max_clients;
+  }
+
+  status = sl_net_set_profile(interface, profile_id, &ap_profile);
+
   if (status == SL_STATUS_OK) {
     sl_net_interface_initialized[interface] = true;
   }
