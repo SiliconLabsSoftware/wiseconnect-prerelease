@@ -62,15 +62,19 @@ extern "C" {
 #ifndef ND6_RTR_SOLICITATION_INTERVAL
 #define ND6_RTR_SOLICITATION_INTERVAL  4000
 #endif
-#if SL_LWIP_ECO_TIMERS 
+#if SL_LWIP_ND6_DYNAMIC_TIMER
 /** Timer interval for active states like INCOMPLETE, DELAY, PROBE (1 second) */
 #ifndef ND6_TMR_ACTIVE_INTERVAL
 #define ND6_TMR_ACTIVE_INTERVAL  1000
 #endif
 
-/** Timer interval for eco states like STALE and REACHABLE (3 seconds) */
+/** Timer interval for eco states like STALE and REACHABLE (30 seconds) */
 #ifndef ND6_TMR_ECO_INTERVAL
-#define ND6_TMR_ECO_INTERVAL  3000
+#define ND6_TMR_ECO_INTERVAL  30000
+#endif
+
+#if ND6_TMR_ECO_INTERVAL > 30000
+#error "ND6_TMR_ECO_INTERVAL must be <= 30000ms (30 seconds - validated maximum)"
 #endif
 
 /** Minimum timer interval in milliseconds to ensure optimal performance when multiple timers exist */
@@ -96,7 +100,7 @@ extern "C" {
 
 struct pbuf;
 struct netif;
-#if SL_LWIP_ECO_TIMERS 
+#if SL_LWIP_ND6_DYNAMIC_TIMER
 void nd6_tmr_init(void);
 void nd6_tmr(void *arg);
 #else

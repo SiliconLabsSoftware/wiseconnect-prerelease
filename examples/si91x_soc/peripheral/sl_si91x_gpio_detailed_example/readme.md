@@ -141,7 +141,6 @@ Configure the following parameters in [`gpio_detailed_example.c`](https://github
 
   ```c
     #define DELAY            1000 // Delay for 1sec
-    #define MS_DELAY_COUNTER 4600 // Delay count
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).

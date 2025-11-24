@@ -24,12 +24,11 @@
 #include "sl_si91x_driver_gpio.h"
 #include "sl_gpio_board.h"
 #include "rsi_debug.h"
-
+#include "sl_si91x_clock_manager.h"
 /*******************************************************************************
  ***************************  Defines / Macros  ********************************
  ******************************************************************************/
-#define DELAY            1000 // Delay for 1sec
-#define MS_DELAY_COUNTER 4600 // Delay count
+#define DELAY 1000 // Delay for 1sec
 /*******************************************************************************
  ********************************   ENUMS   ************************************
  ******************************************************************************/
@@ -47,7 +46,7 @@ static sl_si91x_gpio_pin_config_t sl_gpio_pin_config = { { SL_SI91X_GPIO_10_PORT
 /*******************************************************************************
  **********************  Local Function prototypes   ***************************
  ******************************************************************************/
-static void delay(uint32_t idelay);
+
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
@@ -116,15 +115,5 @@ void gpio_detailed_example_process_action(void)
   }
   // Prints indicating successful pin toggle
   DEBUGOUT("HP GPIO driver toggle pin is successful \r\n");
-  delay(DELAY); // Delay of 1sec
-}
-
-/*******************************************************************************
- * Delay function for 1ms
- ******************************************************************************/
-static void delay(uint32_t idelay)
-{
-  for (uint32_t x = 0; x < MS_DELAY_COUNTER * idelay; x++) {
-    __NOP();
-  }
+  sl_si91x_delay_ms(DELAY); // Delay of 1sec
 }

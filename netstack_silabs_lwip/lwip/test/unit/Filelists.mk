@@ -42,6 +42,7 @@ TESTFILES=$(TESTDIR)/lwip_unittests.c \
 	$(TESTDIR)/acd/test_acd.c \
 	$(TESTDIR)/dhcp/test_dhcp.c \
 	$(TESTDIR)/etharp/test_etharp.c \
+	$(TESTDIR)/etharp/test_etharp_ondemand.c \
 	$(TESTDIR)/ip4/test_ip4.c \
 	$(TESTDIR)/ip6/test_ip6.c \
 	$(TESTDIR)/mdns/test_mdns.c \
@@ -52,5 +53,6 @@ TESTFILES=$(TESTDIR)/lwip_unittests.c \
 	$(TESTDIR)/tcp/test_tcp.c \
 	$(TESTDIR)/tcp/test_tcp_dynamic.c \
 	$(TESTDIR)/udp/test_udp.c \
-	$(TESTDIR)/ppp/test_pppos.c
+	$(TESTDIR)/ppp/test_pppos.c\
+	$(TESTDIR)/nd6/test_nd6.c
 

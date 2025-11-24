@@ -6,18 +6,18 @@ description: >
 category: Network Stack|LwIP|OS
 quality: production
 provides:
-  - name: netstack_silabs_lwip_port_micriumos
+- name: netstack_silabs_lwip_port_micriumos
 requires:
-  - name: netstack_silabs_lwip_core
+- name: netstack_silabs_lwip_core
 source:
-  - path: lwip/contrib/ports/micriumos/sys_arch.c
+- path: lwip/contrib/ports/micriumos/sys_arch.c
 include:
-  - path: lwip/contrib/ports/micriumos/include
-    file_list:
-    - path: arch/sys_arch.h
-    - path: arch/cc.h
-    - path: arch/bpstruct.h
-    - path: arch/epstruct.h
+- path: lwip/contrib/ports/micriumos/include
+  file_list:
+  - path: arch/sys_arch.h
+  - path: arch/cc.h
+  - path: arch/bpstruct.h
+  - path: arch/epstruct.h
 metadata:
   sbom:
     license: BSD-3-Clause
@@ -28,3 +28,4 @@ metadata:
       url: https://savannah.nongnu.org/projects/lwip/
       package_url: https://github.com/lwip-tcpip/lwip/
       comment: lwIP is a small independent implementation of the TCP/IP protocol suite.
+root_path: netstack_silabs_lwip/

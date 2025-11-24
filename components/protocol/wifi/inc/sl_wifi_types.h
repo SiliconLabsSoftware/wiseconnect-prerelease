@@ -352,8 +352,9 @@ typedef struct {
   uint16_t beacon_interval;     ///< Beacon interval of the access point in milliseconds
   uint32_t client_idle_timeout; ///< Period after which AP will disconnect the station
   uint16_t dtim_beacon_count;   ///< Number of beacons per DTIM
-  uint8_t maximum_clients;      ///< Maximum number of associated clients
-  uint8_t beacon_stop;          ///< Flag to stop beaconing when there are no associated clients
+  uint8_t
+    maximum_clients; ///< The maximum number of associated clients must not exceed [SL_SI91X_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap#sl-si91x-custom-feat-max-num-of-clients). If this bit is not set in device configuration, the default maximum is 8 clients in AP-only mode and 4 clients in concurrent mode.
+  uint8_t beacon_stop; ///< Flag to stop beaconing when there are no associated clients
   sl_wifi_tdi_t
     tdi_flags; ///< Flags to enable Transition Disable Indication (TDI). One of the values from @ref sl_wifi_tdi_t
   uint8_t is_11n_enabled; ///< A flag to enable 11n.

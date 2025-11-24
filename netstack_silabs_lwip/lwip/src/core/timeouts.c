@@ -84,12 +84,14 @@ const struct lwip_cyclic_timer lwip_cyclic_timers[] = {
 #if IP_REASSEMBLY
   {IP_TMR_INTERVAL, HANDLER(ip_reass_tmr)},
 #endif /* IP_REASSEMBLY */
-#if LWIP_ARP
+#if LWIP_ARP && !SL_LWIP_ETHARP_ONDEMAND_TIMER
   {ARP_TMR_INTERVAL, HANDLER(etharp_tmr)},
-#endif /* LWIP_ARP */
+#endif /* LWIP_ARP && !SL_LWIP_ETHARP_ONDEMAND_TIMER */
 #if LWIP_DHCP
   {DHCP_COARSE_TIMER_MSECS, HANDLER(dhcp_coarse_tmr)},
+#if !SL_LWIP_DHCP_ONDEMAND_TIMER
   {DHCP_FINE_TIMER_MSECS, HANDLER(dhcp_fine_tmr)},
+#endif /* !SL_LWIP_DHCP_ONDEMAND_TIMER */
 #endif /* LWIP_DHCP */
 #if LWIP_ACD && !SL_LWIP_ACD_ONDEMAND_TIMER
   {ACD_TMR_INTERVAL, HANDLER(acd_tmr)},
@@ -102,7 +104,7 @@ const struct lwip_cyclic_timer lwip_cyclic_timers[] = {
   {DNS_TMR_INTERVAL, HANDLER(dns_tmr)},
 #endif /* LWIP_DNS */
 #if LWIP_IPV6
-#if !SL_LWIP_ECO_TIMERS 
+#if !SL_LWIP_ND6_DYNAMIC_TIMER
   {ND6_TMR_INTERVAL, HANDLER(nd6_tmr)},
 #endif  
 #if LWIP_IPV6_REASS

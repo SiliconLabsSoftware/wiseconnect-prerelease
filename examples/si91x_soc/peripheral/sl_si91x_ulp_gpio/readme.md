@@ -134,7 +134,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define GRP_CNT                  2      // Count of group interrupt pins
   #define INT_CH                   0      // GPIO Pin interrupt 0
   #define NPSS_INTR                2      // NPSS GPIO interrupt number
-  #define DELAY                    1000   // Delay for 1sec
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).

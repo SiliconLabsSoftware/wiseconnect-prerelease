@@ -62,7 +62,17 @@ ip6_test_handle_timers(int count)
 {
   int i;
   for (i = 0; i < count; i++) {
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+    nd6_tmr(NULL);
+    /* Clean up the timeout scheduled by nd6_tmr to prevent accumulation */
+    sys_untimeout(nd6_tmr, NULL);
+    sys_untimeout(nd6_tmr, NULL); /* Second pass to be sure */
+    sys_untimeout(nd6_tmr, NULL); /* Third pass to be absolutely sure */
+    /* Process any expired timers */
+    sys_check_timeouts();
+#else
     nd6_tmr();
+#endif
   }
 }
 

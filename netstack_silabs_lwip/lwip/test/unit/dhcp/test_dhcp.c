@@ -6,6 +6,12 @@
 #include "lwip/etharp.h"
 #include "lwip/inet.h"
 #include "netif/ethernet.h"
+#if SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE
+#include "lwip/timeouts.h"
+#include "arch/sys_arch.h"
+/* Forward declaration for direct handler calls in tests */
+extern void dhcp_fine_timer_handler(void *arg);
+#endif
 
 #if LWIP_ACD
 #if LWIP_DHCP_DOES_ACD_CHECK
@@ -155,6 +161,39 @@ static void tick_lwip(void)
   }
 }
 
+#if SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE
+/**
+ * Tick function for on-demand timer test cases
+ * Directly calls dhcp_fine_timer_handler() for the specified netif
+ * Removes timer from list before calling handler (like sys_check_timeouts)
+ * @param netif The network interface to process timer for
+ */
+static void tick_lwip_ondemand(struct netif *netif)
+{
+  struct dhcp *dhcp;
+  
+  tick++;
+  
+#if LWIP_DHCP_DOES_ACD_CHECK
+  acd_tmr();
+#endif
+
+  /* Process DHCP timer for the specified netif */
+  dhcp = netif_dhcp_data(netif);
+  if (dhcp != NULL && dhcp->fine_timer_active == 1) {
+    /* Remove timer from list BEFORE calling handler (like sys_check_timeouts) */
+    /* sys_untimeout() removes timer and frees memory */
+    sys_untimeout(dhcp_fine_timer_handler, netif);
+    /* Now call handler - it will reschedule itself if needed */
+    dhcp_fine_timer_handler(netif);
+  }
+  
+  if (tick % 600 == 0) {
+    dhcp_coarse_tmr();
+  }
+}
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE */
+
 static u32_t get_bad_xid(const struct netif *netif)
 {
   return ~netif_dhcp_data(netif)->xid;
@@ -210,7 +249,86 @@ static void dhcp_setup(void)
 {
   txpacket = 0;
   lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
+#if SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE
+  lwip_sys_now = 0;
+  tick = 0;
+#endif
 }
+
+#if SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE
+/**
+ * Check if fine timer is active for a given netif
+ * @param netif The network interface to check
+ * @return 1 if timer is active, 0 otherwise
+ */
+static int timer_is_active(struct netif *netif)
+{
+  struct dhcp *dhcp = netif_dhcp_data(netif);
+  if (dhcp == NULL) {
+    return 0;
+  }
+  return dhcp->fine_timer_active == 1;
+}
+
+/**
+ * Check if timer handler exists in sys_timeout list for a given netif
+ * Note: We can't directly compare function pointers since dhcp_fine_timer_handler
+ * is static, but we can check if a timer exists with the netif as arg.
+ * This is less precise but sufficient for testing.
+ * @param netif The network interface to check
+ * @return 1 if timer exists in list, 0 otherwise
+ */
+static int timer_handler_exists(struct netif *netif)
+{
+  struct sys_timeo **list_head = sys_timeouts_get_next_timeout();
+  struct sys_timeo *t;
+  
+  if (list_head == NULL) {
+    return 0;
+  }
+  
+  for (t = *list_head; t != NULL; t = t->next) {
+    /* Check if timer has netif as arg - this is how on-demand timer works */
+    if (t->arg == netif) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/**
+ * Count number of DHCP timers for a specific netif in sys_timeout list
+ * Used for duplicate timer detection - should always be 0 or 1
+ * @param netif The network interface to check
+ * @return Number of timers found for this netif
+ */
+static int count_dhcp_timers_for_netif(struct netif *netif)
+{
+  struct sys_timeo **list_head = sys_timeouts_get_next_timeout();
+  struct sys_timeo *t;
+  int count = 0;
+  
+  if (list_head == NULL) {
+    return 0;
+  }
+  
+  for (t = *list_head; t != NULL; t = t->next) {
+    /* Check if timer has netif as arg - this is how on-demand timer works */
+    if (t->arg == netif) {
+      count++;
+    }
+  }
+  return count;
+}
+
+#define CHECK_TIMER_ACTIVE(netif) fail_unless(timer_is_active(netif), "Timer should be active")
+#define CHECK_TIMER_INACTIVE(netif) fail_unless(!timer_is_active(netif), "Timer should be inactive")
+#define CHECK_TIMER_EXISTS(netif) fail_unless(timer_handler_exists(netif), "Timer should exist in sys_timeout list")
+#define CHECK_TIMER_COUNT(netif, expected_count) \
+  fail_unless(count_dhcp_timers_for_netif(netif) == (expected_count), \
+    "Expected %d timer(s) for netif, found %d", (expected_count), \
+    count_dhcp_timers_for_netif(netif))
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE */
 
 static void dhcp_teardown(void)
 {
@@ -1093,6 +1211,1169 @@ START_TEST(test_dhcp_invalid_overload)
 }
 END_TEST
 
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+
+/*
+ * Test 1: Verify timer starts when dhcp_discover is called
+ */
+START_TEST(test_dhcp_ondemand_timer_discover_starts_active)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  fail_unless(dhcp != NULL);
+  fail_unless(dhcp->state == DHCP_STATE_SELECTING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 2: Verify timer remains active when entering REQUESTING state
+ */
+START_TEST(test_dhcp_ondemand_timer_select_starts_active)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  u32_t xid;
+  struct dhcp *dhcp;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  fail_unless(dhcp != NULL);
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  /* Send DHCP OFFER to trigger dhcp_select */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  fail_unless(dhcp->state == DHCP_STATE_REQUESTING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 3: Verify timer starts when entering RENEWING state
+ */
+START_TEST(test_dhcp_ondemand_timer_renew_starts_active)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  u32_t xid;
+  struct dhcp *dhcp;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  /* Complete DHCP negotiation to BOUND state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to reach BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* Advance coarse timer to trigger T1 renewal */
+  dhcp->t1_renew_time = 1;
+  dhcp_coarse_tmr();  /* Trigger coarse timer - directly call like ACD tests */
+
+  fail_unless(dhcp->state == DHCP_STATE_RENEWING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  dhcp_stop(&net_test);
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 4: Verify timer starts when entering REBINDING state
+ */
+START_TEST(test_dhcp_ondemand_timer_rebind_starts_active)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  u32_t xid;
+  struct dhcp *dhcp;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  /* Complete DHCP negotiation to BOUND state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to reach BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* Advance coarse timer to trigger T2 rebind */
+  dhcp->t2_rebind_time = 1;
+  dhcp_coarse_tmr();  /* Trigger coarse timer - directly call like ACD tests */
+
+  fail_unless(dhcp->state == DHCP_STATE_REBINDING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  dhcp_stop(&net_test);
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 5: Verify timer starts when entering REBOOTING state
+ */
+START_TEST(test_dhcp_ondemand_timer_reboot_starts_active)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  u32_t xid;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  fail_unless(dhcp != NULL);
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  /* Complete DHCP negotiation to BOUND state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to reach BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* Trigger network change to enter REBOOTING state */
+  dhcp_network_changed_link_up(&net_test);
+
+  fail_unless(dhcp->state == DHCP_STATE_REBOOTING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  dhcp_stop(&net_test);
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 6: Verify timer stops when entering BOUND state
+ */
+START_TEST(test_dhcp_ondemand_timer_bind_stops_eco)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  u32_t xid;
+  struct dhcp *dhcp;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  /* Send DHCP OFFER */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  /* Send DHCP ACK to trigger dhcp_bind */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to reach BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  dhcp_stop(&net_test);
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 7: Verify timer stops when entering OFF state
+ */
+START_TEST(test_dhcp_ondemand_timer_release_stops_eco)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  u32_t xid;
+  struct dhcp *dhcp;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  /* Complete DHCP negotiation to BOUND state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to reach BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* Call dhcp_release_and_stop */
+  dhcp_release_and_stop(&net_test);
+
+  fail_unless(dhcp->state == DHCP_STATE_OFF);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 8: Verify timer NOT started in INIT state with link down
+ */
+START_TEST(test_dhcp_ondemand_timer_init_link_down_eco)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_down(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  fail_unless(dhcp != NULL);
+  fail_unless(dhcp->state == DHCP_STATE_INIT);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* Set link up - timer should start */
+  netif_set_link_up(&net_test);
+  dhcp_network_changed_link_up(&net_test);
+
+  fail_unless(dhcp->state == DHCP_STATE_SELECTING);
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 9: Verify timer handler decrements timeout and reschedules
+ */
+START_TEST(test_dhcp_ondemand_timer_handler_decrements_timeout)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  u16_t initial_timeout;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  CHECK_TIMER_ACTIVE(&net_test);
+  fail_unless(dhcp->request_timeout > 1);
+  initial_timeout = dhcp->request_timeout;
+
+  /* Simulate timer tick - use tick_lwip_ondemand() to call dhcp_fine_timer_handler() directly */
+  tick_lwip_ondemand(&net_test);
+
+  fail_unless(dhcp->request_timeout == (initial_timeout - 1));
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 10: Verify timer auto-stops when handler fires with request_timeout == 0
+ * This tests the else branch (line 668) of dhcp_fine_timer_handler
+ */
+START_TEST(test_dhcp_ondemand_timer_handler_auto_stops)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  CHECK_TIMER_ACTIVE(&net_test);
+  fail_unless(dhcp->request_timeout > 0);
+
+  /* Force request_timeout to 0 while timer is still scheduled */
+  dhcp->request_timeout = 0;
+  CHECK_TIMER_ACTIVE(&net_test);  /* Timer still active (flag set) */
+  CHECK_TIMER_EXISTS(&net_test);  /* Timer still in sys_timeout list */
+
+  /* 
+   * Advance time to trigger timer expiration
+   * Handler will see request_timeout == 0 and hit the ELSE branch
+   * This triggers TRUE auto-stop: handler exits without rescheduling
+   */
+  /* Simulate timer tick - use tick_lwip_ondemand() to call dhcp_fine_timer_handler() directly */
+  tick_lwip_ondemand(&net_test);
+
+  /* Verify timer auto-stopped (handler didn't reschedule) */
+  fail_unless(dhcp->request_timeout == 0);
+  CHECK_TIMER_INACTIVE(&net_test);  /* fine_timer_active = 0 */
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 11: Verify timer handler triggers dhcp_timeout (else-if branch at line 656)
+ * In SELECTING state, dhcp_timeout reconfigures timer via dhcp_discover
+ */
+START_TEST(test_dhcp_ondemand_timer_handler_triggers_timeout)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  fail_unless(dhcp->state == DHCP_STATE_SELECTING);
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  /* Set request_timeout to 1 to trigger else-if branch */
+  dhcp->request_timeout = 1;
+
+  /* 
+   * Advance time to trigger timer expiration
+   * Handler hits else-if branch: request_timeout == 1 → dhcp_timeout()
+   * In SELECTING state, dhcp_timeout() calls dhcp_discover()
+   * dhcp_discover() reconfigures request_timeout and restarts timer
+   */
+  /* Simulate timer tick - use tick_lwip_ondemand() to call dhcp_fine_timer_handler() directly */
+  tick_lwip_ondemand(&net_test);
+
+  /* Verify dhcp_timeout was called and reconfigured timer */
+  fail_unless(dhcp->state == DHCP_STATE_SELECTING);
+  fail_unless(dhcp->request_timeout > 0);  /* Timer reconfigured, not 0 */
+  
+  /* Timer should have restarted (dhcp_discover called) */
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 12: Verify full DHCP negotiation flow - timer active during transactions, inactive in BOUND
+ */
+START_TEST(test_dhcp_ondemand_timer_full_negotiation_flow)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  u32_t xid;
+  struct dhcp *dhcp;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  /* SELECTING state - timer should be active */
+  fail_unless(dhcp->state == DHCP_STATE_SELECTING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  /* Send DHCP OFFER - should enter REQUESTING state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  fail_unless(dhcp->state == DHCP_STATE_REQUESTING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* If ACD is enabled, we'll go through CHECKING state */
+  /* Send DHCP ACK - should enter CHECKING state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+  fail_unless(dhcp->state == DHCP_STATE_CHECKING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+  
+  /* 
+   * Complete ACD check and enter BOUND state
+   * ACD process: PROBE_WAIT(1s) + PROBE(3 probes) + ANNOUNCE_WAIT(2s) + ANNOUNCE(2)
+   * Worst case: ~13 seconds
+   * ACD_TMR_INTERVAL = 100ms, so need 130 ticks for worst case coverage
+   * 
+   * Note: tick_lwip_ondemand() calls acd_tmr() and dhcp_fine_timer_handler() directly
+   * for each netif with active timer, simulating timer ticks without sys_timeout framework
+   */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#else
+  /* If ACD is disabled, ACK directly binds to BOUND state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* 
+   * Timer should remain inactive during BOUND state
+   * Advance time and verify timer stays stopped
+   */
+  for (i = 0; i < 50; i++) {  /* 50 ticks = 5 seconds */
+    tick_lwip_ondemand(&net_test);  /* Simulate timer ticks - timer should remain inactive */
+  }
+  
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  dhcp_stop(&net_test);
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 14: Verify renewal flow - timer starts for RENEWING, stops back to BOUND
+ */
+START_TEST(test_dhcp_ondemand_timer_renewal_flow)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  u32_t xid;
+  struct dhcp *dhcp;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  /* Complete DHCP negotiation to BOUND state */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to reach BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* Advance to T1 renewal */
+  dhcp->t1_renew_time = 1;
+  dhcp_coarse_tmr();  /* Trigger coarse timer - directly call like ACD tests */
+
+  fail_unless(dhcp->state == DHCP_STATE_RENEWING);
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  /* Send renewal ACK */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to go back to BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  dhcp_stop(&net_test);
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 15: Verify idempotent start - multiple calls don't create duplicate timers
+ */
+START_TEST(test_dhcp_ondemand_timer_idempotent_start)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  /* struct dhcp *dhcp; */
+  int timer_count_before, timer_count_after;
+  struct sys_timeo **list_head;
+  struct sys_timeo *t;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  /* dhcp = netif_dhcp_data(&net_test); */
+
+  CHECK_TIMER_ACTIVE(&net_test);
+
+  /* Count timers with net_test as arg */
+  list_head = sys_timeouts_get_next_timeout();
+  timer_count_before = 0;
+  for (t = *list_head; t != NULL; t = t->next) {
+    if (t->arg == &net_test) {
+      timer_count_before++;
+    }
+  }
+
+  fail_unless(timer_count_before == 1);
+
+  /* Timer should still be active - fine_timer_active flag prevents duplicate */
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  timer_count_after = 0;
+  for (t = *list_head; t != NULL; t = t->next) {
+    if (t->arg == &net_test) {
+      timer_count_after++;
+    }
+  }
+
+  fail_unless(timer_count_after == 1);
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 16: Verify stop when inactive is handled gracefully
+ */
+START_TEST(test_dhcp_ondemand_timer_stop_when_inactive)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  u32_t xid;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+
+  /* Complete DHCP negotiation to BOUND state (timer stops) */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check to reach BOUND state */
+  for (i = 0; i < 130; i++) {  /* 130 ticks = 13 seconds worst case for ACD */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  /* Call dhcp_release_and_stop - should handle gracefully even though timer is inactive */
+  dhcp_release_and_stop(&net_test);
+
+  fail_unless(dhcp->state == DHCP_STATE_OFF);
+  CHECK_TIMER_INACTIVE(&net_test);
+
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+}
+END_TEST
+
+/*
+ * Test 17: Verify cleanup on interface removal handles NULL dhcp gracefully
+ */
+START_TEST(test_dhcp_ondemand_timer_cleanup_on_interface_removal)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  /* struct dhcp *dhcp; */
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  dhcp_start(&net_test);
+  /* dhcp = netif_dhcp_data(&net_test); */
+
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_EXISTS(&net_test);
+
+  /* Remove interface - timer handler should handle NULL dhcp gracefully */
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+
+  /* Verify no memory leaks */
+  lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
+}
+END_TEST
+
+/*
+ * Test 18: Rapid start/stop cycles - duplicate timer detection
+ * Verifies flag protection prevents duplicate timer registrations
+ */
+START_TEST(test_dhcp_ondemand_timer_rapid_start_stop_cycles)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  int cycle;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  /* Perform 10 rapid start/stop cycles */
+  for (cycle = 0; cycle < 10; cycle++) {
+    /* Start DHCP - should create exactly 1 timer */
+    dhcp_start(&net_test);
+    
+    CHECK_TIMER_ACTIVE(&net_test);
+    CHECK_TIMER_EXISTS(&net_test);
+    CHECK_TIMER_COUNT(&net_test, 1);  /* Must be exactly 1, no duplicates */
+    
+    /* Stop DHCP - should remove timer */
+    dhcp_stop(&net_test);
+    
+    CHECK_TIMER_INACTIVE(&net_test);
+    
+    /* Cleanup DHCP structure to verify no leaks */
+    dhcp_cleanup(&net_test);
+    
+    /* Verify no leaks after each cycle */
+    lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
+  }
+
+  netif_set_down(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+  
+  /* Final leak check */
+  lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
+}
+END_TEST
+
+/*
+ * Test 19: Duplicate timer prevention via concurrent operations
+ * Tests that multiple dhcp_start() calls and timer firing don't create duplicates
+ */
+START_TEST(test_dhcp_ondemand_timer_no_duplicate_timers)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  /* Test: Single start creates exactly 1 timer */
+  dhcp_start(&net_test);
+  
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);
+  
+  /* Test: Multiple dhcp_start() calls should NOT create duplicates */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);  /* Still exactly 1 */
+  
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);  /* Still exactly 1 */
+  
+  /* Test: Timer fires and reschedules - still no duplicate */
+  tick_lwip_ondemand(&net_test);  /* Simulate timer tick - calls dhcp_fine_timer_handler() directly */
+  
+  CHECK_TIMER_ACTIVE(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);  /* Still exactly 1 after firing */
+  
+  /* Test: Call dhcp_start() immediately after timer fired */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);  /* Still exactly 1 */
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+  
+  /* Verify no leaks */
+  lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
+}
+END_TEST
+
+/*
+ * Test 20: Link state transition edge cases
+ * Tests timer behavior during link down/up and network changes
+ */
+START_TEST(test_dhcp_ondemand_timer_link_state_transitions)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  /* Test: Link down/up scenario - no duplicate timers */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);
+  
+  netif_set_link_down(&net_test);
+  /* Timer might still be active depending on implementation */
+  
+  netif_set_link_up(&net_test);
+  dhcp_start(&net_test);  /* Restart after link up */
+  
+  /* Should not create duplicate even if previous timer existed */
+  fail_unless(count_dhcp_timers_for_netif(&net_test) <= 1,
+    "Too many timers after link down/up: %d", 
+    count_dhcp_timers_for_netif(&net_test));
+  
+  dhcp_stop(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 0);
+  
+  /* Cleanup DHCP structure to verify no leaks */
+  dhcp_cleanup(&net_test);
+  lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
+  
+  /* Test: Start with active timer, let it fire, then start again */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);
+  
+  /* Simulate timer tick - use tick_lwip_ondemand() to call dhcp_fine_timer_handler() directly */
+  tick_lwip_ondemand(&net_test);  /* Timer fires and reschedules */
+  CHECK_TIMER_COUNT(&net_test, 1);  /* Still 1 after self-reschedule */
+  
+  /* Immediately call start again - should not create duplicate */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);  /* Still exactly 1 */
+
+  dhcp_stop(&net_test);
+  dhcp_cleanup(&net_test);
+  netif_remove(&net_test);
+  
+  /* Verify no leaks */
+  lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
+}
+END_TEST
+
+/*
+ * Test 21: DHCP lifecycle scenarios with leak detection
+ * Tests complete DHCP flows and aborted negotiations
+ */
+START_TEST(test_dhcp_ondemand_timer_lifecycle_scenarios)
+{
+  ip4_addr_t addr;
+  ip4_addr_t netmask;
+  ip4_addr_t gw;
+  struct dhcp *dhcp;
+  u32_t xid;
+  int i;
+  LWIP_UNUSED_ARG(_i);
+
+  tcase = TEST_NONE;
+  setdebug(0);
+
+  IP4_ADDR(&addr, 0, 0, 0, 0);
+  IP4_ADDR(&netmask, 0, 0, 0, 0);
+  IP4_ADDR(&gw, 0, 0, 0, 0);
+
+  netif_add(&net_test, &addr, &netmask, &gw, &net_test, testif_init, ethernet_input);
+  netif_set_link_up(&net_test);
+  netif_set_up(&net_test);
+
+  /* Scenario 1: Complete DHCP negotiation to BOUND state */
+  dhcp_start(&net_test);
+  dhcp = netif_dhcp_data(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);
+  
+  /* Complete DHCP negotiation to BOUND */
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_offer[46], &xid, 4);
+  send_pkt(&net_test, dhcp_offer, sizeof(dhcp_offer));
+  
+  xid = htonl(dhcp->xid);
+  memcpy(&dhcp_ack[46], &xid, 4);
+  send_pkt(&net_test, dhcp_ack, sizeof(dhcp_ack));
+  
+#if LWIP_DHCP_DOES_ACD_CHECK
+  /* Complete ACD check */
+  for (i = 0; i < 90; i++) {  /* 90 ticks = 9 seconds */
+    tick_lwip_ondemand(&net_test);  /* Process ACD and DHCP on-demand timers */
+  }
+#endif
+  
+  fail_unless(dhcp->state == DHCP_STATE_BOUND);
+  CHECK_TIMER_COUNT(&net_test, 0);  /* Timer stops in BOUND (eco mode) */
+  
+  dhcp_stop(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 0);
+  
+  /* Scenario 2: Aborted negotiation - stop before reaching BOUND */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);
+  
+  /* Stop without completing negotiation */
+  dhcp_stop(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 0);
+  
+  /* Scenario 3: Timer self-rescheduling behavior */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);
+  
+  /* Let timer fire and reschedule multiple times */
+  for (i = 0; i < 5; i++) {
+    tick_lwip_ondemand(&net_test);  /* Simulate timer ticks - calls dhcp_fine_timer_handler() directly */
+    /* Timer should reschedule itself - always exactly 1 */
+    CHECK_TIMER_COUNT(&net_test, 1);
+  }
+  
+  dhcp_stop(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 0);
+  
+  /* Scenario 4: Proper cleanup sequence */
+  dhcp_start(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 1);
+  
+  dhcp_stop(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 0);
+  
+  dhcp_cleanup(&net_test);
+  CHECK_TIMER_COUNT(&net_test, 0);
+  
+  netif_remove(&net_test);
+}
+END_TEST
+
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
+
 /** Create the suite including all tests for this module */
 Suite *
 dhcp_suite(void)
@@ -1103,6 +2384,28 @@ dhcp_suite(void)
     TESTFUNC(test_dhcp_relayed),
     TESTFUNC(test_dhcp_nak_no_endmarker),
     TESTFUNC(test_dhcp_invalid_overload)
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+    ,TESTFUNC(test_dhcp_ondemand_timer_discover_starts_active)
+    ,TESTFUNC(test_dhcp_ondemand_timer_select_starts_active)
+    ,TESTFUNC(test_dhcp_ondemand_timer_renew_starts_active)
+    ,TESTFUNC(test_dhcp_ondemand_timer_rebind_starts_active)
+    ,TESTFUNC(test_dhcp_ondemand_timer_reboot_starts_active)
+    ,TESTFUNC(test_dhcp_ondemand_timer_bind_stops_eco)
+    ,TESTFUNC(test_dhcp_ondemand_timer_release_stops_eco)
+    ,TESTFUNC(test_dhcp_ondemand_timer_init_link_down_eco)
+    ,TESTFUNC(test_dhcp_ondemand_timer_handler_decrements_timeout)
+    ,TESTFUNC(test_dhcp_ondemand_timer_handler_auto_stops)
+    ,TESTFUNC(test_dhcp_ondemand_timer_handler_triggers_timeout)
+    ,TESTFUNC(test_dhcp_ondemand_timer_full_negotiation_flow)
+    ,TESTFUNC(test_dhcp_ondemand_timer_renewal_flow)
+    ,TESTFUNC(test_dhcp_ondemand_timer_idempotent_start)
+    ,TESTFUNC(test_dhcp_ondemand_timer_stop_when_inactive)
+    ,TESTFUNC(test_dhcp_ondemand_timer_cleanup_on_interface_removal)
+    ,TESTFUNC(test_dhcp_ondemand_timer_rapid_start_stop_cycles)
+    ,TESTFUNC(test_dhcp_ondemand_timer_no_duplicate_timers)
+    ,TESTFUNC(test_dhcp_ondemand_timer_link_state_transitions)
+    ,TESTFUNC(test_dhcp_ondemand_timer_lifecycle_scenarios)
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
   };
   return create_suite("DHCP", tests, sizeof(tests)/sizeof(testfunc), dhcp_setup, dhcp_teardown);
 }

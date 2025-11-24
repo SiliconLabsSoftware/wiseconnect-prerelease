@@ -116,6 +116,10 @@ struct dhcp
   /** acd struct */
   struct acd acd;
 #endif /* LWIP_DHCP_DOES_ACD_CHECK */
+#if SL_LWIP_DHCP_ONDEMAND_TIMER
+  /** per-interface fine timer active flag */
+  u8_t fine_timer_active;
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER */
 };
 
 
@@ -145,6 +149,11 @@ extern void dhcp_set_ntp_servers(u8_t num_ntp_servers, const ip4_addr_t* ntp_ser
 #endif /* LWIP_DHCP_GET_NTP_SRV */
 
 #define netif_dhcp_data(netif) ((struct dhcp*)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP))
+
+#if SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE
+/** Expose fine timer handler for unit tests - allows direct handler testing without sys_check_timeouts() memory leaks */
+void dhcp_fine_timer_handler_test(struct netif *netif);
+#endif /* SL_LWIP_DHCP_ONDEMAND_TIMER && LWIP_TESTMODE */
 
 #ifdef __cplusplus
 }
