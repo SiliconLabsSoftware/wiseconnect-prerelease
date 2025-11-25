@@ -1434,6 +1434,10 @@ sl_status_t sl_wifi_configure_multicast_filter(sl_wifi_multicast_filter_info_t *
  *   For AP mode with WPA3 security, only SAE-H2E method is supported. SAE hunting and pecking method is not supported.
  *   TKIP encryption mode is not supported. Encryption mode is automatically configured to CCMP.
  *   PMKSA is not supported in WPA3 AP mode.
+ * @note
+ *   Management Frame Protection (MFP) behavior in AP mode:
+ *   - For WPA2 security: MFP is NOT automatically enabled. Use @ref sl_wifi_set_mfp before calling this API if MFP is required.
+ *   - For WPA3 security: MFP is automatically enabled as required by the WPA3 standard.
  * @note   
  *   In FCC-certified modules, 
  *    1. Region configuration is not supported and if triggered returns error SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE.

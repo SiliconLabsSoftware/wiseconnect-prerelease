@@ -192,6 +192,7 @@ components:
 - cmsis_usart
 - cmsis_device_config_917
 - sl_si91x_rgb_led_917
+- sl_si91x_rgb_led
 - sl_si91x_button_917
 - sl_joystick
 - sl_si70xx
@@ -357,6 +358,7 @@ components:
 - memlcd_917
 - sl_si91x_mic
 - sl_si91x_rgb_led_917
+- 
 - sl_si70xx
 - sl_joystick
 - sl_veml6035
@@ -1002,6 +1004,7 @@ extra_files:
 - components/device/silabs/si91x/mcu/drivers/cmsis_driver/config/component/cmsis_device_config_917.slcc
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/src/sl_si91x_rgb_led.c
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/component/sl_si91x_rgb_led_917.slcc
+- components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/component/sl_si91x_rgb_led.slcc
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/config/sl_si91x_rgb_led_init_instance_config.h
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/config/sl_si91x_rgb_led_config.h
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/config/sl_si91x_rgb_led_init_config.h

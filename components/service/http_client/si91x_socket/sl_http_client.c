@@ -495,6 +495,23 @@ static sl_status_t sli_configure_https(sli_si91x_http_client_request_t *http_cli
       return SL_STATUS_INVALID_CONFIGURATION;
   }
 
+  // Fill HTTPS certificate index bitmap
+  switch (client_internal->configuration.certificate_index) {
+    case SL_HTTPS_CLIENT_CERTIFICATE_INDEX_1: {
+      http_client_request->https_enable |= SL_SI91X_HTTPS_CERTIFICATE_INDEX_1;
+      break;
+    }
+    case SL_HTTPS_CLIENT_CERTIFICATE_INDEX_2: {
+      http_client_request->https_enable |= SL_SI91X_HTTPS_CERTIFICATE_INDEX_2;
+      break;
+    }
+    case SL_HTTPS_CLIENT_DEFAULT_CERTIFICATE_INDEX: {
+      break;
+    }
+    default:
+      break;
+  }
+
   if (client_internal->configuration.https_use_sni) {
     // Convert public socket type to internal TLS extension type
     sli_si91x_tls_extension_info_t *internal_sni = NULL;

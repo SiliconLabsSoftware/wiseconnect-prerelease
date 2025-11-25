@@ -46,7 +46,7 @@
 ## About Example Code
 
 - This example demonstrates the Config Timer as a Input Capture and Output Compare. Output Compare Values are updated using DMA.
-- Two macros are present: CT_COUNTER_INPUT_EVENT_USECASE and CT_COUNTER_DMA_MODE_USECASE. By default, the input capture use case is enabled.
+- Configure the following macros in `config_timer_icu_ocu_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.h)]to change the application use case.Two macros are present: CT_COUNTER_INPUT_EVENT_USECASE and CT_COUNTER_DMA_MODE_USECASE. By default, the input capture use case is enabled.
 - Enable only one of the following use case macros at a time.
   - If **CT_COUNTER_INPUT_EVENT_USECASE** is enabled:
     - The Config Timer is initialized using [sl_si91x_config_timer_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-init) API.
@@ -103,24 +103,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in `config_timer_example.h file` to change the application use case (enable any one at a time).
+- Configure the following macros in 'config_timer_icu_ocu_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.h)]file to change the application use case (enable exactly only one at a time).
 
   ```C
     #define CT_COUNTER_DMA_MODE_USECASE   1      -  To run DMA counter mode
     #define CT_COUNTER_INPUT_EVENT_USECASE 1     -  To run input event mode
   ```
-
-- Also enable the CT-configuration for using PWM DMA mode use case.
-- In the `config_timer_icu_ocu_example.c` file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
+  - Also enable the relevant CT (Config Timer) configuration settings required for the PWM DMA mode use case to ensure proper operation of the timer in DMA-driven PWM output mode.
+- In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
 
   ```C
    #define TIME_PERIOD_VALUE     1000         // Time period in microseconds
    #define STEP_SIZE_COUNTER_0   400          // Step size for counter0 increments
   ```
-
-  ![Figure: Time Period Configuration](resources/readme/time_period_config.png)
-
-- Use following CT configurations to run the application either in ICU or OCU DMA Mode.
+  -  Use the **Config Timer** software component in the `.slcp` project file to configure the timer from the Simplicity Studio Component Editor (UC). Search for "Config Timer" or "CT" in the software components list to add or configure this peripheral as needed for ICU or OCU DMA mode operation.
   
   > ![Figure: Pin configuration](resources/uc_screen/uc_screen.png)
 
@@ -143,6 +139,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 |    input-0    | GPIO_25 |     P25       | 
 
 ### Macros for CT Configurations
+In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.c)] file, these are the following macros.
 
 - \ref SL_CT_MODE_32BIT_ENABLE_MACRO , for possible values refer \ref sl_config_timer_mode_t
 - \ref SL_COUNTER0_DIRECTION_MACRO , for possible values refer \ref sl_counter0_direction_t
@@ -152,15 +149,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - \ref SL_COUNTER0_SYNC_TRIGGER_ENABLE_MACRO, true to enable Counter0 sync trigger & false to skip Counter0 sync trigger.
 - \ref SL_COUNTER1_SYNC_TRIGGER_ENABLE_MACRO, true to enable Counter1 sync trigger & false to skip Counter1 sync trigger.
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
-
 ## Test the Application
 
 ### Run the application in INPUT EVENT mode
 
 - The Config Timer will capture external events (such as rising edge) on the configured input pin.
 - Each captured event's capture value will be read and printed to the console.
-- Connect the IN0 input pin to any toggled GPIO pin. For every rising edge event, observe capture functionality.
+- connect the IN0 pin to button0 pin (F12 which is input pin for button),press and release the button, you can see the capture value updating upon the event occured.
 - Following prints will be observed on the console:
 
   > ![Figure: Result](resources/readme/OutputConsole_ICU.png)

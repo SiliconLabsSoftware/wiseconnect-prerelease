@@ -77,6 +77,27 @@
 
 #define RTE_LED1_PAD 5
 
+// RGB LED Instance 0
+// Note: RTE_LED0_NUMBER is already defined above
+
+// Red LED
+#define RTE_LED0_LEDR_PORT   HP
+#define RTE_LED0_LEDR_NUMBER RTE_LED0_NUMBER
+#define RTE_LED0_LEDR_PIN    2
+#define RTE_LED0_LEDR_PAD    14
+
+// Green LED
+#define RTE_LED0_LEDG_PORT   HP
+#define RTE_LED0_LEDG_NUMBER RTE_LED0_NUMBER
+#define RTE_LED0_LEDG_PIN    3
+#define RTE_LED0_LEDG_PAD    15
+
+// Blue LED
+#define RTE_LED0_LEDB_PORT   HP
+#define RTE_LED0_LEDB_NUMBER RTE_LED0_NUMBER
+#define RTE_LED0_LEDB_PIN    15
+#define RTE_LED0_LEDB_PAD    8
+
 // <e> USART0  [Driver_USART0]
 // <i> Configuration settings for Driver_USART0 in component ::CMSIS Driver:USART
 #define RTE_ENABLE_FIFO 1

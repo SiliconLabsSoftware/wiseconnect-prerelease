@@ -44,7 +44,7 @@
 ## About Example Code
 
 - This example demonstrates the Config Timer as a normal counter and Output Compare unit for PWM output generator.
-- Two macros are present: CT_PWM_MODE_USECASE and CT_COUNTER_MODE_USECASE. By default, the normal counter use case is enabled.
+- Configure the following macros in'config_timer_ocu_non_dma_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)]Two macros are present: CT_PWM_MODE_USECASE and CT_COUNTER_MODE_USECASE. By default, the normal counter use case is enabled.
 - Enable only one of the following use case macros at a time.
   - If **CT_PWM_MODE_USECASE** is enabled:
     - The Config Timer is initialized using [sl_si91x_config_timer_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-init) API.
@@ -90,39 +90,39 @@
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-- [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio)
-- [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-3-extension)
-- [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer)
-- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware)
-- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project)
+- [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio)
+- [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-the-wi-se-connect-extension)
+- [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#connect-si-wx91x-to-computer)
+- [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#update-si-wx91x-connectivity-firmware)
+- [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project)
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
 
-- Configure the following macros in `config_timer_example.h file` to change the application use case (enable any one at a time).
+- Configure the following macros in 'config_timer_ocu_non_dma_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)](enable any one at a time).
 
   ```C
     #define CT_PWM_MODE_USECASE           1      -  To run PWM output code
     #define CT_COUNTER_MODE_USECASE       1      -  To run normal counter code
   ```
 
-- Also enable the CT-configuration for using PWM mode use case.
-- In the `config_timer_example.c` file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value for a counter-mode use case. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
+- Also enable the CT configuration macro for the PWM mode use case by setting `CT_PWM_MODE_USECASE` to `1` and ensuring `CT_COUNTER_MODE_USECASE` is set to `0` in the `config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] file.
+
+- In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value for a counter-mode use case. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
 
   ```C
    #define TIME_PERIOD_VALUE     1000         // Time period in microseconds
    
   ```
 
-  ![Figure: Time Period Configuration](resources/readme/time_period_config.png)
-
-  - Change following macros in config_timer_example.c file to change counter-number used for counter-mode use case, by default application is using counter-0 to use counter-1 change it to 'SL_COUNTER_1'.
+  - Change following macros in `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)]file to change counter-number used for counter-mode use case, by default application is using counter-0 to use counter-1 change it to 'SL_COUNTER_1'.
 
   ```C
   #define CT_COUNTER_USED            SL_COUNTER_0  -  For using counter-0
   ```
-- Use following CT configurations to run the application either in Normal counter mode (using Counter-0 or Counter-1) or in PWM mode.
+- Use the following CT configurations to run the application either in Normal counter mode (using Counter-0 or Counter-1) or in PWM mode.
+- In Simplicity Studio, search for **"Config Timer"** in the Software Components tab to add or configure the required timer component for your project.
   
   > ![Figure: Pin configuration](resources/uc_screen/uc_screen.png)
 
@@ -138,10 +138,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 > ![Figure: Pin configuration](resources/readme/image502e.png)
 
-
+### Pin Configuration for INPUT EVENT mode use case
+|  Discription  | GPIO    | Breakout pin  | 
+| ------------- | ------- | ------------- |
+|    input-0    | GPIO_25 |     P25       | 
 
 ### Macros for CT Configurations
 
+ In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)]file,these macros are present.
+ 
 - \ref SL_CT_MODE_32BIT_ENABLE_MACRO , for possible values refer \ref sl_config_timer_mode_t
 - \ref SL_COUNTER0_DIRECTION_MACRO , for possible values refer \ref sl_counter0_direction_t
 - \ref SL_COUNTER1_DIRECTION_MACRO , for possible values refer \ref sl_counter1_direction_t
@@ -150,13 +155,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - \ref SL_COUNTER0_SYNC_TRIGGER_ENABLE_MACRO, true to enable Counter0 sync trigger & false to skip Counter0 sync trigger.
 - \ref SL_COUNTER1_SYNC_TRIGGER_ENABLE_MACRO, true to enable Counter1 sync trigger & false to skip Counter1 sync trigger.
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 
 ### Run the application in counter mode
 
-- Once the interrupt is trigerred console message is generated .
+- To verify the counter mode, ensure that `CT_COUNTER_MODE_USECASE` is enabled in`config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] Build and flash the application. When the timer reaches the configured match value, an interrupt is triggered automatically. You will see a console message indicating that the interrupt has occurred, confirming that the counter mode is working as expected.
 - Following prints will be observed on the console:
 
   > ![Figure: Result](resources/readme/OutputConsole_CT.png)
@@ -170,6 +174,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   > ![Figure: Result](resources/readme/OutputConsole_CT_OCU.png)
 
+  > ![Figure: Result](resources/readme/pwm_CT_output.png)
 
 
 > **Note:**

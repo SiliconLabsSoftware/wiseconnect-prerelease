@@ -90,13 +90,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#build-an-application) to:
 
-1. Build the Application in Studio.
-2. Flash, run, and debug the application.
-3. The following prints should appear on console.
+1. compile and run the application.
+2. The following prints should appear on console.
 
    > ![Figure: outputConsoleI_DMA](resources/readme/outputConsoleI_DMA.png)
 
-4. In debug mode, users can inspect the source buffer `src0[DMA_TRANSFER_SIZE]` (contains sequential data 1,2,3...) and destination buffer `dst0[DMA_TRANSFER_SIZE]` (initially zeros, then copied data after transfer) to verify successful memory-to-memory DMA transfer.
+3. In debug mode, users can inspect the source buffer `src0[DMA_TRANSFER_SIZE]` (contains sequential data 1,2,3...) and destination buffer `dst0[DMA_TRANSFER_SIZE]` (initially zeros, then copied data after transfer) to verify successful memory-to-memory DMA transfer.
 
 > **Note:**
 > - The debug feature will not work after M4 flash is turned off

@@ -521,8 +521,9 @@ config_file:
     instance: i2s0
     vendor: silabs
   path: common_config_opn/sl_mic_config/sl_si91x_i2s_init_i2s0_config.h
-  unless:
+  condition:
   - sl_si91x_mic
+  unless:
   - rsilib_board
 - override:
     component: i2s_instance
@@ -548,8 +549,9 @@ config_file:
     instance: pcm0
     vendor: silabs
   path: common_config_opn/sl_mic_config/sl_si91x_pcm_init_pcm0_config.h
-  unless:
+  condition:
   - sl_si91x_mic
+  unless:
   - rsilib_board
 - override:
     component: pcm_instance

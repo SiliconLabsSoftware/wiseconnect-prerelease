@@ -26,7 +26,6 @@ other_file:
 - path: resources/readme/image502e.png
 - path: resources/uc_screen/uc_screen.png
 - path: resources/readme/setupdiagram.png
-- path: resources/readme/time_period_config.png
 - path: resources/readme/OutputConsole_DMA.png
 - path: resources/readme/OutputConsole_ICU.png
 ui_hints:

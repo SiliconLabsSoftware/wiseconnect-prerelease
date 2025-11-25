@@ -10,6 +10,7 @@ component:
 - id: sl_main
 - id: syscalls
 - id: si91x_memory_default_config
+- id: sl_si91x_rgb_led
 - id: sl_si91x_led_917
   instance:
   - led0

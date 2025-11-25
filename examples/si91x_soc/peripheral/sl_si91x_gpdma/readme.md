@@ -109,9 +109,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-1. Build the SI91x - SL_GPDMA example in Studio.
-2. Flash, run, and debug the application.
-3. The following prints should appear on console.
+1. compile and run the application.
+2. The following prints should appear on console.
 
    > ![Figure: result](resources/readme/outputConsoleI_GPDMA.png)
 
