@@ -112,10 +112,10 @@ void usart_async_example_process_action(void)
         for (uint16_t i = 0; i < USART_BUFFER_SIZE; i++) {
           usart_data_out[i] = (uint8_t)(i + 1);
         }
-        status = sl_si91x_usart_send_data(usart_handle, usart_data_out, sizeof(usart_data_out));
+        status = sl_si91x_usart_async_send_data(usart_handle, usart_data_out, sizeof(usart_data_out));
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          DEBUGOUT("sl_si91x_usart_send_data: Error Code : %lu \n", status);
+          DEBUGOUT("sl_si91x_usart_async_send_data: Error Code : %lu \n", status);
           current_mode = SL_USART_TRANSMISSION_COMPLETED;
           break;
         }
@@ -138,10 +138,10 @@ void usart_async_example_process_action(void)
     case SL_USART_RECEIVE_DATA:
       if (usart_begin_transmission == true) {
         // Validation for executing the API only once
-        status = sl_si91x_usart_receive_data(usart_handle, usart_data_in, sizeof(usart_data_in));
+        status = sl_si91x_usart_async_receive_data(usart_handle, usart_data_in, sizeof(usart_data_in));
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          DEBUGOUT("sl_si91x_usart_receive_data: Error Code : %lu \n", status);
+          DEBUGOUT("sl_si91x_usart_async_receive_data: Error Code : %lu \n", status);
           current_mode = SL_USART_TRANSMISSION_COMPLETED;
           break;
         }

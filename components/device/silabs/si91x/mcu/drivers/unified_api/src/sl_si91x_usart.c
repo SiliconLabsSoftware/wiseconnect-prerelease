@@ -578,8 +578,24 @@ sl_status_t sli_si91x_usart_send_data_blocking(sl_usart_handle_t usart_handle, c
 sl_status_t sl_si91x_usart_async_send_data(sl_usart_handle_t usart_handle, const void *data, uint32_t data_length)
 {
   sl_status_t status = SL_STATUS_FAIL;
-  status             = sl_si91x_usart_send_data(usart_handle, data, data_length);
-  return status;
+  sl_si91x_usart_control_config_t get_config;
+
+  // Validate input parameters
+  if (usart_handle == NULL || data == NULL || data_length == 0) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  status = sl_si91x_usart_get_configurations(get_usart_instance(usart_handle), &get_config);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  // Only allow async receive in async mode
+  if (get_config.mode != ARM_USART_MODE_ASYNCHRONOUS) {
+    return SL_STATUS_INVALID_STATE;
+  }
+
+  return sl_si91x_usart_send_data(usart_handle, data, data_length);
 }
 
 /*******************************************************************************

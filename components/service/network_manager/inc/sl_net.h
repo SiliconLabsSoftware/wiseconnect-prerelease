@@ -352,6 +352,13 @@ sl_status_t sl_net_nat_disable(const sl_net_interface_t interface);
  * 
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ * 
+ * @note
+ * When configuring Wi-Fi clients or Access Points with open security (SL_WIFI_OPEN), 
+ * set the credential_id field to SL_WIFI_NO_CREDENTIAL_ID within the respective 
+ * configuration structures (sl_wifi_client_configuration_t in sl_net_wifi_client_profile_t for clients, 
+ * and sl_wifi_ap_configuration_t in sl_net_wifi_ap_profile_t for APs). 
+ * This ensures the stack does not attempt to fetch credentials that are not required for open security.
  ******************************************************************************/
 sl_status_t sl_net_set_profile(sl_net_interface_t interface, sl_net_profile_id_t id, const sl_net_profile_t *profile);
 

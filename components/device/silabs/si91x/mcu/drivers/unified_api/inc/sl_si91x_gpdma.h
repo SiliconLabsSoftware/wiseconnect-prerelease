@@ -297,7 +297,7 @@ sl_status_t sl_si91x_gpdma_allocate_channel(uint32_t *channel_no, uint32_t prior
 *         - SL_STATUS_BUSY  - Cannot deallocate channel due to an ongoing transfer.
 *         - SL_STATUS_NOT_INITIALIZED  - GPDMA not initialized.
 *         - SL_STATUS_INVALID_PARAMETER  - Channel number is invalid.
- *        - SL_STATUS_GPDMA_CHANNEL_NOT_UNALLOCATED  - Channel already deallocated
+ *        - SL_STATUS_GPDMA_CHANNEL_NOT_ALLOCATED  - Given channel is not allocated
  * For more information on status codes, see [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  ******************************************************************************/
 sl_status_t sl_si91x_gpdma_deallocate_channel(uint32_t channel_no);

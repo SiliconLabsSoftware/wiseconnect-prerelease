@@ -50,9 +50,9 @@ static sl_status_t sli_si91x_validate_sl_net_profile(const sl_net_profile_t *pro
         return SL_STATUS_INVALID_PARAMETER;
       }
       if (((((const sl_net_wifi_client_profile_t *)profile)->config.security == SL_WIFI_OPEN)
-           && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id != SL_NET_NO_CREDENTIAL_ID))
+           && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id != SL_WIFI_NO_CREDENTIAL_ID))
           || ((((const sl_net_wifi_client_profile_t *)profile)->config.security != SL_WIFI_OPEN)
-              && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id == SL_NET_NO_CREDENTIAL_ID))) {
+              && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id == SL_WIFI_NO_CREDENTIAL_ID))) {
         SL_DEBUG_LOG("Mismatch between security and credential_id\n");
         return SL_STATUS_INVALID_CONFIGURATION;
       }
@@ -65,9 +65,9 @@ static sl_status_t sli_si91x_validate_sl_net_profile(const sl_net_profile_t *pro
         return SL_STATUS_INVALID_PARAMETER;
       }
       if (((((const sl_net_wifi_ap_profile_t *)profile)->config.security == SL_WIFI_OPEN)
-           && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id != SL_NET_NO_CREDENTIAL_ID))
+           && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id != SL_WIFI_NO_CREDENTIAL_ID))
           || ((((const sl_net_wifi_ap_profile_t *)profile)->config.security != SL_WIFI_OPEN)
-              && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id == SL_NET_NO_CREDENTIAL_ID))) {
+              && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id == SL_WIFI_NO_CREDENTIAL_ID))) {
         SL_DEBUG_LOG("Mismatch between security and credential_id\n");
         return SL_STATUS_INVALID_CONFIGURATION;
       }

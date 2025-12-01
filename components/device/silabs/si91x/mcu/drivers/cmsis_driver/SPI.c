@@ -1226,17 +1226,20 @@ int32_t SSI_SetFrameLength(uint8_t ssi_instance, uint8_t frame_length)
   int32_t status = ARM_DRIVER_OK;
 
   do {
-    if (frame_length < 4U || frame_length > 16U) {
+    if (frame_length < 4U || frame_length > 32U) {
       status = ARM_SPI_ERROR_DATA_BITS;
       break;
     }
     if (ssi_instance == SPI_MASTER_MODE) {
-      // For Dual/Quad SPI, the frame length should be a multiple of 2 or 4.
-      if(SSI_MASTER_Resources.reg->CTRLR0_b.SPI_FRF != STANDARD_SPI_FORMAT) {
-        if ((frame_length % 2 != 0) || (frame_length % 4 != 0)) {
-          status = ARM_SPI_ERROR_DATA_BITS;
-          break;
-        }
+      // For Dual mode, the frame length should be a multiple of 2.
+      if((SSI_MASTER_Resources.reg->CTRLR0_b.SPI_FRF == DUAL_SPI_FORMAT) && ((frame_length % 2) != 0)) {
+        status = ARM_SPI_ERROR_DATA_BITS;
+        break;
+      }
+      // For Quad mode, the frame length should be a multiple of 4.
+      else if ((SSI_MASTER_Resources.reg->CTRLR0_b.SPI_FRF == QUAD_SPI_FORMAT) && ((frame_length % 4) != 0)) {
+        status = ARM_SPI_ERROR_DATA_BITS;
+        break;
       }
       SSI_MASTER_Resources.reg->CTRLR0_b.DFS_32 = (frame_length - LENGTH_OFFSET);
       break;

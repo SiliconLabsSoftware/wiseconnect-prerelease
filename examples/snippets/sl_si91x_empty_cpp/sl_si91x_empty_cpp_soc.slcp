@@ -1,4 +1,4 @@
-project_name: sl_si91x_empty_cpp_ncp
+project_name: sl_si91x_empty_cpp_soc
 package: platform_siwx91x_app
 quality: production
 label: Platform - Empty C++ Example

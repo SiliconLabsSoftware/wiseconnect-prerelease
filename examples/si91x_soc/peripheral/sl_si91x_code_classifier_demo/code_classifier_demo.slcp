@@ -10,7 +10,6 @@ component:
 - id: sl_main
 - id: sleeptimer
 - id: data_segment_in_psram
-- id: heap_segment_in_psram
 - id: text_segment_in_psram
 - id: psram_core
 - id: psram_aps6404l_sqh

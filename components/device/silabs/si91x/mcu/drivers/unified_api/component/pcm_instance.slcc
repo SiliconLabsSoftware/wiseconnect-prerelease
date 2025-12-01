@@ -1,8 +1,9 @@
 id: pcm_instance
 label: PCM
 package: platform_siwx91x
-description: "PCM Supports instances. Instances created must be named as pcm0, ulp_pcm.\
-  \ \n"
+description: 'PCM Supports instances. Instances created must be named as pcm0, ulp_pcm.
+
+  '
 category: Device|Si91x|MCU|Peripheral
 quality: production
 metadata:
@@ -36,6 +37,7 @@ template_contribution:
   value: pcm_{{instance}}
 requires:
 - name: sl_i2s
+- name: sl_pcm
 documentation:
   docset: wiseconnect
   document: wiseconnect-api-reference-guide-si91x-peripherals/i2s

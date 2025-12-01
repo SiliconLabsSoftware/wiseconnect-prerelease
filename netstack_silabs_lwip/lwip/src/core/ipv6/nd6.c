@@ -110,9 +110,8 @@ static ip6_addr_t multicast_address;
 
 #if SL_LWIP_ND6_DYNAMIC_TIMER
 static u32_t nd6_tmr_rs_reduction = 0;
-/* Static variables for timer tracking - moved to file scope */
-static u32_t nd6_last_timer_call = 0xFFFFFFFF; /* Sentinel value to detect first call */
-static u8_t nd6_first_call = 1; /* Flag to detect first call */
+static u32_t nd6_last_timer_call = 0xFFFFFFFF;
+static u8_t nd6_first_call = 1;
 #else
 static u8_t nd6_tmr_rs_reduction;
 #endif
@@ -971,7 +970,7 @@ lenerr_drop_free_return:
 
 #if SL_LWIP_ND6_DYNAMIC_TIMER
 /**
- * Initialize the nd6 timer with an initial 1-second callback
+ * Initialize the nd6 timer.
  */
 void
 nd6_tmr_init(void)
@@ -1001,44 +1000,35 @@ nd6_safe_multiply_by_1000(u32_t timer_value)
   return timer_value * 1000;
 }
 
-/* Unified helper function for both millisecond and second-based timers */
 static inline void
 nd6_handle_timer(u32_t *timer_value, u32_t timeout_value, u32_t *min_timer_value_after_processing, u8_t is_millisecond)
 {
   u32_t timer_ms = 0;
-  /* Parameter validation */
+  
   if (timer_value == NULL || min_timer_value_after_processing == NULL) {
-    /* TODO: keep assertion */ 
     return;
   }
   
-  /* Handle edge cases */
   if (is_millisecond) {
-    /* Millisecond-based timer - no multiplication needed, can use full range */
     if (*timer_value > UINT32_MAX) {
       *timer_value = UINT32_MAX;
     }
   } else {
-    /* Second-based timer - needs multiplication by 1000, limit to prevent overflow */
     if (*timer_value > ND6_MAX_TIMER_VALUE_FOR_MULTIPLICATION) {
       *timer_value = ND6_MAX_TIMER_VALUE_FOR_MULTIPLICATION;
     }
   }
   
-  /* Timer still has time remaining, decrement by the timeout interval */
   if (*timer_value > timeout_value) {
     *timer_value -= timeout_value;
   } else {
     *timer_value = 0;
   }
   
-  /* Calculate minimum timer value for this entry - convert everything to milliseconds */
   if (*timer_value > 0 && *timer_value <= ND6_MAX_TIMER_VALUE_FOR_MULTIPLICATION) {
     if (is_millisecond) {
-      /* Timer value is already in milliseconds */
       timer_ms = *timer_value;
     } else {
-      /* Convert seconds to milliseconds */
       timer_ms = nd6_safe_multiply_by_1000(*timer_value);
     }
     
@@ -1050,13 +1040,12 @@ nd6_handle_timer(u32_t *timer_value, u32_t timeout_value, u32_t *min_timer_value
 
 void nd6_tmr(void *arg)
 {
-  /* Initialize all local variables at the start */
   s8_t i;
   struct netif *netif;
   u8_t eco_mode = 0;
   u8_t active_mode = 0;
-  u32_t next_timeout = ND6_TMR_ECO_INTERVAL; /* Default to 30 seconds (30000ms) */
-  u32_t min_timer_value_after_processing = next_timeout; /* Track minimum timer value across all cases */
+  u32_t next_timeout = ND6_TMR_ECO_INTERVAL;
+  u32_t min_timer_value_after_processing = next_timeout;
   u32_t start_time = 0;
   u32_t current_time = 0;
   u32_t elapsed_time_ms = 0;
@@ -1117,6 +1106,8 @@ void nd6_tmr(void *arg)
     next_timeout = ND6_TMR_ACTIVE_INTERVAL; /* 1 second for active states */
   } else if (eco_mode) {
     next_timeout = ND6_TMR_ECO_INTERVAL; /* 30 seconds for eco states */
+  } else {
+    next_timeout = ND6_TMR_ACTIVE_INTERVAL; /* 1 second for active states */
   }
 
   /* Process neighbor entries. */

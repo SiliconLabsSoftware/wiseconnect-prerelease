@@ -21,6 +21,7 @@ root_path: "components/device/silabs/si91x/mcu/drivers/unified_api"
 provides:
   - name: psram_core
 requires:
+  - name: wiseconnect_toolchain_psram_linker
   - name: psram_config
   - name: rsilib_qspi
   - name: systemlevel_pll

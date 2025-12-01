@@ -86,6 +86,7 @@ void ssi_master_example_init(void)
   ssi_master_config.clock_mode           = SL_SSI_PERIPHERAL_CPOL0_CPHA0;
   ssi_master_config.baud_rate            = SSI_MASTER_BAUDRATE;
   ssi_master_config.receive_sample_delay = SSI_MASTER_RECEIVE_SAMPLE_DELAY;
+  ssi_master_config.transfer_mode        = SL_SSI_PRIMARY_TRANSFER_MODE;
 
   // Filled data into input buffer
   for (i = 0; i < SSI_MASTER_BUFFER_SIZE; i++) {

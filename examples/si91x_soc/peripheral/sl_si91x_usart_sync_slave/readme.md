@@ -42,7 +42,7 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 - [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_usart_sync_slave/usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous slave mode.
 - In this example, first USART gets initialized if not already initialized with clock and DMA configurations using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).  
 **Note:** If the UART/USART instance is already selected for debug output logs, initialization returns `SL_STATUS_NOT_AVAILABLE` (informational; the example continues using the existing instance).
-- After initialization, the USART power mode is set with [`sl_si91x_usart_set_power_mode()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-power-mode) and then configured (clock, pins, synchronous mode, etc.) using [`sl_si91x_usart_set_configuration()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration) either from UC parameters or from user-defined macros.
+- After initialization, USART configured (clock, pins, synchronous mode, etc.) using [`sl_si91x_usart_set_configuration()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration) either from UC parameters or from user-defined macros.
 - Then the register user event callback for send and receive complete notification is set using [`sl_si91x_usart_multiple_instance_register_event_callback()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-multiple-instance-register-event-callback).
 - After setting the user event callback, the data send and receive can happen through [`sl_si91x_usart_transfer_data()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-transfer-data).
 - When the transfer completes, the transmit and receive buffers are compared to confirm loopback success.
@@ -145,8 +145,10 @@ To enable hardware flow control (RTS/CTS):
 1. Open `sl_si91x_usart_sync_slave.slcp` → Software Components → USART.
 2. Set **Flow control** to **RTS/CTS**.
 3. Assign RTS and CTS pins either:
-  - Through the UC pin assignment widget (preferred), OR
-  - Manually by editing `RTE_Device_917.h` in the USART0 section.
+
+- Through the UC pin assignment widget (preferred), OR
+- Manually by editing `RTE_Device_917.h` in the USART0 section.
+
 4. Use the following default mapping if the Pin Tool is unavailable:
 
   | Signal | GPIO  | WPK Breakout | AC1 Explorer |

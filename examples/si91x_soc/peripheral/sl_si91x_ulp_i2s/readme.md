@@ -85,7 +85,7 @@ The data received should match the transmitted data.
 4. Since 8-bit resolution is not supported, a `uint8_t` data type buffer can use 16-bit resolution for transfers and pass SL_I2S_DATA_SIZE8 to the data_size parameter in  `sl_i2s_xfer_config_t` while configuring the transfer. While performing this operation, the data buffer should be typecast to `(uint16_t *)`, and the transfer size should be half of the 8-bit data type buffer. (Refer to the I2S loopback application for more details.) For 8-bit transfers, the transfer size should be multiples of 4 (8,12,16,20...).
 5. Any I2S transfers with 16-bit and 32-bit resolutions should only have an even transfer size (8,10,12,14...).
 6. Any I2S transfers with 24-bit resolution should only have transfer size as multiples of 4 (8,12,16,20...).
-7. The `I2S_LOOP_BACK` macro is used only for I2S loopback applications to avoid clock generation from the receiver block during transfer.
+7. The `I2S1_LOOP_BACK` macro is used only for I2S loopback applications to avoid clock generation from the receiver block during transfer.
 8. SCK frequency is calculated using `SCK = 2 * bit_width * sampling rate`. By default, I2S0 uses I2S_PLL_CLK as a clock source. This can generate any frequency range mentioned in section 6.11.7 of the Si91x HRM.
 
 **Note**

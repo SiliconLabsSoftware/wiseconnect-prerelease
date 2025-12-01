@@ -99,6 +99,9 @@
 /// Length of the Wi-Fi MAC address.
 #define SL_WIFI_MAC_ADDRESS_LENGTH 6
 
+/// No Wi-Fi credential ID.
+#define SL_WIFI_NO_CREDENTIAL_ID 0
+
 /**
   * @enum sl_wifi_security_t
   * @brief Enumeration for Wi-Fi security types.

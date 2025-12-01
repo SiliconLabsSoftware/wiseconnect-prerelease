@@ -36,8 +36,8 @@
 #include "base_types.h"
 
 /*Configure the PMU and XTAL good times */
-#define PMU_GOOD_TIME  0x34 /* 900 us*/
-#define XTAL_GOOD_TIME 31   /*Duration in us*/
+#define PMU_GOOD_TIME_VALUE  0x34 /* 900 us*/
+#define XTAL_GOOD_TIME_VALUE 31   /*Duration in us*/
 
 #ifdef SLI_SI91X_MCU_COMMON_FLASH_MODE
 #define NWPAON_MEM_HOST_ACCESS_CTRL_SET_1     (*(volatile uint32_t *)(0x41300000 + 0x0))

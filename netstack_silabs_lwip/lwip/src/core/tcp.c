@@ -145,9 +145,8 @@
 #endif
 
 #if SL_LWIP_TCP_DYNAMIC_TIMER
-/* Timer mode states for dynamic timer system */
-#define TCP_MODE_ECO    0  /* ECO mode: Dynamic intervals (up to 30s) for power savings */
-#define TCP_MODE_ACTIVE 1  /* ACTIVE mode: Fixed 250ms intervals for high responsiveness */
+#define TCP_MODE_ECO    0
+#define TCP_MODE_ACTIVE 1
 #endif /* SL_LWIP_TCP_DYNAMIC_TIMER */
 
 static const char *const tcp_state_str[] = {
@@ -198,7 +197,6 @@ static u8_t tcp_timer;
 static u8_t tcp_timer_ctr;
 
 #if LWIP_TESTMODE && SL_LWIP_TCP_DYNAMIC_TIMER
-/* Test mode accessor function prototypes */
 u8_t tcp_get_timer(void);
 u8_t tcp_get_timer_ctr(void);
 void tcp_set_timer(u8_t value);
@@ -206,11 +204,6 @@ void tcp_set_timer_ctr(u8_t value);
 u32_t tcp_get_time_diff(u32_t current, u32_t previous);
 u32_t tcp_get_tw_remaining_time_ms(struct tcp_pcb *pcb);
 u8_t tcp_get_pcb_needs_active_mode(struct tcp_pcb *pcb);
-
-/**
- * Test mode accessors for tcp_timer and tcp_timer_ctr
- * These functions provide read/write access to internal timer state for unit testing
- */
 u8_t
 tcp_get_timer(void)
 {
@@ -253,9 +246,8 @@ static u16_t tcp_new_port(void);
 #error "TCP dynamic timer requires TCP_SLOW_INTERVAL = 2*TCP_TMR_INTERVAL"
 #endif
 
-/* Maximum values for timer overflow checks */
-#define TCP_TIMER_U8_MAX    0xFF    /* Maximum value for u8_t timer counters */
-#define TCP_TIMER_U16_MAX   0xFFFF  /* Maximum value for u16_t calculations */
+#define TCP_TIMER_U8_MAX    0xFF
+#define TCP_TIMER_U16_MAX   0xFFFF
 
 struct tcp_dynamic_timer_state tcp_dynamic_state = {
   0xFFFFFFFF,     /* last_timer_call */
@@ -737,19 +729,12 @@ tcp_tmr_init(void)
 /**
  * TCP timer with dynamic intervals for power savings
  * 
- * This is the main entry point for the dynamic TCP timer system. It replaces
- * the standard tcp_tmr() function when SL_LWIP_TCP_DYNAMIC_TIMER is enabled.
- * 
- * The timer operates in two modes:
+ * Operates in two modes:
  * - ACTIVE mode: 250ms intervals for responsive network handling
  * - ECO mode: Extended intervals (up to 30s) for power savings during idle periods
  * 
- * The function performs the following operations:
- * 1. Calculate elapsed time since last call
- * 2. Execute timer functions (tcp_fasttmr/tcp_slowtmr) as needed
- * 3. Determine appropriate timer mode based on post-execution system state
- * 4. Calculate next optimal timeout interval
- * 5. Schedule next timer callback
+ * Calculates elapsed time, runs required TCP timers, determines the next timer mode,
+ * computes the optimal timeout, and schedules the next callback accordingly.
  * 
  * @note Must be called from TCPIP thread context with core lock held
  * @note Maintains compatibility with standard LWIP timer accounting
@@ -764,20 +749,12 @@ tcp_tmr(void)
   
   LWIP_ASSERT_CORE_LOCKED();
   
-  /* Calculate elapsed time and timer intervals */
   tcp_calculate_elapsed_time(&elapsed_fast, &num_slow);
-  
-  /* Execute timer functions and perform accounting */
   tcp_execute_timer_functions(elapsed_fast, num_slow);
-  
-  /* Determine timer mode based on current PCB states */
   selected_mode = tcp_determine_timer_mode();
-  
-  /* Calculate next timeout based on selected mode */
   next_timeout = tcp_calculate_next_timeout(selected_mode);
   
 #if SL_LWIP_TCP_DYNAMIC_STATS
-  /* Update statistics for the cycle just completed */
   if (tcp_dynamic_state.current_mode == TCP_MODE_ACTIVE) {
     tcp_dynamic_state.total_active_cycles++;
   } else {
@@ -785,10 +762,7 @@ tcp_tmr(void)
   }
 #endif
   
-  /* Store selected mode for next cycle */
   tcp_dynamic_state.current_mode = selected_mode;
-  
-  /* Set next timer timeout */
   tcp_tmr_set_next_timeout(next_timeout);
   
   LWIP_DEBUGF(TCP_DEBUG, ("tcp_tmr: %s mode, %"U32_F"ms, active_pcbs=%s, tw_pcbs=%s\n",
@@ -800,16 +774,14 @@ tcp_tmr(void)
 #else /* !SL_LWIP_TCP_DYNAMIC_TIMER */
 
 /**
- * TCP timer - Standard lwIP implementation with fixed intervals
+ * TCP timer - Standard lwIP implementation with fixed intervals.
  */
 void
 tcp_tmr(void)
 {
-  /* Call tcp_fasttmr() every TCP_TMR_INTERVAL */
   tcp_fasttmr();
 
   if (++tcp_timer & 1) {
-    /* Call tcp_slowtmr() every TCP_SLOW_INTERVAL (every other fast timer) */
     tcp_slowtmr();
   }
 }
@@ -3268,13 +3240,7 @@ tcp_ext_arg_invoke_callbacks_passive_open(struct tcp_pcb_listen *lpcb, struct tc
 
 #if SL_LWIP_TCP_DYNAMIC_STATS
 /**
- * Get TCP ECO timer statistics
- * 
- * Retrieves runtime statistics about ECO timer operation including
- * the number of timer cycles in ACTIVE vs ECO modes and the number
- * of activity-triggered interrupts.
- * 
- * This function is only available when SL_LWIP_TCP_DYNAMIC_STATS is enabled.
+ * Get TCP ECO timer statistics.
  * 
  * @param active_cycles Pointer to store total ACTIVE mode cycles (can be NULL)
  * @param eco_cycles Pointer to store total ECO mode cycles (can be NULL)

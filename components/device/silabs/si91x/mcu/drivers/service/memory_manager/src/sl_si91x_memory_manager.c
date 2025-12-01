@@ -1,9 +1,9 @@
 /***************************************************************************/ /**
- * @file
+ * @file sl_si91x_memory_manager.c
  * @brief Si91x Memory Manager Wrapper Implementation
  *******************************************************************************
  * # License
- * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2025 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -58,7 +58,7 @@ extern void xPortResetHeapMinimumEverFreeHeapSize(void);
   ******************************************************************************/
 
 /***************************************************************************/ /**
-  * Si91x HAL: Gets the current used heap size.
+  * Si91x wrapper for getting current heap used size.
   *
   * @return Current amount of memory used in the heap (in bytes)
   ******************************************************************************/
@@ -79,7 +79,7 @@ size_t sl_si91x_memory_get_used_heap_size(void)
 }
 
 /***************************************************************************/ /**
-  * Si91x HAL: Gets heap high watermark.
+  * Si91x wrapper for getting heap high watermark.
   *
   * @return Maximum amount of memory that has been used in the heap (in bytes)
   ******************************************************************************/
@@ -100,7 +100,7 @@ size_t sl_si91x_memory_get_heap_high_watermark(void)
 }
 
 /***************************************************************************/ /**
-  * Si91x HAL: Gets the current free heap size.
+  * Si91x wrapper for getting current free heap size.
   *
   * @return Current amount of free memory in the heap (in bytes)
   ******************************************************************************/
@@ -115,17 +115,18 @@ size_t sl_si91x_memory_get_free_heap_size(void)
 
 /***************************************************************************/ /**
  * Si91x wrapper for resetting heap high watermark.
- * Maps to FreeRTOS heap statistics for Matter stack compatibility.
  *
- * Resets the high watermark to the current heap usage, allowing
- * new watermark measurements to start from the current state.
+ * @details Resets the high watermark to the current heap usage, allowing
+ *          new watermark measurements to start from the current state.
+ *          This is useful when you want to measure memory usage for a
+ *          specific operation or time period.
  *
- * Note: FreeRTOS heap implementations (heap_4, heap_5) provide
- * xPortResetHeapMinimumEverFreeHeapSize() which resets the minimum
- * ever free heap size. This effectively resets the high watermark
- * since high watermark = total_heap - minimum_ever_free.
+ * @note For FreeRTOS heap implementations (heap_4, heap_5), this function
+ *       uses xPortResetHeapMinimumEverFreeHeapSize() which resets the
+ *       minimum ever free heap size. This effectively resets the high
+ *       watermark since high watermark = total_heap - minimum_ever_free.
  *
- * For other heap implementations, this function will be a no-op.
+ *       For other heap implementations, this function will be a no-op.
  ******************************************************************************/
 void sl_si91x_memory_reset_heap_high_watermark(void)
 {

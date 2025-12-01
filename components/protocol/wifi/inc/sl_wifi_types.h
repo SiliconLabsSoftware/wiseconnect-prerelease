@@ -151,7 +151,16 @@ typedef struct {
  */
 typedef sl_status_t (*sl_wifi_event_handler_t)(sl_wifi_event_t event, sl_wifi_buffer_t *buffer);
 
-/// Wi-Fi credential handle
+/**
+ * @typedef sl_wifi_credential_id_t
+ * @brief Wi-Fi credential identifier type.
+ * 
+ * @details
+ * This type stores credential identifiers for Wi-Fi configurations.
+ *
+ * @note 
+ * For open security networks (SL_WIFI_OPEN), use SL_WIFI_NO_CREDENTIAL_ID.
+ */
 typedef uint32_t sl_wifi_credential_id_t;
 
 /**
@@ -323,7 +332,7 @@ typedef struct {
  *
  * Indicates the configuration parameters for setting up a Wi-Fi Access Point (AP).
  * 
- * @note When configuring AP interface in open security mode, the credential ID must be set to `SL_NET_NO_CREDENTIAL_ID`.
+ * @note When configuring AP interface in open security mode, the credential ID must be set to `SL_WIFI_NO_CREDENTIAL_ID`.
  * @note The security field refers to the security type of the Wi-Fi Access Point.
  * In Wi-Fi access point mode, the Access Point supports OPEN, WPA-PSK, WPA2-PSK, WPA/WPA2 Mixed, WPA3 security modes.
  * Valid configurations are:
@@ -392,7 +401,7 @@ typedef struct {
  *
  * Defines the configuration parameters for a Wi-Fi client interface.
  * 
- * @note When configuring client interface in open security mode, the credential ID must be set to `SL_NET_NO_CREDENTIAL_ID`.
+ * @note When configuring client interface in open security mode, the credential ID must be set to `SL_WIFI_NO_CREDENTIAL_ID`.
  * 
  * @note The security field refers to the security type for the Wi-Fi Station (STA) interface.
  * @note In Wi-Fi concurrent mode, the client interface supports Open, WPA-PSK, WPA2-PSK, WPA/WPA2 Mixed, WPA3, and WPA3 Transition security (WPA2/WPA3) modes.

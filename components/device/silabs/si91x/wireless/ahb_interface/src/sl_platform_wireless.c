@@ -161,9 +161,9 @@ void sl_si91x_hardware_setup(void)
   /* Power-Down QSPI-DLL Domain */
   RSI_PS_QspiDllDomainDisable();
   /* Configure PMU Start-up Time to be used on Wake-up*/
-  RSI_PS_PmuGoodTimeDurationConfig(PMU_GOOD_TIME);
+  RSI_PS_PmuGoodTimeDurationConfig(PMU_GOOD_TIME_VALUE);
   /* Configure XTAL Start-up Time to be used on Wake-up*/
-  RSI_PS_XtalGoodTimeDurationConfig(XTAL_GOOD_TIME);
+  RSI_PS_XtalGoodTimeDurationConfig(XTAL_GOOD_TIME_VALUE);
   /*Enable first boot up*/
   RSI_PS_EnableFirstBootUp(1);
 }

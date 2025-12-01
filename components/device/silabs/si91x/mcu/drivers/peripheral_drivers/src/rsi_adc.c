@@ -309,9 +309,18 @@ STATIC INLINE void config_ch_freq(adc_ch_config_t adcChConfig, adc_config_t adcC
     sampl_rate_index = (const volatile uint16_t *)&adc_channel;
   }
 
-  // Configure channel frequency value for channel0
-  adcInterConfig.ch_sampling_factor[*sampl_rate_index] =
-    (uint16_t)adc_dac_ceil((float)fs_adc / (float)adcChConfig.sampling_rate[*sampl_rate_index]);
+  // Calculate the sampling factor for the current channel
+  // Sampling factor = ADC clock frequency / desired sampling rate
+  // The factor determines how many ADC clock cycles occur between samples
+  float calculated_factor  = (float)fs_adc / (float)adcChConfig.sampling_rate[*sampl_rate_index];
+  uint32_t sampling_factor = (uint32_t)adc_dac_ceil(calculated_factor);
+
+  // Clamp the sampling factor to UINT16_MAX to prevent overflow
+  if (sampling_factor > UINT16_MAX) {
+    sampling_factor = UINT16_MAX;
+  }
+
+  adcInterConfig.ch_sampling_factor[*sampl_rate_index] = (uint16_t)sampling_factor;
 
   if (adcInterConfig.ch_sampling_factor[*sampl_rate_index] < 2) {
     adcInterConfig.ch_sampling_factor[*sampl_rate_index] = 2;

@@ -68,6 +68,7 @@
 #define MCU_CLK_OUT_DIV_FACTOR_MAX          0x3F        // Maximum division factor for MCU clock out
 #define SL_SI91X_MCU_CLK_OUT_GPIO_DIRECTION GPIO_OUTPUT // Direction output
 #endif
+#define ULP_PROC_MAX_CLK_DIV_FAC 5 // Maximum division factor for ULP processor clock division
 /************************************************************************************
  *************************  LOCAL VARIABLES  ****************************************
  ************************************************************************************/
@@ -609,11 +610,14 @@ void sl_si91x_delay_ms(uint32_t milli_seconds)
  * @return sl_status_t Status code indicating the result:
  *         - SL_STATUS_OK  - Success.
  *         - SL_STATUS_INVALID_PARAMETER - Invalid argument.
- */
+ * 
+ * @note    This API should be invoked only when the system is in PS2 state, as the source clock in this mode is configured to use a 20 MHz RC
+ *
+ ******************************************************************************/
 sl_status_t sl_si91x_clock_manager_ulp_processor_clk_division(uint8_t clk_div)
 {
   sl_status_t status = SL_STATUS_OK;
-  if (clk_div > 15) {
+  if (clk_div > ULP_PROC_MAX_CLK_DIV_FAC) {
     status = SL_STATUS_INVALID_PARAMETER;
     return status;
   }

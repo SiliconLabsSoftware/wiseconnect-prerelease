@@ -147,7 +147,7 @@ typedef struct {
   uint16_t msg_length;                  ///< Length of the message
   const uint8_t *nonce;                 ///< Pointer to the Initialization vector
   const uint8_t *ad;                    ///< Pointer to the additional data
-  uint16_t nonce_length;                ///< Length of the Initialization vector
+  uint16_t nonce_length;                ///< Length of the Initialization vector (Supports fixed 12 Bytes of IV)
   uint16_t ad_length;                   ///< Length of the additional data
   sl_si91x_gcm_key_config_t key_config; ///< Key configuration
 } sl_si91x_gcm_config_t;

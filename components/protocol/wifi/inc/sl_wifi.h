@@ -1820,6 +1820,8 @@ sl_status_t sl_wifi_start_wps(sl_wifi_interface_t interface,
  *
  * @note
  *   Currently, this API is supported only in STA mode.
+ * @note
+ *   WPS PBC does not support Protected Management Frames (PMF) security feature.
  ******************************************************************************/
 sl_status_t sl_wifi_start_wps_v2(sl_wifi_interface_t interface,
                                  sl_wifi_wps_config_t config,

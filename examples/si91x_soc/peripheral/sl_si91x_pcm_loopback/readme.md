@@ -118,7 +118,7 @@ To use the ULP_PCM instance instead of the default PCM0 instance:
 |   GPIO    | Breakout pin on WPK (4002A baseboard) | Breakout pin Explorer kit |  Description     |
 | ----------| --------------------------------------|-------------------------- | ---------------- |
 | GPIO_25   |         P25                           |          [SCK]            | PCM SCK          |
-| GPIO_26   |         P27                           |          [MISO]           | PCM Frame Sync        |
+| GPIO_26   |         P27                           |          [MISO]           | PCM Frame Sync   |
 | GPIO_28   |         P31                           |          [CS]             | PCM DOUT         |
 | GPIO_27   |         P29                           |          [MOSI]           | PCM DIN          |
 
@@ -128,10 +128,7 @@ To use the ULP_PCM instance instead of the default PCM0 instance:
 
 - Pin Description
 
-  >**Note:** Review the pin configuration in `RTE_Device_xxx.h` file:
-  > - SiWx917: `RTE_Device_917.h` (path: /$project/config/RTE_Device_917.h)
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+ >**Note:** The default pin configurations are set in the SiWx917:[RTE_Device_917.h](path:/$project/config/RTE_Device_917.h) file. Verify that these pin settings match your hardware setup. You can modify the pin configurations in this file if your board uses different GPIO pins for the PCM interface.
 
 ## Test the Application
 

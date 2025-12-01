@@ -41,17 +41,6 @@
  * - dns_setserver() / dns_getserver(): Must be called from TCPIP thread
  * - Callbacks (dns_found_callback): Executed in TCPIP thread context
  *
- * When SL_LWIP_DNS_ONDEMAND_TIMER is enabled:
- * - Timer callbacks (dns_timeout_cb) are scheduled via sys_timeout()
- * - sys_timeout() infrastructure ensures TCPIP thread execution
- * - Core lock (LWIP_TCPIP_CORE_LOCKING) must be held during timer operations
- * - Timer state changes are atomic with respect to the core lock
- * - Mode transitions (eco ↔ active) occur within the protected critical section
- *
- * Standard timer mode (SL_LWIP_DNS_ONDEMAND_TIMER disabled):
- * - dns_tmr() is called cyclically via lwip_cyclic_timers[] every DNS_TMR_INTERVAL (1s)
- * - Executes in TCPIP thread context as part of normal timer processing
- *
  * @section dns_eco_timer Eco-Friendly Timer Operation (SL_LWIP_DNS_ONDEMAND_TIMER)
  *
  * When enabled, the DNS timer dynamically adjusts its interval to reduce power consumption:
@@ -464,27 +453,12 @@ dns_getserver(u8_t numdns)
 /**
  * DNS eco-timer timeout callback function.
  * 
- * This wrapper function is registered with sys_timeout() and serves as the entry point
- * for the eco-friendly DNS timer mechanism. It replaces the cyclic timer approach when
- * SL_LWIP_DNS_ONDEMAND_TIMER is enabled.
- * 
- * Thread Context Requirements:
- * - MUST be called from TCPIP thread context
- * - sys_timeout() infrastructure ensures this requirement is met
- * - Core lock is acquired before calling dns_tmr()
- * 
- * Relationship to Cyclic Timer:
- * - When SL_LWIP_DNS_ONDEMAND_TIMER is enabled, DNS is removed from lwip_cyclic_timers[]
- * - This callback allows dynamic timer intervals (eco mode vs active mode)
- * - Active queries: 1-second intervals (DNS_TMR_INTERVAL)
- * - Cached entries only: Variable intervals based on minimum TTL
+ * Wrapper function registered with sys_timeout() for eco-friendly DNS timer mechanism.
+ * See @ref dns_eco_timer for details on timer operation.
  * 
  * @param arg Unused argument (required by sys_timeout callback signature)
  * 
  * @note Made non-static when LWIP_TESTMODE is defined for unit testing.
- *       LWIP_TESTMODE is defined in lwip/test/unit/lwipopts.h for the test build,
- *       allowing unit tests to directly invoke this callback. In production builds,
- *       this function remains static for proper encapsulation.
  */
 #ifdef LWIP_TESTMODE
 void dns_timeout_cb(void *arg)

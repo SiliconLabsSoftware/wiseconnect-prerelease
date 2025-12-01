@@ -867,7 +867,7 @@ uint32_t sl_si91x_ssi_get_frame_length(sl_ssi_handle_t ssi_handle)
 /*******************************************************************************
  * To set the frame length i.e., bit width
  * @param[in] ssi_handle  Handle to the SSI instance
- * @param[in] frame_length Frame length (bit width) to set (4-16 bits)
+ * @param[in] frame_length Frame length (bit width) to set (4-32 bits)
  * @return
  * *      SL_STATUS_OK if successful, error code otherwise
  ******************************************************************************/
@@ -887,8 +887,8 @@ sl_status_t sl_si91x_ssi_set_frame_length(sl_ssi_handle_t ssi_handle, uint8_t fr
       break;
     }
 
-    // Validate frame length range (4-16 bits)
-    if (frame_length < 4 || frame_length > 16) {
+    // Validate frame length range (4-32 bits)
+    if (frame_length < 4 || frame_length > 32) {
       status = SL_STATUS_INVALID_PARAMETER;
       break;
     }

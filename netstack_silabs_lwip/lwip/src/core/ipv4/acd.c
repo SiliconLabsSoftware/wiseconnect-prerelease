@@ -108,22 +108,13 @@ static void acd_handle_arp_conflict(struct netif *netif, struct acd *acd);
 static void acd_put_in_passive_mode(struct netif *netif, struct acd *acd);
 
 #if SL_LWIP_ACD_ONDEMAND_TIMER
-/* On-demand timer management functions */
-
-/* Forward declarations */
 static u8_t acd_needs_timer(struct acd *acd);
 static void acd_timer_callback(void *arg);
 
-/* Global counter tracking number of active ACD instances needing timer.
- * This avoids scanning all netifs and instances in activate/deactivate operations.
- * Must be accessed only with core lock held. */
 static u16_t acd_timer_active_count = 0;
 
 /**
- * Check if any ACD instance across all network interfaces needs timer processing.
- * 
- * This is primarily used as a safety check in the timer callback to verify
- * the global counter matches the actual state.
+ * Check if any ACD instance needs timer processing.
  * 
  * @return 1 if at least one ACD instance needs the timer, 0 otherwise
  * 
@@ -158,7 +149,7 @@ acd_timer_needed(void)
 }
 
 /**
- * Check if a specific ACD instance needs timer processing based on its current state.
+ * Check if a specific ACD instance needs timer processing.
  * 
  * Active states (PROBE_WAIT, PROBING, ANNOUNCE_WAIT, ANNOUNCING, RATE_LIMIT) always need the timer.
  * Passive states (ONGOING, PASSIVE_ONGOING) only need the timer during the defense window (lastconflict > 0).
@@ -214,17 +205,14 @@ acd_timer_activate(struct acd *acd)
   LWIP_ASSERT_CORE_LOCKED();
   LWIP_ASSERT("acd != NULL", acd != NULL);
   
-  /* Early return if already active */
   if (acd->timer_active) {
     return;
   }
   
-  /* Early return if this instance doesn't need timer */
   if (!acd_needs_timer(acd)) {
     return;
   }
   
-  /* Mark this instance as active and increment global counter */
   acd->timer_active = 1;
   acd_timer_active_count++;
   
@@ -294,7 +282,6 @@ acd_timer_callback(void *arg)
   LWIP_UNUSED_ARG(arg);
   LWIP_ASSERT_CORE_LOCKED();
   
-  /* Process all ACD instances */
   acd_tmr();
   
   /* Reschedule if any instance still needs timer */
@@ -337,8 +324,6 @@ acd_add(struct netif *netif, struct acd *acd,
   }
 
 #if SL_LWIP_ACD_ONDEMAND_TIMER
-  /* Initialize timer flag only for new instances to avoid clearing an active timer
-   * and causing acd_timer_active_count inconsistency */
   acd->timer_active = 0;
 #endif
 
@@ -371,7 +356,7 @@ acd_remove(struct netif *netif, struct acd *acd)
         netif->acd_list = acd->next;
       }
 #if SL_LWIP_ACD_ONDEMAND_TIMER
-      acd_timer_deactivate(acd);  /* Deactivate timer before removal */
+      acd_timer_deactivate(acd);
 #endif /* SL_LWIP_ACD_ONDEMAND_TIMER */
       return;
     }
@@ -432,7 +417,7 @@ acd_stop(struct acd *acd)
   if (acd != NULL) {
     acd->state = ACD_STATE_OFF;
 #if SL_LWIP_ACD_ONDEMAND_TIMER
-    acd_timer_deactivate(acd);  /* Deactivate timer for this instance */
+    acd_timer_deactivate(acd);
 #endif /* SL_LWIP_ACD_ONDEMAND_TIMER */
   }
   return ERR_OK;

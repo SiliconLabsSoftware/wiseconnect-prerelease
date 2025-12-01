@@ -62,7 +62,7 @@ This application demonstrates the I2S transfer using loopback mechanism.
 4. Since 8-bit resolution is not supported, `uint8_t` data type buffer can use 16-bit resolution for transfer and pass SL_I2S_DATA_SIZE8 to data_size parameter in sl_i2s_xfer_config_t while configuring the transfer. While performing this operation, the data buffer should be typecast to (`uint16_t *`) and the transfer size should be half of the 8-bit data type buffer. (Refer to the I2S loopback application for more details). For 8-bit transfers, transfer size should be multiples of 4 (8,12,16,20...).
 5. Any I2S transfers with 16-bit and 32-bit resolutions should only have an even transfer size (8,10,12,14...).
 6. Any I2S transfers with 24-bit resolutions should only have transfer size as multiples of 4 (8,12,16,20...).
-7. I2S_LOOP_BACK macro is only used for I2S loopback applications to avoid clock generation from the receiver block during transfer.
+7. I2S0_LOOP_BACK macro is only used for I2S loopback applications to avoid clock generation from the receiver block during transfer.
 8. SCK frequency is calculated using `SCK = 2 * bit_width * sampling_frequency`. By default, I2S0 uses I2S_PLL_CLK as a clock source. This can generate any frequency range mentioned in section 6.11.7 of Si91x HRM.
 9. By default ULP_I2S/I2S1 uses ULP_MHZ_RC_CLK to support I2S operation in low-power states. This limits the maximum supported sampling frequency of ULP_I2S to 48kHz (32 MHz RC trims to 20MHz in sleep).
 

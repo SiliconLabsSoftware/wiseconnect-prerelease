@@ -9,7 +9,7 @@ category: Example|Platform
 filter:
 - name: Device Type
   value:
-  - SoC
+  - NCP
 - name: MCU
   value:
   - 32-bit MCU

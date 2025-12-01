@@ -58,12 +58,11 @@
 
 #include <string.h>
 
-/* Additional includes for on-demand timer feature */
 #if SL_LWIP_ETHARP_ONDEMAND_TIMER
 #include "lwip/sys.h"
 #include "lwip/timeouts.h"
 #if !NO_SYS
-#include "lwip/tcpip.h"  /* For LOCK_TCPIP_CORE() */
+#include "lwip/tcpip.h"
 #endif
 #endif /* SL_LWIP_ETHARP_ONDEMAND_TIMER */
 
@@ -119,7 +118,6 @@ static netif_addr_idx_t etharp_cached_entry;
 #endif /* !LWIP_NETIF_HWADDRHINT */
 
 #if SL_LWIP_ETHARP_ONDEMAND_TIMER
-/** On-demand timer state management */
 static u8_t arp_timer_started;
 static u8_t arp_timer_eco_mode;
 static u32_t last_timer_time_ms;
@@ -190,7 +188,6 @@ etharp_transition_to_active_mode(void)
     elapsed_seconds = elapsed_ms / 1000;
   }
   
-  /* Age all entries by elapsed time */
   if (elapsed_seconds > 0) {
     for (i = 0; i < ARP_TABLE_SIZE; i++) {
       if (arp_table[i].state != ETHARP_STATE_EMPTY

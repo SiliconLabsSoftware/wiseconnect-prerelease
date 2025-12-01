@@ -85,8 +85,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Application Build Environment
 
 1. Configure UC from the slcp component.
-2. Open the **sl_si91x_pcm_secondary.slcp** project file and select the **Software component** tab.
-3. Search for **PCM** in the search bar.
+2. Open the **sl_si91x_pcm_secondary.slcp** project file and select **Software component** tab and search for **PCM** in search bar.
+
 
   ![Figure: pcm_secondary_uc_screen](resources/uc_screen/pcm_secondary_uc_screen.png)
 
@@ -131,7 +131,7 @@ To use the ULP_PCM instance instead of the default PCM0 instance:
 |   GPIO    | Breakout pin on WPK (4002A baseboard) | Breakout pin Explorer kit |  Description     |
 | ----------| --------------------------------------|-------------------------- | ---------------- |
 | GPIO_25   |         P25                           |          [SCK]            | I2S SCK          |
-| GPIO_26   |         P27                           |          [MISO]           | I2S Frame-sync        |
+| GPIO_26   |         P27                           |          [MISO]           | I2S Frame-sync   |
 | GPIO_28   |         P31                           |          [CS]             | I2S DOUT         |
 | GPIO_27   |         P29                           |          [MOSI]           | I2S DIN          |
 
@@ -141,10 +141,7 @@ To use the ULP_PCM instance instead of the default PCM0 instance:
 
 - Pin description
 
-  >**Note:** Make sure pin configuration in RTE_Device_xxx.h file 
-   > - SiWx917: RTE_Device_917.h (path: /$project/config/RTE_Device_917.h)
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+ >**Note:** The default pin configurations are set in the SiWx917:[RTE_Device_917.h](path:/$project/config/RTE_Device_917.h) file. Verify that these pin settings match your hardware setup. You can modify the pin configurations in this file if your board uses different GPIO pins for the PCM interface.
 
 ## Test the Application
 

@@ -587,19 +587,12 @@ dhcp_fine_tmr(void)
 
 #if SL_LWIP_DHCP_ONDEMAND_TIMER
 /**
- * Per-Interface Self-Reconfigurable Timer Architecture
+ * Start the fine timer for a specific interface.
  * 
- * Key Design:
- * - Each interface has its own timer (dhcp->fine_timer_active flag)
- * - Timer callback carries netif pointer - no global iteration needed
- * - Self-destructing: timer auto-stops when request_timeout reaches 0
- * - Self-reconfiguring: timer only reschedules if still needed
- * - Scalable: O(1) complexity per interface, no cross-interface dependencies
- */
-
-/**
- * Start the fine timer for a specific interface
- * @param netif The network interface to start timer for
+ * Per-interface O(1) DHCP timers that self-stop and only reschedule when needed,
+ * avoiding global iteration and cross-interface dependencies.
+ * 
+ * @param netif The network interface to start timer.
  */
 static void
 dhcp_fine_timer_start(struct netif *netif)
@@ -607,7 +600,6 @@ dhcp_fine_timer_start(struct netif *netif)
   struct dhcp *dhcp = netif_dhcp_data(netif);
   
   if (dhcp != NULL && !dhcp->fine_timer_active) {
-    /* Pass netif pointer to timer - enables per-interface handling */
     sys_timeout(DHCP_FINE_TIMER_MSECS, dhcp_fine_timer_handler, netif);
     dhcp->fine_timer_active = 1;
     LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_STATE, 
@@ -617,8 +609,9 @@ dhcp_fine_timer_start(struct netif *netif)
 }
 
 /**
- * Stop the fine timer for a specific interface
- * @param netif The network interface to stop timer for
+ * Stop the fine timer for a specific interface.
+ * 
+ * @param netif The network interface
  */
 static void
 dhcp_fine_timer_stop(struct netif *netif)
@@ -636,8 +629,9 @@ dhcp_fine_timer_stop(struct netif *netif)
 }
 
 /**
- * Per-interface timer handler with self-destruct logic
- * @param arg The network interface (netif) pointer
+ * Per-interface timer handler.
+ * 
+ * @param arg The network interface pointer
  */
 #if LWIP_TESTMODE
 void
@@ -650,10 +644,9 @@ dhcp_fine_timer_handler(void *arg)
   struct dhcp *dhcp = netif_dhcp_data(netif);
   
   if (dhcp == NULL) {
-    return;  /* Interface removed or DHCP disabled */
+    return;
   }
   
-  /* Execute timeout logic (same as dhcp_fine_tmr for single interface) */
   if (dhcp->request_timeout > 1) {
     dhcp->request_timeout--;
     
@@ -960,10 +953,7 @@ dhcp_start(struct netif *netif)
     LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE, ("dhcp_start(): restarting DHCP configuration\n"));
 
 #if SL_LWIP_DHCP_ONDEMAND_TIMER
-    /* Stop on-demand timer before clearing structure to prevent timer leaks/duplicates
-     * Critical: memset() below will clear fine_timer_active flag, but if timer is still
-     * scheduled in sys_timeout list, we'd have orphaned timer + new timer = duplicate!
-     */
+    /* Stop timer before memset() to prevent timer leak */
     dhcp_fine_timer_stop(netif);
 #endif
 

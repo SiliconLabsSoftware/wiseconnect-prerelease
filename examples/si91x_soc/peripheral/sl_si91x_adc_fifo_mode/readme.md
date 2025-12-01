@@ -24,13 +24,14 @@
 This application demonstrates the ADC peripheral, including:
 
 - Conversion of analog input to 12-bit digital output.
-- Sampling the data.
+- Sampling the data at configurable rates from **80 Hz to 2.5 MHz**.
 - Converting data into equivalent input voltage based on operation mode.
 
 ## Overview
 
 - The ADC Controller works on an ADC with a resolution of 12bits at 10Msps when ADC reference Voltage is greater than 2.8v or 5Msps when ADC reference Voltage is less than 2.8v.
 - Sample application will be 12 bit ADC Output in 2's complement representation.
+- **Sampling Rate Range**: The ADC supports a sampling rate range from **80 Hz to 2.5 MHz**, providing flexibility for various application requirements from low-frequency sensor monitoring to high-speed signal acquisition.
 - There are two operating mode in AUX ADC controller:
   - Static Mode Operation: ADC data input will be sampled and written to a register in this mode.
   - FIFO Mode Operation: ADC data input will be sampled and written to the ADC FIFO in this mode.
@@ -134,8 +135,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - **ADC Channel Configuration**
 
-    - Input Type: ADC input type can be configured to either single ended (or) differential.
-    - Sampling rate: Sample rate can be configurable to ADC channel, sample rate unit is samples/second. The configuration range from 1sps to 2.5 Msps.
+   - Input Type: ADC input type can be configured to either single ended (or) differential.
+    - Sampling rate: Sample rate can be configurable to ADC channel, sample rate unit is samples/second. **The configuration range is from 80 Hz to 2.5 MHz (2,500,000 samples/second)**, allowing for both low-frequency precision measurements and high-speed data acquisition.
     - Sample length: Set the length of ADC samples (that is, the number of ADC samples collected for operation). It should be minimum value set to 1 and maximum of 1023.
 
       ![Figure: sl_adc_channel_uc_screen](resources/uc_screen/sl_adc_channel_uc_screen.png)

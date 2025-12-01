@@ -192,6 +192,14 @@
 #if !defined SL_LWIP_TCP_DYNAMIC_TIMER || defined __DOXYGEN__
 #define SL_LWIP_TCP_DYNAMIC_TIMER       SL_LWIP_ADAPTIVE_TIMERS
 #endif
+
+/**
+ * SL_LWIP_MLD6_ONDEMAND_TIMER: Enable MLD6 on-demand timer.
+ * Timer runs only when multicast listener discovery operations are active.
+ */
+#if !defined SL_LWIP_MLD6_ONDEMAND_TIMER || defined __DOXYGEN__
+#define SL_LWIP_MLD6_ONDEMAND_TIMER     SL_LWIP_ADAPTIVE_TIMERS
+#endif
 /**
  * @}
  */
@@ -2744,13 +2752,6 @@
  */
 #if !defined LWIP_IPV6_MLD || defined __DOXYGEN__
 #define LWIP_IPV6_MLD                   LWIP_IPV6
-#endif
-
-/**
- * SL_LWIP_MLD6_ONDEMAND_TIMER==1: Enable ondemand timer for multicast listener discovery protocol.
- */
-#if !defined SL_LWIP_MLD6_ONDEMAND_TIMER || defined __DOXYGEN__
-#define SL_LWIP_MLD6_ONDEMAND_TIMER             0
 #endif
 
 /**

@@ -89,7 +89,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   ![Figure: pcm_primary_uc_screen](resources/uc_screen/pcm_primary_uc_screen.png)
 
-### General Configuration
+### General Configuration 
 
 - SL_PCM0_RESOLUTION: PCM0 resolution can be configured through this macro,valid resolution values are 16, 24 and 32 bit.
 - SL_PCM0_SAMPLING_RATE: PCM0 sampling rate can be configured through this macro,valid sampling rate values are
@@ -97,7 +97,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - SL_PCM0_CHANNEL: PCM0 channel number (0-channel no 0, 1-channel no 1)
 - Configuration files are generated in **config folder**, if not changed then the code will run on default UC values.
 
-Configuration files are generated in **config** folder. If not changed, the code will run on default UC values.
+
 
 Configure the following macros in [`pcm_primary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_pcm_primary/pcm_primary_example.c) file and update/modify the following macros if required.
 
@@ -124,21 +124,17 @@ To use the ULP_PCM instance instead of the default PCM0 instance:
 |   GPIO    | Breakout pin on WPK (4002A baseboard) | Breakout pin Explorer kit |  Description     |
 | ----------| --------------------------------------|-------------------------- | ---------------- |
 | GPIO_25   |         P25                           |          [SCK]            | I2S SCK          |
-| GPIO_26   |         P27                           |          [MISO]           | I2S Frame-sync        |
+| GPIO_26   |         P27                           |          [MISO]           | I2S Frame-sync   |
 | GPIO_28   |         P31                           |          [CS]             | I2S DOUT         |
 | GPIO_27   |         P29                           |          [MOSI]           | I2S DIN          |
 
 - For pin connections, refer to the following diagrams
 
   ![Figure: Pin connections](resources/readme/image505d.png)
+  ### Pin Description
 
-- Pin fescription
+   >**Note:** The default pin configurations are set in the SiWx917:[RTE_Device_917.h](path:/$project/config/RTE_Device_917.h) file. Verify that these pin settings match your hardware setup. You can modify the pin configurations in this file if your board uses different GPIO pins for the PCM interface.
 
-  >**Note:** Make sure pin configuration in RTE_Device_xxx.h file 
-  >
-  > - SiWx917: RTE_Device_917.h (path: /$project/config/RTE_Device_917.h)
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 

@@ -65,12 +65,17 @@
 
 {%- if psram_present %}	
 	{%- set app_psram_start = psram_addr %}
-	{%- if text_segment_in_psram %}
-		{#- Adds 0x1000 offset (4096 in decimal) #}
-		{%- set psram_start_offset = 4096 %}
-		{%- set app_psram_start = psram_addr + psram_start_offset %}
-	{%- endif %}	
+
+	{#- This linker file is only used when wiseconnect_toolchain_psram_linker is installed #}
+
+	{#- Always apply 0x1000 offset (4096 in decimal) to skip reserved area #}
+
+	{%- set psram_start_offset = 4096 %}
+
+	{%- set app_psram_start = psram_addr + psram_start_offset %}
+
 	{%- set app_psram_end = psram_addr + psram_size %}
+
 {%- endif %}
 
 {#-
