@@ -30,9 +30,11 @@ toolchain_settings:
   value: -Wall -Werror
 other_file:
 - path: resources/readme/setupdiagram.png
-- path: resources/readme/image505d.png
+- path: resources/readme/PCM_Primary_Secondary_Pins.png
 - path: resources/uc_screen/pcm_secondary_uc_screen.png
 - path: resources/readme/output.png
+requires:
+- name: sl_gpio
 configuration:
 - name: SL_PCM0_MODE
   value: SL_I2S_SLAVE

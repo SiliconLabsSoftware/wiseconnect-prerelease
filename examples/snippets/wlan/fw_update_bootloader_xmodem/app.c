@@ -133,11 +133,7 @@ static const sl_wifi_device_configuration_t firmware_update_configuration = {
 #endif
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode              = SL_SI91X_CLIENT_MODE,
                    .coex_mode              = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map        = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION),

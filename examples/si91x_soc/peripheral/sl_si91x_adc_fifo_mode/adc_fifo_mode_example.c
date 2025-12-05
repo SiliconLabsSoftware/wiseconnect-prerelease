@@ -64,7 +64,6 @@ void adc_fifo_mode_example_init(void)
 {
   sl_adc_version_t version;
   sl_status_t status;
-  sl_adc_channel_config.channel = SL_ADC_CHANNEL_2;
   sl_adc_channel_config.channel = SL_ADC_CHANNEL_1;
   adc_channel                   = sl_adc_channel_config.channel;
 

@@ -91,10 +91,12 @@ static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
   }
 
   sl_net_profile_id_t profile_id = SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID;
-  status                         = sl_net_set_profile(interface, profile_id, &DEFAULT_WIFI_CLIENT_PROFILE);
-  if (status == SL_STATUS_OK) {
-    sl_net_interface_initialized[interface] = true;
+
+  if (DEFAULT_WIFI_CLIENT_PROFILE.config.ssid.length > 0) {
+    status = sl_net_set_profile(interface, profile_id, &DEFAULT_WIFI_CLIENT_PROFILE);
+    VERIFY_STATUS_AND_RETURN(status);
   }
+  sl_net_interface_initialized[interface] = true;
   return status;
 }
 #endif
@@ -138,11 +140,12 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
     ap_profile.config.maximum_clients = (uint8_t)max_clients;
   }
 
-  status = sl_net_set_profile(interface, profile_id, &ap_profile);
-
-  if (status == SL_STATUS_OK) {
-    sl_net_interface_initialized[interface] = true;
+  if (DEFAULT_WIFI_ACCESS_POINT_PROFILE.config.ssid.length > 0) {
+    status = sl_net_set_profile(interface, profile_id, &ap_profile);
+    VERIFY_STATUS_AND_RETURN(status);
   }
+
+  sl_net_interface_initialized[interface] = true;
   return status;
 }
 #endif

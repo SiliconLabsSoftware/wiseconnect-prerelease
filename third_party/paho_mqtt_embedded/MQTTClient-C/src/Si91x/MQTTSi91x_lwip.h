@@ -30,6 +30,10 @@
 // mbedTLS includes (only when TLS is enabled)
 #if MQTT_TLS_ENABLE
 #include "mbedtls/mbedtls_config.h"
+// Undefine TLS 1.3 if defined to avoid compatibility issues
+#ifdef MBEDTLS_SSL_PROTO_TLS1_3
+#undef MBEDTLS_SSL_PROTO_TLS1_3
+#endif
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/ssl.h"
 #include "mbedtls/x509.h"

@@ -209,11 +209,7 @@ static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_BLE_MODE,
                    .feature_bit_map = (SL_WIFI_FEAT_WPS_DISABLE | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE
@@ -970,7 +966,7 @@ void ble_privacy_app(void *unused)
   }
 #else
   uint8_t Resolve_list_updated = 0; // Variable to check if reslove_key is updated or not.
-  status = rsi_ble_start_scanning();
+  status                       = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
     LOG_PRINT("\r\nStart Scanning Failed, Error Code : 0x%lX\r\n", status);
     return;

@@ -95,6 +95,9 @@ static psa_status_t check_curve_availability(const psa_key_attributes_t *attribu
   } else
 #endif // SLI_PSA_DRIVER_FEATURE_ECDSA
   {
+#if !defined(SLI_PSA_DRIVER_FEATURE_ECDSA)
+    UNUSED_VARIABLE(key_type);
+#endif
     return PSA_ERROR_NOT_SUPPORTED;
   }
 

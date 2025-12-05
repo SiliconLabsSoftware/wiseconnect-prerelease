@@ -73,6 +73,8 @@ toolchain_settings: []
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
+- name: SL_USART_MODE
+  value: SL_USART_MODE_ASYNCHRONOUS
 readme:
 - path: readme.md
 other_file:

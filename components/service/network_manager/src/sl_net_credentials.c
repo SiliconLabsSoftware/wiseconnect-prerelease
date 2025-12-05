@@ -145,7 +145,7 @@ sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
       // PSK must be between 8 and 63 characters long
       if ((credential_length < SL_WIFI_MIN_PSK_LENGTH) || (credential_length > (SL_WIFI_MAX_PSK_LENGTH - 1))) {
         SL_DEBUG_LOG("\n PSK: Invalid credential length: %ld\n", credential_length);
-        return SL_STATUS_INVALID_PARAMETER;
+        return SL_STATUS_SI91X_INVALID_PSK_LENGTH;
       }
       break;
     }
@@ -153,7 +153,7 @@ sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
       // PMK must be exactly 32 bytes in hex format
       if (credential_length != SL_WIFI_MAX_PMK_LENGTH) {
         SL_DEBUG_LOG("\n PMK: Invalid credential length: %ld\n", credential_length);
-        return SL_STATUS_INVALID_PARAMETER;
+        return SL_STATUS_SI91X_INVALID_PMK_LEN;
       }
       break;
     }

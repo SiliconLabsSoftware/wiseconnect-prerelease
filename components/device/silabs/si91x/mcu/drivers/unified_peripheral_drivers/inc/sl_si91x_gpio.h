@@ -226,16 +226,16 @@ typedef struct {
 
 /// @brief GPIO power-on start enable selection
 typedef enum {
-  GPIO_POS_LOW  = 0, ///< power-on-start disable
-  GPIO_POS_HIGH = 1, ///< power-on-start enable
-  GPIO_POS_LAST,     ///< Last enum for validating
+  GPIO_POS_DIS = 0, ///< power-on-start disable
+  GPIO_POS_EN  = 1, ///< power-on-start enable
+  GPIO_POS_LAST,    ///< Last enum for validating
 } sl_si91x_gpio_pos_t;
 
 /// @brief GPIO Schmitt trigger selection
 typedef enum {
-  GPIO_SCHMITT_TRIG_LOW  = 0, ///< Schmitt trigger disable
-  GPIO_SCHMITT_TRIG_HIGH = 1, ///< Schmitt trigger enable
-  GPIO_SCHMITT_TRIG_LAST,     ///< Last enum for validating
+  GPIO_SCHMITT_TRIG_DIS = 0, ///< Schmitt trigger disable
+  GPIO_SCHMITT_TRIG_EN  = 1, ///< Schmitt trigger enable
+  GPIO_SCHMITT_TRIG_LAST,    ///< Last enum for validating
 } sl_si91x_gpio_schmitt_trig_t;
 
 // -----------------------------------------------------------------------------
@@ -342,8 +342,8 @@ void sl_si91x_gpio_select_pad_driver_strength(uint8_t gpio_num, sl_si91x_gpio_dr
  * @param[in] gpio_num - GPIO pin number to configure
  * @param[in] pos      - Power-on start level of type \ref sl_si91x_gpio_pos_t \n
  *                       Possible values are: \n
- *                         GPIO_POS_LOW  - power-on-start disable \n
- *                         GPIO_POS_HIGH - power-on-start enable \n
+ *                         GPIO_POS_DIS  - power-on-start disable \n
+ *                         GPIO_POS_EN - power-on-start enable \n
  * @return    None
  ******************************************************************************/
 void sl_si91x_gpio_select_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos_t pos);
@@ -356,8 +356,8 @@ void sl_si91x_gpio_select_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos
  * @param[in] gpio_num     - GPIO pin number to configure
  * @param[in] schmitt_trig - Schmitt trigger level of type \ref sl_si91x_gpio_schmitt_trig_t \n
  *                            Possible values are: \n
- *                              GPIO_SCHMITT_TRIG_LOW  - Schmitt trigger disable\n
- *                              GPIO_SCHMITT_TRIG_HIGH - Schmitt trigger enable \n
+ *                              GPIO_SCHMITT_TRIG_DIS  - Schmitt trigger disable\n
+ *                              GPIO_SCHMITT_TRIG_EN - Schmitt trigger enable \n
  * @return    None
  ******************************************************************************/
 void sl_si91x_gpio_select_pad_active_high_schmitt_trigger(uint8_t gpio_num, sl_si91x_gpio_schmitt_trig_t schmitt_trig);
@@ -735,8 +735,8 @@ void sl_si91x_gpio_select_ulp_pad_driver_strength(uint8_t gpio_num, sl_si91x_gpi
  * @param[in] gpio_num - GPIO pin number to configure
  * @param[in] pos      - Power-on start level of type \ref sl_si91x_gpio_pos_t \n
  *                       Possible values are: \n
- *                         GPIO_POS_LOW  - power-on-start disable \n
- *                         GPIO_POS_HIGH - power-on-start enable \n
+ *                         GPIO_POS_DIS  - power-on-start disable \n
+ *                         GPIO_POS_EN - power-on-start enable \n
  * @return    None
  ******************************************************************************/
 void sl_si91x_gpio_select_ulp_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos_t pos);
@@ -749,8 +749,8 @@ void sl_si91x_gpio_select_ulp_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio
  * @param[in] gpio_num     - GPIO pin number to configure
  * @param[in] schmitt_trig - Schmitt trigger level of type \ref sl_si91x_gpio_schmitt_trig_t \n
  *                            Possible values are: \n
- *                              GPIO_SCHMITT_TRIG_LOW  - Schmitt trigger disable\n
- *                              GPIO_SCHMITT_TRIG_HIGH - Schmitt trigger enable \n
+ *                              GPIO_SCHMITT_TRIG_DIS  - Schmitt trigger disable\n
+ *                              GPIO_SCHMITT_TRIG_EN - Schmitt trigger enable \n
  * @return    None
  ******************************************************************************/
 void sl_si91x_gpio_select_ulp_pad_active_high_schmitt_trigger(uint8_t gpio_num,

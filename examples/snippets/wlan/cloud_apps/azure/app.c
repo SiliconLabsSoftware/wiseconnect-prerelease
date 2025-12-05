@@ -235,11 +235,7 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =
@@ -358,7 +354,7 @@ sl_status_t load_certificates_in_flash(void)
 
 #ifdef democonfigDEVICE_SYMMETRIC_KEY
   // Clear TLS Client certificate
-  status = sli_net_delete_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX), SL_NET_CERTIFICATE);
+  status = sl_net_delete_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX), SL_NET_CERTIFICATE);
   if (status != SL_STATUS_OK) {
     printf("\r\nTLS client certificate location not cleared, Error Code : 0x%lX\r\n", status);
     return status;
@@ -366,7 +362,7 @@ sl_status_t load_certificates_in_flash(void)
   printf("\r\nTLS Client certificate at index %d cleared successfully\r\n", CERTIFICATE_INDEX);
 
   // Clear TLS Client private key
-  status = sli_net_delete_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX), SL_NET_PRIVATE_KEY);
+  status = sl_net_delete_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX), SL_NET_PRIVATE_KEY);
   if (status != SL_STATUS_OK) {
     printf("\r\nTLS Client private key location not cleared, Error Code : 0x%lX\r\n", status);
     return status;

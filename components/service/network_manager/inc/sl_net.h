@@ -570,7 +570,10 @@ sl_status_t sl_net_inet_addr(const char *addr, uint32_t *value);
  * 
  * @details
  *   This function enables multicast for the specified IP address on the given interface.
- *   It allows the interface to receive/send multicast packets sent to the specified IP address.
+ *   It allows the interface to receive or send multicast packets to the specified IP address.
+ *
+ * @note
+ *   IGMPv1 and IGMPv2 are supported.
  * 
  *   Users can use [sendto](../wiseconnect-api-reference-guide-sockets/bsd-socket-functions#sendto) and [recvfrom](../wiseconnect-api-reference-guide-sockets/bsd-socket-functions#recvfrom) socket APIs to send and receive data.  
  * 
@@ -593,7 +596,10 @@ sl_status_t sl_net_join_multicast_address(sl_net_interface_t interface, const sl
  * 
  * @details
  *   This function disables multicast for the specified IP address on the given interface.
- * It prevents the interface from receiving/sending multicast packets sent to the specified IP address.
+ *   It prevents the interface from receiving or sending multicast packets to the specified IP address.
+ *
+ * @note
+ *   IGMPv1 and IGMPv2 are supported.
  * 
  * @pre Pre-conditions:
  * - @ref sl_net_up should be called before this API.

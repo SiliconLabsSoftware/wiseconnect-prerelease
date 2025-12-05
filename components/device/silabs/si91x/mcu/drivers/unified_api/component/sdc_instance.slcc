@@ -7,6 +7,7 @@ description: >
    into digital data (discrete binary values) that the controller can handle in PS1 power state.
    
    SDC Supports instances.
+   Instances created must be named as channel_1, channel_2, channel_3, channel_4.
 
 category: Device|Si91x|MCU|Peripheral
 quality: production

@@ -864,7 +864,7 @@ sl_status_t sli_si91x_mqtt_event_handler(sl_status_t status,
 
   sdk_context->client->client_event_handler(sdk_context->client,
                                             is_error_event ? SL_MQTT_CLIENT_ERROR_EVENT : sdk_context->event,
-                                            is_error_event ? error_status : event_data,
+                                            is_error_event ? (void *)error_status : (void *)event_data,
                                             sdk_context->user_context);
 
   // Free the sdk_context after event handler is triggered.
@@ -1087,7 +1087,7 @@ sl_status_t sl_mqtt_client_connect_v2(sl_mqtt_client_t *client,
         return SL_STATUS_ALLOCATION_FAILED;
       }
       internal_sni->type   = SL_SI91X_TLS_EXTENSION_SNI_TYPE;
-      internal_sni->length = sni_host_name_len;
+      internal_sni->length = (uint16_t)sni_host_name_len;
       memcpy(internal_sni->value, broker->sni_host_name, sni_host_name_len);
       status = sli_configure_sni(internal_sni, broker->sni_host_name, SI91X_SNI_FOR_MQTT);
       free(internal_sni);

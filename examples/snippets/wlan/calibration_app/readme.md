@@ -74,7 +74,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 The application can be configured to suit user requirements and development environment. Read through the following sections and make any changes needed. 
 
-1. Ensure that SL_SI91X_EXT_FEAT_DISABLE_XTAL_CORRECTION (BIT(18)) is enabled in the sl_wifi_device_configuration_t.sl_si91x_boot_configuration_t.ext_custom_feature_bit_map structure variable. This setting will disable the automatic compensation for frequency offsets, thereby ensuring error-free calibration.
+1. Ensure that SL_SI91X_EXT_FEAT_DISABLE_XTAL_CORRECTION (BIT(18)) is enabled in the sl_wifi_device_configuration_t.sl_wifi_system_boot_configuration_t.ext_custom_feature_bit_map structure variable. This setting will disable the automatic compensation for frequency offsets, thereby ensuring error-free calibration.
 
 2. Configure the following parameters in **app.c** to test calibration app as per requirements:
 

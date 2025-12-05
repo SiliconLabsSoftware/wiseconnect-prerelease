@@ -738,7 +738,7 @@ sl_status_t sl_si91x_debug_log(const sl_si91x_assertion_t *assertion);
  *
  *  The join feature bitmap determines various connection parameters and behaviors.
  *
- *  By default, the `SL_SI91X_JOIN_FEAT_LISTEN_INTERVAL_VALID` bitmap is enabled.
+ *  By default, the `SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID` bitmap is enabled.
  *
  *  Users can call this API before calling [sl_wifi_connect](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-connect), [sl_wifi_start_ap](../wiseconnect-api-reference-guide-wi-fi/wifi-ap-api#sl-wifi-start-ap), [sl_wifi_start_wps](../wiseconnect-api-reference-guide-wi-fi/wifi-wps-api#sl-wifi-start-wps) to overwrite the join feature bitmap.
  *
@@ -765,7 +765,7 @@ sl_status_t sl_si91x_set_join_configuration(sl_wifi_interface_t interface,
  *   This function gets the current join feature bitmap configuration for the specified Wi-Fi interface.
  *   The join feature bitmap determines various connection parameters and behaviors.
  *
- *   By default, the `SL_SI91X_JOIN_FEAT_LISTEN_INTERVAL_VALID` bitmap is enabled.
+ *   By default, the `SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID` bitmap is enabled.
  *
  * @param[in] interface
  *   The selected Wi-Fi interface. Refer to [sl_wifi_interface_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-interface-t) for possible values.
@@ -905,7 +905,6 @@ sl_status_t sl_si91x_frequency_offset(const sl_si91x_freq_offset_t *frequency_ca
  * 
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
- * @note When SL_WIFI_IGNORE_REGION is specified, the SiWx917 device intentionally bypasses the region configuration.
  * @note When SL_WIFI_DEFAULT_REGION is specified, the SiWx917 device applies the same settings as SL_WIFI_REGION_US.
  * @note SL_WIFI_REGION_WORLD_DOMAIN is supported only in SL_SI91X_CLIENT_MODE, SL_SI91X_TRANSCEIVER_MODE and SL_SI91X_TRANSMIT_TEST_MODE.
  * @note
@@ -914,7 +913,7 @@ sl_status_t sl_si91x_frequency_offset(const sl_si91x_freq_offset_t *frequency_ca
  *      2. STA mode channels 1 to 11 are actively scanned and 12,13,14 are passively scanned.
  *      3. AP mode and Concurrent mode supports only 1 to 11 channels.
  *      4. The AP will not broadcast the Country Information Element (IE).
- *      5. The device region for modules parts cannot be manually configured by the user. It automatically updates to align with the region of the connected AP.
+ *      5. `region_code` parameter will be ignored for modules. The device region for modules parts cannot be manually configured by the user. It automatically updates to align with the region of the connected AP.
  ******************************************************************************/
 sl_status_t sl_si91x_set_device_region(sl_wifi_operation_mode_t operation_mode,
                                        sl_wifi_band_mode_t band,
@@ -1318,20 +1317,3 @@ sl_status_t sli_command_engine_status_queue_deinit();
  *                     or an appropriate error code otherwise.
  ******************************************************************************/
 sl_status_t sli_get_nwp_timestamp(uint32_t *timestamp);
-
-/***************************************************************************/
-/**
- * @brief
- *   Get the config feature bit map that was set during device initialization.
- *
- * @details
- *   This function retrieves the config_feature_bit_map value that was configured
- *   during sl_wifi_init() call.
- *
- * @pre Pre-conditions:
- * - @ref sl_si91x_driver_init should be called before this API.
- *
- * @return
- *   uint32_t - The config feature bit map value.
- ******************************************************************************/
-uint32_t sli_si91x_get_config_feature_bit_map(void);

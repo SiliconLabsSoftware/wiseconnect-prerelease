@@ -16,11 +16,19 @@
 
 This application fetches the M4 application address from flash. If a valid address is obtained from slot information, it jumps to the M4 application; otherwise, it enters an infinite loop in case of failure.
 
-> **Note**
->
->A/B firmware update functionality requires a special MBR to be preloaded on the device. Ensure these components are correctly loaded before running this example.
-
 ## Prerequisites/Setup Requirements
+
+### MBR Provisioning
+
+> **Note:** Refer to UG625: SiWG917 Firmware Fallback User Guide before executing the reference examples.
+
+Before using the A/B firmware fallback feature, the fallback profile must be enabled in the MBR on the device.
+
+To enable firmware fallback for the devices using default MBR, use `commander manufacturing provision --mbr default --profile fallback -d <OPN>` command in the Simplicity Commander CLI tool.
+
+To confirm the firmware fallback feature is enabled on the device, use `commander readmem --range 0x4000091:+1` command in the Simplicity Commander CLI tool and confirm the value to be 1.
+
+For more details on firmware fallback feature enablement and usage, refer to UG625: SiWG917 Firmware Fallback User Guide.
 
 ### Hardware Requirements
 

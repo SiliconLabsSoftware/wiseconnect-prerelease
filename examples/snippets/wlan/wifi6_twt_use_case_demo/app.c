@@ -47,7 +47,7 @@
 #include "sl_si91x_socket_constants.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_socket.h"
-
+#include "sl_wifi_types.h"
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_power_manager.h"
 #include "sl_si91x_m4_ps.h"
@@ -187,10 +187,10 @@ sl_wifi_twt_selection_t default_twt_selection_configuration = {
   .beacon_wake_up_count_after_sp         = MAX_BEACON_WAKE_UP_AFTER_SP
 };
 
-sl_si91x_timeout_t timeout_configuration = { .keep_alive_timeout_value       = KEEP_ALIVE_TIMEOUT,
-                                             .auth_assoc_timeout_value       = AUTH_ASSOCIATION_TIMEOUT,
-                                             .active_chan_scan_timeout_value = ACTIVE_CHANNEL_SCAN_TIME,
-                                             .passive_scan_timeout_value     = PASSIVE_CHANNEL_SCAN_TIME };
+sl_wifi_timeout_t timeout_configuration = { .keep_alive_timeout_value       = KEEP_ALIVE_TIMEOUT,
+                                            .auth_assoc_timeout_value       = AUTH_ASSOCIATION_TIMEOUT,
+                                            .active_chan_scan_timeout_value = ACTIVE_CHANNEL_SCAN_TIME,
+                                            .passive_scan_timeout_value     = PASSIVE_CHANNEL_SCAN_TIME };
 
 volatile sl_status_t callback_status = SL_STATUS_OK;
 

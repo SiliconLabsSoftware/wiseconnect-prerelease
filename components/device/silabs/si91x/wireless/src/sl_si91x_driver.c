@@ -229,7 +229,6 @@ bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX] = { false, false, false, false
 bool bg_enabled                                   = false;
 uint32_t frontend_switch_control                  = 0;
 static uint32_t feature_bit_map                   = 0;
-static uint32_t config_feature_bit_map            = 0;
 static sli_wifi_efuse_data_t si91x_efuse_data     = { 0 };
 static uint32_t client_listen_interval            = 1000;
 //! Currently, initialized_opermode is used only to handle concurrent mode using sl_net_init()
@@ -517,11 +516,16 @@ sl_status_t sl_si91x_driver_init_wifi_radio(const sl_wifi_device_configuration_t
                                          NULL);
   VERIFY_STATUS_AND_RETURN(status);
 
+#ifndef SL_SI91X_ACX_MODULE
   if (SL_WIFI_IGNORE_REGION != config->region_code) {
     // Set the device's region based on configuration
     status = sl_si91x_set_device_region(config->boot_config.oper_mode, config->band, config->region_code);
+    SL_DEBUG_LOG("Region code set to %d\r\n", config->region_code);
     VERIFY_STATUS_AND_RETURN(status);
   }
+#else
+  SL_DEBUG_LOG("Region code configuration skipped for Modules\r\n");
+#endif
 
   // Configure the RTS threshold for WLAN
   sli_wifi_config_request_t config_request = { .config_type = SLI_WIFI_CONFIG_RTS_THRESHOLD,
@@ -722,8 +726,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   VERIFY_STATUS_AND_RETURN(status);
 #endif
 
-  feature_bit_map        = config->boot_config.feature_bit_map;
-  config_feature_bit_map = config->boot_config.config_feature_bit_map;
+  feature_bit_map = config->boot_config.feature_bit_map;
 
 #ifdef SLI_SI91X_ENABLE_BLE
   if (config->boot_config.coex_mode == SL_SI91X_BLE_MODE || config->boot_config.coex_mode == SL_SI91X_WLAN_BLE_MODE) {
@@ -943,9 +946,6 @@ sl_status_t sl_si91x_driver_deinit(void)
   si91x_event_handler  = NULL;
   device_initialized   = false;
   initialized_opermode = SLI_WIFI_INVALID_MODE;
-
-  // Reset config feature bit map
-  config_feature_bit_map = 0;
 
   // Reset all the interfaces
   memset(interface_is_up, 0, sizeof(interface_is_up));
@@ -2773,11 +2773,6 @@ sl_status_t sli_get_nwp_timestamp(uint32_t *timestamp)
   sli_si91x_host_free_buffer(buffer);
 
   return status;
-}
-
-uint32_t sli_si91x_get_config_feature_bit_map(void)
-{
-  return config_feature_bit_map;
 }
 
 sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, void *context)

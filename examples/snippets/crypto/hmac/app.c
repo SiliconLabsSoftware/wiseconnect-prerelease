@@ -59,11 +59,7 @@ static const sl_wifi_device_configuration_t client_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION
@@ -172,7 +168,7 @@ static void application_start(void *argument)
 
 #else
   hmac_config.key_config.B0.key_type = SL_SI91X_TRANSPARENT_KEY;
-  hmac_config.key_config.B0.key = key;
+  hmac_config.key_config.B0.key      = key;
   hmac_config.key_config.B0.key_size = sizeof(key);
 #endif
 

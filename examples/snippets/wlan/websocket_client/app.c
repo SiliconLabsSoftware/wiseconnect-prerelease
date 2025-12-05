@@ -38,6 +38,7 @@
 #include "sl_net_default_values.h"
 #include "sl_websocket_client_types.h"
 #include "sl_websocket_client.h"
+#include "cacert.pem.h"
 #include <string.h>
 
 /******************************************************
@@ -49,8 +50,9 @@
 #define SERVER_IP_ADDR "192.168.29.160"
 #endif
 
-#define HOST_NAME     "example.com"
-#define RESOURCE_NAME "/myresource"
+#define HOST_NAME         "example.com"
+#define RESOURCE_NAME     "/myresource"
+#define CERTIFICATE_INDEX 0
 /******************************************************
  *               Variable Definitions
  ******************************************************/
@@ -73,11 +75,7 @@ static const sl_wifi_device_configuration_t websocket_client_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =
@@ -259,6 +257,19 @@ sl_websocket_error_t create_and_send_websocket_data(void)
     .remote_terminate_cb = remote_terminate_callback,
     .enable_ssl          = false,
   };
+
+  // Load SSL CA certificate only when SSL is enabled
+  if (ws_config.enable_ssl) {
+    sl_status_t status = sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(CERTIFICATE_INDEX),
+                                               SL_NET_SIGNING_CERTIFICATE,
+                                               cacert,
+                                               sizeof(cacert) - 1);
+    if (status != SL_STATUS_OK) {
+      printf("\r\nLoading TLS CA certificate into FLASH Failed, Error Code : 0x%lX\r\n", status);
+      return SL_WEBSOCKET_ERR_SSL_SETSOCKOPT;
+    }
+    printf("\r\nLoad SSL CA certificate at index %d Success\r\n", CERTIFICATE_INDEX);
+  }
 
   sl_websocket_error_t ws_error = sl_websocket_init(&ws_handle, &ws_config);
   if (ws_error != SL_WEBSOCKET_SUCCESS) {

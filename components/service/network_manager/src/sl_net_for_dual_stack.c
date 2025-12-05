@@ -517,7 +517,7 @@ sl_status_t sl_net_wifi_client_init(sl_net_interface_t interface,
   }
 
   // Set the user-defined event handler for client mode
-  sl_si91x_register_event_handler(event_handler);
+  sli_net_register_event_handler(event_handler);
 
   status = sl_wifi_init(configuration, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
@@ -623,7 +623,7 @@ sl_status_t sl_net_wifi_ap_init(sl_net_interface_t interface,
   }
 
   // Set the user-defined event handler for AP mode
-  sl_si91x_register_event_handler(event_handler);
+  sli_net_register_event_handler(event_handler);
 
   status = sl_wifi_init(configuration, NULL, sl_wifi_default_event_handler);
   VERIFY_STATUS_AND_RETURN(status);

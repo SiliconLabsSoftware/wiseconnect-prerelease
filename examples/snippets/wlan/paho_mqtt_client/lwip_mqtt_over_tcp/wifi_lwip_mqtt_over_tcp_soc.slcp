@@ -21,6 +21,8 @@ include:
   - path: app.h
 define:
 - name: SL_SI91X_PRINT_DBG_LOG
+- name: SLI_MBEDTLS_CONFIG_AUTOGEN_OVERRIDE_FILE
+  value: '"sli_lwip_mqtt_mbedtls_config.h"'
 component:
 - id: sl_main
 - id: freertos
@@ -41,11 +43,6 @@ component:
 - id: mbedtls_ecdhe_key_exchange
 - id: mbedtls_sha256
 - id: mbedtls_sha512
-- id: psa_crypto_tls12_prf
-- id: psa_crypto
-- id: psa_crypto_hmac
-- id: psa_crypto_sha256
-- id: psa_crypto_sha384
 - id: mbedtls_hkdf
 - id: mbedtls_source
 - id: mbedtls_oid
@@ -69,6 +66,20 @@ toolchain_settings:
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
+- name: SL_MBEDTLS_SSL_IN_CONTENT_LEN
+  value: '6384'
+- name: SL_MBEDTLS_SSL_OUT_CONTENT_LEN
+  value: '6384'
+- name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
+  value: '1'
+- name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+  value: '1'
+- name: SL_MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED
+  value: '1'
+- name: MBEDTLS_SSL_CIPHERSUITES
+  value: MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+- name: SL_SI91X_WRAP_KEY_BUFFER_SIZE
+  value: 1696
 readme:
 - path: readme.md
 other_file:
@@ -88,11 +99,6 @@ other_file:
 - path: resources/readme/mqtt_explorer_msg.png
 - path: resources/readme/mqtt_publish_msg_from_explorer.png
 - path: resources/readme/setup_soc_ncp.png
-template_contribution:
-- name: psa_crypto_config
-  value: PSA_WANT_ALG_HKDF_EXTRACT 1
-- name: psa_crypto_config
-  value: PSA_WANT_ALG_HKDF_EXPAND 1
 ui_hints:
   highlight:
   - path: readme.md

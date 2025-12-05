@@ -538,7 +538,8 @@ static void ps4_to_ps2_state_change(void)
   // Change to 20MHz-RC to be used as Processor Clock in PS2 state
   sli_si91x_clock_manager_config_clks_on_ps_change(SL_SI91X_POWER_MANAGER_PS2,
                                                    sl_si91x_power_manager_get_clock_scaling());
-#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)
+#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1) \
+  && (SLI_SI91X_MCU_COMMON_FLASH_MODE == 1)
   // Turn off XTAL
   sli_si91x_xtal_turn_off_request_from_m4_to_TA();
   // Reset M4_USING_FLASH bit
@@ -630,7 +631,8 @@ static void ps3_to_ps2_state_change(void)
   // Change to 20MHz-RC to be used as Processor Clock in PS2 state
   sli_si91x_clock_manager_config_clks_on_ps_change(SL_SI91X_POWER_MANAGER_PS2,
                                                    sl_si91x_power_manager_get_clock_scaling());
-#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)
+#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1) \
+  && (SLI_SI91X_MCU_COMMON_FLASH_MODE == 1)
   // Turn off XTAL
   sli_si91x_xtal_turn_off_request_from_m4_to_TA();
   // Reset M4_USING_FLASH bit
@@ -707,7 +709,8 @@ static void ps2_to_ps4_state_change(void)
   __asm volatile("isb");
   // To initialize the flash
   initialize_flash();
-#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)
+#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1) \
+  && (SLI_SI91X_MCU_COMMON_FLASH_MODE == 1)
   // Set m4ss_ref_clk_mux_ctrl ,tass_ref_clk_mux_ctrl ,AON domain power supply controls from NWP to M4
   RSI_Set_Cntrls_To_M4();
   // Poll for flash magic word
@@ -750,7 +753,8 @@ static void ps2_to_ps3_state_change(void)
   __asm volatile("isb");
   // To initialize the flash
   initialize_flash();
-#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)
+#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1) \
+  && (SLI_SI91X_MCU_COMMON_FLASH_MODE == 1)
   // Set m4ss_ref_clk_mux_ctrl ,tass_ref_clk_mux_ctrl ,AON domain power supply controls from NWP to M4
   RSI_Set_Cntrls_To_M4();
   // Poll for flash magic word

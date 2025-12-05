@@ -27,10 +27,21 @@ This application shows how to update the M4 firmware of a device via Wi-Fi by do
 This process allows the device to update its software over the air (OTA) without needing a physical connection.
 
 >**Note:**
->A/B firmware update functionality requires a special MBR to be preloaded on the device. Ensure these components are correctly loaded before running this example.
 >This feature doesnot support sleep wakeup functionality from M4 Updater.
 
 ## Prerequisites/Setup Requirements
+
+### MBR Provisioning
+
+> **Note:** Refer to UG625: SiWG917 Firmware Fallback User Guide before executing the reference examples.
+
+Before using the A/B firmware fallback feature, the fallback profile must be enabled in the MBR on the device.
+
+To enable firmware fallback for the devices using default MBR, use `commander manufacturing provision --mbr default --profile fallback -d <OPN>` command in the Simplicity Commander CLI tool.
+
+To confirm the firmware fallback feature is enabled on the device, use `commander readmem --range 0x4000091:+1` command in the Simplicity Commander CLI tool and confirm the value to be 1.
+
+For more details on firmware fallback feature enablement and usage, refer to UG625: SiWG917 Firmware Fallback User Guide.
 
 ### Hardware Requirements  
 
@@ -112,6 +123,19 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
     - Possible Values:
       - 0: Disable firmware slot updates.
       - 1: Enable firmware slot updates.
+
+- Combined Image Support is controlled by the following macro:
+
+  ```c
+  #define SL_APP_COMBINED_IMAGE_SUPPORT 0 
+  ```
+
+  - Purpose: Enables or disables support for processing multiple firmware images in sequence (combined image update). When enabled, the application can handle two images (e.g., M4 and NWP) in a single update session.
+    - Default Value: 0 (Disabled)
+    - Possible Values:
+      - 0: Disable combined image support. Process only a single firmware image per update session.
+      - 1: Enable combined image support. Process multiple images sequentially, updating slot information after each image and maintaining the socket connection between images.
+    - **Note:** When enabled, the socket connection remains open between images to allow downloading the second image. The socket is closed only after all images are processed.
 
 - Debug Logging Configuration
   - The **DISABLE_AB_DEBUG_LOGS** macro controls whether debug logs are enabled or disabled in the A/B Firmware Fallback module. By default, debug logs are disabled.

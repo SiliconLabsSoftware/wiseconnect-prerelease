@@ -46,6 +46,7 @@ This application demonstrates the Pulse Code Modulation (PCM) secondary device t
 - The test will pass after successful data comparison.
 
 **Note!** 
+
 1. Any PCM transfers with 16-bit and 32-bit resolutions should only have an even transfer size (8,10,12,14...)
 2. Any PCM transfers with 24-bit resolutions should only have transfer size as multiples of 4 (8,12,16,20...)
 3. Frame-sync will be equal to the sampling frequency, but if measured with a logic analyzer or a device that does not support mono PCM, it will appear as double the sampling frequency.
@@ -87,7 +88,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 1. Configure UC from the slcp component.
 2. Open the **sl_si91x_pcm_secondary.slcp** project file and select **Software component** tab and search for **PCM** in search bar.
 
-
   ![Figure: pcm_secondary_uc_screen](resources/uc_screen/pcm_secondary_uc_screen.png)
 
 ### General Configuration
@@ -95,13 +95,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - SL_PCM0_RESOLUTION: PCM0 resolution can be configured through this macro, valid resolution values are 16, 24 and 32 bit.
 - SL_PCM0_SAMPLING_RATE: PCM0 sampling rate can be configured through this macro,valid sampling rate values are
     8kHz, 11.025kHz, 16kHz, 22.05kHz and 24kHz.
-- SL_PCM0_CHANNEL: PCM0 channel number (0-channel no 0, 1-channel no 1)
 - Configuration files are generated in **config folder**, if not changed then the code will run on default UC values.
 
 - SL_PCM0_RESOLUTION: PCM0 resolution can be configured through this macro. Valid resolution values are 16, 24 and 32 bit.
 - SL_PCM0_SAMPLING_RATE: I2S0 sampling rate can be configured through this macro. Valid sampling rate values are
     8, 11.025, 16, 22.05, and 24 kHz.
-- SL_PCM0_CHANNEL: PCM0 channel number (0-channel no 0, 1-channel no 1)
 
 Configuration files are generated in the **config** folder. If not changed, the code will run on default UC values.
 
@@ -112,6 +110,7 @@ Configure the following macros in [`pcm_secondary_example.c`](https://github.com
 ```
 
 - If the resolution is changed to 24-bit or 32-bit, update the typedef for `pcm_data_size_t` to `uint32_t` instead of `uint16_t` to accommodate the larger data size - 
+
  ```C
  typedef uint32_t pcm_data_size_t;
  ```
@@ -121,10 +120,10 @@ Configure the following macros in [`pcm_secondary_example.c`](https://github.com
 To use the ULP_PCM instance instead of the default PCM0 instance:
 
 - Change the `PCM_INSTANCE` macro value to `ULP_PCM` in [`pcm_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_pcm_secondary/pcm_secondary_example.c):
+
   ```C
   #define PCM_INSTANCE ULP_PCM
   ```
-
 
 ### Pin Configuration
 
@@ -137,7 +136,7 @@ To use the ULP_PCM instance instead of the default PCM0 instance:
 
 - For pin connections, refer to the following diagram:
   
-  ![Figure: Pin connections](resources/readme/image505d.png)
+  ![Figure: Pin connections](resources/readme/PCM_Primary_Secondary_Pins.png)
 
 - Pin description
 
@@ -147,15 +146,21 @@ To use the ULP_PCM instance instead of the default PCM0 instance:
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-1. Take two Silicon Labs boards [Si917 Evaluation Kit WPK(BRD4002) + BRD4325A/BRD4325B/BRD4338A]
-2. On the first board, compile and run the PCM primary device application.
-3. On the other board, compile and run this application.
-4. When the application runs, it sends data to the primary device. After successful comparison, it receives data from the primary device.
-5. After successful program execution, the prints in serial console looks as shown below.
+1. Take two Silicon Labs boards: Si917 Evaluation Kit WPK (BRD4002) and one of BRD4325A / BRD4325B / BRD4338A.
+2. On the first board, compile and run the PCM secondary device application.
+3. On the other board, compile and run the PCM primary application.
+4. When the primary application starts, it shows the message:
+   "Reset Secondary and Press Button 0 on Primary to sync."
+5. Reset the secondary board. After reset, the secondary console prints:
+   "Waiting for primary button 0 press to sync with primary."
+6. Press Button 0 on the primary board to complete the synchronization.
+7. After sync, the primary receives data from the secondary device, compares it, and then sends data back to the secondary device.
+8. When the primary sends data back, the secondary device receives it and performs loopback comparison to validate the data.
+9. After successful execution, the serial console will show the expected output logs.
 
    >![Figure: output](resources/readme/output.png)
-
 
 > **Note:**
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
+> - pcm0 or ulp_pcm uses i2s0 and ulp_i2s peripherals internally. It is recommended not to install the i2s0 and ulp_i2s instances simultaneously with pcm0 or ulp_pcm, as this may cause resource conflicts.

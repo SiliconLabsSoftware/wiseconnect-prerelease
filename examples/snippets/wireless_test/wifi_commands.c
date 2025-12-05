@@ -132,11 +132,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_client_configuration
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = WORLD_DOMAIN,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =
@@ -175,25 +171,22 @@ static const sl_wifi_device_configuration_t sl_wifi_default_ap_configuration_cli
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
-  .boot_config = { .oper_mode              = SL_SI91X_ACCESS_POINT_MODE,
-                   .coex_mode              = SL_SI91X_WLAN_ONLY_MODE,
-                   .feature_bit_map        = SL_WIFI_FEAT_SECURITY_OPEN,
-                   .tcp_ip_feature_bit_map = SL_SI91X_TCP_IP_FEAT_DHCPV4_SERVER,
-                   .custom_feature_bit_map = SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID,
-                   .ext_custom_feature_bit_map =
+  .boot_config = { .oper_mode                  = SL_SI91X_ACCESS_POINT_MODE,
+                   .coex_mode                  = SL_SI91X_WLAN_ONLY_MODE,
+                   .feature_bit_map            = SL_WIFI_FEAT_SECURITY_OPEN,
+                   .tcp_ip_feature_bit_map     = SL_SI91X_TCP_IP_FEAT_DHCPV4_SERVER,
+                   .custom_feature_bit_map     = SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID,
+                   .ext_custom_feature_bit_map = (
 #if ENABLE_POWERSAVE_CLI
                      SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE
 #else
                      0,
 #endif
 #ifdef SLI_SI917
-                     | SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0,
+                     | SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
 #endif
+                     ),
                    .bt_feature_bit_map         = 0,
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
@@ -206,11 +199,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_configura
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode              = SL_SI91X_CONCURRENT_MODE,
                    .coex_mode              = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map        = SL_WIFI_FEAT_AGGREGATION,
@@ -237,11 +226,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_enterprise_client_co
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode              = SL_SI91X_ENTERPRISE_CLIENT_MODE,
                    .coex_mode              = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map        = (SL_WIFI_FEAT_SECURITY_OPEN | SL_WIFI_FEAT_AGGREGATION),
@@ -270,11 +255,7 @@ static const sl_wifi_device_configuration_t sl_wifi_transmit_test_configuration_
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = WORLD_DOMAIN,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_TRANSMIT_TEST_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =
@@ -534,16 +515,16 @@ static const char *get_sl_wifi_rate_name(sl_wifi_rate_t mask)
   }
 }
 
-static inline const char *get_performance_profile_name(sl_si91x_performance_profile_t profile)
+static inline const char *get_performance_profile_name(sl_wifi_system_performance_profile_t profile)
 {
   switch (profile) {
-    case HIGH_PERFORMANCE:
+    case SL_WIFI_SYSTEM_HIGH_PERFORMANCE:
       return "High Performance";
-    case ASSOCIATED_POWER_SAVE:
+    case SL_WIFI_SYSTEM_ASSOCIATED_POWER_SAVE:
       return "Associated power save";
-    case ASSOCIATED_POWER_SAVE_LOW_LATENCY:
+    case SL_WIFI_SYSTEM_ASSOCIATED_POWER_SAVE_LOW_LATENCY:
       return "Associated power save low latency";
-    case DEEP_SLEEP_WITHOUT_RAM_RETENTION:
+    case SL_WIFI_SYSTEM_DEEP_SLEEP_WITHOUT_RAM_RETENTION:
       return "Standby low power";
     default:
       return "Unknown";

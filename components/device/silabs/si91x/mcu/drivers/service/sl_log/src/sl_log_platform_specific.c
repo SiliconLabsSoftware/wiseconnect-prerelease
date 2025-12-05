@@ -34,19 +34,7 @@ uint32_t sl_si91x_log_host_timesync_address =
  ******************************************************************************/
 int si91x_timestamp_delta;
 
-/**
- * @brief Write multiple log events into the platform ring buffer.
- *
- * This inline helper writes `length` events from `data` into the global
- * ring buffer. The implementation is responsible for handling wrap-around
- * and basic concurrency model (interrupt disable/enable). Callers should
- * ensure `data` points to at least `length * sizeof(sl_log_event_t)` bytes.
- *
- * @param[in] data   Pointer to the input events to write
- * @param[in] length Number of events to write
- * @return SL_STATUS_OK on success, SL_STATUS_ALLOCATION_FAILED on insufficient space
- */
-static inline sl_status_t sl_log_si91x_burst_write_to_ring_buffer(sl_log_event_t *data, uint16_t length);
+extern sl_log_backend_status_t sl_log_backend_status;
 
 /**
  * @brief Start the platform timestamp counter used by the logging core.
@@ -97,7 +85,7 @@ uint32_t sl_log_hal_get_timestamp_timer_frequency(uint8_t core_id);
  * @param[in] args    Optional arguments (currently unused)
  * @return SL_STATUS_OK on success or an sl_status_t error code
  */
-sl_status_t sl_log_hal_timer_sync(uint8_t core_id, void *args);
+sl_status_t sl_log_hal_timer_sync(void *args, uint8_t core_id);
 
 /**
  * @brief Prepare logging subsystem before entering sleep.
@@ -138,6 +126,58 @@ sl_status_t sl_log_hal_get_configuration(void *args, uint8_t core_id);
  */
 sl_status_t sl_log_hal_set_configuration(void *args, uint8_t core_id);
 
+/***************************************************************************/ /**
+ * @brief Write multiple log events into the ring buffer.
+ *
+ * Inserts a contiguous block of log events into the internal ring buffer while
+ * maintaining correct wraparound, overwrite handling, and IRQ-safe updates to
+ * buffer indices.  
+ *
+ * This function performs the write in three phases:
+ * 1. **Reserve slots and advance write index (IRQ-off):**  
+ *    - Atomically reduces `available_event_slots` by `count`.  
+ *    - Checks whether the backend is currently busy; if insufficient space is
+ *      available and the backend has not yet completed its previous transfer,
+ *      the operation is rejected with ::SL_STATUS_NOT_AVAILABLE.  
+ *    - Updates `write_index` with wraparound.
+ *
+ * 2. **Copy events into ring buffer (outside IRQ-off):**  
+ *    - Performs one or two memcpy operations depending on wraparound.  
+ *
+ * 3. **Finalize event_count and adjust read_index (IRQ-off):**  
+ *    - Updates `event_count`, clamping to the buffer's maximum size.  
+ *    - If the write overwrote existing events, advances `read_index`
+ *      appropriately.  
+ *
+ * @param[in] events  
+ *   Pointer to an array of `sl_log_event_t` structures to be written.
+ *
+ * @param[in] count  
+ *   Number of events to write. Must be non-zero.
+ *
+ * @return sl_status_t  
+ *   - ::SL_STATUS_OK  
+ *       Successfully wrote all events into the ring buffer.  
+ *   - ::SL_STATUS_INVALID_PARAMETER  
+ *       `events` is NULL or `count` is zero.  
+ *   - ::SL_STATUS_NOT_AVAILABLE  
+ *       Not enough space is available and the backend transfer is still in
+ *       progress, preventing safe overwrite accounting.  
+ *
+ * @note  
+ * - This function is intended for internal logger operations where multiple
+ *   events are written efficiently.  
+ * - Overwrite behavior adheres to the standard ring buffer model: the oldest
+ *   unread events are discarded first when capacity is exceeded.  
+ * - Callers must ensure `events` points to valid and populated event data.
+ *
+ * @internal  
+ * Uses critical sections (`__disable_irq` / `__enable_irq`) to guarantee that
+ * write and read indices are updated atomically relative to ISR-based backends.
+ ******************************************************************************/
+
+sl_status_t sl_log_write_multiple_to_ring_buffer(const sl_log_event_t *events, uint32_t count);
+
 /**
  * @brief   Core API structure.
  * 
@@ -149,7 +189,8 @@ sl_log_api_core_t sl_log_api_core = { .platform_core_init            = sl_log_ha
                                       .post_sleep_process            = sl_log_hal_post_sleep_process,
                                       .pre_sleep_process             = sl_log_hal_pre_sleep_process,
                                       .set_configuration             = sl_log_hal_set_configuration,
-                                      .get_configuration             = sl_log_hal_get_configuration };
+                                      .get_configuration             = sl_log_hal_get_configuration,
+                                      .time_sync                     = sl_log_hal_timer_sync };
 
 /**
  * @brief Timer overflow callback function.
@@ -327,7 +368,7 @@ sl_status_t sl_log_hal_post_sleep_process(void *config)
   sl_log_api_backend_t *api = sl_log_get_api_backend();
   api->backend_init();
   sl_log_hal_start_timestamp_counter();
-  sl_log_hal_timer_sync(SL_SI91X_CAPTIVE_CORE_ID, NULL);
+  sl_log_hal_timer_sync(NULL, SL_SI91X_CAPTIVE_CORE_ID);
   return SL_STATUS_OK;
 }
 /**
@@ -337,7 +378,7 @@ sl_status_t sl_log_hal_post_sleep_process(void *config)
  * @param args  Pointer to additional arguments if any
  * @return sl_status_t  Status of the operation.
  */
-sl_status_t sl_log_hal_timer_sync(uint8_t core_id, void *args)
+sl_status_t sl_log_hal_timer_sync(void *args, uint8_t core_id)
 {
   (void)core_id;
   (void)args;
@@ -378,81 +419,7 @@ sl_status_t sl_log_hal_timer_sync(uint8_t core_id, void *args)
  */
 void sli_handle_nwp_log_packet(const uint8_t *data, uint16_t length)
 {
-  sl_log_si91x_burst_write_to_ring_buffer((sl_log_event_t *)data, length / sizeof(sl_log_event_t));
-}
-
-/**
- * @brief   Writes a burst of log events to the ring buffer.
- * 
- * @param data  Pointer to the log event data.
- * @param length  Number of log events to write.
- * @return sl_status_t 
- */
-sl_status_t sl_log_si91x_burst_write_to_ring_buffer(sl_log_event_t *data, uint16_t length)
-{
-  /* Validate input parameters: data must be non-NULL and length within bounds */
-  if (!data || length == 0 || length > SL_LOG_NUMBER_OF_EVENTS) { /* invalid args */
-    return SL_STATUS_INVALID_PARAMETER;                           /* return error for invalid parameters */
-  }
-
-  /* Get pointer to the global ring buffer configuration */
-  sl_log_ring_buffer_t *sl_log_ring_buffer_ptr = sl_log_get_ring_buffer_config();
-
-  /* Enter critical section by disabling interrupts on this core */
-  __disable_irq();
-
-  /* Read the current write index from the ring buffer (where producers append) */
-  uint32_t write_index = sl_log_ring_buffer_ptr->write_index; /* snapshot */
-
-  /* Read the current number of events already in the buffer */
-  uint32_t event_count = sl_log_ring_buffer_ptr->event_count; /* snapshot */
-
-  /* Compute free space available in the ring buffer */
-  uint32_t free_space = SL_LOG_NUMBER_OF_EVENTS - event_count; /* available slots */
-
-  /* If there isn't enough space for the incoming events, bail out */
-  if (free_space < length) {
-    __enable_irq();                     /* leave critical section before returning */
-    return SL_STATUS_ALLOCATION_FAILED; /* not enough room */
-  }
-
-  /* Handle wrap-around when writing past the end of the circular buffer */
-  if ((write_index + length) >= SL_LOG_NUMBER_OF_EVENTS) {
-    /* Compute number of events that fit until the physical buffer end */
-    uint16_t first_chunk_size = SL_LOG_NUMBER_OF_EVENTS - write_index; /* events before wrap */
-
-    /* Reserve the new write index after the wrap (length - first_chunk_size) */
-    sl_log_ring_buffer_ptr->write_index = (length - first_chunk_size); /* update index for consumer */
-
-    __enable_irq(); /* leave critical section before performing copies */
-
-    /* Copy first chunk (from write_index to buffer end) */
-    memcpy(&sl_log_ring_buffer_ptr->sl_log_buffer[write_index],
-           data,
-           first_chunk_size * sizeof(sl_log_event_t)); /* copy first segment */
-
-    /* Copy remaining events to the start of the buffer (after wrap) */
-    memcpy(&sl_log_ring_buffer_ptr->sl_log_buffer[0],
-           &data[first_chunk_size],
-           (length - first_chunk_size) * sizeof(sl_log_event_t)); /* copy second segment */
-
-  } else {
-    /* No wrap: advance write_index by length to reserve space */
-    sl_log_ring_buffer_ptr->write_index += length; /* reserve contiguous region */
-
-    __enable_irq(); /* leave critical section before copying data */
-
-    /* Copy the events into the reserved region */
-    memcpy(&sl_log_ring_buffer_ptr->sl_log_buffer[write_index],
-           data,
-           length * sizeof(sl_log_event_t)); /* single contiguous copy */
-  }
-  /* Re-enter critical section to atomically update the event_count */
-  __disable_irq();
-  sl_log_ring_buffer_ptr->event_count += length; /* update stored event count */
-  __enable_irq();                                /* leave critical section */
-
-  return SL_STATUS_OK; /* success */
+  sl_log_write_multiple_to_ring_buffer((sl_log_event_t *)data, length / sizeof(sl_log_event_t));
 }
 
 /**
@@ -494,4 +461,125 @@ sl_status_t sl_log_hal_set_configuration(void *args, uint8_t core_id)
 sl_log_api_core_t *sl_log_get_api_core(void)
 {
   return &sl_log_api_core;
+}
+
+/***************************************************************************/ /**
+ * @brief Write multiple log events into the ring buffer.
+ *
+ * Inserts a contiguous block of log events into the internal ring buffer while
+ * maintaining correct wraparound, overwrite handling, and IRQ-safe updates to
+ * buffer indices.  
+ *
+ * This function performs the write in three phases:
+ * 1. **Reserve slots and advance write index (IRQ-off):**  
+ *    - Atomically reduces `available_event_slots` by `count`.  
+ *    - Checks whether the backend is currently busy; if insufficient space is
+ *      available and the backend has not yet completed its previous transfer,
+ *      the operation is rejected with ::SL_STATUS_NOT_AVAILABLE.  
+ *    - Updates `write_index` with wraparound.
+ *
+ * 2. **Copy events into ring buffer (outside IRQ-off):**  
+ *    - Performs one or two memcpy operations depending on wraparound.  
+ *
+ * 3. **Finalize event_count and adjust read_index (IRQ-off):**  
+ *    - Updates `event_count`, clamping to the buffer's maximum size.  
+ *    - If the write overwrote existing events, advances `read_index`
+ *      appropriately.  
+ *
+ * @param[in] events  
+ *   Pointer to an array of `sl_log_event_t` structures to be written.
+ *
+ * @param[in] count  
+ *   Number of events to write. Must be non-zero.
+ *
+ * @return sl_status_t  
+ *   - ::SL_STATUS_OK  
+ *       Successfully wrote all events into the ring buffer.  
+ *   - ::SL_STATUS_INVALID_PARAMETER  
+ *       `events` is NULL or `count` is zero.  
+ *   - ::SL_STATUS_NOT_AVAILABLE  
+ *       Not enough space is available and the backend transfer is still in
+ *       progress, preventing safe overwrite accounting.  
+ *
+ * @note  
+ * - This function is intended for internal logger operations where multiple
+ *   events are written efficiently.  
+ * - Overwrite behavior adheres to the standard ring buffer model: the oldest
+ *   unread events are discarded first when capacity is exceeded.  
+ * - Callers must ensure `events` points to valid and populated event data.
+ *
+ * @internal  
+ * Uses critical sections (`__disable_irq` / `__enable_irq`) to guarantee that
+ * write and read indices are updated atomically relative to ISR-based backends.
+ ******************************************************************************/
+
+sl_status_t sl_log_write_multiple_to_ring_buffer(const sl_log_event_t *events, uint32_t count)
+{
+  if (events == NULL || count == 0) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  sl_log_ring_buffer_t *ring = sl_log_get_ring_buffer_config();
+  const uint32_t N           = SL_LOG_NUMBER_OF_EVENTS;
+
+  // ---- 1) Reserve slots and advance write_index (IRQ-off) ----
+  __disable_irq();
+
+  int32_t new_available = ring->available_event_slots - (int32_t)count;
+
+  // Always reduce permanently, even if not available (for overflow tracking)
+  ring->available_event_slots = new_available;
+
+  // If backend busy and we went negative, reject
+  if ((new_available < 0) && (sl_log_backend_status.backend_transfer_done == 0)) {
+    __enable_irq();
+    return SL_STATUS_NOT_AVAILABLE;
+  }
+
+  uint32_t start_index = ring->write_index;
+  uint32_t new_write   = start_index + count;
+  if (new_write >= N) {
+    new_write -= N;
+  }
+  ring->write_index = new_write;
+
+  __enable_irq();
+
+  // ---- 2) Copy events outside critical section ----
+  uint32_t tail_space  = N - start_index;
+  uint32_t first_chunk = (count <= tail_space) ? count : tail_space;
+
+  if (first_chunk > 0) {
+    memcpy(&ring->sl_log_buffer[start_index], &events[0], first_chunk * sizeof(sl_log_event_t));
+  }
+
+  uint32_t remaining = count - first_chunk;
+  if (remaining > 0) {
+    memcpy(&ring->sl_log_buffer[0], &events[first_chunk], remaining * sizeof(sl_log_event_t));
+  }
+
+  // ---- 3) Update event_count/read_index under IRQ-off ----
+  __disable_irq();
+
+  uint32_t old_count   = ring->event_count;
+  uint32_t new_count   = old_count + count;
+  uint32_t overwritten = 0;
+
+  if (new_count > N) {
+    overwritten = new_count - N;
+    new_count   = N;
+  }
+  ring->event_count = new_count;
+
+  if (overwritten > 0) {
+    uint32_t new_read = ring->read_index + overwritten;
+    if (new_read >= N) {
+      new_read -= N;
+    }
+    ring->read_index = new_read;
+  }
+
+  __enable_irq();
+
+  return SL_STATUS_OK;
 }

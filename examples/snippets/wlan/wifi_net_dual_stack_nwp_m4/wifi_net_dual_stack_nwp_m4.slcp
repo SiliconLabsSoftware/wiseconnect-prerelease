@@ -47,6 +47,18 @@ toolchain_settings:
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
+readme:
+- path: readme.md
+other_file:
+- path: resources/readme/dual_stack_tcp_rx.png
+- path: resources/readme/dual_stack_tcp_tx.png
+- path: resources/readme/dual_stack_udp_rx.png
+- path: resources/readme/dual_stack_udp_tx.png
+- path: resources/readme/test_setup.png
+ui_hints:
+  highlight:
+  - path: readme.md
+    focus: true
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

@@ -244,7 +244,11 @@ static sl_status_t sli_handle_psk_security(const sl_wifi_client_configuration_t 
   VERIFY_STATUS_AND_RETURN(status);
 
   psk_request.type = cred.type == SL_WIFI_PSK_CREDENTIAL ? 1 : 2;
-  memcpy(psk_request.psk_or_pmk, cred.pmk.value, SL_WIFI_MAX_PMK_LENGTH);
+  if (cred.type == SL_WIFI_PSK_CREDENTIAL) {
+    memcpy(psk_request.psk_or_pmk, cred.psk.value, SL_WIFI_MAX_PSK_LENGTH);
+  } else {
+    memcpy(psk_request.psk_or_pmk, cred.pmk.value, SL_WIFI_MAX_PMK_LENGTH);
+  }
 
   return sli_wifi_send_command(SLI_WIFI_REQ_HOST_PSK,
                                SLI_WIFI_WLAN_CMD,

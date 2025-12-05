@@ -46,6 +46,8 @@ include:
   file_list:
      - path: MQTTSi91x_lwip.h
        condition: ["sl_si91x_lwip_stack"]
+     - path: sli_lwip_mqtt_mbedtls_config.h
+       condition: ["sl_si91x_lwip_stack"]
 
 - path: MQTTClient-C/src/Si91x
   file_list:
@@ -109,6 +111,8 @@ requires:
 - name: mbedtls_sha512
   condition: ["sl_si91x_lwip_stack"]
 - name: mbedtls_sha256
+  condition: ["sl_si91x_lwip_stack"]
+- name: mbedtls_debug
   condition: ["sl_si91x_lwip_stack"]
 - name: mbedtls_ecdhe_key_exchange
   condition: ["sl_si91x_lwip_stack"]

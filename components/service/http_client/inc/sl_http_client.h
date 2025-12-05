@@ -408,6 +408,13 @@ sl_status_t sl_http_client_deinit(const sl_http_client_t *client);
  *   - SL_STATUS_OK: Operation successful.
  *   - SL_STATUS_INVALID_PARAMETER: One or more input parameters are NULL or invalid.
  *   - SL_STATUS_FAIL: Failed to initialize the HTTP client request.
+ * 
+ * @note
+ *   SNI Limitation:
+ *   - Only one SNI command can be active at a time, irrespective of protocol (MQTT or HTTP).
+ *   - You must wait for the connection to be fully established before initiating another connection with SNI.
+ *   - If multiple SNI commands are sent simultaneously, SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE will be returned.
+ *   - For reconnection scenarios, set SNI before calling reconnect.
  ******************************************************************************/
 sl_status_t sl_http_client_request_init(sl_http_client_request_t *request,
                                         sl_http_client_event_handler_t event_handler,

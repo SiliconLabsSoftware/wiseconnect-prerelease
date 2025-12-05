@@ -271,6 +271,16 @@ static sl_status_t sensorhub_sdc_init(void);
 #ifdef SH_SDC_ENABLE
 static void sensorhub_sdc_config_params(sl_drv_sdc_config_t *sdc_config_st_p);
 #endif
+/**************************************************************************/ /**
+ *  @fn          static sl_status_t sensorhub_adc_init(void)
+ *  @brief       Initialize the ADC Interface based on the configuration.
+ *  @param[in]   None
+ *  @return      status 0 if successful,
+ *               else error code
+ *               \ref SL_STATUS_FAIL (0x0001)- Fail ,
+ *               \ref SL_STATUS_OK (0X000)- Success,
+*******************************************************************************/
+static sl_status_t sensorhub_adc_init(void);
 /*******************************************************************************
  ************************  Global structures   *********************************
  ******************************************************************************/
@@ -283,7 +293,7 @@ sl_sensorhub_errors_t bus_errors; //< structure to track the status of the senso
 ARM_DRIVER_I2C *I2Cdrv       = &Driver_I2C2;           //< I2C driver operations
 ARM_DRIVER_SPI *SPIdrv       = &Driver_SSI_ULP_MASTER; //< ULP SSI driver operations
 uint8_t sl_sensor_wait_flags = 0;                      //< Store the sensor event bits
-static RTC_TIME_CONFIG_T alarmConfig, rtc_get_Time;
+
 /*TODO: the sensor_data_ram must be mapped to ULP RAM*/
 uint8_t sensor_data_ram[SENSORS_RAM_SIZE] __attribute__((aligned(4))); //< Ram using for the sensor data storage
 uint32_t free_ram_index = 0;                                           //< ram index for the sensor
@@ -295,7 +305,7 @@ extern uint16_t *adc_data_ptrs[];
  **************************  Callback function ***********************************
  ******************************************************************************/
 sl_sensor_cb_info_t cb_info; //< sensor call back handler
-                             /*******************************************************************************
+/*******************************************************************************
  * ADC user callback
  * This function will be called from ADC interrupt handler
  *
@@ -783,7 +793,7 @@ void sl_si91x_sdc_intr_event_set(uint8_t channel_no, uint8_t event)
 }
 
 /**************************************************************************/ /**
- *  @fn          static uint8_t sli_si91x_adc_init_v2(void)
+ *  @fn          static sl_status_t sensorhub_adc_init(void)
  *  @brief       Initialize the ADC Interface based on the configuration.
  *  @param[in]   None
  *  @return      status 0 if successful,
@@ -791,7 +801,7 @@ void sl_si91x_sdc_intr_event_set(uint8_t channel_no, uint8_t event)
  *               \ref SL_STATUS_FAIL (0x0001)- Fail ,
  *               \ref SL_STATUS_OK (0X000)- Success,
 *******************************************************************************/
-static sl_status_t sli_si91x_adc_init_v2(void)
+static sl_status_t sensorhub_adc_init(void)
 {
   uint32_t status = 0;
 
@@ -903,7 +913,7 @@ static sl_status_t sensorhub_sdc_init(void)
 
   sl_si91x_sh_rtc_start(); //start the RTC
 
-  sli_config_sdc_params(&sli_sdc_config_st);
+  sensorhub_sdc_config_params(&sli_sdc_config_st);
 
   sdc_pin_mux(sli_sdc_config_st.sdc_p_channel_sel[0], sli_sdc_config_st.sdc_n_channel_sel[0], 0);
 
@@ -966,14 +976,14 @@ sl_status_t sl_si91x_sensorhub_init()
   }
 #endif
 #ifdef SH_ADC_ENABLE
-  status = sli_si91x_adc_init_v2();
+  status = sensorhub_adc_init();
   if (status != SL_STATUS_OK) {
     bus_errors.adc = false;
     DEBUGOUT("\r\n ADC Init Fail \r\n");
   }
 #endif
 #ifdef SH_SDC_ENABLE
-  status = sli_si91x_sdc_init();
+  status = sensorhub_sdc_init();
   if (status != SL_STATUS_OK) {
     bus_errors.sdc = false;
     DEBUGOUT("\r\n sdc Init Fail \r\n");
@@ -1536,7 +1546,7 @@ static void sensorhub_em_task(void)
       if (em_event.event == SL_SENSOR_DATA_READY) {
         if (sl_ps4_ps2_done == SL_PWR_STATE_SWICTH_DONE) {
           sl_ps4_ps2_done = 0;
-          sli_si91x_sensorhub_ps2tops4_state();
+          sensorhub_ps2tops4_state();
           sl_ps2_ps4_done = 1;
         }
       }
@@ -1563,7 +1573,7 @@ static void sensorhub_em_task(void)
       if (em_event.event == SL_SENSOR_DATA_READY) {
         if (sl_ps4_ps2_done != SL_PWR_STATE_SWICTH_DONE) {
           sl_power_state_enum = SL_SH_PS4TOPS2;
-          sli_si91x_sensorhub_ps4tops2_state();
+          sensorhub_ps4tops2_state();
           sl_ps4_ps2_done = 1;
         }
       }
@@ -1656,7 +1666,7 @@ static void sensorhub_sensor_task(void)
               bus_errors.spi = true;
             }
             if ((sensor_list.sl_sensors_st[i].config_st->sensor_bus == SL_SH_ADC) && !bus_errors.adc) {
-              sli_si91x_adc_init_v2();
+              sensorhub_adc_init();
               sl_status_t ret =
                 sl_si91x_adc_channel_init(&bus_intf_info.adc_config.adc_ch_cfg, &bus_intf_info.adc_config.adc_cfg);
               if (ret != SL_STATUS_OK) {
@@ -2153,6 +2163,88 @@ void sli_si91x_set_alarm_intr_time(uint16_t interval)
   return;
 }
 
+/**************************************************************************/ /**
+ *  @fn          sl_status_t sli_si91x_adc_init(void) is deprecated API no longer in use
+ *  @brief       Initialize the ADC Interface based on the configuration.
+ *  @param[in]   None
+ *  @return      status 0 if successful,
+ *               else error code
+ *               \ref SL_STATUS_FAIL (0x0001)- Fail ,
+ *               \ref SL_STATUS_OK (0X000)- Success,
+*******************************************************************************/
+sl_status_t sli_si91x_adc_init(void)
+{
+  /* Deprecated API no longer in use */
+  return 0;
+}
+
+/***************************************************************************/ /**
+* @fn         void sli_si91x_init_m4alarm_config(void) is deprecated API not longer in use
+* @brief To initialize the Alarm block 
+* @details
+* This function will initialize the Alarm block.
+*
+*
+******************************************************************************/
+void sli_si91x_init_m4alarm_config(void)
+{
+  /* Deprecated API no longer in use */
+  return;
+}
+/***************************************************************************/ /**
+* @fn         void sl_si91x_power_state_task(void) is deprecated API not longer in use
+* @brief Task to handle the system power operations
+*
+* @details
+* Power state task changes the system from one power save mode to another power save mode like(PS4 to PS2),(PS2toPS4),(Sleep_mode) using Binary semaphore.
+*
+******************************************************************************/
+void sl_si91x_power_state_task(void)
+{
+  /* Deprecated API no longer in use */
+  return;
+}
+
+/***************************************************************************/ /**
+* @fn         void sli_si91x_config_wakeup_source(uint16_t sleep_time) is deprecated API not longer in use
+* @brief To configure wake-up source for the system
+*
+* @details
+* This function will configure the wake-up source to the system.
+*
+* @param[in] sleep_time  -   Sleep time for the sensor hub.
+*
+******************************************************************************/
+void sli_si91x_config_wakeup_source(uint16_t sleep_time)
+{
+  (void)sleep_time;
+  /* Deprecated API no longer in use */
+  return;
+}
+/***************************************************************************/ /**
+* @fn         void sli_si91x_sleep_wakeup(uint16_t sh_sleep_time) is deprecated API not longer in use
+* @brief To configures sleep/wakeup sources for the system.
+*
+* @details
+* This function will configure sleep/wakeup sources.
+*
+* @param[in] sh_sleep_time  -   Sleep time for the sensor hub, in ADC PS-1 no parameters.
+*
+******************************************************************************/
+#ifdef SL_SH_PS1_STATE
+void sli_si91x_sleep_wakeup(void)
+{
+  /* Deprecated API no longer in use */
+  return;
+}
+#else
+void sli_si91x_sleep_wakeup(uint16_t sh_sleep_time)
+{
+  (void)sh_sleep_time;
+  /* Deprecated API no longer in use */
+  return;
+}
+#endif
 /*******************************************************************************
  * ADC user callback
  * This function will be called from ADC interrupt handler
@@ -2195,7 +2287,7 @@ sl_status_t sli_si91x_sdc_init(void)
  *               \ref SL_STATUS_OK (0X000)- Success,
 *******************************************************************************/
 #ifdef SH_SDC_ENABLE
-void sensorhub_sdc_config_params(sl_drv_sdc_config_t *sdc_config_st_p)
+void sli_config_sdc_params(sl_drv_sdc_config_t *sdc_config_st_p)
 {
   (void)sdc_config_st_p;
   /* Deprecated API no longer in use */

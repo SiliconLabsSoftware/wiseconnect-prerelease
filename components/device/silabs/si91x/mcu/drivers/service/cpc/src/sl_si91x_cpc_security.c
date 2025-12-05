@@ -54,12 +54,7 @@ static const sl_wifi_device_configuration_t client_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_US,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
-
   .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION

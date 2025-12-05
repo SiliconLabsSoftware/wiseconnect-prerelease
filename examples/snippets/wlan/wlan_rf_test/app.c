@@ -55,11 +55,7 @@ static const sl_wifi_device_configuration_t transmit_test_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = WORLD_DOMAIN,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_TRANSMIT_TEST_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =

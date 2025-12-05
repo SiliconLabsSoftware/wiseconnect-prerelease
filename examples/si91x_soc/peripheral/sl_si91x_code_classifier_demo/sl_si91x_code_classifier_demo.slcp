@@ -1,4 +1,4 @@
-project_name: code_classifier_demo
+project_name: sl_si91x_code_classifier_demo
 package: platform_siwx91x_app
 description: 'This application demonstrates the use of code classifier for SiWx917. It highlights memory configuration for applications requiring execution from PSRAM, enabling expanded memory space usage and optimizing on-chip resources.
 

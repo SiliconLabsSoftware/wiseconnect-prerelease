@@ -140,7 +140,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | --------------------- | ------------ | ---------------- | 
 | Phase A Signal Output |GPIO_29       | P33              | 
 | Phase B Signal Output |GPIO_30       | P35              |
-| Index Signal Output   |GPIO_12       | P21              |
+| Index Signal Output   |GPIO_6        | P19              |
 
 #### QEI Output Pin Configuration(for simulating QEI signals) of Explorer Kit
 
@@ -148,7 +148,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | --------------------- | ---------------- |
 | Phase A Signal Output |GPIO_29           |
 | Phase B Signal Output |GPIO_30           | 
-| Index Signal Output   |GPIO_12           | 
+| Index Signal Output   |GPIO_6            | 
 
 > **Note:**
 >
@@ -161,7 +161,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 1. Compile and run the application.
 2. Connect GPIO_29 to GPIO_26. This is phase A signal
 3. Connect GPIO_30 to GPIO_27. This is phase B signal
-4. Connect GPIO_12 to GPIO_25. This is index signal
+4. Connect GPIO_6 to GPIO_25. This is index signal
 5. After successful program execution the prints in serial console looks as shown below.
 
    > ![output](resources/readme/output_qei.png)

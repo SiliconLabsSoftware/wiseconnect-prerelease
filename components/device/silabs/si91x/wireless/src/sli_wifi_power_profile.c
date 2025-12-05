@@ -30,9 +30,7 @@
 #include "sli_wifi_power_profile.h"
 #include "sli_wifi_types.h"
 #include <string.h>
-#include <stdbool.h>
 #include "sli_wifi_utility.h"
-#include "sl_si91x_driver.h"
 #define SLI_MAX_SIZE_OF_UINT16_T          65535
 #define SLI_ULP_WITH_RAM_RETENTION        1
 #define SLI_MAX_PSP                       0
@@ -175,17 +173,6 @@ sl_status_t sli_wifi_set_performance_profile(const sl_wifi_performance_profile_t
     return SL_STATUS_INVALID_MODE;
   }
 
-  // Enhanced Max PSP validation: Ensure proper configuration when using Enhanced Max PSP
-  uint32_t current_config_feature_bit_map = sli_si91x_get_config_feature_bit_map();
-  bool enhanced_max_psp_enabled           = (current_config_feature_bit_map & SL_WIFI_ENABLE_ENHANCED_MAX_PSP)
-                                  == SL_WIFI_ENABLE_ENHANCED_MAX_PSP;
-  bool low_latency_profile_requested = (profile_v2.profile == ASSOCIATED_POWER_SAVE_LOW_LATENCY);
-
-  // Throw error if ASSOCIATED_POWER_SAVE_LOW_LATENCY profile is requested but Enhanced Max PSP is not enabled
-  if (low_latency_profile_requested && !enhanced_max_psp_enabled) {
-    return SL_STATUS_INVALID_CONFIGURATION;
-  }
-
   // Take backup of current wifi profile
   sli_wifi_get_current_performance_profile(&current_wifi_profile_mode);
 
@@ -231,17 +218,6 @@ sl_status_t sli_wifi_set_performance_profile_v2(const sl_wifi_performance_profil
   // Check if the listen interval in the profile exceeds the maximum size supported by NWP
   if (profile->listen_interval > SLI_MAX_SIZE_OF_UINT16_T) {
     return SL_STATUS_INVALID_RANGE;
-  }
-
-  // Enhanced Max PSP validation: Ensure proper configuration when using Enhanced Max PSP
-  uint32_t current_config_feature_bit_map = sli_si91x_get_config_feature_bit_map();
-  bool enhanced_max_psp_enabled           = (current_config_feature_bit_map & SL_WIFI_ENABLE_ENHANCED_MAX_PSP)
-                                  == SL_WIFI_ENABLE_ENHANCED_MAX_PSP;
-  bool low_latency_profile_requested = (profile->profile == ASSOCIATED_POWER_SAVE_LOW_LATENCY);
-
-  // Throw error if ASSOCIATED_POWER_SAVE_LOW_LATENCY profile is requested but Enhanced Max PSP is not enabled
-  if (low_latency_profile_requested && !enhanced_max_psp_enabled) {
-    return SL_STATUS_INVALID_CONFIGURATION;
   }
 
   // Take backup of current wifi profile

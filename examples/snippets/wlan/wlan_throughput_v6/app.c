@@ -152,11 +152,7 @@ static const sl_wifi_device_configuration_t throughput_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION),
@@ -514,9 +510,9 @@ void receive_data_from_tcp_client(void)
   measure_and_print_throughput(bytes_read, (now - start));
 #else
 
-  uint32_t start = 0;
-  uint32_t now = 0;
-  int read_bytes = 1;
+  uint32_t start                = 0;
+  uint32_t now                  = 0;
+  int read_bytes                = 1;
   uint32_t total_bytes_received = 0;
 
   server_socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
@@ -538,8 +534,8 @@ void receive_data_from_tcp_client(void)
   }
 
   server_address6.sin6_family = AF_INET6;
-  server_address6.sin6_port = LISTENING_PORT;
-  socket_return_value = bind(server_socket, (struct sockaddr *)&server_address6, socket_length);
+  server_address6.sin6_port   = LISTENING_PORT;
+  socket_return_value         = bind(server_socket, (struct sockaddr *)&server_address6, socket_length);
   if (socket_return_value < 0) {
     printf("\r\nSocket bind failed with bsd error: %d\r\n", errno);
     close(server_socket);
@@ -694,10 +690,10 @@ void receive_data_from_udp_client(void)
 
   close(client_socket);
 #else
-  sl_status_t status = SL_STATUS_OK;
-  uint32_t start = 0;
-  uint32_t now = 0;
-  int read_bytes = 1;
+  sl_status_t status            = SL_STATUS_OK;
+  uint32_t start                = 0;
+  uint32_t now                  = 0;
+  int read_bytes                = 1;
   uint32_t total_bytes_received = 0;
 
   client_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
@@ -708,7 +704,7 @@ void receive_data_from_udp_client(void)
   printf("\r\nSocket ID : %d\r\n", client_socket);
 
   server_address6.sin6_family = AF_INET6;
-  server_address6.sin6_port = LISTENING_PORT;
+  server_address6.sin6_port   = LISTENING_PORT;
 
   socket_return_value = bind(client_socket, (struct sockaddr *)&server_address6, socket_length);
   if (socket_return_value < 0) {
@@ -738,7 +734,7 @@ void receive_data_from_udp_client(void)
     }
 
     total_bytes_received = total_bytes_received + read_bytes;
-    now = osKernelGetTickCount();
+    now                  = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
       printf("\r\nTest Time Out: %ld ms\r\n", (now - start));
@@ -824,9 +820,9 @@ void receive_data_from_tls_server(void)
   close(client_socket);
   measure_and_print_throughput(bytes_read, (now - start));
 #else
-  uint32_t start = 0;
-  uint32_t now = 0;
-  int read_bytes = 1;
+  uint32_t start                = 0;
+  uint32_t now                  = 0;
+  int read_bytes                = 1;
   uint32_t total_bytes_received = 0;
 
   client_socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
@@ -855,7 +851,7 @@ void receive_data_from_tls_server(void)
   }
 
   server_address6.sin6_family = AF_INET6;
-  server_address6.sin6_port = SERVER_PORT;
+  server_address6.sin6_port   = SERVER_PORT;
 
   int ret_status = sl_inet_pton6(SERVER_IP,
                                  SERVER_IP + strlen(SERVER_IP),
@@ -894,7 +890,7 @@ void receive_data_from_tls_server(void)
     }
 
     total_bytes_received = total_bytes_received + read_bytes;
-    now = osKernelGetTickCount();
+    now                  = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
       printf("\r\nTest Time Out: %ld ms\r\n", (now - start));

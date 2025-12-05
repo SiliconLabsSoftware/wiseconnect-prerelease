@@ -158,15 +158,11 @@ static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                    .coex_mode = SL_SI91X_WLAN_BLE_MODE,
 #ifdef SLI_SI91X_MCU_INTERFACE
-                   .feature_bit_map = (SL_SI91X_FEAT_WPS_DISABLE | RSI_FEATURE_BIT_MAP),
+                   .feature_bit_map = (SL_WIFI_FEAT_WPS_DISABLE | RSI_FEATURE_BIT_MAP),
 #else
                    .feature_bit_map            = RSI_FEATURE_BIT_MAP,
 #endif
@@ -175,9 +171,9 @@ static const sl_wifi_device_configuration_t config = {
 #else
                    .tcp_ip_feature_bit_map     = (RSI_TCP_IP_FEATURE_BIT_MAP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
 #endif
-                   .custom_feature_bit_map = (SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID | RSI_CUSTOM_FEATURE_BIT_MAP),
+                   .custom_feature_bit_map = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID | RSI_CUSTOM_FEATURE_BIT_MAP),
                    .ext_custom_feature_bit_map =
-                     (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | MEMORY_CONFIG | SL_SI91X_EXT_FEAT_XTAL_CLK
+                     (SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE | MEMORY_CONFIG | SL_SI91X_EXT_FEAT_XTAL_CLK
                       | SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
                       | SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE),
                    .bt_feature_bit_map = (RSI_BT_FEATURE_BITMAP),
@@ -226,7 +222,7 @@ static const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_BLE_AE_MAX_ADV_SETS(RSI_BLE_AE_MAX_ADV_SETS)
 #endif
                         ),
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_ENHANCED_MAX_PSP
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
                                               | RSI_CONFIG_FEATURE_BITMAP) }
 };
 

@@ -734,7 +734,7 @@ typedef enum {
   * | Indonesia       | ID            | 500mW (27 dBm)                            | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
   * | China           | CN            | 20 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_CN             |
   *
-  * @note Region codes do not apply to modules.
+  * @note `SL_WIFI_IGNORE_REGION` Moving forward this option is going to be deprecated in future releases.
   **/
 typedef enum {
   SL_WIFI_DEFAULT_REGION,      ///< Factory default region
@@ -745,7 +745,7 @@ typedef enum {
   SL_WIFI_REGION_KR,           ///< Korea
   SL_WIFI_REGION_SG,           ///< Singapore (not currently supported)
   SL_WIFI_REGION_CN,           ///< China
-  SL_WIFI_IGNORE_REGION        ///< Do not update region code during initialization
+  SL_WIFI_IGNORE_REGION        ///< @deprecated Moving forward this option is going to be deprecated in future releases.
 } sl_wifi_region_code_t;
 
 /**

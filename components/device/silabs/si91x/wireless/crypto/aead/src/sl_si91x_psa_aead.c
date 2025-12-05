@@ -75,7 +75,6 @@ static psa_status_t sli_si91x_check_aead_parameters(const psa_key_attributes_t *
                                                     size_t nonce_length,
                                                     size_t additional_data_length)
 {
-  (void)additional_data_length;
   size_t tag_length = PSA_AEAD_TAG_LENGTH(psa_get_key_type(attributes), psa_get_key_bits(attributes), alg);
 
   switch (PSA_ALG_AEAD_WITH_SHORTENED_TAG(alg, 0)) {
@@ -141,6 +140,13 @@ static psa_status_t sli_si91x_check_aead_parameters(const psa_key_attributes_t *
     default:
       return PSA_ERROR_NOT_SUPPORTED;
   }
+
+#if !defined(SLI_PSA_DRIVER_FEATURE_CCM) && !defined(SLI_PSA_DRIVER_FEATURE_GCM) \
+  && !defined(SLI_PSA_DRIVER_FEATURE_CHACHAPOLY)
+  UNUSED_PARAMETER(nonce_length);
+  UNUSED_VARIABLE(tag_length);
+#endif
+  UNUSED_PARAMETER(additional_data_length);
 
   return PSA_SUCCESS;
 }
@@ -376,6 +382,10 @@ psa_status_t sli_si91x_crypto_aead_encrypt(const psa_key_attributes_t *attribute
     default:
       (void)status;
       (void)key_buffer;
+#if !defined(SLI_PSA_DRIVER_FEATURE_CCM) && !defined(SLI_PSA_DRIVER_FEATURE_GCM) \
+  && !defined(SLI_PSA_DRIVER_FEATURE_CHACHAPOLY)
+      UNUSED_VARIABLE(si91x_status);
+#endif
       status = PSA_ERROR_NOT_SUPPORTED;
       break;
   }
@@ -504,6 +514,10 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
     default:
       (void)status;
       (void)key_buffer;
+#if !defined(SLI_PSA_DRIVER_FEATURE_CCM) && !defined(SLI_PSA_DRIVER_FEATURE_GCM) \
+  && !defined(SLI_PSA_DRIVER_FEATURE_CHACHAPOLY)
+      UNUSED_VARIABLE(si91x_status);
+#endif
       status = PSA_ERROR_NOT_SUPPORTED;
       break;
   }

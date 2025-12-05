@@ -28,7 +28,7 @@ template_contribution:
       wifi:
         config:
           type: "ram_struct"
-          struct: "sl_si91x_boot_configuration_t"
+          struct: "sl_wifi_system_boot_configuration_t"
           instance: "si91x_init_configuration.boot_config"
           members:
             - name: "oper_mode"

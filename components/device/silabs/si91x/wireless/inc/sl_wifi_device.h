@@ -452,6 +452,8 @@
  * @def SL_WIFI_ENABLE_ENHANCED_MAX_PSP
  * @brief Enables Enhanced Max PSP.
  * @details Set this bit to enable the Enhanced Max PSP feature for improved performance.
+ * 
+ * @note The performance profile should be set to ASSOCIATED_POWER_SAVE_LOW_LATENCY for the device to enter Enhanced Max PSP mode.
  */
 #define SL_WIFI_ENABLE_ENHANCED_MAX_PSP BIT(26)
 
@@ -1548,7 +1550,7 @@
  * @note VC1, VC2, and VC3 are control voltage pins of the RF switch.
  * @note This configuration is not applicable for devices with internal antennas.
  */
-#if defined(SLI_SI91X_DEVICE_WITH_INT_ANTENNA)
+#if defined(SLI_SI91X_DEVICE_WITH_INT_RF_SWITCH)
 #define SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 0
 #else
 #define SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 BIT(29)
@@ -2407,7 +2409,7 @@
 #define ASSOCIATED_POWER_SAVE \
   SL_WIFI_SYSTEM_ASSOCIATED_POWER_SAVE ///< Low power profile when the device is associated with an AP (MAX PSP).
 #define ASSOCIATED_POWER_SAVE_LOW_LATENCY \
-  SL_WIFI_SYSTEM_ASSOCIATED_POWER_SAVE_LOW_LATENCY ///< Low power profile when the device is associated with an AP (FAST PSP).
+  SL_WIFI_SYSTEM_ASSOCIATED_POWER_SAVE_LOW_LATENCY ///< Low power profile when the device is associated with an AP (FAST PSP). If SL_WIFI_ENABLE_ENHANCED_MAX_PSP bit is set in config_feature_bit_map, then this mode enables the Enhanced Max PSP feature.
 #define DEEP_SLEEP_WITHOUT_RAM_RETENTION \
   SL_WIFI_SYSTEM_DEEP_SLEEP_WITHOUT_RAM_RETENTION ///< Deep Sleep without RAM retention when the device is not associated with AP.
 #define DEEP_SLEEP_WITH_RAM_RETENTION \
@@ -2709,11 +2711,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_client_configuration
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_US,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =
@@ -2750,11 +2748,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_enterprise_client_co
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_US,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode              = SL_SI91X_ENTERPRISE_CLIENT_MODE,
                    .coex_mode              = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map        = (SL_WIFI_FEAT_SECURITY_OPEN | SL_WIFI_FEAT_AGGREGATION),
@@ -2782,11 +2776,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_ap_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_US,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode       = SL_SI91X_ACCESS_POINT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map = SL_WIFI_FEAT_SECURITY_OPEN,
@@ -2812,11 +2802,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_configura
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_US,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode              = SL_SI91X_CONCURRENT_MODE,
                    .coex_mode              = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map        = SL_WIFI_FEAT_AGGREGATION,
@@ -2842,11 +2828,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_v6_config
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_US,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode       = SL_SI91X_CONCURRENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map = (SL_WIFI_FEAT_AGGREGATION | SL_WIFI_FEAT_DISABLE_11AX_SUPPORT),
@@ -2875,18 +2857,14 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transmit_test_config
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_WORLD_DOMAIN,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_TRANSMIT_TEST_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =
 #ifdef SLI_SI91X_MCU_INTERFACE
                      (SL_WIFI_FEAT_SECURITY_OPEN | SL_WIFI_FEAT_WPS_DISABLE),
 #else
-                     (SL_SI91X_FEAT_SECURITY_OPEN),
+                     (SL_WIFI_FEAT_SECURITY_OPEN),
 #endif
                    .tcp_ip_feature_bit_map =
                      (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
@@ -2910,11 +2888,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transceiver_configur
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_WIFI_BAND_MODE_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_WIFI_REGION_JP,
-#else
-  .region_code = SL_WIFI_IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode = SL_SI91X_TRANSCEIVER_MODE,
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
 #ifdef TRANSCEIVER_MAC_PEER_DS_SUPPORT

@@ -31,6 +31,9 @@
 - Compare Channel - When count value matches CMPnVALUE, and CMPnEN in CTRL register is set, the CMPnIF interrupt flag is set. At the same time, PRS output is updated according to CMPnCMOA value in CTRL register. CTRL and CMPnVALUE can be written at any time and will take effect immediately.
 - Capture Channel- When CAPnEN in CTRL register is set, the count value will be captured into CAPnVALUE based on PRS input edges. CAPnEDGE in CTRL register controls which edges that will result in capture. When count value is captured, CAPnIF interrupt flag is set.A capture event is generated whenever RUNNING status set, the corresponding GRP_CTRL_CAPEN register setting set and the desired PRS input edge occurs according to the GRP_CTRL_CAPEDGE register setting. This event is followed by GRP_IF_CAPIF being set after up to 3 cycles. At the same time when the corresponding flag is set the GRP_CAPVALUE register captures the current counter value. Note that PRS input edges should not occur more frequently than once in 3 cycles. If counter is being started/stopped or GRP_CTRL_CAPEN/GRP_CTRL_CAPEDGE being reprogrammed close to the PRS input edge, please account for the race condition.
 
+### What is PRS?  
+- In the context of SYSRTC, PRS(Peripheral Reflex System ) is used to connect compare events to GPIO pins as PRS_OUT or to feed external signals into the SYSRTC as PRS_IN for capture event .
+
 ## About Example Code
 
 - [`sysrtc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c) this example file demonstrates how to use sysrtc
@@ -70,10 +73,10 @@
 ### For PRS_IN / PRS_OUT GPIO Configuration
 If you are configuring PRS_IN or PRS_OUT through GPIOs:
 - 	GPIOs must be selected from the UC (Universal Configurator).
-- 	For compare channels, the corresponding GPIO will be toggled when the compare match occurs.
-- 	For PRS input, use GPIO pin P35 (or other mapped GPIO) and connect it to the corresponding PRS_IN channel.
+- 	For compare channels, the corresponding GPIO pin which is selected as PRS_OUT will be toggled when the compare match occurs.
+- 	For capture channels, use ulp_gpio_10 (or other mapped GPIO) and connect it to the corresponding GPIO pin which is selected as PRS_IN.
 - 	To enable GPIO-based PRS configuration, define the macro in [`#define SYSRTC_PRS`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c) in [`sysrtc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c)
-### if compare channel0 or compare channel1 is enabled and PRS_OUT pin selceted through UC
+### if compare channel0 or compare channel1 is enabled and PRS_OUT pin selected through UC
   - if[`#define SYSRTC_PRS `] (https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c) macro is enabled
   - Then SYSRTC groups are configured as per UC values through [sl_si91x_sysrtc_configure_group](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-configure-group) API.
   - Compare match output action is set to toggle using [SYSRTC_GROUP_CHANNEL_COMPARE_CONFIG_TOGGLE] (https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c)
@@ -95,9 +98,10 @@ If you are configuring PRS_IN or PRS_OUT through GPIOs:
    - The GPIO is then configured as a PRS input using [sl_si91x_sysrtc_set_gpio_as_capture_input_prs] 
    - If the configuration is successful, a confirmation message is printed. 
    - To toggle the PRS_IN a GPIO pin(ULP_GPIO_10) is further configured using sl_gpio_set_configuration, and success or failure is logged accordingly.
-   - Then registers sysrtc callback and enabled capture channel interrupt, through [sl_si91x_sysrtc_register_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-register-callback).
+   - SYSRTC callback is registered and the capture-channel interrupt is enabled by calling [sl_si91x_sysrtc_register_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-register-callback).
+   - The SYSRTC is started using sl_si91x_sysrtc_start.
    - Starts counter through [sl_si91x_sysrtc_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-start)
-   - ULP_GPIO_10 is toggled, which is supplied as input to PRS_IN.whenever rise edge or fall edge interrupt will be triggered
+   - ULP_GPIO_10 is set to high, which is supplied as input to PRS_IN. At the rise edge of PRS_IN,interrupt will be triggered
    - when first capture interrupt is generated ,LED  toggles one time.
    - And SYSRTC is de-initialized through [sl_si91x_sysrtc_deinit](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-deinit)
 
@@ -164,10 +168,14 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1. Compile and run the application.
-2. When the application runs, LED0 (ULP_GPIO_0 for ACx Module boards) or LED1 (GPIO_10 for ICs) will be toggled five times at a 1-second periodic rate.If PRS_IN/PRS_OUT are configured through GPIO,for compare out observe the PRS_OUT toggling using logic analyzer,for Capture input connect the ULP_GPIO10 pin to selected PRS_IN.
+2. When the application runs, LED0 (GPIO_10 for BRD2708A) or LED1 (GPIO_10 for evaluation kit[WPK(BRD4002) + BRD4338A / BRD4342A / BRD4343A ]) will be toggled ten times at a 1-second periodic rate.
 3. After successful program execution the prints in serial console looks as shown below.
 
     ![Figure: Output](resources/readme/output.png)
+
+ 
+## when [`SYSRTC_PRS`] macro is enabled:
+If PRS_IN/PRS_OUT are configured through GPIO,for compare out observe the PRS_OUT toggling using logic analyzer,for Capture input connect the ULP_GPIO_10 pin to selected PRS_IN.   
   **for PRS_OUT**:
     ![Figure: Output](resources/readme/output_prs_out.png)
   **for PRS_IN**:

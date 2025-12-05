@@ -54,8 +54,7 @@ static sl_si91x_gpio_pin_config_t sl_gpio_pin29_config = { { SL_SI91X_GPIO_29_PO
                                                            GPIO_OUTPUT };
 static sl_si91x_gpio_pin_config_t sl_gpio_pin30_config = { { SL_SI91X_GPIO_30_PORT, SL_SI91X_GPIO_30_PIN },
                                                            GPIO_OUTPUT };
-static sl_si91x_gpio_pin_config_t sl_gpio_pin12_config = { { SL_SI91X_GPIO_12_PORT, SL_SI91X_GPIO_12_PIN },
-                                                           GPIO_OUTPUT };
+static sl_si91x_gpio_pin_config_t sl_gpio_pin6_config  = { { SL_SI91X_GPIO_6_PORT, SL_SI91X_GPIO_6_PIN }, GPIO_OUTPUT };
 /*******************************************************************************
 **************************   GLOBAL FUNCTIONS   *******************************
 ******************************************************************************/
@@ -67,11 +66,11 @@ static void qei_stimulus_pin_mux_init(void)
 {
   sl_gpio_set_configuration(sl_gpio_pin29_config);
   sl_gpio_set_configuration(sl_gpio_pin30_config);
-  sl_gpio_set_configuration(sl_gpio_pin12_config);
+  sl_gpio_set_configuration(sl_gpio_pin6_config);
 
   sl_gpio_driver_clear_pin(&sl_gpio_pin29_config.port_pin);
   sl_gpio_driver_set_pin(&sl_gpio_pin30_config.port_pin);
-  sl_gpio_driver_clear_pin(&sl_gpio_pin12_config.port_pin);
+  sl_gpio_driver_clear_pin(&sl_gpio_pin6_config.port_pin);
 }
 
 /*******************************************************************************
@@ -98,12 +97,12 @@ static void qei_emulate_phase_and_index_signals(void)
       sl_gpio_driver_clear_pin(&sl_gpio_pin30_config.port_pin);
       if (index_count > QEI_IDX_REVOLUTIONS) {
         index_count = 0;
-        sl_gpio_driver_set_pin(&sl_gpio_pin12_config.port_pin);
+        sl_gpio_driver_set_pin(&sl_gpio_pin6_config.port_pin);
       }
     } else {
       x = 1;
       sl_gpio_driver_set_pin(&sl_gpio_pin30_config.port_pin);
-      sl_gpio_driver_clear_pin(&sl_gpio_pin12_config.port_pin);
+      sl_gpio_driver_clear_pin(&sl_gpio_pin6_config.port_pin);
     }
   }
 }

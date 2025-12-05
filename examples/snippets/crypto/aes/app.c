@@ -63,11 +63,7 @@ static const sl_wifi_device_configuration_t client_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = US,
-#else
-  .region_code = IGNORE_REGION,
-#endif
   .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION
@@ -286,20 +282,20 @@ sl_status_t aes_encryption(void)
   sl_si91x_aes_config_t config;
   memset(&config, 0, sizeof(sl_si91x_aes_config_t));
 
-  config.aes_mode = SL_SI91X_AES_CTR;
-  config.encrypt_decrypt = SL_SI91X_AES_ENCRYPT;
-  config.msg = msg;
-  config.msg_length = sizeof(msg);
-  config.iv = iv;
-  config.key_config.b0.key_size = SL_SI91X_AES_KEY_SIZE_256;
-  config.key_config.b0.key_slot = 0;
+  config.aes_mode                   = SL_SI91X_AES_CTR;
+  config.encrypt_decrypt            = SL_SI91X_AES_ENCRYPT;
+  config.msg                        = msg;
+  config.msg_length                 = sizeof(msg);
+  config.iv                         = iv;
+  config.key_config.b0.key_size     = SL_SI91X_AES_KEY_SIZE_256;
+  config.key_config.b0.key_slot     = 0;
   config.key_config.b0.wrap_iv_mode = SL_SI91X_WRAP_IV_ECB_MODE;
-  config.key_config.b0.key_type = SL_SI91X_TRANSPARENT_KEY;
+  config.key_config.b0.key_type     = SL_SI91X_TRANSPARENT_KEY;
   memcpy(config.key_config.b0.key_buffer, &key, config.key_config.b0.key_size);
 
 #if USE_WRAPPED_KEYS
-  wrap_config.key_type = SL_SI91X_TRANSPARENT_KEY;
-  wrap_config.key_size = SL_SI91X_AES_KEY_SIZE_256;
+  wrap_config.key_type     = SL_SI91X_TRANSPARENT_KEY;
+  wrap_config.key_size     = SL_SI91X_AES_KEY_SIZE_256;
   wrap_config.wrap_iv_mode = SL_SI91X_WRAP_IV_ECB_MODE;
   memcpy(wrap_config.key_buffer, key, wrap_config.key_size);
 
@@ -329,7 +325,7 @@ sl_status_t aes_encryption(void)
     pkcs7_padding((const uint8_t *)config.msg, config.msg_length, SL_SI91X_AES_BLOCK_SIZE, &padded_data_length);
   SL_VERIFY_POINTER_OR_RETURN(padded_data, SL_STATUS_NULL_POINTER);
 
-  config.msg = padded_data;
+  config.msg        = padded_data;
   config.msg_length = padded_data_length;
 #endif
 
@@ -456,15 +452,15 @@ sl_status_t aes_decryption(void)
   sl_si91x_aes_config_t config;
   memset(&config, 0, sizeof(sl_si91x_aes_config_t));
 
-  config.aes_mode = SL_SI91X_AES_CTR;
-  config.encrypt_decrypt = SL_SI91X_AES_DECRYPT;
-  config.msg = encrypted_buffer;
-  config.msg_length = sizeof(msg);
-  config.iv = iv;
-  config.key_config.b0.key_size = SL_SI91X_AES_KEY_SIZE_256;
-  config.key_config.b0.key_slot = 0;
+  config.aes_mode                   = SL_SI91X_AES_CTR;
+  config.encrypt_decrypt            = SL_SI91X_AES_DECRYPT;
+  config.msg                        = encrypted_buffer;
+  config.msg_length                 = sizeof(msg);
+  config.iv                         = iv;
+  config.key_config.b0.key_size     = SL_SI91X_AES_KEY_SIZE_256;
+  config.key_config.b0.key_slot     = 0;
   config.key_config.b0.wrap_iv_mode = SL_SI91X_WRAP_IV_ECB_MODE;
-  config.key_config.b0.key_type = SL_SI91X_TRANSPARENT_KEY;
+  config.key_config.b0.key_type     = SL_SI91X_TRANSPARENT_KEY;
   memcpy(config.key_config.b0.key_buffer, &key, config.key_config.b0.key_size);
 
 #if USE_WRAPPED_KEYS

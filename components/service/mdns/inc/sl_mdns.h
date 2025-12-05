@@ -256,6 +256,7 @@ sl_status_t sl_mdns_update_service_message(const sl_mdns_t *mdns,
  * - Minimum timeout value must be greater than 250 ms.
  * - Internal stop handler is triggered automatically after 5 seconds of inactivity.
  * - `sl_mdns_register_service()` must be called before initiating discovery.
+ * - mDNS works best with the DTIM-based power save method. Performance issues may be observed with the listen interval-based power save method due to multicast packet loss.
  *
  * @param[in] mdns           mDNS instance handle of type @ref sl_mdns_t.
  * @param[in] interface      Network interface of type [sl_net_interface_t](../wiseconnect-api-reference-guide-nwk-mgmt/sl-net-constants#sl-net-interface-t).

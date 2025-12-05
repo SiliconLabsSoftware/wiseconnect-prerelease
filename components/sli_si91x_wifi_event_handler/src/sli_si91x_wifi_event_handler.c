@@ -713,7 +713,8 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
           case SLI_COMMON_RSP_SET_CONFIG:
           case SLI_COMMON_RSP_GET_CONFIG:
           case SLI_COMMON_RSP_DEBUG_LOG:
-          case SLI_COMMON_RSP_FEATURE_FRAME: {
+          case SLI_COMMON_RSP_FEATURE_FRAME:
+          case SLI_COMMON_RSP_NWP_LOGGING: {
             ++cmd_queues[SLI_WIFI_COMMON_CMD].rx_counter; // Increment the received counter for common commands
 
             // Check if this command is expected to have a response status

@@ -101,11 +101,7 @@ static const sl_wifi_device_configuration_t station_init_configuration = {
   .mac_address = NULL,
 #endif
   .band        = SL_SI91X_WC_WIFI_BAND,
-#ifndef SL_SI91X_ACX_MODULE
   .region_code = SL_SI91X_WC_REGION,
-#else
-  .region_code = IGNORE_REGION,
-#endif  
   .boot_config = {
                 .oper_mode                  = SL_SI91X_WC_OPERMODE,
                 .coex_mode                  = SL_SI91X_WC_COEXMODE,

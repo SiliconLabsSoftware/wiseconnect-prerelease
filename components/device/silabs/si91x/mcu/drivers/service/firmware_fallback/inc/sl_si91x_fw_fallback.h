@@ -433,10 +433,11 @@ sl_status_t sl_si91x_fallback_load_qspi_keys(uint32_t image_offset);
  *  @param[in]   m4_slot_image_offset  Base address of M4 firmware in active slot (A or B).
  *                                     This address points to the firmware image that will
  *                                     be used after the reset.
- *  @post        1. Must immediately call M4 updater API to branch the slot to the application
+ *  @post        1. After this API call, the updater application must branch to the active slot application.
+ *                  No other operations should not be performed after this API call.
  *               2. No NWP operations allowed between reset and M4 updater
- *               3. System will be in a transitional state until M4 updater completes
  ******************************************************************************/
+
 void sl_si91x_nwp_soft_reset_from_updater(const uint32_t m4_slot_image_offset);
 
 /// @} (end addtogroup Firmware_Fallback) */

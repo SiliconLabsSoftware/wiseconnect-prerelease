@@ -19,7 +19,7 @@
     value: '1'
   - name: SL_SI91X_ACX_MODULE
     value: '1'
-  - name: SLI_SI91X_DEVICE_WITH_EXT_ANTENNA
+  - name: SLI_SI91X_DEVICE_WITH_INT_RF_SWITCH
     value: '1'
 - provides:
   - name: siwn917y100lgnba

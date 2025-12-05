@@ -143,7 +143,7 @@ Configure the following parameters in [`gpio_detailed_example.c`](https://github
     #define DELAY            1000 // Delay for 1sec
   ```
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+> **Note**: When GPIO_PORT_GROUP_ABCD is enabled (set to 1), this macro transforms the example from controlling a single GPIO pin to controlling 5 GPIO pins simultaneously, creating a multi-port GPIO demonstration with synchronized toggling behavior. Connect logic analyzer to GPIO_10 (F11), GPIO_6 (P19), GPIO_27 (P29), GPIO_47 (P26), GPIO_49 (P30) on explorer kit [WPK(BRD4002) + BRD4338A] to observe toggles.
 
 ## Test the Application
 

@@ -878,7 +878,6 @@ sl_wifi_event_t sli_convert_si91x_event_to_sl_wifi_event(uint32_t command, uint1
   switch (command) {
     case SLI_WIFI_RSP_BG_SCAN:
     case SLI_WIFI_RSP_SCAN:
-    case SLI_WLAN_RSP_SCAN_RESULTS:
       return SL_WIFI_SCAN_RESULT_EVENT | fail_indication;
     case SLI_WIFI_RSP_JOIN:
       return SL_WIFI_JOIN_EVENT | fail_indication;
