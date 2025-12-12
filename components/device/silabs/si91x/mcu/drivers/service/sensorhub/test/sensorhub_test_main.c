@@ -61,6 +61,7 @@ void test_sensorhub_start_sensor(void);
 void test_sensorhub_stop_sensor(void);
 void test_sensorhub_notify_cb_register(void);
 void test_sensor_hub_start(void);
+void test_sl_si91x_fetch_adc_bus_intf_info(void);
 
 /******************************************************************************
  * This function will create the thread to the sensorhub_test task.
@@ -83,6 +84,7 @@ void sensorhub_test()
   RUN_TEST(test_sensor_hub_init, __LINE__);
   RUN_TEST(test_sensorhub_detect_sensors, __LINE__);
   RUN_TEST(test_sensorhub_create_sensor, __LINE__);
+  RUN_TEST(test_sl_si91x_fetch_adc_bus_intf_info, __LINE__);
   RUN_TEST(test_sensor_hub_start, __LINE__);
   RUN_TEST(test_sensorhub_start_sensor, __LINE__);
   RUN_TEST(test_sensorhub_stop_sensor, __LINE__);
@@ -121,7 +123,7 @@ void test_sensorhub_detect_sensors(void)
   //Sensor should interface otherwise controller will stuck here
   UnityPrintf("Testing with correct parameters \n");
   test_sensor_scan_cnt = sl_si91x_sensorhub_detect_sensors((sl_sensor_id_t *)&test_sensor_scan_info, 1);
-  TEST_ASSERT_EQUAL_HEX(NUMBER_OF_SENSOR, test_sensor_scan_cnt); //since number of sensors in testing is 1
+  TEST_ASSERT_EQUAL_HEX(NUMBER_OF_SENSORS, test_sensor_scan_cnt); //since number of sensors in testing is 1
   UnityPrintf("Status of API is correct, Sensor Hub detect sensor successfully \n");
 
   UnityPrintf("Sensor Hub detect sensor test completed \n");
@@ -246,7 +248,16 @@ void test_sensorhub_stop_sensor(void)
 
   UnityPrintf("Sensor Hub stop sensor test completed \n");
 }
-
+/*******************************************************************************
+ * Function to test fetch adc bus intf info
+ ******************************************************************************/
+void test_sl_si91x_fetch_adc_bus_intf_info(void)
+{
+  UnityPrintf("\n");
+  UnityPrintf("Testing fetch adc bus intf info  \n");
+  sl_adc_cfg_t adc_info = *sl_si91x_fetch_adc_bus_intf_info();
+  UnityPrintf("adc init:%d \n", adc_info.adc_init); //
+}
 /**************************************************************************/ /**
  * @fn           void test_sensor_event_handler()
  * @brief        This Sensor event handle to the Sensor HUB.

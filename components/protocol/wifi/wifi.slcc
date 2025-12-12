@@ -34,3 +34,4 @@ define:
 requires:
 - name: wifi_driver
 - name: sli_wifi
+- name: si91x_log_none

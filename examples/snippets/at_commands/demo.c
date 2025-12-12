@@ -27,6 +27,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
+
 #ifndef SLI_SI91X_MCU_INTERFACE
 #include "sl_iostream.h"
 #endif
@@ -38,10 +39,11 @@
 #include "at_command_data_mode.h"
 #include "sl_utility.h"
 #include "sl_common.h"
+#include "at_utility.h"
 #include <stdbool.h>
 #include <string.h>
 #include <inttypes.h>
-#include "at_utility.h"
+
 /******************************************************
  *                    Constants
  ******************************************************/
@@ -74,21 +76,14 @@ bool end_of_cmd = false;
 sl_status_t help_command_handler(console_args_t *arguments);
 sl_status_t echo_command_handler(console_args_t *arguments);
 
+#ifndef SLI_SI91X_MCU_INTERFACE
 extern void cache_uart_rx_data(const char character);
+#endif
 
 void print_command_args(const console_descriptive_command_t *command);
 
-extern sl_status_t process_buffer_line(const console_database_t *command_database,
-                                       console_args_t *args,
-                                       const console_descriptive_command_t **command);
-
 void application_start(const void *unused);
 void print_status(sl_status_t status);
-extern sl_status_t sl_board_enable_vcom(void);
-
-SL_WEAK void fs_init(void)
-{
-}
 
 /******************************************************
  *               Variable Definitions
@@ -113,8 +108,10 @@ const osThreadAttr_t thread_attributes = {
 
 void app_init(void)
 {
-  osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
-  fs_init();
+  print_mutex = osMutexNew(NULL);
+  assert(print_mutex != NULL);
+  osThreadId_t thread_id = osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
+  assert(thread_id != NULL);
 }
 
 #ifndef SLI_SI91X_MCU_INTERFACE
@@ -157,11 +154,11 @@ void application_start(const void *unused)
 
   SL_DEBUG_LOG("app start\n");
 
-  printf("Ready\r\n");
+  AT_PRINTF("Ready\r\n");
   console_line_ready = 0;
 
   while (1) {
-    printf("\r\n> \r\n");
+    AT_PRINTF("\r\n> \r\n");
 #ifndef SLI_SI91X_MCU_INTERFACE
     while (!end_of_cmd) {
       iostream_rx();
@@ -187,11 +184,9 @@ void application_start(const void *unused)
         print_status(result);
       }
     } else if (result == SL_STATUS_COMMAND_IS_INVALID) {
-      printf("\r\nArgs: ");
-      print_command_args(command);
       print_status(SL_STATUS_INVALID_PARAMETER);
     } else {
-      printf("\r\nNot supported\r\n");
+      AT_PRINTF("\r\nNot supported\r\n");
     }
     console_line_ready = 0;
   }
@@ -200,10 +195,11 @@ void application_start(const void *unused)
 void print_status(sl_status_t status)
 {
   if (status != SL_STATUS_OK) {
-    printf("\r\n%s %" PRIi32 "\r\n", "ERROR", (int32_t)status);
+    AT_PRINTF("\r\n%s %" PRIi32 "\r\n", "ERROR", (int32_t)status);
   }
 }
 
+// at+echo=<echo-flag>
 sl_status_t echo_command_handler(console_args_t *arguments)
 {
   echo_enable = GET_OPTIONAL_COMMAND_ARG(arguments, 0, 0, bool);
@@ -211,6 +207,7 @@ sl_status_t echo_command_handler(console_args_t *arguments)
   return SL_STATUS_OK;
 }
 
+// at+ready?
 sl_status_t ready_command_handler(console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
@@ -222,9 +219,9 @@ sl_status_t help_command_handler(console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
   for (uint8_t a = 0; a < console_command_database.length; ++a) {
-    printf("\r\n");
-    printf("at+%s", console_command_database.entries[a].key);
-    printf("  ");
+    AT_PRINTF("\r\n");
+    AT_PRINTF("at+%s", console_command_database.entries[a].key);
+    AT_PRINTF("  ");
     print_command_args((console_descriptive_command_t *)console_command_database.entries[a].value);
   }
   return SL_STATUS_OK;
@@ -237,36 +234,36 @@ void print_command_args(const console_descriptive_command_t *command)
   for (int a = 0; command->argument_list[a] != CONSOLE_ARG_END; ++a) {
     if (command->argument_list[a] & CONSOLE_ARG_OPTIONAL) {
       char option_char[2] = { (char)command->argument_list[a] & CONSOLE_ARG_OPTIONAL_CHARACTER_MASK, 0 };
-      printf("[-");
-      printf("%s", option_char);
-      printf(" ");
+      AT_PRINTF("[-");
+      AT_PRINTF("%s", option_char);
+      AT_PRINTF(" ");
       is_optional = true;
       continue;
     } else if (command->argument_list[a] & CONSOLE_ARG_ENUM) {
-      printf("{");
+      AT_PRINTF("{");
       uint8_t enum_index = command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK;
       for (int b = 0; console_argument_types[enum_index][b] != NULL;
            /* Increment occurs in internal logic */) {
-        printf("%s", console_argument_types[enum_index][b]);
+        AT_PRINTF("%s", console_argument_types[enum_index][b]);
         if (console_argument_types[enum_index][++b]) {
-          printf("|");
+          AT_PRINTF("|");
         }
       }
-      printf("}");
+      AT_PRINTF("}");
     } else {
-      printf("<");
+      AT_PRINTF("<");
       if (command->argument_help && command->argument_help[a]) {
-        printf("%s", command->argument_help[a]);
+        AT_PRINTF("%s", command->argument_help[a]);
       } else {
-        printf(console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
+        AT_PRINTF(console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
       }
-      printf(">");
+      AT_PRINTF(">");
     }
     if (is_optional) {
-      printf("] ");
+      AT_PRINTF("] ");
       is_optional = false;
     } else {
-      printf(" ");
+      AT_PRINTF(" ");
     }
   }
 }

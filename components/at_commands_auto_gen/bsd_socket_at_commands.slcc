@@ -86,10 +86,14 @@ template_contribution:
         description: "BSD socket close"
         arguments:
           - "int32"
-      receive:
+      recv:
         handler: bsd_socket_receive_from_handler
         description: "BSD socket receive from"
         arguments:
+          - "int32"
+          - "string"
+          - "uint16"
+          - "uint16"
           - "int32"
       send:
         handler: bsd_socket_send_to_handler

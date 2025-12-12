@@ -43,6 +43,9 @@ template_contribution:
           - "uint16"  # connect-timeout
           - "uint16"  # keep-alive-interval
           - "uint16"  # keep-alive-retries
+          - "string"  # host-name
+          - "uint8"   # enable-sni
+          - "string"  # sni-host-name
       mqtt-client-opt:
         handler: mqtt_client_opt_command_handler
         arguments:

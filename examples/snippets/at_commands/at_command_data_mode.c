@@ -31,6 +31,7 @@
 #include "console.h"
 #include "sl_constants.h"
 #include "at_command_data_mode.h"
+#include "at_utility.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <inttypes.h>
@@ -71,9 +72,9 @@ bool at_command_data_mode_process()
     if (data_mode.handler != NULL) {
       sl_status_t status = data_mode.handler(data_mode.buffer, data_mode.max_data, data_mode.user_data);
       if (status != SL_STATUS_OK) {
-        printf("ERROR %" PRIi32 "", (int32_t)status);
+        AT_PRINTF("ERROR %" PRIi32 "", (int32_t)status);
       }
-      printf("\r\n> \r\n");
+      AT_PRINTF("\r\n> \r\n");
     }
 
     data_mode.enable     = false;

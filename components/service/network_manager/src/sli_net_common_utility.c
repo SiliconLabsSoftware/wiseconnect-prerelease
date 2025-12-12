@@ -603,19 +603,9 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
     if (sli_handle_disconnect_or_failure_event(&ack_message, SL_NET_AUTO_JOIN_EVENT)) {
       SL_DEBUG_LOG("\r\n Connected via auto-join retry\r\n");
       sli_sync_client_state.state = SLI_NET_STATE_CONNECTED;
-      ack_message.event_flags     = SLI_NET_AUTO_JOIN_SUCCESS_Q_EVENT;
-      osStatus_t queue_status =
-        osMessageQueuePut(sli_network_manager_response_queue, &ack_message, SLI_NET_MSG_PRIO_NORMAL, 0);
-      if (queue_status != osOK) {
-        SL_DEBUG_LOG("Failed to send auto-join success ACK: %d\n", queue_status);
-      }
     } else {
-      ack_message.event_flags = SLI_NET_AUTO_JOIN_FAILURE_Q_EVENT;
-      osStatus_t queue_status =
-        osMessageQueuePut(sli_network_manager_response_queue, &ack_message, SLI_NET_MSG_PRIO_NORMAL, 0);
-      if (queue_status != osOK) {
-        SL_DEBUG_LOG("Failed to send auto-join failure ACK: %d\n", queue_status);
-      }
+      SL_DEBUG_LOG("\r\n Failed to connect via auto-join retry\r\n");
+      sli_sync_client_state.state = SLI_NET_STATE_DISCONNECTED;
     }
     return;
   }

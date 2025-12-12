@@ -21,11 +21,11 @@ component:
 - id: pm_ps2_component
 template_contribution:
 - name: user_files_ps2
-  value: ps1_state.o
+  value: ps1_state*
 - name: user_files_ps2
-  value: app.o
+  value: app*
 - name: user_files_ps2
-  value: main.o
+  value: main*
 define:
 - name: SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION
   value: '1'

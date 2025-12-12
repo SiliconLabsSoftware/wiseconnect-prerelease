@@ -862,6 +862,10 @@ sl_status_t sl_net_configure_ip(sl_net_interface_t interface,
   uint8_t vap_id                   = 0;
   sl_net_ip_configuration_t config = { 0 };
 
+  if (timeout == 0 || timeout & (1 << 30)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
   if (bypass_mode_enabled) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }

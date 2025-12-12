@@ -50,6 +50,7 @@ component_path:
  - path: components/common
  - path: components/console
  - path: components/console/variables
+ - path: components/device/stm32
  - path: components/device/silabs/si91x/wireless
  - path: components/device/silabs/si91x/wireless/asynchronous_socket
  - path: components/device/silabs/si91x/wireless/crypto

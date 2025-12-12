@@ -40,6 +40,7 @@
 #include "sli_wifi_types.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
+#include "sl_log_helper_si91x.h"
 #if defined(SLI_SI91X_SOCKETS)
 #include "sl_si91x_socket_utility.h"
 #endif
@@ -70,7 +71,7 @@ extern rsi_m4ta_desc_t crypto_desc[2];
 #include "rsi_wisemcu_hardware_setup.h"
 #endif
 
-#if defined(SLI_CAPTIVE_CORE_PRESENT) && (SLI_CAPTIVE_CORE_PRESENT == 1)
+#ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
 extern uint32_t sl_si91x_log_host_timesync_address;
 #endif
 
@@ -92,11 +93,22 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
 #endif
   sl_status_t status = SL_STATUS_OK;
   status             = sl_si91x_driver_init(configuration, event_handler);
-#if defined(SLI_CAPTIVE_CORE_PRESENT) && (SLI_CAPTIVE_CORE_PRESENT == 1)
-  status = sl_si91x_configure_timestamp_memory_location(sizeof(uint32_t), &sl_si91x_log_host_timesync_address);
-  if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\nTimestamp Memory Location Configuration Failed\r\n");
+#ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
+#if defined(SLI_SI91X_MCU_INTERFACE)
+  if (status == SL_STATUS_OK) {
+    status = sl_si91x_configure_timestamp_memory_location(sizeof(uint32_t), &sl_si91x_log_host_timesync_address);
+    if (status != SL_STATUS_OK) {
+      SL_PRINT_STRING_ERROR("\r\nTimestamp Memory Location Configuration Failed with error: 0x%lX\r\n", status);
+    }
+    sl_log_level_t level        = sl_log_get_loglevel();
+    sli_nwp_log_config_t config = { .log_config_level = (uint8_t)level };
+    status                      = sli_nwp_log_configure(&config);
+    if (status != SL_STATUS_IN_PROGRESS) {
+      SL_PRINT_STRING_ERROR("\r\nNWP Log Configuration Failed with error: 0x%lX\r\n", status);
+    }
+    status = SL_STATUS_OK;
   }
+#endif
 #endif
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
   if (status == SL_STATUS_OK) {

@@ -43,6 +43,7 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi_power_profile.h"
 #include "sl_utility.h"
+#include "sl_log_helper_si91x.h"
 
 #ifdef SL_NET_COMPONENT_INCLUDED
 #include "sl_net_types.h"
@@ -336,7 +337,7 @@ static sl_status_t bus_write_frame(sli_wifi_command_queue_t *queue,
 
   // Handle errors during frame writing
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n BUS_WRITE_ERROR \r\n");
+    SL_PRINT_STRING_ERROR("\r\n BUS_WRITE_ERROR \r\n");
     node->frame_status = SL_STATUS_BUS_ERROR;
 #ifdef SLI_SI91X_ENABLE_BLE
     // Notify BLE stack that transmission is done
@@ -354,10 +355,10 @@ static sl_status_t bus_write_frame(sli_wifi_command_queue_t *queue,
       sli_si91x_config_m4_dma_desc_on_reset();
     }
 #endif
-    SL_DEBUG_LOG("<>>>> Tx -> queueId : %u, frameId : 0x%x, length : %u\n",
-                 node->firmware_queue_id,
-                 packet->command,
-                 length);
+    SL_PRINT_STRING_DEBUG("<>>>> Tx -> queueId : %u, frameId : 0x%x, length : %u\n",
+                          node->firmware_queue_id,
+                          packet->command,
+                          length);
     if (packet->command) {
       // Set the global_queue_block flag if it is present in the packet's flags
       if (SI91X_PACKET_GLOBAL_QUEUE_BLOCK & node->flags) {
@@ -435,10 +436,10 @@ static sl_status_t bus_write_data_frame(sli_wifi_buffer_queue_t *queue)
 
   // Handle errors during frame writing
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n BUS_WRITE_ERROR \r\n");
+    SL_PRINT_STRING_ERROR("\r\n BUS_WRITE_ERROR \r\n");
     sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_BUS_ERROR);
   } else {
-    SL_DEBUG_LOG("<>>>> Tx -> queueId : %u, frameId : 0x%x, length : %u\n", 5, 0, length);
+    SL_PRINT_STRING_DEBUG("<>>>> Tx -> queueId : %u, frameId : 0x%x, length : %u\n", 5, 0, length);
   }
 
   if (current_performance_profile != HIGH_PERFORMANCE) {
@@ -659,11 +660,8 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
 #endif
 
     const sl_wifi_system_packet_t *response = (const sl_wifi_system_packet_t *)data;
-    SL_DEBUG_LOG("><<<< Rx -> queueId : %u, frameId : 0x%x, frameStatus: 0x%x, length : %u\n",
-                 queue_id,
-                 frame_type,
-                 frame_status,
-                 (response->length & (~(0xF000))));
+    SL_PRINT_STRING_DEBUG("><<<< Rx -> queueId : %u, frameId : 0x%x, ", queue_id, frame_type);
+    SL_PRINT_STRING_DEBUG("frameStatus: 0x%x, length : %u\n", frame_status, (response->length & (~(0xF000))));
 
     switch (queue_id) {
       case SLI_WLAN_MGMT_Q: {
@@ -727,7 +725,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
                                                       sizeof(sli_si91x_queue_packet_t),
                                                       1000);
               if (status != SL_STATUS_OK) {
-                SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+                SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
                 sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
                 sli_si91x_host_free_buffer(buffer);
                 break;
@@ -879,7 +877,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
                                                       sizeof(sli_si91x_queue_packet_t),
                                                       1000);
               if (status != SL_STATUS_OK) {
-                SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+                SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
                 sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
                 sli_si91x_host_free_buffer(buffer);
                 break;
@@ -948,7 +946,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
                                                       sizeof(sli_si91x_queue_packet_t),
                                                       1000);
               if (status != SL_STATUS_OK) {
-                SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+                SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
                 sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
                 sli_si91x_host_free_buffer(buffer);
                 break;
@@ -987,7 +985,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
                                                       sizeof(sli_si91x_queue_packet_t),
                                                       1000);
               if (status != SL_STATUS_OK) {
-                SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+                SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
                 sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
                 sli_si91x_host_free_buffer(buffer);
                 break;
@@ -1057,7 +1055,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
             status =
               sli_si91x_host_allocate_buffer(&packet, SL_WIFI_RX_FRAME_BUFFER, sizeof(sli_si91x_queue_packet_t), 1000);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+              SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
               sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
               sli_si91x_host_free_buffer(buffer);
               break;
@@ -1107,7 +1105,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
                                                       sizeof(sli_si91x_queue_packet_t),
                                                       1000);
               if (status != SL_STATUS_OK) {
-                SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+                SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
                 sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
                 sli_si91x_host_free_buffer(buffer);
                 break;
@@ -1201,7 +1199,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
                                                       sizeof(sli_si91x_queue_packet_t),
                                                       1000);
               if (status != SL_STATUS_OK) {
-                SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+                SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
                 sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
                 sli_si91x_host_free_buffer(buffer);
                 break;
@@ -1243,7 +1241,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
             status =
               sli_si91x_host_allocate_buffer(&packet, SL_WIFI_RX_FRAME_BUFFER, sizeof(sli_si91x_queue_packet_t), 1000);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+              SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
               sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
               sli_si91x_host_free_buffer(buffer);
               break;
@@ -1313,7 +1311,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
             status =
               sli_si91x_host_allocate_buffer(&packet, SL_WIFI_RX_FRAME_BUFFER, sizeof(sli_si91x_queue_packet_t), 1000);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+              SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
               sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
               sli_si91x_host_free_buffer(buffer);
               break;
@@ -1362,7 +1360,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
             status =
               sli_si91x_host_allocate_buffer(&packet, SL_WIFI_RX_FRAME_BUFFER, sizeof(sli_si91x_queue_packet_t), 1000);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+              SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
               sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
               sli_si91x_host_free_buffer(buffer);
               break;
@@ -1391,7 +1389,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
             status =
               sli_si91x_host_allocate_buffer(&packet, SL_WIFI_RX_FRAME_BUFFER, sizeof(sli_si91x_queue_packet_t), 1000);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+              SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
               sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
               break;
             }
@@ -1462,7 +1460,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
         data[1] &= 0xF;
         if (frame_type == SLI_RECEIVE_RAW_DATA) {
           // If the frame type is raw data reception
-          SL_DEBUG_LOG("Raw Data\n");
+          SL_PRINT_STRING_INFO("Raw Data\n");
 
 #if defined(SLI_SI91X_OFFLOAD_NETWORK_STACK) && !defined(SLI_SI91X_NETWORK_DUAL_STACK)
           // Offload only mode is not enabled
@@ -1563,7 +1561,7 @@ static inline void sli_si91x_wifi_handle_rx_events(uint32_t *event)
 
 #ifdef SLI_SI91X_ENABLE_BLE
       case SLI_BT_Q: {
-        SL_DEBUG_LOG("Received BLE packet\n");
+        SL_PRINT_STRING_INFO("Received BLE packet\n");
         // Increment the receive counter for the Bluetooth command
         ++cmd_queues[SLI_SI91X_BT_CMD].rx_counter;
 
@@ -2082,7 +2080,7 @@ sl_status_t sli_create_generic_rx_packet_from_params(sli_si91x_queue_packet_t **
                                           sizeof(sli_si91x_queue_packet_t),
                                           SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+    SL_PRINT_STRING_ERROR("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
     sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
     return SL_STATUS_ALLOCATION_FAILED;
   }

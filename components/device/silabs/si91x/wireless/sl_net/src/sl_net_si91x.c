@@ -406,6 +406,10 @@ sl_status_t sl_net_configure_ip(sl_net_interface_t interface,
   uint8_t vap_id                   = 0;
   sl_net_ip_configuration_t config = { 0 };
 
+  if (timeout == 0 || timeout & (1 << 30)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
   if (SL_NET_WIFI_CLIENT_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {
     vap_id                      = SL_WIFI_CLIENT_VAP_ID;
     dhcp_type[SLI_SI91X_CLIENT] = ip_config->mode;

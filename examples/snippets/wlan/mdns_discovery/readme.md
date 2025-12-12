@@ -134,6 +134,26 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ---
 
+## Setting Up an mDNS Test Environment
+
+For mDNS discovery to work, there must be an mDNS responder advertising services on the same network as the SiWx91x device. Without an external service to discover, the application will time out.
+
+### Linux (using Avahi)
+
+Install and publish a test service:
+
+```bash
+# Install avahi (if not already installed)
+sudo apt-get install avahi-utils
+
+# Publish an HTTP service
+avahi-publish-service "TestDevice" _http._tcp 80
+```
+
+> **Note**: The test machine running the mDNS responder must be connected to the **same network** as the SiWx91x device.
+
+---
+
 ## Behavior Overview
 
 After successfully connecting to the Access Point, the device initializes the mDNS stack.
@@ -158,12 +178,18 @@ TXT             Metadata associated with the service
 ```
 
 ## Expected Output: PTR Query
-The following image shows the expected console output when performing a PTR query. This includes the discovered instance name, service type, protocol, and TTL.
+The following image shows the expected console output when performing a PTR query for `_http._tcp.local.`. This includes the discovered instance name, service type, protocol, and TTL.
 
   ![mdns_discovery_output](resources/readme/mdns_ptr_query_response.png)
 
+### Performing an ANY Query (Optional)
 
-## Expected Output: ANY Query
-The following image shows the expected console output when performing an ANY query using _services._dns-sd._udp.local.. This returns all available PTR records on the network, which can then be used to initiate targeted queries for other record types.
+To query advertised service types on the network, modify the `service_query` in `app.c`:
 
-  ![mdns_discovery_output](resources/readme/mdns_any_query_response.png)
+```c
+sl_mdns_service_query_t service_query = { .service_type = "_services._dns-sd._udp.local.",
+                                          .query_type   = SL_MDNS_QUERY_TYPE_ANY,
+                                          .timeout      = 5000 };
+```
+
+This returns all PTR records on the network, which can then be used to initiate targeted queries for specific services.

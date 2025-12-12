@@ -103,7 +103,7 @@ typedef enum {
 
 #define SLI_WIFI_WAIT_FOR(x)          (sli_wifi_wait_period_t)(x)
 #define SLI_WIFI_WAIT_FOR_RESPONSE(x) (sli_wifi_wait_period_t)(SLI_WIFI_WAIT_FOR_RESPONSE_BIT | (x))
-
+#define SLI_SI91X_WAIT_FOR_EVER       SLI_WIFI_WAIT_FOR_EVER
 typedef enum { SET_REGION_CODE_FROM_BEACONS, SET_REGION_CODE_FROM_USER } sli_wifi_set_region_code_command_t;
 
 typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_ENCRYPTION } sli_wifi_encryption_t;

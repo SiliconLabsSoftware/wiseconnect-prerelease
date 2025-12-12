@@ -1259,25 +1259,36 @@ float get_min_sampling_time(uint8_t number_of_channel, adc_ch_config_t adcChConf
   return delay_return;
 }
 
-/*==============================================*/
 /**
- * @fn     rsi_error_t ADC_PinMux(uint8_t pos_input_pinsel, uint8_t neg_input_pinsel, uint8_t input_type)
- * @brief  This API used for configure GPIO pins in analog mode for ADC operation.
- * @param[in]  pos_inp_sel : Positive input selection for ADC channel.
- * @param[in] neg_inp_sel  : Negative input selection for ADC channel.
- * @param[in]  input_type  : Select single ended or differential ended input to ADC, 
- *                           - For Single ended : 0 
- *                           - Differential ended : 1 
- * @return rsi_error_t         : Execution status,This function return 'RSI_OK' on
- *                           successful execution.  
+ * @brief Configure ADC pin multiplexing for single-ended or differential mode.
+ *
+ * Logic:
+ * - Validate parameters for differential mode (negative pin must be POS0–POS9).
+ * - Configure positive pin if valid (POS0–POS19).
+ * - Configure negative pin only when input_type indicates differential mode.
+ *
+ * @param pos_input_pinsel  Positive input pin selection
+ * @param neg_input_pinsel  Negative input pin selection (used in differential mode)
+ * @param input_type        Mode indicator (0 = single-ended, 1 = differential)
+ *
+ * @return RSI_OK on success, ERROR_ADC_INVALID_ARG on invalid parameters
  */
 rsi_error_t ADC_PinMux(uint8_t pos_input_pinsel, uint8_t neg_input_pinsel, uint8_t input_type)
 {
-  // Configure positive input pins
+  // Validate parameters
+  // For differential mode, negative input pin must be valid (POS0–POS9)
+  if (input_type && (neg_input_pinsel > POS9)) {
+    return ERROR_ADC_INVALID_ARG;
+  }
+
+  // Configure positive input pins (valid range: POS0–POS19)
+  // Note: POS20+ may be valid for internal signals (opamp/DAC) that don't need GPIO pin mux
   if (pos_input_pinsel <= POS19) {
     ADC_ConfigurePositiveInputPin(pos_input_pinsel);
-  } else if (input_type) {
-    // Configure negative input pins (or differential mode inputs)
+  }
+
+  // Configure negative input pins for differential mode (valid range: POS0–POS9)
+  if (input_type) {
     ADC_ConfigureNegativeInputPin(neg_input_pinsel);
   }
 

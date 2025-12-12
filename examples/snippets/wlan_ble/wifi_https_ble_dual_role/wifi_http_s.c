@@ -96,6 +96,7 @@ extern bool powersave_cmd_given;
 sl_wifi_scan_result_t *scan_result          = NULL;
 static volatile bool scan_complete          = false;
 static volatile sl_status_t callback_status = SL_STATUS_OK;
+static osSemaphoreId_t scan_complete_sem    = NULL;
 uint16_t scanbuf_size = (sizeof(sl_wifi_scan_result_t) + (SL_WIFI_MAX_SCANNED_AP * sizeof(scan_result->scan_info[0])));
 
 sl_wifi_client_configuration_t access_point = { 0 };
@@ -209,11 +210,18 @@ sl_status_t wlan_app_scan_callback_handler(sl_wifi_event_t event,
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
     callback_status = status_code;
+    if (scan_complete_sem != NULL) {
+      osSemaphoreRelease(scan_complete_sem);
+    }
     return status_code;
   }
 
   if (result_length != 0) {
     callback_status = show_scan_results(result);
+  }
+
+  if (scan_complete_sem != NULL) {
+    osSemaphoreRelease(scan_complete_sem);
   }
 
   return SL_STATUS_OK;
@@ -316,6 +324,9 @@ int32_t rsi_wlan_app_task(void)
       } break;
       case RSI_WLAN_INITIAL_STATE: {
         rsi_wlan_app_callbacks_init(); //! register callback to initialize WLAN
+        if (scan_complete_sem == NULL) {
+          scan_complete_sem = osSemaphoreNew(1, 0, NULL);
+        }
         rsi_wlan_app_cb.state = RSI_WLAN_SCAN_STATE;
 
 #if ENABLE_NWP_POWER_SAVE
@@ -359,12 +370,11 @@ int32_t rsi_wlan_app_task(void)
         status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
         if (SL_STATUS_IN_PROGRESS == status) {
           LOG_PRINT("Scanning...\r\n");
-          const uint32_t start = osKernelGetTickCount();
-
-          while (!scan_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT) {
-            osThreadYield();
+          if (osSemaphoreAcquire(scan_complete_sem, WIFI_SCAN_TIMEOUT) == osOK) {
+            status = callback_status;
+          } else {
+            status = SL_STATUS_TIMEOUT;
           }
-          status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
         }
         if (status != RSI_SUCCESS) {
           LOG_PRINT("\r\n scan failed \r\n");

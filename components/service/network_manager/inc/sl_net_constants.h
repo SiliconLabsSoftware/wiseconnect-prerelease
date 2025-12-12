@@ -73,6 +73,10 @@ typedef enum {
   SL_NET_BLUETOOTH_INTERFACE     = (5 << 3),                       ///< Bluetooth Interface (not currently supported)
   SL_NET_ZWAVE_INTERFACE         = (6 << 3),                       ///< Z-Wave Interface (not currently supported)
 } sl_net_interface_t;
+
+/// This macro sets the wait period bit flag to indicate infinite wait time for network API calls.
+#define SL_NET_WAIT_FOREVER (1 << 31)
+
 /** @} */
 
 ///Maximum number of network interfaces supported

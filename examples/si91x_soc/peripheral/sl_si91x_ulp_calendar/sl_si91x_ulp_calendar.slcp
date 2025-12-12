@@ -31,17 +31,17 @@ define:
 - name: SL_SI91X_ULP_STATE_ENABLE
 template_contribution:
 - name: user_files_ps2
-  value: ulp_calendar_example.o
+  value: ulp_calendar_example*
 - name: user_files_ps2
-  value: app.o
+  value: app*
 - name: user_files_ps2
-  value: main.o
+  value: main*
 - name: user_files_ps2
-  value: sl_system_process_action.o
+  value: sl_system_process_action*
   condition:
   - sl_system
 - name: user_files_ps2
-  value: sl_event_handler.o
+  value: sl_event_handler*
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror

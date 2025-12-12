@@ -30,6 +30,7 @@
 
 #include "sl_board_configuration.h"
 #include "sl_rsi_utility.h"
+#include "sl_si91x_socket_constants.h"
 #include "console.h"
 #include "sl_net.h"
 #include "sl_http_client.h"
@@ -78,15 +79,6 @@ static http_client_request_t http_request = {
   .remaining      = 0,
   .client_request = { 0 },
 };
-
-static void http_print_char_buffer(char *buffer, uint32_t buffer_length)
-{
-  if (buffer == NULL)
-    return;
-  for (uint32_t index = 0; index < buffer_length; index++) {
-    printf("%c", buffer[index]);
-  }
-}
 
 static sl_status_t check_http_client_instance_id(console_args_t *arguments, uint8_t index)
 {
@@ -161,13 +153,13 @@ static sl_status_t http_response_callback_handler(const sl_http_client_t *client
     status = response->status;
   }
 
-  printf("at+HTTP_CLIENT_RESPONSE=%d,%d,%d,%" PRIu32 ",%d,%d,",
-         HTTP_CLIENT_DEFAULT_ID,
-         request->request_id,
-         event,
-         response->status,
-         response->http_response_code,
-         response->version);
+  AT_PRINTF("at+HTTP_CLIENT_RESPONSE=%d,%d,%d,%" PRIu32 ",%d,%d,",
+            HTTP_CLIENT_DEFAULT_ID,
+            request->request_id,
+            event,
+            response->status,
+            response->http_response_code,
+            response->version);
 
   uint32_t header_count                = 0;
   char output[HTTP_OUTPUT_BUFFER_SIZE] = { 0 }; // Buffer to store headers
@@ -195,12 +187,10 @@ static sl_status_t http_response_callback_handler(const sl_http_client_t *client
     header = (sl_http_client_header_t *)header->node.node;
   }
 
-  printf("%" PRIu32 ",%s,", header_count, output);
-
-  printf("%" PRIu32 ",%d,", response->end_of_data, response->data_length);
-  http_print_char_buffer((char *)response->data_buffer, response->data_length);
-  printf("\r\n>\r\n");
-
+  AT_PRINTF("%" PRIu32 ",%s,", header_count, output);
+  AT_PRINTF("%" PRIu32 ",%d,", response->end_of_data, response->data_length);
+  at_print_char_buffer((char *)response->data_buffer, response->data_length);
+  AT_PRINTF("\r\n>\r\n");
   return status;
 }
 
@@ -214,9 +204,7 @@ static sl_status_t http_client_req_body_send_buffer_handler(uint8_t *buffer, uin
   // Set the buffer and length in the request
   SL_CLEANUP_MALLOC(request->client_request.body);
   request->client_request.body = calloc(1, length);
-  if (request->client_request.body == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
+  SL_VERIFY_POINTER_OR_RETURN(request->client_request.body, SL_STATUS_ALLOCATION_FAILED);
   memcpy(request->client_request.body, buffer, length);
 
   PRINT_AT_CMD_SUCCESS;
@@ -266,12 +254,14 @@ sl_status_t http_client_mode_command_handler(console_args_t *arguments)
     return SL_STATUS_ALREADY_INITIALIZED;
   }
 
-  bool mode = GET_OPTIONAL_COMMAND_ARG(arguments, 0, false, bool);
+  uint8_t mode = GET_OPTIONAL_COMMAND_ARG(arguments, 0, 0, uint8_t);
 
-  if (mode) {
+  if (mode == 1) {
     si91x_init_configuration.boot_config.tcp_ip_feature_bit_map |= SL_SI91X_TCP_IP_FEAT_HTTP_CLIENT;
-  } else {
+  } else if (mode == 0) {
     si91x_init_configuration.boot_config.tcp_ip_feature_bit_map &= ~SL_SI91X_TCP_IP_FEAT_HTTP_CLIENT;
+  } else {
+    return SL_STATUS_INVALID_PARAMETER;
   }
 
   PRINT_AT_CMD_SUCCESS;
@@ -343,7 +333,7 @@ sl_status_t http_client_init_command_handler(console_args_t *arguments)
   VERIFY_STATUS_AND_RETURN(status);
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%d\r\n", HTTP_CLIENT_DEFAULT_ID);
+  AT_PRINTF("%d\r\n", HTTP_CLIENT_DEFAULT_ID);
 
   return SL_STATUS_OK;
 }
@@ -473,7 +463,7 @@ sl_status_t http_client_req_geturl_command_handler(console_args_t *arguments)
   http_client_request_t *request = &http_request;
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%s\r\n", request->client_request.resource ? (char *)request->client_request.resource : "");
+  AT_PRINTF("\"%s\"\r\n", request->client_request.resource ? (char *)request->client_request.resource : "");
 
   return SL_STATUS_OK;
 }
@@ -673,7 +663,7 @@ sl_status_t http_client_req_getallhd_command_handler(console_args_t *arguments)
   }
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%" PRIu32 "%s\r\n", header_count, output);
+  AT_PRINTF("%" PRIu32 "%s\r\n", header_count, output);
 
   return SL_STATUS_OK;
 }

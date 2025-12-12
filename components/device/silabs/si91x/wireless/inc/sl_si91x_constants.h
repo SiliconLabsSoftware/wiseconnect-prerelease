@@ -325,6 +325,9 @@ typedef enum {
   SLI_SI91X_HIGH_POWER_LEVEL
 } sli_si91x_transmit_power_level_t;
 
+/// This macro is an alias for @ref SLI_WIFI_WAIT_FOR_EVER and sets the wait period bit flag to indicate infinite wait time.
+/// This macro is deprecated, use SL_NET_WAIT_FOREVER instead.
+#define SLI_SI91X_WAIT_FOR_EVER SLI_WIFI_WAIT_FOR_EVER
 /*====================================================*/
 // Constant Defines
 // SPI Status

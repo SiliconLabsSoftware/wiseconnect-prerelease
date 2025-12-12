@@ -69,11 +69,11 @@
 
 #define CERTIFICATE_INDEX 0
 
-#define SUBSCRIBE_TO_TOPIC  "aws_status_555"     //! Subscribe Topic to receive the message from cloud
-#define PUBLISH_ON_TOPIC    "siwx91x_status_555" //! Publish Topic to send the status from application to cloud
-#define SUBSCRIBE_QOS       QOS1                 //! Quality of Service for subscribed topic "SUBSCRIBE_TO_TOPIC"
-#define PUBLISH_QOS         QOS1                 //! Quality of Service for publish topic "PUBLISH_ON_TOPIC"
-#define PUBLISH_PERIODICITY 1000                 //! Publish periodicity in milliseconds
+#define SUBSCRIBE_TO_TOPIC  "aws_status_555"     //! Subscribe Topic to receive the message from cloud.
+#define PUBLISH_ON_TOPIC    "siwx91x_status_555" //! Publish Topic to send the status from application to cloud.
+#define SUBSCRIBE_QOS       QOS1                 //! Quality of Service for subscribed topic "SUBSCRIBE_TO_TOPIC".
+#define PUBLISH_QOS         QOS1                 //! Quality of Service for publish topic "PUBLISH_ON_TOPIC".
+#define PUBLISH_PERIODICITY 1000                 //! Publish periodicity in milliseconds.
 #define MQTT_USERNAME       "username"
 #define MQTT_PASSWORD       "password"
 
@@ -82,7 +82,8 @@
 #if SH_AWS_ENABLE
 extern char mqtt_publish_payload[500];
 #else
-#define MQTT_PUBLISH_PAYLOAD "Hi from SiWx91x" //! Publish message
+#define MQTT_PUBLISH_PAYLOAD \
+  "Hi from SiWx91x" //! Publish message. Increase the AWS_IOT_MQTT_TX_BUF_LEN value in aws_iot_config.h for larger payloads.
 #endif
 
 #if ENABLE_NWP_POWER_SAVE

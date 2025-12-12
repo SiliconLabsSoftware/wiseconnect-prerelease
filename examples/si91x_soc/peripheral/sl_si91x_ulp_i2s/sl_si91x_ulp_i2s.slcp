@@ -39,17 +39,17 @@ toolchain_settings:
   value: -Wall -Werror
 template_contribution:
 - name: user_files_ps2
-  value: ulp_i2s_example.o
+  value: ulp_i2s_example*
 - name: user_files_ps2
-  value: app.o
+  value: app*
 - name: user_files_ps2
-  value: main.o
+  value: main*
 - name: user_files_ps2
-  value: sl_system_process_action.o
+  value: sl_system_process_action*
   condition:
   - sl_system
 - name: user_files_ps2
-  value: sl_event_handler.o
+  value: sl_event_handler*
 other_file:
 - path: resources/readme/setupdiagram.png
 - path: resources/uc_screen/i2s_lowpower_uc_screen.png

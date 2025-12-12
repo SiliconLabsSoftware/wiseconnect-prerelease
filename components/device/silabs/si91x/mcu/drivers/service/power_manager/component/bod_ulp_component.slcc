@@ -21,7 +21,7 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: bod_ps2
-    value: rsi_bod.o
+    value: rsi_bod*
   - name: bod_ps2
-    value: sl_si91x_bod.o
+    value: sl_si91x_bod*
 

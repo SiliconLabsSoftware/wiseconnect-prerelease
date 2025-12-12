@@ -1558,10 +1558,25 @@
     <properties key="readmeFiles" value="examples/snippets/wlan/wifi_net_dual_stack_nwp_m4/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Advanced" />
   </descriptors>
-  <descriptors name="wps_pbc_soc" label="Wi-Fi - WPS PBC (SoC)" description="Start WPS PBC to connect to an Access Point">
+  <descriptors name="wifi_wps_pbc_ncp" label="Wi-Fi - WPS PBC (NCP)" description="Start WPS Push Button Configuration (PBC) to connect to an Access Point">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/wlan/wps_pbc/wps_pbc_soc.slcp" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/wps_pbc/wifi_wps_pbc_ncp.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/wps_pbc/readme.md" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="wifi_wps_pbc_soc" label="Wi-Fi - WPS PBC (SoC)" description="Start WPS PBC to connect to an Access Point">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/wps_pbc/wifi_wps_pbc_soc.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4339b brd4340b brd4343q" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -2052,5 +2067,20 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/featured/low_power/powersave_standby_associated_tcp_client/readme.md" />
     <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="wifi_commander_soc" label="Wi-Fi - Commander (SoC)" description="Wi-Fi Commander application">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/demos/wifi_commander/wifi_commander_soc.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2911a brd4338a brd4342a brd4340a brd4343a brd4343b brd4339b brd4340b" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/demos/wifi_commander/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
 </model:MDescriptors>

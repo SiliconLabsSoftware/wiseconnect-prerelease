@@ -47,6 +47,7 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi_utility.h"
 #include "sli_wifi_power_profile.h"
+#include "sl_log_helper_si91x.h"
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sli_siwx917_soc.h"
 #include "rsi_rom_clks.h"
@@ -407,11 +408,11 @@ sl_status_t sli_command_engine_status_queue_init()
     if (sli_command_engine_status_msg_queue != NULL) {
       return SL_STATUS_OK;
     } else {
-      SL_DEBUG_LOG("\r\nERROR: FAILED TO CREATE COMMAND ENGINE MESSAGE QUEUE\r\n");
+      SL_PRINT_STRING_ERROR("\r\nERROR: FAILED TO CREATE COMMAND ENGINE MESSAGE QUEUE\r\n");
       return SL_STATUS_FAIL;
     }
   } else {
-    SL_DEBUG_LOG("\r\nERROR: MESSAGE QUEUE ALREADY EXISTS\r\n");
+    SL_PRINT_STRING_ERROR("\r\nERROR: MESSAGE QUEUE ALREADY EXISTS\r\n");
     return SL_STATUS_ALREADY_EXISTS;
   }
 }
@@ -425,11 +426,11 @@ sl_status_t sli_command_engine_status_queue_deinit()
       sli_command_engine_status_msg_queue = NULL; // Clear the queue handle
       return SL_STATUS_OK;
     } else {
-      SL_DEBUG_LOG("\r\n Failed to delete the queue.\r\n");
+      SL_PRINT_STRING_ERROR("\r\n Failed to delete the queue.\r\n");
       return SL_STATUS_FAIL;
     }
   } else {
-    SL_DEBUG_LOG("\r\n Queue was not initialized.\r\n");
+    SL_PRINT_STRING_ERROR("\r\n Queue was not initialized.\r\n");
     return SL_STATUS_NOT_INITIALIZED;
   }
 }
@@ -449,13 +450,13 @@ void sli_command_engine_status_queue_enqueue_and_set_event(sl_status_t status)
 {
   // Check if the queue is initialized
   if (sli_command_engine_status_msg_queue == NULL) {
-    SL_DEBUG_LOG("Command engine status queue not initialized\r\n");
+    SL_PRINT_STRING_ERROR("Command engine status queue not initialized\r\n");
     return;
   }
 
   // Attempt to enqueue the error_status into the message queue
   if (osMessageQueuePut(sli_command_engine_status_msg_queue, &status, 0, SLI_SI91X_ERROR_QUEUE_TIMEOUT_MS) != osOK) {
-    SL_DEBUG_LOG("Failed to enqueue status message into command engine status queue\r\n");
+    SL_PRINT_STRING_ERROR("Failed to enqueue status message into command engine status queue\r\n");
   } else {
     // Trigger the event once the error_status is successfully enqueued
     osEventFlagsSet(si91x_async_events, SLI_SI91X_NCP_HOST_COMMAND_ENGINE_STATUS_NOTIFICATION_EVENT);
@@ -654,7 +655,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     sli_m4_ta_interrupt_init();
     status = sli_si91x_submit_rx_pkt();
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG("\r\n RX packet submission failed with status: %d \r\n", status);
+      SL_PRINT_STRING_ERROR("\r\n RX packet submission failed with status: %d \r\n", status);
       return status;
     }
   }

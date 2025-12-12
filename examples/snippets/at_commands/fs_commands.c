@@ -35,6 +35,7 @@
 #include "sl_si91x_littlefs_hal.h"
 #include "at_utility.h"
 #include "at_command_data_mode.h"
+#include "fs_commands.h"
 #include <string.h>
 #include <inttypes.h>
 
@@ -115,15 +116,6 @@ const struct lfs_config cfg = {
   .block_cycles   = FS_BLOCK_CYCLES,   // Number of erase cycles before the block is considered worn out
 };
 
-static void fs_print_char_buffer(char *buffer, uint32_t buffer_length)
-{
-  if (buffer == NULL)
-    return;
-  for (uint32_t index = 0; index < buffer_length; index++) {
-    printf("%c", buffer[index]);
-  }
-}
-
 void fs_init(void)
 {
   sl_si91x_littlefs_qspi_init();
@@ -145,7 +137,7 @@ static sl_status_t fs_fwrite_send_buffer_handler(uint8_t *buffer, uint32_t lengt
   VERIFY_ERR_AND_RETURN(bytes_written);
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%" PRIi32 "\r\n", bytes_written);
+  AT_PRINTF("%" PRIi32 "\r\n", bytes_written);
   return SL_STATUS_OK;
 }
 #endif
@@ -228,12 +220,12 @@ sl_status_t fs_ls_command_handler(console_args_t *arguments)
   VERIFY_STATUS_AND_RETURN(status);
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%d", entries_count);
+  AT_PRINTF("%d", entries_count);
 
   for (int i = 0; i < entries_count; ++i) {
-    printf(" %s %d", entries[i].filename, entries[i].is_dir);
+    AT_PRINTF(" %s %d", entries[i].filename, entries[i].is_dir);
   }
-  printf("\r\n");
+  AT_PRINTF("\r\n");
 
   return SL_STATUS_OK;
 }
@@ -278,7 +270,7 @@ sl_status_t fs_fopen_command_handler(console_args_t *arguments)
   }
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%d\r\n", index);
+  AT_PRINTF("%d\r\n", index);
 
   return SL_STATUS_OK;
 #else
@@ -308,7 +300,7 @@ sl_status_t fs_fseek_command_handler(console_args_t *arguments)
   VERIFY_ERR_AND_RETURN(pos);
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%" PRIi32 "\r\n", pos);
+  AT_PRINTF("%" PRIi32 "\r\n", pos);
 
   return SL_STATUS_OK;
 }
@@ -331,7 +323,7 @@ sl_status_t fs_fsize_command_handler(console_args_t *arguments)
   VERIFY_ERR_AND_RETURN(size);
 
   PRINT_AT_CMD_SUCCESS;
-  printf("%" PRIi32 "\r\n", size);
+  AT_PRINTF("%" PRIi32 "\r\n", size);
   return SL_STATUS_OK;
 }
 
@@ -388,9 +380,8 @@ sl_status_t fs_fread_command_handler(console_args_t *arguments)
   }
 
   PRINT_AT_CMD_SUCCESS;
-  // TODO: Waiting to analyze printing the number of bytes
-  // printf("%" PRIi32 " ", bytes_read);
-  fs_print_char_buffer((char *)buffer, (uint32_t)bytes_read);
+  AT_PRINTF("%" PRIi32 " ", bytes_read);
+  at_print_char_buffer((char *)buffer, (uint32_t)bytes_read);
 
   SL_CLEANUP_MALLOC(buffer);
 

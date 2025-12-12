@@ -130,14 +130,14 @@ The application can be configured to suit your requirements and development envi
 - The following parameters are common to SoC and NCP.
 
  ```c
- #define SUBSCRIBE_TO_TOPIC        "aws_status"      //! Subscribe topic to receive the messages from AWS IoT cloud
- #define PUBLISH_ON_TOPIC          "siwx91x_status"  //! Publish topic to send the messages from application to AWS IoT cloud
- #define MQTT_PUBLISH_PAYLOAD      "Hi from SiWx91x" //! Publish message
- #define SUBSCRIBE_QOS             QOS1              //! Quality of Service for subscribed topic "SUBSCRIBE_TO_TOPIC"
- #define PUBLISH_QOS               QOS1              //! Quality of Service for publish topic "PUBLISH_ON_TOPIC"
- #define PUBLISH_PERIODICITY       30000             //! Publish periodicity in milliseconds
- #define ENABLE_NWP_POWER_SAVE         1             //! Set this macro to 1 for enabling NWP power save
- #define WRAP_PRIVATE_KEY              0             //! Enable this to wrap the private key
+ #define SUBSCRIBE_TO_TOPIC        "aws_status"      //! Subscribe topic to receive the messages from AWS IoT cloud.
+ #define PUBLISH_ON_TOPIC          "siwx91x_status"  //! Publish topic to send the messages from application to AWS IoT cloud.
+ #define MQTT_PUBLISH_PAYLOAD      "Hi from SiWx91x" //! Publish message. Increase the AWS_IOT_MQTT_TX_BUF_LEN value in aws_iot_config.h for larger payloads.
+ #define SUBSCRIBE_QOS             QOS1              //! Quality of Service for subscribed topic "SUBSCRIBE_TO_TOPIC".
+ #define PUBLISH_QOS               QOS1              //! Quality of Service for publish topic "PUBLISH_ON_TOPIC".
+ #define PUBLISH_PERIODICITY       30000             //! Publish periodicity in milliseconds.
+ #define ENABLE_NWP_POWER_SAVE         1             //! Set this macro to 1 for enabling NWP power save.
+ #define WRAP_PRIVATE_KEY              0             //! Enable this to wrap the private key.
  ```
 
 - `SUBSCRIBE_TO_TOPIC` refers to the topic to which the device subscribes.

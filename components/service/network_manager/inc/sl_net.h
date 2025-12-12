@@ -253,11 +253,10 @@ sl_status_t sl_net_get_interface_info(sl_net_interface_t interface, sl_net_inter
  * @param[in] ip_config
  *   Multicast IP address of type @ref sl_net_ip_configuration_t
  * @param[in] timeout
- *   The maximum time to wait for the IP address Configuration, in milliseconds.
+ *   Allowed range for finite timeout: [1,(1<<30)-1] milliseconds.
+ *   if bit (1 << 31) is set and (1<<30) bit is not set then it will be considered as indefinite timeout, irrespective of what's there in all other bits .
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
-@note
- * - This API doesn't support async mode operation, so passing 0 in timeout parameter leads to an error.
  ******************************************************************************/
 sl_status_t sl_net_configure_ip(sl_net_interface_t interface,
                                 const sl_net_ip_configuration_t *ip_config,

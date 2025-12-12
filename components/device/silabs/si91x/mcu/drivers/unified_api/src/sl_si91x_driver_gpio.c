@@ -546,7 +546,7 @@ sl_status_t sl_gpio_driver_init(void)
     gpio_group_int_callback_fptr[flag] = NULL;
   }
   for (flag = 0; flag < MAX_UULP_INT; flag++) {
-    sl_si91x_gpio_driver_clear_uulp_interrupt((uint8_t)flag);
+    sl_si91x_gpio_driver_clear_uulp_npss_interrupt((uint8_t)flag);
     gpio_uulp_pin_int_callback_fptr[flag] = NULL;
   }
   for (flag = 0; flag < GPIO_MAX_INTR_VALUE; flag++) {

@@ -22,20 +22,20 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: i2c_ps2
-    value: sl_si91x_peripheral_i2c.o
+    value: sl_si91x_peripheral_i2c*
   - name: i2c_ps2
-    value: sl_si91x_i2c.o
+    value: sl_si91x_i2c*
   - name: i2c_ps2
-    value: memcpy*.o
+    value: memcpy*
   - name: i2c_ps2
-    value: UDMA.o
+    value: UDMA*
   - name: i2c_ps2
-    value: rsi_udma.o
+    value: rsi_udma*
   - name: i2c_ps2
-    value: rsi_udma_wrapper.o
+    value: rsi_udma_wrapper*
   - name: i2c_ps2
-    value: sl_si91x_dma.o
+    value: sl_si91x_dma*
   - name: i2c_ps2
-    value: rsi_i2c.o
+    value: rsi_i2c*
   - name: i2c_ps2
-    value: sl_si91x_clock_manager.o
+    value: sl_si91x_clock_manager*

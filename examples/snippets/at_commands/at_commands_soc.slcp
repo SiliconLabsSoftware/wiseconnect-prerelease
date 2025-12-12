@@ -15,6 +15,7 @@ filter:
   - Beginner
 source:
 - path: demo.c
+- path: at_utility.c
 - path: at_command_parser.c
 - path: wifi_commands.c
 - path: network_commands.c
@@ -23,12 +24,17 @@ source:
 - path: mqtt_commands.c
 - path: http_commands.c
 - path: fs_commands.c
+- path: ble_commands.c
+- path: fwup_commands.c
+- path: uart_commands.c
 - path: at_command_data_mode.c
 include:
 - path: .
   file_list:
   - path: app.h
   - path: at_utility.h
+  - path: fs_commands.h
+  - path: ble_config.h
   - path: at_command_data_mode.h
 define:
 - name: SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT
@@ -62,11 +68,17 @@ component:
 - id: mqtt
 - id: http_at_commands
 - id: http_client
+- id: ble_at_commands
+- id: ble
 - id: fs_at_commands
 - id: sl_si91x_littlefs_common_flash
+- id: fwup_at_commands
+- id: uart_at_commands
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror
+- option: gcc_linker_option
+  value: -Wl,--wrap=Board_Debug_Init
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
@@ -84,6 +96,13 @@ other_file:
 - path: resources/readme/Ready.PNG
 - path: resources/readme/sta.png
 - path: resources/readme/at_power_save_comp.png
+template_contribution:
+- name: event_handler
+  value:
+    event: platform_init
+    include: fs_commands.h
+    handler: fs_init
+    priority: -9999
 ui_hints:
   highlight:
   - path: readme.md

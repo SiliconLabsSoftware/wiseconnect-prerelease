@@ -785,16 +785,11 @@ typedef struct {
  * The effective transmit power is subject to regional and device limitations. If the specified transmit power exceeds the
  * maximum supported value for that region, or if the specified transmit power exceeds the maximum supported value of the device,
  * the transmission would occur at the maximum supported transmit power.
- *
+ * 
  * @note
- * There are three available configurations for join_tx_power: low, medium, and high, which correspond to the values 0, 1, and 2, respectively.
- * Each configuration has a specified power level.
- *     Low power (7 +/- 1) dBm
- *     Medium power (10 +/- 1) dBm
- *     High power (18 +/- 2) dBm
- * An absolute power level can be set using the most significant bit (MSB) of an 8-bit value. This is achieved by setting the MSB to 128 (binary: 1000 0000).
- * To configure the absolute transmission power, add the desired Tx power to 128.
- * For example, setting the parameter to 148 (128 + 20) configures the transmission power to 20 dBm.
+ * Software has the Configuration support up to 31dbm, refer Datasheet for Maximum possible power.
+ * The device automatically picks the highest transmit power allowed for each data rate.
+ * If the configured power level is higher than what the device supports for that rate, it will limit the power to the maximum supported for that rate.
  *
  */
 typedef struct {

@@ -627,3 +627,29 @@ void NetworkDisconnect(Network *n)
   }
   return;
 }
+
+#if MQTT_TLS_ENABLE && !defined(MBEDTLS_PSA_CRYPTO_C)
+// No-op stub for psa_crypto_init to satisfy API linkage when PSA crypto is disabled.
+psa_status_t psa_crypto_init(void)
+{
+  // No-op: PSA crypto core is disabled, so initialization is not needed
+  return PSA_SUCCESS;
+}
+
+// Stub implementation of psa_generate_random that uses external RNG directly, bypassing PSA crypto core when disabled.
+psa_status_t psa_generate_random(uint8_t *output, size_t output_size)
+{
+  size_t output_length = 0;
+  psa_status_t status  = mbedtls_psa_external_get_random(NULL, output, output_size, &output_length);
+
+  if (status != PSA_SUCCESS) {
+    return status;
+  }
+
+  if (output_length != output_size) {
+    return PSA_ERROR_INSUFFICIENT_ENTROPY;
+  }
+
+  return PSA_SUCCESS;
+}
+#endif // MQTT_TLS_ENABLE && !defined(MBEDTLS_PSA_CRYPTO_C)

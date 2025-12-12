@@ -27,17 +27,17 @@ define:
 - name: SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION
 template_contribution:
 - name: user_files_ps2
-  value: ulp_i2c_leader_example.o
+  value: ulp_i2c_leader_example*
 - name: user_files_ps2
-  value: app.o
+  value: app*
 - name: user_files_ps2
-  value: main.o
+  value: main*
 - name: user_files_ps2
-  value: sl_system_process_action.o
+  value: sl_system_process_action*
   condition:
   - sl_system
 - name: user_files_ps2
-  value: sl_event_handler.o
+  value: sl_event_handler*
 source:
 - path: app.c
 - path: ulp_i2c_leader_example.c

@@ -16,3 +16,5 @@ source:
 provides:
     - name: sli_si91x_wifi_event_handler
     - name: wifi_event_handler
+requires:
+- name: si91x_log_none

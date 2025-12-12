@@ -142,16 +142,16 @@ SECTIONS
 		{% endif %}	
 
 		/* .ctors */
-		*crtbegin.o(.ctors)
-		*crtbegin?.o(.ctors)
-		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+		*crtbegin*(.ctors)
+		*crtbegin?*(.ctors)
+		*(EXCLUDE_FILE(*crtend?* *crtend*) .ctors)
 		*(SORT(.ctors.*))
 		*(.ctors)
 		
 		/* .dtors */
-		*crtbegin.o(.dtors)
-		*crtbegin?.o(.dtors)
-		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+		*crtbegin*(.dtors)
+		*crtbegin?*(.dtors)
+		*(EXCLUDE_FILE(*crtend?* *crtend*) .dtors)
 		*(SORT(.dtors.*))
 		*(.dtors)
 		
@@ -166,21 +166,6 @@ SECTIONS
 	{%- else %}			
 	} > ram 
 	{% endif %}	
-	
-  {%- if si91x_platform_core %}
-  .log_fmt :
-	{
-		. = ALIGN(4);
-		__log_start__ = .;
-		*(.log_fmt*)
-		. = ALIGN(4);
-		__log_end__ = .;		
-	{%- if flash_present %}			
-	} > rom 
-	{%- else %}			
-	} > ram 
-	{% endif %}
-	{% endif %}
 	
 	.ARM.extab : 
 	{
@@ -441,6 +426,22 @@ SECTIONS
 	} > udma1 AT> rom 
 {%- endif %}	
 {% endif %}
+
+{%- if si91x_platform_core %}
+  .log_fmt (INFO):
+	{
+		. = ALIGN(4);
+		__log_start__ = .;
+		*(.log_fmt*)
+		. = ALIGN(4);
+		__log_end__ = .;		
+	{%- if flash_present %}			
+	} > rom 
+	{%- else %}			
+	} > ram 
+	{% endif %}
+{% endif %}
+
 
 {%- if flash_present %}
 {%- if nvm3_enable %}

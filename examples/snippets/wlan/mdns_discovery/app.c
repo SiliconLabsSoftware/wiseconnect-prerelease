@@ -279,11 +279,9 @@ static void application_start(void *argument)
   }
   printf("\r\nService Added to MDNS\r\n");
 
-  sl_mdns_service_query_t service_query = {
-    .service_type = "_services._dns-sd._udp.local.", // Target service instance or hostname
-    .query_type   = SL_MDNS_QUERY_TYPE_ANY,          // Query type
-    .timeout      = 5000                             // Timeout in milliseconds
-  };
+  sl_mdns_service_query_t service_query = { .service_type = "_http._tcp.local.", // Query for HTTP services
+                                            .query_type   = SL_MDNS_QUERY_TYPE_PTR,
+                                            .timeout      = 5000 };
 
   status = sl_mdns_service_discovery_start(&mdns, SL_NET_WIFI_CLIENT_INTERFACE, &service_query);
   if (status != SL_STATUS_IN_PROGRESS) {

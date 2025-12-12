@@ -21,7 +21,7 @@
  ***************************  Local Variables   *******************************
  ******************************************************************************/
 // Mock button configuration
-sl_button_t mock_button = { .pin           = 2,
+sl_button_t mock_button = { .pin           = 7,
                             .port          = 0,
                             .button_number = 0,
 #ifdef SL_BUTTON_BTN0_PAD
@@ -202,7 +202,7 @@ void test_button_deinit(void)
   UnityPrintf("UULP button deinit passed\n");
   mock_button.port          = ULP;
   mock_button.button_number = 2;
-  status = sl_si91x_button_deinit(&mock_button); //invalid handle since button number not initialized or not registerd
+  status = sl_si91x_button_deinit(&mock_button); //invalid handle since button number not initialized or not registerd.
   TEST_ASSERT_EQUAL_HEX(SL_STATUS_INVALID_HANDLE, status);
   UnityPrintf("Invalid ULP button deinit handled correctly\n");
 }
