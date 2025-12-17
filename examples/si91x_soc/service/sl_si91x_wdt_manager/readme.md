@@ -18,7 +18,7 @@
 
 ## Purpose/Scope
 
-This example demonstrates WDT (Watchdog Timer) manager integration with LED blinking functionality. The LED blinks periodically every 1 second for 10 times, then the system intentionally hangs to demonstrate the WDT manager's ability to detect an unresponsive system and automatically reset it.
+This example demonstrates Watchdog Timer (WDT) manager integration with LED blinking functionality. The LED blinks periodically every 1 second for 10 times, then the system intentionally hangs to demonstrate the WDT manager's ability to detect an unresponsive system and automatically reset it.
 
 ## Overview
 
@@ -39,6 +39,7 @@ This example demonstrates WDT (Watchdog Timer) manager integration with LED blin
   - Provides system reset recovery if needed
 
 ## Prerequisites/Setup Requirements
+
 - Windows PC
 - Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A / BRD4342A / BRD4343A ]
 - SiWx917 AC1 Module Explorer Kit (BRD2708A)
@@ -63,20 +64,21 @@ This example demonstrates WDT (Watchdog Timer) manager integration with LED blin
 
 1. **Open Simplicity Studio**: Launch Simplicity Studio and navigate to your workspace.
 
-2. **Import the Example**: 
-   - Go to File → Import → Simplicity Studio → Examples
-   - Select "SL SI91X WDT Manager" from the Si91x examples
-   - Click "Finish" to import the project
+2. **Import the Example**:
+   - Go to **File → Import → Simplicity Studio → Examples**.
+   - Select **SL SI91X WDT Manager** from the Si91x examples.
+   - Click **Finish** to import the project.
 
 3. **Build and Flash**:
-   - Right-click on the project in Project Explorer
-   - Select "Build Project" to compile the code
-   - Connect your development board via USB
-   - Right-click on the project and select "Flash to Device"
+   - Right-click on the project in Project Explorer.
+   - Select **Build Project** to compile the code.
+   - Connect your development board via USB.
+   - Right-click on the project and select **Flash to Device**.
 
 ## Application Build Environment
 
 The example uses the following components:
+
 - **sl_main**: Main application framework
 - **sleeptimer**: For periodic LED toggling
 - **sl_si91x_led_917**: LED driver for Si91x
@@ -86,7 +88,7 @@ The example uses the following components:
 
 ### Configuration Options
 
-- **TOGGLE_DELAY_MS**: LED toggle interval (default: 1000ms)
+- **TOGGLE_DELAY_MS**: LED toggle interval (default: 1000 ms)
 - **LED_INSTANCE**: LED instance to use (default: led_led0)
 
 ## Test the Application
@@ -101,15 +103,15 @@ The example uses the following components:
 
 ## Expected Results
 
-- **LED Behavior**: LED0 blinks every 1 second for exactly 10 times, then stops
-- **Debug Output**: Console shows initialization messages, LED toggle count, and hang notification
-- **System Hang**: After 10 toggles, system disables interrupts and enters infinite loop
-- **WDT Reset**: WDT timer expires (cannot be kicked) and resets the system
-- **Cycle Repeat**: System restarts and the cycle repeats, demonstrating continuous WDT protection
+- **LED Behavior**: LED0 blinks every 1 second for exactly 10 times, then stops.
+- **Debug Output**: Console shows initialization messages, LED toggle count, and hang notification.
+- **System Hang**: After 10 toggles, system disables interrupts and enters infinite loop.
+- **WDT Reset**: WDT timer expires (cannot be kicked) and resets the system.
+- **Cycle Repeat**: System restarts and the cycle repeats, demonstrating continuous WDT protection.
 
 ### Debug Output Example
 
-```
+```text
 WDT Manager Example Started
 LED will toggle every 1000 ms
 After 10 LED toggles, system will hang and WDT will reset it
@@ -132,17 +134,17 @@ Watch for system reset in a few seconds...
 
 ## Key Features
 
-- **LED Blinking with Count**: Demonstrates basic GPIO/LED control with toggle counting
-- **WDT Manager Integration**: Shows how to integrate WDT manager for system reliability
-- **System Hang Simulation**: Intentionally creates system hang to test WDT functionality
-- **WDT Reset Demonstration**: Shows WDT manager detecting and recovering from system hang
-- **Automatic WDT Management**: No manual WDT configuration required
-- **Continuous Protection**: System automatically restarts and repeats the cycle
-- **Low Power**: Uses sleeptimer for efficient power management
+- **LED Blinking with Count**: Demonstrates basic GPIO/LED control with toggle counting.
+- **WDT Manager Integration**: Shows how to integrate WDT manager for system reliability.
+- **System Hang Simulation**: Intentionally creates system hang to test WDT functionality.
+- **WDT Reset Demonstration**: Shows WDT manager detecting and recovering from system hang.
+- **Automatic WDT Management**: No manual WDT configuration required.
+- **Continuous Protection**: System automatically restarts and repeats the cycle.
+- **Low Power**: Uses sleeptimer for efficient power management.
 
 ## Troubleshooting
 
-- **LED Not Blinking**: Check if the board is properly connected and flashed
-- **No Debug Output**: Ensure console is properly configured in Simplicity Studio
-- **System Resets**: If the system resets unexpectedly, check for infinite loops or blocking operations in your code
-- **WDT Manager Issues**: The WDT manager is automatically managed, but ensure no other components are interfering with the watchdog timer
+- **LED Not Blinking**: Check if the board is properly connected and flashed.
+- **No Debug Output**: Ensure console is properly configured in Simplicity Studio.
+- **System Resets**: If the system resets unexpectedly, check for infinite loops or blocking operations in your code.
+- **WDT Manager Issues**: The WDT manager is automatically managed, but ensure no other components are interfering with the watchdog timer.

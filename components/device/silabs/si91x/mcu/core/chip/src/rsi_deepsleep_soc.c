@@ -547,12 +547,6 @@ rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
   /* Save Stack pointer value and Control registers */
   RSI_Save_Context();
 #endif
-  if (!in_ps2_state && sleepType == SLEEP_WITH_RETENTION) {
-#if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)
-    /* If M4 is using XTAL then request NWP to turn OFF XTAL as M4 is going to sleep */
-    sli_si91x_xtal_turn_off_request_from_m4_to_TA();
-#endif
-  }
   /* Take backup before going to PowerSave */
   p2p_intr_status_bkp.tass_p2p_intr_mask_clr_bkp = TASS_P2P_INTR_MASK_CLR;
   p2p_intr_status_bkp.m4ss_p2p_intr_set_reg_bkp  = M4SS_P2P_INTR_SET_REG;

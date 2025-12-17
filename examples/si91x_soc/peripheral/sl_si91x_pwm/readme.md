@@ -19,7 +19,7 @@
 
 ## Purpose/Scope
 
-This application demonstrates the PWM (Pulse Width Modulation) to generate a periodic pulse waveform, which is useful in motor control and power control applications.
+This application demonstrates the Pulse Width Modulation (PWM) to generate a periodic pulse waveform, which is useful in motor control and power control applications.
 
 ## Overview
 
@@ -33,7 +33,7 @@ This application demonstrates the PWM (Pulse Width Modulation) to generate a per
 ## About Example Code
 
 - This example demonstrates the generation of periodic pulse waveform with 50% duty cycle and frequency of 25Khz.
-- Four macros are present that is DEAD_TIME, OVERRIDE, FAULT, SVT.
+- Four macros are present (that is, DEAD_TIME, OVERRIDE, FAULT, and SVT).
 - If **DEAD_TIME** is enabled:
   - DEAD_TIME: To perform correct status change of the power switches in the inverter leg, a PWM generator should insert a small amount of time between required switching edges for top and bottom switch. This time is called dead-time.
   - Dead time mode is applied only in complementary mode.

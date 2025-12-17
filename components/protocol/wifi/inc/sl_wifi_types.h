@@ -265,13 +265,13 @@ typedef struct {
  * @note The `channel_bitmap_2g4` uses the lower 14 bits to represent channels from 1 to 14,
  *       where channel 1 = (1 << 0), channel 2 = (1 << 1), and so on.
  * @note When `channel_bitmap_2g4` is not set (value is 0), the device will scan all available channels.
- * @note periodic_scan_interval is only applicable for SL_WIFI_SCAN_TYPE_ADV_SCAN of type @ref sl_wifi_scan_type_t.
+ * @note `periodic_scan_interval` is only applicable for SL_WIFI_SCAN_TYPE_ADV_SCAN of type @ref sl_wifi_scan_type_t.
  * @note To configure active_channel_time and passive_channel_time for active and passive scans, 
  *       use the sl_wifi_set_advanced_scan_configuration() API with @ref sl_wifi_advanced_scan_configuration_t.
  * @note Channel scanning behavior:
- *       - For active scans: Scans the channels specified in channel_bitmap_2g4. If set to 0, scans all available channels. Can be configured as a subset of channels.
- *       - For background scans (SL_WIFI_SCAN_TYPE_ADV_SCAN): Scans the channels that were originally specified in channel_bitmap_2g4 during the first scan. The channel bitmap cannot be modified for background scans.
- * @note 5GHz is not supported.
+ *       - For active scans: Scans the channels specified in `channel_bitmap_2g4`. If set to 0, scans all available channels. Can be configured as a subset of channels.
+ *       - For background scans (SL_WIFI_SCAN_TYPE_ADV_SCAN): Scans the channels that were originally specified in `channel_bitmap_2g4` during the first scan. The channel bitmap cannot be modified for background scans.
+ * @note 5 GHz is not supported.
  *
  * | Channel Number 2.4 GHz | channel_bitmap_2g4    |
  * |------------------------|-----------------------|
@@ -333,8 +333,8 @@ typedef struct {
  * Indicates the configuration parameters for setting up a Wi-Fi Access Point (AP).
  * 
  * @note When configuring AP interface in open security mode, the credential ID must be set to `SL_WIFI_NO_CREDENTIAL_ID`.
- * @note The security field refers to the security type of the Wi-Fi Access Point.
- * In Wi-Fi access point mode, the Access Point supports OPEN, WPA-PSK, WPA2-PSK, WPA/WPA2 Mixed, WPA3 security modes.
+ * @note The security field refers to the security type of the Wi-Fi AP.
+ * In Wi-Fi access-point mode, the AP supports OPEN, WPA-PSK, WPA2-PSK, WPA/WPA2 Mixed, and WPA3 security modes.
  * Valid configurations are:
  * - SL_WIFI_OPEN                       - For OPEN security mode (no encryption)
  * - SL_WIFI_WPA                        - For WPA-PSK security mode
@@ -342,9 +342,9 @@ typedef struct {
  * - SL_WIFI_WPA_WPA2_MIXED             - For WPA/WPA2 mixed security mode
  * - SL_WIFI_WPA3                       - For WPA3 security mode
  *
- * @note client_idle_timeout - This is the period after which AP will disconnect the station if there are no wireless exchanges from station to AP. Keep alive period is calculated in terms of 32 multiples of beacon interval i.e if there are no wireless transfers from station to AP with in
- * (32 x beacon_interval) milliseconds time period, station will be disconnected.
- * If null data based method is selected, AP checks the connectivity of station by sending null data packet. If station does not acknowledge the packet, that station will be disconnected from AP after 4 retries.
+ * @note client_idle_timeout - This is the period after which the AP will disconnect the station if there are no wireless exchanges from the station to the AP. The keep-alive period is calculated in terms of 32 multiples of the beacon interval (i.e, if there are no wireless transfers from station to AP within a
+ * (32 x beacon_interval) milliseconds time period, the station will be disconnected).
+ * If null data-based method is selected, the AP checks the connectivity of the station by sending null data packet. If the station does not acknowledge the packet, that station will be disconnected from the AP after 4 retries.
  * The maximum valid range supported is up to 255.
  */
 typedef struct {
@@ -354,7 +354,7 @@ typedef struct {
   sl_wifi_channel_t channel;             ///< Channel configuration of the Access Point
   sl_wifi_rate_protocol_t rate_protocol; ///< Rate protocol of the Access Point
   sl_wifi_ap_flag_t
-    options; ///< Optional flags for AP configuration. @note Dynamic configurability of Hidden SSID is only available in APCONF when it is disabled in opermode.
+    options; ///< Optional flags for AP configuration. @note Dynamic configurability of hidden SSIDs is only available in APCONF when it is disabled in opermode.
   sl_wifi_credential_id_t credential_id; ///< ID of secure credentials
   uint8_t
     keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-types#sl-si91x-ap-keepalive-type-t)
@@ -851,7 +851,7 @@ typedef struct {
 
 /**
  * @enum sl_wifi_pll_mode_t
- * @brief Wi-Fi PLL (Phase-Locked Loop) mode selection.
+ * @brief Wi-Fi Phase-Locked Loop (PLL) mode selection.
  *
  * Specifies the PLL operating mode for Wi-Fi hardware, determining the clock frequency bandwidth.
  *
@@ -868,12 +868,12 @@ typedef enum {
  * @brief Wi-Fi power chain selection.
  *
  * This enum defines the available power chains for Wi-Fi operation.
- * - SL_WIFI_HP_CHAIN: High Power chain (default).
- * - SL_WIFI_LP_CHAIN: Low Power chain.
+ * - SL_WIFI_HP_CHAIN: High-power chain (default).
+ * - SL_WIFI_LP_CHAIN: Low-power chain.
  */
 typedef enum {
-  SL_WIFI_HP_CHAIN = 0, ///< High Power chain (default)
-  SL_WIFI_LP_CHAIN = 12 ///< Low Power chain
+  SL_WIFI_HP_CHAIN = 0, ///< High-power chain (default)
+  SL_WIFI_LP_CHAIN = 12 ///< Low-power chain
 } sl_wifi_power_chain_t;
 
 /**
@@ -1674,13 +1674,13 @@ typedef struct {
 typedef struct {
   uint16_t
     wlan_state; ///< WLAN state: 1 = connected, 0 = disconnected in station mode; number of stations connected in AP mode.
-  uint16_t channel_number; ///< Channel number of connected AP in station mode; channel number of the module in AP mode
+  uint16_t channel_number; ///< Channel number of connected AP in station mode; channel number of the module in AP mode.
   uint8_t ssid[SL_WIFI_SSID_LEN]; ///< SSID of connected AP in station mode; SSID of the module in AP mode
   uint8_t sec_type;               ///< Security type of connected AP is supported in station mode, but not in AP mode.
-  uint8_t psk_pmk[SL_WIFI_MAX_PSK_LENGTH]; ///< PSK for AP mode, PMK for station mode
-  uint8_t bssid[SL_WIFI_BSSID_LENGTH];     ///< BSSID address of connected AP in station mode; not supported in AP mode
+  uint8_t psk_pmk[SL_WIFI_MAX_PSK_LENGTH]; ///< PSK for AP mode, PMK for station mode.
+  uint8_t bssid[SL_WIFI_BSSID_LENGTH];     ///< BSSID address of connected AP in station mode; not supported in AP mode.
   uint8_t
-    wireless_mode; ///< Wireless mode used in connected AP (6 - AX, 4 - N, 3 - G, 1 - B) in station mode, not supported in AP mode
-  uint8_t mac_address[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< MAC address of the module
+    wireless_mode; ///< Wireless mode used in connected AP (6 - AX, 4 - N, 3 - G, 1 - B) in station mode; not supported in AP mode.
+  uint8_t mac_address[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< MAC address of the module.
 } sl_wifi_interface_info_t;
 /** @} */

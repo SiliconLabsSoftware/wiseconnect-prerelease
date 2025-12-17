@@ -411,7 +411,7 @@ sl_status_t sl_si91x_sysrtc_set_compare_output_gpio(sl_sysrtc_group_number_t gro
  * @brief To configure the PRS input pins for the SYSRTC capture channel of the selected group.
  * 
  * @details Configures GPIO-0 and GPIO-1 as input pins for the capture channel of group 0 and group 1, respectively.
- *          Sets pin mode, mux, and direction,and enables the input buffer for the pins.
+ *          Sets pin mode, mux, and direction, and enables the input buffer for the pins.
  * 
  * @pre Pre-conditions:
  *      - Enable and configure the capture channel of the respective group through

@@ -116,7 +116,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 3. The SiWx91x device enters into the BLE advertising mode, launch the **Simplicity Connect App(formerly EFR Connect App)** App.
 
-4. Click on the demo tab and select Wifi-Commissioning tile.
+4. Click on the **Demo** tab and select **Wi-Fi Commissioning** tile.
 
     ![](resources/readme/remote_screen1.png)
 
@@ -180,6 +180,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    ![](resources/readme/TCP_tx_console.png)
 
    **NOTE:** If the python command is not working, replace the python with py.
+
 
 
 > **Note** : The number of NAT entries is limited to 100.

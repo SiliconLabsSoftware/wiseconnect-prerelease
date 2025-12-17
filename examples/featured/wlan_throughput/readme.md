@@ -350,7 +350,6 @@ To measure TLS RX throughput, configure the SiWx91x as a TLS client and open a T
 ##### For NCP with EFR host:
   ![Figure: TLS_RX](resources/readme/TLS_RX_NCP.png)
 
-**Note:**
->  The captured reference images are measured in an isolated chamber. However, variations can be observed if throughputs are measured in dense environments, i.e., in a dense environment, we can observe less throughput.
+>**Note:** The captured reference images are measured in an isolated chamber. However, variations can be observed if throughputs are measured in dense environments, i.e., in a dense environment, we can observe less throughput.
 
-> **Note:** For UART NCP applications, the handshake feature bit (`SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE`) is enabled by default to ensure reliable socket connections and proper power save operation. You can control this feature using the `ENABLE_UART_NCP_BITMAP` macro in your preprocessor settings.
+> **Note:** For UART NCP applications, the handshake feature bit (`SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE`) is enabled by default to ensure reliable socket connections and proper power-save operation. You can control this feature by using the `ENABLE_UART_NCP_BITMAP` macro in your preprocessor settings.

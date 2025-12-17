@@ -257,7 +257,7 @@ sl_status_t sl_http_server_write_data(sl_http_server_t *handle, uint8_t *data, u
  *    adjusts the interface if the operation mode is concurrent.
  *
  * @note
- *    If this function not called, the HTTP server defaults to using the Access Point (AP) interface in concurrent mode. In standalone mode, it uses the respective mode's as default interface.
+ *    If this function not called, the HTTP server defaults to using the Access Point (AP) interface in concurrent mode. In standalone mode, it uses the respective mode as the default interface.
  *    It should be called before @ref sl_http_server_start to configure the desired interface.
  *
  * @note 

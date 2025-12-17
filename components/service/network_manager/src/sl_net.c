@@ -249,12 +249,13 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface)
   }
 
   if (status == SL_STATUS_OK) {
-    sl_net_interface_initialized[interface] = false;
-
-    // Deinitialize network manager thread only if no other interface is using it
-    if (!sli_is_any_interface_initialized()) {
-      status = sli_network_manager_deinit();
+    //Set the initialized flag of every interface to false.
+    for (size_t i = 0; i < SL_NET_INTERFACE_MAX; i++) {
+      sl_net_interface_initialized[i] = false;
     }
+
+    // Deinitialize network manager thread
+    status = sli_network_manager_deinit();
   }
   return status;
 }

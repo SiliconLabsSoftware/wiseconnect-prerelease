@@ -584,4 +584,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
   ![Figure: Energy Profiler Output](resources/readme/outputs_2.png)
 
-**NOTE**: The average current consumption may vary based on the environment, the above image is for reference.
+>**Note**: The average current consumption may vary based on the environment, the above image is for reference.

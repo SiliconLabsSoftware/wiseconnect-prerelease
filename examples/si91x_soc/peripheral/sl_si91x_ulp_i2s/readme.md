@@ -88,10 +88,10 @@ The data received should match the transmitted data.
 7. The `I2S1_LOOP_BACK` macro is used only for I2S loopback applications to avoid clock generation from the receiver block during transfer.
 8. SCK frequency is calculated using `SCK = 2 * bit_width * sampling rate`. By default, I2S0 uses I2S_PLL_CLK as a clock source. This can generate any frequency range mentioned in section 6.11.7 of the Si91x HRM.
 
-**Note**
->
-> - The exact I2S clock frequency may not be achieved as intended because the integral part of the calculated division factor is written into register ignoring decimal part.
->
+   >**Note:**
+   >
+   > - The exact I2S clock frequency may not be achieved as intended because the integral part of the calculated division factor is written into register ignoring decimal part.
+   >
 9. By default, ULP_I2S/I2S1 uses ULP_I2S_REF_CLK to support I2S operation in low-power states. This limits the maximum supported sampling frequency of ULP_I2S to 48kHz (32 MHz RC trims to 20MHz in  ULP_State).
 
 ## Prerequisites/Setup Requirements

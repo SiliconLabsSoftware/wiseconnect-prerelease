@@ -194,11 +194,11 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
       sli_si91x_config_clocks_to_mhz_rc();
 
 #if SL_WIFI_COMPONENT_INCLUDED
-      /* Check's if SOC is in PS2 state. If so, skip switching off XTAL control from M4. */
+      /* Check's if SOC is in PS2 state. If so, skip writing to PLL registers as they are unavailable in this state. */
       if (!(M4_ULP_SLP_STATUS_REG & ULP_MODE_SWITCHED_NPSS)) {
         if (sl_si91x_is_device_initialized()) {
-          // Wake up NWP to turn OFF XTAL as M4 is going to sleep
-          P2P_STATUS_REG |= M4_WAKEUP_TA;
+          /* If M4 is using XTAL then request NWP to turn OFF XTAL as M4 is going to sleep */
+          sli_si91x_xtal_turn_off_request_from_m4_to_TA();
         }
       }
 #endif

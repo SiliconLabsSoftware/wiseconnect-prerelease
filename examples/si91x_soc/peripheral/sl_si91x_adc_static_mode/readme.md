@@ -50,7 +50,7 @@ This application demonstrates the ADC peripheral, including:
 #### Single-Channel Static Mode
 
 1. Performs one conversion at a time.
-2. Only one result is available at once.
+2. Only one result is available at a time.
 3. Each new conversion replaces the previous result.
 4. Application reads the latest value directly from the selected channel.
 

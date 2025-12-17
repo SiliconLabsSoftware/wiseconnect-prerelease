@@ -195,14 +195,17 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    ![Figure: output](resources/readme/output_gspi.png)
 
 > **Note:**
-> - To achieve 116MHz for non powersave application user needs to change the INTF_PLL Frequency in components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sl_si91x_clock_manager.c to 116MHz
-```c 
-  #define INTF_PLL_FREQ  (160000000UL) to (116000000UL) ///< Non Powersave Application      
-  ```
-> - To achieve 116MHz for powersave application user needs to change the clock scaling mode to performance and INTF_PLL Frequency in components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sli_si91x_clock_manager.c to 116MHz
-```c 
-#define PS4_PERFORMANCE_MODE_INTF_FREQ     (160000000UL) to (116000000UL)   ///< Powersave Application
-```
-This change affects Flash performance, as its operating frequency decreases from 80MHz to 58MHz.
-
-> - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
+>- To achieve 116 MHz for non-power-save applications, you must change the INTF_PLL frequency in `components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sl_si91x_clock_manager.c` to 116M Hz.
+>
+>   ```c 
+>   #define INTF_PLL_FREQ  (160000000UL) to (116000000UL) ///< Non Powersave Application      
+>   ```
+>
+>- To achieve 116 MHz for power-save applications, you must change the clock scaling mode to performance and INTF_PLL frequency in `components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sli_si91x_clock_manager.c` to 116 MHz.
+>
+>    ```c 
+>    #define PS4_PERFORMANCE_MODE_INTF_FREQ     (160000000UL) to (116000000UL)   ///< Powersave Application
+>    ```
+>   This change affects flash performance, as its operating frequency decreases from 80 MHz to 58 MHz.
+>
+>- Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.

@@ -162,7 +162,7 @@ sl_status_t sl_si91x_clock_manager_m4_set_core_clk(M4_SOC_CLK_SRC_SEL_T clk_sour
 
 /***************************************************************************/
 /**
- * @brief To set the selected PLL (Phase-Locked Loop) clock to the desired frequency.
+ * @brief To set the selected Phase-Locked Loop (PLL) clock to the desired frequency.
  * 
  * @param[in] pll_type Enum specifying the type of PLL to configure.
  * @param[in] pll_freq Desired frequency for the PLL clock (in MHz).

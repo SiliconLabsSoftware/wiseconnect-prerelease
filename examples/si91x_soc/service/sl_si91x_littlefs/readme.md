@@ -69,14 +69,10 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Test the Application
 
-1. Run the application 
-2. Observe boot_count on console output
- > ![Figure: Build run and Debug](resources/readme/file_system_output.png)
+1. Run the application.
+2. Observe boot_count on console output.
+   ![Figure: Build run and Debug](resources/readme/file_system_output.png)
 
- >
 > **Note**:
 >
->- When you run the littlefs example first time, after flash erase you see the error **(error: Corrupted dir pair at {0x0, 0x1})** because flash is not yet formatted for littlefs. Ignore the error when running the example the first time.
-
-
-
+>- When you run the littlefs example the first time, after flash erase you see the error `(error: Corrupted dir pair at {0x0, 0x1})` because flash is not yet formatted for littlefs. Ignore the error when running the example the first time.

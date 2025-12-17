@@ -390,14 +390,15 @@ Calculate the output voltage [Vout=-(Vin-Vref)*(R2/R1)+Vref].
 - Calculate the Output Voltage    
   [Vout2=(V2-V1)*R2/R1+Vref]
 
-   **NOTE:** 
+  **Notes:** 
   - The **Instrumentation Amplifier** configuration internally initializes and uses the **DAC peripheral** to provide reference voltage for the differential amplifier stage.
   - This DAC configuration is handled by the driver and does not require user intervention.
   - If you have enabled `DAC` in the OPAMP UC, this will  conflict with the internal DAC usage in Instrumentation Amplifier mode.
   - In the above formula, Vref (the DAC output voltage) depends on the OPAMP reference voltage.
-       - For an OPAMP reference voltage of 3.3V, Vref is approximately 1.65V.
-       - For an OPAMP reference voltage of 2.5V, Vref is approximately 1.26V.
-Please use the appropriate Vref value in formula based on your selected OPAMP reference voltage.
+    - For an OPAMP reference voltage of 3.3 V, Vref is approximately 1.65 V.
+    - For an OPAMP reference voltage of 2.5 V, Vref is approximately 1.26 V.
+
+    Use the appropriate Vref value in formula based on your selected OPAMP reference voltage.
 
 #### Trans-Impedance Amplifier
 

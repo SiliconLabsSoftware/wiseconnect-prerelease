@@ -121,18 +121,24 @@
  *  @ingroup SL_SI91X_BOOT_CONFIGURATION
  *	
  *   This section provides a reference to the Bluetooth Low Energy (BLE) feature bitmap in the boot configuration feature bitmaps.
+ * 
+ *   This bitmap is valid only when BIT(31) is set to 1 in custom_feature_bitmap, ext_custom_feature_bit_map, and bt_feature_bit_map.
  */
 
 /*! @defgroup SI91X_EXTENDED_BLE_CUSTOM_FEATURE_BITMAP Extended BLE Custom Feature Bitmap
  *  @ingroup SL_SI91X_BOOT_CONFIGURATION
  *	
  *   This section provides a reference to the Bluetooth Low Energy (BLE) extended custom feature bitmap in the boot configuration feature bitmaps.
+ * 
+ *   This bitmap is valid only when BIT(31) is set to 1 in ble_feature_bit_map, custom_feature_bitmap, ext_custom_feature_bit_map, and bt_feature_bit_map.
  */
 
 /*! @defgroup SI91X_BT_FEATURE_BITMAP Bluetooth Feature Bitmap
  *  @ingroup SL_SI91X_BOOT_CONFIGURATION
  *	
  *   This section provides a reference to the Bluetooth feature bitmap in the boot configuration feature bitmaps.
+ * 
+ *   This bitmap is valid only when BIT(31) is set to 1 in both custom_feature_bit_map and ext_custom_feature_bit_map.
  */
 
 /*! @defgroup SI91X_FEATURE_BITMAP Feature Bitmap
@@ -157,6 +163,8 @@
  *  @ingroup SL_SI91X_BOOT_CONFIGURATION
  *	
  *   This section provides a reference to the configuration feature bitmap in the boot configuration feature bitmaps.
+ * 
+ *   This bitmap is valid only when BIT(31) is set to 1 in both ext_tcp_ip_feature_bit_map and tcp_ip_feature_bit_map.
  */
 
 /*! @defgroup SI91X_CUSTOM_FEATURE_BITMAP Custom Feature Bitmap

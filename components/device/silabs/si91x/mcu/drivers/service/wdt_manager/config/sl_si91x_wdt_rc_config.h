@@ -40,12 +40,12 @@
 
 // <e> Watchdog Timer Configuration for M4
 // <i> Enable: Peripheral configuration is taken straight from the
-// configuration set in the universal configuration (UC).
-// <i> Disable: If the application demands it to be modified during runtime, use the
+// configuration set in the Universal Configurator (UC).
+// <i> Disable: If the application requires it to be modified during runtime, use the
 // sl_si91x_watchdog_set_configuration API to modify the peripheral
 // configuration.
 // <i> Default: 1
-// Note: SL_WDT_MANAGER_PRESENT_M4_UC_RC is now defined in the component file based on device type
+// Note: SL_WDT_MANAGER_PRESENT_M4_UC_RC is now defined in the component file based on device type.
 
 // <o SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_PERIOD> WDT Timeout Interval in milliseconds
 //   <SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_INDEX_5 => 1

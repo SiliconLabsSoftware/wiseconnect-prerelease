@@ -604,8 +604,7 @@ sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_inte
 
   sl_wifi_max_tx_power_t wifi_max_tx_power = sli_get_max_tx_power();
 
-  /* The Most Significant Bit serves as an indicator for toggling between absolute power value representation.
-  * When the MSB is set, the 'power_level' variable encodes the absolute power value using bits 2 through 6. */
+  /* The MSB is set by default, the 'power_level' variable encodes the absolute power value using bits 2 through 6. */
   join_request->power_level = (uint8_t)((wifi_max_tx_power.join_tx_power << 2) | ABSOLUTE_POWER_VALUE_TOGGLE);
 
   return SL_STATUS_OK;

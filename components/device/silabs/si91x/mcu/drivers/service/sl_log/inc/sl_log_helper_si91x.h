@@ -37,7 +37,10 @@
 extern "C" {
 #endif
 
+#ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_component_catalog.h"
+#endif
+
 #ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
 #include "sl_log_helper.h"
 #else

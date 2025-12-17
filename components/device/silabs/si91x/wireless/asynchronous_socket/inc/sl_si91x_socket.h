@@ -413,9 +413,9 @@ int sl_si91x_send_large_data(int socket, const uint8_t *buffer, size_t buffer_le
  * This function receives data from a connected socket and stores it in the specified buffer.
  * It is typically used on the client or server side to read incoming data from a remote peer.
  *
- * If the incoming TCP payload exceeds the provided buffer, only the first bufferLength bytes are returned;
- * any remaining bytes will be delivered by subsequent calls to `sl_si91x_recv()`.
- * the max buffer length for each supported protocol is as follows:
+ * If the incoming TCP payload exceeds the provided buffer, only the first bufferLength bytes are returned.
+ * Any remaining bytes will be delivered by subsequent calls to `sl_si91x_recv()`.
+ * The max buffer length for each supported protocol is as follows:
  *   - IPv4: 1460 bytes
  *   - IPv6: 1440 bytes
  *

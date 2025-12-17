@@ -180,7 +180,7 @@ typedef struct {
   /// data rate, 0=auto, 1=1 Mbps, 2=2 Mbps, 3=5.5Mbps, 4=11 Mbps, 12=54 Mbps
   uint8_t data_rate;
 
-  /// transmit power level, 0=low (6-9 dBm), 1=medium (10-14 dBm, 2=high (15-17 dBm)
+  /// transmit power level
   uint8_t power_level;
 
   /// pre-shared key, 63-byte string , last character is NULL

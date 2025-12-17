@@ -193,7 +193,7 @@ This functionality is controlled by the `SL_WIFI_ENABLE_VENDOR_IE` macro. Set th
 
 The valid range for unique IDs is from 1 to `SLI_WIFI_MAX_VENDOR_IE` (inclusive).
 
-###  Unique Identifier
+### Unique Identifier
 
 The unique identifier is the unique ID associated with each added vendor-specific IE. If a new vendor-specific IE needs to be added, `SL_WIFI_VENDOR_IE_AUTO_ASSIGN` should be used as the identifier. More details about `SL_WIFI_VENDOR_IE_AUTO_ASSIGN` can be found next section.
 
@@ -203,10 +203,11 @@ Use `SL_WIFI_VENDOR_IE_AUTO_ASSIGN` (value: 0) when you want the firmware to aut
 When a vendor-specific IE is successfully added, the firmware returns the actual assigned unique ID through the `fw_unique_id` output parameter of the `sl_wifi_add_vendor_ie` API. This firmware-assigned identifier must be passed as `unique_id` for subsequent operations like removing or updating the IE.
 
 **Important Notes:**
-- `unique_id` is an input parameter that specifies which vendor IE to operate on (use `SL_WIFI_VENDOR_IE_AUTO_ASSIGN` for adding new IEs or the `fw_unique_id` value for existing IEs)
-- `fw_unique_id` is an output parameter that receives the actual unique ID assigned by the firmware
-- Always use the returned `fw_unique_id` value for subsequent operations such as removal or updates
-- The addition operation will fail with an error status if no firmware slots are available
+
+- `unique_id` is an input parameter that specifies which vendor IE to operate on. (Use `SL_WIFI_VENDOR_IE_AUTO_ASSIGN` for adding new IEs or the `fw_unique_id` value for existing IEs.)
+- `fw_unique_id` is an output parameter that receives the actual unique ID assigned by the firmware.
+- Always use the returned `fw_unique_id` value for subsequent operations such as removal or updates.
+- The addition operation will fail with an error status if no firmware slots are available.
 
 ### Management Frame Bitmap
 
@@ -223,7 +224,7 @@ Set the `mgmt_frame_bitmap` field in the `sl_wifi_vendor_ie_t` structure using t
 ### IE Buffer Length
 
 The maximum length of the IE buffer is restricted. Refer to `SLI_WIFI_MAX_VENDOR_IE_BUFFER_LENGTH` for the precise value.
-Please note, IE length mentioned inside the buffer should not be greater than the length passed as the argument. Violation of this will result in error with `SL_STATUS_INVALID_PARAMETER` error code.
+IE length mentioned inside the buffer **should not** be greater than the length passed as the argument. Violation of this will result in error with a `SL_STATUS_INVALID_PARAMETER` error code.
 
 ### IE Buffer Format
 

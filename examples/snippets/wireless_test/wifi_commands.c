@@ -118,6 +118,14 @@ float pass_avg                           = 0;
 float fail_avg                           = 0;
 
 typedef struct {
+  sl_wifi_interface_t interface;
+  uint16_t channel;
+  uint32_t max_stats_count;
+} wifi_statistic_params_t;
+
+static wifi_statistic_params_t statistic_params = { 0 };
+
+typedef struct {
   sl_wifi_operation_mode_t operation_mode;
   sl_wifi_band_mode_t band;
   sl_wifi_region_code_t region_code;
@@ -661,6 +669,11 @@ sl_status_t wifi_stats_receive_handler(sl_wifi_event_t event,
 {
   UNUSED_PARAMETER(result_length);
   UNUSED_PARAMETER(arg);
+
+  if (stop_wifi_statistic_report) {
+    return SL_STATUS_OK;
+  }
+
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
     callback_status = status_code;
     return status_code;
@@ -949,14 +962,14 @@ sl_status_t wifi_get_operational_statistics_command_handler(console_args_t *argu
 
 void wifi_statistic_thread(const void *arg)
 {
-  console_args_t *arguments = (console_args_t *)arg;
+  UNUSED_PARAMETER(arg);
   sl_status_t status;
   sl_wifi_interface_t interface;
   sl_wifi_channel_t channel;
 
-  interface               = GET_OPTIONAL_COMMAND_ARG(arguments, 0, SL_WIFI_CLIENT_INTERFACE, sl_wifi_interface_t);
-  channel.channel         = GET_OPTIONAL_COMMAND_ARG(arguments, 1, 1, const uint16_t);
-  max_receive_stats_count = GET_OPTIONAL_COMMAND_ARG(arguments, 2, 10, const uint32_t);
+  interface               = statistic_params.interface;
+  channel.channel         = statistic_params.channel;
+  max_receive_stats_count = statistic_params.max_stats_count;
   stats_count             = 0;
   sl_wifi_set_stats_callback_v2(wifi_stats_receive_handler, NULL);
 
@@ -965,10 +978,11 @@ void wifi_statistic_thread(const void *arg)
     callback_status = SL_STATUS_IN_PROGRESS;
     while (stats_count <= max_receive_stats_count) {
       if (stop_wifi_statistic_report) {
-        osThreadExit();
+        break;
       }
       osThreadYield();
       if (stats_count == max_receive_stats_count && callback_status != SL_STATUS_IN_PROGRESS) {
+        stop_wifi_statistic_report = true;
 
         printf("\r\nCRC Average pass%% = %.6f,         CRC Average fail%% = %.6f \r\n",
                pass_avg / max_receive_stats_count,
@@ -980,18 +994,25 @@ void wifi_statistic_thread(const void *arg)
         total_crc_pass = 0;
         total_crc_fail = 0;
 
-        sl_wifi_stop_statistic_report(SL_WIFI_CLIENT_INTERFACE);
-        osThreadExit();
+        sl_wifi_stop_statistic_report(interface);
+        osDelay(100);
+        break;
       }
     }
   }
+
+  wifi_statistic_thread_id = NULL;
+  osThreadExit();
 }
 
 sl_status_t wifi_start_statistic_report_command_handler(console_args_t *arguments)
 {
+  statistic_params.interface = GET_OPTIONAL_COMMAND_ARG(arguments, 0, SL_WIFI_CLIENT_INTERFACE, sl_wifi_interface_t);
+  statistic_params.channel   = GET_OPTIONAL_COMMAND_ARG(arguments, 1, 1, uint16_t);
+  statistic_params.max_stats_count = GET_OPTIONAL_COMMAND_ARG(arguments, 2, 10, uint32_t);
+
   stop_wifi_statistic_report = false;
-  // Run the start_statistic_report on a different thread as we should be able to call stop_statistic_report while the start_statistic_report is still running.
-  wifi_statistic_thread_id = osThreadNew((osThreadFunc_t)wifi_statistic_thread, arguments, NULL);
+  wifi_statistic_thread_id   = osThreadNew((osThreadFunc_t)wifi_statistic_thread, NULL, NULL);
   if (wifi_statistic_thread_id == NULL) {
     return SL_STATUS_FAIL;
   }

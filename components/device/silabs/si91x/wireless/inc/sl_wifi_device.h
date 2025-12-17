@@ -1858,7 +1858,7 @@
  * @details
  * Sets the maximum number of BLE peripherals.
  
- * @note Maximum number of BLE peripherals is 8. 
+ * @note Maximum number of BLE peripherals is 8 and minimum number of BLE peripheral is 1. 
  * @note Bits 12-15 are used to set MAX_NBR_PERIPHERALS.
  */
 #define SL_SI91X_BLE_MAX_NBR_PERIPHERALS(max_num_of_peripherals) (max_num_of_peripherals << 12)
@@ -1895,7 +1895,7 @@
  * @details
  * Sets the maximum number of BLE Central devices.
  
- * @note Maximum number of BLE Centrals is 2.
+ * @note Maximum number of BLE Centrals is 2 and minimum number of BLE Central is 1.
  * @note Bits 27-28 are used to set BLE_PWR_INX.
  */
 #define SL_SI91X_BLE_MAX_NBR_CENTRALS(max_num_of_centrals) (max_num_of_centrals << 27)
@@ -2576,9 +2576,9 @@ typedef struct {
   sl_mac_address_t *
     mac_address; ///< MAC address of type [sl_mac_address_t](../wiseconnect-api-reference-guide-nwk-mgmt/sl-net-types#sl-mac-address-t).
   sl_wifi_band_mode_t
-    band; ///< Wi-Fi band of type [sl_wifi_band_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-band-mode-t).
+    band; ///< Wi-Fi band of type [sl_wifi_band_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-band-mode-t).
   sl_wifi_region_code_t
-    region_code; ///< Region code of type [sl_wifi_region_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-region-code-t).
+    region_code; ///< Region code of type [sl_wifi_region_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-regulatory-region-t).
   sl_wifi_system_boot_configuration_t
     boot_config; ///< Boot configuration. [sl_wifi_system_boot_configuration_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-boot-configuration-t).
   sl_wifi_system_dynamic_pool_t
@@ -2668,7 +2668,7 @@ typedef struct {
 /**
  * @struct sl_si91x_rsp_wireless_info_t
  * @brief si91x Specific Wireless information.
- * @note This structure is deprecated. Please use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-interface-info-t) for new implementations.
+ * @note This structure is deprecated. Use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-interface-info-t) for new implementations.
  */
 typedef struct {
 

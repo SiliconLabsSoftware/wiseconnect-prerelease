@@ -228,8 +228,8 @@ sl_status_t sl_si91x_flash_write(uint32_t address, const uint8_t *buffer, uint32
 
 /***************************************************************************/ /**
  *  @fn          sl_status_t sl_si91x_fw_fallback_ota_flash_write(const sl_si91x_fw_fallback_config_t *config, const uint8_t *data_buffer)
- *  @pre         1. Flash region must be erased before writing
- *               2. Data chunk size must not exceed 1024 bytes
+ *  @pre         1. Flash region must be erased before writing.
+ *               2. Data chunk size must not exceed 1024 bytes.
  *  @brief       Writes firmware data to flash during OTA updates.
  *               Call this function when receiving each chunk of OTA firmware data.
  *               Must be called after erasing flash and before verifying the image.
@@ -382,8 +382,8 @@ int16_t sl_si91x_select_default_nwp_fw(const uint8_t fw_image_number);
 
 /***************************************************************************/ /**
  *  @fn          sl_status_t sl_si91x_burn_nwp_security_version(uint32_t flash_address)
- *  @pre         1. Valid NWP firmware must be present at the specified flash address
- *               2. OTP memory must not be programmed with a higher security version
+ *  @pre         1. Valid NWP firmware must be present at the specified flash address.
+ *               2. OTP memory must not be programmed with a higher security version.
  *  @brief       Burns the NWP security version to OTP memory to prevent firmware rollback.
  *               Call this function after validating a new NWP firmware version and before
  *               using it. This operation is irreversible - once burned, only firmware
@@ -397,8 +397,8 @@ sl_status_t sl_si91x_burn_nwp_security_version(uint32_t flash_address);
 
 /***************************************************************************/ /**
  *  @fn          sl_status_t sl_si91x_fallback_load_qspi_keys(uint32_t image_offset)
- *  @pre         1. Firmware encryption must be enabled
- *               2. Valid firmware must exist at the specified offset
+ *  @pre         1. Firmware encryption must be enabled.
+ *               2. Valid firmware must exist at the specified offset.
  *  @brief       Loads QSPI keys for encrypted firmware execution.
  *               Call this function:
  *               - After system reset when using encrypted firmware
@@ -413,11 +413,11 @@ sl_status_t sl_si91x_fallback_load_qspi_keys(uint32_t image_offset);
 
 /***************************************************************************/ /**
  *  @fn          void sl_si91x_nwp_soft_reset_from_updater(const uint32_t m4_slot_image_offset)
- *  @pre         1. Device must be configured with A/B firmware slots
- *               2. M4 updater firmware must be running
- *               3. Active slot information must be retrieved
- *               4. Image verification must be successful
- *               5. QSPI keys must be loaded
+ *  @pre         1. Device must be configured with A/B firmware slots.
+ *               2. M4 updater firmware must be running.
+ *               3. Active slot information must be retrieved.
+ *               4. Image verification must be successful.
+ *               5. QSPI keys must be loaded.
  *  @brief       Performs a soft reset of the NWP firmware during A/B firmware fallback operations.
  *               This function is a critical part of the firmware update process that:
  *               - Ensures safe transition between firmware versions

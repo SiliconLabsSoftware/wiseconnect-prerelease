@@ -329,6 +329,8 @@ static void application_start(void *argument)
 {
   UNUSED_PARAMETER(argument);
   sl_status_t status;
+  sl_net_wifi_client_profile_t profile = { 0 };
+  sl_ip_address_t ip_address           = { 0 };
 
   status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
@@ -462,6 +464,20 @@ static void application_start(void *argument)
         printf("\r\nWLAN Connect Failed, Error Code : 0x%lX\r\n", status);
       } else {
         printf("\n WLAN connection is successful\n");
+
+        status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_0, &profile);
+        if (status != SL_STATUS_OK) {
+          printf("\r\nFailed to get client profile: 0x%lx\r\n", status);
+        }
+
+        status = sl_si91x_configure_ip_address(&profile.ip, SL_SI91X_WIFI_CLIENT_VAP_ID);
+        if (status != SL_STATUS_OK) {
+          printf("\r\nIPv4 address configuration is failed : 0x%lx\r\n", status);
+        }
+
+        ip_address.type = SL_IPV4;
+        memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
+        print_sl_ip_address(&ip_address);
       }
     } while (status != SL_STATUS_OK);
   } else {

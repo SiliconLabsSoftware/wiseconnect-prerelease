@@ -106,7 +106,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
       #define PING_PACKET_SIZE    64                 // Size of ping request packet
       ```
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+> **Note**: For recommended settings, see the [Recommendations Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the application
 
@@ -116,6 +116,6 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - Flash, run and debug the application.
 - After successful connection with the Access Point, the device starts sending ping requests to the given REMOTE_IP_ADDRESS with configured PING_PACKET_SIZE to check availability of target device.
 
-- In app.c file, when ping response comes from the remote node, it is known from the status parameter of the callback function (ping_callback_handler) registered.
+- In the `app.c` file, when the ping response arrives from the remote node, the application identifies it from the `status` parameter of the callback function (`ping_callback_handler`) registered.
 
   ![Station_Ping_Output](resources/readme/station_ping_output.png)

@@ -230,7 +230,7 @@ sl_status_t sl_si91x_efuse_write_bit(uint16_t address,
  * @brief To write a bit in the position of an 8-bit location in the specified eFuse address.
  * 
  * @details The API writes a bit to a specific 8-bit location position at the designated
- *          eFuse address. There is only one programming scheme, which is single bit programming.
+ *          eFuse address. There is only one programming scheme, which is single-bit programming.
  * 
  * @pre Pre-conditions:
  *      - \ref sl_si91x_efuse_init()

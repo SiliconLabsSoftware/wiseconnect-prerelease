@@ -892,13 +892,13 @@ sl_status_t sl_si91x_frequency_offset(const sl_si91x_freq_offset_t *frequency_ca
  *   This function sets the operational region of the Si91x device. The region is specified using the `sl_wifi_region_code_t` enumeration.
  * 
  * @param[in] operation_mode
- *   Operation mode of the device, specified by [sl_wifi_operation_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-operation-mode-t)..
+ *   Operation mode of the device, specified by [sl_wifi_operation_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-operation-mode-t).
  * 
  * @param[in] band
- *   Operational band of the device, specified by [sl_wifi_band_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-band-mode-t)..
+ *   Operational band of the device, specified by [sl_wifi_band_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-band-mode-t).
  * 
  * @param[in] region_code
- *   Region code to be set in the device, specified by [sl_wifi_region_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-region-code-t).
+ *   Region code to be set in the device, specified by [sl_wifi_region_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-regulatory-region-t).
  * 
  * @pre Pre-conditions:
  * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.

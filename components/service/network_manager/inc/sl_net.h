@@ -229,7 +229,7 @@ sl_status_t sl_net_down(sl_net_interface_t interface);
  * @param[in] interface
  *   The network interface to query. Supported values are SL_NET_WIFI_CLIENT_INTERFACE (Station mode) and SL_NET_WIFI_AP_INTERFACE (AP mode).
  * @param[out] info
- *   Pointer to a sl_net_interface_info_t structure that will be populated with the interface information.
+ *   Pointer to a `sl_net_interface_info_t` structure that will be populated with the interface information.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  ******************************************************************************/

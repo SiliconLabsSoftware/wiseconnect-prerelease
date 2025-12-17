@@ -4430,12 +4430,12 @@ int32_t rsi_ble_read_transmit_power(void *resp);
  *
  * @pre        Pre-conditions:
  *             \ref rsi_ble_connect() API needs to be called before this API.
- * @param[in]  dev_addr      - remote device address
- * @param[in]  start_handle  - start handle (index) of the remote device's service records
- * @param[in]  end_handle    - end handle (index) of the remote device's service records
+ * @param[in]  dev_addr      - Remote device address
+ * @param[in]  start_handle  - Start handle (index) of the remote device's service records
+ * @param[in]  end_handle    - End handle (index) of the remote device's service records
  * @param[out] p_prof_list   - NULL for p_prof_list because the profiles/services information will be provided asynchronously through the callback event.
  *
- * @note       p_prof_list structure should be set to NULL for Asynchronous APIs.
+ * @note       The p_prof_list structure should be set to NULL for asynchronous APIs.
  *
  * @return     The following values are returned:
  *               - Zero Value - Success
@@ -4576,14 +4576,14 @@ int32_t rsi_ble_get_inc_services_async(uint8_t *dev_addr,
  * @pre        Pre-conditions:
  *             - \ref rsi_ble_connect() API needs to be called before this API.
  *
- * @param[in]  dev_addr     - remote device address
- * @param[in]  start_handle - start handle (index) of the remote device's service records
- * @param[in]  end_handle   - end handle (index) of the remote device's service records
+ * @param[in]  dev_addr     - Remote device address
+ * @param[in]  start_handle - Start handle (index) of the remote device's service records
+ * @param[in]  end_handle   - End handle (index) of the remote device's service records
  * @param[in]  char_uuid    - UUID of the characteristic
  * @param[out] p_char_val   - NULL for p_char_val because the characteristic value from a specified characteristic service information will be provided asynchronously through the callback event. 
  *                            
  *
- * @note       p_char_val structure should be set to NULL for Asynchronous APIs.
+ * @note       The p_char_val structure should be set to NULL for Asynchronous APIs.
  *
  * @return     The following values are returned:
  *               - 0              - Success 
@@ -4620,13 +4620,13 @@ int32_t rsi_ble_get_char_value_by_uuid_async(uint8_t *dev_addr,
  * @pre        Pre-conditions:
  *             \ref rsi_ble_connect() API needs to be called before this API.
  *
- * @param[in]  dev_addr     - remote device address
- * @param[in]  start_handle - start handle (index) of the remote device's service records
- * @param[in]  end_handle   - end handle (index) of the remote device's service records
+ * @param[in]  dev_addr     - Remote device address
+ * @param[in]  start_handle - Start handle (index) of the remote device's service records
+ * @param[in]  end_handle   - End handle (index) of the remote device's service records
  * @param[out] p_att_desc   - NULL for p_att_desc because the characteristic descriptors list information will be provided asynchronously through the callback event. 
  *                            
  *
- * @note       p_att_desc structure should be set to NULL for Asynchronous APIs.
+ * @note       The p_att_desc structure should be set to NULL for Asynchronous APIs.
  *
  * @return     The following values are returned:
  *               - 0              - Success 
@@ -4660,12 +4660,12 @@ int32_t rsi_ble_get_att_descriptors_async(uint8_t *dev_addr,
  * @pre        Pre-conditions:
  *             \ref rsi_ble_connect() API needs to be called before this API.
  *
- * @param[in]  dev_addr   - remote device address
- * @param[in]  handle     - handle value of the attribute
+ * @param[in]  dev_addr   - Remote device address
+ * @param[in]  handle     - Handle value of the attribute
  * @param[out] p_att_val  - NULL for p_att_val because the attribute for the specified handle information will be provided asynchronously through the callback event. 
  *                          
  *
- * @note       p_att_val structure should be set to NULL for Asynchronous APIs.
+ * @note       The p_att_val structure should be set to NULL for Asynchronous APIs.
  *
  * @return     The following values are returned:
  *               - 0              - Success 
@@ -4698,13 +4698,13 @@ int32_t rsi_ble_get_att_value_async(uint8_t *dev_addr, uint16_t handle, rsi_ble_
  * @pre        Pre-conditions:
  *             \ref rsi_ble_connect() API needs to be called before this API.
  *
- * @param[in]  dev_addr        - remote device address
- * @param[in]  num_of_handlers - number of handles in the list
- * @param[in]  handles         - list of attribute handles
+ * @param[in]  dev_addr        - Remote device address
+ * @param[in]  num_of_handlers - Number of handles in the list
+ * @param[in]  handles         - List of attribute handles
  * @param[out] p_att_vals      - NULL for p_att_vals because the multiple attribute values for the specified multiple handles information will be provided asynchronously through the callback event. 
  *                               
  *
- * @note       p_att_vals structure should be set to NULL for Asynchronous APIs.
+ * @note       The p_att_vals structure should be set to NULL for asynchronous APIs.
  *
  * @return     The following values are returned:
  *               - 0              - Success 
@@ -4743,7 +4743,7 @@ int32_t rsi_ble_get_multiple_att_values_async(uint8_t *dev_addr,
  * @param[out] p_att_vals  - NULL for p_att_vals because the long attribute value information will be provided asynchronously through the callback event. 
  *                          
  *
- * @note       p_att_vals structure should be set to NULL for Asynchronous APIs.
+ * @note       The p_att_vals structure should be set to NULL for asynchronous APIs.
  *
  * @return     Possible return values:
  *             - 0              Success
@@ -4840,7 +4840,7 @@ int32_t rsi_ble_prepare_write_async(uint8_t *dev_addr,
 /**
  * @fn         int32_t rsi_ble_execute_write_async(uint8_t *dev_addr, uint8_t exe_flag)
  *
- * @brief      This API initiates a command to Execute the prepared attribute values.
+ * @brief      This API initiates a command to execute the prepared attribute values.
  *             The discovery results are provided asynchronously through callback functions:
  *               - \ref rsi_ble_on_event_write_resp_t - Invoked upon successful execute write operation.
  *               - \ref rsi_ble_on_gatt_error_resp_t  - Invoked when an error response is received.
@@ -4853,7 +4853,7 @@ int32_t rsi_ble_prepare_write_async(uint8_t *dev_addr,
  *             \ref rsi_ble_connect() API needs to be called before this API.
  *
  * @param[in]  dev_addr - Remote device address
- * @param[in]  exe_flag - Execute flag to write, possible values mentioned below:
+ * @param[in]  exe_flag - Execute flag to write. The possible values are listed below:
  *                          - 0 - BLE_ATT_EXECUTE_WRITE_CANCEL
  *                          - 1 - BLE_ATT_EXECUTE_PENDING_WRITES_IMMEDIATELY
  *

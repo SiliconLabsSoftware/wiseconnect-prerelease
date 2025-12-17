@@ -160,7 +160,7 @@ app_state_t app_cb; //! application control block
 //! IP address of Gateway
 #define DEFAULT_WIFI_AP_GATEWAY6_ADDRESS "2001:db8:0:1::121"
 
-static const sl_net_wifi_client_profile_t wifi_client_profile_4 = {
+static sl_net_wifi_client_profile_t wifi_client_profile_4 = {
     .config = {
         .channel.channel = SL_WIFI_AUTO_CHANNEL,
         .channel.band = SL_WIFI_AUTO_BAND,
@@ -178,7 +178,7 @@ static const sl_net_wifi_client_profile_t wifi_client_profile_4 = {
     }
 };
 
-static const sl_net_wifi_client_profile_t wifi_client_profile_6 = {
+static sl_net_wifi_client_profile_t wifi_client_profile_6 = {
     .config = {
         .channel.channel = SL_WIFI_AUTO_CHANNEL,
         .channel.band = SL_WIFI_AUTO_BAND,
@@ -544,6 +544,18 @@ static void application_start(void *argument)
 
         sl_wifi_set_callback_v2(SL_WIFI_CLIENT_CONNECTED_EVENTS, ap_connected_event_handler, NULL);
         sl_wifi_set_callback_v2(SL_WIFI_CLIENT_DISCONNECTED_EVENTS, ap_disconnected_event_handler, NULL);
+
+        wifi_client_profile_4.config.ssid.length = strlen((char *)WIFI_CLIENT_PROFILE_SSID);
+        memcpy(&wifi_client_profile_4.config.ssid.value,
+               WIFI_CLIENT_PROFILE_SSID,
+               wifi_client_profile_4.config.ssid.length);
+        wifi_client_profile_4.config.security = string_to_security_type(WIFI_CLIENT_SECURITY_TYPE);
+
+        wifi_client_profile_6.config.ssid.length = strlen((char *)WIFI_CLIENT_PROFILE_SSID);
+        memcpy(&wifi_client_profile_6.config.ssid.value,
+               WIFI_CLIENT_PROFILE_SSID,
+               wifi_client_profile_6.config.ssid.length);
+        wifi_client_profile_6.config.security = string_to_security_type(WIFI_CLIENT_SECURITY_TYPE);
 
         //  Keeping the station ipv4 record in profile_id_0
         status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_0, &wifi_client_profile_4);

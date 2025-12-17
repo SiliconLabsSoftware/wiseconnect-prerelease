@@ -100,26 +100,30 @@ To test the application, follow these steps:
 2. **Flash, run, and debug the application** on your target hardware.
 3. **Configure the baudrate:**
    - In `app.c`, set the baudrate for firmware flashing:
+
      ```c
      init.baudrate = 921600;
      ```
+
    - In Simplicity Studio Launch Console, set the vcom port baudrate:
+
      ```c
      serial vcom config speed 921600
      ```
-    - Setting the vcom port baudrate in Launch Console
+
+   - Setting the vcom port baudrate in Launch Console:
         1. Open Simplicity Studio.
         2. Go to the Launch Console for your connected device.
         3. Enter the above command in the console and press Enter.
-        4. Confirm the baudrate is set to 921600 before starting the firmware update.
+        4. Confirm the baudrate is set to **921600** before starting the firmware update.
 4. **Open Tera Term and set up the serial connection:**
-   - Set the baud rate to 115200 initially via `Setup > Serial port > Speed` and click `New setting`.
-   - ![Figure: Teraterm serial port settings](resources/readme/serial_port_settings.png)
+   - Set the baud rate to **115200** initially via **Setup > Serial port > Speed** and click **New setting**.
+     ![Figure: Teraterm serial port settings](resources/readme/serial_port_settings.png)
    - For faster firmware updates, change the baud rate to 921600.
-   - ![Figure: Teraterm serial port settings](resources/readme/serial_port_settings_921600.png)
+     ![Figure: Teraterm serial port settings](resources/readme/serial_port_settings_921600.png)
 5. **Start the firmware flashing process:**
    - After flashing the application, Tera Term should display the character `C` repeatedly, indicating readiness for xmodem transfer. If not, verify connections and baudrate settings.
-   - In Tera Term, go to `File > Transfer > XMODEM > Send` and select your firmware file (.rps).
+   - In Tera Term, go to **File > Transfer > XMODEM > Send** and select your firmware file (`.rps`).
    - For SoC boards, press and hold both the Reset and ISP buttons, then release the Reset button first, followed by the ISP button.
    - Begin the xmodem transfer within 90 seconds of seeing the `C` character, or Tera Term will cancel the transfer.
 6. **Monitor the update:**
@@ -196,7 +200,7 @@ sl_net_init: 0x4
 - In the navigation pane, go to the Console section.
 - In the Console section, select the RTT tab.
 - Enable the check box on Reset target on connect.
-- Before we start streaming the logs over RTT, make sure you have flashed the application.
+- Before you start streaming the logs over RTT, make sure you have flashed the application.
 ![Figure: RTT Console](resources/readme/rtt_console.png)
 - Click on connect
 
@@ -207,5 +211,6 @@ sl_net_init: 0x4
 |**Firmware Upgrade timing**|    3mins 58secs          |     4mins 37secs         |
 
 ## Appendix
+
 - [Secure Zone](https://www.silabs.com/documents/public/data-sheets/siwg917-datasheet.pdf)
 - [Secure Zone bit](https://www.silabs.com/documents/public/user-guides/ug574-siwx917-soc-manufacturing-utility-user-guide.pdf)

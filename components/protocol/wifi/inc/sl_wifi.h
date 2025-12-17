@@ -328,16 +328,16 @@ sl_status_t sl_wifi_get_mfp(sl_wifi_interface_t interface, sl_wifi_mfp_mode_t *c
 
 /***************************************************************************/ /**
  * @brief
- *   This function sets the PLL mode which determines the frequency bandwidth used by the Wi-Fi hardware.
+ *   This function sets the Phase-Locked Loop (PLL) mode which determines the frequency bandwidth used by the Wi-Fi hardware.
  *   The PLL mode affects power consumption and performance characteristics.
  * @param[in] pll_mode
  *   PLL mode configuration of type @ref sl_wifi_pll_mode_t
- *   - SL_WIFI_PLL_MODE_20MHZ : For 20MHz operations (default, lower power)
- *   - SL_WIFI_PLL_MODE_40MHZ : For 40MHz operations (higher performance)
+ *   - SL_WIFI_PLL_MODE_20MHZ : For 20 MHz operations (default, lower power)
+ *   - SL_WIFI_PLL_MODE_40MHZ : For 40 MHz operations (higher performance)
  * @note
- *   This API needs to be called before @ref sl_wifi_init
+ *   This API needs to be called before @ref sl_wifi_init.
  * @note
- *   SL_WIFI_PLL_MODE_40MHZ is not supported in coexistence mode
+ *   SL_WIFI_PLL_MODE_40MHZ is not supported in coexistence mode.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  ******************************************************************************/
@@ -348,8 +348,8 @@ sl_status_t sl_wifi_config_pll_mode(sl_wifi_pll_mode_t pll_mode);
  *   Configure the power chain for RX/TX: High Power (HP) or Low Power (LP).
  * @param[in] power_chain
  *   Power chain configuration of type @ref sl_wifi_power_chain_t
- *   - SL_WIFI_HP_CHAIN: High Power chain (default) — maximizes range and throughput, but increases power consumption.
- *   - SL_WIFI_LP_CHAIN: Low Power chain — reduces power usage, but may decrease range and data rates.
+ *   - SL_WIFI_HP_CHAIN: High-power chain (default) — maximizes range and throughput, but increases power consumption.
+ *   - SL_WIFI_LP_CHAIN: Low-power chain — reduces power usage, but may decrease range and data rates.
  * @note 
  *   Choose HP for performance-critical applications; choose LP for battery-sensitive use cases.
  *   This API must be called before @ref sl_wifi_init.
@@ -1137,6 +1137,8 @@ sl_status_t sl_wifi_disconnect(sl_wifi_interface_t interface);
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
  *   The RSSI value is valid only when the Wi-Fi client is connected to an access point. If the Wi-Fi client is disconnected, the RSSI value will be 0xFF.
+ * @note
+ *   The RSSI value is the average of the last four beacons received by the STA from the connected AP.
  ******************************************************************************/
 sl_status_t sl_wifi_get_signal_strength(sl_wifi_interface_t interface, int32_t *rssi);
 
@@ -1639,9 +1641,9 @@ sl_status_t sl_wifi_get_ap_client_count(sl_wifi_interface_t interface, uint32_t 
  * @note
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_set_performance_profile_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-power-api#sl-wifi-set-performance-profile-v2) API. This is retained for backward compatibility.
  * @note
- *   For POWER_SAVE_PROFILE with DEEP_SLEEP_WITHOUT_RAM_RETENTION, user should call [sl_net_deinit](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-deinit) before calling [sl_net_init](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-init).
+ *   For POWER_SAVE_PROFILE with DEEP_SLEEP_WITHOUT_RAM_RETENTION, call [sl_net_deinit](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-deinit) before calling [sl_net_init](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-init).
  * @note
- *   For further more details on connected and non-connected mode please refer https://www.silabs.com/documents/public/application-notes/an1430-siwx917-soc-low-power.pdf.
+ *   For more details about connected and non-connected mode, see https://www.silabs.com/documents/public/application-notes/an1430-siwx917-soc-low-power.pdf.
  ******************************************************************************/
 sl_status_t sl_wifi_set_performance_profile(const sl_wifi_performance_profile_t *profile)
   SL_DEPRECATED_API_WISECONNECT_3_5;
@@ -1662,9 +1664,9 @@ sl_status_t sl_wifi_set_performance_profile(const sl_wifi_performance_profile_t 
  *   This v2 API is defined due to a new configuration member beacon_miss_ignore_limit added to the structure sl_wifi_performance_profile_v2_t.
  *   Default value for beacon_miss_ignore_limit is 1. Recommended max value is 10. Higher value may cause interop issues.
  * @note 
- *   For POWER_SAVE_PROFILE with DEEP_SLEEP_WITHOUT_RAM_RETENTION, user should call [sl_net_deinit](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-deinit) before calling [sl_net_init](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-init).
+ *   For POWER_SAVE_PROFILE with DEEP_SLEEP_WITHOUT_RAM_RETENTION, call [sl_net_deinit](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-deinit) before calling [sl_net_init](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-init).
  * @note
- *   For further more details on connected and non-connected mode please refer https://www.silabs.com/documents/public/application-notes/an1430-siwx917-soc-low-power.pdf.
+ *   For more details about connected and non-connected mode, see https://www.silabs.com/documents/public/application-notes/an1430-siwx917-soc-low-power.pdf.
  ******************************************************************************/
 sl_status_t sl_wifi_set_performance_profile_v2(const sl_wifi_performance_profile_v2_t *profile);
 

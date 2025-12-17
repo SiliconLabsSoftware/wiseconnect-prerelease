@@ -91,9 +91,9 @@ typedef struct {
 
 /**
  * @brief
- * Retrieve information about currently opened sockets from the socket management.
+ * Retrieve information about currently opened sockets from the socket management system.
  * @param[out] socket_info_response
- *    Pointer to a sl_si91x_socket_info_response_t structure that will hold the response from the socket management.
+ *    Pointer to a sl_si91x_socket_info_response_t structure that will hold the response from the socket management system.
  * @return 
  * sl_status_t
 */

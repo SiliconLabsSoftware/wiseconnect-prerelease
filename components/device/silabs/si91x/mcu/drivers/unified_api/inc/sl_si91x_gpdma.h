@@ -549,15 +549,15 @@ sl_status_t sl_si91x_get_channel_fifo_size(uint32_t channel_no, uint32_t *fifo_s
 sl_status_t sl_si91x_gpdma_get_channel_status(uint32_t channel_number);
 
 /**
- * @brief This function deinitializes the GPDMA driver
+ * @brief This function deinitializes the GPDMA driver.
  *
- * @details This API 
- * 1. This function deinitializes the GPDMA driver by disabling the GPDMA clock and NVIC interrupt.
- * 2. It also clears any pending interrupts and resets the GPDMA driver context to NULL.
- * 3. It also clears the callback functions for transfer completion, descriptor fetch completion, HRESP error, and GPDMA controller error.
- * 4. It also resets the GPDMA resource data, channel allocation data to its default state.
+ * @details This API performs the following actions:
+ * 1. Deinitializes the GPDMA driver by disabling the GPDMA clock and NVIC interrupt.
+ * 2. Clears any pending interrupts and resets the GPDMA driver context to NULL.
+ * 3. Clears the callback functions for transfer completion, descriptor fetch completion, HRESP error, and GPDMA controller error.
+ * 4. Resets the GPDMA resource data and channel allocation data to the default state.
  *
- * @return status of the operation.
+ * @return Status of the operation.
  *        - SL_STATUS_OK: de-Initialization success.
  * For more information on status codes, see [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  */

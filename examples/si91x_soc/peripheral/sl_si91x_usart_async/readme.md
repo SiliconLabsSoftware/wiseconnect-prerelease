@@ -126,7 +126,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Configuring higher clock
 
-- To achieve baud rates exceeding 2 million bps, need to modify the clock source to INTF PLL CLK in the UC. 
+- To achieve baud rates exceeding 2 million bps, you need to modify the clock source to INTF PLL CLK in the UC. 
 
 > **Note:**
 >

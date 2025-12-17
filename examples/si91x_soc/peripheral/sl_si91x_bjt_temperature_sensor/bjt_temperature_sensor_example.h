@@ -30,8 +30,8 @@
  * 
  * The temperature measurement requires coordination of multiple subsystems:
  * - **BJT Circuit**: Provides temperature-dependent voltage (~2mV/°C change)
- * - **ADC Channel 0**: Measures both BJT output and band-gap reference.
- * - **OPAMP1**: Unity gain buffer for signal conditioning.
+ * - **ADC Channel 0**: Measures both BJT output and band-gap reference
+ * - **OPAMP1**: Unity gain buffer for signal conditioning
  * - **eFuse Calibration**: Factory values for measurement accuracy
  * 
  * @section BJT_TEMP_RESOURCES Resource Usage
@@ -58,13 +58,13 @@
 // Function Prototypes
 // -----------------------------------------------------------------------------
 /***************************************************************************/ /**
-* @brief Initialize the BJT temperature sensor system
+* @brief Initialize the BJT temperature sensor system.
 *
 * @details This function configures all subsystems required for temperature measurement:
 * 
 * **SUBSYSTEMS CONFIGURED:**
 * - ADC Channel 0: Set up for 12-bit single-ended measurements
-* - OPAMP1: Configured as unity gain buffer for signal conditioning
+* - OPAMP1: Configured as a unity gain buffer for signal conditioning
 * - Internal routing: Sets up ADC input switching between band-gap (20) and BJT (23)
 * - eFuse interface: Reads factory calibration values for accuracy
 * 
@@ -74,10 +74,10 @@
 * - Temperature sensor offset voltage (BJT-specific calibration)
 * 
 * **SYSTEM IMPACT:**
-* - ADC Channel 0 becomes dedicated to temperature measurement
-* - OPAMP1 becomes dedicated to temperature sensor buffering
-* - Other ADC channels and OPAMPs remain available
-* - Brief system clock change during eFuse access (automatically handled)
+* - ADC Channel 0 becomes dedicated to temperature measurement.
+* - OPAMP1 becomes dedicated to temperature sensor buffering.
+* - Other ADC channels and OPAMPs remain available.
+* - Brief system clock change during eFuse access (automatically handled).
 *
 * @pre None required - this is the initialization function
 * @post System ready for temperature measurements via bjt_temperature_sensor_example_process_action()
@@ -103,7 +103,7 @@ void bjt_temperature_sensor_example_init(void);
 * 5. Return calibrated temperature in Celsius
 * 
 * **WHY BOTH MEASUREMENTS ARE NEEDED:**
-* - Band-gap reference: Provides stable voltage reference (~1.2V, temperature-independent)
+* - Band-gap reference: Provides stable voltage reference (~1.2 V, temperature-independent)
 * - BJT output: Provides temperature-dependent voltage (~2mV/°C change)
 * - Ratio calculation: Eliminates ADC gain variations and supply voltage effects
 * 
@@ -114,7 +114,7 @@ void bjt_temperature_sensor_example_init(void);
 * 
 * **EXPECTED TEMPERATURE RANGE:** -40°C to +125°C
 * 
-* @pre bjt_temperature_sensor_example_init() must have been called successfully
+* @pre bjt_temperature_sensor_example_init() must have been called successfully.
 * @post Temperature reading displayed on debug console
 * 
 * @param none  

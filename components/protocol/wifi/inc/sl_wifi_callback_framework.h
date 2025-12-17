@@ -92,7 +92,7 @@ typedef sl_status_t (*sl_wifi_callback_function_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the scan results data received in bytes.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_scan_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-scan-callback).
+ *   Optional user-provided argument passed in [sl_wifi_set_scan_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-scan-callback).
  *
  * @pre Wi-Fi module must call @ref sl_wifi_start_scan to receive SL_WIFI_SCAN_RESULT_EVENTS event.
  *
@@ -132,7 +132,7 @@ typedef sl_status_t (*sl_wifi_scan_callback_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the payload received in bytes.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_stats_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-stats-callback).
+ *   Optional user-provided argument passed in [sl_wifi_set_stats_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-stats-callback).
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -266,7 +266,7 @@ typedef sl_status_t (*sl_wifi_stats_callback_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the data received in bytes. This parameter indicates the size of the data buffer pointed to by the `data` parameter.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_join_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-join-callback).
+ *   Optional user-provided argument passed in [sl_wifi_set_join_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-join-callback).
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -314,7 +314,7 @@ typedef sl_status_t (*sl_wifi_join_callback_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the data received in bytes.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_twt_config_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-twt-config-callback).
+ *   Optional user-provided argument passed in [sl_wifi_set_twt_config_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-twt-config-callback).
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -349,7 +349,7 @@ typedef sl_status_t (*sl_wifi_twt_config_callback_t)(sl_wifi_event_t event,
  * @param[out] data_length
  *   Reserved.
  * @param[out] optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_transceiver_callback](../pages/wifi-callback-framework#sl-wifi-set-transceiver-callback)
+ *   Optional user-provided argument passed in [sl_wifi_set_transceiver_callback](../pages/wifi-callback-framework#sl-wifi-set-transceiver-callback)
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/4.1/common/api/group-status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -450,7 +450,7 @@ typedef sl_status_t (*sl_wifi_callback_function_v2_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the scan results data received in bytes.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_scan_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-scan-callback-v2).
+ *   Optional user-provided argument passed in [sl_wifi_set_scan_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-scan-callback-v2).
  *
  * @pre Wi-Fi module must call @ref sl_wifi_start_scan to receive SL_WIFI_SCAN_RESULT_EVENTS event.
  *
@@ -493,7 +493,7 @@ typedef sl_status_t (*sl_wifi_scan_callback_v2_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the payload received in bytes.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_stats_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-stats-callback-v2).
+ *   Optional user-provided argument passed in [sl_wifi_set_stats_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-stats-callback-v2).
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -630,7 +630,7 @@ typedef sl_status_t (*sl_wifi_stats_callback_v2_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the data received in bytes. This parameter indicates the size of the data buffer pointed to by the `data` parameter.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_join_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-join-callback-v2).
+ *   Optional user-provided argument passed in [sl_wifi_set_join_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-join-callback-v2).
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -681,7 +681,7 @@ typedef sl_status_t (*sl_wifi_join_callback_v2_t)(sl_wifi_event_t event,
  * @param data_length
  *   Length of the data received in bytes.
  * @param optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_twt_config_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-twt-config-callback-v2).
+ *   Optional user-provided argument passed in [sl_wifi_set_twt_config_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-twt-config-callback-v2).
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -719,7 +719,7 @@ typedef sl_status_t (*sl_wifi_twt_config_callback_v2_t)(sl_wifi_event_t event,
  * @param[out] data_length
  *   Reserved.
  * @param[out] optional_arg
- *   Optional user provided argument passed in [sl_wifi_set_transceiver_callback_v2](../pages/wifi-callback-framework#sl-wifi-set-transceiver-callback-v2)
+ *   Optional user-provided argument passed in [sl_wifi_set_transceiver_callback_v2](../pages/wifi-callback-framework#sl-wifi-set-transceiver-callback-v2)
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/4.1/common/api/group-status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
@@ -748,7 +748,7 @@ typedef sl_status_t (*sl_wifi_transceiver_callback_v2_t)(sl_wifi_event_t event,
  * @param[in] function
  *   Function pointer to callback of type @ref sl_wifi_callback_function_t that would be invoked when an event in the specified group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_callback_function_t.
+ *   Optional user-provided argument to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_callback_function_t.
  * @pre Pre-conditions:
  * - The Wi-Fi module must be initialized by calling @ref sl_wifi_init before this API can be used.
  * @return
@@ -776,7 +776,7 @@ sl_status_t sl_wifi_set_callback(sl_wifi_event_group_t group,
  * @param[in] function
  *   Function pointer to callback of type @ref sl_wifi_callback_function_v2_t that would be invoked when an event in the specified group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_callback_function_v2_t.
+ *   Optional user-provided argument to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_callback_function_v2_t.
  * @pre Pre-conditions:
  * - The Wi-Fi module must be initialized by calling @ref sl_wifi_init before this API can be used.
  * @return
@@ -820,7 +820,7 @@ extern sl_status_t sl_wifi_default_event_handler(sl_wifi_event_t event, sl_wifi_
  * @param[in] function
  *   Callback function to register. This parameter specifies the callback function of type @ref sl_wifi_scan_callback_t that would be invoked when an event in the SL_WIFI_SCAN_RESULT_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This would be passed back to callback handler of type @ref sl_wifi_scan_callback_t.
+ *   Optional user-provided argument. This would be passed back to callback handler of type @ref sl_wifi_scan_callback_t.
  * @pre Pre-conditions:
  *   - @ref sl_wifi_init should be called before this API.
  * @return
@@ -847,7 +847,7 @@ static inline sl_status_t sl_wifi_set_scan_callback(sl_wifi_scan_callback_t func
  * @param[in] function
  *   Function pointer to callback of type @ref sl_wifi_join_callback_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_JOIN_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_twt_config_callback_t.
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_twt_config_callback_t.
  * @pre Pre-conditions:
  *   @ref sl_wifi_init should be called before this API.
  * @return
@@ -873,7 +873,7 @@ static inline sl_status_t sl_wifi_set_join_callback(sl_wifi_join_callback_t func
  * @param[in] function
  *   Function pointer to the callback of type @ref sl_wifi_twt_config_callback_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_TWT_RESPONSE_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This would be passed back to callback handler.
+ *   Optional user-provided argument. This would be passed back to callback handler.
  * @pre Pre-conditions:
  *   @ref sl_wifi_init should be called before this API.
  * @return
@@ -900,7 +900,7 @@ static inline sl_status_t sl_wifi_set_twt_config_callback(sl_wifi_twt_config_cal
  * @param[in] function
  *   Function pointer to the callback of type @ref sl_wifi_stats_callback_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_STATS_RESPONSE_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
  * @pre Pre-conditions:
  *   @ref sl_wifi_init should be called before this API.
  * @return
@@ -929,7 +929,7 @@ static inline sl_status_t sl_wifi_set_stats_callback(sl_wifi_stats_callback_t fu
  * @param[in] function
  *   Function pointer to the callback of type @ref sl_wifi_transceiver_callback_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_TRANSCEIVER_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
  * @pre Pre-conditions:
  * - @ref sl_wifi_init should be called before this API.
  * @return
@@ -956,7 +956,7 @@ static inline sl_status_t sl_wifi_set_transceiver_callback(sl_wifi_transceiver_c
  * @param[in] function
  *   Callback function to register. This parameter specifies the callback function of type @ref sl_wifi_scan_callback_v2_t that would be invoked when an event in the SL_WIFI_SCAN_RESULT_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This would be passed back to callback handler of type @ref sl_wifi_scan_callback_v2_t.
+ *   Optional user-provided argument. This would be passed back to callback handler of type @ref sl_wifi_scan_callback_v2_t.
  * @pre Pre-conditions:
  *   - @ref sl_wifi_init should be called before this API.
  * @return
@@ -984,7 +984,7 @@ static inline sl_status_t sl_wifi_set_scan_callback_v2(sl_wifi_scan_callback_v2_
  * @param[in] function
  *   Function pointer to callback of type @ref sl_wifi_join_callback_v2_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_JOIN_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_join_callback_v2_t.
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_join_callback_v2_t.
  * @pre Pre-conditions:
  *   @ref sl_wifi_init should be called before this API.
  * @return
@@ -1009,7 +1009,7 @@ static inline sl_status_t sl_wifi_set_join_callback_v2(sl_wifi_join_callback_v2_
  * @param[in] function
  *   Function pointer to the callback of type @ref sl_wifi_twt_config_callback_v2_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_TWT_RESPONSE_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This would be passed back to callback handler.
+ *   Optional user-provided argument. This would be passed back to callback handler.
  * @pre Pre-conditions:
  *   @ref sl_wifi_init should be called before this API.
  * @return
@@ -1038,7 +1038,7 @@ static inline sl_status_t sl_wifi_set_twt_config_callback_v2(sl_wifi_twt_config_
  * @param[in] function
  *   Function pointer to the callback of type @ref sl_wifi_stats_callback_v2_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_STATS_RESPONSE_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
  * @pre Pre-conditions:
  *   @ref sl_wifi_init should be called before this API.
  * @return
@@ -1065,7 +1065,7 @@ static inline sl_status_t sl_wifi_set_stats_callback_v2(sl_wifi_stats_callback_v
  * @param[in] function
  *   Function pointer to the callback of type @ref sl_wifi_transceiver_callback_v2_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_TRANSCEIVER_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler.
  * @pre Pre-conditions:
  * - @ref sl_wifi_init should be called before this API.
  * @return
@@ -1114,7 +1114,7 @@ static inline sl_status_t sl_wifi_get_saved_firmware_status(void)
  * @param[in] function
  *   Function pointer to callback of type @ref sl_wifi_command_engine_status_callback_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_COMMAND_ENGINE_STATUS_EVENTS group occurs.
  * @param[in] optional_arg
- *   Optional user provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_command_engine_status_callback_t.
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_command_engine_status_callback_t.
  * @pre Pre-conditions:
  *   @ref sl_wifi_init should be called before this API.
  * @return

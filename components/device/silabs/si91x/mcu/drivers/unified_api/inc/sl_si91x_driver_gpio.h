@@ -217,7 +217,7 @@ sl_status_t sl_si91x_gpio_driver_select_pad_driver_strength(uint8_t gpio_num,
 sl_status_t sl_si91x_gpio_driver_enable_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos_t pos);
 
 /***************************************************************************/ /**
- * @brief      Select the schmitt trigger for the HP instance of the GPIO peripheral.
+ * @brief      Select the Schmitt trigger for the HP instance of the GPIO peripheral.
  * @pre Pre-conditions:
  * -   \ref sl_si91x_gpio_driver_enable_clock()
  * -   \ref sl_si91x_gpio_driver_enable_pad_receiver()
@@ -724,7 +724,7 @@ sl_status_t sl_si91x_gpio_driver_select_ulp_pad_driver_strength(uint8_t gpio_num
 sl_status_t sl_si91x_gpio_driver_enable_ulp_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos_t pos);
 
 /***************************************************************************/ /**
- * @brief      Select the schmitt trigger for the ULP instance of the GPIO peripheral.
+ * @brief      Select the Schmitt trigger for the ULP instance of the GPIO peripheral.
  * @pre Pre-conditions:
  * -   \ref sl_si91x_gpio_driver_enable_clock()
  * -   \ref sl_si91x_gpio_driver_enable_ulp_pad_receiver()
