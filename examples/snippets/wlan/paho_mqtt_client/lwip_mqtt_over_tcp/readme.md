@@ -73,20 +73,21 @@ In the Project Explorer pane, expand the **config** folder and open the ``sl_net
 
   - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which the Wi-Fi network shall be advertised. The Si91X module is connected to it.
 
-   ```c
-   #define DEFAULT_WIFI_CLIENT_PROFILE_SSID "YOUR_AP_SSID"      
-    ```
+    ```c
+    #define DEFAULT_WIFI_CLIENT_PROFILE_SSID "YOUR_AP_SSID"      
+     ```
 
   - DEFAULT_WIFI_CLIENT_CREDENTIAL refers to the secret key if the access point is configured in WPA-PSK/WPA2-PSK security modes.
 
     ```c
-   #define DEFAULT_WIFI_CLIENT_CREDENTIAL "YOUR_AP_PASSPHRASE" 
-    ```
+    #define DEFAULT_WIFI_CLIENT_CREDENTIAL "YOUR_AP_PASSPHRASE" 
+     ```
   
-    - DEFAULT_WIFI_CLIENT_SECURITY_TYPE refers to the security type if the access point is configured in WPA/WPA2 or mixed security modes.
-    ```c
-   #define DEFAULT_WIFI_CLIENT_SECURITY_TYPE SL_WIFI_WPA2 
-    ```
+   - DEFAULT_WIFI_CLIENT_SECURITY_TYPE refers to the security type if the access point is configured in WPA/WPA2 or mixed security modes.
+
+     ```c
+     #define DEFAULT_WIFI_CLIENT_SECURITY_TYPE SL_WIFI_WPA2
+      ```
 
 - Other STA instance configurations can be modified if required in `default_wifi_client_profile` configuration structure.
 
@@ -112,7 +113,7 @@ In the Project Explorer pane, expand the **config** folder and open the ``sl_net
   - client.ipstack->transport_type = MQTT_TRANSPORT_TCP;
 
      ```c
-        This sets the transport type for the MQTT client to use TCP, enabling MQTT communication over a TCP connection.
+    This sets the transport type for the MQTT client to use TCP, enabling MQTT communication over a TCP connection.
      ```
 
   - CLIENT_ID refers to the unique ID with which the MQTT client connects to MQTT broker/server.
@@ -124,7 +125,7 @@ In the Project Explorer pane, expand the **config** folder and open the ``sl_net
   - PUBLISH_MESSAGE refers to message that would be published by MQTT client.
 
      ```c
-     uint8_t publish_message[] =     "THIS IS MQTT CLIENT DEMO FROM APPLICATION";
+     uint8_t publish_message[] = "THIS IS MQTT CLIENT DEMO FROM APPLICATION";
      ```
 
   - QOS indicates quality of service which MQTT client uses to publish a message.
@@ -168,7 +169,7 @@ In the Project Explorer pane, expand the **config** folder and open the ``sl_net
   - In your project configuration (refer to `app.c`, `wifi_mqtt_client_configuration.boot_config.tcp_ip_feature_bit_map`), make sure bypass mode is enabled as shown below:
 
     ```c
-      .tcp_ip_feature_bit_map =    (SL_SI91X_TCP_IP_FEAT_BYPASS | ..)
+      .tcp_ip_feature_bit_map = (SL_SI91X_TCP_IP_FEAT_BYPASS | ..)
      ```
 
 **MQTT client application level memory configuration**
@@ -177,7 +178,7 @@ In the Project Explorer pane, expand the **config** folder and open the ``sl_net
 #define TCP_MQTT_CLIENT_INIT_BUFF_LEN 3500 
       
       //! Global buffer or memory which is used for MQTT client initialization. This is used for the MQTT client information storage.
-      uint8_t tcp_mqtt_client_buffer[TCP_MQTT_CLIENT_INIT_BUFF_LEN]
+      uint8_t tcp_mqtt_client_buffer[TCP_MQTT_CLIENT_INIT_BUFF_LEN];
    ```
 
 > **Note**: For recommended settings, see the [Recommendations Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -308,6 +309,37 @@ Follow the steps below for successful execution of the application:
 
    **![Adding CA certificate in MQTT Explorer](resources/readme/mqtt_explorer_add_cacert3.png)**
 
+
+## Procedure to configure for IPv6
+
+- Define the following macros in the application to enable IPv6 support:
+
+   - `SLI_SI91X_ENABLE_IPV6`
+   - `LWIP_IPV6`
+
+   **![IPv6 configuration macros](resources/readme/mqtt_over_lwip_IPv6_config.png)**
+
+- Use the Mosquitto command line to test the example because the MQTT Explorer application does not support IPv6.
+
+- The following commands can be used to test the MQTT client with IPv6 addresses using the Mosquitto command line:
+
+1. `mosquitto_sub -h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3 -p 1883 -t THERMOSTAT-DATA`
+
+     This command runs the Mosquitto client in subscriber mode.  It will connect to the MQTT broker and listen for messages published to a specific topic.
+
+     - `-h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3`: Specifies the hostname or IP address of the MQTT broker to connect to. In this example, it's an IPv6 address.
+     - `-p 1883`: Specifies the network port that the MQTT broker is listening on. The default MQTT port is 1883.
+     - `-t THERMOSTAT-DATA`: Specifies the topic that the client should subscribe to. The client will receive any messages published to this topic.
+
+2. `mosquitto_pub -h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3 -p 1883 -t THERMOSTAT-DATA -m "hello"`
+
+     This command runs the Mosquitto client in publisher mode. It connects to the MQTT broker, publishes a message to a specific topic, and then automatically disconnects and closes the client.
+
+     - `-h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3`: Like the `-h` option for `mosquitto_sub`, this specifies the hostname or IP address of the MQTT broker to connect to.
+     - `-p 1883`: This is the same as the `-p` option for `mosquitto_sub`, specifying the network port of the MQTT broker.
+     - `-t THERMOSTAT-DATA`: Specifies the topic that the client should publish the message to.
+     - `-m "hello"`: Specifies the message to publish. In this example, the message is the string "hello".
+
 >**Notes:**
 >
 > To generate the certificates locally, run the following commands:
@@ -317,24 +349,3 @@ Follow the steps below for successful execution of the application:
 > 3. Generate server private key `openssl genrsa -out server.key 2048`
 > 4. Create server certificate signing request `openssl req -new -key server.key -out server.csr`
 > 5. Sign server certificate with CA `openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt`
->
-> If you want to use IPv6 with the Paho MQTT client application, use the Mosquitto command line to test the example because the MQTT Explorer application does not support IPv6.
->
-> The following commands are used to test the MQTT client with IPv6 addresses using the Mosquitto command line:
->
-> 1. `mosquitto_sub -h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3 -p 1883 -t THERMOSTAT-DATA`
->
->    This command runs the Mosquitto client in subscriber mode.  It will connect to the MQTT broker and listen for messages published to a specific topic.
->
->    - `-h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3`: Specifies the hostname or IP address of the MQTT broker to connect to. In this example, it's an IPv6 address.
->    - `-p 1883`: Specifies the network port that the MQTT broker is listening on. The default MQTT port is 1883.
->    - `-t THERMOSTAT-DATA`: Specifies the topic that the client should subscribe to. The client will receive any messages published to this topic.
->
-> 2. `mosquitto_pub -h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3 -p 1883 -t THERMOSTAT-DATA -m "hello"`
->
->    This command runs the Mosquitto client in publisher mode. It connects to the MQTT broker, publishes a message to a specific topic, and then automatically disconnects and closes the client.
->
->    - `-h 2409:40f2:2044:d93c:f088:79d:19aa:c1c3`: Like the `-h` option for `mosquitto_sub`, this specifies the hostname or IP address of the MQTT broker to connect to.
->    - `-p 1883`: This is the same as the `-p` option for `mosquitto_sub`, specifying the network port of the MQTT broker.
->    - `-t THERMOSTAT-DATA`: Specifies the topic that the client should publish the message to.
->    - `-m "hello"`: Specifies the message to publish. In this example, the message is the string "hello".

@@ -49,7 +49,7 @@ When flashed with this example the boot count get updated in the "boot_count" fi
 
 - Simplicity Studio
 - Serial console Setup
-  - For Serial Console setup instructions, refer to [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+  - For Serial Console setup instructions, refer to [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 

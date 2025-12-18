@@ -92,14 +92,14 @@ This application demonstrates the Pulse Width Modulation (PWM) to generate a per
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A / BRD4342A / BRD4343A ]
-- SiWx917 AC1 Module Explorer Kit (BRD2708A)
+- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, see the [Console Input and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output) section in the *WiSeConnect Developer's Guide*.
+  - For serial console setup instructions, see the [Console Input and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output) section in the *WiSeConnect Developer's Guide*.
 
 ### Setup Diagram
 
@@ -205,7 +205,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | PWM_H         | ULP_GPIO_7  |EXP_15            |          [TX]            |
   | PWM_L         | ULP_GPIO_6  |EXP_16            |          [RX]            |
 
->**Note:** Make sure pin configuration are set in the `RTE_Device_xxx.h` file:
+>**Note:** Make sure pin configuration are set in the `RTE_Device_917.h` file:
 >
 > - SiWx917: RTE_Device_917.h (path: /$project/config/RTE_Device_917.h)
 

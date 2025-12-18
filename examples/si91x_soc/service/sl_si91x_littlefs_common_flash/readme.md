@@ -56,7 +56,7 @@ On each boot, the application mounts LittleFS, reads a stored counter from the f
 
 - Simplicity Studio
 - Serial console Setup
-  - For Serial Console setup instructions, refer to [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+  - For Serial Console setup instructions, refer to [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 

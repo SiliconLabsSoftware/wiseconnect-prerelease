@@ -859,6 +859,9 @@ void wifi_app_task(void)
             printf("\r\nFailed to set client credentials: 0x%lx\r\n", status);
             continue;
           }
+        } else {
+          // For OPEN security, clear the credential ID
+          wifi_client_profile.config.credential_id = SL_WIFI_NO_CREDENTIAL_ID;
         }
 
         status =

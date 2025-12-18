@@ -65,7 +65,7 @@
 - Simplicity Studio
 - Serial console Setup
   - The Serial Console setup instructions are provided below:
-Refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+Refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 

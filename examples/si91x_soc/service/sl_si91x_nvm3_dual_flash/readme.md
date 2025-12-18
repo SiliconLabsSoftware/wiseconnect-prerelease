@@ -48,7 +48,7 @@ For more detailed information about NVM3, refer to [Third Generation NonVolatile
 
 - Simplicity Studio
 - Serial console Setup
-  - For Serial Console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+  - For Serial Console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 

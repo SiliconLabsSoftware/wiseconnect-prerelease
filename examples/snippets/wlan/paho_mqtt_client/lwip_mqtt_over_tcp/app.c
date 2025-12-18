@@ -268,7 +268,7 @@ int paho_mqtt_demo()
   // Fill server_address.ip.v6.bytes using sl_inet_pton6
   sl_inet_pton6(MQTT_BROKER_IP,
                 MQTT_BROKER_IP + strlen(MQTT_BROKER_IP),
-                &server_address.ip.v6.bytes,
+                (unsigned char *)&server_address.ip.v6.bytes,
                 (unsigned int *)&status);
   if (status != 0) {
     printf("Invalid IPv6 address: %s\n", MQTT_BROKER_IP);

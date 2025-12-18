@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SL VEML6035](#sl-veml6035)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -34,7 +33,7 @@ This example demonstrates the measurement of Lux for every 2 seconds. It also sh
 
 - Simplicity Studio
 - Serial console Setup
-  - For Serial Console setup instructions, see the [Console Input and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output) section in the *WiSeConnect Developer's Guide*.
+  - For Serial Console setup instructions, see the [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -90,11 +89,10 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 | SCL | ULP_GPIO_7 [EXP_HEADER-15] | Connect to Follower SCL pin |
 | SDA | ULP_GPIO_6 [EXP_HEADER-16] | Connect to Follower SDA pin |
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 
-See the instructions [Creating a Project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project) section on the **Developing with Boards in SoC Mode** guide to:
+See the instructions [Creating a Project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project) section on the **Developing with Boards in SoC Mode** guide to:
 
 1. Compile and run the application.
 2. When the application runs, it measures **ALS channel lux** and **white channel lux** every 2 seconds.

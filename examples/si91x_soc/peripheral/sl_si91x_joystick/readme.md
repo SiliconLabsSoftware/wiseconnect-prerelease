@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SL JOYSTICK](#sl-joystick)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -13,7 +12,6 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
     - [Pin Configuration](#pin-configuration)
-      - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-radio-board)
     - [Joystick on BRD4002A](#joystick-on-brd4002a)
   - [Test the Application](#test-the-application)
 
@@ -26,13 +24,13 @@ This sample app demonstrates the use of the Joystick Driver. It prints the joyst
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A / BRD4342A / BRD4343A]
+- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 
 ### Software Requirements
 
-- Simplicity Studio
+- Simplicity Studio 
 - Serial console Setup
-  - For Serial Console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+  - For Serial Console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -53,36 +51,57 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Application Build Environment
 
 ### Application Configuration Parameters
-
-- Configure UC from the slcp component.
-- Open **sl_si91x_joystick.slcp** project file select **software component** tab and search for **joystick** in search bar.
-- Configure the UC as mentioned below.
-
-Refer to   ![Figure: sl_joystick_uc_screen](resources/uc_screen/sl_joystick_uc_screen.png)
+- Configure UC from the slcp component:
+  - Open **sl_si91x_joystick.slcp** project file select **software component** tab and search for **joystick** in search bar.
+  - Configure the UC as mentioned below.
+![Figure: sl_joystick_uc_screen](resources/uc_screen/sl_joystick_uc_screen.png)
 
 - Using configuration wizard one can configure different parameters like:
   - **Channel selection**
-  - Joystick ADC channel: The selection of the ADC channel instance for the joystick can be adjusted between channels 1 and channel_16.
+     - Joystick ADC channel : The selection of the ADC channel instance for the joystick can be adjusted between channels 1 and channel_16.
   > **Note:**
-  - The user can install up to sixteen instances of the channel, which will execute in sequential order. To configure this, follow the steps below:
+  > - The user can install up to sixteen instances of the channel, which will execute in sequential order. To configure this, follow the steps below:
+  >
+  >   1. Open the **SOFTWARE COMPONENTS** tab in your project.
+  >   2. Search for **joystick** and select the component.
+  >   3. Install the channel instances.
+  >   4. Update the Number of Channel(s) in the ADC Peripheral Common Configuration section to match the number of instances added in UC in the previous step.
 
-       1. Install the channel instances.
-       2. Update the `Number of Channel(s)` value in the **ADC Peripheral Common Configuration** section and number of channels should be equal to the number of instances added in UC.
-  - The order of instances must be strictly sequential, starting from 1 and increasing consecutively (e.g., 1, 2, 3). Non-sequential orders such as 1, 4, 6 or 1, 5, 2 are not permitted.
+  ## Instance Order Requirements
 
-  > **Joystick Voltage value Configuration**
+  This requirement specifies that when configuring multiple instances of a component or driver in your project, they must be numbered sequentially without gaps.
+
+  **What this means:**
+  - Instance numbering must start at 1
+  - Each subsequent instance must increment by exactly 1
+  - No numbers can be skipped in the sequence
+
+  **Valid examples:**
+  - ✅ Instance 1, Instance 2, Instance 3
+  - ✅ Single Instance 1
+
+  **Invalid examples:**
+  - ❌ Instance 1, Instance 4, Instance 6 (skips 2, 3, 5)
+  - ❌ Instance 1, Instance 5, Instance 2 (out of order)
+  - ❌ Instance 0, Instance 1, Instance 2 (must start at 1)
+ > **Note:** 
+ > - This is a configuration requirement, not an installation order requirement. You    can add instances in any order through the component installer. However, when naming or configuring them, ensure their instance numbers are sequential (e.g., 1, 2, 3). The system typically enforces this numbering automatically when instances are created.
+ > 
+ > - Explanation: The important rule is sequential numbering, not the order in which you click “Install.” For example, if you need 3 channels, you must have instances numbered 1, 2, and 3. You cannot skip numbers (like 1, 3, 4) or have duplicates. Whether you install instance 2 before instance 1 does not matter, as long as the final numbering is consecutive starting from 1.
+
+ **Joystick Voltage value Configuration**
   - REFERENCE VOLTAGE: Vref magnitude expressed in millivolts. As per Joystick Hardware on Wireless Pro Kit, Vref = AVDD = 3300 mV.
   - CENTER POSITION: Center position value(mV).
   - NORTH POSITION: North/Up position value(mV).
   - SOUTH POSITION: South/Down position value(mV).
   - EAST POSITION: East/Right position value(mV).
   - WEST POSITION: West/Left position value(mV).
-  - JOYSTICK_MV_ERR_CARDINAL_ONLY:Joystick error mV value for Cardinal Directions only.
+  - JOYSTICK_MV_ERR_CARDINAL_ONLY : Joystick error mV value for Cardinal Directions only.
 ### Pin Configuration
 
 #### Pin Configuration of the WPK[BRD4002A] Base Board, and with radio board
 
-The following table lists the mentioned pin numbers for the Si917 radio board. If you want to use a different radio board, refer to the board-specific user guide.
+The following table lists the ADC channel pin mappings for the Si917 radio board. These pin configurations are essential for connecting the joystick input to the correct ADC channel based on your selected channel instance. If you want to use a different radio board, refer to the board-specific user guide.
 
   | CHANNEL | PIN TO ADCP | 
   | --- | --- | 
@@ -108,8 +127,6 @@ The following table lists the mentioned pin numbers for the Si917 radio board. I
 Image shows Joystick located on BRD4002A, position/direction to press the Joystick and pin for Joystick.
 
 ![Figure: Joystick Hardware](resources/readme/image520d.png)
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 

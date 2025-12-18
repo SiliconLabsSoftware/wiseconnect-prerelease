@@ -14,12 +14,14 @@ provides:
 requires:
 - name: netstack_silabs_lwip_core
 source:
-- path: lwip/src/apps/tftp/tftp_server.c
+- path: lwip/src/apps/tftp/tftp.c
 include:
 - path: lwip/src/include
   file_list:
   - path: lwip/apps/tftp_opts.h
   - path: lwip/apps/tftp_server.h
+  - path: lwip/apps/tftp_common.h
+  - path: lwip/apps/tftp_client.h
 metadata:
   sbom:
     license: BSD-3-Clause

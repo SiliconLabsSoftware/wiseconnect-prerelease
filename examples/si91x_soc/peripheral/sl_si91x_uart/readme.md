@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SL UART](#sl-uart)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -39,7 +38,7 @@
 - [`uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_uart/uart_example.c) - This example code demonstrates how to configure the UART to send and receive data.
 - In this example, first UART gets initialized if it is not initialized already with clock and DMA configurations if DMA is enabled using [sl_si91x_usart_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).  
 **Note:** If the UART/USART instance is already selected for debug output logs, initialization will return `SL_STATUS_NOT_AVAILABLE`.
-- After UART initialization, the UART power mode is set using [sl_si91x_usart_set_power_mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-power-mode). Then UART is configured with the default configurations from UC along with the UART transmit and receive lines using [sl_si91x_usart_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration).
+- After UART initialization, the UART is configured with the default configurations from UC along with the UART transmit and receive lines using [sl_si91x_usart_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration).
 - The register user event callback for send and receive complete notification is set using [sl_si91x_usart_multiple_instance_register_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-multiple-instance-register-event-callback).
 - After setting the user event callback, the data send and receive can happen through [sl_si91x_usart_send_data](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-send-data) and [sl_si91x_usart_receive_data](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-receive-data) respectively.
 - Once the receive data event is triggered, the transmitted and received buffer data is compared to confirm that the received data is the same.
@@ -50,13 +49,13 @@
 
 - Windows PC
 - Silicon Labs Si917 Evaluation Kit [WPK(4002A) + BRD4338A]
-- SiWx917 AC1 Module Explorer Kit (BRD2708A)
+- SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output)..
+  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output)..
 
 ### Setup Diagram
 
@@ -94,7 +93,7 @@ Configuration of UART at UC (Universal Configuration):
 ## Flow Control Configuration
 
 - Set the SL_USART_FLOW_CONTROL_TYPE parameter to SL_USART_FLOW_CONTROL_RTS_CTS to enable UART flow control.
-- Make sure the following two macros in `RTE_Device_917.h` are set to '1' to map RTS and CTS pins to WSTK/WPK Main Board EXP header or breakout pins.
+- Make sure the following two macros in `RTE_Device_917.h(path: /$project/config/RTE_Device_917.h)` are set to '1' to map RTS and CTS pins to WSTK/WPK Main Board EXP header or breakout pins.
 
   ```C
   #define RTE_UART1_CTS_PORT_ID    1
@@ -105,8 +104,6 @@ Configuration of UART at UC (Universal Configuration):
   | -------------- | ------- | --------------- | ------------------------ |
   | UART_CTS_PIN   | GPIO_28 |     P31         |           [CS]           |
   | UART_RTS_PIN   | GPIO_27 |     P29         |           [MOSI]         |
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 

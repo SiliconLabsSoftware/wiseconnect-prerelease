@@ -67,14 +67,14 @@ Advanced users may edit the device configuration header `RTE_Device_917.h` direc
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(4002A) +  BRD4338A / BRD4342A / BRD4343A ]- Master and Slave
-- SiWx917 AC1 Module Explorer Kit (BRD2708A) - Master and Slave
+- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]- Master and Slave
+- SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit) - Master and Slave
 
 ### Software Requirements
 
 - Simplicity Studio
 - Serial console Setup
-  - For Serial Console setup instructions, refer [Console Inpput and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output) section of the *WiSeConnect Developer's Guide*.
+  - For Serial Console setup instructions, refer [Console Inpput and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output) section of the *WiSeConnect Developer's Guide*.
 
 ### Setup Diagram
 

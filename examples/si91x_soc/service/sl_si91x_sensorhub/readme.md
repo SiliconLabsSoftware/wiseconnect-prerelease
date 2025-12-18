@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SENSOR HUB](#sensor-hub)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
   - [Framework](#framework)
@@ -76,7 +75,7 @@
 
 ### Hardware Requirements	
 
-- Silicon Labs Si917 Pro Kit [WPK + BRD4338A / BRD4342A / BRD4343A ]
+- Silicon Labs Si917 Pro Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - BH1750 Light Sensor
 - LM75 Temperature Sensor
 - APDS9960 RGB-Gesture-Proximity Sensor
@@ -87,7 +86,7 @@
 - Simplicity Studio
 - Serial console-setup
   - The Serial console setup instructions are provided below, 
-Refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output)
+Refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output)
 
 ### Setup Diagram
 
@@ -110,7 +109,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 1. Configure the number of sensor info in [`sensors_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/sensors_config.h) file.
     ```c
-
     #define SL_MAX_NUM_SENSORS 5 // Maximum sensors present in the system
     ```
 
@@ -120,40 +118,35 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
       - **Polling Sensor Mode** configures the following parameters:
 
         ```c
-
         .sensor_mode         = SL_SH_POLLING_MODE,
         .sampling_interval   = 100, 
         ```
 
-        - If sensor_mode is selected as ***SL_SH_POLLING_MODE***, then data_deliver.data_mode should be configured as **one** of the following for a sensor configuration structure:
+       - If sensor_mode is selected as ***SL_SH_POLLING_MODE***, then data_deliver.data_mode should be configured as **one** of the following for a sensor configuration structure:
             - For **TIMEOUT Data Mode** configure the following parameters:
 
               ```c
-
               .data_deliver.data_mode          = SL_SH_TIMEOUT
-              .data_deliver.timeout       = 1000
+              .data_deliver.timeout            = 1000
               ```
 
             - For **THRESHOLD Data Mode** configure the following parameters:
 
               ```c
-
               .data_deliver.data_mode          = SL_SH_THRESHOLD,  
-              .data_deliver.threshold     = 1000,
+              .data_deliver.threshold          = 1000,
               ```
 
             - For **SAMPLING Data Mode** configure the following parameters:
 
               ```c
-
               .data_deliver.data_mode          = SL_SH_NUM_OF_SAMPLES,  
-              .data_deliver.numOfSamples  = 5,
+              .data_deliver.numOfSamples       = 5,
               ```
 
             - **Example of Sensor Polling Mode Configurations**:-
 
               ```c
-
               .sensor_name               = "TEMPERATURE_SENSOR_LM75",
               .sensor_bus                = SL_SH_I2C,
               .sensor_id                 = SL_SENSOR_LM75_ID,
@@ -176,18 +169,14 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
               ```
 
       - **INTERRUPT Sensor Mode** configures the below parameters:
-
+          ```c
+              .sensor_mode                = SL_SH_INTERRUPT_MODE,
+              .sampling_intr_req_pin      = BUTTON_0_GPIO_PIN, 
+              .sensor_intr_type           = SL_SH_FALL_EDGE,
+              .data_deliver.data_mode     = SL_SH_NO_DATA_MODE,
+          ```
+      - **Example of Sensor Interrupt Mode Configurations:**
         ```c
-
-        .sensor_mode                = SL_SH_INTERRUPT_MODE,
-        .sampling_intr_req_pin      = BUTTON_0_GPIO_PIN, 
-        .sensor_intr_type           = SL_SH_FALL_EDGE,
-        .data_deliver.data_mode     = SL_SH_NO_DATA_MODE,
-        ```
-          - **Example of Sensor Interrupt Mode Configurations:-**
-
-            ```c
-
             //For I2C Sensor
             .sensor_name               = "LIGHT_SENSOR",
             .sensor_bus                = SL_SH_I2C,
@@ -197,10 +186,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
             .sampling_intr_req_pin     = BUTTON_0_GPIO_PIN,
             .sensor_intr_type          = SL_SH_FALL_EDGE,
             .data_deliver.data_mode    = SL_SH_NO_DATA_MODE,
-            ```
-
-
-            ```c
+        ```
+         ```c
             //For ADC Sensors, channel should be BIT(channel number)
             .sensor_name               = "ADC_JOYSTICK",
             .sensor_id                 = SL_SENSOR_ADC_JOYSTICK_ID,
@@ -233,7 +220,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
         configure as shown below in [`adc_sensor_hal.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/adc_sensor/adc_sensor_hal.h) file:
 
           ```C
-            
           #define SL_SH_ADC_CH0_NUM_SAMPLES 1
           #define SL_SH_ADC_SENSOR0_NUM_OF_SAMPLES 5 
           ```  
@@ -241,7 +227,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - **ADC FIFO mode:-**
       - The SensorHUB interrupt mode configurations are utilized in conjunction with **ADC FIFO mode**.      
       - Configure the following parameter [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c) file:
-
+    
         ```c
         .adc_config.adc_cfg.operation_mode = SL_ADC_FIFO_MODE,
         ```
@@ -264,11 +250,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
        * To configure the PS1 power state from the PS2 State, please update the below macro in the preprocessor settings.
         1. Disable the tickles mode in the [`FreeRTOS.h`] file.
         2. The PS1 state transition only applies to ADC FIFO Mode. Before entering this mode, kindly turn off any other sensors.
-
-          ```C
+        ```c
           SL_SH_PS1_STATE=1 
           //Enabling this macro moves the core from PS2 Active state to PS1 state by using the Power_Task 
-          ```
+         ```
 5. **SDC Configurations**:
     - Disable the ADC **SH_ADC_ENABLE** macro if enabled in the preprocessor settings and enable the **SH_SDC_ENABLE** macro for the sdc
     - For SDC Multichannel enable the **SDC_MUTI_CHANNEL_ENABLE** macro in the preprocessor settings
@@ -312,7 +297,6 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 >Note: AWS will work ONLY in PS4 Active power state.
 
 1. After creating the project add **SH_AWS_ENABLE=1** macro in the preprocessor settings.
-
 2. Now refer to ***Wi-Fi - AWS IoT MQTT Client (SoC)*** example readme.
 3. Make the relevant changes according to the above example readme in [`sl_net_default_values.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/resources/defaults/sl_net_default_values.h),  [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/resources/defaults/aws_iot_config.h) present in *config* folder 
 4. Modify the relevant changes in [`sensorhub_aws_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_aws_app.c) also. 
@@ -332,8 +316,8 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 
 ### SPI Sensor Pin Configurations for BRD4338A radio board
 
-| Sensor PIN  | BRD4338A GPIO pin  | BRD4338A Description | BRD4343A GPIO pin   | BRD4343A Description
-| ------------| ------------------ | -------------------- | ------------------- | -------------------- |
+| Sensor PIN  | BRD4338A GPIO pin  | BRD4338A Description | BRD4343A GPIO pin   | BRD4343A Description |
+| ------------| ------------------- | -------------------- | ------------------- | -------------------- |
 | SCK         | ULP_GPIO_8  [P15]  | P15                  |  ULP_GPIO_8  [P15]  | P15                  |
 | CS          | ULP_GPIO_10 [P17]  | P17                  |  ULP_GPIO_4  [P17]  | P17                  |  
 | MOSI        | ULP_GPIO_1  [P16]  | Connect to SDA       |  ULP_GPIO_1  [P16]  | Connect to SDA       |  
@@ -351,9 +335,7 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 | Sensor PIN |   ULP GPIO PIN     |           Description            |
 | ---------- | ------------------ | -------------------------------- |
 | ADC Input  | ULP_GPIO_8 [ P15 ] | Connect to Joystick output (P36) |
-| 
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 
@@ -363,6 +345,8 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 ## Expected Results
 
 - The sensor events should be observed on the Serial Terminal as per the given configuration. 
+- Below are the console prints when BH1750 sensor is connected to I2C.
+    ![Figure: Console prints for sensor BH1750](resources/readme/BH1750_console_prints.png)
 
 >### Note:
 >#### General

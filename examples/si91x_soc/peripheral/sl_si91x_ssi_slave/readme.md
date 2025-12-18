@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SL SSI SLAVE](#sl-ssi-slave)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -54,12 +53,11 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 - Various parameters like SSI clock mode, Bit-width, Manual cs pin, and SSI baud rate can be configured using the UC. Also, Master or Slave or ULP Master DMA can be configured using UC.
 - The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
 - In the example code, first the output buffer is filled with some data which is transferred to the slave.
-- The firmware version of API is fetched using [sl_si91x_ssi_get_version](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-get-version) which includes the release version, major version, and minor version [sl_ssi_version_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-ssi-version-t).
+- The firmware version of API is fetched using [sl_si91x_ssi_get_version](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-get-version) which includes the release version, major version, and minor version [sl_ssi_version_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sl-ssi-version-t).
 - [sl_si91x_ssi_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-init) is used to initialize the peripheral, that includes pin configuration and it powers up the module.
 - SSI instance must be passed in init to get the instance handle [sl_ssi_instance_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-ssi-instance-t), which is used in other APIs.
-- After initialization, [sl_si91x_ssi_configure_power_mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-configure-power-mode) is called to set the power mode [sl_ssi_power_state_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-ssi-power-state-t).
 - All the necessary parameters are configured using [sl_si91x_ssi_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-set-configuration) API. It expects a structure with required parameters
-  [sl_ssi_control_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-ssi-control-config-t).
+  [sl_ssi_control_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sl-ssi-control-config-t).
 - After configuration, a callback register API is called to register the callback at the time of events [sl_si91x_ssi_register_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-register-event-callback).
 - The State machine code is implemented for transfer, send and receive data, and the current mode is determined by ssi_mode_enum_t which is declared in [`ssi_slave_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/ssi_slave_example.c) file.
 - According to the macro which is enabled, the example code executes the transfer of data:
@@ -90,14 +88,14 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A / BRD4342A / BRD4343A ]
-- SiWx917 AC1 Module Explorer Kit (BRD2708A)
+- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -127,12 +125,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   - **SSI Secondary(Slave) Configuration**
     - Frame Format: SSI Frame Format can be configured:
-      - Mode 0: Clock Polarity is zero and Clock Phase is zero.
-      - Mode 1: Clock Polarity is zero, Clock Phase is one.
-      - Mode 2: Clock Polarity is one and Clock Phase is zero.
-      - Mode 3: Clock Polarity is one and Clock Phase is one.
-      - Mode-4: TEXAS_INSTRUMENTS SSI.
-      - Mode-5: NATIONAL_SEMICONDUCTORS_MICROWIRE.
+      - Mode 0, Mode 1, Mode 2, Mode 3 ,Mode 4 and Mode 5.
     - Bit Rate: The speed of transfer is configurable. The configuration range is from 500Kbps to 40Mbps in high-power mode.
     - Data Width: The size of data packet. The configuration range from 4 to 16.
     - Mode: SSI mode/instance can be configurable. It can be configured Secondary.
@@ -218,9 +211,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 1. Compile and run the application.
 2. Connect master SSI pins to slave SSI pins on WPK board.
 3. First reset the slave board and then reset the master board. The time difference between these resets is expected up to 5 seconds.
-4. Console output of successful configuration of clock, power mode, and SSI configuration.
-5. Post transfer the data with master, the slave should print the console output as test case passed.
-6. After successful program execution, the prints in serial console looks as shown below.
+4. Post transfer the data with master, the slave should print the console output as test case passed.
+5. After successful program execution, the prints in serial console looks as shown below.
 
     ![Figure: output](resources/readme/output.png)
 

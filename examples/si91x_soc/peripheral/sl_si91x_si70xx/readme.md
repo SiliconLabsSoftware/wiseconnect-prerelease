@@ -29,11 +29,11 @@ This example demonstrates the measurement of relative humidity and temperature f
 
 - Windows PC
 - Standalone
-  - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
+  - BRD4002A Wireless pro kit mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
   - Radio Boards
-    - BRD4338A [SiWx917-RB4338A]
-    - BRD4342A [SiWx917-RB4342A]
-    - BRD4343A [SiWx917-RB4343A]
+    - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+    - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+    - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
 - Kits
   - SiWx917 Development Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
 
@@ -41,7 +41,7 @@ This example demonstrates the measurement of relative humidity and temperature f
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -77,7 +77,7 @@ Tested on WPK Base board - 4002A and Radio board - BRD4338A.
 | I2C_SDA      | ULP_GPIO_6 | EXP_16    |
 | I2C_SCL      | ULP_GPIO_7 | EXP_15    |
 
->**Note:** Make sure the pin configurations are in the `RTE_Device_xxx.h` file:
+>**Note:** Make sure the pin configurations are in the `RTE_Device_917.h` file:
 >
 > - SiWx917: RTE_Device_917.h (path: /$project/config/RTE_Device_917.h)
 

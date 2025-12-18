@@ -16,12 +16,16 @@ requires:
 - name: netstack_silabs_lwip_core
 source:
 - path: lwip/src/apps/mdns/mdns.c
+- path: lwip/src/apps/mdns/mdns_domain.c
+- path: lwip/src/apps/mdns/mdns_out.c
 include:
 - path: lwip/src/include
   file_list:
   - path: lwip/apps/mdns.h
   - path: lwip/apps/mdns_opts.h
   - path: lwip/apps/mdns_priv.h
+  - path: lwip/apps/mdns_domain.h
+  - path: lwip/apps/mdns_out.h
 metadata:
   sbom:
     license: BSD-3-Clause

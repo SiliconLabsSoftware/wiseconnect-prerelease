@@ -325,6 +325,9 @@ void wifi_app_task()
             printf("\r\nFailed to set client credentials: 0x%lx\r\n", status);
             continue;
           }
+        } else {
+          // For OPEN security, clear the credential ID
+          id = SL_WIFI_NO_CREDENTIAL_ID;
         }
         access_point.ssid.length = strlen((char *)coex_ssid);
         memcpy(access_point.ssid.value, coex_ssid, access_point.ssid.length);

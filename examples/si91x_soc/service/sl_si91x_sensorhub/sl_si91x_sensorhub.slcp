@@ -90,6 +90,7 @@ other_file:
 - path: resources/readme/image508b.png
 - path: resources/readme/setupdiagram.png
 - path: resources/readme/wakeup.png
+- path: resources/readme/BH1750_console_prints.png
 requires:
 - name: aws_sdk
 ui_hints:

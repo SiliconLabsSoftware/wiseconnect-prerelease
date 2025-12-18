@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SL COMBO APP](#sl-combo-app)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
     - [1. I2C](#1-i2c)
@@ -35,7 +34,7 @@ The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts
 
 - Semaphores
 - Event Flags
-- This application contains a comprehensive sample application which includes multiple perpherals listed below
+- This application contains a comprehensive sample application which includes multiple peripherals listed below
   - PWM
   - I2C (as Driver Leader application)
   - GPIO Interrupts
@@ -53,7 +52,7 @@ The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts
 - I2C instances will be configured in Leader mode. The SCL and SDA lines of Leader controller are connected to another I2C Follower's SCL and SDA pins.
 
 - From Leader, the Follower address is sent after START on bus and waits till it gets the ACK respose from the Follower.
-- The write data to other Follower application and sends back the same data. Once received, it compares and produces the results.
+- The data is written to the other Follower application and Follower application sent back same data. Once received, it compares the returned data with the original and produces the results.
 - I2C can be configured with following features:
   - I2C standard compliant bus interface with open-drain pins
   - Configurable as Leader or Follower
@@ -76,14 +75,14 @@ The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A / BRD4342A / BRD4343A ]
-- SiWx917 AC1 Module Explorer Kit (BRD2708A)
+- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -140,16 +139,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### I2C0
 
-| PIN |   917 GPIO   Explorer kit GPIO  | Description      |
-| --- | ----------- | ------------- | -----------------| -----------------|
-| SCL |  GPIO_7 [P20]   | GPIO_7 [SCL] | Connect to Follower SCL pin |
-| SDA |  GPIO_6 [P19]   | GPIO_6 [SDA] |Connect to Follower SDA pin |
+| PIN |   917 GPIO      |    Explorer kit GPIO  |           Description       |
+| --- | ----------------| ----------------------| ----------------------------| 
+| SCL |  GPIO_7 [P20]   | GPIO_7 [SCL]          | Connect to Follower SCL pin |
+| SDA |  GPIO_6 [P19]   | GPIO_6 [SDA]          |Connect to Follower SDA pin  |
 
 ### I2C1
 
-| PIN |     917 GPIO      |   Explorer kit GPIO   |   Description    |
-| --- | ---------------- | ---------------------- | --------------------- | -----------------|
-| SCL |    GPIO_50[P32]  | GPIO_50 [EXP_HEADER-13] | Connect to Follower SCL pin |
+| PIN |     917 GPIO      |   Explorer kit GPIO     |   Description               |
+| --- | ----------------  | ----------------------  | ----------------------------| 
+| SCL |    GPIO_50[P32]   | GPIO_50 [EXP_HEADER-13] | Connect to Follower SCL pin |
 | SDA |    GPIO_51[P34]   | GPIO_51 [EXP_HEADER-15] | Connect to Follower SDA pin |
 
 ### ULP_I2C
@@ -197,8 +196,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | PWM_H         | ULP_GPIO_7  | P12         |  [TX] |
   | PWM_L         | ULP_GPIO_6  | P13         |  [RX] |
   
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
-
 ## Test the Application
 
 1. Compile and run the application.

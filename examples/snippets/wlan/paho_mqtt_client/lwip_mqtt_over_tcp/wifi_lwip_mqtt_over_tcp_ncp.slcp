@@ -111,6 +111,7 @@ other_file:
 - path: resources/readme/mqtt_explorer_msg.png
 - path: resources/readme/mqtt_publish_msg_from_explorer.png
 - path: resources/readme/setup_soc_ncp.png
+- path: resources/readme/mqtt_over_lwip_IPv6_config.png
 ui_hints:
   highlight:
   - path: readme.md
