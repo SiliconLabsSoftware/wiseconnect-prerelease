@@ -1551,7 +1551,7 @@
  * @note This configuration is not applicable for devices with internal antennas.
  */
 #if defined(SLI_SI91X_DEVICE_WITH_INT_RF_SWITCH)
-#define SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 0
+#define SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 BIT(30)
 #else
 #define SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 BIT(29)
 #endif

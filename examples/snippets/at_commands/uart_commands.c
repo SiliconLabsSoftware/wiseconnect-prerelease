@@ -40,6 +40,27 @@
 #include <inttypes.h>
 #include "uart_at_commands_config.h"
 
+#ifdef USART_MODULE
+#include "sl_si91x_usart_config.h"
+#if USART_UC
+#error "USART UC Configuration is enabled. Please disable it to use USART AT commands."
+#endif
+#endif
+
+#ifdef UART_MODULE
+#include "sl_si91x_uart_config.h"
+#if UART_UC
+#error "UART UC Configuration is enabled. Please disable it to use UART AT commands."
+#endif
+#endif
+
+#ifdef ULP_UART_MODULE
+#include "sl_si91x_ulp_uart_config.h"
+#if ULP_UART_UC
+#error "ULP UART UC Configuration is enabled. Please disable it to use UART AT commands."
+#endif
+#endif
+
 /******************************************************
  *                    Constants
  ******************************************************/

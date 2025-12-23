@@ -383,6 +383,7 @@ bool sli_si91x_ta_packet_initiated_to_m4(void)
   }
   return sli_p2p_status;
 }
+#endif // #if (SL_SI91X_TICKLESS_MODE  == 1)
 /**************************************************************************
  * @fn           sli_si91x_m4_ta_wakeup_configurations(void)
  * @brief        It is essential to properly configure the NWP and M4 status registers 
@@ -411,5 +412,4 @@ void sli_si91x_m4_ta_wakeup_configurations(void)
   );
 #endif
 }
-#endif // #if (SL_SI91X_TICKLESS_MODE  == 1)
 #endif

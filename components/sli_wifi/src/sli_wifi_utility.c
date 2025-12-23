@@ -695,3 +695,21 @@ sli_scan_info_t **sli_get_scan_info_database(void)
 {
   return &scan_info_database;
 }
+
+bool sli_wifi_packet_identification_function(const sl_wifi_buffer_t *buffer, const void *user_data)
+{
+  const uint8_t *packet_id = (const uint8_t *)user_data;
+
+  // Check if the packet's packet ID matches the expected one
+  return (*packet_id == buffer->id);
+}
+
+uint32_t sli_wifi_host_queue_status(const sli_wifi_buffer_queue_t *queue)
+{
+  return queue->head != NULL;
+}
+
+uint32_t sl_wifi_host_elapsed_time(uint32_t starting_timestamp)
+{
+  return (osKernelGetTickCount() - starting_timestamp);
+}

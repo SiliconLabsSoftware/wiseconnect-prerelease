@@ -241,5 +241,8 @@ void sli_wifi_save_power_chain(const sl_wifi_power_chain_t power_chain);
 
 // Accessor for the scan results database head pointer
 sli_scan_info_t **sli_get_scan_info_database(void);
+bool sli_wifi_packet_identification_function(const sl_wifi_buffer_t *buffer, const void *user_data);
+uint32_t sli_wifi_host_queue_status(const sli_wifi_buffer_queue_t *queue);
+uint32_t sl_wifi_host_elapsed_time(uint32_t starting_timestamp);
 
 #endif

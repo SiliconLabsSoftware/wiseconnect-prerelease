@@ -364,58 +364,59 @@ sl_status_t sli_wifi_wait_for_response_packet(sli_wifi_buffer_queue_t *queue,
 {
   // Verify that packet_buffer is a valid pointer, return error if invalid
   SL_VERIFY_POINTER_OR_RETURN(packet_buffer, SL_STATUS_INVALID_PARAMETER);
+  SL_VERIFY_POINTER_OR_RETURN(queue, SL_STATUS_NULL_POINTER);
+  SL_VERIFY_POINTER_OR_RETURN(event_flag, SL_STATUS_NULL_POINTER);
 
-  // Variables to store event flags, start time, and elapsed time
-  uint32_t events       = 0;
-  uint32_t start_time   = osKernelGetTickCount(); // Capture the start time of the wait period
-  uint32_t elapsed_time = 0;                      // Elapsed time tracker
-  sl_wifi_buffer_t *buffer;
+  uint32_t start_time      = osKernelGetTickCount();
+  uint32_t elapsed_time    = 0;
+  sl_wifi_buffer_t *buffer = NULL;
 
   if (wait_period != osWaitForever) {
     wait_period = SLI_SYSTEM_MS_TO_TICKS(wait_period);
   }
 
-  do {
-    // Wait for event flag(s) to be set within the specified wait period.
-    // This blocks the thread until any event in the mask is set or a timeout occurs.
-    events = osEventFlagsWait(event_flag, event_mask, (osFlagsWaitAny | osFlagsNoClear), (wait_period - elapsed_time));
+  while (1) {
+    // Calculate the remaining timeout for the event wait
+    uint32_t remaining_timeout = (wait_period > elapsed_time) ? (wait_period - elapsed_time) : 0;
+
+    // Wait for the event flag to be set, with the specified timeout
+    uint32_t events = osEventFlagsWait(event_flag, event_mask, (osFlagsWaitAny | osFlagsNoClear), remaining_timeout);
 
     // If the event wait times out or resources are unavailable, return timeout status
     if (events == (uint32_t)osErrorTimeout || events == (uint32_t)osErrorResource) {
       return SL_STATUS_TIMEOUT;
     }
 
-    // Log the event and queue details (for debugging purposes)
-    SL_DEBUG_LOG("Event: %u, queue %u\n", events, queue);
+    // Enter atomic section to safely access the queue
+    CORE_irqState_t state = CORE_EnterAtomic();
+    // Try to remove the buffer with the matching packet_id from the queue
+    sl_status_t packet_status = sli_wifi_remove_buffer_from_queue_by_comparator(queue,
+                                                                                &packet_id,
+                                                                                sli_wifi_packet_identification_function,
+                                                                                &buffer);
 
-    // Traverse the queue to check if the packet with the desired packet_id is at the head.
-    // Introduce a delay if the head of the queue packet doesn't belong to the current thread.
-    // This allows other threads to process the packet at the head.
-    do {
-      buffer = queue->head; // Peek at the head of the queue
-    } while ((buffer != NULL) && (buffer->id != packet_id)
-             && osDelay(SLI_SYSTEM_MS_TO_TICKS(1)) == 0); // Delay to yield if packet_id does not match
+    if (packet_status == SL_STATUS_OK) {
+      // If the queue is now empty, clear the event flag
+      if (0 == sli_wifi_host_queue_status(queue)) {
+        osEventFlagsClear(event_flag, event_mask);
+      }
+      CORE_ExitAtomic(state);
+      *packet_buffer = buffer;
+      return SL_STATUS_OK;
+    } else if (packet_status == SL_STATUS_EMPTY) {
+      // If the queue is empty, clear the event flag to avoid spurious wakeups
+      osEventFlagsClear(event_flag, event_mask);
+    }
+    CORE_ExitAtomic(state);
+    if (packet_status == SL_STATUS_NOT_FOUND) {
+      osDelay(SLI_SYSTEM_MS_TO_TICKS(2)); // Add a small delay to avoid busy waiting
+    }
 
-    // Update the elapsed time since the start of the wait
-    elapsed_time = osKernelGetTickCount() - start_time;
-
-  } while (buffer == NULL || (buffer->id != packet_id)); // Loop until the correct packet is found or timeout occurs
-
-  // Remove the identified packet from the queue
-  sli_wifi_pop_from_buffer_queue(queue, &buffer);
-
-  // Assign the identified packet to packet_buffer
-  *packet_buffer = buffer;
-
-  // Enter atomic section to ensure thread safety while clearing the event flag
-  CORE_irqState_t state = CORE_EnterAtomic();
-  // If the queue is empty after popping the packet, clear the event flag to avoid unnecessary waits
-  if (queue->head == NULL) {
-    osEventFlagsClear(event_flag, event_mask);
+    // Update elapsed time for the next iteration
+    elapsed_time = sl_wifi_host_elapsed_time(start_time);
   }
-  CORE_ExitAtomic(state); // Exit atomic section
-
-  return SL_STATUS_OK; // Return success status
+  // This code path should not be reached; loop exits on success or timeout.
+  return SL_STATUS_FAIL;
 }
 
 static sl_status_t sli_wifi_convert_old_gain_table_to_su_gain_table(const uint8_t old_table[],

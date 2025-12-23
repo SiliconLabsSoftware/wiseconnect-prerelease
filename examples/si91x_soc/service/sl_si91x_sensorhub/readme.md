@@ -82,7 +82,6 @@
 - 2 ADC-based Sensor(Joystick and GUVA_12D_UV)
 
 ### Software Requirements
-- Si91x Wiseconnect
 - Simplicity Studio
 - Serial console-setup
   - The Serial console setup instructions are provided below, 
@@ -205,7 +204,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
       ```
 
 4. **ADC Configurations**:
-    - Configure SH_ADC_ENABLE=1 in properties -> C/C++ Build -> Setting -> Tool Settings -> GNU ARM C Compiler -> Preprocessor to enable ADC
+    - Configure the macro SH_ADC_ENABLE=1 in the preprocessor settings to enable ADC support.
     - Configure the following parameters in the [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/master/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c) file to change the ADC's mode from FIFO to STATIC and vice versa.
 
       ```c
@@ -280,7 +279,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
             .sensor_bus                = SL_SH_ADC,
             .sensor_mode               = SL_SH_INTERRUPT_MODE,
             .data_deliver.data_mode    = SL_SH_NO_DATA_MODE,
-        ```
+           ```
+
     - **SDC Power Save(PS-1)**
       - The SensorHUB interrupt mode configurations are utilized in conjunction with **SDC mode**.
           ```C

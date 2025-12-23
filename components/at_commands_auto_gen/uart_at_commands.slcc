@@ -11,14 +11,6 @@ component_root_path: ./components/at_commands_auto_gen
 provides:
   - name: uart_at_commands
 
-source:
-  - path: ../../components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_usart.c
-
-include:
-  - path: ../../components/device/silabs/si91x/mcu/drivers/unified_api/inc
-    file_list:
-      - path: "sl_si91x_usart.h"
-
 template_contribution:
   - name: console_commands
     value:

@@ -223,14 +223,6 @@ void *sli_wifi_host_get_buffer_data(void *buffer, uint16_t offset, uint16_t *dat
   return (void *)&temp_buffer->data[offset];
 }
 
-static bool sli_wifi_packet_identification_function(const sl_wifi_buffer_t *buffer, const void *user_data)
-{
-  const uint8_t *packet_id = (const uint8_t *)user_data;
-
-  // Check if the packet's packet ID matches the expected one
-  return (*packet_id == buffer->id);
-}
-
 sl_status_t sli_wifi_send_command(uint32_t command,
                                   sli_wifi_command_type_t command_type,
                                   const void *data,

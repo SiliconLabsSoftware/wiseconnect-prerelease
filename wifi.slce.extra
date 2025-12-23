@@ -1196,9 +1196,13 @@ extra_files:
 - components/at_commands_auto_gen/net_at_commands.slcc
 - components/at_commands_auto_gen/wifi_at_commands.slcc
 - components/at_commands_auto_gen/at_power_manager.slcc
+- components/at_commands_auto_gen/uart_at_commands_config.h
 - components/at_commands_auto_gen/wifi_commands.h
 - components/at_commands_auto_gen/bsd_socket_at_commands.slcc
 - components/at_commands_auto_gen/mqtt_at_commands.slcc
+- components/at_commands_auto_gen/uart_at_commands.slcc
+- components/at_commands_auto_gen/fwup_at_commands.slcc
+- components/at_commands_auto_gen/ble_at_commands.slcc
 - components/at_commands_auto_gen/templates/console_variable_group_processing.jinja
 - components/at_commands_auto_gen/templates/console_argument_types.c.jinja
 - components/at_commands_auto_gen/templates/console_variable_table.c.jinja

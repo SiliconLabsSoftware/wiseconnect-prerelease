@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SL CRC](#sl-crc)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -30,11 +29,10 @@
 
 ### Software Requirements
 
-- Simplicity Studio
 - Serial console setup
   - For serial console setup instructions, see the [Console Input and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output) section of the *WiSeConnect Developer's Guide*.
 - Embedded Development Environment
-  - For Silicon Labs Si91x, use the latest version of Simplicity Studio (refer to the [Download and Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio) section in the Developing with *WiSeConnect™ SDK with SiWx91x™ Boards Guide*).
+  - For Silicon Labs Si91x, use the latest version of Simplicity Studio (refer to the [Download and Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-from-scratch) section in the Developing with *WiSeConnect™ SDK with SiWx91x™ Boards Guide*).
 
 ### Setup Diagram
 
@@ -56,9 +54,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- The application has two configurable parameters:  Polynomial value and Data width.
-**Polynomial value:**Defines the mathematical polynomial used in CRC (Cyclic Redundancy Check) calculations
-**Data width:** Specifies how many bits wide the input data is (e.g., 8-bit, 16-bit, 32-bit)
+- The application has two configurable parameters:  Polynomial value  and Data width.
+- **Polynomial value:** Defines the mathematical polynomial used in CRC (Cyclic Redundancy Check) calculations
+- **Data width:** Specifies how many bits wide the input data is (e.g., 8-bit, 16-bit, 32-bit)
 - These parameters allow users to customize the CRC implementation for different standards and data types.
 
 - Configure the following parameter in the [`sl_si91x_crc.h`](https://github.com/SiliconLabs/wiseconnect/blob/master/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_crc.h) file. Update or modify the following macro, if required. The code illustrates the default configurations.
@@ -75,8 +73,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 > - Ensure both variable lengths match the size of your new data array.
 
 ## Test the Application
-
-Refer to the instructions in the [Create a Project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project) section on the *Developing with WiSeConnect™ SDK with SiWx91x™ Boards* page to:
 
 - Compile and run the application.
 
