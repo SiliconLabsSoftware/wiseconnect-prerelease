@@ -116,7 +116,8 @@ documentation:
    version: 4.0.0
  - docset: unknown
    version: 0.0.0
-upgrade_manifest: []
+upgrade_manifest:
+ - path: upgrade.slcu
 post_build_profile:
  - path: utilities/postbuild_profile
 vendor: silabs

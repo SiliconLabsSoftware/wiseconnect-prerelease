@@ -58,7 +58,7 @@ static const void *local_i2s1_handle            = NULL;
 extern sl_i2s_driver_t Driver_SAI0;
 extern sl_i2s_driver_t Driver_SAI1;
 
-#ifndef I2S0_LOOP_BACK
+#ifndef I2S_LOOP_BACK
 static uint32_t master_mode_i2s0 = 0;
 #endif
 #ifndef I2S1_LOOP_BACK
@@ -322,7 +322,7 @@ sl_status_t sl_si91x_i2s_config_transmit_receive(sl_i2s_handle_t i2s_handle, sl_
       break;
     }
 
-#ifndef I2S0_LOOP_BACK
+#ifndef I2S_LOOP_BACK
     if (xfer_config->mode == SL_I2S_MASTER && i2s_handle == &Driver_SAI0) {
       master_mode_i2s0 = I2S_MASTER_CONFIG;
     }
@@ -343,7 +343,7 @@ sl_status_t sl_si91x_i2s_config_transmit_receive(sl_i2s_handle_t i2s_handle, sl_
         I2S0->CHANNEL_CONFIG[0].I2S_TFF_b.TXCHFR = 1;
 #endif
 
-#ifndef I2S0_LOOP_BACK
+#ifndef I2S_LOOP_BACK
         if (i2s_handle == &Driver_SAI0 && master_mode_i2s0 == I2S_MASTER_CONFIG) {
           master_mode_i2s0 = I2S_MASTER_CONFIG_TX;
         }
@@ -738,7 +738,7 @@ static sl_status_t convert_arm_to_sl_error_code(int32_t error)
  ******************************************************************************/
 static void i2s0_callback_event_handler(uint32_t event)
 {
-#ifndef I2S0_LOOP_BACK
+#ifndef I2S_LOOP_BACK
   if (event == SL_I2S_SEND_COMPLETE) {
     if (master_mode_i2s0 == I2S_MASTER_CONFIG_TX) {
 //Flush out the remaining bytes in Transmit FIFO by writing 0s to LTHR and RTHR registers before disabling WSCLK
@@ -763,7 +763,7 @@ static void i2s0_callback_event_handler(uint32_t event)
 #endif
   //Call the registered application callback
   i2s0_user_callback(event);
-#ifndef I2S0_LOOP_BACK
+#ifndef I2S_LOOP_BACK
   //Disable WSCLK
   I2S0->I2S_CER_b.CLKEN = DISABLE;
 #endif

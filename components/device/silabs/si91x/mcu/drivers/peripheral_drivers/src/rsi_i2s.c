@@ -1079,7 +1079,7 @@ int32_t I2S_Send(const void *data,
         }
         UDMAx_ChannelEnable(i2s->dma_tx->channel, udma, udmaHandle);
         UDMAx_DMAEnable(udma, udmaHandle);
-#ifdef I2S0_LOOP_BACK
+#ifdef I2S_LOOP_BACK
         if (i2s->reg == I2S0) {
           i2s->reg->I2S_IRER_b.RXEN = 0x1;
         }
@@ -1231,7 +1231,7 @@ int32_t I2S_Receive(void *data,
       }
       i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_RER_b.RXCHEN = 0x1;
 // Only enable RXEN for the correct instance and avoid duplicate writes
-#ifndef I2S0_LOOP_BACK
+#ifndef I2S_LOOP_BACK
       if (i2s->reg == I2S0) {
         i2s->reg->I2S_IRER_b.RXEN = 0x1;
       }
@@ -1243,7 +1243,7 @@ int32_t I2S_Receive(void *data,
 #endif
       UDMAx_ChannelEnable(i2s->dma_rx->channel, udma, udmaHandle);
       UDMAx_DMAEnable(udma, udmaHandle);
-#ifndef I2S0_LOOP_BACK
+#ifndef I2S_LOOP_BACK
       if (i2s->reg == I2S0 && i2s->info->rx.master) {
         i2s->reg->I2S_CER_b.CLKEN = ENABLE; //RX_Clock is not required in Loopback connections.
       }

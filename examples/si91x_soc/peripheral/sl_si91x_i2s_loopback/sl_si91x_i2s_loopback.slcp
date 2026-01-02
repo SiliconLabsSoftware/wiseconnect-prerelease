@@ -25,7 +25,7 @@ toolchain_settings:
   value: -Wall -Werror
 define:
 - name: SYSCALLS_WRITE
-- name: I2S0_LOOP_BACK
+- name: I2S_LOOP_BACK
 other_file:
 - path: resources/readme/setupdiagram.png
 - path: resources/uc_screen/i2s_loopback_uc_screen.png
