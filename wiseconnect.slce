@@ -1,6 +1,6 @@
 id: wiseconnect3_sdk
 label: Wiseconnect
-description: Wiseconnect3 Sdk extension for the Simplicity SDK
+description: WiSeConnect extension for the Simplicity SDK (formerly Gecko SDK)
 version: 4.0.0
 component_path:
  - path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
