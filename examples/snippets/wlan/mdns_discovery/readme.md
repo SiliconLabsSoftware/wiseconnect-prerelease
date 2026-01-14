@@ -136,7 +136,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Setting Up an mDNS Test Environment
 
-For mDNS discovery to work, there must be an mDNS responder advertising services on the same network as the SiWx91x device. Without an external service to discover, the application will time out.
+For mDNS discovery to work, an mDNS responder must advertise services on the same network as the SiWx91x device. Without an external service to discover, the application will time out.
 
 ### Linux (using Avahi)
 
@@ -192,4 +192,4 @@ sl_mdns_service_query_t service_query = { .service_type = "_services._dns-sd._ud
                                           .timeout      = 5000 };
 ```
 
-This returns all PTR records on the network, which can then be used to initiate targeted queries for specific services.
+This returns all PTR records on the network, which can then initiate targeted queries for specific services.

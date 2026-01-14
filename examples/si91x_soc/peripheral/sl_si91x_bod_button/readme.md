@@ -31,7 +31,7 @@ To use this application, the following hardware, software, and project setup is 
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer to [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
+  - For Serial Console setup instructions, refer to [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 ### Setup Diagram
 
 > ![Figure: setupdiagram](resources/readme/setupdiagram.png)

@@ -130,7 +130,7 @@ The application can be configured to suit your requirements and development envi
 - The following parameters are common to SoC and NCP.
 
  ```c
- #define SUBSCRIBE_TO_TOPIC        "aws_status"      //! Subscribe topic to receive the messages from AWS IoT cloud.
+ #define SUBSCRIBE_TO_TOPIC        "aws_status"      //! Subscribe to topic to receive the messages from AWS IoT cloud.
  #define PUBLISH_ON_TOPIC          "siwx91x_status"  //! Publish topic to send the messages from application to AWS IoT cloud.
  #define MQTT_PUBLISH_PAYLOAD      "Hi from SiWx91x" //! Publish message. Increase the AWS_IOT_MQTT_TX_BUF_LEN value in aws_iot_config.h for larger payloads.
  #define SUBSCRIBE_QOS             QOS1              //! Quality of Service for subscribed topic "SUBSCRIBE_TO_TOPIC".
@@ -370,3 +370,4 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 - Click **Done**.
 
 - The created thing should now be visible on the AWS console (Manage > All devices > Things).
+

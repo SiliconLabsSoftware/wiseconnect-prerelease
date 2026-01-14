@@ -453,7 +453,7 @@
  * @brief Enables Enhanced Max PSP.
  * @details Set this bit to enable the Enhanced Max PSP feature for improved performance.
  * 
- * @note The performance profile should be set to ASSOCIATED_POWER_SAVE_LOW_LATENCY for the device to enter Enhanced Max PSP mode.
+ * @note Set the performance profile to ASSOCIATED_POWER_SAVE_LOW_LATENCY for the device to enter Enhanced Max PSP mode.
  */
 #define SL_WIFI_ENABLE_ENHANCED_MAX_PSP BIT(26)
 

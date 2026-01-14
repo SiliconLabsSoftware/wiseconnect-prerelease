@@ -30,7 +30,7 @@ This sample app demonstrates the use of the Joystick Driver. It prints the joyst
 
 - Simplicity Studio 
 - Serial console Setup
-  - For Serial Console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
+  - For Serial Console setup instructions, refer to [Console Input and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -51,16 +51,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Application Build Environment
 
 ### Application Configuration Parameters
-- Configure UC from the slcp component:
-  - Open **sl_si91x_joystick.slcp** project file select **software component** tab and search for **joystick** in search bar.
-  - Configure the UC as mentioned below.
+- Open the **sl_si91x_joystick.slcp** project file, select the **software component** tab, and search for **joystick** in the search bar.
+  - Configure the UC as described below.
 ![Figure: sl_joystick_uc_screen](resources/uc_screen/sl_joystick_uc_screen.png)
 
 - Using configuration wizard one can configure different parameters like:
   - **Channel selection**
-     - Joystick ADC channel : The selection of the ADC channel instance for the joystick can be adjusted between channels 1 and channel_16.
+     - Joystick ADC channel: The selection of the ADC channel instance for the joystick can be adjusted between channels 1 and channel_16.
   > **Note:**
-  > - The user can install up to sixteen instances of the channel, which will execute in sequential order. To configure this, follow the steps below:
+  > - You can install up to 16 instances of the channel, which will execute in sequential order. To configure the device, follow these steps:
   >
   >   1. Open the **SOFTWARE COMPONENTS** tab in your project.
   >   2. Search for **joystick** and select the component.
@@ -85,11 +84,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - ❌ Instance 1, Instance 5, Instance 2 (out of order)
   - ❌ Instance 0, Instance 1, Instance 2 (must start at 1)
  > **Note:** 
- > - This is a configuration requirement, not an installation order requirement. You    can add instances in any order through the component installer. However, when naming or configuring them, ensure their instance numbers are sequential (e.g., 1, 2, 3). The system typically enforces this numbering automatically when instances are created.
+ > - This is a configuration requirement, not an installation order requirement. You can add instances in any order through the component installer. However, when naming or configuring them, ensure their instance numbers are sequential (e.g., 1, 2, 3). The system typically enforces this numbering automatically when instances are created.
  > 
- > - Explanation: The important rule is sequential numbering, not the order in which you click “Install.” For example, if you need 3 channels, you must have instances numbered 1, 2, and 3. You cannot skip numbers (like 1, 3, 4) or have duplicates. Whether you install instance 2 before instance 1 does not matter, as long as the final numbering is consecutive starting from 1.
+ > - Explanation: The important rule is sequential numbering, not the order in which you click "Install". For example, if you need 3 channels, you must have instances numbered 1, 2, and 3. You cannot skip numbers (like 1, 3, 4) or have duplicates. Whether you install instance 2 before instance 1 does not matter, as long as the final numbering is consecutive starting from 1.
 
- **Joystick Voltage value Configuration**
+ **Joystick Voltage Value Configuration**
   - REFERENCE VOLTAGE: Vref magnitude expressed in millivolts. As per Joystick Hardware on Wireless Pro Kit, Vref = AVDD = 3300 mV.
   - CENTER POSITION: Center position value(mV).
   - NORTH POSITION: North/Up position value(mV).

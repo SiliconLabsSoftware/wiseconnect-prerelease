@@ -787,9 +787,9 @@ typedef struct {
  * the transmission would occur at the maximum supported transmit power.
  * 
  * @note
- * Software has the Configuration support up to 31dbm, refer Datasheet for Maximum possible power.
- * The device automatically picks the highest transmit power allowed for each data rate.
- * If the configured power level is higher than what the device supports for that rate, it will limit the power to the maximum supported for that rate.
+ * The software supports configuration up to 31 dBm. Refer to the data sheet for the maximum supported power.
+ * The device automatically selects the highest transmit power allowed for each data rate.
+ * If the configured power level exceeds the device’s supported power for that rate, the device limits the power to the maximum supported level.
  *
  */
 typedef struct {

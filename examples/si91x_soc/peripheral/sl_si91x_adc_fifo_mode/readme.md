@@ -97,7 +97,7 @@ sl_si91x_adc_set_channel_configuration(sl_adc_channel_config, sl_adc_config);
 
 - Simplicity Studio
 - Serial console setup
-  - For serial Console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
+  - For Serial Console setup instructions, refer to [link name](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -200,7 +200,7 @@ The following table lists the mentioned pin numbers for the radio board. If you 
   | 15 | GPIO_28 [CS] | GPIO_26 [MISO] |
   | 16 | GPIO_30 [RST] | ULP_GPIO_7 [TX] |
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+> **Note**: For recommended settings, please refer to the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 

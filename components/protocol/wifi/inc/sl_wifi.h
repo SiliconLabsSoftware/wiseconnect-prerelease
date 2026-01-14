@@ -266,7 +266,7 @@ sl_status_t sl_wifi_set_max_tx_power(sl_wifi_interface_t interface, sl_wifi_max_
 
 /***************************************************************************/ /**
  * @brief
- *   Configures the RTS (Request-To-Send) threshold in bytes.
+ *   Configures the Request-To-Send (RTS) threshold in bytes.
  *   When a frame’s size meets or exceeds this value, the RTS/CTS handshake is initiated to reduce collisions. Frames smaller than the threshold are sent directly, avoiding the extra overhead of control frames.
  * @param[in] interface
  *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
@@ -283,7 +283,7 @@ sl_status_t sl_wifi_set_rts_threshold(sl_wifi_interface_t interface, uint16_t rt
 
 /***************************************************************************/ /**
  * @brief
- *   Get the RTS (Request-To-Send) threshold (in bytes).
+ *   Get the Request-To-Send (RTS) threshold (in bytes).
  * @param[in] interface
  *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
  *   Note: Applies to all active interfaces; per-interface values are not supported.

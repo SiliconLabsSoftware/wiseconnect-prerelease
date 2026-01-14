@@ -95,7 +95,7 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
+  - For Serial Console setup instructions, refer to [link name](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -125,7 +125,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   - **SSI Secondary(Slave) Configuration**
     - Frame Format: SSI Frame Format can be configured:
-      - Mode 0, Mode 1, Mode 2, Mode 3 ,Mode 4 and Mode 5.
+      - Mode 0, Mode 1, Mode 2, Mode 3, Mode 4 and Mode 5.
     - Bit Rate: The speed of transfer is configurable. The configuration range is from 500Kbps to 40Mbps in high-power mode.
     - Data Width: The size of data packet. The configuration range from 4 to 16.
     - Mode: SSI mode/instance can be configurable. It can be configured Secondary.

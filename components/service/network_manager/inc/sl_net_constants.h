@@ -115,7 +115,7 @@ typedef enum {
   SL_NET_DHCP_NOTIFICATION_EVENT, ///< Event triggered when a DHCP notification is received.
   SL_NET_IP_ADDRESS_CHANGE_EVENT, ///< Event triggered when there is a DHCP IP address change.
   SL_NET_AUTO_JOIN_EVENT, ///< Event triggered when the auto-join process starts, is in progress, or is completed.
-  SL_NET_CONNECT_EVENT, ///< Event triggered when WiFi connection completes (status: SL_STATUS_OK=success, else=specific error code). @note ONLY for @ref sl_net_up_async().
+  SL_NET_CONNECT_EVENT, ///< Event triggered when Wi-Fi connection completes (status: SL_STATUS_OK=success, else=specific error code). @note ONLY for @ref sl_net_up_async().
   SL_NET_IP_CONFIG_EVENT, ///< Event triggered when IP configuration completes (status: SL_STATUS_OK=success, else=specific error code). @note ONLY for @ref sl_net_up_async().
   SL_NET_MDNS_EVENT,      ///< Event triggered when an mDNS query response is received.
   SL_NET_MDNS_STOP_EVENT, ///< Event triggered when the mDNS service is stopped.

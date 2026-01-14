@@ -34,7 +34,7 @@ The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts
 
 - Semaphores
 - Event Flags
-- This application contains a comprehensive sample application which includes multiple peripherals listed below
+- This application contains a comprehensive sample application which includes the following peripherals listed below
   - PWM
   - I2C (as Driver Leader application)
   - GPIO Interrupts
@@ -52,7 +52,7 @@ The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts
 - I2C instances will be configured in Leader mode. The SCL and SDA lines of Leader controller are connected to another I2C Follower's SCL and SDA pins.
 
 - From Leader, the Follower address is sent after START on bus and waits till it gets the ACK respose from the Follower.
-- The data is written to the other Follower application and Follower application sent back same data. Once received, it compares the returned data with the original and produces the results.
+- The application writes the date to the other follower application, which sends the same data back. Upon receipt, the application compares the returned data with the original data and reports the results.
 - I2C can be configured with following features:
   - I2C standard compliant bus interface with open-drain pins
   - Configurable as Leader or Follower
@@ -82,7 +82,7 @@ The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts
 
 - Simplicity Studio
 - Serial console setup
-  - For serial console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
+  - For Serial Console setup instructions, refer to [link name](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 

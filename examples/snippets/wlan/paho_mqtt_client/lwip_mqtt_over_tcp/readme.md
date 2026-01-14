@@ -76,7 +76,6 @@ In the Project Explorer pane, expand the **config** folder and open the ``sl_net
     ```c
     #define DEFAULT_WIFI_CLIENT_PROFILE_SSID "YOUR_AP_SSID"      
      ```
-
   - DEFAULT_WIFI_CLIENT_CREDENTIAL refers to the secret key if the access point is configured in WPA-PSK/WPA2-PSK security modes.
 
     ```c
@@ -308,7 +307,6 @@ Follow the steps below for successful execution of the application:
    **![Adding CA certificate in MQTT Explorer](resources/readme/mqtt_explorer_add_cacert2.png)**
 
    **![Adding CA certificate in MQTT Explorer](resources/readme/mqtt_explorer_add_cacert3.png)**
-
 
 ## Procedure to configure for IPv6
 

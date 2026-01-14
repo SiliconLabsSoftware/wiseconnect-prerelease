@@ -141,8 +141,8 @@ sl_websocket_config_t ws_config = {
 When SSL is enabled, the CA certificate is automatically loaded from `cacert.pem.h`.
 
 To test WebSocket over SSL (WSS):
-1. Set `.enable_ssl = true` in `app.c`
-2. Ensure the WebSocket server is started with SSL enabled (set `USE_SSL = true` in `index.js`)
+1. Set `.enable_ssl = true` in `app.c`.
+2. Ensure the WebSocket server is started with SSL enabled (set `USE_SSL = true` in `index.js`).
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -154,3 +154,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - Flash, run and debug the application.
 
    ![Application prints](resources/readme/output_soc.png)
+

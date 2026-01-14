@@ -41,8 +41,8 @@
 
 #define CERTIFICATE_INDEX 0
 
-#define SUBSCRIBE_TO_TOPIC "aws_status"     //! Subscribe Topic to receive the message from cloud.
-#define PUBLISH_ON_TOPIC   "siwx91x_status" //! Publish Topic to send the status from application to cloud.
+#define SUBSCRIBE_TO_TOPIC "aws_status"     //! Subscribe to topic to receive the message from the cloud.
+#define PUBLISH_ON_TOPIC   "siwx91x_status" //! Publish topic to send the status from application to cloud.
 #define MQTT_PUBLISH_PAYLOAD \
   "Hi from SiWx91x" //! Publish message. Increase the AWS_IOT_MQTT_TX_BUF_LEN value in aws_iot_config.h for larger payloads.
 #define SUBSCRIBE_QOS       QOS1  //! Quality of Service for subscribed topic "SUBSCRIBE_TO_TOPIC".

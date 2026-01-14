@@ -2,18 +2,26 @@
 
 ## Table of Contents
 
-- [SL SI91x Logger](#si91x-logger-example)  
-  - [Purpose/Scope](#purposescope)  
-  - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)  
-    - [Hardware Requirements](#hardware-requirements)  
-    - [Software Requirements](#software-requirements)  
-    - [Setup Diagram](#setup-diagram)  
-  - [Getting Started](#getting-started)  
-  - [Application Build Environment](#application-build-environment)  
-    - [Application Configuration Parameters](#application-configuration-parameters)  
-    - [Logger Levels](#logger-levels)  
-    - [Where Each Level Appears in the Code](#where-each-level-appears-in-the-code)  
-  - [Test the Application](#test-the-application)  
+- [SL SI91x Logger](#sl-si91x-logger)
+  - [Table of Contents](#table-of-contents)
+  - [Purpose/Scope](#purposescope)
+  - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
+    - [Hardware Requirements](#hardware-requirements)
+    - [Software Requirements](#software-requirements)
+    - [Setup Diagram](#setup-diagram)
+  - [Getting Started](#getting-started)
+  - [Application Build Environment](#application-build-environment)
+    - [Application Configuration Parameters](#application-configuration-parameters)
+    - [Logger Levels](#logger-levels)
+  - [UC Config](#uc-config)
+    - [Where Each Level Appears in the Code](#where-each-level-appears-in-the-code)
+      - [DEBUG](#debug)
+      - [INFO](#info)
+      - [WARN](#warn)
+      - [ERROR](#error)
+    - [Time-Sync \& Log Flush Behavior](#time-sync--log-flush-behavior)
+    - [Note on Log Flushing (sl\_log\_flush)](#note-on-log-flushing-sl_log_flush)
+  - [Test the Application](#test-the-application)
 
 ## Purpose/Scope
 
@@ -46,7 +54,7 @@ To use this application, the following hardware, software, and project setup are
 
 - **Simplicity Studio**  
 - **Serial console setup**  
-  - For serial console setup instructions, refer to the WiSeConnect *Console input and output* section.  
+  - For Serial Console setup instructions, refer to the WiSeConnect *Console input and output* section.  
 - **Embedded Development Environment**  
   - For Si91x, use the latest version of Simplicity Studio (see **“Download and Install Simplicity Studio”** in the *getting-started-with-siwx917-soc* guide in `release_package/docs/index.html`).  
 
@@ -236,7 +244,9 @@ Follow these steps to build and test the SI91x Logger example:
    - Flash the image to the Si91x device.  
 
 4. **Decode and view logger output**
-   - To convert the encoded logger stream into human-readable text, run the Python decoding script recommended by the Logger documentation.
+   - To convert the encoded logger stream into readable text format, run the Python decoding script present in example project folder.
+   - Sample command for converting raw log events to readable text is  **python Log_script.py --port (SERIAL_COMPORT) --out (project.out file) --baud 115200**. 
+      Ex Command "python Log_script.py --port COM3 --out sl_si91x_logger.out --baud 115200"
 
 5. ## Console Output
 

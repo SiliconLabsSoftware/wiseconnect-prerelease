@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [SL I2S PRIMARY](#sl-i2s-primary)
-  - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -20,11 +19,11 @@
 
 ## Purpose/Scope
 
-- This application demonstrate the I2S primary device transfer
+ - The application performs bidirectional I2S sample transfers between primary and secondary devices, compares the corresponding buffers, and prints the results to the console.
 
 ## Overview
 
-- The I2S_2CH supports two stereo channels while the ULP_I2S and the NWP/Security subsystem I2S support one stereo channel
+- The I2S0 peripheral supports two stereo channels for both transmit and receive while the ULP_I2S supports one stereo channel
 - Programmable Audio data resolutions of 16, 24 and 32 bits
 - Supported audio sampling rates are 8, 11.025, 16, 22.05, 24, 32, 44.1, 48, 88.2, 96 and 192 kHz
 - Support for Master and Slave modes
@@ -46,28 +45,23 @@
 - Application will be in wait state until data transmit complete.
 - Test will be pass after successful data comparison.
 
-**Note!**
+**Note:**
 
-1. sl_i2s_xfer_config_t has following parameters,
-   (a) mode - Configure I2S device in Primary(Master)/Secondary(Slave) mode
-   (b) sync - I2S synchronous mode (4-pin mode: SCK and WS signals are shared between I2S transmit and receive blocks)
-      and asynchronous mode(requires SCK and WS pins). Currently, the driver only supports ASYNC mode.
-   (c) protocol - I2S/PCM protocol. Currently, the driver only supports I2S protocol.
-   (d) resolution - Audio data resolutions (16-bit, 24-bit and 32-bit)
-   (e) data_size - Transfer buffer data type (8-bit, 16-bit and 32-bit)
-   (f) sampling_rate - Audio sampling rate
-   (g) transfer_type - Transfer type (Transmit, Receive, Transmit abort, and Receive abort)
-2. Transfers with 16-bit resolution must use uint16_t data type buffer and pass SL_I2S_DATA_SIZE16 to data_size parameter
-   in sl_i2s_xfer_config_t while configuring transfer.
-3. Transfers with 24-bit and 32-bit resolutions must use uint32_t data type buffer and pass SL_I2S_DATA_SIZE32 to data_size parameter
-   in sl_i2s_xfer_config_t while configuring transfer
-4. Since 8-bit resolution is not supported, uint8_t data type buffer can use 16-bit resolution for transfer and pass SL_I2S_DATA_SIZE8
-   to data_size parameter in sl_i2s_xfer_config_t while configuring transfer. While performing this operation data buffer should be
-   typecast to (uint16_t *) and the transfer size should be half of the 8-bit data type buffer. (Refer to the I2S loopback application for more details). For 8-bit transfers, transfer size should be multiples of 4 (8,12,16,20...)
-5. Any I2S transfers with 16-bit and 32-bit resolutions should only have an even transfer size (8,10,12,14...)
-6. Any I2S transfers with 24-bit resolutions should only have transfer size as multiples of 4 (8,12,16,20...)
-7. SCK frequency is calculated using SCK = 2 *bit_width* sampling_frequency. By default, I2S0 uses I2S_PLL_CLK as a clock source. This can generate any frequency range mentioned in section 6.11.7 of Si91x HRM.
-8. By default ULP_I2S/I2S1 uses ULP_MHZ_RC_CLK to support I2S operation in low power states. This limits the maximum supported sampling frequency of ULP_I2S to 48kHz (32 MHz RC trims to 20MHz in sleep).
+- sl_i2s_xfer_config_t has following parameters:
+  - **mode** - Configure I2S device in Primary(Master)/Secondary(Slave) mode
+  - **sync** - I2S synchronous mode (4-pin mode: SCK and WS signals are shared between I2S transmit and receive blocks) and asynchronous mode (requires SCK and WS pins). Currently, the driver only supports ASYNC mode.
+  - **protocol** - I2S/PCM protocol. Currently, the driver only supports I2S protocol.
+  - **resolution** - Audio data resolutions (16-bit, 24-bit and 32-bit)
+  - **data_size** - Transfer buffer data type (8-bit, 16-bit and 32-bit)
+  - **sampling_rate** - Audio sampling rate
+  - **transfer_type** - Transfer type (Transmit, Receive, Transmit abort, and Receive abort)
+- Transfers with 16-bit resolution must use uint16_t data type buffer and pass SL_I2S_DATA_SIZE16 to data_size parameter in sl_i2s_xfer_config_t while configuring transfer.
+- Transfers with 24-bit and 32-bit resolutions must use uint32_t data type buffer and pass SL_I2S_DATA_SIZE32 to data_size parameter in sl_i2s_xfer_config_t while configuring transfer.
+- Since 8-bit resolution is not supported, uint8_t data type buffer can use 16-bit resolution for transfer and pass SL_I2S_DATA_SIZE8 to data_size parameter in sl_i2s_xfer_config_t while configuring transfer. While performing this operation data buffer should be typecast to (uint16_t *) and the transfer size should be half of the 8-bit data type buffer. (Refer to the [I2S loopback](https://github.com/SiliconLabs/wiseconnect/tree/master/examples/si91x_soc/peripheral/sl_si91x_i2s_loopback) application for more details). For 8-bit transfers, transfer size should be multiples of 4 (8,12,16,20...)
+- Any I2S transfers with 16-bit and 32-bit resolutions should only have an even transfer size (8,10,12,14...)
+- Any I2S transfers with 24-bit resolutions should only have transfer size as multiples of 4 (8,12,16,20...)
+ - SCK frequency is calculated as SCK = 2 × bit_width × sampling_rate. By default, I2S0 uses I2S_PLL_CLK as the clock source and can generate a wide range of audio bit-clock frequencies suitable for common sampling rates.
+- By default ULP_I2S/I2S1 uses ULP_MHZ_RC_CLK to support I2S operation in low power states. This limits the maximum supported sampling frequency of ULP_I2S to 48kHz (32 MHz RC trims to 20MHz in sleep).
 
 ## Prerequisites/Setup Requirements
 
@@ -80,7 +74,7 @@
 
 - Simplicity Studio
 - Serial console Setup
-  - For Serial Console setup instructions, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
+  - For Serial Console setup instructions, refer to [Console Input and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
 ### Setup Diagram
 
@@ -110,8 +104,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ### General Configuration
 
 - SL_I2S0_RESOLUTION: I2S0 resolution can be configured through this macro,valid resolution values are 16, 24 and 32 bit.
-- SL_I2S0_SAMPLING_RATE: I2S0 sampling rate can be configured through this macro,valid sampling rate values are
-    8kHz, 11.025kHz, 16kHz, 22.05kHz, 24kHz, 32kHz, 44.1kHz, 48kHz, 88.2kHz, 96kHz and 192kHz
+- SL_I2S0_SAMPLING_RATE: I2S0 sampling rate can be configured through this macro, valid sampling rate values are 8kHz, 11.025kHz, 16kHz, 22.05kHz, 24kHz, 32kHz, 44.1kHz, 48kHz, 88.2kHz, 96kHz and 192kHz
 - SL_I2S0_CHANNEL: I2S0 channel number (0-channel no 0, 1-channel no 1)
 - Configuration files are generated in **config folder**, if not changed then the code will run on default UC values.
 
@@ -121,7 +114,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 #define I2S_PRIMARY_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
 ```
 
-### Pin Configuration
+### Pin Configuration for I2S primary
 
 - For BRD4338A
 
@@ -136,20 +129,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
    >![Figure: Pin connections](resources/readme/image505d.png)
 
-### Pin Description
-
-> **Note:**
->
-> Make sure pin configuration in RTE_Device_917.h file.(path:/$project/config/RTE_Device_917.h)
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
-
 ## Test the Application
 
-Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
+Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project) to:
 
-1. Take two Silicon Labs [Si917 Evaluation Kit WPK(BRD4002) + BRD4338A]
-2. First compile and run i2s secondary device application in one board.
+1. Take two Silicon Labs Si917 Evaluation Kits: [WPK (BRD4002)](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+2. First compile and run [i2s secondary](https://github.com/SiliconLabs/wiseconnect/tree/master/examples/si91x_soc/peripheral/sl_si91x_i2s_secondary) application in one board.
 3. Compile and run this application in another board.
 4. When the application runs. It receives data from secondary device and after successful
    comparision, it sends data to secondary device.

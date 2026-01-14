@@ -220,7 +220,7 @@ typedef struct {
  * @details
  *   This structure holds the information required to connect to an MQTT broker, that includes the broker's IP address, port number, connection encryption status, connection timeout, keep-alive interval, and keep-alive retries.
  * @note 
- *   Moving forward, this structure will be deprecated. Instead, use the [sl-mqtt-broker-v2-t](../wiseconnect-api-reference-guide-mqtt/sl-mqtt-broker-v2-t) structure. This is retained for backward compatibility.
+ *   This structure will be deprecated in a future release. Instead, use the [sl-mqtt-broker-v2-t](../wiseconnect-api-reference-guide-mqtt/sl-mqtt-broker-v2-t) structure. This structure is retained for backward compatibility.
  */
 typedef struct {
   sl_ip_address_t ip; ///< IP address of the broker.
@@ -246,7 +246,7 @@ typedef struct {
  *
  *   @note
  *   - The `host_name` field is reserved for future support of MQTT broker hostname.
- *   - The `sni_host_name` field is used for SNI (Server Name Indication) when connecting over TLS. This is required for AWS IoT and similar brokers.
+ *   - The `sni_host_name` field is used for Server Name Indication (SNI) when connecting over TLS. This is required for AWS IoT and similar brokers.
  *   - If SNI is enabled (`enable_sni` is true), `sni_host_name` must be provided and will be programmed into the firmware before connecting.
  *   - For non-TLS connections, SNI fields are ignored.
  */
@@ -255,11 +255,11 @@ typedef struct {
   uint8_t *host_name; ///< MQTT broker hostname (not currently supported).
   uint16_t port;      ///< Port number of the broker.
   bool
-    is_connection_encrypted; ///< Indicates if the connection is encrypted. This field would be deprecated in future releases. You are recommended to use `tls_flags` in @ref sl_mqtt_client_configuration_t.
+    is_connection_encrypted; ///< Indicates if the connection is encrypted. This field will be deprecated in future releases. Use `tls_flags` in @ref sl_mqtt_client_configuration_t instead.
   uint16_t connect_timeout;  ///< MQTT connection timeout in milliseconds.
   uint16_t keep_alive_interval; ///< Keep-alive interval of the MQTT connection in seconds.
   uint16_t keep_alive_retries;  ///< Number of MQTT ping retries.
-  bool enable_sni;              ///< Enable or disable the use of Server Name Indication (SNI) extension in MQTT.
+  bool enable_sni;              ///< Enable or disable SNI extension in MQTT.
   uint8_t *sni_host_name;       ///< Hostname to use in SNI (required for TLS/SNI connections; e.g., AWS IoT).
 } sl_mqtt_broker_v2_t;
 

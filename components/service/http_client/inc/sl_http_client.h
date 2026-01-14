@@ -413,7 +413,7 @@ sl_status_t sl_http_client_deinit(const sl_http_client_t *client);
  *   SNI Limitation:
  *   - Only one SNI command can be active at a time, irrespective of protocol (MQTT or HTTP).
  *   - You must wait for the connection to be fully established before initiating another connection with SNI.
- *   - If multiple SNI commands are sent simultaneously, SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE will be returned.
+ *   - If multiple SNI commands are sent simultaneously, SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE returns.
  *   - For reconnection scenarios, set SNI before calling reconnect.
  ******************************************************************************/
 sl_status_t sl_http_client_request_init(sl_http_client_request_t *request,
@@ -537,7 +537,7 @@ sl_status_t sl_http_client_delete_all_headers(sl_http_client_request_t *request)
  *   SNI Limitation:
  *   - Only one SNI command can be active at a time, irrespective of protocol (MQTT or HTTP).
  *   - You must wait for the connection to be fully established before initiating another connection with SNI.
- *   - If multiple SNI commands are sent simultaneously, SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE will be returned.
+ *   - If multiple SNI commands are sent simultaneously, the device returns SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE.
  *   - For reconnection scenarios, set SNI before calling reconnect.
  ******************************************************************************/
 sl_status_t sl_http_client_send_request(const sl_http_client_t *client, const sl_http_client_request_t *request);

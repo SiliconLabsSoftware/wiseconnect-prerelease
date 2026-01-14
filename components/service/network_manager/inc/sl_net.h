@@ -152,7 +152,7 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface);
  * @note
  * The user is advised to reset the NWP with @ref sl_net_deinit() if this API fails with error SL_STATUS_TIMEOUT.
  * @note
- * This API is not atomic. It performs multiple operations (network scanning, connection, IP configuration) sequentially. If any step fails after previous steps have completed, the interface may be left in a partially configured state (e.g., connected to WiFi but without an IP address). In such cases, call @ref sl_net_down to properly clean up before retrying.
+ * This API is not atomic. It performs multiple operations (network scanning, connection, IP configuration) sequentially. If any step fails after previous steps have completed, you may leave the interface in a partially configured state (e.g., connected to Wi-Fi but without an IP address). In such cases, call @ref sl_net_down to properly clean up before retrying.
  * ******************************************************************************/
 sl_status_t sl_net_up(sl_net_interface_t interface, sl_net_profile_id_t profile_id);
 
@@ -254,7 +254,7 @@ sl_status_t sl_net_get_interface_info(sl_net_interface_t interface, sl_net_inter
  *   Multicast IP address of type @ref sl_net_ip_configuration_t
  * @param[in] timeout
  *   Allowed range for finite timeout: [1,(1<<30)-1] milliseconds.
- *   if bit (1 << 31) is set and (1<<30) bit is not set then it will be considered as indefinite timeout, irrespective of what's there in all other bits .
+ *   If bit (1 << 31) is set and bit (1<<30) is not set, the value is treated as an indefinite timeout, regardless of the other bits.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  ******************************************************************************/
@@ -355,7 +355,7 @@ sl_status_t sl_net_nat_disable(const sl_net_interface_t interface);
  * @note
  * When configuring Wi-Fi clients or Access Points with open security (SL_WIFI_OPEN), 
  * set the credential_id field to SL_WIFI_NO_CREDENTIAL_ID within the respective 
- * configuration structures (sl_wifi_client_configuration_t in sl_net_wifi_client_profile_t for clients, 
+ * configuration structures (sl_wifi_client_configuration_t in sl_net_wifi_client_profile_t for clients 
  * and sl_wifi_ap_configuration_t in sl_net_wifi_ap_profile_t for APs). 
  * This ensures the stack does not attempt to fetch credentials that are not required for open security.
  ******************************************************************************/

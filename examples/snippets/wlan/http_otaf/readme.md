@@ -137,6 +137,12 @@ The application can be configured to suit your requirements and the development 
       #define FW_UPDATE_TYPE TA_FW_UPDATE
       ```
 
+      > **Note:**
+      > - It is strongly recommended to perform firmware update using a combined image, which includes both the Network Processor (NWP) and the Application Processor (M4) images in a single package.
+      > - When generating a combined image, use NWP image and M4 image from the same release package. Using different versions may result in undefined behavior due to a version mismatch.
+      > - For devices with 4 MB flash, updating using a combined image is not supported due to memory limitations. In this case, it is mandatory to update the NWP image first, followed by the M4 image.
+      > - For NCP mode, it is mandatory to update the NWP image first, followed by the Host image of the same release version.
+
     - Based on the type of server (Apache/AWS S3 bucket/Azure Blob Storage) from which the firmware files need to be downloaded, the following parameters need to be configured.
       - Configure FLAGS to choose the version and security type to be enabled.
 

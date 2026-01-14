@@ -81,7 +81,7 @@ No additional application level changes are required to execute the OOB demo exa
 
 If the pro kit used, The status of the application is updated in TFT-LCD display of the WPK baseboard. 
 The SiWG917 dev kit does not have an onboard display. All device activities for the pro and dev kits can be observed on the serial terminal prints.
-To view the application prints on the console, refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
+To view the application prints on the console, refer to [link name](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#console-input-and-output).
 
 ### Run the application
 

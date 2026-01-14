@@ -149,13 +149,13 @@ sl_status_t sl_mqtt_client_connect(sl_mqtt_client_t *client,
  *   Pointer to the MQTT client structure of type @ref sl_mqtt_client_t that would be connected to the broker.
  *
  * @param[in] broker
- *   Pointer to the broker configuration of type @ref sl_mqtt_broker_v2_t. This parameter could be NULL for subsequent calls to retain the previous broker configuration.
+ *   Pointer to the broker configuration of type @ref sl_mqtt_broker_v2_t. You can set this parameter to NULL in later calls to reuse the previous broker configuration.
  *
  * @param[in] last_will_message
- *   Pointer to the last will message of the client of type @ref sl_mqtt_client_last_will_message_t. This parameter could be NULL for subsequent calls if no will message is to be sent.
+ *   Pointer to the last will message of the client of type @ref sl_mqtt_client_last_will_message_t. You can set this parameter to NULL in later calls if no will message is to be sent.
  *
  * @param[in] configuration
- *   Pointer to the client configuration of type @ref sl_mqtt_client_configuration_t. This parameter could be NULL for subsequent calls to retain the previous configuration.
+ *   Pointer to the client configuration of type @ref sl_mqtt_client_configuration_t. You can set this parameter to NULL in later calls to reuse the previous broker configuration.
  *
  * @param[in] connect_timeout
  *   Timeout for the API is in milliseconds. If the value is zero, the API operates in asynchronous mode.

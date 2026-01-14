@@ -11,6 +11,7 @@ metadata:
 component_root_path: ./components/common
 provides:
 - name: wiseconnect_common
+- name: wiseconnect3_common
 source:
 - path: src/sl_utility.c
 include:
