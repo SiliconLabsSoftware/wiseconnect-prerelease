@@ -244,7 +244,7 @@ Follow these steps to build and test the SI91x Logger example:
    - Flash the image to the Si91x device.  
 
 4. **Decode and view logger output**
-   - To convert the encoded logger stream into readable text format, run the Python decoding script present in example project folder.
+   - To convert the encoded logger stream into readable text format, run the Python decoding script located in the example project folder.
    - Sample command for converting raw log events to readable text is  **python Log_script.py --port (SERIAL_COMPORT) --out (project.out file) --baud 115200**. 
       Ex Command "python Log_script.py --port COM3 --out sl_si91x_logger.out --baud 115200"
 

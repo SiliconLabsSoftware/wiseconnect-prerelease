@@ -17,7 +17,7 @@
 
 ## Purpose/Scope
 
-This sample app demonstrates the use of the Joystick Driver. It prints the joystick position after every finite interval over serial console
+This sample app demonstrates the use of the Joystick Driver. It prints the joystick position after every finite interval over the serial console.
 
 ## Prerequisites/Setup Requirements
 
@@ -55,9 +55,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - Configure the UC as described below.
 ![Figure: sl_joystick_uc_screen](resources/uc_screen/sl_joystick_uc_screen.png)
 
-- Using configuration wizard one can configure different parameters like:
+- Use the configuration wizard to configure different parameters, such as:
   - **Channel selection**
-     - Joystick ADC channel: The selection of the ADC channel instance for the joystick can be adjusted between channels 1 and channel_16.
+     - Joystick ADC channel: Use this setting to select the ADC channel instance for the joystick. Supported values range from channel 1 to channel_16.
   > **Note:**
   > - You can install up to 16 instances of the channel, which will execute in sequential order. To configure the device, follow these steps:
   >
@@ -142,4 +142,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 > **Note:**
 >
-> - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Further, copy the necessary code from the driver handler to your custom interrupt handler.
+> - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then copy the necessary code from the driver handler to your custom interrupt handler.

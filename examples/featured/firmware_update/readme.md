@@ -150,14 +150,14 @@ The application can be configured to suit user requirements and development envi
 ```
 
 > **Note:**
-> - It is strongly recommended to perform firmware update using a combined image, which includes both the Network Processor (NWP) and the Application Processor (M4) images in a single package.
-> - When generating a combined image, use NWP image and M4 image from the same release package. Using different versions may result in undefined behavior due to a version mismatch.
-> - For devices with 4 MB flash, updating using a combined image is not supported due to memory limitations. In this case, it is mandatory to update the NWP image first, followed by the M4 image.
-> - For NCP mode, it is mandatory to update the NWP image first, followed by the Host image of the same release version.
+> - Use a combined image to update the firmware whenever possible. A combined image includes both the Network Processor (NWP) and Application Processor (M4) images in a single package.
+> - When generating a combined image, use the NWP and M4 images from the same release package. Using different versions may result in undefined behavior due to a version mismatch.
+> - For devices with 4 MB flash, updating with a combined image is not supported because of memory limitations. In this case, update the NWP image first, and then update the M4 image.
+> - For NCP mode, update the NWP image first, followed by the host image from the same release version.
 
 ## Test the Application
 
-### Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC, and NCP Modes)
+### Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -237,3 +237,5 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
       ```c
       ./ota_server 5001 SiWG917-B.2.x.x.x.x.x.rps
       ```
+
+

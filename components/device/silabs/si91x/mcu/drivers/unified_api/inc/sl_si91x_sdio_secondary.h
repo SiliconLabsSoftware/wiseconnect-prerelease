@@ -158,7 +158,7 @@ void sl_si91x_sdio_secondary_receive(uint8_t *data_buf);
  * @pre Pre-condition:
  *      - \ref sl_si91x_sdio_secondary_init must be called prior.
  * 
- * @note This function can be called before \ref sl_si91x_sdio_secondary_send
+ * @note Call this function before calling \ref sl_si91x_sdio_secondary_send
  *       to explicitly notify the host that data is ready for transmission.
  ******************************************************************************/
 void sl_si91x_sdio_secondary_request_to_send(void);
