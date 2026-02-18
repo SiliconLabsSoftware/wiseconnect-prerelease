@@ -33,6 +33,10 @@
  * Include files
  * */
 
+/******************************************************
+ *                    Configuration
+ ******************************************************/
+
 //! SL Wi-Fi SDK includes
 #include "sl_constants.h"
 #include "sl_wifi.h"
@@ -48,16 +52,17 @@
 #include "errno.h"
 #include "socket.h"
 #include "sl_si91x_socket.h"
-#include "sl_wifi_device.h"
-#include "sl_si91x_driver.h"
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_power_manager.h"
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_driver_gpio.h"
-//! I2C related files
-#include "i2c_leader_example.h"
 #include "rsi_ps_config.h"
+#endif
+
+//! I2C related files
+#if defined(SLI_SI91X_MCU_INTERFACE)
+#include "i2c_leader_example.h"
 #endif
 
 #include "cmsis_os2.h"
@@ -71,7 +76,6 @@
 #include "aws_iot_config.h"
 #include "aws_iot_shadow_interface.h"
 #include "ble_config.h"
-#include "wifi_config.h"
 #include "aws_client_certificate.pem.crt.h"
 #include "aws_client_private_key.pem.key.h"
 #include "aws_starfield_ca.pem.h"
@@ -706,7 +710,7 @@ void wifi_app_mqtt_task(void)
   char client_id[25];
   sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   sprintf(mac_id,
-          "%x:%x:%x:%x:%x:%x",
+          "%02x:%02x:%02x:%02x:%02x:%02x",
           mac_addr.octet[0],
           mac_addr.octet[1],
           mac_addr.octet[2],
@@ -891,11 +895,19 @@ void wifi_app_mqtt_task(void)
 #if (defined(SLI_SI91X_MCU_INTERFACE) && I2C_SENSOR_PERI_ENABLE)
           char temp_string[48] = { 0 };
 
-          // Initialize I2C
+          // Add PS4 and initialize I2C for this transaction
           i2c_init();
+
+          // Read temperature from LM75 sensor
           i2c_leader_example_process_action();
 
-          snprintf(temp_string, sizeof(temp_string) - 1, "Current Temperature in Celsius: %.2f", sensor_data);
+          // Clean shutdown and remove PS4 to allow M4 deep sleep
+          i2c_deinit();
+
+          snprintf(temp_string,
+                   sizeof(temp_string) - 1,
+                   "Current Temperature in Celsius: %.2f",
+                   get_sensor_temperature());
 
           publish_QOS0.payload    = temp_string;
           publish_QOS0.payloadLen = strlen(temp_string);

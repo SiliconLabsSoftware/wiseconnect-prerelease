@@ -34,10 +34,18 @@
 This section provides instructions on how to get started with the Hardware Random Number Generator (HRNG) example.
 
 - **Initialize the HRNG Peripheral**: Before using the HRNG, you need to initialize it. This can be done using the [`sl_si91x_hrng_init()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-init) function.
-- **Start the HRNG**: After initialization, start the HRNG using the [`sl_si91x_hrng_start()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-start) function.
-- **Generate Random Numbers**: Use the [`sl_si91x_hrng_get_bytes()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-get-bytes) function to generate random numbers.
+- **Soft Reset Demonstration**: This example demonstrates the soft reset functionality by executing three test scenarios in sequence:
+  1. **Soft Reset Enabled State**: Uses [`sl_si91x_hrng_soft_reset_set()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-soft-reset-set) to put the HRNG peripheral in reset state. While in this state, the HRNG is held in reset and subsequent operations (start, get_bytes) will fail or produce no data, demonstrating the effect of the reset state.
+  2. **PSEUDO_RANDOM Mode**: Uses [`sl_si91x_hrng_soft_reset_clear()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-soft-reset-clear) to release the HRNG from reset state, then demonstrates PSEUDO_RANDOM mode operation. In this state, the HRNG operates normally and produces random data.
+  3. **TRUE_RANDOM Mode**: Demonstrates TRUE_RANDOM mode operation, which uses hardware-based entropy sources for generating random numbers.
+  
+  This sequence helps users understand the difference between the reset and operational states of the HRNG peripheral, as well as the two available random number generation modes.
+- **Start the HRNG**: After initialization, start the HRNG using the [`sl_si91x_hrng_start()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-start) function with the desired mode (TRUE_RANDOM or PSEUDO_RANDOM).
+- **Generate Random Numbers**: Use the [`sl_si91x_hrng_get_bytes()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-get-bytes) function to generate random numbers. The example reads 10 random 32-bit values and validates that no duplicates are present.
 - **Stop the HRNG**: Once you are done generating random numbers, stop the HRNG using the [`sl_si91x_hrng_stop()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-stop) function.
-- **Deinitialize the HRNG**: Finally, deinitialize the HRNG using the [`sl_si91x_hrng_deinit()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-deinit) function to release any allocated resources.
+- **Deinitialize the HRNG**: Finally, deinitialize the HRNG using the [`sl_si91x_hrng_deinit()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng#sl-si91x-hrng-deinit) function to release any allocated resources and disable the peripheral clocks.
+
+> **Note**: When the soft reset bit is set, the HRNG peripheral is held in reset and cannot generate random numbers. To use the HRNG after setting the soft reset, you must first clear the soft reset bit using `sl_si91x_hrng_soft_reset_clear()`.
 
 ## Prerequisites/Setup Requirements
 
@@ -73,7 +81,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Include the HRNG header file in your project:
   
-  #include ["sl_si91x_hrng.h"](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_hrng.h)
+  #include ["sl_si91x_hrng.h"](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_hrng.h)
   
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).

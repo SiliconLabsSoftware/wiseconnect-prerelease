@@ -63,7 +63,7 @@ static sl_status_t secondary_sync_wait();
 /*******************************************************************************
  * PCM secondary device initialization function
  ******************************************************************************/
-void pcm_example_init(void)
+void pcm_secondary_example_init(void)
 {
   sl_status_t status;
   pcm_sampling_frequency = PCM_INSTANCE_CONFIG_(SAMPLING_RATE);
@@ -114,7 +114,7 @@ void pcm_example_init(void)
 /*******************************************************************************
  * Function will run continuously in while loop
  ******************************************************************************/
-void pcm_example_process_action(void)
+void pcm_secondary_example_process_action(void)
 {
   static transfer_state_t state = SEND_DATA;
   switch (state) {

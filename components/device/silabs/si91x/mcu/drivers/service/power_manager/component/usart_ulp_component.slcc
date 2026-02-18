@@ -22,9 +22,9 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: usart_ps2
-    value: sl_si91x_usart*
+    value: sl_si91x_usart.*
   - name: usart_ps2
-    value: rsi_udma*
+    value: rsi_udma.*
   - name: usart_ps2
-    value: rsi_udma_wrapper*
+    value: rsi_udma_wrapper.*
 

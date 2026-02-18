@@ -370,7 +370,7 @@ The wakeup mode defines the bootloader sequence the SiWx917 will undergo once it
 >**Note:**
 >* rsi_deepsleep_soc.c file should compiled to SRAM.
 >
->* Refer to the [Wi-Fi - TCP Tx on Periodic Wakeup (SoC)](https://github.com/SiliconLabs/wiseconnect/tree/v4.0.0-content-for-docs/examples/snippets/wlan/tcp_tx_on_periodic_wakeup) example for a detailed >example of M4 sleep wakeup.
+>* Refer to the [Wi-Fi - TCP Tx on Periodic Wakeup (SoC)](https://github.com/SiliconLabs/wiseconnect/tree/v4.0.1-content-for-docs/examples/snippets/wlan/tcp_tx_on_periodic_wakeup) example for a detailed >example of M4 sleep wakeup.
 >
 >* Enable SL_SI91X_ENABLE_LOWPWR_RET_LDO macro to optimize the deepsleep >power number. By default, it is disabled.
 >
@@ -836,7 +836,7 @@ The Lite configuration is used for 4 MB SoC OPN where 1.3 MB is allocated for th
 The `SLI_SI91X_MCU_4MB_LITE_IMAGE` macro will be enabled if the **lite_image_for_4mb** component is installed.
 
 For low-power M4 sleep states such as PS2, PS3, and PS4, certain files must be run from RAM memory. Refer to [Power manager integration guide](
-https://github.com/SiliconLabs/wiseconnect/blob/v4.0.0-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) for more details.
+https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) for more details.
 
 #### SL_SI91X_ENABLE_GCC_LTO
 
@@ -981,5 +981,5 @@ For further assistance and support, please contact:
 | Getting Started with WiSeConnect | [Getting Started](http://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) |
 | NVM3 - NVM Data Manager | [NVM3 Documentation](https://docs.silabs.com/gecko-platform/3.1/driver/api/group-nvm3) |
 | Third Generation NonVolatile Memory (NVM3) Data Storage | [NVM3 Application Note](https://www.silabs.com/documents/public/application-notes/an1135-using-third-generation-nonvolatile-memory.pdf) |
-| Power Manager Integration Guide | [Power Manager Integration Guide](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.0-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) |
+| Power Manager Integration Guide | [Power Manager Integration Guide](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) |
 | SiWx917 Reference Manual | Contact [Silicon Labs Sales](https://www.silabs.com/about-us/contact-sales) for access. |

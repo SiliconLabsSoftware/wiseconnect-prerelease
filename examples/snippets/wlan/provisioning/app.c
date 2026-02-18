@@ -248,6 +248,7 @@ static void application_start(void *argument)
         server_config.default_handler = default_handler;
         server_config.handlers_list   = (sl_http_server_handler_t *)provisioning_server_request_handlers;
         server_config.handlers_count  = sizeof(provisioning_server_request_handlers) / sizeof(sl_http_server_handler_t);
+        server_config.client_idle_time = 1; // 1 second timeout to prevent hanging on slow/dead clients
 
         status = sl_http_server_init(&server_handle, &server_config);
         if (status != SL_STATUS_OK) {

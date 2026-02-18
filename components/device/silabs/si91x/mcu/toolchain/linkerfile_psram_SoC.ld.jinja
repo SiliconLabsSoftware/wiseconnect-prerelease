@@ -154,6 +154,10 @@ SECTIONS
 		{% endif %}        
 			 KEEP(*(.init))
 			 KEEP(*(.fini))	
+        /* Align before rodata for flash line efficiency */
+        . = ALIGN(32);
+        *(.rodata*)
+        *(.rodata.*)
 
 		/* .ctors */
 		*/crtbegin.*(.ctors)
@@ -169,7 +173,6 @@ SECTIONS
 		*(SORT(.dtors.*))
 		*(.dtors)
 		
-		*(.rodata*)
 		
 		KEEP(*(.eh_fram e*))
 	{%- if psram_present and text_segment_in_psram %}

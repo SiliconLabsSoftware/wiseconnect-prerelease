@@ -22,17 +22,17 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: ssi_ps2
-    value: sl_si91x_ssi*
+    value: sl_si91x_ssi.*
   - name: ssi_ps2
-    value: rsi_spi*
+    value: rsi_spi.*
   - name: ssi_ps2
-    value: SPI*
+    value: SPI.*
   - name: ssi_ps2
-    value: memcpy*
+    value: memcpy.*
   - name: ssi_ps2
-    value: UDMA*
+    value: UDMA.*
   - name: ssi_ps2
-    value: rsi_udma*
+    value: rsi_udma.*
   - name: ssi_ps2
-    value: rsi_udma_wrapper*
+    value: rsi_udma_wrapper.*
 

@@ -119,11 +119,10 @@ extern ARM_DRIVER_I2C Driver_I2C2;                             //< I2C driver st
 extern ARM_DRIVER_SPI Driver_SSI_ULP_MASTER;                   //< SPI driver structure
 extern sl_sensor_info_t sensor_hub_info_t[SL_MAX_NUM_SENSORS]; //< Sensor configuration structure
 extern sl_bus_intf_config_t bus_intf_info;                     //< Bus interface configuration structure
-osSemaphoreAttr_t sl_semaphore_attr_st;                        //< Power task semaphore attributes
-sl_sh_power_state_t sl_power_state_enum;                       //< Power state structure
-uint32_t sl_ps4_ps2_done;                                      //< Variable to check power switch status
-uint32_t sl_ps2_ps4_done;                                      //< Variable to check power switch status
-osSemaphoreId_t sl_semaphore_em_task_id;                       //< EM task semaphore
+sl_power_state_t sensorhub_current_powerstate = SL_SI91X_POWER_MANAGER_PS3;
+osSemaphoreAttr_t sl_semaphore_attr_st;  //< Power task semaphore attributes
+sl_sh_power_state_t sl_power_state_enum; //< Power state structure
+osSemaphoreId_t sl_semaphore_em_task_id; //< EM task semaphore
 
 extern uint8_t sdc_intr_done;
 /*******************************************************************************
@@ -231,22 +230,7 @@ static void sensorhub_gpio_interrupt_start(uint16_t gpio_pin);
  *  @param[in]   gpio_pin     GPIO pin number
 *******************************************************************************/
 static void sensorhub_gpio_interrupt_stop(uint16_t gpio_pin);
-/**************************************************************************/ /**
- * @fn           static void sensorhub_ps4tops2_state(void)
- * @brief        This function changed the system status from PS4 to PS2.
- * @param[in]    None
- * @param[out]   None
-*******************************************************************************/
-#ifdef SL_SH_POWER_STATE_TRANSITIONS
-static void sensorhub_ps4tops2_state(void);
-/**************************************************************************/ /**
- * @fn           static void sensorhub_ps2tops4_state(void)
- * @brief        This function changed the system status from PS4 to PS2.
- * @param[in]    None
- * @param[out]   None
-*******************************************************************************/
-static void sensorhub_ps2tops4_state(void);
-#endif
+
 /**************************************************************************/ /**
  *  @fn          static uint8_t sensorhub_sdc_init(void)
  *  @brief       Initialize the sdc Interface based on the configuration.
@@ -448,77 +432,6 @@ static void transition_callback(sl_power_state_t from, sl_power_state_t to)
       break;
   }
 }
-
-/**************************************************************************/ /**
- * @fn           static void sensorhub_ps4tops2_state(void)
- * @brief        This function changed the system status from PS4 to PS2.
- * @param[in]    None
- * @param[out]   None
-*******************************************************************************/
-#ifdef SL_SH_POWER_STATE_TRANSITIONS
-static void sensorhub_ps4tops2_state(void)
-{
-  /* tass_ref_clk_mux_ctr in NWP Control */
-  RSI_Set_Cntrls_To_TA();
-  __disable_irq();
-  /* Switching from PS4 to PS2 state */
-  RSI_PS_PowerStateChangePs4toPs2(ULP_MCU_MODE,
-                                  PWR_MUX_SEL_ULPSSRAM_SCDC_0_9,
-                                  PWR_MUX_SEL_M4_ULP_RAM_SCDC_0_9,
-                                  PWR_MUX_SEL_M4_ULP_RAM16K_SCDC_0_9,
-                                  PWR_MUX_SEL_M4ULP_SCDC_0_6,
-                                  PWR_MUX_SEL_ULPSS_SCDC_0_9,
-                                  DISABLE_BG_SAMPLE_ENABLE,
-                                  DISABLE_DC_DC_ENABLE,
-                                  DISABLE_SOCLDO_ENABLE,
-                                  DISABLE_STANDBYDC,
-                                  DISABLE_TA192K_RAM_RET,
-                                  ENABLE_M464K_RAM_RET);
-  __enable_irq();
-}
-#endif
-/**************************************************************************/ /**
- * @fn           static void sensorhub_ps2tops4_state(void)
- * @brief        This function changed the system status from PS2 to PS4.
- * @param[in]    None
- * @param[out]   None
-*******************************************************************************/
-#ifdef SL_SH_POWER_STATE_TRANSITIONS
-static void sensorhub_ps2tops4_state(void)
-{
-  __disable_irq();
-  /* change the power state from PS2 to PS4 */
-  RSI_PS_PowerStateChangePs2toPs4(SL_SH_PMUBUCKTURNONWAITTIME, SL_SH_SOCLDOTURNONWAITTIME);
-  /* power_On the M4SS Flash and peripherals*/
-  RSI_PS_M4ssPeriPowerUp(M4SS_PWRGATE_ULP_QSPI_ICACHE | M4SS_PWRGATE_ULP_EFUSE_PERI);
-  /* enable the power to the QSPI-DLL module */
-  RSI_PS_QspiDllDomainEnable();
-  /* Initialize the QSPI after moving to PS4 state because it was powered down in PS2 mode. */
-  RSI_PS_FlashLdoEnable();
-  if (!(P2P_STATUS_REG & TA_is_active)) {
-    //!wakeup NWP
-    P2P_STATUS_REG |= M4_wakeup_TA;
-    //!wait for NWP active
-    while (!(P2P_STATUS_REG & TA_is_active))
-      ;
-  }
-  //! Request NWP to program flash
-  //! raise an interrupt to NWP register
-  M4SS_P2P_INTR_SET_REG = BIT(4);
-  P2P_STATUS_REG        = BIT(0);
-
-  while (!(P2P_STATUS_REG & BIT(3)))
-    ;
-  /*  Initialize the QSPI  */
-  RSI_FLASH_Initialize();
-  __enable_irq();
-  // Initialize NWP interrupt and submit RX packets
-  sli_m4_ta_interrupt_init();
-  M4SS_P2P_INTR_SET_REG = RX_BUFFER_VALID;
-  /* AON domain power supply controls from NWP to M4 */
-  RSI_Set_Cntrls_To_M4();
-}
-#endif
 
 /**************************************************************************/ /**
  *  @fn         static sl_sensor_impl_type* sensorhub_get_sensor_implementation(int32_t sensor_id)
@@ -1018,6 +931,9 @@ sl_status_t sl_si91x_sensor_hub_start()
 
   if (sl_si91x_power_manager_get_current_state() == SL_SI91X_POWER_MANAGER_PS3) {
     sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+    sensorhub_current_powerstate = SL_SI91X_POWER_MANAGER_PS4;
+  } else {
+    sensorhub_current_powerstate = sl_si91x_power_manager_get_current_state();
   }
 
   status = osThreadNew((osThreadFunc_t)sensorhub_sensor_task, NULL, &sensor_thread_attributes);
@@ -1499,7 +1415,7 @@ static void sensorhub_em_post_event(sl_sensor_id_t sensor_id,
 *******************************************************************************/
 static void sensorhub_em_task(void)
 {
-
+  sl_status_t status = SL_STATUS_OK;
   sl_em_event_t em_event;
   osStatus_t sl_semcq_status;
   sl_status_t em_wlan_status;
@@ -1544,10 +1460,19 @@ static void sensorhub_em_task(void)
       }
 #ifdef SL_SH_POWER_STATE_TRANSITIONS
       if (em_event.event == SL_SENSOR_DATA_READY) {
-        if (sl_ps4_ps2_done == SL_PWR_STATE_SWICTH_DONE) {
-          sl_ps4_ps2_done = 0;
-          sensorhub_ps2tops4_state();
-          sl_ps2_ps4_done = 1;
+        if (sl_si91x_power_manager_get_current_state() == SL_SI91X_POWER_MANAGER_PS2
+            && sensorhub_current_powerstate == SL_SI91X_POWER_MANAGER_PS2) {
+          status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+          if (status != SL_STATUS_OK) {
+            DEBUGOUT("\r\n Add PS requirement PS4 fail %lu", status);
+          }
+          status = sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS2);
+          if (status != SL_STATUS_OK) {
+            DEBUGOUT("\r\n Remove PS requirement PS2 fail %lu", status);
+          }
+          if (status == SL_STATUS_OK) {
+            sensorhub_current_powerstate = SL_SI91X_POWER_MANAGER_PS4;
+          }
         }
       }
 #endif
@@ -1571,10 +1496,19 @@ static void sensorhub_em_task(void)
 
 #ifdef SL_SH_POWER_STATE_TRANSITIONS
       if (em_event.event == SL_SENSOR_DATA_READY) {
-        if (sl_ps4_ps2_done != SL_PWR_STATE_SWICTH_DONE) {
-          sl_power_state_enum = SL_SH_PS4TOPS2;
-          sensorhub_ps4tops2_state();
-          sl_ps4_ps2_done = 1;
+        if (sl_si91x_power_manager_get_current_state() == SL_SI91X_POWER_MANAGER_PS4
+            && sensorhub_current_powerstate == SL_SI91X_POWER_MANAGER_PS4) {
+          status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS2);
+          if (status != SL_STATUS_OK) {
+            DEBUGOUT("\r\n ADD PS requirement PS2 fail %lu", status);
+          }
+          status = sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+          if (status != SL_STATUS_OK) {
+            DEBUGOUT("\r\n Remove PS requirement PS4 fail %lu", status);
+          }
+          if (status == SL_STATUS_OK) {
+            sensorhub_current_powerstate = SL_SI91X_POWER_MANAGER_PS2;
+          }
         }
       }
 #endif

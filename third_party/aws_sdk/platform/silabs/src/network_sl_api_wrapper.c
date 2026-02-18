@@ -52,7 +52,7 @@ osSemaphoreId_t select_sem;
 #define SL_CERT_INDEX_0   0
 #define MQTT_TLS_PORT 443
 #define ALPN_AMZN_MQTT_CA "x-amzn-mqtt-ca"
-#define SEMAPHORE_TIMEOUT_MS 512000 // Timeout in milliseconds (512 seconds) for QoS1 PUBACK semaphore acquisition.
+#define SEMAPHORE_TIMEOUT_MS 640000 // Timeout in milliseconds (640 seconds) for QoS1 PUBACK semaphore acquisition.
                                     // This accounts for maximum TCP retransmission timeout (AWS_IOT_MAX_RETRANSMISSION_TIMEOUT = 128s)
                                     // with default maximum retries (SL_SO_MAXRETRY = 10), allowing sufficient time for
                                     // PUBACK reception before timing out.

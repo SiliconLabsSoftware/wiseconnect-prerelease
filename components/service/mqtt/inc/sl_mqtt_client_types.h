@@ -274,7 +274,7 @@ typedef struct {
   uint16_t
     username_length; ///< Length of the username. It should not exceed 120 bytes which includes NULL termination character.
   uint16_t
-    password_length; ///< Length of the password. It should not exceed 60 bytes which includes NULL termination character.
+    password_length; ///< Length of the password. It should not exceed 512 bytes which includes NULL termination character.
   uint8_t data[];    ///< Flexible array to store both the username and password.
 } sl_mqtt_client_credentials_t;
 

@@ -25,9 +25,9 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: gpio_ps2
-    value: sl_si91x_peripheral_gpio*
+    value: sl_si91x_peripheral_gpio.*
   - name: gpio_ps2
-    value: sl_si91x_driver_gpio*
+    value: sl_si91x_driver_gpio.*
   - name: wakeup
     value: 
       event: wakeup_init

@@ -73,10 +73,11 @@ static uint32_t counter_value2 = COUNTER_VALUE2;
 #endif
 #if ((SYSRTC_PRS == 1) && (SL_SYSRTC_CAPTURE_CHANNEL0_ENABLE == 1))
 static sl_si91x_gpio_pin_config_t sl_gpio_pin_config = {
-  { SL_SI91X_ULP_GPIO_10_PORT, SL_SI91X_ULP_GPIO_10_PIN },
+  { SL_SI91X_ULP_GPIO_8_PORT, SL_SI91X_ULP_GPIO_8_PIN },
   GPIO_OUTPUT
 }; // To provide the clock edges for SYSRTC PRS_IN GPIO Pin
 #endif
+
 /*******************************************************************************
  **********************  Local variables   *************************************
  ******************************************************************************/
@@ -229,7 +230,7 @@ void sysrtc_example_init(void)
       DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
       break; // breaks if error occurs
     }
-    DEBUGOUT("GPIO set pin configuration is successful for ULP_GPIO 10\r\n");
+    DEBUGOUT("GPIO set pin configuration is successful for ULP_GPIO %d \r\n", sl_gpio_pin_config.port_pin.pin);
 #else
     uint32_t current_count = 0;
     uint32_t compare_value = SYSRTC_COMPARE_VALUE;

@@ -25,9 +25,9 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: calendar_ps2
-    value: sl_si91x_calendar*
+    value: sl_si91x_calendar.*
   - name: calendar_ps2
-    value: rsi_rtc*
+    value: rsi_rtc.*
   - name: wakeup
     value: 
       event: wakeup_init

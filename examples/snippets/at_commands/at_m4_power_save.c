@@ -197,6 +197,10 @@ sl_status_t power_manager_calender_start_handler(console_args_t *arguments)
   // Periodic alarm setting API is called.
   set_periodic_alarm_pm(time_ms);
 
+  // Clear any existing alarm callback
+  status = sl_si91x_calendar_unregister_alarm_trigger_callback();
+  VERIFY_STATUS_AND_RETURN(status);
+
   // Alarm callback is registered
   status = sl_si91x_calendar_register_alarm_trigger_callback(calendar_callback_function_pm);
   VERIFY_STATUS_AND_RETURN(status);

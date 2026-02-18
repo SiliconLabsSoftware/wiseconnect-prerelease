@@ -64,7 +64,7 @@ static sl_status_t primary_sync_wait();
 /*******************************************************************************
  * I2S example initialization function
  ******************************************************************************/
-void pcm_example_init(void)
+void pcm_primary_example_init(void)
 {
   sl_status_t status;
   pcm_sampling_frequency = PCM_INSTANCE_CONFIG_(SAMPLING_RATE);
@@ -115,7 +115,7 @@ void pcm_example_init(void)
 /*******************************************************************************
  * Function will run continuously in while loop
  ******************************************************************************/
-void pcm_example_process_action(void)
+void pcm_primary_example_process_action(void)
 {
   static transfer_state_t state = RECEIVE_DATA;
   switch (state) {

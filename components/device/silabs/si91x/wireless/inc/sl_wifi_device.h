@@ -1028,6 +1028,7 @@
  * 
  * @note Ensure to set `pll_mode` to 1 in the feature frame command for this configuration to take effect.
  * @note Bit 3 is reserved.
+ * @note This configuration is NOT supported in WLAN+BLE coexistence mode.
  */
 #define SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_160MHZ BIT(4)
 

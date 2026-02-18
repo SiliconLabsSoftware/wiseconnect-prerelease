@@ -15,15 +15,15 @@ template_contribution:
   - name: user_files_ps2
     value: app.*
   - name: user_files_ps2
-    value: main*
+    value: main.*
   - name: user_files_ps2
-    value: sl_event_handler*
+    value: sl_event_handler.*
   - name: user_files_ps2
-    value: sl_system_process_action*
+    value: sl_system_process_action.*
     condition:
     - sl_system
   - name: user_files_ps2
-    value: sl_main_process_action*
+    value: sl_main_process_action.*
   - name: user_files_ps2
     value: sl_ulp_adc_example.*
     condition:

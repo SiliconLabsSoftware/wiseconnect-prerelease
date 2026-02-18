@@ -141,9 +141,35 @@ The application can be configured to suit your requirements and the development 
       > - Use a combined image to update the firmware whenever possible. A combined image includes both the Network Processor (NWP) and Application Processor (M4) images in a single package.
       > - When generating a combined image, use the NWP and M4 images from the same release package. Using different versions may result in undefined behavior due to a version mismatch.
       > - For devices with 4 MB flash, updating with a combined image is not supported because of memory limitations. In this case, update the NWP image first, and then update the M4 image.
-      > - For NCP mode, pdate the NWP image first, followed by the host image from the same release version.
+      > - For NCP mode, update the NWP image first, followed by the host image from the same release version.
 
-    - Based on the type of server (Apache/AWS S3 bucket/Azure Blob Storage) from which the firmware files need to be downloaded, the following parameters need to be configured.
+  - Steps to Create a Combined Image
+
+    - **Case 1: When Security is Disabled**
+      1. Navigate to the Commander directory.
+      2. Copy the NWP firmware image and M4 image into the Commander directory.
+      3. Create the nwp_combined_image.rps file:
+
+         ```sh
+         commander rps convert <nwp_combined_image.rps> --taapp <original non-encrypted TA rps> --combinedimage
+         ```
+
+      4. Create the m4_combined_image.rps file:
+
+         ```sh
+         commander rps convert <m4_combined_image.rps> --app <original non-encrypted M4 rps> --combinedimage
+         ```
+
+      5. Create the final combined image:
+
+         ```sh
+         commander rps convert <combined_image.rps> --app <m4_combined_image.rps> --taapp <nwp_combined_image.rps>
+         ```
+
+    - **Case 2: When Security is Enabled**
+      - For devices with security enabled, additional signing and encryption steps are required. Follow the detailed instructions in **Section 6 - Combined Image (NWP + M4)** of the [UG574 SiWx917 SoC Manufacturing Utility User Guide](https://www.silabs.com/documents/public/user-guides/ug574-siwx917-soc-manufacturing-utility-user-guide.pdf#page=24).
+
+  - Based on the type of server (Apache/AWS S3 bucket/Azure Blob Storage) from which the firmware files need to be downloaded, the following parameters need to be configured.
       - Configure FLAGS to choose the version and security type to be enabled.
 
         Valid configurations are:

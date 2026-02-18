@@ -199,6 +199,9 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &firmware_update_configuration, NULL, NULL);
   if (status == SL_STATUS_OK) {
+    printf("Wi-Fi initialized successfully for firmware update.\n");
+  } else {
+    printf("Wi-Fi init failed with error: 0x%lX\n", status);
     return;
   }
 
@@ -367,9 +370,20 @@ int32_t app_task_fw_update_via_xmodem(uint8_t *rx_data, uint32_t size)
     } break;
     case SI91X_WLAN_FW_UPGRADE_DONE: {
 
+      //! De-initialize the client network interface before reinitializing
+      status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
+      if (status == SL_STATUS_OK) {
+        printf("Wi-Fi deinitialized successfully after firmware upgrade.\n");
+      } else {
+        printf("Wi-Fi deinit failed with error: 0x%lX\n", status);
+        return status;
+      }
       //! WiSeConnect initialization
       status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, NULL, NULL, NULL);
-      if (status != SL_STATUS_OK) {
+      if (status == SL_STATUS_OK) {
+        printf("Wi-Fi initialized successfully after firmware upgrade.\n");
+      } else {
+        printf("Wi-Fi init failed with error: 0x%lX\n", status);
         return status;
       }
 

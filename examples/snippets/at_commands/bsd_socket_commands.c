@@ -371,7 +371,7 @@ sl_status_t bsd_socket_receive_from_handler(console_args_t *arguments)
 
 static sl_status_t setup_server_info(server_info_t *info, int fd, const char *address, uint16_t port)
 {
-  if (info == NULL || address == NULL) {
+  if (info == NULL) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -381,14 +381,16 @@ static sl_status_t setup_server_info(server_info_t *info, int fd, const char *ad
   // Clear before new allocate
   SL_CLEANUP_MALLOC(info->address);
 
-  size_t addr_len = strlen(address);
-  info->address   = calloc(1, addr_len + 1);
-  if (info->address == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
+  if (address != NULL) {
+    size_t addr_len = strlen(address);
+    info->address   = calloc(1, addr_len + 1);
+    if (info->address == NULL) {
+      return SL_STATUS_ALLOCATION_FAILED;
+    }
 
-  strncpy(info->address, address, addr_len);
-  info->address[addr_len] = '\0';
+    strncpy(info->address, address, addr_len);
+    info->address[addr_len] = '\0';
+  }
 
   return SL_STATUS_OK;
 }
@@ -400,43 +402,54 @@ static sl_status_t bsd_socket_sendto(server_info_t *info, uint8_t *buffer, size_
   }
 
   ssize_t size;
-  sl_ip_address_t ip_address = { 0 };
-  sl_status_t status         = sl_net_inet_addr_auto(info->address, &ip_address);
-  VERIFY_STATUS_AND_RETURN(status);
+  if (info->address != NULL) {
+    sl_ip_address_t ip_address = { 0 };
+    sl_status_t status         = sl_net_inet_addr_auto(info->address, &ip_address);
+    VERIFY_STATUS_AND_RETURN(status);
 
-  // Get domain from linked list
-  int domain = socket_list_get_domain(info->fd);
-  if (domain == AF_UNSPEC) {
-    return SL_STATUS_NOT_INITIALIZED;
-  }
+    // Get domain from linked list
+    int domain = socket_list_get_domain(info->fd);
+    if (domain == AF_UNSPEC) {
+      return SL_STATUS_NOT_INITIALIZED;
+    }
 
-  // Verify with sock_domain
-  if ((ip_address.type == SL_IPV4 && domain != AF_INET) || (ip_address.type == SL_IPV6 && domain != AF_INET6)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
+    // Verify with sock_domain
+    if ((ip_address.type == SL_IPV4 && domain != AF_INET) || (ip_address.type == SL_IPV6 && domain != AF_INET6)) {
+      return SL_STATUS_INVALID_PARAMETER;
+    }
 
-  if (ip_address.type == SL_IPV4) {
-    struct sockaddr_in server_address = { 0 };
+    if (ip_address.type == SL_IPV4) {
+      struct sockaddr_in server_address = { 0 };
 
-    server_address.sin_addr.s_addr = ip_address.ip.v4.value;
-    server_address.sin_port        = (in_port_t)info->port;
-    server_address.sin_family      = AF_INET;
+      server_address.sin_addr.s_addr = ip_address.ip.v4.value;
+      server_address.sin_port        = (in_port_t)info->port;
+      server_address.sin_family      = AF_INET;
 
-    size = sendto(info->fd, buffer, data_len, 0, (const struct sockaddr *)&server_address, sizeof(server_address));
-    VERIFY_BSD_STATUS(size);
-  } else if (ip_address.type == SL_IPV6) {
-    struct sockaddr_in6 server_address6 = { 0 };
+      size = sendto(info->fd, buffer, data_len, 0, (const struct sockaddr *)&server_address, sizeof(server_address));
+      VERIFY_BSD_STATUS(size);
+    } else if (ip_address.type == SL_IPV6) {
+      struct sockaddr_in6 server_address6 = { 0 };
 
-    memcpy(&server_address6.sin6_addr.__u6_addr.__u6_addr32,
-           &(ip_address.ip.v6.value),
-           sizeof(server_address6.sin6_addr.__u6_addr.__u6_addr32));
-    server_address6.sin6_family = AF_INET6;
-    server_address6.sin6_port   = (in_port_t)info->port;
+      memcpy(&server_address6.sin6_addr.__u6_addr.__u6_addr32,
+             &(ip_address.ip.v6.value),
+             sizeof(server_address6.sin6_addr.__u6_addr.__u6_addr32));
+      server_address6.sin6_family = AF_INET6;
+      server_address6.sin6_port   = (in_port_t)info->port;
 
-    size = sendto(info->fd, buffer, data_len, 0, (const struct sockaddr *)&server_address6, sizeof(server_address6));
-    VERIFY_BSD_STATUS(size);
+      size = sendto(info->fd, buffer, data_len, 0, (const struct sockaddr *)&server_address6, sizeof(server_address6));
+      VERIFY_BSD_STATUS(size);
+    } else {
+      return SL_STATUS_NOT_SUPPORTED;
+    }
   } else {
-    return SL_STATUS_NOT_SUPPORTED;
+    // Get domain from linked list
+    int domain = socket_list_get_domain(info->fd);
+    if (domain == AF_UNSPEC) {
+      return SL_STATUS_NOT_INITIALIZED;
+    }
+
+    size = sendto(info->fd, buffer, data_len, 0, NULL, 0);
+    VERIFY_BSD_STATUS(size);
   }
 
   return SL_STATUS_OK;

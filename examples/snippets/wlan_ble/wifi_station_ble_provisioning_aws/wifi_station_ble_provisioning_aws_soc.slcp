@@ -35,7 +35,10 @@ component:
 - id: syscalls
 - id: si91x_memory_default_config
 - id: wiseconnect_common
-- id: sl_i2c_peripheral
+- id: sl_i2c
+- id: i2c_instance
+  instance:
+  - i2c2
 - id: ble
 - id: wifi
 - id: sl_si91x_internal_stack
@@ -113,8 +116,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.0
+  version: 4.0.1
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.0
+  version: 2025.12.2

@@ -283,7 +283,7 @@ static sl_status_t at_command_strtoul(unsigned long *out_val, const char *str, i
     return SL_STATUS_COMMAND_IS_INVALID;
   }
 
-  if (str == NULL) {
+  if ((str == NULL) || (*str == '\0')) {
     *out_val = 0;
     return SL_STATUS_OK;
   }

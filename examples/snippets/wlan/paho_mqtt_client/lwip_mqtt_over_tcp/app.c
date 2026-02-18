@@ -82,6 +82,7 @@
 #define QOS_OF_LAST_WILL      1
 #define IS_LAST_WILL_RETAINED 0
 #define WILL_FLAG_ENABLE      0
+#define IPV6_PARSE_SUCCESS    1
 
 /******************************************************
  *               Variable Definitions
@@ -266,11 +267,13 @@ int paho_mqtt_demo()
   sl_ip_address_t server_address = { 0 };
 #ifdef SLI_SI91X_ENABLE_IPV6
   // Fill server_address.ip.v6.bytes using sl_inet_pton6
-  sl_inet_pton6(MQTT_BROKER_IP,
-                MQTT_BROKER_IP + strlen(MQTT_BROKER_IP),
-                (unsigned char *)&server_address.ip.v6.bytes,
-                (unsigned int *)&status);
-  if (status != 0) {
+  sl_ip_address_t canonical_ipv6_address;
+  canonical_ipv6_address.type = SL_IPV6;
+  int parsed_result           = sl_inet_pton6(MQTT_BROKER_IP,
+                                    MQTT_BROKER_IP + strlen(MQTT_BROKER_IP),
+                                    (unsigned char *)&server_address.ip.v6.bytes,
+                                    (unsigned int *)canonical_ipv6_address.ip.v6.value);
+  if (parsed_result != IPV6_PARSE_SUCCESS) {
     printf("Invalid IPv6 address: %s\n", MQTT_BROKER_IP);
     return -1;
   }
@@ -289,6 +292,7 @@ int paho_mqtt_demo()
 #ifdef SLI_SI91X_ENABLE_IPV6
   memcpy(&mqtt_client->server_ip.ip.v6, server_ip, 16);
 #else
+  mqtt_client->server_ip.type = SL_IPV4;
   memcpy(&mqtt_client->server_ip.ip.v4, server_ip, 4);
 #endif
   mqtt_client->tcp_mqtt_tx_buffer = buffer_ptr;
@@ -308,12 +312,14 @@ int paho_mqtt_demo()
              TCP_MQTT_CLIENT_RX_BUFFER_SIZE);
 
   printf("Connecting to MQTT broker on port %ld\n", mqtt_client->server_port);
-  printf("Server IP: %d.%d.%d.%d\n",
-         mqtt_client->server_ip.ip.v4.bytes[0],
-         mqtt_client->server_ip.ip.v4.bytes[1],
-         mqtt_client->server_ip.ip.v4.bytes[2],
-         mqtt_client->server_ip.ip.v4.bytes[3]);
-  printf("SSL enabled: %s\n", enable_ssl ? "Yes" : "No");
+#ifdef SLI_SI91X_ENABLE_IPV6
+  printf("Server IP: ");
+  print_sl_ip_address(&canonical_ipv6_address);
+#else
+  printf("Server IP: ");
+  print_sl_ip_address(&mqtt_client->server_ip);
+#endif
+  printf("\nSSL enabled: %s\n", enable_ssl ? "Yes" : "No");
 
   // Fill TLS certificates only via configure_tls_certificates API
   if (enable_ssl) {

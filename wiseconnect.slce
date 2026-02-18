@@ -1,14 +1,8 @@
 id: wiseconnect3_sdk
 label: Wiseconnect
 description: WiSeConnect extension for the Simplicity SDK (formerly Gecko SDK)
-version: 4.0.0
+version: 4.0.1
 component_path:
- - path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
- - path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
- - path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
- - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
- - path: third_party/littlefs/component
- - path: components/device/silabs/si91x/wireless/ble
  - path: components/board/silabs/component
  - path: components/device/silabs/si91x/mcu
  - path: components/device/silabs/si91x/mcu/core/chip/component
@@ -46,6 +40,11 @@ component_path:
  - path: components/device/silabs/si91x/mcu/hal/component
  - path: components/device/silabs/si91x/mcu/toolchain/component
  - path: third_party/silicon_labs/freertos/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
+ - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
+ - path: third_party/littlefs/component
  - path: components/at_commands_auto_gen
  - path: components/common
  - path: components/console
@@ -104,16 +103,17 @@ component_path:
  - path: third_party/paho_mqtt_embedded
  - path: third_party/qcbor/component
  - path: third_party/tcose/component
+ - path: components/device/silabs/si91x/wireless/ble
  - path: netstack_silabs_lwip/component
 documentation:
- - docset: platform_nwp_siwx91x
-   version: 4.0.0
- - docset: bluetooth_le_siwx91x
-   version: 4.0.0
  - docset: platform_siwx91x
-   version: 4.0.0
+   version: 4.0.1
+ - docset: platform_nwp_siwx91x
+   version: 4.0.1
  - docset: wifi
-   version: 4.0.0
+   version: 4.0.1
+ - docset: bluetooth_le_siwx91x
+   version: 4.0.1
  - docset: unknown
    version: 0.0.0
 upgrade_manifest:

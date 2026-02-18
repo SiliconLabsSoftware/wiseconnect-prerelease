@@ -44,10 +44,6 @@
 #include "rsi_ble_common_config.h"
 #include <rsi_common_apis.h>
 
-#if (defined(SLI_SI91X_MCU_INTERFACE) && I2C_SENSOR_PERI_ENABLE)
-#include "i2c_leader_example.h"
-#endif
-
 // APP version
 #define APP_FW_VERSION "0.4"
 
@@ -65,7 +61,6 @@ uint8_t magic_word;
 
 osSemaphoreId_t wlan_thread_sem;
 osSemaphoreId_t ble_thread_sem;
-osSemaphoreId_t i2c_sem;
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,

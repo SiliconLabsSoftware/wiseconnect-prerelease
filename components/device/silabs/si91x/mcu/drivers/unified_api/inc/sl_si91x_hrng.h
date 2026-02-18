@@ -75,6 +75,36 @@ typedef enum sl_si91x_hrng_mode {
  ******************************************************************************/
 sl_status_t sl_si91x_hrng_init(void);
 
+/***************************************************************************/ /**
+ * @brief
+ *   Set the soft reset bit of the HRNG peripheral.
+ *
+ * @details
+ *   Sets the HRNG control register `SOFT_RESET` bit to 1 to initiate a reset of
+ *   the internal HRNG logic/state. Use this after enabling clocks to ensure a clean
+ *   starting state. Call @ref sl_si91x_hrng_soft_reset_clear to clear the reset bit
+ *   before starting the HRNG again.
+ *
+ * @pre Pre-conditions:
+ *  - The HRNG peripheral clocks must be enabled using @ref sl_si91x_hrng_init.
+ ******************************************************************************/
+void sl_si91x_hrng_soft_reset_set(void);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Clear the soft reset bit of the HRNG peripheral.
+ *
+ * @details
+ *   Clears the HRNG control register `SOFT_RESET` bit to 0, releasing the HRNG
+ *   from reset state. Call this after @ref sl_si91x_hrng_soft_reset_set to complete
+ *   the reset sequence before requesting random data.
+ *
+ * @pre Pre-conditions:
+ *  - The HRNG peripheral clocks must be enabled using @ref sl_si91x_hrng_init.
+ *  - The soft reset bit should have been set using @ref sl_si91x_hrng_soft_reset_set.
+ ******************************************************************************/
+void sl_si91x_hrng_soft_reset_clear(void);
+
 /***************************************************************************/
 /**
  * @brief

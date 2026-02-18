@@ -140,3 +140,6 @@ upgrade:
         status: automatic  
         add:
            - sl_si91x_freertos_heap4_for_littlefs
+      - script: upgrade_component_nvm3_network_manager.lua
+        description: >
+                          

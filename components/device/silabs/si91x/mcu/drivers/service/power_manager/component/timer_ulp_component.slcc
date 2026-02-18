@@ -23,17 +23,17 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: ulp_timer_ps2
-    value: sl_si91x_ulp_timer*
+    value: sl_si91x_ulp_timer.*
   - name: ulp_timer_ps2
-    value: rsi_timers*
+    value: rsi_timers.*
   - name: ulp_timer_ps2
-    value: memcpy*
+    value: memcpy.*
   - name: ulp_timer_ps2
-    value: UDMA*
+    value: UDMA.*
   - name: ulp_timer_ps2
-    value: rsi_udma*
+    value: rsi_udma.*
   - name: ulp_timer_ps2
-    value: rsi_udma_wrapper*
+    value: rsi_udma_wrapper.*
   - name: ulp_timer_ps2
-    value: sl_si91x_led*
+    value: sl_si91x_led.*
 

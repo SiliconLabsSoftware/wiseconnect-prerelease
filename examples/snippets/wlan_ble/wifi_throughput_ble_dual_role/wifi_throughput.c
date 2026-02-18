@@ -47,6 +47,7 @@
 #include "errno.h"
 #include "socket.h"
 #include "sl_si91x_socket_support.h"
+#include "sl_si91x_socket_utility.h"
 #include "sl_si91x_core_utilities.h"
 
 #include "cmsis_os2.h"
@@ -332,6 +333,21 @@ void receive_data_from_tcp_client(void)
   timeout.tv_sec            = 30;
 #endif
   sl_status_t status = SL_STATUS_FAIL;
+
+  // Configure socket for 64KB TCP RX window
+  sl_si91x_socket_config_t socket_config = { .total_sockets                   = 1,
+                                             .total_tcp_sockets               = 1,
+                                             .tcp_rx_only_sockets             = 1,
+                                             .tcp_rx_high_performance_sockets = 1,
+                                             .tcp_rx_window_size_cap          = TCP_RX_WINDOW_SIZE_CAP,
+                                             .tcp_rx_window_div_factor        = TCP_RX_WINDOW_DIV_FACTOR };
+
+  status = sl_si91x_config_socket(socket_config);
+  if (status != SL_STATUS_OK) {
+    LOG_PRINT("\r\nSocket config failed: %ld\r\n", status);
+    return;
+  }
+  LOG_PRINT("\r\nSocket config Done\r\n");
 
   server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (server_socket < 0) {

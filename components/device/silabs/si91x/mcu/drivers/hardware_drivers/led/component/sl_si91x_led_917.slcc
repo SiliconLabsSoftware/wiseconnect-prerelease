@@ -88,16 +88,13 @@ source:
     unless: [si917_prod_board, device_is_917_module_dev_kit]
 requires:
   - name: sl_gpio
-  # Sleeptimer for OPN with RGB LED (RGB LED needs sleeptimer for PWM, even if sl_sysrtc conflicts)
+  # Sleeptimer required for RGB LED on OPN boards (needed for PWM functionality)
+  # Note: Required even if sl_sysrtc is present, as RGB LED PWM takes precedence
   - name: sleeptimer
     condition: [opn_config, sl_si91x_rgb_led]
-  # Sleeptimer for OPN with regular LED (exclude if sl_sysrtc is present to avoid conflict)
+  # Sleeptimer required when led/rgb_led component is used on dev boards
   - name: sleeptimer
-    condition: [opn_config]
-    unless: [sl_sysrtc, sl_si91x_rgb_led]
-  # Sleeptimer for dev_board (always uses RGB LED which needs sleeptimer)
-  - name: sleeptimer
-    condition: [si917_dev_board]
+    condition: [si917_dev_board, sl_si91x_led_917]
 provides:
   - name: sl_si91x_led_917
 template_file:

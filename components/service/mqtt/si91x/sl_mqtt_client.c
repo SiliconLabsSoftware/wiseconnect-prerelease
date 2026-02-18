@@ -387,7 +387,7 @@ static sl_status_t sli_si91x_send_firmware_mqtt_init(const sl_mqtt_client_t *cli
     memcpy(si91x_init_request.password, &credentials->data[credentials->username_length], credentials->password_length);
 
     si91x_init_request.username_len = (uint8_t)(credentials->username_length);
-    si91x_init_request.password_len = (uint8_t)(credentials->password_length);
+    si91x_init_request.password_len = (credentials->password_length);
   }
 
   return sli_si91x_driver_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
@@ -1108,11 +1108,7 @@ sl_status_t sl_mqtt_client_connect_v2(sl_mqtt_client_t *client,
     legacy_broker_ptr->keep_alive_retries      = broker->keep_alive_retries;
   }
 
-  status = sl_mqtt_client_connect(client,
-                                  legacy_broker_ptr,
-                                  last_will_message,
-                                  (const sl_mqtt_client_configuration_t *)configuration,
-                                  connect_timeout);
+  status = sl_mqtt_client_connect(client, legacy_broker_ptr, last_will_message, configuration, connect_timeout);
   if (legacy_broker_ptr != NULL) {
     free(legacy_broker_ptr);
   }

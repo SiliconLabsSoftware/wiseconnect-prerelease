@@ -18,35 +18,35 @@ template_contribution:
     condition:
       - pm_ps2_component  
   - name: debug_ps2
-    value: stdio*
+    value: stdio.*
   - name: debug_ps2
-    value: puts*
+    value: puts.*
   - name: debug_ps2
-    value: wbuf*
+    value: wbuf.*
   - name: debug_ps2
-    value: writer*
+    value: writer.*
   - name: debug_ps2
-    value: memchr*
+    value: memchr.*
   - name: debug_ps2
-    value: memset*
+    value: memset.*
   - name: debug_ps2
-    value: nano-vfprintf*
+    value: nano-vfprintf.*
   - name: debug_ps2
-    value: nano-vfprintf_i*
+    value: nano-vfprintf_i.*
   - name: debug_ps2
-    value: printf*
+    value: printf.*
   - name: debug_ps2
-    value: lock*
+    value: lock.*
   - name: debug_ps2
-    value: fflush*
+    value: fflush.*
   - name: debug_ps2
-    value: rsi_debug*
+    value: rsi_debug.*
   - name: debug_ps2
-    value: rsi_usart*
+    value: rsi_usart.*
   - name: debug_ps2
-    value: syscalls*
+    value: syscalls.*
   - name: debug_ps2
-    value: USART*
+    value: USART.*
   - name: debug_ps2
     value: libm_a-s_ceil*
   - name: debug_ps2
@@ -56,4 +56,4 @@ template_contribution:
   - name: debug_ps2
     value: 'libm_a*'
   - name: debug_ps2
-    value: 'sbrk*'
+    value: 'sbrk.*'

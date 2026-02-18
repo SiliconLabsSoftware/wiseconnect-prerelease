@@ -16,15 +16,15 @@ component:
 - id: pm_ps2_component
 template_contribution:
 - name: user_files_ps2
-  value: ps3_state*
+  value: ps3_state.*
 - name: user_files_ps2
-  value: app*
+  value: app.*
 - name: user_files_ps2
-  value: main*
+  value: main.*
 - name: user_files_ps2
-  value: sl_main_process_action*
+  value: sl_main_process_action.*
 - name: user_files_ps2
-  value: sl_event_handler*
+  value: sl_event_handler.*
 define:
 - name: SI_SI91X_NWP_SHUTDOWN
   value: '1'
@@ -54,8 +54,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.0
+  version: 4.0.1
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.0
+  version: 2025.12.2

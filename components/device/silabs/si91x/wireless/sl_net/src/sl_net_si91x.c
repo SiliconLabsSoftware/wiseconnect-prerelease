@@ -59,7 +59,7 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
 static bool sli_si91x_get_dns_mode(const sl_net_dns_address_t *address);
 extern bool device_initialized;
 extern osMessageQueueId_t sli_network_manager_request_queue;
-extern osMessageQueueId_t sli_network_manager_response_queue;
+extern osEventFlagsId_t sli_network_manager_response_flags;
 static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interface,
                                                     const sl_ip_address_t *ip_address,
                                                     uint8_t command_type);

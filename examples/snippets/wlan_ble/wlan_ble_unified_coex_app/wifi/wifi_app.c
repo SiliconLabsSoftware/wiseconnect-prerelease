@@ -572,7 +572,6 @@ sl_status_t start_aws_mqtt(void)
             } else {
               printf("\r\nMQTT Publish with QoS%d failed with error: %d\n", PUBLISH_QOS, rc);
             }
-            osSemaphoreRelease(select_sem);
             wlan_app_cb = WIFI_APP_MQTT_DISCONNECT;
             break;
           } else {
@@ -695,19 +694,19 @@ void async_socket_select(fd_set *fd_read, fd_set *fd_write, fd_set *fd_except, i
 {
   UNUSED_PARAMETER(fd_except);
   UNUSED_PARAMETER(fd_write);
-  UNUSED_PARAMETER(status);
 
-  //!Check the data pending on this particular socket descriptor
-  if (FD_ISSET(mqtt_client.networkStack.socket_id, fd_read)) {
-    if (pub_state != 1) { //This check is for handling PUBACK in QOS1
-      check_for_recv_data = 1;
-      osSemaphoreRelease(data_received_semaphore);
-      wlan_app_cb = WIFI_APP_AWS_SELECT_CONNECT_STATE;
-    } else if (pub_state == 1) { //This check is for handling PUBACK in QOS1
-      osSemaphoreRelease(select_sem);
+  if (status == SL_STATUS_OK) {
+    //!Check the data pending on this particular socket descriptor
+    if (FD_ISSET(mqtt_client.networkStack.socket_id, fd_read)) {
+      if (pub_state != 1) { //This check is for handling PUBACK in QOS1
+        check_for_recv_data = 1;
+        osSemaphoreRelease(data_received_semaphore);
+      } else {
+        osSemaphoreRelease(select_sem);
+      }
     }
+    wlan_app_cb = WIFI_APP_AWS_SELECT_CONNECT_STATE;
   }
-  wlan_app_cb = WIFI_APP_AWS_SELECT_CONNECT_STATE;
 }
 
 void disconnect_notify_handler(AWS_IoT_Client *pClient, void *data)

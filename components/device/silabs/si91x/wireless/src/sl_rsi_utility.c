@@ -623,7 +623,7 @@ static uint32_t sli_get_key_management_info(const sli_wlan_cipher_suite_t *akms,
   }
 
   for (int i = 0; i < akmsc; i++) {
-    oui_type = ((akms[i].cs_oui[0] << 24) | (akms[i].cs_oui[1] << 16) | (akms[i].cs_oui[2] << 8) | akms[0].cs_type);
+    oui_type = ((akms[i].cs_oui[0] << 24) | (akms[i].cs_oui[1] << 16) | (akms[i].cs_oui[2] << 8) | akms[i].cs_type);
 
     switch (oui_type) {
       case SLI_AUTH_KEY_MGMT_UNSPEC_802_1X:
