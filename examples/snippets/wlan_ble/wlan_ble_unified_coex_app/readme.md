@@ -489,7 +489,7 @@ Follow the steps below for the successful execution of the program:
 
 
 **Limitations for this application**
-- This feature is only supported with SL_SI91X_EXT_FEAT_480K_M4SS_192K memory configuration.
+- This feature is only supported with SL_SI91X_EXT_FEAT_416K_M4SS_256K memory configuration.
 - The minimum connection interval for all the 8 BLE peripheral connections (DUT as central) should be 200 ms.
 - The first BLE central connection (DUT as peripheral) interval should be at least 45 ms.
 - The second BLE central connection (DUT as peripheral) interval should be at least 500 ms.

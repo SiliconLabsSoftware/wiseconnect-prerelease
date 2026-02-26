@@ -116,7 +116,7 @@ upgrade:
                           
   - sdk:
       id: wiseconnect3_sdk
-      version: "4.0.0"
+      version: "4.0.1"
     component:
       - trigger: wiseconnect3_common
         description: >

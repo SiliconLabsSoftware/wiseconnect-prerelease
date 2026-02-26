@@ -204,6 +204,22 @@ static bool sli_filter_scan_info(const sli_scan_info_t *scan_info,
   return true;
 }
 
+// Function to get the total count of stored extended scan results (for callback data_length)
+sl_status_t sli_wifi_get_stored_scan_result_count(sl_wifi_interface_t interface, uint16_t *scan_count)
+{
+  UNUSED_PARAMETER(interface);
+
+  if (NULL == scan_count) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  *scan_count = 0;
+  for (sli_scan_info_t *scan_info = scan_info_database; scan_info != NULL; scan_info = scan_info->next) {
+    (*scan_count)++;
+  }
+  return SL_STATUS_OK;
+}
+
 // Function to get all or filtered scan results from scan result database
 sl_status_t sli_wifi_get_stored_scan_results(sl_wifi_interface_t interface,
                                              sl_wifi_extended_scan_result_parameters_t *extended_scan_parameters) //Done
