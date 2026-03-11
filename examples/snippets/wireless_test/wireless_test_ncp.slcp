@@ -37,8 +37,6 @@ include:
 define:
 - name: SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT
   value: 30
-- name: SLI_SI91X_OFFLOAD_NETWORK_STACK
-  value: 1
 - name: SL_SI91X_PRINT_DBG_LOG
 - name: SLI_SI91X_DBG_MIDDLEWARE_EN
 - name: SLI_SI91X_MCU_INTR_BASED_RX_ON_UART
@@ -64,7 +62,6 @@ component:
 - id: console
 - id: console_variables
 - id: iot_socket
-- id: sl_si91x_basic_buffers
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror
@@ -158,8 +155,8 @@ ui_hints:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.1
+  version: 4.1.0
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.2
+  version: 2026.6.0

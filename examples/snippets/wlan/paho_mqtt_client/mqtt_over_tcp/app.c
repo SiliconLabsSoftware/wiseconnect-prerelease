@@ -89,7 +89,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 static const sl_wifi_device_configuration_t wifi_mqtt_client_configuration = {
@@ -239,6 +238,7 @@ int paho_mqtt_demo()
 {
   int status;
   uint16_t flags             = 0;
+  int recv_failed            = 0; // Flag to indicate receive failure of data published on the subscribed topic
   mqtt_client_t *mqtt_client = NULL;
   MQTTMessage publish_msg;
   sl_ip_address_t server_address = { 0 };
@@ -288,105 +288,113 @@ int paho_mqtt_demo()
                           mqtt_client->client_port,
                           enable_ssl);
 
-  if (status == NETWORK_ERROR_NULL_STRUCTURE) {
-    printf("\r\nError: Network structure is NULL.\r\n");
-    return status;
-  } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
-    printf("\r\nError: Address is NULL.\r\n");
-    return status;
-  } else if (status == NETWORK_ERROR_INVALID_TYPE) {
-    printf("\r\nError: Invalid transport type.\r\n");
-    return status;
-  } else if (status != 0) {
-    printf("\r\n TCP Connection Failed: %d\r\n", status);
-    return status;
-  }
-
-  MQTTPacket_connectData connectData = MQTTPacket_connectData_initializer;
-  connectData.willFlag               = 0;
-  // MQTT Version
-  connectData.MQTTVersion = MQTT_VERSION;
-  // Assign client ID
-  connectData.clientID.cstring = (char *)clientID;
-  // Fill username
-  connectData.username.cstring = USERNAME;
-  // Fill password
-  connectData.password.cstring = PASSWORD;
-  // Keep Alive interval
-  connectData.keepAliveInterval = mqtt_client->keep_alive_interval;
-  // New connection
-  connectData.cleansession = 1;
-  // Connect to MQTT broker
-  status = MQTTConnect(&mqtt_client->client, &connectData);
-  if (status != 0) {
-    printf("\r\nMQTT Connection Failed: %d\r\n", status);
-    return status;
-  }
-  printf("\r\nMQTT Connected Successfully!\r\n");
-  // Subscribe to the topic given
-  status = MQTTSubscribe(&mqtt_client->client, (char *)TOPIC_TO_BE_SUBSCRIBED, (enum QoS)QOS, message_arrived);
-  if (status != 0) {
-    printf("\r\nSubscription Failed: %d\r\n", status);
-    return status;
-  }
-  printf("\r\nSubscribed to topic: %s\r\n", TOPIC_TO_BE_SUBSCRIBED);
-
-  publish_msg.dup = 0;
-  if (QOS == QOS0) {
-    publish_msg.qos = QOS0;
-  } else if (QOS == QOS1) {
-    publish_msg.qos = QOS1;
-  } else {
-    publish_msg.qos = QOS2;
-  }
-  publish_msg.retained   = 0;
-  publish_msg.payload    = publish_message;
-  publish_msg.payloadlen = strlen((char *)publish_message);
-
-  // Publish message on the topic
-  status = MQTTPublish(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED, &publish_msg);
-  if (status != 0) {
-    printf("\r\nMQTT Publish Failed: %d\r\n", status);
-    return status;
-  } else {
-    printf("\r\nPublishes to Topic successfully\r\n");
-  }
-
-  while (!halt) {
-    // Recv data published on the subscribed topic
-    status = MQTTYield(&mqtt_client->client, 60000);
-    if (status != SL_STATUS_OK) {
-      //! Error in receiving
-      printf("\r\nReceive Data Failed, Error Code : 0x%X\r\n", status);
-      return status;
-    } else {
-      printf("\r\nReceive Data Success\r\n");
+  do {
+    if (status == NETWORK_ERROR_NULL_STRUCTURE) {
+      printf("\r\nError: Network structure is NULL.\r\n");
+      break;
+    } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
+      printf("\r\nError: Address is NULL.\r\n");
+      break;
+    } else if (status == NETWORK_ERROR_INVALID_TYPE) {
+      printf("\r\nError: Invalid transport type.\r\n");
+      break;
+    } else if (status != 0) {
+      printf("\r\n TCP Connection Failed: %d\r\n", status);
+      break;
     }
-  }
 
-  // UnSubscribe to the topic given
-  status = MQTTUnsubscribe(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED);
-  if (status != SL_STATUS_OK) {
-    printf("\r\nUnsubscription to Topic Failed, Error Code : 0x%X\r\n", status);
-    return status;
-  } else {
-    printf("\r\nUnsubscription to Topic Success\r\n");
-  }
+    MQTTPacket_connectData connectData = MQTTPacket_connectData_initializer;
+    connectData.willFlag               = 0;
+    // MQTT Version
+    connectData.MQTTVersion = MQTT_VERSION;
+    // Assign client ID
+    connectData.clientID.cstring = (char *)clientID;
+    // Fill username
+    connectData.username.cstring = USERNAME;
+    // Fill password
+    connectData.password.cstring = PASSWORD;
+    // Keep Alive interval
+    connectData.keepAliveInterval = mqtt_client->keep_alive_interval;
+    // New connection
+    connectData.cleansession = 1;
 
-  // Disconnect to the MQTT broker
-  status = MQTTDisconnect(&mqtt_client->client);
-  if (status != SL_STATUS_OK) {
-    printf("\r\nDisconnect to the MQTT broker Failed, Error Code : 0x%X\r\n", status);
-    return status;
-  } else {
-    printf("\r\nDisconnect to the MQTT broker Success\r\n");
-  }
+    // Connect to MQTT broker
+    status = MQTTConnect(&mqtt_client->client, &connectData);
+    if (status != 0) {
+      printf("\r\nMQTT Connection Failed: %d\r\n", status);
+      break;
+    }
+    printf("\r\nMQTT Connected Successfully!\r\n");
+
+    // Subscribe to the topic given
+    status = MQTTSubscribe(&mqtt_client->client, (char *)TOPIC_TO_BE_SUBSCRIBED, (enum QoS)QOS, message_arrived);
+    if (status != 0) {
+      printf("\r\nSubscription Failed: %d\r\n", status);
+      break;
+    }
+    printf("\r\nSubscribed to topic: %s\r\n", TOPIC_TO_BE_SUBSCRIBED);
+
+    publish_msg.dup = 0;
+    if (QOS == QOS0) {
+      publish_msg.qos = QOS0;
+    } else if (QOS == QOS1) {
+      publish_msg.qos = QOS1;
+    } else {
+      publish_msg.qos = QOS2;
+    }
+    publish_msg.retained   = 0;
+    publish_msg.payload    = publish_message;
+    publish_msg.payloadlen = strlen((char *)publish_message);
+
+    // Publish message on the topic
+    status = MQTTPublish(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED, &publish_msg);
+    if (status != 0) {
+      printf("\r\nMQTT Publish Failed: %d\r\n", status);
+      break;
+    } else {
+      printf("\r\nPublishes to Topic successfully\r\n");
+    }
+
+    while (!halt) {
+      // Recv data published on the subscribed topic
+      status = MQTTYield(&mqtt_client->client, 60000);
+      if (status != SL_STATUS_OK) {
+        //! Error in receiving
+        printf("\r\nReceive Data Failed, Error Code : 0x%X\r\n", status);
+        recv_failed = 1;
+        break;
+      } else {
+        printf("\r\nReceive Data Success\r\n");
+      }
+    }
+    if (recv_failed)
+      break;
+
+    // UnSubscribe to the topic given
+    status = MQTTUnsubscribe(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED);
+    if (status != SL_STATUS_OK) {
+      printf("\r\nUnsubscription to Topic Failed, Error Code : 0x%X\r\n", status);
+      break;
+    } else {
+      printf("\r\nUnsubscription to Topic Success\r\n");
+    }
+
+    // Disconnect to the MQTT broker
+    status = MQTTDisconnect(&mqtt_client->client);
+    if (status != SL_STATUS_OK) {
+      printf("\r\nDisconnect to the MQTT broker Failed, Error Code : 0x%X\r\n", status);
+      break;
+    } else {
+      printf("\r\nDisconnect to the MQTT broker Success\r\n");
+    }
+
+    printf("\r\nExecution completed!\r\n");
+
+  } while (0);
 
   if (mqtt_client->client.ipstack) {
     NetworkDisconnect(mqtt_client->client.ipstack);
   }
 
-  printf("\r\nExecution completed!\r\n");
-
-  return 0;
+  return status;
 }

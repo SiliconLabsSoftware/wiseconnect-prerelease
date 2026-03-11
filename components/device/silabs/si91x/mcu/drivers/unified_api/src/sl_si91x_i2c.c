@@ -80,6 +80,8 @@
 #define DIVISION_FACTOR_32MHZ    2         // Division factor to get accurate ticks at 32 MHz
 #define SOC_PIN_MUX              6         // Pin mux to set the ulp gpio in soc mode
 #define I2C_PORT                 0         // Port used while configuring ulp gpio in soc mode
+#define SL_I2C_SCL_HCNT_OFFSET   3         // IC_SCL_HCNT offset value for TX hold time validation
+#define SL_I2C_SCL_LOW_OFFSET    2         // IC_SCL_LOW offset value for TX hold time validation
 
 /*******************************************************************************
  ***************************  Local TYPES  ********************************
@@ -261,6 +263,109 @@ sl_i2c_status_t sl_i2c_driver_configure_fifo_threshold(sl_i2c_instance_t i2c_ins
     sl_si91x_i2c_set_tx_threshold(i2c, tx_threshold_value);
     // Setting rx FIFO threshold
     sl_si91x_i2c_set_rx_threshold(i2c, rx_threshold_value);
+    // Enabling I2C instance
+    sl_si91x_i2c_enable(i2c);
+  } while (false);
+  return i2c_status;
+}
+
+/*******************************************************************************
+ * This function configures both the transmit and receive SDA hold times for the specified
+ * I2C instance. The SDA hold time determines how long the SDA line is held after the SCL
+ * falling edge. The function validates the hold time values against hardware constraints
+ * based on the current operating mode (Standard, Fast, Fast Plus, or High Speed).
+ ******************************************************************************/
+sl_i2c_status_t sl_i2c_driver_configure_sda_hold_time(sl_i2c_instance_t i2c_instance,
+                                                      const sl_i2c_sda_hold_config_t *p_hold_config)
+{
+  sl_i2c_status_t i2c_status = SL_I2C_SUCCESS;
+  I2C0_Type *i2c             = NULL;
+  do {
+    // Validating I2C instance and NULL pointer
+    if ((i2c_instance >= SL_I2C_LAST) || (p_hold_config == NULL)) {
+      i2c_status = SL_I2C_INVALID_PARAMETER;
+      break;
+    }
+    // Updating pointer to i2c register block as per instance number
+    i2c = (I2C0_Type *)get_i2c_base_address(i2c_instance);
+
+    // Getting FS spklen value
+    uint32_t ic_fs_spklen = i2c->IC_FS_SPKLEN_b.IC_FS_SPKLEN;
+    // Getting HS spklen value
+    uint32_t ic_hs_spklen = i2c->IC_HS_SPKLEN_b.IC_HS_SPKLEN;
+    // Validate sda_rx_hold value based on operating mode
+    uint32_t max_sda_rx_hold = 0;
+
+    // Calculate maximum allowed sda_rx_hold based on operating mode
+    switch (i2c_instance_state[i2c_instance].operating_mode) {
+      case SL_I2C_STANDARD_MODE:
+        if (i2c->IC_SS_SCL_HCNT_b.IC_SS_SCL_HCNT <= (ic_fs_spklen + SL_I2C_SCL_HCNT_OFFSET)) {
+          i2c_status = SL_I2C_INVALID_PARAMETER;
+          break;
+        }
+        max_sda_rx_hold = i2c->IC_SS_SCL_HCNT_b.IC_SS_SCL_HCNT - ic_fs_spklen - SL_I2C_SCL_HCNT_OFFSET;
+        break;
+      case SL_I2C_FAST_MODE:
+      case SL_I2C_FAST_PLUS_MODE:
+        if (i2c->IC_FS_SCL_HCNT_b.IC_FS_SCL_HCNT <= (ic_fs_spklen + SL_I2C_SCL_HCNT_OFFSET)) {
+          i2c_status = SL_I2C_INVALID_PARAMETER;
+          break;
+        }
+        max_sda_rx_hold = i2c->IC_FS_SCL_HCNT_b.IC_FS_SCL_HCNT - ic_fs_spklen - SL_I2C_SCL_HCNT_OFFSET;
+        break;
+      case SL_I2C_HIGH_SPEED_MODE: {
+        if (i2c->IC_FS_SCL_HCNT_b.IC_FS_SCL_HCNT <= (ic_fs_spklen + SL_I2C_SCL_HCNT_OFFSET)
+            || i2c->IC_HS_SCL_HCNT_b.IC_HS_SCL_HCNT <= (ic_hs_spklen + SL_I2C_SCL_HCNT_OFFSET)) {
+          i2c_status = SL_I2C_INVALID_PARAMETER;
+          break;
+        }
+        uint32_t fs_limit = i2c->IC_FS_SCL_HCNT_b.IC_FS_SCL_HCNT - ic_fs_spklen - SL_I2C_SCL_HCNT_OFFSET;
+        // Assuming IC_CAP_LOADING = 100 as default, adjust if needed
+        uint32_t hs_limit = i2c->IC_HS_SCL_HCNT_b.IC_HS_SCL_HCNT - ic_hs_spklen - SL_I2C_SCL_HCNT_OFFSET;
+        max_sda_rx_hold   = (fs_limit < hs_limit) ? fs_limit : hs_limit;
+        break;
+      }
+      default:
+        i2c_status = SL_I2C_INVALID_PARAMETER;
+        break;
+    }
+    // Check if sda_rx_hold exceeds maximum allowed value
+    if (i2c_status == SL_I2C_SUCCESS && p_hold_config->sda_rx_hold > max_sda_rx_hold) {
+      i2c_status = SL_I2C_INVALID_PARAMETER;
+      break;
+    }
+
+    // Validate sda_tx_hold does not exceed N_SCL_LOW-2
+    uint32_t n_scl_low = 0;
+    switch (i2c_instance_state[i2c_instance].operating_mode) {
+      case SL_I2C_STANDARD_MODE:
+        n_scl_low = i2c->IC_SS_SCL_LCNT_b.IC_SS_SCL_LCNT;
+        break;
+      case SL_I2C_FAST_MODE:
+      case SL_I2C_FAST_PLUS_MODE:
+        n_scl_low = i2c->IC_FS_SCL_LCNT_b.IC_FS_SCL_LCNT;
+        break;
+      case SL_I2C_HIGH_SPEED_MODE:
+        n_scl_low = i2c->IC_HS_SCL_LCNT_b.IC_HS_SCL_LCNT;
+        break;
+      default:
+        i2c_status = SL_I2C_INVALID_PARAMETER;
+        break;
+    }
+
+    // Check if sda_tx_hold exceeds N_SCL_LOW-2 or prior validation failed
+    if (i2c_status != SL_I2C_SUCCESS || n_scl_low <= SL_I2C_SCL_LOW_OFFSET
+        || p_hold_config->sda_tx_hold > (n_scl_low - SL_I2C_SCL_LOW_OFFSET)) {
+      i2c_status = SL_I2C_INVALID_PARAMETER;
+      break;
+    }
+
+    // Disabling I2C instance - IC_SDA_HOLD can only be programmed when I2C is disabled
+    sl_si91x_i2c_disable(i2c);
+    // Setting SDA transmit hold time (bits [15:0])
+    sl_si91x_i2c_set_sda_hold_time(i2c, SL_I2C_WRITE, p_hold_config->sda_tx_hold);
+    // Setting SDA receive hold time (bits [23:16])
+    sl_si91x_i2c_set_sda_hold_time(i2c, SL_I2C_READ, p_hold_config->sda_rx_hold);
     // Enabling I2C instance
     sl_si91x_i2c_enable(i2c);
   } while (false);

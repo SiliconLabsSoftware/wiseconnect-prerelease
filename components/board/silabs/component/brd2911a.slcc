@@ -2,7 +2,7 @@
 - id: brd2911a
 - label: BRD2911A
 - package: platform_siwx91x
-- description: Board support for BRD2911A.
+- description: Board support for BRD2911A(SoC Ezurio Module Explorer Kit).
 - category: Board|Radio Board
 - quality: production
 - metadata:

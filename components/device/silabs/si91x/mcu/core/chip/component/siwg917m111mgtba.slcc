@@ -55,6 +55,7 @@ provides:
 - name: device_has_chip
 - name: device_supports_external_psram
 requires:
+- name: sl_si91x_agents_md
 - name: rsilib_chip
 - name: cmsis_common
   condition:

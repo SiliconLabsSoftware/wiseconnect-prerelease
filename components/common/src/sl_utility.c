@@ -38,7 +38,7 @@
 #include "sli_wifi_types.h"
 #include "sli_wifi_constants.h"
 #include "sli_wifi.h"
-
+#include "sli_wifi_utility.h"
 extern bool device_initialized;
 
 #define NWP_LOGGING_ENABLE  1

@@ -67,7 +67,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 static const sl_wifi_device_configuration_t station_init_configuration = {
@@ -115,9 +114,8 @@ static void initialise_counters(void);
 /******************************************************
  *               Function Definitions
  ******************************************************/
-void app_init(const void *unused)
+void app_init(void)
 {
-  UNUSED_PARAMETER(unused);
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
 }
 

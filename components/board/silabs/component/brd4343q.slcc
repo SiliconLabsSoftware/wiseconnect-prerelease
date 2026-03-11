@@ -1,7 +1,7 @@
 id: brd4343q
 label: BRD4343Q
 package: platform_siwx91x
-description: Board support for BRD4343Q.
+description: Board support for BRD4343Q(SoC Module).
 category: Board|Radio Board
 quality: production
 metadata:

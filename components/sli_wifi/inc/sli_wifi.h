@@ -273,19 +273,6 @@ sl_status_t sli_wifi_flush_transceiver_data(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_configure_multicast_filter(sl_wifi_multicast_filter_info_t *multicast_filter_info);
 /* Function used to update the variable that stores the wifi rate */
 sl_status_t sli_wifi_save_rate(sl_wifi_rate_t transfer_rate);
-sl_status_t sli_wifi_send_command(uint32_t command,
-                                  sli_wifi_command_type_t command_type,
-                                  const void *data,
-                                  uint32_t data_length,
-                                  sli_wifi_wait_period_t wait_period,
-                                  void *sdk_context,
-                                  void **data_buffer);
-sl_status_t sli_wifi_wait_for_response_packet(sli_wifi_buffer_queue_t *queue,
-                                              osEventFlagsId_t event_flag,
-                                              uint32_t event_mask,
-                                              uint16_t packet_id,
-                                              sli_wifi_wait_period_t wait_period,
-                                              sl_wifi_buffer_t **packet_buffer);
 sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_interface,
                                                  const void *configuration,
                                                  sli_wifi_join_request_t *join_request);
@@ -320,5 +307,5 @@ sl_status_t sli_wifi_send_mac_data_frame(sl_wifi_interface_t interface,
                                          sl_wifi_transmitter_test_info_t *per_params,
                                          sl_wifi_system_packet_t *packet,
                                          uint16_t chunk_length);
-sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, void *context);
+sl_status_t sli_wifi_send_data_packet(const void *data, uint16_t length, const void *context);
 #endif

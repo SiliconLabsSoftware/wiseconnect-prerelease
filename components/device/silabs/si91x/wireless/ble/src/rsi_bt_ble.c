@@ -43,6 +43,7 @@
 #include "stdio.h"
 
 #include "sl_si91x_host_interface.h"
+#include "sli_buffer_manager.h"
 #include "rsi_ble_common_config.h"
 
 sl_status_t sli_si91x_allocate_command_buffer(sl_wifi_buffer_t **host_buffer,
@@ -351,7 +352,6 @@ void rsi_add_remote_ble_dev_info(const rsi_ble_event_enhance_conn_status_t *remo
       le_cb->remote_ble_info[inx].avail_buf_cnt  = 1;
       le_cb->remote_ble_info[inx].mode           = 1;
       le_cb->remote_ble_info[inx].ble_buff_mutex = osMutexNew(NULL);
-
       break;
     }
   }
@@ -2091,7 +2091,6 @@ uint16_t rsi_bt_prepare_le_pkt(uint16_t cmd_type, void *cmd_struct, sl_wifi_syst
           }
           if ((le_cb->remote_ble_info[inx].avail_buf_cnt) != (le_cb->remote_ble_info[inx].max_buf_cnt)) {
             le_cb->buf_status = 2; //return error based on the status
-
             if (le_cb->remote_ble_info[inx].ble_buff_mutex) {
               osMutexRelease(le_cb->remote_ble_info[inx].ble_buff_mutex);
             }
@@ -2172,8 +2171,6 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
   rsi_bt_cb_t *bt_cb            = NULL;
   uint32_t calculate_timeout_ms = 0;
 
-  sl_wifi_buffer_t *buffer = NULL;
-
   protocol_type = rsi_bt_get_proto_type(cmd, &bt_cb);
 
   SL_PRINTF(SL_RSI_BT_SEND_CMD_PROTOCOL_TYPE, BLUETOOTH, LOG_INFO, "PROTOCOL_TYPE: %2x", protocol_type);
@@ -2208,11 +2205,11 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
     return RSI_ERROR_BT_BLE_CMD_IN_PROGRESS;
   }
 
-  // Allocate command buffer from ble pool
-  status = sli_si91x_allocate_command_buffer(&buffer,
-                                             (void **)&pkt,
-                                             sizeof(sl_wifi_system_packet_t) + RSI_BT_COMMON_CMD_LEN,
-                                             calculate_timeout_ms);
+  // Allocate a buffer for the command with appropriate size
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+                                              SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
+                                              SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
+                                              (sli_buffer_t)&pkt);
   // If allocation of packet fails
   if (pkt == NULL) {
     osSemaphoreRelease(bt_cb->bt_cmd_sem);
@@ -2246,7 +2243,7 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
   }
 
   if (bt_cb->buf_status || bt_cb->cmd_status || (bt_cb->state & RSI_BLE_CHECK_CMD)) {
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(pkt);
 
     if (bt_cb->buf_status == SI_LE_BUFFER_IN_PROGRESS) {
       status = RSI_ERROR_BLE_DEV_BUF_IS_IN_PROGRESS;
@@ -2277,6 +2274,7 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
 
   rsi_uint16_to_2bytes(host_desc, (payload_size & 0xFFF));
   rsi_uint16_to_2bytes(&host_desc[2], cmd);
+  host_desc[1] |= SLI_BT_Q << 4;
 
   // Save expected response type
   bt_cb->expected_response_type = cmd;
@@ -2290,7 +2288,7 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
     bt_cb->sync_rsp               = 1;
   }
 
-  status = sli_si91x_driver_send_bt_command(cmd, SLI_SI91X_BT_CMD, buffer, bt_cb->sync_rsp);
+  status = sli_si91x_driver_send_bt_command(cmd, SLI_SI91X_BT_CMD, pkt);
   if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS) {
     rsi_bt_set_status(bt_cb, status);
     osSemaphoreRelease(bt_cb->bt_cmd_sem);

@@ -38,10 +38,7 @@
 #include "sl_core.h"
 #include "sl_wifi_region_db_config.h"
 #include "sli_wifi_utility.h"
-#include "sli_wifi_memory_manager.h"
 #include <string.h>
-#include "sli_buffer_manager.h"
-
 #ifndef SL_NCP_DEFAULT_COMMAND_WAIT_TIME
 #define SL_NCP_DEFAULT_COMMAND_WAIT_TIME 3000
 #endif
@@ -83,9 +80,9 @@
 
 // Enterprise method should be one of the following: TLS, TTLS, FAST or PEAP.
 // PEAP encryption now supports three security levels through different enum values:
-// 	SL_WIFI_PEAP_MSCHAPV2_ENCRYPTION - The EAP server may bypass Phase2 authentication (less secure).
-// 	SL_WIFI_PEAP_SAFE1_ENCRYPTION - If a client certificate (private_key/client_cert) is not used and TLS session resumption is not used, then Phase2 authentication is mandatory.
-// 	SL_WIFI_PEAP_SAFE2_ENCRYPTION - Requires Phase2 authentication in all cases (most secure).
+//     SL_WIFI_PEAP_MSCHAPV2_ENCRYPTION - The EAP server may bypass Phase2 authentication (less secure).
+//     SL_WIFI_PEAP_SAFE1_ENCRYPTION - If a client certificate (private_key/client_cert) is not used and TLS session resumption is not used, then Phase2 authentication is mandatory.
+//     SL_WIFI_PEAP_SAFE2_ENCRYPTION - Requires Phase2 authentication in all cases (most secure).
 // Users can select the desired PEAP security level by setting the appropriate encryption type in their Wi-Fi profile.
 
 #define SL_EAP_TLS_METHOD       "TLS"
@@ -123,8 +120,6 @@ extern sli_wifi_performance_profile_t performance_profile;
 extern bool device_initialized;
 extern bool bg_enabled;
 extern bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX];
-extern volatile uint32_t tx_command_queues_status;
-extern sli_wifi_command_queue_t cmd_queues[SI91X_CMD_MAX];
 extern sl_wifi_interface_t default_interface;
 osEventFlagsId_t sli_wifi_events                                             = 0;
 sl_wifi_advanced_scan_configuration_t advanced_scan_configuration            = { 0 };
@@ -244,11 +239,7 @@ static sl_status_t sli_handle_psk_security(const sl_wifi_client_configuration_t 
   VERIFY_STATUS_AND_RETURN(status);
 
   psk_request.type = cred.type == SL_WIFI_PSK_CREDENTIAL ? 1 : 2;
-  if (cred.type == SL_WIFI_PSK_CREDENTIAL) {
-    memcpy(psk_request.psk_or_pmk, cred.psk.value, SL_WIFI_MAX_PSK_LENGTH);
-  } else {
-    memcpy(psk_request.psk_or_pmk, cred.pmk.value, SL_WIFI_MAX_PMK_LENGTH);
-  }
+  memcpy(psk_request.psk_or_pmk, cred.pmk.value, SL_WIFI_MAX_PMK_LENGTH);
 
   return sli_wifi_send_command(SLI_WIFI_REQ_HOST_PSK,
                                SLI_WIFI_WLAN_CMD,
@@ -355,70 +346,6 @@ bool sli_wifi_is_interface_up(sl_wifi_interface_t interface)
   }
 }
 
-sl_status_t sli_wifi_wait_for_response_packet(sli_wifi_buffer_queue_t *queue,
-                                              osEventFlagsId_t event_flag,
-                                              uint32_t event_mask,
-                                              uint16_t packet_id,
-                                              sli_wifi_wait_period_t wait_period,
-                                              sl_wifi_buffer_t **packet_buffer)
-{
-  // Verify that packet_buffer is a valid pointer, return error if invalid
-  SL_VERIFY_POINTER_OR_RETURN(packet_buffer, SL_STATUS_INVALID_PARAMETER);
-  SL_VERIFY_POINTER_OR_RETURN(queue, SL_STATUS_NULL_POINTER);
-  SL_VERIFY_POINTER_OR_RETURN(event_flag, SL_STATUS_NULL_POINTER);
-
-  uint32_t start_time      = osKernelGetTickCount();
-  uint32_t elapsed_time    = 0;
-  sl_wifi_buffer_t *buffer = NULL;
-
-  if (wait_period != osWaitForever) {
-    wait_period = SLI_SYSTEM_MS_TO_TICKS(wait_period);
-  }
-
-  while (1) {
-    // Calculate the remaining timeout for the event wait
-    uint32_t remaining_timeout = (wait_period > elapsed_time) ? (wait_period - elapsed_time) : 0;
-
-    // Wait for the event flag to be set, with the specified timeout
-    uint32_t events = osEventFlagsWait(event_flag, event_mask, (osFlagsWaitAny | osFlagsNoClear), remaining_timeout);
-
-    // If the event wait times out or resources are unavailable, return timeout status
-    if (events == (uint32_t)osErrorTimeout || events == (uint32_t)osErrorResource) {
-      return SL_STATUS_TIMEOUT;
-    }
-
-    // Enter atomic section to safely access the queue
-    CORE_irqState_t state = CORE_EnterAtomic();
-    // Try to remove the buffer with the matching packet_id from the queue
-    sl_status_t packet_status = sli_wifi_remove_buffer_from_queue_by_comparator(queue,
-                                                                                &packet_id,
-                                                                                sli_wifi_packet_identification_function,
-                                                                                &buffer);
-
-    if (packet_status == SL_STATUS_OK) {
-      // If the queue is now empty, clear the event flag
-      if (0 == sli_wifi_host_queue_status(queue)) {
-        osEventFlagsClear(event_flag, event_mask);
-      }
-      CORE_ExitAtomic(state);
-      *packet_buffer = buffer;
-      return SL_STATUS_OK;
-    } else if (packet_status == SL_STATUS_EMPTY) {
-      // If the queue is empty, clear the event flag to avoid spurious wakeups
-      osEventFlagsClear(event_flag, event_mask);
-    }
-    CORE_ExitAtomic(state);
-    if (packet_status == SL_STATUS_NOT_FOUND) {
-      osDelay(SLI_SYSTEM_MS_TO_TICKS(2)); // Add a small delay to avoid busy waiting
-    }
-
-    // Update elapsed time for the next iteration
-    elapsed_time = sl_wifi_host_elapsed_time(start_time);
-  }
-  // This code path should not be reached; loop exits on success or timeout.
-  return SL_STATUS_FAIL;
-}
-
 static sl_status_t sli_wifi_convert_old_gain_table_to_su_gain_table(const uint8_t old_table[],
                                                                     uint8_t new_table[],
                                                                     uint16_t payload_length,
@@ -470,12 +397,10 @@ static sl_status_t sli_wifi_fill_join_request_security_using_encryption(sl_wifi_
 
 static sl_status_t sli_wifi_configure_mfp_mode(sl_wifi_mfp_config_t *mfp_config,
                                                uint8_t security_type,
-                                               uint8_t *join_feature_bitmap,
-                                               sl_wifi_interface_t interface)
+                                               uint8_t *join_feature_bitmap)
 {
   sl_status_t status = SL_STATUS_OK;
   if (mfp_config->is_configured) {
-    // User explicitly configured MFP - honor it for both STA and AP modes
     switch (mfp_config->mfp_mode) {
       case SL_WIFI_MFP_REQUIRED:
         *join_feature_bitmap |= SL_WIFI_JOIN_FEAT_MFP_CAPABLE_REQUIRED;
@@ -487,7 +412,6 @@ static sl_status_t sli_wifi_configure_mfp_mode(sl_wifi_mfp_config_t *mfp_config,
         break;
     }
   } else {
-    // User did not configure MFP
     if ((security_type == SL_WIFI_WPA3) || (security_type == SL_WIFI_WPA3_ENTERPRISE)) {
       *join_feature_bitmap |= SL_WIFI_JOIN_FEAT_MFP_CAPABLE_REQUIRED;
       mfp_config->mfp_mode = SL_WIFI_MFP_REQUIRED;
@@ -496,12 +420,8 @@ static sl_status_t sli_wifi_configure_mfp_mode(sl_wifi_mfp_config_t *mfp_config,
       *join_feature_bitmap |= SL_WIFI_JOIN_FEAT_MFP_CAPABLE_ONLY;
       mfp_config->mfp_mode = SL_WIFI_MFP_CAPABLE;
     } else if (security_type == SL_WIFI_WPA2 || security_type == SL_WIFI_WPA_WPA2_MIXED) {
-      // Automatically enable MFP only for STA/Client mode with WPA2
-      // For AP mode, MFP should only be enabled if user explicitly configures it
-      if (interface & SL_WIFI_CLIENT_INTERFACE) {
-        *join_feature_bitmap |= SL_WIFI_JOIN_FEAT_MFP_CAPABLE_ONLY;
-        mfp_config->mfp_mode = SL_WIFI_MFP_CAPABLE;
-      }
+      *join_feature_bitmap |= SL_WIFI_JOIN_FEAT_MFP_CAPABLE_ONLY;
+      mfp_config->mfp_mode = SL_WIFI_MFP_CAPABLE;
     }
     status = sli_wifi_save_mfp_mode(mfp_config);
   }
@@ -562,10 +482,7 @@ sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_inte
     join_request->security_type = (uint8_t)client_configuration->security;
 
     sl_wifi_mfp_config_t mfp_config = sli_wifi_get_mfp_mode();
-    status                          = sli_wifi_configure_mfp_mode(&mfp_config,
-                                         join_request->security_type,
-                                         &join_request->join_feature_bitmap,
-                                         SL_WIFI_CLIENT_INTERFACE);
+    status = sli_wifi_configure_mfp_mode(&mfp_config, join_request->security_type, &join_request->join_feature_bitmap);
     VERIFY_STATUS_AND_RETURN(status);
 
     sli_wifi_fill_join_request_security_using_encryption(client_configuration->encryption,
@@ -590,10 +507,7 @@ sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_inte
     join_request->vap_id        = 0;
 
     sl_wifi_mfp_config_t mfp_config = sli_wifi_get_mfp_mode();
-    status                          = sli_wifi_configure_mfp_mode(&mfp_config,
-                                         join_request->security_type,
-                                         &join_request->join_feature_bitmap,
-                                         SL_WIFI_AP_INTERFACE);
+    status = sli_wifi_configure_mfp_mode(&mfp_config, join_request->security_type, &join_request->join_feature_bitmap);
     VERIFY_STATUS_AND_RETURN(status);
 
     if (sli_wifi_get_opermode() == SL_WIFI_CONCURRENT_MODE) {
@@ -605,7 +519,9 @@ sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_inte
 
   sl_wifi_max_tx_power_t wifi_max_tx_power = sli_get_max_tx_power();
 
-  /* The MSB is set by default, the 'power_level' variable encodes the absolute power value using bits 2 through 6. */
+  /* Within the 1-byte 'power_level' variable, bit 0 and bit 1 are allocated for encoding power level thresholds(low, mid, high).
+* The Most Significant Bit serves as an indicator for toggling between absolute power value representation.
+* When the MSB is set, the 'power_level' variable encodes the absolute power value using bits 2 through 6. */
   join_request->power_level = (uint8_t)((wifi_max_tx_power.join_tx_power << 2) | ABSOLUTE_POWER_VALUE_TOGGLE);
 
   return SL_STATUS_OK;
@@ -666,7 +582,7 @@ sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_r
   if (buffer != NULL) {
     packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
     memcpy(wps_response, &packet->data[1], sizeof(sl_wifi_wps_response_t));
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   } else {
     return SL_STATUS_FAIL;
   }
@@ -772,10 +688,9 @@ sl_status_t sli_wifi_connect(sl_wifi_interface_t interface,
                                  timeout_ms ? SLI_WIFI_WAIT_FOR_RESPONSE(timeout_ms) : SLI_WIFI_RETURN_IMMEDIATELY,
                                  NULL,
                                  (void **)&buffer);
-
   if (timeout_ms != 0 && status != SL_STATUS_OK) {
     if (buffer != NULL) {
-      sli_wifi_memory_manager_free_buffer(buffer);
+      sli_buffer_manager_free_buffer(buffer);
     }
     sl_status_t temp_status = sli_wifi_send_command(SLI_WIFI_REQ_INIT,
                                                     SLI_WIFI_WLAN_CMD,
@@ -792,11 +707,11 @@ sl_status_t sli_wifi_connect(sl_wifi_interface_t interface,
   packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
 
   if (packet->data[0] != 'C') {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
     return SL_STATUS_NOT_AVAILABLE;
   }
 
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
 }
 /***************************************************************************/ /**
@@ -810,7 +725,7 @@ sl_status_t sli_wifi_connect(sl_wifi_interface_t interface,
  * HtCaps is identified by @ref sli_wifi_request_ap_high_throughput_capability_t
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note 
+ * @note
  *   Client interfaces are not supported.
  ******************************************************************************/
 static sl_status_t sli_wifi_set_high_throughput_capability(sl_wifi_interface_t interface,
@@ -976,12 +891,12 @@ sl_status_t sli_wifi_wait_for_scan_results(sl_wifi_scan_result_t **scan_results,
   if (packet->command == SLI_WIFI_RSP_SCAN) {
     *scan_results = (sl_wifi_scan_result_t *)malloc(packet->length);
     if (scan_results == NULL) {
-      sli_wifi_memory_manager_free_buffer(buffer);
+      sli_buffer_manager_free_buffer(buffer);
       return SL_STATUS_ALLOCATION_FAILED;
     }
     memcpy(*scan_results, packet->data, packet->length);
   }
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
 #endif
 
   return SL_STATUS_NOT_SUPPORTED;
@@ -1082,13 +997,13 @@ sl_status_t sli_wifi_get_signal_strength(sl_wifi_interface_t interface, int32_t 
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   const sl_wifi_system_packet_t *packet =
     (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
   *rssi = -(packet->data[0]);
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
 }
 
@@ -1119,13 +1034,13 @@ sl_status_t sli_wifi_get_sta_tsf(sl_wifi_interface_t interface, sl_wifi_tsf64_t 
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   const sl_wifi_system_packet_t *packet =
     (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
   memcpy(tsf, packet->data, packet->length);
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
 }
 
@@ -1164,7 +1079,7 @@ sl_status_t sli_wifi_get_mac_address(sl_wifi_interface_t interface, sl_mac_addre
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   const sl_wifi_system_packet_t *packet =
@@ -1178,7 +1093,7 @@ sl_status_t sli_wifi_get_mac_address(sl_wifi_interface_t interface, sl_mac_addre
     }
     memcpy(mac->octet, packet->data + mac_address_offset, sizeof(*mac));
   }
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
 }
 
@@ -1361,14 +1276,14 @@ sl_status_t sli_wifi_start_ap(sl_wifi_interface_t interface, const sl_wifi_ap_co
                                  NULL,
                                  (void **)&rx_buffer);
   if ((status != SL_STATUS_OK) && (rx_buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(rx_buffer);
+    sli_buffer_manager_free_buffer(rx_buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
   join_response = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)rx_buffer, 0, NULL);
 
   if (join_response->data[0] != 'G') {
-    sli_wifi_memory_manager_free_buffer(rx_buffer);
+    sli_buffer_manager_free_buffer(rx_buffer);
     return SL_STATUS_NOT_AVAILABLE;
   }
 
@@ -1380,7 +1295,7 @@ sl_status_t sli_wifi_start_ap(sl_wifi_interface_t interface, const sl_wifi_ap_co
   else if (interface == SL_WIFI_AP_2_4GHZ_INTERFACE)
     interface_is_up[SL_WIFI_AP_2_4GHZ_INTERFACE_INDEX] = true;
 
-  sli_wifi_memory_manager_free_buffer(rx_buffer);
+  sli_buffer_manager_free_buffer(rx_buffer);
   return SL_STATUS_OK;
 }
 
@@ -1411,13 +1326,13 @@ sl_status_t sli_wifi_get_pairwise_master_key(sl_wifi_interface_t interface,
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   const sl_wifi_system_packet_t *packet =
     (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
   memcpy(pairwise_master_key, packet->data, packet->length);
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
 }
 
@@ -1448,7 +1363,6 @@ sl_status_t sli_wifi_disconnect_ap_client(sl_wifi_interface_t interface,
                                              SLI_WLAN_RSP_DISCONNECT_WAIT_TIME,
                                              (void *)mac,
                                              NULL);
-
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -1482,7 +1396,7 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
@@ -1491,7 +1405,7 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
   memcpy(&sli_wifi_client_info_response, packet->data, sizeof(sli_wifi_client_info_response));
   sli_wifi_convert_client_info(client_info, &sli_wifi_client_info_response);
 
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 sl_status_t sli_wifi_disconnect(sl_wifi_interface_t interface)
@@ -1591,13 +1505,13 @@ sl_status_t sli_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_stati
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
   packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
   if (packet->length != sizeof(sl_wifi_statistics_t)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
     return SL_STATUS_FAIL;
   }
 
@@ -1605,7 +1519,7 @@ sl_status_t sli_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_stati
     memcpy(statistics, packet->data, packet->length);
   }
 
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
@@ -1634,13 +1548,13 @@ sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
   packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
   if (packet->length != sizeof(sl_wifi_operational_statistics_t)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
     return SL_STATUS_FAIL;
   }
 
@@ -1648,7 +1562,7 @@ sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
     memcpy(operational_statistics, packet->data, packet->length);
   }
 
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 
@@ -1937,7 +1851,7 @@ sl_status_t sli_wifi_generate_wps_pin(sl_wifi_wps_pin_t *wps_pin)
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
@@ -1946,7 +1860,7 @@ sl_status_t sli_wifi_generate_wps_pin(sl_wifi_wps_pin_t *wps_pin)
     memcpy(wps_pin->digits, packet->data, sizeof(sl_wifi_wps_pin_t));
   }
 
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 
@@ -2062,7 +1976,6 @@ sl_status_t sli_wifi_set_roam_configuration(sl_wifi_interface_t interface,
                                              SLI_WIFI_RSP_ROAM_PARAMS_WAIT_TIME,
                                              NULL,
                                              NULL);
-
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -2592,7 +2505,7 @@ sl_status_t sli_wifi_set_transceiver_parameters(sl_wifi_interface_t interface, s
   }
 
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
 
   VERIFY_STATUS_AND_RETURN(status);
@@ -2602,7 +2515,7 @@ sl_status_t sli_wifi_set_transceiver_parameters(sl_wifi_interface_t interface, s
     memcpy(params, packet->data, sizeof(sl_wifi_transceiver_parameters_t));
   }
 
-  sli_wifi_memory_manager_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 
@@ -2781,7 +2694,6 @@ sl_status_t sli_wifi_configure_multicast_filter(sl_wifi_multicast_filter_info_t 
                                  SLI_WIFI_RSP_SET_MULTICAST_FILTER_WAIT_TIME,
                                  NULL,
                                  NULL);
-
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -2924,7 +2836,6 @@ sl_status_t sli_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface)
                                  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
                                  NULL,
                                  NULL);
-
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -2948,7 +2859,6 @@ sl_status_t sli_wifi_set_tx_powerdBm(int16_t txPower)
                                  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
                                  NULL,
                                  NULL);
-
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -3010,9 +2920,8 @@ sl_status_t sli_wifi_config_xo_ctune(sl_wifi_interface_t interface,
                                  SLI_WIFI_WAIT_FOR_RESPONSE(1000),
                                  NULL,
                                  (void **)&buffer);
-
   if ((status != SL_STATUS_OK) && (NULL != buffer)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
@@ -3021,7 +2930,7 @@ sl_status_t sli_wifi_config_xo_ctune(sl_wifi_interface_t interface,
 
   if ((xo_ctune != NULL) && (packet != NULL)) {
     memcpy(xo_ctune, packet->data, packet->length);
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
 
   return status;
@@ -3055,9 +2964,8 @@ sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
                                  SLI_WIFI_WAIT_FOR_RESPONSE(1000),
                                  NULL,
                                  (void **)&buffer);
-
   if ((status != SL_STATUS_OK) && (NULL != buffer)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   const sl_wifi_system_packet_t *packet =
@@ -3065,7 +2973,7 @@ sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
 
   if ((get_xo_ctune != NULL) && (packet != NULL)) {
     memcpy(get_xo_ctune, packet->data, packet->length);
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   return status;
 }
@@ -3119,7 +3027,7 @@ sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_u
 
   free(packet);
   if ((status != SL_STATUS_OK) && (NULL != buffer)) {
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   const sl_wifi_system_packet_t *resp_packet =
@@ -3128,7 +3036,7 @@ sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_u
   if ((resp_packet != NULL)) {
     *fw_unique_id = resp_packet->data[0];
     SL_DEBUG_LOG("vendor IE added with unique ID: %d\r\n", *fw_unique_id);
-    sli_wifi_memory_manager_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
 
   VERIFY_STATUS_AND_RETURN(status);
@@ -3380,11 +3288,17 @@ sl_status_t sli_wifi_send_mac_data_frame(sl_wifi_interface_t interface,
 
   // Set the packet's transmitter test information
   _11ax_transmit = per_params->enable_11ax;
+  uint8_t mode   = _11ax_transmit ? (per_params->rate & BIT(7) ? 2 : 1) : 0;
   if (_11ax_transmit) {
-    bbp_info = (per_params->coding_type << 0) | (per_params->nominal_pe << 1) | (per_params->ul_dl << 3)
-               | (per_params->he_ppdu_type << 4) | (per_params->beam_change << 6) | (per_params->bw << 7)
-               | (per_params->stbc << 8) | (per_params->tx_bf << 9) | (per_params->dcm << 10)
-               | (per_params->gi_ltf << 11) | (per_params->nsts_midamble << 13);
+    if (mode == 2) {
+      bbp_info = ((per_params->bw << 0) | (per_params->he_ppdu_type << 4) | (per_params->ul_dl << 6)
+                  | (per_params->sigb_mcs << 7));
+    } else {
+      bbp_info = (per_params->coding_type << 0) | (per_params->nominal_pe << 1) | (per_params->ul_dl << 3)
+                 | (per_params->he_ppdu_type << 4) | (per_params->beam_change << 6) | (per_params->bw << 7)
+                 | (per_params->stbc << 8) | (per_params->tx_bf << 9) | (per_params->dcm << 10)
+                 | (per_params->gi_ltf << 11) | (per_params->nsts_midamble << 13);
+    }
   }
   rate_field_params = (per_params->nominal_pe << RATE_OFFSET_NOMINAL_PE)
                       | (per_params->coding_type << RATE_OFFSET_CODING_TYPE)

@@ -136,7 +136,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = 0,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 sl_ip_address_t ip_address           = { 0 };

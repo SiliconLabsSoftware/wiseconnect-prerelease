@@ -34,15 +34,19 @@
 #include "sl_cmsis_utility.h"
 #include "sl_net_types.h"
 #include "sl_net_wifi_types.h"
+#if defined(SLI_SI917)
 #include "sl_net_si91x.h"
+#endif
 #include "sl_wifi.h"
 #include "string.h"
-#include "sl_si91x_driver.h"
 #ifdef SLI_SI91X_LWIP_HOSTED_NETWORK_STACK
 #include "sl_net_for_lwip.h"
 #endif
 #include "sli_wifi_constants.h"
 #include "sli_net_types.h"
+
+#define CRED_TYPE_CERT 0
+#define CRED_TYPE_CRED 1
 
 // Auto-join / network manager synchronization primitives
 osThreadId_t sli_network_manager_id                  = NULL;
@@ -58,9 +62,7 @@ const osThreadAttr_t sli_network_manager_attributes = {
   .stack_size = SL_NET_NETWORK_MANAGER_THREAD_STACK_SIZE,
   .priority   = SL_NET_NETWORK_MANAGER_THREAD_PRIORITY,
   .tz_module  = 0,
-  .reserved   = 0,
 };
-
 const osMessageQueueAttr_t sli_network_manager_req_queue_attributes = { .name = "sli_network_manager_request_queue" };
 const osEventFlagsAttr_t sli_network_manager_rsp_flags_attributes   = { .name = "sli_network_manager_response_flags" };
 
@@ -127,6 +129,114 @@ sl_status_t sli_net_register_event_handler(sl_net_event_handler_t function)
 {
   net_event_handler = function;
   return SL_STATUS_OK;
+}
+
+sl_status_t sli_net_get_wifi_credential_type(sl_net_credential_type_t type, sl_wifi_credential_type_t *wifi_type)
+{
+  // Map the network credential type to WiFi credential type
+  switch (type) {
+    case SL_NET_WIFI_PSK:
+      // Set the credential type to Pre-Shared Key (PSK)
+      *wifi_type = SL_WIFI_PSK_CREDENTIAL;
+      break;
+    case SL_NET_WIFI_PMK:
+      // Set the credential type to Pairwise Master Key (PMK)
+      *wifi_type = SL_WIFI_PMK_CREDENTIAL;
+      break;
+    case SL_NET_WIFI_WEP:
+      // Set the credential type to Wired Equivalent Privacy (WEP)
+      *wifi_type = SL_WIFI_WEP_CREDENTIAL;
+      break;
+    case SL_NET_EAP_CLIENT_CREDENTIAL:
+      // Set the credential type to Extensible Authentication Protocol (EAP)
+      *wifi_type = SL_WIFI_EAP_CREDENTIAL;
+      break;
+    default:
+      return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_net_get_net_credential_type(sl_wifi_credential_type_t type, sl_net_credential_type_t *net_type)
+{
+  // Map the WiFi credential type to network credential type
+  switch (type) {
+    case SL_WIFI_PSK_CREDENTIAL:
+      // Set the credential type to Pre-Shared Key (PSK)
+      *net_type = SL_NET_WIFI_PSK;
+      break;
+    case SL_WIFI_PMK_CREDENTIAL:
+      // Set the credential type to Pairwise Master Key (PMK)
+      *net_type = SL_NET_WIFI_PMK;
+      break;
+    case SL_WIFI_WEP_CREDENTIAL:
+      // Set the credential type to Wired Equivalent Privacy (WEP)
+      *net_type = SL_NET_WIFI_WEP;
+      break;
+    case SL_WIFI_EAP_CREDENTIAL:
+      // Set the credential type to Extensible Authentication Protocol (EAP)
+      *net_type = SL_NET_EAP_CLIENT_CREDENTIAL;
+      break;
+    default:
+      return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_net_validate_sl_net_profile(const sl_net_profile_t *profile, sl_net_interface_t interface)
+{
+  switch (interface) {
+#ifdef SL_WIFI_COMPONENT_INCLUDED
+    case SL_NET_WIFI_CLIENT_INTERFACE: {
+      if (
+        (((const sl_net_wifi_client_profile_t *)profile)->config.ssid.length == 0)
+        || (((const sl_net_wifi_client_profile_t *)profile)->config.ssid.length
+            > SL_WIFI_MAX_SSID_LENGTH
+                - 2)) { //The maximum length of the SSID is 34 characters with 2 characters reserved for NULL termination and internal alignment. Therefore, used `SL_WIFI_MAX_SSID_LENGTH - 2`
+        SL_DEBUG_LOG("Invalid SSID length: %d\n", ((const sl_net_wifi_client_profile_t *)profile)->config.ssid.length);
+        return SL_STATUS_INVALID_PARAMETER;
+      }
+      if (((((const sl_net_wifi_client_profile_t *)profile)->config.security == SL_WIFI_OPEN)
+           && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id != SL_WIFI_NO_CREDENTIAL_ID))
+          || ((((const sl_net_wifi_client_profile_t *)profile)->config.security != SL_WIFI_OPEN)
+              && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id == SL_WIFI_NO_CREDENTIAL_ID))) {
+        SL_DEBUG_LOG("Mismatch between security and credential_id\n");
+        return SL_STATUS_INVALID_CONFIGURATION;
+      }
+      return SL_STATUS_OK;
+    }
+    case SL_NET_WIFI_AP_INTERFACE: {
+      if ((((const sl_net_wifi_ap_profile_t *)profile)->config.ssid.length == 0)
+          || (((const sl_net_wifi_ap_profile_t *)profile)->config.ssid.length > SL_WIFI_MAX_SSID_LENGTH - 2)) {
+        SL_DEBUG_LOG("Invalid SSID length: %d\n", ((const sl_net_wifi_ap_profile_t *)profile)->config.ssid.length);
+        return SL_STATUS_INVALID_PARAMETER;
+      }
+      if (((((const sl_net_wifi_ap_profile_t *)profile)->config.security == SL_WIFI_OPEN)
+           && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id != SL_WIFI_NO_CREDENTIAL_ID))
+          || ((((const sl_net_wifi_ap_profile_t *)profile)->config.security != SL_WIFI_OPEN)
+              && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id == SL_WIFI_NO_CREDENTIAL_ID))) {
+        SL_DEBUG_LOG("Mismatch between security and credential_id\n");
+        return SL_STATUS_INVALID_CONFIGURATION;
+      }
+      return SL_STATUS_OK;
+    }
+#endif
+    default:
+      return SL_STATUS_NOT_SUPPORTED;
+  }
+}
+
+int sli_net_check_cred_type(sl_net_credential_type_t type)
+{
+  if ((SL_NET_CERTIFICATE == type) || (SL_NET_PUBLIC_KEY == type) || (SL_NET_PRIVATE_KEY == type)
+      || (SL_NET_SIGNING_CERTIFICATE == type) || (SL_NET_PACK_FILE == type) || (SL_NET_TLS_PRIVATE_KEY_CBC_WRAP == type)
+      || (SL_NET_TLS_PRIVATE_KEY_ECB_WRAP == type)) {
+    return CRED_TYPE_CERT;
+  }
+
+  return CRED_TYPE_CRED;
 }
 
 sl_status_t sli_network_manager_init(void)
@@ -806,7 +916,7 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
 }
 
 // Helper: handle termination
-static void sli_handle_thread_terminate(sli_network_manager_message_t *message)
+static void sli_handle_thread_terminate(const sli_network_manager_message_t *message)
 {
   UNUSED_PARAMETER(message);
   SL_DEBUG_LOG("\r\n Terminating network manager thread\r\n");
@@ -928,32 +1038,6 @@ void sli_network_manager_event_handler(const void *arg)
       }
     }
   }
-}
-
-sl_status_t sli_net_nat_configure(const sli_net_nat_config_t *sli_nat_config)
-{
-  sl_status_t status = SL_STATUS_OK;
-
-  if (sli_nat_config == NULL) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  // Check if both STA and AP interfaces are up
-  if (!sl_wifi_is_interface_up(SL_WIFI_CLIENT_INTERFACE) || !sl_wifi_is_interface_up(SL_WIFI_AP_INTERFACE)) {
-    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
-  }
-
-  // Send the NAT configure command to the driver
-  status = sli_si91x_driver_send_command(SLI_WLAN_REQ_NAT,
-                                         SLI_SI91X_NETWORK_CMD,
-                                         sli_nat_config,
-                                         sizeof(sli_net_nat_config_t),
-                                         SLI_WIFI_WAIT_FOR_COMMAND_RESPONSE,
-                                         NULL,
-                                         NULL);
-
-  VERIFY_STATUS_AND_RETURN(status);
-  return status;
 }
 
 sl_status_t sli_network_manager_auto_join_request(sl_net_interface_t interface, sl_net_profile_id_t profile_id)

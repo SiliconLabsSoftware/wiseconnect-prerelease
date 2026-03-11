@@ -40,7 +40,6 @@
 #include "sli_wifi_types.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
-#include "sl_log_helper_si91x.h"
 #if defined(SLI_SI91X_SOCKETS)
 #include "sl_si91x_socket_utility.h"
 #endif
@@ -72,11 +71,14 @@ extern rsi_m4ta_desc_t crypto_desc[2];
 #endif
 
 #ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
+#include "sl_log_helper.h"
 extern uint32_t sl_si91x_log_host_timesync_address;
 #endif
 
 extern bool device_initialized;
 extern sl_wifi_advanced_scan_configuration_t advanced_scan_configuration;
+extern sli_wifi_command_queue_t cmd_queues[SI91X_CMD_MAX];
+
 sl_status_t sl_wifi_get_associated_client_list(const void *client_list_buffer,
                                                uint16_t buffer_length,
                                                uint32_t timeout);
@@ -93,8 +95,7 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
 #endif
   sl_status_t status = SL_STATUS_OK;
   status             = sl_si91x_driver_init(configuration, event_handler);
-#ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
-#if defined(SLI_SI91X_MCU_INTERFACE)
+#if defined(SL_CATALOG_LOGGER_COMPONENT_PRESENT) && defined(SLI_SI91X_MCU_INTERFACE)
   if (status == SL_STATUS_OK) {
     status = sl_si91x_configure_timestamp_memory_location(sizeof(uint32_t), &sl_si91x_log_host_timesync_address);
     if (status != SL_STATUS_OK) {
@@ -108,7 +109,6 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
     }
     status = SL_STATUS_OK;
   }
-#endif
 #endif
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
   if (status == SL_STATUS_OK) {
@@ -235,7 +235,7 @@ sl_status_t sl_wifi_get_channel(sl_wifi_interface_t interface, sl_wifi_channel_t
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   sl_wifi_system_packet_t *packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
@@ -275,7 +275,7 @@ sl_status_t sl_wifi_get_channel(sl_wifi_interface_t interface, sl_wifi_channel_t
       break;
   }
 
-  sli_si91x_host_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 
@@ -378,7 +378,7 @@ sl_status_t sl_wifi_get_interface_info(sl_wifi_interface_t interface, sl_wifi_in
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   sl_wifi_system_packet_t *packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
@@ -392,7 +392,6 @@ sl_status_t sl_wifi_get_interface_info(sl_wifi_interface_t interface, sl_wifi_in
       memcpy(&info->wlan_state, (uint16_t *)&response->sta_count, sizeof(uint16_t));
       memcpy(&info->channel_number, (uint16_t *)&response->channel_number, sizeof(uint16_t));
       memcpy(info->ssid, response->ssid, MIN(sizeof(info->ssid), sizeof(response->ssid)));
-      memcpy(info->mac_address, response->mac_address, SL_WIFI_MAC_ADDRESS_LENGTH);
       // PSK for AP mode, PMK for Client mode
       memcpy(info->psk_pmk, response->psk, 64);
     } else {
@@ -401,7 +400,6 @@ sl_status_t sl_wifi_get_interface_info(sl_wifi_interface_t interface, sl_wifi_in
       memcpy(&info->wlan_state, (uint16_t *)&response->wlan_state, sizeof(uint8_t));
       memcpy((uint8_t *)&info->channel_number, &response->channel_number, sizeof(uint8_t));
       memcpy(info->ssid, response->ssid, MIN(sizeof(info->ssid), sizeof(response->ssid)));
-      memcpy(info->mac_address, response->mac_address, SL_WIFI_MAC_ADDRESS_LENGTH);
       memcpy(&info->sec_type, &response->sec_type, sizeof(uint8_t));
       // PSK for AP mode, PMK for Client mode
       memcpy(info->psk_pmk, response->psk, 64);
@@ -409,7 +407,7 @@ sl_status_t sl_wifi_get_interface_info(sl_wifi_interface_t interface, sl_wifi_in
       memcpy(&info->wireless_mode, &response->wireless_mode, sizeof(uint8_t));
     }
   }
-  sli_si91x_host_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 
@@ -447,7 +445,7 @@ sl_status_t sl_wifi_get_wireless_info(sl_si91x_rsp_wireless_info_t *info)
   }
 
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   sl_wifi_system_packet_t *packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
@@ -485,7 +483,7 @@ sl_status_t sl_wifi_get_wireless_info(sl_si91x_rsp_wireless_info_t *info)
     memcpy(&info->wireless_mode, &response->wireless_mode, sizeof(uint8_t));
   }
 
-  sli_si91x_host_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 

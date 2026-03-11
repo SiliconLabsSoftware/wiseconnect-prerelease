@@ -33,6 +33,7 @@
 #include "si91x_device.h"
 #include "core_cm4.h"
 #ifdef SL_SI91X_FW_FALLBACK
+#include "sli_wifi_utility.h"
 #include "sl_si91x_driver.h"
 #include "sli_siwx917_soc.h"
 #include "sl_device.h"
@@ -198,13 +199,13 @@ sl_status_t sl_si91x_flash_write(uint32_t address, const uint8_t *buffer, uint32
   request_size = offsetof(sl_si91x_fw_fallback_request_t, data) + length;
 
   // Send firmware update command
-  status = sli_si91x_driver_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
-                                         SLI_WIFI_COMMON_CMD,
-                                         &fw_request,
-                                         request_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &fw_request,
+                                 request_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
+                                 NULL,
+                                 NULL);
 
   return status;
 }
@@ -251,13 +252,13 @@ sl_status_t sl_si91x_fw_fallback_ota_flash_write(const sl_si91x_fw_fallback_conf
   request_size = offsetof(sl_si91x_fw_fallback_request_t, data) + config->ota_image_data_length;
 
   // Send firmware update command
-  status = sli_si91x_driver_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
-                                         SLI_WIFI_COMMON_CMD,
-                                         &fw_request,
-                                         request_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &fw_request,
+                                 request_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
+                                 NULL,
+                                 NULL);
 
   return status;
 }
@@ -294,13 +295,13 @@ sl_status_t sl_si91x_verify_image(uint32_t flash_address)
   size_t request_size = offsetof(sl_si91x_fw_fallback_request_t, data);
 
   // Send firmware update command
-  status = sli_si91x_driver_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
-                                         SLI_WIFI_COMMON_CMD,
-                                         &fw_request,
-                                         request_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &fw_request,
+                                 request_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
+                                 NULL,
+                                 NULL);
   return status;
 }
 /***************************************************************************/ /**
@@ -408,13 +409,13 @@ sl_status_t sl_si91x_flash_erase(uint32_t address, uint32_t length)
   size_t request_size = offsetof(sl_si91x_fw_fallback_request_t, data);
 
   // Send firmware update command
-  status = sli_si91x_driver_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
-                                         SLI_WIFI_COMMON_CMD,
-                                         &fw_request,
-                                         request_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &fw_request,
+                                 request_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
+                                 NULL,
+                                 NULL);
   DEBUGOUT("\r\n [flash_erase] Erase Success %lX\n", status);
   return status;
 }
@@ -764,13 +765,13 @@ sl_status_t sl_si91x_burn_nwp_security_version(uint32_t flash_address)
   // DEBUGOUT("\r\n integratiy+request_size:%u %u \r\n", sizeof(sl_si91x_fw_fallback_request_t), request_size);
 
   // Send firmware update command
-  status = sli_si91x_driver_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
-                                         SLI_WIFI_COMMON_CMD,
-                                         &fw_request,
-                                         request_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &fw_request,
+                                 request_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
+                                 NULL,
+                                 NULL);
   return status;
 }
 
@@ -797,13 +798,13 @@ sl_status_t sl_si91x_fallback_load_qspi_keys(uint32_t image_offset)
   size_t request_size = offsetof(sl_si91x_fw_fallback_request_t, data);
 
   // Send firmware update command
-  status = sli_si91x_driver_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
-                                         SLI_WIFI_COMMON_CMD,
-                                         &fw_request,
-                                         request_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &fw_request,
+                                 request_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SL_SI91X_NWP_RESPONSE_TIMEOUT),
+                                 NULL,
+                                 NULL);
   return status;
 }
 
@@ -833,13 +834,13 @@ void sl_si91x_nwp_soft_reset_from_updater(const uint32_t m4_slot_image_offset)
   size_t request_size = offsetof(sl_si91x_fw_fallback_request_t, data);
 
   // Send firmware update command
-  status = sli_si91x_driver_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
-                                         SLI_WIFI_COMMON_CMD,
-                                         &fw_request,
-                                         request_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(3000),
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_SI91X_FW_FALLBACK_REQ_FROM_HOST,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &fw_request,
+                                 request_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(3000),
+                                 NULL,
+                                 NULL);
   (void)status;
   // Wait for the memory to match the expected value(SL_SI91X_MEM_CHECK_VALUE) for the NWP firmware
   while ((*addr != SL_SI91X_MEM_CHECK_VALUE)) {

@@ -300,8 +300,8 @@ TEST(sl_si91x_socket_utility_unit_tests, CreateSocketRequestWithSSL)
 TEST(sl_si91x_socket_utility_unit_tests, SuccessfulRequest)
 {
   // Reset all fake functions
-  RESET_FAKE(sli_si91x_driver_send_command);
-  RESET_FAKE(sli_si91x_host_free_buffer);
+  RESET_FAKE(sli_wifi_send_command);
+  RESET_FAKE(sli_buffer_manager_free_buffer);
   RESET_FAKE(sli_wifi_host_get_buffer_data);
 
   // Set up mock socket
@@ -324,7 +324,7 @@ TEST(sl_si91x_socket_utility_unit_tests, SuccessfulRequest)
 
   // Set up fake function behavior
   sli_wifi_host_get_buffer_data_fake.return_val = fake_packet;
-  sli_si91x_driver_send_command_fake.return_val = SL_STATUS_OK;
+  sli_wifi_send_command_fake.return_val         = SL_STATUS_OK;
 
   sli_si91x_sockets[0] = &mock_socket;
 
@@ -337,7 +337,7 @@ TEST(sl_si91x_socket_utility_unit_tests, SuccessfulRequest)
   EXPECT_EQ(status, SL_STATUS_OK);
   EXPECT_EQ(mock_socket.id, 1);
   EXPECT_EQ(mock_socket.local_address.sin6_port, 0x3412); // Port is in little-endian format
-  EXPECT_EQ(sli_si91x_driver_send_command_fake.call_count, 1);
+  EXPECT_EQ(sli_wifi_send_command_fake.call_count, 1);
   EXPECT_EQ(sli_wifi_host_get_buffer_data_fake.call_count, 1);
 }
 
@@ -345,8 +345,8 @@ TEST(sl_si91x_socket_utility_unit_tests, SuccessfulRequest)
 TEST(sl_si91x_socket_utility_unit_tests, SocketDoesNotExist)
 {
   // Reset all fake functions
-  RESET_FAKE(sli_si91x_driver_send_command);
-  RESET_FAKE(sli_si91x_host_free_buffer);
+  RESET_FAKE(sli_wifi_send_command);
+  RESET_FAKE(sli_buffer_manager_free_buffer);
   RESET_FAKE(sli_wifi_host_get_buffer_data);
 
   // Call the function under test
@@ -360,8 +360,8 @@ TEST(sl_si91x_socket_utility_unit_tests, SocketDoesNotExist)
 TEST(sl_si91x_socket_utility_unit_tests, DriverSendCommandFails)
 {
   // Reset all fake functions
-  RESET_FAKE(sli_si91x_driver_send_command);
-  RESET_FAKE(sli_si91x_host_free_buffer);
+  RESET_FAKE(sli_wifi_send_command);
+  RESET_FAKE(sli_buffer_manager_free_buffer);
   RESET_FAKE(sli_wifi_host_get_buffer_data);
 
   // Set up mock socket
@@ -370,7 +370,7 @@ TEST(sl_si91x_socket_utility_unit_tests, DriverSendCommandFails)
   mock_socket.state = INITIALIZED;
 
   // Set up fake function behavior
-  sli_si91x_driver_send_command_fake.return_val = SL_STATUS_FAIL;
+  sli_wifi_send_command_fake.return_val = SL_STATUS_FAIL;
 
   sli_si91x_sockets[0] = &mock_socket;
 
@@ -381,5 +381,5 @@ TEST(sl_si91x_socket_utility_unit_tests, DriverSendCommandFails)
 
   // Verify the results
   EXPECT_EQ(status, SL_STATUS_FAIL);
-  EXPECT_EQ(sli_si91x_driver_send_command_fake.call_count, 1);
+  EXPECT_EQ(sli_wifi_send_command_fake.call_count, 1);
 }

@@ -127,6 +127,16 @@ void ARM_UART_SignalEvent(uint32_t event)
  */
 void Board_Debug_Init(void)
 {
+  // Check if system power state in PS2 (ULP mode)
+#if defined(DEBUG_UART_UC) \
+  && ((SL_DEBUG_INSTANCE == SL_M4_USART0_INSTANCE) || (SL_DEBUG_INSTANCE == SL_M4_UART1_INSTANCE))
+  if (M4_ULP_SLP_STATUS_REG & ULP_MODE_SWITCHED_NPSS) {
+    // M4 UARTs (USART0/UART1) don't work in PS2 state
+    // Only ULP_UART is functional in PS2
+    // Return without initialization to prevent hardware issues
+    return;
+  }
+#endif // Continue with normal UART initialization...
 
   UARTdrv->Uninitialize();
 

@@ -13,20 +13,20 @@ The WiSeConnect (versions 3.0.0 and later) SDK is the next-generation API for Si
 
 ## Release Notes
 
-The release notes for this release are located at: [Wi-Fi 6 + BLE (WiSeConnect) SDK Version 4.0.1 (March 2026) - Release Notes](https://docs.silabs.com/wiseconnect/4.0.1/sisdk-wifi-release-notes/).
+The release notes for this release are located at: [Wi-Fi 6 + BLE (WiSeConnect) SDK Version 4.0.0 (January 2026) - Release Notes](https://docs.silabs.com/wiseconnect/4.0.0/sisdk-wifi-release-notes/).
 
 ## Licensing
 
 WiSeConnect SDK is covered by one of several different licenses. The default license is the [Master Software License Agreement](https://www.silabs.com/about-us/legal/master-software-license-agreement) (MSLA), which applies unless otherwise noted. See [here](license.md) for full details.
 
 ## Documentation
-An archive of all documents associated with the latest release of WiSeConnect™ SDK can be found in [Releases](https://github.com/SiliconLabs/wiseconnect/releases). The online WiSeConnect SDK documentation is available [here](https://docs.silabs.com/wiseconnect/4.0.1).
+An archive of all documents associated with the latest release of WiSeConnect™ SDK can be found in [Releases](https://github.com/SiliconLabs/wiseconnect/releases). The online WiSeConnect SDK documentation is available [here](https://docs.silabs.com/wiseconnect/4.0.0).
 
 ### Software Reference
 
   - See the [Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started) section to run your first example.
   - See the [Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples) section to explore all the available examples.
-  - See our [Migration Guide](https://docs.silabs.com/wiseconnect/4.0.1/wiseconnect-developers-guide-migr-guides-overview/migrating-from-v4-0-0) for information on porting your WiSeConnect v4.0.0 application to WiSeConnect v4.0.1
+  - See our [Migration Guide](https://docs.silabs.com/wiseconnect/4.0.0/wiseconnect-developers-guide-migr-guides-overview/migrating-from-v3-5-2) for information on porting your WiSeConnect v3.5.2 application to WiSeConnect v4.0.0
   - [API Reference Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-summary)
   - [SiWx917 Software Reference Manual](docs/software-reference/manuals/siwx91x-software-reference-manual.md)
 

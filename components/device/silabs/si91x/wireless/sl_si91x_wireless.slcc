@@ -13,7 +13,6 @@ metadata:
 component_root_path: ./components/device/silabs/si91x/wireless
 provides:
 - name: sli_wifi_power_profile
-- name: sli_wifi_memory_manager
 - name: sl_si91x_wireless
 - name: wifi_driver
 - condition:
@@ -24,8 +23,9 @@ provides:
   name: efx_ncp_custom_host_mcu
 source:
 - path: src/sli_wifi_power_profile.c
-- path: src/sli_wifi_memory_manager.c
 - path: src/sl_si91x_driver.c
+- path: src/sl_rsi_utility.c
+- path: src/sli_si91x_wifi_command_engine_config.c
 - path: sl_net/src/sl_net_si91x.c
   condition:
   - sl_si91x_internal_stack
@@ -38,7 +38,6 @@ source:
 - path: sl_net/src/sli_net_si91x_utility.c
   condition:
   - sl_si91x_lwip_stack
-- path: src/sl_rsi_utility.c
 - path: sl_net/src/sl_net_si91x_callback_framework.c
   condition:
   - network_manager
@@ -102,6 +101,8 @@ include:
   - path: sl_si91x_status.h
   - path: sl_si91x_types.h
   - path: sl_wifi_device.h
+  - path: sli_wifi_command_engine_config.h
+  - path: sli_wifi_command_engine_packet.h
 - path: sl_net/inc
   file_list:
   - path: sli_net_utility.h
@@ -134,6 +135,7 @@ define:
 requires:
 - name: sli_wifi
 - name: sli_wifi_command_engine
+- name: sli_si91x_wifi_event_handler
 - name: wiseconnect_common
 - condition:
   - sl_si91x_internal_stack
@@ -145,7 +147,6 @@ requires:
   - network_manager
   name: sl_si91x_network_stack
 - name: sl_si91x_fwup
-- name: sl_si91x_buffer_management
 - name: bit
 - name: cmsis_os2_ext_task_register
 - condition:
@@ -172,6 +173,7 @@ requires:
 - name: emlib_core
 - name: wifi
 - name: wifi_resources
+- name: sli_hal_si91x
 - name: si91x_log_none
 recommends:
 - id: '%extension-wiseconnect3_sdk%sl_si91x_internal_stack'

@@ -44,7 +44,7 @@
 #endif
 #endif
 #include "sl_si91x_protocol_types.h"
-
+#include "sli_command_engine.h"
 /**
  * @addtogroup SI91X_SOCKET_FUNCTIONS
  * @{ 
@@ -293,10 +293,10 @@ typedef struct {
   osEventFlagsId_t socket_events;                                          ///< Event Flags for sockets
   int32_t client_id;                                                       ///< Client Socket Id for accept
   uint8_t socket_bitmap;                                                   ///< Socket Bitmap
-  uint8_t data_buffer_count;              ///< Number of queued data buffers allocated by this socket
-  uint8_t data_buffer_limit;              ///< Maximum number of queued data buffers permitted for this socket
-  sli_wifi_command_queue_t command_queue; ///< Command queue
-  sli_wifi_buffer_queue_t tx_data_queue;  ///< Transmit data queue
-  sli_wifi_buffer_queue_t rx_data_queue;  ///< Receive data queue
-  uint8_t *domain_name;                   ///< Expected domain name for TLS certificate verification
+  uint8_t data_buffer_count; ///< Number of queued data buffers allocated by this socket
+  uint8_t data_buffer_limit; ///< Maximum number of queued data buffers permitted for this socket
+  sli_queue_t rx_queue;      ///< Receive queue for incoming commands
+  sli_command_engine_packet_type_configuration_t socket_packet_type_configuration; ///< Pointer to socket packet
+  bool Is_receive_cmd_pending; ///< Flag to indicate if a receive command is pending
+  uint8_t *domain_name;        ///< Expected domain name for TLS certificate verification
 } sli_si91x_socket_t;

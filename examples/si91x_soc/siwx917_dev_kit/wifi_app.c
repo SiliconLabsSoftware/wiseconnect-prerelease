@@ -163,7 +163,7 @@ wlan_app_cb_t wlan_app_cb; //! application control block
  *********************************************************************************************************
  */
 extern void wifi_app_send_to_ble(uint16_t msg_type, uint8_t *data, uint16_t data_len);
-extern uint8_t coex_ssid[50], pwd[34], sec_type;
+extern uint8_t coex_ssid[50], pwd[RSI_BLE_MAX_DATA_LEN], sec_type;
 
 uint8_t conn_status;
 extern uint8_t magic_word;

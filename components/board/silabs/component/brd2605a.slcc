@@ -2,7 +2,7 @@
 - id: brd2605a
 - label: BRD2605A
 - package: platform_siwx91x
-- description: Board support for BRD2605A.
+- description: Board support for BRD2605A(SoC Dev Kit).
 - category: Board|Radio Board
 - quality: production
 - metadata:

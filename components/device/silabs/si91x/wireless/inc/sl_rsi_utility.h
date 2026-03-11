@@ -242,15 +242,6 @@ uint32_t sli_si91x_clear_event(uint32_t event_mask);
 sl_status_t sli_si91x_send_power_save_request(const sl_wifi_performance_profile_v2_t *wifi_profile,
                                               const sl_bt_performance_profile_t *bt_profile);
 
-sl_status_t sli_si91x_host_init_buffer_manager(const sl_wifi_buffer_configuration_t *config);
-sl_status_t sli_si91x_host_deinit_buffer_manager(void);
-
-/* Function used to allocate memory */
-sl_status_t sli_si91x_host_allocate_buffer(sl_wifi_buffer_t **buffer,
-                                           sl_wifi_buffer_type_t type,
-                                           uint32_t buffer_size,
-                                           uint32_t wait_duration_ms);
-
 // Helper functions for command packet processing
 /**
  * @brief Set flags for command packet based on wait period and command type
@@ -383,15 +374,6 @@ sl_status_t sli_wifi_remove_buffer_from_queue_by_comparator(sli_wifi_buffer_queu
                                                             sli_si91x_wifi_buffer_comparator comparator,
                                                             sl_wifi_buffer_t **buffer);
 
-sl_status_t sli_si91x_flush_all_tx_wifi_queues(uint16_t frame_status);
-
-/* Function used to flush all the pending TX packets from the specified queue */
-sl_status_t sli_si91x_flush_queue_based_on_type(sli_wifi_command_queue_t *queue,
-                                                uint32_t event_mask,
-                                                uint16_t frame_status,
-                                                sli_si91x_compare_function_t compare_function,
-                                                void *user_data);
-
 /* Function used to check whether queue is empty or not */
 uint32_t sli_si91x_host_queue_status(const sli_wifi_buffer_queue_t *queue);
 
@@ -427,13 +409,18 @@ sl_status_t sli_si91x_bus_write_frame(sl_wifi_system_packet_t *packet,
                                       uint16_t size_param);
 
 /* Function used to check the bus availability */
-sl_status_t sl_si91x_bus_init();
+sl_status_t sl_si91x_bus_init(void);
+
+/* Function used to release bus-owned buffers; must be called before buffer manager deinit */
+sl_status_t sl_si91x_bus_deinit(void);
 
 /* Function used to check the bus availability */
 sl_status_t sli_si91x_bus_rx_irq_handler(void);
 
 /* Function used to check the bus availability */
 void sli_si91x_bus_rx_done_handler(void);
+
+sl_status_t sl_si91x_host_power_cycle(void);
 
 /*==============================================*/
 /**
@@ -538,16 +525,6 @@ sl_si91x_host_timestamp_t sl_si91x_host_elapsed_time(uint32_t starting_timestamp
 bool sl_si91x_is_device_initialized(void);
 
 /** @} */
-#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
-sl_status_t sli_si91x_flush_all_socket_command_queues(uint16_t frame_status, uint8_t vap_id);
-
-sl_status_t sli_si91x_flush_socket_command_queues_based_on_queue_type(uint8_t index, uint16_t frame_status);
-
-sl_status_t sli_si91x_flush_all_socket_data_queues(uint8_t vap_id);
-
-sl_status_t sli_si91x_flush_socket_data_queues_based_on_queue_type(uint8_t index);
-#endif
-
 /**
  * @brief Flushes all packets from the specified data transmission queue.
  * @details This function removes all packets from the provided transmission queue (`tx_data_queue`) and frees the associated memory. It ensures thread-safe operation by preventing race conditions during the process.

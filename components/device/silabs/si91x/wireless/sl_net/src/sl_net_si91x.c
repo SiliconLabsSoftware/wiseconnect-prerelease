@@ -282,13 +282,13 @@ static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interfac
   }
   multicast.type[0] = command_type;
 
-  status = sli_si91x_driver_send_command(SLI_WLAN_REQ_MULTICAST,
-                                         SLI_SI91X_NETWORK_CMD,
-                                         &multicast,
-                                         sizeof(multicast),
-                                         SLI_WLAN_RSP_MULTICAST_WAIT_TIME,
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_WLAN_REQ_MULTICAST,
+                                 SLI_SI91X_NETWORK_CMD,
+                                 &multicast,
+                                 sizeof(multicast),
+                                 SLI_WLAN_RSP_MULTICAST_WAIT_TIME,
+                                 NULL,
+                                 NULL);
 
   VERIFY_STATUS_AND_RETURN(status);
   return SL_STATUS_OK;
@@ -304,8 +304,8 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
   SL_WIFI_ARGS_CHECK_NULL_POINTER(sl_ip_address);
 
   sl_status_t status;
-  sl_wifi_system_packet_t *packet;
-  sl_wifi_buffer_t *buffer                        = NULL;
+  sl_wifi_system_packet_t *response_packet;
+  sl_wifi_buffer_t *response_buffer               = NULL;
   const sli_si91x_dns_response_t *dns_response    = { 0 };
   sli_si91x_dns_query_request_t dns_query_request = { 0 };
 
@@ -315,27 +315,27 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
   dns_query_request.ip_version[0] = (dns_resolution_ip == SL_NET_DNS_TYPE_IPV4) ? 4 : 6;
   memcpy(dns_query_request.url_name, host_name, sizeof(dns_query_request.url_name));
 
-  status = sli_si91x_driver_send_command(SLI_WLAN_REQ_DNS_QUERY,
-                                         SLI_SI91X_NETWORK_CMD,
-                                         &dns_query_request,
-                                         sizeof(dns_query_request),
-                                         wait_period,
-                                         NULL,
-                                         &buffer);
+  status = sli_wifi_send_command(SLI_WLAN_REQ_DNS_QUERY,
+                                 SLI_SI91X_NETWORK_CMD,
+                                 &dns_query_request,
+                                 sizeof(dns_query_request),
+                                 wait_period,
+                                 NULL,
+                                 (void **)&response_buffer);
 
   // Check if the command failed and free the buffer if it was allocated
-  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_si91x_host_free_buffer(buffer);
+  if ((status != SL_STATUS_OK) && (response_buffer != NULL)) {
+    sli_buffer_manager_free_buffer(response_buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
-  // Extract the DNS response from the SI91X packet buffer
-  packet       = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-  dns_response = (sli_si91x_dns_response_t *)packet->data;
+  // Extract the DNS response from the SI91X response buffer
+  response_packet = sli_wifi_host_get_buffer_data(response_buffer, 0, NULL);
+  dns_response    = (sli_si91x_dns_response_t *)response_packet->data;
 
   // Convert the SI91X DNS response to the sl_ip_address format
   sli_convert_si91x_dns_response(sl_ip_address, dns_response);
-  sli_si91x_host_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(response_buffer);
   return SL_STATUS_OK;
 }
 
@@ -388,13 +388,13 @@ sl_status_t sl_net_set_dns_server(sl_net_interface_t interface, const sl_net_dns
            SL_IPV6_ADDRESS_LENGTH);
   }
 
-  status = sli_si91x_driver_send_command(SLI_WLAN_REQ_DNS_SERVER_ADD,
-                                         SLI_SI91X_NETWORK_CMD,
-                                         &dns_server_add_request,
-                                         sizeof(dns_server_add_request),
-                                         SLI_WLAN_RSP_DNS_SERVER_ADD_WAIT_TIME,
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_WLAN_REQ_DNS_SERVER_ADD,
+                                 SLI_SI91X_NETWORK_CMD,
+                                 &dns_server_add_request,
+                                 sizeof(dns_server_add_request),
+                                 SLI_WLAN_RSP_DNS_SERVER_ADD_WAIT_TIME,
+                                 NULL,
+                                 NULL);
 
   return status;
 }

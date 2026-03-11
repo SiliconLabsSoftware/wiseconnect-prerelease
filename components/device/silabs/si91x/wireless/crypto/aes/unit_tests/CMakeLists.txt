@@ -30,6 +30,12 @@ include_directories(
     ../../../../../../../protocol/wifi/inc
     ../../../../../../../service/mdns/inc/
     ./inc 
+    ../../../../../../../sli_queue_manager/inc/
+    ../../../../../../../sli_buffer_manager/inc/
+    ../../../../../../../sli_routing_utility/inc/
+    ../../../../../../../gsdk/service/mem_pool/inc
+    ../../../../../../../sli_command_engine/inc
+    ../../../../../../../sli_event_engine/inc
 )
 
 # Add source files for the test executable

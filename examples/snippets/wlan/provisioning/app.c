@@ -140,8 +140,8 @@ static sl_status_t callback_status                             = SL_STATUS_OK;
 static app_state_t app_state                                   = PROVISIONING_INIT_STATE;
 static sl_wifi_client_configuration_t provisioned_access_point = { 0 };
 
-char wifi_client_profile_ssid[32]; // Assuming SSID can be up to 32 characters long
-char wifi_client_credential[64];   // Assuming Password can be up to 64 characters long
+char wifi_client_profile_ssid[33]; // SSID is limited to 32 characters plus null terminator
+char wifi_client_credential[64];   // Password is limited to 63 characters plus null terminator
 char wifi_client_security_type[32];
 
 static const osThreadAttr_t thread_attributes = {
@@ -153,7 +153,6 @@ static const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 static sl_net_wifi_client_profile_t wifi_client_profile_4 = {

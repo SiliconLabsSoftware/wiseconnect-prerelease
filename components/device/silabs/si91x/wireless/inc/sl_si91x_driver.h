@@ -124,37 +124,6 @@ sl_status_t sl_si91x_driver_deinit(void);
  *   Register a function and optional argument for scan results callback.
  * @param[in] command
  *   Command type to be sent to NWP firmware.
- * @param[in] queue_type
- *   @ref sli_wifi_command_type_t Command type
- * @param[in] data
- *   Command packet to be sent to the NWP firmware.
- * @param[in] data_length
- *   Length of command packet.
- * @param[in] wait_period
- *   @ref sli_wifi_wait_period_t Timeout for the command response.
- * @param[in] sdk_context
- *   Pointer to the context.
- * @param[in] data_buffer
- *   [sl_wifi_buffer_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-buffer-t) Pointer to a data buffer pointer for the response data to be returned in.
- * @pre Pre-conditions:
- * - 
- *   @ref sl_si91x_driver_init should be called before this API.
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- ******************************************************************************/
-sl_status_t sli_si91x_driver_send_command(uint32_t command,
-                                          sli_wifi_command_type_t queue_type,
-                                          const void *data,
-                                          uint32_t data_length,
-                                          sli_wifi_wait_period_t wait_period,
-                                          void *sdk_context,
-                                          sl_wifi_buffer_t **data_buffer);
-
-/***************************************************************************/ /**
- * @brief
- *   Register a function and optional argument for scan results callback.
- * @param[in] command
- *   Command type to be sent to NWP firmware.
  * @param[in] data
  *   Command packet to be sent to the NWP firmware.
  * @param[in] data_length
@@ -173,24 +142,6 @@ sl_status_t sl_si91x_driver_send_side_band_crypto(uint32_t command,
 
 /***************************************************************************/ /**
  * @brief
- * Send commands to the NWP; whose response needs to be handled asynchronously.
- * Note: This function doesn't acquire "command_in_flight" boolean
- * @param[in] command
- *   Command type to be sent to NWP firmware.
- * @param[in] queue_type
- *   @ref sli_wifi_command_type_t Command type
- * @param[in] data
- *   Command packet to be sent to the NWP firmware.
- * @param[in] data_length
- *   Length of the command packet.
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- ******************************************************************************/
-sl_status_t sli_si91x_driver_send_async_command(uint32_t command,
-                                                sli_wifi_command_type_t queue_type,
-                                                void *data,
-                                                uint32_t data_length);
-/***************************************************************************/ /**
- * @brief
  *   Wait for a command response.
  * @param[in] command
  *   @ref sli_wlan_cmd_request_t Command type to wait .
@@ -206,25 +157,6 @@ sl_status_t sl_si91x_driver_wait_for_response(sli_wlan_cmd_request_t command, sl
 
 /***************************************************************************/ /**
  * @brief
- *   Send a socket command.
- * @param[in] request
- *   @ref sli_si91x_socket_send_request_t Pointer to socket command packet.
- * @param[in] data
- *   Pointer to socket data.
- * @param[in] wait_time
- *   Timeout  for the command response.
- * @pre Pre-conditions:
- * - 
- *   @ref sl_si91x_driver_init should be called before this API.
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- ******************************************************************************/
-sl_status_t sli_si91x_driver_send_socket_data(const sli_si91x_socket_send_request_t *request,
-                                              const void *data,
-                                              uint32_t wait_time);
-
-/***************************************************************************/ /**
- * @brief
  *   Send a Bluetooth command.
  * @param[in] command
  *   @ref sli_wlan_cmd_request_t Command type to be sent.
@@ -232,8 +164,6 @@ sl_status_t sli_si91x_driver_send_socket_data(const sli_si91x_socket_send_reques
  *   @ref sli_wifi_command_type_t Command type.
  * @param[in] data
  *   [sl_wifi_buffer_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-buffer-t) Pointer to Bluetooth data.
- * @param[in] sync_command
- *   Sync or Async command.
  * @pre Pre-conditions:
  * - 
  *   @ref sl_si91x_driver_init should be called before this API.
@@ -242,8 +172,7 @@ sl_status_t sli_si91x_driver_send_socket_data(const sli_si91x_socket_send_reques
  ******************************************************************************/
 sl_status_t sli_si91x_driver_send_bt_command(sli_wlan_cmd_request_t command,
                                              sli_wifi_command_type_t command_type,
-                                             sl_wifi_buffer_t *data,
-                                             uint8_t sync_command);
+                                             sl_wifi_system_packet_t *data);
 //! @endcond
 
 /***************************************************************************/ /**

@@ -110,13 +110,8 @@ static sl_status_t sli_handle_failed_event(sli_wifi_callback_entry_t *entry,
   sl_status_t status = sli_convert_and_save_firmware_status(sli_get_si91x_frame_status(packet));
 
   if (packet->command == SLI_WIFI_RSP_JOIN) {
-    sl_status_t temp_status = sli_si91x_driver_send_command(SLI_WIFI_REQ_INIT,
-                                                            SLI_WIFI_WLAN_CMD,
-                                                            NULL,
-                                                            0,
-                                                            SLI_WIFI_RSP_INIT_WAIT_TIME,
-                                                            NULL,
-                                                            NULL);
+    sl_status_t temp_status =
+      sli_wifi_send_command(SLI_WIFI_REQ_INIT, SLI_WIFI_WLAN_CMD, NULL, 0, SLI_WIFI_RSP_INIT_WAIT_TIME, NULL, NULL);
     VERIFY_STATUS_AND_RETURN(temp_status);
   }
 

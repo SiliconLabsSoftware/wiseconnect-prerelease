@@ -45,10 +45,10 @@ extra_files:
 - components/device/silabs/si91x/mcu/drivers/service/nvm3/inc/sl_si91x_dual_flash_intf.h
 - components/device/silabs/si91x/mcu/drivers/service/nvm3/inc/sl_si91x_common_flash_intf.h
 - components/device/silabs/si91x/mcu/hal/sli_hal_si91x/src/sli_hal_si91x.c
-- components/device/silabs/si91x/mcu/hal/sli_hal_si91x/unit_tests/CMakeLists.txt
-- components/device/silabs/si91x/mcu/hal/sli_hal_si91x/unit_tests/src/sli_hal_si91x_fake_functions.c
-- components/device/silabs/si91x/mcu/hal/sli_hal_si91x/unit_tests/src/sli_hal_si91x_unit_tests.cpp
-- components/device/silabs/si91x/mcu/hal/sli_hal_si91x/unit_tests/inc/sli_hal_si91x_fake_functions.h
+- components/device/silabs/si91x/wireless/sli_hal_si91x/unit_tests/CMakeLists.txt
+- components/device/silabs/si91x/wireless/sli_hal_si91x/unit_tests/src/sli_hal_si91x_fake_functions.c
+- components/device/silabs/si91x/wireless/sli_hal_si91x/unit_tests/src/sli_hal_si91x_unit_tests.cpp
+- components/device/silabs/si91x/wireless/sli_hal_si91x/unit_tests/inc/sli_hal_si91x_fake_functions.h
 - components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component/sli_hal_si91x.slcc
 - components/device/silabs/si91x/mcu/hal/sli_hal_si91x/inc/sli_hal_si91x_packet.h
 - components/device/silabs/si91x/mcu/hal/sli_hal_si91x/inc/sli_hal_si91x.h

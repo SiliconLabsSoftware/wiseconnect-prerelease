@@ -37,6 +37,7 @@
 #ifdef DEBUG_UART
 #include "rsi_debug.h"
 #endif
+#include "sl_component_catalog.h"
 
 #if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)
 #include "rsi_m4.h"
@@ -98,7 +99,8 @@ volatile uint32_t control_reg_val;
 uint32_t npss_gpio_config = 0;
 
 #if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION)
-extern char ram_vector[SI91X_VECTOR_TABLE_ENTRIES];
+// RAM vector table entry pointer
+extern char ram_vector[];
 #endif
 
 /**
@@ -191,24 +193,24 @@ __asm void RSI_PS_RestoreCpuContext(void)
  */
 void RSI_PS_SaveCpuContext(void)
 {
-  __asm("push {r0}");
-  __asm("push {r1}");
-  __asm("push {r2}");
-  __asm("push {r3}");
-  __asm("push {r4}");
-  __asm("push {r5}");
-  __asm("push {r6}");
-  __asm("push {r7}");
-  __asm("push {r8}");
-  __asm("push {r9}");
-  __asm("push {r10}");
-  __asm("push {r11}");
-  __asm("push {r12}");
-  __asm("push {r14}");
+  __asm("push {r0}");  // Push the r0 register onto the stack
+  __asm("push {r1}");  // Push the r1 register onto the stack
+  __asm("push {r2}");  // Push the r2 register onto the stack
+  __asm("push {r3}");  // Push the r3 register onto the stack
+  __asm("push {r4}");  // Push the r4 register onto the stack
+  __asm("push {r5}");  // Push the r5 register onto the stack
+  __asm("push {r6}");  // Push the r6 register onto the stack
+  __asm("push {r7}");  // Push the r7 register onto the stack
+  __asm("push {r8}");  // Push the r8 register onto the stack
+  __asm("push {r9}");  // Push the r9 register onto the stack
+  __asm("push {r10}"); // Push the r10 register onto the stack
+  __asm("push {r11}"); // Push the r11 register onto the stack
+  __asm("push {r12}"); // Push the r12 register onto the stack
+  __asm("push {r14}"); // Push the r14 register onto the stack
 
   /*R13 Stack pointer */
-  __asm("mov %0, sp\n\t" : "=r"(__sp));
-  __asm("WFI");
+  __asm("mov %0, sp\n\t" : "=r"(__sp)); // Move the stack pointer value into the __sp variable
+  __asm("WFI");                         // Wait for interrupt
 }
 
 /**
@@ -218,26 +220,24 @@ void RSI_PS_SaveCpuContext(void)
  */
 void RSI_PS_RestoreCpuContext(void)
 {
-#ifdef SL_SI91X_ENABLE_GCC_LTO
-  __asm__ volatile("ldr r0, %[sym]\n" : : [sym] "m"(__sp) : "r0");
-#else
-  __asm("ldr r0 , =__sp");
-#endif
-  __asm("ldr sp , [r0 , #0]");
-  __asm("pop {r14}");
-  __asm("pop {r12}");
-  __asm("pop {r11}");
-  __asm("pop {r10}");
-  __asm("pop {r9}");
-  __asm("pop {r8}");
-  __asm("pop {r7}");
-  __asm("pop {r6}");
-  __asm("pop {r5}");
-  __asm("pop {r4}");
-  __asm("pop {r3}");
-  __asm("pop {r2}");
-  __asm("pop {r1}");
-  __asm("pop {r0}");
+  // LTO-safe: use memory constraint so the compiler emits the reference to __sp.
+  // This loads sp from the memory at __sp; the compiler handles addressing for
+  // both LTO and non-LTO, avoiding reliance on &__sp or a literal symbol.
+  __asm__ volatile("ldr sp, %0" : : "m"(__sp));
+  __asm("pop {r14}"); // Pop the return address (r14 register)
+  __asm("pop {r12}"); // Pop the r12 register
+  __asm("pop {r11}"); // Pop the r11 register
+  __asm("pop {r10}"); // Pop the r10 register
+  __asm("pop {r9}");  // Pop the r9 register
+  __asm("pop {r8}");  // Pop the r8 register
+  __asm("pop {r7}");  // Pop the r7 register
+  __asm("pop {r6}");  // Pop the r6 register
+  __asm("pop {r5}");  // Pop the r5 register
+  __asm("pop {r4}");  // Pop the r4 register
+  __asm("pop {r3}");  // Pop the r3 register
+  __asm("pop {r2}");  // Pop the r2 register
+  __asm("pop {r1}");  // Pop the r1 register
+  __asm("pop {r0}");  // Pop the r0 register
 }
 #endif /*------------------ GNU Compiler ---------------------*/
 

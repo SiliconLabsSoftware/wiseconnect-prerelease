@@ -61,7 +61,6 @@ component:
 - id: wifi_resources
 - id: network_manager
 - id: basic_network_config_manager
-- id: sl_si91x_mem_pool_buffers_with_quota
 - id: paho_mqtt_embedded
 - id: spidrv
   instance:
@@ -119,8 +118,8 @@ ui_hints:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.1
+  version: 4.1.0
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.2
+  version: 2026.6.0

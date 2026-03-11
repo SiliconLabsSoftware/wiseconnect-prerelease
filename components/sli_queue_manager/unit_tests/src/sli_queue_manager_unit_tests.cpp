@@ -39,20 +39,22 @@ typedef struct {
   int id;
 } temp_node;
 
-sl_status_t fake_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_types_t p, 
+sl_status_t fake_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_types_t p,
                                                 const sli_buffer_manager_allocation_types_t at,
                                                 const uint32_t t,
-                                                sli_buffer_t *buffer) {
+                                                sli_buffer_t *buffer)
+{
   *buffer = (sli_buffer_t)malloc(128);
   return SL_STATUS_OK;
 }
 
-sl_status_t fake_buffer_manager_free_buffer(sli_buffer_t buffer) {
+sl_status_t fake_buffer_manager_free_buffer(sli_buffer_t buffer)
+{
   free((void *)buffer);
   return SL_STATUS_OK;
 }
 
-bool sli_queue_manager_node_match_handler(sli_queue_t *handle, void *node, void *node_match_data)
+bool sli_queue_manager_node_match_handler(const sli_queue_t *handle, void *node, const void *node_match_data)
 {
   temp_node *buffer = (temp_node *)node;
   if (buffer->id == *((uint32_t *)node_match_data)) {
@@ -86,8 +88,8 @@ TEST(sli_queue_manager, sli_queue_manager_enqueue_null_handle)
   sl_slist_node_t node;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
-  status = sli_queue_manager_enqueue(NULL, &node);
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
+  status                                              = sli_queue_manager_enqueue(NULL, &node);
   EXPECT_TRUE(status == SL_STATUS_INVALID_PARAMETER);
 }
 
@@ -97,7 +99,7 @@ TEST(sli_queue_manager, sli_queue_manager_enqueue_valid_handle)
   sl_slist_node_t node;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node);
@@ -109,8 +111,8 @@ TEST(sli_queue_manager, sli_queue_manager_dequeue_null_handle)
   void *node;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
-  status = sli_queue_manager_dequeue(NULL, &node);
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
+  status                                              = sli_queue_manager_dequeue(NULL, &node);
   EXPECT_TRUE(status == SL_STATUS_INVALID_PARAMETER);
 }
 
@@ -120,7 +122,7 @@ TEST(sli_queue_manager, sli_queue_manager_dequeue_empty_queue)
   void *node;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_dequeue(&handle, &node);
@@ -134,7 +136,7 @@ TEST(sli_queue_manager, sli_queue_manager_dequeue_singleton_queue)
   void *node_ptr;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node);
@@ -151,7 +153,7 @@ TEST(sli_queue_manager, sli_queue_manager_dequeue_non_empty_queue)
   void *node_ptr;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node1);
@@ -167,8 +169,8 @@ TEST(sli_queue_manager, sli_queue_manager_add_to_queue_head_null_handle)
   sl_slist_node_t node;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
-  status = sli_queue_manager_add_to_queue_head(NULL, &node);
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
+  status                                              = sli_queue_manager_add_to_queue_head(NULL, &node);
   EXPECT_TRUE(status == SL_STATUS_INVALID_PARAMETER);
 }
 
@@ -178,7 +180,7 @@ TEST(sli_queue_manager, sli_queue_manager_add_to_queue_head_empty_queue)
   sl_slist_node_t node;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_add_to_queue_head(&handle, &node);
@@ -193,7 +195,7 @@ TEST(sli_queue_manager, sli_queue_manager_add_to_queue_head_non_empty_queue)
   sl_slist_node_t *node_ptr;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node1);
@@ -206,9 +208,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_null_handle)
 {
   void *node;
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_remove_node_from_queue(NULL, sli_queue_manager_node_match_handler, &id, &node);
   EXPECT_TRUE(status == SL_STATUS_INVALID_PARAMETER);
 }
@@ -217,9 +219,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_null_node)
 {
   sli_queue_t handle;
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_remove_node_from_queue(&handle, sli_queue_manager_node_match_handler, &id, NULL);
@@ -231,9 +233,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_empty_queue)
   sli_queue_t handle;
   void *node;
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_remove_node_from_queue(&handle, sli_queue_manager_node_match_handler, &id, &node);
@@ -247,9 +249,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_match_found_sin
   node1.id = 1;
   sl_status_t status;
   void *node_ptr;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &(node1.node));
@@ -267,9 +269,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_match_found_two
   node2.id = 2;
   sl_status_t status;
   void *node_ptr;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &(node1.node));
@@ -289,9 +291,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_match_found_two
   node2.id = 2;
   sl_status_t status;
   void *node_ptr;
-  int id = 2;
+  int id                                              = 2;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &(node1.node));
@@ -313,9 +315,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_match_found_nei
   node3.id = 3;
   sl_status_t status;
   void *node_ptr;
-  int id = 2;
+  int id                                              = 2;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &(node1.node));
@@ -337,9 +339,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_no_match_found)
   node2.id = 2;
   sl_status_t status;
   void *node_ptr;
-  int id = 3;
+  int id                                              = 3;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &(node1.node));
@@ -355,9 +357,9 @@ TEST(sli_queue_manager, sli_queue_manager_remove_node_from_queue_null_id_handler
   sli_queue_t handle;
   sl_status_t status;
   void *node_ptr;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_remove_node_from_queue(&handle, NULL, &id, &node_ptr);
@@ -368,9 +370,9 @@ TEST(sli_queue_manager, sli_queue_manager_flush_nodes_from_queue_null_id_handler
 {
   sli_queue_t handle;
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_flush_nodes_from_queue(&handle, NULL, &id, sli_queue_manager_flush_handler);
@@ -380,9 +382,9 @@ TEST(sli_queue_manager, sli_queue_manager_flush_nodes_from_queue_null_id_handler
 TEST(sli_queue_manager, sli_queue_manager_flush_nodes_from_queue_null_handle)
 {
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_flush_nodes_from_queue(NULL, NULL, &id, sli_queue_manager_flush_handler);
   EXPECT_TRUE(status == SL_STATUS_INVALID_PARAMETER);
 }
@@ -391,9 +393,9 @@ TEST(sli_queue_manager, sli_queue_manager_flush_nodes_from_queue_empty_queue)
 {
   sli_queue_t handle;
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_flush_nodes_from_queue(&handle,
@@ -411,9 +413,9 @@ TEST(sli_queue_manager, sli_queue_manager_flush_nodes_from_queue_match_present_h
   temp_node node2;
   node2.id = 2;
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &(node1.node));
@@ -435,9 +437,9 @@ TEST(sli_queue_manager, sli_queue_manager_flush_nodes_from_queue_match_present_t
   temp_node node2;
   node2.id = 2;
   sl_status_t status;
-  int id = 2;
+  int id                                              = 2;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &(node1.node));
@@ -455,12 +457,12 @@ TEST(sli_queue_manager, sli_queue_manager_flush_queue_empty_queue)
 {
   sli_queue_t handle;
   sl_status_t status;
-  int id = 1;
+  int id                                              = 1;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
-  status = sli_queue_manager_flush_queue(&handle, sli_queue_manager_flush_handler);
+  status = sli_queue_manager_flush_queue(&handle, sli_queue_manager_flush_handler, NULL);
   EXPECT_TRUE(status == SL_STATUS_OK);
 }
 
@@ -470,12 +472,12 @@ TEST(sli_queue_manager, sli_queue_manager_flush_queue_single_element)
   sl_slist_node_t node1;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node1);
   EXPECT_TRUE(status == SL_STATUS_OK);
-  status = sli_queue_manager_flush_queue(&handle, sli_queue_manager_flush_handler);
+  status = sli_queue_manager_flush_queue(&handle, sli_queue_manager_flush_handler, NULL);
   EXPECT_TRUE(status == SL_STATUS_OK);
 }
 
@@ -485,14 +487,14 @@ TEST(sli_queue_manager, sli_queue_manager_flush_queue_two_element)
   sl_slist_node_t node1, node2;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node1);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node2);
   EXPECT_TRUE(status == SL_STATUS_OK);
-  status = sli_queue_manager_flush_queue(&handle, sli_queue_manager_flush_handler);
+  status = sli_queue_manager_flush_queue(&handle, sli_queue_manager_flush_handler, NULL);
   EXPECT_TRUE(status == SL_STATUS_OK);
 }
 
@@ -500,8 +502,8 @@ TEST(sli_queue_manager, sli_queue_manager_deinit_null_handle)
 {
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
-  status = sli_queue_manager_deinit(NULL, sli_queue_manager_flush_handler);
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
+  status = sli_queue_manager_deinit(NULL, sli_queue_manager_flush_handler, NULL);
   EXPECT_TRUE(status == SL_STATUS_INVALID_PARAMETER);
 }
 
@@ -510,10 +512,10 @@ TEST(sli_queue_manager, sli_queue_manager_deinit_empty_queue)
   sli_queue_t handle;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
-  status = sli_queue_manager_deinit(&handle, sli_queue_manager_flush_handler);
+  status = sli_queue_manager_deinit(&handle, sli_queue_manager_flush_handler, NULL);
   EXPECT_TRUE(status == SL_STATUS_OK);
 }
 
@@ -523,11 +525,11 @@ TEST(sli_queue_manager, sli_queue_manager_deinit_non_empty_queue)
   sl_slist_node_t node1;
   sl_status_t status;
   sli_buffer_manager_allocate_buffer_fake.custom_fake = fake_buffer_manager_allocate_buffer;
-  sli_buffer_manager_free_buffer_fake.custom_fake = fake_buffer_manager_free_buffer;
+  sli_buffer_manager_free_buffer_fake.custom_fake     = fake_buffer_manager_free_buffer;
   status = sli_queue_manager_init(&handle, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   EXPECT_TRUE(status == SL_STATUS_OK);
   status = sli_queue_manager_enqueue(&handle, &node1);
   EXPECT_TRUE(status == SL_STATUS_OK);
-  status = sli_queue_manager_deinit(&handle, sli_queue_manager_flush_handler);
+  status = sli_queue_manager_deinit(&handle, sli_queue_manager_flush_handler, NULL);
   EXPECT_TRUE(status == SL_STATUS_OK);
 }

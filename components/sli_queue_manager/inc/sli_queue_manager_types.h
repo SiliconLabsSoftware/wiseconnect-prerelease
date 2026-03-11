@@ -95,7 +95,9 @@ typedef struct {
  * @return
  *   Should return TRUE if the target node is found else it should return FALSE
  */
-typedef bool (*sli_queue_manager_node_match_handler_t)(sli_queue_t *handle, void *data, void *node_match_data);
+typedef bool (*sli_queue_manager_node_match_handler_t)(const sli_queue_t *handle,
+                                                       void *data,
+                                                       const void *node_match_data);
 
 /**
  * @typedef sli_queue_manager_flush_handler_t

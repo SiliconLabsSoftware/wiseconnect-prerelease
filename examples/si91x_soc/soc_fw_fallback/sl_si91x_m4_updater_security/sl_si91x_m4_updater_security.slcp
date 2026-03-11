@@ -11,7 +11,6 @@ component:
 - id: syscalls
 - id: wiseconnect_common
 - id: wifi
-- id: sl_si91x_mem_pool_buffers_with_quota
 - id: si91x_memory_default_config
 - id: bsd_socket
 - id: basic_network_config_manager
@@ -53,8 +52,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.1
+  version: 4.1.0
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.2
+  version: 2026.6.0

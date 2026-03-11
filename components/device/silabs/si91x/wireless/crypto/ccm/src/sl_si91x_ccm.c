@@ -119,19 +119,19 @@ static sl_status_t sli_si91x_ccm_pending(sl_si91x_ccm_config_t *config,
   request->key_length = config->key_config.a0.key_length;
 #endif
 
-  status = sli_si91x_driver_send_command(
-    SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-    SLI_WIFI_COMMON_CMD,
-    request,
-    (sizeof(sli_si91x_ccm_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES_FOR_CCM + chunk_length),
-    SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-    NULL,
-    &buffer);
+  status =
+    sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
+                          SLI_WIFI_COMMON_CMD,
+                          request,
+                          (sizeof(sli_si91x_ccm_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES_FOR_CCM + chunk_length),
+                          SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
+                          NULL,
+                          (void **)&buffer);
 
   if (status != SL_STATUS_OK) {
     free(request);
     if (buffer != NULL)
-      sli_si91x_host_free_buffer(buffer);
+      sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
@@ -139,7 +139,7 @@ static sl_status_t sli_si91x_ccm_pending(sl_si91x_ccm_config_t *config,
 
   memcpy(output, packet->data, packet->length);
   if (buffer != NULL)
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   free(request);
   return status;
 }

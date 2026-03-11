@@ -73,10 +73,10 @@ The application can be configured to suit your requirements and development envi
 #define FLAGS                               0
 ```
 
-- SERVER_IP_ADDRESS refers to the remote SNTP Server IP address to connect.
+- NTP_SERVER_IP is the hostname or IP address of the SNTP server to synchronize time with (default: "0.pool.ntp.org", which may resolve to IP addresses such as "162.159.200.123").
 
 ```c
-#define NTP_SERVER_IP                       "162.159.200.123"
+#define NTP_SERVER_IP                       "0.pool.ntp.org"
 ```
 
 - Configure the SNTP method to use the server.

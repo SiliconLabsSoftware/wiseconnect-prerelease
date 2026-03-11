@@ -22,3 +22,4 @@ provides:
 requires:
   - name: wifi
   - name: sli_wifi
+  - name: sli_buffer_manager

@@ -58,7 +58,6 @@ const osThreadAttr_t app_thread_attributes = {
   .stack_size = SL_APP_TASK_STACK_SIZE, // Stack size of sensor_app task
   .priority   = osPriorityLow,          // Priority of Sensor task
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 #if SH_AWS_ENABLE
@@ -71,7 +70,6 @@ const osThreadAttr_t aws_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityLow3,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 #endif
 

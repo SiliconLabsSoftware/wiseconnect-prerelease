@@ -78,23 +78,23 @@ static sl_status_t sli_si91x_aes_pending(const sl_si91x_aes_config_t *config,
   memcpy(request->key, config->key_config.a0.key, request->key_length);
 #endif
 
-  status = sli_si91x_driver_send_command(
-    SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-    SLI_WIFI_COMMON_CMD,
-    request,
-    (sizeof(sli_si91x_aes_request_t) - SLI_SI91X_MAX_DATA_SIZE_IN_BYTES_FOR_AES + chunk_length),
-    SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-    NULL,
-    &buffer);
+  status =
+    sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
+                          SLI_WIFI_COMMON_CMD,
+                          request,
+                          (sizeof(sli_si91x_aes_request_t) - SLI_SI91X_MAX_DATA_SIZE_IN_BYTES_FOR_AES + chunk_length),
+                          SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
+                          NULL,
+                          (void **)&buffer);
   if (status != SL_STATUS_OK) {
     free(request);
     if (buffer != NULL)
-      sli_si91x_host_free_buffer(buffer);
+      sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
   packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
   memcpy(output, packet->data, packet->length);
-  sli_si91x_host_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   free(request);
   return status;
 }

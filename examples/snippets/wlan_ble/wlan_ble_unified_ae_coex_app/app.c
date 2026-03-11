@@ -183,7 +183,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t ui_thread_attributes = {
@@ -195,7 +194,6 @@ const osThreadAttr_t ui_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 const osThreadAttr_t ble_thread_attributes = {
   .name       = "ble_thread",
@@ -206,7 +204,6 @@ const osThreadAttr_t ble_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t wifi_thread_attributes = {
@@ -218,7 +215,6 @@ const osThreadAttr_t wifi_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 rsi_ble_att_list_t *rsi_gatt_get_attribute_from_list(rsi_ble_t *p_val, uint16_t handle)
 {

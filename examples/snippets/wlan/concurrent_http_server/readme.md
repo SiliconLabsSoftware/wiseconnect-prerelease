@@ -85,7 +85,7 @@ The application can be configured to suit your requirements and development envi
 
 NOTE:
 > 1. In concurrent mode, STA and AP should be configured on the same channel. 
-> 2. Valid values for CHANNEL_NO are 1 to 11 in 2.4 GHz band and 36 to 48 and 149 to 165 in 5 GHz. In this example, default configured band is 2.4 GHz.
+> 2. Valid values for CHANNEL_NO are 1 to 14 in the 2.4 GHz band. The default region code is set to US.
 > 3. The `sli_si91x_accept_async` function in sl_http_server_start is not thread-safe.
 > 4. For WPA3 security (including WPA3 Personal and WPA3 Personal Transition modes), enable the SL_SI91X_EXT_FEAT_IEEE_80211W bit in the .ext_custom_feature_bit_map field of boot configuration.
 

@@ -290,7 +290,7 @@ sl_status_t sli_event_engine_deinit(void)
     sli_event_engine_handler_node_t *temp = event_handler_list; // Take current head
 
     // Flush and deinit the event queue associated with this handler
-    sli_queue_manager_deinit(temp->event_queue, sli_event_engine_queue_flush_handler);
+    sli_queue_manager_deinit(temp->event_queue, sli_event_engine_queue_flush_handler, NULL);
 
     event_handler_list = event_handler_list->next; // Advance to next node
     free(temp);                                    // Release node memory

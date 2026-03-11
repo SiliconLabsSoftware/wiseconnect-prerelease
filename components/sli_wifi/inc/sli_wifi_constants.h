@@ -39,6 +39,7 @@
 #define SLI_WLAN_MGMT_Q 4
 #define SLI_BT_Q        2
 
+#define SLI_WIFI_SUCCESS         0 // Success
 #define SLI_WIFI_BG_SCAN_DISABLE 0
 #define SLI_WIFI_BG_SCAN_ENABLE  1
 
@@ -89,21 +90,25 @@ typedef enum {
   SLI_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT ///< Used for setting dwell time per channel in milliseconds during passive scan
 } sli_wifi_timeout_type_t;
 
+/// Lower 16 bits hold raw wait time value
+#define SLI_WIFI_WAIT_TIME_BIT_MASK 0x0000FFFF
+
 typedef enum {
   SLI_WIFI_RETURN_IMMEDIATELY              = 0,
+  SLI_WIFI_ASYNC_RESPONSE_BIT              = (1UL << 29),
   SLI_WIFI_WAIT_FOR_RESPONSE_BIT           = (1UL << 30),
   SLI_WIFI_WAIT_FOR_EVER                   = (1UL << 31),
   SLI_WIFI_WAIT_FOR_OTAF_RESPONSE          = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | SLI_WIFI_WAIT_FOR_EVER),
-  SLI_WIFI_WAIT_FOR_SYNC_SCAN_RESULTS      = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | 12000),
-  SLI_WIFI_WAIT_FOR_COMMAND_RESPONSE       = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | 1000),
-  SLI_WIFI_WAIT_FOR_SOCKET_ACCEPT_RESPONSE = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | 5000),
-  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS        = 3000,
-  SLI_WIFI_WAIT_FOR_DNS_RESOLUTION         = 20000,
+  SLI_WIFI_WAIT_FOR_SYNC_SCAN_RESULTS      = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | (12000 & SLI_WIFI_WAIT_TIME_BIT_MASK)),
+  SLI_WIFI_WAIT_FOR_COMMAND_RESPONSE       = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | (1000 & SLI_WIFI_WAIT_TIME_BIT_MASK)),
+  SLI_WIFI_WAIT_FOR_SOCKET_ACCEPT_RESPONSE = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | (5000 & SLI_WIFI_WAIT_TIME_BIT_MASK)),
+  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS        = (3000 & SLI_WIFI_WAIT_TIME_BIT_MASK),
+  SLI_WIFI_WAIT_FOR_DNS_RESOLUTION         = (20000 & SLI_WIFI_WAIT_TIME_BIT_MASK),
 } sli_wifi_wait_period_t;
 
 #define SLI_WIFI_WAIT_FOR(x)          (sli_wifi_wait_period_t)(x)
-#define SLI_WIFI_WAIT_FOR_RESPONSE(x) (sli_wifi_wait_period_t)(SLI_WIFI_WAIT_FOR_RESPONSE_BIT | (x))
-#define SLI_SI91X_WAIT_FOR_EVER       SLI_WIFI_WAIT_FOR_EVER
+#define SLI_WIFI_WAIT_FOR_RESPONSE(x) (sli_wifi_wait_period_t)(SLI_WIFI_WAIT_FOR_RESPONSE_BIT | x)
+
 typedef enum { SET_REGION_CODE_FROM_BEACONS, SET_REGION_CODE_FROM_USER } sli_wifi_set_region_code_command_t;
 
 typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_ENCRYPTION } sli_wifi_encryption_t;
@@ -195,6 +200,8 @@ typedef enum {
   SLI_WIFI_RSP_TWT_AUTO_CONFIG              = 0x2E, ///< TWT Auto Configuration
   SLI_WIFI_RSP_FILTER_BCAST_PACKETS         = 0xC9, ///< Filter Broadcast Packets
   SLI_WIFI_REQ_GET_DPD_DATA                 = 0xDC, ///< Get DPD Data
+  SLI_WIFI_RSP_MODULE_STATE                 = 0x70,
+  SLI_WIFI_RSP_TWT_ASYNC                    = 0x71,
   SLI_WIFI_RSP_WPS_METHOD                   = 0x72, ///< WPS Method
   SLI_WIFI_RSP_GAIN_TABLE                   = 0x47, ///< Gain Table
   SLI_WIFI_RSP_TIMEOUT                      = 0xEA, ///< Timeout
@@ -212,7 +219,13 @@ typedef enum {
   SLI_WIFI_RSP_SCAN_RESULTS                 = 0xAF, ///< Scan Results
   SLI_WIFI_RSP_TSF                          = 0x65, ///< TSF
   SLI_WIFI_RSP_VENDOR_IE                    = 0x38, ///< vendor-specific IE Response
-  SLI_COMMON_RSP_NWP_LOGGING                = 0x82  ///< NWP Logging
+  SLI_COMMON_RSP_NWP_LOGGING                = 0x82, ///< NWP Logging
+  SLI_WIFI_RSP_HTTP_OTAF                    = 0xF4,
+  SLI_WIFI_RSP_CLIENT_CONNECTED             = 0xC2,
+  SLI_WIFI_RSP_CLIENT_DISCONNECTED          = 0xC3,
+  SLI_WIFI_RSP_TRANSCEIVER_TX_DATA_STATUS   = 0x3D,
+  SLI_WIFI_RX_DOT11_DATA                    = 0x03,
+  SLI_WIFI_RATE_RSP_STATS                   = 0x88
 } sli_wifi_response_commands_t;
 #endif
 

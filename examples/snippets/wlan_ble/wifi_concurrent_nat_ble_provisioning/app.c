@@ -167,7 +167,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t ble_thread_attributes = {
@@ -179,7 +178,6 @@ const osThreadAttr_t ble_thread_attributes = {
   .stack_size = 2048,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 void rsi_wlan_ble_app_init(void *argument)

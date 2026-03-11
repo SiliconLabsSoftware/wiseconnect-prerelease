@@ -976,7 +976,7 @@ sl_status_t wifi_stop_scan_command_handler(console_args_t *arguments)
 // at+wifi-per-cnf-gen=<interface>,<power>,<rate>,<packet-length>,<mode>,
 //                     <channel>,<rate-flags>,<channel-bw>,<aggr-enable>,
 //                     <reserved>,<pkt-count>,<delay>
-sl_status_t wifi_per_cnf_gen_command_handler(console_args_t *arguments)
+sl_status_t wifi_peripherals_cnf_gen_command_handler(console_args_t *arguments)
 {
   CHECK_ARGUMENT_BITMAP(arguments, 0x0FFF);
 
@@ -1059,7 +1059,7 @@ sl_status_t wifi_per_cnf_gen_command_handler(console_args_t *arguments)
 
 // at+wifi-per-cnf-axppdu=<interface>,<enable-11ax>,<he-ppdu-type>,<ul-dl>,<bw>,
 //                        <coding-type>,<spatial-reuse>,<nominal-pe>,<bss-color>
-sl_status_t wifi_per_cnf_axppdu_command_handler(console_args_t *arguments)
+sl_status_t wifi_peripherals_cnf_axppdu_command_handler(console_args_t *arguments)
 {
   CHECK_ARGUMENT_BITMAP(arguments, 0x1FF);
 
@@ -1113,7 +1113,7 @@ sl_status_t wifi_per_cnf_axppdu_command_handler(console_args_t *arguments)
 // at+wifi-per-cnf-axsiga=<interface>,<gi-ltf>,<num-he-ltf>,<beam-change>,<dcm>,
 //                        <he-siga2-reserved>,<nsts-midamble>,<ru-allocation>,
 //                        <stbc>,<tx-bf>
-sl_status_t wifi_per_cnf_axsiga_command_handler(console_args_t *arguments)
+sl_status_t wifi_peripherals_cnf_axsiga_command_handler(console_args_t *arguments)
 {
   CHECK_ARGUMENT_BITMAP(arguments, 0x03FF);
 
@@ -1177,7 +1177,7 @@ sl_status_t wifi_per_cnf_axsiga_command_handler(console_args_t *arguments)
 
 // at+wifi-per-cnf-axsigb=<interface>,<sigb-compression-field>,<sigb-dcm>,<sigb-mcs>,
 //                        <user-idx>,<user-sta-id>
-sl_status_t wifi_per_cnf_axsigb_command_handler(console_args_t *arguments)
+sl_status_t wifi_peripherals_cnf_axsigb_command_handler(console_args_t *arguments)
 {
   CHECK_ARGUMENT_BITMAP(arguments, 0x03F);
 
@@ -1221,7 +1221,7 @@ sl_status_t wifi_per_cnf_axsigb_command_handler(console_args_t *arguments)
 }
 
 // at+wifi-per-start=<interface>,<enable>
-sl_status_t wifi_per_start_command_handler(console_args_t *arguments)
+sl_status_t wifi_peripherals_start_command_handler(console_args_t *arguments)
 {
   CHECK_ARGUMENT_BITMAP(arguments, 0x03);
 
@@ -1255,7 +1255,7 @@ sl_status_t wifi_per_start_command_handler(console_args_t *arguments)
 }
 
 // at+wifi-per-stop=<interface>
-sl_status_t wifi_per_stop_command_handler(console_args_t *arguments)
+sl_status_t wifi_peripherals_stop_command_handler(console_args_t *arguments)
 {
   CHECK_ARGUMENT_BITMAP(arguments, 0x01);
 

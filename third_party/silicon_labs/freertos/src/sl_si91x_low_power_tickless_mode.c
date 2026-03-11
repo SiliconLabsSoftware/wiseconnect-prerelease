@@ -16,13 +16,10 @@
  ******************************************************************************/
 
 #include "sl_si91x_m4_ps.h"
-#include "cmsis_os2.h"
 #include "FreeRTOS.h"
 #include "sl_rsi_utility.h"
 #include "sl_sleeptimer.h"
 #include "sli_sleeptimer_hal.h"
-#include "projdefs.h"
-#include "portmacro.h"
 #include "sl_atomic.h"
 #include "sl_core.h"
 #include "rsi_sysrtc.h"

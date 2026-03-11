@@ -65,6 +65,19 @@ typedef struct {
 
 static inline uint8_t parse_enum_arg(const char *line, const char *const *options);
 
+static sl_status_t process_optional_argument(const console_argument_type_t *argument_list,
+                                             const char *token,
+                                             char **command_line_pos,
+                                             const char *command_line_end,
+                                             console_args_t *args);
+
+static sl_status_t validate_and_parse_ordered_arg(const console_argument_type_t *argument_list,
+                                                  int *arg_index,
+                                                  int *arg_count,
+                                                  char *token,
+                                                  console_args_t *args,
+                                                  bool *reached_end);
+
 char *string_token(register char *s, register const char *delim, char **lasts);
 sl_status_t console_tokenize(char *start,
                              const char *end,
@@ -133,7 +146,10 @@ sl_status_t console_parse_command(char *command_line,
   while (true) {
     type = argument_list[arg_index];
 
-    SL_ASSERT(arg_count < SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT, "Command has too many args");
+    // Validate arg_count is within bounds
+    if (arg_count >= SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT) {
+      return SL_STATUS_INVALID_COUNT;
+    }
 
     if (type == CONSOLE_ARG_REMAINING_COMMAND_LINE) {
       args->bitmap |= (1 << arg_count);
@@ -157,46 +173,102 @@ sl_status_t console_parse_command(char *command_line,
 
     // Check for optional argument
     if (token[0] == '-' && ((token[1] >= 'a' && token[1] <= 'z') || (token[1] >= 'A' && token[1] <= 'Z'))) {
-      // Find optional argument descriptor
-      for (uint32_t a = 0, arg_number = 0; argument_list[a] != CONSOLE_ARG_END; ++a, ++arg_number) {
-        if (!(argument_list[a] & CONSOLE_ARG_OPTIONAL)) {
-          continue;
-        }
-        if ((argument_list[a] & 0x7F) != token[1]) {
-          ++a;
-          continue;
-        }
-        // Found a match!
-        args->bitmap |= (1 << arg_number);
-        status = console_tokenize(command_line, command_line_end, &token, &command_line, SL_CONSOLE_TOKENIZE_ON_SPACE);
-        if (status == SL_STATUS_OK) {
-          status = console_parse_arg(argument_list[a + 1], token, &args->arg[arg_number]);
-          if (status != SL_STATUS_OK) {
-            return status;
-          }
-        }
-        break;
+      status = process_optional_argument(argument_list, token, &command_line, command_line_end, args);
+      if (status != SL_STATUS_OK) {
+        return status;
       }
       continue;
     }
 
-    // Verify current ordered argument is not an optional argument
-    while (type & CONSOLE_ARG_OPTIONAL) {
-      arg_index += 2;
-      ++arg_count;
-      type = argument_list[arg_index];
-      if (type == CONSOLE_ARG_END) {
-        return SL_STATUS_OK;
+    // Validate and parse ordered argument
+    bool reached_end = false;
+    status           = validate_and_parse_ordered_arg(argument_list, &arg_index, &arg_count, token, args, &reached_end);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+    if (reached_end) {
+      return SL_STATUS_OK;
+    }
+  }
+}
+
+static sl_status_t process_optional_argument(const console_argument_type_t *argument_list,
+                                             const char *token,
+                                             char **command_line_pos,
+                                             const char *command_line_end,
+                                             console_args_t *args)
+{
+  sl_status_t status;
+  char *option_value_token = NULL;
+
+  // Find optional argument descriptor
+  for (uint32_t a = 0, arg_number = 0; argument_list[a] != CONSOLE_ARG_END; ++a, ++arg_number) {
+    if (!(argument_list[a] & CONSOLE_ARG_OPTIONAL)) {
+      continue;
+    }
+    if ((argument_list[a] & 0x7F) != token[1]) {
+      ++a;
+      continue;
+    }
+    // Found a match!
+    // Check bounds before accessing array
+    if (arg_number >= SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT) {
+      return SL_STATUS_INVALID_COUNT;
+    }
+    args->bitmap |= (1 << arg_number);
+    // Tokenize: reads from *command_line_pos, updates command_line_pos to next position
+    status = console_tokenize(*command_line_pos,
+                              command_line_end,
+                              &option_value_token,
+                              command_line_pos,
+                              SL_CONSOLE_TOKENIZE_ON_SPACE);
+    if (status == SL_STATUS_OK) {
+      status = console_parse_arg(argument_list[a + 1], option_value_token, &args->arg[arg_number]);
+      if (status != SL_STATUS_OK) {
+        return status;
       }
     }
-
-    status = console_parse_arg(type, token, &args->arg[arg_count]);
-    if (status == SL_STATUS_OK) {
-      args->bitmap |= (1 << arg_count);
-    }
-    ++arg_index;
-    ++arg_count;
+    break;
   }
+  return SL_STATUS_OK;
+}
+
+static sl_status_t validate_and_parse_ordered_arg(const console_argument_type_t *argument_list,
+                                                  int *arg_index,
+                                                  int *arg_count,
+                                                  char *token,
+                                                  console_args_t *args,
+                                                  bool *reached_end)
+{
+  sl_status_t status;
+  console_argument_type_t type = argument_list[*arg_index];
+
+  *reached_end = false;
+
+  // Verify current ordered argument is not an optional argument
+  while (type & CONSOLE_ARG_OPTIONAL) {
+    *arg_index += 2;
+    ++(*arg_count);
+    type = argument_list[*arg_index];
+    if (type == CONSOLE_ARG_END) {
+      *reached_end = true;
+      return SL_STATUS_OK;
+    }
+  }
+
+  // Check bounds before accessing array
+  if (*arg_count >= SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT) {
+    return SL_STATUS_INVALID_COUNT;
+  }
+
+  status = console_parse_arg(type, token, &args->arg[*arg_count]);
+  if (status == SL_STATUS_OK) {
+    args->bitmap |= (1 << *arg_count);
+  }
+  ++(*arg_index);
+  ++(*arg_count);
+
+  return SL_STATUS_OK;
 }
 
 void console_add_to_history(const char *line, uint8_t line_length)

@@ -90,7 +90,6 @@ const osThreadAttr_t http_server_attributes = {
   .stack_size = SL_HTTP_SERVER_THREAD_STACK_SIZE,
   .priority   = SL_HTTP_SERVER_THREAD_PRIORITY,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 /******************************************************

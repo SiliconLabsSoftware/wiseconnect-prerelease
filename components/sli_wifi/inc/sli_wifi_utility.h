@@ -29,20 +29,33 @@
  ******************************************************************************/
 #ifndef SLI_WIFI_UTILITY_H
 #define SLI_WIFI_UTILITY_H
+
 #include "sl_wifi_types.h"
 #include "sli_wifi_types.h"
 #include "sl_status.h"
 #include "sl_wifi_host_interface.h"
+#include "sli_wifi_command_engine_config.h"
+#include "sli_wifi_constants.h"
+
+#define SLI_WIFI_WAIT_ON_THREAD_ID 0
+#define SLI_WIFI_WAIT_ON_EVENT_ID  1
+
 #ifndef __ZEPHYR__
 /******************************************************************************
  * @brief
- * 	A utility function that store the firmware status code in thread specific storage.
+ *  A utility function that store the firmware status code in thread specific storage.
  * @param[in] converted_firmware_status
- *	Firmware status code that needs to be saved.
+ *  Firmware status code that needs to be saved.
  *****************************************************************************/
 void sli_wifi_save_firmware_status(sl_status_t converted_firmware_status);
 #endif
+
 typedef bool (*sli_wifi_buffer_comparator)(const sl_wifi_buffer_t *buffer, const void *userdata);
+
+static inline uint16_t sli_wifi_get_frame_status(const sl_wifi_system_packet_t *packet)
+{
+  return (uint16_t)(packet->desc[12] + (packet->desc[13] << 8));
+}
 
 /**
  * @brief
@@ -104,6 +117,20 @@ sl_status_t sli_wifi_remove_buffer_from_queue_by_comparator(sli_wifi_buffer_queu
  *
  ******************************************************************************/
 void *sli_wifi_host_get_buffer_data(void *buffer, uint16_t offset, uint16_t *data_length);
+
+/**
+ * @brief
+ *   Retrieve the response buffer associated with a specific command engine response.
+ *
+ * @param[in] response
+ *   Pointer to the command engine response structure.
+ *
+ * @return
+ *   Pointer to the response buffer, or NULL if not found.
+ */
+sl_wifi_buffer_t *sli_wifi_get_response_buffer(sli_command_engine_response_t *response);
+
+sli_command_engine_metadata_t *sli_wifi_get_response_metadata(sli_command_engine_response_t *response);
 
 /******************************************************************************
  * @brief
@@ -199,6 +226,18 @@ void sli_wifi_set_opermode(sl_wifi_operation_mode_t mode);
 
 sl_wifi_operation_mode_t sli_wifi_get_opermode(void);
 
+/**
+ * @brief Get the VAP ID from the operation mode and packet descriptor
+ * 
+ * This function determines the VAP ID based on the current operation mode and,
+ * in concurrent mode, the packet descriptor byte 7.
+ * 
+ * @param rx_packet Pointer to the received packet structure. Can be NULL for non-concurrent modes.
+ *                  In concurrent mode, if NULL, defaults to AP VAP ID.
+ * @return uint8_t The VAP ID (SL_WIFI_CLIENT_VAP_ID or SL_WIFI_AP_VAP_ID)
+ */
+uint8_t sli_wifi_get_vap_id_from_operation_mode(const sl_wifi_system_packet_t *rx_packet);
+
 sl_status_t sli_wifi_set_listen_interval(sl_wifi_interface_t interface, sl_wifi_listen_interval_t listen_interval);
 sl_status_t sli_wifi_set_listen_interval_v2(sl_wifi_interface_t interface,
                                             sl_wifi_listen_interval_v2_t listen_interval);
@@ -224,19 +263,6 @@ uint8_t sli_lmac_crc8_c(uint8_t crc8_din, uint8_t crc8_state, uint8_t end);
  *
  */
 uint8_t sli_multicast_mac_hash(const uint8_t *mac);
-/**
- * @brief Atomically remove the head buffer from a buffer queue.
- * 
- * This function removes the buffer at the head of the specified buffer queue in an atomic operation,
- * ensuring thread safety during the removal. The removed buffer is then passed back through a pointer
- * to the caller.
- *
- * @param[in] queue Pointer to the source buffer queue from which the head buffer will be removed.
- * @param[out] buffer Pointer to a pointer of sl_wifi_buffer_t where the removed buffer's address will be stored.
- * @return sl_status_t Returns the status of the operation. A value of 0 (SL_STATUS_OK) indicates success.
- *                     Other values indicate failure. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- */
-sl_status_t sli_wifi_pop_from_buffer_queue(sli_wifi_buffer_queue_t *queue, sl_wifi_buffer_t **buffer);
 
 /* Function used to set the bluetooth performance profile */
 void sli_save_bt_current_performance_profile(const sl_bt_performance_profile_t *profile);
@@ -258,7 +284,89 @@ void sli_wifi_save_power_chain(const sl_wifi_power_chain_t power_chain);
 // Accessor for the scan results database head pointer
 sli_scan_info_t **sli_get_scan_info_database(void);
 bool sli_wifi_packet_identification_function(const sl_wifi_buffer_t *buffer, const void *user_data);
-uint32_t sli_wifi_host_queue_status(const sli_wifi_buffer_queue_t *queue);
 uint32_t sl_wifi_host_elapsed_time(uint32_t starting_timestamp);
 
+sl_wifi_event_t sli_wifi_convert_event_to_sl_wifi_event(uint16_t command, uint16_t frame_status);
+
+sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
+                                                   sli_wifi_command_type_t command_type,
+                                                   const void *data,
+                                                   uint32_t data_length,
+                                                   sli_wifi_wait_period_t wait_period,
+                                                   void *sdk_context,
+                                                   void **response_buffer,
+                                                   uint8_t custom_host_desc);
+
+sl_status_t sli_wifi_send_command(uint32_t command,
+                                  sli_wifi_command_type_t command_type,
+                                  const void *data,
+                                  uint32_t data_length,
+                                  sli_wifi_wait_period_t wait_period,
+                                  void *sdk_context,
+                                  void **data_buffer);
+
+sl_status_t sli_wifi_receive_response_buffer(uint16_t command_packet_type,
+                                             uint16_t packet_id,
+                                             sli_wifi_wait_period_t wait_time,
+                                             uint8_t wait_type,
+                                             void **response_packet);
+
+sl_status_t sli_wifi_async_send_command(uint32_t command,
+                                        sli_wifi_command_type_t command_type,
+                                        const void *data,
+                                        uint32_t data_length,
+                                        void *custom_desc);
+
+sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_type,
+                                                     uint16_t packet_id,
+                                                     sli_wifi_wait_period_t wait_period,
+                                                     uint8_t wait_type,
+                                                     sli_command_engine_metadata_t **packet_buffer);
+/**
+ * @brief Internal function to send a command packet to Command Engine
+ *
+ * @param command The command to be sent.
+ * @param command_type The type of the command.
+ * @param packet Pointer to the sl_wifi_system_packet_t containing the command data.
+ * @param wait_period The wait period for the command response.
+ * @param sdk_context Pointer to the SDK context.
+ * @param response_buffer Pointer to the buffer where the response will be stored.
+ * @return sl_status_t Status of the operation.
+ */
+sl_status_t sli_wifi_send_command_packet(uint32_t command,
+                                         sli_wifi_command_type_t command_type,
+                                         sl_wifi_system_packet_t *packet,
+                                         sli_wifi_wait_period_t wait_period,
+                                         void *sdk_context,
+                                         void **response_buffer);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Calculates the elapsed time since a given starting timestamp.
+ * 
+ * @details
+ *   This function calculates the difference between the current timestamp and a provided starting timestamp. It is useful for measuring the time elapsed during operations.
+ * 
+ * @param[in] starting_timestamp
+ *   The starting timestamp from which the elapsed time is calculated.
+ * 
+ * @return
+ *   The elapsed time in milliseconds of type uint32_t.
+ ******************************************************************************/
+uint32_t sli_wifi_host_elapsed_time(uint32_t starting_timestamp);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Converts firmware status sent by firmware to sl_status_t and stores it in thread local storage.
+ * 
+ * @details
+ *   This function converts the SI91x firmware status code to an sl_status_t value and stores it in the thread local storage of the caller thread. This allows the firmware status to be retrieved later by the same thread.
+ * 
+ * @param[in] firmware_status
+ *   The firmware status code that needs to be converted to sl_status_t.
+ * 
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ ******************************************************************************/
+sl_status_t sli_wifi_convert_and_save_firmware(uint16_t firmware_status);
 #endif

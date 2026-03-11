@@ -39,7 +39,6 @@ component:
 - id: psram_aps6404l_sqh
 - id: bsd_socket
 - id: sl_si91x_asynchronous_socket
-- id: sl_si91x_mem_pool_buffers_with_quota
 requires:
 - name: device_needs_ram_execution
   condition:
@@ -79,8 +78,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.1
+  version: 4.1.0
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.2
+  version: 2026.6.0

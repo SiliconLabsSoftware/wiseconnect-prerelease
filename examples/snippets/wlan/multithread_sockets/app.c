@@ -214,7 +214,6 @@ void app_init(void)
     .stack_size = 3072,
     .priority   = osPriorityLow,
     .tz_module  = 0,
-    .reserved   = 0,
   };
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
 }
@@ -794,17 +793,17 @@ void receive_data_from_tcp_client(void *userinfo)
 
     measure_and_print_throughput(total_bytes_received, (now - start), client_socket);
   }
-  sl_status_t status = close(server_socket);
+  sl_status_t status = close(client_socket);
   if (status == SL_STATUS_OK) {
-    LOG_PRINT("\r\nnServer Socket ID : %d closed successfully : %s\r\n", server_socket, threadname);
+    LOG_PRINT("\r\nClient socket ID : %d closed successfully : %s\r\n", client_socket, threadname);
   } else {
-    LOG_PRINT("\r\nnServer Socket ID : %d close failed : %s\r\n", server_socket, threadname);
+    LOG_PRINT("\r\nClient socket ID : %d close failed : %s\r\n", client_socket, threadname);
   }
-  status = close(client_socket);
+  status = close(server_socket);
   if (status == SL_STATUS_OK) {
-    LOG_PRINT("\r\nSocket ID : %d closed successfully : %s\r\n", client_socket, threadname);
+    LOG_PRINT("\r\nnServer socket ID : %d closed successfully : %s\r\n", server_socket, threadname);
   } else {
-    LOG_PRINT("\r\nSocket ID : %d close failed : %s\r\n", client_socket, threadname);
+    LOG_PRINT("\r\nnServer socket ID : %d close failed : %s\r\n", server_socket, threadname);
   }
   osThreadTerminate(osThreadGetId());
 }

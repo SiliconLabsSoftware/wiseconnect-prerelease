@@ -71,6 +71,22 @@
    | SLI_COMMAND_ENGINE_PACKET_TX_ACK_EVENT                 /* TX completion/ack available */          \
    | SLI_COMMAND_ENGINE_THREAD_TERMINATE_EVENT)             /* thread terminate request */
 
+// Macro to identify if a packet expects a synchronous or sequential asynchronous response
+#define SLI_COMMAND_ENGINE_EXPECT_PACKET_RESPONSE(x)                        \
+  ((SLI_COMMAND_ENGINE_COMMAND_PACKET & x->tx_info.flags)                   \
+   && ((SLI_COMMAND_ENGINE_SYNC_RESPONSE_STATUS_PACKET & x->tx_info.flags)  \
+       || (SLI_COMMAND_ENGINE_SYNC_RESPONSE_DATA_PACKET & x->tx_info.flags) \
+       || (SLI_COMMAND_ENGINE_SEQ_ASYNC_RESPONSE_PACKET & x->tx_info.flags)))
+
+/// Evaluates to true if the async response flag is set in metadata->tx_info.flags.
+#define SLI_COMMAND_ENGINE_IS_ASYNC_RESPONSE_PACKET(metadata) \
+  (SLI_COMMAND_ENGINE_ASYNC_RESPONSE_PACKET == (metadata->tx_info.flags & SLI_COMMAND_ENGINE_ASYNC_RESPONSE_PACKET))
+
+/// Checks if a packet has the global TX block flag set in its metadata.
+#define SLI_COMMAND_ENGINE_IS_PACKET_WITH_GLOBAL_TX_BLOCK(metadata) \
+  (SLI_COMMAND_ENGINE_REQUEST_WITH_GLOBAL_TX_BLOCK                  \
+   == (metadata->tx_info.flags & SLI_COMMAND_ENGINE_REQUEST_WITH_GLOBAL_TX_BLOCK))
+
 /******************************************************
   *               Local Type Definitions
   ******************************************************/
@@ -96,6 +112,17 @@ typedef struct {
   sli_command_engine_packet_type_configuration_node_t
     *packet_type_config; // Pointer to new node when registering, NULL when unregistering
 } sli_command_engine_packet_type_configuration_request_t;
+
+/**
+ * @brief Context structure for command engine flush handlers.
+ * - Encapsulates the state needed to perform a flush operation within the command engine,
+ *   pairing a specific engine instance with the packet-type configuration to apply during flushing.
+ */
+typedef struct {
+  sli_command_engine_t *instance; // Command engine instance owning the queues being flushed
+  sli_command_engine_packet_type_configuration_t *packet_type_config; // Packet-type config of this packet type
+  uint16_t packet_type;                                               // Packet type being flushed
+} sli_command_engine_packet_flush_context_t;
 
 /******************************************************
  *               Variable Definitions
@@ -168,10 +195,7 @@ static sl_status_t sli_command_engine_send_error_event(sli_command_engine_t *ins
   sl_command_engine_error_status_t *error_status = NULL;
 
   // Validate error queue and event id configuration.
-  if (NULL == instance->config.error_event_queue) {
-    return SL_STATUS_FAIL;
-  }
-  if (NULL == instance->config.error_event_id) {
+  if (NULL == instance->config.error_event_queue || NULL == instance->config.error_event_id) {
     return SL_STATUS_FAIL;
   }
 
@@ -202,9 +226,12 @@ static sl_status_t sli_command_engine_send_error_event(sli_command_engine_t *ins
 
 // Identify if an in-flight metadata node matches the received packet metadata
 // Match criteria: packet_type and frame_id must both be equal
-static bool rx_packet_identity_handler(sli_queue_t *handle, void *data, void *node_match_data)
+static bool rx_packet_identity_handler(const sli_queue_t *handle, void *data, const void *node_match_data)
 {
   UNUSED_PARAMETER(handle); // Not used in this matcher
+  if (data == NULL || node_match_data == NULL) {
+    return false;
+  }
   // node_match_data carries the received packet temporary metadata
   sli_command_engine_metadata_t *rx_metadata = (sli_command_engine_metadata_t *)node_match_data;
   // data is the current in-flight metadata node being checked
@@ -228,8 +255,10 @@ static sl_status_t sli_command_engine_get_dynamic_packet_info(
 {
   sli_command_engine_packet_type_configuration_node_t *node = NULL;
 
+  CORE_irqState_t state = CORE_EnterAtomic();
   // No dynamic packet types registered
   if (NULL == instance->dynamic_packet_type) {
+    CORE_ExitAtomic(state);
     return SL_STATUS_NOT_FOUND;
   }
 
@@ -247,10 +276,12 @@ static sl_status_t sli_command_engine_get_dynamic_packet_info(
       if (NULL != packet_type_configuration) {
         *packet_type_configuration = &(node->packet_config);
       }
+      CORE_ExitAtomic(state);
       return SL_STATUS_OK; // Found
     }
     node = node->next; // Advance to next node
   }
+  CORE_ExitAtomic(state);
 
   // Not found in dynamic list
   return SL_STATUS_NOT_FOUND;
@@ -274,7 +305,8 @@ static sl_status_t sli_command_engine_handle_packet_tx(
   sli_command_engine_t *instance,
   sli_command_engine_queue_info_t *queue_info,
   sli_command_engine_packet_type_configuration_t *packet_type_configuration,
-  uint16_t packet_type)
+  uint16_t packet_type,
+  bool *global_queue_block)
 {
   sl_status_t status                      = SL_STATUS_OK;
   sli_command_engine_metadata_t *metadata = NULL;
@@ -294,8 +326,12 @@ static sl_status_t sli_command_engine_handle_packet_tx(
 
     // Compute time elapsed since packet queued to detect timeout
     time_elapsed = (osKernelGetTickCount() - metadata->packet_start_tickcount);
-    if ((time_elapsed > metadata->tx_info.timeout) && (metadata->tx_info.timeout)) {
+    // Drop timed out packets (unless async response expected)
+    if (!(metadata->tx_info.flags
+          & (SLI_COMMAND_ENGINE_ASYNC_RESPONSE_PACKET | SLI_COMMAND_ENGINE_SEQ_ASYNC_RESPONSE_PACKET))
+        && time_elapsed > metadata->tx_info.timeout) {
       // Drop timed out packet metadata and try next one (if any)
+      sli_buffer_manager_free_buffer(metadata->tx_info.data_packet);
       sli_buffer_manager_free_buffer(metadata);
       metadata = NULL;
     }
@@ -313,13 +349,17 @@ static sl_status_t sli_command_engine_handle_packet_tx(
   if (NULL != packet_type_configuration->pre_tx_handler) {
     status = packet_type_configuration->pre_tx_handler(instance, packet_type, (void *)metadata);
     if (SL_STATUS_OK != status) {
-      // Pre-TX hook failure -> fatal error notification then graceful return
-      status = sli_command_engine_send_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
-      if (SL_STATUS_OK != status) {
-        return status;
-      }
+      // Pre-TX hook failure: free metadata and return
+      sli_buffer_manager_free_buffer(metadata->tx_info.data_packet);
+      sli_buffer_manager_free_buffer(metadata);
       return SL_STATUS_OK;
     }
+  }
+
+  /// Checks if the packet metadata indicates a global TX block flag is set
+  if (SLI_COMMAND_ENGINE_IS_PACKET_WITH_GLOBAL_TX_BLOCK(metadata)) {
+    // Set the global queue block flag to true to prevent further packet processing
+    *global_queue_block = true;
   }
 
   // Route (send) the packet via routing utility (may be async)
@@ -330,7 +370,7 @@ static sl_status_t sli_command_engine_handle_packet_tx(
                                             metadata);
   if (SL_STATUS_IN_PROGRESS == status) {
     // Async TX started: completion path will enqueue metadata for ACK processing
-    return SL_STATUS_OK;
+    metadata->tx_status = SLI_COMMAND_ENGINE_PACKET_TX_INPROGRESS;
   } else if (SL_STATUS_OK != status) {
     // Immediate TX failure: report command TX failure and return
     status = sli_command_engine_send_error_event(instance, SLI_COMMAND_ENGINE_STATUS_COMMAND_TX_FAILED);
@@ -340,17 +380,17 @@ static sl_status_t sli_command_engine_handle_packet_tx(
     return SL_STATUS_OK;
   } else {
     // Immediate success (synchronous send). Data buffer no longer needed.
+    metadata->tx_status = SLI_COMMAND_ENGINE_PACKET_TX_DONE;
     sli_buffer_manager_free_buffer(metadata->tx_info.data_packet);
   }
 
-  // For command packets expecting a synchronous response we retain metadata
-  if ((SLI_COMMAND_ENGINE_COMMAND_PACKET == (SLI_COMMAND_ENGINE_COMMAND_PACKET & metadata->tx_info.flags))
-      && ((SLI_COMMAND_ENGINE_SYNC_RESPONSE_STATUS_PACKET
-           == (SLI_COMMAND_ENGINE_SYNC_RESPONSE_STATUS_PACKET & metadata->tx_info.flags))
-          || (SLI_COMMAND_ENGINE_SYNC_RESPONSE_DATA_PACKET
-              == (SLI_COMMAND_ENGINE_SYNC_RESPONSE_DATA_PACKET & metadata->tx_info.flags)))) {
-    metadata->tx_info.data_packet        = NULL;
-    metadata->tx_info.data_packet_length = 0;
+  // For command packets expecting a synchronous response Or sequential async response or Async TX we retain metadata
+  if (SLI_COMMAND_ENGINE_EXPECT_PACKET_RESPONSE(metadata)
+      || (SL_STATUS_IN_PROGRESS == status)) { // Or needs sequential async response
+    if (SL_STATUS_IN_PROGRESS != status) {
+      metadata->tx_info.data_packet        = NULL;
+      metadata->tx_info.data_packet_length = 0;
+    }
 
     SL_DEBUG_LOG("Adding meta data : 0x%X\n", (unsigned int)metadata);
 
@@ -364,8 +404,8 @@ static sl_status_t sli_command_engine_handle_packet_tx(
 
     metadata = NULL;
     queue_info->in_flight_command_count++;
-  } else {
-    // No synchronous response expected: release metadata structure
+  } else if ((SL_STATUS_OK == status) && SLI_COMMAND_ENGINE_IS_ASYNC_RESPONSE_PACKET(metadata)) {
+    // No synchronous response or TX acknowledgement is expected: release metadata structure
     sli_buffer_manager_free_buffer(metadata);
     metadata = NULL;
   }
@@ -376,6 +416,28 @@ static sl_status_t sli_command_engine_handle_packet_tx(
 // Flush handler used when de‑initializing queues or removing nodes.
 // This function is called for every node remaining in a queue so that
 // any allocated packet (data) buffer is released to avoid memory leaks.
+static void sli_command_engine_packet_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
+{
+  UNUSED_PARAMETER(handle); // Queue handle not needed for simple free
+  sli_command_engine_metadata_t *metadata                  = (sli_command_engine_metadata_t *)data;
+  sli_command_engine_packet_flush_context_t *flush_context = (sli_command_engine_packet_flush_context_t *)context;
+  sli_command_engine_t *instance                           = metadata->instance;
+
+  instance->config.flush_handler(instance,
+                                 flush_context->packet_type,
+                                 flush_context->packet_type_config,
+                                 &metadata->tx_info);
+
+  // Release the buffer associated with this queue node
+  sli_buffer_manager_free_buffer(metadata->tx_info.data_packet);
+  sli_buffer_manager_free_buffer(data);
+
+  return; // Explicit for clarity
+}
+
+// Flush handler used when removing nodes.
+// This function is called for every node remaining in a queue so that
+// any allocated packet (data) buffer is released to avoid memory leaks.
 static void sli_command_engine_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
 {
   UNUSED_PARAMETER(handle);  // Queue handle not needed for simple free
@@ -383,6 +445,20 @@ static void sli_command_engine_queue_flush_handler(sli_queue_t *handle, void *da
 
   // Release the buffer associated with this queue node
   sli_buffer_manager_free_buffer(data);
+
+  return; // Explicit for clarity
+}
+
+// Flush handler used when removing nodes.
+// This function is called for every node remaining in a queue so that
+// any allocated packet (data) buffer is released to avoid memory leaks.
+static void sli_command_engine_control_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
+{
+  UNUSED_PARAMETER(handle);  // Queue handle not needed for simple free
+  UNUSED_PARAMETER(context); // No extra context required
+
+  // Release the buffer associated with this queue node
+  free(data);
 
   return; // Explicit for clarity
 }
@@ -408,6 +484,7 @@ static void sli_command_engine_thread(void *args)
   uint16_t packet_type                                                      = 0; // Current packet type being processed
   void *data                                                                = NULL; // Generic packet pointer
   osThreadId_t resp_thread_id;                                                      // Waiting thread for sync response
+  bool global_queue_block = false;
 
   SL_DEBUG_LOG("%s task started \n", instance->config.name);
 
@@ -419,10 +496,16 @@ static void sli_command_engine_thread(void *args)
 
     // ---------------- Thread termination handling ----------------
     if (events_received & SLI_COMMAND_ENGINE_THREAD_TERMINATE_EVENT) {
-      events_received &= ~SLI_COMMAND_ENGINE_THREAD_TERMINATE_EVENT; // Clear request
+      // Clear request flag
+      events_received &= ~SLI_COMMAND_ENGINE_THREAD_TERMINATE_EVENT;
+
       // Acknowledge so deinit can continue
       sli_command_engine_set_event(instance->command_engine_eventId, SLI_COMMAND_ENGINE_THREAD_TERMINATE_ACK_EVENT);
-      osThreadTerminate(osThreadGetId()); // Self terminate
+
+      // Suspend the thread until it is terminated.
+      while (1) {
+        osThreadSuspend(osThreadGetId());
+      }
     }
 
     // ---------------- Dynamic packet type configuration requests ----------------
@@ -464,9 +547,10 @@ static void sli_command_engine_thread(void *args)
               }
 
               // Clean queues then free
-              sli_queue_manager_deinit(&(ntbr->queue_info.packet_queue), sli_command_engine_queue_flush_handler);
+              sli_queue_manager_deinit(&(ntbr->queue_info.packet_queue), sli_command_engine_queue_flush_handler, NULL);
               sli_queue_manager_deinit(&(ntbr->queue_info.inflight_packet_queue),
-                                       sli_command_engine_queue_flush_handler);
+                                       sli_command_engine_queue_flush_handler,
+                                       NULL);
               free(ntbr); // Release node memory
               break;      // Removal complete
             }
@@ -483,6 +567,7 @@ static void sli_command_engine_thread(void *args)
 
     // ---------------- TX completion (ACK) handling ----------------
     if (events_received & SLI_COMMAND_ENGINE_PACKET_TX_ACK_EVENT) {
+      SL_DEBUG_LOG("Got TX ACK Event\n");
       while (!SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&instance->tx_status_packet_queue)) {
         status = sli_queue_manager_dequeue(&(instance->tx_status_packet_queue), (void **)(&metadata));
         if (SL_STATUS_OK != status) {
@@ -495,16 +580,10 @@ static void sli_command_engine_thread(void *args)
         sli_buffer_manager_free_buffer(metadata->tx_info.data_packet);
         metadata->tx_info.data_packet        = NULL;
         metadata->tx_info.data_packet_length = 0;
+        metadata->tx_status                  = SLI_COMMAND_ENGINE_PACKET_TX_DONE;
 
-        // For command packets expecting sync response, move to in‑flight queue
-        if ((SLI_COMMAND_ENGINE_COMMAND_PACKET
-             == (SLI_COMMAND_ENGINE_COMMAND_PACKET & metadata->tx_info.flags)) // Is a command packet
-            && ((SLI_COMMAND_ENGINE_SYNC_RESPONSE_STATUS_PACKET
-                 == (SLI_COMMAND_ENGINE_SYNC_RESPONSE_STATUS_PACKET
-                     & metadata->tx_info.flags)) // Needs sync status response
-                || (SLI_COMMAND_ENGINE_SYNC_RESPONSE_DATA_PACKET
-                    == (SLI_COMMAND_ENGINE_SYNC_RESPONSE_DATA_PACKET
-                        & metadata->tx_info.flags)))) { // Or needs sync data response
+        // For command packets which don't expect sync or sequential async response, remove in‑flight queue if present and free it
+        if (!SLI_COMMAND_ENGINE_EXPECT_PACKET_RESPONSE(metadata)) { // Or needs sequential async response
           if (metadata->tx_info.packet_type < instance->config.packet_type_count) {
             queue_info = &(instance->queue_info[metadata->tx_info.packet_type]); // Static packet type queues
             packet_type_configuration =
@@ -512,7 +591,7 @@ static void sli_command_engine_thread(void *args)
           } else {
             // Lookup dynamic packet info (packet_type variable contains metadata->tx_info.packet_type value)
             status = sli_command_engine_get_dynamic_packet_info(instance,
-                                                                packet_type,
+                                                                metadata->tx_info.packet_type,
                                                                 &queue_info,
                                                                 &packet_type_configuration);
             if ((SL_STATUS_OK != status) || (NULL == queue_info) || (NULL == packet_type_configuration)) {
@@ -521,22 +600,35 @@ static void sli_command_engine_thread(void *args)
             }
           }
 
-          SL_DEBUG_LOG("Adding meta data : 0x%X\n", (unsigned int)metadata);
-          status =
-            sli_queue_manager_enqueue(&(queue_info->inflight_packet_queue), (void *)metadata); // Move to in-flight list
-          if (SL_STATUS_OK != status) {
+          SL_DEBUG_LOG("Removing meta data : 0x%X\n", (unsigned int)metadata);
+          sli_command_engine_metadata_t *inflight_queue_metadata = NULL; // Generic metadata pointer
+          // Remove from in-flight list if present if response is not expected
+          status = sli_queue_manager_remove_node_from_queue(&(queue_info->inflight_packet_queue),
+                                                            rx_packet_identity_handler,
+                                                            (const void *)metadata,
+                                                            (void **)&inflight_queue_metadata);
+          if ((SL_STATUS_NOT_FOUND == status) || (SL_STATUS_EMPTY == status)) {
+            // Not found; nothing more to do
+            sli_buffer_manager_free_buffer(metadata); // Free metadata
+          } else if (SL_STATUS_OK != status) {
             sli_command_engine_send_error_event(instance,
                                                 SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR); // Queue failure -> report
             continue;
+          } else {
+            // Successfully removed from in-flight queue
+            queue_info->in_flight_command_count--;
+            if (NULL != inflight_queue_metadata->tx_info.data_packet) {
+              sli_buffer_manager_free_buffer(
+                inflight_queue_metadata->tx_info.data_packet); // Free data packet if still present
+              inflight_queue_metadata->tx_info.data_packet = NULL;
+            }
+            sli_buffer_manager_free_buffer(inflight_queue_metadata); // Free metadata
           }
-          metadata = NULL;                       // Ownership transferred
-          queue_info->in_flight_command_count++; // Track outstanding sync command
-        } else {
-          // No sync response expected; free metadata (TX completed and not waiting for anything)
-          sli_buffer_manager_free_buffer(metadata);
-          metadata = NULL;
         }
+        metadata = NULL;
       }
+      // Clear TX ACK event bit after processing all pending ACKs
+      events_received &= ~(SLI_COMMAND_ENGINE_PACKET_TX_ACK_EVENT);
     }
 
     // ---------------- RX packet handling ----------------
@@ -557,10 +649,13 @@ static void sli_command_engine_thread(void *args)
         events_received &= ~(SLI_COMMAND_ENGINE_PACKET_RX_EVENT);
       }
 
+      SL_DEBUG_LOG("Got RX Packet\n");
+
       // Fill temporary RX metadata using user callback
       rx_metadata.tx_info.data_packet = data;
       status                          = instance->config.get_packet_metadata(instance, data, &rx_metadata);
       if (SL_STATUS_OK != status) {
+        SL_DEBUG_LOG("Unidentified Packet\n");
         // If metadata extraction fails, free the data buffer and continue
         sli_buffer_manager_free_buffer(data);
         continue;
@@ -577,6 +672,7 @@ static void sli_command_engine_thread(void *args)
           sli_command_engine_get_dynamic_packet_info(instance, packet_type, &queue_info, &packet_type_configuration);
         if ((SL_STATUS_OK != status) || (NULL == queue_info) || (NULL == packet_type_configuration)) {
           // If not found, free the data buffer and continue
+          SL_DEBUG_LOG("Unidentified Packet info\n");
           sli_buffer_manager_free_buffer(data);
           continue;
         }
@@ -586,6 +682,7 @@ static void sli_command_engine_thread(void *args)
       if (queue_info->in_flight_command_count > 0) {
         queue_info->in_flight_command_count--;
       }
+      SL_DEBUG_LOG("Got Packet info\n");
 
       // Call RX event handler if configured (e.g., for parsing/classification)
       if (NULL != packet_type_configuration->rx_event_handler) {
@@ -597,24 +694,43 @@ static void sli_command_engine_thread(void *args)
             break;
           }
           sli_buffer_manager_free_buffer(data);
+          SL_DEBUG_LOG("RX packet handler error\n");
           continue;
         }
       }
 
-      // Try to locate matching in-flight metadata for synchronous response
-      status = sli_queue_manager_remove_node_from_queue(
-        &(instance->queue_info[rx_metadata.tx_info.packet_type].inflight_packet_queue),
-        rx_packet_identity_handler,
-        (void *)&rx_metadata,
-        (void **)&metadata);
+      sli_command_engine_response_t *response = NULL;
+      SL_DEBUG_LOG("Searching Packet metadata\n");
 
-      if ((SL_STATUS_NOT_FOUND == status) | (SL_STATUS_EMPTY == status)) {
+      // Try to locate matching in-flight metadata for synchronous response
+      status = sli_queue_manager_remove_node_from_queue(&(queue_info->inflight_packet_queue),
+                                                        rx_packet_identity_handler,
+                                                        (const void *)&rx_metadata,
+                                                        (void **)&metadata);
+      SL_DEBUG_LOG("Search Packet metadata status : %lu\n", status);
+
+      if ((SL_STATUS_NOT_FOUND == status) || (SL_STATUS_EMPTY == status)) {
         // If not found, treat as async response: enqueue to async queue and signal event
         SL_DEBUG_LOG("Sending data pointer : 0x%X to async event handler for packet type : %u\n",
                      (unsigned int)data,
                      packet_type);
 
-        status = sli_queue_manager_enqueue(packet_type_configuration->async_response_queue, (void *)data);
+        status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_METADATA_POOL,
+                                                    SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
+                                                    1000,
+                                                    (sli_buffer_t *)&response);
+
+        if (status != SL_STATUS_OK) {
+          status = sli_command_engine_send_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
+          if (SL_STATUS_OK != status) {
+            break;
+          }
+        }
+
+        response->data = data;
+        response->type = SLI_COMMAND_ENGINE_PACKET_ONLY_RESPONSE;
+
+        status = sli_queue_manager_enqueue(packet_type_configuration->async_response_queue, (void *)response);
         if (SL_STATUS_OK != status) {
           // On enqueue failure, send fatal error event
           SL_DEBUG_LOG("Async enqueue failed : %lu", status);
@@ -633,6 +749,7 @@ static void sli_command_engine_thread(void *args)
         sli_command_engine_set_event(*(packet_type_configuration->async_response_event_id),
                                      packet_type_configuration->async_response_event);
       } else if (SL_STATUS_OK != status) {
+        SL_DEBUG_LOG("Got error while dequeueing packet metadata : %lu\n", status);
         // Unexpected queue error, send fatal error event
         status = sli_command_engine_send_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
         if (SL_STATUS_OK != status) {
@@ -640,17 +757,69 @@ static void sli_command_engine_thread(void *args)
         }
         continue;
       } else {
-        // Sync response: complete metadata and enqueue for waiting thread
+        uint32_t response_event             = 0;
+        osEventFlagsId_t *response_event_id = NULL;
+        sli_queue_t *response_queue         = NULL;
+        // Compute time elapsed since packet queued to detect timeout
+        uint32_t time_elapsed = (osKernelGetTickCount() - metadata->packet_start_tickcount);
+
+        // Check if the request has timed out by the time the response is received
+        if ((time_elapsed > metadata->tx_info.timeout) && (metadata->tx_info.timeout > 0)) {
+          // Drop timed out response data and metadata
+          SL_DEBUG_LOG("Packet timedout after : %lu\n", metadata->tx_info.timeout);
+          sli_buffer_manager_free_buffer(data);
+          sli_buffer_manager_free_buffer(metadata);
+          continue;
+        }
+
+        /// Checks if the packet metadata indicates a global TX block flag is set
+        if (SLI_COMMAND_ENGINE_IS_PACKET_WITH_GLOBAL_TX_BLOCK(metadata)) {
+          // Clear the global queue block flag to allow further packet processing
+          global_queue_block = false;
+        }
+
+        // Sync response: Complete metadata and enqueue for waiting thread
         SL_DEBUG_LOG("Found meta data : 0x%X\n", (unsigned int)metadata);
         metadata->tx_info.data_packet        = data;
         metadata->tx_info.data_packet_length = rx_metadata.tx_info.data_packet_length;
-        resp_thread_id                       = metadata->sync_resp_thread_id;
+
+        // Check if the response is sequential asynchronous response
+        if (SLI_COMMAND_ENGINE_SEQ_ASYNC_RESPONSE_PACKET & metadata->tx_info.flags) {
+
+          status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_METADATA_POOL,
+                                                      SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
+                                                      1000,
+                                                      (sli_buffer_t *)&response);
+
+          if (status != SL_STATUS_OK) {
+            status = sli_command_engine_send_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
+            if (SL_STATUS_OK != status) {
+              break;
+            }
+          }
+          metadata->tx_info.data_packet = data;
+          response->data                = metadata;
+          response->type                = SLI_COMMAND_ENGINE_METADATA_RESPONSE;
+          resp_thread_id                = NULL;
+          response_event_id             = packet_type_configuration->async_response_event_id;
+          response_event                = packet_type_configuration->async_response_event;
+          response_queue                = packet_type_configuration->async_response_queue;
+
+          status = sli_queue_manager_enqueue(response_queue, (void *)response);
+        } else { // Else use synchronous response
+          resp_thread_id          = metadata->sync_resp_thread_id;
+          metadata->packet_status = rx_metadata.packet_status;
+          response_event_id       = packet_type_configuration->sync_response_event_id;
+          response_event          = packet_type_configuration->sync_response_event;
+          response_queue          = packet_type_configuration->sync_response_queue;
+
+          status = sli_queue_manager_enqueue(response_queue, (void *)metadata);
+        }
 
         SL_DEBUG_LOG("Adding %u command packet to queue 0x%X\n",
                      rx_metadata.tx_info.packet_type,
-                     (unsigned int)packet_type_configuration->sync_response_queue);
+                     (unsigned int)response_queue);
 
-        status = sli_queue_manager_enqueue(packet_type_configuration->sync_response_queue, (void *)metadata);
         if (SL_STATUS_OK != status) {
           // On enqueue failure, send fatal error event
           status = sli_command_engine_send_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
@@ -660,16 +829,15 @@ static void sli_command_engine_thread(void *args)
           continue;
         }
         SL_DEBUG_LOG("Sending Event: 0x%X on event id : 0x%X for queue 0x%X\n",
-                     (unsigned int)packet_type_configuration->sync_response_event,
-                     (unsigned int)*(packet_type_configuration->sync_response_event_id),
-                     (unsigned int)packet_type_configuration->sync_response_queue);
+                     (unsigned int)response_event,
+                     (unsigned int)*(response_event_id),
+                     (unsigned int)response_queue);
 
         // Signal waiting thread (if original context still alive) else global event
         if (NULL != resp_thread_id) {
-          sli_command_engine_set_thread_event(resp_thread_id, packet_type_configuration->sync_response_event);
+          sli_command_engine_set_thread_event(resp_thread_id, response_event);
         } else {
-          sli_command_engine_set_event(*(packet_type_configuration->sync_response_event_id),
-                                       packet_type_configuration->sync_response_event);
+          sli_command_engine_set_event(*(response_event_id), response_event);
         }
 
         metadata = NULL;
@@ -692,7 +860,8 @@ static void sli_command_engine_thread(void *args)
           status = sli_command_engine_handle_packet_tx(instance,
                                                        &(instance->queue_info[i]),
                                                        &(instance->config.packet_type_configuration[i]),
-                                                       i);
+                                                       i,
+                                                       &global_queue_block);
           if (SL_STATUS_OK != status) {
             break;
           }
@@ -722,7 +891,8 @@ static void sli_command_engine_thread(void *args)
           status = sli_command_engine_handle_packet_tx(instance,
                                                        &(node->queue_info),
                                                        &(node->packet_config),
-                                                       node->packet_type);
+                                                       node->packet_type,
+                                                       &global_queue_block);
           if (SL_STATUS_OK != status) {
             break;
           }
@@ -841,6 +1011,22 @@ sl_status_t sli_command_engine_deinit(sli_command_engine_t *instance)
     return SL_STATUS_TIMEOUT;
   }
 
+  // Retry thread termination with a simple constant delay
+  osStatus_t terminate_status = osError;
+
+  for (int retry = 0; retry < 3; retry++) {
+    terminate_status = osThreadTerminate(instance->command_engine_threadId);
+    if (terminate_status == osOK) {
+      break;
+    }
+
+    osDelay(SLI_SYSTEM_MS_TO_TICKS(20)); // Simple 20ms delay between retries
+  }
+
+  if (terminate_status != osOK) {
+    SL_DEBUG_LOG("Failed to terminate command engine thread after 3 retries");
+  }
+
   // Clear stored thread id (thread has terminated)
   instance->command_engine_threadId = NULL;
 
@@ -849,14 +1035,23 @@ sl_status_t sli_command_engine_deinit(sli_command_engine_t *instance)
   instance->command_engine_eventId = NULL;
 
   // Deinitialize auxiliary queues
-  sli_queue_manager_deinit(&(instance->control_queue), sli_command_engine_queue_flush_handler);
-  sli_queue_manager_deinit(&(instance->tx_status_packet_queue), sli_command_engine_queue_flush_handler);
-  sli_queue_manager_deinit(&(instance->rx_packet_queue), sli_command_engine_queue_flush_handler);
+  sli_queue_manager_deinit(&(instance->control_queue), sli_command_engine_control_queue_flush_handler, NULL);
+  sli_queue_manager_deinit(&(instance->tx_status_packet_queue), NULL, NULL);
+  sli_queue_manager_deinit(&(instance->rx_packet_queue), sli_command_engine_queue_flush_handler, NULL);
+
+  sli_command_engine_packet_flush_context_t flush_context = { 0 };
+  flush_context.instance                                  = instance;
 
   // Deinitialize per static packet-type queues
   for (uint16_t i = 0; i < instance->config.packet_type_count; i++) {
-    sli_queue_manager_deinit(&(instance->queue_info[i].packet_queue), sli_command_engine_queue_flush_handler);
-    sli_queue_manager_deinit(&(instance->queue_info[i].inflight_packet_queue), sli_command_engine_queue_flush_handler);
+    flush_context.packet_type        = i;
+    flush_context.packet_type_config = &(instance->config.packet_type_configuration[i]);
+    sli_queue_manager_deinit(&(instance->queue_info[i].packet_queue),
+                             sli_command_engine_packet_queue_flush_handler,
+                             (void *)&flush_context);
+    sli_queue_manager_deinit(&(instance->queue_info[i].inflight_packet_queue),
+                             sli_command_engine_packet_queue_flush_handler,
+                             (void *)&flush_context);
   }
 
   // Free static packet type queue info array
@@ -865,10 +1060,16 @@ sl_status_t sli_command_engine_deinit(sli_command_engine_t *instance)
 
   // Walk and free all dynamically registered packet types
   while (NULL != instance->dynamic_packet_type) {
-    node                          = instance->dynamic_packet_type;       // Take head
-    instance->dynamic_packet_type = instance->dynamic_packet_type->next; // Advance list head
-    sli_queue_manager_deinit(&(node->queue_info.packet_queue), sli_command_engine_queue_flush_handler);
-    sli_queue_manager_deinit(&(node->queue_info.inflight_packet_queue), sli_command_engine_queue_flush_handler);
+    node                             = instance->dynamic_packet_type;       // Take head
+    instance->dynamic_packet_type    = instance->dynamic_packet_type->next; // Advance list head
+    flush_context.packet_type        = node->packet_type;
+    flush_context.packet_type_config = &(node->packet_config);
+    sli_queue_manager_deinit(&(node->queue_info.packet_queue),
+                             sli_command_engine_packet_queue_flush_handler,
+                             (void *)&flush_context);
+    sli_queue_manager_deinit(&(node->queue_info.inflight_packet_queue),
+                             sli_command_engine_packet_queue_flush_handler,
+                             (void *)&flush_context);
     free(node); // Free node memory
   }
 
@@ -923,6 +1124,7 @@ sl_status_t sli_command_engine_add_packet_type(sli_command_engine_t *instance,
 
   // Copy user configuration into node
   new_node->packet_config = *packet_config;
+  new_node->packet_type   = packet_type;
   new_node->next          = NULL;
 
   // Initialize TX queue for this packet type
@@ -936,12 +1138,16 @@ sl_status_t sli_command_engine_add_packet_type(sli_command_engine_t *instance,
   // Initialize in-flight (awaiting response) queue
   status = sli_queue_manager_init(&new_node->queue_info.inflight_packet_queue, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   if (SL_STATUS_OK != status) {
-    sli_queue_manager_deinit(&new_node->queue_info.packet_queue, sli_command_engine_queue_flush_handler);
-    VERIFY_STATUS_AND_RETURN(status);
-    free(new_node);
     free(request);
-    return SL_STATUS_FAIL;
+    sli_queue_manager_deinit(&new_node->queue_info.packet_queue, sli_command_engine_queue_flush_handler, NULL);
+    free(new_node);
+    VERIFY_STATUS_AND_RETURN(status);
   }
+  new_node->queue_info.in_flight_command_count = 0;
+  new_node->queue_info.tx_counter              = 0;
+  new_node->queue_info.rx_counter              = 0;
+  new_node->queue_info.packet_id               = 0;
+  // new_node->sequential= 0;
 
   // Populate request
   request->request_type       = SLI_COMMAND_ENGINE_REGISTER_PACKET_TYPE;
@@ -961,10 +1167,10 @@ sl_status_t sli_command_engine_add_packet_type(sli_command_engine_t *instance,
   events_received = osThreadFlagsWait(SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT, osFlagsWaitAny, 10000);
   if (!(events_received & SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT)) {
     // Timed out / failed: cleanup (thread never took ownership)
-    sli_queue_manager_deinit(&new_node->queue_info.packet_queue, sli_command_engine_queue_flush_handler);
-    sli_queue_manager_deinit(&new_node->queue_info.inflight_packet_queue, sli_command_engine_queue_flush_handler);
-    free(new_node);
     free(request);
+    sli_queue_manager_deinit(&new_node->queue_info.packet_queue, sli_command_engine_queue_flush_handler, NULL);
+    sli_queue_manager_deinit(&new_node->queue_info.inflight_packet_queue, sli_command_engine_queue_flush_handler, NULL);
+    free(new_node);
     return SL_STATUS_FAIL;
   }
 
@@ -1069,12 +1275,6 @@ sl_status_t sli_command_engine_send_packet(sli_command_engine_t *instance, sli_c
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  // Reject packet types that collide with static space (dynamic types handled later in lookup)
-  if (tx_info->packet_type >= instance->config.packet_type_count) {
-    // Caller attempted to send with an unknown / unregistered packet type
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
   // Allocate metadata buffer (hybrid allocation allows pool + heap fallback)
   status = sli_buffer_manager_allocate_buffer(instance->config.metadata_buffer_pool_type,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
@@ -1082,23 +1282,10 @@ sl_status_t sli_command_engine_send_packet(sli_command_engine_t *instance, sli_c
                                               (sli_buffer_t *)&metadata);
   VERIFY_STATUS_AND_RETURN(status);
 
-  // Atomically allocate a monotonically increasing packet_id per packet type
-  CORE_irqState_t state = CORE_EnterAtomic();
-  tx_info->packet_id    = (instance->queue_info[tx_info->packet_type].packet_id)++;
-  CORE_ExitAtomic(state);
-
-  // Populate metadata structure
-  metadata->instance               = instance;               // Back reference to engine instance
-  metadata->tx_info.packet_type    = tx_info->packet_type;   // Store packet type (redundant but explicit)
-  metadata->tx_info.packet_id      = tx_info->packet_id;     // Store assigned packet id
-  metadata->tx_info                = *tx_info;               // Copy full TX descriptor
-  metadata->packet_start_tickcount = osKernelGetTickCount(); // Timestamp for timeout handling
-  metadata->sync_resp_thread_id    = osThreadGetId();        // Thread to signal for sync responses
-
   // Resolve queue info and appropriate wake event (static vs dynamic)
-  if (metadata->tx_info.packet_type < instance->config.packet_type_count) {
-    queue_info = &(instance->queue_info[metadata->tx_info.packet_type]); // Static packet type queue
-    event_mask = SLI_COMMAND_ENGINE_PACKET_TX_EVENT;                     // Static TX scheduler event
+  if (tx_info->packet_type < instance->config.packet_type_count) {
+    queue_info = &(instance->queue_info[tx_info->packet_type]); // Static packet type queue
+    event_mask = SLI_COMMAND_ENGINE_PACKET_TX_EVENT;            // Static TX scheduler event
   } else {
     // Dynamic packet type: lookup its queue info
     status = sli_command_engine_get_dynamic_packet_info(instance, tx_info->packet_type, &queue_info, NULL);
@@ -1110,6 +1297,20 @@ sl_status_t sli_command_engine_send_packet(sli_command_engine_t *instance, sli_c
     event_mask = SLI_COMMAND_ENGINE_DYNAMIC_PACKET_TYPE_TX_EVENT; // Dynamic TX scheduler event
   }
 
+  // Atomically allocate a monotonically increasing packet_id per packet type
+  CORE_irqState_t state = CORE_EnterAtomic();
+  tx_info->packet_id    = (queue_info->packet_id)++;
+  CORE_ExitAtomic(state);
+
+  // Populate metadata structure
+  metadata->instance               = instance;                          // Back reference to engine instance
+  metadata->tx_info.packet_type    = tx_info->packet_type;              // Store packet type (redundant but explicit)
+  metadata->tx_info.packet_id      = tx_info->packet_id;                // Store assigned packet id
+  metadata->tx_info                = *tx_info;                          // Copy full TX descriptor
+  metadata->packet_start_tickcount = osKernelGetTickCount();            // Timestamp for timeout handling
+  metadata->sync_resp_thread_id    = osThreadGetId();                   // Thread to signal for sync responses
+  metadata->tx_status              = SLI_COMMAND_ENGINE_PACKET_TX_INIT; // Initial TX status
+
   // Enqueue metadata onto the packet queue (ownership transfers to queue on success)
   status = sli_queue_manager_enqueue(&(queue_info->packet_queue), (sl_slist_node_t *)metadata);
   VERIFY_STATUS_AND_RETURN(status);
@@ -1117,6 +1318,31 @@ sl_status_t sli_command_engine_send_packet(sli_command_engine_t *instance, sli_c
   // Wake command engine thread to process TX scheduling
   sli_command_engine_set_event(instance->command_engine_eventId, event_mask);
 
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_command_engine_get_rx_queue_info_from_packet_type(
+  sli_command_engine_t *instance,
+  uint16_t packet_type,
+  sli_command_engine_packet_type_configuration_t *packet_type_info)
+{
+
+  sli_command_engine_packet_type_configuration_t *temp_info = NULL;
+
+  // Resolve queue info and appropriate wake event (static vs dynamic)
+  if (packet_type < instance->config.packet_type_count) {
+    temp_info = &(instance->config.packet_type_configuration[packet_type]); // Static packet type queue
+  } else {
+    // Dynamic packet type: lookup its queue info
+    sl_status_t status = sli_command_engine_get_dynamic_packet_info(instance, packet_type, NULL, &temp_info);
+    if ((SL_STATUS_OK != status) || (NULL == temp_info)) {
+      // Unknown / unregistered dynamic type
+      return SL_STATUS_INVALID_CONFIGURATION;
+    }
+  }
+  packet_type_info->sync_response_queue    = temp_info->sync_response_queue;
+  packet_type_info->sync_response_event    = temp_info->sync_response_event;
+  packet_type_info->sync_response_event_id = temp_info->sync_response_event_id;
   return SL_STATUS_OK;
 }
 

@@ -32,7 +32,7 @@
 DEFINE_FFF_GLOBALS;
 
 DEFINE_FAKE_VALUE_FUNC7(sl_status_t,
-                        sli_si91x_driver_send_command,
+                        sli_wifi_send_command,
                         uint32_t,
                         sli_wifi_command_type_t,
                         const void *,
@@ -40,20 +40,10 @@ DEFINE_FAKE_VALUE_FUNC7(sl_status_t,
                         sli_wifi_wait_period_t,
                         void *,
                         sl_wifi_buffer_t **);
-DEFINE_FAKE_VOID_FUNC1(sli_si91x_host_free_buffer, sl_wifi_buffer_t *);
+DEFINE_FAKE_VALUE_FUNC1(sl_status_t, sli_buffer_manager_free_buffer, sli_buffer_t);
 DEFINE_FAKE_VALUE_FUNC3(void *, sli_wifi_host_get_buffer_data, sl_wifi_buffer_t *, uint16_t, uint16_t *);
-DEFINE_FAKE_VALUE_FUNC2(sl_status_t, sli_si91x_flush_socket_command_queues_based_on_queue_type, uint8_t, uint16_t);
-DEFINE_FAKE_VALUE_FUNC1(sl_status_t, sli_si91x_flush_socket_data_queues_based_on_queue_type, uint8_t);
 DEFINE_FAKE_VOID_FUNC2(sli_si91x_append_to_buffer_queue, sli_wifi_buffer_queue_t *, sl_wifi_buffer_t *);
 DEFINE_FAKE_VOID_FUNC1(sli_si91x_set_event, uint32_t);
-DEFINE_FAKE_VALUE_FUNC6(sl_status_t,
-                        sli_wifi_wait_for_response_packet,
-                        sli_wifi_buffer_queue_t *,
-                        osEventFlagsId_t,
-                        uint32_t,
-                        uint16_t,
-                        sli_wifi_wait_period_t,
-                        sl_wifi_buffer_t **);
 DEFINE_FAKE_VALUE_FUNC4(sl_status_t,
                         sli_si91x_host_allocate_buffer,
                         sl_wifi_buffer_t **,
@@ -97,3 +87,57 @@ DEFINE_FAKE_VOID_FUNC1(sli_wifi_set_event, uint32_t);
 DEFINE_FAKE_VOID_FUNC2(sli_wifi_append_to_buffer_queue, sli_wifi_buffer_queue_t *, sl_wifi_buffer_t *);
 DEFINE_FAKE_VALUE_FUNC2(size_t, sl_strnlen, char *, size_t);
 DEFINE_FAKE_VALUE_FUNC0(uint32_t, osKernelGetTickFreq);
+DEFINE_FAKE_VALUE_FUNC2(sl_status_t, sli_command_engine_remove_packet_type, sli_command_engine_t *, uint8_t);
+DEFINE_FAKE_VALUE_FUNC3(sl_status_t,
+                        sli_queue_manager_deinit,
+                        sli_queue_t *,
+                        sli_queue_manager_flush_handler_t,
+                        void *);
+DEFINE_FAKE_VALUE_FUNC2(sl_status_t, sli_queue_manager_init, sli_queue_t *, sli_buffer_manager_pool_types_t);
+DEFINE_FAKE_VALUE_FUNC3(sl_status_t,
+                        sli_command_engine_add_packet_type,
+                        sli_command_engine_t *,
+                        uint8_t,
+                        sli_command_engine_packet_type_configuration_t *);
+DEFINE_FAKE_VALUE_FUNC3(sl_status_t,
+                        sli_command_engine_get_rx_queue_info_from_packet_type,
+                        sli_command_engine_t *,
+                        uint16_t,
+                        sli_command_engine_packet_type_configuration_t *);
+DEFINE_FAKE_VALUE_FUNC4(sl_status_t,
+                        sli_buffer_manager_allocate_buffer,
+                        sli_buffer_manager_pool_types_t,
+                        sli_buffer_manager_allocation_types_t,
+                        uint32_t,
+                        sli_buffer_t *);
+DEFINE_FAKE_VALUE_FUNC2(sl_status_t, sli_queue_manager_enqueue, sli_queue_t *, void *);
+DEFINE_FAKE_VALUE_FUNC5(sl_status_t,
+                        sli_routing_utility_route_packet,
+                        sli_routing_table_t *,
+                        uint16_t,
+                        const void *,
+                        uint16_t,
+                        const void *);
+DEFINE_FAKE_VALUE_FUNC5(sl_status_t,
+                        sli_wifi_async_send_command,
+                        uint32_t,
+                        sli_wifi_command_type_t,
+                        const void *,
+                        uint32_t,
+                        void *);
+DEFINE_FAKE_VALUE_FUNC5(sl_status_t,
+                        sli_wifi_receive_response_buffer,
+                        uint16_t,
+                        uint16_t,
+                        sli_wifi_wait_period_t,
+                        uint8_t,
+                        void **);
+DEFINE_FAKE_VALUE_FUNC1(bool, sli_wifi_is_ip_address_zero, const sl_ip_address_t *);
+
+// Fake global variables
+sli_routing_table_t wifi_command_engine_routing_table;
+uint32_t sli_wifi_event_engine_event_id;
+sli_queue_t event_queue;
+void *sli_wifi_command_engine_rx_packet_handler;
+sli_command_engine_t sli_wifi_command_engine;
+sli_wifi_command_queue_t cmd_queues[5];

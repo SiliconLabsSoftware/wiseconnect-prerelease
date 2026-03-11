@@ -1328,7 +1328,7 @@
                 </param>
                 <param name="ap_beacon_interval" type="uint16">
                     <description>
-                        Beacon interval of the access point in milliseconds and defaut value is 100 ms.
+                        Beacon interval of the access point in time units (1 TU = 1024 microseconds) and default value is 100 TU.
                     </description>
                 </param>
                 <param name="ap_client_idle_timeout" type="uint32">
@@ -1548,7 +1548,7 @@
                 </param>
                 <param name="ap_beacon_interval" type="uint16">
                     <description>
-                        Beacon interval of the access point in milliseconds; default is 100 ms.
+                        Beacon interval of the access point in time units (1 TU = 1024 microseconds); default is 100 TU.
                     </description>
                 </param>
                 <param name="ap_client_idle_timeout" type="uint32">

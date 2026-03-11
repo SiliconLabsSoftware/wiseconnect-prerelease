@@ -149,7 +149,7 @@ static sl_status_t configure_ram_memory(sl_power_ram_retention_config_t *config,
 static sl_status_t trigger_sleep(sli_power_sleep_config_t *config, uint8_t sleep_type);
 static sl_status_t convert_rsi_to_sl_error_code(rsi_error_t error);
 #if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)
-__WEAK sl_status_t sli_si91x_submit_rx_pkt(void);
+__WEAK sl_status_t sli_si91x_submit_rx_pkt(uint32_t timeout);
 #endif
 /*******************************************************************************
  *************************** LOCAL VARIABLES   *******************************

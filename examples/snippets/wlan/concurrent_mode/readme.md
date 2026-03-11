@@ -128,13 +128,13 @@ The application can be configured to suit your requirements and development envi
 > Note:
 >
 > 1. In concurrent mode, STA and AP should be configured on the same channel. The STA instance shall first scan for the specified external AP, wherein the channel number of AP is fetched and passed as an argument during SoftAP creation.
-> 2. Valid values for CHANNEL_NO are 1 to 11 in 2.4 GHz band and 36 to 48 and 149 to 165 in 5 GHz. In this example, default configured band is 2.4 GHz.
+> 2. Valid values for CHANNEL_NO are 1 to 14 in the 2.4 GHz band. The default region code is set to US.
 
 - Other STA instance configurations can be modified if required in `default_wifi_ap_profile` configuration structure.
 
 > Note:
 >
-> 1. This application is not providing the facility to configure the access point’s IP Parameters. Default IP address of the Silicon Labs access point is **192.168.100.76**.
+> 1. This application provides the facility to configure the access point’s IP Parameters. The IPv4 address for the Silicon Labs access point is 192.168.10.10.
 > 2. In concurrent mode, the IP networks of Silicon Labs STA and Silicon Labs access point both should be different. Configure Wireless Access Point IP network (Ex: 192.168.0.1) other than Silicon Labs access point IP network.
 
 #### Open **sl_wifi_device.h** file. You can also refer to `sl_wifi_default_concurrent_configuration` and modify/create configurations as per your needs and requirements.

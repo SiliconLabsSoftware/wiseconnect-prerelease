@@ -31,115 +31,50 @@
 #include <stdint.h>
 #include "sli_wifi_command_engine.h"
 #include "sl_constants.h"
-#include "sli_wifi_event_handler.h"
-#include "cmsis_os2.h"
-#include "sl_cmsis_utility.h"
+#include "sli_wifi_command_engine_config.h"
+#include "sli_command_engine.h"
+#include "sli_event_engine.h"
 
 /******************************************************
  *               Macro Definitions
  ******************************************************/
-#define SLI_WLAN_TERMINATE_THREAD_EVENT     (1 << 23)
-#define SLI_WLAN_TERMINATE_THREAD_ACK_EVENT (1 << 22)
 
 /******************************************************
  *               Variable Definitions
  ******************************************************/
-static osThreadId_t command_engine_id = 0;
 
 /******************************************************
  *               Function Declarations
 ******************************************************/
 
-void sli_wifi_command_engine(void *args);
-
 /******************************************************
  *               Function Definitions
 ******************************************************/
-
-void sli_wifi_command_engine_init(void)
+sl_status_t sli_wifi_command_engine_init(void)
 {
-  // Call the init function of Command Engine Event Handler.
-  sli_wifi_event_handler_init();
+  sl_status_t status = SL_STATUS_OK;
 
-  // Create and start command engine thread
-  if (NULL == command_engine_id) {
-    const osThreadAttr_t attr = {
-      .name       = "sli_wifi_command_engine",
-      .priority   = SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY,
-      .stack_mem  = 0,
-      .stack_size = 1636,
-      .cb_mem     = 0,
-      .cb_size    = 0,
-      .attr_bits  = 0u,
-      .tz_module  = 0u,
-    };
-    command_engine_id = osThreadNew(&sli_wifi_command_engine, NULL, &attr);
-  }
+  status = sli_wifi_event_engine_init();
+  VERIFY_STATUS_AND_RETURN(status);
+
+  // Initialize the command engine
+  status = sli_command_engine_init(&sli_wifi_command_engine,
+                                   (const sli_command_engine_configuration_t *)&sli_wifi_command_engine_config);
+  VERIFY_STATUS_AND_RETURN(status);
+
+  return SL_STATUS_OK;
 }
 
-void sli_wifi_command_engine_deinit(void)
+sl_status_t sli_wifi_command_engine_deinit(void)
 {
-  if (command_engine_id == NULL)
-    return;
+  sl_status_t status = SL_STATUS_OK;
 
-  sli_wifi_command_engine_set_event(SLI_WLAN_TERMINATE_THREAD_EVENT);
+  // Deinitialize the command engine
+  status = sli_command_engine_deinit(&sli_wifi_command_engine);
+  VERIFY_STATUS_AND_RETURN(status);
 
-  // Wait for thread termination acknowledgment with timeout
-  uint32_t events_received = sli_wifi_command_engine_wait_for_event(SLI_WLAN_TERMINATE_THREAD_ACK_EVENT, 5000);
+  status = sli_event_engine_deinit();
+  VERIFY_STATUS_AND_RETURN(status);
 
-  if (0 == events_received) {
-    // Return timeout if acknowledgment is not received
-    //return SL_STATUS_TIMEOUT;
-    return;
-  }
-
-  // Retry thread termination with a simple constant delay
-  osStatus_t terminate_status = osError;
-
-  for (int retry = 0; retry < 3; retry++) {
-    terminate_status = osThreadTerminate(command_engine_id);
-    if (terminate_status == osOK) {
-      break;
-    }
-
-    osDelay(SLI_SYSTEM_MS_TO_TICKS(20)); // Simple 20ms delay between retries
-  }
-
-  if (terminate_status != osOK) {
-    SL_DEBUG_LOG("Failed to terminate command engine thread after 3 retries");
-  }
-  command_engine_id = NULL;
-
-  sli_wifi_event_handler_deinit();
-}
-
-void sli_wifi_command_engine(void *args)
-{
-  UNUSED_PARAMETER(args);
-
-  uint32_t events_to_wait_on = sli_wifi_event_handler_get_flags_to_wait_on();
-  uint32_t events_received   = 0;
-
-  events_to_wait_on |= SLI_WLAN_TERMINATE_THREAD_EVENT;
-
-  while (1) {
-    uint32_t wait_time = sli_wifi_event_handler_get_wait_time(&events_received);
-
-    events_received |= sli_wifi_command_engine_wait_for_event(events_to_wait_on, wait_time);
-
-    if (events_received & SLI_WLAN_TERMINATE_THREAD_EVENT) {
-      // Clear the termination event flag
-      events_received &= ~SLI_WLAN_TERMINATE_THREAD_EVENT;
-
-      // Acknowledge the termination request
-      sli_wifi_command_engine_set_event(SLI_WLAN_TERMINATE_THREAD_ACK_EVENT);
-
-      // Suspend the thread until it is terminated.
-      osThreadSuspend(osThreadGetId());
-    }
-
-    sli_wifi_handle_event(&events_received);
-  }
-
-  return;
+  return SL_STATUS_OK;
 }

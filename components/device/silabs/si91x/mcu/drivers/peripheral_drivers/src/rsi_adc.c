@@ -91,7 +91,7 @@ int16_t adc_output_buf[UDMA_PING_PONG_LENGTH * 2] __attribute__((at(ADC_DATA_AQU
 #else
 int16_t adc_output_buf[UDMA_PING_PONG_LENGTH * 2] __attribute__((at(ADC_DATA_AQU_BUF_PS4)));
 #endif
-extern RSI_UDMA_DESC_T UDMA1_Table[32];
+extern RSI_UDMA_DESC_T UDMA1_Table[CONTROL_STRUCT1];
 #endif // defined (__CC_ARM)
 
 #if defined(__GNUC__)
@@ -100,7 +100,7 @@ int16_t __attribute__((section(".adc_multi_ch_buf_ps2_addr"))) adc_output_buf[UD
 #else
 int16_t __attribute__((section(".adc_multi_ch_buf_ps4_addr"))) adc_output_buf[UDMA_PING_PONG_LENGTH * 2];
 #endif
-extern RSI_UDMA_DESC_T __attribute__((section(".udma_addr1"))) UDMA1_Table[32];
+extern RSI_UDMA_DESC_T __attribute__((section(".udma_addr1"))) UDMA1_Table[CONTROL_STRUCT1];
 #endif // defined (__GNUC__)
 #endif
 

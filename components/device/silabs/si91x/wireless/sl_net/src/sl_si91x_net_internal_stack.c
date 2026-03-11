@@ -105,17 +105,17 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     ip_req.dhcp_discover_max_retries      = ip_config->dhcp_config.max_discover_retries;
     ip_req.dhcp_request_max_retries       = ip_config->dhcp_config.max_request_retries;
 
-    status = sli_si91x_driver_send_command(SLI_WLAN_REQ_IPCONFV4,
-                                           SLI_SI91X_NETWORK_CMD,
-                                           &ip_req,
-                                           sizeof(sli_si91x_req_ipv4_params_t),
-                                           wait_time,
-                                           NULL,
-                                           &buffer);
+    status = sli_wifi_send_command(SLI_WLAN_REQ_IPCONFV4,
+                                   SLI_SI91X_NETWORK_CMD,
+                                   &ip_req,
+                                   sizeof(sli_si91x_req_ipv4_params_t),
+                                   wait_time,
+                                   NULL,
+                                   (void **)&buffer);
 
     // Check if the command failed and free the buffer if it was allocated
     if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-      sli_si91x_host_free_buffer(buffer);
+      sli_buffer_manager_free_buffer(buffer);
     }
 
     // Verify the status and return it
@@ -131,7 +131,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     }
 
     // Free the buffer and return success status
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
 
   if (SL_IPV6 & ip_config->type) {
@@ -152,17 +152,17 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     }
 
     // Send the IPv6 configuration request to SI91X driver
-    status = sli_si91x_driver_send_command(SLI_WLAN_REQ_IPCONFV6,
-                                           SLI_SI91X_NETWORK_CMD,
-                                           &ipv6_request,
-                                           sizeof(sli_si91x_req_ipv6_params_t),
-                                           wait_time,
-                                           NULL,
-                                           &buffer);
+    status = sli_wifi_send_command(SLI_WLAN_REQ_IPCONFV6,
+                                   SLI_SI91X_NETWORK_CMD,
+                                   &ipv6_request,
+                                   sizeof(sli_si91x_req_ipv6_params_t),
+                                   wait_time,
+                                   NULL,
+                                   (void **)&buffer);
 
     // Check if the command failed and free the buffer if it was allocated
     if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-      sli_si91x_host_free_buffer(buffer);
+      sli_buffer_manager_free_buffer(buffer);
     }
 
     VERIFY_STATUS_AND_RETURN(status);
@@ -183,7 +183,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
            sizeof(ipv6_response->gateway_address));
 
     // Free the buffer and return success status
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
 
   return status;

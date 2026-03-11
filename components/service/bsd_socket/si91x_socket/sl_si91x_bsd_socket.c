@@ -175,16 +175,16 @@ sli_si91x_get_nwp_socket_info(sl_si91x_socket_info_response_t *socket_info_respo
   sl_wifi_buffer_t *buffer                            = NULL;
   const sli_si91x_network_params_response_t *response = NULL;
 
-  status = sli_si91x_driver_send_command(SLI_WIFI_REQ_QUERY_NETWORK_PARAMS,
-                                         SLI_WIFI_WLAN_CMD,
-                                         NULL,
-                                         0,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_QUERY_NETWORK_PARAMS_WAIT_TIME),
-                                         NULL,
-                                         &buffer);
+  status = sli_wifi_send_command(SLI_WIFI_REQ_QUERY_NETWORK_PARAMS,
+                                 SLI_WIFI_WLAN_CMD,
+                                 NULL,
+                                 0,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_QUERY_NETWORK_PARAMS_WAIT_TIME),
+                                 NULL,
+                                 (void **)&buffer);
 
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
   }
 
   VERIFY_STATUS_AND_RETURN(status);
@@ -199,7 +199,7 @@ sli_si91x_get_nwp_socket_info(sl_si91x_socket_info_response_t *socket_info_respo
          response->socket_info,
          (sizeof(sl_si91x_sock_info_query_t) * socket_info_response->number_of_opened_sockets));
 
-  sli_si91x_host_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
 }
 
@@ -465,7 +465,7 @@ ssize_t sendto(int socket_id,
 
   // Send the socket data request
   status = sli_si91x_send_socket_data(si91x_socket, &request, data);
-  SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_OK, ENOBUFS);
+  SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_IN_PROGRESS, ENOBUFS);
 
   return data_len;
 }
@@ -551,11 +551,11 @@ ssize_t recvfrom(int socket_id, void *buf, size_t buf_len, int flags, struct soc
   sli_si91x_req_socket_read_t request        = { 0 }; // Initialize a request structure
   sl_status_t status                         = SL_STATUS_OK;
   ssize_t bytes_read                         = 0; // Number of bytes read
-  sl_wifi_system_packet_t *packet            = NULL;
+  sl_wifi_system_packet_t *response_packet   = NULL;
   const sl_si91x_socket_metadata_t *response = NULL;                            // Response structure
   sli_si91x_socket_t *si91x_socket           = sli_get_si91x_socket(socket_id); // Get socket information
 
-  sl_wifi_buffer_t *buffer = NULL;
+  sl_wifi_buffer_t *response_buffer = NULL;
 
   // Validate input parameters, initialize UDP socket if necessary, and adjust buffer length
   status = sli_prepare_socket(si91x_socket, socket_id, buf, &buf_len);
@@ -574,30 +574,43 @@ ssize_t recvfrom(int socket_id, void *buf, size_t buf_len, int flags, struct soc
 
   // Configure wait time and send the command
   wait_time = (SLI_WIFI_WAIT_FOR_EVER | SLI_WIFI_WAIT_FOR_RESPONSE_BIT);
-  status    = sli_si91x_send_socket_command(si91x_socket,
-                                         SLI_WLAN_REQ_SOCKET_READ_DATA,
-                                         &request,
-                                         sizeof(request),
-                                         wait_time,
-                                         &buffer);
+
+  si91x_socket->Is_receive_cmd_pending = true;
+  status                               = sli_wifi_async_send_command(SLI_WLAN_REQ_SOCKET_READ_DATA,
+                                       (SI91X_CMD_MAX + si91x_socket->index),
+                                       &request,
+                                       sizeof(request),
+                                       NULL);
+  if (status != SL_STATUS_IN_PROGRESS) {
+    si91x_socket->Is_receive_cmd_pending = false;
+    VERIFY_STATUS_AND_RETURN(status);
+  }
+
+  status = sli_wifi_receive_response_buffer((uint16_t)(SI91X_CMD_MAX + si91x_socket->index),
+                                            0,
+                                            wait_time,
+                                            SLI_WIFI_WAIT_ON_EVENT_ID,
+                                            (void **)&response_buffer);
   if (status == SL_STATUS_SI91X_SOCKET_CLOSED) {
-    sli_si91x_host_free_buffer(buffer);
-    errno = ENOTCONN;
+    sli_buffer_manager_free_buffer(response_buffer);
+    errno                                = ENOTCONN;
+    si91x_socket->Is_receive_cmd_pending = false;
     return -1;
   }
 
-  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_si91x_host_free_buffer(buffer);
+  if ((status != SL_STATUS_OK) && (response_buffer != NULL)) {
+    sli_buffer_manager_free_buffer(response_buffer);
   }
+  si91x_socket->Is_receive_cmd_pending = false;
   SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_OK, SLI_SI91X_UNDEFINED_ERROR);
 
   // Process the response
-  packet   = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-  response = (sl_si91x_socket_metadata_t *)packet->data;
+  response_packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(response_buffer, 0, NULL);
+  response        = (sl_si91x_socket_metadata_t *)response_packet->data;
   sli_populate_source_address(addr, addr_len, response, buf, buf_len, &bytes_read);
 
   // Free the buffer
-  sli_si91x_host_free_buffer(buffer);
+  sli_buffer_manager_free_buffer(response_buffer);
 
   return bytes_read;
 }

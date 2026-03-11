@@ -108,8 +108,8 @@ volatile bool is_server_running = false;
 uint8_t data_buffer[TCP_BUFFER_SIZE];
 uint8_t address_buffer[SL_IPV6_ADDRESS_LENGTH];
 
-char WIFI_CLIENT_PROFILE_SSID[32]; // Assuming SSID can be up to 32 characters long
-char WIFI_CLIENT_CREDENTIAL[64];   // Assuming Password can be up to 64 characters long
+char WIFI_CLIENT_PROFILE_SSID[33]; // SSID is limited to 32 characters plus null terminator
+char WIFI_CLIENT_CREDENTIAL[64];   // Password is limited to 63 characters plus null terminator
 char WIFI_CLIENT_SECURITY_TYPE[32];
 
 static jsmntok_t t[128]; /* We expect no more than 128 tokens */
@@ -126,7 +126,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t fw_up_thread_attributes = {
@@ -138,7 +137,6 @@ const osThreadAttr_t fw_up_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 osThreadId_t fw_up_thread_id = NULL;

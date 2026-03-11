@@ -35,7 +35,6 @@ component:
 - id: network_manager
 - id: basic_network_config_manager
 - id: bsd_socket
-- id: sl_si91x_basic_buffers
 - id: sl_power_manager
 - id: gpio_npss_component
 requires:
@@ -85,8 +84,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.1
+  version: 4.1.0
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.2
+  version: 2026.6.0

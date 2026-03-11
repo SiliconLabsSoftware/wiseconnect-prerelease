@@ -2,7 +2,7 @@
 - id: brd2708a
 - label: BRD2708A
 - package: platform_siwx91x
-- description: Board support for BRD2708A.
+- description: Board support for BRD2708A(SoC Module Explorer Kit).
 - category: Board|Radio Board
 - quality: production
 - metadata:

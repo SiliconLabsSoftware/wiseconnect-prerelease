@@ -85,17 +85,14 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 /*
   * @brief Application initialization function
-  * @param unused Pointer to the unused parameter
   * @return None
   */
-void app_init(const void *unused)
+void app_init(void)
 {
-  UNUSED_PARAMETER(unused);
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
 }
 /*

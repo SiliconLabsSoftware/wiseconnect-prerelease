@@ -38,7 +38,6 @@ const osThreadAttr_t button_thread_attributes = {
   .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 const osThreadAttr_t pwm_thread_attributes = {
   .name       = "pwm",
@@ -49,7 +48,6 @@ const osThreadAttr_t pwm_thread_attributes = {
   .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
   .priority   = osPriorityLow1,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 const osThreadAttr_t i2c_thread_attributes = {
   .name       = "i2c",
@@ -60,7 +58,6 @@ const osThreadAttr_t i2c_thread_attributes = {
   .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
   .priority   = osPriorityLow1,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 /*******************************************************************************
  * Initialize application.

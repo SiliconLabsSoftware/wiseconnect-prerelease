@@ -20,6 +20,12 @@ include_directories(
     ../../../../../service/bsd_socket/inc
     ../../../../../../sli_wifi/inc
     ../../../../../service/mdns/inc/
+    ../../../../../../sli_queue_manager/inc/
+    ../../../../../../sli_buffer_manager/inc/
+    ../../../../../../sli_routing_utility/inc/
+    ../../../../../../gsdk/service/mem_pool/inc
+    ../../../../../../sli_command_engine/inc
+    ../../../../../../sli_event_engine/inc
 )
 # Add source files for the test executable
 add_executable(${PROJECT_NAME}

@@ -26,6 +26,8 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
+#ifndef _SL_SI91X_SOCKET_UTILITY_H_
+#define _SL_SI91X_SOCKET_UTILITY_H_
 
 #pragma once
 
@@ -33,6 +35,7 @@
 #include "sl_si91x_socket_types.h"
 #include "sl_si91x_protocol_types.h"
 #include "sl_si91x_socket_constants.h"
+#include "sl_ip_types.h"
 #ifdef SLI_SI91X_NETWORK_DUAL_STACK
 #include "lwip/errno.h"
 #else
@@ -219,15 +222,17 @@ sl_status_t sl_si91x_config_socket(sl_si91x_socket_config_t socket_config);
 void sli_si91x_free_socket(int socket);
 
 /**
- * A internal function to get sl_si91x_socket structure based on socket FD sent
- * @param socket 
- * Socket FD whose structure is required.
- * @param index 
- * Socket FD index number.
- * @return 
- * sl_si91x_socket or NULL in case of invalid FD.
+ * An internal function to get the sl_si91x_socket structure based on the socket FD provided.
+ * @param socket Pointer to store the address of the found sl_si91x_socket structure.
+ * @param index Pointer to store the socket FD index number.
+ * @return
+ * sl_status_t indicating the result of the operation.
+ *         - SL_STATUS_OK if a free socket is found.
+ *         - SL_STATUS_NOT_FOUND if no free socket is available.
  */
-void sli_get_free_socket(sli_si91x_socket_t **socket, int *index);
+sl_status_t sli_get_free_socket(sli_si91x_socket_t **socket, int *index);
+
+void sli_si91x_send_tx_packet_status_handler(uint16_t packet_type, sl_status_t status, void *context);
 
 /**
  * A internal function to get free socket.
@@ -294,13 +299,6 @@ void sli_si91x_set_accept_callback(sli_si91x_socket_t *server_socket,
 
 void sli_si91x_set_remote_socket_termination_callback(sl_si91x_socket_remote_termination_callback_t callback);
 
-sl_status_t sli_si91x_send_socket_command(sli_si91x_socket_t *socket,
-                                          uint32_t command,
-                                          const void *data,
-                                          uint32_t data_length,
-                                          uint32_t wait_period,
-                                          sl_wifi_buffer_t **response_buffer);
-
 int sli_si91x_get_socket_id(sl_wifi_system_packet_t *packet);
 
 /**
@@ -352,6 +350,8 @@ void sl_si91x_set_extended_socket_cipherlist(uint32_t extended_cipher_list);
 
 /** @} */
 
+sli_si91x_socket_t *get_socket_from_packet(sl_wifi_system_packet_t *socket_packet);
+
 #ifdef __ZEPHYR__
 static inline void SL_SI91X_FD_CLR(unsigned int n, sl_si91x_fdset_t *p)
 {
@@ -373,3 +373,26 @@ static inline void SL_SI91X_FD_ZERO(sl_si91x_fdset_t *p)
   p->__fds_bits = 0;
 }
 #endif
+
+sl_status_t sli_si91x_socket_pre_tx_handler(sli_command_engine_t *instance, uint16_t packet_type, void *data);
+
+/**
+ * @brief Get the destination IP address from ap_disconnect_resp structure
+ * 
+ * This function extracts the destination IP address from a sli_si91x_ap_disconnect_resp_t structure.
+ * It supports IPv4, IPv6 link-local, and IPv6 global addresses. The function checks the flag
+ * bits to determine which addresses are available and returns the first available address
+ * in priority order: IPv4 > IPv6 Global > IPv6 Link-Local
+ * 
+ * @param ap_disconnect_resp Pointer to the ap_disconnect_resp structure
+ * @param dest_ip_address Pointer to sl_ip_address_t structure to store the destination IP address
+ * @return sl_status_t Status of the operation
+ *         - SL_STATUS_OK if the IP address was successfully retrieved
+ *         - SL_STATUS_NULL_POINTER if ap_disconnect_resp or dest_ip_address is NULL
+ *         - SL_STATUS_NOT_FOUND if no valid IP address is available
+ */
+sl_status_t sli_si91x_get_dest_ip_address_from_ap_client_disconnect_resp(
+  const sli_si91x_ap_disconnect_resp_t *ap_disconnect_resp,
+  sl_ip_address_t *dest_ip_address);
+
+#endif // _SL_SI91X_SOCKET_UTILITY_H_

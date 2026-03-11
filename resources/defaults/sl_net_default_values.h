@@ -128,7 +128,7 @@
         .rate_protocol = SL_WIFI_RATE_PROTOCOL_AUTO, \
         .options = 0, \
         .credential_id = SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID, \
-        .keepalive_type = SL_SI91X_AP_NULL_BASED_KEEP_ALIVE, \
+        .keepalive_type = SL_WIFI_AP_NULL_BASED_KEEP_ALIVE, \
         .beacon_interval = 100, \
         .client_idle_timeout = 0xFF, \
         .dtim_beacon_count = 3, \

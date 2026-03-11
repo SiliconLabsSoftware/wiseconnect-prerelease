@@ -475,7 +475,7 @@ sl_status_t sl_wifi_get_transmit_rate(sl_wifi_interface_t interface,
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
- *   By default listen interval is set 1000 millisecs. User can call this API to overwrite the value.
+ *   By default listen interval is set 1000 time units (TU), where 1 TU = 1024 microseconds. User can call this API to overwrite the value.
  * @note
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_set_listen_interval_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-radio-api#sl-wifi-set-listen-interval-v2) API. This is retained for backward compatibility.
  *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps()
@@ -496,7 +496,7 @@ sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface,
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
-*   By default listen interval is set 1000 millisecs and listen interval multiplier is set to 1. User can call this API to overwrite the values for listen interval and listen interval multiplier.
+*   By default listen interval is set 1000 time units (TU) and listen interval multiplier is set to 1, where 1 TU = 1024 microseconds. User can call this API to overwrite the values for listen interval and listen interval multiplier.
 *   Recommended max value for listen_interval_multiplier is 10. Higher value may cause interop issues. 
  *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps()
  ******************************************************************************/
@@ -515,7 +515,7 @@ sl_status_t sl_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wif
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
-*   By default, the listen interval is set to 1000 millisecs.
+*   By default, the listen interval is set to 1000 time units (TU), where 1 TU = 1024 microseconds.
  * @note
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_get_listen_interval_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-radio-api#sl-wifi-get-listen-interval-v2) API. This is retained for backward compatibility.
  ******************************************************************************/
@@ -535,7 +535,7 @@ sl_status_t sl_wifi_get_listen_interval(sl_wifi_interface_t interface,
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
- *  By default, the listen interval is set to 1000 millisecs and listen interval multiplier is set to 1.
+ *  By default, the listen interval is set to 1000 time units (TU) and listen interval multiplier is set to 1, where 1 TU = 1024 microseconds.
  ******************************************************************************/
 sl_status_t sl_wifi_get_listen_interval_v2(sl_wifi_interface_t interface,
                                            sl_wifi_listen_interval_v2_t *listen_interval);

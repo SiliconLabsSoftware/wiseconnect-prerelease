@@ -76,12 +76,11 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 volatile bool is_server_running = false;
-char WIFI_CLIENT_PROFILE_SSID[32]; // Assuming SSID can be up to 32 characters long
-char WIFI_CLIENT_CREDENTIAL[64];   // Assuming Password can be up to 64 characters long
+char WIFI_CLIENT_PROFILE_SSID[33]; // SSID is limited to 32 characters plus null terminator
+char WIFI_CLIENT_CREDENTIAL[64];   // Password is limited to 63 characters plus null terminator
 char WIFI_CLIENT_SECURITY_TYPE[32];
 
 static sl_net_wifi_ap_profile_t wifi_ap_profile = {

@@ -47,7 +47,6 @@ const osThreadAttr_t cpc_crypto_init_thread_attributes = {
   .stack_size = SL_SI91X_CPC_CRYPTO_INIT_TASK_STACK_SIZE, // Stack size of sl_si91x_cpc_crypto_init_task task
   .priority   = osPriorityHigh, //osPriorityLow,                            // Priority of Sensor task
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 static const sl_wifi_device_configuration_t client_configuration = {

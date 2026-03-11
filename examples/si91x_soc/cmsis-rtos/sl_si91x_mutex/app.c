@@ -32,7 +32,6 @@ const osThreadAttr_t led_on_thread_attributes = {
   .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 const osThreadAttr_t led_off_thread_attributes = {
   .name       = "led_off",
@@ -43,7 +42,6 @@ const osThreadAttr_t led_off_thread_attributes = {
   .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 /*******************************************************************************
  * Initialize application.

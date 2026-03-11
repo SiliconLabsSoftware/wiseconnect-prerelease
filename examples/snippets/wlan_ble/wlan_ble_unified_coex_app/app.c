@@ -208,7 +208,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t ui_thread_attributes = {
@@ -220,7 +219,6 @@ const osThreadAttr_t ui_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 const osThreadAttr_t ble_thread_attributes = {
   .name       = "ble_thread",
@@ -231,7 +229,6 @@ const osThreadAttr_t ble_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t wifi_thread_attributes = {
@@ -243,7 +240,6 @@ const osThreadAttr_t wifi_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 #if BTDM_DEBUG_LOGGING
@@ -256,7 +252,6 @@ const osThreadAttr_t bt_debug_logs_thread_attributes = {
   .stack_size = 1024,
   .priority   = osPriorityBelowNormal3,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 #endif
 

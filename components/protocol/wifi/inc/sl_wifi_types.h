@@ -321,7 +321,11 @@ typedef struct {
     trigger_level_change; ///< RSSI delta change threshold to trigger background scan for roaming. If the current RSSI value drops by this delta amount from the previous measurement, a background scan is triggered to find better APs for potential roaming.
   uint16_t active_channel_time;  ///< Time spent on each channel during active scan (milliseconds)
   uint16_t passive_channel_time; ///< Time spent on each channel during passive scan (milliseconds)
-  uint8_t enable_instant_scan;   ///< Flag to start advanced scan immediately
+  union {
+    uint8_t enable_instant_scan; ///< Flag to start advanced scan immediately
+    uint8_t
+      advanced_scan_bitmap; ///< Bitmap of advanced scan flags: BIT(0) - Enable Instant Scan, BIT(6) - Enable Non-periodic Scan, BIT(7) - Enable Extended Scan Results
+  };
   uint8_t
     enable_multi_probe; ///< Flag to send multiple probes to AP. If the value is set to 1, a probe request would be sent to all access points in addition to the connected SSID.
 } sl_wifi_advanced_scan_configuration_t;
@@ -343,7 +347,7 @@ typedef struct {
  * - SL_WIFI_WPA3                       - For WPA3 security mode
  *
  * @note client_idle_timeout - This is the period after which the AP will disconnect the station if there are no wireless exchanges from the station to the AP. The keep-alive period is calculated in terms of 32 multiples of the beacon interval (i.e, if there are no wireless transfers from station to AP within a
- * (32 x beacon_interval) milliseconds time period, the station will be disconnected).
+ * (32 x beacon_interval) time units (where 1 TU = 1024 microseconds) time period, the station will be disconnected).
  * If null data-based method is selected, the AP checks the connectivity of the station by sending null data packet. If the station does not acknowledge the packet, that station will be disconnected from the AP after 4 retries.
  * The maximum valid range supported is up to 255.
  */
@@ -358,7 +362,7 @@ typedef struct {
   sl_wifi_credential_id_t credential_id; ///< ID of secure credentials
   uint8_t
     keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-types#sl-si91x-ap-keepalive-type-t)
-  uint16_t beacon_interval;     ///< Beacon interval of the access point in milliseconds
+  uint16_t beacon_interval;     ///< Beacon interval of the access point in time units (1 TU = 1024 microseconds)
   uint32_t client_idle_timeout; ///< Period after which AP will disconnect the station
   uint16_t dtim_beacon_count;   ///< Number of beacons per DTIM
   uint8_t
@@ -733,24 +737,24 @@ typedef struct {
  * @struct sl_wifi_listen_interval_t
  * @brief Wi-Fi Listen interval structure.
  *
- * Specifies the Wi-Fi Listen interval in milliseconds.
+ * Specifies the Wi-Fi Listen interval in time units (1 TU = 1024 microseconds).
  * The listen interval is the time interval between two consecutive Target Beacon Transmission (TBTT) events.
  * Moving forward, this structure will be deprecated. Instead, use the [sl_wifi_listen_interval_v2_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-listen-interval-v2-t) structure. This is retained for backward compatibility.
  */
 typedef struct {
-  uint32_t listen_interval; ///< Wi-Fi Listen interval in millisecs
+  uint32_t listen_interval; ///< Wi-Fi Listen interval in time units (1 TU = 1024 microseconds)
 } sl_wifi_listen_interval_t;
 
 /**
  * @struct sl_wifi_listen_interval_v2_t
  * @brief Wi-Fi Listen interval structure.
  *
- * Specifies the Wi-Fi Listen interval in milliseconds and listen interval multiplier.
+ * Specifies the Wi-Fi Listen interval in time units (1 TU = 1024 microseconds) and listen interval multiplier.
  * The listen interval is the time interval between two consecutive Target Beacon Transmission (TBTT) events.
  * The listen interval is multiplied with listen interval multiplier and advertised in the assoc request.
  */
 typedef struct {
-  uint32_t listen_interval; ///< Wi-Fi Listen interval in millisecs
+  uint32_t listen_interval; ///< Wi-Fi Listen interval in time units (1 TU = 1024 microseconds)
   uint32_t
     listen_interval_multiplier; ///< Multiplier for the listen interval, sent by the device in the association request to the AP. Default: 1. Max recommended: 10. Higher values may lead to interoperability issues.
 } sl_wifi_listen_interval_v2_t;
@@ -819,11 +823,16 @@ typedef struct {
  *
  * This enumeration defines the modes for Management Frame Protection (MFP) in Wi-Fi.
  * MFP is used to protect management frames from spoofing and other attacks.
+ *
+ * The MFP setting persists across reconnect/rejoin operations at the NWP level.
+ *
  * The modes are:
- * - SL_WIFI_MFP_DISABLED: MFP is disabled (0b00)
- * - SL_WIFI_MFP_CAPABLE: MFP is capable/optional (0b01)
- * - SL_WIFI_MFP_REQUIRED: MFP is required/mandatory (0b10)
+ * - SL_WIFI_MFP_DISABLED: MFP is disabled (0b00). No management frame protection is used.
+ * - SL_WIFI_MFP_CAPABLE: MFP is capable/optional (0b01). If the AP does not support MFP, the connection will still be established without MFP.
+ * - SL_WIFI_MFP_REQUIRED: MFP is required/mandatory (0b10). If the AP does not support MFP, the connection will fail.
  * 
+ * Supported Management Frames: All management frames as per IEEE 802.11w standard are supported, except for BIP (Broadcast Integrity Protocol).
+ *
  */
 typedef enum {
   SL_WIFI_MFP_DISABLED = 0, ///< MFP disabled (0b00)

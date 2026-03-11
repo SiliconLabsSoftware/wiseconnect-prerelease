@@ -164,10 +164,10 @@ The application can be configured to suit your requirements and development envi
       #define RSI_BLE_MAX_DATA_LEN                             20
       ```
 
-   - `RSI_BLE_APP_DEVICE_NAME` refers to the name of the SiWx91x EVK to appear during scanning by remote devices.
+   - `RSI_BLE_DEVICE_NAME` refers to the name of the SiWx91x EVK to appear during scanning by remote devices.
 
       ```c
-      #define  RSI_BLE_APP_DEVICE_NAME                         "WLAN_BLE_APP"
+      #define  RSI_BLE_DEVICE_NAME                         "BLE_THROUGHPUT_APP"
       ```
 
    The following are the **non-configurable** macros in the application.

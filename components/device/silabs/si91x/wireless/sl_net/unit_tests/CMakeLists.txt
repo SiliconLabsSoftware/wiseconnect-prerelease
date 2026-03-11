@@ -21,6 +21,14 @@ include_directories(./inc
                     ../../../../../../sli_wifi/inc
                     ../../../../../../sli_wifi_per_mode/inc
                     ../../../../../../service/mdns/inc/
+                    ../../../../../../sli_queue_manager/inc/
+                    ../../../../../../sli_buffer_manager/inc/
+                    ../../../../../../sli_routing_utility/inc/
+                    ../../../../../../gsdk/service/mem_pool/inc
+                    ../../../../../../sli_command_engine/inc
+                    ../../../../../../sli_event_engine/inc
+                    ../../sli_hal_si91x/inc
+                    ../../../../../../sli_wifi_command_engine/inc
 )
 # Add unit test cpp here
 add_executable(${PROJECT_NAME}

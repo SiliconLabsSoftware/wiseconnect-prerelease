@@ -59,6 +59,7 @@ provides:
 - name: device_no_antenna
 - name: device_supports_external_psram
 requires:
+- name: sl_si91x_agents_md
 - name: rsilib_chip
 - name: cmsis_common
   condition:

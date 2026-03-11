@@ -59,7 +59,6 @@ const osThreadAttr_t thread_attributes_0 = {
   .stack_size = 3072,
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t thread_attributes_1 = {
@@ -71,7 +70,6 @@ const osThreadAttr_t thread_attributes_1 = {
   .stack_size = 3072,
   .priority   = osPriorityLow4,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t thread_attributes_2 = {
@@ -83,7 +81,6 @@ const osThreadAttr_t thread_attributes_2 = {
   .stack_size = 3072,
   .priority   = osPriorityLow4,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const osThreadAttr_t thread_attributes_2_same_acc = {
@@ -95,7 +92,6 @@ const osThreadAttr_t thread_attributes_2_same_acc = {
   .stack_size = 3072,
   .priority   = osPriorityLow4,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 static const sl_wifi_device_configuration_t client_configuration = {

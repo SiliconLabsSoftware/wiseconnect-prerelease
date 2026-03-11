@@ -90,7 +90,6 @@ const osThreadAttr_t thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 const sl_wifi_data_rate_t rate              = SL_WIFI_DATA_RATE_1;

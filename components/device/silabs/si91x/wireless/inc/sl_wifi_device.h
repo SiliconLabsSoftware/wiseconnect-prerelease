@@ -490,42 +490,94 @@
 /** \addtogroup WIFI_CALIBRATION_FLAGS
     * @{ */
 /**
-   * @def SL_WIFI_BURN_GAIN_OFFSET
-   * @brief Burn gain offset into the device.
-   *
-   * @details
-   * This macro defines the bit for burning the gain offset into the device.
-   */
+ * @note Bit positions 0 and 7 are reserved. Bit positions 11-31 are reserved.
+ */
+
+/**
+ * @def SL_WIFI_BURN_GAIN_OFFSET
+ * @brief Burn gain offset into the device.
+ * 
+ * @note The macro SL_WIFI_BURN_GAIN_OFFSET is being deprecated and will be removed in future releases. Use SL_WIFI_BURN_GAIN_OFFSET_LOW, SL_WIFI_BURN_GAIN_OFFSET_MID, or SL_WIFI_BURN_GAIN_OFFSET_HIGH instead.
+ */
 #define SL_WIFI_BURN_GAIN_OFFSET BIT(0)
 
 /**
-   * @def SL_WIFI_BURN_FREQ_OFFSET
-   * @brief Burn frequency offset into the device.
-   *
-   * @details
-   * This macro defines the bit for burning the frequency offset into the device.
-   */
+ * @def SL_WIFI_BURN_FREQ_OFFSET
+ * @brief Update XO Ctune to calibration data.
+ *
+ * @details
+ * This macro defines the bit for burning the frequency offset into the device.
+ *  - 1 - Update XO Ctune to calibration data
+ *  - 0 - Skip XO Ctune update
+ */
 #define SL_WIFI_BURN_FREQ_OFFSET BIT(1)
 
 /**
-   * @def SL_WIFI_SW_XO_CTUNE_VALID
-   * @brief Indicates if the software XO CTUNE is valid.
-   *
-   * @details
-   * This macro defines the bit to indicate that the software XO CTUNE (crystal tuning) value is valid.
-   */
+ * @def SL_WIFI_SW_XO_CTUNE_VALID
+ * @brief Use XO Ctune provided as argument to update calibration data.
+ *
+ * @details
+ * This macro defines the bit to indicate that the software XO CTUNE (crystal tuning) value is valid.
+ *  - 1 - Use XO Ctune provided as argument to update calibration data
+ *  - 0 - Use XO Ctune value as read from hardware register
+ */
 #define SL_WIFI_SW_XO_CTUNE_VALID BIT(2)
 
 /**
-   * @def SL_WIFI_BURN_XO_FAST_DISABLE
-   * @brief Burn bit to disable XO fast into the device.
-   *
-   * @details
-   * This macro defines the bit for burning a setting to disable the fast XO (crystal oscillator) into the device.
-   * 
-   * @note Not applicable for SiWx91x.
-   */
+ * @def SL_WIFI_BURN_XO_FAST_DISABLE
+ * @brief Apply patch for cold temperature issue on CC0/CC1 modules.
+ *
+ * @details
+ * This macro defines the bit used to apply patch for cold temperature issue
+ * (host interface detection) observed on CC0/CC1 modules.
+ *
+ * @note Not applicable for SiWx91x.
+ */
 #define SL_WIFI_BURN_XO_FAST_DISABLE BIT(3)
+
+/**
+ * @def SL_WIFI_BURN_GAIN_OFFSET_LOW
+ * @brief Update gain offset for low sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for low sub-band into the device.
+ *  - 1 - Update gain offset for low sub-band (2 GHz, channel 1)
+ *  - 0 - Skip low sub-band gain-offset update
+ */
+#define SL_WIFI_BURN_GAIN_OFFSET_LOW BIT(4)
+
+/**
+ * @def SL_WIFI_BURN_GAIN_OFFSET_MID
+ * @brief Update gain offset for mid sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for mid sub-band into the device.
+ *  - 1 - Update gain offset for mid sub-band (2 GHz, channel 6)
+ *  - 0 - Skip mid sub-band gain-offset update
+ */
+#define SL_WIFI_BURN_GAIN_OFFSET_MID BIT(5)
+
+/**
+ * @def SL_WIFI_BURN_GAIN_OFFSET_HIGH
+ * @brief Update gain offset for high sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for high sub-band into the device.
+ *  - 1 - Update gain offset for high sub-band (2 GHz, channel 11)
+ *  - 0 - Skip high sub-band gain-offset update
+ */
+#define SL_WIFI_BURN_GAIN_OFFSET_HIGH BIT(6)
+
+/**
+ * @def SL_WIFI_BURN_GAIN_OFFSET_CHANNEL_14
+ * @brief Update gain offset for channel-14 sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for channel-14 into the device.
+ *  - 1 - Update gain offset for channel-14 sub-band (2 GHz)
+ *  - 0 - Skip channel-14 sub-band gain-offset update
+ */
+#define SL_WIFI_BURN_GAIN_OFFSET_CHANNEL_14 BIT(10)
 
 /** @} */
 
@@ -1762,8 +1814,22 @@
  * @details
  * This feature enables Network Address Translation (NAT) support, allowing
  * stations connected to SiWx91x to access the internet through a third-party AP.
+ * 
+ * @note Bits 22-27 are reserved.
  */
 #define SL_SI91X_EXT_TCP_NAT_SUPPORT BIT(21)
+
+/**
+ * @def SL_SI91X_EXT_TCP_IP_FEAT_SSL_HEAP_SIZE
+ * @brief Enable additional memory for SSL/TLS connections.
+ * @details
+ * This feature allocates additional memory for SSL/TLS connections,
+ * typically required when experiencing memory-related issues with cloud server connections.
+ * 
+ * @note Enable this bit to avoid 0xD2 errors related to insufficient memory during SSL/TLS operations.
+ * @note Applicable ONLY to SiWx91x chipset
+ */
+#define SL_SI91X_EXT_TCP_IP_FEAT_SSL_HEAP_SIZE BIT(28)
 
 /**
  * @def SL_SI91X_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS
@@ -1773,7 +1839,6 @@
  * SSL/TLS connections.
  * 
  * @note Set tcp_ip_feature_bit_map[31] and ext_tcp_ip_feature_bit_map[29] to open three TLS sockets.
- * @note Bits 21-28 are reserved.
  */
 #define SL_SI91X_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS BIT(29)
 
@@ -2490,42 +2555,94 @@ typedef enum {
 /** \addtogroup SI91X_CALIBRATION_FLAGS
   * @{ */
 /**
+ * @note Bit positions 0 and 7 are reserved. Bit positions 11-31 are reserved.
+ */
+
+/**
  * @def SL_SI91X_BURN_GAIN_OFFSET
  * @brief Burn gain offset into the device.
- *
- * @details
- * This macro defines the bit for burning the gain offset into the device.
+ * 
+ * @note The macro SL_SI91X_BURN_GAIN_OFFSET is being deprecated and will be removed in future releases. Use SL_SI91X_BURN_GAIN_OFFSET_LOW, SL_SI91X_BURN_GAIN_OFFSET_MID, or SL_SI91X_BURN_GAIN_OFFSET_HIGH instead.
  */
 #define SL_SI91X_BURN_GAIN_OFFSET SL_WIFI_BURN_GAIN_OFFSET
 
 /**
  * @def SL_SI91X_BURN_FREQ_OFFSET
- * @brief Burn frequency offset into the device.
+ * @brief Update XO Ctune to calibration data.
  *
  * @details
  * This macro defines the bit for burning the frequency offset into the device.
+ *  - 1 - Update XO Ctune to calibration data
+ *  - 0 - Skip XO Ctune update
  */
 #define SL_SI91X_BURN_FREQ_OFFSET SL_WIFI_BURN_FREQ_OFFSET
 
 /**
  * @def SL_SI91X_SW_XO_CTUNE_VALID
- * @brief Indicates if the software XO CTUNE is valid.
+ * @brief Use XO Ctune provided as argument to update calibration data.
  *
  * @details
  * This macro defines the bit to indicate that the software XO CTUNE (crystal tuning) value is valid.
+ *  - 1 - Use XO Ctune provided as argument to update calibration data
+ *  - 0 - Use XO Ctune value as read from hardware register
  */
 #define SL_SI91X_SW_XO_CTUNE_VALID SL_WIFI_SW_XO_CTUNE_VALID
 
 /**
  * @def SL_SI91X_BURN_XO_FAST_DISABLE
- * @brief Burn bit to disable XO fast into the device.
+ * @brief Apply patch for cold temperature issue on CC0/CC1 modules.
  *
  * @details
- * This macro defines the bit for burning a setting to disable the fast XO (crystal oscillator) into the device.
- * 
+ * This macro defines the bit used to apply patch for cold temperature issue
+ * (host interface detection) observed on CC0/CC1 modules.
+ *
  * @note Not applicable for SiWx91x.
  */
 #define SL_SI91X_BURN_XO_FAST_DISABLE SL_WIFI_BURN_XO_FAST_DISABLE
+
+/**
+ * @def SL_SI91X_BURN_GAIN_OFFSET_LOW
+ * @brief Update gain offset for low sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for low sub-band into the device.
+ *  - 1 - Update gain offset for low sub-band (2 GHz, channel 1)
+ *  - 0 - Skip low sub-band gain-offset update
+ */
+#define SL_SI91X_BURN_GAIN_OFFSET_LOW SL_WIFI_BURN_GAIN_OFFSET_LOW
+
+/**
+ * @def SL_SI91X_BURN_GAIN_OFFSET_MID
+ * @brief Update gain offset for mid sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for mid sub-band into the device.
+ *  - 1 - Update gain offset for mid sub-band (2 GHz, channel 6)
+ *  - 0 - Skip mid sub-band gain-offset update
+ */
+#define SL_SI91X_BURN_GAIN_OFFSET_MID SL_WIFI_BURN_GAIN_OFFSET_MID
+
+/**
+ * @def SL_SI91X_BURN_GAIN_OFFSET_HIGH
+ * @brief Update gain offset for high sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for high sub-band into the device.
+ *  - 1 - Update gain offset for high sub-band (2 GHz, channel 11)
+ *  - 0 - Skip high sub-band gain-offset update
+ */
+#define SL_SI91X_BURN_GAIN_OFFSET_HIGH SL_WIFI_BURN_GAIN_OFFSET_HIGH
+
+/**
+ * @def SL_SI91X_BURN_GAIN_OFFSET_CHANNEL_14
+ * @brief Update gain offset for channel-14 sub-band (2 GHz).
+ *
+ * @details
+ * This macro defines the bit used to burn gain offset for channel-14 into the device.
+ *  - 1 - Update gain offset for channel-14 sub-band (2 GHz)
+ *  - 0 - Skip channel-14 sub-band gain-offset update
+ */
+#define SL_SI91X_BURN_GAIN_OFFSET_CHANNEL_14 SL_WIFI_BURN_GAIN_OFFSET_CHANNEL_14
 
 /** @} */
 
@@ -2624,7 +2741,7 @@ typedef struct {
     profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
   uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
   uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint16_t listen_interval;  ///< Listen interval in milliseconds.
+  uint16_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
   uint16_t
     monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
   sl_wifi_twt_request_t twt_request;     ///< Target Wake Time (TWT) request settings.
@@ -2637,7 +2754,7 @@ typedef struct {
     profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
   uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
   uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint32_t listen_interval;  ///< Listen interval in milliseconds.
+  uint32_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
   uint16_t
     monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
   sl_wifi_twt_request_t twt_request;     ///< Target Wake Time (TWT) request settings.

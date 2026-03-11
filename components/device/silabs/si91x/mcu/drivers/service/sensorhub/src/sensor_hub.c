@@ -336,7 +336,6 @@ const osThreadAttr_t sensor_thread_attributes = {
   .stack_size = SL_SH_SENSOR_TASK_STACK_SIZE, //< Stack size of sensor task
   .priority   = osPriorityLow1,               //< Priority of Sensor task
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 /*******************************************************************************
@@ -351,7 +350,6 @@ const osThreadAttr_t EM_thread_attributes = {
   .stack_size = SL_SH_EM_TASK_STACK_SIZE, //< Stack size of EM task
   .priority   = osPriorityLow2,           //< Priority of EM task
   .tz_module  = 0,
-  .reserved   = 0,
 };
 
 /**************************************************************************/ /**

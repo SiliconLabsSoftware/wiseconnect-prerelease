@@ -395,6 +395,7 @@ typedef enum {
 #define SLI_RTS_THRESHOLD 2346
 #endif
 
+#define SLI_SEND_SOCKET_DATA                 0x0
 #define SLI_SEND_RAW_DATA                    0x1
 #define SLI_RECEIVE_RAW_DATA                 0x0
 #define SLI_NET_DUAL_STACK_RX_RAW_DATA_FRAME 0x1 // Rx data frame type in network dual stack mode

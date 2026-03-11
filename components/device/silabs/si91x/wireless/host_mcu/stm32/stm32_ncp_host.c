@@ -164,10 +164,15 @@ void sl_si91x_host_release_from_reset(void)
   HAL_GPIO_WritePin(RESET_PIN_GPIO_Port, RESET_PIN_Pin, GPIO_PIN_SET);
 }
 
+static sl_si91x_host_init_configuration_t bus_config = { 0 };
+
 sl_status_t sl_si91x_host_init(const sl_si91x_host_init_configuration_t *config)
 {
-  UNUSED_PARAMETER(config);
   uint32_t status = 0;
+
+  bus_config.rx_irq      = config->rx_irq;
+  bus_config.rx_done     = config->rx_done;
+  bus_config.boot_option = config->boot_option;
 
   //! Initialize the host platform GPIOs
   sli_mx_gpio_init();
@@ -283,7 +288,11 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 void gpio_interrupt(void)
 {
   // Trigger SiWx91x BUS Event
-  sli_wifi_set_event(SL_SI91X_NCP_HOST_BUS_RX_EVENT);
+  if (NULL != bus_config.rx_irq) {
+    bus_config.rx_irq();
+  }
+
+  return;
 }
 bool sl_si91x_host_is_in_irq_context(void)
 {

@@ -58,6 +58,7 @@ provides:
 - name: device_is_module
 - name: device_no_antenna
 requires:
+- name: sl_si91x_agents_md
 - name: rsilib_chip
 - name: cmsis_common
   condition:

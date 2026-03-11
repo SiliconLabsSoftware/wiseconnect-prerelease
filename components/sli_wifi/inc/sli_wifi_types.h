@@ -31,6 +31,8 @@
 #define SLI_WIFI_TYPES_H
 #include "sl_wifi_device.h"
 #include "sl_wifi_constants.h"
+#include "sli_queue_manager.h"
+#include "cmsis_os2.h"
 
 #define SLI_WIFI_PSK_LEN                 64
 #define SLI_WIFI_SSID_LEN                34
@@ -260,7 +262,7 @@ typedef struct {
   /// password in case of security mode
   uint8_t psk[SLI_WIFI_MAX_PMK_LENGTH];
 
-  /// Beacon interval of the access point in milliseconds. Allowed values are integers in the range of 100 to 1000 in multiples of 100.
+  /// Beacon interval of the access point in time units (1 TU = 1024 microseconds). Allowed values are integers in the range of 100 to 1000 in multiples of 100.
   uint16_t beacon_interval;
 
   /// DTIM period of the access point
@@ -404,24 +406,9 @@ typedef struct {
 
 /// Structure to represent a command queue
 typedef struct {
-  sli_wifi_buffer_queue_t tx_queue;    ///< TX queue
-  sli_wifi_buffer_queue_t rx_queue;    ///< RX queue
-  sli_wifi_buffer_queue_t event_queue; ///< Event queue
-  void *mutex;                         ///< Pointer to mutex
-  uint32_t flag;                       ///< Flags
-  bool sequential;                     ///< Indicates if the commands are sequential
-  bool command_in_flight;              ///< Indicates if a command is currently being processed
-  uint16_t frame_type;                 ///< Type of the frame associated with the command
-  uint8_t firmware_queue_id;           ///< ID of the firmware queue for the command
-  uint32_t rx_counter;                 ///< Counter for received packets
-  uint32_t tx_counter;                 ///< Counter for transmitted packets
-  uint16_t packet_id;                  ///< ID of the packet associated with the command
-  uint8_t flags;                       ///< Flags associated with the command
-  uint32_t command_tickcount;          ///< Command tick count
-  uint32_t command_timeout;            ///< Command timeout
-  void *sdk_context;                   ///< Context data associated with the command
-  bool is_queue_initialized;           ///< indicates queue is initialiazed or not.
-  uint32_t event_mask;                 ///< Bitmask to notify handler threads when a packet is added to the rx_queue.
+  osEventFlagsId_t event_flags; ///< Event flags for synchronization
+  sli_queue_t rx_queue;         ///< RX queue
+  uint32_t flag;                ///< Flags
 } sli_wifi_command_queue_t;
 
 // Scan Information
@@ -560,4 +547,4 @@ typedef struct {
   uint16_t ie_buffer_length;  ///< Length of the IE buffer (must be < SLI_MAX_VENDOR_IE_BUFFER_LENGTH)
   uint8_t ie_buffer[];        ///< Flexible array for raw IE buffer
 } sli_wifi_manage_vendor_ie_packet_t;
-#endif
+#endif // SLI_WIFI_TYPES_H

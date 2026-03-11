@@ -224,6 +224,7 @@ int32_t rsi_send_pkt_to_ta(rsi_m4ta_desc_t *tx_desc);
 void rsi_transfer_to_ta_done_isr(void);
 void rsi_pkt_pending_from_ta_isr(void);
 sl_status_t sli_receive_from_ta_done_isr(void);
+sl_status_t sli_receive_tx_buffer_available_isr(void);
 int16_t rsi_device_buffer_full_status(void);
 int rsi_submit_rx_pkt(void);
 void unmask_ta_interrupt(uint32_t interrupt_no);

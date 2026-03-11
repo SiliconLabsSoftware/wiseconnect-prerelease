@@ -56,7 +56,6 @@ const osThreadAttr_t wdt_thread_attributes = {
   .stack_size = SL_WDT_TASK_STACK_SIZE, // Stack size of WDT task
   .priority   = osPriorityHigh7,        // Priority of WDT task
   .tz_module  = 0,
-  .reserved   = 0,
 };
 #endif //SLI_SI91X_ENABLE_OS
 

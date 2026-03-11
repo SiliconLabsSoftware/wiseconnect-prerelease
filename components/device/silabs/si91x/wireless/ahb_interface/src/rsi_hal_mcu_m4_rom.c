@@ -27,6 +27,8 @@
  *
  ******************************************************************************/
 #include "sli_wifi_utility.h"
+#include "sli_hal_si91x.h"
+#include "sli_hal_si91x_constants.h"
 #include "sl_si91x_types.h"
 #include "sl_constants.h"
 #include "sl_status.h"
@@ -277,7 +279,8 @@ sl_status_t sli_m4_interrupt_isr(void)
 
     mask_ta_interrupt(TA_RSI_BUFFER_FULL_CLEAR_EVENT);
 
-    sli_wifi_set_event(SL_SI91X_TA_BUFFER_FULL_CLEAR_EVENT);
+    sl_status_t status = sli_receive_tx_buffer_available_isr();
+    VERIFY_STATUS_AND_RETURN(status);
 
     // Clear the interrupt
     clear_ta_to_m4_interrupt(TA_RSI_BUFFER_FULL_CLEAR_EVENT);
@@ -320,22 +323,22 @@ sl_status_t sli_m4_interrupt_isr(void)
 /**
  * @fn           sl_status_t sli_receive_from_ta_done_isr(void)
  * @brief        Called when DMA done for RX packet is received
- * @param[in]    global_cb_p - pointer to the global control block
- * @return       void
+ * @param[in]    void
+ * @return       sl_status_t : returns the status of interrupt handling
  */
-sl_status_t sli_receive_from_ta_done_isr(void)
+__WEAK sl_status_t sli_receive_from_ta_done_isr(void)
 {
-#ifdef SL_WIFI_COMPONENT_INCLUDED
-  extern sl_wifi_buffer_t *rx_pkt_buffer;
-  extern sli_wifi_buffer_queue_t sli_ahb_bus_rx_queue;
-  // Add to rx packet to CCP queue
-  sl_status_t status = sli_si91x_add_to_queue(&sli_ahb_bus_rx_queue, rx_pkt_buffer);
-  VERIFY_STATUS_AND_RETURN(status);
+  return SL_STATUS_OK;
+}
 
-  //! Set event RX pending event to host
-  sli_wifi_set_event(SL_SI91X_NCP_HOST_BUS_RX_EVENT);
-#endif
-
+/**
+ * @fn           sl_status_t sli_receive_tx_buffer_available_isr(void)
+ * @brief        Called when TX Buffers are free to receive data
+ * @param[in]    void
+ * @return       sl_status_t : returns the status of interrupt handling
+ */
+__WEAK sl_status_t sli_receive_tx_buffer_available_isr(void)
+{
   return SL_STATUS_OK;
 }
 

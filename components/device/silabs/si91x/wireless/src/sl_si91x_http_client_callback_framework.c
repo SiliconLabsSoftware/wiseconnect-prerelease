@@ -95,13 +95,13 @@ static sl_status_t sl_si91x_http_client_put_delete(void)
   request->command_type = SLI_SI91X_HTTP_CLIENT_PUT_DELETE;
   uint16_t packet_len   = sizeof(sl_si91x_http_client_put_request_t) - SLI_SI91X_HTTP_CLIENT_PUT_MAX_BUFFER_LENGTH;
 
-  status = sli_si91x_driver_send_command(SLI_WLAN_REQ_HTTP_CLIENT_PUT,
-                                         SLI_SI91X_NETWORK_CMD,
-                                         request,
-                                         packet_len,
-                                         SLI_WLAN_RSP_HTTP_CLIENT_PUT_WAIT_TIME,
-                                         NULL,
-                                         NULL);
+  status = sli_wifi_send_command(SLI_WLAN_REQ_HTTP_CLIENT_PUT,
+                                 SLI_SI91X_NETWORK_CMD,
+                                 request,
+                                 packet_len,
+                                 SLI_WLAN_RSP_HTTP_CLIENT_PUT_WAIT_TIME,
+                                 NULL,
+                                 NULL);
   // Free the memory allocated
   free(request);
 

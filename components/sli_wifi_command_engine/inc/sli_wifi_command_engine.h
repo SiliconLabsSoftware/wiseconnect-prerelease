@@ -27,35 +27,26 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-
 #ifndef SLI_WIFI_COMMAND_ENGINE_H
 #define SLI_WIFI_COMMAND_ENGINE_H
-#include "sl_status.h"
+
 #include <stdint.h>
 
-/**
- * @brief Defines the thread priority for the WLAN command engine.
- *
- * This macro sets the priority level for the WLAN command engine thread.
- * The default value is set to `osPriorityRealtime`, which is a real-time priority level.
- *
- * @note
- * - The priority level of this thread should be second highest after @ref SL_WLAN_EVENT_THREAD_PRIORITY among all the threads in the system.
- */
-#ifndef SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY
-#define SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY osPriorityRealtime
-#endif
+#include "sl_status.h"
+#include "sli_command_engine.h"
+#include "sli_event_engine.h"
+#include "sli_wifi_command_engine_config.h"
 
 /**
  * @brief
  *  This function initializes the command engine and creates a thread to receive the TX and RX events.
  */
-void sli_wifi_command_engine_init(void);
+sl_status_t sli_wifi_command_engine_init(void);
 
 /**
  * @brief
  *   This function deinitialize the command engine and terminates the thread.
  */
-void sli_wifi_command_engine_deinit(void);
+sl_status_t sli_wifi_command_engine_deinit(void);
 
 #endif

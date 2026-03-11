@@ -87,17 +87,17 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
 
   send_size = sizeof(sli_si91x_sha_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES + chunk_len;
 
-  status = sli_si91x_driver_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-                                         SLI_WIFI_COMMON_CMD,
-                                         request,
-                                         send_size,
-                                         SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-                                         NULL,
-                                         &buffer);
+  status = sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
+                                 SLI_WIFI_COMMON_CMD,
+                                 request,
+                                 send_size,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
+                                 NULL,
+                                 (void **)&buffer);
   if (status != SL_STATUS_OK) {
     free(request);
     if (buffer != NULL)
-      sli_si91x_host_free_buffer(buffer);
+      sli_buffer_manager_free_buffer(buffer);
   }
   VERIFY_STATUS_AND_RETURN(status);
 
@@ -110,7 +110,7 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
 
   free(request);
   if (buffer != NULL)
-    sli_si91x_host_free_buffer(buffer);
+    sli_buffer_manager_free_buffer(buffer);
 
   return status;
 }

@@ -33,6 +33,10 @@ template_contribution:
         handler: net_down_command_handler
         arguments:
           - "uint8"
+      net-info:
+        handler: net_info_command_handler
+        arguments:
+          - "uint8"   # interface
       net-ping:
         handler: sl_net_ping_command_handler
         arguments:

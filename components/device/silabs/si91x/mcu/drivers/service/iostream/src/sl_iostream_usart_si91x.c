@@ -147,6 +147,11 @@ sl_status_t sl_iostream_usart_init(sl_iostream_uart_t *iostream_uart,
 {
   sl_status_t status;
 
+  // Validate config parameter (NULL check - fixes crash with LTO)
+  if (config == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
   status = sli_iostream_uart_context_init(iostream_uart,
                                           &usart_context->context,
                                           uart_config,

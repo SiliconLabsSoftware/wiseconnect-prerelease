@@ -60,7 +60,6 @@ const osThreadAttr_t test_thread_attributes = {
   .stack_size = 3072,
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 /*******************************************************************************
  ************************  Test Function Prototypes  ****************************

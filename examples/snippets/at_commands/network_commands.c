@@ -528,6 +528,75 @@ sl_status_t net_configure_ip_command_handler(console_args_t *arguments)
   return SL_STATUS_OK;
 }
 
+// at+net-info=<interface>
+sl_status_t net_info_command_handler(console_args_t *arguments)
+{
+  CHECK_ARGUMENT_BITMAP(arguments, 0x01);
+
+  if (!sl_si91x_is_device_initialized()) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  sl_net_interface_info_t info;
+  sl_net_interface_t interface =
+    GET_OPTIONAL_COMMAND_ARG(arguments, 0, SL_NET_WIFI_CLIENT_INTERFACE, sl_net_interface_t);
+
+  sl_status_t status = sl_net_get_interface_info(interface, &info);
+  VERIFY_STATUS_AND_RETURN(status);
+
+  char temp_buffer[46] = { 0 };
+  sl_inet_ntop6((const unsigned char *)(&info.ipv6_address), (char *)temp_buffer, sizeof(temp_buffer));
+
+  PRINT_AT_CMD_SUCCESS;
+
+  // <ipv4-address> <ipv6-address> <wlan-state> <channel-number> <ssid>
+  // <sec-type> <psk-pmk> <bssid> <wireless-mode> <mac-address>
+
+  // Print IPv4 address
+  AT_PRINTF("%d.%d.%d.%d ",
+            info.ipv4_address.bytes[0],
+            info.ipv4_address.bytes[1],
+            info.ipv4_address.bytes[2],
+            info.ipv4_address.bytes[3]);
+
+  // Print IPv6 address
+  AT_PRINTF("%s ", temp_buffer);
+
+  // Print WLAN state and channel number
+  AT_PRINTF("%d %d ", info.hw_info.wifi_info.wlan_state, info.hw_info.wifi_info.channel_number);
+
+  // Print SSID, security type
+  AT_PRINTF("%s %d ", info.hw_info.wifi_info.ssid, info.hw_info.wifi_info.sec_type);
+
+  // Print PSK/PMK
+  for (uint8_t i = 0; i < SL_WIFI_MAX_PSK_LENGTH; ++i) {
+    AT_PRINTF("%02X", info.hw_info.wifi_info.psk_pmk[i]);
+  }
+
+  // Print BSSID
+  AT_PRINTF(" %02X:%02X:%02X:%02X:%02X:%02X ",
+            info.hw_info.wifi_info.bssid[0],
+            info.hw_info.wifi_info.bssid[1],
+            info.hw_info.wifi_info.bssid[2],
+            info.hw_info.wifi_info.bssid[3],
+            info.hw_info.wifi_info.bssid[4],
+            info.hw_info.wifi_info.bssid[5]);
+
+  // Print wireless mode
+  AT_PRINTF("%d ", info.hw_info.wifi_info.wireless_mode);
+
+  // Print MAC address
+  AT_PRINTF("%02X:%02X:%02X:%02X:%02X:%02X\r\n",
+            info.hw_info.wifi_info.mac_address[0],
+            info.hw_info.wifi_info.mac_address[1],
+            info.hw_info.wifi_info.mac_address[2],
+            info.hw_info.wifi_info.mac_address[3],
+            info.hw_info.wifi_info.mac_address[4],
+            info.hw_info.wifi_info.mac_address[5]);
+
+  return SL_STATUS_OK;
+}
+
 static sl_status_t convert_string_to_sl_ipv6_address(char *line, uint16_t *ipv6)
 {
   uint8_t double_colon = 0xFF;

@@ -40,7 +40,6 @@ component:
 - id: psram_aps6404l_sqh
 - id: text_segment_in_psram
 - id: data_segment_in_psram
-- id: sl_si91x_basic_buffers
 requires:
 - name: device_needs_ram_execution
   condition:
@@ -74,8 +73,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.0.1
+  version: 4.1.0
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2025.12.2
+  version: 2026.6.0

@@ -1,7 +1,7 @@
 id: wiseconnect3_sdk
 label: Wiseconnect
 description: WiSeConnect extension for the Simplicity SDK (formerly Gecko SDK)
-version: 4.0.1
+version: 4.1.0
 component_path:
  - path: components/at_commands_auto_gen
  - path: components/common
@@ -47,9 +47,10 @@ component_path:
  - path: components/sli_event_engine/component
  - path: components/sli_queue_manager
  - path: components/sli_routing_utility
- - path: components/sli_si91x_wifi_event_handler
+ - path: components/device/silabs/si91x/wireless/sli_si91x_wifi_event_handler/component
  - path: components/sli_wifi
- - path: components/sli_wifi_command_engine
+ - path: components/sli_wifi_command_engine/component
+ - path: components/device/silabs/si91x/wireless/sli_hal_si91x/component
  - path: components/sli_wifi_per_mode
  - path: components/sli_wlan_command_engine/component
  - path: resources
@@ -103,17 +104,18 @@ component_path:
  - path: components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/component
  - path: components/device/silabs/si91x/mcu/hal/component
  - path: components/device/silabs/si91x/mcu/toolchain/component
+ - path: components/device/silabs/si91x/sl_si91x_generative_ai/component
  - path: third_party/silicon_labs/freertos/component
  - path: netstack_silabs_lwip/component
 documentation:
  - docset: wifi
-   version: 4.0.1
+   version: 4.1.0
  - docset: bluetooth_le_siwx91x
-   version: 4.0.1
+   version: 4.1.0
  - docset: platform_nwp_siwx91x
-   version: 4.0.1
+   version: 4.1.0
  - docset: platform_siwx91x
-   version: 4.0.1
+   version: 4.1.0
  - docset: unknown
    version: 0.0.0
 upgrade_manifest:

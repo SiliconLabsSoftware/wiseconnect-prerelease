@@ -13,6 +13,7 @@
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
   - [Additional Information](#additional-information)
+    - [Steps to Create a Combined Image](#steps-to-create-a-combined-image)
     - [Configuring an AWS S3 Bucket](#configuring-an-aws-s3-bucket)
     - [Configuring Azure Blob Storage](#configuring-azure-blob-storage)
     - [Configuring and Uploading Firmware on Apache HTTP](#configuring-and-uploading-firmware-on-apache-http)
@@ -136,6 +137,8 @@ The application can be configured to suit your requirements and the development 
       //! Set FW update type
       #define FW_UPDATE_TYPE TA_FW_UPDATE
       ```
+
+      > **Note:** For combined firmware upgrade, you need to create a combined image file. Refer to the [Steps to Create a Combined Image](#steps-to-create-a-combined-image) section for detailed instructions.
 
       > **Note:**
       > - Use a combined image to update the firmware whenever possible. A combined image includes both the Network Processor (NWP) and Application Processor (M4) images in a single package.
@@ -394,6 +397,44 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
      ![Run](resources/readme/application_prints_apache.png)
 
 ## Additional Information
+
+### Steps to Create a Combined Image
+
+  #### Case 1: When Security is Disabled
+
+  1. Navigate to the Commander directory.
+
+  2. Copy the NWP firmware image and M4 image into the Commander directory.
+
+     ![Commander Directory](resources/readme/commander_directory.png)
+
+  3. Create the nwp_combined_image.rps file:
+
+      ```c
+      commander rps convert <nwp_combined_image.rps> --taapp <original non-encrypted TA rps> --combinedimage
+      ```
+
+  4. Create the m4_combined_image.rps file:
+
+      ```c
+      commander rps convert <m4_combined_image.rps> --app <original non-encrypted M4 rps> --combinedimage
+      ```
+
+  5. Create the final combined image:
+
+      ```c
+      commander rps convert <combined_image.rps> --app <m4_combined_image.rps> --taapp <nwp_combined_image.rps>
+      ```
+
+     The following screenshot shows the execution of commands from steps 3, 4, and 5:
+
+     ![Combined Image Creation](resources/readme/commander_combined.png)
+
+     After successful execution, the `combined_image.rps` file will be generated in the Commander directory. Upload this file to your server and configure `HTTP_URL` to point to it.
+
+  #### Case 2: When Security is Enabled
+
+  For devices with security enabled, additional signing and encryption steps are required. Follow the detailed instructions in **Section 6 - Combined Image (NWP + M4)** of the [UG574 SiWx917 SoC Manufacturing Utility User Guide](https://www.silabs.com/documents/public/user-guides/ug574-siwx917-soc-manufacturing-utility-user-guide.pdf#page=24).
 
 ### Configuring an AWS S3 Bucket
 

@@ -62,8 +62,8 @@ sl_status_t sli_routing_utility_route_queue_node(sli_routing_table_t *routing_ta
  */
 sl_status_t sli_routing_utility_route_packet(sli_routing_table_t *routing_table,
                                              uint16_t packet_type,
-                                             void *packet,
+                                             const void *packet,
                                              uint16_t packet_size,
-                                             void *context);
+                                             const void *context);
 
 #endif

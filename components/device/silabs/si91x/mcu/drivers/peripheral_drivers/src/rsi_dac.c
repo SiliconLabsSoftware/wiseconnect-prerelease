@@ -42,12 +42,12 @@
 // UDMA config
 // DMA descriptors must be aligned to 16 bytes
 #if defined(__CC_ARM)
-extern RSI_UDMA_DESC_T UDMA1_Table[32];
+extern RSI_UDMA_DESC_T UDMA1_Table[CONTROL_STRUCT1];
 #endif // defined (__CC_ARM)
 
 #ifdef DAC_FIFO_MODE_EN
 #if defined(__GNUC__)
-extern RSI_UDMA_DESC_T __attribute__((section(".udma_addr1"))) UDMA1_Table[32];
+extern RSI_UDMA_DESC_T __attribute__((section(".udma_addr1"))) UDMA1_Table[CONTROL_STRUCT1];
 #endif // defined (__GNUC__)
 
 extern RSI_UDMA_HANDLE_T udmaHandle1;

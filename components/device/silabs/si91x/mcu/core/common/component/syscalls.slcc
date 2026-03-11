@@ -19,6 +19,8 @@ include:
         unless: [no_syscalls]
 provides:
   - name: syscalls
+  - name: sl_syscalls
+    condition: [device_si91x]
   - name: no_syscalls
     condition: [sl_usart_iostream]
 requires:

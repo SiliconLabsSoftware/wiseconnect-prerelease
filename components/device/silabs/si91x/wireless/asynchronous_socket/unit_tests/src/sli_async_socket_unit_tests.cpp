@@ -208,7 +208,7 @@ TEST(sli_async_socket_unit_tests, enable_DTLS_V_1_2_invalid_flag)
 TEST(sli_async_socket_unit_tests, SendToAsync_Success)
 {
   RESET_FAKE(sli_get_si91x_socket);
-  RESET_FAKE(sli_si91x_driver_send_socket_data);
+  RESET_FAKE(sli_si91x_send_socket_data);
 
   // Mock behavior for sli_get_si91x_socket
   sli_si91x_socket_t mock_socket;
@@ -216,13 +216,13 @@ TEST(sli_async_socket_unit_tests, SendToAsync_Success)
   mock_socket.id                        = 0;           // Default socket ID
   mock_socket.type                      = SOCK_STREAM; // Set type to SOCK_STREAM for TCP
   mock_socket.state                     = CONNECTED;
-  mock_socket.local_address.sin6_family = AF_INET; // Set family to AF_INET
+  mock_socket.local_address.sin6_family = AF_INET;                          // Set family to AF_INET
   mock_socket.mss                       = SLI_DEFAULT_STREAM_MSS_SIZE_IPV4; // Set default MSS for IPv4
   mock_socket.is_waiting_on_ack         = false;
   sli_get_si91x_socket_fake.return_val  = &mock_socket;
 
-  // Mock behavior for sli_si91x_driver_send_socket_data
-  sli_si91x_driver_send_socket_data_fake.return_val = SL_STATUS_OK;
+  // Mock behavior for sli_si91x_send_socket_data
+  sli_si91x_send_socket_data_fake.return_val = SL_STATUS_IN_PROGRESS;
 
   int socket = 1;
   SendToAsyncTestParams params;
@@ -237,15 +237,13 @@ TEST(sli_async_socket_unit_tests, SendToAsync_Success)
 
   EXPECT_EQ(result, params.buffer_length);
   EXPECT_FALSE(mock_socket.is_waiting_on_ack);
-  EXPECT_EQ(sli_si91x_driver_send_socket_data_fake.call_count, 1);
 }
 
 // Test Case: Valid UDP Socket
 TEST(sli_async_socket_unit_tests, valid_udp_Socket_request)
 {
   RESET_FAKE(sli_get_si91x_socket);
-  RESET_FAKE(sli_create_and_send_socket_request);
-  RESET_FAKE(sli_si91x_driver_send_socket_data);
+  RESET_FAKE(sli_si91x_send_socket_data);
 
   // Mock behavior for sli_get_si91x_socket
   sli_si91x_socket_t mock_socket;
@@ -255,11 +253,8 @@ TEST(sli_async_socket_unit_tests, valid_udp_Socket_request)
   mock_socket.state                    = BOUND;
   sli_get_si91x_socket_fake.return_val = &mock_socket;
 
-  // Mock behavior for sli_create_and_send_socket_request
-  sli_create_and_send_socket_request_fake.return_val = SL_STATUS_OK;
-
-  // Mock behavior for sli_si91x_driver_send_socket_data
-  sli_si91x_driver_send_socket_data_fake.return_val = SL_STATUS_OK;
+  // Mock behavior for sli_si91x_send_socket_data
+  sli_si91x_send_socket_data_fake.return_val = SL_STATUS_IN_PROGRESS;
 
   int socket = 1;
   SendToAsyncTestParams params;
@@ -275,7 +270,7 @@ TEST(sli_async_socket_unit_tests, valid_udp_Socket_request)
 
   // Validate the result
   EXPECT_EQ(result, params.buffer_length);
-  EXPECT_EQ(sli_create_and_send_socket_request_fake.call_count, 1);
+  EXPECT_EQ(sli_si91x_send_socket_data_fake.call_count, 1);
 }
 
 // Test case: Invalid socket
@@ -337,7 +332,6 @@ TEST(sli_async_socket_unit_tests, send_to_async_buffer_overflow)
 TEST(sli_async_socket_unit_tests, message_size_exceeds_limit)
 {
   RESET_FAKE(sli_get_si91x_socket);
-  RESET_FAKE(sli_si91x_driver_send_socket_data);
 
   // Mock behavior for sli_get_si91x_socket
   sli_si91x_socket_t mock_socket;

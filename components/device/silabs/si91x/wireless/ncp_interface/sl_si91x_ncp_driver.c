@@ -46,7 +46,7 @@
 // This macro converts a 16-bit value from host to little-endian byte order
 #define htole16(x) (x)
 
-sl_status_t sli_submit_rx_buffer(void);
+sl_status_t sli_submit_rx_buffer(uint32_t timeout);
 
 sl_status_t sli_si91x_bus_set_interrupt_mask(uint32_t mask)
 {
@@ -105,8 +105,9 @@ sl_status_t sli_si91x_req_wakeup(void)
   } while (1);
   return SL_STATUS_OK;
 }
-sl_status_t sli_submit_rx_buffer(void)
+sl_status_t sli_submit_rx_buffer(uint32_t timeout)
 {
+  UNUSED_PARAMETER(timeout);
   return SL_STATUS_OK;
 }
 

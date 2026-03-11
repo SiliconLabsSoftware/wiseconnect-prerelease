@@ -550,12 +550,12 @@ sl_status_t sl_log_write_multiple_to_ring_buffer(const sl_log_event_t *events, u
   uint32_t first_chunk = (count <= tail_space) ? count : tail_space;
 
   if (first_chunk > 0) {
-    memcpy(&ring->sl_log_buffer[start_index], &events[0], first_chunk * sizeof(sl_log_event_t));
+    memcpy(&ring->buffer[start_index], &events[0], first_chunk * sizeof(sl_log_event_t));
   }
 
   uint32_t remaining = count - first_chunk;
   if (remaining > 0) {
-    memcpy(&ring->sl_log_buffer[0], &events[first_chunk], remaining * sizeof(sl_log_event_t));
+    memcpy(&ring->buffer[0], &events[first_chunk], remaining * sizeof(sl_log_event_t));
   }
 
   // ---- 3) Update event_count/read_index under IRQ-off ----

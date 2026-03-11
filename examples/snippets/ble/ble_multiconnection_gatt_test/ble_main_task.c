@@ -1923,7 +1923,6 @@ void rsi_ble_main_app_task()
     .stack_size = 2048,
     .priority   = osPriorityBelowNormal,
     .tz_module  = 0,
-    .reserved   = 0,
   };
   ble_sleep_task_handle = osThreadNew((osThreadFunc_t)rsi_common_sleep_task, NULL, &sleep_thread_attributes);
 #endif

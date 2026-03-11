@@ -105,7 +105,7 @@
 // Defines for error logging
 #define PRINT_ERROR_LOGS 0
 
-#define PRINT_STATUS(tag, status) printf("\r\n%s %s:%d: 0x%lu \r\n", tag, __FILE__, __LINE__, (unsigned long)status);
+#define PRINT_STATUS(tag, status) printf("\r\n%s %s:%d: 0x%lx \r\n", tag, __FILE__, __LINE__, (unsigned long)status);
 
 #define SL_CHECK_STATUS(x)    \
   do {                        \
@@ -203,7 +203,13 @@
     }                                                  \
   } while (0)
 
-#define PRINT_ERROR_STATUS(tag, status) printf("\r\n%s %s:%d: 0x%x \r\n", tag, __FILE__, __LINE__, (unsigned int)status)
+#define PRINT_ERROR_STATUS(tag, status)            \
+  printf("\r\n%s %s:%d: 0x%x : Thread_id<%s>\r\n", \
+         tag,                                      \
+         __FILE__,                                 \
+         __LINE__,                                 \
+         (unsigned int)status,                     \
+         osThreadGetName(osThreadGetId()))
 
 #ifdef PRINT_DEBUG_LOG
 extern void sl_debug_log(const char *format, ...);

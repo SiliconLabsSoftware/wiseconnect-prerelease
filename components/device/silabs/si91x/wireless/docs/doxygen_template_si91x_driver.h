@@ -151,6 +151,8 @@
  *  @ingroup SL_SI91X_BOOT_CONFIGURATION
  *	
  *   This section provides a reference to the calibration flags in the boot configuration feature bitmaps.
+ *
+ *  @note Bit positions 11-31 and 0 are reserved.
  */
 
 /*! @defgroup SI91X_BURN_TARGET_OPTIONS Burn Target Options

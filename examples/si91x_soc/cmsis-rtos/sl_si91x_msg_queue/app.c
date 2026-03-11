@@ -36,7 +36,6 @@ const osThreadAttr_t i2c_follower_thread_attributes = {
   .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
   .priority   = osPriorityLow,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 const osThreadAttr_t usart_thread_attributes = {
   .name       = "usart",
@@ -47,7 +46,6 @@ const osThreadAttr_t usart_thread_attributes = {
   .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
   .priority   = osPriorityLow1,
   .tz_module  = 0,
-  .reserved   = 0,
 };
 /*******************************************************************************
  * Initialize application.
