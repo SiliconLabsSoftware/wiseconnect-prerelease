@@ -1,5 +1,5 @@
 id: sl_si91x_memory_manager
-label: Si91x Memory Manager 
+label: Si91x Memory Manager
 package: platform_siwx91x
 description: >
   Si91x wrapper for memory manager heap statistics functions.
@@ -18,7 +18,6 @@ include:
       - path: sl_si91x_memory_manager.h
 requires:
   - name: freertos
-  - name: freertos_heap_4
   - name: memory_manager_redirect
 provides:
   - name: sl_si91x_memory_manager
