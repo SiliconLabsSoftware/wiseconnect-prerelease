@@ -231,7 +231,6 @@ bool bg_enabled                                   = false;
 uint32_t frontend_switch_control                  = 0;
 static uint32_t feature_bit_map                   = 0;
 static sli_wifi_efuse_data_t si91x_efuse_data     = { 0 };
-static uint32_t client_listen_interval            = 1000;
 //! Currently, initialized_opermode is used only to handle concurrent mode using sl_net_init()
 extern uint16_t initialized_opermode;
 extern sli_wifi_command_queue_t cmd_queues[SI91X_CMD_MAX];
@@ -2338,8 +2337,11 @@ sl_status_t sl_si91x_get_join_configuration(sl_wifi_interface_t interface, uint8
 
 void sl_si91x_set_listen_interval(uint32_t listen_interval)
 {
-  client_listen_interval = listen_interval;
-  return;
+  sl_wifi_listen_interval_v2_t v2_params = {
+    .listen_interval            = listen_interval,
+    .listen_interval_multiplier = 1, /* Default multiplier; matches sli_wifi DEFAULT_LISTEN_INTERVAL_MULTIPLIER */
+  };
+  sli_wifi_set_listen_interval_v2(SL_WIFI_CLIENT_INTERFACE, v2_params);
 }
 
 void sl_si91x_set_timeout(const sl_wifi_timeout_t *timeout_config)

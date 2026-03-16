@@ -127,13 +127,6 @@ sl_status_t sli_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wi
 {
   UNUSED_PARAMETER(interface);
 
-  if (!device_initialized) {
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  if (!sli_wifi_is_interface_up(interface)) {
-    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
-  }
-
   if (listen_interval.listen_interval_multiplier < DEFAULT_LISTEN_INTERVAL_MULTIPLIER) {
     SL_DEBUG_LOG("\r\n listen_interval_multiplier minimum value should be 1, Updating to the minimum value.\r\n");
     listen_interval.listen_interval_multiplier = DEFAULT_LISTEN_INTERVAL_MULTIPLIER;
@@ -152,6 +145,8 @@ sl_status_t sli_wifi_get_listen_interval(sl_wifi_interface_t interface, sl_wifi_
   if (!sli_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
+
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(listen_interval);
   listen_interval->listen_interval = client_listen_interval;
   return SL_STATUS_OK;
 }

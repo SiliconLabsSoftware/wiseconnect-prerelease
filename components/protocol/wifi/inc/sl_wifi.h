@@ -486,9 +486,6 @@ sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface,
 /***************************************************************************/ /**
  * @brief
  *   Set the Wi-Fi client interface listen interval and listen interval multiplier.
- * @pre Pre-conditions:
- * -
- *   @ref sl_wifi_init should be called before this API.
  * @param[in] interface
  *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
  * @param[in] listen_interval
@@ -496,8 +493,8 @@ sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface,
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
-*   By default listen interval is set 1000 millisecs and listen interval multiplier is set to 1. User can call this API to overwrite the values for listen interval and listen interval multiplier.
-*   Recommended max value for listen_interval_multiplier is 10. Higher value may cause interop issues. 
+ *   By default listen interval is set 1000 millisecs and listen interval multiplier is set to 1. User can call this API to overwrite the values for listen interval and listen interval multiplier.
+ *   Recommended max value for listen_interval_multiplier is 10. Higher value may cause interop issues.
  *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps()
  ******************************************************************************/
 sl_status_t sl_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wifi_listen_interval_v2_t listen_interval);
@@ -515,7 +512,7 @@ sl_status_t sl_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wif
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
-*   By default, the listen interval is set to 1000 millisecs.
+ *   By default, the listen interval is set to 1000 millisecs.
  * @note
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_get_listen_interval_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-radio-api#sl-wifi-get-listen-interval-v2) API. This is retained for backward compatibility.
  ******************************************************************************/
