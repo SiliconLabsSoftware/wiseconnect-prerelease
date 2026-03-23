@@ -461,7 +461,7 @@ typedef sl_status_t (*sl_wifi_callback_function_v2_t)(sl_wifi_event_t event,
  *   In case of event failure, SL_WIFI_FAIL_EVENT_STATUS_INDICATION bit is set in the event.
  *   When this bit is set, the `data` parameter and the `data_length` parameter can be ignored.
  *   In the case of SL_WIFI_SCAN_TYPE_EXTENDED, the scan callback is invoked with data set to NULL and data_length
- *   indicating the total size of the scan results (i.e., scan count * sizeof(sl_wifi_extended_scan_result_t)). Upon
+ *   indicating the total size of the scan results (that is, scan count * sizeof(sl_wifi_extended_scan_result_t)). Upon
  *   receiving this callback, the application must allocate a buffer of size data_length and explicitly call the
  *   @ref sl_wifi_get_stored_scan_results() API, passing the allocated buffer to retrieve the complete scan results.
  */
@@ -1135,4 +1135,5 @@ static inline sl_status_t sl_wifi_set_command_engine_status_handler(sl_wifi_comm
                                (sl_wifi_callback_function_v2_t)function,
                                optional_arg);
 }
+
 /** @} */

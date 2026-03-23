@@ -857,8 +857,8 @@ ble_user_gain_table_lp_chain_8dBm_offset
 >```
 
 > **Note**: 
- - The Worldwide table is available for BLE only, and must not be modified. 
- - The values in the worldwide table comply with Bluetooth SIG specifications.
+> - The Worldwide table is available for BLE only, and must not be modified. 
+> - The values in the worldwide table comply with Bluetooth SIG specifications.
 
 
 ## **Commands**

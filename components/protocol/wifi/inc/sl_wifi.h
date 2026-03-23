@@ -955,8 +955,8 @@ sl_status_t sl_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi
  *      Use the SL_WIFI_SCAN_TYPE_EXTENDED to obtain the scan results that exceed the SL_WIFI_MAX_SCANNED_AP. In this scan type, the number of scan results is not restricted; it is only limited by the amount of dynamic memory that the host can provide.
  *      Default Passive Scan Channel time is 400 milliseconds. If the user wants to modify the time, sl_si91x_set_timeout can be called.
  *      In the case of SL_WIFI_SCAN_TYPE_EXTENDED, the scan callback is invoked with data set to NULL and data_length
- *      set to the total size of the scan results (i.e., count * sizeof(sl_wifi_extended_scan_result_t)). The application
- *      must allocate a buffer of size data_length and pass this buffer to the @ref sl_wifi_get_stored_scan_results() API to retrieve the complete scan results.
+ *      indicating the total size of the scan results (that is, count * sizeof(sl_wifi_extended_scan_result_t)). Upon receiving this callback, the application
+ *      must allocate a buffer of size data_length and explicitly call the @ref sl_wifi_get_stored_scan_results() API, passing the allocated buffer to retrieve the complete scan results.
  *      This API is not applicable for ADV_SCAN scan_type in AP mode
  *      This API is supported in AP mode, to scan for - to trigger this, send a scan after sl_wifi_start_ap() API with the SL_WIFI_SCAN_TYPE_ACTIVE scan_type.
  *      After connecting to Wi-Fi, if you want to initiate a background scan, call this API with scan_type set to SL_WIFI_SCAN_TYPE_ADV_SCAN in the @ref sl_wifi_scan_configuration_t.
@@ -981,7 +981,7 @@ sl_status_t sl_wifi_start_scan(sl_wifi_interface_t interface,
  * 	This API will only hold scan results if sl_wifi_start_scan is called with scan type as SL_WIFI_SCAN_TYPE_EXTENDED.
  *  These results are stored until another call to sl_wifi_start_scan is made with scan type as SL_WIFI_SCAN_TYPE_EXTENDED.
  *  In the case of SL_WIFI_SCAN_TYPE_EXTENDED, the scan callback is invoked with data set to NULL and data_length
- *  indicating the total size of the scan results (i.e., scan count * sizeof(sl_wifi_extended_scan_result_t)). Upon
+ *  indicating the total size of the scan results (that is, scan count * sizeof(sl_wifi_extended_scan_result_t)). Upon
  *  receiving this callback, the application must allocate a buffer of size data_length and explicitly call the
  *  @ref sl_wifi_get_stored_scan_results() API, passing the allocated buffer to retrieve the complete scan results.
  ******************************************************************************/
