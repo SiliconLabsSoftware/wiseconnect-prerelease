@@ -39,7 +39,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="42" column="9" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="42" bodyend="-1"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="38" column="9" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="38" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="func">
@@ -83,7 +83,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="89" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="89" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="85" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="85" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga4a9f888e25793169c7a579bc8c2f8ea4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -103,7 +103,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="100" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="100" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="96" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="96" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga88c917f81bf74552bb5fd10657127d51" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -145,7 +145,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="115" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="115" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="111" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="111" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga3b2dceb5f8a51388fd59db965b627ae3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -187,7 +187,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="130" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="130" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="126" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="126" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga3fc29e8cb2d3d95b398c97e14960d0b0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -229,7 +229,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="146" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="146" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="142" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="142" declcolumn="13"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -287,120 +287,116 @@
 <codeline lineno="33"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="sl__si91x__crypto_8h" kindref="compound">sl_si91x_crypto.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="34"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;sl_status.h&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="35"><highlight class="normal"></highlight></codeline>
-<codeline lineno="36"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>SLI_TRNG_DEVICE_SI91X</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="37"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;sl_si91x_protocol_types.h&quot;</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="38"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">//SLI_TRNG_DEVICE_SI91X</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="39"><highlight class="normal"></highlight></codeline>
-<codeline lineno="40"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="41"><highlight class="comment">///<sp/>@brief<sp/>Enables<sp/>duplicate<sp/>check<sp/>for<sp/>TRNG<sp/>output.</highlight></codeline>
-<codeline lineno="42" refid="sl__si91x__trng_8h_1aba91756d6be3639f550bd0b0b8a0d7be" refkind="member"><highlight class="comment"></highlight><highlight class="preprocessor">#define<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK<sp/>1</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="43"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">//<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="44"><highlight class="normal"></highlight></codeline>
-<codeline lineno="45"><highlight class="normal"></highlight><highlight class="comment">/******************************************************</highlight></codeline>
-<codeline lineno="46"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Type<sp/>Definitions</highlight></codeline>
-<codeline lineno="47"><highlight class="comment"><sp/>******************************************************/</highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="48"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="49"><highlight class="comment"><sp/>*<sp/>@addtogroup<sp/>CRYPTO_TRNG_TYPES<sp/></highlight></codeline>
-<codeline lineno="50"><highlight class="comment"><sp/>*<sp/>@{<sp/></highlight></codeline>
-<codeline lineno="51"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="52"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="53"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="54"><highlight class="comment"><sp/>*<sp/>@brief<sp/>Structure<sp/>defining<sp/>TRNG<sp/>configuration</highlight></codeline>
-<codeline lineno="55"><highlight class="comment"><sp/>*<sp/></highlight></codeline>
-<codeline lineno="56"><highlight class="comment"><sp/>*<sp/>This<sp/>structure<sp/>defines<sp/>TRNG<sp/>configuration<sp/>required<sp/>for<sp/>the<sp/>operation<sp/>which<sp/>includes</highlight></codeline>
-<codeline lineno="57"><highlight class="comment"><sp/>*<sp/>input<sp/>message,<sp/>length<sp/>of<sp/>input<sp/>message,<sp/>key,<sp/>and<sp/>so<sp/>on.<sp/></highlight></codeline>
-<codeline lineno="58"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="59" refid="structsl__si91x__trng__config__t" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">{</highlight></codeline>
-<codeline lineno="60" refid="structsl__si91x__trng__config__t_1af3517a81bc06d3e3e7ea6803380fcc23" refkind="member"><highlight class="normal"><sp/><sp/>uint32_t<sp/>*<ref refid="structsl__si91x__trng__config__t_1af3517a81bc06d3e3e7ea6803380fcc23" kindref="member">trng_test_data</ref>;<sp/></highlight><highlight class="comment">///&lt;<sp/>Test<sp/>input<sp/>data<sp/>for<sp/>TRNG</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="61" refid="structsl__si91x__trng__config__t_1a451065e3d109ecc0c6afdc752e4c0009" refkind="member"><highlight class="normal"><sp/><sp/>uint16_t<sp/><ref refid="structsl__si91x__trng__config__t_1a451065e3d109ecc0c6afdc752e4c0009" kindref="member">input_length</ref>;<sp/><sp/><sp/><sp/></highlight><highlight class="comment">///&lt;<sp/>Input<sp/>length</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="62" refid="structsl__si91x__trng__config__t_1a25ec083e4374631863ad2a98eb0a69ff" refkind="member"><highlight class="normal"><sp/><sp/>uint32_t<sp/>*<ref refid="structsl__si91x__trng__config__t_1a25ec083e4374631863ad2a98eb0a69ff" kindref="member">trng_key</ref>;<sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">///&lt;<sp/>TRNG<sp/>key</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="63"><highlight class="normal">}<sp/><ref refid="structsl__si91x__trng__config__t" kindref="compound">sl_si91x_trng_config_t</ref>;</highlight></codeline>
-<codeline lineno="64"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="65"><highlight class="comment">/**<sp/>@}<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="66"><highlight class="normal"></highlight></codeline>
-<codeline lineno="67"><highlight class="normal"></highlight><highlight class="comment">/******************************************************</highlight></codeline>
-<codeline lineno="68"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Function<sp/>Declarations</highlight></codeline>
-<codeline lineno="69"><highlight class="comment">*******************************************************/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="70"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="71"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="72"><highlight class="comment"><sp/>*<sp/>@addtogroup<sp/>CRYPTO_TRNG_FUNCTIONS</highlight></codeline>
-<codeline lineno="73"><highlight class="comment"><sp/>*<sp/>@{<sp/></highlight></codeline>
-<codeline lineno="74"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="75"><highlight class="normal"></highlight></codeline>
-<codeline lineno="76"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="77"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="78"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
-<codeline lineno="79"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>initialize<sp/>the<sp/>TRNG<sp/>hardware<sp/>engine.</highlight></codeline>
-<codeline lineno="80"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>config<sp/></highlight></codeline>
-<codeline lineno="81"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Configuration<sp/>object<sp/>of<sp/>type<sp/>@ref<sp/>sl_si91x_trng_config_t</highlight></codeline>
-<codeline lineno="82"><highlight class="comment"><sp/>*<sp/>@param[out]<sp/>output<sp/></highlight></codeline>
-<codeline lineno="83"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Buffer<sp/>to<sp/>store<sp/>the<sp/>output.</highlight></codeline>
-<codeline lineno="84"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
-<codeline lineno="85"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
-<codeline lineno="86"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
-<codeline lineno="87"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
-<codeline lineno="88"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="89" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga8f1943b72b3f9c8905d660b444bedf52" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga8f1943b72b3f9c8905d660b444bedf52" kindref="member">sl_si91x_trng_init</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structsl__si91x__trng__config__t" kindref="compound">sl_si91x_trng_config_t</ref><sp/>*config,<sp/>uint32_t<sp/>*output);</highlight></codeline>
-<codeline lineno="90"><highlight class="normal"></highlight></codeline>
-<codeline lineno="91"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="92"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="93"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
-<codeline lineno="94"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>check<sp/>the<sp/>entropy<sp/>of<sp/>TRNG<sp/>and<sp/>verify<sp/>its<sp/>functioning.</highlight></codeline>
-<codeline lineno="95"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
-<codeline lineno="96"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
-<codeline lineno="97"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
-<codeline lineno="98"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
-<codeline lineno="99"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="100" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga4a9f888e25793169c7a579bc8c2f8ea4" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga4a9f888e25793169c7a579bc8c2f8ea4" kindref="member">sl_si91x_trng_entropy</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">);</highlight></codeline>
-<codeline lineno="101"><highlight class="normal"></highlight></codeline>
-<codeline lineno="102"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="103"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="104"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
-<codeline lineno="105"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>initialize<sp/>and<sp/>program<sp/>the<sp/>key<sp/>required<sp/>for<sp/>the<sp/>TRNG<sp/>hardware<sp/>engine.</highlight></codeline>
-<codeline lineno="106"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>trng_key<sp/></highlight></codeline>
-<codeline lineno="107"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Pointer<sp/>to<sp/>the<sp/>TRNG<sp/>key.</highlight></codeline>
-<codeline lineno="108"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>key_length<sp/></highlight></codeline>
-<codeline lineno="109"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Length<sp/>of<sp/>the<sp/>key<sp/>in<sp/>Dwords<sp/>(uint32_t).</highlight></codeline>
-<codeline lineno="110"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
-<codeline lineno="111"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
-<codeline lineno="112"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
-<codeline lineno="113"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
-<codeline lineno="114"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="115" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga88c917f81bf74552bb5fd10657127d51" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga88c917f81bf74552bb5fd10657127d51" kindref="member">sl_si91x_trng_program_key</ref>(uint32_t<sp/>*trng_key,<sp/>uint16_t<sp/>key_length);</highlight></codeline>
-<codeline lineno="116"><highlight class="normal"></highlight></codeline>
-<codeline lineno="117"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="118"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="119"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
-<codeline lineno="120"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>generate<sp/>a<sp/>random<sp/>number<sp/>of<sp/>the<sp/>desired<sp/>length.</highlight></codeline>
-<codeline lineno="121"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>random_number<sp/></highlight></codeline>
-<codeline lineno="122"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Address<sp/>for<sp/>the<sp/>random<sp/>number.</highlight></codeline>
-<codeline lineno="123"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>length<sp/></highlight></codeline>
-<codeline lineno="124"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Length<sp/>of<sp/>the<sp/>random<sp/>number<sp/>in<sp/>bytes.</highlight></codeline>
-<codeline lineno="125"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
-<codeline lineno="126"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
-<codeline lineno="127"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
-<codeline lineno="128"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
-<codeline lineno="129"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="130" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3b2dceb5f8a51388fd59db965b627ae3" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3b2dceb5f8a51388fd59db965b627ae3" kindref="member">sl_si91x_trng_get_random_num</ref>(uint32_t<sp/>*random_number,<sp/>uint16_t<sp/>length);</highlight></codeline>
-<codeline lineno="131"><highlight class="normal"></highlight></codeline>
-<codeline lineno="132"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="133"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="134"><highlight class="comment">/**</highlight></codeline>
-<codeline lineno="135"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
-<codeline lineno="136"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>check<sp/>if<sp/>there<sp/>are<sp/>any<sp/>repeating<sp/>elements<sp/>in<sp/>the<sp/>array.</highlight></codeline>
-<codeline lineno="137"><highlight class="comment"><sp/>*<sp/>@param[in,out]<sp/>dword<sp/></highlight></codeline>
-<codeline lineno="138"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Pointer<sp/>to<sp/>the<sp/>array<sp/>of<sp/>elements.</highlight></codeline>
-<codeline lineno="139"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>length_in_dwords<sp/></highlight></codeline>
-<codeline lineno="140"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Length<sp/>of<sp/>the<sp/>array<sp/>in<sp/>dwords.</highlight></codeline>
-<codeline lineno="141"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
-<codeline lineno="142"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
-<codeline lineno="143"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
-<codeline lineno="144"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
-<codeline lineno="145"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="146" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3fc29e8cb2d3d95b398c97e14960d0b0" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3fc29e8cb2d3d95b398c97e14960d0b0" kindref="member">sl_si91x_duplicate_element</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint32_t<sp/>*dword,<sp/>uint32_t<sp/>length_in_dwords);</highlight></codeline>
-<codeline lineno="147"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">//<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="148"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
-<codeline lineno="149"><highlight class="comment">/**<sp/>@}<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="37"><highlight class="comment">///<sp/>@brief<sp/>Enables<sp/>duplicate<sp/>check<sp/>for<sp/>TRNG<sp/>output.</highlight></codeline>
+<codeline lineno="38" refid="sl__si91x__trng_8h_1aba91756d6be3639f550bd0b0b8a0d7be" refkind="member"><highlight class="comment"></highlight><highlight class="preprocessor">#define<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK<sp/>1</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">//<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="comment">/******************************************************</highlight></codeline>
+<codeline lineno="42"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Type<sp/>Definitions</highlight></codeline>
+<codeline lineno="43"><highlight class="comment"><sp/>******************************************************/</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="44"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="45"><highlight class="comment"><sp/>*<sp/>@addtogroup<sp/>CRYPTO_TRNG_TYPES<sp/></highlight></codeline>
+<codeline lineno="46"><highlight class="comment"><sp/>*<sp/>@{<sp/></highlight></codeline>
+<codeline lineno="47"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="49"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="50"><highlight class="comment"><sp/>*<sp/>@brief<sp/>Structure<sp/>defining<sp/>TRNG<sp/>configuration</highlight></codeline>
+<codeline lineno="51"><highlight class="comment"><sp/>*<sp/></highlight></codeline>
+<codeline lineno="52"><highlight class="comment"><sp/>*<sp/>This<sp/>structure<sp/>defines<sp/>TRNG<sp/>configuration<sp/>required<sp/>for<sp/>the<sp/>operation<sp/>which<sp/>includes</highlight></codeline>
+<codeline lineno="53"><highlight class="comment"><sp/>*<sp/>input<sp/>message,<sp/>length<sp/>of<sp/>input<sp/>message,<sp/>key,<sp/>and<sp/>so<sp/>on.<sp/></highlight></codeline>
+<codeline lineno="54"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="55" refid="structsl__si91x__trng__config__t" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="56" refid="structsl__si91x__trng__config__t_1af3517a81bc06d3e3e7ea6803380fcc23" refkind="member"><highlight class="normal"><sp/><sp/>uint32_t<sp/>*<ref refid="structsl__si91x__trng__config__t_1af3517a81bc06d3e3e7ea6803380fcc23" kindref="member">trng_test_data</ref>;<sp/></highlight><highlight class="comment">///&lt;<sp/>Test<sp/>input<sp/>data<sp/>for<sp/>TRNG</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="57" refid="structsl__si91x__trng__config__t_1a451065e3d109ecc0c6afdc752e4c0009" refkind="member"><highlight class="normal"><sp/><sp/>uint16_t<sp/><ref refid="structsl__si91x__trng__config__t_1a451065e3d109ecc0c6afdc752e4c0009" kindref="member">input_length</ref>;<sp/><sp/><sp/><sp/></highlight><highlight class="comment">///&lt;<sp/>Input<sp/>length</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="58" refid="structsl__si91x__trng__config__t_1a25ec083e4374631863ad2a98eb0a69ff" refkind="member"><highlight class="normal"><sp/><sp/>uint32_t<sp/>*<ref refid="structsl__si91x__trng__config__t_1a25ec083e4374631863ad2a98eb0a69ff" kindref="member">trng_key</ref>;<sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">///&lt;<sp/>TRNG<sp/>key</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal">}<sp/><ref refid="structsl__si91x__trng__config__t" kindref="compound">sl_si91x_trng_config_t</ref>;</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="61"><highlight class="comment">/**<sp/>@}<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight><highlight class="comment">/******************************************************</highlight></codeline>
+<codeline lineno="64"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Function<sp/>Declarations</highlight></codeline>
+<codeline lineno="65"><highlight class="comment">*******************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="67"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="68"><highlight class="comment"><sp/>*<sp/>@addtogroup<sp/>CRYPTO_TRNG_FUNCTIONS</highlight></codeline>
+<codeline lineno="69"><highlight class="comment"><sp/>*<sp/>@{<sp/></highlight></codeline>
+<codeline lineno="70"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="73"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="74"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
+<codeline lineno="75"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>initialize<sp/>the<sp/>TRNG<sp/>hardware<sp/>engine.</highlight></codeline>
+<codeline lineno="76"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>config<sp/></highlight></codeline>
+<codeline lineno="77"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Configuration<sp/>object<sp/>of<sp/>type<sp/>@ref<sp/>sl_si91x_trng_config_t</highlight></codeline>
+<codeline lineno="78"><highlight class="comment"><sp/>*<sp/>@param[out]<sp/>output<sp/></highlight></codeline>
+<codeline lineno="79"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Buffer<sp/>to<sp/>store<sp/>the<sp/>output.</highlight></codeline>
+<codeline lineno="80"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
+<codeline lineno="81"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
+<codeline lineno="82"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
+<codeline lineno="83"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
+<codeline lineno="84"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="85" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga8f1943b72b3f9c8905d660b444bedf52" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga8f1943b72b3f9c8905d660b444bedf52" kindref="member">sl_si91x_trng_init</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structsl__si91x__trng__config__t" kindref="compound">sl_si91x_trng_config_t</ref><sp/>*config,<sp/>uint32_t<sp/>*output);</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="88"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="89"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
+<codeline lineno="90"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>check<sp/>the<sp/>entropy<sp/>of<sp/>TRNG<sp/>and<sp/>verify<sp/>its<sp/>functioning.</highlight></codeline>
+<codeline lineno="91"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
+<codeline lineno="92"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
+<codeline lineno="93"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
+<codeline lineno="94"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
+<codeline lineno="95"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="96" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga4a9f888e25793169c7a579bc8c2f8ea4" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga4a9f888e25793169c7a579bc8c2f8ea4" kindref="member">sl_si91x_trng_entropy</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"></highlight></codeline>
+<codeline lineno="98"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="99"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="100"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
+<codeline lineno="101"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>initialize<sp/>and<sp/>program<sp/>the<sp/>key<sp/>required<sp/>for<sp/>the<sp/>TRNG<sp/>hardware<sp/>engine.</highlight></codeline>
+<codeline lineno="102"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>trng_key<sp/></highlight></codeline>
+<codeline lineno="103"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Pointer<sp/>to<sp/>the<sp/>TRNG<sp/>key.</highlight></codeline>
+<codeline lineno="104"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>key_length<sp/></highlight></codeline>
+<codeline lineno="105"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Length<sp/>of<sp/>the<sp/>key<sp/>in<sp/>Dwords<sp/>(uint32_t).</highlight></codeline>
+<codeline lineno="106"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
+<codeline lineno="107"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
+<codeline lineno="108"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
+<codeline lineno="109"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
+<codeline lineno="110"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="111" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga88c917f81bf74552bb5fd10657127d51" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga88c917f81bf74552bb5fd10657127d51" kindref="member">sl_si91x_trng_program_key</ref>(uint32_t<sp/>*trng_key,<sp/>uint16_t<sp/>key_length);</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"></highlight></codeline>
+<codeline lineno="113"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="114"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="115"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
+<codeline lineno="116"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>generate<sp/>a<sp/>random<sp/>number<sp/>of<sp/>the<sp/>desired<sp/>length.</highlight></codeline>
+<codeline lineno="117"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>random_number<sp/></highlight></codeline>
+<codeline lineno="118"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Address<sp/>for<sp/>the<sp/>random<sp/>number.</highlight></codeline>
+<codeline lineno="119"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>length<sp/></highlight></codeline>
+<codeline lineno="120"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Length<sp/>of<sp/>the<sp/>random<sp/>number<sp/>in<sp/>bytes.</highlight></codeline>
+<codeline lineno="121"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
+<codeline lineno="122"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
+<codeline lineno="123"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
+<codeline lineno="124"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
+<codeline lineno="125"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="126" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3b2dceb5f8a51388fd59db965b627ae3" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3b2dceb5f8a51388fd59db965b627ae3" kindref="member">sl_si91x_trng_get_random_num</ref>(uint32_t<sp/>*random_number,<sp/>uint16_t<sp/>length);</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"></highlight></codeline>
+<codeline lineno="128"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="129"><highlight class="normal"></highlight><highlight class="comment">/***************************************************************************/</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="130"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="131"><highlight class="comment"><sp/>*<sp/>@brief<sp/></highlight></codeline>
+<codeline lineno="132"><highlight class="comment"><sp/>*<sp/><sp/><sp/>To<sp/>check<sp/>if<sp/>there<sp/>are<sp/>any<sp/>repeating<sp/>elements<sp/>in<sp/>the<sp/>array.</highlight></codeline>
+<codeline lineno="133"><highlight class="comment"><sp/>*<sp/>@param[in,out]<sp/>dword<sp/></highlight></codeline>
+<codeline lineno="134"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Pointer<sp/>to<sp/>the<sp/>array<sp/>of<sp/>elements.</highlight></codeline>
+<codeline lineno="135"><highlight class="comment"><sp/>*<sp/>@param[in]<sp/>length_in_dwords<sp/></highlight></codeline>
+<codeline lineno="136"><highlight class="comment"><sp/>*<sp/><sp/><sp/>Length<sp/>of<sp/>the<sp/>array<sp/>in<sp/>dwords.</highlight></codeline>
+<codeline lineno="137"><highlight class="comment"><sp/>*<sp/>@return</highlight></codeline>
+<codeline lineno="138"><highlight class="comment"><sp/>*<sp/><sp/><sp/>sl_status_t.</highlight></codeline>
+<codeline lineno="139"><highlight class="comment"><sp/>*<sp/>For<sp/>more<sp/>information<sp/>on<sp/>status<sp/>codes,<sp/>see<sp/></highlight></codeline>
+<codeline lineno="140"><highlight class="comment"><sp/>*<sp/>[SL<sp/>STATUS<sp/>DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).</highlight></codeline>
+<codeline lineno="141"><highlight class="comment">******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="142" refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3fc29e8cb2d3d95b398c97e14960d0b0" refkind="member"><highlight class="normal">sl_status_t<sp/><ref refid="group__CRYPTO__TRNG__FUNCTIONS_1ga3fc29e8cb2d3d95b398c97e14960d0b0" kindref="member">sl_si91x_duplicate_element</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint32_t<sp/>*dword,<sp/>uint32_t<sp/>length_in_dwords);</highlight></codeline>
+<codeline lineno="143"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">//<sp/>SLI_SI91X_TRNG_DUPLICATE_CHECK</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="144"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="145"><highlight class="comment">/**<sp/>@}<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h"/>
   </compounddef>

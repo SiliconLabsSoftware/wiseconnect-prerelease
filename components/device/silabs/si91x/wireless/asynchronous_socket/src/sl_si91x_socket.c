@@ -424,7 +424,19 @@ static int sli_si91x_prepare_and_validate_udp_socket(sli_si91x_socket_t *si91x_s
   return 0;
 }
 
-// Helper: Setup destination address in request
+/**
+ * @brief Fill the send request with destination address and port.
+ *
+ * Sets the request's IP version, data offset, socket id, destination IP, and
+ * destination port. For unconnected UDP (or when a destination is supplied),
+ * destination is taken from to_addr; for connected sockets or when to_addr is
+ * not provided, destination is taken from the socket's remote_address.
+ *
+ * @param[in]  si91x_socket Socket context (local and remote address, state, id).
+ * @param[in]  to_addr      Destination address; may be NULL for connected sockets.
+ * @param[in]  to_addr_len Length of the buffer pointed to by to_addr.
+ * @param[out] request      Send request structure to populate.
+ */
 static void sli_si91x_setup_request_address(const sli_si91x_socket_t *si91x_socket,
                                             const struct sockaddr *to_addr,
                                             socklen_t to_addr_len,
@@ -438,12 +450,14 @@ static void sli_si91x_setup_request_address(const sli_si91x_socket_t *si91x_sock
     request->data_offset = (si91x_socket->type == SOCK_STREAM) ? SLI_TCP_V6_HEADER_LENGTH : SLI_UDP_V6_HEADER_LENGTH;
 #ifdef SLI_SI91X_NETWORK_DUAL_STACK
     const uint8_t *destination_ip =
-      (si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len >= sizeof(struct sockaddr_in6))
+      ((si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len >= sizeof(struct sockaddr_in6))
+       && socket_address != NULL)
         ? socket_address->sin6_addr.un.u8_addr
         : si91x_socket->remote_address.sin6_addr.un.u8_addr;
 #else
     const uint8_t *destination_ip =
-      (si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len >= sizeof(struct sockaddr_in6))
+      ((si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len >= sizeof(struct sockaddr_in6))
+       && socket_address != NULL)
 #ifndef __ZEPHYR__
         ? socket_address->sin6_addr.__u6_addr.__u6_addr8
         : si91x_socket->remote_address.sin6_addr.__u6_addr.__u6_addr8;
@@ -460,7 +474,8 @@ static void sli_si91x_setup_request_address(const sli_si91x_socket_t *si91x_sock
     request->ip_version                      = SL_IPV4_ADDRESS_LENGTH;
     request->data_offset = (si91x_socket->type == SOCK_STREAM) ? SLI_TCP_HEADER_LENGTH : SLI_UDP_HEADER_LENGTH;
     uint32_t destination_ip =
-      (si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len >= sizeof(struct sockaddr_in))
+      ((si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len >= sizeof(struct sockaddr_in))
+       && socket_address != NULL)
         ? socket_address->sin_addr.s_addr
         : ((const struct sockaddr_in *)&si91x_socket->remote_address)->sin_addr.s_addr;
 
@@ -468,7 +483,7 @@ static void sli_si91x_setup_request_address(const sli_si91x_socket_t *si91x_sock
   }
   // Set other parameters in the send request
   request->socket_id = (uint16_t)si91x_socket->id;
-  request->dest_port = (si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len > 0)
+  request->dest_port = ((si91x_socket->state == UDP_UNCONNECTED_READY || to_addr_len > 0) && to_addr != NULL)
                          ? ((const struct sockaddr_in *)to_addr)->sin_port
                          : si91x_socket->remote_address.sin6_port;
 }
@@ -516,7 +531,14 @@ int sl_si91x_sendto_async(int socket,
       && (si91x_socket->socket_bitmap & SLI_SI91X_SOCKET_FEAT_TCP_ACK_INDICATION)) {
     si91x_socket->is_waiting_on_ack = false;
   }
-  SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_IN_PROGRESS, ENOBUFS);
+  // Both SL_STATUS_OK (sync success) and SL_STATUS_IN_PROGRESS (async) are success for async send.
+  if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS) {
+    if (PRINT_ERROR_LOGS) {
+      PRINT_ERROR_STATUS(ERROR_TAG, ENOBUFS);
+    }
+    errno = ENOBUFS;
+    return -1;
+  }
 
   return buffer_length;
 }
@@ -591,14 +613,14 @@ int sl_si91x_recvfrom(int socket,
   memcpy(request.read_timeout, &si91x_socket->read_timeout, sizeof(si91x_socket->read_timeout));
   wait_time = (SLI_WIFI_WAIT_FOR_EVER | SLI_WIFI_WAIT_FOR_RESPONSE_BIT);
 
-  si91x_socket->Is_receive_cmd_pending = true;
-  sl_status_t status                   = sli_wifi_async_send_command(SLI_WLAN_REQ_SOCKET_READ_DATA,
+  si91x_socket->is_receive_cmd_pending = true;
+  sl_status_t status                   = sli_wifi_async_send_command(SLI_WIFI_REQ_SOCKET_READ_DATA,
                                                    (SI91X_CMD_MAX + si91x_socket->index),
                                                    &request,
                                                    sizeof(request),
                                                    NULL);
   if (status != SL_STATUS_IN_PROGRESS) {
-    si91x_socket->Is_receive_cmd_pending = false;
+    si91x_socket->is_receive_cmd_pending = false;
     VERIFY_STATUS_AND_RETURN(status);
   }
 
@@ -610,7 +632,7 @@ int sl_si91x_recvfrom(int socket,
   if (status == SL_STATUS_SI91X_SOCKET_CLOSED) {
     sli_buffer_manager_free_buffer(response_buffer);
     errno                                = ENOTCONN;
-    si91x_socket->Is_receive_cmd_pending = false;
+    si91x_socket->is_receive_cmd_pending = false;
     return -1;
   }
 
@@ -618,7 +640,7 @@ int sl_si91x_recvfrom(int socket,
   if ((status != SL_STATUS_OK) && (response_buffer != NULL)) {
     sli_buffer_manager_free_buffer(response_buffer);
   }
-  si91x_socket->Is_receive_cmd_pending = false;
+  si91x_socket->is_receive_cmd_pending = false;
 
   SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_OK, SLI_SI91X_UNDEFINED_ERROR);
 

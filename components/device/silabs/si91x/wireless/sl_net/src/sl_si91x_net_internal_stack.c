@@ -47,6 +47,32 @@
 // Global variable indicating if the device is initialized
 extern bool device_initialized;
 
+static sl_status_t sli_send_client_ip_address_info_if_applicable(const sl_net_ip_configuration_t *ip_config,
+                                                                 uint8_t virtual_ap_id)
+{
+  sl_status_t status = SL_STATUS_OK;
+
+  if ((virtual_ap_id == SL_WIFI_CLIENT_VAP_ID) || (virtual_ap_id == SL_WIFI_CLIENT_VAP_ID_1)) {
+    sli_wifi_ip_address_info_t ip_info = { 0 };
+
+    if (ip_config->type & SL_IPV4) {
+      ip_info.flags |= SLI_WIFI_IPV4_AVAILABLE;
+      memcpy(ip_info.ipv4_address, ip_config->ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
+    }
+
+    if (ip_config->type & SL_IPV6) {
+      ip_info.flags |= SLI_WIFI_IPV6_AVAILABLE;
+      memcpy(ip_info.ipv6_address, ip_config->ip.v6.link_local_address.bytes, sizeof(sl_ipv6_address_t));
+    }
+
+    if (ip_info.flags != 0) {
+      status = sli_wifi_send_ip_address_info(SL_WIFI_CLIENT_INTERFACE, &ip_info);
+    }
+  }
+
+  return status;
+}
+
 sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
                                          uint8_t virtual_ap_id,
                                          const uint32_t timeout)
@@ -63,13 +89,8 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  // Check for NULL ip_config pointer
-  if (NULL == ip_config) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  // Check if timeout is 0
-  if (0 == timeout) {
+  // Check for NULL ip_config pointer or timeout is 0
+  if ((NULL == ip_config) || (0 == timeout)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -105,7 +126,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     ip_req.dhcp_discover_max_retries      = ip_config->dhcp_config.max_discover_retries;
     ip_req.dhcp_request_max_retries       = ip_config->dhcp_config.max_request_retries;
 
-    status = sli_wifi_send_command(SLI_WLAN_REQ_IPCONFV4,
+    status = sli_wifi_send_command(SLI_WIFI_REQ_IPCONFV4,
                                    SLI_SI91X_NETWORK_CMD,
                                    &ip_req,
                                    sizeof(sli_si91x_req_ipv4_params_t),
@@ -152,7 +173,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     }
 
     // Send the IPv6 configuration request to SI91X driver
-    status = sli_wifi_send_command(SLI_WLAN_REQ_IPCONFV6,
+    status = sli_wifi_send_command(SLI_WIFI_REQ_IPCONFV6,
                                    SLI_SI91X_NETWORK_CMD,
                                    &ipv6_request,
                                    sizeof(sli_si91x_req_ipv6_params_t),
@@ -185,6 +206,10 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     // Free the buffer and return success status
     sli_buffer_manager_free_buffer(buffer);
   }
+
+  // Send IP address information to firmware if it's a client interface.
+  status = sli_send_client_ip_address_info_if_applicable(ip_config, virtual_ap_id);
+  VERIFY_STATUS_AND_RETURN(status);
 
   return status;
 }

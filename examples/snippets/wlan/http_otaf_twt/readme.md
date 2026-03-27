@@ -332,58 +332,37 @@ The application can be configured to suit your requirements and the development 
     - sl_wifi_enable_target_wake_time - This API allows users to manually configure iTWT session parameters and enables the iTWT session. This API is not recommended for users. It is for internal certification purposes only.
     - sl_wifi_disable_target_wake_time - Disables a TWT session.
 
-    **sl_wifi_target_wake_time_auto_selection API**
+    **sl_wifi_target_wake_time_auto_selection_v2 API**
     
     ```c
-      sl_status_t sl_wifi_target_wake_time_auto_selection(sl_wifi_twt_selection_t *twt_auto_request)
+      sl_status_t sl_wifi_target_wake_time_auto_selection_v2(sl_wifi_twt_selection_v2_t *config)
     ```
-    Parameters of this API can be configured in *sl_wifi_twt_selection_t* structure. 
+    Parameters of this API can be configured in *sl_wifi_twt_selection_v2_t* structure.
     This TWT API is recommended because it is designed for maintaining connections, improving throughput, and enhancing power performance.
 
-    
    The following are the parameter descriptions:
     - twt_enable:  1- Setup ; 0 - teardown
+    - avg_tx_throughput:  This is the expected average Tx throughput in Kbps. Value ranges from 0 to 10 Mbps, which is half of the default [device_average_throughput](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-selection-v2-t#device-average-throughput) (20 Mbps by default).
     - tx_latency:  The allowed latency, in milliseconds, within which the given Tx operation is expected to be completed. If 0 is configured, the maximum allowed Tx latency is the same as rx_latency. Otherwise, valid values are in the range of [200 ms - 6 hrs].
     - rx_latency: The maximum latency, in milliseconds, for receiving buffered packets from the AP. The device wakes up at least once for a TWT service period within the configured rx_latency if there are any pending packets destined for the device from the AP. If set to 0, the default latency of 2 seconds is used. Valid range is between 2 seconds to 6 hours. Recommended range is 2 seconds to 60 seconds to avoid connection failures with AP due to longer sleep time.
-    - avg_tx_throughput:  This is the expected average Tx throughput in Kbps. Value ranges from 0 to 10 Mbps, which is half of the default [device_average_throughput](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-selection-t#device-average-throughput) (20 Mbps by default).
 
-    For more information on parameters, refer to [sl_wifi_twt_selection_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-selection-t).
+    For more information, refer to [sl_wifi_twt_selection_v2_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-selection-v2-t).
 
     Enable TWT_AUTO_CONFIG MACRO in the app.c file.
 
    The following are sample configurations.
     ```c
-      sl_wifi_twt_selection_t       default_twt_selection_configuration = {
-        .twt_enable                            = 1,
-        .average_tx_throughput                 = 1000,
-        .tx_latency                            = 0,
-        .rx_latency                            = 5000,
-        .device_average_throughput             = DEVICE_AVERAGE_THROUGHPUT,
-        .estimated_extra_wake_duration_percent = ESTIMATE_EXTRA_WAKE_DURATION_PERCENT,
-        .twt_tolerable_deviation               = TWT_TOLERABLE_DEVIATION,
-        .default_wake_interval_ms              = TWT_DEFAULT_WAKE_INTERVAL_MS,
-        .default_minimum_wake_duration_ms      = TWT_DEFAULT_WAKE_DURATION_MS,
-        .beacon_wake_up_count_after_sp         = MAX_BEACON_WAKE_UP_AFTER_SP
+      sl_wifi_twt_selection_v2_t default_twt_config = {
+        .twt_enable            = 1,
+        .average_tx_throughput = 1000,
+        .tx_latency            = 0,
+        .rx_latency            = 5000,
       };
     ```
 
-    Sample API call is given as below : 
+    Sample API call:
     ```c
-      status                            = sl_wifi_target_wake_time_auto_selection(&performance_profile.twt_selection);
-    ```
-
-    The following are the default macro settings. The user should not change these values as they may affect the algorithm's functioning. 
-
-    Sample Macro Settings : 
-    ```c
-      #define DEVICE_AVG_THROUGHPUT                20000 \\ Kbps
-      #define ESTIMATE_EXTRA_WAKE_DURATION_PERCENT 0 \\ in percentage
-      #define TWT_TOLERABLE_DEVIATION              10 \\ in percentage
-      #define TWT_DEFAULT_WAKE_INTERVAL_MS         1024     // in milli   seconds
-      #define TWT_DEFAULT_WAKE_DURATION_MS         16       // in milli seconds
-      #define MAX_TX_AND_RX_LATENCY_LIMIT          22118400 // 6 hrs in milli seconds
-      #define MAX_BEACON_WAKE_UP_AFTER_SP \
-      2 // The number of beacons after the service period completion for which the module wakes up and listens for any pending RX.
+      status = sl_wifi_target_wake_time_auto_selection_v2(&default_twt_config);
     ```
 
     >Note :  WLAN Keep Alive should not be disabled while using this API.
@@ -464,9 +443,9 @@ The application can be configured to suit your requirements and the development 
   To teardown TWT session, use the matching TWT teardown API corresponding to the TWT setup configuration API:
     1. For TWT parameters Auto Selection API, call the following API to teardown:
     ```c
-        status = sl_wifi_target_wake_time_auto_selection(twt_selection);
+        status = sl_wifi_target_wake_time_auto_selection_v2(&twt_config);
     ```
-    - Set twt_enable parameter to '0' in the **twt_selection** structure. 
+    - Set twt_enable parameter to '0' in the **twt_config** (sl_wifi_twt_selection_v2_t) structure. 
     - The other parameters in the structure are ignored. 
 
     2. For manually configurable TWT parameters API, call the following API to teardown:

@@ -1,9 +1,13 @@
 project_name: wifi_net_dual_stack_nwp_m4
 package: wifi_app
 quality: production
-label: Wi-Fi - Network Dual Stack NWP M4
+label: Wi-Fi - Network Dual Stack NWP M4 (IPv4/IPv6)
 category: Example|Wi-Fi
-description: 'Wi-Fi Network Dual Stack Example
+description: 'Wi-Fi Network Dual Stack Example demonstrating:
+
+  - TA (Offload stack): IPv4 + IPv6 dual stack
+
+  - LWIP (Host stack): IPv4 + IPv6 (application demonstrates IPv6 traffic)
 
   '
 filter:
@@ -21,6 +25,9 @@ include:
   - path: app.h
 define:
 - name: SL_SI91X_PRINT_DBG_LOG
+- name: SLI_SI91X_ENABLE_IPV6
+- name: LWIP_IPV6
+  value: '1'
 component:
 - id: sl_main
 - id: freertos

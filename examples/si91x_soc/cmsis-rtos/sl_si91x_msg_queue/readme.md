@@ -15,6 +15,9 @@
     - [I2C Pin Configuration](#i2c-pin-configuration)
   - [USART Pin Configuration](#usart-pin-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs / Support](#report-bugs--support)
 
 ## Purpose/Scope
 
@@ -173,3 +176,20 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 9. After successful program execution the prints in serial console looks as shown below.
 
     ![Figure: Introduction](resources/readme/output.png)
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+- If I2C or USART communication fails, verify pin connections (SCL/SDA for I2C, TX/RX loopback for USART) and that the leader application uses the same buffer size and I2C address.
+- If "Test Case Passed" does not appear, check serial console baud rate (115200) and that both msg_queue and I2C leader applications are running.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

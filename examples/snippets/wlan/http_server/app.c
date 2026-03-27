@@ -304,7 +304,10 @@ sl_status_t large_data_handler(sl_http_server_t *handle, sl_http_server_request_
     data_length            = req->request_data_length;
 
     while (0 != data_length) {
-      sl_http_server_read_request_data(handle, &recvData);
+      if (sl_http_server_read_request_data(handle, &recvData) != SL_STATUS_OK) {
+        // Peer closed connection or read error; do not send response
+        return SL_STATUS_FAIL;
+      }
       data_length -= recvData.received_data_length;
       printf("Read %lu bytes, remaining %lu bytes\n", recvData.received_data_length, data_length);
     }

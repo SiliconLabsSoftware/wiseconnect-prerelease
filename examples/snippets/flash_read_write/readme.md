@@ -13,7 +13,10 @@
   - [Application Build Environment](#application-build-environment)
   - [Configuration Parameters](#configuration-parameters)
   - [Test the Application](#test-the-application)
-  
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs / Support](#report-bugs--support)
+
 ## Purpose/Scope
 
 This application demonstrates the process of writing to and reading from SiWx91x flash.
@@ -93,3 +96,16 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - After successful execution of the application, the output will be displayed on the console.
 
   ![Output](resources/readme/output_prints.png)
+
+## Troubleshooting
+
+For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-troubleshooting/).
+
+## Resources
+
+- [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+
+## Report Bugs / Support
+
+To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

@@ -14,6 +14,9 @@
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
   - [Application Output](#application-output)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs / Support](#report-bugs--support)
 
 ## Purpose/Scope
 
@@ -87,3 +90,16 @@ Follow the steps as mentioned for the successful execution of the application:
       a. openssl dgst -sha256 -verify <Attestation_pubkey.pem> -signature <signature_file> <payload_file>
 
 5. If out put is "Vefified OK", program is working fine. If  verification is failed, could be payload and Signature is copied wrongly.
+
+## Troubleshooting
+
+For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-troubleshooting/).
+
+## Resources
+
+- [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+
+## Report Bugs / Support
+
+To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

@@ -148,3 +148,13 @@ Watch for system reset in a few seconds...
 - **No Debug Output**: Ensure console is properly configured in Simplicity Studio.
 - **System Resets**: If the system resets unexpectedly, check for infinite loops or blocking operations in your code.
 - **WDT Manager Issues**: The WDT manager is automatically managed, but ensure no other components are interfering with the watchdog timer.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

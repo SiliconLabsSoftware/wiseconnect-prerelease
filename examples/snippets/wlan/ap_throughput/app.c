@@ -73,7 +73,7 @@
 #define UDP_BUFFER_SIZE 1470
 #define TLS_BUFFER_SIZE 1370
 
-// Bufer Size
+// Buffer Size
 #if ((THROUGHPUT_TYPE == UDP_RX) || (THROUGHPUT_TYPE == UDP_TX))
 #define BUFFER_SIZE UDP_BUFFER_SIZE
 #elif ((THROUGHPUT_TYPE == TCP_RX) || (THROUGHPUT_TYPE == TCP_TX))
@@ -341,7 +341,7 @@ static void application_start(void *argument)
 
   // Wait for client to get connect to AP
   while (ap_client_connected != true) {
-    printf("waiting for client to connect with APUT : %d\r\n", ap_client_connected);
+    printf("waiting for client to connect with AP : %d\r\n", ap_client_connected);
     osDelay(1000);
   }
 
@@ -574,7 +574,7 @@ void receive_data_from_tcp_client(void)
   }
   printf("\r\nClient Socket ID : %d\r\n", client_socket);
 
-  // Recieve data
+  // Receive data
   printf("\r\nTCP_RX Throughput test start\r\n");
   start = osKernelGetTickCount();
   while (1) {

@@ -277,7 +277,7 @@ sl_status_t wifi_stats_receive_handler(sl_wifi_event_t event,
   if (event == SL_WIFI_STATS_ASYNC_EVENT) {
     sl_wifi_async_stats_response_t *result = (sl_wifi_async_stats_response_t *)reponse;
 
-    printf("\r\n%s: WIFI STATS Recieved packet# %d\n", __func__, stats_count);
+    printf("\r\n%s: WIFI STATS Received packet# %d\n", __func__, stats_count);
     printf("stats : crc_pass %d, crc_fail %d, cal_rssi :%d\n", result->crc_pass, result->crc_fail, result->cal_rssi);
     float p = result->crc_pass;
     float f = result->crc_fail;

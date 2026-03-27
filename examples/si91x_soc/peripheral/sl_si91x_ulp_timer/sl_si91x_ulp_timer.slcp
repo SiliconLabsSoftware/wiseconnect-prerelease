@@ -5,7 +5,7 @@ description: 'This application demonstrates ULP Timer functionality.
   '
 category: example|peripheral
 quality: production
-label: SI91x - SL_ULP_Timer
+label: Platform SiWx91x - ULP Timer
 component:
 - id: sl_main
 - id: status
@@ -62,6 +62,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

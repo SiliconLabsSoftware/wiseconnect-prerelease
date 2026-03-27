@@ -211,7 +211,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
   sl_status_t status;
 
   status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *)p->payload, p->len);
-  if (status != SL_STATUS_OK) {
+  if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS) {
     return ERR_IF;
   }
   return ERR_OK;
@@ -274,6 +274,40 @@ static void sta_netif_config(void)
   netif_set_default(&(wifi_client_context->netif));
 }
 
+static sl_status_t sli_send_ip_info_to_firmware_from_profile(const sl_net_wifi_client_profile_t *profile)
+{
+  sli_wifi_ip_address_info_t ip_info = { 0 };
+
+  if ((profile->ip.type & SL_IPV4) == SL_IPV4) {
+    ip_info.flags |= SLI_WIFI_IPV4_AVAILABLE;
+    memcpy(ip_info.ipv4_address, profile->ip.ip.v4.ip_address.bytes, sizeof(ip_info.ipv4_address));
+  }
+
+  if ((profile->ip.type & SL_IPV6) == SL_IPV6) {
+    ip_info.flags |= SLI_WIFI_IPV6_AVAILABLE;
+    memcpy(ip_info.ipv6_address, profile->ip.ip.v6.link_local_address.bytes, sizeof(ip_info.ipv6_address));
+  }
+
+  if (ip_info.flags != 0) {
+    return sli_wifi_send_ip_address_info(SL_WIFI_CLIENT_INTERFACE, &ip_info);
+  }
+
+  return SL_STATUS_OK;
+}
+
+#if LWIP_IPV6
+/* SDK stores IPv6 addresses in little-endian format (each 32-bit word is LE).
+ * LwIP expects network byte order (big-endian). Convert and set one address. */
+static void set_netif_ip6_from_profile_value(struct netif *netif, int idx, const uint32_t value[4])
+{
+  ip6_addr_t ip6_addr;
+  for (int i = 0; i < 4; i++) {
+    ip6_addr.addr[i] = htonl(value[i]);
+  }
+  netif_ip6_addr_set(netif, idx, &ip6_addr);
+}
+#endif /* LWIP_IPV6 */
+
 /* In dual stack mode, assign the IP received from offloaded stack to LWIP interface statically */
 static void set_sta_link_up(sl_net_wifi_client_profile_t *profile)
 {
@@ -299,16 +333,9 @@ static void set_sta_link_up(sl_net_wifi_client_profile_t *profile)
                             &gateway.u_addr.ip4);
   }
   if ((profile->ip.type & SL_IPV6) == SL_IPV6) {
-    uint32_t *address = &(profile->ip.ip.v6.link_local_address.value[0]);
-    IP6_ADDR(&ipaddr.u_addr.ip6, address[0], address[1], address[2], address[3]);
-    address = &(profile->ip.ip.v6.global_address.value[0]);
-    IP6_ADDR(&gateway.u_addr.ip6, address[0], address[1], address[2], address[3]);
-    address = &(profile->ip.ip.v6.gateway.value[0]);
-    IP6_ADDR(&netmask.u_addr.ip6, address[0], address[1], address[2], address[3]);
-
-    netif_ip6_addr_set(&(wifi_client_context->netif), 0, &ipaddr.u_addr.ip6);
-    netif_ip6_addr_set(&(wifi_client_context->netif), 1, &gateway.u_addr.ip6);
-    netif_ip6_addr_set(&(wifi_client_context->netif), 2, &netmask.u_addr.ip6);
+    set_netif_ip6_from_profile_value(&(wifi_client_context->netif), 0, profile->ip.ip.v6.link_local_address.value);
+    set_netif_ip6_from_profile_value(&(wifi_client_context->netif), 1, profile->ip.ip.v6.global_address.value);
+    set_netif_ip6_from_profile_value(&(wifi_client_context->netif), 2, profile->ip.ip.v6.gateway.value);
 
     netif_ip6_addr_set_state(&(wifi_client_context->netif), 0, IP6_ADDR_PREFERRED);
     netif_ip6_addr_set_state(&(wifi_client_context->netif), 1, IP6_ADDR_PREFERRED);
@@ -328,19 +355,9 @@ static void set_sta_link_up(sl_net_wifi_client_profile_t *profile)
 
   netifapi_netif_set_addr(&(wifi_client_context->netif), &ipaddr, &netmask, &gateway);
 #elif LWIP_IPV6
-  ip6_addr_t link_local_address = { 0 };
-  ip6_addr_t global_address     = { 0 };
-  ip6_addr_t gateway            = { 0 };
-  uint32_t *address             = &(profile->ip.ip.v6.link_local_address.value[0]);
-
-  IP6_ADDR(&link_local_address, address[0], address[1], address[2], address[3]);
-  address = &(profile->ip.ip.v6.global_address.value[0]);
-  IP6_ADDR(&global_address, address[0], address[1], address[2], address[3]);
-  address = &(profile->ip.ip.v6.gateway.value[0]);
-  IP6_ADDR(&gateway, address[0], address[1], address[2], address[3]);
-  netif_ip6_addr_set(&(wifi_client_context->netif), 0, &link_local_address);
-  netif_ip6_addr_set(&(wifi_client_context->netif), 1, &global_address);
-  netif_ip6_addr_set(&(wifi_client_context->netif), 2, &gateway);
+  set_netif_ip6_from_profile_value(&(wifi_client_context->netif), 0, profile->ip.ip.v6.link_local_address.value);
+  set_netif_ip6_from_profile_value(&(wifi_client_context->netif), 1, profile->ip.ip.v6.global_address.value);
+  set_netif_ip6_from_profile_value(&(wifi_client_context->netif), 2, profile->ip.ip.v6.gateway.value);
 
   netif_ip6_addr_set_state(&(wifi_client_context->netif), 0, IP6_ADDR_PREFERRED);
   netif_ip6_addr_set_state(&(wifi_client_context->netif), 1, IP6_ADDR_PREFERRED);
@@ -591,6 +608,11 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Set the client profile
   status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, profile_id, &profile);
+  VERIFY_STATUS_AND_RETURN(status);
+
+  status = sli_send_ip_info_to_firmware_from_profile(&profile);
+  VERIFY_STATUS_AND_RETURN(status);
+
   return status;
 }
 
@@ -741,11 +763,11 @@ static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interfac
   }
   multicast.type[0] = command_type;
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_MULTICAST,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_MULTICAST,
                                  SLI_SI91X_NETWORK_CMD,
                                  &multicast,
                                  sizeof(multicast),
-                                 SLI_WLAN_RSP_MULTICAST_WAIT_TIME,
+                                 SLI_WIFI_RSP_MULTICAST_WAIT_TIME,
                                  NULL,
                                  NULL);
 
@@ -779,7 +801,7 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
   dns_query_request.ip_version[0] = (dns_resolution_ip == SL_NET_DNS_TYPE_IPV4) ? 4 : 6;
   memcpy(dns_query_request.url_name, host_name, sizeof(dns_query_request.url_name));
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_DNS_QUERY,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_DNS_QUERY,
                                  SLI_SI91X_NETWORK_CMD,
                                  &dns_query_request,
                                  sizeof(dns_query_request),
@@ -859,11 +881,11 @@ sl_status_t sl_net_set_dns_server(sl_net_interface_t interface, const sl_net_dns
            SL_IPV6_ADDRESS_LENGTH);
   }
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_DNS_SERVER_ADD,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_DNS_SERVER_ADD,
                                  SLI_SI91X_NETWORK_CMD,
                                  &dns_server_add_request,
                                  sizeof(dns_server_add_request),
-                                 SLI_WLAN_RSP_DNS_SERVER_ADD_WAIT_TIME,
+                                 SLI_WIFI_RSP_DNS_SERVER_ADD_WAIT_TIME,
                                  NULL,
                                  NULL);
 

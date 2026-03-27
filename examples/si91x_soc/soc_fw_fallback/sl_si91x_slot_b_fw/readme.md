@@ -5,6 +5,7 @@
 - [Wi-Fi - NWP-M4 Firmware Update via TCP (A/B Fallback)](#wi-fi---nwp-m4-firmware-update-via-tcp-ab-fallback)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
+  - [Overview](#overview)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
@@ -14,6 +15,9 @@
     - [STA Instance-related Parameters](#sta-instance-related-parameters)
     - [TCP Configuration](#tcp-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs / Support](#report-bugs--support)
 
 ## Purpose/Scope
 
@@ -28,6 +32,10 @@ This process allows the device to update its software over the air (OTA) without
 
 >**Note:**
 >This feature doesnot support sleep wakeup functionality from M4 Updater.
+
+## Overview
+
+This example downloads M4 firmware over Wi-Fi from a TCP server and programs the device flash (Slot B). It is used with the A/B fallback flow for OTA updates.
 
 ## Prerequisites/Setup Requirements
 
@@ -221,3 +229,18 @@ To establish the TCP server with firmware file on remote PC, follow the steps be
 
  ![Figure: output_soc_1](resources/readme/output_soc_1.png)
 
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+- If OTA update fails, verify Wi-Fi connection, TCP server is running with the correct firmware file, and MBR fallback profile is provisioned.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

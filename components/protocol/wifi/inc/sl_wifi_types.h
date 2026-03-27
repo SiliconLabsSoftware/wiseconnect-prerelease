@@ -264,14 +264,16 @@ typedef struct {
  *       after finding the access point.
  * @note The `channel_bitmap_2g4` uses the lower 14 bits to represent channels from 1 to 14,
  *       where channel 1 = (1 << 0), channel 2 = (1 << 1), and so on.
+ * @note The 'channel_bitmap_5' uses the lower 25 bits to represent channels.
  * @note When `channel_bitmap_2g4` is not set (value is 0), the device will scan all available channels.
+ * @note When `channel_bitmap_5` is not set (value is 0), the device will scan all available channels.
  * @note `periodic_scan_interval` is only applicable for SL_WIFI_SCAN_TYPE_ADV_SCAN of type @ref sl_wifi_scan_type_t.
  * @note To configure active_channel_time and passive_channel_time for active and passive scans, 
  *       use the sl_wifi_set_advanced_scan_configuration() API with @ref sl_wifi_advanced_scan_configuration_t.
  * @note Channel scanning behavior:
- *       - For active scans: Scans the channels specified in `channel_bitmap_2g4`. If set to 0, scans all available channels. Can be configured as a subset of channels.
- *       - For background scans (SL_WIFI_SCAN_TYPE_ADV_SCAN): Scans the channels that were originally specified in `channel_bitmap_2g4` during the first scan. The channel bitmap cannot be modified for background scans.
- * @note 5 GHz is not supported.
+ *       - For active scans: Scans the channels specified in `channel_bitmap_2g4` and `channel_bitmap_5`. If set to 0, scans all available channels. Can be configured as a subset of channels.
+ *       - For background scans (SL_WIFI_SCAN_TYPE_ADV_SCAN): Scans the channels that were originally specified in `channel_bitmap_2g4` and `channel_bitmap_5` during the first scan. The channel bitmap cannot be modified for background scans.
+ * @note 5 GHz is not supported in SiWx91x devices.
  *
  * | Channel Number 2.4 GHz | channel_bitmap_2g4    |
  * |------------------------|-----------------------|
@@ -289,13 +291,42 @@ typedef struct {
  * | 12                     | (1 << 11)             |
  * | 13                     | (1 << 12)             |
  * | 14                     | (1 << 13)             |
+ *
+ * | Channel Number 5 GHz   | channel_bitmap_5    |
+ * |------------------------|-----------------------|
+ * |All available channels  | 0                     |
+ * | 36                     | (1 << 0)              |
+ * | 40                     | (1 << 1)              |
+ * | 44                     | (1 << 2)              |
+ * | 48                     | (1 << 3)              |
+ * | 52                     | (1 << 4)              |
+ * | 56                     | (1 << 5)              |
+ * | 60                     | (1 << 6)              |
+ * | 64                     | (1 << 7)              |
+ * | 100                    | (1 << 8)              |
+ * | 104                    | (1 << 9)              |
+ * | 108                    | (1 << 10)             |
+ * | 112                    | (1 << 11)             |
+ * | 116                    | (1 << 12)             |
+ * | 120                    | (1 << 13)             |
+ * | 124                    | (1 << 14)             |
+ * | 128                    | (1 << 15)             |
+ * | 132                    | (1 << 16)             |
+ * | 136                    | (1 << 17)             |
+ * | 140                    | (1 << 18)             |
+ * | 144                    | (1 << 19)             |
+ * | 149                    | (1 << 20)             |
+ * | 153                    | (1 << 21)             |
+ * | 157                    | (1 << 22)             |
+ * | 161                    | (1 << 23)             
+ * | 165                    | (1 << 24)             |
  */
 typedef struct {
   sl_wifi_scan_type_t type;        ///< Scan type to be configured of type @ref sl_wifi_scan_type_t
   uint32_t flags;                  ///< Reserved
   uint32_t periodic_scan_interval; ///< Duration in milliseconds between periodic scans
   uint16_t channel_bitmap_2g4;     ///< Bitmap of selected 2.4 GHz channels
-  uint32_t channel_bitmap_5g[8];   ///< Bitmap of selected 5 GHz channels (currently not supported)
+  uint32_t channel_bitmap_5g[8];   ///< Bitmap of selected 5 GHz channels (Not supported in SiWx91x devices)
   uint8_t lp_mode;                 ///< Enable LP mode, 1 - Enable LP mode, 0 - Disable LP mode
 } sl_wifi_scan_configuration_t;
 
@@ -391,12 +422,12 @@ typedef struct {
  * @note A 2.4 GHz channel is enabled by setting the bit of the corresponding channel number minus 1.
  * For example, for channel 1, set bit 0; 
  				for channel 2, set bit 1, and so on. @ref sl_wifi_scan_configuration_t
- * @note 5 GHz chnannels are not supported.
+ * @note 5 GHz chnannels are not supported in SiWx91x devices.
  */
 typedef struct {
   uint16_t channel_bitmap_2_4; ///< Channel bitmap for scanning in a set of selective channels in 2.4 GHz.
   uint32_t
-    channel_bitmap_5; ///< Channel bitmap for scanning in a set of selective channels in 5 GHz. (Currently not supported).
+    channel_bitmap_5; ///< Channel bitmap for scanning in a set of selective channels in 5 GHz. (Not supported in SiWx91x devices).
 } sl_wifi_channel_bitmap_t;
 
 /**
@@ -605,6 +636,21 @@ typedef struct {
   uint8_t
     beacon_wake_up_count_after_sp; ///< The number of beacons after the service period completion for which the module wakes up and listens for any pending RX. The default value is 2. Internal SDK use only: do not use.
 } sl_wifi_twt_selection_t;
+
+/**
+ * @struct sl_wifi_twt_selection_v2_t
+ * @brief TWT (Target Wake Time) auto-selection configuration. Use this structure with @ref sl_wifi_target_wake_time_auto_selection_v2.
+ *        Only these four parameters are configurable; all other TWT parameters are set internally by the SDK.
+ */
+typedef struct {
+  uint8_t twt_enable; ///< TWT enable. 0 - TWT session teardown; 1 - TWT session setup.
+  uint16_t
+    average_tx_throughput; ///< Expected average Tx throughput in Kbps. Range: 0 to 10 Mbps (half of default device capability).
+  uint32_t
+    tx_latency; ///< Allowed Tx latency in milliseconds. If 0, maximum Tx latency equals rx_latency. Valid range: 200 ms - 6 hrs.
+  uint32_t
+    rx_latency; ///< Maximum latency in ms for receiving buffered packets from AP. If 0, default 2 s is used. Valid range: 2 s - 6 hrs. Recommended: 2 s - 60 s.
+} sl_wifi_twt_selection_v2_t;
 
 /**
  * @struct sl_wifi_reschedule_twt_config_t
@@ -1501,6 +1547,20 @@ typedef struct {
   uint16_t
     passive_scan_timeout_value; ///< Time spent on each channel when performing passive scan (milliseconds). The minimum passive_scan_timeout_value is 5 millisecs, and maximum is 1000 milliseconds. Default value of 400 milliseconds is used when SL_WIFI_DEFAULT_PASSIVE_CHANNEL_SCAN_TIME is passed.
 } sl_wifi_timeout_t;
+
+/**
+ * @enum sl_wifi_timeout_type_t
+ * @brief Wi-Fi timeout types
+ */
+typedef enum {
+  SL_WIFI_AUTHENTICATION_ASSOCIATION_TIMEOUT =
+    0, ///< Used for setting association and authentication timeout request in milliseconds
+  SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT,  ///< Used for setting dwell time per channel in milliseconds during active scan
+  SL_WIFI_KEEP_ALIVE_TIMEOUT,           ///< Used for setting WLAN keep alive time in seconds
+  SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT, ///< Used for setting dwell time per channel in milliseconds during passive scan
+  SL_WIFI_BSS_MAX_IDLE_PERIOD,          ///< Used for setting BSS Max Idle Period in seconds
+  SL_WIFI_TIMEOUT_TYPE_MAX              ///< Used for setting the maximum timeout type
+} sl_wifi_timeout_type_t;
 
 /**
  * @struct sl_wifi_request_tx_test_info_t

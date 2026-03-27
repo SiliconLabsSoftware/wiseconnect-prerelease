@@ -51,6 +51,10 @@
 // Global array to track the initialization state of each network interface
 bool sl_net_interface_initialized[SL_NET_INTERFACE_MAX] = { false };
 
+#ifdef SL_SI91X_NVM3_CONFIG_MANAGER
+static bool nvm3_default_initialized = false;
+#endif
+
 extern bool device_initialized;
 // Helper function to check if any network interface is initialized
 static bool sli_is_any_interface_initialized(void)
@@ -75,10 +79,49 @@ static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
   }
   status = sl_net_wifi_client_init(interface, configuration, network_context, event_handler);
   VERIFY_STATUS_AND_RETURN(status);
+
+  sl_net_profile_id_t profile_id = SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID;
+
 #ifdef SL_SI91X_NVM3_CONFIG_MANAGER
-  status = nvm3_initDefault();
-  VERIFY_STATUS_AND_RETURN(status);
-#endif
+  // When NVM3 is enabled, use NVM profile + NVM credential only when both are valid in NVM.
+  // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
+  sl_net_wifi_client_profile_t stored_profile;
+  bool is_nvm_profile_valid;
+  if (DEFAULT_WIFI_CLIENT_PROFILE.config.ssid.length > 0) {
+    is_nvm_profile_valid =
+      (sl_net_get_profile(interface, profile_id, (sl_net_profile_t *)&stored_profile) == SL_STATUS_OK)
+      && (sli_net_validate_sl_net_profile((const sl_net_profile_t *)&stored_profile, interface) == SL_STATUS_OK);
+  } else {
+    is_nvm_profile_valid =
+      true; // No default profile is defined in sl_net_default_values.h, so consider NVM profile as valid
+  }
+  bool is_nvm_credential_valid;
+  if (default_wifi_client_credential.data_length > 0) {
+    sl_net_credential_type_t cred_type;
+    uint8_t cred_buf[SL_WIFI_MAX_PSK_LENGTH];
+    uint32_t cred_len = sizeof(cred_buf);
+    is_nvm_credential_valid =
+      (sl_net_get_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, &cred_type, cred_buf, &cred_len)
+       == SL_STATUS_OK);
+  } else {
+    is_nvm_credential_valid =
+      true; // No default credential is defined in sl_net_default_values.h, so consider NVM credential as valid
+  }
+  if ((is_nvm_profile_valid == false) || (is_nvm_credential_valid == false)) {
+    // If either profile or credential present in NVM is invalid, then overwrite both values in NVM with the corresponding default values present in sl_net_default_values.h file.
+    if (default_wifi_client_credential.data_length > 0) {
+      status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
+                                     default_wifi_client_credential.type,
+                                     (const void *)default_wifi_client_credential.data,
+                                     default_wifi_client_credential.data_length);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+    if (DEFAULT_WIFI_CLIENT_PROFILE.config.ssid.length > 0) {
+      status = sl_net_set_profile(interface, profile_id, (const sl_net_profile_t *)&DEFAULT_WIFI_CLIENT_PROFILE);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+  }
+#else
   if (default_wifi_client_credential.data_length > 0) {
     status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
                                    default_wifi_client_credential.type,
@@ -86,13 +129,11 @@ static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
                                    default_wifi_client_credential.data_length);
     VERIFY_STATUS_AND_RETURN(status);
   }
-
-  sl_net_profile_id_t profile_id = SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID;
-
   if (DEFAULT_WIFI_CLIENT_PROFILE.config.ssid.length > 0) {
-    status = sl_net_set_profile(interface, profile_id, &DEFAULT_WIFI_CLIENT_PROFILE);
+    status = sl_net_set_profile(interface, profile_id, (const sl_net_profile_t *)&DEFAULT_WIFI_CLIENT_PROFILE);
     VERIFY_STATUS_AND_RETURN(status);
   }
+#endif
 
   sl_net_interface_initialized[interface] = true;
   return status;
@@ -111,17 +152,6 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
   }
   status = sl_net_wifi_ap_init(interface, configuration, network_context, event_handler);
   VERIFY_STATUS_AND_RETURN(status);
-#ifdef SL_SI91X_NVM3_CONFIG_MANAGER
-  status = nvm3_initDefault();
-  VERIFY_STATUS_AND_RETURN(status);
-#endif
-  if (default_wifi_ap_credential.data_length > 0) {
-    status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
-                                   default_wifi_ap_credential.type,
-                                   (const void *)default_wifi_ap_credential.data,
-                                   default_wifi_ap_credential.data_length);
-    VERIFY_STATUS_AND_RETURN(status);
-  }
 
   sl_net_profile_id_t profile_id = SL_NET_DEFAULT_WIFI_AP_PROFILE_ID;
 
@@ -138,10 +168,57 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
     ap_profile.config.maximum_clients = (uint8_t)max_clients;
   }
 
+#ifdef SL_SI91X_NVM3_CONFIG_MANAGER
+  // When NVM3 is enabled, use NVM profile + NVM credential only when both are valid in NVM.
+  // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
+  sl_net_wifi_ap_profile_t stored_ap_profile;
+  bool is_nvm_profile_valid;
   if (DEFAULT_WIFI_ACCESS_POINT_PROFILE.config.ssid.length > 0) {
-    status = sl_net_set_profile(interface, profile_id, &ap_profile);
+    is_nvm_profile_valid =
+      (sl_net_get_profile(interface, profile_id, (sl_net_profile_t *)&stored_ap_profile) == SL_STATUS_OK)
+      && (sli_net_validate_sl_net_profile((const sl_net_profile_t *)&stored_ap_profile, interface) == SL_STATUS_OK);
+  } else {
+    is_nvm_profile_valid =
+      true; // No default profile is defined in sl_net_default_values.h, so consider NVM profile as valid
+  }
+  bool is_nvm_credential_valid;
+  if (default_wifi_ap_credential.data_length > 0) {
+    sl_net_credential_type_t cred_type;
+    uint8_t cred_buf[SL_WIFI_MAX_PSK_LENGTH];
+    uint32_t cred_len = sizeof(cred_buf);
+    is_nvm_credential_valid =
+      (sl_net_get_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID, &cred_type, cred_buf, &cred_len) == SL_STATUS_OK);
+  } else {
+    is_nvm_credential_valid =
+      true; // No default credential is defined in sl_net_default_values.h, so consider NVM credential as valid
+  }
+  if ((is_nvm_profile_valid == false) || (is_nvm_credential_valid == false)) {
+    // If either profile or credential present in NVM is invalid, then overwrite both values in NVM with the corresponding default values present in sl_net_default_values.h file.
+    if (default_wifi_ap_credential.data_length > 0) {
+      status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
+                                     default_wifi_ap_credential.type,
+                                     (const void *)default_wifi_ap_credential.data,
+                                     default_wifi_ap_credential.data_length);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+    if (DEFAULT_WIFI_ACCESS_POINT_PROFILE.config.ssid.length > 0) {
+      status = sl_net_set_profile(interface, profile_id, (const sl_net_profile_t *)&ap_profile);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+  }
+#else
+  if (default_wifi_ap_credential.data_length > 0) {
+    status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
+                                   default_wifi_ap_credential.type,
+                                   (const void *)default_wifi_ap_credential.data,
+                                   default_wifi_ap_credential.data_length);
     VERIFY_STATUS_AND_RETURN(status);
   }
+  if (DEFAULT_WIFI_ACCESS_POINT_PROFILE.config.ssid.length > 0) {
+    status = sl_net_set_profile(interface, profile_id, (const sl_net_profile_t *)&ap_profile);
+    VERIFY_STATUS_AND_RETURN(status);
+  }
+#endif
 
   sl_net_interface_initialized[interface] = true;
   return status;
@@ -168,6 +245,15 @@ sl_status_t sl_net_init(sl_net_interface_t interface,
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
     return status;
   }
+
+#ifdef SL_SI91X_NVM3_CONFIG_MANAGER
+  // Initialize NVM3 once for credentials and profiles (shared by all interfaces)
+  if (!nvm3_default_initialized) {
+    status = nvm3_initDefault();
+    VERIFY_STATUS_AND_RETURN(status);
+    nvm3_default_initialized = true;
+  }
+#endif
 
   switch (SL_NET_INTERFACE_TYPE(interface)) {
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_1_INTERFACE)

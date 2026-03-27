@@ -146,6 +146,13 @@ sl_status_t sl_si91x_pcm_set_configuration(sl_i2s_handle_t pcm_handle,
   return status;
 }
 
+/***************************************************************************
+ * PCM peripheral and configure Tx/Rx channels
+ ******************************************************************************/
+sl_status_t sl_si91x_pcm_config_transmit_receive(sl_i2s_handle_t pcm_handle, sl_i2s_xfer_config_t *xfer_config)
+{
+  return sl_si91x_i2s_config_transmit_receive(pcm_handle, xfer_config);
+}
 /*******************************************************************************
  * Configure PCM transmit and send data on the Tx line.
  ******************************************************************************/
@@ -190,6 +197,23 @@ sl_status_t sl_si91x_pcm_receive_data(sl_i2s_handle_t pcm_handle, const void *da
   return status;
 }
 
+/*******************************************************************************
+ * @brief Transfers PCM data using the I2S peripheral.
+ * This function initiates a PCM data transfer operation using the underlying I2S
+ * interface. It can perform transmit, receive, or simultaneous transmit-receive
+ * operations based on the provided parameters.
+ ******************************************************************************/
+sl_status_t sl_si91x_pcm_transfer(sl_i2s_handle_t pcm_handle,
+                                  void *data_in,
+                                  const void *data_out,
+                                  uint32_t data_in_size,
+                                  uint32_t data_out_size)
+{
+  sl_status_t status = SL_STATUS_OK;
+  status             = sl_si91x_i2s_transfer(pcm_handle, data_in, data_out, data_in_size, data_out_size);
+
+  return status;
+}
 /*******************************************************************************
  * To register the user event callback
  ******************************************************************************/

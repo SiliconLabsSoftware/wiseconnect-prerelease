@@ -29,6 +29,7 @@
  ******************************************************************************/
 #ifndef SLI_WIFI_TYPES_H
 #define SLI_WIFI_TYPES_H
+#include <stdbool.h>
 #include "sl_wifi_device.h"
 #include "sl_wifi_constants.h"
 #include "sli_queue_manager.h"
@@ -43,6 +44,25 @@
 
 // Maximum number of stations associated when running as an AP
 #define SLI_WIFI_MAX_STATIONS 16
+
+//! @cond Doxygen_Suppress
+//**************************** Macros for FEATURE frame Method request START *********************************/
+#define SLI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE       (1 << 0)
+#define SLI_FEAT_FRAME_PERMIT_UNDESTINED_PACKETS (1 << 1)
+#define SLI_FEAT_FRAME_LP_CHAIN                  (1 << 4)
+#define SLI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE      (1 << 5)
+
+#define PLL_MODE      0
+#define RF_TYPE       1 // 0 - External RF 1- Internal RF
+#define WIRELESS_MODE 0
+#define ENABLE_PPP    0
+#define AFE_TYPE      1
+#ifndef SLI_FEATURE_ENABLES
+#define SLI_FEATURE_ENABLES \
+  (SLI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE | SLI_FEAT_FRAME_LP_CHAIN | SLI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE)
+#endif
+
+//**************************** Macros for FEATURE frame Method request END *********************************/
 
 // -----------------------------------------------------------------------------
 // Internal macros and enums for vendor-specific IE management
@@ -65,6 +85,36 @@
 
 #define SLI_WIFI_COUNTRY_CODE_LENGTH  3
 #define SLI_WIFI_MAX_POSSIBLE_CHANNEL 24
+
+// WLAN Management Frame Sub-Type
+#define SLI_WIFI_FRAME_SUBTYPE_MASK       0xf0 // WLAN Management Frame Sub-Type Mask
+#define SLI_WIFI_FRAME_SUBTYPE_PROBE_RESP 0x50 // WLAN Management Frame Sub-Type Probe Response Frame
+#define SLI_WIFI_FRAME_SUBTYPE_BEACON     0x80 // WLAN Management Frame Sub-Type Beacon Frame
+#define SLI_WIFI_MINIMUM_FRAME_LENGTH     36   // Minimum Frame Length of WLAN Management Frame
+#define SLI_WIFI_HARDWARE_ADDRESS_LENGTH  6    // Hardware Address Length
+
+// WLAN Information Element Type
+#define SLI_WLAN_TAG_SSID            0   // WLAN Information Element Type SSID
+#define SLI_WLAN_TAG_RSN             48  // WLAN Robust Security Network Information Element
+#define SLI_WLAN_TAG_VENDOR_SPECIFIC 221 // WLAN Vendor Specific Information Element
+
+// Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_UNSPEC_802_1X   0x000FAC01 // Unspecified Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_PSK_OVER_802_1X 0x000FAC02 // PSK Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_802_1X_SHA256   0x000FAC05 // SHA256 Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_PSK_SHA256      0x000FAC06 // PSK SHA256 Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_SAE             0x000FAC08 // SAE Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_FT_SAE          0x000FAC09 // FT_SAE Authentication key Management Type
+
+// Authentication key Management Type Flags
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA           0x00000001 // WPA AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA2          0x00000002 // WPA2 AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA_PSK       0x00000004 // WPA_PSK AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA2_PSK      0x00000008 // WPA2_PSK AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_SAE           0x00010000 // SAE AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_FT_SAE        0x00100000 // FT_SAE AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_802_1X_SHA256 0x00020000 // SHA256 AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_PSK_SHA256    0x00040000 // PSK_SHA256 AKM Type
 
 /// Efuse data information
 typedef union {
@@ -376,11 +426,6 @@ typedef struct {
   uint8_t beacon_miss_ignore_limit;
 } sli_wifi_power_save_request_t;
 
-/// Si91x specific buffer queue structure
-typedef struct {
-  sl_wifi_buffer_t *head; ///< Head
-  sl_wifi_buffer_t *tail; ///< Tail
-} sli_wifi_buffer_queue_t;
 /// Si91x specific command type
 typedef enum {
   SLI_WIFI_COMMON_CMD   = 0, ///< SI91X Common Command
@@ -390,26 +435,6 @@ typedef enum {
   SLI_SI91X_SOCKET_CMD  = 4, ///< SI91X Socket Command
   SI91X_CMD_MAX         = 5  ///< SI91X Maximum Command value
 } sli_wifi_command_type_t;
-/// Si91x queue packet structure
-typedef struct {
-  sl_wifi_buffer_t *host_packet;        ///< Si91x host buffer
-  uint8_t firmware_queue_id;            ///< Si91x firmware queue id
-  sli_wifi_command_type_t command_type; ///< Si91x command type
-  //  uint16_t packet_id;                   ///< Packet id, used internally to track packets
-  uint8_t flags;              ///< One of the values from Si91x packet response flags
-  uint16_t frame_status;      ///< Si91x command status
-  void *sdk_context;          ///< SDK context, unused internally to invoke user callbacks
-  uint32_t command_timeout;   ///< Si91x command timeout
-  uint32_t command_tickcount; ///< Command_tickcount stores the tickcount when the command is given to the bus thread
-  uint32_t event_mask;        ///< Bitmask to notify handler threads when a packet is added to the rx_queue.
-} sli_si91x_queue_packet_t;
-
-/// Structure to represent a command queue
-typedef struct {
-  osEventFlagsId_t event_flags; ///< Event flags for synchronization
-  sli_queue_t rx_queue;         ///< RX queue
-  uint32_t flag;                ///< Flags
-} sli_wifi_command_queue_t;
 
 // Scan Information
 typedef struct sli_scan_info_s {
@@ -420,6 +445,7 @@ typedef struct sli_scan_info_s {
   uint8_t network_type;                            ///< AP network type
   uint8_t ssid[34];                                ///< SSID of the AP
   uint8_t bssid[SLI_WIFI_HARDWARE_ADDRESS_LENGTH]; ///< BSSID of the AP
+  bool wpa_vendor_ie_seen;                         ///< true if WPA vendor IE was present (parsing only, not stored)
 } sli_scan_info_t;
 
 /// Si91x specific station information
@@ -547,4 +573,74 @@ typedef struct {
   uint16_t ie_buffer_length;  ///< Length of the IE buffer (must be < SLI_MAX_VENDOR_IE_BUFFER_LENGTH)
   uint8_t ie_buffer[];        ///< Flexible array for raw IE buffer
 } sli_wifi_manage_vendor_ie_packet_t;
+
+typedef struct {
+  uint8_t
+    pll_mode; ///< PLL Mode. 0 - less than 120 Mhz NWP SoC clock; 1 - greater than 120 Mhz NWP SoC clock (Mode 1 is not currently supported for coex)
+  uint8_t rf_type;          ///< RF Type.
+  uint8_t wireless_mode;    ///< Wireless Mode.
+  uint8_t enable_ppp;       ///< Enable PPP.
+  uint8_t afe_type;         ///< AFE Type.
+  uint32_t feature_enables; ///< Feature Enables.
+} sli_wifi_feature_frame_request;
+
+// WLAN Frame
+typedef struct {
+  uint8_t fc[2];                                   // Frame Control
+  uint8_t duration[2];                             // Duration
+  uint8_t da[SLI_WIFI_HARDWARE_ADDRESS_LENGTH];    // Destination Address
+  uint8_t sa[SLI_WIFI_HARDWARE_ADDRESS_LENGTH];    // Source Address
+  uint8_t bssid[SLI_WIFI_HARDWARE_ADDRESS_LENGTH]; // BSS Id
+  uint8_t sc[2];                                   // Sequence Control Id
+  uint8_t timestamp[8];                            // Time Stamp
+  uint8_t bi[2];                                   // Beacon Interval
+  uint8_t ci[2];                                   // Capability Information
+  uint8_t tagged_info[];                           // Variable Information Elememt
+} sli_wifi_data_frame_t;
+
+// WLAN Information Element
+typedef struct {
+  uint8_t tag;         // Information Element Tag Id
+  uint8_t data_length; // Information Element Data Length
+  uint8_t data[];      // Information Element Data
+} sli_wifi_data_tagged_info_t;
+
+// Cipher suite
+typedef struct {
+  uint8_t cs_oui[3]; // Cipher Suite OUI
+  uint8_t cs_type;   // Cipher Suite Type
+} sli_wifi_cipher_suite_t;
+
+// WLAN Robust Security Network Information Element
+typedef struct {
+  uint8_t version[2];          // RSN Version
+  sli_wifi_cipher_suite_t gcs; // Group cipher suite
+  uint8_t pcsc[2];             // Pairwise cipher suite count
+  uint8_t pcsl[];              // Pairwise cipher suite list
+} sli_wifi_rsn_element_t;
+
+// WLAN Vendor Specific Information Element
+typedef struct {
+  uint8_t oui[3];              // Vendor OUI
+  uint8_t vs_oui;              // Vendor specific OUI
+  uint8_t type;                // WPA Information Element
+  uint8_t wpa_version[2];      // WPA Version
+  sli_wifi_cipher_suite_t mcs; // Multicast Cipher Suite
+  uint8_t ucsc;                // Unicast Cipher Suite List Count
+  uint8_t ucsl[];              // Unicast Cipher Suite List
+} sli_wifi_vendor_specific_element_t;
+
+/**
+ * @struct sli_wifi_ip_address_info_t
+ * @brief IP address information structure for passing IP addresses to firmware.
+ * @details This structure is used to send the device's IP address information to firmware after obtaining an IP address.
+ *          The firmware uses this information for BSS Max Idle Period keepalive functionality (Gratuitous ARP for IPv4, Neighbor Advertisement for IPv6).
+ */
+typedef struct {
+  uint8_t flags;            // Bit flags: Bit 0 = IPv4 available, Bit 1 = IPv6 available
+  uint8_t reserved[3];      // Reserved
+  uint8_t ipv4_address[4];  // IPv4 address
+  uint8_t ipv6_address[16]; // IPv6 address
+} sli_wifi_ip_address_info_t;
+
 #endif // SLI_WIFI_TYPES_H

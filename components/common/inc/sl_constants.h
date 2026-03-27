@@ -57,6 +57,12 @@
 #define SL_DEPRECATED_API_WISECONNECT_4_0 __attribute__((deprecated))
 #endif
 
+#ifdef SL_SUPPRESS_DEPRECATION_WARNINGS_WISECONNECT_4_1
+#define SL_DEPRECATED_API_WISECONNECT_4_1
+#else
+#define SL_DEPRECATED_API_WISECONNECT_4_1 __attribute__((deprecated))
+#endif
+
 #define SLI_STATUS_ENUM(prefix, name, value) prefix##_##name = (prefix##_ENUM_OFFSET + value)
 #define SLI_STATUS_SHARED_ENUM(prefix, name) prefix##_##name = (SL_##name)
 

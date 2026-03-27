@@ -5,7 +5,7 @@ description: 'Demonstrates how to use BOD when the supply voltage is less than t
   '
 category: example|peripheral
 quality: production
-label: SI91x - BOD
+label: Platform SiWx91x - BOD
 source:
 - path: bod_example.c
 - path: app.c
@@ -39,6 +39,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

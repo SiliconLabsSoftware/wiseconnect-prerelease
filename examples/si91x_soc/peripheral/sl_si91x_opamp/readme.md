@@ -433,3 +433,18 @@ When using the **Two OPAMP Differential Amplifier** configuration, ensure that *
 - **OPAMP2** utilizes **ULP_UART** pins for its configuration.
 - As a result, `debug_uart` is **disabled**, which prevents error messages from being printed via the standard debug interface.
 - To view debug/error prints, consider using **alternative USART/UART pins**.
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

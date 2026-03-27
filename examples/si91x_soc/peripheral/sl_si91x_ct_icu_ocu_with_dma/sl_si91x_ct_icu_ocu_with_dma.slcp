@@ -5,7 +5,7 @@ description: 'Demonstrates the Config Timer Input Capture and Output Compare fea
   '
 category: example|peripheral
 quality: production
-label: SL Si91x - Config Timer ICU and OCU with DMA
+label: Platform SiWx91x - Config Timer ICU and OCU with DMA
 readme:
 - path: readme.md
 source:
@@ -32,6 +32,19 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

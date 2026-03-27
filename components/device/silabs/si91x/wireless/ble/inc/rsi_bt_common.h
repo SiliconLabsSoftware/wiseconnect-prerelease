@@ -77,8 +77,20 @@
 #define RSI_PROTO_BT_BLE_STACK 0x05
 ///The maximum length of the device name.
 #define RSI_DEV_NAME_LEN 50
-///Length of the device address in bytes.
+/// Length of the device address in bytes.
 #define RSI_DEV_ADDR_LEN 6
+/// Length of BLE encryption key / IRK / LTK in bytes.
+#define RSI_BLE_ENC_KEY_LENGTH 16
+/// Length of BLE random value (e.g. rand in encryption) in bytes.
+#define RSI_BLE_RAND_LEN 8
+/// Length of remote rand field in LE security keys event (firmware/struct layout).
+#define RSI_BLE_REMOTE_RAND_LEN 16
+/// Length of LE Remote Features bitmask in bytes (per BLE Core Spec).
+#define RSI_BLE_REMOTE_FEATURES_LEN 8
+/// Length of the data4 field (final 8 bytes) of a 128-bit UUID (RFC 4122).
+#define RSI_BLE_UUID128_DATA4_LEN 8
+/// Length of coex role priority payload in bytes (7 roles × 3 bytes each).
+#define RSI_BLE_COEX_ROLE_PRIORITY_PAYLOAD_LEN 21
 ///Length of the Attribute Protocol (ATT) buffer for the device.
 #define RSI_DEV_ATT_LEN 240
 ///Defines the Bluetooth classic device type.

@@ -114,6 +114,18 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
     ![Figure: Introduction](resources/readme/output.png)
 
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+- If NVM3 operations fail, verify flash layout and that repack/erase commands are used as documented.
+
 ## Resources
 
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
 - [AN1135: Using Third Generation Non-Volatile Memory (NVM3) Data Storage](https://www.silabs.com/documents/public/application-notes/an1135-using-third-generation-nonvolatile-memory.pdf)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

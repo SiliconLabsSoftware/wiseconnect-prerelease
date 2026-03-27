@@ -1824,10 +1824,10 @@ uint16_t rsi_bt_prepare_le_pkt(uint16_t cmd_type, void *cmd_struct, sl_wifi_syst
     } break;
 
     case RSI_BLE_SET_RANDOM_ADDRESS: {
-      uint8_t dummy_rand_addr[6]       = { 0 };
-      rsi_ble_req_rand_t *rsi_ble_rand = (rsi_ble_req_rand_t *)pkt->data;
+      uint8_t dummy_rand_addr[RSI_DEV_ADDR_LEN] = { 0 };
+      rsi_ble_req_rand_t *rsi_ble_rand          = (rsi_ble_req_rand_t *)pkt->data;
       memcpy(rsi_ble_rand, cmd_struct, sizeof(rsi_ble_req_rand_t));
-      if (memcmp(rsi_ble_rand->rand_addr, dummy_rand_addr, 6) == 0) {
+      if (memcmp(rsi_ble_rand->rand_addr, dummy_rand_addr, RSI_DEV_ADDR_LEN) == 0) {
         rsi_ascii_dev_address_to_6bytes_rev(rsi_ble_rand->rand_addr, (int8_t *)RSI_BLE_SET_RAND_ADDR);
       }
       // fill payload size
@@ -2293,6 +2293,7 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
     rsi_bt_set_status(bt_cb, status);
     osSemaphoreRelease(bt_cb->bt_cmd_sem);
     SL_PRINTF(SL_RSI_ERROR_BT_COMMAND_SEND, BLUETOOTH, LOG_ERROR, "COMMAND: %2x, STATUS: %4x", cmd, status);
+    sli_buffer_manager_free_buffer(pkt);
     return status;
   }
 

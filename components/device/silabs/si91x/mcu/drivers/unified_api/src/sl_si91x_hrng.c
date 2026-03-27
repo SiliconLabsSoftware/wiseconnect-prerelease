@@ -110,8 +110,8 @@ sl_status_t sl_si91x_hrng_init(void)
  ******************************************************************************/
 sl_status_t sl_si91x_hrng_deinit(void)
 {
-  M4CLK->CLK_ENABLE_CLEAR_REG1_b.HWRNG_PCLK_ENABLE_b = 1;
-  return SL_STATUS_OK;
+  int32_t error_code = RSI_CLK_PeripheralClkDisable1(M4CLK, HWRNG_PCLK_ENABLE);
+  return convert_rsi_to_sl_error_code(error_code);
 }
 
 /***************************************************************************/
@@ -130,7 +130,7 @@ sl_status_t sl_si91x_hrng_start(sl_si91x_hrng_mode_t hrng_mode)
  ***************************************************************************/
 void sl_si91x_hrng_soft_reset_set(void)
 {
-  pHRNG->HWRNG_CTRL_REG_b.SOFT_RESET = 1;
+  rng_soft_reset_set(pHRNG);
 }
 
 /***************************************************************************/
@@ -139,7 +139,7 @@ void sl_si91x_hrng_soft_reset_set(void)
  ***************************************************************************/
 void sl_si91x_hrng_soft_reset_clear(void)
 {
-  pHRNG->HWRNG_CTRL_REG_b.SOFT_RESET = 0;
+  rng_soft_reset_clear(pHRNG);
 }
 /***************************************************************************/
 /**

@@ -19,6 +19,7 @@
 #include "si70xx_example.h"
 #include "sl_sleeptimer.h"
 #include "sl_si91x_driver_gpio.h"
+#include "sl_si91x_clock_manager.h"
 
 /*******************************************************************************
  ***************************  Defines / Macros  ********************************
@@ -31,6 +32,10 @@
 #define DELAY_PERIODIC_MS1 2000                //sleeptimer1 periodic timeout in ms
 #define MODE_0             0                   // Initializing GPIO MODE_0 value
 #define OUTPUT_VALUE       1                   // GPIO output value
+/* Si70xx datasheet: 5–15 ms after reset before I2C is ready. Driver does a single
+ * attempt (no retry); application retries init until success or timeout. */
+#define SI70XX_POST_RESET_READY_MS    15
+#define SI70XX_INIT_RETRY_INTERVAL_MS 1
 
 /*******************************************************************************
  ******************************  Data Types  ***********************************
@@ -180,15 +185,21 @@ void si70xx_example_init(void)
     } else {
       DEBUGOUT("Successfully reset sensor\n");
     }
-    // Initializes sensor and reads electronic ID 1st byte
-    status = sl_si91x_si70xx_init(I2C, SI70XX_SLAVE_ADDR, SL_EID_FIRST_BYTE);
-    if (status != SL_STATUS_OK) {
-      DEBUGOUT("Sensor initialization un-successful, Error Code: 0x%ld \n", status);
-      break;
-    } else {
-      DEBUGOUT("Successfully initialized sensor\n");
+    /* After reset, Si70xx needs 5–15 ms (datasheet). Retry init until success or timeout. */
+    uint8_t retry_ms;
+    for (retry_ms = 0; retry_ms < SI70XX_POST_RESET_READY_MS; retry_ms += SI70XX_INIT_RETRY_INTERVAL_MS) {
+      sl_si91x_delay_ms(SI70XX_INIT_RETRY_INTERVAL_MS);
+      status = sl_si91x_si70xx_init(I2C, SI70XX_SLAVE_ADDR, SL_EID_FIRST_BYTE);
+      if (status == SL_STATUS_OK) {
+        break;
+      }
     }
-    // Initializes sensor and reads electronic ID 2nd byte
+    if (status != SL_STATUS_OK) {
+      DEBUGOUT("Sensor initialization un-successful (no ACK after %u ms), Error Code: 0x%ld \n", retry_ms, status);
+      break;
+    }
+    DEBUGOUT("Successfully initialized sensor\n");
+    // Initializes sensor and reads electronic ID 2nd byte (single attempt)
     status = sl_si91x_si70xx_init(I2C, SI70XX_SLAVE_ADDR, SL_EID_SECOND_BYTE);
     if (status != SL_STATUS_OK) {
       DEBUGOUT("Sensor initialization un-successful, Error Code: 0x%ld \n", status);

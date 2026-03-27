@@ -47,8 +47,9 @@
  ******************************************************************************/
 
 sl_sleeptimer_timer_handle_t timer;
-bool toggle_timeout             = false;
-static uint8_t led_toggle_count = 0;
+/* Volatile: set in sleeptimer callback (ISR), read in main loop. Required for LTO. */
+static volatile bool toggle_timeout = false;
+static uint8_t led_toggle_count     = 0;
 
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************

@@ -50,49 +50,31 @@ static osThreadId_t threadId0;
 static osThreadId_t threadId1;
 static osThreadId_t threadId2;
 
-const osThreadAttr_t thread_attributes_0 = {
+static const osThreadAttr_t thread_attributes_0 = {
   .name       = "thread0_app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow,
-  .tz_module  = 0,
 };
 
-const osThreadAttr_t thread_attributes_1 = {
+static const osThreadAttr_t thread_attributes_1 = {
   .name       = "thread1_sha_app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow4,
-  .tz_module  = 0,
 };
 
-const osThreadAttr_t thread_attributes_2 = {
+static const osThreadAttr_t thread_attributes_2 = {
   .name       = "thread2_aes_app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow4,
-  .tz_module  = 0,
 };
 
-const osThreadAttr_t thread_attributes_2_same_acc = {
+#if defined(SAME_CRYPTO_ACCELERATORS)
+static const osThreadAttr_t thread_attributes_2_same_acc = {
   .name       = "thread2_sha_app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow4,
-  .tz_module  = 0,
 };
+#endif
 
 static const sl_wifi_device_configuration_t client_configuration = {
   .boot_option = LOAD_NWP_FW,

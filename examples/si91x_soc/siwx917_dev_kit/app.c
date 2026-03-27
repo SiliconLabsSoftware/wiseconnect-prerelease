@@ -119,26 +119,16 @@ static const sl_wifi_device_configuration_t config = {
                    .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
 };
 
-const osThreadAttr_t thread_attributes = {
+static const osThreadAttr_t thread_attributes = {
   .name       = "application_thread",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityNormal,
-  .tz_module  = 0,
 };
 
-const osThreadAttr_t ble_thread_attributes = {
+static const osThreadAttr_t ble_thread_attributes = {
   .name       = "ble_thread",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 2048,
   .priority   = osPriorityNormal,
-  .tz_module  = 0,
 };
 
 void rsi_wlan_ble_app_init(void *argument)

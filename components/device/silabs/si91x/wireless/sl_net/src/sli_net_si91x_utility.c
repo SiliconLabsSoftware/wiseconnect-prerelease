@@ -265,7 +265,7 @@ sl_status_t sli_net_nat_configure(const sli_net_nat_config_t *sli_nat_config)
   }
 
   // Send the NAT configure command to the driver
-  status = sli_wifi_send_command(SLI_WLAN_REQ_NAT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_NAT,
                                  SLI_SI91X_NETWORK_CMD,
                                  sli_nat_config,
                                  sizeof(sli_net_nat_config_t),

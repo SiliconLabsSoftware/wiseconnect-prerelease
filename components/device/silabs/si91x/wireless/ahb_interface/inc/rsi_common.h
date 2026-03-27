@@ -208,7 +208,7 @@
 
 #define RSI_TX_EVENT_WAIT_TIME (30000 + TX_WAIT_TIME)
 #define DEFAULT_TIMEOUT        RSI_TX_EVENT_WAIT_TIME
-#define WAIT_TIMEOOUT          5000
+#define WAIT_TIMEOUT           5000
 
 /********NWP GPIO defines ******************************/
 //! GPIO address
@@ -600,7 +600,6 @@ typedef struct rsi_set_config_s {
  * *               Function Declarations
  * ******************************************************/
 int32_t rsi_driver_process_common_recv_cmd(rsi_pkt_t *pkt);
-int32_t rsi_driver_common_send_cmd(rsi_common_cmd_request_t cmd, rsi_pkt_t *pkt);
 int8_t rsi_common_cb_init(rsi_common_cb_t *common_cb);
 void rsi_common_set_status(int32_t status);
 void rsi_handle_slp_wkp(uint8_t frame_type);

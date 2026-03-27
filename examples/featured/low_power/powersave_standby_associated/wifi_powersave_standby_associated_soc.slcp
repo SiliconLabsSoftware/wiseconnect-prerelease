@@ -79,6 +79,8 @@ other_file:
 - path: resources/readme/setup_soc_ncp.png
 - path: resources/readme/alarm_timer_configure.png
 - path: resources/readme/wakeup_configure.png
+- path: resources/readme/wifi_powersave_standby_associated_soc.png
+- path: resources/readme/wakeup_configure.png
 ui_hints:
   highlight:
   - path: readme.md

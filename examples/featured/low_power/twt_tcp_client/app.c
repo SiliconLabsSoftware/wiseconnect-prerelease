@@ -34,7 +34,6 @@
 #include "sl_status.h"
 #include "sl_board_configuration.h"
 #include "cmsis_os2.h"
-#include "string.h"
 #include "sl_wifi.h"
 #include "socket.h"
 #include "sl_utility.h"
@@ -64,14 +63,7 @@
 #define TWT_AUTO_CONFIG   1
 
 // Use case based TWT selection params
-#define TWT_RX_LATENCY                       60000 // in milli seconds
-#define DEVICE_AVERAGE_THROUGHPUT            20000 // Kbps
-#define ESTIMATE_EXTRA_WAKE_DURATION_PERCENT 0     // in percentage
-#define TWT_TOLERABLE_DEVIATION              10    // in percentage
-#define TWT_DEFAULT_WAKE_INTERVAL_MS         1024  // in milli seconds
-#define TWT_DEFAULT_WAKE_DURATION_MS         8     // in milli seconds
-#define MAX_BEACON_WAKE_UP_AFTER_SP \
-  2 // The number of beacons after the service period completion for which the module wakes up and listens for any pending RX.
+#define TWT_RX_LATENCY      60000 // in milli seconds
 #define TCP_KEEP_ALIVE_TIME 240
 
 static const sl_wifi_device_configuration_t twt_client_configuration = {
@@ -138,17 +130,11 @@ sl_wifi_twt_request_t default_twt_setup_configuration = {
   .negotiation_type        = 0,
 };
 
-sl_wifi_twt_selection_t default_twt_selection_configuration = {
-  .twt_enable                            = 1,
-  .average_tx_throughput                 = 0,
-  .tx_latency                            = 0,
-  .rx_latency                            = TWT_RX_LATENCY,
-  .device_average_throughput             = DEVICE_AVERAGE_THROUGHPUT,
-  .estimated_extra_wake_duration_percent = ESTIMATE_EXTRA_WAKE_DURATION_PERCENT,
-  .twt_tolerable_deviation               = TWT_TOLERABLE_DEVIATION,
-  .default_wake_interval_ms              = TWT_DEFAULT_WAKE_INTERVAL_MS,
-  .default_minimum_wake_duration_ms      = TWT_DEFAULT_WAKE_DURATION_MS,
-  .beacon_wake_up_count_after_sp         = MAX_BEACON_WAKE_UP_AFTER_SP
+sl_wifi_twt_selection_v2_t default_twt_config = {
+  .twt_enable            = 1,
+  .average_tx_throughput = 0,
+  .tx_latency            = 0,
+  .rx_latency            = TWT_RX_LATENCY,
 };
 
 volatile sl_status_t callback_status = SL_STATUS_OK;
@@ -269,8 +255,7 @@ sl_status_t set_twt(void)
   //! Set TWT Config
   sl_wifi_set_twt_config_callback_v2(twt_callback_handler, NULL);
   if (TWT_AUTO_CONFIG == 1) {
-    performance_profile.twt_selection = default_twt_selection_configuration;
-    status                            = sl_wifi_target_wake_time_auto_selection(&performance_profile.twt_selection);
+    status = sl_wifi_target_wake_time_auto_selection_v2(&default_twt_config);
   } else {
     performance_profile.twt_request = default_twt_setup_configuration;
     status                          = sl_wifi_enable_target_wake_time(&performance_profile.twt_request);

@@ -45,12 +45,13 @@
 #define SLI_WIFI_SET_SYTH_CONFIG_COUNT                4    ///< Set syth config configs array size
 #define SLI_WIFI_READ_HMATRIX_CONFIG_COUNT            4    ///< Read H-matrix configs array size
 #define SLI_WIFI_QUERY_COMMAND_CONFIG_COUNT           4    ///< Query command configs array size
-#define SLI_WIFI_STATICS_COMMAND_CONFIG_COUNT         4    ///< Statics command configs array size
+#define SLI_WIFI_STATICS_COMMAND_CONFIG_COUNT         64   ///< Statics command configs array size
 #define SLI_WIFI_READ_HMATRIX_RESPONSE_DATA_SIZE      1024 ///< Read H-matrix response data buffer size
 #define SLI_WIFI_QUERY_COMMAND_RESPONSE_DATA_SIZE     1024 ///< Query command response data buffer size
 #define SLI_WIFI_STATICS_COMMAND_RESPONSE_DATA_SIZE   1024 ///< Statics command response data buffer size
 #define SLI_WIFI_TRANSMIT_LOOPBACK_DATA_ELEMENTS      402  ///< Transmit loopback data elements
 #define SLI_WIFI_TRANSMIT_LOOPBACK_DATA_RESPONSE_SIZE 1624 ///< Transmit loopback data size
+#define SLI_WIFI_GET_TX_POWER_LOG_RESERVED_COUNT      128 ///< Reserved array size in sli_wifi_response_get_tx_power_log_t
 
 /* MLO config */
 #define MLO_CONFIG_CMD   87
@@ -343,9 +344,7 @@ typedef struct {
 
 typedef struct {
   uint32_t flags; /*Valids for the presence of below fields*/
-  uint16_t rf_gain_lut_inx;
-  uint16_t tx_scaler;
-  uint32_t reserved[2];
+  uint32_t reserved[SLI_WIFI_GET_TX_POWER_LOG_RESERVED_COUNT];
 } sli_wifi_response_get_tx_power_log_t;
 
 typedef struct {

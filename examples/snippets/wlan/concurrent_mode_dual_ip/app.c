@@ -36,8 +36,6 @@
 #include "sl_wifi.h"
 #include "sl_net_wifi_types.h"
 #include "socket.h"
-#include "sl_net_wifi_types.h"
-#include "sl_net.h"
 #include "sl_si91x_socket_support.h"
 #include "sl_si91x_socket_constants.h"
 #include <string.h>

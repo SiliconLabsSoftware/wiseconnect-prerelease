@@ -16,6 +16,7 @@ include_directories(
     ../../../../../../tests/unit_tests/inc
     ../inc
     ../../inc
+    ../../sli_si91x_wifi_command_engine/inc
     ../../../../../../protocol/wifi/inc
     ../../../../../service/bsd_socket/inc
     ../../../../../../sli_wifi/inc

@@ -27,7 +27,6 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-#include "sli_hal_si91x_constants.h"
 #include "sli_queue_manager.h"
 #include "sli_routing_utility.h"
 #include "sli_hal_si91x_packet.h"
@@ -36,6 +35,8 @@
 #include "sl_rsi_utility.h"
 #include "sl_si91x_host_interface.h"
 #include "sli_si91x_wifi_event_handler.h"
+#include "sli_si91x_wifi_command_engine.h"
+#include "sli_wifi_command_engine_config.h"
 #include "sl_status.h"
 #include "cmsis_os2.h"
 #include "sl_cmsis_utility.h"
@@ -68,7 +69,7 @@ typedef struct {
   } while (0)
 
 #define SLI_HAL_SI91X_IS_FLASH_COMMAND(command)                                                \
-  (((command) == SLI_COMMON_RSP_TA_M4_COMMANDS) || ((command) == SLI_WLAN_REQ_SET_CERTIFICATE) \
+  (((command) == SLI_COMMON_RSP_TA_M4_COMMANDS) || ((command) == SLI_WIFI_REQ_SET_CERTIFICATE) \
    || ((command) == SLI_COMMON_RSP_SOFT_RESET)) ///< Check if the command is a flash command
 /******************************************************
  *               Function Declarations
@@ -119,35 +120,35 @@ static osEventFlagsId_t sli_hal_si91x_events = NULL;
 // Routing entries for HAL
 static sli_routing_entry_t hal_si91x_routing_entires[SLI_HAL_SI91X_MAX] = { [SLI_HAL_SI91X_WIFI_COMMON_PACKET] = {
                                                                              .destination_packet_handler =
-                                                                                 sli_wifi_command_engine_packet_handler,
+                                                                                 sli_si91x_wifi_command_engine_packet_handler,
                                                                              .packet_status_handler = NULL,
                                                                              .packet_type =
                                                                                SLI_HAL_SI91X_WIFI_COMMON_PACKET,
                                                                              },
                                                                             [SLI_HAL_SI91X_DATA_PACKET] = {
                                                                               .destination_packet_handler =
-                                                                                 sli_wifi_data_packet_handler,
+                                                                                 sli_si91x_wifi_data_packet_handler,
                                                                               .packet_status_handler = NULL,
                                                                               .packet_type =
                                                                                 SLI_HAL_SI91X_DATA_PACKET,
                                                                              },
                                                                             [SLI_HAL_SI91X_BLUETOOTH_PACKET] = {
                                                                               .destination_packet_handler =
-                                                                                 sli_wifi_ble_packet_handler,
+                                                                                 sli_si91x_wifi_ble_packet_handler,
                                                                               .packet_status_handler = NULL,
                                                                               .packet_type =
                                                                                 SLI_HAL_SI91X_BLUETOOTH_PACKET,
                                                                              },
                                                                             [SLI_HAL_SI91X_PACKET] = {
                                                                               .destination_packet_handler =
-                                                                                 sli_wifi_command_engine_packet_handler,
+                                                                                 sli_si91x_wifi_command_engine_packet_handler,
                                                                               .packet_status_handler = NULL,
                                                                               .packet_type =
                                                                                   SLI_HAL_SI91X_BLUETOOTH_PACKET,
                                                                             },
                                                                             [SLI_HAL_SI91X_NWP_LOG_PACKET] = {
                                                                               .destination_packet_handler =
-                                                                                 sli_wifi_nwp_log_packet_handler,
+                                                                                 sli_si91x_wifi_nwp_log_packet_handler,
                                                                               .packet_status_handler = NULL,
                                                                               .packet_type =
                                                                                 SLI_HAL_SI91X_NWP_LOG_PACKET,
@@ -633,6 +634,13 @@ static uint32_t sli_hal_si91x_wait_for_event(uint32_t event_mask, uint32_t timeo
 
 sl_status_t sli_hal_si91x_notify_events(uint32_t flags)
 {
+  // Guard against calling before HAL initialization
+  // If HAL event flags are not yet created, silently ignore the event
+  // to prevent null-handle faults during system bring-up
+  if (sli_hal_si91x_events == NULL) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
   uint32_t result = osEventFlagsSet(sli_hal_si91x_events, flags);
 
   if (result == (uint32_t)osErrorTimeout || result == (uint32_t)osErrorResource) {

@@ -1126,7 +1126,7 @@
   </Group>
 
   <Group>
-    <GroupName>components/sli_wifi_command_engine</GroupName>
+    <GroupName>components/device/silabs/si91x/wireless/sli_si91x_wifi_command_engine</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1138,8 +1138,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\components\sli_wifi_command_engine\inc\sli_wifi_command_engine.h</PathWithFileName>
-      <FilenameWithoutPath>sli_wifi_command_engine.h</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\components\device\silabs\si91x\wireless\sli_si91x_wifi_command_engine\inc\sli_si91x_wifi_command_engine.h</PathWithFileName>
+      <FilenameWithoutPath>sli_si91x_wifi_command_engine.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1150,8 +1150,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\components\sli_wifi_command_engine\inc\sli_wifi_event_handler.h</PathWithFileName>
-      <FilenameWithoutPath>sli_wifi_event_handler.h</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\components\device\silabs\si91x\wireless\sli_si91x_wifi_command_engine\inc\sli_wifi_command_engine_config.h</PathWithFileName>
+      <FilenameWithoutPath>sli_wifi_command_engine_config.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1162,8 +1162,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\components\sli_wifi_command_engine\src\sli_wifi_command_engine.c</PathWithFileName>
-      <FilenameWithoutPath>sli_wifi_command_engine.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\components\device\silabs\si91x\wireless\sli_si91x_wifi_command_engine\src\sli_si91x_wifi_command_engine.c</PathWithFileName>
+      <FilenameWithoutPath>sli_si91x_wifi_command_engine.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

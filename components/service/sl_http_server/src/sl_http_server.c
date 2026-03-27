@@ -257,6 +257,12 @@ static void sli_process_request(sl_http_server_t *handle, int client_socket)
       sl_si91x_shutdown(client_socket, SHUTDOWN_BY_ID);
       return;
     }
+    if (length == 0) {
+      // Connection closed by peer (e.g. browser tab closed) before full request received
+      SL_DEBUG_LOG("\r\nConnection closed by peer before headers complete\r\n");
+      close(client_socket);
+      return;
+    }
     char *sol = &(recv_buffer[recv_length]);
     recv_length += length;
     rem_length -= length;
@@ -805,6 +811,12 @@ sl_status_t sl_http_server_read_request_data(sl_http_server_t *handle, sl_http_r
     int receive_length = recv(handle->client_socket, &(recvData->buffer[offset]), rem_len, 0);
     if (receive_length < 0) {
       SL_DEBUG_LOG("\r\nSocket receive failed with bsd error: %d\r\n", errno);
+      close(handle->client_socket);
+      return SL_STATUS_FAIL;
+    }
+    if (receive_length == 0) {
+      // Connection closed by peer before full request body received
+      SL_DEBUG_LOG("\r\nConnection closed by peer during request body read\r\n");
       close(handle->client_socket);
       return SL_STATUS_FAIL;
     }

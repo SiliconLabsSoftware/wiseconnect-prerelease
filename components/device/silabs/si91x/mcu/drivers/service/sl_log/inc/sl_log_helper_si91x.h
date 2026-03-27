@@ -41,7 +41,7 @@ extern "C" {
 #include "sl_component_catalog.h"
 #endif
 
-#ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
+#ifdef SL_CATALOG_LOG_COMPONENT_PRESENT
 #include "sl_log_helper.h"
 #else
 

@@ -23,8 +23,8 @@
 This application demonstrates the ADC peripheral, including:
 
 - Conversion of analog input to 12-bit digital output.
-- Samples the data.
-- Convert data into equivalent input voltage based on operation mode.
+- Sampling the data.
+- Converting data into equivalent input voltage based on operation mode.
 
 This application also switches between PS4 and PS2 power states, samples, collects, and displays ADC data.
 
@@ -108,7 +108,7 @@ Configure UC from the slcp component.
   - **ADC Channel Configuration**
 
     - Input Type: ADC input type can be configured to be either single ended or differential.
-    - Sampling rate: Sample rate can be configurable to ADC channel, sample rate unit is samples/second. The configuration range from 1sps to 2.5 Msps.
+    - Sampling rate: The ADC sampling rate is configurable per channel, in units of samples per second. The supported range depends on the operating mode: in FIFO mode, the range is **80 Hz to 2.5 Msps**; in static mode, the range is approximately **39.1 ksps to 2.5 Msps** (determined by the 40 MHz ADC clock and an effective divider range of 16 to 1023).
     - Sample length: Set the length of ADC samples (that is, the number of ADC samples collected for operation). It should be minimum value set to 1 and maximum of 1023.
 
       ![Figure: sl_adc_channel_uc_screen](resources/uc_screen/sl_adc_channel_uc_screen.png)
@@ -222,3 +222,18 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 > **Note:**
 >
 >- This application is intended for demonstration purposes only to showcase the ULP peripheral functionality. It should not be used as a reference for real-time use case project development, because the wireless shutdown scenario is not supported in the current SDK.
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

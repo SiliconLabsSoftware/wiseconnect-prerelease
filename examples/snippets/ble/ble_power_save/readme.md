@@ -102,7 +102,7 @@ The application can be configured to suit your requirements and development envi
     #define BLE_ROLE    PERIPHERAL_ROLE
     ```
    
-  - Remote Peripheral device paramters:
+  - Remote Peripheral device parameters:
     - `RSI_BLE_DEV_ADDR_TYPE` refers to the address type of the remote device to connect.
     - Based on address type of remote device, valid configurations are `LE_RANDOM_ADDRESS` and `LE_PUBLIC_ADDRESS`
       ```c

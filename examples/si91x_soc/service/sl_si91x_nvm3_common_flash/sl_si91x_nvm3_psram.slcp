@@ -3,7 +3,7 @@ package: platform_nwp_siwx91x_app
 description: "Testing NVM3 in Si91x PSRAM \n"
 category: Example|Service
 quality: production
-label: sl_si91x_nvm3_psram
+label: Platform SiWx91x - NVM3 PSRAM
 component:
 - id: sl_main
 - id: freertos
@@ -45,12 +45,18 @@ ui_hints:
 readme:
 - path: readme.md
 filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
 - name: Wireless Technology
   value:
   - Wi-Fi
-- name: Project Difficulty
-  value:
-  - Beginner
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

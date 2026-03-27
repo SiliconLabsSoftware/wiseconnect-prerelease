@@ -181,7 +181,7 @@ typedef struct rsi_bt_event_le_ltk_request_s {
   /**ediv of local device*/
   uint16_t localediv;
   /**rand of local device*/
-  uint8_t localrand[8];
+  uint8_t localrand[RSI_BLE_RAND_LEN];
   /**Address type of remote device*/
   uint8_t dev_addr_type;
 } rsi_bt_event_le_ltk_request_t;
@@ -194,15 +194,15 @@ typedef struct rsi_bt_event_le_security_keys_s {
   /**BD Address of the remote device*/
   uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /**16 byte irk of the local device*/
-  uint8_t local_irk[16];
+  uint8_t local_irk[RSI_BLE_ENC_KEY_LENGTH];
   /**16 byte irk of the remote device*/
-  uint8_t remote_irk[16];
+  uint8_t remote_irk[RSI_BLE_ENC_KEY_LENGTH];
   /**remote device ediv value*/
   uint16_t remote_ediv;
   /**remote device rand value*/
-  uint8_t remote_rand[16];
+  uint8_t remote_rand[RSI_BLE_REMOTE_RAND_LEN];
   /**remote device ltk value*/
-  uint8_t remote_ltk[16];
+  uint8_t remote_ltk[RSI_BLE_ENC_KEY_LENGTH];
   /**Identity address type - public/random 
 -
       0x00 --> Public Identity Address 
@@ -212,7 +212,7 @@ typedef struct rsi_bt_event_le_security_keys_s {
       All other values Reserved for future use*/
   uint8_t Identity_addr_type;
   /**Identity address which is resolved after security keys exchange*/
-  uint8_t Identity_addr[6];
+  uint8_t Identity_addr[RSI_DEV_ADDR_LEN];
   /**Device address type*/
   uint8_t dev_addr_type;
 } rsi_bt_event_le_security_keys_t;
@@ -243,9 +243,9 @@ typedef struct rsi_bt_event_encryption_enabled_s {
   /**Local device EDIV*/
   uint16_t localediv;
   /**Local RAND*/
-  uint8_t localrand[8];
+  uint8_t localrand[RSI_BLE_RAND_LEN];
   /**Local Long term Key*/
-  uint8_t localltk[16];
+  uint8_t localltk[RSI_BLE_ENC_KEY_LENGTH];
   /**Remote Device Address type*/
   uint8_t dev_addr_type;
 } rsi_bt_event_encryption_enabled_t;
@@ -257,7 +257,7 @@ typedef struct rsi_bt_event_encryption_enabled_s {
  */
 typedef struct rsi_bt_event_smp_req_s {
   /**address of remote device*/
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /**auth req of remote device*/
   uint8_t auth_req;
 } rsi_bt_event_smp_req_t;
@@ -268,7 +268,7 @@ typedef struct rsi_bt_event_smp_req_s {
  */
 typedef struct rsi_bt_event_smp_resp_s {
   /**address of remote device*/
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /**Device input output capability 
 -
       0x00 - Display Only 
@@ -322,7 +322,7 @@ typedef struct rsi_bt_event_smp_resp_s {
  */
 typedef struct rsi_bt_event_smp_passkey_s {
   /**address of remote device*/
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
 } rsi_bt_event_smp_passkey_t;
 
 //SMP passkey display event structure
@@ -355,7 +355,7 @@ typedef struct rsi_bt_event_sc_passkey_s {
  */
 typedef struct rsi_bt_event_smp_failed_s {
   /**device address of the remote device*/
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
 } rsi_bt_event_smp_failed_t;
 
 //Security Methods event structure
@@ -381,7 +381,7 @@ typedef struct rsi_bt_event_ctkd_s {
   /** Address of the remote device */
   uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /** Derived key */
-  uint8_t key[16];
+  uint8_t key[RSI_BLE_ENC_KEY_LENGTH];
 } rsi_ble_event_ctkd_t;
 
 // phy update complete event
@@ -391,7 +391,7 @@ typedef struct rsi_bt_event_ctkd_s {
 typedef struct rsi_ble_event_phy_update_s {
 
   /**Device address of the remote device.*/
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /**Transmission PHY rate(1 byte) 
 -
      BIT(0) - The Host prefers to use the LE 1M transmitter PHY (possible among others) 
@@ -422,7 +422,7 @@ typedef struct rsi_ble_event_phy_update_s {
  */
 typedef struct rsi_ble_event_conn_update_s {
   /**Device address of the remote device*/
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /**Connection Interval*/
   uint16_t conn_interval;
   /**Slave Latency*/
@@ -438,7 +438,7 @@ typedef struct rsi_ble_event_conn_update_s {
  */
 typedef struct rsi_ble_event_remote_conn_param_req_s {
   /** Device address of the remote device */
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /** Minimum connection interval */
   uint16_t conn_interval_min;
   /** Maximum connection interval */
@@ -454,11 +454,11 @@ typedef struct rsi_ble_event_remote_conn_param_req_s {
  */
 typedef struct rsi_ble_event_remote_features_s {
   /**Remote device address*/
-  uint8_t dev_addr[6];
+  uint8_t dev_addr[RSI_DEV_ADDR_LEN];
   /**Remote device supported features 
 -
      @note Refer to spec for the supported features list. */
-  uint8_t remote_features[8];
+  uint8_t remote_features[RSI_BLE_REMOTE_FEATURES_LEN];
 } rsi_ble_event_remote_features_t;
 
 /**
@@ -505,9 +505,9 @@ typedef struct uuid128_s {
    */
   uint16_t data3;
   /**
-   * @brief Array to store 8 bytes of data.
+   * @brief Array to store 8 bytes of data (final 64 bits of 128-bit UUID, RFC 4122).
    */
-  uint8_t data4[8];
+  uint8_t data4[RSI_BLE_UUID128_DATA4_LEN];
 } uuid128_t;
 
 /// 16 bit UUID format structure
@@ -900,7 +900,7 @@ typedef struct rsi_ble_resp_profiles_list_s {
 typedef struct rsi_ble_resp_query_profile_descriptor_s {
   /**remote device address*/
   uint8_t dev_addr[RSI_DEV_ADDR_LEN];
-  /**List of recieved profile descriptors.
+  /**List of received profile descriptors.
 -
       The maximum value is 5. */
   profile_descriptors_t profile_desc[RSI_BLE_MAX_RESP_LIST];
@@ -3832,7 +3832,7 @@ int32_t rsi_ble_set_local_att_value(uint16_t handle, uint16_t data_len, const ui
  * @param[in]  buf_cnt - no of buffers to be configured 
  *    only value 1 and 2 are supported in BLE_SMALL_BUFF_MODE  
 			in BLE_BIG_BUFF_MODE, buffers allocated based on the below notations.
-			intial available_buf_cnt = RSI_BLE_NUM_CONN_EVENTS,
+			initial available_buf_cnt = RSI_BLE_NUM_CONN_EVENTS,
 			a) When connection 1 is formed, the possible range of buffers is (available_buf_cnt - remaining possible number of connections)
 			b) After allocating X buffers using \ref rsi_ble_set_wo_resp_notify_buf_info to the 1st connection remaining available_buf_cnt = (available_buf_cnt - X ) 
  * @return The following values are returned:

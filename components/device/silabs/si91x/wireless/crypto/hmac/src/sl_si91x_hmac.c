@@ -37,7 +37,6 @@
 #include "sl_si91x_crypto_thread.h"
 #endif
 #include <string.h>
-#include "sli_wifi_utility.h"
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
 static sl_status_t sli_si91x_hmac_pending(const sl_si91x_hmac_config_t *config,
                                           const uint8_t *data,

@@ -38,7 +38,7 @@
 #endif
 #include "sl_component_catalog.h"
 
-#ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
+#ifdef SL_CATALOG_LOG_COMPONENT_PRESENT
 #include "sl_log_platform_specific.h"
 #endif
 /*******************************************************************************
@@ -248,7 +248,7 @@ sl_status_t sl_si91x_power_manager_sleep(void)
     return SL_STATUS_BUSY;
   }
 #endif
-#ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
+#ifdef SL_CATALOG_LOG_COMPONENT_PRESENT
   sl_log_api_core_t *sl_log_core_api = sl_log_get_api_core();
   sl_log_core_api->pre_sleep_process(NULL);
 #endif
@@ -266,7 +266,7 @@ sl_status_t sl_si91x_power_manager_sleep(void)
   if (status != SL_STATUS_OK) {
     return status;
   }
-#ifdef SL_CATALOG_LOGGER_COMPONENT_PRESENT
+#ifdef SL_CATALOG_LOG_COMPONENT_PRESENT
   sl_log_core_api->post_sleep_process(NULL);
 #endif
   // Notifies the state transition who has subscribed to it.

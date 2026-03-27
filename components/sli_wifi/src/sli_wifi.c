@@ -60,6 +60,7 @@
 #define TWT_WAKE_DURATION_UNIT_256TU             256
 #define ABSOLUTE_POWER_VALUE_TOGGLE              0x80
 #define MAX_2_4G_CHANNEL                         14
+#define MAX_5G_CHANNEL                           25
 #define PASSIVE_SCAN_ENABLE                      BIT(7)
 #define LP_CHAIN_ENABLE                          BIT(6)
 #define QUICK_SCAN_ENABLE                        1
@@ -121,7 +122,6 @@ extern bool device_initialized;
 extern bool bg_enabled;
 extern bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX];
 extern sl_wifi_interface_t default_interface;
-osEventFlagsId_t sli_wifi_events                                             = 0;
 sl_wifi_advanced_scan_configuration_t advanced_scan_configuration            = { 0 };
 static sl_wifi_advanced_client_configuration_t advanced_client_configuration = { 0 };
 static uint8_t client_join_feature_bitmap                                    = SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID;
@@ -283,24 +283,76 @@ static sl_status_t sli_wifi_convert_client_info(sl_wifi_client_info_response_t *
   return SL_STATUS_OK;
 }
 
-sl_status_t sli_wifi_configure_timeout(sli_wifi_timeout_type_t timeout_type, uint16_t timeout_value)
+sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
+                                       sl_wifi_timeout_type_t timeout_type,
+                                       uint16_t timeout_value)
 {
-  sl_status_t status                         = SL_STATUS_OK;
-  sli_wifi_request_timeout_t timeout_request = { 0 };
-
-  if (timeout_type > SLI_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT) {
+  if (!(interface & SL_WIFI_CLIENT_INTERFACE) || (timeout_type >= SL_WIFI_TIMEOUT_TYPE_MAX)
+      || ((timeout_type == SL_WIFI_BSS_MAX_IDLE_PERIOD) && (timeout_value == 0))) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  timeout_request.timeout_bitmap = BIT(timeout_type);
-  timeout_request.timeout_value  = timeout_value;
-  status                         = sli_wifi_send_command(SLI_WIFI_REQ_TIMEOUT,
+  sli_wifi_request_timeout_t timeout_request = { 0 };
+  timeout_request.timeout_bitmap             = BIT(timeout_type);
+  timeout_request.timeout_value              = timeout_value;
+
+  return sli_wifi_send_command(SLI_WIFI_REQ_TIMEOUT,
+                               SLI_WIFI_WLAN_CMD,
+                               &timeout_request,
+                               sizeof(sli_wifi_request_timeout_t),
+                               SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
+                               NULL,
+                               NULL);
+}
+
+sl_status_t sli_wifi_get_timeout(sl_wifi_interface_t interface,
+                                 sl_wifi_timeout_type_t timeout_type,
+                                 uint16_t *timeout_value)
+{
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (!sli_wifi_is_interface_up(interface)) {
+    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
+  }
+
+  if (!(interface & SL_WIFI_CLIENT_INTERFACE) || (timeout_type >= SL_WIFI_TIMEOUT_TYPE_MAX)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  SL_VERIFY_POINTER_OR_RETURN(timeout_value, SL_STATUS_NULL_POINTER);
+
+  sl_status_t status                         = SL_STATUS_FAIL;
+  sl_wifi_buffer_t *buffer                   = NULL;
+  sli_wifi_request_timeout_t timeout_request = { 0 };
+  timeout_request.timeout_bitmap             = BIT(timeout_type);
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_GET_TIMEOUT,
                                  SLI_WIFI_WLAN_CMD,
                                  &timeout_request,
                                  sizeof(sli_wifi_request_timeout_t),
-                                 SLI_WIFI_WAIT_FOR(30100),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_TIMEOUT_WAIT_TIME),
                                  NULL,
-                                 NULL);
+                                 (void **)&buffer);
+
+  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
+    sli_buffer_manager_free_buffer(buffer);
+    return status;
+  }
+
+  if (buffer == NULL) {
+    return (status == SL_STATUS_OK) ? SL_STATUS_NULL_POINTER : status;
+  }
+
+  const sl_wifi_system_packet_t *packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
+  if ((packet != NULL) && (packet->length >= sizeof(uint16_t))) {
+    memcpy(timeout_value, packet->data, sizeof(uint16_t));
+  } else {
+    status = SL_STATUS_FAIL;
+  }
+
+  sli_buffer_manager_free_buffer(buffer);
   return status;
 }
 
@@ -527,30 +579,67 @@ sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_inte
   return SL_STATUS_OK;
 }
 
-static void sli_configure_channel_bitmap(sl_wifi_interface_t interface,
-                                         const sl_wifi_scan_configuration_t *configuration,
-                                         sli_wifi_request_scan_t *scan_request)
+static sl_status_t sli_configure_channel_bitmap(sl_wifi_interface_t interface,
+                                                const sl_wifi_scan_configuration_t *configuration,
+                                                sli_wifi_request_scan_t *scan_request)
 {
-  if (!(interface & SL_WIFI_2_4GHZ_INTERFACE) || (configuration->channel_bitmap_2g4 == 0xFFFF)) {
-    return;
+  scan_request->channel[0] = 0;
+  /* Check if interface is valid */
+  if (!((interface & SL_WIFI_CLIENT_2_4GHZ_INTERFACE) || (interface & SL_WIFI_CLIENT_5GHZ_INTERFACE))) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  /* Check if configuration and scan request are not NULL */
+  if (configuration == NULL || scan_request == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  /* Set channel bitmap for 2.4 GHz interface */
+  if ((interface & SL_WIFI_CLIENT_2_4GHZ_INTERFACE) && (configuration->channel_bitmap_2g4 != 0xFFFF)
+      && (configuration->channel_bitmap_2g4 != 0x0000)) {
+    memcpy(&scan_request->channel_bit_map_2_4,
+           &configuration->channel_bitmap_2g4,
+           sizeof(scan_request->channel_bit_map_2_4));
   }
 
-  memcpy(&scan_request->channel_bit_map_2_4,
-         &configuration->channel_bitmap_2g4,
-         sizeof(scan_request->channel_bit_map_2_4));
+  /* Set channel bitmap for 5 GHz interface */
+  if ((interface & SL_WIFI_CLIENT_5GHZ_INTERFACE) && (configuration->channel_bitmap_5g[0] != 0xFFFFFFFF)
+      && (configuration->channel_bitmap_5g[0] != 0x00000000)) {
+    memcpy(&scan_request->channel_bit_map_5,
+           &configuration->channel_bitmap_5g[0],
+           sizeof(scan_request->channel_bit_map_5));
+  }
 
-  uint16_t channel_bitmap = configuration->channel_bitmap_2g4;
-
-  // Set channel, if only one channel is selected in channel_bitmap
-  // if channel is 0, scan on all channels.
-  if ((channel_bitmap > 0) && (0 == (channel_bitmap & (channel_bitmap - 1)))) {
+  uint16_t single_channel_2g4 = 0;
+  uint32_t single_channel_5g  = 0;
+  /* Set channel for 2.4 GHz interface if only one channel is selected in channel_bitmap */
+  if (configuration->channel_bitmap_2g4 > 0
+      && (0 == (configuration->channel_bitmap_2g4 & (configuration->channel_bitmap_2g4 - 1)))) {
     for (uint8_t channel = 1; channel <= MAX_2_4G_CHANNEL; channel++) {
-      if (BIT((channel - 1)) == channel_bitmap) {
-        scan_request->channel[0] = channel;
+      if (BIT((channel - 1)) == configuration->channel_bitmap_2g4) {
+        single_channel_2g4 = channel;
         break;
       }
     }
   }
+  /* Set channel for 5 GHz interface if only one channel is selected in channel_bitmap */
+  if (configuration->channel_bitmap_5g[0] > 0
+      && (0 == (configuration->channel_bitmap_5g[0] & (configuration->channel_bitmap_5g[0] - 1)))) {
+    for (uint8_t channel = 1; channel <= MAX_5G_CHANNEL; channel++) {
+      if (BIT((channel - 1)) == configuration->channel_bitmap_5g[0]) {
+        single_channel_5g = channel;
+        break;
+      }
+    }
+  }
+
+  /* Set channel for 2.4 GHz interface if only one channel is selected in channel_bitmap */
+  if ((single_channel_2g4 > 0) && (single_channel_5g == 0)) {
+    scan_request->channel[0] = single_channel_2g4;
+  }
+  /* Set channel for 5 GHz interface if only one channel is selected in channel_bitmap */
+  else if ((single_channel_5g > 0) && (single_channel_2g4 == 0)) {
+    scan_request->channel[0] = single_channel_5g;
+  }
+  return SL_STATUS_OK;
 }
 sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_response_t *wps_response)
 {
@@ -648,8 +737,9 @@ sl_status_t sli_wifi_connect(sl_wifi_interface_t interface,
   VERIFY_STATUS_AND_RETURN(status);
 
   if (advanced_scan_configuration.active_channel_time != SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME) {
-    status =
-      sli_wifi_configure_timeout(SLI_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT, advanced_scan_configuration.active_channel_time);
+    status = sli_wifi_configure_timeout(interface,
+                                        SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT,
+                                        advanced_scan_configuration.active_channel_time);
     VERIFY_STATUS_AND_RETURN(status);
   }
 
@@ -762,7 +852,8 @@ static sl_status_t sli_handle_standard_scan(sl_wifi_interface_t interface,
     memcpy(scan_request.ssid, optional_ssid->value, optional_ssid->length);
   }
 
-  sli_configure_channel_bitmap(interface, configuration, &scan_request);
+  sl_status_t status = sli_configure_channel_bitmap(interface, configuration, &scan_request);
+  VERIFY_STATUS_AND_RETURN(status);
 
   if (configuration->type == SL_WIFI_SCAN_TYPE_PASSIVE) {
     scan_request.pscan_bitmap[3] |= PASSIVE_SCAN_ENABLE;
@@ -784,8 +875,9 @@ static sl_status_t sli_handle_standard_scan(sl_wifi_interface_t interface,
   // Configure active scan timeout only if active_channel_time is set to a non-default and non-zero value.
   if (advanced_scan_configuration.active_channel_time != SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME
       && advanced_scan_configuration.active_channel_time != 0) {
-    sl_status_t status =
-      sli_wifi_configure_timeout(SLI_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT, advanced_scan_configuration.active_channel_time);
+    sl_status_t status = sli_wifi_configure_timeout(interface,
+                                                    SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT,
+                                                    advanced_scan_configuration.active_channel_time);
     VERIFY_STATUS_AND_RETURN(status);
   }
 
@@ -869,36 +961,6 @@ sl_status_t sli_wifi_wait_for_scan_results(sl_wifi_scan_result_t **scan_results,
 {
   UNUSED_PARAMETER(scan_results);
   UNUSED_PARAMETER(max_scan_result_count);
-
-#ifdef SI91x_ENABLE_WAIT_ON_RESULTS
-  if (!device_initialized) {
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  sl_status_t status;
-  sl_wifi_system_packet_t *buffer;
-  sl_wifi_system_packet_t *packet;
-
-  status = sl_si91x_driver_wait_for_response(SLI_WIFI_RSP_SCAN, SLI_WIFI_WAIT_FOR(3000));
-  VERIFY_STATUS_AND_RETURN(status);
-
-  status = sl_si91x_host_remove_from_queue(SI91X_WLAN_RESPONSE_QUEUE, &buffer);
-  VERIFY_STATUS_AND_RETURN(status);
-
-  packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-  status = sli_wifi_convert_and_save_firmware_status(sli_get_si91x_frame_status(packet));
-  VERIFY_STATUS_AND_RETURN(status);
-
-  if (packet->command == SLI_WIFI_RSP_SCAN) {
-    *scan_results = (sl_wifi_scan_result_t *)malloc(packet->length);
-    if (scan_results == NULL) {
-      sli_buffer_manager_free_buffer(buffer);
-      return SL_STATUS_ALLOCATION_FAILED;
-    }
-    memcpy(*scan_results, packet->data, packet->length);
-  }
-  sli_buffer_manager_free_buffer(buffer);
-#endif
-
   return SL_STATUS_NOT_SUPPORTED;
 }
 
@@ -1131,7 +1193,7 @@ sl_status_t sli_wifi_set_max_tx_power(sl_wifi_interface_t interface, sl_wifi_max
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  sli_save_max_tx_power(max_scan_tx_power, max_join_tx_power);
+  sli_wifi_save_max_tx_power(max_scan_tx_power, max_join_tx_power);
   return SL_STATUS_OK;
 }
 
@@ -1360,7 +1422,7 @@ sl_status_t sli_wifi_disconnect_ap_client(sl_wifi_interface_t interface,
                                              SLI_WIFI_WLAN_CMD,
                                              &disconnect_request,
                                              sizeof(disconnect_request),
-                                             SLI_WLAN_RSP_DISCONNECT_WAIT_TIME,
+                                             SLI_WIFI_RSP_DISCONNECT_WAIT_TIME,
                                              (void *)mac,
                                              NULL);
   VERIFY_STATUS_AND_RETURN(status);
@@ -1428,7 +1490,7 @@ sl_status_t sli_wifi_disconnect(sl_wifi_interface_t interface)
                                              SLI_WIFI_WLAN_CMD,
                                              &disconnect_request,
                                              sizeof(disconnect_request),
-                                             SLI_WLAN_RSP_DISCONNECT_WAIT_TIME,
+                                             SLI_WIFI_RSP_DISCONNECT_WAIT_TIME,
                                              NULL,
                                              NULL);
   VERIFY_STATUS_AND_RETURN(status);
@@ -2152,7 +2214,7 @@ sl_status_t sli_wifi_enable_target_wake_time(const sl_wifi_twt_request_t *twt_re
   return status;
 }
 
-sl_status_t sli_wifi_target_wake_time_auto_selection(sl_wifi_twt_selection_t *twt_auto_request)
+sl_status_t sli_wifi_target_wake_time_auto_selection(sli_wifi_twt_selection_t *twt_auto_request)
 {
   if ((twt_auto_request->twt_enable != 0) && (twt_auto_request->twt_enable != 1)) {
     return SL_STATUS_INVALID_PARAMETER;
@@ -2173,7 +2235,7 @@ sl_status_t sli_wifi_target_wake_time_auto_selection(sl_wifi_twt_selection_t *tw
   sl_status_t status = sli_wifi_send_command(SLI_WIFI_REQ_TWT_AUTO_CONFIG,
                                              SLI_WIFI_WLAN_CMD,
                                              twt_auto_request,
-                                             sizeof(sl_wifi_twt_selection_t),
+                                             sizeof(sli_wifi_twt_selection_t),
                                              SLI_WIFI_RSP_TWT_WAIT_TIME,
                                              NULL,
                                              NULL);
@@ -2563,7 +2625,7 @@ sl_status_t sli_wifi_transceiver_up(sl_wifi_interface_t interface, sl_wifi_trans
     SL_DEBUG_LOG("\r\nSet Channel(%d) Initialization success\r\n", config->channel.chan_info.channel);
   }
 
-  // Get DUT MAC address to use as Addr2/Transmitter Addresss
+  // Get DUT MAC address to use as Addr2/Transmitter Address
   status = sli_wifi_get_mac_address(interface, &config->dut_mac);
   if (status == SL_STATUS_OK) {
     SL_DEBUG_LOG("\r\nDevice MAC address: %x:%x:%x:%x:%x:%x\r\n",
@@ -3245,110 +3307,21 @@ void sli_wifi_prepare_mac_frame_header(const void *buf,
   memcpy(hdr->addr3, addr3, ETH_MAC_ADR_LEN);
 }
 
-sl_status_t sli_wifi_send_mac_data_frame(sl_wifi_interface_t interface,
-                                         sl_wifi_transmitter_test_info_t *per_params,
-                                         sl_wifi_system_packet_t *packet,
-                                         uint16_t chunk_length)
+sl_status_t sli_wifi_send_ip_address_info(sl_wifi_interface_t interface,
+                                          const sli_wifi_ip_address_info_t *ip_address_info)
 {
-  unsigned int temp_word;
-  uint8_t _11ax_transmit         = 0;
-  unsigned int bbp_info          = 0;
-  unsigned int rate_field_params = 0;
-  unsigned int rate_flags        = 0;
-  unsigned int ch_bw             = 0;
-  unsigned int greenfield        = 0;
-  unsigned char extended_desc    = 4;
-  sl_status_t status;
+  UNUSED_PARAMETER(interface);
+  SL_VERIFY_POINTER_OR_RETURN(ip_address_info, SL_STATUS_NULL_POINTER);
 
-  // If the packet is not allocated successfully, return an allocation failed error
-  if (packet == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-
-  if (!device_initialized) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-
-  if (!sli_wifi_is_interface_up(interface)) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
-  }
-
-  if (chunk_length <= FRAME_DESC_SZ) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
+  if (ip_address_info->flags == 0) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  // Clear the packet descriptor and copy the command data if available
-  memset(packet->desc, 0, sizeof(packet->desc));
-
-  packet->length  = (chunk_length - FRAME_DESC_SZ) & 0xFFF;
-  packet->command = (uint16_t)SLI_SEND_MAC_FRAME;
-
-  // Set the packet's transmitter test information
-  _11ax_transmit = per_params->enable_11ax;
-  uint8_t mode   = _11ax_transmit ? (per_params->rate & BIT(7) ? 2 : 1) : 0;
-  if (_11ax_transmit) {
-    if (mode == 2) {
-      bbp_info = ((per_params->bw << 0) | (per_params->he_ppdu_type << 4) | (per_params->ul_dl << 6)
-                  | (per_params->sigb_mcs << 7));
-    } else {
-      bbp_info = (per_params->coding_type << 0) | (per_params->nominal_pe << 1) | (per_params->ul_dl << 3)
-                 | (per_params->he_ppdu_type << 4) | (per_params->beam_change << 6) | (per_params->bw << 7)
-                 | (per_params->stbc << 8) | (per_params->tx_bf << 9) | (per_params->dcm << 10)
-                 | (per_params->gi_ltf << 11) | (per_params->nsts_midamble << 13);
-    }
-  }
-  rate_field_params = (per_params->nominal_pe << RATE_OFFSET_NOMINAL_PE)
-                      | (per_params->coding_type << RATE_OFFSET_CODING_TYPE)
-                      | (per_params->gi_ltf << RATE_OFFSET_GI_LTF) | (per_params->dcm << RATE_OFFSET_DCM);
-
-  *(uint32_t *)&packet->desc[4] = (MIN_802_11_HDR_LEN << 8) | (BIT(2) << 16); //MIN_HDR_LEN Insert Seq no
-
-  if (per_params->aggr_enable) {
-    temp_word = ((ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
-    *(uint32_t *)&packet->desc[12] |= (QOS_EN);
-  } else {
-    temp_word = ((BROADCAST_IND | ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
-  }
-  rate_flags = (per_params->rate_flags << 2);
-  ch_bw      = (rate_flags & 0x00F0);
-
-  if (ch_bw & BIT(4))
-    ch_bw = 0;
-  greenfield = (rate_flags & 0x0008);
-  greenfield = (greenfield << 10);
-
-  if (rate_flags & 0x0004) //checking short_GI
-  {
-    per_params->rate |= BIT(9);
-  }
-
-  *(uint32_t *)&packet->desc[4] |= (temp_word | extended_desc);
-
-  if (_11ax_transmit) {
-    *(uint32_t *)&packet->desc[8] = ((per_params->rate & SLI_11AX_BE_RATE_MASK) | BIT(10) | rate_field_params);
-    *(uint32_t *)&packet->desc[8] |= (bbp_info << 16);
-  } else {
-
-    *(uint32_t *)&packet->desc[8] = ((per_params->rate & 0x3ff) | (ch_bw << 12) | greenfield);
-  }
-  *(uint32_t *)&packet->data[0] = (per_params->power) & 0xff;
-  if (per_params->mode == PER_CONT_MODE) {
-    *(uint32_t *)&packet->data[0] |= (3 << 8);
-  }
-
-  // Modify the packet's descriptor to include the firmware queue ID in the length field
-  packet->desc[1] |= (5 << 4);
-  packet->desc[14] |= 1;
-
-  // Calling the routing utility to route the packet
-  status =
-    sli_wifi_send_data_packet((void *)packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
-
-  if (status != SL_STATUS_OK) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-  }
-  return status;
+  return sli_wifi_send_command(SLI_WIFI_REQ_IP_ADDRESS_INFO,
+                               SLI_SI91X_NETWORK_CMD,
+                               ip_address_info,
+                               sizeof(sli_wifi_ip_address_info_t),
+                               SLI_WIFI_WAIT_FOR(SLI_WIFI_RSP_SEND_IP_ADDRESS_INFO_WAIT_TIME),
+                               NULL,
+                               NULL);
 }

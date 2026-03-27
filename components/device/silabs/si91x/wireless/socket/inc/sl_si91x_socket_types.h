@@ -265,8 +265,8 @@ typedef struct {
   int32_t index;                       ///< Socket index
   int role;                            ///< Socket role
   int32_t protocol;                    ///< Protocol
-  uint16_t tcp_keepalive_initial_time; ///< TCP keepalive intial time
-  uint8_t max_tcp_retries;             ///< MAX TCOP retries
+  uint16_t tcp_keepalive_initial_time; ///< TCP keepalive initial time
+  uint8_t max_tcp_retries;             ///< MAX TCP retries
   uint16_t read_timeout;               ///< Read timeout
   uint8_t certificate_index;           ///< Certificate Index
   uint8_t vap_id;                      ///< Virtual AP ID
@@ -297,6 +297,6 @@ typedef struct {
   uint8_t data_buffer_limit; ///< Maximum number of queued data buffers permitted for this socket
   sli_queue_t rx_queue;      ///< Receive queue for incoming commands
   sli_command_engine_packet_type_configuration_t socket_packet_type_configuration; ///< Pointer to socket packet
-  bool Is_receive_cmd_pending; ///< Flag to indicate if a receive command is pending
+  bool is_receive_cmd_pending; ///< Flag to indicate if a receive command is pending
   uint8_t *domain_name;        ///< Expected domain name for TLS certificate verification
 } sli_si91x_socket_t;

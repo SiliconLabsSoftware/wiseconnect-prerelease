@@ -28,7 +28,8 @@
  *************************** LOCAL VARIABLES   *******************************
  ******************************************************************************/
 sl_sleeptimer_timer_handle_t timer1; //sleeptimer1 handle
-boolean_t delay_timeout = false;     //Indicates sleeptimer1 timeout
+/* Volatile: set in sleeptimer callback, read in main loop. Required for LTO. */
+static volatile boolean_t delay_timeout = false; //Indicates sleeptimer1 timeout
 
 /*******************************************************************************
  **********************  Local Function prototypes   ***************************

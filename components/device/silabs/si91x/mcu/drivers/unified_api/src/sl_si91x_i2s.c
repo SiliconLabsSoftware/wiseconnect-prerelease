@@ -520,7 +520,57 @@ sl_status_t sl_si91x_i2s_receive_data(sl_i2s_handle_t i2s_handle, const void *da
   } while (false);
   return status;
 }
+/*******************************************************************************
+ * I2S full duplex transfer. 
+ * It includes both transmit and receive operations.
+ ******************************************************************************/
+sl_status_t sl_si91x_i2s_transfer(sl_i2s_handle_t i2s_handle,
+                                  void *data_in,
+                                  const void *data_out,
+                                  uint32_t data_in_size,
+                                  uint32_t data_out_size)
+{
+  sl_status_t status   = SL_STATUS_OK;
+  int32_t error_status = 0;
 
+  do {
+
+    // Validate input parameters (combined from transmit_data and receive_data)
+    if ((data_out == NULL) || (data_in == NULL) || (i2s_handle == NULL)) {
+      status = SL_STATUS_NULL_POINTER;
+      break;
+    }
+
+    // Validate I2S handle (from both transmit_data and receive_data)
+    if ((i2s_handle != &Driver_SAI0) && (i2s_handle != &Driver_SAI1)) {
+      // Invalid I2S handle
+      status = SL_STATUS_INVALID_PARAMETER;
+      break;
+    }
+
+    // Validate data size - transfer size should be even for I2S transfers
+    // (from both transmit_data and receive_data)
+    if ((data_out_size % 2 != 0) || (data_in_size % 2 != 0)) {
+      // Invalid data size. transfer size should be even for I2S transfers
+      status = SL_STATUS_INVALID_PARAMETER;
+      break;
+    }
+
+    // CMSIS API for I2S transfer is called and the arm error code returned
+    // from the API is converted to SL error code via
+    // convert_arm_to_sl_error_code function.
+    // This uses Transfer function pointer instead of separate Send and Receive
+
+    if (i2s_handle == &Driver_SAI0) {
+      error_status = I2S_Transfer((void *)data_out, (void *)data_in, data_out_size, data_in_size, I2S0_INSTANCE);
+    } else {
+      error_status = I2S_Transfer((void *)data_out, (void *)data_in, data_out_size, data_in_size, I2S1_INSTANCE);
+    }
+    status = convert_arm_to_sl_error_code(error_status);
+  } while (false);
+
+  return status;
+}
 /*******************************************************************************
  * To register the user event callback
  * It registers the callback, i.e., stores the callback function address 

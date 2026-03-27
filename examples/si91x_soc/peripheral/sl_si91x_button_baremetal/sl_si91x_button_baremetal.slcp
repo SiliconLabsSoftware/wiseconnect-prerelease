@@ -3,7 +3,7 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to configure and use a button as an input device. \nIt includes initializing the GPIO peripheral, configuring the button pin as an input, \nand detecting button presses or releases to trigger specific actions.\n"
 category: example|peripheral
 quality: production
-label: SI91x - Button Baremetal
+label: Platform SiWx91x - Button Baremetal
 component:
 - id: sl_main
 - id: status
@@ -41,6 +41,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

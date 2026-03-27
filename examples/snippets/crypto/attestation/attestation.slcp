@@ -1,5 +1,5 @@
 project_name: attestation
-label: SI91x - SoC Secure Attestation
+label: Platform SiWx91x - Secure Attestation
 description: 'Demonstates how to request and get attestation token.
 
   '
@@ -52,6 +52,22 @@ ui_hints:
   highlight:
   - path: readme.md
     focus: true
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
+- name: Project Difficulty
+  value:
+  - Beginner
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

@@ -289,10 +289,6 @@ int sli_handle_select_response(const sli_si91x_socket_select_rsp_t *response,
                                sl_si91x_fdset_t *exception_fd);
 #endif
 
-uint8_t sli_si91x_socket_identification_function_based_on_socketid(sl_wifi_buffer_t *buffer, void *user_data);
-
-void sli_set_select_callback(sl_si91x_socket_select_callback_t callback);
-
 void sli_si91x_set_accept_callback(sli_si91x_socket_t *server_socket,
                                    sl_si91x_socket_accept_callback_t callback,
                                    int32_t client_socket_id);

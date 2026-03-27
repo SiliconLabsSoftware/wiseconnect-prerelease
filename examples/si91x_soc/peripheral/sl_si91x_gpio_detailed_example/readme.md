@@ -84,6 +84,11 @@ This application demonstrates the toggling of a High-Power (HP) instance GPIO at
 
 >**Note:** Do not enable PAD selection number 9, as it is pre-configured for another function.
 
+>**Note:** 
+Default High Configuration:
+To ensure the pin defaults to high after being set as output, you should set the pin value in Bit Load register using [sl_gpio_driver_set_pin()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl_gpio_driver_set_pin). before setting/changing its configuration.This prevents unintended glitches or low states during the transition.
+
+
 The following table lists the GPIO examples available and their functionality:
 
   |  GPIO Examples        |    GPIO Functionality                              |  
@@ -160,3 +165,18 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
 >- To use GPIO pins 31-34 in GPIO mode, see the [SiWx917 Software Reference Manual](docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -102,6 +102,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   ![Figure: Selecting UC](resources/uc_screen/usart_uc.png)
 
+- By default, `USART0 SYNC Mode` is disabled in UC. Enable it for synchronous communication.
+- By default, the CLK pin is not configured in UC. Select the required CLK pin.
 - Connect the boards: master clock (GPIO_8 or GPIO_25) ↔ slave clock, master TX (GPIO_30) → slave RX (GPIO_29), slave TX (GPIO_30) → master RX (GPIO_29). (Clock direction is from master to slave.)
 
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
@@ -182,3 +184,18 @@ If the Pin Tool is not working, UC changes plus manual verification in `RTE_Devi
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
 > - By default, RTS/CTS flow control signals are disabled in the UART driver UC and pins are unassigned. After enabling RTS/CTS, assign the GPIOs via UC or edit `RTE_Device_917.h` if the Pin Tool is unavailable.
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

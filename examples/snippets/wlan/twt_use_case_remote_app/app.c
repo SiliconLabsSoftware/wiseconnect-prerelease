@@ -34,7 +34,6 @@
 #include "sl_status.h"
 #include "sl_board_configuration.h"
 #include "cmsis_os2.h"
-#include "string.h"
 #include "sl_wifi.h"
 #include "socket.h"
 #include "sl_utility.h"

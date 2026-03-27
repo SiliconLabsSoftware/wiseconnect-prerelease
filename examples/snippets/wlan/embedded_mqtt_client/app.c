@@ -274,21 +274,21 @@ void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t
   switch (*error) {
     case SL_MQTT_CLIENT_RECEIVE_FAILED:
       printf("MQTT Error: Message receive failed.\r\n");
-      return;
+      break;
 
     case SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE:
       printf("MQTT Error: Received payload exceeds max size (%u bytes). "
              "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE.\r\n",
              SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE);
-      return;
+      break;
 
     case SL_MQTT_CLIENT_RECEIVE_MEMORY_ALLOCATION_FAILED:
       printf("MQTT Error: Failed to allocate memory for message reassembly.\r\n");
-      return;
+      break;
 
     case SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED:
       printf("MQTT Error: Data corruption detected during message reassembly.\r\n");
-      return;
+      break;
 
     default:
       printf("Terminating program, Error: %d\r\n", *error);

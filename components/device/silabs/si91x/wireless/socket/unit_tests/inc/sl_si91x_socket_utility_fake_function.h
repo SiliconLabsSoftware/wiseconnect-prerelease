@@ -52,14 +52,7 @@ DECLARE_FAKE_VALUE_FUNC7(sl_status_t,
                          sl_wifi_buffer_t **);
 DECLARE_FAKE_VALUE_FUNC1(sl_status_t, sli_buffer_manager_free_buffer, sli_buffer_t);
 DECLARE_FAKE_VALUE_FUNC3(void *, sli_wifi_host_get_buffer_data, sl_wifi_buffer_t *, uint16_t, uint16_t *);
-DECLARE_FAKE_VOID_FUNC2(sli_si91x_append_to_buffer_queue, sli_wifi_buffer_queue_t *, sl_wifi_buffer_t *);
 DECLARE_FAKE_VOID_FUNC1(sli_si91x_set_event, uint32_t);
-DECLARE_FAKE_VALUE_FUNC4(sl_status_t,
-                         sli_si91x_host_allocate_buffer,
-                         sl_wifi_buffer_t **,
-                         sl_wifi_buffer_type_t,
-                         uint32_t,
-                         uint32_t);
 DECLARE_FAKE_VALUE_FUNC1(sl_si91x_host_timestamp_t, sl_si91x_host_elapsed_time, uint32_t);
 DECLARE_FAKE_VALUE_FUNC4(sl_status_t,
                          sli_si91x_driver_send_async_command,
@@ -93,7 +86,6 @@ DECLARE_FAKE_VALUE_FUNC1(osStatus_t, osMutexDelete, osMutexId_t);
 DECLARE_FAKE_VALUE_FUNC1(osStatus_t, osMutexRelease, osMutexId_t);
 DECLARE_FAKE_VOID_FUNC_VARARG(sl_redirect_log, const char *, ...);
 DECLARE_FAKE_VOID_FUNC1(sli_wifi_set_event, uint32_t);
-DECLARE_FAKE_VOID_FUNC2(sli_wifi_append_to_buffer_queue, sli_wifi_buffer_queue_t *, sl_wifi_buffer_t *);
 DECLARE_FAKE_VALUE_FUNC2(size_t, sl_strnlen, char *, size_t);
 DECLARE_FAKE_VALUE_FUNC0(uint32_t, osKernelGetTickFreq);
 DECLARE_FAKE_VALUE_FUNC2(sl_status_t, sli_command_engine_remove_packet_type, sli_command_engine_t *, uint8_t);
@@ -142,5 +134,4 @@ DECLARE_FAKE_VALUE_FUNC5(sl_status_t,
                          uint8_t,
                          void **);
 DECLARE_FAKE_VALUE_FUNC1(bool, sli_wifi_is_ip_address_zero, const sl_ip_address_t *);
-
-extern sli_wifi_command_queue_t cmd_queues[5];
+DECLARE_FAKE_VALUE_FUNC1(uint16_t, sli_wifi_get_wifi_frame_status, const sl_wifi_system_packet_t *);

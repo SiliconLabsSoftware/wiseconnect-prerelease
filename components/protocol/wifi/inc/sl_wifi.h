@@ -253,6 +253,8 @@ sl_status_t sl_wifi_get_max_tx_power(sl_wifi_interface_t interface, sl_wifi_max_
  *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
  * @param[in] max_tx_power
  *   Max transmission power as identified by @ref sl_wifi_max_tx_power_t
+ * @pre Pre-conditions:
+ * -   This API should be called before @ref sl_wifi_connect or @ref sl_wifi_start_ap.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
@@ -1275,6 +1277,79 @@ sl_status_t sl_wifi_set_advanced_client_configuration(sl_wifi_interface_t interf
 
 /***************************************************************************/ /**
  * @brief
+ *   Configure Wi-Fi timeout parameters.
+ *
+ * @details
+ *   This API configures various timeout settings for the Wi-Fi module including
+ *   authentication/association timeout, channel scan timeouts, keep alive timeout,
+ *   and BSS Max Idle Period. The timeout type determines which parameter is being
+ *   configured.
+ *
+ *   For BSS Max Idle Period (SL_WIFI_BSS_MAX_IDLE_PERIOD), this allows the IoT client
+ *   device to negotiate a longer idle period with the AP, reducing the frequency of
+ *   keepalive messages for improved power efficiency.
+ *
+ * @pre
+ *   @ref sl_wifi_init should be called before this API.
+ *
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ *
+ * @param[in] timeout_type
+ *   Identifies which timeout type to set. See @ref sl_wifi_timeout_type_t.
+ *
+ * @param[in] timeout_value
+ *   The timeout value to set. The time resolution depends on the timeout_type:
+ *   - SL_WIFI_AUTHENTICATION_ASSOCIATION_TIMEOUT: milliseconds
+ *   - SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT: milliseconds
+ *   - SL_WIFI_KEEP_ALIVE_TIMEOUT: seconds
+ *   - SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT: milliseconds
+ *   - SL_WIFI_BSS_MAX_IDLE_PERIOD: seconds
+ *
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *
+ * @note For BSS_MAX_IDLE_PERIOD: can be called after opermode set and before association.
+ * @note Configuration is applied during the next association/reconnection.
+ ******************************************************************************/
+sl_status_t sl_wifi_configure_timeout(sl_wifi_interface_t interface,
+                                      sl_wifi_timeout_type_t timeout_type,
+                                      uint16_t timeout_value);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Get Wi-Fi timeout parameter value.
+ *
+ * @details
+ *   This API queries timeout parameter values from NWP. For BSS Max Idle Period
+ *   (SL_WIFI_BSS_MAX_IDLE_PERIOD), it returns the negotiated value from the AP after
+ *   a successful association.
+ *
+ * @pre
+ *   @ref sl_wifi_init should be called before this API.
+ *   For SL_WIFI_BSS_MAX_IDLE_PERIOD, an active connection to an AP is required.
+ *
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ *
+ * @param[in] timeout_type
+ *   Identifies which timeout value to retrieve. See @ref sl_wifi_timeout_type_t.
+ *
+ * @param[out] timeout_value
+ *   Pointer to store the retrieved timeout value.
+ *
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   For BSS Max Idle configuration, the AP may indicate whether keepalive frames must be secured or non-secured. 
+ *   The firmware logs this frame type information, which can be accessed if the application has enabled logging.
+ ******************************************************************************/
+sl_status_t sl_wifi_get_timeout(sl_wifi_interface_t interface,
+                                sl_wifi_timeout_type_t timeout_type,
+                                uint16_t *timeout_value);
+
+/***************************************************************************/ /**
+ * @brief
  *   Send raw data frame.
  * @pre Pre-conditions:
  * -
@@ -1324,12 +1399,29 @@ sl_status_t sl_wifi_disable_target_wake_time(const sl_wifi_twt_request_t *twt_re
  * @pre Pre-conditions:
  * -
  *   @ref sl_wifi_connect should be called before this API.
+ * @param[in] config
+ *   @ref sl_wifi_twt_selection_v2_t object containing configurable TWT selection parameters.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_target_wake_time_auto_selection_v2(const sl_wifi_twt_selection_v2_t *config);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Calculates and configures TWT parameters based on the given inputs. Enables or disables a TWT session. This is blocking API.
+ * @deprecated Use @ref sl_wifi_target_wake_time_auto_selection_v2 with @ref sl_wifi_twt_selection_v2_t instead.
+ *   Internal TWT fields in @ref sl_wifi_twt_selection_t are overwritten by the SDK with default values; only twt_enable,
+ *   average_tx_throughput, tx_latency, and rx_latency are effective. This API is retained for backward compatibility.
+ * @pre Pre-conditions:
+ * -
+ *   @ref sl_wifi_connect should be called before this API.
  * @param[in] twt_selection_req
  *   @ref sl_wifi_twt_selection_t object containing configurable TWT selection parameters.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  ******************************************************************************/
-sl_status_t sl_wifi_target_wake_time_auto_selection(sl_wifi_twt_selection_t *twt_selection_req);
+sl_status_t sl_wifi_target_wake_time_auto_selection(sl_wifi_twt_selection_t *twt_selection_req)
+  SL_DEPRECATED_API_WISECONNECT_4_1;
 
 /***************************************************************************/ /**
  * @brief

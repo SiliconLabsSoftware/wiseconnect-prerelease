@@ -241,7 +241,7 @@ void rsi_ble_task_on_conn(void *parameters)
   //! connection identifier should always be less than the total no. of connections requested
   if (l_conn_id >= TOTAL_CONNECTIONS) {
     LOG_PRINT("\r\n Wrong connection identifier\r\n");
-    //! check why this state has occured
+    //! check why this state has occurred
     return;
   }
 

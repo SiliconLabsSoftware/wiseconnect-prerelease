@@ -30,10 +30,11 @@
 #pragma once
 
 #include "sl_si91x_status.h"
+#include "sl_wifi_types.h"
 #include "sl_si91x_protocol_types.h"
+#include "sl_si91x_constants.h"
 #include "sl_constants.h"
 #include "sl_bit.h"
-#include "sl_wifi_types.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -2722,48 +2723,6 @@ typedef struct {
   uint8_t reserved1[2]; ///< Reserved bits
 } si91x_calibration_data_t;
 
-/** \addtogroup SL_SI91X_TYPES
- * @{
- * */
-/// Bluetooth performance profile
-typedef struct {
-  sl_wifi_system_performance_profile_t
-    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
-} sl_bt_performance_profile_t;
-
-/**
-* Wi-Fi performance profile
-* 
-* Moving forward, this structure will be deprecated. Instead, use the [sl_wifi_performance_profile_v2_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-performance-profile-v2-t) structure. This is retained for backward compatibility.
-*/
-typedef struct {
-  sl_wifi_system_performance_profile_t
-    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
-  uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
-  uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint16_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
-  uint16_t
-    monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
-  sl_wifi_twt_request_t twt_request;     ///< Target Wake Time (TWT) request settings.
-  sl_wifi_twt_selection_t twt_selection; ///< Target Wake Time (TWT) selection request settings.
-} sl_wifi_performance_profile_t;
-
-/// Wi-Fi performance profile v2
-typedef struct {
-  sl_wifi_system_performance_profile_t
-    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
-  uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
-  uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint32_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
-  uint16_t
-    monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
-  sl_wifi_twt_request_t twt_request;     ///< Target Wake Time (TWT) request settings.
-  sl_wifi_twt_selection_t twt_selection; ///< Target Wake Time (TWT) selection request settings.
-  uint8_t
-    beacon_miss_ignore_limit; ///< Number of consecutive missed beacons that can be ignored while the device remains in sleep mode. If the number of beacon misses exceeds this limit and the beacon is still not received, the device will wake up to listen for the beacon. The default value is 1. Recommended range: 1 - 10. Values beyond 10 might lead to interoperability issues.
-} sl_wifi_performance_profile_v2_t;
-
-/** @} */
 // driver TX/RX packet structure
 /// Wi-Fi packet structure
 typedef struct {
@@ -3034,4 +2993,58 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transceiver_configur
 #include "sl_si91x_types.h"
 /** @} */
 
+/** \addtogroup SL_SI91X_TYPES
+ * @{
+ * */
+/// Bluetooth performance profile
+typedef struct {
+  sl_wifi_system_performance_profile_t
+    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
+} sl_bt_performance_profile_t;
+
+/**
+* Wi-Fi performance profile
+*
+* Moving forward, this structure will be deprecated. Instead, use the [sl_wifi_performance_profile_v2_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-performance-profile-v2-t) structure. This is retained for backward compatibility.
+*/
+typedef struct {
+  sl_wifi_system_performance_profile_t
+    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
+  uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
+  uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
+  uint16_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
+  uint16_t
+    monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
+  sl_wifi_twt_request_t twt_request; ///< Target Wake Time (TWT) request settings.
+  union {
+    sl_wifi_twt_selection_t
+      twt_selection; ///< @deprecated Use twt_selection_v2 instead. Target Wake Time (TWT) selection request settings.
+    sl_wifi_twt_selection_v2_t twt_selection_v2; ///< Target Wake Time (TWT) selection request settings.
+  };
+} sl_wifi_performance_profile_t;
+
+/// Wi-Fi performance profile v2
+typedef struct {
+  sl_wifi_system_performance_profile_t
+    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
+  uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
+  uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
+  uint32_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
+  uint16_t
+    monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
+  sl_wifi_twt_request_t twt_request; ///< Target Wake Time (TWT) request settings.
+  union {
+    sl_wifi_twt_selection_t
+      twt_selection; ///< @deprecated Use twt_selection_v2 instead. Target Wake Time (TWT) selection request settings.
+    sl_wifi_twt_selection_v2_t twt_selection_v2; ///< Target Wake Time (TWT) selection request settings.
+  };
+  uint8_t
+    beacon_miss_ignore_limit; ///< Number of consecutive missed beacons that can be ignored while the device remains in sleep mode. If the number of beacon misses exceeds this limit and the beacon is still not received, the device will wake up to listen for the beacon. The default value is 1. Recommended range: 1 - 10. Values beyond 10 might lead to interoperability issues.
+} sl_wifi_performance_profile_v2_t;
+/** @} */
+
+/**
+ * @brief Print the firmware version
+ * @param firmware_version The firmware version to print
+ */
 void print_firmware_version(const sl_wifi_firmware_version_t *firmware_version);

@@ -19,12 +19,13 @@
 
 ## Purpose/Scope
 
-- This application demonstrates the usage of HP (High Power) pin interrupt and Toggling of HP GPIO pin 6.
+- This application demonstrates the usage of HP (High Power) pin interrupt and toggling of HP GPIO pin 6.
+- Optionally, it also demonstrates toggling HP GPIO pin 66 via ULP GPIO 2 using the ULP-to-SOC peripheral pin muxing feature. This is controlled by the `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE` macro.
 
 ## Overview
 
 - The GPIO functionality in the MCU consists of three instances:
-  - **HP (High Power) Instance:** Controls the SoC GPIOs (GPIO_n; n=6 to 57).
+  - **HP (High Power) Instance:** Controls the SoC GPIOs (GPIO_n; n=6 to 75).
   - **ULP (Ultra Low Power) Instance:** Controls the ULP GPIOs (ULP_GPIO_n; n=0 to 11).
   - **UULP (Ultra Ultra Low Power) Instance:** Controls the UULP GPIOs (UULP_GPIO_n; n=0 to 4).
 - HP and ULP Instance have same features and functionality except for different base address.
@@ -45,11 +46,14 @@
 | HP GPIO Instance               |  SL_GPIO_PORT_B   |   (16-31)         |
 |                                |  SL_GPIO_PORT_C   |   (32-47)         | 
 |                                |  SL_GPIO_PORT_D   |   (48-57)         |
+| SOC Peripheral on ULP GPIO     |  NA               |   (64-75)         |
 | ULP GPIO Instance              |  SL_GPIO_ULP_PORT |   (0-11)          |
 | UULP GPIO Instance             | SL_GPIO_UULP_PORT |   (0-4)           |
 | | |
 
-**NOTE** : There is also option to select (0-57)pins with SL_GPIO_PORT_A. For example, to select HP GPIO pin number 49, one can select Port as SL_GPIO_PORT_A and pin number as 49. This option is given only when SL_GPIO_PORT_A GPIO port is selected. (57-63)pins are reserved.
+> **Note:** GPIO_64 to GPIO_75 are unavailable at SoC GPIO pins, but may be mapped to ULP_GPIO pins (SOCPERH_ON_ULP_GPIO_x in the ULP GPIO pin mode control). GPIO_67 is not available. ULP_GPIO_3 is unavailable on a ULP_GPIO pin, but may be mapped to SoC GPIO_9 (ULPPERH_ON_SOC_GPIO_3 in the GPIO pin mode control).
+
+**NOTE** : There is also option to select (0-75)pins with SL_GPIO_PORT_A. For example, to select HP GPIO pin number 49, one can select Port as SL_GPIO_PORT_A and pin number as 49. This option is given only when SL_GPIO_PORT_A GPIO port is selected. Pins 13-14, 16-24, 36-45, 58-63, and 67 are reserved.
 
 > **NOTE** : For reference on how to select Port and Pin number for different instances, please see the following points:
 >
@@ -88,7 +92,7 @@ Below are the list of GPIO examples available and it's functionality:
   |  GPIO Examples        |    GPIO Functionality                              |  
   |-----------------------|----------------------------------------------------|  
   | gpio_detailed_example | Demonstrates GPIO toggle and supported APIs        |       
-  | gpio_example          |  Demonstrates HP GPIO pin interrupt                |  
+  | gpio_example          | Demonstrates HP GPIO pin interrupt and optional ULP-to-HP GPIO toggle |  
   | gpio_group_example    | Demonstrates HP, ULP  GPIO group interrupts        | 
   | gpio_ulp_example      |  Demonstrates GPIO toggle and ULP  pin interrupt   |           
   | gpio_uulp_example     | Demonstrates UULP  pin interrupt                   | 
@@ -96,11 +100,12 @@ Below are the list of GPIO examples available and it's functionality:
 
 ## About Example Code
 
-- The example shows configuring the pin interrupt. Press BTN1 for triggering HP GPIO pin interrupt. Connect to GPIO pin 6(P19) for toggles to observe. 
+- The example shows configuring the pin interrupt, toggling HP GPIO pin 6, and toggling HP GPIO 66 mapped via ULP GPIO 2 using `sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode`. Press BTN1 for triggering HP GPIO pin interrupt. Connect to GPIO pin 6 (P19) to observe toggles.
 
 ### Initialization of GPIO
 
 - Use [sl_gpio_set_configuration()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl_gpio_set_configuration) to configure the GPIO pin based on the port and pin, direction.
+- Use [sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl-si91x-gpio-driver-set-soc-peri-on-ulp-pin-mode) to map a ULP GPIO to SOC HP peripheral pin mode after configuring the ULP pin and before configuring the corresponding HP pin.
 - Use [sl_gpio_configure_pin_interrupt()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl_gpio_configure_pin_interrupt) to configure the pin interrupt for GPIO.
 
 ## Prerequisites/Setup Requirements
@@ -140,9 +145,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Configure the following parameters in gpio_example.c (examples/si91x_soc/peripheral/sl_si91x_gpio_example/) file and update/modify following macros if required
 
   ```c
-    #define AVL_INTR_NO      0      // available interrupt number
-    #define INT_CH           0      // GPIO Pin interrupt 0
+    #define AVL_INTR_NO           0  // available interrupt number
+    #define INT_CH                0  // GPIO Pin interrupt 0
+    #define ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE 1  // Set to 1 to enable HP GPIO 66 toggle via ULP GPIO 2
   ```
+
+  - `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 2 mapped to HP GPIO 66 toggling. Set to **0** to disable this feature and only use HP GPIO pin 6 toggle with pin 11 interrupt.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -151,8 +159,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1. Compile and run the application.
-2. Observe toggles on GPIO6(P19). Press BTN1 for triggering HP GPIO pin interrupt.
-3. After successful program execution the prints in serial console looks as shown below.
+2. Observe toggles on GPIO 6 (P19). Press BTN1 for triggering HP GPIO pin interrupt.
+3. When `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE` is set to **1**, also observe HP GPIO 66 toggle on the ULP GPIO 2 pad.
+4. After successful program execution the prints in serial console looks as shown below.
 
   ![Figure: output](resources/readme/output.png)
 
@@ -160,3 +169,18 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
 >- To use GPIO pins 31-34 in GPIO mode, see the [SiWx917 Software Reference Manual](docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

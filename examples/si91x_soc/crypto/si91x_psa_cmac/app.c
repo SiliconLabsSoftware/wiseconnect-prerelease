@@ -85,15 +85,10 @@
 /******************************************************
  *               Variable Definitions
  ******************************************************/
-const osThreadAttr_t thread_attributes = {
+static const osThreadAttr_t thread_attributes = {
   .name       = "app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow,
-  .tz_module  = 0,
 };
 
 static const sl_wifi_device_configuration_t client_configuration = {

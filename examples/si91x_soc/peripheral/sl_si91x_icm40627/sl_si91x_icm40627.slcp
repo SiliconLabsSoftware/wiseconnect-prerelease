@@ -3,7 +3,7 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to configure and use the ICM40627 motion sensor, a 6-axis sensor that combines a 3-axis accelerometer and a 3-axis gyroscope. \nThe example covers how to initialize the sensor, configure its settings for various motion detection tasks, and retrieve sensor data for further processing, enabling motion-based applications.\n"
 category: example|peripheral
 quality: production
-label: sl_si91x_icm40627
+label: Platform SiWx91x - ICM40627
 component:
 - id: sl_main
 - id: syscalls
@@ -42,6 +42,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

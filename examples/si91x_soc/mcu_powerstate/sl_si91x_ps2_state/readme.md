@@ -94,3 +94,18 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 4. For Active number, please set the ACTIVE_STATE macro as 1. 
 5. After successful program execution, the prints in the serial console look as shown below.
   ![Figure: PS2 Active State](resources/readme/ps2_active_state.png)
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -83,7 +83,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 1. Build the application.
 2. Flash, run and debug the application.
-3. After the application has been successfully flashed, Wi-Fi commander tool would recieve `sl_wifi_evt_system_boot` event indicating module is ready and tool can now send commands and receive the corresponding responses and events.
+3. After the application has been successfully flashed, Wi-Fi commander tool would receive `sl_wifi_evt_system_boot` event indicating module is ready and tool can now send commands and receive the corresponding responses and events.
 
 ### Evaluating with Wi-Fi Commander
 

@@ -671,7 +671,7 @@ static sl_status_t sli_send_single_http_request(sl_http_client_method_type_t sen
                                                 const sl_http_client_request_t *request)
 {
   if (send_request == SL_HTTP_POST) {
-    return sli_wifi_send_command(SLI_WLAN_REQ_HTTP_CLIENT_POST,
+    return sli_wifi_send_command(SLI_WIFI_REQ_HTTP_CLIENT_POST,
                                  SLI_SI91X_NETWORK_CMD,
                                  http_client_request,
                                  packet_length,
@@ -679,7 +679,7 @@ static sl_status_t sli_send_single_http_request(sl_http_client_method_type_t sen
                                  request->context,
                                  NULL);
   } else {
-    return sli_wifi_send_command(SLI_WLAN_REQ_HTTP_CLIENT_GET,
+    return sli_wifi_send_command(SLI_WIFI_REQ_HTTP_CLIENT_GET,
                                  SLI_SI91X_NETWORK_CMD,
                                  http_client_request,
                                  packet_length,
@@ -728,7 +728,7 @@ static sl_status_t sli_send_chunked_http_request(sl_http_client_method_type_t se
     if (send_request == SL_HTTP_GET) {
       // HTTP Get request with custom driver command
       status = sli_wifi_send_command_with_custom_desc(
-        SLI_WLAN_REQ_HTTP_CLIENT_GET,
+        SLI_WIFI_REQ_HTTP_CLIENT_GET,
         SLI_SI91X_NETWORK_CMD,
         packet_buffer,
         (sizeof(sli_si91x_http_client_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + *chunk_size),
@@ -739,7 +739,7 @@ static sl_status_t sli_send_chunked_http_request(sl_http_client_method_type_t se
     } else if (send_request == SL_HTTP_POST) {
       // HTTP POST request with custom driver command
       status = sli_wifi_send_command_with_custom_desc(
-        SLI_WLAN_REQ_HTTP_CLIENT_POST,
+        SLI_WIFI_REQ_HTTP_CLIENT_POST,
         SLI_SI91X_NETWORK_CMD,
         packet_buffer,
         (sizeof(sli_si91x_http_client_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + *chunk_size),
@@ -875,11 +875,11 @@ static sl_status_t sli_http_client_send_put_request(const sl_http_client_interna
   // Since body is not sent in this request, we are subtracting max SLI_SI91X_HTTP_CLIENT_PUT_MAX_BUFFER_LENGTH
   packet_length = sizeof(sl_si91x_http_client_put_request_t) - SLI_SI91X_HTTP_CLIENT_PUT_MAX_BUFFER_LENGTH;
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_HTTP_CLIENT_PUT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_HTTP_CLIENT_PUT,
                                  SLI_SI91X_NETWORK_CMD,
                                  http_put_request,
                                  packet_length,
-                                 SLI_WLAN_RSP_HTTP_CLIENT_PUT_WAIT_TIME,
+                                 SLI_WIFI_RSP_HTTP_CLIENT_PUT_WAIT_TIME,
                                  NULL,
                                  NULL);
   if (status != SL_STATUS_OK) {
@@ -1030,7 +1030,7 @@ static sl_status_t sli_http_client_send_put_request(const sl_http_client_interna
   packet_length =
     sizeof(sl_si91x_http_client_put_request_t) - SLI_SI91X_HTTP_CLIENT_PUT_MAX_BUFFER_LENGTH + http_buffer_offset;
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_HTTP_CLIENT_PUT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_HTTP_CLIENT_PUT,
                                  SLI_SI91X_NETWORK_CMD,
                                  http_put_request,
                                  packet_length,
@@ -1142,7 +1142,7 @@ sl_status_t sl_http_client_write_chunked_data(const sl_http_client_t *client,
                                  - SLI_SI91X_HTTP_CLIENT_POST_MAX_BUFFER_LENGTH + data_length);
 
       // Send HTTP Post Data request
-      status = sli_wifi_send_command(SLI_WLAN_REQ_HTTP_CLIENT_POST_DATA,
+      status = sli_wifi_send_command(SLI_WIFI_REQ_HTTP_CLIENT_POST_DATA,
                                      SLI_SI91X_NETWORK_CMD,
                                      http_post_data,
                                      packet_length,
@@ -1179,7 +1179,7 @@ sl_status_t sl_http_client_write_chunked_data(const sl_http_client_t *client,
                                  - SLI_SI91X_HTTP_CLIENT_PUT_MAX_BUFFER_LENGTH + data_length);
 
       // Send HTTP Put Data request
-      status = sli_wifi_send_command(SLI_WLAN_REQ_HTTP_CLIENT_PUT,
+      status = sli_wifi_send_command(SLI_WIFI_REQ_HTTP_CLIENT_PUT,
                                      SLI_SI91X_NETWORK_CMD,
                                      http_put_pkt_request,
                                      packet_length,
@@ -1202,11 +1202,11 @@ sl_status_t sl_http_client_write_chunked_data(const sl_http_client_t *client,
 
 static sl_status_t sli_si91x_http_client_abort(void)
 {
-  sl_status_t status = sli_wifi_send_command(SLI_WLAN_REQ_HTTP_ABORT,
+  sl_status_t status = sli_wifi_send_command(SLI_WIFI_REQ_HTTP_ABORT,
                                              SLI_SI91X_NETWORK_CMD,
                                              NULL,
                                              0,
-                                             SLI_WLAN_RSP_HTTP_ABORT_WAIT_TIME,
+                                             SLI_WIFI_RSP_HTTP_ABORT_WAIT_TIME,
                                              NULL,
                                              NULL);
   VERIFY_STATUS_AND_RETURN(status);

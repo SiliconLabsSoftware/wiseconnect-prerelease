@@ -99,28 +99,28 @@ sl_status_t sli_convert_si91x_event_to_sl_net_event(const uint16_t *event,
 
   // Map SI91X events to SimpleLink network events
   switch (*event) {
-    case SLI_WLAN_RSP_DNS_QUERY: {
+    case SLI_WIFI_RSP_DNS_QUERY: {
       *sl_net_event = SL_NET_DNS_RESOLVE_EVENT;
       return SL_STATUS_OK;
     }
-    case SLI_WLAN_RSP_PING_PACKET: {
+    case SLI_WIFI_RSP_PING_PACKET: {
       *sl_net_event = SL_NET_PING_RESPONSE_EVENT;
       return SL_STATUS_OK;
     }
-    case SLI_WLAN_RSP_OTA_FWUP: {
+    case SLI_WIFI_RSP_OTA_FWUP: {
       *sl_net_event = SL_NET_OTA_FW_UPDATE_EVENT;
       return SL_STATUS_OK;
     }
-    case SLI_WLAN_RSP_IPCONFV4: {
+    case SLI_WIFI_RSP_IPCONFV4: {
       *sl_net_event = SL_NET_DHCP_NOTIFICATION_EVENT;
       return SL_STATUS_OK;
     }
-    case SLI_WLAN_RSP_IPV4_CHANGE:
-    case SLI_WLAN_RSP_IPCONFV6: {
+    case SLI_WIFI_RSP_IPV4_CHANGE:
+    case SLI_WIFI_RSP_IPCONFV6: {
       *sl_net_event = SL_NET_IP_ADDRESS_CHANGE_EVENT;
       return SL_STATUS_OK;
     }
-    case SLI_WLAN_RSP_DISCOVER_SERVICE: {
+    case SLI_WIFI_RSP_DISCOVER_SERVICE: {
       // Check packet length to differentiate between MDNS STOP and MDNS QUERY
       if (packet->length == 1) {
         *sl_net_event = SL_NET_MDNS_STOP_EVENT;
@@ -269,18 +269,18 @@ sl_status_t sli_convert_si91x_event_to_sl_http_client_event(const uint16_t *even
 
   // Map SI91X HTTP client events to SimpleLink HTTP client events
   switch (*event) {
-    case SLI_WLAN_RSP_HTTP_CLIENT_GET: {
+    case SLI_WIFI_RSP_HTTP_CLIENT_GET: {
       *sl_http_client_event = SL_HTTP_CLIENT_GET_RESPONSE_EVENT;
       return SL_STATUS_OK;
     }
 
-    case SLI_WLAN_RSP_HTTP_CLIENT_POST:
-    case SLI_WLAN_RSP_HTTP_CLIENT_POST_DATA: {
+    case SLI_WIFI_RSP_HTTP_CLIENT_POST:
+    case SLI_WIFI_RSP_HTTP_CLIENT_POST_DATA: {
       *sl_http_client_event = SL_HTTP_CLIENT_POST_RESPONSE_EVENT;
       return SL_STATUS_OK;
     }
 
-    case SLI_WLAN_RSP_HTTP_CLIENT_PUT: {
+    case SLI_WIFI_RSP_HTTP_CLIENT_PUT: {
       *sl_http_client_event = SL_HTTP_CLIENT_PUT_RESPONSE_EVENT;
       return SL_STATUS_OK;
     }

@@ -76,15 +76,10 @@ sl_status_t sl_si91x_app_get_active_slot_addresses(sl_si91x_active_slot_info_t *
   *               Variable Definitions
   ******************************************************/
 
-const osThreadAttr_t thread_attributes = {
+static const osThreadAttr_t thread_attributes = {
   .name       = "app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow,
-  .tz_module  = 0,
 };
 
 /*

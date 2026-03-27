@@ -42,10 +42,12 @@
  *                    Constants
  ******************************************************/
 #define REMOTE_IP_ADDRESS "8.8.8.8"
+#define CONNECT_WITH_PMK  0
+#define PING_PACKET_SIZE  64
 
-#define CONNECT_WITH_PMK 0
-
-#define PING_PACKET_SIZE 64
+// Set to 1 to demonstrate BSS Max Idle Period configuration.
+#define TEST_BSS_MAX_IDLE       0
+#define BSS_MAX_IDLE_PERIOD_SEC 60
 
 /******************************************************
  *               Variable Definitions
@@ -85,7 +87,7 @@ static void application_start(void *argument)
     printf("\r\nFailed to start Wi-Fi Client interface: 0x%lX\r\n", status);
     return;
   }
-  printf("\r\nWi-Fi client interface up success\r\n");
+  printf("\r\nWi-Fi client interface init success\r\n");
 
 #if CONNECT_WITH_PMK
   uint8_t pairwise_master_key[32] = { 0 };
@@ -125,12 +127,32 @@ static void application_start(void *argument)
   printf("\r\nsl_net_set_credential done\r\n");
 
 #endif
+
+#if TEST_BSS_MAX_IDLE
+  status = sl_wifi_configure_timeout(SL_WIFI_CLIENT_INTERFACE, SL_WIFI_BSS_MAX_IDLE_PERIOD, BSS_MAX_IDLE_PERIOD_SEC);
+  if (status != SL_STATUS_OK) {
+    printf("\r\nFailed to configure BSS MAX Idle Period: 0x%lX\r\n", status);
+    return;
+  }
+  printf("\r\nConfigured BSS MAX Idle Period to %d seconds\r\n", BSS_MAX_IDLE_PERIOD_SEC);
+#endif
+
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
     printf("\r\nFailed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
   printf("\r\nWi-Fi client connected\r\n");
+
+#if TEST_BSS_MAX_IDLE
+  uint16_t bss_max_idle_period = 0;
+  status = sl_wifi_get_timeout(SL_WIFI_CLIENT_INTERFACE, SL_WIFI_BSS_MAX_IDLE_PERIOD, &bss_max_idle_period);
+  if (status != SL_STATUS_OK) {
+    printf("\r\nFailed to get BSS MAX Idle Period: 0x%lX\r\n", status);
+    return;
+  }
+  printf("\r\nNegotiated and fetched BSS MAX Idle Period from the AP is %d seconds\r\n", bss_max_idle_period);
+#endif
 
 #define GET_STA_TSF 0
 #if GET_STA_TSF

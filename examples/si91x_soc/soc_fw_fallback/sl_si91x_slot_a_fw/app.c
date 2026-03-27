@@ -187,15 +187,10 @@ static void sl_app_reset_state_for_next_image(uint16_t *data_chunk,
   *               Global Variable
   ******************************************************/
 
-const osThreadAttr_t thread_attributes = {
+static const osThreadAttr_t thread_attributes = {
   .name       = "app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow,
-  .tz_module  = 0,
 };
 
 static sl_wifi_device_configuration_t sl_wifi_firmware_update_configuration = {

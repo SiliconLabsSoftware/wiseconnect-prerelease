@@ -34,7 +34,6 @@
 #include "sl_status.h"
 #include "sl_board_configuration.h"
 #include "cmsis_os2.h"
-#include "string.h"
 #include "sl_wifi.h"
 #include "socket.h"
 #include "sl_utility.h"
@@ -78,16 +77,8 @@
 #define TWT_SCAN_TIMEOUT             10000
 #define ENABLE_NWP_POWER_SAVE        1
 
-// Use case based TWT selection params
-#define TWT_RX_LATENCY                       5000
-#define DEVICE_AVG_THROUGHPUT                20000
-#define ESTIMATE_EXTRA_WAKE_DURATION_PERCENT 0
-#define TWT_TOLERABLE_DEVIATION              10
-#define TWT_DEFAULT_WAKE_INTERVAL_MS         1024     // in milli seconds
-#define TWT_DEFAULT_WAKE_DURATION_MS         8        // in milli seconds
-#define MAX_TX_AND_RX_LATENCY_LIMIT          22118400 // 6hrs in milli seconds
-#define MAX_BEACON_WAKE_UP_AFTER_SP \
-  2 // The number of beacons after the service period completion for which the module wakes up and listens for any pending RX.
+#define TWT_RX_LATENCY              5000
+#define MAX_TX_AND_RX_LATENCY_LIMIT 22118400 // 6hrs in milli seconds
 
 #define KEEP_ALIVE_TIMEOUT        SL_WIFI_DEFAULT_KEEP_ALIVE_TIMEOUT
 #define AUTH_ASSOCIATION_TIMEOUT  SL_WIFI_DEFAULT_AUTH_ASSOCIATION_TIMEOUT
@@ -173,17 +164,11 @@ sl_wifi_twt_request_t default_twt_setup_configuration = {
   .negotiation_type        = 0,
 };
 
-sl_wifi_twt_selection_t default_twt_selection_configuration = {
-  .twt_enable                            = 1,
-  .average_tx_throughput                 = EXCPECTED_TX_THROUGHPUT_KBPS,
-  .tx_latency                            = 0,
-  .rx_latency                            = TWT_RX_LATENCY,
-  .device_average_throughput             = DEVICE_AVG_THROUGHPUT,
-  .estimated_extra_wake_duration_percent = ESTIMATE_EXTRA_WAKE_DURATION_PERCENT,
-  .twt_tolerable_deviation               = TWT_TOLERABLE_DEVIATION,
-  .default_wake_interval_ms              = TWT_DEFAULT_WAKE_INTERVAL_MS,
-  .default_minimum_wake_duration_ms      = TWT_DEFAULT_WAKE_DURATION_MS,
-  .beacon_wake_up_count_after_sp         = MAX_BEACON_WAKE_UP_AFTER_SP
+sl_wifi_twt_selection_v2_t default_twt_config = {
+  .twt_enable            = 1,
+  .average_tx_throughput = EXCPECTED_TX_THROUGHPUT_KBPS,
+  .tx_latency            = 0,
+  .rx_latency            = TWT_RX_LATENCY,
 };
 
 sl_wifi_timeout_t timeout_configuration = { .keep_alive_timeout_value       = KEEP_ALIVE_TIMEOUT,
@@ -318,8 +303,7 @@ void application_start()
 
   sl_wifi_set_twt_config_callback_v2(twt_callback_handler, NULL);
   if (TWT_AUTO_CONFIG == 1) {
-    performance_profile.twt_selection = default_twt_selection_configuration;
-    status                            = sl_wifi_target_wake_time_auto_selection(&performance_profile.twt_selection);
+    status = sl_wifi_target_wake_time_auto_selection_v2(&default_twt_config);
   } else {
     performance_profile.twt_request = default_twt_setup_configuration;
     status                          = sl_wifi_enable_target_wake_time(&performance_profile.twt_request);

@@ -27,8 +27,9 @@
 /*******************************************************************************
  ***************************  Defines / Macros  ********************************
  ******************************************************************************/
-#define AVL_INTR_NO 0 // available interrupt number
-#define INT_CH      0 // GPIO Pin interrupt 0
+#define AVL_INTR_NO                       0 // available interrupt number
+#define INT_CH                            0 // GPIO Pin interrupt 0
+#define ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE 0 // Set to 1 to enable HP GPIO 66 toggle via ULP GPIO 2
 /*******************************************************************************
  ********************************   ENUMS   ************************************
  ******************************************************************************/
@@ -44,10 +45,21 @@ static sl_si91x_gpio_pin_config_t sl_gpio_pin_config = { { SL_SI91X_GPIO_6_PORT,
 // This is defined to '0' which is PORT_A and SL_SI91X_GPIO_11_PIN refers to GPIO pin number 11.
 // Same representation followed for other port and pins.
 static sl_si91x_gpio_pin_config_t sl_gpio_pin_config1 = { { SL_SI91X_GPIO_11_PORT, SL_SI91X_GPIO_11_PIN }, GPIO_INPUT };
+#if (ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE == 1)
+// Define ULP GPIO pin 2 configuration for output.
+static sl_si91x_gpio_pin_config_t sl_gpio_ulp_pin_config = { { SL_SI91X_ULP_GPIO_2_PORT, SL_SI91X_ULP_GPIO_2_PIN },
+                                                             GPIO_OUTPUT };
+// Define HP GPIO pin 66 (SOC peripheral mapped from ULP GPIO 2) configuration for output.
+static sl_si91x_gpio_pin_config_t sl_gpio_hp_pin_config = { { SL_SI91X_HP_GPIO_66_PORT, SL_SI91X_HP_GPIO_66_PIN },
+                                                            GPIO_OUTPUT };
+#endif
 /*******************************************************************************
  **********************  Local Function prototypes   ***************************
  ******************************************************************************/
 static void gpio_pin_interrupt0_callback(uint32_t pin_intr);
+#if (ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE == 1)
+static sl_status_t gpio_configure_soc_peri_on_ulp_pin(void);
+#endif
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
@@ -68,6 +80,13 @@ void gpio_example_init(void)
       break; // breaks if error occurs
     }
     DEBUGOUT("GPIO driver initialization is successful \r\n");
+#if (ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE == 1)
+    // Configure SOC peripheral on ULP pin to map HP GPIO to ULP GPIO
+    status = gpio_configure_soc_peri_on_ulp_pin();
+    if (status != SL_STATUS_OK) {
+      break;
+    }
+#endif
     // Configure GPIO pin 6 using pin configuration API.
     // Using this API by default GPIO mode is set as MODE 0. If any other mode is selected for any GPIO use
     // corresponding API sl_gpio_driver_set_pin_mode() is for mode setting.
@@ -110,13 +129,50 @@ void gpio_example_process_action(void)
   sl_status_t status;
   status = sl_gpio_driver_toggle_pin(&sl_gpio_pin_config.port_pin); // Toggle HP GPIO pin 6
   if (status != SL_STATUS_OK) {
-    // Prints if toggling pin fails
     DEBUGOUT("sl_gpio_toggle_pin, Error code: %lu\r\n", status);
-    return;
+  } else {
+    DEBUGOUT("HP GPIO pin %d driver toggle pin is successful \r\n", sl_gpio_pin_config.port_pin.pin);
   }
-  // Prints indicating successful pin toggle
-  DEBUGOUT("HP GPIO driver toggle pin is successful \r\n");
+#if (ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE == 1)
+  // Toggle HP GPIO pin mapped via SOC peripheral on ULP pin
+  status = sl_gpio_driver_toggle_pin(&sl_gpio_hp_pin_config.port_pin);
+  if (status != SL_STATUS_OK) {
+    DEBUGOUT("sl_gpio_toggle_pin, Error code: %lu\r\n", status);
+  } else {
+    DEBUGOUT("HP GPIO pin %d driver toggle pin is successful \r\n", sl_gpio_hp_pin_config.port_pin.pin);
+  }
+#endif
 }
+
+#if (ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE == 1)
+/*******************************************************************************
+ * Configure SOC peripheral on ULP GPIO pin for HP GPIO toggle
+ ******************************************************************************/
+static sl_status_t gpio_configure_soc_peri_on_ulp_pin(void)
+{
+  sl_status_t status;
+
+  status = sl_gpio_set_configuration(sl_gpio_ulp_pin_config);
+  if (status != SL_STATUS_OK) {
+    DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
+    return status;
+  }
+  status = sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode(&sl_gpio_ulp_pin_config.port_pin, SL_GPIO_MODE_0);
+  if (status != SL_STATUS_OK) {
+    DEBUGOUT("sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode, Error code: %lu\r\n", status);
+    return status;
+  }
+  status = sl_gpio_set_configuration(sl_gpio_hp_pin_config);
+  if (status != SL_STATUS_OK) {
+    DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
+    return status;
+  }
+  DEBUGOUT("HP GPIO pin %d is mapped to ULP GPIO %d successfully \r\n",
+           sl_gpio_hp_pin_config.port_pin.pin,
+           sl_gpio_ulp_pin_config.port_pin.pin);
+  return SL_STATUS_OK;
+}
+#endif
 
 /*******************************************************************************
  *   This API handles GPIO pin interrupt 0 request

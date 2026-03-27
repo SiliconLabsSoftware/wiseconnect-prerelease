@@ -15,6 +15,9 @@
   - [Test the Application](#test-the-application)
   - [Note](#note)
   - [Application Output](#application-output)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs / Support](#report-bugs--support)
 
 ## Purpose/Scope
 
@@ -95,3 +98,16 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Application Output
 
 ![Output](resources/readme/output.png)
+
+## Troubleshooting
+
+For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-troubleshooting/).
+
+## Resources
+
+- [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+
+## Report Bugs / Support
+
+To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

@@ -682,7 +682,7 @@ sl_status_t wifi_stats_receive_handler(sl_wifi_event_t event,
   if (event == SL_WIFI_STATS_ASYNC_EVENT) {
     sl_wifi_async_stats_response_t *result = (sl_wifi_async_stats_response_t *)reponse;
 
-    printf("%s: WIFI STATS Recieved packet# %d\n", __func__, stats_count);
+    printf("%s: WIFI STATS Received packet# %d\n", __func__, stats_count);
     printf("stats : crc_pass %d, crc_fail %d, cal_rssi :%d\n", result->crc_pass, result->crc_fail, result->cal_rssi);
     stats_count++;
 
@@ -1624,7 +1624,7 @@ sl_status_t sl_wifi_send_raw_data_command_handler(console_args_t *arguments)
   //version and header length
   buffer[14] = 0x45;
 
-  //total lenght
+  //total length
   buffer[17] = 0x26;
 
   //identification
@@ -1962,7 +1962,7 @@ sl_status_t wifi_configure_timeout_command_handler(console_args_t *arguments)
   const sl_si91x_timeout_type_t timeout_type = (sl_si91x_timeout_type_t)GET_COMMAND_ARG(arguments, 0);
   const uint16_t timeout_value               = (uint16_t)GET_COMMAND_ARG(arguments, 1);
 
-  status = sl_si91x_configure_timeout(timeout_type, timeout_value);
+  status = sl_wifi_configure_timeout(SL_WIFI_CLIENT_INTERFACE, (sl_wifi_timeout_type_t)timeout_type, timeout_value);
   VERIFY_STATUS_AND_RETURN(status);
   return SL_STATUS_OK;
 }

@@ -13,6 +13,7 @@ include_directories(./inc
                     ../../../../../../protocol/wifi/inc
                     ../../../../../../../third_party/fff
                     ../../../../../../device/silabs/si91x/wireless/inc
+                    ../../../../../../device/silabs/si91x/wireless/sli_si91x_wifi_command_engine/inc
                     ../../../../../../gsdk/cmsis/RTOS2/Include
                     ../../../../../../freertos/cmsis/Include
                     ../../../../third_party/googletest/googlemock/include
@@ -28,7 +29,6 @@ include_directories(./inc
                     ../../../../../../sli_command_engine/inc
                     ../../../../../../sli_event_engine/inc
                     ../../sli_hal_si91x/inc
-                    ../../../../../../sli_wifi_command_engine/inc
 )
 # Add unit test cpp here
 add_executable(${PROJECT_NAME}

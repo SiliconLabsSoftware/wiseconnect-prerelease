@@ -33,6 +33,9 @@
 #include "sl_status.h"
 #include "sl_net_constants.h"
 
+#define SLI_NET_MIN_DNS_INITIAL_TIMEOUT 5  ///< minimum DNS initial timeout in seconds.
+#define SLI_NET_MAX_DNS_INITIAL_TIMEOUT 10 ///< maximum DNS initial timeout in seconds.
+
 /** \addtogroup SL_NET_TYPES Types
  * @{ */
 
@@ -95,6 +98,52 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
                                         const uint32_t timeout,
                                         const sl_net_dns_resolution_ip_type_t dns_resolution_ip,
                                         sl_ip_address_t *ip_address);
+
+/**
+ * @brief
+ *   Resolve the given host name to an IP address.
+ * 
+ * @details
+ *   This function resolves a host name to its corresponding IP address. It requires
+ *   the DNS client feature to be enabled in the TCP/IP feature bitmap before calling.
+ * 
+ * 
+ * @pre Pre-conditions:
+ * - The [sl_net_up](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-up) API must be called before this API.
+ * - If [sl_net_up](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-up) is not used, then [sl_si91x_configure_ip_address](../wiseconnect-api-reference-guide-si91x-driver/si91-x-network-functions#sl-si91x-configure-ip-address) should be called prior to this API.
+ * - The [SL_SI91X_TCP_IP_FEAT_DNS_CLIENT](../wiseconnect-api-reference-guide-si91x-driver/si91-x-tcp-ip-feature-bitmap#sl-si91-x-tcp-ip-feat-dns-client) bit should be enabled in the TCP/IP feature bitmap.
+ * 
+ * @param[in] host_name
+ *   Host name that needs to be resolved.
+ * @param[in] initial_timeout_sec
+ *   Timeout in seconds. Can be configured in the range 5 to 10 seconds. If the value is zero, the response will be sent through @ref sl_net_event_handler_t.
+ * @param[in] retry_count
+ *   Number of retries after the first attempt (total attempts = 1 + retry_count).
+ * @param[in] dns_resolution_ip
+ *   DNS resolution by IP of type @ref sl_net_dns_resolution_ip_type_t.
+ * @param[out] sl_ip_address
+ *   IP address object to store resolved IP address of type [sl_ip_address_t](../wiseconnect-api-reference-guide-nwk-mgmt/sl-ip-address-t).
+ *
+ * @note
+ *   Retry timeouts use exponential backoff: the first attempt uses initial_timeout_sec in seconds (T),
+ *   then 2T, 4T, 8T, ... for each retry. According to the DNS specification, any backoff value
+ *   exceeding 45 seconds is not used, so the total DNS timeout is the sum of attempt timeouts (each at most 45 s).
+ *   - Use 0 for a single attempt (total timeout = initial_timeout_sec in seconds; e.g. 5 to 10 s).
+ *   - Use 1 for two attempts (T + 2T); 2 for three attempts (T + 2T + 4T); 3 for four
+ *     attempts. With initial_timeout_sec in seconds = 10 s, retry_count 2 reaches the maximum total of
+ *     70 s (10 + 20 + 40); values above 2 do not increase total timeout because further
+ *     terms (80 s, 160 s, ...) exceed the 45 s cap. Configure the value based on
+ *     how many retries you need; effective total remains in the range 5 to 70 seconds.
+ * @note
+ * If the initial_timeout_sec value is set to zero, the API will behave asynchronously (non-blocking) and return immediately with SL_STATUS_IN_PROGRESS. A value greater than zero will make the API behave synchronously (blocking).
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ */
+sl_status_t sl_net_dns_resolve_hostname_v2(const char *host_name,
+                                           const uint8_t initial_timeout_sec,
+                                           const uint8_t retry_count,
+                                           const sl_net_dns_resolution_ip_type_t dns_resolution_ip,
+                                           sl_ip_address_t *sl_ip_address);
 
 /**
  * @brief

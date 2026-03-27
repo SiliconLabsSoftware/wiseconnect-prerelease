@@ -40,12 +40,15 @@
 /*******************************************************************************
  *************************** LOCAL VARIABLES   *******************************
  ******************************************************************************/
-static float vref_value                    = (float)VREF_VALUE;
-static boolean_t data_sample_complete_flag = false;
+static float vref_value = (float)VREF_VALUE;
+/* Volatile: written in ADC callback (ISR), read in main loop. Required for LTO. */
+static volatile boolean_t data_sample_complete_flag = false;
+/* Volatile: DMA writes ADC samples; CPU must see them (LTO-safe). */
 static int16_t adc_output[CHANNEL_SAMPLE_LENGTH];
 static uint8_t adc_channel = 0;
 #ifdef DAC_FIFO_MODE_EN
-static boolean_t dac_fifo_intr_flag = false;
+/* Volatile: written in DAC callback (ISR), read in main loop. Required for LTO. */
+static volatile boolean_t dac_fifo_intr_flag = false;
 #endif
 /*******************************************************************************
  **********************  Local Function prototypes   ***************************
@@ -77,7 +80,7 @@ void adc_fifo_mode_example_init(void)
   // These fields MUST be configured before calling sl_si91x_adc_init() and
   // sl_si91x_adc_set_channel_configuration() for FIFO+DMA operation.
   // The init function does NOT automatically set these addresses.
-  sl_adc_channel_config.rx_buf[adc_channel]            = adc_output;
+  sl_adc_channel_config.rx_buf[adc_channel]            = (int16_t *)adc_output;
   sl_adc_channel_config.chnl_ping_address[adc_channel] = ADC_PING_BUFFER; /* ADC Ping address */
   sl_adc_channel_config.chnl_pong_address[adc_channel] =
     ADC_PING_BUFFER + (sl_adc_channel_config.num_of_samples[adc_channel]); /* ADC Pong address */

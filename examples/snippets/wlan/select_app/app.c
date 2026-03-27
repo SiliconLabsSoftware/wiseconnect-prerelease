@@ -32,7 +32,6 @@
 #include "sl_board_configuration.h"
 #include "sl_wifi_types.h"
 #include "errno.h"
-#include "sl_net.h"
 #include "socket.h"
 #include "sl_utility.h"
 #include "sl_net_si91x.h"

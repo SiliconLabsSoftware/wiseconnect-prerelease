@@ -32,7 +32,6 @@
 #include "sl_si91x_status.h"
 #include "sl_si91x_types.h"
 #include "sl_si91x_constants.h"
-#include "sli_hal_si91x_constants.h"
 #include "sl_si91x_spi_constants.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_driver.h"
@@ -433,7 +432,6 @@ sl_status_t sli_si91x_bus_read_frame(sl_wifi_buffer_t **buffer)
   if (status != SL_STATUS_OK) {
     sl_si91x_host_spi_cs_deassert();
     SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
-    sli_command_engine_status_queue_enqueue_and_set_event(SL_STATUS_ALLOCATION_FAILED);
     return SL_STATUS_ALLOCATION_FAILED;
   }
 

@@ -5,7 +5,7 @@ description: 'This application demonstrates the usage of QSPI configured for rea
   '
 category: example|Service
 quality: production
-label: SL Si91x - LittleFS Basic File Operations
+label: Platform SiWx91x - LittleFS Basic File Operations
 component:
 - id: sl_main
 - id: freertos
@@ -36,6 +36,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

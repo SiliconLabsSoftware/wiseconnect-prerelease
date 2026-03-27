@@ -543,6 +543,8 @@ sl_status_t http_response_status(volatile uint8_t *response)
 
 static void reset_http_handles(void)
 {
-  app_buff_index = 0;
-  end_of_file    = 0;
+  app_buff_index    = 0;
+  end_of_file       = 0;
+  http_rsp_received = 0;
+  callback_status   = SL_STATUS_OK;
 }

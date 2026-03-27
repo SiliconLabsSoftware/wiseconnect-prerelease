@@ -28,6 +28,7 @@
  *
  ******************************************************************************/
 #include "sli_routing_utility_types.h"
+#include "sli_hal_si91x_constants.h"
 /**
  * @brief Initialize the HAL instance.
  *        This API is responsible for initializing all the components, tasks and variables/resources
@@ -126,3 +127,12 @@ sl_status_t sli_hal_si91x_ble_send_packet(void *packet,
  * @return Status of the deinitialization.
  */
 sl_status_t sli_hal_si91x_deinit(void);
+
+/**
+ * @brief Notify the HAL of events (e.g. RX data ready).
+ *        Used by NCP host or transport layer to wake the HAL thread.
+ *
+ * @param[in] flags Event flags (e.g. SLI_HAL_SI91X_RX_EVENT).
+ * @return Status of the operation.
+ */
+sl_status_t sli_hal_si91x_notify_events(uint32_t flags);

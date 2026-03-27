@@ -5,7 +5,7 @@ description: 'This application demonstrates how to configure the ULP USART (Ultr
   '
 category: example|peripheral
 quality: production
-label: SI91x - SL_ulp_uart
+label: Platform SiWx91x - ULP UART
 component:
 - id: sl_main
 - id: status
@@ -59,6 +59,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

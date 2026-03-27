@@ -84,6 +84,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   > ![Figure: Selecting UC](resources/uc_screen/usart_uc.png)
 
+- By default, `USART0 Clock Source` is configured to `ULP REF CLK` in UC. Select `SOC PLL CLK`.
+
 ## Pin Configuration
 
   | USART PINS     | GPIO    | Breakout pin  | Explorer kit Breakout pin | UART-TTL cable |
@@ -108,8 +110,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | USART0_CTS_PIN | GPIO_26 |     P27       |           [MISO]         |
   | USART0_RTS_PIN | GPIO_28 |     P31       |           [CS]           |
 
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
-
 ## Test the Application
 
 1. Connect TX pin (GPIO_30) to RX pin of UART to TTL cable and RX pin (GPIO_29) to TX pin of UART-TTL cable and open UART-TTL's serial console.
@@ -132,3 +132,18 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 >
 > Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
 > By default, Request to Send (RTS) and Clear to Send (CTS) flow control signals are disabled in the UART driver UC, and their corresponding GPIO pins are not assigned in the Pintool. If you enable RTS/CTS in the Driver UC, you must manually configure and assign the appropriate GPIO pins in the Pintool to ensure proper hardware flow control functionality.
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

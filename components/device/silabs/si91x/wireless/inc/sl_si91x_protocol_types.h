@@ -36,6 +36,7 @@
 #include "sl_wifi_types.h"
 #include "sl_si91x_constants.h"
 #include "sl_common.h"
+#include "cmsis_os2.h"
 
 //! @cond Doxygen_Suppress
 // below defines and structure for CFG_GET: Getting user store configuration.
@@ -175,24 +176,8 @@
 /** @} */
 
 //! @cond Doxygen_Suppress
-//**************************** Macros for FEATURE frame Method request START *********************************/
-#define SLI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE       (1 << 0)
-#define SLI_FEAT_FRAME_PERMIT_UNDESTINED_PACKETS (1 << 1)
-#define SLI_FEAT_FRAME_LP_CHAIN                  (1 << 4)
-#define SLI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE      (1 << 5)
-
-#define PLL_MODE      0
-#define RF_TYPE       1 // 0 - External RF 1- Internal RF
-#define WIRELESS_MODE 0
-#define ENABLE_PPP    0
-#define AFE_TYPE      1
-#ifndef SLI_FEATURE_ENABLES
-#define SLI_FEATURE_ENABLES \
-  (SLI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE | SLI_FEAT_FRAME_LP_CHAIN | SLI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE)
-#endif
-
-//**************************** Macros for FEATURE frame Method request END *********************************/
-
+/** \addtogroup SL_SI91X_PROTOCOL_INTERNAL
+ * @{ */
 //**************************** Macros for HTTP Client START *********************************/
 
 #define SLI_SI91X_HTTP_BUFFER_LEN     2400
@@ -231,6 +216,7 @@
 #define NONCE_DATA_SIZE 32
 
 typedef enum { SLI_NONE, SLI_TKIP, SLI_CCMP } sli_si91x_encryption_mode_t;
+/** @} */
 //! @endcond
 
 /// Scan information response structure
@@ -656,17 +642,6 @@ typedef struct {
   uint32_t remote_ip_addr; ///< Remote IP address
 } sli_si91x_socket_connect_or_listen_parameters_t;
 
-/// Si91x specific feature frame request
-typedef struct {
-  uint8_t
-    pll_mode; ///< PLL Mode. 0 - less than 120 Mhz NWP SoC clock; 1 - greater than 120 Mhz NWP SoC clock (Mode 1 is not currently supported for coex)
-  uint8_t rf_type;          ///< RF Type.
-  uint8_t wireless_mode;    ///< Wireless Mode.
-  uint8_t enable_ppp;       ///< Enable PPP.
-  uint8_t afe_type;         ///< AFE Type.
-  uint32_t feature_enables; ///< Feature Enables.
-} sli_si91x_feature_frame_request;
-
 /// DNS query request structure
 typedef struct {
   //! Ip version value
@@ -677,6 +652,12 @@ typedef struct {
 
   //! DNS servers count
   uint8_t dns_server_number[2];
+
+  //! Timeout in seconds
+  uint8_t initial_timeout_sec;
+
+  //! Retry count
+  uint8_t retry_count;
 } sli_si91x_dns_query_request_t;
 
 /// DNS query response structure
@@ -1631,12 +1612,6 @@ typedef struct sli_net_mdns_result_s {
   uint8_t data[];      ///< Flexible array member holding TXT and address data
 } sli_net_mdns_response_t;
 //! @endcond
-
-/// Request timeout Structure
-typedef struct {
-  uint32_t timeout_bitmap; ///< Timeout bitmap
-  uint16_t timeout_value;  ///< Timeout value
-} sli_si91x_request_timeout_t;
 
 /// Access point disconnect response structure
 #pragma pack(1)

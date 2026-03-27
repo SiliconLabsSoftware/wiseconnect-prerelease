@@ -1,7 +1,7 @@
 project_name: sl_si91x_empty_c_ncp
 package: platform_siwx91x_app
 quality: production
-label: Platform - Empty C Example
+label: Platform SiWx91x - Empty C Example
 description: 'This application demonstrates the usage of an empty configuration that can be used as a starting point to add components and functionality for NCP boards.
 
   '

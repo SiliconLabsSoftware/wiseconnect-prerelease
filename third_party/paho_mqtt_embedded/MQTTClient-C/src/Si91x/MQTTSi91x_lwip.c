@@ -171,7 +171,7 @@ static int mqtt_ssl_recv_timeout(void *ctx, unsigned char *buf, size_t len, uint
 
   // Avoid immediate timeout if mbedTLS passes 0
   if (timeout == 0) {
-    timeout = WAIT_TIMEOOUT;
+    timeout = WAIT_TIMEOUT;
   }
 
   FD_ZERO(&read_fds);

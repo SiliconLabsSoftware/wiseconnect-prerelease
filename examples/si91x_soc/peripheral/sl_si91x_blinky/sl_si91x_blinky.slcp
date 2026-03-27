@@ -3,7 +3,7 @@ package: platform_siwx91x_app
 description: "This application demonstrates the process of configuring a basic LED blinking functionality. \nIt highlights how to initialize the GPIO peripheral, set the LED pin as an output, \nand toggle its state periodically to achieve a blinking effect.\n"
 category: example|peripheral
 quality: production
-label: Si91x - Blinky
+label: Platform SiWx91x - Blinky
 component:
 - id: sl_main
 - id: sleeptimer
@@ -33,6 +33,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

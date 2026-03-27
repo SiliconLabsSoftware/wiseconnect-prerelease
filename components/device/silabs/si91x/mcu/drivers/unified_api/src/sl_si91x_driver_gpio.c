@@ -55,7 +55,11 @@
 #define GPIO_UULP_WAKEUP_MAX_VALUE          4  // UULP GPIO maximum value
 #define GPIO_UULP_PIN_MAX_VALUE             4  // UULP GPIO pin maximum value
 #define GPIO_MAX_PAD_NUM                    34 // GPIO maximum pad number
-#define GPIO_MAX_PIN_NUM                    57 // Maximum number of GPIO pins in m4 instance
+#define GPIO_MAX_PIN_NUM                    75 // Maximum number of GPIO pins in m4 instance
+// Reserved HP GPIO pins not available for general use: 13-14, 16-24, 36-45, 58-63, 67
+#define GPIO_PIN_IS_RESERVED(pin)                                                                           \
+  ((((pin) >= 13) && ((pin) <= 14)) || (((pin) >= 16) && ((pin) <= 24)) || (((pin) >= 36) && ((pin) <= 45)) \
+   || (((pin) >= 58) && ((pin) <= 63)) || ((pin) == 67))
 
 #define ULP_GPIO_INTERRUPT_PRIORITY 18 // Priority 18 for ulp pin interrupt
 #define GPIO_INTERRUPT_PRIORITY0    52 // Priority 52 for m4 pin interrupt 0
@@ -453,7 +457,7 @@ sl_status_t sl_gpio_configure_group_interrupt(sl_si91x_gpio_group_interrupt_conf
  *      - Select PAD selection of the GPIO HP instance.
  *      - Enable PAD receiver for GPIO pin number, whether GPIO pin is
  *        selected as output/input.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not use
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not use
  *      GPIO pin number(0 to 5) in HP instance as these are used for other
  *      functionality.
  * - If GPIO ULP instance is considered, the following actions are performed:
@@ -497,7 +501,7 @@ sl_status_t sl_gpio_driver_set_pin_mode(sl_gpio_t *gpio, sl_gpio_mode_t mode, ui
  *        selected as output/input.
  *      - Set pin mode and direction of the GPIO pin.
  *      - Get the pin mode of GPIO pin.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  *         use GPIO pin number(0 to 5) in HP instance as these are used for other
  *         functionality.
  * - If GPIO ULP instance is considered, the following actions are
@@ -605,7 +609,7 @@ sl_status_t sl_si91x_gpio_driver_set_uulp_pad_configuration(uulp_pad_config_t *p
  *      - Enable PAD receiver for GPIO pin number, whether GPIO pin is
  *      selected as output/input.
  *      - Set pin mode and direction of the GPIO pin.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  *  use GPIO pin number(0 to 5) in HP instance as these are used for other
  *  functionality.
  * - If GPIO ULP instance is considered, the following actions are
@@ -649,7 +653,7 @@ sl_status_t sl_si91x_gpio_driver_set_pin_direction(uint8_t port, uint8_t pin, sl
  *      selected as output/input.
  *      - Set pin mode and direction of the GPIO pin.
  *      - Get the pin direction of the GPIO pin.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  *    use GPIO pin number(0 to 5) in HP instance as these are used for other
  *    functionality.
  * - If GPIO ULP instance is considered, the following actions are
@@ -689,14 +693,14 @@ uint8_t sl_si91x_gpio_driver_get_pin_direction(uint8_t port, uint8_t pin)
  *   - Select PAD selection of the GPIO HP instance.
  *   - Enable PAD receiver for GPIO pin number, whether GPIO pin is
  *    selected as output/input.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  *  use GPIO pin number(0 to 5) in HP instance as these are used for other
  *  functionality.
  *******************************************************************************/
 sl_status_t sl_si91x_gpio_driver_enable_pad_receiver(uint8_t gpio_num)
 {
-  // Check if the GPIO pin number exceeds the maximum allowed value.
-  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM)) {
+  // Check if the GPIO pin number exceeds the maximum allowed value or is in a reserved range.
+  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Enable the pad receiver for the GPIO pin.
@@ -711,14 +715,14 @@ sl_status_t sl_si91x_gpio_driver_enable_pad_receiver(uint8_t gpio_num)
  *   - Select PAD selection of the GPIO HP instance.
  *   - Disable PAD receiver for GPIO pin number, whether GPIO pin is
  *    selected as output/input.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  *  use GPIO pin number(0 to 5) in HP instance as these are used for other
  *  functionality.
  *******************************************************************************/
 sl_status_t sl_si91x_gpio_driver_disable_pad_receiver(uint8_t gpio_num)
 {
-  // Check if the GPIO pin number exceeds the maximum allowed value.
-  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM)) {
+  // Check if the GPIO pin number exceeds the maximum allowed value or is in a reserved range.
+  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Disable the pad receiver for the GPIO pin.
@@ -774,15 +778,16 @@ sl_status_t sl_si91x_gpio_driver_enable_host_pad_selection(uint8_t gpio_num)
  *   - Set pin mode and direction of the GPIO pin.
  *   - Select the PAD driver strength of type @ref
  *    sl_si91x_gpio_driver_strength_select_t.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  *  use GPIO pin number(0 to 5) in HP instance as these are used for other
  *  functionality.
  ******************************************************************************/
 sl_status_t sl_si91x_gpio_driver_select_pad_driver_strength(uint8_t gpio_num,
                                                             sl_si91x_gpio_driver_strength_select_t strength)
 {
-  // Check if GPIO pin number or strength value exceeds the maximum allowed.
-  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || (strength > GPIO_STRENGTH_MAX_VAL)) {
+  // Check if GPIO pin number or strength value exceeds the maximum allowed, or pin is reserved.
+  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
+      || (strength > GPIO_STRENGTH_MAX_VAL)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Select the pad driver strength for the GPIO pin.
@@ -800,13 +805,14 @@ sl_status_t sl_si91x_gpio_driver_select_pad_driver_strength(uint8_t gpio_num,
  *     selected as output/input.
  *   - Set pin mode and direction of the GPIO pin.
  *   - Enable power-on start using @ref sl_si91x_gpio_pos_t.
- * @note: Select HP GPIO pins for HP instances (6 to 57). Do not use
+ * @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not use
  * GPIO pin numbers (0 to 5) in HP instance as these are reserved.
  ******************************************************************************/
 sl_status_t sl_si91x_gpio_driver_enable_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos_t pos)
 {
-  // Validate GPIO number and position parameter
-  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || (pos >= GPIO_POS_LAST)) {
+  // Validate GPIO number and position parameter, reject reserved pins.
+  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
+      || (pos >= GPIO_POS_LAST)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Enable power-on start for HP GPIO
@@ -824,13 +830,13 @@ sl_status_t sl_si91x_gpio_driver_enable_pad_power_on_start(uint8_t gpio_num, sl_
  *     selected as output/input.
  *   - Set pin mode and direction of the GPIO pin.
  *   - Select the PAD schmitt trigger of type @ref sl_si91x_gpio_schmitt_trig_t.
- * @note: Select HP GPIO pins for HP instances (6 to 57). Do not use
+ * @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not use
  * GPIO pin numbers (0 to 5) in HP instance as these are reserved.
  ******************************************************************************/
 sl_status_t sl_si91x_gpio_driver_select_pad_schmitt_trigger(uint8_t gpio_num, sl_si91x_gpio_schmitt_trig_t schmitt_trig)
 {
-  // Validate GPIO number and schmitt trigger parameter
-  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM)
+  // Validate GPIO number and schmitt trigger parameter, reject reserved pins.
+  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
       || (schmitt_trig >= GPIO_SCHMITT_TRIG_LAST)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -850,15 +856,15 @@ sl_status_t sl_si91x_gpio_driver_select_pad_schmitt_trigger(uint8_t gpio_num, sl
  *   - Set pin mode and direction of the GPIO pin.
  *   - Select the PAD driver disable state of type @ref
  *    sl_si91x_gpio_driver_disable_state_t.
- *  @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ *  @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  *  use GPIO pin number(0 to 5) in HP instance as these are used for other
  *  functionality.
  ******************************************************************************/
 sl_status_t sl_si91x_gpio_driver_select_pad_driver_disable_state(uint8_t gpio_num,
                                                                  sl_si91x_gpio_driver_disable_state_t disable_state)
 {
-  // Check if GPIO pin number or disable state value exceeds the maximum allowed.
-  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM)
+  // Check if GPIO pin number or disable state value exceeds the maximum allowed, or pin is reserved.
+  if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
       || (disable_state > GPIO_DISABLE_STATE_MAX_VAL)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -912,7 +918,7 @@ sl_status_t sl_si91x_gpio_driver_disable_clock(sl_si91x_gpio_select_clock_t cloc
  *    instance,
  *      @ref sl_si91x_gpio_driver_configure_ulp_group_interrupt(), used for ULP
  *    instance.
- * @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ * @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  * use GPIO pin number(0 to 5) in HP instance as these are used for other
  * functionality.
  * @note: Select ULP GPIO pins for ULP instances(0 to 11).
@@ -940,7 +946,7 @@ sl_status_t sl_si91x_gpio_driver_enable_group_interrupt(sl_si91x_group_interrupt
 /*******************************************************************************
  * This API is used for GPIO HP, ULP instances.
  * It is used to disable the group interrupts.
- * @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ * @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  * use GPIO pin number(0 to 5) in HP instance as these are used for other
  * functionality.
  * @note: Select ULP GPIO pins for ULP instances(0 to 11).
@@ -1050,7 +1056,7 @@ uint8_t sl_si91x_gpio_driver_get_group_interrupt_level_edge(uint8_t port, sl_si9
  *    instance,
  *      @ref sl_si91x_gpio_driver_configure_ulp_group_interrupt(), used for ULP
  *    instance.
- * @note: Select HP GPIO pins for HP instances(6 to 57). Do not
+ * @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not
  * use GPIO pin number(0 to 5) in HP instance as these are used for other
  * functionality.
  * @note: Select ULP GPIO pins for ULP instances(0 to 11).
@@ -1080,7 +1086,7 @@ sl_status_t sl_si91x_gpio_driver_set_group_interrupt_polarity(sl_si91x_group_int
 /*******************************************************************************
  * This API is used for GPIO HP, ULP instances.
  * It is used to get polarity of group interrupt .
- * @note: Select HP GPIO pins for HP instances(6 to 57). Do not use
+ * @note: Select HP GPIO pins for HP instances (6 to 75, excluding reserved pins 13-14, 16-24, 36-45, 58-63, 67). Do not use
  *      GPIO pin number(0 to 5) in HP instance as these are used for other functionality.
  * @note: Select ULP GPIO pins for ULP instances(0 to 11).
  ******************************************************************************/
@@ -2119,14 +2125,14 @@ sl_status_t sl_gpio_driver_unregister(sl_si91x_gpio_instances_t gpio_instance,
  * This function checks if the given ULP pin is configured as a SOC pin by
  * examining the `soc_peri_on_ulp_gpio_status` bit corresponding to the pin number.
  * The function performs the following steps:
- *   1. Shifts the `soc_peri_on_ulp_gpio_status` by the pin number minus the offset for ULP pins.
- *   2. Checks if the resulting bit is set.
+ *   1. Computes the bit position as (pin - SOC_PERI_ON_ULP_GPIO_OFFSET) and
+ *      checks if that bit is set in `soc_peri_on_ulp_gpio_status` using the BIT() macro.
  *      - If the bit is set, the pin is valid and SOC peripheral is configured on that ULP pin.
  *      - If the bit is not set, the pin is invalid and SOC peripheral is not configured on that ULP pin.
 ******************************************************************************/
 sl_status_t sl_si91x_gpio_validate_soc_peri_on_ulp_gpio(uint8_t pin)
 {
-  if ((soc_peri_on_ulp_gpio_status >> (pin - SOC_PERI_ON_ULP_GPIO_OFFSET)) & 1) {
+  if (soc_peri_on_ulp_gpio_status & BIT(pin - SOC_PERI_ON_ULP_GPIO_OFFSET)) {
     return SL_STATUS_OK;
   } else {
     return SL_STATUS_INVALID_PARAMETER;

@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Data Transfer Application (NCP)
 category: Example|Wi-Fi
-description: 'In Client interface, recieve the data from remote PC1 to SiWx91x Station. This recieved data is stored in a buffer. Later in AP interface, the stored buffer is sent by SiWx91x AP to remote PC2.
+description: 'In Client interface, receive the data from remote PC1 to SiWx91x Station. This received data is stored in a buffer. Later in AP interface, the stored buffer is sent by SiWx91x AP to remote PC2.
 
   '
 filter:

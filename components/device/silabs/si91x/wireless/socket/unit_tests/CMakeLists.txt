@@ -7,6 +7,7 @@ include_directories(
     ../inc
     ../../../../../../../tests/unit_tests/inc
     ../../../../../../device/silabs/si91x/wireless/inc
+    ../../../../../../device/silabs/si91x/wireless/sli_si91x_wifi_command_engine/inc
     ../../../../../../gsdk/common/inc
     ../../../../../../common/inc
     ../../../../../../protocol/wifi/inc

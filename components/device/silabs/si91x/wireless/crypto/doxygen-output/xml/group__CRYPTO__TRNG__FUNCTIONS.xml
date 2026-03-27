@@ -44,7 +44,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="89" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="89" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="85" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="85" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga4a9f888e25793169c7a579bc8c2f8ea4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -64,7 +64,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="100" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="100" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="96" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="96" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga88c917f81bf74552bb5fd10657127d51" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -106,7 +106,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="115" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="115" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="111" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="111" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga3b2dceb5f8a51388fd59db965b627ae3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -148,7 +148,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="130" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="130" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="126" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="126" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__TRNG__FUNCTIONS_1ga3fc29e8cb2d3d95b398c97e14960d0b0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -190,7 +190,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="146" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="146" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="142" column="13" declfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" declline="142" declcolumn="13"/>
       </memberdef>
       </sectiondef>
     <briefdescription>

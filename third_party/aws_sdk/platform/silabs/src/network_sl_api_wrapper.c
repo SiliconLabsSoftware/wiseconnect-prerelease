@@ -307,6 +307,10 @@ IoT_Error_t iot_tls_connect(Network *pNetwork, TLSConnectParams *params)
                             &dns_query_response,
                             pNetwork->tlsConnectParams.DestinationPort,
                             CLIENT_PORT);
+  /* After new TLS connection, reset select_given so the app re-arms select for this socket. */
+  if (status == SUCCESS) {
+    select_given = 0;
+  }
   return status;
 }
 
@@ -409,6 +413,10 @@ IoT_Error_t iot_tls_read(Network *pNetwork, unsigned char *pMsg, size_t len, Tim
 IoT_Error_t iot_tls_disconnect(Network *pNetwork)
 {
   int32_t status = close(pNetwork->socket_id);
+  /* Clear select_given and flush select table so the single select slot is freed when socket closes
+   * (firmware may not send select response on close); next connection can then register select successfully. */
+  select_given = 0;
+  (void)sli_si91x_flush_select_request_table(0);
   if (status) {
     return sli_si91x_get_aws_error(status);
   }

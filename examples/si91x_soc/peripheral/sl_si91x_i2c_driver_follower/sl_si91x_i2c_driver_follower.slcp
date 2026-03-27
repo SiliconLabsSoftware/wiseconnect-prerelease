@@ -5,7 +5,7 @@ description: 'This application demonstrates how to use the I2C interface on the 
   '
 category: example|peripheral
 quality: production
-label: SI91x - SL_I2C_Driver_Follower
+label: Platform SiWx91x - I2C Driver Follower
 component:
 - id: sl_main
 - id: status
@@ -48,6 +48,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

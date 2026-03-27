@@ -49,27 +49,17 @@
  **************  Sensor app Task Attributes structure for thread   *************
  ******************************************************************************/
 #define SL_APP_TASK_STACK_SIZE 4096
-const osThreadAttr_t app_thread_attributes = {
-  .name       = "SensorHub_App", // Name of thread
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
+static const osThreadAttr_t app_thread_attributes = {
+  .name       = "SensorHub_App",        // Name of thread
   .stack_size = SL_APP_TASK_STACK_SIZE, // Stack size of sensor_app task
   .priority   = osPriorityLow,          // Priority of Sensor task
-  .tz_module  = 0,
 };
 
 #if SH_AWS_ENABLE
-const osThreadAttr_t aws_thread_attributes = {
+static const osThreadAttr_t aws_thread_attributes = {
   .name       = "AWS_App",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow3,
-  .tz_module  = 0,
 };
 #endif
 

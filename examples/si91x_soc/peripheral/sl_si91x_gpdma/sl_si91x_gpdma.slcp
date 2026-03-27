@@ -5,7 +5,7 @@ description: 'This application demonstrates the memory to memory transfer for GP
   '
 category: example|peripheral
 quality: production
-label: Si91x - GPDMA
+label: Platform SiWx91x - GPDMA
 component:
 - id: sl_main
 - id: status
@@ -32,6 +32,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

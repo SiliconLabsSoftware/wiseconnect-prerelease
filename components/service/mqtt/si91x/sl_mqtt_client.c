@@ -75,8 +75,6 @@
 // Declaring strtok_r as extern to suppress implicit declaration warning.
 extern char *strtok_r(char *, const char *, char **);
 
-extern sli_wifi_command_queue_t cmd_queues[SI91X_CMD_MAX];
-
 #define SI91X_MQTT_CLIENT_INIT_TIMEOUT        5000
 #define SI91X_MQTT_CLIENT_DISCONNECT_TIMEOUT  5000
 #define SI91X_MQTT_CHECK_RETAIN_MESSAGE       BIT(0)
@@ -259,7 +257,7 @@ sl_status_t sli_si91x_build_mqtt_sdk_context_if_async(sl_mqtt_client_event_t eve
     return SL_STATUS_OK;
   }
 
-  sl_si91x_mqtt_client_context_t *mqtt_client_sdk_context = calloc(sizeof(sl_si91x_mqtt_client_context_t), 1);
+  sl_si91x_mqtt_client_context_t *mqtt_client_sdk_context = calloc(1, sizeof(sl_si91x_mqtt_client_context_t));
 
   if (mqtt_client_sdk_context == NULL) {
     return SL_STATUS_ALLOCATION_FAILED;
@@ -420,11 +418,11 @@ static sl_status_t sli_si91x_send_firmware_mqtt_init(const sl_mqtt_client_t *cli
     si91x_init_request.password_len = (credentials->password_length);
   }
 
-  return sli_wifi_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
+  return sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                                SLI_SI91X_NETWORK_CMD,
                                &si91x_init_request,
                                sizeof(si91x_init_request),
-                               SLI_WLAN_RSP_EMB_MQTT_CLIENT_WAIT_TIME,
+                               SLI_WIFI_RSP_EMB_MQTT_CLIENT_WAIT_TIME,
                                NULL,
                                NULL);
 }
@@ -554,7 +552,7 @@ static sl_status_t sli_mqtt_client_connect(sl_mqtt_client_t *client,
   VERIFY_STATUS_AND_RETURN(status);
 
   status =
-    sli_wifi_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
+    sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                           SLI_SI91X_NETWORK_CMD,
                           &si91x_connect_request,
                           sizeof(si91x_connect_request),
@@ -602,11 +600,11 @@ sl_status_t sl_mqtt_client_disconnect(sl_mqtt_client_t *client, uint32_t timeout
     sli_si91x_mqtt_client_command_request_t si91x_disconnect_request = { .command_type =
                                                                            SLI_SI91X_MQTT_CLIENT_DISCONNECT_COMMAND };
 
-    status = sli_wifi_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
+    status = sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                                    SLI_SI91X_NETWORK_CMD,
                                    &si91x_disconnect_request,
                                    sizeof(si91x_disconnect_request),
-                                   SLI_WLAN_RSP_EMB_MQTT_CLIENT_WAIT_TIME,
+                                   SLI_WIFI_RSP_EMB_MQTT_CLIENT_WAIT_TIME,
                                    sdk_context,
                                    NULL);
 
@@ -626,7 +624,7 @@ sl_status_t sl_mqtt_client_disconnect(sl_mqtt_client_t *client, uint32_t timeout
                                                      &sdk_context);
   VERIFY_STATUS_AND_RETURN(status);
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  &si91x_deinit_request,
                                  sizeof(si91x_deinit_request),
@@ -665,7 +663,7 @@ sl_status_t sl_mqtt_client_publish(sl_mqtt_client_t *client,
   sl_si91x_mqtt_client_context_t *sdk_context = NULL;
   uint32_t publish_request_size = sizeof(sli_si91x_mqtt_client_publish_request_t) + message->content_length;
 
-  sli_si91x_mqtt_client_publish_request_t *si91x_publish_request = calloc(publish_request_size, 1);
+  sli_si91x_mqtt_client_publish_request_t *si91x_publish_request = calloc(1, publish_request_size);
   if (si91x_publish_request == NULL) {
     return SL_STATUS_ALLOCATION_FAILED;
   }
@@ -694,7 +692,7 @@ sl_status_t sl_mqtt_client_publish(sl_mqtt_client_t *client,
   memcpy(si91x_publish_request->topic, message->topic, message->topic_length);
   memcpy(si91x_publish_request->msg, message->content, message->content_length);
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  si91x_publish_request,
                                  publish_request_size,
@@ -736,7 +734,7 @@ sl_status_t sl_mqtt_client_subscribe(sl_mqtt_client_t *client,
   sl_si91x_mqtt_client_context_t *sdk_context               = NULL;
 
   sl_mqtt_client_topic_subscription_info_t *subscription =
-    calloc(sizeof(sl_mqtt_client_topic_subscription_info_t) + topic_length, 1);
+    calloc(1, sizeof(sl_mqtt_client_topic_subscription_info_t) + topic_length);
 
   status = sli_si91x_build_mqtt_sdk_context_if_async(SL_MQTT_CLIENT_SUBSCRIBED_EVENT,
                                                      client,
@@ -764,7 +762,7 @@ sl_status_t sl_mqtt_client_subscribe(sl_mqtt_client_t *client,
   memcpy(si91x_subscribe_request.topic, topic, topic_length);
   memcpy(subscription->topic, topic, topic_length);
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  &si91x_subscribe_request,
                                  sizeof(si91x_subscribe_request),
@@ -819,7 +817,7 @@ sl_status_t sl_mqtt_client_unsubscribe(sl_mqtt_client_t *client,
   si91x_unsubscribe_request.topic_len    = (uint8_t)topic_length;
   memcpy(si91x_unsubscribe_request.topic, topic, topic_length);
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_EMB_MQTT_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  &si91x_unsubscribe_request,
                                  sizeof(si91x_unsubscribe_request),
@@ -1325,17 +1323,17 @@ static void sli_si91x_handle_disconnected_event(sl_status_t status,
      However, if the status is SL_STATUS_SI91X_MQTT_KEEP_ALIVE_TERMINATE_ERROR, 
      it indicates a keep-alive terminate error, not a user-initiated disconnect failure.
   */
-  if (rx_packet->command == SLI_WLAN_REQ_EMB_MQTT_CLIENT && status != SL_STATUS_OK
+  if (rx_packet->command == SLI_WIFI_REQ_EMB_MQTT_CLIENT && status != SL_STATUS_OK
       && status != SL_STATUS_SI91X_MQTT_KEEP_ALIVE_TERMINATE_ERROR) {
     *is_error_event = true;
     return;
   }
 
   bool is_keep_alive_response_timeout_termination =
-    (rx_packet->command == SLI_WLAN_REQ_EMB_MQTT_CLIENT && status == SL_STATUS_SI91X_MQTT_KEEP_ALIVE_TERMINATE_ERROR);
+    (rx_packet->command == SLI_WIFI_REQ_EMB_MQTT_CLIENT && status == SL_STATUS_SI91X_MQTT_KEEP_ALIVE_TERMINATE_ERROR);
   sl_status_t disconnection_status = SL_STATUS_FAIL;
 
-  if (rx_packet->command == SLI_WLAN_RSP_MQTT_REMOTE_TERMINATE || is_keep_alive_response_timeout_termination) {
+  if (rx_packet->command == SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE || is_keep_alive_response_timeout_termination) {
     sdk_context->client->state = SL_MQTT_CLIENT_TA_DISCONNECTED;
     disconnection_status       = sl_mqtt_client_disconnect(sdk_context->client, SI91X_MQTT_CLIENT_DISCONNECT_TIMEOUT);
 
@@ -1352,14 +1350,14 @@ static void sli_si91x_handle_disconnected_event(sl_status_t status,
     *event_data = (uint8_t *)reason;
   } else {
     // As keep alive response timeout is already handled,
-    // we can safely assume that the disconnection is user initiated if the frame type is SLI_WLAN_REQ_EMB_MQTT_CLIENT.
+    // we can safely assume that the disconnection is user initiated if the frame type is SLI_WIFI_REQ_EMB_MQTT_CLIENT.
     *reason     = (rx_packet->command == SLI_WIFI_RSP_JOIN) ? SL_MQTT_CLIENT_WLAN_DISCONNECTION
                                                             : SL_MQTT_CLIENT_USER_INITIATED_DISCONNECTION;
     *event_data = (uint8_t *)reason;
   }
 
-  if (rx_packet->command == SLI_WIFI_RSP_JOIN || rx_packet->command == SLI_WLAN_REQ_EMB_MQTT_CLIENT
-      || ((rx_packet->command == SLI_WLAN_RSP_MQTT_REMOTE_TERMINATE || is_keep_alive_response_timeout_termination)
+  if (rx_packet->command == SLI_WIFI_RSP_JOIN || rx_packet->command == SLI_WIFI_REQ_EMB_MQTT_CLIENT
+      || ((rx_packet->command == SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE || is_keep_alive_response_timeout_termination)
           && disconnection_status == SL_STATUS_OK)) {
     sdk_context->client->state = SL_MQTT_CLIENT_DISCONNECTED;
     // Free all subscriptions as we have disconnected from mqtt broker

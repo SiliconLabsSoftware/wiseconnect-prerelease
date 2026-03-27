@@ -5,7 +5,7 @@ description: 'This application demonstrates how one-shot and periodic sleeptimer
   '
 category: example|peripheral
 quality: production
-label: SI91x - Sleeptimer
+label: Platform SiWx91x -eeptimer
 component:
 - id: sl_main
 - id: sleeptimer_si91x
@@ -41,6 +41,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

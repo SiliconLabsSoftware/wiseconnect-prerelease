@@ -189,7 +189,8 @@ sl_status_t sli_net_validate_sl_net_profile(const sl_net_profile_t *profile, sl_
 {
   switch (interface) {
 #ifdef SL_WIFI_COMPONENT_INCLUDED
-    case SL_NET_WIFI_CLIENT_INTERFACE: {
+    case SL_NET_WIFI_CLIENT_INTERFACE:
+    case SL_NET_WIFI_CLIENT_2_INTERFACE: {
       if (
         (((const sl_net_wifi_client_profile_t *)profile)->config.ssid.length == 0)
         || (((const sl_net_wifi_client_profile_t *)profile)->config.ssid.length
@@ -207,7 +208,8 @@ sl_status_t sli_net_validate_sl_net_profile(const sl_net_profile_t *profile, sl_
       }
       return SL_STATUS_OK;
     }
-    case SL_NET_WIFI_AP_INTERFACE: {
+    case SL_NET_WIFI_AP_INTERFACE:
+    case SL_NET_WIFI_AP_2_INTERFACE: {
       if ((((const sl_net_wifi_ap_profile_t *)profile)->config.ssid.length == 0)
           || (((const sl_net_wifi_ap_profile_t *)profile)->config.ssid.length > SL_WIFI_MAX_SSID_LENGTH - 2)) {
         SL_DEBUG_LOG("Invalid SSID length: %d\n", ((const sl_net_wifi_ap_profile_t *)profile)->config.ssid.length);
@@ -461,7 +463,7 @@ static int sli_get_iterate_profiles_count()
     SL_DEBUG_LOG("\r\nFailed to get performance profile: 0x%lx\r\n", status);
     return 1;
   }
-  if (performance_profile.profile == HIGH_PERFORMANCE) {
+  if (performance_profile.profile == SL_WIFI_SYSTEM_HIGH_PERFORMANCE) {
     return AUTO_JOIN_RETRY_COUNT;
   } else {
     return 1;

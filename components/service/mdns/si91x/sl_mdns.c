@@ -156,11 +156,11 @@ sl_status_t sl_mdns_init(sl_mdns_t *mdns, const sl_mdns_configuration_t *config,
   memcpy(req.buffer, config->host_name, length_host_name);
   length = sizeof(sl_si91x_mdns_req_t) - MDNSD_BUFFER_SIZE + length_host_name;
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_MDNSD,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_MDNSD,
                                  SLI_SI91X_NETWORK_CMD,
                                  &req,
                                  length,
-                                 SLI_WLAN_RSP_MDNSD_WAIT_TIME,
+                                 SLI_WIFI_RSP_MDNSD_WAIT_TIME,
                                  NULL,
                                  NULL);
 
@@ -176,11 +176,11 @@ sl_status_t sl_mdns_deinit(sl_mdns_t *mdns)
   req.command_type = SI91X_MDNSD_DEINIT;
   length           = sizeof(sl_si91x_mdns_req_t) - MDNSD_BUFFER_SIZE;
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_MDNSD,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_MDNSD,
                                  SLI_SI91X_NETWORK_CMD,
                                  &req,
                                  length,
-                                 SLI_WLAN_RSP_MDNSD_WAIT_TIME,
+                                 SLI_WIFI_RSP_MDNSD_WAIT_TIME,
                                  NULL,
                                  NULL);
 
@@ -310,11 +310,11 @@ sl_status_t sl_mdns_register_service(sl_mdns_t *mdns, sl_net_interface_t interfa
   memcpy((char *)((req.buffer) + length), service->service_message, length_service_message);
   length += length_service_message + (sizeof(sl_si91x_mdns_req_t) - MDNSD_BUFFER_SIZE);
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_MDNSD,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_MDNSD,
                                  SLI_SI91X_NETWORK_CMD,
                                  &req,
                                  length,
-                                 SLI_WLAN_RSP_MDNSD_WAIT_TIME,
+                                 SLI_WIFI_RSP_MDNSD_WAIT_TIME,
                                  NULL,
                                  NULL);
   if (SL_STATUS_OK != status) {
@@ -383,7 +383,7 @@ sl_status_t sl_mdns_service_discovery_start(const sl_mdns_t *mdns,
   req.req_conf.discover_srv.timeout = service_query->timeout;
 
   // Send command to firmware
-  status = sli_wifi_send_command(SLI_WLAN_REQ_DISCOVER_SERVICE,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_DISCOVER_SERVICE,
                                  SLI_SI91X_NETWORK_CMD,
                                  &req,
                                  sizeof(sl_si91x_mdns_req_t),
@@ -405,11 +405,11 @@ sl_status_t sl_mdns_service_discovery_stop(const sl_mdns_t *mdns, const sl_net_i
   req.command_type = SI91X_MDNS_COMMAND_STOP_DISCOVERY;
 
   // Send command to firmware
-  status = sli_wifi_send_command(SLI_WLAN_REQ_MDNSD,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_MDNSD,
                                  SLI_SI91X_NETWORK_CMD,
                                  &req,
                                  sizeof(sl_si91x_mdns_req_t),
-                                 SLI_WLAN_RSP_MDNSD_WAIT_TIME,
+                                 SLI_WIFI_RSP_MDNSD_WAIT_TIME,
                                  NULL,
                                  NULL);
 

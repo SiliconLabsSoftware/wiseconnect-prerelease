@@ -3,7 +3,7 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to program the E-Fuse and read from a specified address on the SiWx917 SoC device. \n"
 category: example|peripheral
 quality: production
-label: SI91X - SL EFUSE
+label: Platform SiWx91x - EFUSE
 component:
 - id: sl_main
 - id: status
@@ -33,6 +33,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

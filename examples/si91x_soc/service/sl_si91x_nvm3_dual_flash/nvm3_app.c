@@ -64,15 +64,10 @@ static char buffer[NVM3_DEFAULT_MAX_OBJECT_SIZE];
 unsigned char newString[CMD_INPUT][NVM3_DEFAULT_MAX_OBJECT_SIZE];
 
 #if defined(SL_CATALOG_KERNEL_PRESENT)
-const osThreadAttr_t thread_attributes = {
+static const osThreadAttr_t thread_attributes = {
   .name       = "app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow,
-  .tz_module  = 0,
 };
 #endif
 

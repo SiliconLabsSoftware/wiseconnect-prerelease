@@ -5,7 +5,7 @@ description: 'This application demonstrates how to use of the sensorhub in SI91x
   '
 category: example|si91x_soc|service
 quality: production
-label: SI91x - SoC SL_SI91X_SENSORHUB
+label: Platform SiWx91x - Sensorhub
 component:
 - id: freertos
 - id: freertos_heap_4
@@ -98,6 +98,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

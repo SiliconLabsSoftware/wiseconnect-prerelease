@@ -3,7 +3,7 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to use the I2C interface on the Si91x SoC device with blocking APIs. \nIt highlights the configuration of the I2C peripheral and shows how to send and receive data in a blocking mode, \nwhich ensures that the system waits for a transaction to complete before proceeding to the next one.\n"
 category: example|peripheral
 quality: production
-label: SI91x - SL_I2C_Driver_Leader
+label: Platform SiWx91x - I2C Driver Leader
 component:
 - id: sl_main
 - id: status
@@ -39,6 +39,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

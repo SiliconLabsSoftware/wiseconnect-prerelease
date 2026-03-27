@@ -3,7 +3,7 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to generate a random number using the built-in random number generation functionality on the Si91x SoC device. \n"
 category: example|peripheral
 quality: production
-label: Si91x - HRNG
+label: Platform SiWx91x - HRNG
 component:
 - id: sl_main
 - id: status
@@ -30,6 +30,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

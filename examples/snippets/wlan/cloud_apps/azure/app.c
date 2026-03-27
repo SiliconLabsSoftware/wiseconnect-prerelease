@@ -595,7 +595,7 @@ int32_t TLS_Socket_Recv(NetworkContext_t *pNetworkContext, void *pBuffer, size_t
   int32_t recv_bytes = recv(client_socket, pBuffer, bytesToRecv, 0);
   if (recv_bytes < 0) {
     if (SL_STATUS_SI91X_SOCKET_READ_TIMEOUT == sl_wifi_get_saved_firmware_status()) {
-      //printf("Recieve timed out\r\n");
+      //printf("Receive timed out\r\n");
       return 0;
     }
   }

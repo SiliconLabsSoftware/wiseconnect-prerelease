@@ -804,7 +804,7 @@ void rsi_ble_event_adv_report_driver_callback(rsi_ble_event_adv_report_t *rsi_bl
   return;
 }
 
-void rsi_ble_on_data_recieve(uint8_t conn_id)
+void rsi_ble_on_data_receive(uint8_t conn_id)
 {
   uint8_t ble_conn_id = conn_id;
   if (rsi_ble_conn_info[ble_conn_id].notify_handle_found
@@ -849,7 +849,7 @@ void rsi_ble_on_data_recieve(uint8_t conn_id)
 
 /*==============================================*/
 /**
- * @fn          void rsi_ble_event_on_data_recieve(uint16_t status, void *event_data)
+ * @fn          void rsi_ble_event_on_data_receive(uint16_t status, void *event_data)
  * @brief       handler for event_advertisement_restart to be executed in ble task context
  * @param[in]   uint16_t , event_status 
  * @param[in]   void, event_data
@@ -859,13 +859,13 @@ void rsi_ble_on_data_recieve(uint8_t conn_id)
  * handler for event_advertisement_restart to be executed in ble task context
  *
  */
-void rsi_ble_event_on_data_recieve(uint16_t __attribute__((unused)) status, void *event_data)
+void rsi_ble_event_on_data_receive(uint16_t __attribute__((unused)) status, void *event_data)
 {
   //! Add handling here
   uint8_t *conn_id    = (uint8_t *)event_data;
   uint8_t ble_conn_id = *conn_id;
 
-  rsi_ble_on_data_recieve(ble_conn_id);
+  rsi_ble_on_data_receive(ble_conn_id);
 }
 
 void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
@@ -1101,7 +1101,7 @@ void rsi_conn_update_req_event(uint8_t conn_id)
     rsi_ble_conn_info[ble_conn_id].rsi_rx_from_rem_dev = false;
     LOG_PRINT("\r\n start receiving data from - conn%d\r\n", ble_conn_id);
 
-    rsi_ble_event_on_data_recieve_driver_callback(&ble_conn_id);
+    rsi_ble_event_on_data_receive_driver_callback(&ble_conn_id);
   }
   //! set RSI_DATA_TRANSMIT_EVENT to transmit data to remote device
   if (rsi_ble_conn_info[ble_conn_id].rsi_tx_to_rem_dev) {
@@ -2515,7 +2515,7 @@ void rsi_ble_event_profiles_list(uint16_t status, void *event_data)
                   .rsi_ble_profile_list_by_conn.profile_desc[i + rsi_ble_conn_info[ble_conn_id].total_remote_profiles],
                &rsi_ble_conn_info[ble_conn_id].get_allprofiles.profile_desc[i],
                sizeof(profile_descriptors_t));
-        LOG_PRINT_D("\n profile end handle  recieved: %x \n",
+        LOG_PRINT_D("\n profile end handle  received: %x \n",
                     *(uint16_t *)(rsi_ble_conn_info[ble_conn_id].get_allprofiles.profile_desc[i].end_handle));
       }
       rsi_ble_conn_info[ble_conn_id].total_remote_profiles += rsi_ble_conn_info[ble_conn_id].no_of_profiles;

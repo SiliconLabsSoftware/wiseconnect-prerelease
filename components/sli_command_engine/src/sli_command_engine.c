@@ -226,7 +226,7 @@ static sl_status_t sli_command_engine_send_error_event(sli_command_engine_t *ins
 
 // Identify if an in-flight metadata node matches the received packet metadata
 // Match criteria: packet_type and frame_id must both be equal
-static bool rx_packet_identity_handler(const sli_queue_t *handle, void *data, const void *node_match_data)
+static bool rx_packet_identity_handler(const sli_queue_t *handle, const void *data, const void *node_match_data)
 {
   UNUSED_PARAMETER(handle); // Not used in this matcher
   if (data == NULL || node_match_data == NULL) {
@@ -573,6 +573,17 @@ static void sli_command_engine_thread(void *args)
         if (SL_STATUS_OK != status) {
           // Queue corruption / unexpected failure
           sli_command_engine_send_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
+          continue;
+        }
+
+        // Check if this metadata was marked FLUSHED during a queue flush operation.
+        // If so, the flush path has already notified waiters and removed it from the
+        // inflight queue. Just clean up resources and continue.
+        if (metadata->tx_status == SLI_COMMAND_ENGINE_PACKET_FLUSHED) {
+          SL_DEBUG_LOG("TX ACK for FLUSHED packet - freeing resources\n");
+          sli_buffer_manager_free_buffer(metadata->tx_info.data_packet);
+          sli_buffer_manager_free_buffer(metadata);
+          metadata = NULL;
           continue;
         }
 

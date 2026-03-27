@@ -575,14 +575,14 @@ ssize_t recvfrom(int socket_id, void *buf, size_t buf_len, int flags, struct soc
   // Configure wait time and send the command
   wait_time = (SLI_WIFI_WAIT_FOR_EVER | SLI_WIFI_WAIT_FOR_RESPONSE_BIT);
 
-  si91x_socket->Is_receive_cmd_pending = true;
-  status                               = sli_wifi_async_send_command(SLI_WLAN_REQ_SOCKET_READ_DATA,
+  si91x_socket->is_receive_cmd_pending = true;
+  status                               = sli_wifi_async_send_command(SLI_WIFI_REQ_SOCKET_READ_DATA,
                                        (SI91X_CMD_MAX + si91x_socket->index),
                                        &request,
                                        sizeof(request),
                                        NULL);
   if (status != SL_STATUS_IN_PROGRESS) {
-    si91x_socket->Is_receive_cmd_pending = false;
+    si91x_socket->is_receive_cmd_pending = false;
     VERIFY_STATUS_AND_RETURN(status);
   }
 
@@ -594,14 +594,14 @@ ssize_t recvfrom(int socket_id, void *buf, size_t buf_len, int flags, struct soc
   if (status == SL_STATUS_SI91X_SOCKET_CLOSED) {
     sli_buffer_manager_free_buffer(response_buffer);
     errno                                = ENOTCONN;
-    si91x_socket->Is_receive_cmd_pending = false;
+    si91x_socket->is_receive_cmd_pending = false;
     return -1;
   }
 
   if ((status != SL_STATUS_OK) && (response_buffer != NULL)) {
     sli_buffer_manager_free_buffer(response_buffer);
   }
-  si91x_socket->Is_receive_cmd_pending = false;
+  si91x_socket->is_receive_cmd_pending = false;
   SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_OK, SLI_SI91X_UNDEFINED_ERROR);
 
   // Process the response

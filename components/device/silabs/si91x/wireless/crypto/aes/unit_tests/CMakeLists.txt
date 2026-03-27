@@ -6,6 +6,7 @@ include_directories(
     ../../../../tests/unit_tests/inc
     ../inc
     ../../../device/silabs/si91x/wireless/inc
+    ../../../sli_si91x_wifi_command_engine/inc
     ../../../device/silabs/si91x/wireless/sl_net/inc
     ../../../firmware_upgrade
     ../../../device/silabs/si91x/wireless/ahb_interface/inc

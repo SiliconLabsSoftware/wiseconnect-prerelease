@@ -39,7 +39,6 @@
 #include "sl_si91x_crypto_thread.h"
 #endif
 #include <string.h>
-#include "sli_wifi_utility.h"
 static sl_status_t sli_si91x_get_size_from_ecdh_mode(sl_si91x_ecdh_mode_t ecdh_mode, uint8_t *size)
 {
   switch (ecdh_mode) {

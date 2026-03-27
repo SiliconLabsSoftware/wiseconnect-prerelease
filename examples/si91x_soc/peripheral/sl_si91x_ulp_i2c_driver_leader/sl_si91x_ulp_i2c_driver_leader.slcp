@@ -5,7 +5,7 @@ description: 'This application demonstrates how to use the ULP I2C interface on 
   '
 category: example|peripheral
 quality: production
-label: SI91x - SL_ULP_I2C_Driver_Leader
+label: Platform SiWx91x - ULP I2C Driver Leader
 component:
 - id: sl_main
 - id: status
@@ -60,6 +60,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

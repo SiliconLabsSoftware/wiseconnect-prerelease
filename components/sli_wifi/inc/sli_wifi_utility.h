@@ -40,61 +40,19 @@
 #define SLI_WIFI_WAIT_ON_THREAD_ID 0
 #define SLI_WIFI_WAIT_ON_EVENT_ID  1
 
-#ifndef __ZEPHYR__
-/******************************************************************************
+#define SLI_WIFI_HEADER_SIZE               16
+#define SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE 4
+
+/***************************************************************************/ /**
  * @brief
- *  A utility function that store the firmware status code in thread specific storage.
- * @param[in] converted_firmware_status
- *  Firmware status code that needs to be saved.
- *****************************************************************************/
-void sli_wifi_save_firmware_status(sl_status_t converted_firmware_status);
-#endif
-
-typedef bool (*sli_wifi_buffer_comparator)(const sl_wifi_buffer_t *buffer, const void *userdata);
-
-static inline uint16_t sli_wifi_get_frame_status(const sl_wifi_system_packet_t *packet)
-{
-  return (uint16_t)(packet->desc[12] + (packet->desc[13] << 8));
-}
-
-/**
- * @brief
- *   Allocate a buffer to send a command
- * @param[out] host_buffer
- *   Destination buffer object
- * @param[out] buffer
- *   Start of the internal buffer data
- * @param[in] requested_buffer_size
- *   Requested buffer size
- * @param[in] wait_duration_ms
- *   Duration to wait for buffer to become available
- * @return sl_status_t Returns the status of the operation. A value of 0 (SL_STATUS_OK) indicates success.
- *                     Other values indicate failure. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- */
-sl_status_t sli_wifi_allocate_command_buffer(sl_wifi_buffer_t **host_buffer,
-                                             void **buffer,
-                                             uint32_t requested_buffer_size,
-                                             uint32_t wait_duration_ms);
-/**
- * @brief Atomically append a given buffer to the end of a buffer queue.
- * 
- * This function appends a buffer to the end of a specified buffer queue in an atomic operation,
- * ensuring thread safety during the append operation.
- *
- * @param[in] queue Pointer to the destination buffer queue where the buffer will be appended.
- * @param[in] buffer Pointer to the buffer that is to be appended to the queue.
- */
-void sli_wifi_append_to_buffer_queue(sli_wifi_buffer_queue_t *queue, sl_wifi_buffer_t *buffer);
-
-// Event API
-/* Function used to set specified flags for event */
-void sli_wifi_set_event(uint32_t event_mask);
-
-/* Function used to remove the buffer from the specified queue by using comparator */
-sl_status_t sli_wifi_remove_buffer_from_queue_by_comparator(sli_wifi_buffer_queue_t *queue,
-                                                            const void *user_data,
-                                                            sli_wifi_buffer_comparator comparator,
-                                                            sl_wifi_buffer_t **buffer);
+ *   A utility function to extract firmware status from RX packet.
+ *   The extracted firmware status can be given to sli_wifi_convert_and_save_firmware_status() to get sl_status equivalent.
+ * @param[in] packet
+ *   Packet that contains the frame status which needs to be extracted.
+ * @return
+ *   Frame status (uint16_t)
+ ******************************************************************************/
+uint16_t sli_wifi_get_wifi_frame_status(const sl_wifi_system_packet_t *packet);
 
 /***************************************************************************/ /**
  * @brief
@@ -132,24 +90,6 @@ sl_wifi_buffer_t *sli_wifi_get_response_buffer(sli_command_engine_response_t *re
 
 sli_command_engine_metadata_t *sli_wifi_get_response_metadata(sli_command_engine_response_t *response);
 
-/******************************************************************************
- * @brief
- *   A utility function that converts frame status sent by firmware to sl_status_t and stores in thread local storage of caller thread.
- * @param[in] si91x_firmware_status
- *   si91x_firmware_status that needs to be converted to sl_status_t.
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- *****************************************************************************/
-static inline sl_status_t sli_wifi_convert_and_save_firmware_status(uint16_t wifi_firmware_status)
-{
-  sl_status_t converted_firmware_status = (wifi_firmware_status == SL_STATUS_OK) ? SL_STATUS_OK
-                                                                                 : (wifi_firmware_status | BIT(16));
-#ifndef __ZEPHYR__
-  sli_wifi_save_firmware_status(converted_firmware_status);
-#endif
-  return converted_firmware_status;
-}
-
 /* Function used to get maximum transmission power */
 sl_wifi_max_tx_power_t sli_get_max_tx_power();
 
@@ -170,7 +110,7 @@ sl_status_t sli_wifi_get_saved_rate(sl_wifi_rate_t *transfer_rate);
 sl_status_t sli_wifi_host_get_credentials(sl_wifi_credential_id_t id, uint8_t type, sl_wifi_credential_t *cred);
 
 /* Function used to set the maximum transmission power */
-void sli_save_max_tx_power(uint8_t max_scan_tx_power, uint8_t max_join_tx_power);
+void sli_wifi_save_max_tx_power(uint8_t max_scan_tx_power, uint8_t max_join_tx_power);
 
 /* Function converts SDK encryption mode to NWP supported mode */
 sl_status_t sli_wifi_get_nwp_encryption(sl_wifi_encryption_t encryption_mode, uint8_t *encryption_request);
@@ -181,10 +121,10 @@ sl_status_t sli_wifi_save_ap_configuration(const sl_wifi_ap_configuration_t *wif
 /* Function used to destroy the current access point configuration */
 void sli_wifi_reset_ap_configuration();
 
-/* Function to send the requested Wi-Fi and BT/BLE performance profile to firmware */
-sl_status_t sli_wifi_send_power_save_request(const sl_wifi_performance_profile_v2_t *wifi_profile,
-                                             const sl_bt_performance_profile_t *bt_profile);
 void sli_wifi_flush_scan_results_database(void);
+
+/** Parse beacon/probe response and update scan results database. Called from event handler. */
+void sli_handle_wifi_beacon(sl_wifi_system_packet_t *packet);
 
 /***************************************************************************/ /**
  * @brief
@@ -204,16 +144,20 @@ sl_status_t sli_wifi_get_stored_scan_result_count(sl_wifi_interface_t interface,
 sl_status_t sli_wifi_get_stored_scan_results(
   sl_wifi_interface_t interface,
   sl_wifi_extended_scan_result_parameters_t *extended_scan_parameters); //Done
+
 /* Function used to retrieve the access point configuration */
 sl_status_t sli_wifi_get_saved_ap_configuration(sl_wifi_ap_configuration_t *wifi_ap_confuguration);
+
 /* Function used to retrieve protocol and transfer rate */
 sl_status_t sli_wifi_get_rate_protocol_and_data_rate(const uint8_t data_rate,
                                                      sl_wifi_rate_protocol_t *rate_protocol,
                                                      sl_wifi_rate_t *transfer_rate);
 /* Function used to set maximum transmission power to default value(31 dBm) */
 void sli_wifi_reset_max_tx_power();
+
 /* Function used to set wifi rate to default value of 1 Mbps */
 void sli_wifi_reset_sl_wifi_rate();
+
 /* Function used to set whether card ready is required or not */
 void sli_wifi_set_card_ready_required(bool card_ready_required);
 /***************************************************************************/ /**
@@ -283,10 +227,10 @@ void sli_wifi_save_power_chain(const sl_wifi_power_chain_t power_chain);
 
 // Accessor for the scan results database head pointer
 sli_scan_info_t **sli_get_scan_info_database(void);
-bool sli_wifi_packet_identification_function(const sl_wifi_buffer_t *buffer, const void *user_data);
 uint32_t sl_wifi_host_elapsed_time(uint32_t starting_timestamp);
 
-sl_wifi_event_t sli_wifi_convert_event_to_sl_wifi_event(uint16_t command, uint16_t frame_status);
+/* Converts firmware/NWP response (command + frame_status) to common sl_wifi_event_t. Common API for all devices. */
+sl_wifi_event_t sli_wifi_convert_event_to_sl_wifi_event(uint32_t command, uint16_t frame_status);
 
 sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
                                                    sli_wifi_command_type_t command_type,
@@ -355,18 +299,19 @@ sl_status_t sli_wifi_send_command_packet(uint32_t command,
  ******************************************************************************/
 uint32_t sli_wifi_host_elapsed_time(uint32_t starting_timestamp);
 
+#ifndef __ZEPHYR__
 /***************************************************************************/ /**
  * @brief
- *   Converts firmware status sent by firmware to sl_status_t and stores it in thread local storage.
- * 
+ *   Initializes new task register index for storing firmware status.
+ *
  * @details
- *   This function converts the SI91x firmware status code to an sl_status_t value and stores it in the thread local storage of the caller thread. This allows the firmware status to be retrieved later by the same thread.
- * 
- * @param[in] firmware_status
- *   The firmware status code that needs to be converted to sl_status_t.
- * 
+ *   This function sets up the task register index to store the firmware status in thread-specific storage.
+ *   For all the threads at this index of the thread local array firmware status will be stored.
+ *
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  ******************************************************************************/
-sl_status_t sli_wifi_convert_and_save_firmware(uint16_t firmware_status);
+sl_status_t sli_fw_status_storage_index_init(void);
+#endif
+
 #endif

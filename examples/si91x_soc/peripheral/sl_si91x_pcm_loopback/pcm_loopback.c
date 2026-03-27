@@ -39,8 +39,9 @@
 /*******************************************************************************
  *************************** LOCAL VARIABLES   *******************************
  ******************************************************************************/
-static uint8_t pcm_send_complete    = 0;
-static uint8_t pcm_receive_complete = 0;
+/* Volatile: written in PCM callback (ISR), read in main loop. Required for LTO. */
+static volatile uint8_t pcm_send_complete    = 0;
+static volatile uint8_t pcm_receive_complete = 0;
 typedef uint16_t pcm_data_size_t;
 pcm_data_size_t pcm_data_in[PCM_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT];
 pcm_data_size_t pcm_data_out[PCM_BUFFER_SIZE];
@@ -54,6 +55,7 @@ static sl_i2s_handle_t pcm_handle = NULL;
 static void callback_event(uint32_t event);
 static void compare_loop_back_data(void);
 static void remove_pcm_frame_offset(pcm_data_size_t data_buffer[PCM_BUFFER_SIZE + FRAME_OFFSET]);
+sl_i2s_xfer_config_t pcm_xfer_config;
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
@@ -104,18 +106,37 @@ void pcm_example_init(void)
       break;
     }
     DEBUGOUT("PCM user callback register success\r\n");
-    //Configure PCM receive DMA channel
-    if (sl_si91x_pcm_receive_data(pcm_handle, (uint16_t *)pcm_data_in, (PCM_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT))) {
-      DEBUGOUT("PCM receive start fail\r\n");
+    pcm_xfer_config.mode          = mode;
+    pcm_xfer_config.protocol      = SL_PCM_PROTOCOL;
+    pcm_xfer_config.resolution    = pcm_resolution;
+    pcm_xfer_config.sampling_rate = pcm_sampling_frequency;
+    pcm_xfer_config.sync          = SL_I2S_ASYNC;
+    pcm_xfer_config.transfer_type = SL_I2S_TRANSMIT;
+    pcm_xfer_config.data_size     = SL_I2S_DATA_SIZE16;
+    status                        = sl_si91x_pcm_config_transmit_receive(pcm_handle, &pcm_xfer_config);
+    if (status != SL_STATUS_OK) {
+
+      DEBUGOUT("PCM transmit invalid config \r\n");
       break;
     }
-    DEBUGOUT("PCM receive start success\r\n");
-    //Configure PCM transmit DMA channel
-    if (sl_si91x_pcm_transmit_data(pcm_handle, (uint16_t *)pcm_data_out, PCM_BUFFER_SIZE)) {
-      DEBUGOUT("PCM transmit start fail\r\n");
+    pcm_xfer_config.transfer_type = SL_I2S_RECEIVE; /* Configure I2S for receive operation */
+    status                        = sl_si91x_pcm_config_transmit_receive(pcm_handle, &pcm_xfer_config);
+    if (status != SL_STATUS_OK) {
+
+      DEBUGOUT("PCM recive invalid config \r\n");
       break;
     }
-    DEBUGOUT("PCM transmit start success\r\n");
+    //Start PCM transfer
+    status = sl_si91x_pcm_transfer(pcm_handle,
+                                   (uint16_t *)pcm_data_in,
+                                   (uint16_t *)pcm_data_out,
+                                   PCM_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT,
+                                   PCM_BUFFER_SIZE);
+    if (status != SL_STATUS_OK) {
+      DEBUGOUT("PCM transfer start failed, status = 0x%lx\r\n", status);
+      break;
+    }
+    DEBUGOUT("PCM transfer success\r\n");
   } while (false);
 }
 /*******************************************************************************

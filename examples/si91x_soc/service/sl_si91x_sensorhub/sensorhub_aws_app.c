@@ -142,17 +142,6 @@ extern osSemaphoreId_t select_sem;
 extern volatile uint8_t pub_state, qos1_publish_handle, select_given;
 int32_t sh_aws_status = SL_STATUS_OK;
 
-const osThreadAttr_t thread_attributes = {
-  .name       = "app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
-  .stack_size = 3072,
-  .priority   = osPriorityNormal,
-  .tz_module  = 0,
-};
-
 //! No of ltcp socktes
 #define RSI_NUMBER_OF_LTCP_SOCKETS 0
 

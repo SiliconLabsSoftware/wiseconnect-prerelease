@@ -144,13 +144,6 @@ void sl_gpio_set_pin_mode(sl_gpio_port_t port, uint8_t pin, sl_gpio_mode_t mode,
     // Set mode in HP GPIO instance
     GPIO->PIN_CONFIG[(port * MAX_GPIO_PORT_PIN) + pin].GPIO_CONFIG_REG_b.MODE = mode;
   }
-  if (mode == SL_GPIO_MODE_DISABLED) {
-    if (output_value) {
-      sl_gpio_set_pin_output(port, pin); // Set the GPIO pin
-    } else {
-      sl_gpio_clear_pin_output(port, pin); // Clear the GPIO pin
-    }
-  }
 }
 
 /*******************************************************************************
@@ -901,7 +894,7 @@ uint32_t sl_si91x_gpio_get_group_interrupt_status(uint8_t port, sl_si91x_group_i
  ******************************************************************************/
 void sl_si91x_gpio_select_group_interrupt_wakeup(uint8_t port,
                                                  sl_si91x_group_interrupt_t group_interrupt,
-                                                 uint8_t flags)
+                                                 sl_si91x_gpio_wakeup_t flags)
 {
   SL_GPIO_ASSERT(SL_GPIO_VALIDATE_PORT(port));
   SL_GPIO_ASSERT(SL_GPIO_VALIDATE_PARAMETER(group_interrupt));

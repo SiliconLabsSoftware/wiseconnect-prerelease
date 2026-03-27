@@ -24,7 +24,7 @@
 ## Overview
 
 - The GPIO functionality in the MCU consists of three instances:
-  - HP (High Power) Instance: Controls the SoC GPIOs (GPIO_n; n=6 to 57).
+  - HP (High Power) Instance: Controls the SoC GPIOs (GPIO_n; n=6 to 75).
   - ULP (Ultra Low Power) Instance: Controls the ULP GPIOs (ULP_GPIO_n; n=0 to 11).
   - UULP (Ultra Ultra Low Power) Instance: Controls the UULP GPIOs (UULP_GPIO_n; n=0 to 4).
 - HP and ULP Instance have the same features and functionality except for a different base address.
@@ -45,12 +45,13 @@
 | HP GPIO Instance               |  SL_GPIO_PORT_B   |   (16-31)         |
 |                                |  SL_GPIO_PORT_C   |   (32-47)         |
 |                                |  SL_GPIO_PORT_D   |   (48-57)         |
+| SOC Peripheral on ULP GPIO     |  NA               |   (64-75)         |
 |--------------------------------|-------------------|-------------------|
 | ULP GPIO Instance              |  SL_GPIO_ULP_PORT |   (0-11)          |
 |--------------------------------|-------------------|-------------------|
 | UULP GPIO Instance             | SL_GPIO_UULP_PORT |   (0-4)           |
 
-**NOTE** : There is also option to select (0-57)pins with SL_GPIO_PORT_A. For example, to select HP GPIO pin number 49, one can select Port as SL_GPIO_PORT_A and pin number as 49. This option is given only when SL_GPIO_PORT_A GPIO port is selected. (57-63)pins are reserved.
+**NOTE** : There is also option to select (0-75)pins with SL_GPIO_PORT_A. For example, to select HP GPIO pin number 49, one can select Port as SL_GPIO_PORT_A and pin number as 49. This option is given only when SL_GPIO_PORT_A GPIO port is selected. Pins 13-14, 16-24, 36-45, 58-63, and 67 are reserved.
 
 > **NOTE** : For reference on how to select Port and Pin number for different instances, please see the following points:
 >
@@ -101,13 +102,15 @@ The following table lists the GPIO examples available and their functionality:
 - Clear all GPIO interrupts and enable the clock.
 - Configure the GPIO using the `sl_gpio_set_configuration` API.
 - In the default application, toggling of a GPIO pin is achieved using the `sl_gpio_driver_set_pin` API to set the pin, and the `sl_gpio_driver_clear_pin` API to clear it.
+- When `ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE` is set to **1**, ULP GPIO 1 is configured in SOC peripheral mode using `sl_si91x_gpio_driver_set_ulp_peri_on_soc_pin_mode`, and HP GPIO 7 is toggled using `sl_gpio_driver_toggle_pin`.
 - To observe the toggling, connect an oscilloscope or analyzer to ULP GPIO 2 (LED0) or it can be observed on LED0.
 - To check the ULP GPIO interrupt, connect ULP GPIO 8 (P15) to BTN1 (F13). You can observe console prints `gpio ulp pin interrupt0` upon pressing Button 1, the pin interrupt will be triggered on the falling edge event.
 
 ### Initialization of GPIO
 
-- Use \ref [sl_gpio_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl-gpio-set-configuration)(). This configures the GPIO pin based on the port and pin, direction.
-- Use \ref [sl_gpio_configure_pin_interrupt](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl-gpio-driver-configure-interrupt)(). This configures the pin interrupt for GPIO.
+- Use [sl_gpio_set_configuration()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl-gpio-set-configuration). This configures the GPIO pin based on the port and pin, direction.
+- Use [sl_si91x_gpio_driver_set_ulp_peri_on_soc_pin_mode()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl-si91x-gpio-driver-set-ulp-peri-on-soc-pin-mode) to map a ULP GPIO to SOC peripheral mode.
+- Use [sl_gpio_configure_pin_interrupt()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl-gpio-driver-configure-interrupt). This configures the pin interrupt for GPIO.
 
 ## Prerequisites/Setup Requirements
 
@@ -143,13 +146,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following parameters in `ulp_gpio_simple_driver_example.c` (examples/si91x_soc/peripheral/sl_si91x_driver_ulp_gpio_simple/) file and update/modify following macros if required
+- Configure the following parameters in `gpio_ulp_example.c` (examples/si91x_soc/peripheral/sl_si91x_gpio_ulp_example/) file and update/modify following macros if required
 
   ```c
-    #define DELAY            1000 // Delay for 1sec
-    #define ULP_INT_CH       0      // ULP GPIO Pin interrupt 0
-    #define AVL_INTR_NO      0      // available interrupt number
+    #define DELAY                  1000 // Delay for 1sec
+    #define ULP_INT_CH             0    // ULP GPIO Pin interrupt 0
+    #define AVL_INTR_NO            0    // available interrupt number
+    #define ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE 0  // Set to 1 to enable ULP peripheral on SOC GPIO 7 and toggle ULP GPIO 1
   ```
+
+  - `ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 1 in SOC peripheral mode and toggle HP GPIO 7. Set to **0** to disable this feature.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -160,7 +166,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 1. Compile and run the application.
 2. By default, ULP_GPIO2 should be toggled for SiWx917.
 3. Connect logic analyzer to ULP GPIO 2(F10) for the Si917 on WPK board to observe the toggle state.
-4. After successful program execution, the prints in serial console looks as shown below.
+4. When `ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE` is set to **1**, also observe HP GPIO 7 toggle.
+5. After successful program execution, the prints in serial console looks as shown below.
 
   ![Figure: output](resources/readme/output.png)
 
@@ -170,3 +177,18 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 > **Note:**
 Header connection pin references mentioned here are all specific to BRD4338A. If the user runs this application on a different board, it is recommended to refer the board-specific schematic for GPIO-Header connection pin mapping.
 >- To use GPIO pins 31-34 in GPIO mode, see the [SiWx917 Software Reference Manual](docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

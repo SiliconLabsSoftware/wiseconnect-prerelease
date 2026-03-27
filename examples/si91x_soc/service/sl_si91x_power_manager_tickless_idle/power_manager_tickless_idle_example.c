@@ -59,15 +59,10 @@ static ps_transition transition = ADD_REQ;
 static boolean_t change_state   = false;
 osSemaphoreId_t timer_semaphore;
 // Thread attributes which are required for creating a thread
-const osThreadAttr_t thread_attributes = {
+static const osThreadAttr_t thread_attributes = {
   .name       = "app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
   .stack_size = 3072,
   .priority   = osPriorityLow,
-  .tz_module  = 0,
 };
 
 /*******************************************************************************

@@ -44,14 +44,14 @@
 #include "sl_string.h"
 #include <string.h>
 #include <stdbool.h>
-#include "sli_wifi_command_engine_packet.h"
+#include "sli_si91x_wifi_command_engine_packet.h"
 #include "sli_hal_si91x.h"
 #include "sli_si91x_wifi_event_handler.h"
+#include "sli_si91x_wifi_command_engine.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sl_cmsis_utility.h"
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 #include "sl_ip_types.h"
-#include "sli_wifi_utility.h"
 #endif
 #include "sli_net_utility.h"
 
@@ -108,16 +108,8 @@ static uint8_t sli_si91x_max_select_count                                       
 
 static sli_si91x_select_request_t *select_request_table = NULL;
 
-sli_wifi_buffer_queue_t sli_si91x_select_response_queue;
-
-extern sli_wifi_command_queue_t cmd_queues[SI91X_CMD_MAX];
-
 osEventFlagsId_t si91x_socket_events        = 0;
 osEventFlagsId_t si91x_socket_select_events = 0;
-
-extern volatile uint32_t tx_socket_command_queues_status;
-
-extern volatile uint32_t tx_socket_data_queues_status;
 
 uint32_t sl_si91x_socket_selected_ciphers          = SL_SI91X_TLS_DEFAULT_CIPHERS;
 uint32_t sl_si91x_socket_selected_extended_ciphers = SL_SI91X_TLS_EXT_CIPHERS;
@@ -374,11 +366,11 @@ sl_status_t sl_si91x_config_socket(sl_si91x_socket_config_t socket_config)
   sl_status_t status = SL_STATUS_OK;
 
   // Send the socket configuration command to the SI91X driver
-  status = sli_wifi_send_command(SLI_WLAN_REQ_SOCKET_CONFIG,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_CONFIG,
                                  SLI_SI91X_SOCKET_CMD,
                                  &socket_config,
                                  sizeof(socket_config),
-                                 SLI_WLAN_RSP_SOCKET_CONFIG_WAIT_TIME,
+                                 SLI_WIFI_RSP_SOCKET_CONFIG_WAIT_TIME,
                                  NULL,
                                  NULL);
 
@@ -548,7 +540,7 @@ sl_status_t sli_get_free_socket(sli_si91x_socket_t **socket, int *socket_fd)
 
   // Fill the socket packet type configuration structure
   sli_si91x_sockets[socket_index]->socket_packet_type_configuration.rx_event_handler =
-    sli_wifi_command_engine_rx_packet_handler;
+    sli_si91x_wifi_command_engine_rx_packet_handler;
   sli_si91x_sockets[socket_index]->socket_packet_type_configuration.pre_tx_handler = sli_si91x_socket_pre_tx_handler;
   sli_si91x_sockets[socket_index]->socket_packet_type_configuration.packet_processing_type =
     SLI_COMMAND_ENGINE_COMMAND_PACKET;
@@ -598,13 +590,13 @@ sl_status_t sli_si91x_socket_pre_tx_handler(sli_command_engine_t *instance, uint
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  if (packet->command == SLI_WLAN_REQ_SOCKET_ACCEPT || packet->command == SLI_WLAN_RSP_SOCKET_CLOSE
-      || packet->command == SLI_WLAN_REQ_SOCKET_READ_DATA) {
+  if (packet->command == SLI_WIFI_REQ_SOCKET_ACCEPT || packet->command == SLI_WIFI_RSP_SOCKET_CLOSE
+      || packet->command == SLI_WIFI_REQ_SOCKET_READ_DATA) {
     // fill the firmware_queue_id in the packet header
     packet->desc[1] |= (SLI_WLAN_MGMT_Q << 4);
   }
 
-  if (packet->command == SLI_WLAN_REQ_SOCKET_READ_DATA && packet_type >= SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES) {
+  if (packet->command == SLI_WIFI_REQ_SOCKET_READ_DATA && packet_type >= SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES) {
     // Check if the socket is already closed
     // Extract socket index from packet_type: packet_type = socket->index + SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES
     uint8_t socket_index             = (uint8_t)(packet_type - SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES);
@@ -781,7 +773,7 @@ void sli_si91x_create_socket_request(sli_si91x_socket_t *si91x_bsd_socket,
       socket_create_request->total_extension_length = si91x_bsd_socket->tls_extensions.current_size_of_extensions;
       socket_create_request->no_of_tls_extensions   = si91x_bsd_socket->tls_extensions.total_extensions;
     }
-    *wait_period = SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WLAN_RSP_SOCKET_CREATE_WAIT_TIME);
+    *wait_period = SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_SOCKET_CREATE_WAIT_TIME);
   }
 
   // Check for HIGH_PERFORMANCE feature bit
@@ -823,7 +815,7 @@ sl_status_t sli_create_and_send_socket_request(int socketIdIndex, int type, cons
   sli_si91x_socket_create_request_t socket_create_request          = { 0 };
   const sli_si91x_socket_create_response_t *socket_create_response = NULL;
   sli_si91x_socket_t *si91x_bsd_socket                             = sli_get_si91x_socket(socketIdIndex);
-  sli_wifi_wait_period_t wait_period = SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WLAN_RSP_SOCKET_CREATE_WAIT_TIME);
+  sli_wifi_wait_period_t wait_period = SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_SOCKET_CREATE_WAIT_TIME);
   //Verifying socket existence
   if (si91x_bsd_socket == NULL) {
     return -1;
@@ -839,7 +831,7 @@ sl_status_t sli_create_and_send_socket_request(int socketIdIndex, int type, cons
 
   // Store socket role for future references.
   si91x_bsd_socket->role = type;
-  status                 = sli_wifi_send_command(SLI_WLAN_REQ_SOCKET_CREATE,
+  status                 = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_CREATE,
                                  SLI_SI91X_SOCKET_CMD,
                                  &socket_create_request,
                                  sizeof(socket_create_request),
@@ -972,7 +964,7 @@ int sli_si91x_accept(int socket, struct sockaddr *addr, socklen_t *addr_len, sl_
   // Set the callback and client socket ID.
   sli_si91x_set_accept_callback(si91x_server_socket, callback, client_socket_id);
   if (callback != NULL) {
-    status = sli_wifi_send_command(SLI_WLAN_REQ_SOCKET_ACCEPT,
+    status = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_ACCEPT,
                                    (client_socket_id + SI91X_CMD_MAX),
                                    &accept_request,
                                    sizeof(accept_request),
@@ -982,7 +974,7 @@ int sli_si91x_accept(int socket, struct sockaddr *addr, socklen_t *addr_len, sl_
     SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_IN_PROGRESS, SLI_SI91X_UNDEFINED_ERROR);
     return SL_STATUS_OK;
   } else {
-    status = sli_wifi_send_command(SLI_WLAN_REQ_SOCKET_ACCEPT,
+    status = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_ACCEPT,
                                    (client_socket_id + SI91X_CMD_MAX),
                                    &accept_request,
                                    sizeof(accept_request),
@@ -1072,7 +1064,7 @@ int sli_si91x_shutdown(int socket, int how)
   socket_close_request.socket_id   = (uint16_t)((close_request_type == SHUTDOWN_BY_ID) ? si91x_socket->id : 0);
   socket_close_request.port_number = (close_request_type == SHUTDOWN_BY_ID) ? 0 : si91x_socket->local_address.sin6_port;
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_SOCKET_CLOSE,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_CLOSE,
                                  (si91x_socket->index + SI91X_CMD_MAX),
                                  &socket_close_request,
                                  sizeof(socket_close_request),
@@ -1159,7 +1151,7 @@ static void sli_handle_remote_terminate(sl_wifi_system_packet_t *rx_packet)
 
     socket->state             = DISCONNECTED;
     socket->disconnect_reason = SLI_SI91X_BSD_DISCONNECT_REASON_REMOTE_CLOSED;
-    uint16_t frame_status     = sli_get_si91x_frame_status(rx_packet);
+    uint16_t frame_status     = sli_wifi_get_wifi_frame_status(rx_packet);
     frame_status = (frame_status == SL_STATUS_OK) ? (SL_STATUS_SI91X_SOCKET_CLOSED & 0xFFFF) : frame_status;
 
     if (user_remote_socket_termination_callback != NULL) {
@@ -1353,33 +1345,48 @@ static sl_status_t sli_handle_select_request(sl_wifi_system_packet_t *rx_packet,
 
     if (status != SL_STATUS_OK || response_buffer == NULL) {
       SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
-    } else {
-      response_buffer->length = packet_size;
-      memcpy(response_buffer->data, rx_packet, packet_size);
-
-      status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_METADATA_POOL,
-                                                  SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
-                                                  1000,
-                                                  (sli_buffer_t *)&metadata);
-      if (status != SL_STATUS_OK || metadata == NULL) {
-        sli_buffer_manager_free_buffer((sli_buffer_t)response_buffer);
-        SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING METADATA ALLOCATION \r\n");
-      } else {
-        metadata->packet_status              = select_request->frame_status;
-        metadata->tx_info.data_packet        = (void *)response_buffer;
-        metadata->tx_info.data_packet_length = (uint16_t)packet_size;
-        metadata->tx_info.flags              = 0;
-        metadata->tx_info.packet_id          = socket_select_rsp->select_id;
-
-        status = sli_queue_manager_enqueue(&cmd_queues[SLI_SI91X_SOCKET_CMD].rx_queue, (void *)metadata);
-        if (status != SL_STATUS_OK) {
-          sli_buffer_manager_free_buffer((sli_buffer_t)response_buffer);
-          sli_buffer_manager_free_buffer((sli_buffer_t)metadata);
-        } else {
-          osEventFlagsSet(cmd_queues[SLI_SI91X_SOCKET_CMD].event_flags, SL_WIFI_SOCKET_RESPONSE_EVENT);
-        }
-      }
+      return SL_STATUS_ALLOCATION_FAILED;
     }
+
+    response_buffer->length = packet_size;
+    memcpy(response_buffer->data, rx_packet, packet_size);
+
+    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_METADATA_POOL,
+                                                SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
+                                                1000,
+                                                (sli_buffer_t *)&metadata);
+    if (status != SL_STATUS_OK || metadata == NULL) {
+      sli_buffer_manager_free_buffer((sli_buffer_t)response_buffer);
+      SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING METADATA ALLOCATION \r\n");
+      return SL_STATUS_ALLOCATION_FAILED;
+    }
+
+    metadata->packet_status              = select_request->frame_status;
+    metadata->tx_info.data_packet        = (void *)response_buffer;
+    metadata->tx_info.data_packet_length = (uint16_t)packet_size;
+    metadata->tx_info.flags              = 0;
+    metadata->tx_info.packet_id          = socket_select_rsp->select_id;
+
+    sli_command_engine_packet_type_configuration_t packet_type_info = { 0 };
+    status = sli_command_engine_get_rx_queue_info_from_packet_type(&sli_wifi_command_engine,
+                                                                   SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET,
+                                                                   &packet_type_info);
+
+    if (status != SL_STATUS_OK) {
+      sli_buffer_manager_free_buffer((sli_buffer_t)response_buffer);
+      sli_buffer_manager_free_buffer((sli_buffer_t)metadata);
+      return status;
+    }
+
+    status = sli_queue_manager_enqueue(packet_type_info.sync_response_queue, (void *)metadata);
+
+    if (status != SL_STATUS_OK) {
+      sli_buffer_manager_free_buffer((sli_buffer_t)response_buffer);
+      sli_buffer_manager_free_buffer((sli_buffer_t)metadata);
+      return status;
+    }
+
+    osEventFlagsSet(*packet_type_info.sync_response_event_id, packet_type_info.sync_response_event);
   }
 
   return SL_STATUS_OK;
@@ -1425,7 +1432,7 @@ sl_status_t sli_si91x_socket_event_handler(sl_status_t frame_status,
 
   switch (rx_packet->command) {
     // Handle data read request response
-    case SLI_WLAN_REQ_SOCKET_READ_DATA: {
+    case SLI_WIFI_REQ_SOCKET_READ_DATA: {
       result = sli_handle_data_read_request(frame_status, (const sl_wifi_system_packet_t *)rx_packet, sdk_context);
       if (result != SL_STATUS_OK) {
         return -1;
@@ -1433,7 +1440,7 @@ sl_status_t sli_si91x_socket_event_handler(sl_status_t frame_status,
       break;
     }
     // Handle connection establishment response
-    case SLI_WLAN_REQ_SOCKET_ACCEPT: {
+    case SLI_WIFI_REQ_SOCKET_ACCEPT: {
       result = sli_handle_socket_accept_request(rx_packet);
       if (result != SL_STATUS_OK) {
         return -1;
@@ -1441,12 +1448,12 @@ sl_status_t sli_si91x_socket_event_handler(sl_status_t frame_status,
       break;
     }
     // Handle remote socket termination response
-    case SLI_WLAN_RSP_REMOTE_TERMINATE: {
+    case SLI_WIFI_RSP_REMOTE_TERMINATE: {
       sli_handle_remote_terminate(rx_packet);
       break;
     }
     // Handle select request response
-    case SLI_WLAN_RSP_SELECT_REQUEST: {
+    case SLI_WIFI_RSP_SELECT_REQUEST: {
       // Handle select request response
       result = sli_handle_select_request(rx_packet, sdk_context);
       if (result != SL_STATUS_OK) {
@@ -1455,7 +1462,7 @@ sl_status_t sli_si91x_socket_event_handler(sl_status_t frame_status,
       break;
     }
     // This block of code is executed when a TCP acknowledgment indication is received.
-    case SLI_WLAN_RSP_TCP_ACK_INDICATION: {
+    case SLI_WIFI_RSP_TCP_ACK_INDICATION: {
       result = sli_handle_tcp_ack_indication(rx_packet, sdk_context);
       if (result == -1) {
         return -1;
@@ -1503,7 +1510,7 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
   }
 
   // Call the user-defined receive data callback
-  if (client_socket->Is_receive_cmd_pending == true) {
+  if (client_socket->is_receive_cmd_pending == true) {
     sli_command_engine_packet_type_configuration_t packet_type_info = { 0 };
     // Get packet type configuration for the given command type
     sl_status_t status =
@@ -1523,7 +1530,7 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
       return SL_STATUS_ALLOCATION_FAILED;
     }
     VERIFY_STATUS_AND_RETURN(status);
-    metadata->packet_status              = sli_wifi_get_frame_status(rx_packet);
+    metadata->packet_status              = sli_wifi_get_wifi_frame_status(rx_packet);
     metadata->tx_info.data_packet        = rx_buffer;
     metadata->tx_info.data_packet_length = (rx_packet->length & 0x0FFF);
     metadata->tx_info.flags              = 0;
@@ -1613,20 +1620,20 @@ int sli_si91x_get_socket_id(sl_wifi_system_packet_t *packet)
 {
   // Handle connection establishment response
   switch (packet->command) {
-    case SLI_WLAN_RSP_CONN_ESTABLISH:
+    case SLI_WIFI_RSP_CONN_ESTABLISH:
       return ((sli_si91x_rsp_ltcp_est_t *)packet->data)->socket_id;
-    case SLI_WLAN_RSP_REMOTE_TERMINATE:
+    case SLI_WIFI_RSP_REMOTE_TERMINATE:
       return ((sl_si91x_socket_close_response_t *)packet->data)->socket_id;
     case SLI_RECEIVE_RAW_DATA:
       return *((uint8_t *)&(((sl_si91x_socket_metadata_t *)packet->data)->socket_id));
-    case SLI_WLAN_RSP_SOCKET_READ_DATA:
+    case SLI_WIFI_RSP_SOCKET_READ_DATA:
       return packet->data[0];
-    case SLI_WLAN_RSP_TCP_ACK_INDICATION:
+    case SLI_WIFI_RSP_TCP_ACK_INDICATION:
       return ((sli_si91x_rsp_tcp_ack_t *)packet->data)->socket_id;
-    case SLI_WLAN_RSP_SOCKET_CREATE:
+    case SLI_WIFI_RSP_SOCKET_CREATE:
       return (((sli_si91x_socket_create_response_t *)packet->data)->socket_id[0]
               + (((sli_si91x_socket_create_response_t *)packet->data)->socket_id[1] << 8));
-    case SLI_WLAN_RSP_SOCKET_CLOSE:
+    case SLI_WIFI_RSP_SOCKET_CLOSE:
       if (((sl_si91x_socket_close_response_t *)packet->data)->socket_id != 0) {
         return ((sl_si91x_socket_close_response_t *)packet->data)->socket_id;
       }
@@ -1642,7 +1649,7 @@ int sli_si91x_get_socket_id(sl_wifi_system_packet_t *packet)
         }
       }
       return -1;
-    case SLI_WLAN_RSP_SELECT_REQUEST:
+    case SLI_WIFI_RSP_SELECT_REQUEST:
       __attribute__((fallthrough));
     default:
       return -1;
@@ -1938,7 +1945,7 @@ int sli_si91x_select(int nfds,
 
   // Send the select request asynchronously to the firmware
   status =
-    sli_wifi_async_send_command(SLI_WLAN_REQ_SELECT_REQUEST, SLI_SI91X_SOCKET_CMD, &request, sizeof(request), NULL);
+    sli_wifi_async_send_command(SLI_WIFI_REQ_SELECT_REQUEST, SLI_SI91X_SOCKET_CMD, &request, sizeof(request), NULL);
   if (status != SL_STATUS_IN_PROGRESS) {
     // If sending the command fails, clear the select ID and return
     sli_si91x_clear_select_id(request.select_id);
@@ -2088,18 +2095,18 @@ sli_si91x_socket_t *get_socket_from_packet(sl_wifi_system_packet_t *socket_packe
 {
   int socket_id = sli_si91x_get_socket_id(socket_packet);
 
-  if (socket_packet->command == SLI_WLAN_RSP_CONN_ESTABLISH) {
-    socket_packet->command = SLI_WLAN_RSP_SOCKET_ACCEPT;
+  if (socket_packet->command == SLI_WIFI_RSP_CONN_ESTABLISH) {
+    socket_packet->command = SLI_WIFI_RSP_SOCKET_ACCEPT;
   }
 
-  if (socket_packet->command == SLI_WLAN_RSP_SOCKET_CREATE) {
+  if (socket_packet->command == SLI_WIFI_RSP_SOCKET_CREATE) {
     const sli_si91x_socket_create_response_t *socket_create_response =
       ((sli_si91x_socket_create_response_t *)socket_packet->data);
     return sli_si91x_get_socket_from_id(
       -1,
       RESET,
       (int16_t)(socket_create_response->socket_type[0] | (socket_create_response->socket_type[1] << 8)));
-  } else if (socket_packet->command == SLI_WLAN_RSP_SOCKET_ACCEPT) {
+  } else if (socket_packet->command == SLI_WIFI_RSP_SOCKET_ACCEPT) {
     const uint16_t port = ((sli_si91x_rsp_ltcp_est_t *)socket_packet->data)->src_port_num;
     for (uint8_t i = 0; i < SLI_NUMBER_OF_SOCKETS; ++i) {
       if (sli_si91x_sockets[i] != NULL && sli_si91x_sockets[i]->local_address.sin6_port == port
@@ -2108,7 +2115,7 @@ sli_si91x_socket_t *get_socket_from_packet(sl_wifi_system_packet_t *socket_packe
       }
     }
     return NULL;
-  } else if (socket_packet->command == SLI_WLAN_RSP_SOCKET_CLOSE) {
+  } else if (socket_packet->command == SLI_WIFI_RSP_SOCKET_CLOSE) {
     if (((sl_si91x_socket_close_response_t *)socket_packet->data)->socket_id != 0) {
       return sli_si91x_get_socket_from_id(socket_id, LISTEN, -1);
     }

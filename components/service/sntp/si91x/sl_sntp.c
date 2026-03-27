@@ -87,7 +87,7 @@ static sl_status_t sli_sntp_client_get_time_date(uint8_t *data,
     wait_time         = SLI_WIFI_RETURN_IMMEDIATELY;
   }
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_SNTP_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SNTP_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  &client_req,
                                  sizeof(client_req),
@@ -112,14 +112,21 @@ static sl_status_t sli_sntp_client_get_time_date(uint8_t *data,
   return status;
 }
 
+/**
+ * @brief Handles SNTP client command engine response.
+ * @param[in] command_engine_response Response from command engine; must not be NULL.
+ * @return SL_STATUS_OK on success.
+ * @return SL_STATUS_INVALID_PARAMETER if command_engine_response is NULL.
+ * @return SL_STATUS_FAIL on invalid response type or missing buffer/data/context.
+ */
 sl_status_t sli_si91x_sntp_event_handler(sli_command_engine_response_t *command_engine_response)
 {
-  uint16_t status                     = 0;
-  sl_sntp_client_response_t *response = (sl_sntp_client_response_t *)malloc(sizeof(sl_sntp_client_response_t));
-  sl_wifi_buffer_t *sdk_context       = NULL;
+  uint16_t status = 0;
+  sl_sntp_client_response_t response;
+  sl_wifi_buffer_t *sdk_context = NULL;
 
-  if (response == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
+  if (command_engine_response == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
   }
 
   if (command_engine_response->type != SLI_COMMAND_ENGINE_METADATA_RESPONSE) {
@@ -127,32 +134,40 @@ sl_status_t sli_si91x_sntp_event_handler(sli_command_engine_response_t *command_
     return SL_STATUS_FAIL;
   }
 
-  memset(response, 0, sizeof(sl_sntp_client_response_t));
+  memset(&response, 0, sizeof(sl_sntp_client_response_t));
 
-  sl_wifi_buffer_t *buffer               = sli_wifi_get_response_buffer(command_engine_response);
-  sl_wifi_system_packet_t *raw_rx_packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
+  sl_wifi_buffer_t *buffer = sli_wifi_get_response_buffer(command_engine_response);
+  if (buffer == NULL) {
+    return SL_STATUS_FAIL;
+  }
+
+  if (command_engine_response->data == NULL) {
+    return SL_STATUS_FAIL;
+  }
 
   sdk_context = ((sli_command_engine_metadata_t *)command_engine_response->data)->tx_info.context;
+  if (sdk_context == NULL) {
+    return SL_STATUS_FAIL;
+  }
 
-  sli_sntp_client_context_t *node = NULL;
-  uint16_t buffer_length          = 0;
-
-  node = (sli_sntp_client_context_t *)sli_wifi_host_get_buffer_data(sdk_context, 0, &buffer_length);
+  sl_wifi_system_packet_t *raw_rx_packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
+  sli_sntp_client_context_t *node = (sli_sntp_client_context_t *)sli_wifi_host_get_buffer_data(sdk_context, 0, NULL);
 
   osMutexAcquire(sntp_mutex, 0xFFFFFFFFUL);
-  if (NULL != sntp_event_handler) {
-    status                = sli_get_si91x_frame_status(raw_rx_packet);
-    response->event_type  = node->callback_event_type;
-    response->status      = sli_convert_and_save_firmware_status(status);
-    response->data        = raw_rx_packet->data;
-    response->data_length = raw_rx_packet->length;
+  if (NULL != sntp_event_handler && node != NULL && raw_rx_packet != NULL) {
+    status               = sli_wifi_get_wifi_frame_status(raw_rx_packet);
+    response.event_type  = node->callback_event_type;
+    response.status      = sli_wifi_convert_and_save_firmware_status(status);
+    response.data        = raw_rx_packet->data;
+    response.data_length = raw_rx_packet->length;
 
-    sntp_event_handler(response, node->data, node->data_length);
+    sntp_event_handler(&response, node->data, node->data_length);
   }
   osMutexRelease(sntp_mutex);
 
-  free(response);
-  sli_buffer_manager_free_buffer(sdk_context);
+  if (sdk_context != NULL) {
+    sli_buffer_manager_free_buffer(sdk_context);
+  }
   return SL_STATUS_OK;
 }
 
@@ -213,7 +228,7 @@ sl_status_t sl_sntp_client_start(sl_sntp_client_config_t *config, uint32_t timeo
     wait_time                 = SLI_WIFI_RETURN_IMMEDIATELY;
   }
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_SNTP_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SNTP_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  &client_req,
                                  sizeof(client_req),
@@ -267,7 +282,7 @@ sl_status_t sl_sntp_client_get_server_info(sl_sntp_server_info_t *data, uint32_t
     wait_time                 = SLI_WIFI_RETURN_IMMEDIATELY;
   }
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_SNTP_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SNTP_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  &client_req,
                                  sizeof(client_req),
@@ -318,7 +333,7 @@ sl_status_t sl_sntp_client_stop(uint32_t timeout)
     wait_time                 = SLI_WIFI_RETURN_IMMEDIATELY;
   }
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_SNTP_CLIENT,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SNTP_CLIENT,
                                  SLI_SI91X_NETWORK_CMD,
                                  &client_req,
                                  sizeof(client_req),

@@ -1078,7 +1078,7 @@
     <properties key="readmeFiles" value="examples/snippets/wlan/http_otaf_twt/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="wifi_data_transfer_application_soc" label="Wi-Fi - Data Transfer Application (SoC)" description="In Client interface, recieve the data from remote PC1 to SiWx91x Station. This recieved data is stored in a buffer. Later in AP interface, the stored buffer is sent by SiWx91x AP to remote PC2.">
+  <descriptors name="wifi_data_transfer_application_soc" label="Wi-Fi - Data Transfer Application (SoC)" description="In Client interface, receive the data from remote PC1 to SiWx91x Station. This received data is stored in a buffer. Later in AP interface, the stored buffer is sent by SiWx91x AP to remote PC2.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/data_transfer/wifi_data_transfer_application_soc.slcp" />
@@ -1093,7 +1093,7 @@
     <properties key="readmeFiles" value="examples/snippets/wlan/data_transfer/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="wifi_data_transfer_application_ncp" label="Wi-Fi - Data Transfer Application (NCP)" description="In Client interface, recieve the data from remote PC1 to SiWx91x Station. This recieved data is stored in a buffer. Later in AP interface, the stored buffer is sent by SiWx91x AP to remote PC2.">
+  <descriptors name="wifi_data_transfer_application_ncp" label="Wi-Fi - Data Transfer Application (NCP)" description="In Client interface, receive the data from remote PC1 to SiWx91x Station. This received data is stored in a buffer. Later in AP interface, the stored buffer is sent by SiWx91x AP to remote PC2.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/data_transfer/wifi_data_transfer_application_ncp.slcp" />
@@ -1542,6 +1542,21 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/wlan/wlan_rf_test/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="wifi_net_dual_stack_nwp_m4_ncp" label="Wi-Fi - Network Dual Stack NWP M4 (NCP)" description="WiFi Network Dual Stack Example for NCP mode">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_net_dual_stack_nwp_m4/wifi_net_dual_stack_nwp_m4_ncp.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/wifi_net_dual_stack_nwp_m4/readme.md" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Project\ Difficulty|Advanced" />
   </descriptors>
   <descriptors name="wifi_net_dual_stack_nwp_m4" label="Wi-Fi - Network Dual Stack NWP M4(SoC)" description="WiFi Network Dual Stack Example">
     <properties key="namespace" value="template.uc" />

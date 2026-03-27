@@ -152,7 +152,7 @@ Configure the following parameters in `app.c` to test throughput app as per requ
       #define SERVER_PORT        <remote_port>      // Remote server port
       #define SERVER_IP  "192.168.0.100"    // Remote server IP address
       #define SOCKET_ASYNC_FEATURE 1                // Type of socket used. Synchronous = 0, Asynchronous = 1
-	  #define LISTEN_ON_AP_INTERFACE 1  // DUT wait on recieve either on STA or AP interface
+	  #define LISTEN_ON_AP_INTERFACE 1  // DUT wait on receive either on STA or AP interface
 	  To listen_on_station = 0, listen_on_ap = 1
       ```
 

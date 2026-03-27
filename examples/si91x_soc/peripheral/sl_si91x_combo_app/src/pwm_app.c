@@ -57,7 +57,7 @@ static void pwm_callback_function(uint16_t event);
  **********************  Local variables   *************************************
  ******************************************************************************/
 static uint8_t flag[10];
-static boolean_t event_flag = 1;
+static volatile boolean_t event_flag = 1;
 /*******************************************************************************
  * PWM Initialization function
  ******************************************************************************/

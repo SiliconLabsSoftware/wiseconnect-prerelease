@@ -127,7 +127,7 @@ The application can be configured to suit you requirements and development envir
          #define RSI_BLE_DEV_3_ADDR "00:1A:7D:DA:73:13"
          ```
 
-   - Specific Remote Periperal device configuration paramters
+   - Specific Remote Peripheral device configuration parameters
 
       > **Note:** Where XX refers to C1 (or) C2
 

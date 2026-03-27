@@ -42,7 +42,8 @@
 /*******************************************************************************
  ***************************  GLOBAL VARIABLES   *******************************
  ******************************************************************************/
-static osMutexId_t led_mutex_id;
+/* Written in init, read by threads; volatile ensures threads see it with LTO. */
+static volatile osMutexId_t led_mutex_id;
 
 static const osMutexAttr_t led_blink_mutex_attr = {
   "ledBlinkMutex",  // human readable mutex name
@@ -55,7 +56,8 @@ static const osMutexAttr_t led_blink_mutex_attr = {
  ******************************************************************************/
 
 sl_sleeptimer_timer_handle_t timer;
-volatile bool toggle_timeout = false;
+/* Volatile: set in sleeptimer callback, read in RTOS threads. Required for LTO. */
+static volatile bool toggle_timeout = false;
 
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************

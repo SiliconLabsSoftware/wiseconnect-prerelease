@@ -642,11 +642,11 @@ void receive_data_from_tcp_client(void *userinfo)
                                               sizeof(high_performance_socket));
     if (socket_return_value < 0) {
       LOG_PRINT("\r\nSet Socket option failed with bsd error: %d : %s\r\n", errno, threadname);
-      sl_status_t status = close(client_socket);
+      sl_status_t status = close(server_socket);
       if (status == SL_STATUS_OK) {
-        LOG_PRINT("\r\nSocket ID : %d closed successfully : %s\r\n", client_socket, threadname);
+        LOG_PRINT("\r\nServer Socket ID : %d closed successfully : %s\r\n", server_socket, threadname);
       } else {
-        LOG_PRINT("\r\nSocket ID : %d close failed : %s\r\n", client_socket, threadname);
+        LOG_PRINT("\r\nServer Socket ID : %d close failed : %s\r\n", server_socket, threadname);
       }
       osThreadTerminate(osThreadGetId());
     }
@@ -716,11 +716,11 @@ void receive_data_from_tcp_client(void *userinfo)
                                      sizeof(high_performance_socket));
     if (socket_return_value < 0) {
       LOG_PRINT("\r\nSet Socket option failed with bsd error: %d : %s\r\n", errno, threadname);
-      sl_status_t status = close(client_socket);
+      sl_status_t status = close(server_socket);
       if (status == SL_STATUS_OK) {
-        LOG_PRINT("\r\nSocket ID : %d closed successfully : %s\r\n", client_socket, threadname);
+        LOG_PRINT("\r\nServer Socket ID : %d closed successfully : %s\r\n", server_socket, threadname);
       } else {
-        LOG_PRINT("\r\nSocket ID : %d close failed : %s\r\n", client_socket, threadname);
+        LOG_PRINT("\r\nServer Socket ID : %d close failed : %s\r\n", server_socket, threadname);
       }
       osThreadTerminate(osThreadGetId());
     }
@@ -793,17 +793,28 @@ void receive_data_from_tcp_client(void *userinfo)
 
     measure_and_print_throughput(total_bytes_received, (now - start), client_socket);
   }
-  sl_status_t status = close(client_socket);
-  if (status == SL_STATUS_OK) {
-    LOG_PRINT("\r\nClient socket ID : %d closed successfully : %s\r\n", client_socket, threadname);
-  } else {
-    LOG_PRINT("\r\nClient socket ID : %d close failed : %s\r\n", client_socket, threadname);
+  /* Must close client (accepted) socket before server (listening) socket on NCP & SOC,
+   * otherwise client close fails. */
+  sl_status_t status;
+  if (client_socket >= 0) {
+    int id        = client_socket;
+    status        = close(client_socket);
+    client_socket = -1;
+    if (status == SL_STATUS_OK) {
+      LOG_PRINT("\r\nClient socket ID : %d closed successfully : %s\r\n", id, threadname);
+    } else {
+      LOG_PRINT("\r\nClient socket ID : %d close failed : %s\r\n", id, threadname);
+    }
   }
-  status = close(server_socket);
-  if (status == SL_STATUS_OK) {
-    LOG_PRINT("\r\nnServer socket ID : %d closed successfully : %s\r\n", server_socket, threadname);
-  } else {
-    LOG_PRINT("\r\nnServer socket ID : %d close failed : %s\r\n", server_socket, threadname);
+  if (server_socket >= 0) {
+    int id        = server_socket;
+    status        = close(server_socket);
+    server_socket = -1;
+    if (status == SL_STATUS_OK) {
+      LOG_PRINT("\r\nServer socket ID : %d closed successfully : %s\r\n", id, threadname);
+    } else {
+      LOG_PRINT("\r\nServer socket ID : %d close failed : %s\r\n", id, threadname);
+    }
   }
   osThreadTerminate(osThreadGetId());
 }

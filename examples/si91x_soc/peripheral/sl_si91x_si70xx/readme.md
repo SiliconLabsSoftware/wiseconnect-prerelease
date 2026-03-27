@@ -23,6 +23,8 @@ This application demonstrate the si70xx RHT sensor, which measures the relative 
 
 This example demonstrates the measurement of relative humidity and temperature for every 2 seconds. Also shows how to use different APIs present via I2C interface.
 
+**Si70xx after reset:** The Si70xx needs 5–15 ms after a software or hardware reset before it responds on I2C (see datasheet). The driver performs a single I2C attempt (no retry). This example waits and retries `sl_si91x_si70xx_init()` for up to 15 ms after `sl_si91x_si70xx_reset()`. If you call init elsewhere (e.g. after your own reset), wait at least 15 ms before calling `sl_si91x_si70xx_init()` or `sl_si91x_si70xx_is_present()`.
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -99,3 +101,18 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 > **Note:**
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

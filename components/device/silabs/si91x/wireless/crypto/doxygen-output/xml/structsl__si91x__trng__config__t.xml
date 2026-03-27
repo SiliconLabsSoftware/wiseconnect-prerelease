@@ -17,7 +17,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="60" column="12" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="60" bodyend="-1"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="56" column="12" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="56" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="structsl__si91x__trng__config__t_1a451065e3d109ecc0c6afdc752e4c0009" prot="public" static="no" mutable="no">
         <type>uint16_t</type>
@@ -32,7 +32,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="61" column="12" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="61" bodyend="-1"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="57" column="12" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="57" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="structsl__si91x__trng__config__t_1a25ec083e4374631863ad2a98eb0a69ff" prot="public" static="no" mutable="no">
         <type>uint32_t *</type>
@@ -47,7 +47,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="62" column="12" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="62" bodyend="-1"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="58" column="12" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="58" bodyend="-1"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -56,7 +56,7 @@
     <detaileddescription>
 <para>This structure defines TRNG configuration required for the operation which includes input message, length of input message, key, and so on. </para>
     </detaileddescription>
-    <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="59" column="1" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="59" bodyend="63"/>
+    <location file="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" line="55" column="1" bodyfile="components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h" bodystart="55" bodyend="59"/>
     <listofallmembers>
       <member refid="structsl__si91x__trng__config__t_1a451065e3d109ecc0c6afdc752e4c0009" prot="public" virt="non-virtual"><scope>sl_si91x_trng_config_t</scope><name>input_length</name></member>
       <member refid="structsl__si91x__trng__config__t_1a25ec083e4374631863ad2a98eb0a69ff" prot="public" virt="non-virtual"><scope>sl_si91x_trng_config_t</scope><name>trng_key</name></member>

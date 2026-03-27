@@ -77,7 +77,7 @@ int32_t sl_handle_received_data_wrapper(sl_flexcomm_uart_cb_t *sl_flexcomm_uart_
  * @param[in]  evevnt_map_mutex, Mutex for accesing event_map.
  * @return     none.
  * @section description
- * This function is used during application task intialilzation
+ * This function is used during application task initialization
  */
 void rsi_app_init_event_parameters(uint32_t *async_event_map,
                                    uint32_t *async_event_map_mask,

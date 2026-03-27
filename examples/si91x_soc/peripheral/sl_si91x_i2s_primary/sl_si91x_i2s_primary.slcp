@@ -3,7 +3,7 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to configure and use the primary I2S interface on the Si91x SoC device, enabling audio data communication through the I2S protocol. \nThis example shows how to set up the I2S interface to transmit and receive audio signals, offering a foundation for audio applications.\n"
 category: example|peripheral
 quality: production
-label: SI91x - SL_I2S_PRIMARY
+label: Platform SiWx91x - I2S PRIMARY
 component:
 - id: sl_main
 - id: status
@@ -36,6 +36,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

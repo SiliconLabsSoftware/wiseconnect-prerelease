@@ -255,6 +255,8 @@ sl_status_t sl_gpio_configure_group_interrupt(sl_si91x_gpio_group_interrupt_conf
  * 
  * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  * 
+ * @note The output_value passed has no impact on pin state, when GPIO mode is selected.
+ *       To explicitly change the pin state, invoke sl_gpio_driver_set_pin() or sl_gpio_driver_clear_pin(), separately after setting the pin mode.
  * @note Ensure that the GPIO clock is enabled and the pin is properly configured 
  *       before calling this function.
   ******************************************************************************/

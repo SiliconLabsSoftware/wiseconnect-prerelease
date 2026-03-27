@@ -54,9 +54,9 @@ sl_status_t fake_buffer_manager_free_buffer(sli_buffer_t buffer)
   return SL_STATUS_OK;
 }
 
-bool sli_queue_manager_node_match_handler(const sli_queue_t *handle, void *node, const void *node_match_data)
+bool sli_queue_manager_node_match_handler(const sli_queue_t *handle, const void *node, const void *node_match_data)
 {
-  temp_node *buffer = (temp_node *)node;
+  const temp_node *buffer = (const temp_node *)node;
   if (buffer->id == *((uint32_t *)node_match_data)) {
     return true;
   }

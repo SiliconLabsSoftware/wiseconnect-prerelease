@@ -405,11 +405,11 @@ rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
   /* Save the NVIC registers */
   COPY_CONFIG_REGS(nvic_enable, NVIC->ISER, MAX_NVIC_REGS);
 
-  /* Save the Interrupt Priority Register */
-  COPY_CONFIG_REGS(nvic_ip_reg, NVIC->IP, MAX_IPS);
+  /* Save the Interrupt Priority Register (CMSIS 6.2: IPR) */
+  COPY_CONFIG_REGS(nvic_ip_reg, NVIC->IPR, MAX_IPS);
 
-  /* Save the System Handlers Priority Registers */
-  COPY_CONFIG_REGS(scs_shp_reg, SCB->SHP, MAX_SHP);
+  /* Save the System Handlers Priority Registers (CMSIS 6.2: SHPR) */
+  COPY_CONFIG_REGS(scs_shp_reg, SCB->SHPR, MAX_SHP);
 
   /*store the NPSS interrupt mask clear status*/
   npssIntrState = NPSS_INTR_MASK_CLR_REG;
@@ -713,11 +713,11 @@ rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
   TASS_P2P_INTR_MASK_CLR = ~p2p_intr_status_bkp.tass_p2p_intr_mask_clr_bkp;
   M4SS_P2P_INTR_SET_REG  = p2p_intr_status_bkp.m4ss_p2p_intr_set_reg_bkp;
 
-  /* Restore the Interrupt Priority Register  */
-  COPY_CONFIG_REGS(NVIC->IP, nvic_ip_reg, MAX_IPS);
+  /* Restore the Interrupt Priority Register (CMSIS 6.2: IPR) */
+  COPY_CONFIG_REGS(NVIC->IPR, nvic_ip_reg, MAX_IPS);
 
-  /* Restore the System Handlers Priority Registers */
-  COPY_CONFIG_REGS(SCB->SHP, scs_shp_reg, MAX_SHP);
+  /* Restore the System Handlers Priority Registers (CMSIS 6.2: SHPR) */
+  COPY_CONFIG_REGS(SCB->SHPR, scs_shp_reg, MAX_SHP);
 
   /* Restore the NVIC registers */
   COPY_CONFIG_REGS(NVIC->ISER, nvic_enable, MAX_NVIC_REGS);

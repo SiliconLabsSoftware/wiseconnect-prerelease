@@ -5,7 +5,7 @@ description: 'This application demonstrates how to use RGB LED
   '
 category: example|peripheral
 quality: production
-label: Si91x - RGB LED
+label: Platform SiWx91x - RGB LED
 component:
 - id: sl_main
 - id: syscalls
@@ -35,6 +35,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

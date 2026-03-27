@@ -675,7 +675,7 @@ uint8_t sl_si91x_bod_button_value_read(void)
 /*******************************************************************************
  * Function to set the BOD mode
  ******************************************************************************/
-sl_status_t sl_si91x_bod_set_mode(sl_bod_mode_t mode)
+sl_status_t sl_si91x_bod_set_mode(uint8_t mode)
 {
   // Check if the mode is valid
   if (mode >= SL_BOD_MAX_MODE_VALUE) {

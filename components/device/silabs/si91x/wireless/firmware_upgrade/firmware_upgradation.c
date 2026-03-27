@@ -35,10 +35,9 @@
 #include <string.h>
 #include "firmware_upgradation.h"
 #include <sl_string.h>
-
+#include "sl_rsi_utility.h"
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 #include "sl_si91x_socket_utility.h"
-
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -282,7 +281,7 @@ static sl_status_t sli_send_http_request_chunked(const sli_si91x_http_client_req
     memcpy(packet_buffer->buffer, (http_client->buffer + offset), chunk_size);
 
     status = sli_wifi_send_command_with_custom_desc(
-      SLI_WLAN_REQ_HTTP_OTAF,
+      SLI_WIFI_REQ_HTTP_OTAF,
       SLI_WIFI_WLAN_CMD,
       packet_buffer,
       (sizeof(sli_si91x_http_client_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + chunk_size),
@@ -337,11 +336,11 @@ static sl_status_t sl_si91x_fwup(uint16_t type, const uint8_t *content, uint16_t
   memcpy(fwup.content, content, length);
 
   // Send FW update command
-  status = sli_wifi_send_command(SLI_WLAN_REQ_FWUP,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_FWUP,
                                  SLI_WIFI_WLAN_CMD,
                                  &fwup,
                                  sizeof(sli_si91x_req_fwup_t),
-                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WLAN_RSP_FWUP_WAIT_TIME),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_FWUP_WAIT_TIME),
                                  NULL,
                                  NULL);
 
@@ -498,7 +497,7 @@ sl_status_t sl_si91x_ota_firmware_upgradation(sl_ip_address_t server_ip,
   // Fill TCP retry count
   memcpy(otaf_fwup.retry_count, &tcp_retry_count, sizeof(otaf_fwup.retry_count));
 
-  status = sli_wifi_send_command(SLI_WLAN_REQ_OTA_FWUP,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_OTA_FWUP,
                                  SLI_SI91X_NETWORK_CMD,
                                  &otaf_fwup,
                                  sizeof(sli_si91x_ota_firmware_update_request_t),
@@ -615,7 +614,7 @@ sl_status_t sl_si91x_http_otaf_v2(const sl_si91x_http_otaf_params_t *http_otaf_p
   send_size &= 0xFFF;
 
   if (http_length <= SLI_SI91X_MAX_HTTP_CHUNK_SIZE) {
-    status = sli_wifi_send_command(SLI_WLAN_REQ_HTTP_OTAF,
+    status = sli_wifi_send_command(SLI_WIFI_REQ_HTTP_OTAF,
                                    SLI_WIFI_WLAN_CMD,
                                    http_client,
                                    send_size,

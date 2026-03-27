@@ -297,15 +297,16 @@ void async_socket_select(fd_set *fd_read, fd_set *fd_write, fd_set *fd_except, i
 {
   UNUSED_PARAMETER(fd_except);
   UNUSED_PARAMETER(fd_write);
-  UNUSED_PARAMETER(status);
-  //!Check the data pending on this particular socket descriptor
-  if (FD_ISSET(mqtt_client.networkStack.socket_id, fd_read)) {
-    osSemaphoreRelease(data_received_semaphore);
-    check_for_recv_data = 1;
-  }
-  wifi_app_set_event(WIFI_APP_AWS_SELECT_CONNECT_STATE);
-}
 
+  if (status == (int32_t)SL_STATUS_OK) {
+    //!Check the data pending on this particular socket descriptor
+    if (FD_ISSET(mqtt_client.networkStack.socket_id, fd_read)) {
+      osSemaphoreRelease(data_received_semaphore);
+      check_for_recv_data = 1;
+    }
+    wifi_app_set_event(WIFI_APP_AWS_SELECT_CONNECT_STATE);
+  }
+}
 /**
  * @brief This parameter will avoid infinite loop of publish and exit the program after certain number of publishes
  */
@@ -789,6 +790,8 @@ void wifi_app_mqtt_task(void)
             wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
           }
         } else {
+          /* Reset select_given so we re-arm select for the new socket after connect/reconnect. */
+          select_given      = 0;
           wlan_app_cb.state = WIFI_APP_MQTT_AUTO_RECONNECT_SET_STATE;
         }
         osSemaphoreRelease(rsi_mqtt_sem);
@@ -831,6 +834,10 @@ void wifi_app_mqtt_task(void)
           }
           wlan_app_cb.state = WIFI_APP_MQTT_SUBSCRIBE_STATE;
         }
+        /* After successful subscribe, ensure we will re-register select for this socket. */
+        if (SUCCESS == rc) {
+          select_given = 0;
+        }
         wlan_app_cb.state = WIFI_APP_AWS_SELECT_CONNECT_STATE;
 #if ENABLE_NWP_POWER_SAVE
         //! initiating power save in BLE mode
@@ -855,7 +862,6 @@ void wifi_app_mqtt_task(void)
         {
 
           if (!select_given) {
-            select_given = 1;
             memset(&read_fds, 0, sizeof(fd_set));
 
             FD_SET(mqtt_client.networkStack.socket_id, &read_fds);
@@ -863,6 +869,10 @@ void wifi_app_mqtt_task(void)
 
             status1 =
               sl_si91x_select(mqtt_client.networkStack.socket_id + 1, &read_fds, NULL, NULL, NULL, async_socket_select);
+            /* Set select_given = 1 only when select registration succeeds. */
+            if (status1 >= 0) {
+              select_given = 1;
+            }
           }
 
           if (check_for_recv_data) {

@@ -310,6 +310,31 @@ static void sta_netif_config(void)
   netif_set_default(&(wifi_client_context->netif));
 }
 
+static sl_status_t sli_send_ip_info_to_firmware(void)
+{
+  sli_wifi_ip_address_info_t ip_info = { 0 };
+
+#if LWIP_IPV4
+  if (!ip4_addr_isany_val(*netif_ip4_addr(&(wifi_client_context->netif)))) {
+    ip_info.flags |= SLI_WIFI_IPV4_AVAILABLE;
+    memcpy(&ip_info.ipv4_address, netif_ip4_addr(&(wifi_client_context->netif)), sizeof(ip_info.ipv4_address));
+  }
+#endif
+
+#if LWIP_IPV6
+  if (ip6_addr_ispreferred(netif_ip6_addr_state(&(wifi_client_context->netif), 0))) {
+    ip_info.flags |= SLI_WIFI_IPV6_AVAILABLE;
+    memcpy(&ip_info.ipv6_address, netif_ip6_addr(&(wifi_client_context->netif), 0), sizeof(ip_info.ipv6_address));
+  }
+#endif
+
+  if (ip_info.flags != 0) {
+    return sli_wifi_send_ip_address_info(SL_WIFI_CLIENT_INTERFACE, &ip_info);
+  }
+
+  return SL_STATUS_OK;
+}
+
 static sl_status_t set_sta_link_up(sl_net_wifi_client_profile_t *profile)
 {
   netifapi_netif_set_up(&(wifi_client_context->netif));
@@ -613,6 +638,11 @@ static void sli_handle_dhcp_completion(sl_net_interface_t interface)
     sl_net_set_profile(interface, dhcp_monitor_state[interface].profile_id, &profile);
 
     SL_DEBUG_LOG("DHCP IP: %s\n", ip4addr_ntoa((const ip4_addr_t *)&wifi_client_context->netif.ip_addr));
+
+    sl_status_t ip_info_status = sli_send_ip_info_to_firmware();
+    if (ip_info_status != SL_STATUS_OK) {
+      SL_DEBUG_LOG("Failed to send IP address info to firmware: 0x%lx\n", ip_info_status);
+    }
   }
 
   // Cleanup: Stop monitoring and cleanup resources
@@ -805,6 +835,12 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
 
     // Update the profile with configured IP
     sl_net_set_profile(interface, profile_id, &profile);
+
+    sl_status_t ip_info_status = sli_send_ip_info_to_firmware();
+    if (ip_info_status != SL_STATUS_OK) {
+      SL_DEBUG_LOG("Failed to send IP address info to firmware: 0x%lx\n", ip_info_status);
+    }
+
     return SL_STATUS_OK;
 
   } else if (status == SL_STATUS_IN_PROGRESS) {
@@ -1037,6 +1073,12 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Set the client profile
   status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, profile_id, &profile);
+  VERIFY_STATUS_AND_RETURN(status);
+
+  sl_status_t ip_info_status = sli_send_ip_info_to_firmware();
+  if (ip_info_status != SL_STATUS_OK) {
+    SL_DEBUG_LOG("Failed to send IP address info to firmware: 0x%lx\n", ip_info_status);
+  }
 
   return SL_STATUS_OK;
 }

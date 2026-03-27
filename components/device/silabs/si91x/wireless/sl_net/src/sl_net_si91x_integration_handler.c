@@ -54,7 +54,6 @@
 #endif
 
 #ifdef SLI_SI91X_SOCKETS
-#include "sl_si91x_socket_utility.h"
 #include "sl_si91x_socket_callback_framework.h"
 #endif
 #include "sl_si91x_core_utilities.h"
@@ -72,7 +71,6 @@
 #include "sl_si91x_http_client_callback_framework.h"
 #endif
 #include "sli_wifi_utility.h"
-extern sli_wifi_command_queue_t cmd_queues[SI91X_CMD_MAX];
 
 #ifdef SLI_SI91X_EMBEDDED_MQTT_CLIENT
 /**
@@ -93,16 +91,16 @@ static void sli_handle_mqtt_client_asynch_events(sli_command_engine_response_t *
     sdk_context = (sl_si91x_mqtt_client_context_t *)metadata->tx_info.context;
   }
 
-  uint16_t frame_status = sli_wifi_get_frame_status(raw_rx_packet);
+  uint16_t frame_status = sli_wifi_get_wifi_frame_status(raw_rx_packet);
 
   //Variable to indicate whether a disconnect event is related to a keep-alive terminate error.
   bool is_keep_alive_response_related_disconnect =
-    (raw_rx_packet->command == SLI_WLAN_RSP_EMB_MQTT_CLIENT
+    (raw_rx_packet->command == SLI_WIFI_RSP_EMB_MQTT_CLIENT
      && frame_status == (SL_STATUS_SI91X_MQTT_KEEP_ALIVE_TERMINATE_ERROR & ~BIT(16)));
 
   // Since these responses are unsolicited, We need to create a context for them.
-  if (raw_rx_packet->command == SLI_WLAN_RSP_MQTT_REMOTE_TERMINATE
-      || raw_rx_packet->command == SLI_WLAN_RSP_EMB_MQTT_PUBLISH_PKT || raw_rx_packet->command == SLI_WIFI_RSP_JOIN
+  if (raw_rx_packet->command == SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE
+      || raw_rx_packet->command == SLI_WIFI_RSP_EMB_MQTT_PUBLISH_PKT || raw_rx_packet->command == SLI_WIFI_RSP_JOIN
       || is_keep_alive_response_related_disconnect) {
 
     sli_si91x_get_mqtt_client(&mqtt_client);
@@ -133,7 +131,7 @@ static void sli_handle_mqtt_client_asynch_events(sli_command_engine_response_t *
     } else {
       // Build MQTT SDK context for asynchronous MQTT events
       sli_si91x_build_mqtt_sdk_context_if_async(
-        (raw_rx_packet->command == SLI_WLAN_RSP_MQTT_REMOTE_TERMINATE || raw_rx_packet->command == SLI_WIFI_RSP_JOIN
+        (raw_rx_packet->command == SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE || raw_rx_packet->command == SLI_WIFI_RSP_JOIN
          || is_keep_alive_response_related_disconnect)
           ? SL_MQTT_CLIENT_DISCONNECTED_EVENT
           : SL_MQTT_CLIENT_MESSAGED_RECEIVED_EVENT,
@@ -151,8 +149,8 @@ static void sli_handle_mqtt_client_asynch_events(sli_command_engine_response_t *
 
   SL_DEBUG_LOG("sli_handle_mqtt_client_asynch_events: event %x", sdk_context->event);
 
-  uint16_t si91x_event_status = sli_get_si91x_frame_status(raw_rx_packet);
-  sl_status_t event_status    = sli_convert_and_save_firmware_status(si91x_event_status);
+  uint16_t si91x_event_status = sli_wifi_get_wifi_frame_status(raw_rx_packet);
+  sl_status_t event_status    = sli_wifi_convert_and_save_firmware_status(si91x_event_status);
 
   // Handle MQTT events
   sli_si91x_mqtt_event_handler(event_status, sdk_context, raw_rx_packet);
@@ -166,8 +164,8 @@ static bool sli_handle_mqtt_client_events(sli_command_engine_response_t *respons
   sl_wifi_buffer_t *buffer              = sli_wifi_get_response_buffer(response);
   const sl_wifi_system_packet_t *packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
 
-  if (packet->command == SLI_WLAN_REQ_EMB_MQTT_CLIENT || packet->command == SLI_WLAN_RSP_EMB_MQTT_PUBLISH_PKT
-      || packet->command == SLI_WLAN_RSP_MQTT_REMOTE_TERMINATE || packet->command == SLI_WIFI_RSP_JOIN) {
+  if (packet->command == SLI_WIFI_REQ_EMB_MQTT_CLIENT || packet->command == SLI_WIFI_RSP_EMB_MQTT_PUBLISH_PKT
+      || packet->command == SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE || packet->command == SLI_WIFI_RSP_JOIN) {
     sli_handle_mqtt_client_asynch_events(response);
     return true;
   }
@@ -182,7 +180,7 @@ static bool sli_handle_sntp_client_events(sli_command_engine_response_t *respons
   const sl_wifi_system_packet_t *packet = (const sl_wifi_system_packet_t *)buffer->data;
 
   // Handle SNTP client events
-  if (packet->command == SLI_WLAN_RSP_SNTP_CLIENT) {
+  if (packet->command == SLI_WIFI_RSP_SNTP_CLIENT) {
     sli_si91x_sntp_event_handler(response);
     return true;
   }
@@ -197,14 +195,14 @@ static void sli_handle_socket_events(const sli_command_engine_metadata_t *data, 
   UNUSED_PARAMETER(data);
   // Handle SI91X socket-related events
   bool is_socket_command =
-    (packet->command == SLI_WLAN_REQ_SOCKET_ACCEPT || packet->command == SLI_WLAN_RSP_REMOTE_TERMINATE
-     || packet->command == SLI_RECEIVE_RAW_DATA || packet->command == SLI_WLAN_RSP_TCP_ACK_INDICATION
-     || packet->command == SLI_WLAN_RSP_SELECT_REQUEST || packet->command == SLI_WLAN_RSP_SOCKET_READ_DATA);
+    (packet->command == SLI_WIFI_REQ_SOCKET_ACCEPT || packet->command == SLI_WIFI_RSP_REMOTE_TERMINATE
+     || packet->command == SLI_RECEIVE_RAW_DATA || packet->command == SLI_WIFI_RSP_TCP_ACK_INDICATION
+     || packet->command == SLI_WIFI_RSP_SELECT_REQUEST || packet->command == SLI_WIFI_RSP_SOCKET_READ_DATA);
   if (is_socket_command) {
     sl_wifi_system_packet_t *raw_rx_packet = packet;
-    uint16_t si91x_event_status            = sli_get_si91x_frame_status(raw_rx_packet);
+    uint16_t si91x_event_status            = sli_wifi_get_wifi_frame_status(raw_rx_packet);
 
-    sl_status_t event_status = sli_convert_and_save_firmware_status(si91x_event_status);
+    sl_status_t event_status = sli_wifi_convert_and_save_firmware_status(si91x_event_status);
     sli_si91x_socket_event_handler(event_status, NULL, raw_rx_packet);
   }
 }

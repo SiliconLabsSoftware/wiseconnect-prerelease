@@ -5,7 +5,7 @@ description: 'Wirelessly updates the M4 firmware from a remote TCP server
   '
 category: Example|si91x_soc
 quality: production
-label: sl_si91x_slot_b_fw
+label: Platform SiWx91x - Firmware Fallback Slot B
 component:
 - id: sl_main
 - id: freertos
@@ -61,15 +61,24 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
-post_build:
-  profile: wiseconnect_soc
 filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
 - name: Wireless Technology
   value:
   - Wi-Fi
 - name: Project Difficulty
   value:
-  - Advanced
+  - Beginner
+post_build:
+  profile: wiseconnect_soc
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs

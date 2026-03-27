@@ -5,7 +5,7 @@ description: 'This application demonstrates how to configure and use the DAC (Di
   '
 category: example|peripheral
 quality: production
-label: Si91x - SL_DAC
+label: Platform SiWx91x - DAC
 component:
 - id: sl_main
 - id: status
@@ -36,6 +36,19 @@ ui_hints:
     focus: true
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

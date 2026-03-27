@@ -31,10 +31,10 @@
  ******************************************************************************/
 uint8_t i2s_data_in[I2S_BUFFER_SIZE];
 uint8_t i2s_data_out[I2S_BUFFER_SIZE];
-static sl_i2s_handle_t i2s_driver_handle    = NULL;
-static uint8_t i2s_send_complete            = 0;
-static uint8_t i2s_receive_complete         = 0;
-static sl_i2s_xfer_config_t i2s_xfer_config = { 0 };
+static sl_i2s_handle_t i2s_driver_handle     = NULL;
+static volatile uint8_t i2s_send_complete    = 0;
+static volatile uint8_t i2s_receive_complete = 0;
+static sl_i2s_xfer_config_t i2s_xfer_config  = { 0 };
 
 /*******************************************************************************
  **********************  Local Function prototypes   ***************************
@@ -112,22 +112,19 @@ void i2s_example_init(void)
       break;
     }
     DEBUGOUT("I2S receive config success\r\n");
-    //Configure I2S receive DMA channel
+    //Configure I2S receive and transmit DMA channels and start the I2S transfer
     //Since 8-bit resolution is not supported in Si91x I2S module, configure receive data as 16-bit
     //chunks which contains two bytes of 8-bit data.
-    if (sl_si91x_i2s_receive_data(i2s_driver_handle, (uint16_t *)i2s_data_in, I2S_BUFFER_SIZE / 2)) {
-      DEBUGOUT("I2S receive start fail\r\n");
+
+    if (sl_si91x_i2s_transfer(i2s_driver_handle,
+                              (uint16_t *)i2s_data_in,
+                              (uint16_t *)i2s_data_out,
+                              I2S_BUFFER_SIZE / 2,
+                              I2S_BUFFER_SIZE / 2)) {
+      DEBUGOUT("I2S transfer start fail\r\n");
       break;
     }
-    DEBUGOUT("I2S receive start success\r\n");
-    //Configure I2S transmit DMA channel
-    //Since 8-bit resolution is not supported in Si91x I2S module, configure transmit data as 16-bit
-    //chunks which contains two bytes of 8-bit data.
-    if (sl_si91x_i2s_transmit_data(i2s_driver_handle, (uint16_t *)i2s_data_out, I2S_BUFFER_SIZE / 2)) {
-      DEBUGOUT("I2S transmit start fail\r\n");
-      break;
-    }
-    DEBUGOUT("I2S transmit start success\r\n");
+    DEBUGOUT("I2S transfer success\r\n");
   } while (false);
 }
 /*******************************************************************************

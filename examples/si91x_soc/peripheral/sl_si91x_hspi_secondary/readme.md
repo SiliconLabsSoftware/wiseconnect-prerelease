@@ -96,3 +96,18 @@ The SPI Primary writes data to the HSPI Secondary
 > **Note:**
 >
 > - The driver handles interrupts internally, offering user-defined callbacks for custom actions. To replace the default driver interrupt handling with your own, create a weak version of the driver's interrupt handler and then incorporate the required code into your custom handler.
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

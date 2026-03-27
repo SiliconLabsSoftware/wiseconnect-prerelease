@@ -5,6 +5,7 @@
 - [Hello World](#hello-world)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
+  - [Overview](#overview)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
@@ -15,6 +16,10 @@
 ## Purpose/Scope
 
 - This example project shows a hello world example that can be used as a starting point to add components and functionality to the Si91x SoC.
+
+## Overview
+
+Minimal Si91x SoC application that prints to console. Use it as a template to add components and build more complex examples.
 
 ## Prerequisites/Setup Requirements
 
@@ -54,3 +59,18 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Console Output:
     
     ![Figure: output](resources/readme/outputConsole.png)
+
+## Troubleshooting
+
+- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the device is not detected, reinstall the connectivity firmware and check USB drivers.
+
+## Resources
+
+- [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
+- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+
+## Report Bugs / Support
+
+For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -205,6 +205,7 @@ components:
 - memlcd_917
 - sl_si91x_led_917
 - sl_veml6035
+- sl_si91x_sht4x
 - sl_si91x_mic
 - romdriver_romtable
 - romdriver_fim
@@ -378,7 +379,6 @@ components:
 - memlcd_917
 - sl_si91x_mic
 - sl_si91x_rgb_led_917
-- 
 - sl_si70xx
 - sl_joystick
 - sl_veml6035
@@ -1079,6 +1079,10 @@ extra_files:
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/veml6035/test/veml6035_test_main.c
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/veml6035/test/veml6035_test.json
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/veml6035/test/veml6035_test.c
+- components/device/silabs/si91x/mcu/drivers/hardware_drivers/sht4x/src/sl_si91x_sht4x.c
+- components/device/silabs/si91x/mcu/drivers/hardware_drivers/sht4x/component/sl_si91x_sht4x.slcc
+- components/device/silabs/si91x/mcu/drivers/hardware_drivers/sht4x/inc/sl_i2cspm.h
+- components/device/silabs/si91x/mcu/drivers/hardware_drivers/sht4x/inc/sl_si91x_sht4x_instances.h
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/mic/src/sl_si91x_mic.c
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/mic/component/sl_si91x_mic.slcc
 - components/device/silabs/si91x/mcu/drivers/hardware_drivers/mic/config/sl_si91x_mic_config.h
@@ -1222,6 +1226,7 @@ extra_files:
 - components/device/silabs/si91x/mcu/core/chip/component/siwg917y111mgnba.slcc
 - components/device/silabs/si91x/mcu/core/chip/component/siwg917y111mgnxa.slcc
 - components/device/silabs/si91x/mcu/core/chip/config/sl_gpio_board.h
+- components/device/silabs/si91x/mcu/core/chip/config/sl_si91x_gpio_hp_pin_config.h
 - components/device/silabs/si91x/mcu/core/chip/config/sl_si91x_external_oscillator.h
 - components/device/silabs/si91x/mcu/core/chip/config/sl_qei_board.h
 - components/device/silabs/si91x/mcu/core/chip/config/sl_board_control.h
