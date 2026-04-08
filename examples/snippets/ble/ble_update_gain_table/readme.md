@@ -222,8 +222,8 @@ uint8_t Si917_BLE_REGION_BASED_LP_CHAIN_10DBM_OFFSET_XX[] = {};  // Fill the use
 | `KCC`          | `4`       |
 
 > **Note**: 
- - The Worldwide table is available for BLE only, and must not be modified. 
- - The values in the worldwide table comply with Bluetooth SIG specifications.
+> - The Worldwide table is available for BLE only, and must not be modified. 
+> - The values in the worldwide table comply with Bluetooth SIG specifications.
 
 ## Test the Application
 
@@ -243,3 +243,4 @@ Follow the steps as mentioned for the successful execution of the application:
 4. Review gain table updates on the serial terminal. Refer the following image for console prints:
 
 ![](resources/readme/update_gain_table_logs.png)
+

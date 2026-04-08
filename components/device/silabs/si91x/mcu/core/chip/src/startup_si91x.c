@@ -226,16 +226,15 @@ void Copy_Table(void)
 {
   /* Initialize data and bss */
   const volatile unsigned long *pulSrc;
-  volatile unsigned long *pulDest;
   pulSrc = &_sidata;
   /* Copy the data segment initializers from flash to SRAM */
-  for (pulDest = &_sdata; pulDest < &_edata;) {
+  for (volatile unsigned long *pulDest = &_sdata; pulDest < &_edata;) {
     *(pulDest++) = *(pulSrc++);
   }
 #if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(DATA_SEGMENT_IN_PSRAM)
   /* Copy the sleep PSRAM driver segment to SRAM */
   pulSrc = &_slpcode;
-  for (pulDest = &_scode; pulDest < &_ecode;) {
+  for (volatile unsigned long *pulDest = &_scode; pulDest < &_ecode;) {
     *(pulDest++) = *(pulSrc++);
   }
 #endif
@@ -244,12 +243,12 @@ void Copy_Table(void)
   && defined(DATA_SEGMENT_IN_PSRAM)
   /* Copy the classified text segment to SRAM */
   pulSrc = &_classified_text_;
-  for (pulDest = &_classified_text_section_start_; pulDest < &_classified_text_section_end_;) {
+  for (volatile unsigned long *pulDest = &_classified_text_section_start_; pulDest < &_classified_text_section_end_;) {
     *(pulDest++) = *(pulSrc++);
   }
 
   pulSrc = &_classified_data_;
-  for (pulDest = &_classified_data_section_start_; pulDest < &_classified_data_section_end_;) {
+  for (volatile unsigned long *pulDest = &_classified_data_section_start_; pulDest < &_classified_data_section_end_;) {
     *(pulDest++) = *(pulSrc++);
   }
 #endif
@@ -258,7 +257,7 @@ void Copy_Table(void)
   && !defined(BSS_SEGMENT_IN_PSRAM)
   /* Copy the classified BSS segment from RAM to PSRAM */
   pulSrc = &_classified_bss_;
-  for (pulDest = &_classified_bss_section_start_; pulDest < &_classified_bss_section_end_;) {
+  for (volatile unsigned long *pulDest = &_classified_bss_section_start_; pulDest < &_classified_bss_section_end_;) {
     *(pulDest++) = *(pulSrc++);
   }
 #endif

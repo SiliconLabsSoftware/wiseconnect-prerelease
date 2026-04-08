@@ -319,7 +319,7 @@ void RSI_Set_Cntrls_To_M4(void)
   BATT_FF->M4SS_TASS_CTRL_SET_REG_b.M4SS_CTRL_TASS_AON_DISABLE_ISOLATION_BYPASS = ENABLE;
   /* M4SS controlling Power supply for TASS AON domains reset pin in bypass mode. */
   M4SS_TASS_CTRL_CLR_REG = M4SS_CTRL_TASS_AON_PWR_DMN_RST_BYPASS_BIT;
-  for (volatile uint8_t delay = 0; delay < 10; delay++) {
+  for (uint8_t delay = 0; delay < 10; delay++) {
     __ASM("NOP");
   }
 }
@@ -388,12 +388,12 @@ STATIC INLINE void request_nwp_to_program_flash(uint8_t in_ps2_state)
  */
 rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
 {
-  volatile int var                       = 0;
-  volatile int enable_sdcss_based_wakeup = 0;
-  volatile int enable_m4ulp_retention    = 0;
-  volatile int Temp;
+  int var                       = 0;
+  int enable_sdcss_based_wakeup = 0;
+  int enable_m4ulp_retention    = 0;
+  int Temp;
 
-  volatile uint8_t in_ps2_state = 0;
+  uint8_t in_ps2_state = 0;
 
   uint32_t ipmuDummyRead         = 0;
   uint32_t m4ulp_ram_core_status = 0;
@@ -475,10 +475,10 @@ rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
       RSI_Periodic_TempUpdate(TIME_PERIOD, 1, 0);
       /*read the temperature*/
       Temp = (int)RSI_TS_ReadTemp(MCU_TEMP);
-      if (Temp > 45) {
-        // disable the XTAL CAP mode
-        RSI_IPMU_ProgramConfigData(lp_scdc_extcapmode);
-      }
+    }
+    if ((lf_clk_mode & BIT(4)) && (Temp > 45)) {
+      // disable the XTAL CAP mode
+      RSI_IPMU_ProgramConfigData(lp_scdc_extcapmode);
     }
 #endif
   }
@@ -658,13 +658,13 @@ rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
       RSI_Periodic_TempUpdate(TIME_PERIOD, 1, 0);
       /*read the temperature*/
       Temp = (int)RSI_TS_ReadTemp(MCU_TEMP);
-      if (Temp > 45) {
-        //SCDC0
-        RSI_IPMU_ProgramConfigData(scdc_volt_sel1);
-        RSI_IPMU_ProgramConfigData(scdc_volt_trim_efuse);
-        //SCDC0_1
-        RSI_IPMU_ProgramConfigData(scdc_volt_sel2);
-      }
+    }
+    if ((lf_clk_mode & BIT(4)) && (Temp > 45)) {
+      //SCDC0
+      RSI_IPMU_ProgramConfigData(scdc_volt_sel1);
+      RSI_IPMU_ProgramConfigData(scdc_volt_trim_efuse);
+      //SCDC0_1
+      RSI_IPMU_ProgramConfigData(scdc_volt_sel2);
     }
 #endif
   }

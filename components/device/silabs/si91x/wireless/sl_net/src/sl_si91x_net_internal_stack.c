@@ -34,6 +34,7 @@
 #include "sl_net_wifi_types.h"
 #include "sl_net_si91x.h"
 #include "sl_si91x_host_interface.h"
+#include "sl_si91x_protocol_types.h"
 #include "sl_si91x_driver.h"
 #include "sl_rsi_utility.h"
 #include "sli_net_utility.h"
@@ -102,13 +103,13 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     if (SL_IP_MANAGEMENT_STATIC_IP == ip_config->mode) {
       ip_req.dhcp_mode = SLI_NET_STATIC_IP;
       // Fill IP address
-      memcpy(ip_req.ipaddress, ip_config->ip.v4.ip_address.bytes, 4);
+      memcpy(ip_req.ipaddress, ip_config->ip.v4.ip_address.bytes, SL_IPV4_ADDRESS_LENGTH);
 
       // Fill network mask
-      memcpy(ip_req.netmask, ip_config->ip.v4.netmask.bytes, 4);
+      memcpy(ip_req.netmask, ip_config->ip.v4.netmask.bytes, SL_IPV4_ADDRESS_LENGTH);
 
       // Fill gateway
-      memcpy(ip_req.gateway, ip_config->ip.v4.gateway.bytes, 4);
+      memcpy(ip_req.gateway, ip_config->ip.v4.gateway.bytes, SL_IPV4_ADDRESS_LENGTH);
     } else {
       ip_req.dhcp_mode = (SLI_NET_DHCP | SL_SI91X_DHCP_UNICAST_OFFER);
     }
@@ -159,7 +160,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     // Initialize the IPv6 request structure
     memset(&ipv6_request, 0, sizeof(ipv6_request));
     uint16_t prefix_length = 64;
-    memcpy(&ipv6_request.prefixLength, &prefix_length, 2);
+    memcpy(&ipv6_request.prefixLength, &prefix_length, SLI_SI91X_2BYTE_FIELD_SIZE);
     ipv6_request.vap_id = virtual_ap_id;
 
     if (SL_IP_MANAGEMENT_STATIC_IP == ip_config->mode) {

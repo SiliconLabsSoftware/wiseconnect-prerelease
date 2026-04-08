@@ -29,6 +29,7 @@
 
 #pragma once
 #include "stdint.h"
+#include "sl_constants.h"
 #include "sl_common.h"
 
 //Note: Please go through http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
@@ -59,8 +60,8 @@ typedef struct {
   // IP version
   uint32_t ip_version;
   union {
-    uint8_t ipv4_address[4];
-    uint8_t ipv6_address[16];
+    uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH];
+    uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH];
   } server_ip_address;
 } sli_si91x_mqtt_client_ip_address_t;
 

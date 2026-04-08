@@ -290,7 +290,7 @@ sl_status_t sli_wifi_update_su_gain_table(uint8_t band,
                                           uint16_t payload_length,
                                           uint8_t x_offset,
                                           uint8_t y_offset);
-sl_status_t sli_wifi_set_11ax_config(uint8_t guard_interval);
+sl_status_t sli_wifi_set_11ax_config(const sl_wifi_11ax_config_params_t *config_11ax_params);
 sl_status_t sli_wifi_transceiver_set_channel(sl_wifi_interface_t interface, sl_wifi_transceiver_set_channel_t channel);
 sl_status_t sli_wifi_set_transceiver_parameters(sl_wifi_interface_t interface,
                                                 sl_wifi_transceiver_parameters_t *params);
@@ -312,7 +312,7 @@ sl_status_t sli_wifi_set_rts_threshold(sl_wifi_interface_t interface, uint16_t r
 sl_status_t sli_wifi_get_rts_threshold(sl_wifi_interface_t interface, uint16_t *rts_threshold);
 sl_status_t sli_wifi_transmit_cw_tone_start(sl_wifi_interface_t interface, sl_wifi_cw_tone_config_t cw_tone_config);
 sl_status_t sli_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface);
-sl_status_t sli_wifi_set_tx_powerdBm(int16_t txPower);
+sl_status_t sli_wifi_set_test_tx_power(int16_t txPower);
 sl_status_t sli_wifi_stop_rx(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_config_xo_ctune(sl_wifi_interface_t interface,
                                      sl_wifi_response_get_ctune_data_t *xo_ctune,

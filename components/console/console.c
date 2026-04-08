@@ -24,7 +24,6 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <limits.h>
-#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -65,6 +64,8 @@ typedef struct {
 
 static inline uint8_t parse_enum_arg(const char *line, const char *const *options);
 
+static bool is_optional_arg_token(const char *token);
+
 static sl_status_t process_optional_argument(const console_argument_type_t *argument_list,
                                              const char *token,
                                              char **command_line_pos,
@@ -78,7 +79,15 @@ static sl_status_t validate_and_parse_ordered_arg(const console_argument_type_t 
                                                   console_args_t *args,
                                                   bool *reached_end);
 
-char *string_token(register char *s, register const char *delim, char **lasts);
+/** Result of handling the "no more tokens" case in console_parse_command. */
+typedef enum {
+  NO_TOKEN_DONE,    /** Return SL_STATUS_OK to caller. */
+  NO_TOKEN_INVALID, /** Return SL_STATUS_COMMAND_IS_INVALID to caller. */
+  NO_TOKEN_CONTINUE /** Update indices and continue the loop. */
+} no_token_action_t;
+
+static no_token_action_t handle_no_more_tokens(console_argument_type_t type, int *arg_index, int *arg_count);
+
 sl_status_t console_tokenize(char *start,
                              const char *end,
                              char **token,
@@ -113,6 +122,28 @@ extern const value_list_t console_argument_values[];
  *               Function Definitions
  ******************************************************/
 
+static bool is_optional_arg_token(const char *token)
+{
+  if (token[0] != '-') {
+    return false;
+  }
+  char c = token[1];
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+static no_token_action_t handle_no_more_tokens(console_argument_type_t type, int *arg_index, int *arg_count)
+{
+  if (type == CONSOLE_ARG_END) {
+    return NO_TOKEN_DONE;
+  }
+  if (type & CONSOLE_ARG_OPTIONAL) {
+    *arg_index += 2;
+    ++(*arg_count);
+    return NO_TOKEN_CONTINUE;
+  }
+  return NO_TOKEN_INVALID;
+}
+
 sl_status_t console_parse_command(char *command_line,
                                   const console_database_t *db,
                                   console_args_t *args,
@@ -122,7 +153,7 @@ sl_status_t console_parse_command(char *command_line,
   const console_database_entry_t *entry = NULL;
   char *token;
   uint32_t index;
-  const char *command_line_end = command_line + sl_strlen(command_line); // The end should be passed in by the user
+  const char *command_line_end = command_line + sl_strlen(command_line);
 
 #ifdef CONSOLE_SUB_COMMAND_SUPPORT
 #endif
@@ -161,18 +192,23 @@ sl_status_t console_parse_command(char *command_line,
 
     // If no more tokens are available, verify there are only optional arguments left
     if (status != SL_STATUS_OK) {
-      if (type == CONSOLE_ARG_END) {
-        return SL_STATUS_OK;
-      } else if (type & CONSOLE_ARG_OPTIONAL) {
-        arg_index += 2;
-        ++arg_count;
+      no_token_action_t action = handle_no_more_tokens(type, &arg_index, &arg_count);
+      if (action == NO_TOKEN_CONTINUE) {
         continue;
+      }
+      if (action == NO_TOKEN_DONE) {
+        return SL_STATUS_OK;
       }
       return SL_STATUS_COMMAND_IS_INVALID;
     }
 
-    // Check for optional argument
-    if (token[0] == '-' && ((token[1] >= 'a' && token[1] <= 'z') || (token[1] >= 'A' && token[1] <= 'Z'))) {
+    // Extra parameters: expected arguments are exhausted but more tokens were provided
+    if (type == CONSOLE_ARG_END) {
+      return SL_STATUS_COMMAND_IS_INVALID;
+    }
+
+    // Check for optional argument (e.g. "-i value")
+    if (is_optional_arg_token(token)) {
       status = process_optional_argument(argument_list, token, &command_line, command_line_end, args);
       if (status != SL_STATUS_OK) {
         return status;
@@ -206,7 +242,7 @@ static sl_status_t process_optional_argument(const console_argument_type_t *argu
     if (!(argument_list[a] & CONSOLE_ARG_OPTIONAL)) {
       continue;
     }
-    if ((argument_list[a] & 0x7F) != token[1]) {
+    if ((argument_list[a] & CONSOLE_ARG_OPTIONAL_CHARACTER_MASK) != token[1]) {
       ++a;
       continue;
     }
@@ -216,13 +252,17 @@ static sl_status_t process_optional_argument(const console_argument_type_t *argu
       return SL_STATUS_INVALID_COUNT;
     }
     args->bitmap |= (1 << arg_number);
-    // Tokenize: reads from *command_line_pos, updates command_line_pos to next position
     status = console_tokenize(*command_line_pos,
                               command_line_end,
                               &option_value_token,
                               command_line_pos,
                               SL_CONSOLE_TOKENIZE_ON_SPACE);
-    if (status == SL_STATUS_OK) {
+    if (status != SL_STATUS_OK) {
+      if (argument_list[a + 1] != CONSOLE_ARG_NONE) {
+        return SL_STATUS_COMMAND_IS_INVALID;
+      }
+      args->arg[arg_number] = 0;
+    } else {
       status = console_parse_arg(argument_list[a + 1], option_value_token, &args->arg[arg_number]);
       if (status != SL_STATUS_OK) {
         return status;
@@ -246,7 +286,7 @@ static sl_status_t validate_and_parse_ordered_arg(const console_argument_type_t 
   *reached_end = false;
 
   // Verify current ordered argument is not an optional argument
-  while (type & CONSOLE_ARG_OPTIONAL) {
+  while ((type & CONSOLE_ARG_OPTIONAL) && (type != CONSOLE_ARG_END)) {
     *arg_index += 2;
     ++(*arg_count);
     type = argument_list[*arg_index];
@@ -262,9 +302,10 @@ static sl_status_t validate_and_parse_ordered_arg(const console_argument_type_t 
   }
 
   status = console_parse_arg(type, token, &args->arg[*arg_count]);
-  if (status == SL_STATUS_OK) {
-    args->bitmap |= (1 << *arg_count);
+  if (status != SL_STATUS_OK) {
+    return status;
   }
+  args->bitmap |= (1 << *arg_count);
   ++(*arg_index);
   ++(*arg_count);
 
@@ -277,14 +318,15 @@ void console_add_to_history(const char *line, uint8_t line_length)
 
   // Ensure there is enough space between the end and the start
   if (console_history_first != 0xFFFFFFFF) {
-    uint32_t available_space = (console_history_first == 0xFFFFFFFF)
-                                 ? sizeof(console_history_buffer)
-                                 : (sizeof(console_history_buffer) + console_history_first - console_history_end)
-                                     % sizeof(console_history_buffer);
+    uint32_t available_space =
+      (sizeof(console_history_buffer) + console_history_first - console_history_end) % sizeof(console_history_buffer);
 
     // Drop items from the start until there is enough available space
     while (available_space <= entry_length) {
-      SL_ASSERT(((console_history_first < sizeof(console_history_first)) && (console_history_first != 0xFFFFFFFF)),
+      if (console_history_first >= sizeof(console_history_buffer)) {
+        break;
+      }
+      SL_ASSERT((console_history_first < sizeof(console_history_buffer)) && (console_history_first != 0xFFFFFFFF),
                 "BAD");
       available_space += console_history_buffer[console_history_first] + sizeof(console_history_entry_t) + 1;
       console_history_first =
@@ -293,7 +335,7 @@ void console_add_to_history(const char *line, uint8_t line_length)
     }
   }
 
-  // Write the entry header. There end should always point to the first available byte
+  // Write the entry header. The end should always point to the first available byte
   console_history_last = console_history_end;
   if (console_history_first == 0xFFFFFFFF) {
     console_history_first = console_history_last;
@@ -506,6 +548,7 @@ sl_status_t console_tokenize(char *start,
             // Escape error
             return SL_STATUS_INVALID_PARAMETER;
           }
+          /* Parse window shortened: one character removed by escape. */
           --end;
         }
         ++i;
@@ -532,6 +575,7 @@ sl_status_t console_tokenize(char *start,
         // Escape error
         return SL_STATUS_INVALID_PARAMETER;
       }
+      /* Parse window shortened: one character removed by escape. */
       --end;
 
       // Ordinary splitting

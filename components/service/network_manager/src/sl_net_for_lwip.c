@@ -247,7 +247,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
                dst_mac[5]);
 
   status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *)p->payload, p->len);
-  if (status != SL_STATUS_OK) {
+  if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS) {
     return ERR_IF;
   }
   return ERR_OK;

@@ -623,15 +623,27 @@ uint16_t rsi_bt_global_cb_init(rsi_driver_cb_t *driver_cb, uint8_t *buffer)
 * @{
 */
 /**
- * @brief      Wait for BT card ready
- * @param[in]  void
+ * @brief      Wait for BT card ready from NWP (blocks on  bt_sem until  RSI_BT_EVENT_CARD_READY or equivalent).
  * @return     void
- * */
+ * @note       After  sl_wifi_deinit() followed by  sl_wifi_init() without a full NWP boot, the NWP does not emit  RSI_BT_EVENT_CARD_READY again—same class of issue as
+ *             the SoC WiFi card-ready skip in  sl_si91x_driver_init() (comment: init-after-deinit path where
+ *             "NWP would not send card ready command response").
+ */
 
 void rsi_bt_common_init(void)
 {
   // Get bt_common_cb structure pointer
   rsi_bt_cb_t *bt_common_cb = rsi_driver_cb->bt_common_cb;
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+  static bool rsi_bt_common_card_ready_wait_done = false;
+  if (rsi_bt_common_card_ready_wait_done) {
+    bt_common_cb->expected_response_type = 0;
+    bt_common_cb->sync_rsp               = 0;
+    bt_common_cb->state                  = RSI_BT_STATE_OPERMODE_DONE;
+    return;
+  }
+#endif
 
   // Save expected response type
   bt_common_cb->expected_response_type = RSI_BT_EVENT_CARD_READY;
@@ -641,6 +653,10 @@ void rsi_bt_common_init(void)
   if (bt_common_cb->bt_sem) {
     osSemaphoreAcquire(bt_common_cb->bt_sem, osWaitForever);
   }
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+  rsi_bt_common_card_ready_wait_done = true;
+#endif
 
   // BT card ready is received
 }

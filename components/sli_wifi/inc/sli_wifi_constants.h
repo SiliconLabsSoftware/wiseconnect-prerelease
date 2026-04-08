@@ -62,6 +62,22 @@
 
 #define SLI_WIFI_INVALID_MODE 0xFFFF
 
+/**
+ * @def SLI_WIFI_TX_POWER_DECIDBM_MIN
+ * @brief Minimum transmit power in decidBm (tenths of dBm).
+ * @details Used with sl_wifi_set_test_tx_power(); value -150 corresponds to -15.0 dBm.
+ */
+#define SLI_WIFI_TX_POWER_DECIDBM_MIN (-150)
+
+/**
+ * @def SLI_WIFI_TX_POWER_DECIDBM_MAX
+ * @brief Maximum transmit power in decidBm (tenths of dBm).
+ * @details Used with sl_wifi_set_test_tx_power(); value 210 corresponds to 21.0 dBm.
+ */
+#define SLI_WIFI_TX_POWER_DECIDBM_MAX 210
+/// Default listen interval multiplier for STA (association / power save).
+#define DEFAULT_LISTEN_INTERVAL_MULTIPLIER 1
+
 /// Flag to indicate that the response status of the command is expected.
 #define SLI_WIFI_PACKET_RESPONSE_STATUS (1 << 0)
 

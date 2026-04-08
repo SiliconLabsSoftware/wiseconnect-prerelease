@@ -2,7 +2,9 @@
 - id: SIWN917Y100LGNXA
 - package: platform_siwx91x
 - description: Silicon Labs CMSIS-Device part headers for SIWN917Y100LGNXA (Refresh Module).
-- category: Device|Si91x|MCU|Device Part|SIWG917
+- category: Device|Si91x|MCU|Device Part|SIWN917
+- ui_hints:
+    visibility: never
 - quality: production
 - metadata:
     sbom:

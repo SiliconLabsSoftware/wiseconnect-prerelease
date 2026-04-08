@@ -34,6 +34,8 @@
 #include "sl_si91x_constants.h"
 #include "sl_si91x_driver.h"
 #include "sl_net_si91x.h"
+#include "sl_wifi_constants.h"
+#include "sl_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
 /******************************************************
@@ -133,11 +135,16 @@ static sli_si91x_cert_type_t convert_to_si91x_cert_type(sl_net_credential_id_t i
   return 0;
 }
 
-sl_status_t sli_net_set_credential(sl_net_credential_id_t id,
-                                   sl_net_credential_type_t type,
-                                   const void *credential,
-                                   uint32_t credential_length)
+sl_status_t sli_si91x_set_credential(sl_net_credential_id_t id,
+                                     sl_net_credential_type_t type,
+                                     const void *credential,
+                                     uint32_t credential_length)
 {
+
+  if ((credential == NULL) || (credential_length == 0)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
   // As the maximum length of the private key is 4096 bytes in NWP, the length of the credential/key should be less than this maximum supported length.
   if (((type == SL_NET_TLS_PRIVATE_KEY_ECB_WRAP) || (type == SL_NET_TLS_PRIVATE_KEY_CBC_WRAP))
       && (credential_length > (SLI_MAX_PRIVATE_KEY_LENGTH - SLI_MAX_PRIVATE_KEY_METADATA_LENGTH - SL_SI91X_IV_SIZE))) {
@@ -158,10 +165,10 @@ sl_status_t sli_net_set_credential(sl_net_credential_id_t id,
   return status;
 }
 
-sl_status_t sli_net_get_credential(sl_net_credential_id_t id,
-                                   const sl_net_credential_type_t *type,
-                                   const void *credential,
-                                   const uint32_t *credential_length)
+sl_status_t sli_si91x_get_credential(sl_net_credential_id_t id,
+                                     const sl_net_credential_type_t *type,
+                                     const void *credential,
+                                     const uint32_t *credential_length)
 {
   UNUSED_PARAMETER(id);
   UNUSED_PARAMETER(type);
@@ -170,7 +177,7 @@ sl_status_t sli_net_get_credential(sl_net_credential_id_t id,
   return SL_STATUS_NOT_SUPPORTED;
 }
 
-sl_status_t sli_net_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type)
+sl_status_t sli_si91x_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type)
 {
   sli_si91x_cert_type_t cert_type = convert_to_si91x_cert_type(id, type);
   uint8_t index                   = sli_get_certificate_index(id);
@@ -226,9 +233,9 @@ sl_status_t sli_net_get_interface_info(sl_net_interface_t interface, sl_net_inte
              SLI_MIN(sizeof(info->hw_info.wifi_info.ssid), sizeof(response->ssid)));
       memcpy(info->hw_info.wifi_info.mac_address, response->mac_address, SL_WIFI_MAC_ADDRESS_LENGTH);
       // PSK for AP mode, PMK for Client mode
-      memcpy(info->hw_info.wifi_info.psk_pmk, response->psk, 64);
-      memcpy(info->ipv4_address.bytes, response->ipv4_address, 4);
-      memcpy(info->ipv6_address.bytes, response->ipv6_address, 16);
+      memcpy(info->hw_info.wifi_info.psk_pmk, response->psk, SL_WIFI_MAX_PSK_LENGTH);
+      memcpy(info->ipv4_address.bytes, response->ipv4_address, SL_IPV4_ADDRESS_LENGTH);
+      memcpy(info->ipv6_address.bytes, response->ipv6_address, SL_IPV6_ADDRESS_LENGTH);
     } else {
       // Station mode
       sli_si91x_network_params_response_t *response = (sli_si91x_network_params_response_t *)packet->data;
@@ -240,10 +247,10 @@ sl_status_t sli_net_get_interface_info(sl_net_interface_t interface, sl_net_inte
       memcpy(info->hw_info.wifi_info.mac_address, response->mac_address, SL_WIFI_MAC_ADDRESS_LENGTH);
       memcpy(&info->hw_info.wifi_info.sec_type, &response->sec_type, sizeof(uint8_t));
       // PSK for AP mode, PMK for Client mode
-      memcpy(info->hw_info.wifi_info.psk_pmk, response->psk, 64);
-      memcpy(info->ipv4_address.bytes, response->ipv4_address, 4);
-      memcpy(info->ipv6_address.bytes, response->ipv6_address, 16);
-      memcpy(info->hw_info.wifi_info.bssid, response->bssid, 6);
+      memcpy(info->hw_info.wifi_info.psk_pmk, response->psk, SL_WIFI_MAX_PSK_LENGTH);
+      memcpy(info->ipv4_address.bytes, response->ipv4_address, SL_IPV4_ADDRESS_LENGTH);
+      memcpy(info->ipv6_address.bytes, response->ipv6_address, SL_IPV6_ADDRESS_LENGTH);
+      memcpy(info->hw_info.wifi_info.bssid, response->bssid, SL_WIFI_MAC_ADDRESS_LENGTH);
       memcpy(&info->hw_info.wifi_info.wireless_mode, &response->wireless_mode, sizeof(uint8_t));
     }
   }

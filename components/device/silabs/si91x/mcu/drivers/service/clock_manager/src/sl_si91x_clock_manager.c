@@ -31,7 +31,9 @@
 #include "sl_si91x_clock_manager.h"
 #include "rsi_rom_clks.h"
 #include "rsi_rom_ulpss_clk.h"
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"
+#endif
 #if (defined(SL_SI91X_MCU_CLK_OUT_EN) && (SL_SI91X_MCU_CLK_OUT_EN == 1))
 #include "sl_si91x_gpio.h"
 #include "sl_gpio_board.h"
@@ -69,6 +71,12 @@
 #define SL_SI91X_MCU_CLK_OUT_GPIO_DIRECTION GPIO_OUTPUT // Direction output
 #endif
 #define ULP_PROC_MAX_CLK_DIV_FAC 5 // Maximum division factor for ULP processor clock division
+#define SL_CLOCK_MANAGER_CHECK_STATUS(s) \
+  do {                                   \
+    if ((s) != SL_STATUS_OK) {           \
+      return (s);                        \
+    }                                    \
+  } while (0)
 /************************************************************************************
  *************************  LOCAL VARIABLES  ****************************************
  ************************************************************************************/
@@ -130,16 +138,12 @@ sl_status_t sl_si91x_clock_manager_init(void)
 
   // Core Clock runs at 180MHz SOC PLL Clock
   status = sl_si91x_clock_manager_m4_set_core_clk(M4_SOCPLLCLK, SOC_PLL_FREQ);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
+  SL_CLOCK_MANAGER_CHECK_STATUS(status);
 
 #ifdef SL_SI91X_REQUIRES_INTF_PLL
   // Configuring the interface PLL clock to 160MHz used by the peripherals whose source clock is INTF_PLL
   status = sl_si91x_clock_manager_set_pll_freq(INTF_PLL, INTF_PLL_FREQ, PLL_REF_CLK_VAL_XTAL);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
+  SL_CLOCK_MANAGER_CHECK_STATUS(status);
 // Configure QSPI clock with INTF PLL as input source
 #if defined(CLOCK_ROMDRIVER_PRESENT)
   ROMAPI_M4SS_CLK_API->clk_qspi_clk_config(pCLK, QSPI_INTFPLLCLK, QSPI_SWALLO_EN, QSPI_ODD_DIV_EN, QSPI_DIV_FACTOR);

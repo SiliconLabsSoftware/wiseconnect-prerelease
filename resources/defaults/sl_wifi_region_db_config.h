@@ -100,25 +100,13 @@ const sli_wifi_set_region_ap_request_t default_KR_region_5GHZ_configurations = {
   .channel_info[3]               = { .first_channel = 149, .no_of_channels = 5, .max_tx_power = 23 }
 };
 
-// Define default configurations for the Singapore region for 2.4 GHz and 5 GHz bands
+// Define default configurations for the Singapore region for 2.4 GHz band
 const sli_wifi_set_region_ap_request_t default_SG_region_2_4GHZ_configurations = {
   .set_region_code_from_user_cmd = SET_REGION_CODE_FROM_USER,
   .country_code                  = "SG ",
   .no_of_rules                   = 1,
   .channel_info[0]               = { .first_channel = 1, .no_of_channels = 13, .max_tx_power = 27 }
 };
-
-const sli_wifi_set_region_ap_request_t default_SG_region_5GHZ_configurations = {
-  .set_region_code_from_user_cmd = SET_REGION_CODE_FROM_USER,
-  .country_code                  = "SG ",
-  .no_of_rules                   = 5,
-  .channel_info[0]               = { .first_channel = 36, .no_of_channels = 4, .max_tx_power = 16 },
-  .channel_info[1]               = { .first_channel = 52, .no_of_channels = 4, .max_tx_power = 23 },
-  .channel_info[2]               = { .first_channel = 100, .no_of_channels = 5, .max_tx_power = 23 },
-  .channel_info[3]               = { .first_channel = 132, .no_of_channels = 3, .max_tx_power = 23 },
-  .channel_info[4]               = { .first_channel = 149, .no_of_channels = 4, .max_tx_power = 29 }
-};
-
 // Define default configurations for the China region for 2.4 GHz and 5 GHz bands
 const sli_wifi_set_region_ap_request_t default_CN_region_2_4GHZ_configurations = {
   .set_region_code_from_user_cmd = SET_REGION_CODE_FROM_USER,
@@ -132,5 +120,5 @@ const sli_wifi_set_region_ap_request_t default_CN_region_5GHZ_configurations = {
   .country_code                  = "CN ",
   .no_of_rules                   = 2,
   .channel_info[0]               = { .first_channel = 36, .no_of_channels = 9, .max_tx_power = 20 },
-  .channel_info[4]               = { .first_channel = 149, .no_of_channels = 5, .max_tx_power = 33 }
+  .channel_info[1]               = { .first_channel = 149, .no_of_channels = 5, .max_tx_power = 33 }
 };

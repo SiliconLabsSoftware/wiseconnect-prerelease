@@ -30,6 +30,7 @@ component_path:
  - path: components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/component
  - path: components/device/silabs/si91x/mcu/drivers/service/iostream/component
  - path: components/device/silabs/si91x/mcu/drivers/service/power_manager/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/secure_storage/component
  - path: components/device/silabs/si91x/mcu/drivers/service/sensorhub/component
  - path: components/device/silabs/si91x/mcu/drivers/service/sl_log/component
  - path: components/device/silabs/si91x/mcu/drivers/service/sl_si91x_etm/component

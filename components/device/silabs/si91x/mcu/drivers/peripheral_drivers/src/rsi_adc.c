@@ -2420,8 +2420,7 @@ rsi_error_t RSI_ADC_Bbp(AUX_ADC_DAC_COMP_Type *pstcADC, uint8_t adc_bbp_en, uint
  */
 rsi_error_t RSI_ADC_InterruptHandler(const AUX_ADC_DAC_COMP_Type *pstcADC)
 {
-  volatile uint32_t intr_status;
-  intr_status = RSI_ADC_ChnlIntrStatus(AUX_ADC_DAC_COMP);
+  uint32_t intr_status = RSI_ADC_ChnlIntrStatus(AUX_ADC_DAC_COMP);
 
   if ((intr_status & ADC_STATIC_MODE_INTR) && (pstcADC->INTR_MASK_REG_b.ADC_STATIC_MODE_DATA_INTR_MASK == 0)) {
 #if defined(SLI_SI917)

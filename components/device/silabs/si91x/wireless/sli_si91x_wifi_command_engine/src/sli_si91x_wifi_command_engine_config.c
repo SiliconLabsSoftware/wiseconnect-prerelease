@@ -59,6 +59,10 @@
 #include "sl_si91x_socket_utility.h"
 #endif
 
+#ifdef SL_NET_COMPONENT_INCLUDED
+#include "sli_net_common_utility.h"
+#endif
+
 /******************************************************
  *               Macro Definitions
  ******************************************************/
@@ -68,6 +72,9 @@
  ******************************************************/
 extern bool bg_enabled;
 
+#ifdef SL_NET_COMPONENT_INCLUDED
+extern osMessageQueueId_t sli_network_manager_request_queue;
+#endif
 /******************************************************
  *               Local Type Definitions
  ******************************************************/
@@ -326,6 +333,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_WIFI_RSP_TWT_PARAMS:
         case SLI_WIFI_RSP_TWT_ASYNC:
         case SLI_WIFI_RSP_TWT_AUTO_CONFIG:
+        case SLI_WIFI_RSP_RESCHEDULE_TWT:
         case SLI_WIFI_RSP_11AX_PARAMS:
         case SLI_WIFI_RSP_REJOIN_PARAMS:
         case SLI_WIFI_RSP_GAIN_TABLE:
@@ -890,6 +898,38 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
 
 #endif // SLI_SI91X_OFFLOAD_NETWORK_STACK
 
+#ifdef SL_NET_COMPONENT_INCLUDED
+static void sli_post_disconnect_event_to_network_manager(sl_net_interface_t interface)
+{
+  if (sli_network_manager_request_queue == NULL) {
+    return;
+  }
+  sli_network_manager_message_t message = { 0 };
+  message.interface                     = interface;
+  message.event_flags                   = SLI_NET_DISCONNECT_Q_EVENT;
+  if (osMessageQueuePut(sli_network_manager_request_queue, &message, SLI_NET_MSG_PRIO_NORMAL, 0) != osOK) {
+    SL_DEBUG_LOG("Failed to enqueue disconnect event for auto-join retry\n");
+  }
+}
+
+/** Client VAP → sl_net interface; must stay aligned with @ref sl_net_wifi_client_up in sl_net_si91x.c */
+static bool sli_si91x_client_vap_id_to_net_interface(uint8_t vap_id, sl_net_interface_t *out_interface)
+{
+  if (out_interface == NULL) {
+    return false;
+  }
+  if (vap_id == SL_WIFI_CLIENT_VAP_ID) {
+    *out_interface = SL_NET_WIFI_CLIENT_1_INTERFACE;
+    return true;
+  }
+  if (vap_id == SL_WIFI_CLIENT_VAP_ID_1) {
+    *out_interface = SL_NET_WIFI_CLIENT_2_INTERFACE;
+    return true;
+  }
+  return false;
+}
+#endif
+
 sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t *instance,
                                                             uint16_t packet_type,
                                                             void *data)
@@ -900,6 +940,27 @@ sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t
   sl_status_t status = sli_handle_packet_flush_logic(instance, packet_type, (sl_wifi_buffer_t *)data);
   VERIFY_STATUS_AND_RETURN(status);
 
+#ifdef SL_NET_COMPONENT_INCLUDED
+  const sl_wifi_system_packet_t *packet =
+    (const sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((sl_wifi_buffer_t *)data, 0, NULL);
+  if (packet != NULL) {
+    uint16_t frame_status = sli_wifi_get_wifi_frame_status(packet);
+    // Post for auto-join retry: client disconnect from AP or join failure (per client VAP / interface).
+    if (packet->command == SLI_WIFI_RSP_JOIN && frame_status != (uint16_t)SL_STATUS_OK) {
+      uint8_t vap_id = sli_wifi_get_vap_id_from_operation_mode(packet);
+      sl_net_interface_t net_interface;
+      if (sli_si91x_client_vap_id_to_net_interface(vap_id, &net_interface)) {
+        sli_post_disconnect_event_to_network_manager(net_interface);
+      }
+    } else if (packet->command == SLI_WIFI_RSP_DISCONNECT && frame_status == (uint16_t)SL_STATUS_OK) {
+      uint8_t vap_id = sli_wifi_get_vap_id_from_operation_mode(packet);
+      sl_net_interface_t net_interface;
+      if (sli_si91x_client_vap_id_to_net_interface(vap_id, &net_interface)) {
+        sli_post_disconnect_event_to_network_manager(net_interface);
+      }
+    }
+  }
+#endif
   return SL_STATUS_OK;
 }
 

@@ -89,8 +89,7 @@ void rsi_d_cache_invalidate_all(void)
   /*Wait until the operation is finished*/
   while ((DCACHE->MAINT_STATUS & DCACHE_MAINT_STATUS_ONGOING_MAINT) != 0x0)
     ;
-  /*Disable HPORT allocation signal*/
-  DCACHE_CTRL_AND_STATUS &= ~(HPORT_ALLOCATE_SIGNAL);
+  rsi_d_cache_disable();
 }
 
 /*==============================================*/

@@ -41,6 +41,39 @@
 extern "C" {
 #endif
 
+/***************************************************************************/ /**
+ * @addtogroup SLI_SI91X_INTERNAL_CONSTANTS
+ * @ingroup SLI_SI91X_DRIVER
+ * @{
+ ******************************************************************************/
+
+/***************************************************************************/ /**
+ * @brief XTAL good time validation range (microseconds).
+ * @details Valid range for crystal oscillator stabilization time.
+ *          Applies to both SoC and NCP modes.
+ * @see sl_si91x_nwp_configuration_t
+ ******************************************************************************/
+#define SLI_SI91X_XTAL_GOOD_TIME_MIN 600                                      ///< XTAL good time lower bound (µs)
+#define SLI_SI91X_XTAL_GOOD_TIME_MAX 5000                                     ///< XTAL good time upper bound (µs)
+
+/***************************************************************************/ /**
+ * @brief PMU good time validation ranges (microseconds).
+ * @details Valid ranges for Power Management Unit stabilization time.
+ *          SoC mode requires 900-2000µs, NCP mode accepts 600-2000µs.
+ * @see sl_si91x_nwp_configuration_t
+ ******************************************************************************/
+#define SLI_SI91X_PMU_GOOD_TIME_MAX     2000 ///< PMU good time common upper bound (µs)
+#define SLI_SI91X_PMU_GOOD_TIME_MIN_SOC 900  ///< PMU good time lower bound for SoC mode
+#define SLI_SI91X_PMU_GOOD_TIME_MIN_NCP 600  ///< PMU good time lower bound for NCP mode
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+#define SLI_SI91X_PMU_GOOD_TIME_MIN SLI_SI91X_PMU_GOOD_TIME_MIN_SOC ///< PMU good time minimum (SoC)
+#else
+#define SLI_SI91X_PMU_GOOD_TIME_MIN SLI_SI91X_PMU_GOOD_TIME_MIN_NCP ///< PMU good time minimum (NCP)
+#endif
+
+/** @} */ // end of SLI_SI91X_INTERNAL_CONSTANTS
+
 /** Command queues used by the command engine (defined in sli_si91x_driver.c). */
 extern sli_queue_t cmd_queues[SI91X_CMD_MAX];
 

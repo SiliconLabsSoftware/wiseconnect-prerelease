@@ -446,6 +446,7 @@ typedef struct sli_scan_info_s {
   uint8_t ssid[34];                                ///< SSID of the AP
   uint8_t bssid[SLI_WIFI_HARDWARE_ADDRESS_LENGTH]; ///< BSSID of the AP
   bool wpa_vendor_ie_seen;                         ///< true if WPA vendor IE was present (parsing only, not stored)
+  uint16_t seen_count;                             ///< Number of times the same AP was observed in the received frames
 } sli_scan_info_t;
 
 /// Si91x specific station information

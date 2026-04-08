@@ -40,6 +40,7 @@
 #include "aws_client_certificate.pem.crt.h"
 #include "aws_client_private_key.pem.key.h"
 #include "sl_si91x_driver.h"
+#include "sl_wifi_constants.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -1847,14 +1848,20 @@ sl_status_t sl_wifi_update_gain_table_command_handler(console_args_t *arguments)
 
 sl_status_t sl_wifi_set_11ax_config_command_handler(console_args_t *arguments)
 {
-  sl_status_t status     = SL_STATUS_OK;
-  uint8_t guard_interval = (uint8_t)GET_COMMAND_ARG(arguments, 0);
-  status                 = sl_wifi_set_11ax_config(guard_interval);
-  VERIFY_STATUS_AND_RETURN(status);
+  sl_status_t status                              = SL_STATUS_OK;
+  sl_wifi_11ax_config_params_t config_11ax_params = { 0 };
+  config_11ax_params.gi_ltf                       = (sl_wifi_gi_ltf_t)GET_COMMAND_ARG(arguments, 0);
+  config_11ax_params.dcm_enable =
+    GET_OPTIONAL_COMMAND_ARG(arguments, 1, SL_WIFI_DCM_ENABLE_DISABLED, sl_wifi_dcm_enable_t);
+  config_11ax_params.beamformee_support =
+    GET_OPTIONAL_COMMAND_ARG(arguments, 2, SL_WIFI_BEAMFORMEE_SUPPORT_ENABLED, sl_wifi_beamformee_support_t);
+  config_11ax_params.config_er_su =
+    GET_OPTIONAL_COMMAND_ARG(arguments, 3, SL_WIFI_CONFIG_ER_SU_NO, sl_wifi_config_er_su_t);
 
+  status = sl_wifi_set_11ax_config_v2(&config_11ax_params);
+  VERIFY_STATUS_AND_RETURN(status);
   return SL_STATUS_OK;
 }
-
 sl_status_t sl_si91x_get_ram_log_command_handler(console_args_t *arguments)
 {
   uint32_t address = (uint32_t)GET_COMMAND_ARG(arguments, 0);

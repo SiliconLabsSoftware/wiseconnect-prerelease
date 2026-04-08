@@ -60,12 +60,10 @@
 #include "sl_si91x_hal_soc_soft_reset.h"
 #endif
 
-// WDT constants
-#define SL_WDT_INTERRUPT_TIME    15 // WDT Interrupt Time
-#define SL_WDT_SYSTEM_RESET_TIME 17 // WDT System Reset Time
-#define SL_WDT_WINDOW_TIME       0  // WDT Window Time
-
-#define FW_HEADER_SIZE 64
+#define BLE_ATT_REC_SIZE 500
+#define NO_OF_VAL_ATT    5
+#define FW_HEADER_SIZE   64
+#define SL_FW_ERROR      2
 //! global parameters list
 static uint8_t chunk_data              = 0;
 static uint16_t chunk_number           = 1;
@@ -176,9 +174,85 @@ const osThreadAttr_t thread_attributes = {
   .tz_module  = 0,
 };
 
+typedef struct rsi_ble_att_list_s {
+  uuid_t char_uuid;
+  uint16_t handle;
+  uint16_t len;
+  uint16_t max_value_len;
+  uint8_t char_val_prop;
+  void *value;
+} rsi_ble_att_list_t;
+
+typedef struct rsi_ble_s {
+  uint8_t DATA[BLE_ATT_REC_SIZE];
+  uint16_t DATA_ix;
+  uint16_t att_rec_list_count;
+  rsi_ble_att_list_t att_rec_list[NO_OF_VAL_ATT];
+} rsi_ble_t;
+
+rsi_ble_t att_list;
+
 sl_status_t update_firmware(void);
 
-/*============================================================================*/
+/*==============================================*/
+/**
+ * @fn         rsi_gatt_add_attribute_to_list
+ * @brief      This function is used to store characteristic service attribute.
+ * @param[in]  p_val, pointer to homekit structure
+ * @param[in]  handle, characteristic service attribute handle.
+ * @param[in]  data_len, characteristic value length
+ * @param[in]  data, characteristic value pointer
+ * @param[in]  uuid, characteristic value uuid
+ * @return     none.
+ * @section description
+ * This function is used to store all attribute records
+ */
+void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
+                                    uint16_t handle,
+                                    uint16_t data_len,
+                                    uint8_t *data,
+                                    uuid_t uuid,
+                                    uint8_t char_prop)
+{
+  if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE) {
+    LOG_PRINT("no data memory for att rec values");
+    return;
+  }
+
+  p_val->att_rec_list[p_val->att_rec_list_count].char_uuid     = uuid;
+  p_val->att_rec_list[p_val->att_rec_list_count].handle        = handle;
+  p_val->att_rec_list[p_val->att_rec_list_count].len           = data_len;
+  p_val->att_rec_list[p_val->att_rec_list_count].max_value_len = data_len;
+  p_val->att_rec_list[p_val->att_rec_list_count].char_val_prop = char_prop;
+  memcpy(p_val->DATA + p_val->DATA_ix, data, data_len);
+  p_val->att_rec_list[p_val->att_rec_list_count].value = p_val->DATA + p_val->DATA_ix;
+  p_val->att_rec_list_count++;
+  p_val->DATA_ix += p_val->att_rec_list[p_val->att_rec_list_count].max_value_len;
+
+  return;
+}
+
+/*==============================================*/
+/**
+ * @fn         rsi_gatt_get_attribute_from_list
+ * @brief      This function is used to retrieve attribute from list based on handle.
+ * @param[in]  p_val, pointer to characteristic structure
+ * @param[in]  handle, characteristic service attribute handle.
+ * @return     pointer to the attribute
+ * @section description
+ * This function is used to store all attribute records
+ */
+rsi_ble_att_list_t *rsi_gatt_get_attribute_from_list(rsi_ble_t *p_val, uint16_t handle)
+{
+  uint16_t i;
+  for (i = 0; i < p_val->att_rec_list_count; i++) {
+    if (p_val->att_rec_list[i].handle == handle) {
+      return &(p_val->att_rec_list[i]);
+    }
+  }
+  return 0;
+}
+/*==============================================*/
 /**
  * @fn         rsi_ble_add_char_serv_att
  * @brief      this function is used to add characteristic service attribute.
@@ -268,6 +342,11 @@ static void rsi_ble_add_char_val_att(void *serv_handler,
   //! add attribute to the service
   rsi_ble_add_attribute(&new_att);
 
+  if (((auth_read & ATT_REC_MAINTAIN_IN_HOST) == 1) || (data_len > 20)) {
+    if (data != NULL)
+      rsi_gatt_add_attribute_to_list(&att_list, handle, data_len, data, att_type_uuid, val_prop);
+  }
+
   return;
 }
 
@@ -352,7 +431,7 @@ static void rsi_ble_add_ota_data_char_serv(void)
                            RSI_BLE_ATT_PROPERTY_WRITE,
                            &chunk_data,
                            RSI_BLE_MAX_DATA_LEN,
-                           0);
+                           ATT_REC_MAINTAIN_IN_HOST);
   ota_fw_tf_handle = ota_serv_response.start_handle + 4;
 }
 
@@ -373,6 +452,7 @@ static void rsi_ble_add_ota_info_char_serv(void)
   uint8_t ota_info_char_serv[UUID_SIZE] = { 0xf7, 0xbf, 0x35, 0x64, 0xfb, 0x6d, 0x4e, 0x53,
                                             0x88, 0xa4, 0x5e, 0x37, 0xe0, 0x32, 0x60, 0x63 };
   ota_info_char_service.size            = UUID_SIZE;
+  uint8_t ota_info_char_serv_data[5]    = { 0 };
 
   rsi_ble_prepare_128bit_uuid(ota_info_char_serv, &ota_info_char_service);
   rsi_ble_add_char_serv_att(ota_serv_response.serv_handler,
@@ -385,9 +465,9 @@ static void rsi_ble_add_ota_info_char_serv(void)
                            ota_serv_response.start_handle + 2,
                            ota_info_char_service,
                            RSI_BLE_ATT_PROPERTY_WRITE,
-                           NULL,
+                           ota_info_char_serv_data,
                            5,
-                           0);
+                           ATT_REC_MAINTAIN_IN_HOST);
   ota_fw_control_handle = ota_serv_response.start_handle + 2;
 }
 
@@ -424,7 +504,7 @@ static void rsi_ble_add_ota_fw_version_char_serv(void)
                            RSI_BLE_ATT_PROPERTY_READ,
                            firmware_version_conversion,
                            20,
-                           0);
+                           ATT_REC_MAINTAIN_IN_HOST);
 }
 
 /*============================================================================*/
@@ -457,7 +537,7 @@ static void rsi_ble_add_ota_bd_add_char_serv(void)
                            RSI_BLE_ATT_PROPERTY_READ,
                            str_local_dev_address,
                            20,
-                           0);
+                           ATT_REC_MAINTAIN_IN_HOST);
 }
 
 /////////////////////////////////////
@@ -698,7 +778,69 @@ static const char *fw_update_status_string(sl_status_t status)
       return NULL;
   }
 }
+/*==============================================*/
+/**
+ * @fn         rsi_ble_gatt_write_event_handler
+ * @brief      Processes a GATT write for one OTA characteristic handle.
+ * @param[in]  app_ble_write_event, write request data from the stack (handle, length, payload).
+ * @param[in]  handle, expected attribute handle (OTA control or firmware transfer).
+ * @return     none.
+ * @section description
+ * Called from the GATT write application event after \c rsi_ble_on_gatt_write_event() queues the write.
+ * If the written handle matches \c handle, looks up the attribute, verifies write properties and length,
+ * copies the value into the local GATT attribute buffer, sends \c rsi_ble_gatt_write_response() on success,
+ * or \c rsi_ble_att_error_response() on invalid handle, write-not-permitted, or length errors.
+ */
+int32_t rsi_ble_gatt_write_event_handler(rsi_ble_event_write_t *app_ble_write_event, uint16_t handle)
+{
+  int32_t status = SL_STATUS_OK;
+  if ((*(uint16_t *)app_ble_write_event->handle) == handle) {
 
+    rsi_ble_att_list_t *attribute = NULL;
+    uint8_t opcode = 0x12, err = 0x00;
+
+    attribute = rsi_gatt_get_attribute_from_list(&att_list, (*(uint16_t *)(app_ble_write_event->handle)));
+
+    //! Check if value has write properties
+    if ((attribute != NULL) && (attribute->value != NULL)) {
+      if (!(attribute->char_val_prop & 0x08)) //! If no write property, send error response
+      {
+        err = 0x03; //! Error - Write not permitted
+      }
+    } else {
+      //!Error = No such handle exists
+      err = 0x01;
+    }
+
+    //! Update the value based6 on the offset and length of the value
+    if ((err == 0) && ((app_ble_write_event->length) <= attribute->max_value_len)) {
+      memset(attribute->value, 0, attribute->max_value_len);
+
+      //! Check if value exists for the handle. If so, maximum length of the value.
+      memcpy(attribute->value, app_ble_write_event->att_value, app_ble_write_event->length);
+
+      //! Update value length
+      attribute->len = app_ble_write_event->length;
+
+      //! Send gatt write response
+      status = rsi_ble_gatt_write_response(conn_event_to_app.dev_addr, 0);
+      if (status != SL_STATUS_OK)
+        printf("rsi_ble_gatt_write_response failed to send response: 0x%lX\r\n", status);
+    } else {
+      //! Error : 0x07 - Invalid request,  0x0D - Invalid attribute value length
+      err = 0x07;
+    }
+
+    if (err) {
+      //! Send error response
+      status =
+        rsi_ble_att_error_response(conn_event_to_app.dev_addr, *(uint16_t *)app_ble_write_event->handle, opcode, err);
+      if (status != SL_STATUS_OK)
+        printf("rsi_ble_att_error_response failed to send response: 0x%lX\r\n", status);
+    }
+  }
+  return status;
+}
 /*==============================================*/
 /**
  * @fn         rsi_ble_on_gatt_write_event
@@ -803,7 +945,8 @@ void rsi_ble_ota_fwup_gatt_server(void *argument)
   }
 
   status = update_firmware();
-  printf("FW UP duration : %ld\n", ((stop_timer - start_timer) / 1000));
+  if (status == SL_FW_ERROR)
+    printf("reconnect the Device and select the Proper FW \n");
 }
 
 sl_status_t update_firmware()
@@ -1033,6 +1176,9 @@ adv:
         rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
 
         if (app_ble_write_event.handle[0] == ota_fw_control_handle) {
+          status = rsi_ble_gatt_write_event_handler(&app_ble_write_event, ota_fw_control_handle);
+          if (status != SL_STATUS_OK)
+            return status;
           if (app_ble_write_event.att_value[0] == 0) {
             data_tf_start = 1;
             chunk_number  = 1;
@@ -1041,16 +1187,35 @@ adv:
           }
 
         } else if (app_ble_write_event.handle[0] == ota_fw_tf_handle) {
+          status = rsi_ble_gatt_write_event_handler(&app_ble_write_event, ota_fw_tf_handle);
+          if (status != SL_STATUS_OK)
+            return status;
           if (data_tf_start == 1) {
             if (chunk_number == 1) {
               memcpy(&firmware_header_data[0], &app_ble_write_event.att_value[0], FW_HEADER_SIZE);
               memcpy(&firmware_chunk_fw_payload[0], &app_ble_write_event.att_value[0], app_ble_write_event.length);
 
 #if (FW_UPGRADE_TYPE == COMBINED_FW_UP)
+              if (firmware_header_data[0] != 0x81) {
+                printf("\r\n wrong firmware selected \n");
+                return SL_FW_ERROR;
+              }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[48]);
-#else
+#elif (FW_UPGRADE_TYPE == TA_FW_UP)
+              if (firmware_header_data[0] != 0) {
+                printf("\r\n wrong firmware selected \n");
+                return SL_FW_ERROR;
+              }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[8]);
               fw_size += FW_HEADER_SIZE;
+#elif (FW_UPGRADE_TYPE == M4_FW_UP)
+              if (firmware_header_data[0] != 1) {
+                printf("\r\n wrong firmware selected \n");
+                return SL_FW_ERROR;
+              }
+              fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[8]);
+              fw_size += FW_HEADER_SIZE;
+
 #endif
               printf("Firmware size: %ld bytes\n", fw_size);
               total_number_of_chunks = (fw_size % app_ble_write_event.length)

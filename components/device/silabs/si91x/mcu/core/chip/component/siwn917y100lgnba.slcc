@@ -2,7 +2,7 @@
 - id: SIWN917Y100LGNBA
 - package: platform_siwx91x
 - description: Silicon Labs CMSIS-Device part headers for SIWN917Y100LGNBA.
-- category: Device|Si91x|MCU|Device Part|SIWG917
+- category: Device|Si91x|MCU|Device Part|SIWN917
 - quality: production
 - metadata:
     sbom:

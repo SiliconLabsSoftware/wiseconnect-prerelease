@@ -63,7 +63,7 @@
 /** \addtogroup WIFI_FEATURE_BITMAP
  * @{ */
 /*=========================================================================*/
-// Feature bit map parameters description !//
+// Feature bitmap parameters description !//
 /*=========================================================================*/
 /**
   * @def SL_WIFI_FEAT_SECURITY_OPEN
@@ -160,7 +160,7 @@
 /** \addtogroup WIFI_CUSTOM_FEATURE_BITMAP
     * @{ */
 /*=========================================================================*/
-// Custom feature bit map parameters description !//
+// Custom feature bitmap parameters description !//
 /*=========================================================================*/
 /**
    * @def SL_WIFI_CUSTOM_FEAT_DISABLE_GATEWAY_IN_RSI_AP
@@ -374,7 +374,7 @@
 /** \addtogroup WIFI_JOIN_FEATURE_BIT_MAP
     * @{ */
 /*=========================================================================*/
-// Join feature bit map parameters description !//
+// Join feature bitmap parameters description !//
 /*=========================================================================*/
 /// To enable b/g only mode in station mode.
 #define SL_WIFI_JOIN_FEAT_STA_BG_ONLY_MODE_ENABLE (1 << 0)
@@ -404,7 +404,7 @@
 /** \addtogroup WIFI_CONFIG_FEATURE_BITMAP
     * @{ */
 /*=========================================================================*/
-// Config feature bit map parameters description !//
+// Config feature bitmap parameters description !//
 /*=========================================================================*/
 /**
    * @def SL_WIFI_FEAT_EAP_TLS_V1P0
@@ -594,7 +594,7 @@
 /** \addtogroup SI91X_FEATURE_BITMAP
   * @{ */
 /*=========================================================================*/
-// feature bit map parameters description !//
+// feature bitmap parameters description !//
 /*=========================================================================*/
 /**
  * @def SL_SI91X_FEAT_SECURITY_OPEN
@@ -762,7 +762,7 @@
 /** \addtogroup SI91X_TCP_IP_FEATURE_BITMAP
   * @{ */
 /*=========================================================================*/
-// TCP/IP feature bit map parameters description !//
+// TCP/IP feature bitmap parameters description !//
 /*=========================================================================*/
 /**
  * @def SL_SI91X_TCP_IP_FEAT_BYPASS
@@ -1060,7 +1060,7 @@
 /** \addtogroup SI91X_CUSTOM_FEATURE_BITMAP
   * @{ */
 /*=========================================================================*/
-// Custom feature bit map parameters description !//
+// Custom feature bitmap parameters description !//
 /*=========================================================================*/
 /**
  * @def SL_SI91X_CUSTOM_FEAT_DISABLE_GATEWAY_IN_RSI_AP
@@ -1645,7 +1645,7 @@
 /** \addtogroup SI91X_EXTENDED_TCP_IP_FEATURE_BITMAP
   * @{ */
 /*=========================================================================*/
-// Extended TCP/IP feature bit map parameters description !//
+// Extended TCP/IP feature bitmap parameters description !//
 /*=========================================================================*/
 /**
  * @def SL_SI91X_EXT_TCP_FEAT_DHCP_OPT77
@@ -1856,9 +1856,9 @@
 
 /**
  * @def SL_SI91X_CONFIG_FEAT_EXTENTION_VALID
- * @brief Config feature bit map validity.
+ * @brief Config feature bitmap validity.
  * @details
- * This feature validates the configuration feature bit map.
+ * This feature validates the configuration feature bitmap.
  * If this bit is enabled then only, the features present in the configuration feature bitmap can be used.
  */
 #ifndef __ZEPHYR__
@@ -1871,7 +1871,7 @@
 /** \addtogroup SI91X_BT_FEATURE_BITMAP
   * @{ */
 /*=========================================================================*/
-// BT feature bit map parameters description !//
+// BT feature bitmap parameters description !//
 /*=========================================================================*/
 /**
  * @def SL_SI91X_BT_RF_TYPE
@@ -1897,7 +1897,7 @@
 /** \addtogroup SI91X_BLE_FEATURE_BITMAP
   * @{ */
 /*=========================================================================*/
-// BLE feature bit map
+// BLE feature bitmap
 /*=========================================================================*/
 /**
  * @def SL_SI91X_BLE_MAX_NBR_ATT_REC
@@ -2000,7 +2000,7 @@
 /** \addtogroup SI91X_EXTENDED_BLE_CUSTOM_FEATURE_BITMAP
   * @{ */
 /*=========================================================================*/
-// Extended BLE custom feature bit map parameters description !//
+// Extended BLE custom feature bitmap parameters description !//
 /*=========================================================================*/
 /**
  * @def SL_SI91X_BLE_NUM_CONN_EVENTS
@@ -2160,8 +2160,8 @@
  * @brief Configures External PMU good time to 100 µs.
  * @details This bit selects an external PMU good time of 100 microseconds.
  * 
- * @note These bits are used to select external PMU good time. 1 to 15 means 100 usec to 1500 usec (in 100 usec granularity).
  * @note Not applicable for SI917.
+ * @note These bits are used to select external PMU good time. 1 to 15 means 100 µsec to 1500 µsec (in 100 µsec granularity).
  */
 #define SL_SI91X_EXTERNAL_PMU_GOOD_TIME_100us BIT(6)
 
@@ -2662,19 +2662,19 @@ typedef enum {
 /**
  * @struct sl_wifi_system_boot_configuration_t
  * @brief Boot configuration structure.
- * @note: Refer sl_wifi_device.h for complete bit map details.
+ * @note: Refer sl_wifi_device.h for complete bitmap details.
  */
 typedef struct {
   uint16_t
     oper_mode; ///< Operation mode, one of the values from [sl_wifi_operation_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-operation-mode-t).
   uint16_t
     coex_mode; ///< Coexistence mode, one of the values from [sl_wifi_system_coex_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-coex-mode-t).
-  uint32_t feature_bit_map;            ///< Feature bit map, @ref SI91X_FEATURE_BITMAP
-  uint32_t tcp_ip_feature_bit_map;     ///< TCP/IP feature bit map, @ref SI91X_TCP_IP_FEATURE_BITMAP
-  uint32_t custom_feature_bit_map;     ///< Custom feature bit map, @ref SI91X_CUSTOM_FEATURE_BITMAP
-  uint32_t ext_custom_feature_bit_map; ///< Extended custom feature bit map, @ref SI91X_EXTENDED_CUSTOM_FEATURE_BITMAP
-  uint32_t bt_feature_bit_map;         ///< BT featured bit map, @ref SI91X_BT_FEATURE_BITMAP
-  uint32_t ext_tcp_ip_feature_bit_map; ///< Extended TCP/IP feature bit map, @ref SI91X_EXTENDED_TCP_IP_FEATURE_BITMAP
+  uint32_t feature_bit_map;            ///< Feature bitmap, @ref SI91X_FEATURE_BITMAP
+  uint32_t tcp_ip_feature_bit_map;     ///< TCP/IP feature bitmap, @ref SI91X_TCP_IP_FEATURE_BITMAP
+  uint32_t custom_feature_bit_map;     ///< Custom feature bitmap, @ref SI91X_CUSTOM_FEATURE_BITMAP
+  uint32_t ext_custom_feature_bit_map; ///< Extended custom feature bitmap, @ref SI91X_EXTENDED_CUSTOM_FEATURE_BITMAP
+  uint32_t bt_feature_bit_map;         ///< BT featured bitmap, @ref SI91X_BT_FEATURE_BITMAP
+  uint32_t ext_tcp_ip_feature_bit_map; ///< Extended TCP/IP feature bitmap, @ref SI91X_EXTENDED_TCP_IP_FEATURE_BITMAP
   uint32_t ble_feature_bit_map;        ///< BLE feature bitmap, @ref SI91X_BLE_FEATURE_BITMAP
   uint32_t ble_ext_feature_bit_map;    ///< BLE extended feature bitmap, @ref SI91X_EXTENDED_BLE_CUSTOM_FEATURE_BITMAP
   uint32_t config_feature_bit_map;     ///< Config feature bitmap, @ref SI91X_CONFIG_FEATURE_BITMAP
@@ -2761,18 +2761,19 @@ typedef struct {
 
   uint8_t ssid[SL_WIFI_SSID_LEN]; ///< SSID of connected AP in station mode; SSID of the module in AP mode
 
-  uint8_t mac_address[6]; ///< MAC address of the module
+  uint8_t mac_address[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< MAC address of the module
 
   uint8_t sec_type; ///< Security type of connected AP is supported in station mode, but not in AP mode.
                     ///< Refer sl_wifi_security_t for possible values of Security type
 
-  uint8_t psk_pmk[64]; ///< PSK for AP mode, PMK for station mode
+  uint8_t psk_pmk[SL_WIFI_MAX_PSK_LENGTH]; ///< PSK for AP mode, PMK for station mode
 
-  uint8_t ipv4_address[4]; ///< Module IPv4 Address
+  uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH]; ///< Module IPv4 Address
 
-  uint8_t ipv6_address[16]; ///< Module IPv6 Address
+  uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH]; ///< Module IPv6 Address
 
-  uint8_t bssid[6]; ///< BSSID address of connected AP in station mode; not supported in AP mode
+  uint8_t
+    bssid[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< BSSID address of connected AP in station mode; not supported in AP mode
 
   uint8_t
     wireless_mode; ///< Wireless mode used in connected AP (6 - AX, 4 - N, 3 - G, 1 - B) in station mode, not supported in AP mode
@@ -2989,7 +2990,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transceiver_configur
 };
 #endif
 
-/// The typdefs in the below header depends on the structs defination in this .h
+/// The typedefs in the below header depends on the structs defination in this .h
 #include "sl_si91x_types.h"
 /** @} */
 

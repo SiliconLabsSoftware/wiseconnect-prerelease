@@ -83,7 +83,7 @@ TEST(sl_net_unit_tests, handles_tls_private_key_ecb_wrap_valid_length)
   RESET_FAKE(sl_si91x_wifi_set_certificate_index);
   sl_si91x_wifi_set_certificate_index_fake.return_val = SL_STATUS_OK;
 
-  sl_status_t status = sli_net_set_credential(id, type, credential, credential_length);
+  sl_status_t status = sli_si91x_set_credential(id, type, credential, credential_length);
 
   EXPECT_EQ(status, SL_STATUS_OK);
   EXPECT_EQ(sl_si91x_wifi_set_certificate_index_fake.call_count, 2);
@@ -98,7 +98,7 @@ TEST(sl_net_unit_tests, handles_tls_private_key_ecb_wrap_invalid_length)
   uint32_t credential_length    = SLI_MAX_PRIVATE_KEY_LENGTH; // Exceeds the allowed length
 
   RESET_FAKE(sl_si91x_wifi_set_certificate_index);
-  sl_status_t status = sli_net_set_credential(id, type, credential, credential_length);
+  sl_status_t status = sli_si91x_set_credential(id, type, credential, credential_length);
 
   // Validate the result
   EXPECT_EQ(status, SL_STATUS_INVALID_PARAMETER);
@@ -116,7 +116,7 @@ TEST(sl_net_unit_tests, handles_tls_private_key_cbc_wrap_valid_length)
   RESET_FAKE(sl_si91x_wifi_set_certificate_index);
   sl_si91x_wifi_set_certificate_index_fake.return_val = SL_STATUS_OK;
 
-  sl_status_t status = sli_net_set_credential(id, type, credential, credential_length);
+  sl_status_t status = sli_si91x_set_credential(id, type, credential, credential_length);
 
   EXPECT_EQ(status, SL_STATUS_OK);
   EXPECT_EQ(sl_si91x_wifi_set_certificate_index_fake.call_count, 2); // Called twice: once to clear, once to set
@@ -131,7 +131,7 @@ TEST(sl_net_unit_tests, handles_tls_private_key_cbc_wrap_invalid_length)
   uint32_t credential_length    = SLI_MAX_PRIVATE_KEY_LENGTH; // Exceeds the allowed length
 
   RESET_FAKE(sl_si91x_wifi_set_certificate_index);
-  sl_status_t status = sli_net_set_credential(id, type, credential, credential_length);
+  sl_status_t status = sli_si91x_set_credential(id, type, credential, credential_length);
 
   EXPECT_EQ(status, SL_STATUS_INVALID_PARAMETER);
   EXPECT_EQ(sl_si91x_wifi_set_certificate_index_fake.call_count, 0); // Should not call the underlying function
@@ -148,7 +148,7 @@ TEST(sl_net_unit_tests, handles_certificate_index_failure)
   RESET_FAKE(sl_si91x_wifi_set_certificate_index);
   sl_si91x_wifi_set_certificate_index_fake.return_val = SL_STATUS_FAIL;
 
-  sl_status_t status = sli_net_set_credential(id, type, credential, credential_length);
+  sl_status_t status = sli_si91x_set_credential(id, type, credential, credential_length);
 
   EXPECT_EQ(status, SL_STATUS_FAIL);
   EXPECT_EQ(sl_si91x_wifi_set_certificate_index_fake.call_count, 1);

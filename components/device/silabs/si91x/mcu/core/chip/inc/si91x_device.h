@@ -13306,6 +13306,102 @@ typedef struct { /*!< (@ 0x24048500) MCU_TEMP Structure */
 
 /* ===========================================================================================================================
   */
+/* ================                                     MCU_SECURE_STORAGE
+  * ================ */
+/* ===========================================================================================================================
+  */
+
+/**
+   * @brief Secure Storage provides a secure mechanism for storing sensitive data in the MCU storage domain.
+   *        It consists of 3 storage banks with a total capacity of 256 bits (32 bytes):
+   *        - Bank 1: 64 bits (REG0, REG1) - supports write protection, data retained when power domain is off
+   *        - Bank 2: 64 bits (REG2, REG3) - supports write protection, data retained when power domain is off
+   *        - Bank 3: 128 bits (REG4, REG5, REG6, REG7) - no write protection
+   *        Each bank is in a different power domain. Access to Bank 1 and Bank 2 can be protected
+   *        using a write key register (MCU_STORAGE_WRITE_KEY). (MCU_SECURE_STORAGE)
+   */
+typedef struct { /*!< (@ 0x24048500) MCU_SECURE_STORAGE Structure */
+
+  __IM unsigned int RESERVED0[32]; /*!< Reserved space from offset 0x00 to 0x7F */
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG0; /*!< (@ 0x00000080) MCU Storage register 0 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_0 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG0_b;
+  };
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG1; /*!< (@ 0x00000084) MCU Storage register 1 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_1 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG1_b;
+  };
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG2; /*!< (@ 0x00000088) MCU Storage register 2 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_2 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG2_b;
+  };
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG3; /*!< (@ 0x0000008C) MCU Storage register 3 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_3 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG3_b;
+  };
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG4; /*!< (@ 0x00000090) MCU Storage register 4 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_4 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG4_b;
+  };
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG5; /*!< (@ 0x00000094) MCU Storage register 5 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_5 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG5_b;
+  };
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG6; /*!< (@ 0x00000098) MCU Storage register 6 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_6 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG6_b;
+  };
+
+  union {
+    __IOM unsigned int MCU_STORAGE_REG7; /*!< (@ 0x0000009C) MCU Storage register 7 */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_WORD_7 : 32; /*!< [31..0] This register can be used to store 32 bits of data. */
+    } MCU_STORAGE_REG7_b;
+  };
+
+  __IM unsigned int RESERVED[88]; /*!< Reserved space from offset 0xA0 to 0x1FC */
+
+  union {
+    __IOM unsigned int
+      MCU_STORAGE_WRITE_KEY; /*!< (@ 0x00000200) Programming the key will enable or disable access to program MCU storage register */
+
+    struct {
+      __IOM unsigned int MCU_STORAGE_KEY : 32; /*!< [31..0] By default the access to MCU storage register is enabled */
+    } MCU_STORAGE_WRITE_KEY_b;
+  };
+} MCU_SECURE_STORAGE_Type; /*!< Size = 516 (0x204) */
+
+/* ===========================================================================================================================
+  */
 /* ================                                          MCU_AON
   * ================ */
 /* ===========================================================================================================================
@@ -15873,10 +15969,13 @@ typedef struct { /*!< (@ 0x24042400) SDC Structure                              
 #define MCU_FSM_BASE           0x24048100UL
 #define MCU_ProcessSensor_BASE 0x24048540UL
 #define MCU_RET_BASE           0x24048600UL
-#define MCU_TEMP_BASE          0x24048500UL
-#define MCU_AON_BASE           0x24048000UL
-#define ULPCLK_BASE            0x24041400UL
-#define SDC_BASE               0x24042400UL
+/* Same physical peripheral: temperature and secure storage share base 0x24048500.
+ * MCU_TEMP_Type and MCU_SECURE_STORAGE_Type are different views of this block. */
+#define MCU_TEMP_BASE           0x24048500UL
+#define MCU_SECURE_STORAGE_BASE 0x24048500UL
+#define MCU_AON_BASE            0x24048000UL
+#define ULPCLK_BASE             0x24041400UL
+#define SDC_BASE                0x24042400UL
 
 #if defined(SLI_SI917B0)
 #define SYSRTC_BASE 0x24048C00UL
@@ -15917,63 +16016,64 @@ typedef struct { /*!< (@ 0x24042400) SDC Structure                              
   * @{
   */
 
-#define BOD               ((BOD_Type *)BOD_BASE)
-#define I2C0              ((I2C0_Type *)I2C0_BASE)
-#define I2C1              ((I2C0_Type *)I2C1_BASE)
-#define I2C2              ((I2C0_Type *)I2C2_BASE)
-#define MCPWM             ((MCPWM_Type *)MCPWM_BASE)
-#define UDMA0             ((UDMA0_Type *)UDMA0_BASE)
-#define UDMA1             ((UDMA0_Type *)UDMA1_BASE)
-#define GPDMA_G           ((GPDMA_G_Type *)GPDMA_G_BASE)
-#define GPDMA_C           ((GPDMA_C_Type *)GPDMA_C_BASE)
-#define HWRNG             ((HWRNG_Type *)HWRNG_BASE)
-#define TIMERS            ((TIMERS_Type *)TIMERS_BASE)
-#define QEI               ((QEI_Type *)QEI_BASE)
-#define USART0            ((USART0_Type *)USART0_BASE)
-#define UART0             ((USART0_Type *)UART0_BASE)
-#define UART1             ((USART0_Type *)UART1_BASE)
-#define ULP_UART          ((USART0_Type *)ULP_UART_BASE)
-#define GSPI0             ((GSPI0_Type *)GSPI0_BASE)
-#define SSI0              ((SSI0_Type *)SSI0_BASE)
-#define SSISlave          ((SSI0_Type *)SSISlave_BASE)
-#define SSI2              ((SSI0_Type *)SSI2_BASE)
-#define SIO               ((SIO_Type *)SIO_BASE)
-#define QSPI              ((QSPI_Type *)QSPI_BASE)
-#define CRC               ((CRC_Type *)CRC_BASE)
-#define EFUSE             ((EFUSE_Type *)EFUSE_BASE)
-#define I2S0              ((I2S0_Type *)I2S0_BASE)
-#define I2S1              ((I2S0_Type *)I2S1_BASE)
-#define IID_AES           ((IID_AES_Type *)IID_AES_BASE)
-#define IID_QK            ((IID_QK_Type *)IID_QK_BASE)
-#define IID_RPINE         ((IID_RPINE_Type *)IID_RPINE_BASE)
-#define CT0               ((CT0_Type *)CT0_BASE)
-#define CT1               ((CT0_Type *)CT1_BASE)
-#define CT2               ((CT0_Type *)CT2_BASE)
-#define CT3               ((CT0_Type *)CT3_BASE)
-#define CT_MUX_REG        ((CT_MUX_REG_Type *)CT_MUX_REG_BASE)
-#define EGPIO             ((EGPIO_Type *)EGPIO_BASE)
-#define EGPIO1            ((EGPIO_Type *)EGPIO1_BASE)
-#define SDIO0             ((SDIO0_Type *)SDIO0_BASE)
-#define SPI_SLAVE         ((SPI_SLAVE_Type *)SPI_SLAVE_BASE)
-#define M4CLK             ((M4CLK_Type *)M4CLK_BASE)
-#define TIME_PERIOD       ((TIME_PERIOD_Type *)TIME_PERIOD_BASE)
-#define MCU_WDT           ((MCU_WDT_Type *)MCU_WDT_BASE)
-#define RTC               ((RTC_Type *)RTC_BASE)
-#define BATT_FF           ((BATT_FF_Type *)BATT_FF_BASE)
-#define MCU_FSM           ((MCU_FSM_Type *)MCU_FSM_BASE)
-#define MCU_ProcessSensor ((MCU_ProcessSensor_Type *)MCU_ProcessSensor_BASE)
-#define MCU_RET           ((MCU_RET_Type *)MCU_RET_BASE)
-#define MCU_TEMP          ((MCU_TEMP_Type *)MCU_TEMP_BASE)
-#define MCU_AON           ((MCU_AON_Type *)MCU_AON_BASE)
-#define ULPCLK            ((ULPCLK_Type *)ULPCLK_BASE)
-#define FIM               ((FIM_Type *)FIM_BASE)
-#define NWP_FSM           ((NWP_FSM_Type *)NWP_FSM_BASE)
-#define OPAMP             ((OPAMP_Type *)OPAMP_BASE)
-#define AUX_ADC_DAC_COMP  ((AUX_ADC_DAC_COMP_Type *)AUX_ADC_DAC_COMP_BASE)
-#define IR                ((IR_Type *)IR_BASE)
-#define MISC_CONFIG       ((MISC_CONFIG_Type *)MISC_CONFIG_BASE)
-#define SDC               ((SDC_Type *)SDC_BASE)
-#define ULP_I2C           I2C2 // Renaming I2C2 base address as ULP_I2C
+#define BOD                ((BOD_Type *)BOD_BASE)
+#define I2C0               ((I2C0_Type *)I2C0_BASE)
+#define I2C1               ((I2C0_Type *)I2C1_BASE)
+#define I2C2               ((I2C0_Type *)I2C2_BASE)
+#define MCPWM              ((MCPWM_Type *)MCPWM_BASE)
+#define UDMA0              ((UDMA0_Type *)UDMA0_BASE)
+#define UDMA1              ((UDMA0_Type *)UDMA1_BASE)
+#define GPDMA_G            ((GPDMA_G_Type *)GPDMA_G_BASE)
+#define GPDMA_C            ((GPDMA_C_Type *)GPDMA_C_BASE)
+#define HWRNG              ((HWRNG_Type *)HWRNG_BASE)
+#define TIMERS             ((TIMERS_Type *)TIMERS_BASE)
+#define QEI                ((QEI_Type *)QEI_BASE)
+#define USART0             ((USART0_Type *)USART0_BASE)
+#define UART0              ((USART0_Type *)UART0_BASE)
+#define UART1              ((USART0_Type *)UART1_BASE)
+#define ULP_UART           ((USART0_Type *)ULP_UART_BASE)
+#define GSPI0              ((GSPI0_Type *)GSPI0_BASE)
+#define SSI0               ((SSI0_Type *)SSI0_BASE)
+#define SSISlave           ((SSI0_Type *)SSISlave_BASE)
+#define SSI2               ((SSI0_Type *)SSI2_BASE)
+#define SIO                ((SIO_Type *)SIO_BASE)
+#define QSPI               ((QSPI_Type *)QSPI_BASE)
+#define CRC                ((CRC_Type *)CRC_BASE)
+#define EFUSE              ((EFUSE_Type *)EFUSE_BASE)
+#define I2S0               ((I2S0_Type *)I2S0_BASE)
+#define I2S1               ((I2S0_Type *)I2S1_BASE)
+#define IID_AES            ((IID_AES_Type *)IID_AES_BASE)
+#define IID_QK             ((IID_QK_Type *)IID_QK_BASE)
+#define IID_RPINE          ((IID_RPINE_Type *)IID_RPINE_BASE)
+#define CT0                ((CT0_Type *)CT0_BASE)
+#define CT1                ((CT0_Type *)CT1_BASE)
+#define CT2                ((CT0_Type *)CT2_BASE)
+#define CT3                ((CT0_Type *)CT3_BASE)
+#define CT_MUX_REG         ((CT_MUX_REG_Type *)CT_MUX_REG_BASE)
+#define EGPIO              ((EGPIO_Type *)EGPIO_BASE)
+#define EGPIO1             ((EGPIO_Type *)EGPIO1_BASE)
+#define SDIO0              ((SDIO0_Type *)SDIO0_BASE)
+#define SPI_SLAVE          ((SPI_SLAVE_Type *)SPI_SLAVE_BASE)
+#define M4CLK              ((M4CLK_Type *)M4CLK_BASE)
+#define TIME_PERIOD        ((TIME_PERIOD_Type *)TIME_PERIOD_BASE)
+#define MCU_WDT            ((MCU_WDT_Type *)MCU_WDT_BASE)
+#define RTC                ((RTC_Type *)RTC_BASE)
+#define BATT_FF            ((BATT_FF_Type *)BATT_FF_BASE)
+#define MCU_FSM            ((MCU_FSM_Type *)MCU_FSM_BASE)
+#define MCU_ProcessSensor  ((MCU_ProcessSensor_Type *)MCU_ProcessSensor_BASE)
+#define MCU_RET            ((MCU_RET_Type *)MCU_RET_BASE)
+#define MCU_TEMP           ((MCU_TEMP_Type *)MCU_TEMP_BASE)
+#define MCU_SECURE_STORAGE ((MCU_SECURE_STORAGE_Type *)MCU_SECURE_STORAGE_BASE)
+#define MCU_AON            ((MCU_AON_Type *)MCU_AON_BASE)
+#define ULPCLK             ((ULPCLK_Type *)ULPCLK_BASE)
+#define FIM                ((FIM_Type *)FIM_BASE)
+#define NWP_FSM            ((NWP_FSM_Type *)NWP_FSM_BASE)
+#define OPAMP              ((OPAMP_Type *)OPAMP_BASE)
+#define AUX_ADC_DAC_COMP   ((AUX_ADC_DAC_COMP_Type *)AUX_ADC_DAC_COMP_BASE)
+#define IR                 ((IR_Type *)IR_BASE)
+#define MISC_CONFIG        ((MISC_CONFIG_Type *)MISC_CONFIG_BASE)
+#define SDC                ((SDC_Type *)SDC_BASE)
+#define ULP_I2C            I2C2 // Renaming I2C2 base address as ULP_I2C
 #if defined(SLI_SI917B0)
 #define SYSRTC0 ((SYSRTC_TypeDef *)SYSRTC_BASE)
 #define MVP     ((MVP_TypeDef *)MVP_BASE) /**< MVP base pointer */

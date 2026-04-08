@@ -708,8 +708,8 @@ typedef enum {
   */
 typedef enum {
   SL_WIFI_BAND_MODE_2_4GHZ = 0, ///< 2.4 GHz Wi-Fi band
-  SL_WIFI_BAND_MODE_5GHZ   = 1, ///< 5 GHz Wi-Fi band (not currently supported)
-  SL_WIFI_DUAL_BAND_MODE   = 2  ///< Both 2.4 GHz and 5 GHZ WiFi band (not currently supported)
+  SL_WIFI_BAND_MODE_5GHZ   = 1, ///< 5 GHz Wi-Fi band (not supported in SiWx91x devices)
+  SL_WIFI_DUAL_BAND_MODE   = 2  ///< Both 2.4 GHz and 5 GHz WiFi band (not supported in SiWx91x devices)
 } sl_wifi_band_mode_t;
 
 /**
@@ -861,6 +861,47 @@ typedef enum __attribute__((packed)) {
   SL_WIFI_CW_TONE_AMPLITUDE_INVALID = 0xFF, ///<  Invalid Tone scale value
 } sl_wifi_cw_tone_amplitude_t;
 
-/** @} */
+/**
+  * @enum sl_wifi_gi_ltf_t
+  * @brief HE guard interval (GI) and LTF symbol length selection.
+  *
+  */
+typedef enum __attribute__((packed)) {
+  SL_WIFI_1HE_LTF_800_NSEC_GI,  ///< 1x HE-LTF, 800 ns guard interval
+  SL_WIFI_1HE_LTF_1600_NSEC_GI, ///< 1x HE-LTF, 1600 ns guard interval
+  SL_WIFI_2HE_LTF_800_NSEC_GI,  ///< 2x HE-LTF, 800 ns guard interval
+  SL_WIFI_2HE_LTF_1600_NSEC_GI, ///< 2x HE-LTF, 1600 ns guard interval
+  SL_WIFI_4HE_LTF_800_NSEC_GI,  ///< 4x HE-LTF, 800 ns guard interval
+  SL_WIFI_4HE_LTF_3200_NSEC_GI, ///< 4x HE-LTF, 3200 ns guard interval
+} sl_wifi_gi_ltf_t;
 
+/**
+  * @enum sl_wifi_beamformee_support_t
+  * @brief Beamformee capability mode.
+  */
+typedef enum __attribute__((packed)) {
+  SL_WIFI_BEAMFORMEE_SUPPORT_ENABLED     = 0, ///< Beamformee support enabled
+  SL_WIFI_BEAMFORMEE_SUPPORT_DISABLED_SU = 1, ///< Beamformee disabled for SU (single-user)
+  SL_WIFI_BEAMFORMEE_SUPPORT_DISABLED_MU = 2, ///< Beamformee disabled for MU (multi-user)
+} sl_wifi_beamformee_support_t;
+
+/**
+  * @enum sl_wifi_config_er_su_t
+  * @brief Extended Range Single User (ER-SU) rate usage 
+  */
+typedef enum __attribute__((packed)) {
+  SL_WIFI_CONFIG_ER_SU_NO   = 0, ///< No ER-SU; use normal SU rates
+  SL_WIFI_CONFIG_ER_SU_USE  = 1, ///< ER-SU rates allowed together with non-ER-SU rates
+  SL_WIFI_CONFIG_ER_SU_ONLY = 2, ///< ER-SU rates only
+} sl_wifi_config_er_su_t;
+
+/**
+  * @enum sl_wifi_dcm_enable_t
+  * @brief Dual subcarrier modulation (DCM) enable for transmissions.
+  */
+typedef enum __attribute__((packed)) {
+  SL_WIFI_DCM_ENABLE_DISABLED = 0, ///< DCM disabled
+  SL_WIFI_DCM_ENABLE_ENABLED  = 1, ///< DCM enabled
+} sl_wifi_dcm_enable_t;
+/**@} */
 #endif // _SL_WIFI_CONSTANTS_H_

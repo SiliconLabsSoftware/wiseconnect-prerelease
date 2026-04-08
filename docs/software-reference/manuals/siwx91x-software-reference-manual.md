@@ -100,7 +100,7 @@ The SiWx917 provides the PSRAM in a ready-to-use state upon boot up. During boot
 
 The application may use the PSRAM for different memory segments like .data, .bss, .stack, .heap, .text, or user defined segments. Different PSRAM components are available in the Simplicity Studio application project depending on the memory segments required. See the components starting from Segments in PSRAM in the [Peripherals](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-migr-sdk-changes/application-components#peripherals) section of the **Application Components** documentation page.
 
-PSRAM can be used for runtime data storage as well as for executing MCU applications. It utilizes D-cache and I-cache to enhance memory access performance for both data and instructions.
+PSRAM can be used for runtime data storage as well as for executing MCU applications, it uses the instruction cache (I-cache) to improve instruction memory access performance. The PSRAM D-cache path is disabled to prevent incorrect data during specific back-to-back accesses. See DCACHE_E301 ERRATA for more details refer [D-Cache Errata](https://www.silabs.com/documents/public/errata/siwg917-soc-ic-errata.pdf).
 
 There is a provision to modify the PSRAM configuration settings in addition to boot up and default settings with the help of driver APIs which are part of the WiSeConnect SDK. These additional configurations include interface mode, read/write type, clock, pinset, and others. The WiSeConnect SDK offers various [examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/) to demonstrate the use of PSRAM memory and driver APIs.
 

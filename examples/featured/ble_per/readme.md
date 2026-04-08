@@ -373,9 +373,9 @@ uint8_t Si917_BLE_REGION_BASED_LP_CHAIN_10DBM_OFFSET_XX[] = {};  // Fill the use
   > **Note:** `ble_config.h` files are already set with desired configuration in the respective example folders. The user does not need to change these for each example.
   
 > **Note**: 
- - For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
- - The Worldwide table is available for BLE only, and must not be modified. 
- - The values in the worldwide table comply with Bluetooth SIG specifications.
+> - For recommended settings, refer to the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+> - The Worldwide table is available for BLE only, and must not be modified. 
+> - The values in the worldwide table comply with Bluetooth SIG specifications.
 
 ## Test the Application
 
@@ -412,5 +412,6 @@ Follow the steps as mentioned for the successful execution of the application:
 ### BLE-PER-RX
 
   ![output](resources/readme/output_2.png)
+
 
 

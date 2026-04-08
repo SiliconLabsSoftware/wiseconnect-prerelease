@@ -820,7 +820,27 @@ sl_status_t sl_wifi_update_su_gain_table(uint8_t band,
 
 sl_status_t sl_wifi_set_11ax_config(uint8_t guard_interval)
 {
-  return sli_wifi_set_11ax_config(guard_interval);
+#if !(SLI_SI91X_CONFIG_WIFI6_PARAMS)
+  UNUSED_PARAMETER(guard_interval);
+  return SL_STATUS_NOT_SUPPORTED;
+#else
+  sl_wifi_11ax_config_params_t config_11ax_params = { 0 };
+  config_11ax_params.gi_ltf                       = guard_interval;
+  config_11ax_params.dcm_enable                   = SL_WIFI_DCM_ENABLE_DISABLED;
+  config_11ax_params.beamformee_support           = SL_WIFI_BEAMFORMEE_SUPPORT_ENABLED;
+  config_11ax_params.config_er_su                 = SL_WIFI_CONFIG_ER_SU_NO;
+  return sli_wifi_set_11ax_config(&config_11ax_params);
+#endif
+}
+
+sl_status_t sl_wifi_set_11ax_config_v2(const sl_wifi_11ax_config_params_t *config_11ax_params)
+{
+#if !(SLI_SI91X_CONFIG_WIFI6_PARAMS)
+  UNUSED_PARAMETER(config_11ax_params);
+  return SL_STATUS_NOT_SUPPORTED;
+#else
+  return sli_wifi_set_11ax_config(config_11ax_params);
+#endif
 }
 
 sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface, sl_wifi_listen_interval_t listen_interval)
@@ -973,7 +993,7 @@ sl_status_t sl_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface)
   return SL_STATUS_NOT_SUPPORTED;
 }
 
-sl_status_t sl_wifi_set_tx_powerdBm(int16_t txPower)
+sl_status_t sl_wifi_set_test_tx_power(int16_t txPower)
 {
   UNUSED_PARAMETER(txPower);
   return SL_STATUS_NOT_SUPPORTED;

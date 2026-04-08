@@ -65,7 +65,6 @@
 #define LP_CHAIN_ENABLE                          BIT(6)
 #define QUICK_SCAN_ENABLE                        1
 #define SCAN_RESULTS_TO_HOST                     2
-#define DEFAULT_LISTEN_INTERVAL_MULTIPLIER       1
 #define ALWAYS_ROAM                              1
 #define MAX_TX_AND_RX_LATENCY_LIMIT              21600000
 #define MAX_TWT_SUSPEND_DURATION                 0x5265c00
@@ -112,7 +111,7 @@
 #define SLI_TX_ONLY_ON_AP_TRIG 0
 #define SLI_CONFIG_ER_SU \
   0 // 0 - NO ER_SU support, 1 - Use ER_SU rates along with Non_ER_SU rates, 2 - Use ER_SU rates only
-#define SLI_SI91X_ENABLE_TWT_FEATURE      1
+#define SLI_ENABLE_TWT_FEATURE            1
 #define SLI_ENABLE_BEAMFORMEE_SUPPORT     0
 #define SLI_DISABLE_SU_BEAMFORMEE_SUPPORT 1
 #define SLI_DISABLE_MU_BEAMFORMEE_SUPPORT 2
@@ -239,7 +238,11 @@ static sl_status_t sli_handle_psk_security(const sl_wifi_client_configuration_t 
   VERIFY_STATUS_AND_RETURN(status);
 
   psk_request.type = cred.type == SL_WIFI_PSK_CREDENTIAL ? 1 : 2;
-  memcpy(psk_request.psk_or_pmk, cred.pmk.value, SL_WIFI_MAX_PMK_LENGTH);
+  if (cred.type == SL_WIFI_PSK_CREDENTIAL) {
+    memcpy(psk_request.psk_or_pmk, cred.psk.value, SL_WIFI_MAX_PSK_LENGTH);
+  } else {
+    memcpy(psk_request.psk_or_pmk, cred.pmk.value, SL_WIFI_MAX_PMK_LENGTH);
+  }
 
   return sli_wifi_send_command(SLI_WIFI_REQ_HOST_PSK,
                                SLI_WIFI_WLAN_CMD,
@@ -908,6 +911,8 @@ static sl_status_t sli_handle_background_scan(const sl_wifi_scan_configuration_t
   scan_request.rssi_tolerance_threshold = (uint16_t)advanced_scan_configuration.trigger_level_change;
   scan_request.bgscan_threshold         = (uint16_t)(-1 * advanced_scan_configuration.trigger_level);
   scan_request.multi_probe              = advanced_scan_configuration.enable_multi_probe;
+
+  sli_wifi_flush_scan_results_database();
 
   return sli_wifi_send_command(SLI_WIFI_REQ_BG_SCAN,
                                SLI_WIFI_WLAN_CMD,
@@ -2430,38 +2435,91 @@ sl_status_t sli_wifi_update_su_gain_table(uint8_t band,
   return status;
 }
 
-sl_status_t sli_wifi_set_11ax_config(uint8_t guard_interval)
+sl_status_t sli_wifi_set_11ax_config(const sl_wifi_11ax_config_params_t *config_11ax_params)
 {
-#if !(SLI_SI91X_CONFIG_WIFI6_PARAMS)
-  UNUSED_PARAMETER(guard_interval);
-  return SL_STATUS_NOT_SUPPORTED;
-#else
-  sl_status_t status                               = SL_STATUS_OK;
-  sli_wifi_11ax_config_params_t config_11ax_params = { 0 };
-  config_11ax_params.guard_interval                = guard_interval;
-  config_11ax_params.nominal_pe                    = SLI_NOMINAL_PE;
-  config_11ax_params.dcm_enable                    = SLI_DCM_ENABLE;
-  config_11ax_params.ldpc_enable                   = SLI_LDPC_ENABLE;
-  config_11ax_params.ng_cb_enable                  = SLI_NG_CB_ENABLE;
-  config_11ax_params.ng_cb_values                  = SLI_NG_CB_VALUES;
-  config_11ax_params.uora_enable                   = SLI_UORA_ENABLE;
-  config_11ax_params.trigger_rsp_ind               = SLI_TRIGGER_RESP_IND;
-  config_11ax_params.ipps_valid_value              = SLI_IPPS_VALID_VALUE;
-  config_11ax_params.tx_only_on_ap_trig            = SLI_TX_ONLY_ON_AP_TRIG;
-  config_11ax_params.twt_support                   = SLI_SI91X_ENABLE_TWT_FEATURE;
-  config_11ax_params.config_er_su                  = SLI_CONFIG_ER_SU;
-  config_11ax_params.beamformee_support            = SLI_ENABLE_BEAMFORMEE_SUPPORT;
-
+  if (sli_wifi_get_opermode() == SL_WIFI_ACCESS_POINT_MODE) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+  sl_status_t status = SL_STATUS_OK;
+  //Null check and validate the input parameters
+  SL_VERIFY_POINTER_OR_RETURN(config_11ax_params, SL_STATUS_NULL_POINTER);
+  if (config_11ax_params->gi_ltf > SL_WIFI_4HE_LTF_3200_NSEC_GI) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  if (config_11ax_params->dcm_enable > SL_WIFI_DCM_ENABLE_ENABLED) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  if (config_11ax_params->beamformee_support > SL_WIFI_BEAMFORMEE_SUPPORT_DISABLED_MU) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  if (config_11ax_params->config_er_su > SL_WIFI_CONFIG_ER_SU_ONLY) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  //Request configuration parameters
+  sli_wifi_11ax_config_params_t req_config_11ax_params = { 0 };
+  //Set the GI LTF
+  switch (config_11ax_params->gi_ltf) {
+    //1HE LTF 800 nsec GI
+    case SL_WIFI_1HE_LTF_800_NSEC_GI:
+      req_config_11ax_params.guard_interval = 0;
+      break;
+    //1HE LTF 1600 nsec GI
+    case SL_WIFI_1HE_LTF_1600_NSEC_GI:
+      return SL_STATUS_INVALID_PARAMETER;
+    //2HE LTF 800 nsec GI
+    case SL_WIFI_2HE_LTF_800_NSEC_GI:
+      req_config_11ax_params.guard_interval = 1;
+      break;
+    //2HE LTF 1600 nsec GI
+    case SL_WIFI_2HE_LTF_1600_NSEC_GI:
+      req_config_11ax_params.guard_interval = 2;
+      break;
+    //4HE LTF 800 nsec GI
+    case SL_WIFI_4HE_LTF_800_NSEC_GI:
+      return SL_STATUS_INVALID_PARAMETER;
+    //4HE LTF 3200 nsec GI
+    case SL_WIFI_4HE_LTF_3200_NSEC_GI:
+      req_config_11ax_params.guard_interval = 3;
+      break;
+    default:
+      return SL_STATUS_INVALID_PARAMETER;
+  }
+  //Set the nominal PE
+  req_config_11ax_params.nominal_pe = SLI_NOMINAL_PE;
+  //Set the DCM enable
+  req_config_11ax_params.dcm_enable = config_11ax_params->dcm_enable;
+  //Set the LDPC enable
+  req_config_11ax_params.ldpc_enable = SLI_LDPC_ENABLE;
+  //Set the NG CB enable
+  req_config_11ax_params.ng_cb_enable = SLI_NG_CB_ENABLE;
+  //Set the NG CB values
+  req_config_11ax_params.ng_cb_values = SLI_NG_CB_VALUES;
+  //Set the UORA enable
+  req_config_11ax_params.uora_enable = SLI_UORA_ENABLE;
+  //Set the trigger RSP ind
+  req_config_11ax_params.trigger_rsp_ind = SLI_TRIGGER_RESP_IND;
+  //Set the IPPS valid value
+  req_config_11ax_params.ipps_valid_value = SLI_IPPS_VALID_VALUE;
+  //Set the TX only on AP trig
+  req_config_11ax_params.tx_only_on_ap_trig = SLI_TX_ONLY_ON_AP_TRIG;
+  //Set the TWT support
+  req_config_11ax_params.twt_support = SLI_ENABLE_TWT_FEATURE;
+  //Set the config ER SU
+  req_config_11ax_params.config_er_su = config_11ax_params->config_er_su;
+  //Set the beamformee support
+  req_config_11ax_params.beamformee_support = config_11ax_params->beamformee_support;
+  //Send the request configuration parameters
   status = sli_wifi_send_command(SLI_WIFI_REQ_11AX_PARAMS,
                                  SLI_WIFI_WLAN_CMD,
-                                 &config_11ax_params,
-                                 sizeof(config_11ax_params),
+                                 &req_config_11ax_params,
+                                 sizeof(req_config_11ax_params),
                                  SLI_WIFI_RSP_11AX_PARAMS_WAIT_TIME,
                                  NULL,
                                  NULL);
-  VERIFY_STATUS_AND_RETURN(status);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
   return status;
-#endif
 }
 
 sl_status_t sli_wifi_transceiver_set_channel(sl_wifi_interface_t interface, sl_wifi_transceiver_set_channel_t channel)
@@ -2902,12 +2960,21 @@ sl_status_t sli_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface)
   return status;
 }
 
-sl_status_t sli_wifi_set_tx_powerdBm(int16_t txPower)
+sl_status_t sli_wifi_set_test_tx_power(int16_t txPower)
 {
   sl_status_t status = SL_STATUS_FAIL;
 
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (txPower < SLI_WIFI_TX_POWER_DECIDBM_MIN || txPower > SLI_WIFI_TX_POWER_DECIDBM_MAX) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  /* If tx power is odd, make it even (floor to next even). */
+  if ((txPower % 2) != 0) {
+    txPower = txPower - 1;
   }
 
   sli_wifi_request_tx_power_t tx_power_request = { 0 };
@@ -3255,7 +3322,7 @@ sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
           if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
             request = default_SG_region_2_4GHZ_configurations;
           } else {
-            request = default_SG_region_5GHZ_configurations;
+            return SL_STATUS_NOT_SUPPORTED;
           }
           break;
         }

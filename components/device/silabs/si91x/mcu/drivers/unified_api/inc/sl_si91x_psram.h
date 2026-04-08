@@ -33,9 +33,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "rsi_qspi_proto.h"
-#if (SL_SI91X_D_CACHE_ENABLE == 1)
-#include "rsi_d_cache.h"
-#endif
 
 /***************************************************************************/
 /**
@@ -97,21 +94,6 @@
 
 /** @brief Macro to convert Mbit to bits */
 #define Mbit_(a) (a * 1000000)
-
-/** @brief Enable D-Cache */
-
-#if (SL_SI91X_D_CACHE_ENABLE == 1)
-
-/** @brief M4SS D-Cache Base Address */
-#define M4SS_DCACHE_BASE_ADDR (0x44040000)
-
-/** @brief D-Cache Control Register */
-#define DCACHE_REG_CTRL (*((uint32_t volatile *)(M4SS_DCACHE_BASE_ADDR + 0x010)))
-
-/** @brief D-Cache Maintenance Status Register */
-#define DCACHE_REG_MAINT_STATUS (*((uint32_t volatile *)(M4SS_DCACHE_BASE_ADDR + 0x028)))
-
-#endif
 
 /** @endcond */
 

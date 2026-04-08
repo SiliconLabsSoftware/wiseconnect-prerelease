@@ -3,7 +3,7 @@
 * @brief
 *******************************************************************************
 * # License
-* <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+* <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
 *******************************************************************************
 *
 * The licensor of this software is Silicon Laboratories Inc. Your use of this
@@ -333,6 +333,8 @@ typedef enum ta_m4_commands_e {
 #ifdef SLI_SI917
   SL_SI91X_WRITE_TO_COMMON_FLASH = 6, ///< //Writes data to the common flash memory
 #endif
+  SL_SI91X_MCU_SECURE_STORAGE_ENABLE_PROTECTION  = 12, ///< Enables MCU secure storage write protection
+  SL_SI91X_MCU_SECURE_STORAGE_DISABLE_PROTECTION = 13, ///< Disables MCU secure storage write protection
 } sl_si91x_ta_m4_commands_t;
 
 ///  M4 and NWP secure handshake request structure.

@@ -45,7 +45,10 @@
 //  sl_si91x_watchdog_set_configuration API to modify the peripheral
 //  configuration.
 //  <i> Default: 1
-// Note: SL_WDT_MANAGER_PRESENT_M4_UC_XTAL is now defined in the component file based on device type
+//  <i> Note: May also be defined by the WDT manager component based on device type; this define allows CMSIS Configuration Wizard to persist the option (v6).
+#ifndef SL_WDT_MANAGER_PRESENT_M4_UC_XTAL
+#define SL_WDT_MANAGER_PRESENT_M4_UC_XTAL 1
+#endif
 
 // <o SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_PERIOD>  WDT Timeout Interval in milliseconds
 //   <SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_INDEX_5 => 0.977

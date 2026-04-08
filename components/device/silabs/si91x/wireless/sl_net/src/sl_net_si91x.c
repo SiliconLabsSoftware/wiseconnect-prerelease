@@ -274,10 +274,10 @@ static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interfac
   //Fill IP version and IP address
   if (ip_address->type == SL_IPV6) {
     multicast.ip_version[0] = 6;
-    memcpy(multicast.multicast_address.ipv6_address, ip_address->ip.v6.bytes, SLI_IP_ADDRESS_LEN * 4);
+    memcpy(multicast.multicast_address.ipv6_address, ip_address->ip.v6.bytes, SL_IPV6_ADDRESS_LENGTH);
   } else {
     multicast.ip_version[0] = 4;
-    memcpy(multicast.multicast_address.ipv4_address, ip_address->ip.v4.bytes, SLI_IP_ADDRESS_LEN);
+    memcpy(multicast.multicast_address.ipv4_address, ip_address->ip.v4.bytes, SL_IPV4_ADDRESS_LENGTH);
   }
   multicast.type[0] = command_type;
 

@@ -45,6 +45,9 @@ extern bool device_initialized;
 #define NWP_TSF_GRANULARITY 10
 #define NWP_MAX_LOG_BUFFER  1024
 
+/** Max length of IPv6 address string including null (e.g. "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255") */
+#define SL_IPV6_ADDRESS_STRING_MAX_LENGTH 46
+
 #ifdef SPRINTF_CHAR
 #define SPRINTF(x) strlen(sprintf /**/ x)
 #else
@@ -77,7 +80,7 @@ sl_status_t convert_string_to_sl_ipv4_address(char *line, sl_ipv4_address_t *ip)
   char *lasts       = NULL;
   const char *token = strtok_r(line, ".", &lasts);
 
-  for (uint8_t i = 0; i < 4; i++, token = strtok_r(NULL, ".", &lasts)) {
+  for (uint8_t i = 0; i < SL_IPV4_ADDRESS_LENGTH; i++, token = strtok_r(NULL, ".", &lasts)) {
     if (token == NULL) {
       return SL_STATUS_COMMAND_IS_INVALID;
     }
@@ -106,7 +109,7 @@ void print_sl_ipv4_address(const sl_ipv4_address_t *ip_address)
 
 void print_sl_ipv6_address(const sl_ipv6_address_t *ip_address)
 {
-  char temp_buffer[46] = { 0 };
+  char temp_buffer[SL_IPV6_ADDRESS_STRING_MAX_LENGTH] = { 0 };
   sl_inet_ntop6((const unsigned char *)(ip_address), (char *)temp_buffer, sizeof(temp_buffer));
   printf("%s\r\n", temp_buffer);
 }
@@ -206,9 +209,9 @@ static char *sli_format_ipv6_address(const unsigned int *words, data_t best, cha
 
 char *sl_inet_ntop6(const unsigned char *input, char *dst, uint32_t size)
 {
-  char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"];
+  char tmp[SL_IPV6_ADDRESS_STRING_MAX_LENGTH];
   unsigned int words[SL_IPV6_ADDRESS_LENGTH / 2];
-  unsigned int ip_big_endian[4];
+  unsigned int ip_big_endian[SL_IPV6_ADDRESS_LENGTH / 4];
 
   // Convert to big endian
   sli_little_to_big_endian((const unsigned int *)input, (unsigned char *)ip_big_endian, SL_IPV6_ADDRESS_LENGTH);
@@ -421,7 +424,7 @@ sl_status_t convert_string_to_mac_address(const char *line, sl_mac_address_t *ma
   }
 
   uint8_t index = 0;
-  while (index < 6) {
+  while (index < SL_MAC_ADDRESS_LENGTH) {
     // Read all the data and verify validity
     int char1 = DIGIT_VAL(line[0]);
     int char2 = DIGIT_VAL(line[1]);

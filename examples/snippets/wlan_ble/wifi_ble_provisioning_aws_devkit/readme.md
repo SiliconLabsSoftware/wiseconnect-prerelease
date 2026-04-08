@@ -37,7 +37,7 @@ The application also publishes the real-time sensor data (LUX, Temperature, Humi
 - Wireless Access Point
 - **SoC Mode**:
   - Kits
-    - BRD2605A (SiWG917 Dev Kit Board)
+    - BRD2605A/BRD2605B (SiWG917 Dev Kit Board)
 - Android Phone or iPhone with Simplicity Connect App (formerly EFR Connect App), which is available in Play Store and App Store (or) Windows PC with windows Silicon labs connect application.
 
 ### Software Requirements

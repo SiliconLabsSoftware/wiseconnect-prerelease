@@ -286,6 +286,59 @@ int8_t add_device_to_ltk_key_list(rsi_ble_dev_ltk_list_t *ble_dev_ltk_list,
   }
   return status;
 }
+
+/*==============================================*/
+/**
+ * @fn         remove_device_from_ltk_key_list
+ * @brief      Clear ble_dev_ltk_list entry for a disconnected peer
+ * @param[in]  ble_dev_ltk_list  LTK / resolving-list mirror table
+ * @param[in]  dev_addr          Remote BD address (6 bytes), from disconnect / encryption / keys events
+ * @param[in]  dev_addr_type     LE address type from disconnect (rsi_ble_event_disconnect_t::dev_type);
+ *                               use 0xFF to ignore type and match on address only
+ * @return     RSI_SUCCESS if at least one entry removed, -1 if none matched
+ * @section description
+ * Matches stored remote_dev_addr or non-zero Identity_addr. When dev_addr_type is not 0xFF and the
+ * slot has remote_dev_addr_type set, both types must match before removal.
+ */
+static int8_t remove_device_from_ltk_key_list(rsi_ble_dev_ltk_list_t *ble_dev_ltk_list,
+                                              const uint8_t *dev_addr,
+                                              uint8_t dev_addr_type)
+{
+  uint8_t ix                                = 0;
+  int8_t removed                            = RSI_FAILURE;
+  const uint8_t zero_addr[RSI_DEV_ADDR_LEN] = { 0 };
+
+  if (dev_addr == NULL) {
+    return RSI_FAILURE;
+  }
+
+  for (ix = 0; ix < TOTAL_CONNECTIONS; ix++) {
+    if (ble_dev_ltk_list[ix].used != 1) {
+      continue;
+    }
+
+    if ((dev_addr_type != (uint8_t)0xFFU) && (ble_dev_ltk_list[ix].remote_dev_addr_type != 0U)
+        && (ble_dev_ltk_list[ix].remote_dev_addr_type != dev_addr_type)) {
+      continue;
+    }
+
+    if (memcmp(ble_dev_ltk_list[ix].remote_dev_addr, dev_addr, RSI_DEV_ADDR_LEN) == 0) {
+      memset(&ble_dev_ltk_list[ix], 0, sizeof(ble_dev_ltk_list[ix]));
+      removed = RSI_SUCCESS;
+      continue;
+    }
+
+    if ((memcmp(ble_dev_ltk_list[ix].Identity_addr, zero_addr, RSI_DEV_ADDR_LEN) != 0)
+        && (memcmp(ble_dev_ltk_list[ix].Identity_addr, dev_addr, RSI_DEV_ADDR_LEN) == 0)) {
+      memset(&ble_dev_ltk_list[ix], 0, sizeof(ble_dev_ltk_list[ix]));
+      LOG_PRINT_D("Removed the device at index: %d \r\n", ix);
+      removed = RSI_SUCCESS;
+    }
+  }
+
+  return removed;
+}
+
 /*==============================================*/
 /**
  * @fn         add_derived_key_to_ltk_list
@@ -1670,6 +1723,13 @@ void rsi_ble_event_disconnect(uint16_t status, void *event_data)
   printf("On Event Disconnect");
   //! convert to ascii
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, resp_disconnect->dev_addr);
+  //remove the disconnected device from the ltk key list
+  if (remove_device_from_ltk_key_list(ble_dev_ltk_list, resp_disconnect->dev_addr, resp_disconnect->dev_type)
+      == RSI_SUCCESS) {
+    LOG_PRINT_D("Removed the device %s from the ltk key list\n", remote_dev_addr_conn);
+  } else {
+    LOG_PRINT_D("Failed to remove the device %s from the ltk key list\n", remote_dev_addr_conn);
+  }
 
 #if (CONNECT_OPTION != CONN_BY_NAME)
   //! get conn_id

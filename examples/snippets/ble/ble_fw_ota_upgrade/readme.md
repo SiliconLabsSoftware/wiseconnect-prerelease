@@ -24,8 +24,8 @@ This application demonstrates how to update the SiWx91x module firmware over-the
 
 Supported upgrade methods:
 
-- **Si Connect mobile app** (Android / iOS) â€“ scan, connect, and upload a `.gbl` firmware file.
-- **Python script** â€“ PC-based tool to scan for the device, connect, and send firmware in chunks.
+- **Si Connect mobile app** (Android / iOS) scan, connect, and upload a `.gbl` firmware file.
+- **Python script** PC-based tool to scan for the device, connect, and send firmware in chunks.
 
 
 ## Prerequisites/Setup Requirements
@@ -56,13 +56,13 @@ Supported upgrade methods:
 - Embedded Development Environment.
 - Download and install [Simplicity Studio](https://www.silabs.com/developers/simplicity-studio) with WiSeConnect extension.
 - Download and install the Silicon Labs [Si Connect (formerly Simplicity Connect / EFR Connect App)](https://www.silabs.com/developers/simplicity-connect-mobile-app) in Android or iOS smartphones for BLE OTA firmware upgrade. Users can also use their choice of BLE apps available in Android/iOS smartphones.
-- For Python scriptâ€“based OTA: Python 3.7.9 or above.
+- For Python script based OTA: Python 3.7.9 or above.
 
 > **Note:** The provided mobile screenshots are from the Si Connect app; it is recommended to use the latest version.
 
 ### Setup Diagram
 
-![](resources/readme/setup.png)
+![](resources/readme/ble_fw_ota_upgrade_soc_ncp.png)
 
 Follow the [Getting Started with SiWx91x](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-soc-mode) guides for hardware connections and Simplicity Studio setup. Ensure the SiWx91x module is loaded with the latest connectivity firmware as described in [SiWx91x Firmware Update](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started).
 
@@ -107,11 +107,16 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - Build the application in Studio.
 - Flash, run, and debug the application.
 
-### Build and Run
+Follow the steps below for successful execution of the application:
 
-1. Build the project (e.g., rightâ€‘click project â†’ **Build Project** or use the build icon).
-2. Flash and run the application. The SiWx91x device starts as a BLE peripheral and OTA GATT server.
-3. Connect a serial console (e.g., Tera Term) to view logs.
+### Verify BLE FW OTA upgrade Application as a Server
+
+1. After the program gets executed, if Silicon Labs device is configured as ``SERVER`` specified in the macro ``GATT_ROLE``, Silicon Labs device will be in Advertising state.
+
+2. Connect any serial console for prints.
+
+3. Open a Simplicity Connect App in the Smartphone and do the scan.
+
 4. The device advertises with the name configured in `RSI_BLE_OTA_FWUP_PROFILE` (default: `BLE_OTA_FWUP`).
 
 ![BLE advertising](resources/readme/bleadv.png)
@@ -211,6 +216,7 @@ A Python-based OTA tool is provided to run on a PC: scan for the device, connect
       ```c
       commander rps convert <combined_image.rps> --app <m4_combined_image.rps> --taapp <nwp_combined_image.rps>
       ```
+  ![](resources/readme/TA_M4_combined_image_generation.png)
 ## Appendix
 
 - **SiWx91x NCP** supports **TA firmware upgrade only**.
@@ -221,3 +227,5 @@ A Python-based OTA tool is provided to run on a PC: scan for the device, connect
 - Anti-rollback feature is not supported for this application.
 - During the firmware upgrade, the mobile device running the Si Connect app should not enter sleep mode. Keep the screen on or disable sleep/auto-lock for the duration of the OTA transfer to avoid interrupting the upgrade.
 - Before upgrading firmware, the user should disable power save mode.
+- This Application support only single connection(GATT server) only.
+- If FW upgrade failed or wrong FW selected Then reconnect the Device and intiate the FW upgrade.

@@ -172,7 +172,7 @@ The application can be configured to suit your requirements and the development 
     - **Case 2: When Security is Enabled**
       - For devices with security enabled, additional signing and encryption steps are required. Follow the detailed instructions in **Section 6 - Combined Image (NWP + M4)** of the [UG574 SiWx917 SoC Manufacturing Utility User Guide](https://www.silabs.com/documents/public/user-guides/ug574-siwx917-soc-manufacturing-utility-user-guide.pdf#page=24).
 
-  - Based on the type of server (Apache/AWS S3 bucket/Azure Blob Storage) from which the firmware files need to be downloaded, the following parameters need to be configured.
+  - Based on the type of server (Apache/AWS S3 bucket/Azure Blob Storage) from which the firmware files are downloaded, configure the following parameters.
       - Configure FLAGS to choose the version and security type to be enabled.
 
         Valid configurations are:
@@ -801,4 +801,5 @@ The HTTPs server configuration for Apache requires the Wamp server. If you have 
     > **Note:** Make sure to check your HTTPS server from other local machines present in the same network. It should be accessible.
 
     > **NOTE :** Support for the SNI extension has been added to the AWS SDK, ensuring it is set by the client when connecting to an AWS server using TLS 1.3. This is handled internally by the AWS SDK and does not affect compatibility with other TLS versions.
+
 

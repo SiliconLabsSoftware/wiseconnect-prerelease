@@ -110,7 +110,7 @@ sl_adc_version_t sl_si91x_adc_get_version(void)
  * RSI errors are converted to the SL errors via convert_rsi_to_sl_error_code
  * function.
  ******************************************************************************/
-sl_status_t sl_si91x_adc_configure_clock(sl_adc_clock_config_t *clock_configuration)
+sl_status_t sl_si91x_adc_configure_clock(const sl_adc_clock_config_t *clock_configuration)
 {
   sl_status_t status = SL_STATUS_OK;
   (void)clock_configuration;

@@ -72,10 +72,11 @@ typedef struct {
   uint16_t dest_port; ///< Two bytes. Port number of the device which sends data to the destination.
 
   union {
-    uint8_t ipv4_address[4]; ///< Four bytes. IPv4 address of the device which sends data. Used if ip_version is four.
-
-    uint8_t ipv6_address[16]; ///< 16 bytes. IPv6 address of the device which sends data. Used if ip_version is six.
-  } dest_ip_addr;             ///< Union for IPv4 or IPv6 address, depending on ip_version.
+    uint8_t ipv4_address
+      [SL_IPV4_ADDRESS_LENGTH]; ///< Four bytes. IPv4 address of the device which sends data. Used if ip_version is four.
+    uint8_t ipv6_address
+      [SL_IPV6_ADDRESS_LENGTH]; ///< 16 bytes. IPv6 address of the device which sends data. Used if ip_version is six.
+  } dest_ip_addr;               ///< Union for IPv4 or IPv6 address, depending on ip_version.
 } sl_si91x_socket_metadata_t;
 
 /**

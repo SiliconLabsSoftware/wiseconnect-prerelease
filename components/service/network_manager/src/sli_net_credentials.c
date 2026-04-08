@@ -1,8 +1,8 @@
 /*******************************************************************************
- * @file  sl_net_credentials.c
+ * @file  sli_net_credentials.c
  *******************************************************************************
  * # License
- * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -32,9 +32,6 @@
 #include "sl_wifi_credentials.h"
 #include "sl_common.h"
 #include "sli_net_common_utility.h"
-#if defined(SLI_SI917)
-#include "sl_net_si91x.h"
-#endif
 #include <string.h>
 
 #define CRED_TYPE_CERT 0
@@ -43,10 +40,10 @@
 // [SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID]
 // [SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID]
 
-sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
-                                  sl_net_credential_type_t type,
-                                  const void *credential,
-                                  uint32_t credential_length)
+sl_status_t sli_net_set_credential(sl_net_credential_id_t id,
+                                   sl_net_credential_type_t type,
+                                   const void *credential,
+                                   uint32_t credential_length)
 {
   // Check if the credential is invalid parameter
   if ((credential == NULL) || (credential_length == 0)) {
@@ -57,14 +54,6 @@ sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
   int cred_id                         = 0;
   sl_status_t status                  = 0;
   sl_wifi_credential_type_t cred_type = 0;
-
-  if (CRED_TYPE_CERT == sli_net_check_cred_type(type)) {
-#if defined(SLI_SI917)
-    return sli_net_set_credential(id, type, credential, credential_length);
-#else
-    return SL_STATUS_FAIL;
-#endif
-  }
 
   group_id = (id & SL_NET_CREDENTIAL_GROUP_MASK);
 
@@ -128,17 +117,11 @@ sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
   return sl_wifi_set_credential(cred_id, cred_type, credential, credential_length);
 }
 
-sl_status_t sl_net_get_credential(sl_net_credential_id_t id,
-                                  sl_net_credential_type_t *type,
-                                  void *credential,
-                                  uint32_t *credential_length)
+sl_status_t sli_net_get_credential(sl_net_credential_id_t id,
+                                   sl_net_credential_type_t *type,
+                                   void *credential,
+                                   uint32_t *credential_length)
 {
-  // Check if the credential ID is one of the invalid parameters
-  if ((id == SL_NET_WIFI_EAP_SERVER_CREDENTIAL_ID) || (SL_NET_TLS_CLIENT_CREDENTIAL_START == (id & ~0xff))
-      || (SL_NET_TLS_SERVER_CREDENTIAL_START == (id & ~0xff))) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
   // Check if the credential is invalid parameter
   if ((NULL == credential) || (0 == *credential_length)) {
     return SL_STATUS_INVALID_PARAMETER;
@@ -185,15 +168,10 @@ sl_status_t sl_net_get_credential(sl_net_credential_id_t id,
   return SL_STATUS_OK;
 }
 
-sl_status_t sl_net_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type)
+sl_status_t sli_net_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type)
 {
-  if (CRED_TYPE_CERT == sli_net_check_cred_type(type)) {
-#if defined(SLI_SI917)
-    return sli_net_delete_credential(id, type);
-#else
-    return SL_STATUS_FAIL;
-#endif
-  }
+
+  UNUSED_PARAMETER(type);
 
   int group_id = 0;
   int cred_id  = 0;

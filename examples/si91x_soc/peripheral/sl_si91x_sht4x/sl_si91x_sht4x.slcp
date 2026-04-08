@@ -37,6 +37,19 @@ other_file:
 - path: resources/readme/output1.png
 readme:
 - path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
 post_build:
   profile: wiseconnect_soc
 sdk_extension:

@@ -141,7 +141,7 @@ For SoC Mode only:
 
 - Below is the default configuration for I2C2 instance define in RTE_Device_917.h file (path: /$project/config/RTE_Device_917.h)
 - I2C2 is utilized for communication with the temperature sensor.
-- The I2C instance can be changed in the Universal Configurator using the **I2C** component (i2c_instance). Enable only one instance (i2c0/i2c1/i2c2); the application auto-selects the enabled instance at build time.
+- You can change the I2C instance in the Universal Configurator using the **I2C** component (i2c_instance). Enable only one instance (i2c0/i2c1/i2c2); the application auto-selects the enabled instance at build time.
 
     ```c
 
@@ -515,3 +515,4 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 
    The created thing should now be visible on the AWS console (**Manage > All devices > Things**).
   
+

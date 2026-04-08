@@ -18,6 +18,7 @@ components:
 - brd4343q
 - brd4343s
 - brd2605a
+- brd2605b
 - sli_si91x_ncp_uart_config
 - opn_config
 - brd4340b
@@ -40,6 +41,7 @@ components:
 - brd2708a_config
 - brd4339b
 - brd2605a_config
+- brd2605b_config
 - brd4341a_config
 - sl_si91x_mcu
 - systemlevel_ipmu
@@ -522,6 +524,7 @@ components:
 - sl_gspi
 - sl_uart1_rs485
 - sl_gpio
+- sl_si91x_mcu_secure_storage
 - sl_efuse
 - sl_uart0_rs485
 - sl_crc
@@ -966,6 +969,10 @@ extra_files:
 - components/device/silabs/si91x/mcu/drivers/service/iostream/test/iostream_test_main.c
 - components/device/silabs/si91x/mcu/drivers/service/iostream/init/sl_iostream_init_si91x_uart.h.jinja
 - components/device/silabs/si91x/mcu/drivers/service/iostream/init/sl_iostream_init_si91x_uart.c.jinja
+- components/device/silabs/si91x/mcu/drivers/service/secure_storage/component/sl_si91x_mcu_secure_storage.slcc
+- components/device/silabs/si91x/mcu/drivers/service/secure_storage/config/sl_si91x_secure_storage_config.h
+- components/device/silabs/si91x/mcu/drivers/service/secure_storage/inc/sl_si91x_secure_storage.h
+- components/device/silabs/si91x/mcu/drivers/service/secure_storage/src/sl_si91x_secure_storage.c
 - components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_rs_ulptimer.c
 - components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c
 - components/device/silabs/si91x/mcu/drivers/service/sleeptimer/component/sleeptimer_si91x.slcc
@@ -1302,6 +1309,7 @@ extra_files:
 - components/board/silabs/component/brd4343q.slcc
 - components/board/silabs/component/brd4343s.slcc
 - components/board/silabs/component/brd2605a.slcc
+- components/board/silabs/component/brd2605b.slcc
 - components/board/silabs/component/sli_si91x_ncp_uart_config.slcc
 - components/board/silabs/component/opn_config.slcc
 - components/board/silabs/component/brd4340b.slcc
@@ -1324,6 +1332,7 @@ extra_files:
 - components/board/silabs/component/brd2708a_config.slcc
 - components/board/silabs/component/brd4339b.slcc
 - components/board/silabs/component/brd2605a_config.slcc
+- components/board/silabs/component/brd2605b_config.slcc
 - components/board/silabs/component/brd4341a_config.slcc
 - components/board/silabs/config/brd4340b/sl_gpio_board.h
 - components/board/silabs/config/brd4340b/sl_si91x_led_init_led0_config.h
@@ -1478,6 +1487,21 @@ extra_files:
 - components/board/silabs/config/brd2605a/sl_mic_config/sl_si91x_i2s_init_i2s0_config.h
 - components/board/silabs/config/brd2605a/sl_icm40627_config/sl_si91x_ssi_ulp_primary_config.h
 - components/board/silabs/config/brd2605a/sl_icm40627_config/sl_si91x_icm40627_config.h
+- components/board/silabs/config/brd2605b/sl_si91x_rgb_led_init_led0_config.h
+- components/board/silabs/config/brd2605b/sl_gpio_board.h
+- components/board/silabs/config/brd2605b/sl_board_control.h
+- components/board/silabs/config/brd2605b/sl_si91x_button_init_btn0_config.h
+- components/board/silabs/config/brd2605b/sl_board_configuration.h
+- components/board/silabs/config/brd2605b/sl_si91x_icm40627_config.h
+- components/board/silabs/config/brd2605b/sl_si91x_button_init_btn1_config.h
+- components/board/silabs/config/brd2605b/pin_config.h
+- components/board/silabs/config/brd2605b/sl_iostream_usart_vcom_config.h
+- components/board/silabs/config/brd2605b/sl_si91x_rgb_led_init_config.h
+- components/board/silabs/config/brd2605b/RTE_Device_917.h
+- components/board/silabs/config/brd2605b/sl_mic_config/sl_si91x_mic_config.h
+- components/board/silabs/config/brd2605b/sl_mic_config/sl_si91x_i2s_init_i2s0_config.h
+- components/board/silabs/config/brd2605b/sl_icm40627_config/sl_si91x_ssi_ulp_primary_config.h
+- components/board/silabs/config/brd2605b/sl_icm40627_config/sl_si91x_icm40627_config.h
 - components/board/silabs/config/brd4340a/sl_gpio_board.h
 - components/board/silabs/config/brd4340a/sl_si91x_led_init_led0_config.h
 - components/board/silabs/config/brd4340a/sl_board_control.h

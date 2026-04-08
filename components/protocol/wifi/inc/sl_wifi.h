@@ -488,9 +488,6 @@ sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface,
 /***************************************************************************/ /**
  * @brief
  *   Set the Wi-Fi client interface listen interval and listen interval multiplier.
- * @pre Pre-conditions:
- * -
- *   @ref sl_wifi_init should be called before this API.
  * @param[in] interface
  *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
  * @param[in] listen_interval
@@ -498,8 +495,8 @@ sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface,
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
-*   By default listen interval is set 1000 time units (TU) and listen interval multiplier is set to 1, where 1 TU = 1024 microseconds. User can call this API to overwrite the values for listen interval and listen interval multiplier.
-*   Recommended max value for listen_interval_multiplier is 10. Higher value may cause interop issues. 
+ *   By default listen interval is set 1000 time units (TU) and listen interval multiplier is set to 1, where 1 TU = 1024 microseconds. User can call this API to overwrite the values for listen interval and listen interval multiplier.
+ *   Recommended max value for listen_interval_multiplier is 10. Higher value may cause interop issues. 
  *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps()
  ******************************************************************************/
 sl_status_t sl_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wifi_listen_interval_v2_t listen_interval);
@@ -517,7 +514,7 @@ sl_status_t sl_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wif
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
-*   By default, the listen interval is set to 1000 time units (TU), where 1 TU = 1024 microseconds.
+ *   By default, the listen interval is set to 1000 time units (TU), where 1 TU = 1024 microseconds.
  * @note
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_get_listen_interval_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-radio-api#sl-wifi-get-listen-interval-v2) API. This is retained for backward compatibility.
  ******************************************************************************/
@@ -788,16 +785,42 @@ sl_status_t sl_wifi_update_su_gain_table(uint8_t band,
 /***************************************************************************/ /**
  * @brief
  *   Configure the 11ax params. This is a blocking API.
+ * @details
+ *   Configures 802.11ax (Wi-Fi 6) parameters for the device. This configuration
+ *   is applicable only to operating modes with a client interface (@ref SL_WIFI_CLIENT_MODE, 
+ *   @ref SL_WIFI_ENTERPRISE_CLIENT_MODE, @ref SL_WIFI_CONCURRENT_MODE). 
+ *   @ref SL_WIFI_ACCESS_POINT_MODE does not support 802.11ax.
+ * @pre Pre-conditions:
+ * - Device must be initialized in a client-capable mode (@ref SL_WIFI_CLIENT_MODE, 
+ *   @ref SL_WIFI_ENTERPRISE_CLIENT_MODE, or @ref SL_WIFI_CONCURRENT_MODE). 
+ *   This API will return an error if called in @ref SL_WIFI_ACCESS_POINT_MODE.
+ * - This API should be called before @ref sl_wifi_connect
+ * @param[in] guard_interval
+ *   Period of time delta between two packets in wireless transmission. Valid values : 0 - 3
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *  Moving forward, this API will be deprecated.
+ *  Instead use sl_wifi_set_11ax_config_v2 API to set the 11ax configuration parameters.
+ *  This API is retained for backward compatibility.
+ ******************************************************************************/
+sl_status_t sl_wifi_set_11ax_config(uint8_t guard_interval) SL_DEPRECATED_API_WISECONNECT_4_1;
+
+/***************************************************************************/ /**
+ * @brief
+ *   Configure the 11ax params. This is a blocking API.
  * @pre Pre-conditions:
  * -
  *   This API should be called before @ref sl_wifi_connect
- * @param[in] guard_interval
- *   Period of time delta between two packets in wireless transmission. Valid values : 0 - 3 (0 = 8 us, 1 = 16 us, 2 = 32 us, 3 = 64 us).
+ * @param[in] config_11ax_params
+ *   Pointer to @ref sl_wifi_11ax_config_params_t structure containing the 11ax configuration parameters.
+ * 
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   802.11ax (Wi-Fi 6) is not supported in @ref SL_WIFI_ACCESS_POINT_MODE due to firmware limitations.
  ******************************************************************************/
-sl_status_t sl_wifi_set_11ax_config(uint8_t guard_interval);
-
+sl_status_t sl_wifi_set_11ax_config_v2(const sl_wifi_11ax_config_params_t *config_11ax_params);
 /**
 * @brief
  *   Start the transmit test.
@@ -960,8 +983,8 @@ sl_status_t sl_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi
  *      Use the SL_WIFI_SCAN_TYPE_EXTENDED to obtain the scan results that exceed the SL_WIFI_MAX_SCANNED_AP. In this scan type, the number of scan results is not restricted; it is only limited by the amount of dynamic memory that the host can provide.
  *      Default Passive Scan Channel time is 400 milliseconds. If the user wants to modify the time, sl_si91x_set_timeout can be called.
  *      In the case of SL_WIFI_SCAN_TYPE_EXTENDED, the scan callback is invoked with data set to NULL and data_length
- *      set to the total size of the scan results (i.e., count * sizeof(sl_wifi_extended_scan_result_t)). The application
- *      must allocate a buffer of size data_length and pass this buffer to the @ref sl_wifi_get_stored_scan_results() API to retrieve the complete scan results.
+ *      indicating the total size of the scan results (that is, count * sizeof(sl_wifi_extended_scan_result_t)). Upon receiving this callback, the application
+ *      must allocate a buffer of size data_length and explicitly call the @ref sl_wifi_get_stored_scan_results() API, passing the allocated buffer to retrieve the complete scan results.
  *      This API is not applicable for ADV_SCAN scan_type in AP mode
  *      This API is supported in AP mode, to scan for - to trigger this, send a scan after sl_wifi_start_ap() API with the SL_WIFI_SCAN_TYPE_ACTIVE scan_type.
  *      After connecting to Wi-Fi, if you want to initiate a background scan, call this API with scan_type set to SL_WIFI_SCAN_TYPE_ADV_SCAN in the @ref sl_wifi_scan_configuration_t.
@@ -986,7 +1009,7 @@ sl_status_t sl_wifi_start_scan(sl_wifi_interface_t interface,
  * 	This API will only hold scan results if sl_wifi_start_scan is called with scan type as SL_WIFI_SCAN_TYPE_EXTENDED.
  *  These results are stored until another call to sl_wifi_start_scan is made with scan type as SL_WIFI_SCAN_TYPE_EXTENDED.
  *  In the case of SL_WIFI_SCAN_TYPE_EXTENDED, the scan callback is invoked with data set to NULL and data_length
- *  indicating the total size of the scan results (i.e., scan count * sizeof(sl_wifi_extended_scan_result_t)). Upon
+ *  indicating the total size of the scan results (that is, scan count * sizeof(sl_wifi_extended_scan_result_t)). Upon
  *  receiving this callback, the application must allocate a buffer of size data_length and explicitly call the
  *  @ref sl_wifi_get_stored_scan_results() API, passing the allocated buffer to retrieve the complete scan results.
  ******************************************************************************/
@@ -2339,14 +2362,16 @@ sl_status_t sl_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface);
 
 /**
  * @brief
- *   Set the transmit power for the Wi-Fi interface.
- * 
+ *   Set the transmit power for the Wi-Fi interface (test/PER mode).
+ *
  * @details
- *   This function sets the transmit power in dBm for the specified Wi-Fi interface.
- * 
+ *   This function sets the transmit power for the specified Wi-Fi interface.
+ *   The value is in decidBm (tenths of dBm), e.g. 210 = 21.0 dBm, -150 = -15.0 dBm.
+ *
  * @param[in] txPower
- *   Transmit power in dBm. Valid range is -30 to 20 dBm.
- * 
+ *   Transmit power in decidBm (tenths of dBm). Valid range is -150 to 210 decidBm
+ *   (-15.0 dBm to 21.0 dBm).
+ *
  * @return
  *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
  *   The following status codes are returned by this API:
@@ -2357,7 +2382,7 @@ sl_status_t sl_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface);
  *  @note
  *    This API is supported only in PER mode.
  */
-sl_status_t sl_wifi_set_tx_powerdBm(int16_t txPower);
+sl_status_t sl_wifi_set_test_tx_power(int16_t txPower);
 
 /**
  * @brief

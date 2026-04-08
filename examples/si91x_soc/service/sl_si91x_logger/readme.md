@@ -15,6 +15,7 @@
     - [Logger Levels](#logger-levels)
   - [UC Config](#uc-config)
     - [Where Each Level Appears in the Code](#where-each-level-appears-in-the-code)
+      - [NONE](#none)
       - [DEBUG](#debug)
       - [INFO](#info)
       - [WARN](#warn)
@@ -121,16 +122,17 @@ Core behavior is defined in `sl_si91x_logger_example.c`:
 
 ### Logger Levels
 
-The example uses four log levels:
+The example uses five log levels:
 
 | Level | Purpose | API Macro |
 | --- | --- | --- |
-| **DEBUG (1 – Least Severe)** | Detailed trace for developers: function entry/exit, raw states. | `SL_PRINT_STRING_DEBUG` |
-| **INFO (2)** | High-level state changes and successful operations. | `SL_PRINT_STRING_INFO` |
-| **WARN (3)** | Non-fatal anomalies such as repeated requests for the same state. | `SL_PRINT_STRING_WARN` |
-| **ERROR (4 – Most Severe)** | Failures that require attention (API failures, resource creation failures). | `SL_PRINT_STRING_ERROR` |
+| **NONE** | Disables all logging. | — |
+| **DEBUG** | Least severe. Detailed trace for developers: function entry/exit, raw states. | `SL_PRINT_STRING_DEBUG` |
+| **INFO** | High-level state changes and successful operations. | `SL_PRINT_STRING_INFO` |
+| **WARN** | Non-fatal anomalies such as repeated requests for the same state. | `SL_PRINT_STRING_WARN` |
+| **ERROR** | Most severe among the macros used in this example. Failures that require attention (API failures, resource creation failures). | `SL_PRINT_STRING_ERROR` |
 
-These macros are provided by the **Logger** component and documented in the WiSeConnect API reference.  
+The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the WiSeConnect API reference). UC **Debug Level** names map to `SL_LOG_CONFIG_LEVEL_*` in `config/sl_log_common_config.h`—the authoritative in-repo definitions for compile-time values (`SL_LOG_CONFIG_LEVEL_NONE`, and so on) and for levels not shown above (for example `SL_LOG_CONFIG_LEVEL_CRASH`).  
 
 ## UC Config
 
@@ -138,6 +140,7 @@ These macros are provided by the **Logger** component and documented in the WiSe
 
 1. **Debug Level**  
    Configure the verbosity of logs:
+   - `NONE` → No logs
    - `DEBUG` → Logs all levels
    - `INFO` → Logs INFO, WARN, ERROR
    - `WARN` → Logs WARN, ERROR
@@ -149,11 +152,19 @@ These macros are provided by the **Logger** component and documented in the WiSe
 3. **Number of Logs**  
    Number of logs that can be buffered before overwrite.
 
-
+4. **Proprietary config mode**  
+   Logger backend output path:
+   - `Buffer Mode` → Logs stored in an internal buffer;
+   - `Console Mode` → Logs sent directly to console/UART.
+   - `Host Mode` → Logs sent to the host interface (required for this example). call `sl_log_flush()` to send them out.
 
 ### Where Each Level Appears in the Code
 
 Below is how each level is used in `sl_si91x_logger_example.c`:  
+
+#### NONE
+
+- No `SL_PRINT_STRING_*` output when this level is selected in UC. 
 
 #### DEBUG
 
@@ -166,8 +177,7 @@ Below is how each level is used in `sl_si91x_logger_example.c`:
 
 Example:
 
-  
-
+ 
 #### INFO
 
 - Successful creation of semaphores and threads in `application_start`.  
@@ -236,7 +246,7 @@ Follow these steps to build and test the SI91x Logger example:
    - In Simplicity Studio, create a new WiSeConnect example project and select the **Logger** example (or import this source file set into your existing Si91x project).  
 
 2. **Configure logger level (optional)**
-   - Set `SL_LOG_LEVEL_DEFAULT` to your desired verbosity (`DEBUG`, `INFO`, `WARN`, or `ERROR`).  
+   - Set `SL_LOG_LEVEL_DEFAULT` to your desired verbosity (`NONE`, `DEBUG`, `INFO`, `WARN`, or `ERROR`).  
    - `INFO` is recommended for a balance of useful logs.
 
 3. **Build and flash**
@@ -255,7 +265,7 @@ Follow these steps to build and test the SI91x Logger example:
 > **Note:**
 >    1. Actual values depend on timing and board profile.   
 >    2. Only `uint32_t` arguments are supported by logger.
->    3. Only Host mode is supported.
+>    3. Keep **Proprietary config mode** on Host Mode for this example (Buffer/Console are not supported here; see that UC item above).
 >    4. Only max args 3 is supported.
 
 For more examples and setup information, visit the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.

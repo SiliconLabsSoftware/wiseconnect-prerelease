@@ -165,9 +165,6 @@ bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX] = { false, false, false, false
 bool bg_enabled                                   = false;
 uint32_t frontend_switch_control                  = 0;
 static uint32_t feature_bit_map                   = 0;
-static uint8_t ap_join_feature_bitmap             = SL_SI91X_JOIN_FEAT_LISTEN_INTERVAL_VALID;
-static uint8_t client_join_feature_bitmap         = SL_SI91X_JOIN_FEAT_LISTEN_INTERVAL_VALID;
-static uint32_t client_listen_interval            = 1000;
 //! Currently, initialized_opermode is used only to handle concurrent mode using sl_net_init()
 extern uint16_t initialized_opermode;
 extern sli_queue_t cmd_queues[SI91X_CMD_MAX];
@@ -224,9 +221,18 @@ sl_status_t sl_si91x_driver_init_wifi_radio(const sl_wifi_device_configuration_t
   sl_status_t status;
 
 // Set 11ax configuration with guard interval if SLI_SI91X_CONFIG_WIFI6_PARAMS is supported
+// Note: 802.11ax is supported only in client-capable modes (SL_WIFI_CLIENT_MODE, SL_WIFI_ENTERPRISE_CLIENT_MODE, SL_WIFI_CONCURRENT_MODE).
+// SL_WIFI_ACCESS_POINT_MODE does not support 802.11ax and the firmware will reject it with error 0x6C.
 #ifdef SLI_SI91X_CONFIG_WIFI6_PARAMS
-  status = sl_wifi_set_11ax_config(SLI_GUARD_INTERVAL);
-  VERIFY_STATUS_AND_RETURN(status);
+  if (config->boot_config.oper_mode != SL_SI91X_ACCESS_POINT_MODE) {
+    sl_wifi_11ax_config_params_t config_11ax_params = { 0 };
+    config_11ax_params.gi_ltf                       = SL_WIFI_4HE_LTF_3200_NSEC_GI;
+    config_11ax_params.dcm_enable                   = SL_WIFI_DCM_ENABLE_DISABLED;
+    config_11ax_params.beamformee_support           = SL_WIFI_BEAMFORMEE_SUPPORT_ENABLED;
+    config_11ax_params.config_er_su                 = SL_WIFI_CONFIG_ER_SU_NO;
+    status                                          = sl_wifi_set_11ax_config_v2(&config_11ax_params);
+    VERIFY_STATUS_AND_RETURN(status);
+  }
 #endif
 
   // Send WLAN request to set the operating band (2.4GHz or 5GHz)
@@ -1046,6 +1052,9 @@ sl_status_t sl_si91x_set_device_region(sl_wifi_operation_mode_t operation_mode,
                                        sl_wifi_band_mode_t band,
                                        sl_wifi_region_code_t region_code)
 {
+  if (band == SL_WIFI_BAND_MODE_5GHZ || band == SL_WIFI_DUAL_BAND_MODE) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
   return sli_wifi_set_device_region(operation_mode, band, region_code);
 }
 
@@ -1541,36 +1550,24 @@ sl_status_t sl_si91x_efuse_read(const sl_si91x_efuse_read_t *efuse_read, uint8_t
 
 sl_status_t sl_si91x_set_join_configuration(sl_wifi_interface_t interface, uint8_t join_feature_bitmap)
 {
-  // Determine whether the configuration is for the client or AP interface
-  if (interface & SL_WIFI_CLIENT_INTERFACE) {
-    client_join_feature_bitmap = join_feature_bitmap;
-  } else if (interface & SL_WIFI_AP_INTERFACE) {
-    ap_join_feature_bitmap = join_feature_bitmap;
-  } else {
-    return SL_STATUS_FAIL;
-  }
-  return SL_STATUS_OK;
+  return sli_wifi_set_join_configuration(interface, join_feature_bitmap);
 }
 
 sl_status_t sl_si91x_get_join_configuration(sl_wifi_interface_t interface, uint8_t *join_feature_bitmap)
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(join_feature_bitmap);
 
-  // Determine whether to retrieve the configuration for the client or AP interface
-  if (interface & SL_WIFI_CLIENT_INTERFACE) {
-    *join_feature_bitmap = client_join_feature_bitmap;
-  } else if (interface & SL_WIFI_AP_INTERFACE) {
-    *join_feature_bitmap = ap_join_feature_bitmap;
-  } else {
-    return SL_STATUS_WIFI_UNKNOWN_INTERFACE;
-  }
-
-  return SL_STATUS_OK;
+  return sli_wifi_get_join_configuration(interface, join_feature_bitmap);
 }
 
 void sl_si91x_set_listen_interval(uint32_t listen_interval)
 {
-  client_listen_interval = listen_interval;
+  sl_wifi_listen_interval_v2_t v2_params = {
+    .listen_interval            = listen_interval,
+    .listen_interval_multiplier = DEFAULT_LISTEN_INTERVAL_MULTIPLIER,
+  };
+  /* Deprecated API is void; cannot propagate sli_wifi status to caller. */
+  (void)sli_wifi_set_listen_interval_v2(SL_WIFI_CLIENT_INTERFACE, v2_params);
   return;
 }
 
@@ -1783,10 +1780,29 @@ sl_status_t sl_si91x_set_nwp_config_request(sl_si91x_nwp_configuration_t nwp_con
 {
   sl_status_t status = SL_STATUS_OK;
 
+  // XTAL good time must be stored and applied during init (firmware not ready before sl_wifi_init)
+  if (nwp_config.code & SL_SI91X_SET_XTAL_GOOD_TIME_FROM_HOST) {
+    if ((nwp_config.values.config_val < SLI_SI91X_XTAL_GOOD_TIME_MIN)
+        || (nwp_config.values.config_val > SLI_SI91X_XTAL_GOOD_TIME_MAX)) {
+      return SL_STATUS_INVALID_PARAMETER;
+    }
+    sli_si91x_set_xtal_pmu_good_time_from_host(SL_SI91X_SET_XTAL_GOOD_TIME_FROM_HOST, nwp_config.values.config_val);
+    return SL_STATUS_OK;
+  }
+
+  // PMU good time must be stored and applied during init (firmware not ready before sl_wifi_init)
+  // Note: SoC requires 900-2000µs, NCP accepts 600-2000µs
+  if (nwp_config.code & SL_SI91X_SET_PMU_GOOD_TIME_FROM_HOST) {
+    if ((nwp_config.values.config_val < SLI_SI91X_PMU_GOOD_TIME_MIN)
+        || (nwp_config.values.config_val > SLI_SI91X_PMU_GOOD_TIME_MAX)) {
+      return SL_STATUS_INVALID_PARAMETER;
+    }
+    sli_si91x_set_xtal_pmu_good_time_from_host(SL_SI91X_SET_PMU_GOOD_TIME_FROM_HOST, nwp_config.values.config_val);
+    return SL_STATUS_OK;
+  }
+
   if ((nwp_config.code & SL_SI91X_XO_CTUNE_FROM_HOST) || (nwp_config.code & SL_SI91X_ENABLE_NWP_WDT_FROM_HOST)
-      || (nwp_config.code & SL_SI91X_DISABLE_NWP_WDT_FROM_HOST)
-      || (nwp_config.code & SL_SI91X_SET_XTAL_GOOD_TIME_FROM_HOST)
-      || (nwp_config.code & SL_SI91X_SET_PMU_GOOD_TIME_FROM_HOST)) {
+      || (nwp_config.code & SL_SI91X_DISABLE_NWP_WDT_FROM_HOST)) {
     status = sli_wifi_send_command(SLI_COMMON_REQ_SET_CONFIG,
                                    SLI_WIFI_COMMON_CMD,
                                    &nwp_config,

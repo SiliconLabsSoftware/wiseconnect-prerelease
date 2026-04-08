@@ -3,7 +3,7 @@ label: brd4343s config
 description: Configuration files for BRD4343S
 package: platform_siwx91x
 category: Board|Configuration
-quality: production
+quality: evaluation
 metadata:
   sbom:
     license: Zlib

@@ -3,7 +3,9 @@ label: BRD4343S
 package: platform_siwx91x
 description: Board support for BRD4343S (SoC Refresh Module).
 category: Board|Radio Board
-quality: production
+ui_hints:
+  visibility: never
+quality: evaluation
 metadata:
   sbom:
     license: Zlib

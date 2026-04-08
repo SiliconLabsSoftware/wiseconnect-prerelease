@@ -150,8 +150,8 @@ extern RSI_UDMA_HANDLE_T udmaHandle0;
 extern uint32_t dma_rom_buff0[30];
 
 static volatile struct xferContextType ctx;
-RSI_UDMA_CHA_CONFIG_DATA_T control;
-RSI_UDMA_CHA_CFG_T config;
+static RSI_UDMA_CHA_CONFIG_DATA_T control;
+static RSI_UDMA_CHA_CFG_T config;
 
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************
@@ -951,9 +951,6 @@ sl_psram_return_type_t sl_si91x_psram_init()
   rsi_error_t clkStatus               = RSI_FAIL;
   uint8_t pinIndex                    = 0;
   uint16_t clkDivFactor               = 0;
-#if (SL_SI91X_D_CACHE_ENABLE == 1)
-  uint32_t dCacheInitStatus = 0;
-#endif
 
   /*Clock Initialization*/
   uint32_t system_clock_value = system_clocks.ulpss_ref_clk;
@@ -1063,18 +1060,6 @@ sl_psram_return_type_t sl_si91x_psram_init()
 
     return PSRAM_Status;
   }
-
-  /*D-cache Initialization*/
-#if (SL_SI91X_D_CACHE_ENABLE == 1)
-  DCACHE_REG_CTRL |= 0x3;
-  dCacheInitStatus = DCACHE_REG_MAINT_STATUS;
-  while (dCacheInitStatus != 0x101) {
-    dCacheInitStatus = DCACHE_REG_MAINT_STATUS;
-  }
-  /*Disable HPORT allocation signal*/
-  DCACHE_CTRL_AND_STATUS &= ~(HPORT_ALLOCATE_SIGNAL);
-#endif
-
   return PSRAM_Status;
 }
 
@@ -1092,13 +1077,6 @@ sl_psram_return_type_t sl_si91x_psram_uninit(void)
 
   /*Initialize the QSPI controller to PSRAM default mode configuration*/
   RSI_QSPI_SpiInit((qspi_reg_t *)M4_QSPI_2_BASE_ADDRESS, (spi_config_t *)&spi_psram_default_config, 0, 0, 0);
-
-  /*disable cache*/
-#if (SL_SI91X_D_CACHE_ENABLE == 1)
-  DCACHE_REG_CTRL &= 0xFFFFFFFE;
-  while ((DCACHE_REG_MAINT_STATUS & 0x3) != 0x0)
-    ;
-#endif
 
   /*UnInitialize PinMux*/
   for (pinIndex = 0; pinIndex < NUM_OF_PSRAM_PINS; pinIndex++) {

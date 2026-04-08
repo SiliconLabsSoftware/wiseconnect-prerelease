@@ -66,10 +66,10 @@ void sli_notify_net_event_handler(sl_net_event_t event, sl_status_t status, void
  *         - SL_STATUS_OK: Credential set successfully.
  *         - SL_STATUS_FAIL: Failed to set the credential.
  */
-sl_status_t sli_net_set_credential(sl_net_credential_id_t id,
-                                   sl_net_credential_type_t type,
-                                   const void *credential,
-                                   uint32_t credential_length);
+sl_status_t sli_si91x_set_credential(sl_net_credential_id_t id,
+                                     sl_net_credential_type_t type,
+                                     const void *credential,
+                                     uint32_t credential_length);
 
 /**
  * @brief Retrieve a network credential.
@@ -83,10 +83,10 @@ sl_status_t sli_net_set_credential(sl_net_credential_id_t id,
  *         - SL_STATUS_FAIL: Failed to retrieve the credential.
  *         - SL_STATUS_INVALID_PARAMETER: Invalid input parameters.
  */
-sl_status_t sli_net_get_credential(sl_net_credential_id_t id,
-                                   const sl_net_credential_type_t *type,
-                                   const void *credential,
-                                   const uint32_t *credential_length);
+sl_status_t sli_si91x_get_credential(sl_net_credential_id_t id,
+                                     const sl_net_credential_type_t *type,
+                                     const void *credential,
+                                     const uint32_t *credential_length);
 
 /**
  * @brief Delete a network credential.
@@ -98,7 +98,7 @@ sl_status_t sli_net_get_credential(sl_net_credential_id_t id,
  *         - SL_STATUS_FAIL: Failed to delete the credential.
  *         - SL_STATUS_INVALID_PARAMETER: Invalid input parameters.
  */
-sl_status_t sli_net_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type);
+sl_status_t sli_si91x_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type);
 
 /**
  * @brief Event handler for network manager events.

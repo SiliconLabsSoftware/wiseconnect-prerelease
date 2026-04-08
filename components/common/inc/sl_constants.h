@@ -72,8 +72,17 @@
 #define BREAKPOINT() __asm__("bkpt")
 #endif
 
+/// IPv4 address length in bytes.
 #define SL_IPV4_ADDRESS_LENGTH 4
+
+/// IPv6 address length in bytes.
 #define SL_IPV6_ADDRESS_LENGTH 16
+
+/// MAC address length
+#define SL_MAC_ADDRESS_LENGTH 6
+
+/// Length of an EUI-64 address in bytes.
+#define SL_EUI64_ADDRESS_LENGTH 8
 
 #ifndef UNUSED_VARIABLE
 #define UNUSED_VARIABLE(x) (void)(x)
@@ -232,6 +241,9 @@ extern void sl_redirect_log(const char *format, ...);
 #endif
 
 #define SL_COMPILE_TIME_ASSERT(condition, comment) typedef char assertion_failed__##comment[2 * !!(condition)-1];
+
+// Expands to SL_PRINT_STRING_<level>(fmt, ...). Use level INFO, ERROR, DEBUG, or WARN (must match macro suffix).
+#define SL_DEBUG_LOG_V2(level, fmt, ...) SL_PRINT_STRING_##level(fmt, ##__VA_ARGS__)
 
 typedef uint32_t sl_duration_t;
 

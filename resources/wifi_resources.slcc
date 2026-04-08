@@ -32,6 +32,7 @@ include:
     - path: mydevkitkey.pem.h
     - path: silabs_dgcert_ca.pem.h
     - path: eap.pem.h
+    - path: ca_cert.h
 - path: html
   file_list:
     - path: login.h
