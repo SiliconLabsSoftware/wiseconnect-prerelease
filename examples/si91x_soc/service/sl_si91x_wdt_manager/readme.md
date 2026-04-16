@@ -1,8 +1,8 @@
-# SL SI91X WDT Manager
+# Platform SiWx91x WDT Manager
 
 ## Table of Contents
 
-- [SL SI91X WDT Manager](#sl-si91x-wdt-manager)
+- [Platform SiWx91x WDT Manager](#platform-siwx91x-wdt-manager)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -14,6 +14,9 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
   - [Expected Results](#expected-results)
 
 ## Purpose/Scope
@@ -41,12 +44,12 @@ This example demonstrates Watchdog Timer (WDT) manager integration with LED blin
 ## Prerequisites/Setup Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit (BRD2708A)
 
 ### Hardware Requirements
 
-- Si91x development board (e.g., Si917 development kit)
+- SiWx91x development board (e.g., SiWx91x development kit)
 - USB cable for programming and debugging
 - Computer running Simplicity Studio
 
@@ -66,7 +69,7 @@ This example demonstrates Watchdog Timer (WDT) manager integration with LED blin
 
 2. **Import the Example**:
    - Go to **File → Import → Simplicity Studio → Examples**.
-   - Select **SL SI91X WDT Manager** from the Si91x examples.
+   - Select **SL SI91X WDT Manager** from the SiWx91x examples.
    - Click **Finish** to import the project.
 
 3. **Build and Flash**:
@@ -81,7 +84,7 @@ The example uses the following components:
 
 - **sl_main**: Main application framework
 - **sleeptimer**: For periodic LED toggling
-- **sl_si91x_led_917**: LED driver for Si91x
+- **sl_si91x_led_917**: LED driver for SiWx91x
 - **sl_wdt_manager**: WDT manager for system reliability
 - **syscalls**: System call interface
 - **si91x_memory_default_config**: Default memory configuration
@@ -153,8 +156,8 @@ Watch for system reset in a few seconds...
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

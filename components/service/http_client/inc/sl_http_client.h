@@ -171,6 +171,10 @@ typedef enum {
  * 
  * @details
  *   This type defines a handle used to identify and manage an HTTP client instance. It is used in various HTTP client operations to reference a specific client.
+ *
+ * @note
+ *   This handle is managed internally by the SDK. Users should not modify its value directly.
+ *   Use the provided APIs (e.g., @ref sl_http_client_init, @ref sl_http_client_deinit) to manage the client lifecycle.
  */
 typedef uint32_t sl_http_client_t;
 
@@ -320,6 +324,32 @@ typedef struct {
   sl_http_client_header_t *
     response_headers; ///< Pointer to the HTTP response headers. See @ref sl_http_client_header_t. (Si91x chipsets do not support this feature).
 } sl_http_client_response_t;
+
+/**
+ * @brief
+ *   Advanced TCP/TLS configuration options for the HTTP client.
+ *
+ * @details
+ *   This structure holds advanced TCP and TLS configuration parameters that can be
+ *   applied to the HTTP client before sending requests. Use @ref sl_http_client_set_tcp_tls_advanced_configuration
+ *   to apply these options after initializing the client.
+ *
+ * @note The ssl_ciphers_bitmap and ssl_ext_ciphers_bitmap fields accept cipher suite bitmaps
+ *   as defined in sl_si91x_socket_constants.h (e.g., SL_SI91X_TLS_DHE_RSA_WITH_AES_256_CBC_SHA256).
+ *   Invalid or unsupported cipher combinations may result in TLS handshake failures.
+ *   Use 0 for firmware default cipher suites.
+ */
+typedef struct {
+  uint16_t
+    tcp_keepalive_initial_time_sec; ///< Idle time before the first keep-alive probe in seconds (0 = firmware default).
+  uint8_t tcp_max_retry_count;      ///< Maximum TCP retransmission attempts (0 = firmware default).
+  uint8_t
+    max_retransmission_timeout_value; ///< Retransmission timeout cap as a power-of-2 scaling factor (0 = firmware default).
+  uint32_t
+    ssl_ciphers_bitmap; ///< TLS 1.2 and below cipher suite selection bitmap (0 = firmware default). See sl_si91x_socket_constants.h for valid values.
+  uint32_t
+    ssl_ext_ciphers_bitmap; ///< TLS 1.3 cipher suite selection bitmap (0 = firmware default). See sl_si91x_socket_constants.h for valid values.
+} sl_http_client_tcp_tls_advanced_options_t;
 
 /** @} */
 
@@ -579,4 +609,33 @@ sl_status_t sl_http_client_write_chunked_data(const sl_http_client_t *client,
                                               const uint8_t *data,
                                               uint32_t data_length,
                                               bool flush_now);
+
+/***************************************************************************/
+/**
+ * @brief
+ *   Configures advanced TCP/TLS options for an HTTP client.
+ *
+ * @details
+ *   This function stores the provided advanced TCP and TLS configuration options in the HTTP client handle.
+ *   The options are applied automatically when subsequent HTTP requests are sent via @ref sl_http_client_send_request.
+ *   Call this function after @ref sl_http_client_init and before sending any requests.
+ *
+ * @pre
+ *   @ref sl_http_client_init should be called before this function.
+ *
+ * @param[in] client
+ *   Pointer to an @ref sl_http_client_t object representing the HTTP client handle. Must not be NULL.
+ *
+ * @param[in] options
+ *   Pointer to an @ref sl_http_client_tcp_tls_advanced_options_t structure containing the TCP/TLS options. Must not be NULL.
+ *
+ * @return
+ *   sl_status_t - Status of the operation. For more details, see https://docs.silabs.com/gecko-platform/latest/platform-common/status.
+ *   - SL_STATUS_OK: Operation successful.
+ *   - SL_STATUS_INVALID_PARAMETER: One or more input parameters are NULL.
+ *   - SL_STATUS_INVALID_HANDLE: The provided client handle is invalid.
+ ******************************************************************************/
+sl_status_t sl_http_client_set_tcp_tls_advanced_configuration(const sl_http_client_t *client,
+                                                              const sl_http_client_tcp_tls_advanced_options_t *options);
+
 /** @} */

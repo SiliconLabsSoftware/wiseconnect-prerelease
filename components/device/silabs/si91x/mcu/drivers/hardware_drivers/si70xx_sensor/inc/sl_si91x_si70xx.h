@@ -38,6 +38,7 @@ extern "C" {
 #include "sl_si91x_si70xx_config.h"
 #include "sl_status.h"
 #include "sl_si91x_i2c.h"
+#include "sl_log_helper.h"
 
 /***************************************************************************/
 /**

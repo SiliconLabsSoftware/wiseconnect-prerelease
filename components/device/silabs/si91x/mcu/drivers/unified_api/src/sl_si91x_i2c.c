@@ -151,11 +151,17 @@ sl_i2c_status_t sl_i2c_driver_init(sl_i2c_instance_t i2c_instance, const sl_i2c_
         || (p_user_config->operating_mode >= SL_I2C_OPERATING_MODE_LAST)
         || (p_user_config->transfer_type >= SL_I2C_TRANFER_TYPE_LAST)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_init: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Checking if callback already registered
     if (i2c_callback_function_ptr[i2c_instance] != NULL) {
       i2c_status = SL_I2C_CALLBACK_BUSY;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_init: callback busy st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating i2c structure as per inputs
@@ -201,6 +207,9 @@ sl_i2c_status_t sl_i2c_driver_init(sl_i2c_instance_t i2c_instance, const sl_i2c_
       if (sl_si91x_dma_init(&dma_init)) {
         // return ARM_DRIVER_ERROR;
         i2c_status = SL_I2C_INVALID_PARAMETER;
+        SL_PRINT_STRING_ERROR("sl_i2c_driver_init: dma initialization failed st=0x%04lX,line no : %d\r\n",
+                              (unsigned long)i2c_status,
+                              (int)__LINE__);
         break;
       }
     }
@@ -221,6 +230,9 @@ sl_i2c_status_t sl_i2c_driver_set_follower_address(sl_i2c_instance_t i2c_instanc
   do {
     if ((i2c_instance >= SL_I2C_LAST) || (follower_address > FOLLOWER_ADDR_10BIT_MAX)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_set_follower_address: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating pointer to i2c register block as per instance number
@@ -253,6 +265,9 @@ sl_i2c_status_t sl_i2c_driver_configure_fifo_threshold(sl_i2c_instance_t i2c_ins
     // Validating I2C instance
     if (i2c_instance >= SL_I2C_LAST) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_configure_fifo_threshold: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating pointer to i2c register block as per instance number
@@ -284,6 +299,9 @@ sl_i2c_status_t sl_i2c_driver_configure_sda_hold_time(sl_i2c_instance_t i2c_inst
     // Validating I2C instance and NULL pointer
     if ((i2c_instance >= SL_I2C_LAST) || (p_hold_config == NULL)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_configure_sda_hold_time: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating pointer to i2c register block as per instance number
@@ -332,6 +350,9 @@ sl_i2c_status_t sl_i2c_driver_configure_sda_hold_time(sl_i2c_instance_t i2c_inst
     // Check if sda_rx_hold exceeds maximum allowed value
     if (i2c_status == SL_I2C_SUCCESS && p_hold_config->sda_rx_hold > max_sda_rx_hold) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_configure_sda_hold_time: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
 
@@ -357,6 +378,9 @@ sl_i2c_status_t sl_i2c_driver_configure_sda_hold_time(sl_i2c_instance_t i2c_inst
     if (i2c_status != SL_I2C_SUCCESS || n_scl_low <= SL_I2C_SCL_LOW_OFFSET
         || p_hold_config->sda_tx_hold > (n_scl_low - SL_I2C_SCL_LOW_OFFSET)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_configure_sda_hold_time: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
 
@@ -385,6 +409,9 @@ sl_i2c_status_t sl_i2c_driver_get_frequency(sl_i2c_instance_t i2c_instance, uint
     // Validating I2C instance number and NULL pointer
     if ((frequency == NULL) || (i2c_instance >= SL_I2C_LAST)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_get_frequency: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating i2c pointer as per instance number
@@ -415,6 +442,9 @@ sl_i2c_status_t sl_i2c_driver_send_data_blocking(sl_i2c_instance_t i2c_instance,
     // will return an error code, also validating I2C instance number.
     if ((tx_buffer == NULL) || (i2c_instance >= SL_I2C_LAST) || (address > FOLLOWER_ADDR_10BIT_MAX)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_blocking: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating i2c pointer as per instance number
@@ -452,6 +482,9 @@ sl_i2c_status_t sl_i2c_driver_send_data_blocking(sl_i2c_instance_t i2c_instance,
         if (i2c_tick_count <= TIMEOUT_EXPIRY) {
           // The loop terminated due to a timeout. Exiting the function with an error code.
           i2c_status = SL_I2C_TIMEOUT;
+          SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_blocking: timeout st=0x%04lX,line no : %d\r\n",
+                                (unsigned long)i2c_status,
+                                (int)__LINE__);
           break;
         } else {
           // The loop terminated due to read request. Updating the data register with the data.
@@ -486,6 +519,9 @@ sl_i2c_status_t sl_i2c_driver_send_data_blocking(sl_i2c_instance_t i2c_instance,
         if (i2c_tick_count <= TIMEOUT_EXPIRY) {
           // The loop terminated due to a timeout. Exiting the function with an error code.
           i2c_status = SL_I2C_TIMEOUT;
+          SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_blocking: timeout st=0x%04lX,line no : %d\r\n",
+                                (unsigned long)i2c_status,
+                                (int)__LINE__);
           break;
         }
         // If reaches here then, the loop is terminated because FIFO is empty.
@@ -589,6 +625,9 @@ sl_i2c_status_t sl_i2c_driver_receive_data_blocking(sl_i2c_instance_t i2c_instan
         // If reaches here & i2c_status is zero then the loop is terminated due to timeout. Exiting the function with an error code.
         else if (i2c_tick_count <= TIMEOUT_EXPIRY) {
           i2c_status = SL_I2C_TIMEOUT;
+          SL_PRINT_STRING_ERROR("sl_i2c_driver_receive_data_blocking: timeout st=0x%04lX,line no : %d\r\n",
+                                (unsigned long)i2c_status,
+                                (int)__LINE__);
           break;
         }
         // The loop terminated due to receive fifo not empty interrupt. Receiving the byte in leader mode
@@ -646,6 +685,9 @@ sl_i2c_status_t sl_i2c_driver_send_data_non_blocking(sl_i2c_instance_t i2c_insta
     if ((tx_buffer == NULL) || (p_dma_config == NULL) || (i2c_instance >= SL_I2C_LAST)
         || (address > FOLLOWER_ADDR_10BIT_MAX)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_non_blocking: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating i2c pointer as per instance number
@@ -656,6 +698,9 @@ sl_i2c_status_t sl_i2c_driver_send_data_non_blocking(sl_i2c_instance_t i2c_insta
       sl_status_t status = wait_for_i2c_follower_ready(i2c);
       if (status) {
         i2c_status = SL_I2C_TIMEOUT;
+        SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_non_blocking: timeout st=0x%04lX,line no : %d\r\n",
+                              (unsigned long)i2c_status,
+                              (int)__LINE__);
         break;
       }
     }
@@ -707,17 +752,26 @@ sl_i2c_status_t sl_i2c_driver_send_data_non_blocking(sl_i2c_instance_t i2c_insta
     // Allocate DMA channel for Tx
     if ((status != SL_STATUS_OK) && (status != SL_STATUS_DMA_CHANNEL_ALLOCATED)) {
       i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_non_blocking: dma allocation failed st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Register transfer complete and error callback
     if (sl_si91x_dma_register_callbacks(dma_number, channel, &i2c_tx_callback)) {
       i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_non_blocking: dma registration failed st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     status = sl_si91x_dma_transfer(dma_number, channel, &dma_transfer_tx);
     if ((status == SL_STATUS_INVALID_PARAMETER) || (status == SL_STATUS_NULL_POINTER)
         || (status == SL_STATUS_NOT_INITIALIZED) || (status == SL_STATUS_DMA_CHANNEL_UNALLOCATED)) {
       i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_send_data_non_blocking: dma transfer failed st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     sl_si91x_dma_channel_enable(dma_number, p_dma_config->dma_tx_channel + CHANNEL_OFFSET);
@@ -752,6 +806,9 @@ sl_i2c_status_t sl_i2c_driver_receive_data_non_blocking(sl_i2c_instance_t i2c_in
     if ((rx_buffer == NULL) || (p_dma_config == NULL) || (i2c_instance >= SL_I2C_LAST)
         || (address > FOLLOWER_ADDR_10BIT_MAX)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_receive_data_non_blocking: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating i2c pointer as per instance number
@@ -800,17 +857,28 @@ sl_i2c_status_t sl_i2c_driver_receive_data_non_blocking(sl_i2c_instance_t i2c_in
     // Allocate DMA channel for Tx
     if ((status != SL_STATUS_OK) && (status != SL_STATUS_DMA_CHANNEL_ALLOCATED)) {
       i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+      SL_PRINT_STRING_ERROR(
+        "sl_i2c_driver_receive_data_non_blocking: dma allocation failed st=0x%04lX,line no : %d\r\n",
+        (unsigned long)i2c_status,
+        (int)__LINE__);
       break;
     }
     // Register transfer complete and error callback
     if (sl_si91x_dma_register_callbacks(dma_number, channel, &i2c_rx_callback)) {
       i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+      SL_PRINT_STRING_ERROR(
+        "sl_i2c_driver_receive_data_non_blocking: dma registration failed st=0x%04lX,line no : %d\r\n",
+        (unsigned long)i2c_status,
+        (int)__LINE__);
       break;
     }
     status = sl_si91x_dma_transfer(dma_number, channel, &dma_transfer_rx);
     if ((status == SL_STATUS_INVALID_PARAMETER) || (status == SL_STATUS_NULL_POINTER)
         || (status == SL_STATUS_NOT_INITIALIZED) || (status == SL_STATUS_DMA_CHANNEL_UNALLOCATED)) {
       i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_receive_data_non_blocking: dma transfer failed st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     sl_si91x_dma_channel_enable(dma_number, p_dma_config->dma_rx_channel + CHANNEL_OFFSET);
@@ -840,6 +908,10 @@ sl_i2c_status_t sl_i2c_driver_receive_data_non_blocking(sl_i2c_instance_t i2c_in
       // Allocate DMA channel for Tx
       if ((status != SL_STATUS_OK) && (status != SL_STATUS_DMA_CHANNEL_ALLOCATED)) {
         i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+        SL_PRINT_STRING_ERROR(
+          "sl_i2c_driver_receive_data_non_blocking: dma allocation failed st=0x%04lX,line no : %d\r\n",
+          (unsigned long)i2c_status,
+          (int)__LINE__);
         break;
       }
       // Configure the channel for DMA transfer
@@ -847,6 +919,10 @@ sl_i2c_status_t sl_i2c_driver_receive_data_non_blocking(sl_i2c_instance_t i2c_in
       if ((status == SL_STATUS_INVALID_PARAMETER) || (status == SL_STATUS_NULL_POINTER)
           || (status == SL_STATUS_NOT_INITIALIZED) || (status == SL_STATUS_DMA_CHANNEL_UNALLOCATED)) {
         i2c_status = SL_I2C_DMA_TRANSFER_ERROR;
+        SL_PRINT_STRING_ERROR(
+          "sl_i2c_driver_receive_data_non_blocking: dma transfer failed st=0x%04lX,line no : %d\r\n",
+          (unsigned long)i2c_status,
+          (int)__LINE__);
         break;
       }
       i2c_read_ack = SET;
@@ -874,6 +950,9 @@ sl_i2c_status_t sl_i2c_driver_transfer_data(sl_i2c_instance_t i2c_instance,
     if ((p_transfer_config == NULL) || (p_transfer_config->tx_buffer == NULL) || (p_transfer_config->rx_buffer == NULL)
         || (address > FOLLOWER_ADDR_10BIT_MAX) || (i2c_instance >= SL_I2C_LAST)) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_transfer_data: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // sending data
@@ -901,6 +980,10 @@ sl_i2c_status_t sl_i2c_driver_leader_reconfig_on_power_mode_change(sl_i2c_power_
     // Validating I2C power modes
     if (new_power_mode >= SL_I2C_POWER_MODE_LAST) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR(
+        "sl_i2c_driver_leader_reconfig_on_power_mode_change: invalid parameters st=0x%04lX,line no : %d\r\n",
+        (unsigned long)i2c_status,
+        (int)__LINE__);
       break;
     }
     // updating I2C mode, bus speed and frequency
@@ -930,6 +1013,9 @@ sl_i2c_status_t sl_i2c_driver_enable_repeated_start(sl_i2c_instance_t i2c_instan
   // Validating I2C instance
   if (i2c_instance >= SL_I2C_LAST) {
     i2c_status = SL_I2C_INVALID_PARAMETER;
+    SL_PRINT_STRING_ERROR("sl_i2c_driver_enable_repeated_start: invalid parameters st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)i2c_status,
+                          (int)__LINE__);
   } else {
     i2c_instance_state[i2c_instance].repeated_start_enable = enable_rep_start;
     i2c_status                                             = SL_I2C_SUCCESS;
@@ -951,6 +1037,9 @@ sl_i2c_status_t sl_si91x_i2c_wait_till_i2c_is_idle(sl_i2c_instance_t i2c_instanc
   // Validating I2C instance
   if (i2c_instance >= SL_I2C_LAST) {
     i2c_status = SL_I2C_INVALID_PARAMETER;
+    SL_PRINT_STRING_ERROR("sl_si91x_i2c_wait_till_i2c_is_idle: invalid parameters st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)i2c_status,
+                          (int)__LINE__);
   } else {
     // Updating i2c pointer as per instance number
     i2c = (I2C0_Type *)get_i2c_base_address(i2c_instance);
@@ -973,6 +1062,9 @@ sl_i2c_status_t sl_i2c_driver_deinit(sl_i2c_instance_t i2c_instance)
     // Validating I2C instance
     if (i2c_instance >= SL_I2C_LAST) {
       i2c_status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_i2c_driver_deinit: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)i2c_status,
+                            (int)__LINE__);
       break;
     }
     // Updating i2c pointer as per instance number
@@ -1089,6 +1181,9 @@ sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
     // Validates the null pointer, if true returns error code
     if (pin_init == NULL) {
       status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_i2c_pin_init: invalid parameters st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)status,
+                            (int)__LINE__);
       break;
     }
 
@@ -1178,6 +1273,11 @@ sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
     }
     status = SL_I2C_SUCCESS;
   } while (false);
+  if (status != SL_I2C_SUCCESS) {
+    SL_PRINT_STRING_ERROR("sl_si91x_i2c_pin_init: failed st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)(unsigned)status,
+                          (int)__LINE__);
+  }
   return status;
 }
 

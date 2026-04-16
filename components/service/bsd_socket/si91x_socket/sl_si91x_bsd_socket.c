@@ -831,6 +831,19 @@ static int sli_handle_sl_so_verify_domain_name(sli_si91x_socket_t *si91x_socket,
   return SLI_SI91X_NO_ERROR;
 }
 
+static int sli_handle_sl_so_per_socket_close(sli_si91x_socket_t *si91x_socket,
+                                             const void *option_value,
+                                             socklen_t option_length)
+{
+  SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket->type != SOCK_STREAM, ENOPROTOOPT);
+  SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket->state != INITIALIZED && si91x_socket->state != BOUND, EINVAL);
+  SLI_SET_ERRNO_AND_RETURN_IF_TRUE(option_length < sizeof(uint8_t), EINVAL);
+  SLI_SET_ERRNO_AND_RETURN_IF_TRUE(*(const uint8_t *)option_value != SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE, EINVAL);
+
+  si91x_socket->socket_ext_bitmap |= SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE;
+  return SLI_SI91X_NO_ERROR;
+}
+
 int setsockopt(int socket_id, int option_level, int option_name, const void *option_value, socklen_t option_length)
 {
   sli_si91x_socket_t *si91x_socket = sli_get_si91x_socket(socket_id);
@@ -878,6 +891,9 @@ int setsockopt(int socket_id, int option_level, int option_name, const void *opt
 
     case SL_SO_VERIFY_DOMAIN_NAME:
       return sli_handle_sl_so_verify_domain_name(si91x_socket, option_value, option_length);
+
+    case SL_SO_PER_SOCKET_CLOSE:
+      return sli_handle_sl_so_per_socket_close(si91x_socket, option_value, option_length);
 
     default: {
       // Unsupported option
@@ -964,6 +980,13 @@ int getsockopt(int socket_id, int option_level, int option_name, void *option_va
       // Retrieve and copy the socket certificate index
       *option_length = SLI_GET_SAFE_MEMCPY_LENGTH(*option_length, sizeof(si91x_socket->certificate_index));
       memcpy(option_value, &si91x_socket->certificate_index, *option_length);
+      break;
+    }
+
+    case SL_SO_PER_SOCKET_CLOSE: {
+      uint8_t enabled = (si91x_socket->socket_ext_bitmap & SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE) ? 1 : 0;
+      *option_length  = SLI_GET_SAFE_MEMCPY_LENGTH(*option_length, sizeof(enabled));
+      memcpy(option_value, &enabled, *option_length);
       break;
     }
 

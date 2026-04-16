@@ -45,6 +45,7 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi_power_profile.h"
 #include "sl_additional_status.h"
+#include "sl_log_helper_si91x.h"
 
 #ifdef SL_NET_COMPONENT_INCLUDED
 #include "sl_net_types.h"
@@ -133,7 +134,7 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
     uint32_t event_result =
       osEventFlagsSet(*packet_type_info.sync_response_event_id, packet_type_info.sync_response_event);
     if ((event_result & osFlagsError) != 0) {
-      SL_DEBUG_LOG("Warning: Failed to set event flags for CARDREADY response\n");
+      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for CARDREADY response\n");
     }
   }
   sli_buffer_manager_free_buffer(buffer);
@@ -169,7 +170,7 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
     return;
   }
   frame_status = sli_wifi_get_wifi_frame_status(packet);
-  SL_DEBUG_LOG("WE-> C: 0x%X, S: 0x%X.\n", packet->command, frame_status);
+  SL_DEBUG_LOG_V2(DEBUG, "WE-> C: 0x%X, S: 0x%X.\n", packet->command, frame_status);
 
   wifi_event = sli_wifi_convert_event_to_sl_wifi_event(packet->command, frame_status);
 
@@ -301,6 +302,7 @@ static void sli_si91x_wifi_event_engine_nwp_log_event_handler(uint32_t event, vo
   const sl_wifi_system_packet_t *packet = (sl_wifi_system_packet_t *)buffer->data;
 
   if (packet == NULL) {
+    SL_DEBUG_LOG_V2(INFO, "NWP log event: null packet");
     sli_buffer_manager_free_buffer(buffer);
     return;
   }
@@ -523,6 +525,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            SLI_WIFI_ASYNC_EVENT_HANDLER_NWP_LOG_EVENT,
                                            sli_si91x_wifi_event_engine_nwp_log_event_handler);
   if (SL_STATUS_OK != status) {
+    SL_DEBUG_LOG_V2(ERROR, "Register NWP_LOG failed 0x%lX", status);
     // If registration fails, deinitialize the event engine
     sli_event_engine_deinit();
   }

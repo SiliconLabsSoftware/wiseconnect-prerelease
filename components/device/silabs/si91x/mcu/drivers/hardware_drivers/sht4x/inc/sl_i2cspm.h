@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include "sl_si91x_i2c.h"
+#include "sl_log_helper.h"
 
 #ifdef __cplusplus
 extern "C" {

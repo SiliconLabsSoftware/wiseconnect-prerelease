@@ -1,8 +1,8 @@
-# SL RGB LED
+# Platform SiWx91x RGB LED
 
 ## Table of Contents
 
-- [SL RGB LED](#sl-rgb-led)
+- [Platform SiWx91x RGB LED](#platform-siwx91x-rgb-led)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -11,6 +11,9 @@
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -46,7 +49,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Test the Application
 
 1. Activates the RGB LED on the board, cycling through various colors at 100ms intervals.
- 
+
 
 > **Note:**
 >
@@ -63,8 +66,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -8,7 +8,7 @@
       license: MSLA
 - category: Device|Si91x|MCU|Core
 - description: >
-    Si91x SoC OPN testing component for internal use only.
+    This component provides SiWx91x SoC OPN testing for internal use only.
 - define:
     - name: USER_CONFIGURATION_ENABLE
       value: '1'

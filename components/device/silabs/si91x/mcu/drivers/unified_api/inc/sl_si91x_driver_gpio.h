@@ -32,6 +32,7 @@
 #if !defined(GPIO_PRESENT)
 #include "sl_status.h"
 #include "sl_driver_gpio.h"
+#include "sl_log_helper.h"
 #include "base_types.h"
 
 #ifdef __cplusplus

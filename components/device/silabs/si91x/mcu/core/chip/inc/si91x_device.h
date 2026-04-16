@@ -11513,7 +11513,7 @@ typedef struct { /*!< (@ 0x24048200) TIME_PERIOD Structure */
   };
 
   union {
-    __IOM unsigned int MCU_CAL_TIMER_CLOCK_PERIOD; /*!< (@ 0x00000004) MCU calender timer clock
+    __IOM unsigned int MCU_CAL_TIMER_CLOCK_PERIOD; /*!< (@ 0x00000004) MCU calendar timer clock
                                         period register                   */
 
     struct {
@@ -11713,14 +11713,14 @@ typedef struct { /*!< (@ 0x24048300) MCU_WDT Structure */
   */
 
 /**
-  * @brief The MCU calender acts as RTC  with time in seconds, minutes, hours,
+  * @brief The MCU calendar acts as RTC  with time in seconds, minutes, hours,
   * days, months, years and centuries (RTC)
   */
 
 typedef struct { /*!< (@ 0x2404821C) RTC Structure */
 
   union {
-    __IOM unsigned int MCU_CAL_ALARM_PROG_1; /*!< (@ 0x00000000) MCU calender alarm
+    __IOM unsigned int MCU_CAL_ALARM_PROG_1; /*!< (@ 0x00000000) MCU calendar alarm
                                              prog register 1 */
 
     struct {
@@ -11734,7 +11734,7 @@ typedef struct { /*!< (@ 0x2404821C) RTC Structure */
   };
 
   union {
-    __IOM unsigned int MCU_CAL_ALARM_PROG_2; /*!< (@ 0x00000004) MCU calender alarm
+    __IOM unsigned int MCU_CAL_ALARM_PROG_2; /*!< (@ 0x00000004) MCU calendar alarm
                                              prog register 2 */
 
     struct {
@@ -11751,18 +11751,25 @@ typedef struct { /*!< (@ 0x2404821C) RTC Structure */
   };
 
   union {
-    __IOM unsigned int MCU_CAL_POWERGATE_REG; /*!< (@ 0x00000008) MCU calender
+    __IOM unsigned int MCU_CAL_POWERGATE_REG; /*!< (@ 0x00000008) MCU calendar
                                               powergate register */
 
-    struct {
-      __IOM unsigned int PG_EN_CALENDER : 1;               /*!< [0..0] Start calender block */
-      __IOM unsigned int ENABLE_CALENDER_COMBI : 1;        /*!< [1..1] Enable calender
-                                                    combitional logic block */
-      __IOM unsigned int DISABLE_COMBI_DYN_PWRGATE_EN : 1; /*!< [2..2] Disable option for
+    union {
+      struct {
+        __IOM unsigned int PG_EN_CALENDAR : 1;               /*!< [0..0] Start calendar block */
+        __IOM unsigned int ENABLE_CALENDAR_COMBI : 1;        /*!< [1..1] Enable calendar
+                                                    combinational logic block */
+        __IOM unsigned int DISABLE_COMBI_DYN_PWRGATE_EN : 1; /*!< [2..2] Disable option for
                                                      dynamic combo RTC power gate      */
-      __IOM unsigned int STATIC_COMBI_RTC_PG_EN : 1;       /*!< [3..3] Enable static combo
+        __IOM unsigned int STATIC_COMBI_RTC_PG_EN : 1;       /*!< [3..3] Enable static combo
                                                      RTC power gate */
-      __IM unsigned int RESERVED1 : 28;                    /*!< [31..4] RESERVED1              */
+        __IM unsigned int RESERVED1 : 28;                    /*!< [31..4] RESERVED1              */
+      };
+      struct {
+        __IOM unsigned int PG_EN_CALENDER : 1;        /*!< [0..0] Legacy SDK spelling; alias of PG_EN_CALENDAR */
+        __IOM unsigned int ENABLE_CALENDER_COMBI : 1; /*!< [1..1] Legacy SDK spelling; alias of ENABLE_CALENDAR_COMBI */
+        __IM unsigned int : 30;                       /*!< [31..2] Remaining bits; use first struct for named access */
+      };
     } MCU_CAL_POWERGATE_REG_b;
   };
 

@@ -1,8 +1,8 @@
-# SL NVM3 COMMON FLASH
+# Platform SiWx91x NVM3 Common Flash
 
 ## Table of Contents
 
-- [SL NVM3 COMMON FLASH](#sl-nvm3-common-flash)
+- [Platform SiWx91x NVM3 Common Flash](#platform-siwx91x-nvm3-common-flash)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -15,10 +15,13 @@
   - [Application Build Environment](#application-build-environment)
     - [General Configuration](#general-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
-- This application demonstrates the use of Third Generation Non-Volatile Memory (NVM3) data storage in Si91x common flash.
+- This application demonstrates the use of Third Generation Non-Volatile Memory (NVM3) data storage in SiWx91x common flash.
 
 ## Overview
 
@@ -46,7 +49,7 @@ For more detailed information about NVM3, refer to [Third Generation NonVolatile
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit (BRD2708A)
 
 ### Software Requirements
@@ -76,7 +79,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Configure UC from the slcp component.
 
    ![Figure: Introduction](resources/uc_screen/si91x_nvm3_uc_screen.png)
-- Open **sl_si91x_nvm3_common_flash.slcp** project file select **software component** tab and search for **NVM3 for Si91x** in search bar.
+- Open **sl_si91x_nvm3_common_flash.slcp** project file select **software component** tab and search for **NVM3 for SiWx91x** in search bar.
 - Using configuration wizard one can configure different parameters like:
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -84,10 +87,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ### General Configuration
 
   Configure following macros from UC,
-- NVM3_DEFAULT_CACHE_SIZE: Number of NVM3 objects to cache. To reduce access times this number should be equal to or higher than the number 
+- NVM3_DEFAULT_CACHE_SIZE: Number of NVM3 objects to cache. To reduce access times this number should be equal to or higher than the number
   of NVM3 objects in the default NVM3 instance.
 - NVM3_DEFAULT_MAX_OBJECT_SIZE: Max NVM3 object size that can be stored. This value should be greater than or equal to 204
-- NVM3_DEFAULT_REPACK_HEADROOM: NVM3 Default Instance User Repack Headroom, Headroom determining how many bytes below the forced repack limit 
+- NVM3_DEFAULT_REPACK_HEADROOM: NVM3 Default Instance User Repack Headroom, Headroom determining how many bytes below the forced repack limit
   the user repack limit should be placed. The default is 0, which means the user and forced repack limits are equal.
 - NVM3_DEFAULT_NVM_SIZE - Size of the NVM3 storage region in flash. This size should be aligned with the flash page size of the device.
 
@@ -109,8 +112,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -151,6 +151,30 @@ sl_websocket_error_t sl_websocket_close(sl_websocket_client_t *handle);
 sl_websocket_error_t sl_websocket_deinit(sl_websocket_client_t *handle);
 
 /***************************************************************************/ /**
+ * @brief Configures advanced TCP/TLS options for a WebSocket client.
+ *
+ * @details
+ *   This function stores the provided advanced TCP and TLS configuration options in the WebSocket client handle.
+ *   The options are applied automatically when the client connects via @ref sl_websocket_connect.
+ *   Call this function after @ref sl_websocket_init and before connecting.
+ *
+ * @pre
+ *   @ref sl_websocket_init should be called before this function.
+ *
+ * @param[in] handle
+ *   Pointer to the WebSocket client structure. Must not be NULL.
+ *
+ * @param[in] options
+ *   Pointer to an @ref sl_websocket_tcp_tls_advanced_options_t structure containing the TCP/TLS options. Must not be NULL.
+ *
+ * @return
+ *   sl_websocket_error_t - Error code indicating the result of the operation.
+ */
+sl_websocket_error_t sl_websocket_set_tcp_tls_advanced_configuration(
+  sl_websocket_client_t *handle,
+  const sl_websocket_tcp_tls_advanced_options_t *options);
+
+/***************************************************************************/ /**
  * @brief Extracts the WebSocket opcode from a given socket ID.
  *
  * @details

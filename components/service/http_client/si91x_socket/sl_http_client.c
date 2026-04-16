@@ -81,12 +81,14 @@ typedef enum {
 /******************************************************
  *                    Structures
  ******************************************************/
-//! HTTP client internal context
+//! HTTP client internal context (SDK-managed, do not modify directly)
 typedef struct {
-  sl_http_client_credentials_t *client_credentials; ///< HTTP client credentials
-  sl_http_client_configuration_t configuration;     ///< HTTP client configurations
-  sl_http_client_request_t request;                 ///< HTTP client request configurations
-  sl_http_client_state_t client_state;              ///< HTTP client state
+  sl_http_client_credentials_t *client_credentials;      ///< HTTP client credentials
+  sl_http_client_configuration_t configuration;          ///< HTTP client configurations
+  sl_http_client_request_t request;                      ///< HTTP client request configurations
+  sl_http_client_state_t client_state;                   ///< HTTP client state
+  sl_http_client_tcp_tls_advanced_options_t tcp_options; ///< Advanced TCP/TLS options
+  bool tcp_options_configured;                           ///< Flag indicating if TCP/TLS options have been set
 } sl_http_client_internal_t;
 
 /******************************************************
@@ -189,8 +191,31 @@ sl_status_t sl_http_client_init(const sl_http_client_configuration_t *client_con
   // Set HTTP client state
   http_client_handle.client_state = HTTP_STATE_INITIALIZED;
 
+  // Ensure tcp_options_configured is initialized to false
+  http_client_handle.tcp_options_configured = false;
+
   // Copy address of HTTP client internal handle
   *client = (sl_http_client_t)&http_client_handle;
+
+  return SL_STATUS_OK;
+}
+
+sl_status_t sl_http_client_set_tcp_tls_advanced_configuration(const sl_http_client_t *client,
+                                                              const sl_http_client_tcp_tls_advanced_options_t *options)
+{
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(client);
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(options);
+
+  if (*client != (sl_http_client_t)&http_client_handle) {
+    return SL_STATUS_INVALID_HANDLE;
+  }
+
+  if (http_client_handle.client_state == HTTP_STATE_DEINITIALIZED) {
+    return SL_STATUS_INVALID_STATE;
+  }
+
+  http_client_handle.tcp_options            = *options;
+  http_client_handle.tcp_options_configured = true;
 
   return SL_STATUS_OK;
 }
@@ -578,6 +603,15 @@ static sl_status_t sli_fill_http_request_common_fields(sli_si91x_http_client_req
   // Fill port number
   http_client_request->port_number = request->port;
 
+  if (client_internal->tcp_options_configured) {
+    http_client_request->tcp_keepalive_initial_time_sec = client_internal->tcp_options.tcp_keepalive_initial_time_sec;
+    http_client_request->tcp_max_retry_count            = client_internal->tcp_options.tcp_max_retry_count;
+    http_client_request->max_retransmission_timeout_value =
+      client_internal->tcp_options.max_retransmission_timeout_value;
+    http_client_request->ssl_ciphers_bitmap     = client_internal->tcp_options.ssl_ciphers_bitmap;
+    http_client_request->ssl_ext_ciphers_bitmap = client_internal->tcp_options.ssl_ext_ciphers_bitmap;
+  }
+
   return SL_STATUS_OK;
 }
 
@@ -961,6 +995,14 @@ static sl_status_t sli_http_client_send_put_request(const sl_http_client_interna
 
   // Fill Total resource content length
   http_put_start->content_length = request->body_length;
+
+  if (client_internal->tcp_options_configured) {
+    http_put_start->tcp_keepalive_initial_time_sec   = client_internal->tcp_options.tcp_keepalive_initial_time_sec;
+    http_put_start->tcp_max_retry_count              = client_internal->tcp_options.tcp_max_retry_count;
+    http_put_start->max_retransmission_timeout_value = client_internal->tcp_options.max_retransmission_timeout_value;
+    http_put_start->ssl_ciphers_bitmap               = client_internal->tcp_options.ssl_ciphers_bitmap;
+    http_put_start->ssl_ext_ciphers_bitmap           = client_internal->tcp_options.ssl_ext_ciphers_bitmap;
+  }
 
   // Fill username
   memcpy(http_put_request->http_put_buffer,

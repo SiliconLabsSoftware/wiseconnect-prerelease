@@ -113,7 +113,7 @@ static void sli_event_handler_set_event(osEventFlagsId_t eventId, uint32_t event
 }
 
 // Flush all the packets in event queues
-static void sli_event_engine_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
+static void sli_event_engine_queue_flush_handler(const sli_queue_t *handle, void *data, const void *context)
 {
   UNUSED_PARAMETER(handle);
   UNUSED_PARAMETER(context);

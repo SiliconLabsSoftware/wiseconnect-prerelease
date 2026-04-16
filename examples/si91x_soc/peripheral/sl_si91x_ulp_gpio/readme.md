@@ -1,8 +1,8 @@
-# SL ULP GPIO STATE TRANSITION EXAMPLE
+# Platform SiWx91x ULP GPIO
 
 ## Table of Contents
 
-- [SL ULP GPIO STATE TRANSITION EXAMPLE](#sl-ulp-gpio-state-transition-example)
+- [Platform SiWx91x ULP GPIO](#platform-siwx91x-ulp-gpio)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -15,6 +15,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -28,7 +31,7 @@ This default application demonstrates the toggling of ULP (Ultra Low Power) inst
   - UULP (Ultra Ultra Low Power) Instance: Controls the UULP GPIOs (UULP_GPIO_n; n=0 to 4).
 - HP and ULP Instance have the same features and functionality except for different base address.
 - Each port in the HP domain supports a maximum of 16 GPIO pins, with a total of four ports (SL_GPIO_PORT_A, SL_GPIO_PORT_B, SL_GPIO_PORT_C, SL_GPIO_PORT_D).
-- The ULP GPIO domain has only one port (SL_GPIO_ULP_PORT) with a maximum of 12 pins.  
+- The ULP GPIO domain has only one port (SL_GPIO_ULP_PORT) with a maximum of 12 pins.
 - Similarly, the UULP GPIO domain has only one port (SL_GPIO_UULP_PORT) with a maximum of 5 pins.
 
   > **Note:** Please note that GPIO_n (n=0:5) are dedicated for the Secure Zone Processor's Flash interface. The MCU should NOT be changing any configuration related to these GPIOs under any circumstances since it may lead to the Flash content being corrupted, rendering the chip unusable. This is applicable to MCU HP EGPIO Instance.
@@ -39,7 +42,7 @@ This default application demonstrates the toggling of ULP (Ultra Low Power) inst
  The table below explains the Port and Pin selection for different instances:
 
 |  GPIO Instance                 |    GPIO Port      |  GPIO Pin Number  |
-|--------------------------------|-------------------|-------------------|  
+|--------------------------------|-------------------|-------------------|
 |                                |  SL_GPIO_PORT_A   |   (0-15)          |
 | HP GPIO Instance               |  SL_GPIO_PORT_B   |   (16-31)         |
 |                                |  SL_GPIO_PORT_C   |   (32-47)         |
@@ -85,7 +88,7 @@ This default application demonstrates the toggling of ULP (Ultra Low Power) inst
 
 ## About Example Code
 
-- By default, the ULP_GPIO_PIN macro is enabled. For Si917, ULP GPIO 2 (F10) will toggle during the transition from PS4 to PS2 and from PS2 back to PS4, after which the GPIO is de-initialized.
+- By default, the ULP_GPIO_PIN macro is enabled. For SiWx91x, ULP GPIO 2 (F10) will toggle during the transition from PS4 to PS2 and from PS2 back to PS4, after which the GPIO is de-initialized.
 - By enabling UULP_GPIO_PIN macro, UULP_GPIO_0(P14) will be toggled when transition takes place from PS4 -> PS2 and from PS2 -> PS4 and finally it de-initializes the GPIO. Connect analyzer to P14 and observe toggles.
 - By enabling ULP_GPIO_PIN_INTR macro, ULP_GPIO_8(P15) acts as a ULP pin interrupt. Connect P15 to BTN1/BTN0 and trigger interrupt. Interrupt occurs during state transitions only, after that GPIO de-initializes.
 - By enabling ULP_GPIO_GROUP_INTR macro, ULP_GPIO_8(P15) and ULP_GPIO_10(P17) acts as a ULP group interrupt on the IC board (or) ULP GPIO8 and ULP_GPIO_4 on the ACX Module board. Connect P15 to BTN1, P17 to BTN0 (or)vice-versa and trigger both interrupts at a time as it is AND event. Interrupt occurs during state transitions only, after that GPIO de-initializes.
@@ -96,7 +99,7 @@ This default application demonstrates the toggling of ULP (Ultra Low Power) inst
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A/ BRD4342A / BRD4343A ]
+- Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002) + BRD4338A/ BRD4342A / BRD4343A ]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -176,8 +179,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

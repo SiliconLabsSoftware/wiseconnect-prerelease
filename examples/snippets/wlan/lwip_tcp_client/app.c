@@ -58,6 +58,11 @@
 #define SERVER_PORT       5001
 #define NUMBER_OF_PACKETS 20
 #define DATA              "hello from tcp client"
+/* Pace bursts to avoid overwhelming lwIP/NWP TX queues on small-packet tests. */
+#define TX_PACE_EVERY_PACKETS       10
+#define TX_PACE_DELAY_MS            1
+#define TX_TRANSIENT_RETRY_DELAY_MS 1
+#define TX_STALL_ABORT_RETRIES      300
 
 /******************************************************
  *               Variable Definitions
@@ -97,7 +102,7 @@ static const sl_wifi_device_configuration_t client_configuration = {
 #endif
                                                   ),
                    .bt_feature_bit_map         = 0,
-                   .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENTION_VALID),
+                   .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
                    .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
@@ -203,6 +208,7 @@ void send_data_to_tcp_server()
   int return_value  = 0;
   int sent_bytes;
   int packet_count                  = 0;
+  int transient_retry_total         = 0;
   sl_ipv4_address_t ip              = { 0 };
   struct sockaddr_in server_address = { 0 };
   socklen_t socket_length           = sizeof(struct sockaddr_in);
@@ -234,13 +240,27 @@ void send_data_to_tcp_server()
   while (packet_count < NUMBER_OF_PACKETS) {
     sent_bytes = send(client_socket, DATA, strlen(DATA), 0);
     if (sent_bytes < 0) {
-      if (errno == ENOBUFS)
+      /* Under load, queue-full/backpressure errors are transient; retry with small delay. */
+      if (errno == ENOBUFS || errno == EAGAIN || errno == EWOULDBLOCK) {
+        transient_retry_total++;
+        if (transient_retry_total >= TX_STALL_ABORT_RETRIES) {
+          printf("\r\nTX stall detected at packet %d (errno=%d)\r\n", packet_count, errno);
+          close(client_socket);
+          return;
+        }
+        osDelay(TX_TRANSIENT_RETRY_DELAY_MS);
         continue;
+      }
       printf("\r\nSend failed with bsd error:%d\r\n", errno);
       close(client_socket);
       return;
     }
+    transient_retry_total = 0;
     packet_count++;
+    /* Insert tiny pacing periodically to reduce burst pressure on TX path. */
+    if ((packet_count % TX_PACE_EVERY_PACKETS) == 0) {
+      osDelay(TX_PACE_DELAY_MS);
+    }
   }
 
   printf("\r\n%d packets sent success\r\n", packet_count);

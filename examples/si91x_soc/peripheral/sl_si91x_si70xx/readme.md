@@ -1,8 +1,8 @@
-# SL SI70XX
+# Platform SiWx91x Si70xx
 
 ## Table of Contents
 
-- [SL SI70XX](#sl-si70xx)
+- [Platform SiWx91x Si70xx](#platform-siwx91x-si70xx)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -14,6 +14,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Pin Configuration](#pin-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -111,8 +114,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

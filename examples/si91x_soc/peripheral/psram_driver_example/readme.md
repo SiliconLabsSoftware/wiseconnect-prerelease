@@ -1,8 +1,8 @@
-# PSRAM Driver Example
+# Platform SiWx91x Peripheral PSRAM Driver Example
 
 ## Table of Contents
 
-- [PSRAM Driver Example](#psram-driver-example)
+- [Platform SiWx91x Peripheral PSRAM Driver Example](#platform-siwx91x-peripheral-psram-driver-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -13,6 +13,9 @@
   - [Application Build Environment](#application-build-environment)
   - [PSRAM Core Component Installation](#psram-core-component-installation)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -23,7 +26,7 @@
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4342A]
+- Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002) + BRD4342A]
 
 ### Software Requirements
 
@@ -63,7 +66,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 > ![Figure: PSRAM Pin Configuration](resources/readme/pin_configs.png)
 - Configuration for Read-Write type and Interface mode
 > ![Figure: PSRAM Device Configuration](resources/readme/device_config.png)
-  
+
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
@@ -89,8 +92,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

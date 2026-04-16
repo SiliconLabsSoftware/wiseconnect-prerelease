@@ -16,6 +16,7 @@ provides:
 requires:
   - name: sl_assert
   - name: sl_hspi_secondary_peripheral
+  - name: log_none
 source:
   - path: src/sl_si91x_hspi_secondary.c
 include:

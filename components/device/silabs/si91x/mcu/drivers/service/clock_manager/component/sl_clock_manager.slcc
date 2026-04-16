@@ -26,6 +26,7 @@ provides:
   - name: sl_clock_manager
 requires:
   - name: status
+  - name: log_none
 template_contribution:
   - name: event_handler
     value:

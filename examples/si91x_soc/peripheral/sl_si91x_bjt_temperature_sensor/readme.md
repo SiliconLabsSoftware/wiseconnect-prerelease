@@ -1,8 +1,8 @@
-# SI91x BJT Temperature Sensor Example
+# Platform SiWx91x BJT Temperature Sensor
 
 ## Table of Contents
 
-- [SL BJT TEMPERATURE SENSOR](#sl-bjt-temperature-sensor)
+- [Platform SiWx91x BJT Temperature Sensor](#platform-siwx91x-bjt-temperature-sensor)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -19,14 +19,17 @@
     - [Pin Configuration](#pin-configuration)
   - [System Resource Usage](#system-resource-usage)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
-This application demonstrates how to use the SI91x Bipolar Junction Transistor (BJT) temperature sensor to measure die temperature. The example shows the complete process of configuring the Analog-to-Digital Converter (ADC), Operational Amplifier (OPAMP), and temperature sensor subsystems to convert the BJT voltage output into temperature readings in the range of -40°C to +125°C.
+This application demonstrates how to use the SiWx91x Bipolar Junction Transistor (BJT) temperature sensor to measure die temperature. The example shows the complete process of configuring the Analog-to-Digital Converter (ADC), Operational Amplifier (OPAMP), and temperature sensor subsystems to convert the BJT voltage output into temperature readings in the range of -40°C to +125°C.
 
 ## Overview
 
-The SI91x BJT temperature sensor is **not a standalone temperature sensor** but rather a **voltage output circuit on the die** that provides a temperature-dependent voltage. This voltage must be measured using the ADC and then converted to temperature using a calibration formula.
+The SiWx91x BJT temperature sensor is **not a standalone temperature sensor** but rather a **voltage output circuit on the die** that provides a temperature-dependent voltage. This voltage must be measured using the ADC and then converted to temperature using a calibration formula.
 
 **Key Points:**
 
@@ -39,7 +42,7 @@ The SI91x BJT temperature sensor is **not a standalone temperature sensor** but 
 
 ### What is the BJT Temperature Sensor?
 
-The BJT temperature sensor is a **temperature-dependent voltage source** built into the SI91x die. It works on the principle that the base-emitter voltage (Vbe) of a silicon bipolar junction transistor decreases linearly with temperature at approximately -2mV/°C.
+The BJT temperature sensor is a **temperature-dependent voltage source** built into the SiWx91x die. It works on the principle that the base-emitter voltage (Vbe) of a silicon bipolar junction transistor decreases linearly with temperature at approximately -2mV/°C.
 
 **Important:** This is not a digital temperature sensor like those found on EFR32 Series 2 devices. Instead, it's an analog voltage that must be:
 
@@ -53,7 +56,7 @@ Measuring the temperature involves the following steps:
 
 1. **Configure OPAMP as a Unity Gain Buffer**: The OPAMP provides impedance matching and signal conditioning.
 2. **Measure Band-gap Reference**: Read the stable ~1.2 V reference voltage via the ADC.
-3. **Measure BJT Output**: Read the temperature-dependent BJT voltage via the ADC.  
+3. **Measure BJT Output**: Read the temperature-dependent BJT voltage via the ADC.
 4. **Apply Calibration**: Use factory-stored eFuse values to correct for manufacturing variations.
 5. **Calculate Temperature**: Apply the conversion formula to get temperature in Celsius.
 
@@ -68,7 +71,7 @@ Measuring the temperature involves the following steps:
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -104,7 +107,7 @@ The BJT temperature sensor requires specific configuration of the ADC and OPAMP 
 ```c
 #define CHANNEL_NUMBER             0       // ADC channel number
 #define POS_IP_OPAMP               20      // OPAMP input selection for band-gap reference
-#define OPAMP_GAIN_OPAMP           51      // OPAMP gain configuration  
+#define OPAMP_GAIN_OPAMP           51      // OPAMP gain configuration
 #define OPAMP_CHANNEL              0       // OPAMP instance to use
 ```
 
@@ -225,7 +228,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 > **Note:**
 >
 > - The temperature sensor measures **die temperature**, not ambient air temperature.
-> - For ambient measurements, ensure good thermal coupling between chip and environment.  
+> - For ambient measurements, ensure good thermal coupling between chip and environment.
 > - Interrupt handlers are implemented in the driver layer with user callbacks available.
 > - The abstraced APIs handle all low-level ADC configuration, OPAMP setup, and calibration automatically.
 
@@ -238,8 +241,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

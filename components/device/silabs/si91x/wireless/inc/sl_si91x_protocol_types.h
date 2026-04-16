@@ -441,6 +441,7 @@ typedef struct {
   uint32_t reserved;                                              ///< reserved
   uint8_t webs_subprotocol_name[SLI_WEBS_MAX_SUBPROTOCOL_LENGTH]; ///< web socket subprotocol name
   uint8_t domain_name[SLI_SI91X_MAX_DOMAIN_NAME_LENGTH];          ///< Domain name for SNI or Host header
+  uint8_t socket_ext_bitmap;                                      ///< Extended socket bitmap
 } sli_si91x_socket_create_request_t;
 #pragma pack()
 
@@ -837,9 +838,39 @@ typedef struct {
   //! port number
   uint16_t port_number;
 
+  //! TCP keepalive initial timeout in seconds
+  uint16_t tcp_keepalive_initial_time_sec;
+
+  //! Max TCP retransmission retry count
+  uint8_t tcp_max_retry_count;
+
+  //! Max retransmission timeout value (power-of-2 scaling)
+  uint8_t max_retransmission_timeout_value;
+
+  //! TLS 1.2 and below cipher suite bitmap
+  uint32_t ssl_ciphers_bitmap;
+
+  //! TLS 1.3 cipher suite bitmap
+  uint32_t ssl_ext_ciphers_bitmap;
+
   //! buffer
   uint8_t buffer[SLI_SI91X_HTTP_BUFFER_LEN];
-} sli_si91x_http_client_request_t;
+} SL_ATTRIBUTE_PACKED sli_si91x_http_client_request_t;
+
+//! HTTP OTAF request structure (maintains original layout for firmware compatibility)
+typedef struct {
+  //! ip version
+  uint16_t ip_version;
+
+  //! https enable
+  uint16_t https_enable;
+
+  //! port number
+  uint16_t port_number;
+
+  //! buffer
+  uint8_t buffer[SLI_SI91X_HTTP_BUFFER_LEN];
+} SL_ATTRIBUTE_PACKED sli_si91x_http_otaf_request_t;
 
 //! SNI for embedded sockets structure
 typedef enum {
@@ -872,6 +903,17 @@ typedef struct {
 
   //! HTTP Content Length
   uint32_t content_length;
+
+  //! TCP keepalive initial timeout in seconds
+  uint16_t tcp_keepalive_initial_time_sec;
+  //! Max TCP retransmission retry count
+  uint8_t tcp_max_retry_count;
+  //! Max retransmission timeout value (power-of-2 scaling)
+  uint8_t max_retransmission_timeout_value;
+  //! TLS 1.2 and below cipher suite bitmap
+  uint32_t ssl_ciphers_bitmap;
+  //! TLS 1.3 cipher suite bitmap
+  uint32_t ssl_ext_ciphers_bitmap;
 } SL_ATTRIBUTE_PACKED sli_si91x_http_client_put_start_t;
 
 typedef struct {

@@ -34,7 +34,6 @@
 #include "rsi_pkt_mgmt.h"
 #include "sl_device.h"
 #include "sl_status.h"
-
 /******************************************************
  * *                    Constants
  * ******************************************************/
@@ -78,6 +77,9 @@
 #define M4_RX_DMA_DESC_REG   *(volatile uint32_t *)(TASS_P2P_INT_BASE_ADDRESS + 0x5C)
 #define HOST_INTR_STATUS_REG *(volatile uint32_t *)(TASS_P2P_INT_BASE_ADDRESS + 0x04)
 
+#define M4_PS2_STATUS_REG   0x1208001C
+#define M4_PS2_STATE_STATUS ((*(volatile uint32_t *)(M4_PS2_STATUS_REG)) & BIT(3))
+
 #define DMA_DESC_REG_VALID (0xA0 << 8)
 
 #define TA_wakeup_M4 BIT(2)
@@ -89,12 +91,11 @@
 #define FIRMWARE_17_PTE_CRC_VALUE 0
 
 /*Macro used to notify NWP about M4 XTAL usage*/
-#define TURN_ON_XTAL_REQUEST     BIT(9)
-#define TURN_OFF_XTAL_REQUEST    BIT(10)
-#define M4_IS_USING_XTAL_REQUEST BIT(11)
+#define TURN_ON_XTAL_REQUEST       BIT(9)
+#define TURN_OFF_XTAL_REQUEST      BIT(10)
+#define M4_IS_USING_XTAL_REQUEST   BIT(11)
+#define M4_REQ_TIME_STAMP_FROM_NWP BIT(12) // M4 request to NWP for timestamp
 
-#define ARM_MASK_1 0xE000E100
-#define ARM_MASK_1 0xE000E100
 #define ARM_MASK_1 0xE000E100
 
 #ifndef BIT
@@ -250,5 +251,9 @@ void sli_si91x_xtal_turn_off_request_from_m4_to_TA(void);
 void sli_si91x_raise_xtal_interrupt_to_ta(uint16_t xtal_enable);
 void sli_si91x_send_m4_xtal_usage_notification_to_ta(void);
 void sli_si91x_clear_xtal_in_use_by_m4(void);
+
+/** M4–NWP timestamp sync for debug logger; defined in rsi_hal_mcu_m4_rom.c. */
+sl_status_t sli_si91x_M4_TA_Timesync(void);
+
 #endif
 #endif

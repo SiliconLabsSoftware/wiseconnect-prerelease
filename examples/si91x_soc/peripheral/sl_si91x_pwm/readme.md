@@ -1,8 +1,8 @@
-# SL PWM
+# Platform SiWx91x PWM
 
 ## Table of Contents
 
-- [SL PWM](#sl-pwm)
+- [Platform SiWx91x PWM](#platform-siwx91x-pwm)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -16,6 +16,9 @@
     - [Application Configuration Parameters](#application-configuration-parameters)
     - [PWM Pin Configuration](#pwm-pin-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -64,7 +67,7 @@ This application demonstrates the Pulse Width Modulation (PWM) to generate a per
   - Start PWM using [sl_si91x_pwm_start()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-start) API.
 - If **FAULT** is enabled:
   - FAULT: There are two fault pins, FAULTxA and FAULTxB, associated with the MCPWM (Motor Control Pulse Width Modulation) module. When asserted, these pins can optionally drive each of the PWM I/O pins to a defined state.
-  - Initialize the PWM using [sl_si91x_pwm_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-init) API, [sl_Si91x_pwm_fault_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-fault-init) API.
+  - Initialize the PWM using [sl_si91x_pwm_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-init) API, [sl_si91x_pwm_fault_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-fault-init) API.
   - Set the configuration using [sl_si91x_pwm_set_configuration()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-set-configuration) API.
   - Set the base timer mode using [sl_si91x_pwm_set_base_timer_mode()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-set-base-timer-mode) API.
   - Set the duty cycle using [sl_si91x_pwm_set_duty_cycle()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-set-duty-cycle) API.
@@ -79,7 +82,7 @@ This application demonstrates the Pulse Width Modulation (PWM) to generate a per
   - Enable the special event trigger using [sl_si91x_pwm_control_special_event_trigger()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-control-special-event-trigger) API.
   - Set the configuration for special event trigger using [sl_si91x_pwm_trigger_special_event()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-trigger-special-event) API.
   - Start PWM using [sl_si91x_pwm_start()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pwm#sl-si91x-pwm-start) API.
-  
+
 >**Note:**
 >
 >1. PWM has four channels. The user can handle these channels using instances. Each channel has 2 PWM outputs (PWM_L (PWM output low) and PWM_H(PWM output high)).The usage of L,H depends on how the application uses them. For example, when driving something in PUSH-PULL configuration, PWM_H can drive the high-side switch, whereas PWM_L drives the low-side switch. This is only a reference of how L,H can be used. There might be other scenarios, which are dependent on settings done and how to achieve it.
@@ -92,7 +95,7 @@ This application demonstrates the Pulse Width Modulation (PWM) to generate a per
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -126,13 +129,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - Global Parameters
 
     ```C
-      #define EVENT_COUNT       10    // Count of events that can generate interrupt. 
+      #define EVENT_COUNT       10    // Count of events that can generate interrupt.
       #define PRESCALE_A        0x100 // PWM Prescale_A value
       #define DEADTIME_A        0x08  // PWM deadtime_A
       #define DT_COUNTER_A      0x00  // Dead time counter A enable
       #define DUTY_CYCLE_UPDATE 0x01  // Enable duty cycle updating bit in register
     ```
-  
+
   - Channel-specific Parameters
 
     ```C
@@ -236,8 +239,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

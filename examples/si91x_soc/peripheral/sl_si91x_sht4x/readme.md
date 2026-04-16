@@ -1,8 +1,8 @@
-# SL SI91x SHT4x
+# Platform SiWx91x SHT4x
 
 ## Table of Contents
 
-  - [Purpose](#purpose)
+  - [Platform SiWx91x SHT4x](#platform-siwx91x-sht4x)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
@@ -11,12 +11,17 @@
   - [Application Build Environment](#application-build-environment)
     - [Pin Configuration](#pin-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose
 
 This application demonstrates the SHT4x sensor: relative humidity and temperature measurement via I2C every 1 second, and how to use the SHT4x APIs.
 
-## Setup in Simplicity Studio
+## Prerequisites/Setup Requirements
+
+### Hardware Requirements
 
 - Windows PC
 - Standalone
@@ -26,7 +31,7 @@ This application demonstrates the SHT4x sensor: relative humidity and temperatur
     - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
     - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
 - Kits
-  - SiWx917 Development Kit BRD2605B
+  - SiWx917 Development Kit [BRD2605B]
 
 ### Software Requirements
 
@@ -92,8 +97,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

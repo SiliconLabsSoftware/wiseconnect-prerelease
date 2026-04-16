@@ -2,7 +2,7 @@ id: sl_si91x_sht4x
 label: SHT4x Humidity and Temperature Sensor
 package: platform_siwx91x
 description: >
-  Provides a driver implementation to control the SHT4x humidity and temperature sensor.
+  This component provides a driver implementation to control the SHT4x humidity and temperature sensor.
 category: Device|Si91x|MCU|Compatibility
 quality: production
 metadata:
@@ -24,3 +24,4 @@ requires:
   - name: sl_i2c
   - name: sleeptimer
   - name: sht4x_driver
+  - name: log_none

@@ -700,6 +700,50 @@ typedef struct {
 } sl_wifi_statistics_t;
 
 /**
+ * @struct sl_wifi_bc_mc_filter_stats_t
+ * @brief NWP broadcast/multicast filtering statistics (layer-2 path).
+ */
+typedef struct {
+  uint32_t bc_rx_count;   ///< Total number of broadcast frames received by NWP
+  uint32_t bc_drop_count; ///< Total number of broadcast frames dropped in NWP
+  uint32_t bc_pass_count; ///< Total number of broadcast frames accepted by NWP
+  uint32_t mc_rx_count;   ///< Total number of multicast frames received by NWP
+  uint32_t mc_drop_count; ///< Total number of multicast frames dropped by NWP
+  uint32_t mc_pass_count; ///< Total number of multicast frames accepted by NWP
+} sl_wifi_bc_mc_filter_stats_t;
+
+/**
+ * @struct sl_wifi_ppe_filter_stats_t
+ * @brief PPE (packet processing engine) broadcast/multicast filtering statistics.
+ */
+typedef struct {
+  uint16_t bc_rx_count;   ///< Broadcast frames received by DUT (includes traffic when PPE filtering is disabled)
+  uint16_t bc_drop_count; ///< Broadcast frames dropped by PPE
+  uint16_t mc_rx_count;   ///< Multicast frames received by DUT (includes traffic when PPE filtering is disabled)
+  uint16_t mc_drop_count; ///< Multicast frames dropped by PPE
+  uint16_t reserved[4];   ///< Reserved
+} sl_wifi_ppe_filter_stats_t;
+
+/**
+ * @struct sl_wifi_statistics_v2_t
+ * @brief Wi-Fi interface statistics (extended): WLAN counters plus filtering breakdown.
+ * @note WLAN extended counters are not reset after the stats request. Filtering counters are reset after the request.
+ * @todo Move to internal API: this public structure is not intended to remain on the public surface long-term.
+ */
+typedef struct {
+  uint32_t beacon_lost_count; ///< Number of missed beacons (not reset after request)
+  uint32_t beacon_rx_count;   ///< Number of received beacons (not reset after request)
+  uint32_t mcast_rx_count;    ///< Multicast packets received (not reset after request)
+  uint32_t mcast_tx_count;    ///< Multicast packets transmitted (not reset after request)
+  uint32_t ucast_rx_count;    ///< Unicast packets received (not reset after request)
+  uint32_t ucast_tx_count;    ///< Unicast packets transmitted (not reset after request)
+  uint32_t
+    overrun_count; ///< Packets dropped at ingress or egress due to lack of buffer memory (not reset after request)
+  sl_wifi_bc_mc_filter_stats_t nwp_filter_stats; ///< NWP B/M filter stats (reset after request)
+  sl_wifi_ppe_filter_stats_t ppe_filter_stats;   ///< PPE B/M filter stats (reset after request)
+} sl_wifi_statistics_v2_t;
+
+/**
  * @struct sl_wifi_operational_statistics_t
  * @brief Wi-Fi Operational Statistics structure.
  */
@@ -1768,4 +1812,15 @@ typedef struct {
     wireless_mode; ///< Wireless mode used in connected AP (6 - AX, 4 - N, 3 - G, 1 - B) in station mode; not supported in AP mode.
   uint8_t mac_address[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< MAC address of the module.
 } sl_wifi_interface_info_t;
+
+/**
+  * @struct sl_wifi_groupcast_filter_config_t
+  * @brief Broadcast/multicast filtering and filter mode for @ref sl_wifi_set_groupcast_filter_config.
+  */
+typedef struct {
+  uint8_t enable_bcast_filter; ///< 1 = enable broadcast filtering, 0 = disable.
+  uint8_t enable_mcast_filter; ///< 1 = enable multicast filtering, 0 = disable.
+  uint8_t filter_mode;         ///< 0 = default, 1 = conservative (see product documentation).
+} sl_wifi_groupcast_filter_config_t;
+
 /** @} */

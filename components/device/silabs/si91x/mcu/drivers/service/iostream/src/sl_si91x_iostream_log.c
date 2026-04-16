@@ -1,6 +1,6 @@
 /***************************************************************************/ /**
  * @file
- * @brief SI91x IO Stream Log Component.
+ * @brief SiWx91x IO Stream Log component.
  *******************************************************************************
  * # License
  * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
@@ -81,7 +81,7 @@ extern sl_iostream_instance_info_t sl_si91x_iostream_instance_swo_info;
 
 #if defined(SL_CATALOG_IOSTREAM_SWO_SI91X_PRESENT) && (IOSTREAM_LOG_TYPE == SL_SI91X_IOSTREAM_SWO_LOG)
 /***************************************************************************/ /**
- * Si91x iostream SWO init function.
+ * SiWx91x IO Stream SWO init function.
  *
  * @return 
  *         SL_STATUS_OK   - SWO initialized succesfully
@@ -101,7 +101,7 @@ __STATIC_INLINE sl_status_t sli_si91x_iostream_log_rtt_init(void);
 
 #elif defined(SL_CATALOG_IOSTREAM_VUART_SI91X_PRESENT) && (IOSTREAM_LOG_TYPE == SL_SI91X_IOSTREAM_VUART_LOG)
 /***************************************************************************/ /**
- * Si91x iostream Vuart init function.
+ * SiWx91x IO Stream VUART init function.
  *
  * @return 
  *         SL_STATUS_OK   - Vuart initialized succesfully

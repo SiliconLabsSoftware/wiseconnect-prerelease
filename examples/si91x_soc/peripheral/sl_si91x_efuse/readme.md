@@ -1,8 +1,8 @@
-# SL EFUSE
+# Platform SiWx91x EFUSE
 
 ## Table of Contents
 
-- [SL EFUSE](#sl-efuse)
+- [Platform SiWx91x EFUSE](#platform-siwx91x-efuse)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -15,15 +15,18 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
-- This application demonstrates how to program the eFuse and read from eFuse. 
+- This application demonstrates how to program the eFuse and read from eFuse.
 
 ## Overview
 
-- The efuse chip set provides 256 eFuse bits as a one-time programmable memory location. These bits use 32-bit addressing 
-  with each address containing 8 bits. 
+- The efuse chip set provides 256 eFuse bits as a one-time programmable memory location. These bits use 32-bit addressing
+  with each address containing 8 bits.
 - The eFuse controller is used to program and read these bits. The 255th eFuse bit is programmed to 1'b1 and tested as part of manufacturing tests.
   Hence this bit has to be marked as Reserved with a default value to '1'.
 - Supports eFuse programming and read operations.
@@ -51,7 +54,7 @@
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -86,7 +89,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define WRITE_ADD_1         0x00001        // efuse address 1
     #define WRITE_ADD_2         0x00002        // efuse address 2
     #define HOLD                40             // count value depends on clock frequency of EFUSE controller
-    #define CLOCK               100            // Clock  
+    #define CLOCK               100            // Clock
     #define BIT_POS_0           0              // Bit position 0
     #define BIT_POS_1           1              // Bit position 1
     #define BIT_POS_3           3              // Bit position 3
@@ -103,7 +106,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1. Compile and run the application.
-2. When the application is executed, the console displays "MATCH" if the read data matches the expected data (when WRITE_ENABLE is set to 1 in 
+2. When the application is executed, the console displays "MATCH" if the read data matches the expected data (when WRITE_ENABLE is set to 1 in
    the application).
 3. By default write into efuse is disabled by using macro WRITE ENABLE. To write into efuse set the WRITE ENABLE macro.
 4. After successful program execution the prints in serial console looks as shown below.
@@ -125,8 +128,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

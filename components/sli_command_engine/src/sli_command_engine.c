@@ -416,7 +416,7 @@ static sl_status_t sli_command_engine_handle_packet_tx(
 // Flush handler used when de‑initializing queues or removing nodes.
 // This function is called for every node remaining in a queue so that
 // any allocated packet (data) buffer is released to avoid memory leaks.
-static void sli_command_engine_packet_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
+static void sli_command_engine_packet_queue_flush_handler(const sli_queue_t *handle, void *data, const void *context)
 {
   UNUSED_PARAMETER(handle); // Queue handle not needed for simple free
   sli_command_engine_metadata_t *metadata                  = (sli_command_engine_metadata_t *)data;
@@ -438,7 +438,7 @@ static void sli_command_engine_packet_queue_flush_handler(sli_queue_t *handle, v
 // Flush handler used when removing nodes.
 // This function is called for every node remaining in a queue so that
 // any allocated packet (data) buffer is released to avoid memory leaks.
-static void sli_command_engine_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
+static void sli_command_engine_queue_flush_handler(const sli_queue_t *handle, void *data, const void *context)
 {
   UNUSED_PARAMETER(handle);  // Queue handle not needed for simple free
   UNUSED_PARAMETER(context); // No extra context required
@@ -452,7 +452,7 @@ static void sli_command_engine_queue_flush_handler(sli_queue_t *handle, void *da
 // Flush handler used when removing nodes.
 // This function is called for every node remaining in a queue so that
 // any allocated packet (data) buffer is released to avoid memory leaks.
-static void sli_command_engine_control_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
+static void sli_command_engine_control_queue_flush_handler(const sli_queue_t *handle, void *data, const void *context)
 {
   UNUSED_PARAMETER(handle);  // Queue handle not needed for simple free
   UNUSED_PARAMETER(context); // No extra context required

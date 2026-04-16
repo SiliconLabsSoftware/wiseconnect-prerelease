@@ -26,6 +26,7 @@ provides:
   - name: sl_watchdog_timer
 requires:
   - name: systemlevel_wwdt
+  - name: log_none
 documentation:
   docset: wiseconnect
   document: wiseconnect-api-reference-guide-si91x-peripherals/watchdog-timer

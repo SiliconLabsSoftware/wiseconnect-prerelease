@@ -38,6 +38,7 @@ extern "C" {
 #include "sl_si91x_peripheral_i2c.h"
 #include "stdio.h"
 #include "sl_i2c_board.h"
+#include "sl_log_helper.h"
 
 /***************************************************************************/ /**
 * @addtogroup I2C I2C

@@ -1,8 +1,8 @@
-# Crypto - ECDSA
+# Platform SiWx91x Crypto ECDSA
 
 ## Table of Contents
 
-- [Crypto - ECDSA](#crypto---ecdsa)
+- [Platform SiWx91x Crypto ECDSA](#platform-siwx91x-crypto-ecdsa)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -17,7 +17,7 @@
   - [Application Output](#application-output)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -40,7 +40,7 @@ This application explains how to configure and use the ECDSA crypto APIs.
 
 #### SoC Mode 
 
-  ![Figure: Setup Diagram SoC Mode for Crypto ECDH Example](resources/readme/setup_diagram_soc.png)
+  ![Figure: Setup Diagram SoC Mode for Crypto ECDSA Example](resources/readme/setup_diagram_soc.png)
 
 ## Getting Started
 
@@ -120,6 +120,6 @@ For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.
 - [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

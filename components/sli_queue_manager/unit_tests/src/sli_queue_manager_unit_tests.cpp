@@ -63,9 +63,14 @@ bool sli_queue_manager_node_match_handler(const sli_queue_t *handle, const void 
   return false;
 }
 
-void sli_queue_manager_flush_handler(sli_queue_t *handle, void *node, void *context)
+/* Signature must match sli_queue_manager_flush_handler_t in sli_queue_manager_types.h
+ * (const on handle and context). C++ rejects passing a function pointer whose type
+ * does not match the typedef exactly. */
+void sli_queue_manager_flush_handler(const sli_queue_t *handle, void *node, const void *context)
 {
-  return;
+  (void)handle;
+  (void)node;
+  (void)context;
 }
 
 TEST(sli_queue_manager, sli_queue_manager_init_null_handle)

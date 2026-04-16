@@ -1,6 +1,6 @@
 /***************************************************************************/ /**
  * @file
- * @brief IOSTREAM_USART Config.
+ * @brief IO Stream USART VCOM configuration for SiWx91x.
  *******************************************************************************
  * # License
  * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>

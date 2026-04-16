@@ -1,7 +1,7 @@
 id: si91x_tickless_mode
-label: SI91X TICK-LESS MODE
+label: Tick-Less Mode
 package: platform_siwx91x
-description: Free RTOS low power tickless mode with sleep timer. 
+description: This Tick-Less Mode component enables FreeRTOS low-power tickless mode using the sleep timer. 
 category: Device|Si91x|MCU|Service
 quality: production
 metadata:

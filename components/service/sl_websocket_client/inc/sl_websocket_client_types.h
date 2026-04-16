@@ -104,6 +104,20 @@ typedef enum {
 } sl_websocket_state_t;
 
 /**
+ * @brief TLS version selection for WebSocket SSL connections.
+ *
+ * @details This enumeration defines the TLS protocol versions that can be
+ *   configured for a secure WebSocket (WSS) connection.
+ */
+typedef enum {
+  SL_WEBSOCKET_TLS_DEFAULT = 0, /**< Use firmware default TLS version. */
+  SL_WEBSOCKET_TLS_V_1_0   = 1, /**< Use TLS 1.0. */
+  SL_WEBSOCKET_TLS_V_1_1   = 2, /**< Use TLS 1.1. */
+  SL_WEBSOCKET_TLS_V_1_2   = 3, /**< Use TLS 1.2. */
+  SL_WEBSOCKET_TLS_V_1_3   = 4, /**< Use TLS 1.3. */
+} sl_websocket_tls_version_t;
+
+/**
  * @brief WebSocket predefined status codes for Close frames.
  * 
  * @details This enumeration defines the pre-defined status codes that endpoints may use when sending a Close frame.
@@ -141,6 +155,30 @@ typedef struct sl_websocket_client_s sl_websocket_client_t;
  */
 
 /**
+ * @brief Advanced TCP/TLS configuration options for the WebSocket client.
+ *
+ * @details This structure holds advanced TCP and TLS configuration parameters that can be
+ *   applied to the WebSocket client before connecting. Use @ref sl_websocket_set_tcp_tls_advanced_configuration
+ *   to apply these options after initializing the client and before calling connect.
+ *
+ * @note The ssl_ciphers_bitmap and ssl_ext_ciphers_bitmap fields accept cipher suite bitmaps
+ *   as defined in sl_si91x_socket_constants.h (e.g., SL_SI91X_TLS_DHE_RSA_WITH_AES_256_CBC_SHA256).
+ *   Invalid or unsupported cipher combinations may result in TLS handshake failures.
+ *   Use 0 for firmware default cipher suites.
+ */
+typedef struct {
+  uint16_t
+    tcp_keepalive_initial_time_sec; ///< Idle time before the first keep-alive probe in seconds (0 = firmware default).
+  uint8_t tcp_max_retry_count;      ///< Maximum TCP retransmission attempts (0 = firmware default).
+  uint8_t
+    max_retransmission_timeout_value; ///< Retransmission timeout cap as a power-of-2 scaling factor (0 = firmware default).
+  uint32_t
+    ssl_ciphers_bitmap; ///< TLS 1.2 and below cipher suite selection bitmap (0 = firmware default). See sl_si91x_socket_constants.h for valid values.
+  uint32_t
+    ssl_ext_ciphers_bitmap; ///< TLS 1.3 cipher suite selection bitmap (0 = firmware default). See sl_si91x_socket_constants.h for valid values.
+} sl_websocket_tcp_tls_advanced_options_t;
+
+/**
  * @brief WebSocket client configuration structure.
  * 
  * @details This structure holds the configuration parameters for initializing a WebSocket client.
@@ -155,12 +193,18 @@ typedef struct {
   sl_si91x_socket_remote_termination_callback_t
     remote_terminate_cb; /**< Callback function for remote termination event. */
   bool enable_ssl;       /**< Enable SSL for WebSocket connection. */
+  sl_websocket_tls_version_t
+    tls_version; /**< TLS version to use when SSL is enabled. Defaults to SL_WEBSOCKET_TLS_DEFAULT (firmware default). */
 } sl_websocket_config_t;
 
 /**
  * @brief WebSocket client structure.
  * 
- * @details This structure holds the state and configuration of a WebSocket client, including socket descriptors, connection state, and callback functions. This is not a user configurable structure.
+ * @details This structure holds the state and configuration of a WebSocket client, including socket descriptors, connection state, and callback functions.
+ *
+ * @note
+ *   This structure is managed internally by the SDK. Users should not modify its members directly.
+ *   Use the provided APIs (e.g., @ref sl_websocket_init, @ref sl_websocket_connect, @ref sl_websocket_deinit) to manage the client lifecycle.
  */
 typedef struct sl_websocket_client_s {
   int socket_fd;                                         /**< BSD socket file descriptor. */
@@ -174,9 +218,12 @@ typedef struct sl_websocket_client_s {
   sl_websocket_state_t state; /**< WebSocket connection state. */
   sl_si91x_socket_receive_data_callback_t data_cb; /**< Data receive callback function. */
   sl_si91x_socket_remote_termination_callback_t
-    remote_terminate_cb; /**< Callback function for remote termination event. */
-  bool enable_ssl;       /**< Enable SSL for WebSocket connection. */
-  void *user_context;    /**< User-defined context (for future reference). */
+    remote_terminate_cb;                               /**< Callback function for remote termination event. */
+  bool enable_ssl;                                     /**< Enable SSL for WebSocket connection. */
+  sl_websocket_tls_version_t tls_version;              /**< Configured TLS version for SSL connections. */
+  void *user_context;                                  /**< User-defined context (for future reference). */
+  sl_websocket_tcp_tls_advanced_options_t tcp_options; /**< Advanced TCP/TLS configuration options. */
+  bool tcp_options_configured; /**< Flag indicating if advanced TCP/TLS options have been set. */
 } sl_websocket_client_t;
 
 /**

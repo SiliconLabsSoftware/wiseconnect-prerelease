@@ -33,6 +33,7 @@
 #include "sl_si91x_socket_callback_framework.h"
 #include "sl_status.h"
 #include "sl_constants.h"
+#include "sl_log_helper_si91x.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_protocol_types.h"
 #include "sl_si91x_socket_constants.h"
@@ -118,7 +119,12 @@ uint32_t sl_si91x_socket_selected_extended_ciphers = SL_SI91X_TLS_EXT_CIPHERS;
  *               Function Definitions
  ******************************************************/
 
-static void sli_si91x_socket_rx_queue_flush_handler(sli_queue_t *handle, void *data, void *context)
+static inline bool sli_is_per_socket_close_enabled(const sli_si91x_socket_t *socket)
+{
+  return (socket != NULL) && (socket->socket_ext_bitmap & SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE);
+}
+
+static void sli_si91x_socket_rx_queue_flush_handler(const sli_queue_t *handle, void *data, const void *context)
 {
   UNUSED_PARAMETER(handle);
   UNUSED_PARAMETER(context);
@@ -247,6 +253,7 @@ sl_status_t sli_si91x_socket_init(uint8_t max_select_count)
   if (sli_si91x_socket_mutex == NULL) {
     sli_si91x_socket_mutex = osMutexNew(NULL); // Create a new mutex.
     if (sli_si91x_socket_mutex == NULL) {
+      SL_DEBUG_LOG_V2(ERROR, "Socket init: mutex creation failed\r\n");
       return SL_STATUS_FAIL; // Return failure if mutex creation fails.
     }
   }
@@ -256,6 +263,7 @@ sl_status_t sli_si91x_socket_init(uint8_t max_select_count)
   if (si91x_socket_events == NULL) {
     si91x_socket_events = osEventFlagsNew(NULL); // Create new event flags.
     if (si91x_socket_events == NULL) {
+      SL_DEBUG_LOG_V2(ERROR, "Socket init: socket event flags creation failed\r\n");
       return SL_STATUS_FAIL; // Return failure if event flag creation fails.
     }
   }
@@ -265,6 +273,7 @@ sl_status_t sli_si91x_socket_init(uint8_t max_select_count)
   if (si91x_socket_select_events == NULL) {
     si91x_socket_select_events = osEventFlagsNew(NULL); // Create new event flags.
     if (si91x_socket_select_events == NULL) {
+      SL_DEBUG_LOG_V2(ERROR, "Socket init: select event flags creation failed\r\n");
       return SL_STATUS_FAIL; // Return failure if event flag creation fails.
     }
   }
@@ -286,6 +295,7 @@ sl_status_t sli_si91x_socket_init(uint8_t max_select_count)
 
     // If memory allocation fails, return failure.
     if (select_request_table == NULL) {
+      SL_DEBUG_LOG_V2(ERROR, "Socket init: select request table allocation failed\r\n");
       return SL_STATUS_FAIL; // Return failure if memory allocation fails.
     }
   }
@@ -415,7 +425,7 @@ void sli_si91x_free_socket(int socket)
     sli_command_engine_remove_packet_type(&sli_wifi_command_engine,
                                           (uint8_t)(SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES + si91x_socket->index));
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("Failed to remove packet type from command engine\r\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Failed to remove packet type from command engine\r\n");
   }
 
   // Set the global socket pointer to NULL to prevent future use of freed memory.
@@ -521,6 +531,7 @@ sl_status_t sli_get_free_socket(sli_si91x_socket_t **socket, int *socket_fd)
 
   if (new_socket == NULL) {
     osMutexRelease(sli_si91x_socket_mutex);
+    SL_DEBUG_LOG_V2(ERROR, "Socket struct malloc failed\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -532,6 +543,7 @@ sl_status_t sli_get_free_socket(sli_si91x_socket_t **socket, int *socket_fd)
 
   status = sli_queue_manager_init(&sli_si91x_sockets[socket_index]->rx_queue, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
   if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Socket RX queue init failed: 0x%lX\r\n", status);
     free(sli_si91x_sockets[socket_index]);
     sli_si91x_sockets[socket_index] = NULL;
     osMutexRelease(sli_si91x_socket_mutex);
@@ -560,6 +572,7 @@ sl_status_t sli_get_free_socket(sli_si91x_socket_t **socket, int *socket_fd)
                                               (SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES + socket_index),
                                               &sli_si91x_sockets[socket_index]->socket_packet_type_configuration);
   if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Command engine add_packet_type failed: 0x%lX\r\n", status);
     sli_queue_manager_deinit(&sli_si91x_sockets[socket_index]->rx_queue, NULL, NULL);
     free(sli_si91x_sockets[socket_index]);
     sli_si91x_sockets[socket_index] = NULL;
@@ -790,6 +803,12 @@ void sli_si91x_create_socket_request(sli_si91x_socket_t *si91x_bsd_socket,
   if (si91x_bsd_socket->socket_bitmap & SLI_SI91X_SOCKET_FEAT_TCP_ACK_INDICATION) {
     socket_create_request->socket_bitmap |= SLI_SI91X_SOCKET_FEAT_TCP_ACK_INDICATION;
   }
+
+  // Check for per-socket graceful close feature bit
+  if (si91x_bsd_socket->socket_ext_bitmap & SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE) {
+    socket_create_request->socket_ext_bitmap |= SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE;
+  }
+
 #if defined(SLI_SI917)
   // Set socket's max retransmission timeout value and TOS (Type of Service) if applicable
   socket_create_request->max_retransmission_timeout_value = (uint8_t)si91x_bsd_socket->max_retransmission_timeout_value;
@@ -820,6 +839,14 @@ sl_status_t sli_create_and_send_socket_request(int socketIdIndex, int type, cons
   if (si91x_bsd_socket == NULL) {
     return -1;
   }
+
+  sl_ip_address_type_t ip_type = (si91x_bsd_socket->local_address.sin6_family == AF_INET6) ? SL_IPV6 : SL_IPV4;
+  status                       = sli_net_get_vap_for_ip_version(si91x_bsd_socket->vap_id, ip_type);
+  if (status != SL_STATUS_OK) {
+    errno = EAFNOSUPPORT;
+    return -1;
+  }
+
   if (type == SLI_SI91X_SOCKET_TCP_CLIENT) {
     wait_period = SLI_WIFI_WAIT_FOR_RESPONSE(100000); // timeout is 10 sec
   }
@@ -957,6 +984,11 @@ int sli_si91x_accept(int socket, struct sockaddr *addr, socklen_t *addr_len, sl_
   // Fill VAP_ID
   si91x_client_socket->vap_id = si91x_server_socket->vap_id;
 
+  // Fill per socket close feature bit
+  if (si91x_server_socket->socket_ext_bitmap & SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE) {
+    si91x_client_socket->socket_ext_bitmap |= SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE;
+  }
+
   // Create accept request
   accept_request.socket_id   = (uint8_t)si91x_server_socket->id;
   accept_request.source_port = si91x_server_socket->local_address.sin6_port;
@@ -1027,7 +1059,7 @@ int sli_si91x_shutdown(int socket, int how)
   sli_wifi_wait_period_t wait_period                            = SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_WAIT_FOR_EVER);
   sl_wifi_buffer_t *response_buffer                             = NULL;
 
-  sli_si91x_socket_t *si91x_socket = sli_get_si91x_socket(socket);
+  const sli_si91x_socket_t *si91x_socket = sli_get_si91x_socket(socket);
 
   // Verify the socket's existence
   SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket == NULL, EBADF);
@@ -1045,7 +1077,8 @@ int sli_si91x_shutdown(int socket, int how)
       || (si91x_socket->state == DISCONNECTED                     // Socket is disconnected
           && si91x_socket->disconnect_reason
                == SLI_SI91X_BSD_DISCONNECT_REASON_REMOTE_CLOSED // Disconnection due to remote side terminate
-          && sli_is_tcp_auto_close_enabled())) {                // Check if TCP auto-close is enabled
+          && sli_is_tcp_auto_close_enabled()                    // Check if TCP auto-close is enabled
+          && !sli_is_per_socket_close_enabled(si91x_socket))) { // Per-socket close forces explicit close path
     // Free the resources associated with this socket
     sli_si91x_free_socket(socket);
 
@@ -1151,8 +1184,6 @@ static void sli_handle_remote_terminate(sl_wifi_system_packet_t *rx_packet)
 
     socket->state             = DISCONNECTED;
     socket->disconnect_reason = SLI_SI91X_BSD_DISCONNECT_REASON_REMOTE_CLOSED;
-    uint16_t frame_status     = sli_wifi_get_wifi_frame_status(rx_packet);
-    frame_status = (frame_status == SL_STATUS_OK) ? (SL_STATUS_SI91X_SOCKET_CLOSED & 0xFFFF) : frame_status;
 
     if (user_remote_socket_termination_callback != NULL) {
       user_remote_socket_termination_callback(socket->id,
@@ -1182,7 +1213,7 @@ static int sli_find_host_socket_by_firmware_id(int firmware_socket_id)
  */
 static sl_status_t sli_handle_data_read_request(sl_status_t frame_status,
                                                 const sl_wifi_system_packet_t *rx_packet,
-                                                sli_si91x_socket_context_t *sdk_context)
+                                                const sli_si91x_socket_context_t *sdk_context)
 {
   UNUSED_PARAMETER(sdk_context);
   sl_status_t status        = SL_STATUS_OK;
@@ -1258,6 +1289,7 @@ static sl_status_t sli_allocate_fd_sets(void **read_fd, void **write_fd, void **
 
   // Check if any allocation failed
   if (*read_fd == NULL || *write_fd == NULL || *exception_fd == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Select: fd_set malloc failed\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -1294,7 +1326,7 @@ static sl_status_t sli_handle_select_request(sl_wifi_system_packet_t *rx_packet,
   const sli_si91x_socket_select_rsp_t *socket_select_rsp = (sli_si91x_socket_select_rsp_t *)rx_packet->data;
 
   if (!sli_is_valid_select_response(socket_select_rsp)) {
-    SL_DEBUG_LOG("\r\n INVALID SELECT ID\r\n");
+    SL_DEBUG_LOG_V2(DEBUG, "\r\n INVALID SELECT ID\r\n");
     return SL_STATUS_OK;
   }
 
@@ -1309,7 +1341,7 @@ static sl_status_t sli_handle_select_request(sl_wifi_system_packet_t *rx_packet,
     sl_status_t alloc_status = sli_allocate_fd_sets(&read_fd, &write_fd, &exception_fd);
     if (alloc_status != SL_STATUS_OK) {
       sli_cleanup_fd_sets(read_fd, write_fd, exception_fd);
-      SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+      SL_DEBUG_LOG_V2(ERROR, "\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
       sli_si91x_clear_select_id(select_request->select_id);
       SL_CLEANUP_MALLOC(sdk_context);
       return SL_STATUS_ALLOCATION_FAILED;
@@ -1344,7 +1376,7 @@ static sl_status_t sli_handle_select_request(sl_wifi_system_packet_t *rx_packet,
                                                 (sli_buffer_t *)&response_buffer);
 
     if (status != SL_STATUS_OK || response_buffer == NULL) {
-      SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+      SL_DEBUG_LOG_V2(ERROR, "\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
       return SL_STATUS_ALLOCATION_FAILED;
     }
 
@@ -1357,7 +1389,7 @@ static sl_status_t sli_handle_select_request(sl_wifi_system_packet_t *rx_packet,
                                                 (sli_buffer_t *)&metadata);
     if (status != SL_STATUS_OK || metadata == NULL) {
       sli_buffer_manager_free_buffer((sli_buffer_t)response_buffer);
-      SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING METADATA ALLOCATION \r\n");
+      SL_DEBUG_LOG_V2(ERROR, "\r\n HEAP EXHAUSTED DURING METADATA ALLOCATION \r\n");
       return SL_STATUS_ALLOCATION_FAILED;
     }
 
@@ -1406,6 +1438,7 @@ static int sli_handle_tcp_ack_indication(sl_wifi_system_packet_t *rx_packet, sli
   sli_si91x_socket_t *si91x_socket = sli_get_si91x_socket(host_socket);
 
   if (si91x_socket == NULL) {
+    SL_DEBUG_LOG_V2(DEBUG, "TCP ACK: host socket not found (fw id %u)\r\n", (unsigned int)tcp_ack->socket_id);
     SL_CLEANUP_MALLOC(sdk_context);
     return -1;
   }
@@ -1494,10 +1527,12 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
   uint8_t *data      = (rx_packet->data + firmware_socket_response->offset);
   int8_t host_socket = -1;
 
-  // Find the host socket corresponding to the received data
+  // Find the host socket corresponding to the received data.
+  // Mask the socket ID to the lower byte, since the upper byte can carry WebSocket frame/opcode information.
+  const uint8_t host_socket_id_from_fw = (uint8_t)(firmware_socket_response->socket_id & 0x00FFU);
   for (uint8_t host_socket_index = 0; host_socket_index < SLI_NUMBER_OF_SOCKETS; host_socket_index++) {
     if ((sli_si91x_sockets[host_socket_index] != NULL)
-        && (firmware_socket_response->socket_id == sli_si91x_sockets[host_socket_index]->id)) {
+        && (host_socket_id_from_fw == sli_si91x_sockets[host_socket_index]->id)) {
       host_socket = host_socket_index;
     }
   }
@@ -1526,6 +1561,7 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
                                                 1000,
                                                 (sli_buffer_t *)&metadata);
     if (status != SL_STATUS_OK) {
+      SL_DEBUG_LOG_V2(ERROR, "Data event: metadata allocation failed\r\n");
       sli_buffer_manager_free_buffer(rx_buffer);
       return SL_STATUS_ALLOCATION_FAILED;
     }
@@ -1708,7 +1744,13 @@ int sli_si91x_connect(int socket, const struct sockaddr *addr, socklen_t addr_le
   }
 
   // Verify the status of the socket operation and return errors if necessary
-  SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SL_STATUS_OK, SLI_SI91X_UNDEFINED_ERROR);
+  // Preserve errno if already set by sli_create_and_send_socket_request (e.g., EAFNOSUPPORT)
+  if (status != SL_STATUS_OK) {
+    if (errno == 0) {
+      errno = SLI_SI91X_UNDEFINED_ERROR;
+    }
+    return -1;
+  }
 
   // Update the socket state to "CONNECTED" and return success
   si91x_socket->state = CONNECTED;
@@ -1748,7 +1790,14 @@ int sli_si91x_bind(int socket_id, const struct sockaddr *addr, socklen_t addr_le
   if (si91x_socket->type == SOCK_DGRAM) {
     sl_status_t socket_create_request_status =
       sli_create_and_send_socket_request(socket_id, SLI_SI91X_SOCKET_UDP_CLIENT, NULL);
-    SLI_SOCKET_VERIFY_STATUS_AND_RETURN(socket_create_request_status, SLI_SI91X_NO_ERROR, SLI_SI91X_UNDEFINED_ERROR);
+    if (socket_create_request_status != SLI_SI91X_NO_ERROR) {
+      // Preserve errno if already set by sli_create_and_send_socket_request (e.g., EAFNOSUPPORT)
+      // Only set to undefined error if errno was not set
+      if (errno == 0) {
+        errno = SLI_SI91X_UNDEFINED_ERROR;
+      }
+      return -1;
+    }
 
     si91x_socket->state = UDP_UNCONNECTED_READY;
   }

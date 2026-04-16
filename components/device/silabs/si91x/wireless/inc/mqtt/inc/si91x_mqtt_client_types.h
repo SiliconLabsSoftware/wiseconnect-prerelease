@@ -97,6 +97,14 @@ typedef struct SL_ATTRIBUTE_PACKED {
 #endif
   //! MQTT ping retries.
   uint16_t keep_alive_retries;
+  //! TCP keepalive initial timeout in seconds
+  uint16_t tcp_keepalive_initial_time_sec;
+  //! Max TCP retransmission retry count
+  uint8_t tcp_max_retry_count;
+  //! TLS 1.2 and below cipher suite bitmap
+  uint32_t ssl_ciphers_bitmap;
+  //! TLS 1.3 cipher suite bitmap
+  uint32_t ssl_ext_ciphers_bitmap;
 } si91x_mqtt_client_init_request_t;
 
 typedef struct SL_ATTRIBUTE_PACKED {

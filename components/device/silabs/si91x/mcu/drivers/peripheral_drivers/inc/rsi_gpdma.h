@@ -345,7 +345,7 @@ typedef struct {
 
 // brief chnl_ctrl_info
 typedef PRE_PACK struct POST_PACK {
-  unsigned int transSize : 12;       // Transfer lenght in bytes
+  unsigned int transSize : 12;       // Transfer length in bytes
   unsigned int transType : 2;        // Type of DMA transfer
   unsigned int dmaFlwCtrl : 2;       // Flow control type
   unsigned int mastrIfFetchSel : 1;  // Master controller select to fetch data
@@ -383,8 +383,8 @@ typedef PRE_PACK struct POST_PACK {
   uint32_t *pNextLink;                             // Pointer to next descriptor link in a chain, NULL to end
   void *src;                                       // source address
   void *dest;                                      // destination address
-  RSI_GPDMA_CHA_CONTROL_T chnlCtrlConfig;          // Channel control register paramter
-  RSI_GPDMA_MISC_CHA_CONTROL_T miscChnlCtrlConfig; // Channel control register paramter
+  RSI_GPDMA_CHA_CONTROL_T chnlCtrlConfig;          // Channel control register parameter
+  RSI_GPDMA_MISC_CHA_CONTROL_T miscChnlCtrlConfig; // Channel control register parameter
 } RSI_GPDMA_DESC_T;
 
 typedef void (*gpdmaTransferCompleteCB)(RSI_GPDMA_HANDLE_T gpdmaHandle, RSI_GPDMA_DESC_T *pTranDesc, uint32_t dmaCh);

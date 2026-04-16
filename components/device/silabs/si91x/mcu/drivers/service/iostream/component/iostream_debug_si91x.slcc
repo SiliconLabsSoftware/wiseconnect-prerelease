@@ -1,8 +1,9 @@
 id: iostream_debug_si91x
+label: IO Stream Debug
 package: platform_siwx91x
-label: "IO Stream: SI91X Debug"
-description: Instantiate the driver for using IO Stream over the
-  Single Wire Output (SWO) Stimulus 8 debug peripheral.
+description: >
+  This component instantiates the driver for using IO Stream over the
+  Single Wire Output (SWO) Stimulus 8 debug peripheral on SiWx91x.
 category: Device|Si91x|MCU|Service
 quality: production
 metadata:

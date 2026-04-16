@@ -4400,8 +4400,21 @@ int32_t rsi_ble_extended_connect_with_params(void *ext_create_conn);
  *     !0 = failure
  * @note
  * This function requests the controller to return the minimum and maximum supported transmit power based on the country region.
+ * Limitation for ACx Boards:
+ * This API must be invoked only after BLE on-air activity has started (e.g. advertising or scanning).
+ * For dynamic TX power Control, first initiate BLE on-air activity, then call this API.
+ * After that, stop the ongoing on-air activity, update the TX power and finally restart the BLE on-air activity to apply the changes.
  */
 int32_t rsi_ble_read_transmit_power(void *resp);
+
+/*==============================================*/
+/**
+ * @fn         int32_t rsi_ble_vendor_set_SMP_min_enc_keysize(uint8_t min_keysize)
+ * @brief      Set the minimum SMP encryption key size on the controller.
+ * @param[in]  min_keysize Minimum encryption key size (typically 7–16).
+ * @return     0 = success, non-zero = failure.
+ */
+int32_t rsi_ble_vendor_set_SMP_min_enc_keysize(uint8_t min_keysize);
 
 /** @} */
 

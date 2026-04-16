@@ -111,83 +111,87 @@ static int mqtt_tcpconnection_handler(Network *n, uint8_t flags, char *addr, int
   int rc   = -1;
   int status;
 
-#ifdef SLI_SI91X_ENABLE_IPV6
-  struct sockaddr_in6 server_address_v6 = { 0 };
-  struct sockaddr_in6 clientAddr_v6     = { 0 };
-  socklen_t socket_length_v6            = sizeof(struct sockaddr_in6);
-#else
-  struct sockaddr_in server_address = { 0 };
-  struct sockaddr_in client_address = { 0 };
-  socklen_t socket_length           = sizeof(struct sockaddr_in);
-#endif
+  // addr points to an sl_ip_address_t: { union ip (v4 at offset 0); type at offset 16 }
+  sl_ip_address_t *ip_addr = (sl_ip_address_t *)addr;
 
 #ifdef SLI_SI91X_ENABLE_IPV6
-  server_address_v6.sin6_family = AF_INET6;
-  server_address_v6.sin6_port   = dst_port;
-  memcpy(&server_address_v6.sin6_addr.s6_addr, addr, SL_IPV6_ADDRESS_LENGTH);
+  if ((ip_addr->type & SL_IPV6) == SL_IPV6) {
+    struct sockaddr_in6 server_address_v6 = { 0 };
+    struct sockaddr_in6 client_address_v6 = { 0 };
+    socklen_t socket_length_v6            = sizeof(struct sockaddr_in6);
 
-  n->socket = sl_si91x_socket(AF_INET6, type, IPPROTO_TCP);
-  if (n->socket < 0) {
-    printf("\r\nSocket creation failed with error: %d\r\n", errno);
-    return -1;
-  }
+    server_address_v6.sin6_family = AF_INET6;
+    server_address_v6.sin6_port   = dst_port;
+    memcpy(&server_address_v6.sin6_addr.s6_addr, ip_addr->ip.v6.bytes, SL_IPV6_ADDRESS_LENGTH);
 
-  clientAddr_v6.sin6_family = AF_INET6;
-  clientAddr_v6.sin6_port   = src_port;
-
-  if (ssl) {
-    uint32_t ssl_enable = SL_SI91X_ENABLE_TLS;
-    status =
-      sl_si91x_setsockopt(n->socket, SL_SI91X_SOL_SOCKET, SL_SI91X_SO_SSL_ENABLE, &ssl_enable, sizeof(ssl_enable));
-    if (status < 0) {
-      printf("\r\nSet Socket SSL option failed with error: %d\r\n", errno);
-      sl_si91x_shutdown(n->socket, 0);
+    n->socket = sl_si91x_socket(AF_INET6, type, IPPROTO_TCP);
+    if (n->socket < 0) {
+      printf("\r\nSocket creation failed with error: %d\r\n", errno);
       return -1;
     }
-  }
 
-  status = sl_si91x_bind(n->socket, (struct sockaddr *)&clientAddr_v6, socket_length_v6);
-  if (status != 0) {
-    printf("\r\nSocket bind failed with error: %d\r\n", errno);
-    mqtt_tcp_disconnect(n);
-    return status;
-  }
+    client_address_v6.sin6_family = AF_INET6;
+    client_address_v6.sin6_port   = src_port;
 
-  rc = sl_si91x_connect(n->socket, (struct sockaddr *)&server_address_v6, socket_length_v6);
-#else
-  server_address.sin_family         = AF_INET;
-  server_address.sin_port           = dst_port;
-  memcpy(&server_address.sin_addr.s_addr, addr, sizeof(server_address.sin_addr.s_addr));
-
-  n->socket = sl_si91x_socket(AF_INET, type, IPPROTO_TCP);
-  if (n->socket < 0) {
-    printf("\r\nSocket creation failed with error: %d\r\n", errno);
-    return -1;
-  }
-
-  client_address.sin_family = AF_INET;
-  client_address.sin_port   = src_port;
-
-  if (ssl) {
-    uint32_t ssl_enable = SL_SI91X_ENABLE_TLS;
-    status =
-      sl_si91x_setsockopt(n->socket, SL_SI91X_SOL_SOCKET, SL_SI91X_SO_SSL_ENABLE, &ssl_enable, sizeof(ssl_enable));
-    if (status < 0) {
-      printf("\r\nSet Socket SSL option failed with error: %d\r\n", errno);
-      sl_si91x_shutdown(n->socket, 0);
-      return -1;
+    if (ssl) {
+      uint32_t ssl_enable = SL_SI91X_ENABLE_TLS;
+      status =
+        sl_si91x_setsockopt(n->socket, SL_SI91X_SOL_SOCKET, SL_SI91X_SO_SSL_ENABLE, &ssl_enable, sizeof(ssl_enable));
+      if (status < 0) {
+        printf("\r\nSet Socket SSL option failed with error: %d\r\n", errno);
+        sl_si91x_shutdown(n->socket, 0);
+        return -1;
+      }
     }
-  }
 
-  status = sl_si91x_bind(n->socket, (struct sockaddr *)&client_address, socket_length);
-  if (status != 0) {
-    printf("\r\nSocket bind failed with error: %d\r\n", errno);
-    mqtt_tcp_disconnect(n);
-    return status;
-  }
+    status = sl_si91x_bind(n->socket, (struct sockaddr *)&client_address_v6, socket_length_v6);
+    if (status != 0) {
+      printf("\r\nSocket bind failed with error: %d\r\n", errno);
+      mqtt_tcp_disconnect(n);
+      return status;
+    }
 
-  rc = sl_si91x_connect(n->socket, (struct sockaddr *)&server_address, socket_length);
+    rc = sl_si91x_connect(n->socket, (struct sockaddr *)&server_address_v6, socket_length_v6);
+  } else
 #endif
+  {
+    struct sockaddr_in server_address = { 0 };
+    struct sockaddr_in client_address = { 0 };
+    socklen_t socket_length           = sizeof(struct sockaddr_in);
+
+    server_address.sin_family = AF_INET;
+    server_address.sin_port   = dst_port;
+    memcpy(&server_address.sin_addr.s_addr, ip_addr->ip.v4.bytes, sizeof(server_address.sin_addr.s_addr));
+
+    n->socket = sl_si91x_socket(AF_INET, type, IPPROTO_TCP);
+    if (n->socket < 0) {
+      printf("\r\nSocket creation failed with error: %d\r\n", errno);
+      return -1;
+    }
+
+    client_address.sin_family = AF_INET;
+    client_address.sin_port   = src_port;
+
+    if (ssl) {
+      uint32_t ssl_enable = SL_SI91X_ENABLE_TLS;
+      status =
+        sl_si91x_setsockopt(n->socket, SL_SI91X_SOL_SOCKET, SL_SI91X_SO_SSL_ENABLE, &ssl_enable, sizeof(ssl_enable));
+      if (status < 0) {
+        printf("\r\nSet Socket SSL option failed with error: %d\r\n", errno);
+        sl_si91x_shutdown(n->socket, 0);
+        return -1;
+      }
+    }
+
+    status = sl_si91x_bind(n->socket, (struct sockaddr *)&client_address, socket_length);
+    if (status != 0) {
+      printf("\r\nSocket bind failed with error: %d\r\n", errno);
+      mqtt_tcp_disconnect(n);
+      return status;
+    }
+
+    rc = sl_si91x_connect(n->socket, (struct sockaddr *)&server_address, socket_length);
+  }
 
   if (rc == -1) {
     printf("\r\nSocket Connect failed with error: %d\r\n", errno);
@@ -195,7 +199,7 @@ static int mqtt_tcpconnection_handler(Network *n, uint8_t flags, char *addr, int
     n->socket = -1;
     return NETWORK_ERROR_CONNECT_FAILED;
   }
-  printf("\nSocket connection success \n");
+  printf("\r\nSocket connection success\r\n");
   return 0;
 }
 

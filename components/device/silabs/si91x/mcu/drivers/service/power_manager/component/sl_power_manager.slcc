@@ -7,7 +7,7 @@ description: >
   specify callbacks that will be executed when entering or exiting specific Power States. 
   This enables the user to perform any accounting after PS transition occurrences. 
   It also exposes a set of events that other components may utilize to register 
-  handlers for the power manager hooks function. 
+  handlers for the power manager hooks function.
 category: Device|Si91x|MCU|Service|Power Manager
 quality: production
 metadata:
@@ -35,6 +35,7 @@ requires:
   - name: romdriver_power_save
   - name: systemlevel_time_period
   - name: sl_clock_manager
+  - name: log_none
 define:
   - name: SLI_WIRELESS_COMPONENT_PRESENT
     value: "1"

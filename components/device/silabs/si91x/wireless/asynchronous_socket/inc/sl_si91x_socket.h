@@ -118,6 +118,7 @@ int sl_si91x_socket_async(int family, int type, int protocol, sl_si91x_socket_re
  *   - @ref SL_SI91X_SO_TLS_SNI
  *   - @ref SL_SI91X_SO_TLS_ALPN
  *   - @ref SL_SI91X_SO_MAX_RETRANSMISSION_TIMEOUT_VALUE
+ *   - @ref SL_SI91X_SO_PER_SOCKET_CLOSE
  *
  * @param[in] option_value 
  *   The value of the parameter.
@@ -138,6 +139,7 @@ int sl_si91x_socket_async(int family, int type, int protocol, sl_si91x_socket_re
  *   | @ref SL_SI91X_SO_TLS_SNI                          | sl_si91x_socket_type_length_value_t       | Server Name Indication (SNI)                                                                                               |
  *   | @ref SL_SI91X_SO_TLS_ALPN                         | sl_si91x_socket_type_length_value_t       | Application-Layer Protocol Negotiation (ALPN)                                                                              |
  *   | @ref SL_SI91X_SO_MAX_RETRANSMISSION_TIMEOUT_VALUE | uint8_t                                   | Maximum retransmission timeout value for TCP                                                                               |
+ *   | @ref SL_SI91X_SO_PER_SOCKET_CLOSE                 | BIT(0)                                    | Enable per-socket graceful close handling                                                                                  |
  *
  * @param[in] option_len 
  *   The length of the parameter of type @ref socklen_t.

@@ -1,8 +1,8 @@
-# PSA Crypto CMAC for SI91X
+# Platform SiWx91x PSA CMAC
 
 ## Table of Contents
 
-- [PSA Crypto CMAC for SI91X](#psa-crypto-cmac-for-si91x)
+- [Platform SiWx91x PSA CMAC](#platform-siwx91x-psa-cmac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -14,6 +14,9 @@
     - [Application Configuration Parameters](#application-configuration-parameters)
   - [Test the Application](#test-the-application)
     - [Expected output](#expected-output)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -26,13 +29,13 @@ To use this application following Hardware, Software and the Project Setup is re
 ### Hardware Requirements
 
   - Windows PC
-  - Silicon Labs Si917 Evaluation Kit [WPK(BRD4002)+ BRD4338A]
+  - Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002)+ BRD4338A]
 
 ### Software Requirements
   - Simplicity SDK version: 2024.6.2
-  - Si91x SDK
+  - SiWx91x SDK
   - Embedded Development Environment
-    - For Silicon Labs Si91x, use the latest version of Simplicity Studio (refer **"Download and Install Simplicity Studio"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html**)
+    - For Silicon Labs SiWx91x, use the latest version of Simplicity Studio (refer **"Download and Install Simplicity Studio"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html**)
 
 ### Setup Diagram
 
@@ -40,11 +43,11 @@ To use this application following Hardware, Software and the Project Setup is re
 
 ## Getting Started
 
-- **Silicon Labs Si91x** refer **"Download SDKs"**, **"Add SDK to Simplicity Studio"**, **"Connect SiWx917"**, **"Open Example Project in Simplicity Studio"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html** to work with Si91x and Simplicity Studio
+- **Silicon Labs SiWx91x** refer **"Download SDKs"**, **"Add SDK to Simplicity Studio"**, **"Connect SiWx917"**, **"Open Example Project in Simplicity Studio"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html** to work with SiWx91x and Simplicity Studio
 
 ## Application Build Environment
 
-- To program the device ,refer **"Burn M4 Binary"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html** to work with Si91x and Simplicity Studio
+- To program the device, refer **"Burn M4 Binary"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html** to work with SiWx91x and Simplicity Studio
 
 - The current implementation will support CMAC single-part mac computation and verification.
 
@@ -81,8 +84,8 @@ Follow the steps as mentioned for the successful execution of the application:
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

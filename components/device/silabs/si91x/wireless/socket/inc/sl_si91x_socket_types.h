@@ -300,4 +300,5 @@ typedef struct {
   sli_command_engine_packet_type_configuration_t socket_packet_type_configuration; ///< Pointer to socket packet
   bool is_receive_cmd_pending; ///< Flag to indicate if a receive command is pending
   uint8_t *domain_name;        ///< Expected domain name for TLS certificate verification
+  uint8_t socket_ext_bitmap;   ///< Extended socket bitmap
 } sli_si91x_socket_t;

@@ -38,6 +38,9 @@
 #include "sl_net_si91x.h"
 #endif
 #include "sl_wifi.h"
+#if defined(SLI_SI91X_OFFLOAD_NETWORK_STACK) || defined(SLI_SI91X_LWIP_HOSTED_NETWORK_STACK)
+#include "sl_si91x_types.h"
+#endif
 #include "string.h"
 #ifdef SLI_SI91X_LWIP_HOSTED_NETWORK_STACK
 #include "sl_net_for_lwip.h"
@@ -240,6 +243,60 @@ int sli_net_check_cred_type(sl_net_credential_type_t type)
 
   return CRED_TYPE_CRED;
 }
+
+#if defined(SLI_SI91X_OFFLOAD_NETWORK_STACK) || defined(SLI_SI91X_LWIP_HOSTED_NETWORK_STACK)
+sl_status_t sli_net_get_vap_for_ip_version(uint8_t vap_id, sl_ip_address_type_t ip_type)
+{
+  sl_status_t status;
+  sl_net_interface_t interface;
+  uint8_t max_profiles;
+  sl_ip_address_type_t combined_ip_types = 0;
+
+#ifdef SLI_SI91X_LWIP_HOSTED_NETWORK_STACK
+  extern bool bypass_mode_enabled;
+  if (bypass_mode_enabled) {
+    return SL_STATUS_WIFI_UNSUPPORTED;
+  }
+#endif
+
+  if (vap_id == SL_SI91X_WIFI_CLIENT_VAP_ID || vap_id == SL_SI91X_WIFI_CLIENT_VAP_ID_1) {
+    interface    = SL_NET_WIFI_CLIENT_INTERFACE;
+    max_profiles = MAX_WIFI_CLIENT_PROFILES;
+  } else if (vap_id == SL_SI91X_WIFI_AP_VAP_ID || vap_id == SL_SI91X_WIFI_AP_VAP_ID_1) {
+    interface    = SL_NET_WIFI_AP_INTERFACE;
+    max_profiles = MAX_WIFI_AP_PROFILES;
+  } else {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  for (uint8_t id = 0; id < max_profiles; id++) {
+    if (SL_NET_WIFI_CLIENT_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {
+      sl_net_wifi_client_profile_t profile = { 0 };
+      status                               = sl_net_get_profile(interface, id, (sl_net_profile_t *)&profile);
+      if (status != SL_STATUS_OK || profile.ip.type == 0) {
+        continue;
+      }
+      combined_ip_types |= profile.ip.type;
+    } else {
+      sl_net_wifi_ap_profile_t profile = { 0 };
+      status                           = sl_net_get_profile(interface, id, (sl_net_profile_t *)&profile);
+      if (status != SL_STATUS_OK || profile.ip.type == 0) {
+        continue;
+      }
+      combined_ip_types |= profile.ip.type;
+    }
+  }
+
+  // If no profiles are configured (combined_ip_types == 0), allow the operation
+  // to proceed. Applications that bypass sl_net (e.g., using sl_si91x_configure_ip_address
+  // directly) won't have profiles set up, and the firmware will handle validation.
+  if (combined_ip_types == 0) {
+    return SL_STATUS_OK;
+  }
+
+  return ((combined_ip_types & ip_type) != 0) ? SL_STATUS_OK : SL_STATUS_INVALID_CONFIGURATION;
+}
+#endif /* SLI_SI91X_OFFLOAD_NETWORK_STACK || SLI_SI91X_LWIP_HOSTED_NETWORK_STACK */
 
 sl_status_t sli_network_manager_init(void)
 {

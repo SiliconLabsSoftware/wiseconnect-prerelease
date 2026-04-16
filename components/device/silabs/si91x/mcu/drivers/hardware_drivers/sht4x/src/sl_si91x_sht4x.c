@@ -83,6 +83,7 @@ I2C_TransferReturn_TypeDef I2CSPM_Transfer(sl_i2cspm_t *i2c, I2C_TransferSeq_Typ
   I2C_TransferReturn_TypeDef phase_ret;
 
   if (i2c == NULL || seq == NULL) {
+    SL_PRINT_STRING_ERROR("I2CSPM_Transfer: invalid parameters, NULL handle or sequence");
     return i2cTransferUsageFault;
   }
 
@@ -90,6 +91,7 @@ I2C_TransferReturn_TypeDef I2CSPM_Transfer(sl_i2cspm_t *i2c, I2C_TransferSeq_Typ
   instance = *(sl_i2c_instance_t *)i2c;
 
   if (instance >= SL_I2C_LAST) {
+    SL_PRINT_STRING_ERROR("I2CSPM_Transfer: invalid instance, out of range");
     return i2cTransferUsageFault;
   }
 
@@ -103,6 +105,7 @@ I2C_TransferReturn_TypeDef I2CSPM_Transfer(sl_i2cspm_t *i2c, I2C_TransferSeq_Typ
     /* Write only: send buf[0] to the device. */
     case I2C_FLAG_WRITE:
       if (seq->buf[0].len == 0 || seq->buf[0].data == NULL) {
+        SL_PRINT_STRING_ERROR("I2CSPM_Transfer: invalid write buffer, length 0 or NULL");
         return i2cTransferUsageFault;
       }
       i2c_status = sl_i2c_driver_send_data_blocking(instance, addr_7bit, seq->buf[0].data, (uint32_t)seq->buf[0].len);
@@ -111,6 +114,7 @@ I2C_TransferReturn_TypeDef I2CSPM_Transfer(sl_i2cspm_t *i2c, I2C_TransferSeq_Typ
     /* Read only: receive into buf[0]. */
     case I2C_FLAG_READ:
       if (seq->buf[0].len == 0 || seq->buf[0].data == NULL) {
+        SL_PRINT_STRING_ERROR("I2CSPM_Transfer: invalid read buffer, length 0 or NULL");
         return i2cTransferUsageFault;
       }
       i2c_status =
@@ -120,6 +124,7 @@ I2C_TransferReturn_TypeDef I2CSPM_Transfer(sl_i2cspm_t *i2c, I2C_TransferSeq_Typ
     /* Write then read (repeated start): send buf[0], then receive into buf[1]. */
     case I2C_FLAG_WRITE_READ: {
       if (seq->buf[0].len == 0 || seq->buf[0].data == NULL || seq->buf[1].len == 0 || seq->buf[1].data == NULL) {
+        SL_PRINT_STRING_ERROR("I2CSPM_Transfer: invalid write/read buffer, length 0 or NULL");
         return i2cTransferUsageFault;
       }
       sl_i2c_driver_enable_repeated_start(instance, true);
@@ -137,11 +142,13 @@ I2C_TransferReturn_TypeDef I2CSPM_Transfer(sl_i2cspm_t *i2c, I2C_TransferSeq_Typ
     /* Write then write: send buf[0], then buf[1] in one transaction (repeated start, no STOP between). */
     case I2C_FLAG_WRITE_WRITE: {
       if (seq->buf[0].len == 0 || seq->buf[0].data == NULL || seq->buf[1].len == 0 || seq->buf[1].data == NULL) {
+        SL_PRINT_STRING_ERROR("I2CSPM_Transfer: invalid write/write buffer, length 0 or NULL");
         return i2cTransferUsageFault;
       }
       sl_i2c_driver_enable_repeated_start(instance, true);
       i2c_status = sl_i2c_driver_send_data_blocking(instance, addr_7bit, seq->buf[0].data, (uint32_t)seq->buf[0].len);
       if (i2c_stop_repeated_start_on_error(instance, i2c_status, &phase_ret)) {
+        SL_PRINT_STRING_ERROR("I2CSPM_Transfer: stop repeated start on error");
         return phase_ret;
       }
       /* Disable repeated-start before second write so the driver emits STOP after the second segment. */
@@ -152,6 +159,7 @@ I2C_TransferReturn_TypeDef I2CSPM_Transfer(sl_i2cspm_t *i2c, I2C_TransferSeq_Typ
 
     /* Unsupported transfer type. */
     default:
+      SL_PRINT_STRING_ERROR("I2CSPM_Transfer: unsupported transfer type");
       return i2cTransferUsageFault;
   }
 }

@@ -1,8 +1,8 @@
-# SL I2S PRIMARY
+# Platform SiWx91x I2S PRIMARY
 
 ## Table of Contents
 
-  - [Purpose/Scope](#purposescope)
+  - [Platform SiWx91x I2S PRIMARY](#platform-siwx91x-i2s-primary)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -12,9 +12,11 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
     - [General Configuration](#general-configuration)
-    - [Pin Configuration](#pin-configuration)
-    - [Pin Description](#pin-description)
+    - [Pin Configuration for I2S primary](#pin-configuration-for-i2s-primary)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -67,7 +69,7 @@
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 
 ### Software Requirements
 
@@ -117,7 +119,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - For BRD4338A
 
-| Si917 GPIO pin | Breakout pin on WPK (4002A baseboard) | Description             |
+| SiWx91x GPIO pin | Breakout pin on WPK (4002A baseboard) | Description             |
 | ---------------| --------------------------------------|------------------------ |
 | GPIO_25        | P25                                   | I2S SCK                 |
 | GPIO_26        | P27                                   | I2S Frame               |
@@ -132,7 +134,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project) to:
 
-1. Obtain two Silicon Labs Si917 Evaluation Kits: a [WPK (BRD4002)](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) and a [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview).
+1. Obtain two Silicon Labs SiWx91x Evaluation Kits: a [WPK (BRD4002)](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) and a [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview).
 2. On one board, build and run the I2S secondary application from the WiseConnect repository: [i2s secondary](https://github.com/SiliconLabs/wiseconnect/tree/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2s_secondary).
 3. Compile and run this application on the other board.
 4. When the application runs, it receives data from the secondary device and after successful
@@ -154,8 +156,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

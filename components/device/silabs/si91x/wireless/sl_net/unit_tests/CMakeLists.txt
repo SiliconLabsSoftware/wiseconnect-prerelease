@@ -29,6 +29,8 @@ include_directories(./inc
                     ../../../../../../sli_command_engine/inc
                     ../../../../../../sli_event_engine/inc
                     ../../sli_hal_si91x/inc
+                    ../../../../../../device/silabs/si91x/mcu/drivers/service/sl_log/inc
+                    ../../unit_tests/inc
 )
 # Add unit test cpp here
 add_executable(${PROJECT_NAME}

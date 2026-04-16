@@ -102,12 +102,14 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
     if (status != SL_STATUS_OK) {
       SL_PRINT_STRING_ERROR("\r\nTimestamp Memory Location Configuration Failed with error: 0x%lX\r\n", status);
     }
+#if 0
     sl_log_level_t level        = sl_log_get_loglevel();
     sli_nwp_log_config_t config = { .log_config_level = (uint8_t)level };
     status                      = sli_nwp_log_configure(&config);
     if (status != SL_STATUS_IN_PROGRESS) {
       SL_PRINT_STRING_ERROR("\r\nNWP Log Configuration Failed with error: 0x%lX\r\n", status);
     }
+#endif
     status = SL_STATUS_OK;
   }
 #endif
@@ -506,6 +508,11 @@ sl_status_t sl_wifi_stop_ap(sl_wifi_interface_t interface)
 sl_status_t sl_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_statistics_t *statistics)
 {
   return sli_wifi_get_statistics(interface, statistics);
+}
+
+sl_status_t sl_wifi_get_statistics_v2(sl_wifi_interface_t interface, sl_wifi_statistics_v2_t *statistics)
+{
+  return sli_wifi_get_statistics_v2(interface, statistics);
 }
 
 sl_status_t sl_wifi_get_operational_statistics(sl_wifi_interface_t interface,
@@ -1062,4 +1069,29 @@ sl_status_t sl_wifi_get_timeout(sl_wifi_interface_t interface,
                                 uint16_t *timeout_value)
 {
   return sli_wifi_get_timeout(interface, timeout_type, timeout_value);
+}
+
+sl_status_t sl_wifi_set_groupcast_filter_config(const sl_wifi_groupcast_filter_config_t *config)
+{
+  return sli_wifi_set_groupcast_filter_config(config);
+}
+
+sl_status_t sl_wifi_allowlist_mcast_add_ip(const sl_ip_address_t *ip_address, sl_ip_address_handle_t *id)
+{
+  return sli_wifi_allowlist_mcast_add_ip(ip_address, id);
+}
+
+sl_status_t sl_wifi_allowlist_mcast_remove_ip(sl_ip_address_handle_t id)
+{
+  return sli_wifi_allowlist_mcast_remove_ip(id);
+}
+
+sl_status_t sl_wifi_allowlist_mcast_remove_all(void)
+{
+  return sli_wifi_allowlist_mcast_remove_all();
+}
+
+sl_status_t sl_wifi_set_beacon_drop_threshold(sl_wifi_interface_t interface, uint16_t beacon_drop_threshold)
+{
+  return sli_wifi_set_beacon_drop_threshold(interface, beacon_drop_threshold);
 }

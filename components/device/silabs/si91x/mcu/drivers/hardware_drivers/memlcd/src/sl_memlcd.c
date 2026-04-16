@@ -323,6 +323,7 @@ sl_status_t sl_memlcd_post_wakeup_init(void)
   /* Initialize the SPI bus. */
   status = sli_memlcd_spi_init(memlcd_post_wakeup_handle->spi_freq);
   if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("memlcd: post-wakeup SPI init failed");
     return SL_STATUS_FAIL;
   }
 
@@ -351,8 +352,10 @@ sl_status_t sl_memlcd_post_wakeup_init(void)
 
   status = sl_memlcd_power_on(memlcd_post_wakeup_handle, true);
   if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("memlcd: post-wakeup power_on failed, status=0x%04lX", (unsigned long)status);
     return SL_STATUS_FAIL;
   }
+
   return SL_STATUS_OK;
 }
 

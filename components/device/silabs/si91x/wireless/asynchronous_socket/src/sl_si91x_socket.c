@@ -30,6 +30,7 @@
 #include "sl_si91x_socket_utility.h"
 #include "sl_status.h"
 #include "sl_constants.h"
+#include "sl_log_helper_si91x.h"
 #include "sl_si91x_socket.h"
 #include "sl_si91x_socket_callback_framework.h"
 #include "sl_si91x_socket_types.h"
@@ -90,7 +91,13 @@ int sl_si91x_listen(int socket, int max_number_of_clients)
 
   // Create and send a socket request to make it a TCP server with the specified maximum number of clients
   status = sli_create_and_send_socket_request(socket, SLI_SI91X_SOCKET_TCP_SERVER, &max_number_of_clients);
-  SLI_SOCKET_VERIFY_STATUS_AND_RETURN(status, SLI_SI91X_NO_ERROR, SLI_SI91X_UNDEFINED_ERROR);
+  // Preserve errno if already set by sli_create_and_send_socket_request (e.g., EAFNOSUPPORT)
+  if (status != SLI_SI91X_NO_ERROR) {
+    if (errno == 0) {
+      errno = SLI_SI91X_UNDEFINED_ERROR;
+    }
+    return -1;
+  }
 
   si91x_socket->state = LISTEN;
 
@@ -253,8 +260,8 @@ int sl_si91x_setsockopt(int32_t sockID, int level, int option_name, const void *
                (const uint32_t *)option_value,
                SLI_GET_SAFE_MEMCPY_LENGTH(sizeof(si91x_socket->max_retransmission_timeout_value), option_len));
       } else {
-        SL_DEBUG_LOG("\n Max retransmission timeout value in between 1 - 128 and "
-                     "should be power of two. ex:1,2,4,8,16,32,64,128 \n");
+        SL_DEBUG_LOG_V2(DEBUG,
+                        "\n Max retransmission timeout must be 1-128 and a power of two (e.g. 1,2,4,8,16,32,64,128)\n");
         SLI_SET_ERROR_AND_RETURN(EINVAL);
       }
       break;
@@ -281,6 +288,16 @@ int sl_si91x_setsockopt(int32_t sockID, int level, int option_name, const void *
       SLI_SET_ERRNO_AND_RETURN_IF_TRUE(((*(uint16_t *)option_value) != (SL_SI91X_ENABLE_DTLS | SL_SI91X_DTLS_V_1_2)),
                                        EINVAL);
       si91x_socket->ssl_bitmap |= SL_SI91X_ENABLE_DTLS | SL_SI91X_DTLS_V_1_2;
+      break;
+    }
+
+    case SL_SI91X_SO_PER_SOCKET_CLOSE: {
+      SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket->type != SOCK_STREAM, ENOPROTOOPT);
+      SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket->state != INITIALIZED && si91x_socket->state != BOUND, EINVAL);
+      SLI_SET_ERRNO_AND_RETURN_IF_TRUE(option_len < sizeof(uint8_t), EINVAL);
+      SLI_SET_ERRNO_AND_RETURN_IF_TRUE((*(uint8_t *)option_value) != SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE, EINVAL);
+
+      si91x_socket->socket_ext_bitmap |= SLI_SI91X_SOCKET_FEAT_PER_SOCKET_CLOSE;
       break;
     }
 
@@ -347,7 +364,7 @@ int sl_si91x_send_large_data(int socket, const uint8_t *buffer, size_t buffer_le
     // Send chunk of data and return the total data sent in successful case
     bsd_ret_code = sl_si91x_send_async(socket, buffer + offset, chunk_size, flags, NULL);
     if (bsd_ret_code < 0) {
-      SL_DEBUG_LOG("\n Send failed with error code 0x%X \n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "\n Send failed with error code 0x%X \n", errno);
       break;
     } else {
       offset += bsd_ret_code;

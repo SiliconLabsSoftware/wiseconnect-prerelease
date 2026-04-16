@@ -64,6 +64,8 @@
 #define BLE_VENDOR_RF_TYPE_CMD_OPCODE 0xFC14
 /// BLE_VENDOR_ACCEPTLIST_USING_ADV_DATA_PAYLOAD.
 #define BLE_VENDOR_ACCEPTLIST_USING_ADV_DATA_PAYLOAD 0xFC1B
+/// BLE vendor opcode to set SMP minimum encryption key size.
+#define BLE_VENDOR_SET_SMP_MIN_KEYSIZE 0xFC25
 /// BLE_VENDOR_SET_COEX_ROLE_PRIORITY.
 #define BLE_VENDOR_SET_COEX_ROLE_PRIORITY 0xFC31
 /// Defines the maximum number of GAP extension callbacks.
@@ -2453,6 +2455,18 @@ typedef struct rsi_ble_ae_pdu {
     rsi_ble_ae_extended_create_connect_t extended_create_conn;
   } SL_ATTRIBUTE_PACKED pdu_type;
 } SL_ATTRIBUTE_PACKED rsi_ble_ae_pdu_t;
+
+/**
+ * @brief Vendor command payload to set the SMP minimum encryption key size.
+ */
+typedef struct rsi_ble_vendor_set_smp_min_enc_keysize_s {
+  /** Vendor sub-opcode (little-endian). */
+  uint8_t opcode[2];
+  /** Reserved. */
+  uint8_t reserved[2];
+  /** Minimum encryption key size (octets). */
+  uint8_t min_keysize;
+} SL_ATTRIBUTE_PACKED rsi_ble_vendor_set_smp_min_enc_keysize_t;
 
 /** @} */
 

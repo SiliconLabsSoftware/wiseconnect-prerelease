@@ -54,15 +54,17 @@
 
 //! Load certificate to device flash :
 //! Certificate should be loaded once and need not need to load for every boot up
-#define LOAD_CERTIFICATE     1
-#define SERVER_IP            "192.168.0.247"
-#define SERVER_PORT1         5002
-#define SERVER_PORT2         5003
-#define DATA                 "Hello from SSL TCP Client\n"
-#define NUMBER_OF_PACKETS    1000
-#define TLS_EXTENSION_ENABLE 0
-#define TLS_ALPN_EXTENSION   "http/1.1"
-#define TLS_SNI_EXTENSION    "example.com"
+#define LOAD_CERTIFICATE        1
+#define SERVER_IP               "192.168.0.247"
+#define SERVER_PORT1            5002
+#define SERVER_PORT2            5003
+#define DATA                    "Hello from SSL TCP Client\n"
+#define NUMBER_OF_PACKETS       1000
+#define TLS_EXTENSION_ENABLE    0
+#define TLS_ALPN_EXTENSION      "http/1.1"
+#define TLS_SNI_EXTENSION       "example.com"
+#define PER_SOCKET_CLOSE_ENABLE 1
+#define PER_SOCKET_CLOSE_VALUE  BIT(0)
 
 /******************************************************
  *               Variable Definitions
@@ -100,11 +102,13 @@ static const sl_wifi_device_configuration_t station_init_configuration = {
 #endif
                       ),
                    .bt_feature_bit_map         = 0,
-                   .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENTION_VALID,
+                   .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
                    .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
 };
+
+static uint8_t per_socket_close_value = PER_SOCKET_CLOSE_VALUE;
 
 /******************************************************
  *               Function Declarations
@@ -190,6 +194,19 @@ sl_status_t send_data_from_tls_socket()
     return SL_STATUS_FAIL;
   }
 
+#if PER_SOCKET_CLOSE_ENABLE
+  return_value = setsockopt(client_socket1,
+                            SOL_SOCKET,
+                            SL_SO_PER_SOCKET_CLOSE,
+                            &per_socket_close_value,
+                            sizeof(per_socket_close_value));
+  if (return_value < 0) {
+    printf("\r\nSet socket1 option per socket close failed with bsd error: %d\r\n", errno);
+    close(client_socket1);
+    return SL_STATUS_FAIL;
+  }
+#endif
+
 #if TLS_EXTENSION_ENABLE
   status = set_tls_extensions(client_socket1);
   if (status != SL_STATUS_OK) {
@@ -223,6 +240,20 @@ sl_status_t send_data_from_tls_socket()
     close(client_socket2);
     return SL_STATUS_FAIL;
   }
+
+#if PER_SOCKET_CLOSE_ENABLE
+  return_value = setsockopt(client_socket2,
+                            SOL_SOCKET,
+                            SL_SO_PER_SOCKET_CLOSE,
+                            &per_socket_close_value,
+                            sizeof(per_socket_close_value));
+  if (return_value < 0) {
+    printf("\r\nSet socket2 option per socket close failed with bsd error: %d\r\n", errno);
+    close(client_socket1);
+    close(client_socket2);
+    return SL_STATUS_FAIL;
+  }
+#endif
 
 #if TLS_EXTENSION_ENABLE
   status = set_tls_extensions(client_socket2);

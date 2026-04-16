@@ -93,6 +93,7 @@ static uint8_t peripheral_conn_id = 0xff;
 static uint8_t remote_name[RSI_REM_DEV_NAME_LEN];
 #endif
 rsi_ble_t att_list;
+rsi_ble_t ta_att_list;
 rsi_ble_req_adv_t change_adv_param;
 rsi_ble_req_scan_t change_scan_param;
 osSemaphoreId_t ble_conn_sem[TOTAL_CONNECTIONS];
@@ -469,9 +470,11 @@ static void rsi_ble_add_char_val_att(void *serv_handler,
   //! add attribute to the service
   rsi_ble_add_attribute(&new_att);
 
-  if ((auth_read == ATT_REC_MAINTAIN_IN_HOST) || (data_len > 20)) {
-    if (data != NULL) {
+  if (data != NULL) {
+    if ((auth_read == ATT_REC_MAINTAIN_IN_HOST) || (data_len > 20)) {
       rsi_gatt_add_attribute_to_list(&att_list, handle, data_len, data, att_type_uuid, val_prop);
+    } else {
+      rsi_gatt_add_attribute_to_list(&ta_att_list, handle, data_len, data, att_type_uuid, val_prop);
     }
   }
 

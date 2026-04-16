@@ -48,6 +48,7 @@
 #include "sli_wifi_utility.h"
 #include "sli_buffer_manager.h"
 #include "sli_queue_manager.h"
+#include "sl_log_helper_si91x.h"
 
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 #include "sl_si91x_socket_utility.h"
@@ -254,11 +255,8 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
   metadata->tx_info.frame_id           = frame_type;
   metadata->packet_status              = frame_status;
 
-  SL_DEBUG_LOG("RX-> Q: %u, C: 0x%X, L: %u, S: 0x%x.\n",
-               queue_id,
-               frame_type,
-               metadata->tx_info.data_packet_length,
-               frame_status);
+  SL_DEBUG_LOG_V2(DEBUG, "RX-> Q: %u, C: 0x%X, L: %u.\n", queue_id, frame_type, metadata->tx_info.data_packet_length);
+  SL_DEBUG_LOG_V2(DEBUG, "RX-> S: 0x%x.\n", frame_status);
 
   switch (queue_id) {
     case SLI_WLAN_MGMT_Q: {
@@ -277,6 +275,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_COMMON_RSP_SET_CONFIG:
         case SLI_COMMON_RSP_GET_CONFIG:
         case SLI_COMMON_RSP_DEBUG_LOG:
+        case SLI_COMMON_RSP_NWP_LOGGING:
         case SLI_COMMON_RSP_FEATURE_FRAME:
         case SLI_COMMON_RSP_ULP_NO_RAM_RETENTION:
         case SLI_WIFI_RSP_CARDREADY: {
@@ -414,9 +413,15 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
 #endif
           break;
         }
+        case SLI_WIFI_RSP_SET_BC_MC_FILTER_CONFIG:
+        case SLI_WIFI_RSP_UPDATE_MC_ALLOWLIST:
+        case SLI_WIFI_RSP_SET_BEACON_DROP_THRESHOLD: {
+          metadata->tx_info.packet_type = SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET;
+          break;
+        }
         default: {
           // frame_type doesn't match any known cases
-          SL_DEBUG_LOG("Unknown frame type: %u\n", frame_type);
+          SL_DEBUG_LOG_V2(DEBUG, "Unknown frame type: %u\n", frame_type);
           status = SL_STATUS_INVALID_INDEX;
           break;
         }
@@ -433,7 +438,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
     }
     default: {
       // frame_type doesn't match any known cases
-      SL_DEBUG_LOG("Unknown Queue type: %u\n", queue_id);
+      SL_DEBUG_LOG_V2(DEBUG, "Unknown Queue type: %u\n", queue_id);
       status = SL_STATUS_INVALID_INDEX;
       break;
     }
@@ -507,14 +512,14 @@ static void sli_process_flush_metadata_node(sli_command_engine_metadata_t *tx_me
       uint32_t thread_flags_result =
         osThreadFlagsSet(tx_metadata->sync_resp_thread_id, packet_config->sync_response_event);
       if ((thread_flags_result & osFlagsError) != 0) {
-        SL_DEBUG_LOG("Warning: Failed to set thread flags for sync response\n");
+        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set thread flags for sync response\n");
       }
     } else if (packet_config->sync_response_event_id != NULL && packet_config->sync_response_event != 0) {
       // Fallback to event flags if thread ID is not available
       uint32_t event_flags_result =
         osEventFlagsSet(*packet_config->sync_response_event_id, packet_config->sync_response_event);
       if ((event_flags_result & osFlagsError) != 0) {
-        SL_DEBUG_LOG("Warning: Failed to set event flags for sync response\n");
+        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for sync response\n");
       }
     }
   } else {
@@ -641,23 +646,14 @@ static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
     case SLI_WIFI_RSP_JOIN:
       if (frame_status != SL_STATUS_OK) {
         sli_reset_coex_current_performance_profile();
-
-        if (!sli_is_command_in_flight_queue(instance, packet_type, SLI_WIFI_REQ_JOIN)) {
-          status = sli_flush_all_command_engine_static_queues(instance, frame_status);
-          VERIFY_STATUS_AND_RETURN(status);
-#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
-          uint8_t vap_id = SL_WIFI_CLIENT_VAP_ID;
-          status = sli_flush_all_socket_queues(instance, (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED, &vap_id, NULL);
-          VERIFY_STATUS_AND_RETURN(status);
-#endif
-          sli_post_packet_to_event_engine(rx_buffer);
-        }
+        sli_post_packet_to_event_engine(rx_buffer);
       }
       break;
 
     case SLI_WIFI_RSP_IPCONFV4:
       if (frame_status != SL_STATUS_OK
           && (!sli_is_command_in_flight_queue(instance, packet_type, SLI_WIFI_REQ_IPCONFV4))) {
+        SL_DEBUG_LOG_V2(WARN, "IPCONFV4 fail flush frame_status=0x%X", frame_status);
         status = sli_flush_all_command_engine_static_queues(instance, frame_status);
         VERIFY_STATUS_AND_RETURN(status);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
@@ -671,6 +667,7 @@ static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
     case SLI_WIFI_RSP_IPCONFV6:
       if (frame_status != SL_STATUS_OK
           && (!sli_is_command_in_flight_queue(instance, packet_type, SLI_WIFI_REQ_IPCONFV6))) {
+        SL_DEBUG_LOG_V2(WARN, "IPCONFV6 fail flush frame_status=0x%X", frame_status);
         status = sli_flush_all_command_engine_static_queues(instance, frame_status);
         VERIFY_STATUS_AND_RETURN(status);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
@@ -683,7 +680,8 @@ static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
 
     case SLI_WIFI_RSP_IPV4_CHANGE: {
       uint16_t error_status = (uint16_t)SL_STATUS_SI91X_IP_ADDRESS_ERROR;
-      status                = sli_flush_all_command_engine_static_queues(instance, error_status);
+      SL_DEBUG_LOG_V2(INFO, "IPV4_CHANGE flush queues");
+      status = sli_flush_all_command_engine_static_queues(instance, error_status);
       VERIFY_STATUS_AND_RETURN(status);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
       uint8_t vap_id = SL_WIFI_CLIENT_VAP_ID;
@@ -695,6 +693,7 @@ static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
     case SLI_WIFI_RSP_DISCONNECT:
       if (frame_status == SL_STATUS_OK
           && (SL_WIFI_CLIENT_VAP_ID == sli_wifi_get_vap_id_from_operation_mode(rx_packet))) {
+        SL_DEBUG_LOG_V2(INFO, "DISCONNECT client flush");
         sli_reset_coex_current_performance_profile();
         status = sli_flush_all_command_engine_static_queues(instance, (uint16_t)SL_STATUS_WIFI_CONNECTION_LOST);
         VERIFY_STATUS_AND_RETURN(status);
@@ -728,7 +727,8 @@ static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
     case SLI_WIFI_RSP_AP_STOP:
       if (frame_status == SL_STATUS_OK) {
         uint8_t vap_id = SL_WIFI_AP_VAP_ID;
-        status         = sli_flush_all_socket_queues(instance, (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED, &vap_id, NULL);
+        SL_DEBUG_LOG_V2(INFO, "AP_STOP flush sockets");
+        status = sli_flush_all_socket_queues(instance, (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED, &vap_id, NULL);
         VERIFY_STATUS_AND_RETURN(status);
 
         sli_post_packet_to_event_engine(rx_buffer);
@@ -737,7 +737,7 @@ static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
 #endif
 
     case SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE: {
-      SL_DEBUG_LOG("Received MQTT remote terminate, flushing the queues \r\n");
+      SL_DEBUG_LOG_V2(INFO, "Received MQTT remote terminate, flushing the queues \r\n");
       status = sli_flush_queue_for_packet_type(
         &instance->queue_info[SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET],
         &instance->config.packet_type_configuration[SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET],
@@ -826,7 +826,7 @@ static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint1
     uint32_t event_result = osEventFlagsSet(*socket->socket_packet_type_configuration.sync_response_event_id,
                                             socket->socket_packet_type_configuration.sync_response_event);
     if ((event_result & osFlagsError) != 0) {
-      SL_DEBUG_LOG("Warning: Failed to set event flags for socket flush response\n");
+      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for socket flush response\n");
     }
   }
 
@@ -842,6 +842,7 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
     return SL_STATUS_INVALID_PARAMETER;
   }
 
+  SL_DEBUG_LOG_V2(INFO, "flush_all_socket_queues err=0x%X\n", (unsigned int)error_status);
   sl_status_t status                              = SL_STATUS_OK;
   sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
   uint8_t socket_vap_id = (current_operation_mode == SL_WIFI_ACCESS_POINT_MODE) ? SL_WIFI_AP_VAP_ID

@@ -1,8 +1,8 @@
-# SL CONFIG TIMER OCU NON DMA
+# Platform SiWx91x Config Timer Basic and OCU without DMA
 
 ## Table of Contents
 
-- [SL CONFIG TIMER OCU NON DMA](#sl-config-timer-ocu-non-dma)
+- [Platform SiWx91x Config Timer Basic and OCU without DMA](#platform-siwx91x-config-timer-basic-and-ocu-without-dma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -16,6 +16,9 @@
     - [Pin Configuration for OCU PWM mode use case](#pin-configuration-for-ocu-pwm-mode-use-case)
     - [Macros for CT Configurations](#macros-for-ct-configurations)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
     - [Run the application in counter mode](#run-the-application-in-counter-mode)
     - [Run the application in Output Compare Unit PWM mode](#run-the-application-in-output-compare-unit-pwm-mode)
 
@@ -24,7 +27,7 @@
 - This Config Timer example demonstrates 2 use cases of a timer:
   - First as free-running timer. Counter-0 is configured to generate interrupt. Once interrupt is trigerred we get the console message and timer is deinitialized.
   - Second as a waveform generator producing two PWM outputs: counter-1 generates a square wave (50%-duty cycle) and counter-0 will produce a waveform whose duty cycle continuously varies from 100% to 0% then 0% to 100%.
-  
+
 
 ## Overview
 
@@ -67,13 +70,13 @@
     - Starts counter-0 using [sl_si91x_config_timer_start_on_software_trigger()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-start-on-software-trigger) API.
     - Generates the console message once the interrupt is triggered.
   -
-  
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
 
 - Windows PC.
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)].
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)].
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -113,7 +116,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   ```C
    #define TIME_PERIOD_VALUE     1000         // Time period in microseconds
-   
+
   ```
 
   - Change following macros in `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)]file to change counter-number used for counter-mode use case, by default application is using counter-0 to use counter-1 change it to 'SL_COUNTER_1'.
@@ -123,12 +126,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   ```
 - Use the following CT configurations to run the application either in Normal counter mode (using Counter-0 or Counter-1) or in PWM mode.
 - In Simplicity Studio, search for **"Config Timer"** in the Software Components tab to add or configure the required timer component for your project.
-  
+
   > ![Figure: Pin configuration](resources/uc_screen/uc_screen.png)
 
    **Note:**
   > The Config Timer supports only 16-bit counter mode, with a maximum match value of 65,535.
- 
+
 ### Pin Configuration for OCU PWM mode use case
 
 |  Discription  | GPIO    | Breakout pin  | Explorer kit Breakout pin|
@@ -139,17 +142,17 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 > ![Figure: Pin configuration](resources/readme/image502e.png)
 
 ### Pin Configuration for INPUT EVENT mode use case
-|  Discription  | GPIO    | Breakout pin  | 
+|  Discription  | GPIO    | Breakout pin  |
 | ------------- | ------- | ------------- |
-|    input-0    | GPIO_25 |     P25       | 
+|    input-0    | GPIO_25 |     P25       |
 
 ### Macros for CT Configurations
 
  In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)]file,these macros are present.
- 
-- \ref SL_CT_MODE_32BIT_ENABLE_MACRO , for possible values refer \ref sl_config_timer_mode_t
-- \ref SL_COUNTER0_DIRECTION_MACRO , for possible values refer \ref sl_counter0_direction_t
-- \ref SL_COUNTER1_DIRECTION_MACRO , for possible values refer \ref sl_counter1_direction_t
+
+- \ref SL_CT_MODE_32BIT_ENABLE_MACRO,  for possible values refer \ref sl_config_timer_mode_t
+- \ref SL_COUNTER0_DIRECTION_MACRO,  for possible values refer \ref sl_counter0_direction_t
+- \ref SL_COUNTER1_DIRECTION_MACRO,  for possible values refer \ref sl_counter1_direction_t
 - \ref SL_COUNTER0_PERIODIC_ENABLE_MACRO, true to enable Counter0 Periodic mode & false to skip Counter0 Periodic mode.
 - \ref SL_COUNTER1_PERIODIC_ENABLE_MACRO, true to enable Counter1 Periodic mode & false to skip Counter1 Periodic mode.
 - \ref SL_COUNTER0_SYNC_TRIGGER_ENABLE_MACRO, true to enable Counter0 sync trigger & false to skip Counter0 sync trigger.
@@ -190,8 +193,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

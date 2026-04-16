@@ -29,6 +29,9 @@
  ******************************************************************************/
 #include "sl_status.h"
 #include "sl_string.h"
+#if defined(SLI_SI917)
+#include "sl_log_helper_si91x.h"
+#endif
 #include "sl_wifi.h"
 #include "sli_wifi.h"
 #include "sli_wifi_constants.h"
@@ -587,8 +590,14 @@ static sl_status_t sli_configure_channel_bitmap(sl_wifi_interface_t interface,
                                                 sli_wifi_request_scan_t *scan_request)
 {
   scan_request->channel[0] = 0;
+  /* Role-only interface (no band bits): inherit band from Wi-Fi device configuration.
+   * At init, the driver sets default_interface from sl_wifi_device_configuration_t::band
+   * together with client/AP role. */
+  if ((interface == SL_WIFI_CLIENT_INTERFACE) || (interface == SL_WIFI_AP_INTERFACE)) {
+    interface |= (default_interface & (SL_WIFI_2_4GHZ_INTERFACE | SL_WIFI_5GHZ_INTERFACE));
+  }
   /* Check if interface is valid */
-  if (!((interface & SL_WIFI_CLIENT_2_4GHZ_INTERFACE) || (interface & SL_WIFI_CLIENT_5GHZ_INTERFACE))) {
+  if (!((interface & SL_WIFI_2_4GHZ_INTERFACE) || (interface & SL_WIFI_5GHZ_INTERFACE))) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   /* Check if configuration and scan request are not NULL */
@@ -596,7 +605,7 @@ static sl_status_t sli_configure_channel_bitmap(sl_wifi_interface_t interface,
     return SL_STATUS_INVALID_PARAMETER;
   }
   /* Set channel bitmap for 2.4 GHz interface */
-  if ((interface & SL_WIFI_CLIENT_2_4GHZ_INTERFACE) && (configuration->channel_bitmap_2g4 != 0xFFFF)
+  if ((interface & SL_WIFI_2_4GHZ_INTERFACE) && (configuration->channel_bitmap_2g4 != 0xFFFF)
       && (configuration->channel_bitmap_2g4 != 0x0000)) {
     memcpy(&scan_request->channel_bit_map_2_4,
            &configuration->channel_bitmap_2g4,
@@ -604,7 +613,7 @@ static sl_status_t sli_configure_channel_bitmap(sl_wifi_interface_t interface,
   }
 
   /* Set channel bitmap for 5 GHz interface */
-  if ((interface & SL_WIFI_CLIENT_5GHZ_INTERFACE) && (configuration->channel_bitmap_5g[0] != 0xFFFFFFFF)
+  if ((interface & SL_WIFI_5GHZ_INTERFACE) && (configuration->channel_bitmap_5g[0] != 0xFFFFFFFF)
       && (configuration->channel_bitmap_5g[0] != 0x00000000)) {
     memcpy(&scan_request->channel_bit_map_5,
            &configuration->channel_bitmap_5g[0],
@@ -1577,7 +1586,50 @@ sl_status_t sli_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_stati
   VERIFY_STATUS_AND_RETURN(status);
 
   packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
-  if (packet->length != sizeof(sl_wifi_statistics_t)) {
+  if (packet->length != sizeof(sl_wifi_statistics_v2_t)) {
+    sli_buffer_manager_free_buffer(buffer);
+    return SL_STATUS_FAIL;
+  }
+
+  if (packet->length > 0) {
+    memcpy(statistics, packet->data, sizeof(sl_wifi_statistics_t));
+  }
+
+  sli_buffer_manager_free_buffer(buffer);
+  return status;
+}
+
+sl_status_t sli_wifi_get_statistics_v2(sl_wifi_interface_t interface, sl_wifi_statistics_v2_t *statistics)
+{
+  sl_status_t status       = SL_STATUS_OK;
+  sl_wifi_buffer_t *buffer = NULL;
+  const sl_wifi_system_packet_t *packet;
+
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (!sli_wifi_is_interface_up(interface)) {
+    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
+  }
+
+  SL_WIFI_ARGS_CHECK_INVALID_INTERFACE(interface);
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(statistics);
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_EXT_STATS,
+                                 SLI_WIFI_WLAN_CMD,
+                                 NULL,
+                                 0,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_EXT_STATS_WAIT_TIME),
+                                 NULL,
+                                 (void **)&buffer);
+  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
+    sli_buffer_manager_free_buffer(buffer);
+  }
+  VERIFY_STATUS_AND_RETURN(status);
+
+  packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
+  if (packet->length != sizeof(sl_wifi_statistics_v2_t)) {
     sli_buffer_manager_free_buffer(buffer);
     return SL_STATUS_FAIL;
   }
@@ -1589,6 +1641,7 @@ sl_status_t sli_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_stati
   sli_buffer_manager_free_buffer(buffer);
   return status;
 }
+
 sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
                                                 sl_wifi_operational_statistics_t *operational_statistics)
 {
@@ -2914,7 +2967,7 @@ sl_status_t sli_wifi_transmit_cw_tone_start(sl_wifi_interface_t interface, sl_wi
   transmit_cw_tone_config.enable = 1;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
-                                 SLI_WIFI_COMMON_CMD,
+                                 SLI_WIFI_WLAN_CMD,
                                  &transmit_cw_tone_config,
                                  sizeof(sli_wifi_request_cw_tone_config_t),
                                  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
@@ -2950,7 +3003,7 @@ sl_status_t sli_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface)
   transmit_cw_tone_config.frame_body_type.sub_type = SLI_WIFI_SUBTYPE_TRANSMIT_CW;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
-                                 SLI_WIFI_COMMON_CMD,
+                                 SLI_WIFI_WLAN_CMD,
                                  &transmit_cw_tone_config,
                                  sizeof(sli_wifi_request_cw_tone_config_t),
                                  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
@@ -2982,7 +3035,7 @@ sl_status_t sli_wifi_set_test_tx_power(int16_t txPower)
   tx_power_request.frame_body_type.sub_type    = SLI_WIFI_SUBTYPE_SET_TX_POWER_DBM;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
-                                 SLI_WIFI_COMMON_CMD,
+                                 SLI_WIFI_WLAN_CMD,
                                  &tx_power_request,
                                  sizeof(sli_wifi_request_tx_power_t),
                                  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
@@ -3012,7 +3065,7 @@ sl_status_t sli_wifi_stop_rx(sl_wifi_interface_t interface)
   stop_rx_request.frame_body_type.sub_type   = SLI_WIFI_SUBTYPE_RX_STOP;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
-                                 SLI_WIFI_COMMON_CMD,
+                                 SLI_WIFI_WLAN_CMD,
                                  &stop_rx_request,
                                  sizeof(sli_wifi_request_stop_rx_t),
                                  SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS,
@@ -3043,7 +3096,7 @@ sl_status_t sli_wifi_config_xo_ctune(sl_wifi_interface_t interface,
   xo_ctune_request.frame_body_type.sub_type              = SLI_WIFI_SUBTYPE_CONFIG_XO_CTUNE;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
-                                 SLI_WIFI_COMMON_CMD,
+                                 SLI_WIFI_WLAN_CMD,
                                  &xo_ctune_request,
                                  sizeof(sli_wifi_request_configure_xo_ctune_t),
                                  SLI_WIFI_WAIT_FOR_RESPONSE(1000),
@@ -3087,7 +3140,7 @@ sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
   get_ctune_request.frame_body_type.sub_type = SLI_WIFI_SUBTYPE_GET_XO_CTUNE;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
-                                 SLI_WIFI_COMMON_CMD,
+                                 SLI_WIFI_WLAN_CMD,
                                  &get_ctune_request,
                                  sizeof(sli_wifi_request_get_xo_ctune_t),
                                  SLI_WIFI_WAIT_FOR_RESPONSE(1000),
@@ -3391,4 +3444,192 @@ sl_status_t sli_wifi_send_ip_address_info(sl_wifi_interface_t interface,
                                SLI_WIFI_WAIT_FOR(SLI_WIFI_RSP_SEND_IP_ADDRESS_INFO_WAIT_TIME),
                                NULL,
                                NULL);
+}
+
+sl_status_t sli_wifi_set_groupcast_filter_config(const sl_wifi_groupcast_filter_config_t *config)
+{
+  sl_status_t status                         = SL_STATUS_FAIL;
+  sli_wifi_groupcast_filter_config_t request = { 0 };
+
+  if (config == NULL) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "gc filter: null cfg\r\n");
+#endif
+    return SL_STATUS_NULL_POINTER;
+  }
+  if (config->enable_bcast_filter > 1 || config->enable_mcast_filter > 1 || config->filter_mode > 1) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "gc filter: bad fields\r\n");
+#endif
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  request.enable_bcast_filter = config->enable_bcast_filter;
+  request.enable_mcast_filter = config->enable_mcast_filter;
+  request.filter_mode         = config->filter_mode;
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SET_BC_MC_FILTER_CONFIG,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &request,
+                                 sizeof(sli_wifi_groupcast_filter_config_t),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_SET_BC_MC_FILTER_CONFIG_WAIT_TIME),
+                                 NULL,
+                                 NULL);
+
+  VERIFY_STATUS_AND_RETURN(status);
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_wifi_allowlist_mcast_add_ip(const sl_ip_address_t *ip_address, sl_ip_address_handle_t *id)
+{
+  sl_status_t status                         = SL_STATUS_FAIL;
+  sli_wifi_mc_allowlist_update_req_t request = { 0 };
+  sl_wifi_buffer_t *buffer                   = NULL;
+
+  if (ip_address == NULL) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "mcast add: null ip\r\n");
+#endif
+    return SL_STATUS_NULL_POINTER;
+  }
+  if (id == NULL) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "mcast add: null id\r\n");
+#endif
+    return SL_STATUS_NULL_POINTER;
+  }
+  /* SL_IPV6_LINK_LOCAL / SITE_LOCAL / GLOBAL share IPv6 base flag in sl_ip_address_type_t. */
+  if ((ip_address->type != SL_IPV4) && ((ip_address->type & SL_IPV6) != SL_IPV6)) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "mcast add: bad IP type\r\n");
+#endif
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  *id               = UINT8_MAX;
+  request.operation = SLI_WIFI_MC_ALLOWLIST_OP_ADD;
+  request.ip_type   = (ip_address->type == SL_IPV4) ? SL_IPV4_VERSION : SL_IPV6_VERSION;
+  if (ip_address->type == SL_IPV4) {
+    request.payload.ipv4 = ip_address->ip.v4;
+  } else {
+    /* SL_IPV6, SL_IPV6_LINK_LOCAL, SL_IPV6_SITE_LOCAL, or SL_IPV6_GLOBAL */
+    request.payload.ipv6 = ip_address->ip.v6;
+  }
+  status = sli_wifi_send_command(SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &request,
+                                 sizeof(sli_wifi_mc_allowlist_update_req_t),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_UPDATE_MC_ALLOWLIST_WAIT_TIME),
+                                 NULL,
+                                 (void **)&buffer);
+
+  if ((status != SL_STATUS_OK) && (NULL != buffer)) {
+    sli_buffer_manager_free_buffer(buffer);
+  }
+
+  VERIFY_STATUS_AND_RETURN(status);
+  const sl_wifi_system_packet_t *resp_packet =
+    (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
+  if (resp_packet == NULL) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(ERROR, "mcast add: empty rsp\r\n");
+#endif
+    sli_buffer_manager_free_buffer(buffer);
+    return SL_STATUS_FAIL;
+  }
+
+  *id = resp_packet->data[0];
+  sli_buffer_manager_free_buffer(buffer);
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_wifi_allowlist_mcast_remove_ip(sl_ip_address_handle_t id)
+{
+  sl_status_t status                         = SL_STATUS_FAIL;
+  sli_wifi_mc_allowlist_update_req_t request = { 0 };
+
+  /* Handles are 0 .. SLI_WIFI_MAX_MC_ALLOWLIST_IP_ADDRESSES-1 for NWP allowlist slots. */
+  if (id >= SLI_WIFI_MAX_MC_ALLOWLIST_IP_ADDRESSES) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "mcast rm: bad handle\r\n");
+#endif
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  request.operation      = SLI_WIFI_MC_ALLOWLIST_OP_REMOVE;
+  request.ip_type        = 0;
+  request.payload.handle = id;
+  status                 = sli_wifi_send_command(SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &request,
+                                 sizeof(sli_wifi_mc_allowlist_update_req_t),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_UPDATE_MC_ALLOWLIST_WAIT_TIME),
+                                 NULL,
+                                 NULL);
+
+  VERIFY_STATUS_AND_RETURN(status);
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_wifi_allowlist_mcast_remove_all(void)
+{
+  sl_status_t status;
+  sli_wifi_mc_allowlist_update_req_t request = { 0 };
+
+  request.operation      = SLI_WIFI_MC_ALLOWLIST_OP_REMOVE_ALL;
+  request.ip_type        = 0;
+  request.payload.handle = 0;
+  status                 = sli_wifi_send_command(SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &request,
+                                 sizeof(sli_wifi_mc_allowlist_update_req_t),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_UPDATE_MC_ALLOWLIST_WAIT_TIME),
+                                 NULL,
+                                 NULL);
+  if (status != SL_STATUS_OK) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(ERROR, "mcast rm all: failed 0x%lx\r\n", (unsigned long)status);
+#endif
+    return status;
+  }
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_wifi_set_beacon_drop_threshold(sl_wifi_interface_t interface, uint16_t beacon_drop_threshold)
+{
+  sl_status_t status               = SL_STATUS_FAIL;
+  sli_wifi_fw_config_req_t request = { 0 };
+
+  if (!device_initialized) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "bcon drop: not inited\r\n");
+#endif
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (!sl_wifi_is_interface_up(interface)) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "bcon drop: iface down\r\n");
+#endif
+    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
+  }
+
+  if (!((default_interface & interface) == interface)) {
+#if defined(SLI_SI917)
+    SL_DEBUG_LOG_V2(WARN, "bcon drop: bad iface\r\n");
+#endif
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  request.config_bitmap = SLI_SET_BEACON_DROP_THRESHOLD;
+  request.value         = beacon_drop_threshold;
+  request.length        = 0;
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_SET_BEACON_DROP_THRESHOLD,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &request,
+                                 sizeof(sli_wifi_fw_config_req_t),
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_SET_BEACON_DROP_THRESHOLD_WAIT_TIME),
+                                 NULL,
+                                 NULL);
+  VERIFY_STATUS_AND_RETURN(status);
+  return SL_STATUS_OK;
 }

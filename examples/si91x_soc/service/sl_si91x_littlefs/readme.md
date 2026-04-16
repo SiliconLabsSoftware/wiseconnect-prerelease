@@ -1,8 +1,8 @@
-# SL FILE SYSTEM
+# Platform SiWx91x QSPI
 
 ## Table of Contents
 
-- [SL FILE SYSTEM](#sl-file-system)
+- [Platform SiWx91x QSPI](#platform-siwx91x-qspi)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -13,6 +13,9 @@
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -39,10 +42,10 @@ When flashed with this example the boot count get updated in the "boot_count" fi
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit + External Flash
+- Silicon Labs SiWx91x Evaluation Kit + External Flash
 
 >**Note:**
->- LittleFS service is not supported on stacked flash boards. However, if the board supports external flash, users can connect external flash to access the LittleFS service. 
+>- LittleFS service is not supported on stacked flash boards. However, if the board supports external flash, users can connect external flash to access the LittleFS service.
 >- For detailed information about pinset configurations, refer to the **Flash and PSRAM Combinations** section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/release/v3.4.2/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 
 ### Software Requirements
@@ -86,8 +89,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

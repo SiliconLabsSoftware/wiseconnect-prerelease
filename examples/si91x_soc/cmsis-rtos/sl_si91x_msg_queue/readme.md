@@ -1,8 +1,8 @@
-# SL MESSAGE QUEUE EXAMPLE
+# Platform SiWx91x RTOS Message Queue
 
 ## Table of Contents
 
-- [SL MESSAGE QUEUE EXAMPLE](#sl-message-queue-example)
+- [Platform SiWx91x RTOS Message Queue](#platform-siwx91x-rtos-message-queue)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -17,7 +17,7 @@
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -32,11 +32,11 @@
 After transmission the data is compared and result is printed on the console.
 - This application demonstrates how to configure USART In asynchronous mode, it will send and receive data in loopback mode.
 
-> **Note:** 
+> **Note:**
 >
 >- The master-slave terminology is now replaced with leader-follower. Master is now recognized as Leader, and Slave as Follower.
 >- Here the SCL and SDA lines of follower are configured as internal pull-up.
->- Data is transferred from leader to follower and follower to leader. 
+>- Data is transferred from leader to follower and follower to leader.
 
 ## Overview
  - Each of the threads, I2C and USART, creates their own message queues for sharing with other.
@@ -52,7 +52,7 @@ After transmission the data is compared and result is printed on the console.
     5. If the Tx and Rx data comparison passes, it then fills this data into USART's message queue
     6. I2C thread which has been waiting in step-2 has now got the data
     7. I2C thread then sends this data back to Leader, followed by data comparison
-    
+
 **1. I2C**
 - There are three configurable I2C Leader/Follower controllers in M4 - two in the MCU HP peripherals (I2C1, I2C2) and one in the MCU ULP subsystem (ULP_I2C).
 - The I2C interface allows the processor to serve as a leader or follower on the I2C bus.
@@ -85,7 +85,7 @@ After transmission the data is compared and result is printed on the console.
 
 ### Software Requirements
 
-- Si91x
+- SiWx91x
 - Simplicity Studio
 - Serial console Setup
   - For Serial Console setup instructions, refer to [link name](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
@@ -151,11 +151,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | USART PINS     | GPIO    | Breakout pin     | UART-TTL cable |
   | -------------- | ------- | ------------- | -------------- |
   | USART0_TX_PIN  | GPIO_30 |     P35       | RX pin         |
-  | USART0_RX_PIN  | GPIO_29 |     P33       | TX Pin         | 
+  | USART0_RX_PIN  | GPIO_29 |     P33       | TX Pin         |
 
 
  > ![Figure: Build run and Debug](resources/readme/image513d.png)
-  
+
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
@@ -169,7 +169,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 2. Create and build msg_queue application
 3. Connect ULP_GPIO_6 and ULP_GPIO_7 with the leader device for ULP_I2C.  Connect TX pin(GPIO_30) to RX pin(GPIO_29) forming a loopback.
 4. Run both application
-5. After running this application below console output can be observed. 
+5. After running this application below console output can be observed.
 6. When the application runs, it receives and sends data.
 7. After the transfer is completed, it validates the data and prints on the console.
 8. Will get "Test Case Passed" print on console.
@@ -188,8 +188,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

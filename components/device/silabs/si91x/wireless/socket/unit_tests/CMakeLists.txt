@@ -28,6 +28,8 @@ include_directories(
     ../../../../../../device/silabs/si91x/wireless/sli_si91x_wifi_event_handler/inc
     ../../../../../../device/silabs/si91x/wireless/sl_net/inc
     ../../../../../../service/network_manager/inc
+    ../../../../../../device/silabs/si91x/mcu/drivers/service/sl_log/inc
+    ../../unit_tests/inc
 )
 # Add source files for the test executable
 add_executable(${PROJECT_NAME}

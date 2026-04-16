@@ -1,0 +1,47 @@
+id: si91x_log_iostream_compact
+label: SL Log Si91x Backend Iostream compact
+package: platform_siwx91x
+description: >
+   This component provides iostream for si91x logger component.
+category: Device|Si91x|MCU|Service
+quality: evaluation
+metadata:
+  sbom:
+    license: Zlib
+root_path: components/device/silabs/si91x/mcu/drivers/service/sl_log    
+provides:
+  - name: si91x_log_iostream_compact
+  - name: si91x_log_iostream
+requires:
+  - name: si91x_iostream_transport
+  - name: log_backend_iostream_compact
+recommends:
+  - id: si91x_log     
+  - id: iostream_rtt_si91x
+include:
+  - path: inc
+    file_list:
+      - path: sl_log_iostream_recommends.h  
+source:
+  - path: src/sl_log_iostream_recommends.c   
+config_file:
+  - path: config/sl_log_proprietary_config.h
+    unless:  [iostream_rtt_si91x]
+  - path: config/sl_log_common_config.h  
+template_contribution:
+  - name: component_catalog
+    value: si91x_log_backend_iostream_compact
+  - name: component_catalog
+    value: si91x_log_backend_iostream    
+  - name: component_catalog
+    value: log_default_ring_buffer
+    condition: [iostream_rtt_si91x]
+  - name: component_catalog
+    value: log_backend_proprietary 
+    unless:  [iostream_rtt_si91x]   
+  - name: event_handler
+    value:
+      event: iostream_instance_init_stage_2
+      include: sl_log_iostream_recommends.h
+      handler: sl_si91x_iostream_set_console_instance
+    priority: 9999   

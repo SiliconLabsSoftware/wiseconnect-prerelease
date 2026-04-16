@@ -1,8 +1,8 @@
-# SL USART SLAVE
+# Platform SiWx91x USART Synchronous Slave
 
 ## Table of Contents
 
-- [SL USART SLAVE](#sl-usart-slave)
+- [Platform SiWx91x USART Synchronous Slave](#platform-siwx91x-usart-synchronous-slave)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -19,6 +19,9 @@
     - [Pin Configuration of the AC1 Module Explorer Kit](#pin-configuration-of-the-ac1-module-explorer-kit)
   - [Flow Control Configuration](#flow-control-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
   - [Configuring higher clock](#configuring-higher-clock)
 
 ## Purpose/Scope
@@ -40,7 +43,7 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 ## About Example Code
 
 - [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_slave/usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous slave mode.
-- In this example, first USART gets initialized if not already initialized with clock and DMA configurations using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).  
+- In this example, first USART gets initialized if not already initialized with clock and DMA configurations using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).
 **Note:** If the UART/USART instance is already selected for debug output logs, initialization returns `SL_STATUS_NOT_AVAILABLE` (informational; the example continues using the existing instance).
 - After initialization, USART configured (clock, pins, synchronous mode, etc.) using [`sl_si91x_usart_set_configuration()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration) either from UC parameters or from user-defined macros.
 - Then the register user event callback for send and receive complete notification is set using [`sl_si91x_usart_multiple_instance_register_event_callback()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-multiple-instance-register-event-callback).
@@ -67,7 +70,7 @@ Advanced users may edit the device configuration header `RTE_Device_917.h` direc
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]- Master and Slave
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]- Master and Slave
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit) - Master and Slave
 
 ### Software Requirements
@@ -120,15 +123,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | ----------------------- | ------- | ------------- |
   | USART_SLAVE_CLOCK_PIN  | GPIO_8  |      F8       |
   | USART_SLAVE_TX_PIN     | GPIO_30 |     P35       |
-  | USART_SLAVE_RX_PIN     | GPIO_29 |     P33       |  
-  
+  | USART_SLAVE_RX_PIN     | GPIO_29 |     P33       |
+
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4342A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
   | ----------------------- | ------- | ------------- |
   | USART_SLAVE_CLOCK_PIN  | GPIO_25 |     P25       |
   | USART_SLAVE_TX_PIN     | GPIO_30 |     P35       |
-  | USART_SLAVE_RX_PIN     | GPIO_29 |     P33       |  
+  | USART_SLAVE_RX_PIN     | GPIO_29 |     P33       |
 
   ![Figure: Build run and Debug](resources/readme/image513d.png)
 
@@ -178,7 +181,7 @@ If the Pin Tool is not working, UC changes plus manual verification in `RTE_Devi
 
 ## Configuring higher clock
 
-- To achieve baud rates exceeding 2 million bps, need to modify the clock source to INTF PLL CLK or SoC PLL CLK in the UC. 
+- To achieve baud rates exceeding 2 million bps, need to modify the clock source to INTF PLL CLK or SoC PLL CLK in the UC.
 
 > **Note:**
 >
@@ -194,8 +197,8 @@ If the Pin Tool is not working, UC changes plus manual verification in `RTE_Devi
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

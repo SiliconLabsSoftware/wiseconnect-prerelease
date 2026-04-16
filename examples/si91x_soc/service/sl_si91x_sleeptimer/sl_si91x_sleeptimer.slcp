@@ -5,7 +5,7 @@ description: 'This application demonstrates how one-shot and periodic sleeptimer
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x -eeptimer
+label: Platform SiWx91x - Sleeptimer
 component:
 - id: sl_main
 - id: sleeptimer_si91x

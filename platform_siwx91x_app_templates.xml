@@ -90,6 +90,21 @@
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_ulp_ssi_master/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="platform_siwx91x_usart_sync_slave_freertos" label="Platform SiWx91x - USART Synchronous Slave FreeRTOS" description="Demonstrates the usage of USART slave transmit and receive in synchronous full duplex mode within a FreeRTOS environment on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_slave_freertos/platform_siwx91x_usart_sync_slave_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_slave_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
+  </descriptors>
   <descriptors name="sl_si91x_ulp_uart" label="Platform SiWx91x - ULP UART" description="Demonstrates how to use ULP Uart.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -134,6 +149,21 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_button_baremetal/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="platform_siwx91x_uart_rs485_freertos" label="Platform SiWx91x - UART RS485 FreeRTOS" description="Demonstrates how to configure and use the UART RS485 peripheral driver in multidrop mode in a FreeRTOS task on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_uart_rs485_freertos/platform_siwx91x_uart_rs485_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4339b brd4340b brd4342a brd4343q" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_uart_rs485_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
   </descriptors>
   <descriptors name="sl_si91x_qei" label="Platform SiWx91x - QEI" description="Demonstrates Quadrature Encoder Interface.">
     <properties key="namespace" value="template.uc" />
@@ -420,6 +450,21 @@
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_i2s_primary_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC" />
   </descriptors>
+  <descriptors name="platform_siwx91x_sdio_secondary_freertos" label="Platform SiWx91x - SDIO Secondary FreeRTOS" description="Demonstrates how to configure and use the SDIO Secondary interface in a FreeRTOS task on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_sdio_secondary_freertos/platform_siwx91x_sdio_secondary_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4339b brd4340b brd4342a brd4343q" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_sdio_secondary_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
+  </descriptors>
   <descriptors name="platform_siwx91x_i2s_secondary_freertos" label="Platform SiWx91x - I2S Secondary FreeRTOS" description="Demonstrates how to use the I2S secondary interface in a FreeRTOS task on the SiWx917 SoC device.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -480,6 +525,21 @@
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_dac/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="platform_siwx91x_pwm_freertos" label="Platform SiWx91x - PWM FreeRTOS" description="Demonstrates how to configure and use the PWM peripheral driver in a FreeRTOS task on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_pwm_freertos/platform_siwx91x_pwm_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4339b brd4340b brd4342a brd4343q" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_pwm_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
+  </descriptors>
   <descriptors name="sl_si91x_ulp_i2s" label="Platform SiWx91x - ULP I2S" description="Demonstrates how to use the I2S loopback on the Si91x SoC device in Ultra Low Power.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -539,6 +599,36 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_ssi_master/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="platform_siwx91x_i2c_driver_follower_freertos" label="Platform SiWx91x - I2C Driver Follower FreeRTOS" description="Demonstrates how to use the I2C interface in a FreeRTOS environment on the SiWx917 SoC device utilizing blocking APIs.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_i2c_driver_follower_freertos/platform_siwx91x_i2c_driver_follower_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_i2c_driver_follower_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
+  </descriptors>
+  <descriptors name="platform_siwx91x_uart_freertos" label="Platform SiWx91x - UART FreeRTOS" description="Demonstrates the usage of UART transmit and receive in full duplex mode within a FreeRTOS environment on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_uart_freertos/platform_siwx91x_uart_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_uart_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
   </descriptors>
   <descriptors name="sl_si91x_mic" label="Platform SiWx91x - Mic" description="Demonstrates the use of Mic Driver.">
     <properties key="namespace" value="template.uc" />
@@ -645,6 +735,21 @@
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_sht4x/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="platform_siwx91x_adc_fifo_mode_freertos" label="Platform SiWx91x - ADC FIFO Mode FreeRTOS" description="Demonstrates how to configure and use the ADC peripheral driver in FIFO mode in a FreeRTOS task on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_adc_fifo_mode_freertos/platform_siwx91x_adc_fifo_mode_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4339b brd4340b brd4342a brd4343q" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_adc_fifo_mode_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Basic" />
+  </descriptors>
   <descriptors name="sl_si91x_si70xx" label="Platform SiWx91x - Si70xx" description="Demonstrates how to use si70xx.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -705,6 +810,21 @@
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_dma/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="platform_siwx91x_usart_sync_master_freertos" label="Platform SiWx91x - USART Synchronous Master FreeRTOS" description="Demonstrates the usage of USART master transmit and receive in synchronous full duplex mode within a FreeRTOS environment on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_master_freertos/platform_siwx91x_usart_sync_master_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_master_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
+  </descriptors>
   <descriptors name="sl_si91x_pwm" label="Platform SiWx91x - PWM" description="Demonstrates how to to use pwm.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -734,6 +854,21 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_uart/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="platform_siwx91x_gpio_detailed_example_freertos" label="Platform SiWx91x - GPIO Detailed Example FreeRTOS" description="Demonstrates how to configure and use the GPIO peripheral driver in a FreeRTOS task on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_gpio_detailed_example_freertos/platform_siwx91x_gpio_detailed_example_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4339b brd4340b brd4342a brd4343q" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_gpio_detailed_example_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Basic" />
   </descriptors>
   <descriptors name="sl_si91x_usart_sync_slave" label="Platform SiWx91x - USART Synchronous Slave" description="Demonstrates the usage of USART slave and transmits and receives data in synchronous full duplex mode.">
     <properties key="namespace" value="template.uc" />
@@ -839,6 +974,21 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/memlcd_baremetal/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="platform_siwx91x_usart_async_freertos" label="Platform SiWx91x - USART Asynchronous FreeRTOS" description="Demonstrates the usage of USART transmit and receive in asynchronous full duplex mode within a FreeRTOS environment on the SiWx917 SoC device.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_usart_async_freertos/platform_siwx91x_usart_async_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_usart_async_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
   </descriptors>
   <descriptors name="sl_si91x_usart_async" label="Platform SiWx91x - USART Asynchronous" description="Demonstrates the usage of USART transmits and receives data in Asynchronous full duplex mode.">
     <properties key="namespace" value="template.uc" />
@@ -959,6 +1109,21 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/sl_si91x_pcm_secondary/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="platform_siwx91x_i2c_driver_leader_freertos" label="Platform SiWx91x - I2C Driver Leader FreeRTOS" description="Demonstrates how to use the I2C interface on the SiWx917 SoC device with blocking APIs in a FreeRTOS environment.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/platform_siwx91x_i2c_driver_leader_freertos/platform_siwx91x_i2c_driver_leader_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/peripheral/platform_siwx91x_i2c_driver_leader_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Project\ Difficulty|Basic" />
   </descriptors>
   <descriptors name="sl_si91x_icm40627" label="Platform SiWx91x - ICM40627" description="Demonstrates how to to use icm40627 device.">
     <properties key="namespace" value="template.uc" />

@@ -1,8 +1,8 @@
-# Brown Out Detection (BOD)
+# Platform SiWx91x BOD
 
 ## Table of Contents
 
-- [BOD \[Brown Out Detection\]](#bod-brown-out-detection)
+- [Platform SiWx91x BOD](#platform-siwx91x-bod)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -13,6 +13,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -104,7 +107,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - When Blackout is enabled:
 
       ![Figure: bod_interrupt_result_console](resources/readme/bod_interrupt_result_console.png)
-    
+
     - When Blackout is Disabled:
 
       ![Figure: bod_interrupt_result_console_DisableBlkot](resources/readme/bod_interrupt_result_console_DisableBlkot.png)
@@ -120,8 +123,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

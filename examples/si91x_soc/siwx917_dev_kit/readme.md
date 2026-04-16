@@ -1,10 +1,10 @@
-# SiWG917 Dev Kit
+# Platform SiWx91x Dev Kit
 
-This example collects and processes sensor data from the SiWG917 dev kit board, transmits them over a Wi-Fi network, and displays them on the Simplicity Connect iOS/Android application.
+This example collects and processes sensor data from the SiWx91x dev kit board, transmits them over a Wi-Fi network, and displays them on the Simplicity Connect iOS/Android application.
 
 ## Table of Contents
 
-- [SiWG917 Dev Kit](#siwg917-dev-kit)
+- [Platform SiWx91x Dev Kit](#platform-siwx91x-dev-kit)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -14,6 +14,9 @@ This example collects and processes sensor data from the SiWG917 dev kit board, 
   - [Program Demo Application](#program-demo-application)
   - [Application Build Environment](#application-build-environment)
   - [Run the Application](#run-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -33,7 +36,7 @@ All device activities can be observed on the serial terminal prints. You may use
 - Wireless Access Point
 - **SoC Mode**:
   - Kits
-    - [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) (SiWG917 Dev Kit Board) / BRD2605B
+    - [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) (SiWx91x Dev Kit Board)
 - Android Phone or iPhone with Simplicity Connect App (formerly EFR Connect App), which is available in Play Store and App Store (or) Windows PC with windows Silicon labs connect application.
 
 ### Software Requirements
@@ -44,7 +47,7 @@ All device activities can be observed on the serial terminal prints. You may use
 
 ### Setup Diagram
 
-![Figure: Setup Diagram for SiWG917 Dev Kit](resources/readme/embedded-sensor-demo-setup.png)
+![Figure: Setup Diagram for SiWx91x Dev Kit](resources/readme/embedded-sensor-demo-setup.png)
 
 ## Program Demo Application
 
@@ -53,7 +56,7 @@ All device activities can be observed on the serial terminal prints. You may use
 - [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio)
 - [Connect the SiWx917 board to your computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#connect-si-wx91x-to-computer)
 - [Update the SiWx917 connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#update-si-wx91x-connectivity-firmware)
-- [Run the demo](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-soc-mode#run-the-demo). Locate the Wi-Fi SiWx917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) / BRD2605B tile and click `Run` to program the dev kit board with the demo binary. 
+- [Run the demo](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-soc-mode#run-the-demo). Locate the Wi-Fi SiWx91x Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) / BRD2605B tile and click `Run` to program the dev kit board with the demo binary. 
 
 ![Run the Demo](resources/readme/demo-run.png)
 
@@ -72,7 +75,7 @@ All device activities can be observed on the serial terminal prints. You may use
 
 ## Run the Application
 
-**Step 1** : The SiWG917 device starts in provisioning mode. All device activities can be observed on the serial terminal prints.
+**Step 1** : The SiWx91x device starts in provisioning mode. All device activities can be observed on the serial terminal prints.
 
 ![Startup Prints](resources/readme/startup-prints.png)
 
@@ -90,7 +93,7 @@ All device activities can be observed on the serial terminal prints. You may use
 
 ![Entering password](resources/readme/entering-password.png)
 
-**Step 5** : The SiWG917 dev kit switches to Wi-Fi Station mode and connects to the selected Wi-Fi network. The Simplicity Connect app then connects to the sensor webserver running on the dev kit board. Wait until connection is established.
+**Step 5** : The SiWx91x dev kit switches to Wi-Fi Station mode and connects to the selected Wi-Fi network. The Simplicity Connect app then connects to the sensor webserver running on the dev kit board. Wait until connection is established.
 
 ![Connected Prints](resources/readme/connected-prints.png)
 
@@ -119,8 +122,8 @@ All device activities can be observed on the serial terminal prints. You may use
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

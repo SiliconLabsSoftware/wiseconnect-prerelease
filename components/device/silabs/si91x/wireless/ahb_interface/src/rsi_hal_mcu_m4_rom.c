@@ -201,7 +201,28 @@ void sli_si91x_send_m4_xtal_usage_notification_to_ta(void)
     sli_si91x_raise_xtal_interrupt_to_ta(M4_IS_USING_XTAL_REQUEST);
   }
 }
+sl_status_t sli_si91x_M4_TA_Timesync(void)
+{
+  sl_status_t status = SL_STATUS_FAIL;
+  if (!M4_PS2_STATE_STATUS) {
+    P2P_STATUS_REG |= M4_WAKEUP_TA;
 
+    while (!(P2P_STATUS_REG & TA_IS_ACTIVE))
+      ; // Wait for NWP
+
+    M4SS_P2P_INTR_SET_REG = M4_REQ_TIME_STAMP_FROM_NWP;
+
+    while (!(TASS_P2P_INTR_CLEAR_REG & M4_REQ_TIME_STAMP_FROM_NWP))
+      ; // Wait for NWP ACK
+
+    clear_ta_to_m4_interrupt(M4_REQ_TIME_STAMP_FROM_NWP);
+
+    sl_si91x_host_clear_sleep_indicator();
+
+    return SL_STATUS_OK;
+  }
+  return status;
+}
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
 /**
  * @fn           void sli_si91x_raise_side_band_interrupt_to_ta(void)

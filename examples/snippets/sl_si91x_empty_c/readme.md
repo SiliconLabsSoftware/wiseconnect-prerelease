@@ -1,23 +1,23 @@
-# Empty C Example
+# Platform SiWx91x Empty C Example
 
 ## Table of Contents
 
-- [Empty C Example](#empty-c-example)
+- [Platform SiWx91x Empty C Example](#platform-siwx91x-empty-c-example)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Purpose/Scope](#purposescope)
   - [Getting Started](#getting-started)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Overview
 
-Minimal Si91x C project template with essential initialization and default peripheral components for building applications incrementally.
+Minimal SiWx91x C project template with essential initialization and default peripheral components for building applications incrementally.
 
 ## Purpose/Scope
 
-This example project provides a minimal starting point for developing applications on the Si91x device. It is designed to be a clean template where developers can build and test features incrementally.
+This example project provides a minimal starting point for developing applications on the SiWx91x device. It is designed to be a clean template where developers can build and test features incrementally.
 
 The project demonstrates an empty configuration that includes the essential initialization along with default peripheral components such as:
 
@@ -39,6 +39,6 @@ For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.
 - [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

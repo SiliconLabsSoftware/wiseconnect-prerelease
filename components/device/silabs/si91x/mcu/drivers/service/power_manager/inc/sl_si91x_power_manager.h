@@ -45,6 +45,7 @@ extern "C" {
 #include "system_si91x.h"
 #include "base_types.h"
 #include "rsi_power_save.h"
+#include "sl_log_helper.h"
 
 #ifdef SL_SI91X_POWER_MANAGER_DEBUG_COMPONENT
 #include "sl_si91x_power_manager_debug_config.h"

@@ -30,3 +30,4 @@ requires:
     - name: sli_event_engine
     - name: sli_buffer_manager
     - name: sli_si91x_wifi_event_handler
+    - name: si91x_log_none

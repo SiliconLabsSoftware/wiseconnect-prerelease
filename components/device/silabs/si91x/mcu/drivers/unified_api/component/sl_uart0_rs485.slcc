@@ -31,6 +31,7 @@ requires:
   - name: udma_linker_config
   - name: sl_dma
   - name: cmsis_usart
+  - name: log_none
 conflicts:
   - name: sl_usart
 documentation:

@@ -32,6 +32,7 @@
 #include "sl_wifi.h"
 #include "sl_net.h"
 #include "sl_http_client.h"
+#include "sl_additional_status.h"
 #include <string.h>
 
 //! Include index html page
@@ -39,13 +40,13 @@
 /******************************************************
  *                      Macros
  ******************************************************/
-#define CLEAN_HTTP_CLIENT_IF_FAILED(status, client_handle, is_sync) \
-  {                                                                 \
-    if (status != SL_STATUS_OK) {                                   \
-      sl_http_client_deinit(client_handle);                         \
-      return ((is_sync == 0) ? status : callback_status);           \
-    }                                                               \
-  }
+#define CLEAN_HTTP_CLIENT_IF_FAILED(status, client_handle, is_sync, cb_status) \
+  do {                                                                         \
+    if ((status) != SL_STATUS_OK && (status) != SL_STATUS_IN_PROGRESS) {       \
+      sl_http_client_deinit(client_handle);                                    \
+      return (((is_sync) == HTTP_SYNC_RESPONSE) ? (status) : (cb_status));     \
+    }                                                                          \
+  } while (0)
 
 /******************************************************
  *                    Constants
@@ -119,6 +120,10 @@
 
 #define HTTP_SUCCESS_RESPONSE 1
 #define HTTP_FAILURE_RESPONSE 2
+
+#define HTTP_STATUS_CLIENT_ERROR_MIN 400U //! HTTP 4xx client error codes
+#define HTTP_STATUS_SERVER_ERROR_MAX 599U //! HTTP 5xx server error codes
+#define HTTP_STATUS_CODE_NONE        0U
 
 //! End of data indications
 // No data pending from host
@@ -293,19 +298,30 @@ sl_status_t http_client_application(void)
   VERIFY_STATUS_AND_RETURN(status);
   printf("\r\nHTTP Client init success\r\n");
 
+  sl_http_client_tcp_tls_advanced_options_t tcp_tls_opts = {
+    .tcp_keepalive_initial_time_sec   = 120,
+    .tcp_max_retry_count              = 5,
+    .max_retransmission_timeout_value = 2,
+    .ssl_ciphers_bitmap               = 0,
+    .ssl_ext_ciphers_bitmap           = 0,
+  };
+  status = sl_http_client_set_tcp_tls_advanced_configuration(&client_handle, &tcp_tls_opts);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
+  printf("\r\nHTTP Client TCP/TLS advanced configuration set\r\n");
+
 #if EXTENDED_HEADER_ENABLE
   //! Add extended headers
   status = sl_http_client_add_header(&client_request, KEY1, VAL1);
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
 
   status = sl_http_client_add_header(&client_request, KEY2, VAL2);
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
 
   status = sl_http_client_add_header(&client_request, KEY3, VAL3);
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
 
   status = sl_http_client_add_header(&client_request, KEY4, VAL4);
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
 #endif
 
   //! Configure HTTP PUT request
@@ -315,16 +331,15 @@ sl_status_t http_client_application(void)
 
   //! Initialize callback method for HTTP PUT request
   status = sl_http_client_request_init(&client_request, http_put_response_callback_handler, "This is HTTP client");
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
   printf("\r\nHTTP PUT request init success\r\n");
 
   //! Send HTTP PUT request
   status = sl_http_client_send_request(&client_handle, &client_request);
-  if (status == SL_STATUS_IN_PROGRESS) {
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
+  if (http_rsp_received != HTTP_SUCCESS_RESPONSE) {
     status = http_response_status(&http_rsp_received);
-    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE);
-  } else {
-    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
   //! Write HTTP PUT data
@@ -339,11 +354,11 @@ sl_status_t http_client_application(void)
 
       if (status == SL_STATUS_IN_PROGRESS) {
         status = http_response_status(&http_rsp_received);
-        CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE);
+        CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
 
         offset += chunk_length;
       } else {
-        CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+        CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
       }
     } else {
       /* All chunks sent; wait for final PUT response (end_of_data) from firmware.
@@ -351,7 +366,7 @@ sl_status_t http_client_application(void)
        * this would send GET while NWP still has PUT client active (firmware status 0x15). */
       http_rsp_received = 0;
       status            = http_response_status(&http_rsp_received);
-      CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE);
+      CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
     }
   }
 
@@ -363,16 +378,15 @@ sl_status_t http_client_application(void)
 
   //! Initialize callback method for HTTP GET request
   status = sl_http_client_request_init(&client_request, http_get_response_callback_handler, "This is HTTP client");
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
   printf("\r\nHTTP Get request init success\r\n");
 
   //! Send HTTP GET request
   status = sl_http_client_send_request(&client_handle, &client_request);
-  if (status == SL_STATUS_IN_PROGRESS) {
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
+  if (http_rsp_received != HTTP_SUCCESS_RESPONSE) {
     status = http_response_status(&http_rsp_received);
-    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE);
-  } else {
-    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
   printf("\r\nHTTP GET request Success\r\n");
@@ -385,16 +399,15 @@ sl_status_t http_client_application(void)
 
   //! Initialize callback method for HTTP POST request
   status = sl_http_client_request_init(&client_request, http_post_response_callback_handler, "This is HTTP client");
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
   printf("\r\nHTTP Post request init success\r\n");
 
   //! Send HTTP POST request
   status = sl_http_client_send_request(&client_handle, &client_request);
-  if (status == SL_STATUS_IN_PROGRESS) {
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
+  if (http_rsp_received != HTTP_SUCCESS_RESPONSE) {
     status = http_response_status(&http_rsp_received);
-    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE);
-  } else {
-    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+    CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
   printf("\r\nHTTP POST request Success\r\n");
@@ -402,7 +415,7 @@ sl_status_t http_client_application(void)
 
 #if EXTENDED_HEADER_ENABLE
   status = sl_http_client_delete_all_headers(&client_request);
-  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE);
+  CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
 #endif
 
   status = sl_http_client_deinit(&client_handle);
@@ -433,8 +446,8 @@ sl_status_t http_put_response_callback_handler(const sl_http_client_t *client,
     put_response->data_length,
     (char *)request_context);
 
-  if (put_response->status != SL_STATUS_OK) {
-    http_rsp_received = 2;
+  if (put_response->status != SL_STATUS_OK && put_response->status != SL_STATUS_IN_PROGRESS) {
+    http_rsp_received = HTTP_FAILURE_RESPONSE;
     return put_response->status;
   }
 
@@ -473,9 +486,15 @@ sl_status_t http_get_response_callback_handler(const sl_http_client_t *client,
     get_response->data_length,
     (char *)request_context);
 
-  if (get_response->status != SL_STATUS_OK
-      || (get_response->http_response_code >= 400 && get_response->http_response_code <= 599
-          && get_response->http_response_code != 0)) {
+  if (get_response->status != SL_STATUS_OK && get_response->status != SL_STATUS_IN_PROGRESS) {
+    http_rsp_received = HTTP_FAILURE_RESPONSE;
+    callback_status   = SL_STATUS_FAIL;
+    return get_response->status;
+  }
+
+  if (get_response->http_response_code >= HTTP_STATUS_CLIENT_ERROR_MIN
+      && get_response->http_response_code <= HTTP_STATUS_SERVER_ERROR_MAX
+      && get_response->http_response_code != HTTP_STATUS_CODE_NONE) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;
     /* Keep actual firmware status for diagnostics (e.g. 0x10015 = invalid state after PUT). */
     callback_status = get_response->status;
@@ -519,15 +538,20 @@ sl_status_t http_post_response_callback_handler(const sl_http_client_t *client,
     post_response->data_length,
     (char *)request_context);
 
-  if (post_response->status != SL_STATUS_OK
-      || (post_response->http_response_code >= 400 && post_response->http_response_code <= 599
-          && post_response->http_response_code != 0)) {
+  if (post_response->status != SL_STATUS_OK && post_response->status != SL_STATUS_IN_PROGRESS) {
+    http_rsp_received = HTTP_FAILURE_RESPONSE;
+    return post_response->status;
+  }
+
+  if (post_response->http_response_code >= HTTP_STATUS_CLIENT_ERROR_MIN
+      && post_response->http_response_code <= HTTP_STATUS_SERVER_ERROR_MAX
+      && post_response->http_response_code != HTTP_STATUS_CODE_NONE) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;
     return post_response->status;
   }
 
   if (post_response->end_of_data) {
-    http_rsp_received = 1;
+    http_rsp_received = HTTP_SUCCESS_RESPONSE;
   }
 
   return SL_STATUS_OK;
@@ -535,8 +559,8 @@ sl_status_t http_post_response_callback_handler(const sl_http_client_t *client,
 
 sl_status_t http_response_status(volatile uint8_t *response)
 {
-  while (!(*response)) {
-    /* Wait till response arrives */
+  while (*response != HTTP_SUCCESS_RESPONSE && *response != HTTP_FAILURE_RESPONSE) {
+    //! Wait till response arrives
   }
 
   if (*response != HTTP_SUCCESS_RESPONSE) {

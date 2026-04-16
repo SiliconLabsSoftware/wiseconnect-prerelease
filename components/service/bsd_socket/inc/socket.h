@@ -130,6 +130,7 @@ typedef	__sa_family_t	sa_family_t;	/* sockaddr address family type */
 #define SL_SO_SOCK_VAP_ID              0x102B  ///< Sets the VAP ID for a socket.
 #define SL_SO_MAXRETRY                 0x102C  ///< Sets the maximum number of retries for a socket.
 #define SL_SO_VERIFY_DOMAIN_NAME       0x102D  ///< Sets expected domain name for TLS certificate verification.
+#define SL_SO_PER_SOCKET_CLOSE         0x102E  ///< Enable per-socket graceful close handling.
 /** @} */
 
 /*

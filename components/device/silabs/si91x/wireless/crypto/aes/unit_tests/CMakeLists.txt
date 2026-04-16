@@ -37,6 +37,8 @@ include_directories(
     ../../../../../../../gsdk/service/mem_pool/inc
     ../../../../../../../sli_command_engine/inc
     ../../../../../../../sli_event_engine/inc
+    ../../../../../../../device/silabs/si91x/mcu/drivers/service/sl_log/inc
+    ../../../unit_tests/inc
 )
 
 # Add source files for the test executable

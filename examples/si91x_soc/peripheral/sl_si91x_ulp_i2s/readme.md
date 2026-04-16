@@ -1,8 +1,8 @@
-# SI91x - SL_ULP_I2S
+# Platform SiWx91x ULP I2S
 
 ## Table of Contents
 
-- [SI91x - SL\_ULP\_I2S](#si91x---sl_ulp_i2s)
+- [Platform SiWx91x ULP I2S](#platform-siwx91x-ulp-i2s)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -15,6 +15,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Pin Description](#pin-description)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -65,10 +68,10 @@ The data received should match the transmitted data.
    (g) **transfer_type** - Transfer type (Transmit, Receive, Transmit abort, and Receive abort).
 2. Transfers with 16-bit resolution must use a `uint16_t` data type buffer and pass SL_I2S_DATA_SIZE16 to the data_size parameter in `sl_i2s_xfer_config_t` while configuring the transfer.
 3. Transfers with 24-bit and 32-bit resolutions must use a `uint32_t` data type buffer and pass `SL_I2S_DATA_SIZE32` to the data_size parameter in `sl_i2s_xfer_config_t` while configuring the transfer.
-   - For **24-bit resolution**, only the lower 24 bits of each 32-bit word are valid; the upper 8 bits must be set to **zero**.  
-   - Buffers should be aligned to **32-bit boundaries**.  
-   - **Transfer-size rules:** 24-bit → multiples of 4 (see Point 6); 32-bit → even numbers (see Point 5).  
-   - **Buffer size constraints (example):**  
+   - For **24-bit resolution**, only the lower 24 bits of each 32-bit word are valid; the upper 8 bits must be set to **zero**.
+   - Buffers should be aligned to **32-bit boundaries**.
+   - **Transfer-size rules:** 24-bit → multiples of 4 (see Point 6); 32-bit → even numbers (see Point 5).
+   - **Buffer size constraints (example):**
 
      ```c
      #define I2S_LOWPOWER_BUFFER_SIZE   1024  // Samples per buffer in 16-bit mode (uint16_t)
@@ -79,14 +82,14 @@ The data received should match the transmitted data.
      // Each bank = 0x800 = 2048 bytes (2 KB)
      ```
 
-     - With **16-bit** data (2 bytes/sample), one 2 KB bank holds **1024 samples** → `I2S_LOWPOWER_BUFFER_SIZE = 1024`.  
+     - With **16-bit** data (2 bytes/sample), one 2 KB bank holds **1024 samples** → `I2S_LOWPOWER_BUFFER_SIZE = 1024`.
      - With **24/32-bit** data (4 bytes/sample), one **2 KB** bank holds **512 samples** → `I2S_LOWPOWER_BUFFER_SIZE = 512`.
-        - Because the ULP memory is fixed at **4 KB total** in this example (2 KB TX + 2 KB RX), when using 32-bit (or 24-bit packed in 32-bit) **set `I2S_LOWPOWER_BUFFER_SIZE` to 512 samples per buffer**. Do **not** increase the buffer size beyond this under `SL_I2S_DATA_SIZE32`. 
+        - Because the ULP memory is fixed at **4 KB total** in this example (2 KB TX + 2 KB RX), when using 32-bit (or 24-bit packed in 32-bit) **set `I2S_LOWPOWER_BUFFER_SIZE` to 512 samples per buffer**. Do **not** increase the buffer size beyond this under `SL_I2S_DATA_SIZE32`.
 4. Since 8-bit resolution is not supported, a `uint8_t` data type buffer can use 16-bit resolution for transfers and pass SL_I2S_DATA_SIZE8 to the data_size parameter in  `sl_i2s_xfer_config_t` while configuring the transfer. While performing this operation, the data buffer should be typecast to `(uint16_t *)`, and the transfer size should be half of the 8-bit data type buffer. (Refer to the I2S loopback application for more details.) For 8-bit transfers, the transfer size should be multiples of 4 (8,12,16,20...).
 5. Any I2S transfers with 16-bit and 32-bit resolutions should only have an even transfer size (8,10,12,14...).
 6. Any I2S transfers with 24-bit resolution should only have transfer size as multiples of 4 (8,12,16,20...).
 7. The `I2S1_LOOP_BACK` macro is used only for I2S loopback applications to avoid clock generation from the receiver block during transfer.
-8. SCK frequency is calculated using `SCK = 2 * bit_width * sampling rate`. By default, I2S0 uses I2S_PLL_CLK as a clock source. This can generate any frequency range mentioned in section 6.11.7 of the Si91x HRM.
+8. SCK frequency is calculated using `SCK = 2 * bit_width * sampling rate`. By default, I2S0 uses I2S_PLL_CLK as a clock source. This can generate any frequency range mentioned in section 6.11.7 of the SiWx91x HRM.
 
    >**Note:**
    >
@@ -99,7 +102,7 @@ The data received should match the transmitted data.
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -191,8 +194,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -201,6 +201,32 @@ typedef enum {
  */
 
 /**
+ * @brief
+ *   Advanced TCP/TLS configuration options for the MQTT client.
+ *
+ * @details
+ *   This structure holds advanced TCP and TLS configuration parameters that can be
+ *   applied to the MQTT client before connecting. Use @ref sl_mqtt_client_set_tcp_tls_advanced_configuration
+ *   to apply these options after initializing the client and before calling connect.
+ *
+ * @note The ssl_ciphers_bitmap and ssl_ext_ciphers_bitmap fields accept cipher suite bitmaps
+ *   as defined in sl_si91x_socket_constants.h (e.g., SL_SI91X_TLS_DHE_RSA_WITH_AES_256_CBC_SHA256).
+ *   Invalid or unsupported cipher combinations may result in TLS handshake failures.
+ *   Use 0 for firmware default cipher suites.
+ */
+typedef struct {
+  uint16_t
+    tcp_keepalive_initial_time_sec; ///< Idle time before the first keep-alive probe in seconds (0 = firmware default).
+  uint8_t tcp_max_retry_count;      ///< Maximum TCP retransmission attempts (0 = firmware default).
+  uint8_t
+    max_retransmission_timeout_value; ///< Retransmission timeout cap as a power-of-2 scaling factor (0 = firmware default).
+  uint32_t
+    ssl_ciphers_bitmap; ///< TLS 1.2 and below cipher suite selection bitmap (0 = firmware default). See sl_si91x_socket_constants.h for valid values.
+  uint32_t
+    ssl_ext_ciphers_bitmap; ///< TLS 1.3 cipher suite selection bitmap (0 = firmware default). See sl_si91x_socket_constants.h for valid values.
+} sl_mqtt_client_tcp_tls_advanced_options_t;
+
+/**
  * @brief 
  *   Structure representing the MQTT Client Last Will message.
  * 
@@ -397,6 +423,10 @@ typedef struct {
  * 
  * @details
  *   This structure represents the handle for an MQTT client. It holds the current state of the client, broker configuration, last will message configuration, client configuration, subscription list, and event handler.
+ *
+ * @note
+ *   This structure is managed internally by the SDK. Users should not modify its members directly.
+ *   Use the provided APIs (e.g., @ref sl_mqtt_client_init, @ref sl_mqtt_client_connect, @ref sl_mqtt_client_deinit) to manage the client lifecycle.
  */
 typedef struct {
   sl_mqtt_client_connection_state_t state; ///< Current state of the MQTT client.
@@ -410,6 +440,9 @@ typedef struct {
     *subscription_list_head; ///< Pointer to the head of the subscription linked list.
   sl_mqtt_client_event_handler_t
     client_event_handler; ///< Function pointer to the event handler, provided at the time of @ref sl_mqtt_client_init.
+  sl_mqtt_client_tcp_tls_advanced_options_t
+    tcp_options; ///< Advanced TCP/TLS configuration options, set via @ref sl_mqtt_client_set_tcp_tls_advanced_configuration.
+  bool tcp_options_configured; ///< Flag indicating if advanced TCP/TLS options have been set.
 } sl_mqtt_client_t;
 
 /** @} */

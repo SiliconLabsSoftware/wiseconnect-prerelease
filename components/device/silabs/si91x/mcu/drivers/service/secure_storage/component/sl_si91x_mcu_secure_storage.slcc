@@ -7,7 +7,7 @@ description: >
   Configurable parameters (via app config component):
     - Write key enable/disable
   Use with config/sl_si91x_secure_storage_config.h for UC screen and config header.
-category: Device|Silabs|Si91x|MCU|Drivers|Service
+category: Device|Si91x|MCU|Service
 quality: production
 metadata:
   sbom:
@@ -26,3 +26,4 @@ provides:
   - name: sl_si91x_mcu_secure_storage
 requires:
   - name: status
+  - name: log_none

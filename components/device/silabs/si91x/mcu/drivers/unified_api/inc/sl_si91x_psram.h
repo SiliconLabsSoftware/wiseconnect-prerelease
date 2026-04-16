@@ -33,7 +33,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "rsi_qspi_proto.h"
-
+#if (SL_SI91X_D_CACHE_ENABLE == 1)
+#include "rsi_d_cache.h"
+#endif
+#include "sl_log_helper.h"
 /***************************************************************************/
 /**
  * @addtogroup PSRAM PSRAM Driver

@@ -103,7 +103,7 @@ void sl_ta_trng_init(void)
 {
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    SL_PRINT_STRING_ERROR("Failed to start Wi-Fi client interface: 0x%lx", status);
     return;
   }
 }
@@ -118,12 +118,12 @@ void sl_si91x_cpc_crypto_init_task(void)
 
   sl_si91x_cpc_crypto_init_semaphore_status = osSemaphoreRelease(sl_si91x_cpc_crypto_init_semaphore_id);
   if (sl_si91x_cpc_crypto_init_semaphore_status != osOK) {
-    DEBUGOUT("Semaphore Release failed: %d \r\n", sl_si91x_cpc_crypto_init_semaphore_status);
+    SL_PRINT_STRING_ERROR("Semaphore Release failed: %d", sl_si91x_cpc_crypto_init_semaphore_status);
   }
 
   sl_si91x_cpc_crypto_wait_semaphore_status = osSemaphoreAcquire(sl_si91x_cpc_crypto_wait_semaphore_id, osWaitForever);
   if (sl_si91x_cpc_crypto_wait_semaphore_status != osOK) {
-    DEBUGOUT("Semaphore Acquire failed in task: %d \r\n", sl_si91x_cpc_crypto_wait_semaphore_status);
+    SL_PRINT_STRING_ERROR("Semaphore Acquire failed in task: %d", sl_si91x_cpc_crypto_wait_semaphore_status);
   }
 }
 

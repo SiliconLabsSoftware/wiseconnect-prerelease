@@ -339,7 +339,7 @@ const osThreadAttr_t sensor_thread_attributes = {
 };
 
 /*******************************************************************************
- **************  Event Manger Task Attributes structure for thread   ***********
+ **************  Event Manager Task Attributes structure for thread   ***********
  ******************************************************************************/
 const osThreadAttr_t EM_thread_attributes = {
   .name       = "EM Task", //< Name of thread
@@ -530,6 +530,9 @@ static sl_sensor_info_t *sensorhub_get_sensor_info(sl_sensor_id_t sensor_id)
 sl_status_t sl_si91x_sensorhub_notify_cb_register(sl_sensor_signalEvent_t cb_event, sl_sensor_id_t *cb_ack)
 {
   if (cb_event == NULL || cb_ack == NULL) {
+    SL_PRINT_STRING_ERROR("sl_si91x_sensorhub_notify_cb_register: invalid parameters st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)SL_SH_INVALID_PARAMETERS,
+                          (int)__LINE__);
     return SL_SH_INVALID_PARAMETERS;
   }
   //!register call back handler for application
@@ -592,14 +595,19 @@ static sl_status_t sensorhub_gpio_interrupt_config(uint16_t gpio_pin, sl_si91x_g
     // Initialize the GPIOs by clearing all interrupts initially
     status = sl_gpio_driver_init();
     if (status != SL_STATUS_OK) {
-      // Prints GPIO initialization fails
+      SL_PRINT_STRING_ERROR("sensorhub_gpio_interrupt_config: sl_gpio_driver_init failed st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)status,
+                            (int)__LINE__);
       DEBUGOUT("sl_gpio_driver_init, Error code: %lu", status);
       break; // breaks if error occurs
     }
 
     status = sl_gpio_set_configuration(sl_gpio_pin_config1);
     if (status != SL_STATUS_OK) {
-      // Prints if pin configuration fails
+      SL_PRINT_STRING_ERROR(
+        "sensorhub_gpio_interrupt_config: sl_gpio_set_configuration failed st=0x%04lX,line no : %d\r\n",
+        (unsigned long)status,
+        (int)__LINE__);
       DEBUGOUT("sl_gpio_set_configuration, Error code: %lu", status);
       break; // breaks if error occurs
     }
@@ -607,6 +615,10 @@ static sl_status_t sensorhub_gpio_interrupt_config(uint16_t gpio_pin, sl_si91x_g
     // Configure the UULP GPIO pin mode, receiver enable, direction and polarity.
     status = sl_si91x_gpio_driver_set_uulp_pad_configuration(&uulp_pad);
     if (status != SL_STATUS_OK) {
+      SL_PRINT_STRING_ERROR(
+        "sensorhub_gpio_interrupt_config: set_uulp_pad_configuration failed st=0x%04lX,line no : %d\r\n",
+        (unsigned long)status,
+        (int)__LINE__);
       DEBUGOUT("sl_si91x_gpio_driver_set_uulp_pad_configuration, Error code: %lu", status);
       break;
     }
@@ -616,6 +628,10 @@ static sl_status_t sensorhub_gpio_interrupt_config(uint16_t gpio_pin, sl_si91x_g
                                                 (sl_gpio_irq_callback_t)&gpio_uulp_pin_interrupt_callback,
                                                 AVL_INTR_NO);
     if (status != SL_STATUS_OK) {
+      SL_PRINT_STRING_ERROR(
+        "sensorhub_gpio_interrupt_config: sl_gpio_driver_configure_interrupt failed st=0x%04lX,line no : %d\r\n",
+        (unsigned long)status,
+        (int)__LINE__);
       DEBUGOUT("sl_gpio_configure_interrupt, Error code: %lu", status);
       break;
     }
@@ -720,6 +736,9 @@ static sl_status_t sensorhub_adc_init(void)
   if (bus_intf_info.adc_config.adc_init == 1) {
     status = sl_si91x_adc_deinit(bus_intf_info.adc_config.adc_cfg);
     if (status != SL_STATUS_OK) {
+      SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_deinit failed st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)status,
+                            (int)__LINE__);
       DEBUGOUT("\r\n ADC DeInit Failed, Error Code : %ld\r\n", status);
       return SL_STATUS_FAIL;
     }
@@ -728,6 +747,9 @@ static sl_status_t sensorhub_adc_init(void)
   status =
     sl_si91x_adc_init(bus_intf_info.adc_config.adc_ch_cfg, bus_intf_info.adc_config.adc_cfg, SL_SH_ADC_VREF_VALUE);
   if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_init failed st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)status,
+                          (int)__LINE__);
     DEBUGOUT("\r\n ADC Initialization Failed, Error Code : %ld\r\n", status);
     return SL_STATUS_FAIL;
   } else {
@@ -738,6 +760,9 @@ static sl_status_t sensorhub_adc_init(void)
   if (bus_intf_info.adc_config.adc_cfg.operation_mode != SL_ADC_STATIC_MODE) {
     status = sl_si91x_adc_register_event_callback(sl_si91x_adc_callback_v2);
     if (status != SL_STATUS_OK) {
+      SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_register_event_callback failed st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)status,
+                            (int)__LINE__);
       DEBUGOUT("\r\n ADC callback event fail:%lu\r\n", status);
       return SL_STATUS_FAIL;
     }
@@ -750,6 +775,9 @@ static sl_status_t sensorhub_adc_init(void)
   /* start the adc peripheral */
   status = sl_si91x_adc_start(bus_intf_info.adc_config.adc_cfg);
   if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_start failed st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)status,
+                          (int)__LINE__);
     DEBUGOUT("\r\n ADC sensor start failed:%lu\r\n", status);
     return SL_STATUS_FAIL;
   }
@@ -902,6 +930,9 @@ sl_status_t sl_si91x_sensorhub_init()
   DEBUGOUT("\r\n sdc Init done \r\n");
 #endif
   if (!bus_errors.i2c && !bus_errors.spi && !bus_errors.adc && !bus_errors.sdc) {
+    SL_PRINT_STRING_ERROR("sl_si91x_sensorhub_init: all peripherals init failed st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)SL_ALL_PERIPHERALS_INIT_FAILED,
+                          (int)__LINE__);
     return SL_ALL_PERIPHERALS_INIT_FAILED;
   }
   bus_errors.peripheral_global_status = 0;
@@ -921,7 +952,9 @@ sl_status_t sl_si91x_sensor_hub_start()
   // Subscribe the state transition callback events, the ored value of flag and function pointer is passed in this API.
   pm_subs_status = sl_si91x_power_manager_subscribe_ps_transition_event(&handle, &info);
   if (pm_subs_status != SL_STATUS_OK) {
-    // If status is not OK, return with the error code.
+    SL_PRINT_STRING_ERROR("sl_si91x_sensor_hub_start: subscribe_ps_transition_event failed st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)pm_subs_status,
+                          (int)__LINE__);
     DEBUGOUT("Power Manager transition event subscription failed, Error Code: 0x%lX \n", pm_subs_status);
     return SL_STATUS_FAIL;
   }
@@ -936,6 +969,9 @@ sl_status_t sl_si91x_sensor_hub_start()
 
   status = osThreadNew((osThreadFunc_t)sensorhub_sensor_task, NULL, &sensor_thread_attributes);
   if (status == NULL) {
+    SL_PRINT_STRING_ERROR("sl_si91x_sensor_hub_start: sensor task create failed st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)SL_SH_SENSOR_TASK_CREATION_FAILED,
+                          (int)__LINE__);
     DEBUGOUT("\r\n Sensor_Task create fail \r\n");
     return SL_SH_SENSOR_TASK_CREATION_FAILED;
   }
@@ -943,6 +979,9 @@ sl_status_t sl_si91x_sensor_hub_start()
 
   status = osThreadNew((osThreadFunc_t)sensorhub_em_task, NULL, &EM_thread_attributes);
   if (status == NULL) {
+    SL_PRINT_STRING_ERROR("sl_si91x_sensor_hub_start: EM task create failed st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)SL_SH_EM_TASK_CREATION_FAILED,
+                          (int)__LINE__);
     DEBUGOUT("\r\n EM_Task create fail \r\n");
     return SL_SH_EM_TASK_CREATION_FAILED;
   }

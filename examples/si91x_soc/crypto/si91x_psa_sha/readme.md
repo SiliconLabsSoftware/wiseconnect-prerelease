@@ -1,8 +1,8 @@
-# PSA Crypto SHA for SI91X
+# Platform SiWx91x PSA SHA
 
 ## Table of Contents
 
-- [PSA Crypto SHA for SI91X](#psa-crypto-sha-for-si91x)
+- [Platform SiWx91x PSA SHA](#platform-siwx91x-psa-sha)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -13,6 +13,9 @@
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
     - [Expected output](#expected-output)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -25,7 +28,7 @@ Before running the application, the user will need the following things to setup
 ### Hardware Requirements
 
   - Windows PC
-  - Silicon Labs Si917 Evaluation Kit [WPK(BRD4002)+ BRD4338A]
+  - Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002)+ BRD4338A]
 
 ### Software Requirements
 
@@ -87,8 +90,8 @@ Follow the steps as mentioned for the successful execution of the application:
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

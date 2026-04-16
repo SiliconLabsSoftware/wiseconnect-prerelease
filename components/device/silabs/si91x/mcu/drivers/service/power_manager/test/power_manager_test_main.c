@@ -172,7 +172,7 @@ static sl_status_t test_initialize_wireless(void)
                      .bt_feature_bit_map         = 0,
                      .ext_tcp_ip_feature_bit_map =
                        (SL_SI91X_EXT_TCP_IP_WINDOW_SCALING | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(10)
-                        | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID),
+                        | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                      .ble_feature_bit_map     = 0,
                      .ble_ext_feature_bit_map = 0,
                      .config_feature_bit_map  = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
@@ -773,7 +773,7 @@ void test_power_manager_get_requirement_table(void)
   UnityPrintf("Power Manager get requirement table test completed \n");
 }
 /*******************************************************************************
- * Function to test power manger request PS1 state.
+ * Function to test power manager request PS1 state.
  ******************************************************************************/
 void test_power_manager_request_ps1_state(void)
 {

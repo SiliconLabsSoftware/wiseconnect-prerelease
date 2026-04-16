@@ -1,8 +1,8 @@
-# SL NVM3 DUAL FLASH
+# Platform SiWx91x NVM3 Dual Flash
 
 ## Table of Contents
 
-- [SL NVM3 DUAL FLASH](#sl-nvm3-dual-flash)
+- [Platform SiWx91x NVM3 Dual Flash](#platform-siwx91x-nvm3-dual-flash)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -15,11 +15,14 @@
   - [Application Build Environment](#application-build-environment)
     - [General Configuration](#general-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
   - [Resources](#resources)
 
 ## Purpose/Scope
 
-- This application demonstrates the use of Third Generation Non-Volatile Memory (NVM3) data storage in Si91x dual flash.
+- This application demonstrates the use of Third Generation Non-Volatile Memory (NVM3) data storage in SiWx91x dual flash.
 
 ## Overview
 
@@ -42,7 +45,7 @@ For more detailed information about NVM3, refer to [Third Generation NonVolatile
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + External Flash]
+- Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002) + External Flash]
 
 ### Software Requirements
 
@@ -72,16 +75,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
    ![Figure: Introduction](resources/uc_screen/si91x_nvm3_uc_screen.png)
 
-- Open **sl_si91x_nvm3_dual_flash.slcp** project file select **software component** tab and search for **NVM3 for Si91x** in search bar.
+- Open **sl_si91x_nvm3_dual_flash.slcp** project file select **software component** tab and search for **NVM3 for SiWx91x** in search bar.
 - Using configuration wizard one can configure different parameters like:
 
 ### General Configuration
 
   Configure following macros from UC,
-- NVM3_DEFAULT_CACHE_SIZE: Number of NVM3 objects to cache. To reduce access times this number should be equal to or higher than the number 
+- NVM3_DEFAULT_CACHE_SIZE: Number of NVM3 objects to cache. To reduce access times this number should be equal to or higher than the number
   of NVM3 objects in the default NVM3 instance.
 - NVM3_DEFAULT_MAX_OBJECT_SIZE: Max NVM3 object size that can be stored. This value should be greater than or equal to 204
-- NVM3_DEFAULT_REPACK_HEADROOM: NVM3 Default Instance User Repack Headroom, Headroom determining how many bytes below the forced repack limit 
+- NVM3_DEFAULT_REPACK_HEADROOM: NVM3 Default Instance User Repack Headroom, Headroom determining how many bytes below the forced repack limit
   the user repack limit should be placed. The default is 0, which means the user and forced repack limits are equal.
 - NVM3_DEFAULT_NVM_SIZE - Size of the NVM3 storage region in flash. This size should be aligned with the flash page size of the device.
 
@@ -126,6 +129,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
 - [AN1135: Using Third Generation Non-Volatile Memory (NVM3) Data Storage](https://www.silabs.com/documents/public/application-notes/an1135-using-third-generation-nonvolatile-memory.pdf)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

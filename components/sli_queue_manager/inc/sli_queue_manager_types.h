@@ -109,14 +109,17 @@ typedef bool (*sli_queue_manager_node_match_handler_t)(const sli_queue_t *handle
  * or sli_queue_instance_deinit() API to free up any packets in the queue.
  *
  * @param queue
- *   Queue Handle.
+ *   Queue handle (read-only in the callback).
  *
  * @param node
  *   Packet which is present in the queue that has to be freed.
  *
+ * @param context
+ *   User context from flush/deinit (read-only in the callback; may be NULL).
+ *
  * @return
  *   N/A
  */
-typedef void (*sli_queue_manager_flush_handler_t)(sli_queue_t *handle, void *data, void *context);
+typedef void (*sli_queue_manager_flush_handler_t)(const sli_queue_t *handle, void *data, const void *context);
 
 #endif // SLI_QUEUE_MANAGER_TYPES_H

@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-#ifdef SL_CATALOG_KERNEL_PRESENT
+#if defined(SL_CATALOG_KERNEL_PRESENT) && defined(SLI_SI91X_CPC_ENABLE)
 #include "rsi_m4.h"
 #endif
 

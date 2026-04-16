@@ -28,6 +28,7 @@
 *
 ******************************************************************************/
 #include "sl_si91x_calendar.h"
+
 #include <stdlib.h>
 #include "rsi_time_period.h"
 #if (SL_SI91X_32KHZ_RC_CALIBRATION_ENABLED)
@@ -150,6 +151,8 @@ sl_status_t sl_si91x_calendar_set_date_time(sl_calendar_datetime_config_t *confi
     // is invalid, it returns an error code
     if (!is_valid_date(config)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_set_date_time: Calendar configuration is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
 #if (SL_SI91X_32KHZ_RC_CALIBRATION_ENABLED == ENABLE) && (ENABLE_ALARM == DISABLE)
@@ -160,6 +163,8 @@ sl_status_t sl_si91x_calendar_set_date_time(sl_calendar_datetime_config_t *confi
     error_status = RSI_RTC_SetDateTime(RTC, config);
     if (error_status == ERROR_CAL_INVALID_PARAMETERS) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_set_date_time: Calendar configuration is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // This API call sets the register bit to bypass the soft resets and retain the date and time
@@ -194,6 +199,8 @@ sl_status_t sl_si91x_calendar_get_date_time(sl_calendar_datetime_config_t *confi
     // returns an error code
     if (config == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_get_date_time: Calendar configuration is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // It converts the RSI error code which is returned by the below API
@@ -201,6 +208,8 @@ sl_status_t sl_si91x_calendar_get_date_time(sl_calendar_datetime_config_t *confi
     error_status = RSI_RTC_GetDateTime(RTC, config);
     if (error_status == ERROR_CAL_INVALID_PARAMETERS) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_get_date_time: Calendar configuration is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required, and the date and time is successfully fetched then,
@@ -226,12 +235,17 @@ sl_status_t sl_si91x_calendar_rcclk_calibration(clock_calibration_config_t *cloc
     // returns an error code
     if (clock_calibration_config == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_rcclk_calibration: Clock calibration configuration is NULL,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
     // To validate the rc trigger time, if not in range,
     // it returns an error code
     if (clock_calibration_config->rc_trigger_time >= SL_RC_LAST_ENUM) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_rcclk_calibration: RC trigger time is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     RSI_RTC_RCCLK_Calib(TIME_PERIOD,
@@ -243,6 +257,8 @@ sl_status_t sl_si91x_calendar_rcclk_calibration(clock_calibration_config_t *cloc
     // incorrect, it returns an error code
     if (TIME_PERIOD->MCU_CAL_TEMP_PROG_REG_b.RTC_TIMER_PERIOD_MUX_SEL != ENABLE) {
       status = SL_STATUS_FAIL;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_rcclk_calibration: RC clock calibration failed,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required, and rc clock is successfully calibrated then,
@@ -278,6 +294,9 @@ sl_status_t sl_si91x_calendar_roclk_calibration(clock_calibration_config_t *cloc
     // returns an error code
     if (clock_calibration_config == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_roclk_calibration: Clock calibration configuration is NULL,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
     // To validate the rc trigger time and ro trigger time, if not in range,
@@ -285,6 +304,8 @@ sl_status_t sl_si91x_calendar_roclk_calibration(clock_calibration_config_t *cloc
     if ((clock_calibration_config->rc_trigger_time >= SL_RC_LAST_ENUM)
         || (clock_calibration_config->ro_trigger_time >= SL_RO_LAST_ENUM)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_roclk_calibration: RC or RO trigger time is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // The RSI_RTC_ROCLK_Calib API, interally calls the RSI_RTC_RCCLK_Calib so that is the
@@ -301,6 +322,8 @@ sl_status_t sl_si91x_calendar_roclk_calibration(clock_calibration_config_t *cloc
     // incorrect, it returns an error code
     if (TIME_PERIOD->MCU_CAL_TEMP_PROG_REG_b.RTC_TIMER_PERIOD_MUX_SEL != ENABLE) {
       status = SL_STATUS_FAIL;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_roclk_calibration: RO clock calibration failed,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required, and ro clock is successfully calibrated then,
@@ -334,18 +357,23 @@ sl_status_t sl_si91x_calendar_set_alarm(sl_calendar_datetime_config_t *alarm)
     // returns an error code
     if (alarm == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_set_alarm: Alarm configuration is NULL,line no : %d\r\n", (int)__LINE__);
       break;
     }
     // To validate the date, if the date is not valid like any of the parameter of date
     // is invalid, it returns an error code
     if (!is_valid_date(alarm)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_set_alarm: Alarm configuration is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // To validate the alarm, if the alarm is not valid i.e., if the configuration is of past
     // datetime, it returns an error code
     if (!is_valid_alarm(alarm)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_set_alarm: Alarm configuration is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
 #if (SL_SI91X_32KHZ_RC_CALIBRATION_ENABLED == ENABLE) && (ENABLE_ALARM == DISABLE)
@@ -359,6 +387,8 @@ sl_status_t sl_si91x_calendar_set_alarm(sl_calendar_datetime_config_t *alarm)
     error_status = RSI_RTC_SetAlarmDateTime(RTC, alarm);
     if (error_status == ERROR_CAL_INVALID_PARAMETERS) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_get_alarm: Alarm configuration is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required, and the alarm is successfully configured then,
@@ -383,6 +413,8 @@ sl_status_t sl_si91x_calendar_get_alarm(sl_calendar_datetime_config_t *alarm)
     // returns an error code
     if (alarm == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_msec_trigger_callback: Callback is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // It converts the RSI error code which is returned by the below API
@@ -390,6 +422,9 @@ sl_status_t sl_si91x_calendar_get_alarm(sl_calendar_datetime_config_t *alarm)
     error_status = RSI_RTC_GetAlarmDateTime(RTC, alarm);
     if (error_status == ERROR_CAL_INVALID_PARAMETERS) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_register_msec_trigger_callback: Alarm configuration is invalid,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
     // If everything is as required, and the alarm is successfully fetched then,
@@ -415,6 +450,8 @@ sl_status_t sl_si91x_calendar_register_msec_trigger_callback(calendar_callback_t
     // returns an error code
     if (callback == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_msec_trigger_callback: Callback is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // To validate the function pointer and void pointer, if the parameters is not NULL then, it
@@ -424,6 +461,9 @@ sl_status_t sl_si91x_calendar_register_msec_trigger_callback(calendar_callback_t
     // another callback
     if (msec_callback != NULL) {
       status = SL_STATUS_BUSY;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_register_msec_trigger_callback: Callback is already registered,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
     // The function pointer is feeded to the static variable which is called in the IRQ handler
@@ -434,6 +474,9 @@ sl_status_t sl_si91x_calendar_register_msec_trigger_callback(calendar_callback_t
     // trigger is enabled or not
     if ((NPSS_INTR_MASK_CLR_REG & RTC_MSEC_INTR) != DISABLE) {
       status = SL_STATUS_FAIL;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_register_msec_trigger_callback: Millisecond trigger failed,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
     // If everything is as required, and the trigger is successfully enabled and the callback is registerd then,
@@ -459,6 +502,8 @@ sl_status_t sl_si91x_calendar_register_sec_trigger_callback(calendar_callback_t 
     // returns an error code
     if (callback == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_sec_trigger_callback: Callback is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // To validate the function pointer and void pointer, if the parameters is not NULL then, it
@@ -468,6 +513,9 @@ sl_status_t sl_si91x_calendar_register_sec_trigger_callback(calendar_callback_t 
     // another callback
     if (sec_callback != NULL) {
       status = SL_STATUS_BUSY;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_register_sec_trigger_callback: Callback is already registered,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
     // The function pointer is feeded to the static variable which is called in the IRQ handler
@@ -478,6 +526,8 @@ sl_status_t sl_si91x_calendar_register_sec_trigger_callback(calendar_callback_t 
     // trigger is enabled or not
     if ((NPSS_INTR_MASK_CLR_REG & RTC_SEC_INTR) != DISABLE) {
       status = SL_STATUS_FAIL;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_sec_trigger_callback: Second trigger failed,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required, and the trigger is successfully enabled and the callback is registerd then,
@@ -503,6 +553,8 @@ sl_status_t sl_si91x_calendar_register_alarm_trigger_callback(calendar_callback_
     // returns an error code
     if (callback == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_alarm_trigger_callback: Callback is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // To validate the function pointer and void pointer, if the parameters is not NULL then, it
@@ -512,6 +564,9 @@ sl_status_t sl_si91x_calendar_register_alarm_trigger_callback(calendar_callback_
     // another callback
     if (alarm_callback != NULL) {
       status = SL_STATUS_BUSY;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_register_alarm_trigger_callback: Callback is already registered,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
     // The function pointer is feeded to the static variable which is called in the IRQ handler
@@ -523,6 +578,8 @@ sl_status_t sl_si91x_calendar_register_alarm_trigger_callback(calendar_callback_
     // trigger is enabled or not, and the MCU_CAL_ALARM_PROG_2_b.ALARM_EN needs to be enabled
     if (((NPSS_INTR_MASK_CLR_REG & RTC_ALARM_INTR) != DISABLE) && (RTC->MCU_CAL_ALARM_PROG_2_b.ALARM_EN != ENABLE)) {
       status = SL_STATUS_FAIL;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_alarm_trigger_callback: Alarm trigger failed,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required, and the trigger is successfully enabled and the callback is registerd then,
@@ -549,6 +606,9 @@ sl_status_t sl_si91x_calendar_unregister_msec_trigger_callback(void)
   // trigger is disabled or not and return the error code accordingly
   if ((NPSS_INTR_MASK_SET_REG & RTC_MSEC_INTR) == DISABLE) {
     status = SL_STATUS_FAIL;
+    SL_PRINT_STRING_ERROR(
+      "sl_si91x_calendar_unregister_msec_trigger_callback: Millisecond trigger failed,line no : %d\r\n",
+      (int)__LINE__);
   } else {
     status = SL_STATUS_OK;
   }
@@ -572,6 +632,8 @@ sl_status_t sl_si91x_calendar_unregister_sec_trigger_callback(void)
   // trigger is disabled or not and return the error code accordingly
   if ((NPSS_INTR_MASK_SET_REG & RTC_SEC_INTR) == DISABLE) {
     status = SL_STATUS_FAIL;
+    SL_PRINT_STRING_ERROR("sl_si91x_calendar_unregister_sec_trigger_callback: Second trigger failed,line no : %d\r\n",
+                          (int)__LINE__);
   } else {
     status = SL_STATUS_OK;
   }
@@ -597,6 +659,8 @@ sl_status_t sl_si91x_calendar_unregister_alarm_trigger_callback(void)
   // Here the value of MCU_CAL_ALARM_PROG_2_b.ALARM_EN should be 0 after disabling the trigger
   if (((NPSS_INTR_MASK_SET_REG & RTC_ALARM_INTR) == DISABLE) && (RTC->MCU_CAL_ALARM_PROG_2_b.ALARM_EN != DISABLE)) {
     status = SL_STATUS_FAIL;
+    SL_PRINT_STRING_ERROR("sl_si91x_calendar_unregister_alarm_trigger_callback: Alarm trigger failed,line no : %d\r\n",
+                          (int)__LINE__);
   } else {
     status = SL_STATUS_OK;
   }
@@ -688,6 +752,8 @@ sl_status_t sl_si91x_calendar_build_datetime_struct(sl_calendar_datetime_config_
     // returns an error code
     if (date == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_build_datetime_struct: Date configuration is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     date->Century      = Century;
@@ -703,6 +769,8 @@ sl_status_t sl_si91x_calendar_build_datetime_struct(sl_calendar_datetime_config_
     // is invalid, it returns an error code
     if (!is_valid_date(date)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_build_datetime_struct: Date configuration is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required, and the structure is successfully built then,
@@ -727,6 +795,8 @@ sl_status_t sl_si91x_calendar_convert_unix_time_to_ntp_time(uint32_t time, uint3
     // returns an error code
     if (ntp_time == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_convert_unix_time_to_ntp_time: NTP time is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // To compare the time with maximum time, if it exceeds the maximum time
@@ -734,12 +804,16 @@ sl_status_t sl_si91x_calendar_convert_unix_time_to_ntp_time(uint32_t time, uint3
     // Maximum Unix timestamp that can be converted to NTP is 2085978495
     if (time > TIME_UNIX_TO_NTP_MAX) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_convert_unix_time_to_ntp_time: Unix time is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     temp = time + TIME_NTP_EPOCH_OFFSET_SEC;
     // To validate the timestamp, if it is not proper then it returns an error code
     if (!is_valid_time(temp, TIME_FORMAT_NTP, TIME_ZONE_DEFAULT)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_convert_unix_time_to_ntp_time: NTP time is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required then, the integer pointer is updated with the new value and
@@ -764,18 +838,23 @@ sl_status_t sl_si91x_calendar_convert_ntp_time_to_unix_time(uint32_t ntp_time, u
     // returns an error code
     if (time == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_convert_ntp_time_to_unix_time: Time is NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // To compare the ntp_time with TIME_NTP_EPOCH_OFFSET_SEC, if it less than ntp_time
     // then the operation is negative so it returns an error code
     if (ntp_time < TIME_NTP_EPOCH_OFFSET_SEC) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("CAL param,line no : %d\r\n", (int)__LINE__);
       break;
     }
     temp = ntp_time - TIME_NTP_EPOCH_OFFSET_SEC;
     // To validate the timestamp, if it is not proper then it returns an error code
     if (!is_valid_time(temp, TIME_FORMAT_UNIX, TIME_ZONE_DEFAULT)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_calendar_convert_ntp_time_to_unix_time: Time is invalid,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // If everything is as required then, the integer pointer is updated with the new value and
@@ -811,6 +890,9 @@ sl_status_t sl_si91x_calendar_convert_unix_time_to_calendar_datetime(uint32_t un
   do {
     if (!is_valid_time(unix_time, TIME_FORMAT_UNIX, TIME_ZONE_DEFAULT)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_convert_unix_time_to_calendar_datetime: Time is invalid,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
 
@@ -887,6 +969,9 @@ sl_status_t sl_si91x_calendar_convert_calendar_datetime_to_unix_time(sl_calendar
   do {
     if (!is_valid_date(cal_date_time)) {
       status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_convert_calendar_datetime_to_unix_time: Date configuration is invalid,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
 
@@ -894,6 +979,9 @@ sl_status_t sl_si91x_calendar_convert_calendar_datetime_to_unix_time(sl_calendar
     current_year = TIME_NTP_EPOCH + ((cal_date_time->Century - 1) * (MAXIMUM_YEAR + 1)) + cal_date_time->Year;
     if (current_year < TIME_UNIX_EPOCH) {
       status = SL_STATUS_INVALID_RANGE; // Unix timestamp range starts from 01/Jan/1970
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_calendar_convert_calendar_datetime_to_unix_time: Unix timestamp range is invalid,line no : %d\r\n",
+        (int)__LINE__);
       break;
     }
 

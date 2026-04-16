@@ -1,8 +1,8 @@
-# Hello World
+# Platform SiWx91x Hello World
 
 ## Table of Contents
 
-- [Hello World](#hello-world)
+- [Platform SiWx91x Hello World](#platform-siwx91x-hello-world)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -12,21 +12,24 @@
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
-- This example project shows a hello world example that can be used as a starting point to add components and functionality to the Si91x SoC.
+- This example project shows a hello world example that can be used as a starting point to add components and functionality to the SiWx91x SoC.
 
 ## Overview
 
-Minimal Si91x SoC application that prints to console. Use it as a template to add components and build more complex examples.
+Minimal SiWx91x SoC application that prints to console. Use it as a template to add components and build more complex examples.
 
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A]
+- Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002) + BRD4338A]
 
 ### Software Requirements
 
@@ -57,7 +60,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Compile and run the application.
 
 - Console Output:
-    
+
     ![Figure: output](resources/readme/outputConsole.png)
 
 ## Troubleshooting
@@ -69,8 +72,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

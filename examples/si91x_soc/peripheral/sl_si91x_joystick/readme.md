@@ -1,8 +1,8 @@
-# SL JOYSTICK
+# Platform SiWx91x JOYSTICK
 
 ## Table of Contents
 
-- [SL JOYSTICK](#sl-joystick)
+- [Platform SiWx91x JOYSTICK](#platform-siwx91x-joystick)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -14,6 +14,9 @@
     - [Pin Configuration](#pin-configuration)
     - [Joystick on BRD4002A](#joystick-on-brd4002a)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -24,11 +27,11 @@ This sample app demonstrates the use of the Joystick Driver. It prints the joyst
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 
 ### Software Requirements
 
-- Simplicity Studio 
+- Simplicity Studio
 - Serial console Setup
   - For Serial Console setup instructions, refer to [Console Input and Output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
@@ -83,9 +86,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - ❌ Instance 1, Instance 4, Instance 6 (skips 2, 3, 5)
   - ❌ Instance 1, Instance 5, Instance 2 (out of order)
   - ❌ Instance 0, Instance 1, Instance 2 (must start at 1)
- > **Note:** 
+ > **Note:**
  > - This is a configuration requirement, not an installation order requirement. You can add instances in any order through the component installer. However, when naming or configuring them, ensure their instance numbers are sequential (e.g., 1, 2, 3). The system typically enforces this numbering automatically when instances are created.
- > 
+ >
  > - Explanation: The important rule is sequential numbering, not the order in which you click "Install". For example, if you need 3 channels, you must have instances numbered 1, 2, and 3. You cannot skip numbers (like 1, 3, 4) or have duplicates. Whether you install instance 2 before instance 1 does not matter, as long as the final numbering is consecutive starting from 1.
 
  **Joystick Voltage Value Configuration**
@@ -100,26 +103,26 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 #### Pin Configuration of the WPK[BRD4002A] Base Board, and with radio board
 
-The following table lists the ADC channel pin mappings for the Si917 radio board. These pin configurations are essential for connecting the joystick input to the correct ADC channel based on your selected channel instance. If you want to use a different radio board, refer to the board-specific user guide.
+The following table lists the ADC channel pin mappings for the SiWx91x radio board. These pin configurations are essential for connecting the joystick input to the correct ADC channel based on your selected channel instance. If you want to use a different radio board, refer to the board-specific user guide.
 
-  | CHANNEL | PIN TO ADCP | 
-  | --- | --- | 
-  | 1 | ULP_GPIO_1 [P16] | 
-  | 2 | GPIO_27 [P29] | 
-  | 3 | ULP_GPIO_8 [P15] | 
-  | 4 | GPIO_25 [P25] | 
-  | 5 | ULP_GPIO_8 [P15] | 
-  | 6 | ULP_GPIO_10 [P17] | 
-  | 7 | GPIO_25 [P25] | 
-  | 8 | GPIO_27 [P29] | 
-  | 9 | GPIO_29 [P33] | 
-  | 10 | GPIO_29 [P33] | 
-  | 11 | ULP_GPIO_1 [P16] | 
-  | 12 | ULP_GPIO_1 [P16] | 
-  | 13 | ULP_GPIO_7 [EXP_HEADER-15] | 
-  | 14 | GPIO_26 [P27] | 
-  | 15 | GPIO_28 [P31] | 
-  | 16 | GPIO_30 [P35] | 
+  | CHANNEL | PIN TO ADCP |
+  | --- | --- |
+  | 1 | ULP_GPIO_1 [P16] |
+  | 2 | GPIO_27 [P29] |
+  | 3 | ULP_GPIO_8 [P15] |
+  | 4 | GPIO_25 [P25] |
+  | 5 | ULP_GPIO_8 [P15] |
+  | 6 | ULP_GPIO_10 [P17] |
+  | 7 | GPIO_25 [P25] |
+  | 8 | GPIO_27 [P29] |
+  | 9 | GPIO_29 [P33] |
+  | 10 | GPIO_29 [P33] |
+  | 11 | ULP_GPIO_1 [P16] |
+  | 12 | ULP_GPIO_1 [P16] |
+  | 13 | ULP_GPIO_7 [EXP_HEADER-15] |
+  | 14 | GPIO_26 [P27] |
+  | 15 | GPIO_28 [P31] |
+  | 16 | GPIO_30 [P35] |
 
 ### Joystick on BRD4002A
 
@@ -153,8 +156,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

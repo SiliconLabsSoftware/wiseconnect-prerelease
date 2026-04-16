@@ -50,9 +50,11 @@
 #define SERVER_IP_ADDR "192.168.29.160"
 #endif
 
-#define HOST_NAME         "example.com"
-#define RESOURCE_NAME     "/myresource"
-#define CERTIFICATE_INDEX 0
+#define HOST_NAME            "example.com"
+#define RESOURCE_NAME        "/myresource"
+#define CERTIFICATE_INDEX    0
+#define WEBSOCKET_PORT_SSL   443
+#define WEBSOCKET_PORT_PLAIN 8080
 /******************************************************
  *               Variable Definitions
  ******************************************************/
@@ -94,7 +96,7 @@ static const sl_wifi_device_configuration_t websocket_client_configuration = {
                                                   ),
                    .bt_feature_bit_map = 0,
                    .ext_tcp_ip_feature_bit_map =
-                     (SL_SI91X_EXT_TCP_IP_WINDOW_DIV | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID
+                     (SL_SI91X_EXT_TCP_IP_WINDOW_DIV | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID
                       | SL_SI91X_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS | SL_SI91X_EXT_TCP_IP_WAIT_FOR_SOCKET_CLOSE),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
@@ -246,15 +248,19 @@ static void application_start(void *argument)
 
 sl_websocket_error_t create_and_send_websocket_data(void)
 {
+  // Set to true for secure WebSocket (wss://), false for plain WebSocket (ws://)
+  bool use_ssl = false;
+
   sl_websocket_config_t ws_config = {
     .host                = HOST_NAME,
     .resource            = RESOURCE_NAME,
-    .server_port         = 8080,
+    .server_port         = use_ssl ? WEBSOCKET_PORT_SSL : WEBSOCKET_PORT_PLAIN,
     .client_port         = 5001,
     .ip_address          = SERVER_IP_ADDR,
     .data_cb             = data_callback,
     .remote_terminate_cb = remote_terminate_callback,
-    .enable_ssl          = false,
+    .enable_ssl          = use_ssl,
+    .tls_version         = SL_WEBSOCKET_TLS_V_1_2,
   };
 
   // Load SSL CA certificate only when SSL is enabled
@@ -276,6 +282,24 @@ sl_websocket_error_t create_and_send_websocket_data(void)
     return ws_error;
   }
   printf("\r\nWebSocket Init done");
+
+  // Advanced TCP/TLS options - customize as needed
+  // For ssl_ciphers_bitmap, use values from sl_si91x_socket_constants.h, e.g.:
+  //   SL_SI91X_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 | SL_SI91X_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+  // Use 0 for firmware default cipher suites
+  sl_websocket_tcp_tls_advanced_options_t ws_tcp_tls_opts = {
+    .tcp_keepalive_initial_time_sec   = 300, // TCP keepalive initial timeout (seconds)
+    .tcp_max_retry_count              = 8,   // Max TCP retransmission attempts
+    .max_retransmission_timeout_value = 3,   // Retransmission timeout cap
+    .ssl_ciphers_bitmap               = 0,   // TLS 1.2 ciphers (0 = default)
+    .ssl_ext_ciphers_bitmap           = 0,   // TLS 1.3 ciphers (0 = default)
+  };
+  ws_error = sl_websocket_set_tcp_tls_advanced_configuration(&ws_handle, &ws_tcp_tls_opts);
+  if (ws_error != SL_WEBSOCKET_SUCCESS) {
+    printf("\r\nError setting WebSocket TCP/TLS advanced configuration:%d", ws_error);
+    return ws_error;
+  }
+  printf("\r\nWebSocket TCP/TLS advanced configuration set");
 
   ws_error = sl_websocket_connect(&ws_handle);
   if (ws_error != SL_WEBSOCKET_SUCCESS) {

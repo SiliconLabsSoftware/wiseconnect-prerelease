@@ -1,8 +1,8 @@
-# M4 FW AB UPDATER FOR SECURITY (A/B Fallback)
+# Platform SiWx91x M4 Updater Security
 
 ## Table of Contents
 
-- [M4 FW AB UPDATER FOR SECURITY (A/B Fallback)](#m4-fw-ab-updater-for-security-ab-fallback)
+- [Platform SiWx91x M4 Updater Security](#platform-siwx91x-m4-updater-security)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -13,7 +13,7 @@
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -23,7 +23,7 @@ This application fetches the M4 application address from flash. If a valid addre
 
 ### MBR Provisioning
 
-> **Note:** Refer to UG625: SiWG917 Firmware Fallback User Guide before executing the reference examples.
+> **Note:** Refer to UG625: SiWx91x Firmware Fallback User Guide before executing the reference examples.
 
 Before using the A/B firmware fallback feature, the fallback profile must be enabled in the MBR on the device.
 
@@ -31,12 +31,12 @@ To enable firmware fallback for the devices using default MBR, use `commander ma
 
 To confirm the firmware fallback feature is enabled on the device, use `commander readmem --range 0x4000091:+1` command in the Simplicity Commander CLI tool and confirm the value to be 1.
 
-For more details on firmware fallback feature enablement and usage, refer to UG625: SiWG917 Firmware Fallback User Guide.
+For more details on firmware fallback feature enablement and usage, refer to UG625: SiWx91x Firmware Fallback User Guide.
 
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A ]
+- Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002) + BRD4338A ]
 
 ### Software Requirements
 
@@ -78,8 +78,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

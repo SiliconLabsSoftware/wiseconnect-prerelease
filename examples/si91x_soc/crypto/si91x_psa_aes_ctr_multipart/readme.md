@@ -1,8 +1,8 @@
-# PSA AES-CTR Multipart for SI91X
+# Platform SiWx91x PSA AES Cipher Multipart
 
 ## Table of Contents
 
-- [PSA AES-CTR Multipart for SI91X](#psa-aes-ctr-multipart-for-si91x)
+- [Platform SiWx91x PSA AES Cipher Multipart](#platform-siwx91x-psa-aes-cipher-multipart)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -14,6 +14,9 @@
     - [Application Configuration Parameters](#application-configuration-parameters)
   - [Test the Application](#test-the-application)
     - [Expected output](#expected-output)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -26,7 +29,7 @@ Before running the application, the user will need the following things to setup
 ### Hardware Requirements
 
   - Windows PC
-  - Silicon Labs Si917 Evaluation Kit [WPK(BRD4002)+ BRD4338A]
+  - Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002)+ BRD4338A]
 
 ### Software Requirements
 
@@ -50,11 +53,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- To program the device ,refer **"Burn M4 Binary"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html** to work with Si91x and Simplicity Studio.
+- To program the device, refer **"Burn M4 Binary"** section in **getting-started-with-siwx917-soc** guide at **release_package/docs/index.html** to work with SiWx91x and Simplicity Studio.
 
 ### Application Configuration Parameters
 
-- This AES multipart sample application demonstrates how to split the encryption and decryption process into multiple chunks and handle each chunk separately. 
+- This AES multipart sample application demonstrates how to split the encryption and decryption process into multiple chunks and handle each chunk separately.
 
 - The function `test_psa_aes()` is used to perform AES encryption and decryption on large messages by splitting them into smaller chunks. The function will first send the first chunk data and then remaining chunks will be considered as middle chunks.
 
@@ -113,8 +116,8 @@ Follow the steps as mentioned for the successful execution of the application:
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

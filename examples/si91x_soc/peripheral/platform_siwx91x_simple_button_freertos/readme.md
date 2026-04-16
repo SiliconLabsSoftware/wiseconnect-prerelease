@@ -32,7 +32,7 @@ This example application demonstrates the use of a BUTTON in a **FreeRTOS** envi
   3. **LED toggle** — When the semaphore is released, toggles the LED via `sl_si91x_led_toggle()` and loops back to wait.
 - The button ISR (`sl_si91x_button_isr`) fires on a press event (`BUTTON_PRESSED`) and releases the semaphore to unblock the task.
 - If semaphore creation fails, the task calls `osThreadExit()` to cleanly terminate.
-- This approach replaces baremetal polling with RTOS-friendly blocking, allowing other tasks to run while waiting for input.
+- This approach uses RTOS-friendly blocking, allowing other tasks to run while waiting for input.
 
 ## Prerequisites/Setup Requirements
 

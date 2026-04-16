@@ -30,6 +30,7 @@
 #ifndef SLI_WIFI_H
 #define SLI_WIFI_H
 #include "sl_status.h"
+#include "sl_constants.h"
 #include "sl_wifi_device.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
@@ -232,6 +233,7 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
 sl_status_t sli_wifi_disconnect(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_stop_ap(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_statistics_t *statistics);
+sl_status_t sli_wifi_get_statistics_v2(sl_wifi_interface_t interface, sl_wifi_statistics_v2_t *statistics);
 sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
                                                 sl_wifi_operational_statistics_t *operational_statistics);
 sl_status_t sli_wifi_transmit_test_start(sl_wifi_interface_t interface,
@@ -301,6 +303,11 @@ sl_status_t sli_wifi_set_transceiver_multicast_filter(sl_wifi_interface_t interf
                                                       sl_wifi_transceiver_mcast_filter_t mcast);
 sl_status_t sli_wifi_flush_transceiver_data(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_configure_multicast_filter(sl_wifi_multicast_filter_info_t *multicast_filter_info);
+sl_status_t sli_wifi_set_groupcast_filter_config(const sl_wifi_groupcast_filter_config_t *config);
+sl_status_t sli_wifi_allowlist_mcast_add_ip(const sl_ip_address_t *ip_address, sl_ip_address_handle_t *id);
+sl_status_t sli_wifi_allowlist_mcast_remove_ip(sl_ip_address_handle_t id);
+sl_status_t sli_wifi_allowlist_mcast_remove_all(void);
+sl_status_t sli_wifi_set_beacon_drop_threshold(sl_wifi_interface_t interface, uint16_t beacon_drop_threshold);
 /* Function used to update the variable that stores the wifi rate */
 sl_status_t sli_wifi_save_rate(sl_wifi_rate_t transfer_rate);
 sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_interface,

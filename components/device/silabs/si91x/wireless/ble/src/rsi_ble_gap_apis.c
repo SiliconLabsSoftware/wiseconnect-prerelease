@@ -2215,6 +2215,10 @@ int32_t rsi_ble_extended_connect_with_params(void *ble_extended_conn_params)
  *            !0  = failure \n
  * @section description
  * This function is used to read minimum and maximum transmit powers supported by the controller based on the country region.
+ * Limitation for ACx Boards:
+ * This API must be invoked only after BLE on-air activity has started (e.g. advertising or scanning).
+ * For dynamic TX power Control, first initiate BLE on-air activity, then call this API.
+ * After that, stop the ongoing on-air activity, update the TX power and finally restart the BLE on-air activity to apply the changes.
  */
 
 int32_t rsi_ble_read_transmit_power(void *resp)
@@ -2265,4 +2269,28 @@ int32_t rsi_ble_write_rf_path_compensation(uint16_t tx_path_value, uint16_t rx_p
   //! Send write rf path compensation cmd
   return rsi_bt_driver_send_cmd(RSI_BLE_CMD_WRITE_RF_PATH_COMP, &rf_path_comp, NULL);
 }
+
+/*==================================================*/
+/**
+ * @fn          int32_t rsi_ble_vendor_set_SMP_min_enc_keysize(uint8_t min_keysize)
+ * @brief       Set minimum encryption key size for SMP pairing.
+ * @param[in]   min_keysize  - Minimum key size (7–16 octets per BLE).
+ * @return      0  =  success \n
+ *             !0  = failure \n
+ * @section description
+ * This function configures the controller minimum acceptable encryption key size during SMP.
+ */
+int32_t rsi_ble_vendor_set_SMP_min_enc_keysize(uint8_t min_keysize)
+{
+  rsi_ble_vendor_set_smp_min_enc_keysize_t ble_vendor_set_smp_min_enc_keysize;
+
+  memset(&ble_vendor_set_smp_min_enc_keysize, 0, sizeof(rsi_ble_vendor_set_smp_min_enc_keysize_t));
+
+  ble_vendor_set_smp_min_enc_keysize.opcode[0]   = (BLE_VENDOR_SET_SMP_MIN_KEYSIZE & 0xFF);
+  ble_vendor_set_smp_min_enc_keysize.opcode[1]   = ((BLE_VENDOR_SET_SMP_MIN_KEYSIZE >> 8) & 0xFF);
+  ble_vendor_set_smp_min_enc_keysize.min_keysize = min_keysize;
+
+  return rsi_bt_driver_send_cmd(RSI_BT_VENDOR_SPECIFIC, &ble_vendor_set_smp_min_enc_keysize, NULL);
+}
+
 /** @} */

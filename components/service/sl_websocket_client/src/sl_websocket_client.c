@@ -50,6 +50,12 @@
 #include <ctype.h>
 
 /******************************************************
+ *               External Declarations
+ ******************************************************/
+extern uint32_t sl_si91x_socket_selected_ciphers;
+extern uint32_t sl_si91x_socket_selected_extended_ciphers;
+
+/******************************************************
  *               API Definitions
  ******************************************************/
 sl_websocket_error_t sl_websocket_init(sl_websocket_client_t *handle, const sl_websocket_config_t *config)
@@ -111,7 +117,22 @@ sl_websocket_error_t sl_websocket_init(sl_websocket_client_t *handle, const sl_w
   handle->remote_terminate_cb = config->remote_terminate_cb;
   handle->state               = SL_WEBSOCKET_STATE_DISCONNECTED;
   handle->enable_ssl          = config->enable_ssl;
+  handle->tls_version         = config->tls_version;
   handle->user_context        = NULL;
+  return SL_WEBSOCKET_SUCCESS;
+}
+
+sl_websocket_error_t sl_websocket_set_tcp_tls_advanced_configuration(
+  sl_websocket_client_t *handle,
+  const sl_websocket_tcp_tls_advanced_options_t *options)
+{
+  if (!handle || !options) {
+    return SL_WEBSOCKET_ERR_INVALID_PARAMETER;
+  }
+
+  handle->tcp_options            = *options;
+  handle->tcp_options_configured = true;
+
   return SL_WEBSOCKET_SUCCESS;
 }
 
@@ -177,7 +198,32 @@ sl_websocket_error_t sl_websocket_connect(sl_websocket_client_t *handle)
   handle->socket_fd = client_socket;
 
   if (handle->enable_ssl) {
-    socket_return_value = setsockopt(client_socket, SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
+    const char *tls_opt;
+    size_t tls_opt_len;
+    switch (handle->tls_version) {
+      case SL_WEBSOCKET_TLS_V_1_0:
+        tls_opt     = TLS_1_0;
+        tls_opt_len = sizeof(TLS_1_0);
+        break;
+      case SL_WEBSOCKET_TLS_V_1_1:
+        tls_opt     = TLS_1_1;
+        tls_opt_len = sizeof(TLS_1_1);
+        break;
+      case SL_WEBSOCKET_TLS_V_1_2:
+        tls_opt     = TLS_1_2;
+        tls_opt_len = sizeof(TLS_1_2);
+        break;
+      case SL_WEBSOCKET_TLS_V_1_3:
+        tls_opt     = TLS_1_3;
+        tls_opt_len = sizeof(TLS_1_3);
+        break;
+      case SL_WEBSOCKET_TLS_DEFAULT:
+      default:
+        tls_opt     = TLS;
+        tls_opt_len = sizeof(TLS);
+        break;
+    }
+    socket_return_value = setsockopt(client_socket, SOL_TCP, TCP_ULP, tls_opt, tls_opt_len);
     if (socket_return_value < 0) {
       SL_DEBUG_LOG("\r\nSet socket failed with bsd error: %d\r\n", errno);
       close(client_socket);
@@ -202,6 +248,20 @@ sl_websocket_error_t sl_websocket_connect(sl_websocket_client_t *handle)
     return SL_WEBSOCKET_ERR_SOCKET_CREATION;
   }
   si91x_socket->ssl_bitmap |= SLI_SI91X_WEBSOCKET_FEAT;
+
+  if (handle->tcp_options_configured) {
+    si91x_socket->tcp_keepalive_initial_time = handle->tcp_options.tcp_keepalive_initial_time_sec;
+    si91x_socket->max_tcp_retries            = handle->tcp_options.tcp_max_retry_count;
+#if defined(SLI_SI917)
+    si91x_socket->max_retransmission_timeout_value = handle->tcp_options.max_retransmission_timeout_value;
+#endif
+    if (handle->tcp_options.ssl_ciphers_bitmap != 0) {
+      sl_si91x_socket_selected_ciphers = handle->tcp_options.ssl_ciphers_bitmap;
+    }
+    if (handle->tcp_options.ssl_ext_ciphers_bitmap != 0) {
+      sl_si91x_socket_selected_extended_ciphers = handle->tcp_options.ssl_ext_ciphers_bitmap;
+    }
+  }
 
   // Copy the host name and resource name from handle to si91x_socket->websocket_info
   size_t host_length     = strlen(handle->host);
@@ -231,6 +291,17 @@ sl_websocket_error_t sl_websocket_connect(sl_websocket_client_t *handle)
   memcpy(si91x_socket->websocket_info->websocket_data + host_length, handle->resource, resource_length);
 
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
+
+  // Restore default cipher globals so subsequent TLS sockets are not affected
+  if (handle->tcp_options_configured) {
+    if (handle->tcp_options.ssl_ciphers_bitmap != 0) {
+      sl_si91x_socket_selected_ciphers = SL_SI91X_TLS_DEFAULT_CIPHERS;
+    }
+    if (handle->tcp_options.ssl_ext_ciphers_bitmap != 0) {
+      sl_si91x_socket_selected_extended_ciphers = SL_SI91X_TLS_EXT_CIPHERS;
+    }
+  }
+
   if (socket_return_value < 0) {
     SL_DEBUG_LOG("\r\nSocket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
@@ -339,7 +410,8 @@ sl_websocket_error_t sl_websocket_deinit(sl_websocket_client_t *handle)
     si91x_socket->websocket_info = NULL;
   }
 
-  // Set the handle's state to disconnected
+  // Clear the entire handle to reset all fields including tcp_options
+  memset(handle, 0, sizeof(sl_websocket_client_t));
   handle->state = SL_WEBSOCKET_STATE_DISCONNECTED;
 
   SL_DEBUG_LOG("\r\nWebSocket deinit success\r\n");

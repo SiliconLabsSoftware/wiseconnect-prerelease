@@ -142,7 +142,7 @@ void sdc_example_init()
       .clock_division_factor = SDC_CLOCK_DIVISION_FACTOR
 
     };
-    sdc_channel_config.recieve_buffer[SDC_CHANNEL1_INDEX] = sdc_read_buffer;
+    sdc_channel_config.receive_buffer[SDC_CHANNEL1_INDEX] = sdc_read_buffer;
     sdc_channel_config.sample_length[SDC_CHANNEL1_INDEX]  = SDC_NUMBER_OF_SAMPLES;
 
     // Initialize the SDC driver with the reference voltage.

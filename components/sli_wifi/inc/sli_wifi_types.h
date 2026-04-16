@@ -29,9 +29,11 @@
  ******************************************************************************/
 #ifndef SLI_WIFI_TYPES_H
 #define SLI_WIFI_TYPES_H
+#include <stddef.h>
 #include <stdbool.h>
 #include "sl_wifi_device.h"
 #include "sl_wifi_constants.h"
+#include "sl_wifi_types.h"
 #include "sli_queue_manager.h"
 #include "cmsis_os2.h"
 
@@ -115,6 +117,16 @@
 #define SLI_WLAN_AUTH_KEY_MGMT_TYPE_FT_SAE        0x00100000 // FT_SAE AKM Type
 #define SLI_WLAN_AUTH_KEY_MGMT_TYPE_802_1X_SHA256 0x00020000 // SHA256 AKM Type
 #define SLI_WLAN_AUTH_KEY_MGMT_TYPE_PSK_SHA256    0x00040000 // PSK_SHA256 AKM Type
+
+// -----------------------------------------------------------------------------
+// Internal macros for multicast allowlist (IP-based) management
+// -----------------------------------------------------------------------------
+/** Maximum concurrent multicast allowlist entries on the NWP (IPv4 + IPv6 combined).
+ *  Valid slot handles returned on ADD are @c 0 .. @c SLI_WIFI_MAX_MC_ALLOWLIST_IP_ADDRESSES - 1
+ *  (see @ref sl_wifi_allowlist_mcast_add_ip / @ref sl_wifi_allowlist_mcast_remove_ip).
+ *  Host updates use @ref SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST with @ref sli_wifi_mc_allowlist_update_req_t.
+ */
+#define SLI_WIFI_MAX_MC_ALLOWLIST_IP_ADDRESSES 6
 
 /// Efuse data information
 typedef union {
@@ -280,7 +292,10 @@ typedef struct {
   uint32_t first_time_retry_enable; ///< Retry enable or disable for first time joining.
 } sli_wifi_rejoin_params_t;
 
-/// WLAN filter broadcast request
+/// Legacy WLAN host-to-NWP request for deprecated broadcast/TIM filter + beacon threshold (single frame).
+/// @details Replaced for new applications by @ref sl_wifi_set_groupcast_filter_config,
+///          @ref sl_wifi_set_beacon_drop_threshold, and multicast IP allowlist commands
+///          (@ref SLI_WIFI_REQ_SET_BC_MC_FILTER_CONFIG, @ref SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST, etc.).
 typedef struct {
   uint8_t beacon_drop_threshold[2];       ///< Beacon drop threshold
   uint8_t filter_bcast_in_tim;            ///< Filter broadcast in TIM
@@ -643,5 +658,78 @@ typedef struct {
   uint8_t ipv4_address[4];  // IPv4 address
   uint8_t ipv6_address[16]; // IPv6 address
 } sli_wifi_ip_address_info_t;
+
+/// Operation field for @ref SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST (command @c 0x5C).
+#define SLI_WIFI_MC_ALLOWLIST_OP_ADD        0
+#define SLI_WIFI_MC_ALLOWLIST_OP_REMOVE     1
+#define SLI_WIFI_MC_ALLOWLIST_OP_REMOVE_ALL 2
+
+/**
+ * @brief Host-to-NWP payload for L3 IPv4/IPv6 multicast address allowlist updates.
+ * @details Used with @ref SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST. This complements layer-2-oriented
+ *          broadcast/multicast filtering configured by @ref SLI_WIFI_REQ_SET_BC_MC_FILTER_CONFIG
+ *          (@ref sl_wifi_set_groupcast_filter_config): when multicast filtering is enabled,
+ *          allowlisted group addresses are still passed toward the host stack per product policy.
+ * @note ADD: set @a ip_type to @c SL_IPV4_VERSION (4) or @c SL_IPV6_VERSION (6); fill @c payload.ipv4 or @c payload.ipv6.
+ * @note REMOVE: set @c payload.handle to the firmware handle (@c 0 .. @ref SLI_WIFI_MAX_MC_ALLOWLIST_IP_ADDRESSES - 1).
+ * @note REMOVE_ALL: @a ip_type and @a payload are ignored by firmware.
+ */
+typedef struct {
+  uint8_t
+    operation; ///< @ref SLI_WIFI_MC_ALLOWLIST_OP_ADD, @ref SLI_WIFI_MC_ALLOWLIST_OP_REMOVE, or @ref SLI_WIFI_MC_ALLOWLIST_OP_REMOVE_ALL
+  uint8_t ip_type;   ///< ADD: @c SL_IPV4_VERSION or @c SL_IPV6_VERSION; REMOVE / REMOVE_ALL: @c 0.
+  uint16_t reserved; ///< Reserved bytes
+  union {
+    sl_ipv4_address_t ipv4; ///< ADD when @a ip_type is IPv4.
+    sl_ipv6_address_t ipv6; ///< ADD when @a ip_type is IPv6.
+    uint8_t handle;         ///< REMOVE: slot handle (@ref sl_ip_address_handle_t on-wire width).
+  } payload;
+} sli_wifi_mc_allowlist_update_req_t;
+
+/**
+ * @typedef sli_wifi_groupcast_filter_config_t
+ * @brief Alias of @ref sl_wifi_groupcast_filter_config_t for NWP command @ref SLI_WIFI_REQ_SET_BC_MC_FILTER_CONFIG.
+ * @details Configures station broadcast/multicast **filter enables** and **filter_mode** (default vs conservative).
+ *          Beacon drop threshold for power save is **not** in this frame; use
+ *          @ref SLI_WIFI_REQ_SET_BEACON_DROP_THRESHOLD / @ref sl_wifi_set_beacon_drop_threshold.
+ *          Multicast **IP** allowlisting uses @ref sli_wifi_mc_allowlist_update_req_t, not this structure.
+ */
+typedef sl_wifi_groupcast_filter_config_t sli_wifi_groupcast_filter_config_t;
+
+// -----------------------------------------------------------------------------
+// Generic firmware configuration request (host to NWP)
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief Byte length of an @ref sli_wifi_fw_config_req_t command buffer including @a _len tail bytes.
+ * @details @c sizeof(sli_wifi_fw_config_req_t) counts only the fixed header (flexible member excluded).
+ *          For @a _len @c 0 (e.g. @ref sl_wifi_set_beacon_drop_threshold), this equals @c sizeof(struct).
+ */
+#define SLI_WIFI_FW_CONFIG_REQ_TOTAL_SIZE(_len) ((size_t)sizeof(sli_wifi_fw_config_req_t) + (size_t)(_len))
+
+/**
+ * @def SLI_SET_BEACON_DROP_THRESHOLD
+ * @brief Bit in @ref sli_wifi_fw_config_req_t::config_bitmap that selects beacon drop threshold (scalar in @c value; @c length 0)
+ *        for @ref SLI_WIFI_REQ_SET_BEACON_DROP_THRESHOLD / @ref sl_wifi_set_beacon_drop_threshold.
+ */
+#define SLI_SET_BEACON_DROP_THRESHOLD BIT(0)
+
+/**
+ * @brief Variable-length configuration request (host to NWP).
+ *
+ * Wire layout: three LE @c uint32_t fields, then @a length bytes of opaque @a config_data (no host pointers).
+ * Used by @ref SLI_WIFI_REQ_SET_BEACON_DROP_THRESHOLD for beacon drop threshold (scalar: @a length @c 0).
+ * Other bitmap options may append a non-zero @a length tail in @a config_data per FW.
+ *
+ * @note For @a length @c 0, pass @c sizeof(sli_wifi_fw_config_req_t) to @ref sli_wifi_send_command.
+ * @note For @a length @gt 0, allocate a contiguous buffer of @ref SLI_WIFI_FW_CONFIG_REQ_TOTAL_SIZE(length),
+ *       set header fields, copy the tail into @a config_data, pass the total size to the command layer.
+ */
+typedef struct {
+  uint32_t config_bitmap; ///< Bitmask of which configuration is applied.
+  uint32_t value;         ///< Scalar argument when no tail is used; otherwise.
+  uint32_t length;        ///< Size in bytes of @a config_data following this struct in the TX buffer.
+  uint8_t config_data[];  ///< Opaque tail; C99 flexible array member, size @a length.
+} sli_wifi_fw_config_req_t;
 
 #endif // SLI_WIFI_TYPES_H

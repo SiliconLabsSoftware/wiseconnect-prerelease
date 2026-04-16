@@ -1,8 +1,8 @@
 id: si91x_log_backend_uart
-label: SL Log Si91x Backend UART
+label: SL Log Backend UART
 package: platform_siwx91x
 description: >
-   This component provides backend interface for si91x logger component
+  This component provides the UART backend interface for the SiWx91x logger.
 category: Device|Si91x|MCU|Service
 quality: evaluation
 metadata:

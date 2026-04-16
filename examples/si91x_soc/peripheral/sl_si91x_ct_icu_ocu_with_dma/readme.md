@@ -1,8 +1,8 @@
-# SL CONFIG TIMER ICU AND OCU DMA
+# Platform SiWx91x Config Timer ICU and OCU with DMA
 
 ## Table of Contents
 
-- [SL CONFIG TIMER ICU AND OCU DMA](#sl-config-timer-icu-ocu-dma)
+- [Platform SiWx91x Config Timer ICU and OCU with DMA](#platform-siwx91x-config-timer-icu-and-ocu-with-dma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -17,6 +17,9 @@
     - [Pin Configuration for INPUT EVENT mode use case](#pin-configuration-for-input-event-mode-use-case)
     - [Macros for CT Configurations](#macros-for-ct-configurations)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
     - [Run the application in DMA mode](#run-the-application-in-dma-mode)
     - [Run the application in INPUT EVENT mode](#run-the-application-in-input-event-mode)
 
@@ -26,7 +29,7 @@
   - First as a input capture event. Here it captures the input event on GPIO pin and store the captured value in
   capture_value variable.
   - Second as a CT DMA used to generate varied PWM waveform. counter-0 and counter-1 will generate PWM output with varied duty cycle.
-  
+
 
 ## Overview
 
@@ -69,14 +72,14 @@
     - When the end of the compare value array is reached, the index wraps around to repeat the sequence.
     - The next DMA transfer is triggered for each counter.
     - CT Output-0 and Output-1 will produce a continuous varied PWM using DMA.
-  
-  
+
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
 
 - Windows PC.
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)].
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)].
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -117,12 +120,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
    #define STEP_SIZE_COUNTER_0   400          // Step size for counter0 increments
   ```
   -  Use the **Config Timer** software component in the `.slcp` project file to configure the timer from the Simplicity Studio Component Editor (UC). Search for "Config Timer" or "CT" in the software components list to add or configure this peripheral as needed for ICU or OCU DMA mode operation.
-  
+
   > ![Figure: Pin configuration](resources/uc_screen/uc_screen.png)
 
    **Note:**
   > The Config Timer supports only 16-bit counter mode, with a maximum match value of 65,535.
- 
+
 ### Pin Configuration for OCU DMA mode use case
 
 |  Discription  | GPIO    | Breakout pin  | Explorer kit Breakout pin|
@@ -134,16 +137,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Pin Configuration for INPUT EVENT mode use case
 
-|  Discription  | GPIO    | Breakout pin  | 
+|  Discription  | GPIO    | Breakout pin  |
 | ------------- | ------- | ------------- |
-|    input-0    | GPIO_25 |     P25       | 
+|    input-0    | GPIO_25 |     P25       |
 
 ### Macros for CT Configurations
 In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.c)] file, these are the following macros.
 
-- \ref SL_CT_MODE_32BIT_ENABLE_MACRO , for possible values refer \ref sl_config_timer_mode_t
-- \ref SL_COUNTER0_DIRECTION_MACRO , for possible values refer \ref sl_counter0_direction_t
-- \ref SL_COUNTER1_DIRECTION_MACRO , for possible values refer \ref sl_counter1_direction_t
+- \ref SL_CT_MODE_32BIT_ENABLE_MACRO,  for possible values refer \ref sl_config_timer_mode_t
+- \ref SL_COUNTER0_DIRECTION_MACRO,  for possible values refer \ref sl_counter0_direction_t
+- \ref SL_COUNTER1_DIRECTION_MACRO,  for possible values refer \ref sl_counter1_direction_t
 - \ref SL_COUNTER0_PERIODIC_ENABLE_MACRO, true to enable Counter0 Periodic mode & false to skip Counter0 Periodic mode.
 - \ref SL_COUNTER1_PERIODIC_ENABLE_MACRO, true to enable Counter1 Periodic mode & false to skip Counter1 Periodic mode.
 - \ref SL_COUNTER0_SYNC_TRIGGER_ENABLE_MACRO, true to enable Counter0 sync trigger & false to skip Counter0 sync trigger.
@@ -183,8 +186,8 @@ In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconn
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -1,8 +1,8 @@
-# SL ANALOG COMPARATOR
+# Platform SiWx91x ANALOG COMPARATOR
 
 ## Table of Contents
 
-- [SL ANALOG COMPARATOR](#sl-analog-comparator)
+- [Platform SiWx91x ANALOG COMPARATOR](#platform-siwx91x-analog-comparator)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -19,13 +19,16 @@
   - [Expected Results](#expected-results)
     - [For Comparator-1](#for-comparator-1)
     - [For Comparator-2](#for-comparator-2)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
 This example demonstrates analog comparator functionality. If non-inverting input voltage is greater than inverting input voltage, analog comparator output will be high and the analog comparator interrupt will hit.
 
 The following configurations are used in this example:
-  
+
 - Non-inverting input pin
 - Inverting input pin
 - Hystersis value
@@ -84,7 +87,7 @@ The following configurations are used in this example:
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -119,7 +122,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 6. If the project is built without selecting configurations, it will take default values from UC.
 
     > ![Figure: UC_Screen](resources/uc_screen/comparator_uc_screen.png)
-  
+
 ### Application Configuration Parameters
 
 - Configure the following macros in the `analog_comparator_example.c` file and update/modify following macros, if required.
@@ -129,20 +132,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   // Update '1' for using comparator1  & '2' for using comparator2
   #define ANALOG_COMPARATOR_USED     2
 
-  // Enable below macro to compare external inputs. 
-  // For this comparision select 'External input-1' as non-inverting input & 
+  // Enable below macro to compare external inputs.
+  // For this comparision select 'External input-1' as non-inverting input &
   // inverting input from UC, so both inputs will fed from GPIOs.
-  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL  ENABLE 
+  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL  ENABLE
 
-  // Enable below macro to compare external input to reference scaler output. 
-  // For this comparision select 'External input-1' as non-inverting input & 
+  // Enable below macro to compare external input to reference scaler output.
+  // For this comparision select 'External input-1' as non-inverting input &
   // select 'Reference scaler' as inverting input from UC.
-  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER  DISABLE 
+  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER  DISABLE
 
   // Enable below macro to compare external input to resistor bank output.
   // For this comparision select 'External input-1' as non-inverting input &
   // select 'Resistor bank output' as inverting input from UC.
-  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK  DISABLE 
+  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK  DISABLE
 
   // Enable below macro to compare reference scaler output to resistor bank output,
   // For this comparision select 'Resistor bank output' as non-inverting input &
@@ -181,15 +184,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   3. To compare external input to buffer output, enable macro 'COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL' and
   select 'External input-1' as non-inverting input and 'Reference buffer ouput' as inverting input from UC. The reference buffer
   will produce a fixed output of 1.2v only
-  
-    // Change below macro value to change resistor bank output voltage, 
+
+    // Change below macro value to change resistor bank output voltage,
     // for possible values see [sl_analog_comparator_threshold_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-threshold-values-t) enum present in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h) file.
-    #define THRESHOLD_VALUE 
-    // Change below macro value to change reference scaler output voltage, 
-    // for possible values see [sl_analog_comparator_scale_factor_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-scale-factor-values-t) present in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h) file. 
+    #define THRESHOLD_VALUE
+    // Change below macro value to change reference scaler output voltage,
+    // for possible values see [sl_analog_comparator_scale_factor_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-scale-factor-values-t) present in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h) file.
     #define SCALE_FACT_VAL
-    
-  
+
+
 ### Pin Configuration
 
 |917 GPIO |Explorer kit GPIO | Description|
@@ -208,17 +211,17 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 2. If 'COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL' MACRO is enabled:
    - Connect external voltage to Non-inverting input and Inverting input.
-  
+
 3. If 'COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER' MACRO is enabled :
-  
+
    - Connect external voltage to non-inverting input.
    - Inverting input will be internally connected to reference scaler output so leave it open.
-  
+
 4. If 'COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK' MACRO is enabled:
 
     - Connect external voltage to non-inverting input.
     - Inverting input will be internally connected to resister bank output so leave it open.
-  
+
 5. If 'COMPARE_POS_INPUT_RESISTOR_BANK_NEG_INPUT_REF_SCALER' MACRO is enabled:
     - Non-inverting input will be internally connected to the resistor bank output.
     - Inverting input will be internally connected to the reference scaler output.
@@ -257,11 +260,11 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ### For Comparator-2
 
-- If the voltage at the non-inverting input is greater than or equal to the voltage at the inverting input, the comparator output will go high, triggering an interrupt. This will cause ULP_GPIO_1 on the Si917 board , as long as the comparator output remains high. Additionally, the following debug prints will be observed. Use a logic analyzer to monitor the status of ULP_GPIO_1 on the Si917 board.
+- If the voltage at the non-inverting input is greater than or equal to the voltage at the inverting input, the comparator output will go high, triggering an interrupt. This will cause ULP_GPIO_1 on the SiWx91x board,  as long as the comparator output remains high. Additionally, the following debug prints will be observed. Use a logic analyzer to monitor the status of ULP_GPIO_1 on the SiWx91x board.
 
     ![Figure: Comparator2_output](resources/readme/comparator2_output1.png)
 
-- If the voltage at the non-inverting input is less than the voltage at the inverting input, the comparator output will be low, and no interrupt will be triggered. As a result, ULP_GPIO_1 on the Si917 board, and the following debug messages will appear on the console. Use a logic analyzer to monitor the status of ULP_GPIO_1 on the Si917 board.
+- If the voltage at the non-inverting input is less than the voltage at the inverting input, the comparator output will be low, and no interrupt will be triggered. As a result, ULP_GPIO_1 on the SiWx91x board, and the following debug messages will appear on the console. Use a logic analyzer to monitor the status of ULP_GPIO_1 on the SiWx91x board.
 
     ![Figure: Comparator2_output](resources/readme/comparator2_output2.png)
 
@@ -278,8 +281,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

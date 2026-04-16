@@ -429,6 +429,21 @@ sl_status_t mqtt_example()
   }
   printf("Init mqtt client Success \r\n");
 
+  sl_mqtt_client_tcp_tls_advanced_options_t mqtt_tcp_tls_opts = {
+    .tcp_keepalive_initial_time_sec   = 180,
+    .tcp_max_retry_count              = 10,
+    .max_retransmission_timeout_value = 3,
+    .ssl_ciphers_bitmap               = 0,
+    .ssl_ext_ciphers_bitmap           = 0,
+  };
+  status = sl_mqtt_client_set_tcp_tls_advanced_configuration(&client, &mqtt_tcp_tls_opts);
+  if (status != SL_STATUS_OK) {
+    printf("Failed to set MQTT TCP/TLS advanced configuration: 0x%lx\r\n", status);
+    mqtt_client_cleanup();
+    return status;
+  }
+  printf("MQTT TCP/TLS advanced configuration set \r\n");
+
 #ifdef SLI_SI91X_ENABLE_IPV6
   unsigned char hex_addr[SL_IPV6_ADDRESS_LENGTH] = { 0 };
   status                                         = sl_inet_pton6(MQTT_BROKER_IP,

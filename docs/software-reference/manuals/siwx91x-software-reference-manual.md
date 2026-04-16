@@ -191,7 +191,7 @@ In this mode, enabling the SL_SI91X_REQUIRES_INTF_PLL define will configure the 
 
 ### External Oscillator(32 kHz) Usage with UULP_GPIOs
 
-This section outlines how to utilize a 32 kHz external oscillator with UULP_GPIOs. To enable this functionality, users must install the "si91x_32kHz_external_oscillator" component, which provides the necessary configurations for the UULP_GPIOs. Additionally, this component includes a UC for selecting the appropriate UULP_GPIO. The component switches the LF-FSM clock to the internal 32 kHz RC oscillator.
+This section outlines how to utilize a 32 kHz external oscillator with UULP_GPIOs. To enable this functionality, users must install the `32kHz External Oscillator` component, which provides the necessary configurations for the UULP_GPIOs. Additionally, this component includes a UC for selecting the appropriate UULP_GPIO. The component switches the LF-FSM clock to the internal 32 kHz RC oscillator.
  
 > **Note**: 
 > - For module boards, this component will be installed by default, and for ICs, the default configuration is an external 32.768kHz XTAL available on pins XTAL_32KHz_P and XTAL_32KHz_N.
@@ -210,21 +210,21 @@ Refer to the User callback recommendation code snippet in the [Appendices](#user
 
 - By default, the 32 kHz XTAL clock source is enabled for Sleep-Timer, LF-FSM, and SysRTC on IC boards. For module boards, the Sleep-Timer and SysRTC use an External Oscillator clock, while LF-FSM operates with a 32 kHz RC clock.
 - To change the clock source:
-  - For Sleep-Timer, switch from XTAL to RC by installing the Sleep-Timer clock configuration.
+  - For Sleep-Timer, switch from XTAL to RC by installing the **Sleep Timer Clock Selection** component.
   - For SysRTC, use the UC configuration for SysRTC.
-  - For LF-FSM, install the LF-FSM clock configuration component.
+  - For LF-FSM, install the **LF-FSM Clock Selection** component.
 - For module boards, LF-FSM does not support clock source selection, because the external oscillator does not feed into the LF-FSM domain.
 
 ### 32 KHz Internal RC Calibration Component
 
-The 32 kHz RC calibration component is designed to enhance clock accuracy by reducing drift through periodic calibration. While the internal RC oscillator is functional, it does not provide the precision required for peripherals dependent on the Low-Frequency FSM (LF-FSM). Installing this component improves clock accuracy, ensuring an error margin of no more than 500 PPM.
+The **32KHZ RC Calibration** component is designed to enhance clock accuracy by reducing drift through periodic calibration. While the internal RC oscillator is functional, it does not provide the precision required for peripherals dependent on the Low-Frequency FSM (LF-FSM). Installing this component improves clock accuracy, ensuring an error margin of no more than 500 PPM.
 
 The calibration process is performed periodically to maintain sustained accuracy over time. The calendar alarm peripheral serves a dual purpose by managing both periodic calibration triggers and standard alarm events. An intelligent algorithm determines the next trigger, categorizing interrupts as either calibration events or alarm events using flags. This implementation is seamlessly integrated into the primary functionality of the calendar alarm without causing interference.
 
 Pre-requisites for installing the 32 kHz RC calibration component are as follows:
 
-- For IC Boards: Users must configure the LF-FSM clock as internal 32 kHz RC clock. To achieve this, install the SL_SI91X_LF_FSM_CLOCK_SELECTION software component and update the LF-FSM to operate using the 32 kHz RC clock prior to installing the RC calibration component.
-- For Module Boards: The internal 32 KHz RC Clock is fed to the LF-FSM by default. The user can directly install the 32 KHz RC calibration component to enable the calibration.
+- For IC Boards: Users must configure the LF-FSM clock as internal 32 kHz RC clock. To achieve this, install the **LF-FSM Clock Selection** component and update the LF-FSM to operate using the 32 kHz RC clock prior to installing the RC calibration component.
+- For Module Boards: The internal 32 KHz RC Clock is fed to the LF-FSM by default. The user can directly install the **32KHZ RC Calibration** component to enable the calibration.
 
 ##### Notes: (Applicable only when the 32kHz RC calibration is enabled)
 - When 32 kHz RC calibration is enabled, the M4 is active for 7.11 milliseconds every 30 minutes, consuming a current of 8.75 milliamperes.
@@ -398,14 +398,14 @@ The following table describes the front-end switch selection for the SiWx917.
 - Select the appropriate power state based on the application's power consumption and performance requirements.
 - Use sleep states to conserve energy when the system is idle.
 - For any wakeup source, ensure the corresponding peripheral component is installed in powersave applications
-- SYSRTC and wake on wireless wakeup resources are enabled by default when tickeless idle mode is enabled. Avoid installing sleeptimer component in power save applications (where FreeRTOS tickless is enabled by default)
+- SYSRTC and wake on wireless wakeup resources are enabled by default when tickeless idle mode is enabled. Avoid installing **Sleep Timer** component in power save applications (where FreeRTOS tickless is enabled by default).
 
 ### Notes
 - After reset, the processor starts in PS4 state which is the highest activity state where the full functionality is available. The other Active states (PS2/PS3) will have limited functionality or processing power.
 
 ## Configuring M4 PS1 State in FreeRTOS Tickless Idle Mode
 - The SiWx917 SoC supports the M4 PS1 state in FreeRTOS Tickless Idle mode. 
-- To enable this functionality, the user must integrate the Power Manager component along with the appropriate ULP peripheral component into the application. 
+- To enable this functionality, the user must integrate the **Power Manager** component along with the appropriate ULP peripheral component into the application. 
 - The PS1 state does not support the UULP wakeup source.
 - The following ULP peripherals are supported in the PS1 state:
 
@@ -562,8 +562,8 @@ For more detailed information about NVM3, refer to [Third Generation NonVolatile
 
 2. **Select Software Components:**
    - In the `.slcp` file, go to the "SOFTWARE COMPONENTS" tab.
-   - Enter "nvm3 for si91x" in the search bar.
-   - Select "NVM3 for Si91x" from the search results and click "Install".
+   - Enter "NVM3" in the search bar.
+   - Select **NVM3** from the search results and click "Install".
 
    ![NVM3 component install](./resources/NVM3_select_and_install.png)
 
@@ -634,7 +634,7 @@ The IO Stream module is a software platform component that facilitates input and
 
 2. **Select Software Components:**
    - In the `.slcp` file, go to the "SOFTWARE COMPONENTS" tab.
-   - Enter "IOSTREAM" in the search bar.
+   - Enter **IO Stream** in the search bar.
    - Select required IOSTREAM component from the search results and click "Install".
 
    ![IOSTREAM component install](./resources/IOSTREAM_select_and_install.png)
@@ -650,7 +650,7 @@ The IO Stream module is a software platform component that facilitates input and
 2. For using other IOSTREAM add any of the following ```iostream_swo_si91x``` , ```iostream_vuart_si91x``` , ```iostream_debug_si91x``` .
 
 **Using IOSTREAM for prints:**
-1. To use IOSTREAM for printf or DEBUGOUT install component "SI91X IOSTREAM LOG".
+1. To use IOSTREAM for printf or DEBUGOUT install component **IO Stream Log**.
 
   ![IOSTREAM LOG stream select](./resources/IOSTREAM_select_log_stream.png)
 
@@ -659,21 +659,24 @@ The IO Stream module is a software platform component that facilitates input and
   ![IOSTREAM LOG config](./resources/IOSTREAM_LOG_config.png)  
 
 > **Note:** 
-> 1. Ensure that the corresponding IOSTREAM component for your selected interface is installed.
-> 2. IOSTREAM LOG does not support UART. To use `printf` or `DEBUGOUT` with UART, please refer to the IOSTREAM USART example.
+> 1. Ensure that the corresponding IO Stream component for your selected interface is installed.
+> 2. **IO Stream Log** does not support UART. To use `printf` or `DEBUGOUT` with UART, please refer to the IO Stream USART example.
 
 **IOSTREAM usage in Si91x:**
 
 1. Use  ```sl_iostream_write(sl_iostream_t *stream,const void *buffer,size_t buffer_length)``` api to write to a IOSTREAM.
 2. Use  ```sl_iostream_read(sl_iostream_t *stream,void *buffer,size_t buffer_length,size_t *bytes_read)``` api to read from a IOSTREAM.
-3. If multiple IOSTREAM components are installed IOSTREAM LOG can be used for selecting which IOSTREAM to use.
+3. If multiple IOSTREAM components are installed, **IO Stream Log** can be used for selecting which IOSTREAM to use.
 
 > **Note:**
 > 1. For more information on how use above IOSTREAM apis refere to IOSTREAM USART BAREMETAL example.
-> 2. IOSTREAM VUART , IOSTREAM debug has limited support.
+> 2. **IO Stream VUART** and **IO Stream Debug** have limited support.
 
 
 ### SLEEP-Timer
+
+The Sleep Timer service component is listed in Software Components as **Sleep Timer**. Clock source selection for the Sleep Timer uses **Sleep Timer Clock Selection**, as described under **32 kHz Clock Configurations** above.
+
 #### Understanding the Use of OS-Timer instead of Sleep-Timer in Tick-less Mode 
 - When FreeRTOS operates in TICKLESS-MODE (low-power mode), the core enters a sleep state, and the OS runs using the sleep timer service instead of the usual SYSTICK timer. This is because the SYSTICK timer stops functioning when the core is a sleep, while the SYSRTC driver continues to run. The SYSRTC is configured as the wake-up source for the core, meaning it will trigger the core to wake up after the specified time has elapsed.
 
@@ -708,8 +711,8 @@ To configure and use the Watchdog Timer Manager, follow these steps:
 
 2. **Select Software Components**:
    - In the `.slcp` file, go to the "SOFTWARE COMPONENTS" tab.
-   - Enter "WDT Manager" in the search bar.
-   - Select "WDT Manager" from the search results and click "Install".
+   - Enter **WDT Manager** in the search bar.
+   - Select **WDT Manager** from the search results and click "Install".
 
    ![WDT Manager Configuration](./resources/WDT_select_and_install.png)
 

@@ -1,8 +1,8 @@
-# SL GPIO DETAILED
+# Platform SiWx91x GPIO DETAILED EXAMPLE
 
 ## Table of Contents
 
-- [SL GPIO DETAILED](#sl-gpio-detailed)
+- [Platform SiWx91x GPIO DETAILED EXAMPLE](#platform-siwx91x-gpio-detailed-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -16,6 +16,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -29,7 +32,7 @@ This application demonstrates the toggling of a High-Power (HP) instance GPIO at
   - **UULP (Ultra Ultra Low Power) Instance:** Controls the UULP GPIOs (UULP_GPIO_n; n=0 to 4).
 - HP and ULP Instance have the same features and functionality except for different base address.
 - Each port in the HP Domain supports a maximum of 16 GPIO pins, with a total of four ports (SL_GPIO_PORT_A, SL_GPIO_PORT_B, SL_GPIO_PORT_C, SL_GPIO_PORT_D).
-- The ULP GPIO Domain has only one port (SL_GPIO_ULP_PORT) with a maximum of 12 pins.  
+- The ULP GPIO Domain has only one port (SL_GPIO_ULP_PORT) with a maximum of 12 pins.
 - Similarly, the UULP GPIO Domain has only one port (SL_GPIO_UULP_PORT) with a maximum of 5 pins.
 
   > **Note:** Note that GPIO_n (n=0:5) are dedicated for the Secure Zone Processor's Flash interface. The MCU should NOT be changing any configuration related to these GPIOs under any circumstances since it may lead to the Flash content being corrupted, rendering the chip unusable. This is applicable to MCU HP EGPIO Instance.
@@ -40,7 +43,7 @@ This application demonstrates the toggling of a High-Power (HP) instance GPIO at
  The table below explains the Port and Pin selections for different instances:
 
 |  GPIO Instance                 |    GPIO Port      |  GPIO Pin Number  |
-|--------------------------------|-------------------|-------------------|  
+|--------------------------------|-------------------|-------------------|
 |                                |  SL_GPIO_PORT_A   |   (6-15)          |
 | HP GPIO Instance               |  SL_GPIO_PORT_B   |   (16-31)         |
 |                                |  SL_GPIO_PORT_C   |   (32-47)         |
@@ -84,17 +87,17 @@ This application demonstrates the toggling of a High-Power (HP) instance GPIO at
 
 >**Note:** Do not enable PAD selection number 9, as it is pre-configured for another function.
 
->**Note:** 
+>**Note:**
 Default High Configuration:
 To ensure the pin defaults to high after being set as output, you should set the pin value in Bit Load register using [sl_gpio_driver_set_pin()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio#sl_gpio_driver_set_pin). before setting/changing its configuration.This prevents unintended glitches or low states during the transition.
 
 
 The following table lists the GPIO examples available and their functionality:
 
-  |  GPIO Examples        |    GPIO Functionality                              |  
-  |-----------------------|----------------------------------------------------|  
+  |  GPIO Examples        |    GPIO Functionality                              |
+  |-----------------------|----------------------------------------------------|
   | gpio_detailed_example | Demonstrates GPIO toggle and supported APIs        |
-  | gpio_example          |  Demonstrates HP GPIO pin interrupt                |  
+  | gpio_example          |  Demonstrates HP GPIO pin interrupt                |
   | gpio_group_example    | Demonstrates HP, ULP  GPIO group interrupts        |
   | gpio_ulp_example      |  Demonstrates GPIO toggle and ULP  pin interrupt   |
   | gpio_uulp_example     | Demonstrates UULP  pin interrupt                   |
@@ -113,7 +116,7 @@ Use [sl_gpio_set_configuration()](https://docs.silabs.com/wiseconnect/latest/wis
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -156,7 +159,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 1. Compile and run the application.
 2. By default, GPIO10(LED1) should be toggled for SiWx917.
-3. Connect the logic analyzer to GPIO_10 (pin F11) for the Si917 on the WPK board to observe the toggle state.
+3. Connect the logic analyzer to GPIO_10 (pin F11) for the SiWx91x on the WPK board to observe the toggle state.
 4. After successful program execution, the prints in serial console looks as shown below.
 
   ![Figure: output](resources/readme/output.png)
@@ -175,8 +178,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

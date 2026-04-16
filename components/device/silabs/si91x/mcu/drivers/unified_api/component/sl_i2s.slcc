@@ -39,6 +39,7 @@ requires:
   - name: udma_linker_config
   - name: rsilib_i2s
   - name: cmsis_sai
+  - name: log_none
 documentation:
     docset: wiseconnect
     document: wiseconnect-api-reference-guide-si91x-peripherals/i2-s

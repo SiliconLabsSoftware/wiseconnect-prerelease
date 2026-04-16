@@ -45,6 +45,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #if (SL_SI91X_TICKLESS_MODE == 1)
 #include "sl_si91x_m4_ps.h"
 #endif
+
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
+
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 //  <o>Minimal stack size [words] <0-65535>
 //  <i> Stack for idle task and default task stack in words.
@@ -347,5 +352,9 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 /* The platform FreeRTOS is running on. */
 #define configPLATFORM_NAME "Si917_SoC"
+
+#if defined(SL_CATALOG_LOG_BACKEND_SYSTEMVIEW_PRESENT)
+#include "SEGGER_SYSVIEW_FreeRTOS.h"
+#endif
 
 #endif /* FREERTOS_CONFIG_H */

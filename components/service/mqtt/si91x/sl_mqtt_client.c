@@ -41,6 +41,7 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi_utility.h"
 #include "sl_rsi_utility.h"
+#include "sl_log_helper_si91x.h"
 
 /**
  * MQTT CLIENT STATE MACHINE
@@ -229,7 +230,7 @@ static void sli_si91x_get_subscription(const sl_mqtt_client_t *client,
 static void sli_si91x_remove_and_free_all_subscriptions(sl_mqtt_client_t *client)
 {
   if (client == NULL) {
-    SL_DEBUG_LOG("MQTT client instance not initialized yet\n");
+    SL_DEBUG_LOG_V2(INFO, "MQTT client instance not initialized yet\n");
     return;
   }
   // Free subscription list.
@@ -418,6 +419,16 @@ static sl_status_t sli_si91x_send_firmware_mqtt_init(const sl_mqtt_client_t *cli
     si91x_init_request.password_len = (credentials->password_length);
   }
 
+  if (client->tcp_options_configured) {
+    si91x_init_request.tcp_keepalive_initial_time_sec = client->tcp_options.tcp_keepalive_initial_time_sec;
+    si91x_init_request.tcp_max_retry_count            = client->tcp_options.tcp_max_retry_count;
+#ifdef SLI_SI917
+    si91x_init_request.tcp_max_retransmission_cap_for_emb_mqtt = client->tcp_options.max_retransmission_timeout_value;
+#endif
+    si91x_init_request.ssl_ciphers_bitmap     = client->tcp_options.ssl_ciphers_bitmap;
+    si91x_init_request.ssl_ext_ciphers_bitmap = client->tcp_options.ssl_ext_ciphers_bitmap;
+  }
+
   return sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
                                SLI_SI91X_NETWORK_CMD,
                                &si91x_init_request,
@@ -429,7 +440,11 @@ static sl_status_t sli_si91x_send_firmware_mqtt_init(const sl_mqtt_client_t *cli
 
 sl_status_t sl_mqtt_client_init(sl_mqtt_client_t *client, sl_mqtt_client_event_handler_t event_handler)
 {
+  SL_VERIFY_POINTER_OR_RETURN(client, SL_STATUS_WIFI_NULL_PTR_ARG);
   SL_VERIFY_POINTER_OR_RETURN(event_handler, SL_STATUS_WIFI_NULL_PTR_ARG);
+
+  // Initialize client structure to zero to ensure tcp_options_configured is false
+  memset(client, 0, sizeof(sl_mqtt_client_t));
 
   client->client_event_handler = event_handler;
   sl_slist_init((sl_slist_node_t **)&client->subscription_list_head);
@@ -564,13 +579,14 @@ static sl_status_t sli_mqtt_client_connect(sl_mqtt_client_t *client,
     return status;
   } else if (status != SL_STATUS_OK) {
     if (client->state == SL_MQTT_CLIENT_DISCONNECTED || status == SL_STATUS_SI91X_COMMAND_ISSUED_IN_REJOIN_STATE) {
-      SL_DEBUG_LOG("\r\nWLAN disconnected. No need to call the disconnect again.\r\n");
+      SL_DEBUG_LOG_V2(INFO, "\r\nWLAN disconnected. No need to call the disconnect again.\r\n");
       return status;
     }
     client->state = SL_MQTT_CLIENT_CONNECTION_FAILED;
     status        = sl_mqtt_client_disconnect(client, SI91X_MQTT_CLIENT_DISCONNECT_TIMEOUT);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG(
+      SL_DEBUG_LOG_V2(
+        INFO,
         "Failed to disconnect the client after failed connection attempt. User needs to call disconnect explicitly.");
     }
     SL_CLEANUP_MALLOC(sdk_context);
@@ -934,7 +950,8 @@ static void sli_si91x_handle_connected_event(sl_status_t status,
   disconnection_status = sl_mqtt_client_disconnect(sdk_context->client, SI91X_MQTT_CLIENT_DISCONNECT_TIMEOUT);
 
   if (disconnection_status != SL_STATUS_OK) {
-    SL_DEBUG_LOG(
+    SL_DEBUG_LOG_V2(
+      INFO,
       "Failed to disconnect the client after failed connection attempt. User needs to call disconnect explicitly.");
   } else {
     sdk_context->client->state = SL_MQTT_CLIENT_DISCONNECTED;
@@ -983,7 +1000,7 @@ static void sli_si91x_handle_message_received_event(sl_status_t status,
   // Note: When firmware sends an error, rx_packet->data does not contain valid MQTT message data,
   // and no further chunks will be sent for this message.
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("MQTT message received with error status: 0x%lx, dropping message", status);
+    SL_DEBUG_LOG_V2(ERROR, "MQTT message received with error status: 0x%lX, dropping message", (unsigned long)status);
 
     // Reset any in-progress reassembly state (firmware won't send more chunks after error)
     sli_si91x_mqtt_reset_reassembly_state();
@@ -1052,10 +1069,11 @@ static void sli_si91x_handle_subsequent_chunk(sl_si91x_mqtt_client_context_t *sd
 
   // Validate buffer overflow protection
   if ((mqtt_rx_reassembly.bytes_received + current_chunk_length) > mqtt_rx_reassembly.total_length) {
-    SL_DEBUG_LOG("MQTT reassembly: Buffer overflow detected (received %lu + %u > total %lu)",
-                 mqtt_rx_reassembly.bytes_received,
-                 current_chunk_length,
-                 mqtt_rx_reassembly.total_length);
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "MQTT reassembly: Buffer overflow (recv %lu + %u > total %lu)",
+                    mqtt_rx_reassembly.bytes_received,
+                    current_chunk_length,
+                    mqtt_rx_reassembly.total_length);
     sli_si91x_mqtt_reset_reassembly_state();
     if (more_data_expected) {
       mqtt_rx_reassembly.discard_in_progress = true;
@@ -1078,9 +1096,10 @@ static void sli_si91x_handle_subsequent_chunk(sl_si91x_mqtt_client_context_t *sd
   if (!more_data_expected) {
     // Verify we received the expected total bytes before delivering
     if (mqtt_rx_reassembly.bytes_received != mqtt_rx_reassembly.total_length) {
-      SL_DEBUG_LOG("MQTT reassembly: Incomplete payload (received %lu bytes, expected %lu bytes)",
-                   mqtt_rx_reassembly.bytes_received,
-                   mqtt_rx_reassembly.total_length);
+      SL_DEBUG_LOG_V2(DEBUG,
+                      "MQTT reassembly: Incomplete payload (recv %lu, expected %lu)",
+                      mqtt_rx_reassembly.bytes_received,
+                      mqtt_rx_reassembly.total_length);
       sli_si91x_mqtt_reset_reassembly_state();
 
       sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED;
@@ -1109,7 +1128,7 @@ static void sli_si91x_handle_subsequent_chunk(sl_si91x_mqtt_client_context_t *sd
                                &subscription);
 
     if (subscription == NULL) {
-      SL_DEBUG_LOG("Unable to find subscription: Dropping reassembled MQTT message");
+      SL_DEBUG_LOG_V2(INFO, "Unable to find subscription: Dropping reassembled MQTT message");
     } else {
       subscription->topic_message_handler(sdk_context->client, &received_message, sdk_context->user_context);
     }
@@ -1148,7 +1167,7 @@ static void sli_si91x_handle_single_message(sl_si91x_mqtt_client_context_t *sdk_
   sli_si91x_get_subscription(sdk_context->client, received_message.topic, received_message.topic_length, &subscription);
 
   if (subscription == NULL) {
-    SL_DEBUG_LOG("Unable to find subscription: Dropping MQTT message handling");
+    SL_DEBUG_LOG_V2(INFO, "Unable to find subscription: Dropping MQTT message handling");
   } else {
     subscription->topic_message_handler(sdk_context->client, &received_message, sdk_context->user_context);
   }
@@ -1175,7 +1194,7 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
 
   // Validate total_length is non-zero (required for fragmented messages)
   if (total_length == 0) {
-    SL_DEBUG_LOG("MQTT reassembly: Invalid total_length (0) with MORE_DATA flag set - firmware error");
+    SL_DEBUG_LOG_V2(ERROR, "MQTT reassembly: Invalid total_length (0) with MORE_DATA - firmware error");
     // Enter discard mode to properly handle subsequent chunks
     // Without this, subsequent chunks would be incorrectly parsed as first-chunk format
     mqtt_rx_reassembly.discard_in_progress = true;
@@ -1191,10 +1210,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
 
   // Validate total_length does not exceed configured maximum
   if (total_length > SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE) {
-    SL_DEBUG_LOG("MQTT reassembly: Payload size %lu exceeds configured max %u. "
-                 "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE or reduce message size.",
-                 total_length,
-                 SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE);
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "MQTT reassembly: Payload %lu exceeds max %u",
+                    total_length,
+                    SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE);
 
     // Set discard flags before callback - callback may trigger disconnect which resets state
     mqtt_rx_reassembly.discard_in_progress = true;
@@ -1210,9 +1229,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
 
   // Validate topic_length does not exceed maximum allowed topic length
   if (topic_length >= SI91X_MQTT_CLIENT_TOPIC_MAXIMUM_LENGTH) {
-    SL_DEBUG_LOG("MQTT reassembly: Topic length %u exceeds maximum %u",
-                 topic_length,
-                 SI91X_MQTT_CLIENT_TOPIC_MAXIMUM_LENGTH);
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "MQTT reassembly: Topic length %u exceeds maximum %u",
+                    topic_length,
+                    SI91X_MQTT_CLIENT_TOPIC_MAXIMUM_LENGTH);
 
     mqtt_rx_reassembly.discard_in_progress = true;
     mqtt_rx_reassembly.in_progress         = true;
@@ -1228,9 +1248,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
   // Validate first chunk doesn't exceed total_length
   // This guards against corrupted firmware packets and prevents unnecessary allocations
   if (current_chunk_length > total_length) {
-    SL_DEBUG_LOG("MQTT reassembly: First chunk length %u exceeds total length %lu - firmware error",
-                 current_chunk_length,
-                 total_length);
+    SL_DEBUG_LOG_V2(ERROR,
+                    "MQTT reassembly: First chunk %u exceeds total %lu - firmware error",
+                    current_chunk_length,
+                    total_length);
     mqtt_rx_reassembly.discard_in_progress = true;
     mqtt_rx_reassembly.in_progress         = true;
 
@@ -1247,7 +1268,7 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
   uint32_t combined_buffer_size = topic_length + total_length;
   uint8_t *combined_buffer      = (uint8_t *)malloc(combined_buffer_size);
   if (combined_buffer == NULL) {
-    SL_DEBUG_LOG("MQTT reassembly: Failed to allocate buffer of %lu bytes", combined_buffer_size);
+    SL_DEBUG_LOG_V2(ERROR, "MQTT reassembly: Failed to allocate buffer of %lu bytes", combined_buffer_size);
 
     // Set discard flags before callback - callback may trigger disconnect which resets state
     mqtt_rx_reassembly.discard_in_progress = true;
@@ -1279,8 +1300,9 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
 #else
   UNUSED_PARAMETER(message);
   // Large payload support disabled - notify application and start discarding
-  SL_DEBUG_LOG("MQTT reassembly: Large payload support disabled (SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE=0). "
-               "Enable by setting SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE > 0");
+  SL_DEBUG_LOG_V2(INFO,
+                  "MQTT reassembly: Large payload support disabled (SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE=0). "
+                  "Enable by setting SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE > 0");
 
   mqtt_rx_reassembly.discard_in_progress = true;
   mqtt_rx_reassembly.in_progress         = true;
@@ -1340,8 +1362,7 @@ static void sli_si91x_handle_disconnected_event(sl_status_t status,
     // NWP requires deinit call if remote termination is received.
     // If the disconnect call fails, we can't set the state to disconnected.
     if (disconnection_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG(
-        "Failed to disconnect the client after remote termination. User needs to call disconnect explicitly");
+      SL_DEBUG_LOG_V2(INFO, "Failed to disconnect after remote termination; call disconnect explicitly");
       return;
     }
 
@@ -1371,7 +1392,7 @@ static void sli_si91x_handle_disconnected_event(sl_status_t status,
 void sli_mqtt_client_cleanup()
 {
   if (mqtt_client == NULL) {
-    SL_DEBUG_LOG("MQTT client instance not initialized yet\n");
+    SL_DEBUG_LOG_V2(DEBUG, "MQTT client instance not initialized yet\n");
     return;
   }
 
@@ -1439,4 +1460,16 @@ sl_status_t sl_mqtt_client_connect_v2(sl_mqtt_client_t *client,
     free(legacy_broker_ptr);
   }
   return status;
+}
+
+sl_status_t sl_mqtt_client_set_tcp_tls_advanced_configuration(sl_mqtt_client_t *client,
+                                                              const sl_mqtt_client_tcp_tls_advanced_options_t *options)
+{
+  SL_VERIFY_POINTER_OR_RETURN(client, SL_STATUS_WIFI_NULL_PTR_ARG);
+  SL_VERIFY_POINTER_OR_RETURN(options, SL_STATUS_WIFI_NULL_PTR_ARG);
+
+  client->tcp_options            = *options;
+  client->tcp_options_configured = true;
+
+  return SL_STATUS_OK;
 }

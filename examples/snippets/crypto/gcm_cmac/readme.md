@@ -1,8 +1,8 @@
-# Crypto - GCM_CMAC
+# Platform SiWx91x Crypto - GCM_CMAC
 
 ## Table of Contents
 
-- [Crypto - GCM\_CMAC](#crypto---gcm_cmac)
+- [Platform SiWx91x Crypto - GCM_CMAC](#platform-siwx91x-crypto---gcm_cmac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -17,7 +17,7 @@
   - [Application Output](#application-output)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -48,7 +48,7 @@ This application demonstrates the following:
 
 Refer the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-- Install Studio and WiSeConnectxtension
+- Install Studio and WiSeConnect extension
 - Connect your device to the computer
 - Upgrade your connectivity firmware
 - Create a Studio project
@@ -108,6 +108,6 @@ For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.
 - [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

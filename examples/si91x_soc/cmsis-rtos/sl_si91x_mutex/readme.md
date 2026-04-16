@@ -1,8 +1,8 @@
-# SL MUTEX EXAMPLE
+# Platform SiWx91x RTOS Mutex
 
 ## Table of Contents
 
-- [SL MUTEX EXAMPLE](#sl-mutex-example)
+- [Platform SiWx91x RTOS Mutex](#platform-siwx91x-rtos-mutex)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -13,6 +13,9 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -31,7 +34,7 @@
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A]
+- Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002) + BRD4338A]
 
 ### Software Requirements
 
@@ -58,8 +61,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Configure the following parameter in [`blinky.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_mutex/src/blinky.c) file, update/modify following macro if required.
 
   ```C
-    #define TOGGLE_DELAY_MS 500//  configured for 500 ms   
-  ```   
+    #define TOGGLE_DELAY_MS 500//  configured for 500 ms
+  ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -82,8 +85,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -1479,6 +1479,10 @@ sl_status_t sl_wifi_reschedule_twt(uint8_t flow_id,
 /***************************************************************************/ /**
  * @brief
  *   Send Filter Broadcast Request frame.
+ * @deprecated
+ *   Deprecated as of WiSeConnect SDK 4.1.0. Use @ref sl_wifi_set_groupcast_filter_config for
+ *   broadcast/multicast filtering options and @ref sl_wifi_set_beacon_drop_threshold for the
+ *   beacon drop threshold; see product documentation for migration from TIM-related fields.
  * @pre Pre-conditions:
  * -
  *   @ref sl_wifi_init should be called before this API.
@@ -1491,10 +1495,81 @@ sl_status_t sl_wifi_reschedule_twt(uint8_t flow_id,
  *   1 - filter_bcast_in_tim is valid till next update by giving the same command.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_set_groupcast_filter_config](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-set-groupcast-filter-config) and [sl_wifi_set_beacon_drop_threshold](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-set-beacon-drop-threshold) APIs.
  ******************************************************************************/
 sl_status_t sl_wifi_filter_broadcast(uint16_t beacon_drop_threshold,
                                      uint8_t filter_bcast_in_tim,
-                                     uint8_t filter_bcast_tim_till_next_cmd);
+                                     uint8_t filter_bcast_tim_till_next_cmd) SL_DEPRECATED_API_WISECONNECT_4_1;
+
+/***************************************************************************/ /**
+ * @brief
+ *   Configure broadcast and multicast filtering on the station interface.
+ * @pre Pre-conditions:
+ * -
+ *   @ref sl_wifi_init should be called before this API.
+ * @param[in] config
+ *   Filter enables and mode. See @ref sl_wifi_groupcast_filter_config_t.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_set_groupcast_filter_config(const sl_wifi_groupcast_filter_config_t *config);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Add an IP multicast address to the NWP allowlist. Returns a handle for later removal.
+ * @pre Pre-conditions:
+ * -
+ *   @ref sl_wifi_init should be called before this API.
+ * @param[in] ip_address
+ *   IPv4 or IPv6 multicast address to allow.
+ * @param[out] id
+ *   On success, opaque handle returned by firmware.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_allowlist_mcast_add_ip(const sl_ip_address_t *ip_address, sl_ip_address_handle_t *id);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Remove one multicast allowlist entry by handle.
+ * @pre Pre-conditions:
+ * -
+ *   @ref sl_wifi_init should be called before this API.
+ * @param[in] id
+ *   Handle returned by @ref sl_wifi_allowlist_mcast_add_ip.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_allowlist_mcast_remove_ip(sl_ip_address_handle_t id);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Clear the multicast IP allowlist.
+ * @pre Pre-conditions:
+ * -
+ *   @ref sl_wifi_init should be called before this API.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_allowlist_mcast_remove_all(void);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Set the beacon drop threshold used for power save (NWP advanced configuration).
+ *   For migration, this supersedes the beacon threshold aspect of deprecated @ref sl_wifi_filter_broadcast;
+ *   TIM-related broadcast filtering is configured separately via @ref sl_wifi_set_groupcast_filter_config.
+ * @pre Pre-conditions:
+ * -
+ *   @ref sl_wifi_init should be called before this API.
+ * @param[in] interface
+ *   Client interface that is up and matches the active band configuration.
+ * @param[in] beacon_drop_threshold
+ *   Threshold value; valid range is product- and firmware-specific.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_set_beacon_drop_threshold(sl_wifi_interface_t interface, uint16_t beacon_drop_threshold);
 
 /***************************************************************************/ /**
  * @brief
@@ -1524,6 +1599,9 @@ sl_status_t sl_wifi_get_pairwise_master_key(sl_wifi_interface_t interface,
 /***************************************************************************/ /**
  * @brief
  *   Configure multicast filter parameters. This is a blocking API.
+ * @deprecated
+ *   Deprecated as of WiSeConnect SDK 4.1.0. Use @ref sl_wifi_set_groupcast_filter_config and the
+ *   multicast IP allowlist APIs (@ref sl_wifi_allowlist_mcast_add_ip and related) as described in product documentation.
  * @pre Pre-conditions:
  * - 
  *   @ref sl_wifi_init should be called before this API.
@@ -1531,8 +1609,11 @@ sl_status_t sl_wifi_get_pairwise_master_key(sl_wifi_interface_t interface,
  *   Configurable multicast filter parameters specified in @ref sl_wifi_multicast_filter_info_t.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_set_groupcast_filter_config](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-set-groupcast-filter-config) API and the multicast IP allowlist APIs (for example [sl_wifi_allowlist_mcast_add_ip](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-allowlist-mcast-add-ip)).
  ******************************************************************************/
-sl_status_t sl_wifi_configure_multicast_filter(sl_wifi_multicast_filter_info_t *multicast_filter_info);
+sl_status_t sl_wifi_configure_multicast_filter(sl_wifi_multicast_filter_info_t *multicast_filter_info)
+  SL_DEPRECATED_API_WISECONNECT_4_1;
 
 /** @} */
 
@@ -1986,6 +2067,24 @@ sl_status_t sl_wifi_stop_wps(sl_wifi_interface_t interface);
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  ******************************************************************************/
 sl_status_t sl_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_statistics_t *statistics);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Return Wi-Fi extended statistics (v2), including broadcast/multicast filtering counters.
+ * @pre Pre-conditions:
+ * -
+ *   @ref sl_wifi_init should be called before this API.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[out] statistics
+ *   @ref sl_wifi_statistics_v2_t object that contains Wi-Fi statistics.
+ * @note
+ *   NWP must return a response payload whose length matches @ref sl_wifi_statistics_v2_t for this API.
+ * @todo Move to internal API: this public function is not intended to remain on the public surface long-term.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_get_statistics_v2(sl_wifi_interface_t interface, sl_wifi_statistics_v2_t *statistics);
 
 /***************************************************************************/ /**
  * @brief

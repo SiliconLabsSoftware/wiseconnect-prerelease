@@ -1,8 +1,8 @@
-# SL GPIO UULP EXAMPLE
+# Platform SiWx91x GPIO UULP EXAMPLE
 
 ## Table of Contents
 
-- [SL GPIO UULP EXAMPLE](#sl-gpio-uulp-example)
+- [Platform SiWx91x GPIO UULP EXAMPLE](#platform-siwx91x-gpio-uulp-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -16,6 +16,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -29,8 +32,8 @@
   - UULP (Ultra Ultra Low Power) Instance: Controls the UULP GPIOs (UULP_GPIO_n; n=0 to 4).
 - HP and ULP Instance have same features and functionality except for different base address.
 - Each port in the HP domain supports a maximum of 16 GPIO pins, with a total of four ports (SL_GPIO_PORT_A, SL_GPIO_PORT_B, SL_GPIO_PORT_C, SL_GPIO_PORT_D).
-- The ULP GPIO domain has only one port (SL_GPIO_ULP_PORT) with a maximum of 12 pins.  
-- Similarly, the UULP GPIO domain has only one port (SL_GPIO_UULP_PORT) with a maximum of 5 pins. 
+- The ULP GPIO domain has only one port (SL_GPIO_ULP_PORT) with a maximum of 12 pins.
+- Similarly, the UULP GPIO domain has only one port (SL_GPIO_UULP_PORT) with a maximum of 5 pins.
 
   > **Note:** Please note that GPIO_n (n=0:5) are dedicated for the Secure Zone Processor's Flash interface. The MCU should NOT be changing any configuration related to these GPIOs under any circumstances since it may lead to the Flash content being corrupted, rendering the chip unusable. This is applicable to MCU HP EGPIO Instance.
 
@@ -40,25 +43,25 @@
  The table below explains the Port and Pin selection for different instances:
 
 |  GPIO Instance                 |    GPIO Port      |  GPIO Pin Number  |
-|--------------------------------|-------------------|-------------------|  
+|--------------------------------|-------------------|-------------------|
 |                                |  SL_GPIO_PORT_A   |   (6-15)          |
 | HP GPIO Instance               |  SL_GPIO_PORT_B   |   (16-31)         |
-|                                |  SL_GPIO_PORT_C   |   (32-47)         | 
+|                                |  SL_GPIO_PORT_C   |   (32-47)         |
 |                                |  SL_GPIO_PORT_D   |   (48-57)         |
 | ULP GPIO Instance              |  SL_GPIO_ULP_PORT |   (0-11)          |
 | UULP GPIO Instance             | SL_GPIO_UULP_PORT |   (0-4)           |
-| | | 
+| | |
 
 **NOTE** : There is also option to select (0-57)pins with SL_GPIO_PORT_A. For example, to select HP GPIO pin number 49, one can select Port as SL_GPIO_PORT_A and pin number as 49. This option is given only when SL_GPIO_PORT_A GPIO port is selected. (57-63)pins are reserved.
 
 >**NOTE** : For reference on how to select Port and Pin number for different instances, please see the following points:
 >
->- To select HP GPIO pin number 16 for usage, Select Port as SL_GPIO_PORT_B and Pin number as 0. 
->- To select HP GPIO pin number 31 for usage, Select Port as SL_GPIO_PORT_B and Pin number as 15. 
->- To select HP GPIO pin number 33 for usage, Select Port as SL_GPIO_PORT_C and Pin number as 1. 
->- To select HP GPIO pin number 56 for usage, Select Port as SL_GPIO_PORT_D and Pin number as 14. 
->- To select ULP  GPIO pin number 10 for usage, Select Port as SL_GPIO_ULP_PORT and Pin number as 10. 
->- To select UULP  GPIO pin number 2 for usage, Select Port as SL_GPIO_UULP_PORT and Pin number as 2. 
+>- To select HP GPIO pin number 16 for usage, Select Port as SL_GPIO_PORT_B and Pin number as 0.
+>- To select HP GPIO pin number 31 for usage, Select Port as SL_GPIO_PORT_B and Pin number as 15.
+>- To select HP GPIO pin number 33 for usage, Select Port as SL_GPIO_PORT_C and Pin number as 1.
+>- To select HP GPIO pin number 56 for usage, Select Port as SL_GPIO_PORT_D and Pin number as 14.
+>- To select ULP  GPIO pin number 10 for usage, Select Port as SL_GPIO_ULP_PORT and Pin number as 10.
+>- To select UULP  GPIO pin number 2 for usage, Select Port as SL_GPIO_UULP_PORT and Pin number as 2.
 
 - Please refer to the following APIs which are common for all 3 instances and are differentiated based on Port and Pin:
 
@@ -84,13 +87,13 @@
 
 Below are the list of GPIO examples available and it's functionality:
 
-  |  GPIO Examples        |    GPIO Functionality                              |  
-  |-----------------------|----------------------------------------------------|  
-  | gpio_detailed_example | Demonstrates GPIO toggle and supported APIs        |       
-  | gpio_example          |  Demonstrates HP GPIO pin interrupt                |      
-  | gpio_group_example    | Demonstrates HP, ULP  GPIO group interrupts        | 
-  | gpio_ulp_example      |  Demonstrates GPIO toggle and ULP  pin interrupt   |           
-  | gpio_uulp_example     | Demonstrates UULP  pin interrupt                   | 
+  |  GPIO Examples        |    GPIO Functionality                              |
+  |-----------------------|----------------------------------------------------|
+  | gpio_detailed_example | Demonstrates GPIO toggle and supported APIs        |
+  | gpio_example          |  Demonstrates HP GPIO pin interrupt                |
+  | gpio_group_example    | Demonstrates HP, ULP  GPIO group interrupts        |
+  | gpio_ulp_example      |  Demonstrates GPIO toggle and ULP  pin interrupt   |
+  | gpio_uulp_example     | Demonstrates UULP  pin interrupt                   |
   |||
 
 ## About Example Code
@@ -115,7 +118,7 @@ Below are the list of GPIO examples available and it's functionality:
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -177,8 +180,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

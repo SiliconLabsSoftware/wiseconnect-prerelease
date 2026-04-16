@@ -1,8 +1,8 @@
-# Wi-Fi - NWP-M4 Firmware Update via TCP (A/B Fallback)
+# Platform SiWx91x Firmware Fallback Slot A
 
 ## Table of Contents
 
-- [Wi-Fi - NWP-M4 Firmware Update via TCP (A/B Fallback)](#wi-fi---nwp-m4-firmware-update-via-tcp-ab-fallback)
+- [Platform SiWx91x Firmware Fallback Slot A](#platform-siwx91x-firmware-fallback-slot-a)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -17,7 +17,7 @@
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -41,7 +41,7 @@ This example downloads M4 firmware over Wi-Fi from a TCP server and programs the
 
 ### MBR Provisioning
 
-> **Note:** Refer to UG625: SiWG917 Firmware Fallback User Guide before executing the reference examples.
+> **Note:** Refer to UG625: SiWx91x Firmware Fallback User Guide before executing the reference examples.
 
 Before using the A/B firmware fallback feature, the fallback profile must be enabled in the MBR on the device.
 
@@ -49,9 +49,9 @@ To enable firmware fallback for the devices using default MBR, use `commander ma
 
 To confirm the firmware fallback feature is enabled on the device, use `commander readmem --range 0x4000091:+1` command in the Simplicity Commander CLI tool and confirm the value to be 1.
 
-For more details on firmware fallback feature enablement and usage, refer to UG625: SiWG917 Firmware Fallback User Guide.
+For more details on firmware fallback feature enablement and usage, refer to UG625: SiWx91x Firmware Fallback User Guide.
 
-### Hardware Requirements  
+### Hardware Requirements
 
 - Windows PC
 - Silicon Labs SiWx917 Evaluation Kit [WPK/WSTK + BRD4325A]
@@ -97,19 +97,19 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
 - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which the Wi-Fi network shall be advertised and Si91X module is connected to it.
 
   ```c
-  #define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"      
+  #define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"
   ```
 
 - DEFAULT_WIFI_CLIENT_CREDENTIAL refers to the secret key if the access point is configured in WPA-PSK/WPA2-PSK security modes.
 
   ```c
-  #define DEFAULT_WIFI_CLIENT_CREDENTIAL                 "YOUR_AP_PASSPHRASE" 
+  #define DEFAULT_WIFI_CLIENT_CREDENTIAL                 "YOUR_AP_PASSPHRASE"
   ```
 
 - DEFAULT_WIFI_CLIENT_SECURITY_TYPE refers to the security type of the access point. The supported security modes are mentioned in `sl_wifi_security_t`.
 
   ```c
-  #define DEFAULT_WIFI_CLIENT_SECURITY_TYPE               SL_WIFI_WPA2 
+  #define DEFAULT_WIFI_CLIENT_SECURITY_TYPE               SL_WIFI_WPA2
   ```
 
 - Other STA instance configurations can be modified if required in `default_wifi_client_profile` configuration structure.
@@ -117,13 +117,13 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
 - SL_APP_TOGGLE_SLOT_INFO controls firmware slot switching when WiFi fails. By default (0), the device stays on the current slot. Setting it to 1 enables automatic switching to the alternate firmware slot if WiFi cannot connect.
 
   ```c
-  #define SL_APP_TOGGLE_SLOT_INFO 0 
+  #define SL_APP_TOGGLE_SLOT_INFO 0
   ```
 
 - The firmware slot update functionality is controlled by the following macro:
 
   ```c
-  #define SL_APP_UPDATE_FIRMWARE_SLOT 0 
+  #define SL_APP_UPDATE_FIRMWARE_SLOT 0
   ```
 
   - Purpose: Controls whether the firmware slot information for M4 and NWP cores is updated after a successful firmware update.
@@ -135,7 +135,7 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
 - Combined Image Support is controlled by the following macro:
 
   ```c
-  #define SL_APP_COMBINED_IMAGE_SUPPORT 0 
+  #define SL_APP_COMBINED_IMAGE_SUPPORT 0
   ```
 
   - Purpose: Enables or disables support for processing multiple firmware images in sequence (combined image update). When enabled, the application can handle two images (e.g., M4 and NWP) in a single update session.
@@ -149,7 +149,7 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
   - The **DISABLE_AB_DEBUG_LOGS** macro controls whether debug logs are enabled or disabled in the A/B Firmware Fallback module. By default, debug logs are disabled.
 
     ```c
-    #define DISABLE_AB_DEBUG_LOGS 1 
+    #define DISABLE_AB_DEBUG_LOGS 1
     ```
 
   - The macro is defined in the following file:  [`components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c)
@@ -191,11 +191,11 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
 
 ### TCP Configuration
 
-- In the Project Explorer pane, open the **app.c** file. 
+- In the Project Explorer pane, open the **app.c** file.
 
   ```c
   #define SERVER_PORT        5000             // TCP server port of the remote TCP server
-  #define SERVER_IP_ADDRESS  "192.168.0.100"  // Server IP address 
+  #define SERVER_IP_ADDRESS  "192.168.0.100"  // Server IP address
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -210,7 +210,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 To establish the TCP server with firmware file on remote PC, follow the steps below:
 
  1. Copy the TCP server application [firmware_update_tcp_server_9117.c](https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk/tree/v4.0.1-content-for-docs/examples/featured/firmware_update/firmware_update_tcp_server_9117.c) provided with the application source to a Linux PC connected to the Wi-Fi access point.
- 
+
  2. For Updater image OTA Copy the upadter TCP server application [firmware_update_tcp_server_for_updater.c] provided with the application source to a Linux PC connected to the Wi-Fi access point.
 
  3. Compile the application.
@@ -239,9 +239,9 @@ To establish the TCP server with firmware file on remote PC, follow the steps be
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
 

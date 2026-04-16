@@ -1,8 +1,8 @@
-# SL LITTLEFS BASED COMMON FLASH FILE SYSTEM
+# Platform SiWx91x File System Common Flash
 
 ## Table of Contents
 
-- [SL FILE SYSTEM FOR COMMON FLASH](#sl-file-system-for-common-flash)
+- [Platform SiWx91x File System Common Flash](#platform-siwx91x-file-system-common-flash)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -12,12 +12,14 @@
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
-  - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
-This example demonstrates a simple persistent **file system** on **Si91x common flash** using **LittleFS**.  
+This example demonstrates a simple persistent **file system** on **SiWx91x common flash** using **LittleFS**.
 On each boot, the application mounts LittleFS, reads a stored counter from the file `boot_count`, increments it, writes it back, and prints the value to the console.
 
 **Key Features:**
@@ -47,7 +49,7 @@ On each boot, the application mounts LittleFS, reads a stored counter from the f
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit 
+- Silicon Labs SiWx91x Evaluation Kit
 
 **Note:**
 >- For detailed information about pinset configurations, refer to the Flash and PSRAM Combinations section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/release/v3.5.2/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
@@ -72,7 +74,6 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware)
 - [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project)
 
-
 ## Test the Application
 
 1. Run the application
@@ -84,7 +85,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 >- When we run the littlefs example first time, after flash erase we see the errors **(error: Corrupted dir pair at {0x0, 0x1})** because flash is not yet formatted for littlefs. So ignore the error when its run first time.
 
 > - **Resetting `boot_count`**
->   - *Using LittleFS APIs:*  
+>   - *Using LittleFS APIs:*
 >     Call the LittleFS API to re-format the filesystem region:
 >     ```c
 >     lfs_unmount(&lfs);
@@ -93,11 +94,11 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 >     ```
 >     This clears all files and re-initializes the LittleFS volume without erasing the entire chip.
 >
->   - *Alternative (Using Studio tools/Simplicity Commander):*  
+>   - *Alternative (Using Studio tools/Simplicity Commander):*
 >     Perform a chip or flash-region erase, then re-program the image.
->     - **Simplicity Studio:**  
->       From Tools, Open **Flash Programmer → Erase Chip**, then **Program** and **Run** the application again.  
->     - **Simplicity Commander CLI:**  
+>     - **Simplicity Studio:**
+>       From Tools, Open **Flash Programmer → Erase Chip**, then **Program** and **Run** the application again.
+>     - **Simplicity Commander CLI:**
 >       ```bash
 >       commander device masserase
 >       ```
@@ -113,8 +114,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

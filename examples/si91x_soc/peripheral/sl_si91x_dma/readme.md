@@ -1,8 +1,8 @@
-# SL DMA
+# Platform SiWx91x DMA
 
 ## Table of Contents
 
-- [SL DMA](#sl-dma)
+- [Platform SiWx91x DMA](#platform-siwx91x-dma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -14,6 +14,9 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -24,7 +27,7 @@ This example used both a simple DMA transfer API and a generic API for performin
 ## Overview
 
 - DMA is used for performing transfers without processor intervention.
-- Si91x DMA supports three types of DMA transfers: memory-to-memory, peripheral-to-memory, and memory-to-peripheral.
+- SiWx91x DMA supports three types of DMA transfers: memory-to-memory, peripheral-to-memory, and memory-to-peripheral.
 - UDMA0 supports 32 channels--out of which last 24 are dedicated channels for particular peripherals. The first 8 channels can support 32 different peripherals.
 - The number of transfers in a single DMA cycle can be programmed from 1 to 1024.
 - The transfer address increment can be greater than the data width.
@@ -46,7 +49,7 @@ This example used both a simple DMA transfer API and a generic API for performin
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -82,9 +85,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
     ```C
     #define DMA_SIMPLE_TRANSFER 1    ///< Enable/Disable simple transfer
-    #define DMA_CHANNEL         32   ///< DMA0 channel number 
-    #define DMA_TRANSFER_SIZE   2048 ///< DMA transfer size 
-    ```  
+    #define DMA_CHANNEL         32   ///< DMA0 channel number
+    #define DMA_TRANSFER_SIZE   2048 ///< DMA transfer size
+    ```
 
 ## Test the Application
 
@@ -110,8 +113,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -1,8 +1,8 @@
-# SL QEI
+# Platform SiWx91x QEI
 
 ## Table of Contents
 
-- [SL QEI](#sl-qei)
+- [Platform SiWx91x QEI](#platform-siwx91x-qei)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -16,6 +16,9 @@
     - [Application Configuration Parameters](#application-configuration-parameters)
     - [Pin Configuration](#pin-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -50,11 +53,11 @@
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [WPK(BRD4002) + BRD4338A]
+- Silicon Labs SiWx91x Evaluation Kit [WPK(BRD4002) + BRD4338A]
 
 ### Software Requirements
 
-- Si91x
+- SiWx91x
 - Simplicity Studio
 - Serial console Setup
   - The Serial Console setup instructions are provided below:
@@ -92,7 +95,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - 1: Disable - Deactivates the Quadrature Encoder Mode and user can configure for Timer Mode instead.
   - QEI Encoding Mode: Configures the position counting method of the QEI.
     - 1x Counting : SL_QEI_ENCODE_MODE_1X
-    - 2x Counting : SL_QEI_ENCODE_MODE_2X 
+    - 2x Counting : SL_QEI_ENCODE_MODE_2X
     - 4x Counting : SL_QEI_ENCODE_MODE_4X
   - QEI Position Counter Mode: Sets the size of the position counter.
     - 32-bit position counter : SL_QEI_POS_CNT_32.
@@ -120,9 +123,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 #### QEI Input Pin Configuration of the WPK[BRD4002A] Base Board, and BRD4338A radio board
 
-| Description   | QEI GPIO Pin | 917 Breakout pin | 
-| ------------- | ------------ | ---------------- | 
-| Phase A Input |GPIO_26       | P27              | 
+| Description   | QEI GPIO Pin | 917 Breakout pin |
+| ------------- | ------------ | ---------------- |
+| Phase A Input |GPIO_26       | P27              |
 | Phase B Input |GPIO_27       | P29              |
 | Index Input   |GPIO_25       | P25              |
 
@@ -131,14 +134,14 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | Description   | Explorer Kit Pin |
 | ------------- | ---------------- |
 | Phase A Input |GPIO_26           |
-| Phase B Input |GPIO_27           | 
-| Index Input   |GPIO_25           | 
+| Phase B Input |GPIO_27           |
+| Index Input   |GPIO_25           |
 
 #### QEI Output Pin Configuration(for simulating QEI signals) of the WPK[BRD4002A] Base Board, and BRD4338A radio board
 
-| Description           | QEI GPIO Pin | 917 Breakout pin | 
-| --------------------- | ------------ | ---------------- | 
-| Phase A Signal Output |GPIO_29       | P33              | 
+| Description           | QEI GPIO Pin | 917 Breakout pin |
+| --------------------- | ------------ | ---------------- |
+| Phase A Signal Output |GPIO_29       | P33              |
 | Phase B Signal Output |GPIO_30       | P35              |
 | Index Signal Output   |GPIO_6        | P19              |
 
@@ -147,8 +150,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | Description           | Explorer Kit Pin |
 | --------------------- | ---------------- |
 | Phase A Signal Output |GPIO_29           |
-| Phase B Signal Output |GPIO_30           | 
-| Index Signal Output   |GPIO_6            | 
+| Phase B Signal Output |GPIO_30           |
+| Index Signal Output   |GPIO_6            |
 
 > **Note:**
 >
@@ -178,8 +181,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

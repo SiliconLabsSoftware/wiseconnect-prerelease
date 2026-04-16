@@ -1,8 +1,8 @@
-# Crypto - SHA
+# Platform SiWx91x Crypto SHA
 
 ## Table of Contents
 
-- [Crypto - SHA](#crypto---sha)
+- [Platform SiWx91x Crypto SHA](#platform-siwx91x-crypto-sha)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -16,7 +16,7 @@
   - [Expected Results](#expected-results)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -40,12 +40,12 @@ SHA forms part of several widely used security applications and protocols, inclu
 ### Hardware Requirements
 
   - Windows PC 
-  - Silicon Labs [Si917 Evaluation Kit WSTK]
+  - Silicon Labs [SiWx91x Evaluation Kit WSTK]
 
 ### Software Requirements
 
   - Embedded Development Environment
-    - For Silicon Labs Si91x, use Simplicity Studio
+    - For Silicon Labs SiWx91x, use Simplicity Studio
 
 ### Setup Diagram
 
@@ -97,6 +97,6 @@ For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.
 - [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

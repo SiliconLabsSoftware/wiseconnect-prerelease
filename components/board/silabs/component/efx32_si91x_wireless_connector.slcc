@@ -1,8 +1,8 @@
 id: efx32_si91x_wireless_connector
-label: EFx32 - Si91x Connection Configurator
+label: EFx32 - SiWx91x Connection Configurator
 package: platform_siwx91x
 description: >
-  Configures the hardware connections between the EFx32 host and the SiWG91x NCP.
+  This component configures the hardware connections between the EFx32 host and the SiWx91x NCP.
 category: Board|Configuration
 quality: production
 metadata:

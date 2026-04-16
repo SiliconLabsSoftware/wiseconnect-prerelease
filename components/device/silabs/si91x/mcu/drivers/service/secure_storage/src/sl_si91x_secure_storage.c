@@ -93,6 +93,7 @@ sl_status_t sl_si91x_secure_storage_write_register(mcu_secure_storage_register_t
                                                    uint32_t secure_storage_write_data)
 {
   if (register_index >= MCU_STORAGE_REGISTER_LAST) {
+
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -124,8 +125,14 @@ sl_status_t sl_si91x_secure_storage_read_register(mcu_secure_storage_register_t 
 
   /* Check for valid parameters - allow reading any valid register (0-7) */
   if (register_index >= MCU_STORAGE_REGISTER_LAST) {
+    SL_PRINT_STRING_ERROR("sl_si91x_secure_storage_read_register():[secure_storage_read_register] Error: Invalid "
+                          "register index. line no: %d",
+                          __LINE__);
     status = SL_STATUS_INVALID_PARAMETER; // Invalid register index
   } else if (secure_storage_read_data == NULL) {
+    SL_PRINT_STRING_ERROR("sl_si91x_secure_storage_read_register():[secure_storage_read_register] Error: Null pointer "
+                          "to secure storage read data. line no: %d",
+                          __LINE__);
     status = SL_STATUS_NULL_POINTER; // Null pointer to secure storage read data
   } else {
     /* REG0–REG7 are consecutive 32-bit words; access as REG0 + offset. */
@@ -169,6 +176,10 @@ sl_status_t sl_si91x_secure_storage_enable_protection_and_lock(void)
                                            0,
                                            NULL);
   if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("sl_si91x_secure_storage_enable_protection_and_lock():[secure_storage_enable_protection_and_"
+                          "lock] Error: Failed to enable secure storage protection. status: %d, line no: %d",
+                          status,
+                          __LINE__);
     return status;
   }
 

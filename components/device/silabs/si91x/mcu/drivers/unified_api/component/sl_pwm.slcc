@@ -34,6 +34,7 @@ provides:
 requires:
   - name: rsilib_pwm
   - name: romdriver_pwm
+  - name: log_none
 documentation:
     docset: wiseconnect
     document: wiseconnect-api-reference-guide-si91x-peripherals/pwm

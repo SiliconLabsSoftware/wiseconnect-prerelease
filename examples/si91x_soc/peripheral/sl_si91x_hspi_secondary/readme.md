@@ -1,8 +1,8 @@
-# HSPI Secondary
+# Platform SiWx91x HSPI SECONDARY
 
 ## Table of Contents
 
-- [HSPI Secondary](#hspi-secondary)
+- [Platform SiWx91x HSPI SECONDARY](#platform-siwx91x-hspi-secondary)
   - [Table of Contents](#table-of-contents)
   - [About Example Code](#about-example-code)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -13,6 +13,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Pin Configuration](#pin-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
   - [HSPI Secondary Data Flow](#hspi-secondary-data-flow)
 
 ## About Example Code
@@ -24,7 +27,7 @@ This example showcases the use of the HSPI secondary interface with GPDMA, provi
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs Si917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - An external SPI Primary device.
 
 ### Software Requirements
@@ -78,13 +81,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
     Ensure the SPI Secondary application is running before the SPI Primary application. This order is essential for proper data communication with  HSPI Secondary.
 
-3. After successful program execution, the prints in serial console looks as shown below.   
-   
+3. After successful program execution, the prints in serial console looks as shown below.
+
   - ####  If GPDMA is enabled
   >![Figure: output_hspi_secondary](resources/readme/output_hspi_secondary.png)
 
   - ####  If GPDMA is disabled
-  >![Figure: output_hspi_secondary_blocking](resources/readme/output_hspi_secondary_blocking.png) 
+  >![Figure: output_hspi_secondary_blocking](resources/readme/output_hspi_secondary_blocking.png)
 
 ## HSPI Secondary Data Flow
 
@@ -106,8 +109,8 @@ The SPI Primary writes data to the HSPI Secondary
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

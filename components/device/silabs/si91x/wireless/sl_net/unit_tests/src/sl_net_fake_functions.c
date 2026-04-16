@@ -29,6 +29,16 @@
  ******************************************************************************/
 
 #include "sl_net_fake_functions.h"
+
+/* Headers for link-time stubs used by sl_net_si91x_integration_handler.c */
+#include "cmsis_os2.h"
+#include "sli_cmsis_os2_ext_task_register.h"
+#include "sli_wifi_device_core_utilities.h"
+#include "sl_si91x_types.h"
+#include "sl_si91x_socket_callback_framework.h"
+/* Do not include sli_wifi_utility.h here: it redeclares sli_wifi_host_get_buffer_data with a
+ * void* buffer type and conflicts with the fff fake declared in sl_net_fake_functions.h. */
+
 DEFINE_FFF_GLOBALS;
 
 DEFINE_FAKE_VALUE_FUNC4(sl_status_t, sl_si91x_wifi_set_certificate_index, uint8_t, uint8_t, const void *, uint32_t);
@@ -59,3 +69,37 @@ DEFINE_FAKE_VALUE_FUNC7(sl_status_t,
                         void *,
                         void **);
 DEFINE_FAKE_VALUE_FUNC1(sl_status_t, sli_buffer_manager_free_buffer, sli_buffer_t);
+
+/***************************************************************************/ /**
+ * Stubs for symbols referenced by sl_net_si91x_integration_handler.c that are
+ * normally provided by sli_wifi / OS layers but are not linked in this target.
+ ******************************************************************************/
+#ifndef __ZEPHYR__
+sli_task_register_id_t sli_fw_status_storage_index = SLI_FW_STATUS_STORAGE_INVALID_INDEX;
+
+sl_status_t sli_osTaskRegisterSetValue(const osThreadId_t thread_id,
+                                       const sli_task_register_id_t reg_id,
+                                       const uint32_t value)
+{
+  (void)thread_id;
+  (void)reg_id;
+  (void)value;
+  return SL_STATUS_OK;
+}
+#endif
+
+uint16_t sli_wifi_get_wifi_frame_status(const sl_wifi_system_packet_t *packet)
+{
+  (void)packet;
+  return (uint16_t)SL_STATUS_OK;
+}
+
+sl_status_t sli_si91x_socket_event_handler(sl_status_t status,
+                                           sli_si91x_socket_context_t *sdk_context,
+                                           sl_wifi_system_packet_t *rx_packet)
+{
+  (void)status;
+  (void)sdk_context;
+  (void)rx_packet;
+  return SL_STATUS_OK;
+}

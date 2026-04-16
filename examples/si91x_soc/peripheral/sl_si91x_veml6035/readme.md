@@ -1,8 +1,8 @@
-# SL VEML6035
+# Platform SiWx91x VEML6035
 
 ## Table of Contents
 
-- [SL VEML6035](#sl-veml6035)
+- [Platform SiWx91x VEML6035](#platform-siwx91x-veml6035)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -13,6 +13,9 @@
   - [Application Build Environment](#application-build-environment)
     - [Pin Configuration](#pin-configuration)
   - [Test the Application](#test-the-application)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -27,7 +30,7 @@ This example demonstrates the measurement of Lux for every 2 seconds. It also sh
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs SiWx917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) / BRD2605B
+- Silicon Labs SiWx917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
 
 ### Software Requirements
 
@@ -65,7 +68,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ### Pin Configuration
 
-- The sensor is internally connected on SiWG917 Dev kit board on ULP_I2C.
+- The sensor is internally connected on SiWx91x Dev kit board on ULP_I2C.
 - However, to use this sensor driver on Custom boards, the following pins are supported based on the instance selected in UC.
 
 **I2C0:**
@@ -113,8 +116,8 @@ See the instructions [Creating a Project](https://docs.silabs.com/wiseconnect/la
 
 - [WiSeConnect Getting Started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
-- [Si91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
+- [SiWx91x SoC Documentation](https://docs.silabs.com/wiseconnect/latest/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.

@@ -29,6 +29,7 @@ define:
 
 requires:
 - name: sli_routing_utility
+- name: si91x_log_none
 - condition: ["device_si91x"]
   name: sl_si91x_mcu
 - condition: ["device_si91x"]

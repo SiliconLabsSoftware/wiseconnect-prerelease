@@ -20,4 +20,5 @@ include:
 
 requires:
 - name: sl_si91x_socket
+- name: si91x_log_none
 

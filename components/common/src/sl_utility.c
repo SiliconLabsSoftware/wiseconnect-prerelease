@@ -487,6 +487,7 @@ sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config)
       .wlan_netstack_log_level = config->log_config_level,
       .bt_ble_ctrl_log_level = config->log_config_level,
       .bt_ble_stack_log_level = config->log_config_level,
+      .btdm_log_level = config->log_config_level,
     },
     .reserved_2 = 0,
     .log_buffer_size = NWP_MAX_LOG_BUFFER

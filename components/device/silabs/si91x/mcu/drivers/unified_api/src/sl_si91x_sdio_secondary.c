@@ -472,6 +472,7 @@ sl_status_t sl_si91x_gpdma_init()
   // Initialize driver
   GPDMAHandle = RSI_GPDMA_Init(devMem_p, &GPDMAInit);
   if (GPDMAHandle == NULL) {
+    SL_PRINT_STRING_ERROR("sl_si91x_gpdma_init: handle NULL,line no : %d\r\n", (int)__LINE__);
     return SL_STATUS_NULL_POINTER;
   }
 
@@ -525,6 +526,8 @@ sl_status_t sl_si91x_sdio_secondary_register_event_callback(sl_sdio_secondary_ca
     // Validates the null pointer, if true returns error code
     if (callback_event == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_sdio_secondary_register_event_callback: handle NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     //Enable and set the SDIO interrupt
@@ -535,6 +538,9 @@ sl_status_t sl_si91x_sdio_secondary_register_event_callback(sl_sdio_secondary_ca
     // returns an error code
     if (user_callback != NULL) {
       status = SL_STATUS_BUSY;
+      SL_PRINT_STRING_ERROR("sl_si91x_sdio_secondary_register_event_callback: error status=0x%04lX,line no : %d\r\n",
+                            (unsigned long)(SL_STATUS_BUSY),
+                            (int)__LINE__);
       break;
     }
     // User callback address is passed to the static variable which is called at the time of
@@ -577,12 +583,18 @@ sl_status_t sl_si91x_sdio_secondary_gpdma_register_event_callback(sl_sdio_second
     // Validates the null pointer, if true returns error code
     if (callback_event == NULL) {
       status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_sdio_secondary_gpdma_register_event_callback: handle NULL,line no : %d\r\n",
+                            (int)__LINE__);
       break;
     }
     // To validate the function pointer if the parameters is not NULL then, it
     // returns an error code
     if (user_gpdma_callback != NULL) {
       status = SL_STATUS_BUSY;
+      SL_PRINT_STRING_ERROR(
+        "sl_si91x_sdio_secondary_gpdma_register_event_callback: error status=0x%04lX,line no : %d\r\n",
+        (unsigned long)(SL_STATUS_BUSY),
+        (int)__LINE__);
       break;
     }
     // User callback address is passed to the static variable which is called at the time of

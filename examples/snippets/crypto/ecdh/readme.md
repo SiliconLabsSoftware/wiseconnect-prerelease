@@ -1,8 +1,8 @@
-# Crypto - ECDH
+# Platform SiWx91x Crypto ECDH
 
 ## Table of Contents
 
-- [Crypto - ECDH](#crypto---ecdh)
+- [Platform SiWx91x Crypto ECDH](#platform-siwx91x-crypto-ecdh)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -16,7 +16,7 @@
   - [Application Output](#application-output)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
-  - [Report Bugs / Support](#report-bugs--support)
+  - [Report Bugs/Support](#report-bugssupport)
 
 ## Purpose/Scope
 
@@ -98,6 +98,6 @@ For troubleshooting information, see [WiSeConnect Troubleshooting](https://docs.
 - [WiSeConnect Documentation](https://docs.silabs.com/wiseconnect/latest/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/)
 
-## Report Bugs / Support
+## Report Bugs/Support
 
 To report bugs or get support, visit [Silicon Labs Community](https://community.silabs.com/).

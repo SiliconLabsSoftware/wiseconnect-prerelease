@@ -34,6 +34,7 @@ requires:
   - name: rsilib_adc
   - name: rsilib_opamp
   - name: sl_dma
+  - name: log_none
 documentation:
     docset: wiseconnect
     document: wiseconnect-api-reference-guide-si91x-peripherals/dac

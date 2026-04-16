@@ -36,6 +36,7 @@ requires:
   - name: udma_linker_config
   - name: sl_dma
   - name: cmsis_usart
+  - name: log_none
 documentation:
     docset: wiseconnect
     document: wiseconnect-api-reference-guide-si91x-peripherals/usart
