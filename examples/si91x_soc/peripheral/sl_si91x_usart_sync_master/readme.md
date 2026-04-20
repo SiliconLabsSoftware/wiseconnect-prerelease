@@ -102,6 +102,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - You can use the configuration wizard to configure different parameters. The following configuration screen illustrates what the user can select as per their requirements.
 
   > ![Figure: Selecting UC](resources/uc_screen/usart_uc.png)
+
+- By default, `USART0 SYNC Mode` is disabled in UC. Enable it for synchronous communication.
+- By default, the CLK pin is not configured in UC. Select the required CLK pin.
 - Connect master (this example) and a board flashed with the slave example: master clock pin (GPIO_8 or GPIO_25 depending on board) to slave clock pin, master TX (GPIO_30) to slave RX, master RX (GPIO_29) to slave TX.
 - The Application has been configured to run in Synchronous Master mode.
 

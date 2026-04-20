@@ -540,17 +540,28 @@ static sli_scan_info_t *sli_update_or_create_scan_info_element(const sli_scan_in
 {
   sli_scan_info_t **scan_db_head = sli_get_scan_info_database();
   sli_scan_info_t *element       = NULL;
+  sli_scan_info_t *prev          = NULL;
 
   element = *scan_db_head;
   while (NULL != element) {
     if (0 == memcmp(info->bssid, element->bssid, SLI_WIFI_HARDWARE_ADDRESS_LENGTH)) {
+      element->seen_count++;
       element->channel       = info->channel;
       element->security_mode = info->security_mode;
       element->rssi          = info->rssi;
       element->network_type  = info->network_type;
       memcpy(element->ssid, info->ssid, 34);
-      break;
+
+      // Remove the element from its current position so it can be re-inserted in sorted order
+      if (NULL == prev) {
+        *scan_db_head = element->next;
+      } else {
+        prev->next = element->next;
+      }
+      element->next = NULL;
+      return element;
     }
+    prev    = element;
     element = element->next;
   }
 
@@ -560,7 +571,8 @@ static sli_scan_info_t *sli_update_or_create_scan_info_element(const sli_scan_in
       return NULL;
     }
     memcpy(element, info, sizeof(sli_scan_info_t));
-    element->next = NULL;
+    element->seen_count = 1;
+    element->next       = NULL;
     return element;
   }
 
@@ -692,19 +704,46 @@ static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli
 // Helper function to process Vendor Specific element
 static void sli_process_vendor_specific_element(const sli_wifi_data_tagged_info_t *info, sli_scan_info_t *scan_info)
 {
-  sli_wlan_vendor_specific_element_t *vendor = (sli_wlan_vendor_specific_element_t *)info->data;
-  uint8_t wlan_oui[3]                        = { 0x00, 0x50, 0xF2 };
+  const uint8_t *d                     = info->data;
+  uint16_t len                         = info->data_length;
+  uint16_t pairwise_cipher_suite_count = 0;
+  uint16_t akm_suite_count             = 0;
+  // First variable-length field (pairwise suites) starts after fixed 12-octet header.
+  uint32_t off = 12;
 
-  if ((!memcmp(vendor->oui, wlan_oui, 3)) && (vendor->vs_oui == 0x01)
-      && ((scan_info->security_mode == SL_WIFI_OPEN) || (scan_info->security_mode == SL_WIFI_WEP))) {
-    scan_info->security_mode            = SL_WIFI_WPA;
-    uint8_t *list_count                 = (vendor->ucsl + (sizeof(sli_wlan_cipher_suite_t) * vendor->ucsc));
-    uint16_t akmsc                      = (uint16_t)(list_count[0] | (list_count[1] << 8));
-    const sli_wlan_cipher_suite_t *akms = (sli_wlan_cipher_suite_t *)(list_count + 2);
+  // Not a WPA vendor IE or truncated before pairwise count.
+  if (len < 12 || d[0] != 0x00 || d[1] != 0x50 || d[2] != 0xF2 || d[3] != 0x01) {
+    return;
+  }
 
-    if ((0 != akmsc) && (akms[akmsc - 1].cs_type == 1)) {
+  // Pairwise cipher suite list.
+  pairwise_cipher_suite_count = (uint16_t)(d[10] | ((uint16_t)d[11] << 8));
+  if (pairwise_cipher_suite_count > ((uint32_t)len - off) >> 2) {
+    return;
+  }
+  off += (uint32_t)pairwise_cipher_suite_count << 2;
+  if ((uint32_t)len - off < 2u) {
+    return;
+  }
+
+  // Read AKM suite count as uint16 little-endian from d[off] and d[off+1] into `akm_suite_count`.
+  // After `off += 2`, `off` points at the first of `akm_suite_count` AKM suites; each suite is 4 octets (OUI + type).
+  akm_suite_count = (uint16_t)(d[off] | ((uint16_t)d[off + 1] << 8));
+  off += 2;
+  if (akm_suite_count > ((uint32_t)len - off) >> 2) {
+    return;
+  }
+
+  // If RSN was not seen yet, WPA IE implies WPA; refine using AKM (802.1X vs PSK).
+  if (scan_info->security_mode == SL_WIFI_OPEN || scan_info->security_mode == SL_WIFI_WEP) {
+    scan_info->security_mode = SL_WIFI_WPA;
+    // Last AKM suite type 1 == 802.1X (enterprise).
+    if (akm_suite_count != 0 && d[off + ((uint32_t)akm_suite_count - 1u) * 4u + 3u] == 1) {
       scan_info->security_mode = SL_WIFI_WPA_ENTERPRISE;
     }
+  } else if (scan_info->security_mode == SL_WIFI_WPA2) {
+    // RSN already set WPA2; presence of WPA IE indicates transition / mixed mode.
+    scan_info->security_mode = SL_WIFI_WPA_WPA2_MIXED;
   }
 }
 
@@ -767,19 +806,22 @@ void sli_handle_wifi_beacon(sl_wifi_system_packet_t *packet)
       if (packet->length <= SLI_WIFI_MINIMUM_FRAME_LENGTH) {
         return;
       }
-      ies_length = packet->length - SLI_WIFI_MINIMUM_FRAME_LENGTH;
-
       memcpy(scan_info.bssid, wifi_frame->bssid, SLI_WIFI_HARDWARE_ADDRESS_LENGTH);
-
+      ies_length                        = packet->length - SLI_WIFI_MINIMUM_FRAME_LENGTH;
       sli_wifi_data_tagged_info_t *info = (sli_wifi_data_tagged_info_t *)wifi_frame->tagged_info;
-      while (0 != ies_length) {
-        sli_process_tag_info(info, &scan_info);
-        ies_length -= (sizeof(sli_wifi_data_tagged_info_t) + info->data_length);
-        info = (sli_wifi_data_tagged_info_t *)&(info->data[info->data_length]);
+      const uint16_t ie_header_len      = (uint16_t)sizeof(sli_wifi_data_tagged_info_t);
 
-        if (ies_length <= sizeof(sli_wifi_data_tagged_info_t)) {
-          ies_length = 0;
+      while (ies_length >= ie_header_len) {
+        uint16_t data_len = info->data_length;
+        uint32_t ie_total = (uint32_t)ie_header_len + (uint32_t)data_len;
+
+        if (ie_total > (uint32_t)ies_length) {
+          break;
         }
+
+        sli_process_tag_info(info, &scan_info);
+        ies_length = (uint16_t)((uint32_t)ies_length - ie_total);
+        info       = (sli_wifi_data_tagged_info_t *)((uint8_t *)info + ie_total);
       }
 
       sli_store_scan_info_element(&scan_info);

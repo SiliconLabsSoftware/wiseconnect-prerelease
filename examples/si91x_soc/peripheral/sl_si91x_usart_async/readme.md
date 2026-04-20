@@ -84,6 +84,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   > ![Figure: Selecting UC](resources/uc_screen/usart_uc.png)
 
+- By default, `USART0 Clock Source` is configured to `ULP REF CLK` in UC. Select `SOC PLL CLK`.
+
 ## Pin Configuration
 
   | USART PINS     | GPIO    | Breakout pin  | Explorer kit Breakout pin | UART-TTL cable |
@@ -107,8 +109,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | -------------- | ------- | ------------- | ------------------------ |
   | USART0_CTS_PIN | GPIO_26 |     P27       |           [MISO]         |
   | USART0_RTS_PIN | GPIO_28 |     P31       |           [CS]           |
-
-> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
 

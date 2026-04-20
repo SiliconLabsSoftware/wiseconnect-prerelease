@@ -130,7 +130,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - **GSPI Configuration**
 
   - Mode: SPI mode can be configured: Mode 0 and Mode 3 (motorola). Mode 0: Clock Polarity 0 and Clock Phase 0, Mode 3: Clock Polarity 1 and Clock Phase 1.
-  - Bitrate: The speed of transfer can be configured (that is, bits/second).
+  - Bitrate: The speed of transfer can be configured from **2 kbit/s** to **116 Mbit/s** (bits/second). The minimum and maximum depend on the GSPI peripheral clock source configured for the device
   - Data Width: The size of data packet, it can be configured between 1 to 16.
   - Byte-wise swapping of read and write data, enable will swap the data and disable will not swap the data. (Can be used only if data width is configured as 16).
 
@@ -195,17 +195,35 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    ![Figure: output](resources/readme/output_gspi.png)
 
 > **Note:**
->- To achieve 116 MHz for non-power-save applications, you must change the INTF_PLL frequency in `components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sl_si91x_clock_manager.c` to 116M Hz.
 >
->   ```c 
->   #define INTF_PLL_FREQ  (160000000UL) to (116000000UL) ///< Non Powersave Application      
+> - The GSPI (SCK) frequency that can be achieved depends on **f_gspi_src** (the GSPI peripheral clock Source). Configure the clock source and frequency as per the device HRM. With the maximum 8-bit clock divider (255), SCK is approximately:
+>
+>   `f_SCK ≈ f_gspi_src / (2 × 255) = f_gspi_src / 510`
+>
+> - GSPI uses the INTF PLL, **f_gspi_src** follows `INTF_PLL_FREQ` in `components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c`:
+>
+>   ```c
+>   #define INTF_PLL_FREQ  (160000000UL) // 160 MHz default interface PLL for peripherals
 >   ```
 >
->- To achieve 116 MHz for power-save applications, you must change the clock scaling mode to performance and INTF_PLL frequency in `components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sli_si91x_clock_manager.c` to 116 MHz.
+> - To achieve 116 MHz for non-power-save applications, user must change the INTF_PLL frequency in `components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sl_si91x_clock_manager.c` to 116M Hz.
 >
->    ```c 
->    #define PS4_PERFORMANCE_MODE_INTF_FREQ     (160000000UL) to (116000000UL)   ///< Powersave Application
->    ```
+>   ```c
+>   // From:
+>   #define INTF_PLL_FREQ  (160000000UL)
+>   // To:
+>   #define INTF_PLL_FREQ  (116000000UL) ///< Non-power-save application
+>   ```
+>
+> - To achieve 116 MHz for power-save applications, user must change the clock scaling mode to performance and INTF_PLL frequency in `components\device\silabs\si91x\mcu\drivers\service\clock_manager\src\sli_si91x_clock_manager.c` to 116 MHz.
+>
+>   ```c
+>   // From:
+>   #define PS4_PERFORMANCE_MODE_INTF_FREQ (160000000UL)
+>   // To:
+>   #define PS4_PERFORMANCE_MODE_INTF_FREQ (116000000UL) ///< Power-save application
+>   ```
+>
 >   This change affects flash performance, as its operating frequency decreases from 80 MHz to 58 MHz.
 >
->- Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
+> - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If the user wants to write their own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to their custom interrupt handler.

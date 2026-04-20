@@ -102,6 +102,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   ![Figure: Selecting UC](resources/uc_screen/usart_uc.png)
 
+- By default, `USART0 SYNC Mode` is disabled in UC. Enable it for synchronous communication.
+- By default, the CLK pin is not configured in UC. Select the required CLK pin.
 - Connect the boards: master clock (GPIO_8 or GPIO_25) ↔ slave clock, master TX (GPIO_30) → slave RX (GPIO_29), slave TX (GPIO_30) → master RX (GPIO_29). (Clock direction is from master to slave.)
 
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
