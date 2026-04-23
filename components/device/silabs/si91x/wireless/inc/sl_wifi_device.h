@@ -1553,7 +1553,7 @@
  * | 1       | 0       | Internal Switch  | Internal Switch  | Internal Switch  |                                
  * | 1       | 1       | Reserved         | Reserved         | Reserved         |
  * 
- * @note SiWx917 has an integrated on-chip Transmit/Receive (T/R) switch. This internal RF switch configuration uses internal logic present in the IC, and GPIOs are not needed. RF_BLE_TX (8 dBm) mode is not supported in this configuration.
+ * @note SiWx917 has an integrated on-chip Transmit/Receive (T/R) switch, controlled by internal IC logic, eliminating the need for external GPIOs. In this configuration, RF_BLE_TX (8 dBm) mode is not supported on the LP chain. However, 8 dBm TX power can still be achieved using the HP chain.
  * @note VC1, VC2, and VC3 are control voltage pins of the RF switch.
  * @note This configuration is not applicable for devices with internal antennas.
  */

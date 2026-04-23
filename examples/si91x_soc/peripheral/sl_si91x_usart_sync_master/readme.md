@@ -108,6 +108,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Connect master (this example) and a board flashed with the slave example: master clock pin (GPIO_8 or GPIO_25 depending on board) to slave clock pin, master TX (GPIO_30) to slave RX, master RX (GPIO_29) to slave TX.
 - The Application has been configured to run in Synchronous Master mode.
 
+> **Note:** **USART0 SCLK fractional divider mode** in the USART Universal Configurator (Fractional vs Clock swallow) has **no effect** when the peripheral runs in **synchronous** mode; it applies to asynchronous baud-clock generation. For this example, timing is governed by synchronous operation and the **CLK** / pin wiring, not that UC field.
+
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |

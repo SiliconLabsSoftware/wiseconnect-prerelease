@@ -663,7 +663,14 @@ static uint32_t sli_get_key_management_info(const sli_wlan_cipher_suite_t *akms,
   return key_mgmt;
 }
 
-// Helper function to process RSN element
+/*
+ * Read the RSN (WPA2/WPA3) information element from a scan and set security_mode.
+ *
+ * Uses the group cipher OUI, key management suites, and whether an older WPA
+ * vendor IE was already seen (for WPA/WPA2 mixed networks). If the group
+ * cipher OUI is not 00:0F:AC, we do not change the default security_mode set
+ * at the start of this function.
+ */
 static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli_scan_info_t *scan_info)
 {
   scan_info->security_mode            = SL_WIFI_WPA2_ENTERPRISE;
@@ -677,8 +684,10 @@ static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli
   SL_DEBUG_LOG("RSN OUI %02x:%02x:%02x.\n", rsn->gcs.cs_oui[0], rsn->gcs.cs_oui[1], rsn->gcs.cs_oui[2]);
   SL_DEBUG_LOG("Pairwise cipher suite count: %u.\n", pcsc);
 
+  // check if the group cipher identifier matches the standard RSN OUI suite id 00:0F:AC.
   if (!memcmp(rsn->gcs.cs_oui, wlan_gcs_oui, 3)) {
-    scan_info->security_mode = SL_WIFI_WPA2;
+    // If a WPA vendor IE was already parsed, set security mode to mixed mode otherwise use WPA2.
+    scan_info->security_mode = (scan_info->wpa_vendor_ie_seen) ? SL_WIFI_WPA_WPA2_MIXED : SL_WIFI_WPA2;
     uint32_t key             = sli_get_key_management_info(akms, akmsc);
 
     if (akms[0].cs_type == 1) {
@@ -734,6 +743,8 @@ static void sli_process_vendor_specific_element(const sli_wifi_data_tagged_info_
     return;
   }
 
+  scan_info->wpa_vendor_ie_seen = true;
+
   // If RSN was not seen yet, WPA IE implies WPA; refine using AKM (802.1X vs PSK).
   if (scan_info->security_mode == SL_WIFI_OPEN || scan_info->security_mode == SL_WIFI_WEP) {
     scan_info->security_mode = SL_WIFI_WPA;
@@ -742,7 +753,6 @@ static void sli_process_vendor_specific_element(const sli_wifi_data_tagged_info_
       scan_info->security_mode = SL_WIFI_WPA_ENTERPRISE;
     }
   } else if (scan_info->security_mode == SL_WIFI_WPA2) {
-    // RSN already set WPA2; presence of WPA IE indicates transition / mixed mode.
     scan_info->security_mode = SL_WIFI_WPA_WPA2_MIXED;
   }
 }
@@ -775,6 +785,7 @@ static void sli_process_tag_info(const sli_wifi_data_tagged_info_t *info, sli_sc
  *            Internal Function Declarations
  ******************************************************/
 // Function to Parse the Beacon and Probe response Frames
+// Extended scan reports WPA/WPA2 mixed APs correctly via wpa_vendor_ie_seen and both IE handlers
 void sli_handle_wifi_beacon(sl_wifi_system_packet_t *packet)
 {
   uint8_t subtype                   = 0;
@@ -823,7 +834,8 @@ void sli_handle_wifi_beacon(sl_wifi_system_packet_t *packet)
         ies_length = (uint16_t)((uint32_t)ies_length - ie_total);
         info       = (sli_wifi_data_tagged_info_t *)((uint8_t *)info + ie_total);
       }
-
+      // Ensure transient flag is never stored (defensive if more code sets it later)
+      scan_info.wpa_vendor_ie_seen = false;
       sli_store_scan_info_element(&scan_info);
     } break;
     default:

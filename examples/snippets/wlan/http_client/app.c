@@ -172,6 +172,8 @@ uint32_t app_buff_index = 0;
 volatile uint8_t http_rsp_received = 0;
 volatile uint8_t end_of_file       = 0;
 sl_status_t callback_status        = SL_STATUS_OK;
+int32_t offset                     = 0;
+int32_t chunk_length               = 0;
 /******************************************************
  *               Function Declarations
  ******************************************************/
@@ -247,8 +249,9 @@ sl_status_t http_client_application(void)
   sl_http_client_configuration_t client_configuration = { 0 };
   sl_http_client_request_t client_request             = { 0 };
   int32_t total_put_data_len                          = sizeof(sl_index) - 1;
-  int32_t offset                                      = 0;
-  int32_t chunk_length                                = 0;
+
+  offset       = 0;
+  chunk_length = 0;
 
   //! Set HTTP Client credentials
   uint16_t username_length = strlen(HTTP_CLIENT_USERNAME);
@@ -556,4 +559,6 @@ static void reset_http_handles(void)
   end_of_file       = 0;
   http_rsp_received = 0;
   callback_status   = SL_STATUS_OK;
+  offset            = 0;
+  chunk_length      = 0;
 }

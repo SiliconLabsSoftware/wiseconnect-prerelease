@@ -193,14 +193,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 | Explorer kit GPIO| Description        |
 | ------------| ------------------------|
-|   GPIO_25   | RTE_SSI_SLAVE_SCK_PIN   |
-|   GPIO_28   | RTE_SSI_SLAVE_CS_PIN    |
+|   GPIO_26   | RTE_SSI_SLAVE_SCK_PIN   |
+|   GPIO_25   | RTE_SSI_SLAVE_CS_PIN    |
 |   GPIO_27   | RTE_SSI_SLAVE_MOSI_PIN  |
-|   GPIO_26   | RTE_SSI_SLAVE_MISO_PIN  |
+|   GPIO_28   | RTE_SSI_SLAVE_MISO_PIN  |
 
 >**Note:** Make sure the following pin configuration are in the `RTE_Device_xxx.h` file:
 >
 > - SiWx917: RTE_Device_917.h (path: /$project/config/RTE_Device_917.h)
+> - On the BRD4342A board, GPIO_9 is dedicated to the TA VCOM TX and GPIO_53 is dedicated to the PSRAM SIO0, so they cannot be used as the SSI slave chip select. Use GPIO_25 or GPIO_46 instead, and update the CS pin selection in the UC.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 

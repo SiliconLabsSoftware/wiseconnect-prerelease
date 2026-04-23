@@ -106,6 +106,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - By default, the CLK pin is not configured in UC. Select the required CLK pin.
 - Connect the boards: master clock (GPIO_8 or GPIO_25) ↔ slave clock, master TX (GPIO_30) → slave RX (GPIO_29), slave TX (GPIO_30) → master RX (GPIO_29). (Clock direction is from master to slave.)
 
+> **Note:** **USART0 SCLK fractional divider mode** in the USART Universal Configurator (Fractional vs Clock swallow) has **no effect** when the peripheral runs in **synchronous** mode; it applies to asynchronous baud-clock generation. For this example, timing is governed by synchronous operation and the **CLK** supplied by the master, not that UC field.
+
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |

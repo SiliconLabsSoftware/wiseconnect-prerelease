@@ -181,16 +181,16 @@
     <description>Guide for updating an existing application using the WiSeConnect™ SDK v3.5.2 to v4.0.0 application. This guide describes the naming and interface changes in v4.0.0, mostly in order to standardize the names and improve the overall usage experience of the Application Programming Interface (API). Migration requires the names everywhere to be updated in the existing code of an application.</description>
   </contentItemData>
 
-  <contentItemData label="WiSeConnect SDK Migration Guide from v4.0.0 to v4.0.1" itemURI="https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-migr-guides-overview/migrating-from-v4-0-0" category="Quick Start Guides" priority="8">
+  <contentItemData label="WiSeConnect SDK Migration Guide from v4.0.0 to v4.0.2" itemURI="https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-migr-guides-overview/migrating-from-v4-0-0" category="Quick Start Guides" priority="8">
     <property key="core.category" value="Quick Start Guides"/>
     <property key="core.priority" value="8"/>
     <property key="core.boardCompatibility" value=""/>
     <property key="core.partCompatibility" value=".*siwg.* .*siwn.*"/>
     <property key="core.sdkAndProtocolTags" value="WiSeConnect"/>
-    <description>Guide for updating an existing application using the WiSeConnect™ SDK v4.0.0 to v4.0.1 application. This guide describes the naming and interface changes in v4.0.1, mostly in order to standardize the names and improve the overall usage experience of the Application Programming Interface (API). Migration requires the names everywhere to be updated in the existing code of an application.</description>
+    <description>Guide for updating an existing application using the WiSeConnect™ SDK v4.0.0 to v4.0.2 application. This guide describes the naming and interface changes in v4.0.2, mostly in order to standardize the names and improve the overall usage experience of the Application Programming Interface (API). Migration requires the names everywhere to be updated in the existing code of an application.</description>
   </contentItemData>
 
-  <contentItemData label="WiSeConnect SDK Migration Guide from v4.0.1 to v4.0.2" itemURI="https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-migr-guides-overview/migrating-from-v4-0-1" category="Quick Start Guides" priority="8">
+  <contentItemData label="WiSeConnect SDK Migration Guide from v4.0.1 to v4.0.2" itemURI="https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-migr-guides-overview/migrating-from-v4-0-0" category="Quick Start Guides" priority="8">
     <property key="core.category" value="Quick Start Guides"/>
     <property key="core.priority" value="8"/>
     <property key="core.boardCompatibility" value=""/>
