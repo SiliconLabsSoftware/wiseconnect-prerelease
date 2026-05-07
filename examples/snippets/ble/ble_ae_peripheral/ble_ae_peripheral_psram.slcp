@@ -22,6 +22,7 @@ include:
   - path: ble_config.h
 define:
 - name: SL_SI91X_PRINT_DBG_LOG
+- name: SLI_SI91X_MCU_ENABLE_PSRAM_FEATURE
 component:
 - id: sl_main
 - id: freertos

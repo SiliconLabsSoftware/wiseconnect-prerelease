@@ -34,9 +34,23 @@
 #include "sl_wifi_types.h"
 #include "sli_wifi.h"
 
+#ifndef SLI_WIFI_PER_TRANSMIT_LOOPBACK_RESPONSE_SIZE
+#define SLI_WIFI_PER_TRANSMIT_LOOPBACK_RESPONSE_SIZE 1624
+#endif
+
+#ifndef SLI_WIFI_PER_TRANSMIT_LOOPBACK_REQUEST_SIZE
+#define SLI_WIFI_PER_TRANSMIT_LOOPBACK_REQUEST_SIZE 1608
+#endif
+
+#ifndef SLI_WIFI_PER_TX_DAC_REQUEST_DATA_SIZE
+#define SLI_WIFI_PER_TX_DAC_REQUEST_DATA_SIZE 403
+#endif
+
+#define SLI_WIFI_TRANSMIT_LOOPBACK_DATA_RESPONSE_SIZE SLI_WIFI_PER_TRANSMIT_LOOPBACK_RESPONSE_SIZE
+#define SLI_WIFI_TRANSMIT_LOOPBACK_REQUEST_SIZE       SLI_WIFI_PER_TRANSMIT_LOOPBACK_REQUEST_SIZE
+#define SLI_WIFI_TX_DAC_DATA_SIZE                     SLI_WIFI_PER_TX_DAC_REQUEST_DATA_SIZE
 #define SLI_WIFI_LUT_GAIN                             96   ///< Default LUT gain value for DPD
 #define SLI_FRAME_DESC_SIZE                           16   ///< Frame descriptor size
-#define SLI_WIFI_TX_DAC_DATA_SIZE                     398  ///< TX DAC data array size
 #define SLI_WIFI_FREQ_PLANNING_PARAMS_COUNT           10   ///< Frequency planning parameters array size
 #define SLI_WIFI_FREQ_PLANNING_CONFIG_COUNT           4    ///< Frequency planning configuration array size
 #define SLI_WIFI_DIG_CLK_PARAMS_COUNT                 4    ///< Digital clock parameters array size
@@ -49,8 +63,6 @@
 #define SLI_WIFI_READ_HMATRIX_RESPONSE_DATA_SIZE      1024 ///< Read H-matrix response data buffer size
 #define SLI_WIFI_QUERY_COMMAND_RESPONSE_DATA_SIZE     1024 ///< Query command response data buffer size
 #define SLI_WIFI_STATICS_COMMAND_RESPONSE_DATA_SIZE   1024 ///< Statics command response data buffer size
-#define SLI_WIFI_TRANSMIT_LOOPBACK_DATA_ELEMENTS      402  ///< Transmit loopback data elements
-#define SLI_WIFI_TRANSMIT_LOOPBACK_DATA_RESPONSE_SIZE 1624 ///< Transmit loopback data size
 #define SLI_WIFI_GET_TX_POWER_LOG_RESERVED_COUNT      128 ///< Reserved array size in sli_wifi_response_get_tx_power_log_t
 
 /* MLO config */
@@ -361,7 +373,7 @@ typedef struct {
 typedef struct {
   sli_wifi_frame_body_type_t frame_body_type;
   uint32_t enable;                              ///< Enable/disable flag for TX DAC
-  uint32_t size;                                ///< Size of DAC data
+  uint32_t size;                                ///< Size of DAC data in bytes
   uint32_t dac_data[SLI_WIFI_TX_DAC_DATA_SIZE]; ///< DAC data array
 } sli_wifi_request_tx_dac_t;
 
@@ -469,7 +481,7 @@ typedef struct {
   uint32_t enable;
   uint32_t flags;
   uint32_t size;
-  uint32_t dac_data[SLI_WIFI_TRANSMIT_LOOPBACK_DATA_ELEMENTS];
+  uint8_t dac_data[SLI_WIFI_TRANSMIT_LOOPBACK_REQUEST_SIZE];
 } sli_wifi_transmit_loopback_config_t;
 
 typedef struct {
@@ -627,7 +639,8 @@ sl_status_t sli_wifi_statics_command(sl_wifi_interface_t interface,
                                      sli_wifi_statics_command_t *statics_command,
                                      sli_wifi_statics_command_response_t *statics_command_response);
 
+// Taking request directly instead of config to avoid extra allocation as buffer could be huge
 sl_status_t sli_wifi_transmit_loopback(sl_wifi_interface_t interface,
-                                       sli_wifi_transmit_loopback_config_t *config,
+                                       sli_wifi_transmit_loopback_request_t *request,
                                        sli_wifi_transmit_loopback_response_t *response);
 #endif // SLI_WIFI_PER_MODE_H

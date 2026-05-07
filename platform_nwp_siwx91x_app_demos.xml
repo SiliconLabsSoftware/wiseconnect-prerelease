@@ -5,7 +5,7 @@
     <property key="demos.blurb" value="Wi-Fi - SiWx917 Dev Kit (BRD2605A/BRD2605B)" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd2605a" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.1.0/platform_nwp_siwx91x_app/brd2605a/siwx917_dev_kit.rps" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.1.0/platform_nwp_siwx91x_app/brd2605a/siwx917_dev_kit-brd2605a.rps" />
     <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.1.0/connectivity_firmware/standard/SiWG917-B.2.16.5.0.0.4.rps" />
     <property key="demos.firmwareFile.version" value="1711.2.16.5.0.0.4" />
     <property key="readmeFiles" value="examples/si91x_soc/siwx917_dev_kit/readme.md" />
@@ -17,7 +17,7 @@
     <property key="demos.blurb" value="Wi-Fi - SiWx917 Dev Kit (BRD2605A/BRD2605B)" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd2605b" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.1.0/platform_nwp_siwx91x_app/brd2605b/siwx917_dev_kit.rps" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.1.0/platform_nwp_siwx91x_app/brd2605b/siwx917_dev_kit-brd2605b.rps" />
     <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.1.0/connectivity_firmware/standard/SiWG917-B.2.16.5.0.0.4.rps" />
     <property key="demos.firmwareFile.version" value="1711.2.16.5.0.0.4" />
     <property key="readmeFiles" value="examples/si91x_soc/siwx917_dev_kit/readme.md" />

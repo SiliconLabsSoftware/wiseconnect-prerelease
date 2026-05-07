@@ -75,6 +75,12 @@ extern rsi_m4ta_desc_t crypto_desc[2];
 #ifdef SL_CATALOG_LOG_COMPONENT_PRESENT
 #include "sl_log_helper.h"
 extern uint32_t sl_si91x_log_host_timesync_address;
+#if defined(SLI_SI91X_MCU_INTERFACE)
+/** Core ID for sl_log_sync_timestamp after timestamp memory is configured (captive / NWP core). */
+#define SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CORE_ID ((uint8_t)1u)
+/** Context pointer for sl_log_sync_timestamp; none used at Wi-Fi init. */
+#define SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CONTEXT_PTR NULL
+#endif
 #endif
 
 extern bool device_initialized;
@@ -103,6 +109,9 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
       SL_PRINT_STRING_ERROR("\r\nTimestamp Memory Location Configuration Failed with error: 0x%lX\r\n", status);
     }
 #if 0
+    /* After shared timestamp memory is configured, synchronize host and captive-core clocks
+     * for logging so M4 and NWP log timestamps are comparable. */
+    sl_log_sync_timestamp(SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CORE_ID, SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CONTEXT_PTR);
     sl_log_level_t level        = sl_log_get_loglevel();
     sli_nwp_log_config_t config = { .log_config_level = (uint8_t)level };
     status                      = sli_nwp_log_configure(&config);

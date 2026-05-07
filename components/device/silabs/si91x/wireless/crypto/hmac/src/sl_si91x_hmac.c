@@ -102,7 +102,7 @@ static sl_status_t sli_si91x_hmac_pending(const sl_si91x_hmac_config_t *config,
 #else
 static sl_status_t sli_si91x_hmac_side_band(uint16_t total_length,
                                             uint8_t *data,
-                                            sl_si91x_hmac_config_t *config,
+                                            const sl_si91x_hmac_config_t *config,
                                             uint8_t *output)
 {
   sl_status_t status                    = SL_STATUS_FAIL;

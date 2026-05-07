@@ -84,6 +84,11 @@
 #define LAST_CHUNK BIT(2)
 
 /**
+ * @brief Side-band crypto request flags: full payload in one operation (@ref FIRST_CHUNK | @ref LAST_CHUNK).
+ */
+#define SL_SI91X_CRYPTO_FLAG_SIDE_BAND ((FIRST_CHUNK) | (LAST_CHUNK))
+
+/**
  * @brief Enumeration defining different key slots for built-in keys supported by the SI91X device.
  *
  * This enumeration defines different key slots for built-in keys supported by the SI91X device.

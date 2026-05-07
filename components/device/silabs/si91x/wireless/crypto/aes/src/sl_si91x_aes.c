@@ -111,6 +111,7 @@ static sl_status_t sli_si91x_aes_side_band(const sl_si91x_aes_config_t *config, 
 
   request->algorithm_type     = AES;
   request->algorithm_sub_type = config->aes_mode;
+  request->aes_flags          = SL_SI91X_CRYPTO_FLAG_SIDE_BAND;
   request->total_msg_length   = config->msg_length;
   request->encrypt_decryption = config->encrypt_decrypt;
   if (config->iv != NULL) {

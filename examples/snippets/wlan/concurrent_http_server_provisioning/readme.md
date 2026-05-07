@@ -15,11 +15,13 @@
 
 *This application demonstrates how to configure the SiWx91x in concurrent mode, i.e., in both Wi-Fi Station mode (STA instance) and Access Point mode (SoftAP instance) with HTTP Provisioning.*
 
-In this example application, the SiWx91x is configured as Provisioning Access Point (SiWx91x Provisioning AP instance) which acts as an HTTP server (Provisioning HTTP server) to obtain the SSID, PSK, and SECURITY_TYPE of a third-party AP (where SiWx91x STA should be connected). A third-party station connects to the SiWx91x Provisioning AP and using the webpage serverd by the Provisioning HTTP server and provides the third-party AP cerdentials (to which SiWx91x STA should be connected). After obtaining the third-party AP credentials, the Provisioning HTTP server and the SiWx91x Provisioning AP will shutdown.
+In this example application, the SiWx91x is configured as Provisioning Access Point (SiWx91x Provisioning AP instance) which acts as an HTTP server (Provisioning HTTP server) to obtain the SSID, PSK, and SECURITY_TYPE of a third-party AP (where SiWx91x STA should be connected). A third-party station connects to the SiWx91x Provisioning AP and, using the webpage served by the Provisioning HTTP server, provides the third-party AP credentials (to which SiWx91x STA should be connected). After obtaining the third-party AP credentials, the Provisioning HTTP server and the SiWx91x Provisioning AP will shutdown.
 
 Now, the SiWx91x will bring-up as Wi-Fi Station mode (SiWx91x STA instance) with the obtained third-party AP credentials and Access Point mode (SoftAP instance). The HTTP server is initialized again on SoftAP instance (SoftAP HTTP server).
 
-It showcases support for both IPv4 and IPv6 addressing, along with data transfer capabilities, i.e., UDPv4 TX data transfer in SiWx91x STA mode . The SiWx91x opens a UDPv6 client socket on the SiWx91x STA instance and sends data to the UDPv4 server connected to the third-party AP. On the SoftAP instance, a UDPv4 server socket is listening to receive data from a UDPv4 client connected to the SoftAP.
+The example uses **IPv4 and IPv6** for interface bring-up (DHCP/static as configured in `app.c`). For **throughput after concurrent mode is established**, the checked-in `start_wifi_throughput()` in **`wifi_app.c`** spawns **five** CMSIS-RTOS threads. Each thread runs **`send_data_to_udp_server`** as an **IPv4 UDP client** on the **STA** interface toward a remote host (default IPv4 **`192.168.0.156`**) on **UDP ports 5002–5006** (one port per thread). Socket pool settings in **`app.h`** (`TOTAL_SOCKETS`, `UDP_TX_ONLY_SOCKETS`, and related macros) are sized for that default pattern. Other variants (UDP server on SoftAP, TCP/TLS, fewer sockets) are left as **commented** code in `wifi_app.c` for you to enable and then retune `app.h` accordingly.
+
+**Threading overview:** `app_init()` in **`app.c`** starts the Wi-Fi / HTTP state machine on a dedicated RTOS thread (`application_start`, attributes in `app.c`). Per-socket work uses **`create_newsocket_with_new_osthread()`** in **`wifi_app.c`**. **`LOG_PRINT`** in **`app.h`** uses **`printf_mutex`** so UART output from these threads does not interleave.
 
 If SiWx91x STA disconnects from the third-party AP, then the SoftAP HTTP server and the SoftAP instance are shutdown and the SiWx91x STA tries to reconnect to the third-party AP for a maximum of five times. If SiWx91x STA is unable to connect to the third-party AP, then SiWx91x will deinitialize and start the application from the beginning (From the SoftAP being up as a Provisioning AP).
 
@@ -129,6 +131,11 @@ The application can be configured to suit your requirements and development envi
   	#define WIFI_AP_CREDENTIAL                     "MY_AP_PASSPHRASE"
     ```
   - Other SoftAP instance configurations can be modified if required in the `wifi_ap_profile_4` and `wifi_ap_profile_6` configuration structures.
+
+3. **UDP throughput targets (default five parallel TX clients)** — edit **`wifi_app.c`**:
+
+   - In **`start_wifi_throughput()`**, set the destination IPv4 address passed to **`create_newsocket_with_new_osthread()`** (default **`192.168.0.156`**) and, if you change the number of iterations in the `for` loop, update **`app.h`** so **`UDP_TX_ONLY_SOCKETS`**, **`TOTAL_UDP_SOCKETS`**, and **`TOTAL_SOCKETS`** still match the maximum concurrent UDP (and other) sockets you use.
+   - Default ports are **5002–5006** (`5001 + i` for `i = 1 … 5`). Any change must stay consistent with the UDP servers you run on the PC side.
 
 > Note:
 >
@@ -384,11 +391,11 @@ create_newsocket_with_new_osthread(receive_data_from_tls_server,
                                    SYNC_SOCKET);    // Synchronous socket
 ```
 
-- Throughput test options
+- Throughput test options (in **`wifi_app.c`**; values below match the **checked-in** project)
 
     ```c
-      #define BYTES_TO_SEND     (1 << 29)     // To measure TX throughput with 512MB data transfer
-      #define BYTES_TO_RECEIVE  (1 << 20)     // To measure RX throughput with 1MB data transfer
+      #define BYTES_TO_SEND     (1 << 30)     // TX cap per thread (~1024 MiB), UDP TX path
+      #define BYTES_TO_RECEIVE  (1 << 30)     // Used by RX / async callback paths when enabled
       #define TEST_TIMEOUT      30000         // Throughput test timeout in ms
     ```
 
@@ -427,27 +434,32 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 **Step 7** : HTTP server is initialized again on SoftAP instance (SoftAP HTTP server).
 
-**Step 8** : IPv4 UDP_TX data transfer is performed on SiWx91x STA. Client device should connect to the third party HTTP SiWx91x SoftAP.
+**Step 8** : IPv4 **UDP TX** runs on the **SiWx91x STA** (not on the SoftAP data path in the default project). On a host **reachable from the STA** through the third-party AP (by default the firmware targets **`192.168.0.156`**), start **five** UDP servers on **ports 5002, 5003, 5004, 5005, and 5006**, or change the IP and port loop in **`start_wifi_throughput()`** in **`wifi_app.c`** to match your LAN. The firmware then starts **five** RTOS threads, each sending UDP from the STA toward that host.
 
-**Step 9** : To trigger rejoin failure on SiWx91x STA, change the SSID, PSK, or CH_NO of the third-party AP by opening it's Admin/login page. Once rejoin is triggered, SiWx91x will shutdown the SoftAP HTTP server and SiWx91x SoftAP. SiWx917 STA then tries to reconnect to the same third-party AP. If unable to reconnect, SiWx917 deinits and goes to Step 1.
+**Step 9** : To trigger rejoin failure on SiWx91x STA, change the SSID, PSK, or CH_NO of the third-party AP by opening its Admin/login page. Once rejoin is triggered, SiWx91x will shutdown the SoftAP HTTP server and SiWx91x SoftAP. SiWx917 STA then tries to reconnect to the same third-party AP. If unable to reconnect, SiWx917 deinits and goes to Step 1.
 
 >
 > Note:
 >
-> When data transfer occurs, communication happens between the client-side and the server-side. Typically, it's recommended to initiate the server first, as the client immediately attempts to establish a connection to transmit data.
+> When data transfer occurs, communication happens between the client-side and the server-side. Start the **PC UDP listeners** (or iPerf servers) **before** or as soon as concurrent mode is up, because the device threads begin sending shortly after entering the data-transfer state.
 
-The following sections describe how to run the SiWx91x application together with examples for UDP and TCP iPerf configurations that run on the PC.
+The following subsection describes UDP iPerf usage for the default throughput path. TCP and TLS throughput patterns exist as commented examples in **`wifi_app.c`** if you enable them and adjust socket counts in **`app.h`**.
 
-### UDP Tx on IPv4
+### UDP Tx on IPv4 (default: five STA clients)
 
-To use IPv4 UDP Tx, the SiWx91x STA is configured as a UDP client and starts a UDP server on the remote PC. 
-The iPerf command to start the IPv6 UDP server on remote PC is:
+The SiWx91x STA acts as **five** simultaneous **UDP clients** to the configured server IP, **one UDP server port per thread** (**5002–5006** with the stock `for` loop in **`start_wifi_throughput()`** in **`wifi_app.c`**).
+
+On the PC (Windows example), start **five** iPerf UDP servers—one per port—or use another tool that listens on those UDP ports:
+
+> `C:\> iperf.exe -s -u -p 5002 -i 1`  
+> `C:\> iperf.exe -s -u -p 5003 -i 1`  
+> `C:\> iperf.exe -s -u -p 5004 -i 1`  
+> `C:\> iperf.exe -s -u -p 5005 -i 1`  
+> `C:\> iperf.exe -s -u -p 5006 -i 1`
+
+Use the **same** IP address in **`wifi_app.c`** as the PC’s address on the third-party AP subnet. Generic form:
 
 > `C:\> iperf.exe -s -u -p <SERVER_PORT> -i 1`
->
-> For example ...
->
-> `C:\> iperf.exe -s -u -p 5000 -i 1`
 
 ## Application Output
 

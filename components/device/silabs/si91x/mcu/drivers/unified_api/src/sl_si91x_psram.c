@@ -952,44 +952,11 @@ sl_psram_return_type_t psram_set_wrap_size(sl_psram_burst_size_type_t PSRAMBurst
  ******************************************************************************/
 
 /***************************************************************************/ /**
- * Initialize the PSRAM Device           
+ * @brief See @ref sli_si91x_psram_device_init in sl_si91x_psram.h.
  ******************************************************************************/
-sl_psram_return_type_t sl_si91x_psram_init()
+sl_psram_return_type_t sli_si91x_psram_device_init(void)
 {
   sl_psram_return_type_t PSRAM_Status = PSRAM_UNKNOWN;
-  rsi_error_t clkStatus               = RSI_FAIL;
-  uint8_t pinIndex                    = 0;
-  uint16_t clkDivFactor               = 0;
-
-  /*Clock Initialization*/
-  uint32_t system_clock_value = system_clocks.ulpss_ref_clk;
-
-  /* read ID command supports max frequency of 33MHz */
-  if (system_clock_value > 33000000) {
-    clkDivFactor = (system_clock_value / 33000000);
-  }
-
-  /* Set qspi clk with value <= 33MHz for read ID call*/
-  clkStatus = RSI_CLK_Qspi2ClkConfig(M4CLK, QSPI_ULPREFCLK, 0, 0, clkDivFactor);
-
-  if (RSI_OK != clkStatus) {
-    SL_PRINT_STRING_ERROR("sl_si91x_psram_init: error status=0x%04lX,line no : %d\r\n",
-                          (unsigned long)(PSRAM_CLOCK_INIT_FAILURE),
-                          (int)__LINE__);
-    return PSRAM_CLOCK_INIT_FAILURE;
-  }
-
-  /*PinMux Initialization*/
-  for (pinIndex = 0; pinIndex < NUM_OF_PSRAM_PINS; pinIndex++) {
-    RSI_EGPIO_PadSelectionEnable(PSRAMPinConfig[pinIndex].pad);
-    RSI_EGPIO_PadReceiverEnable((PSRAMPinConfig[pinIndex].port * 16) + PSRAMPinConfig[pinIndex].pin);
-
-    /*Set the GPIO pin MUX */
-    RSI_EGPIO_SetPinMux(EGPIO,
-                        PSRAMPinConfig[pinIndex].port,
-                        PSRAMPinConfig[pinIndex].pin,
-                        PSRAMPinConfig[pinIndex].mux);
-  }
 
   /*QSPI Initialization*/
 
@@ -1043,22 +1010,6 @@ sl_psram_return_type_t sl_si91x_psram_init()
     PSRAM_Status = PSRAM_SUCCESS;
 
   } else {
-
-    /*UnInitialize QSPI Controller*/
-
-    /*UnInitialize PinMux*/
-    for (pinIndex = 0; pinIndex < NUM_OF_PSRAM_PINS; pinIndex++) {
-
-      /*Set the GPIO pin MUX */
-      RSI_EGPIO_SetPinMux(EGPIO, PSRAMPinConfig[pinIndex].port, PSRAMPinConfig[pinIndex].pin, EGPIO_PIN_MUX_MODE0);
-
-      /* Set output direction */
-      RSI_EGPIO_SetDir(EGPIO, PSRAMPinConfig[pinIndex].port, PSRAMPinConfig[pinIndex].pin, EGPIO_CONFIG_DIR_INPUT);
-    }
-
-    /*UnInitialize clock*/
-    RSI_CLK_PeripheralClkDisable(M4CLK, QSPI_2_CLK);
-
     PSRAMStatus.state = uninitialised;
 
     PSRAMStatus.burstSize = 0;
@@ -1079,13 +1030,62 @@ sl_psram_return_type_t sl_si91x_psram_init()
   return PSRAM_SUCCESS;
 }
 
-/***************************************************************************/ /**
- * Uninitialize the PSRAM Device
- ******************************************************************************/
-sl_psram_return_type_t sl_si91x_psram_uninit(void)
+sl_psram_return_type_t sl_si91x_psram_init()
 {
-  uint8_t pinIndex = 0;
+  sl_psram_return_type_t PSRAM_Status = PSRAM_UNKNOWN;
+  rsi_error_t clkStatus               = RSI_FAIL;
+  uint8_t pinIndex                    = 0;
+  uint16_t clkDivFactor               = 0;
 
+  /*Clock Initialization*/
+  uint32_t system_clock_value = system_clocks.ulpss_ref_clk;
+
+  /* read ID command supports max frequency of 33MHz */
+  if (system_clock_value > 33000000) {
+    clkDivFactor = (system_clock_value / 33000000);
+  }
+
+  /* Set qspi clk with value <= 33MHz for read ID call*/
+  clkStatus = RSI_CLK_Qspi2ClkConfig(M4CLK, QSPI_ULPREFCLK, 0, 0, clkDivFactor);
+
+  if (RSI_OK != clkStatus) {
+    return PSRAM_CLOCK_INIT_FAILURE;
+  }
+
+  /*PinMux Initialization*/
+  for (pinIndex = 0; pinIndex < NUM_OF_PSRAM_PINS; pinIndex++) {
+    RSI_EGPIO_PadSelectionEnable(PSRAMPinConfig[pinIndex].pad);
+    RSI_EGPIO_PadReceiverEnable((PSRAMPinConfig[pinIndex].port * 16) + PSRAMPinConfig[pinIndex].pin);
+
+    /*Set the GPIO pin MUX */
+    RSI_EGPIO_SetPinMux(EGPIO,
+                        PSRAMPinConfig[pinIndex].port,
+                        PSRAMPinConfig[pinIndex].pin,
+                        PSRAMPinConfig[pinIndex].mux);
+  }
+
+  PSRAM_Status = sli_si91x_psram_device_init();
+  if (PSRAM_Status != PSRAM_SUCCESS) {
+    for (pinIndex = 0; pinIndex < NUM_OF_PSRAM_PINS; pinIndex++) {
+
+      /*Set the GPIO pin MUX */
+      RSI_EGPIO_SetPinMux(EGPIO, PSRAMPinConfig[pinIndex].port, PSRAMPinConfig[pinIndex].pin, EGPIO_PIN_MUX_MODE0);
+
+      /* Set output direction */
+      RSI_EGPIO_SetDir(EGPIO, PSRAMPinConfig[pinIndex].port, PSRAMPinConfig[pinIndex].pin, EGPIO_CONFIG_DIR_INPUT);
+    }
+
+    /*UnInitialize clock*/
+    RSI_CLK_PeripheralClkDisable(M4CLK, QSPI_2_CLK);
+  }
+  return PSRAM_Status;
+}
+
+/***************************************************************************/ /**
+ * @brief See @ref sli_si91x_psram_device_uninit in sl_si91x_psram.h.
+ ******************************************************************************/
+sl_psram_return_type_t sli_si91x_psram_device_uninit(void)
+{
   /*Exits PSRAM device from QPI mode*/
   psram_exit_qpi_mode();
 
@@ -1093,6 +1093,23 @@ sl_psram_return_type_t sl_si91x_psram_uninit(void)
 
   /*Initialize the QSPI controller to PSRAM default mode configuration*/
   RSI_QSPI_SpiInit((qspi_reg_t *)M4_QSPI_2_BASE_ADDRESS, (spi_config_t *)&spi_psram_default_config, 0, 0, 0);
+
+  PSRAMStatus.state = uninitialised;
+
+  PSRAMStatus.burstSize = 0;
+
+  PSRAMStatus.secureSegmentNumber = 0;
+
+  PSRAMStatus.secureModeEnable = false;
+
+  return PSRAM_SUCCESS;
+}
+
+sl_psram_return_type_t sl_si91x_psram_uninit(void)
+{
+  uint8_t pinIndex = 0;
+
+  sli_si91x_psram_device_uninit();
 
   /*UnInitialize PinMux*/
   for (pinIndex = 0; pinIndex < NUM_OF_PSRAM_PINS; pinIndex++) {
@@ -1105,14 +1122,6 @@ sl_psram_return_type_t sl_si91x_psram_uninit(void)
   }
 
   RSI_CLK_PeripheralClkDisable(M4CLK, QSPI_2_CLK);
-
-  PSRAMStatus.state = uninitialised;
-
-  PSRAMStatus.burstSize = 0;
-
-  PSRAMStatus.secureSegmentNumber = 0;
-
-  PSRAMStatus.secureModeEnable = false;
 
   /*Return success*/
   return PSRAM_SUCCESS;

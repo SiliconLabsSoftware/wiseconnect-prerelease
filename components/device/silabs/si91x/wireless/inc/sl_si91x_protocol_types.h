@@ -1272,6 +1272,7 @@ typedef struct {
 typedef struct {
   uint8_t algorithm_type;
   uint8_t algorithm_sub_type;
+  uint8_t aes_flags;
   uint16_t total_msg_length;
   uint16_t encrypt_decryption;
   uint16_t output_length;
@@ -1435,6 +1436,25 @@ typedef struct {
   uint32_t *msg;             ///< Message
   uint8_t *token_buf;        ///< Token buffer
 } sli_si91x_rsi_token_req_t;
+
+typedef struct {
+  uint8_t algorithm_type;
+  uint8_t algorithm_sub_type;
+  uint8_t ecdsa_flags;
+  uint8_t curve_id;
+  uint8_t sha_mode;
+  uint8_t private_key_length;
+  uint8_t public_key_length;
+  uint8_t signature_length;
+  uint16_t current_chunk_length;
+  uint16_t msg_len;
+  sli_si91x_key_descriptor_t key_info;
+  uint8_t *private_key;
+  uint8_t *public_key;
+  uint8_t *signature;
+  uint8_t *msg;
+  uint8_t *output;
+} sl_si91x_ecdsa_request_t;
 #else
 typedef struct crypto_key_s {
   uint32_t key_slot;                            ///< For built-in key

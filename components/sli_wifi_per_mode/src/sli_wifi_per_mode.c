@@ -1214,14 +1214,13 @@ sl_status_t sli_wifi_statics_command(sl_wifi_interface_t interface,
 }
 
 sl_status_t sli_wifi_transmit_loopback(sl_wifi_interface_t interface,
-                                       sli_wifi_transmit_loopback_config_t *config,
+                                       sli_wifi_transmit_loopback_request_t *request,
                                        sli_wifi_transmit_loopback_response_t *response)
 {
-  sl_status_t status                                              = SL_STATUS_FAIL;
-  sli_wifi_transmit_loopback_request_t *transmit_loopback_request = NULL;
-  sl_wifi_buffer_t *buffer                                        = NULL;
+  sl_status_t status       = SL_STATUS_FAIL;
+  sl_wifi_buffer_t *buffer = NULL;
 
-  if (config == NULL || response == NULL) {
+  if (request == NULL || response == NULL) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -1241,27 +1240,13 @@ sl_status_t sli_wifi_transmit_loopback(sl_wifi_interface_t interface,
     return SL_STATUS_INVALID_MODE;
   }
 
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
-                                              SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
-                                              SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
-                                              (sli_buffer_t *)&transmit_loopback_request);
-
-  VERIFY_STATUS_AND_RETURN(status);
-
-  memset(transmit_loopback_request, 0, sizeof(sli_wifi_transmit_loopback_request_t));
-
-  memcpy(&transmit_loopback_request->config, config, sizeof(sli_wifi_transmit_loopback_config_t));
-  transmit_loopback_request->frame_body_type.sub_type = SLI_WIFI_SUBTYPE_TRANSMIT_LOOPBACK;
-
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
                                  SLI_WIFI_WLAN_CMD,
-                                 transmit_loopback_request,
+                                 request,
                                  sizeof(sli_wifi_transmit_loopback_request_t),
                                  SLI_WIFI_WAIT_FOR_RESPONSE(1000),
                                  NULL,
                                  (void **)&buffer);
-
-  sli_buffer_manager_free_buffer(transmit_loopback_request);
 
   if ((status != SL_STATUS_OK) && (NULL != buffer)) {
     sli_buffer_manager_free_buffer(buffer);

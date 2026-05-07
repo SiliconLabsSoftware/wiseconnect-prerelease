@@ -34,7 +34,11 @@
 /*******************************************************************************
  ***************************  LOCAL MACROS   ***********************************
  ******************************************************************************/
-#define OUTPUT                1     // Output value set
+#if defined(PWM_OUTPUT_LOW)
+#define OUTPUT 0 // Output value set
+#else
+#define OUTPUT 1 // Output value set
+#endif
 #define MAX_POLARITY          1     // Maximum polarity value
 #define DEAD_TIME_MAX         1     // Dead time counter maximum value
 #define ULP_PORT              4     // GPIO ULP port
@@ -69,10 +73,11 @@ uint32_t ticks       = 0;
 void MCPWM_IRQHANDLER(void);
 
 /*******************************************************************************
- * This API is used for initialize PWM pins and clock. The formal argument passed takes
- * pointer to structure of type \ref sl_pwm_init_t. This holds the GPIO port,pin, pad, mux
- * configuration. The members are assigned to SL macros defined in sl_pwm_board.h.
- * The SL macros are integrated to RTE macros present in RTE device file.
+ * Initializes MCPWM output pads (and legacy path also enables \c PWM_CLK here).
+ * When \ref PWM_OUTPUT_LOW is defined: optional GPIO
+ * output-low preparation, then PWM mux; \c PWM_CLK is enabled in
+ * \ref sl_si91x_pwm_set_configuration(), not here. When undefined: legacy behavior
+ * enables \c PWM_CLK in this API. Argument: \ref sl_pwm_init_t from board / RTE.
  ******************************************************************************/
 sl_status_t sl_si91x_pwm_init(sl_pwm_init_t *pwm_init)
 {
@@ -86,6 +91,9 @@ sl_status_t sl_si91x_pwm_init(sl_pwm_init_t *pwm_init)
     }
     if (pwm_init->pin_l >= MAX_GPIO) {
       sl_si91x_gpio_enable_ulp_pad_receiver((uint8_t)(pwm_init->pin_l - MAX_GPIO));
+#if defined(PWM_OUTPUT_LOW)
+      sl_gpio_pin_configure_gpio_output_level(ULP_PORT, (uint8_t)(pwm_init->pin_l - MAX_GPIO), OUTPUT);
+#endif
       sl_gpio_set_pin_mode(ULP_PORT, (uint8_t)(pwm_init->pin_l - MAX_GPIO), ULP_MODE, OUTPUT);
     } else {
       sl_si91x_gpio_enable_pad_receiver(pwm_init->pin_l);
@@ -95,10 +103,16 @@ sl_status_t sl_si91x_pwm_init(sl_pwm_init_t *pwm_init)
     } else {
       sl_si91x_gpio_enable_pad_selection(pwm_init->pad_l);
     }
+#if defined(PWM_OUTPUT_LOW)
+    sl_gpio_pin_configure_gpio_output_level(pwm_init->port_l, pwm_init->pin_l, OUTPUT);
+#endif
     sl_gpio_set_pin_mode(pwm_init->port_l, pwm_init->pin_l, pwm_init->mux_l, OUTPUT);
 
     if (pwm_init->pin_h >= MAX_GPIO) {
       sl_si91x_gpio_enable_ulp_pad_receiver((uint8_t)(pwm_init->pin_h - MAX_GPIO));
+#if defined(PWM_OUTPUT_LOW)
+      sl_gpio_pin_configure_gpio_output_level(ULP_PORT, (uint8_t)(pwm_init->pin_h - MAX_GPIO), OUTPUT);
+#endif
       sl_gpio_set_pin_mode(ULP_PORT, (uint8_t)(pwm_init->pin_h - MAX_GPIO), ULP_MODE, OUTPUT);
     } else {
       sl_si91x_gpio_enable_pad_receiver(pwm_init->pin_h);
@@ -108,10 +122,22 @@ sl_status_t sl_si91x_pwm_init(sl_pwm_init_t *pwm_init)
     } else {
       sl_si91x_gpio_enable_pad_selection(pwm_init->pad_h);
     }
+#if defined(PWM_OUTPUT_LOW)
+    sl_gpio_pin_configure_gpio_output_level(pwm_init->port_h, pwm_init->pin_h, OUTPUT);
+#endif
     sl_gpio_set_pin_mode(pwm_init->port_h, pwm_init->pin_h, pwm_init->mux_h, OUTPUT);
 
-    // Initialization of PWM clock
+#if defined(PWM_OUTPUT_LOW)
+    /*
+     * PWM_CLK is not enabled here. If the application needs the peripheral clock
+     * (any MCPWM register access after pin setup), it must call
+     * sl_si91x_pwm_set_configuration() (or otherwise enable PWM_CLK) before using
+     * start/duty/period or other PWM APIs; otherwise the block may remain gated.
+     */
+#else
+    // Initialization of PWM clock (legacy)
     RSI_CLK_PeripheralClkEnable(M4CLK, PWM_CLK, ENABLE_STATIC_CLK);
+#endif
     status = SL_STATUS_OK;
   } while (false);
   return status;
@@ -148,12 +174,17 @@ sl_pwm_version_t sl_si91x_pwm_get_version(void)
  ******************************************************************************/
 static sl_status_t validate_config_parameters(sl_pwm_config_t *pwm_config)
 {
-  sl_status_t status = 0;
+  sl_status_t status = SL_STATUS_OK;
   do {
     // Validates the null pointer, if true returns error code
     if (pwm_config == NULL) {
       status = SL_STATUS_NULL_POINTER;
       SL_PRINT_STRING_ERROR("validate_config_parameters: handle NULL,line no : %d\r\n", (int)__LINE__);
+      break;
+    }
+    /* Zero frequency is invalid in every build (see sl_si91x_pwm_set_configuration docs); avoids divide-by-zero below. */
+    if (pwm_config->frequency == 0U) {
+      status = SL_STATUS_INVALID_PARAMETER;
       break;
     }
     // Validating PWM Channel value
@@ -194,15 +225,18 @@ static sl_status_t validate_config_parameters(sl_pwm_config_t *pwm_config)
 }
 
 /*******************************************************************************
- * This API is used to set the PWM configuration parameters
- * The actions to be performed are:
- *      - Initialize PWM using @ref sl_si91x_pwm_init()
+ * Sets PWM configuration. When \ref PWM_OUTPUT_LOW is
+ * defined, enables \c PWM_CLK here then applies polarity/timing; on failure after
+ * enable the clock is left on (shared gate). Legacy build: clock was already
+ * enabled in \ref sl_si91x_pwm_init(); this API does not enable it again.
  ******************************************************************************/
 sl_status_t sl_si91x_pwm_set_configuration(sl_pwm_config_t *pwm_config)
 {
   sl_status_t status;
   uint32_t rate = 0;
-  rate          = (SystemCoreClock / pwm_config->frequency);
+#if defined(PWM_OUTPUT_LOW)
+  rsi_error_t clk_status;
+#endif
   do {
     status = validate_config_parameters(pwm_config);
     if (status != SL_STATUS_OK) {
@@ -211,6 +245,14 @@ sl_status_t sl_si91x_pwm_set_configuration(sl_pwm_config_t *pwm_config)
                             (int)__LINE__);
       break;
     }
+    rate = SystemCoreClock / pwm_config->frequency;
+#if defined(PWM_OUTPUT_LOW)
+    clk_status = RSI_CLK_PeripheralClkEnable(M4CLK, PWM_CLK, ENABLE_STATIC_CLK);
+    if (clk_status != RSI_OK) {
+      status = SL_STATUS_FAIL;
+      break;
+    }
+#endif
     // Set output polarity
     status = sl_si91x_pwm_set_output_polarity(pwm_config->is_polarity_low, pwm_config->is_polarity_high);
     if (status != SL_STATUS_OK) {
@@ -268,7 +310,9 @@ sl_status_t sl_si91x_pwm_set_configuration(sl_pwm_config_t *pwm_config)
                             (int)__LINE__);
       break;
     }
+
     status = SL_STATUS_OK;
+
   } while (false);
   return status;
 }
@@ -276,7 +320,9 @@ sl_status_t sl_si91x_pwm_set_configuration(sl_pwm_config_t *pwm_config)
 /*******************************************************************************
  * This API is used to set output polarity for MCPWM
  * The actions to be performed are:
- *      - Enable PWM clock using @ref sl_si91x_pwm_enable_clock()\n
+ *      - When \ref PWM_OUTPUT_LOW: PWM clock must already
+ *        be enabled (typically via @ref sl_si91x_pwm_set_configuration()).\n
+ *      - Legacy: PWM clock is enabled in @ref sl_si91x_pwm_init().\n
  *      - Select base timer for PWM channel @ref sl_si91x_pwm_control_base_timer()\n
  ******************************************************************************/
 sl_status_t sl_si91x_pwm_set_output_polarity(boolean_t polarity_low, boolean_t polarity_high)
@@ -432,12 +478,13 @@ sl_status_t sl_si91x_pwm_set_time_period(sl_pwm_channel_t channel, uint32_t peri
     }
     error_status = RSI_MCPWM_SetTimePeriod(MCPWM, channel, (uint16_t)period, (uint16_t)init_val);
     if (error_status != RSI_OK) {
-      status = SL_STATUS_FAIL; // Returns status OK if no error occurs
+      status = SL_STATUS_FAIL;
       SL_PRINT_STRING_ERROR("sl_si91x_pwm_set_time_period: error status=0x%04lX,line no : %d\r\n",
                             (unsigned long)(status),
                             (int)__LINE__);
+      break;
     }
-    status = SL_STATUS_OK; // Returns status error code
+    status = SL_STATUS_OK;
   } while (false);
   return status;
 }
@@ -794,12 +841,13 @@ sl_status_t sl_si91x_pwm_read_counter(uint16_t *counter_value, sl_pwm_channel_t 
     }
     error_status = RSI_MCPWM_ReadCounter(MCPWM, counter_value, channel);
     if (error_status != RSI_OK) {
-      status = SL_STATUS_FAIL; // Returns status error code
+      status = SL_STATUS_FAIL;
       SL_PRINT_STRING_ERROR("sl_si91x_pwm_read_counter: error status=0x%04lX,line no : %d\r\n",
                             (unsigned long)(status),
                             (int)__LINE__);
+      break;
     }
-    status = SL_STATUS_OK; // Returns status OK if no error occurs
+    status = SL_STATUS_OK;
   } while (false);
   return status;
 }
@@ -833,12 +881,13 @@ sl_status_t sl_si91x_pwm_get_counter_direction(uint8_t *counter_direction, sl_pw
     }
     error_status = RSI_MCPWM_GetCounterDir(MCPWM, counter_direction, channel);
     if (error_status != RSI_OK) {
-      status = SL_STATUS_FAIL; // Returns status error code
+      status = SL_STATUS_FAIL;
       SL_PRINT_STRING_ERROR("sl_si91x_pwm_get_counter_direction: error status=0x%04lX,line no : %d\r\n",
                             (unsigned long)(status),
                             (int)__LINE__);
+      break;
     }
-    status = SL_STATUS_OK; // Returns status OK if no error occurs
+    status = SL_STATUS_OK;
   } while (false);
   return status;
 }
@@ -1308,7 +1357,9 @@ sl_status_t sl_si91x_pwm_get_time_period(sl_pwm_channel_t channel, uint16_t *per
 }
 
 /*******************************************************************************
- * This API is used for initialize PWM event pins
+ * Initializes MCPWM fault / external-event pads. When
+ * \ref PWM_OUTPUT_LOW is defined, pins are prepared
+ * as inputs before mux (no \c sl_gpio_pin_configure_gpio_output_level on fault lines).
  ******************************************************************************/
 sl_status_t sl_si91x_pwm_fault_init(sl_pwm_fault_init_t *pwm_fault)
 {
@@ -1321,8 +1372,12 @@ sl_status_t sl_si91x_pwm_fault_init(sl_pwm_fault_init_t *pwm_fault)
       break;
     }
     if (pwm_fault->pin >= MAX_GPIO) {
-      sl_si91x_gpio_enable_ulp_pad_receiver((uint8_t)(pwm_fault->pin - MAX_GPIO));
-      sl_gpio_set_pin_mode(ULP_PORT, (uint8_t)(pwm_fault->pin - MAX_GPIO), ULP_MODE, OUTPUT);
+      uint8_t ulp_pin = (uint8_t)(pwm_fault->pin - MAX_GPIO);
+      sl_si91x_gpio_enable_ulp_pad_receiver(ulp_pin);
+#if defined(PWM_OUTPUT_LOW)
+      sl_si91x_gpio_set_pin_direction(ULP_PORT, ulp_pin, GPIO_INPUT);
+#endif
+      sl_gpio_set_pin_mode(ULP_PORT, ulp_pin, ULP_MODE, OUTPUT);
     } else {
       sl_si91x_gpio_enable_pad_receiver(pwm_fault->pin);
     }
@@ -1331,6 +1386,9 @@ sl_status_t sl_si91x_pwm_fault_init(sl_pwm_fault_init_t *pwm_fault)
     } else {
       sl_si91x_gpio_enable_pad_selection(pwm_fault->pad);
     }
+#if defined(PWM_OUTPUT_LOW)
+    sl_si91x_gpio_set_pin_direction(pwm_fault->port, pwm_fault->pin, GPIO_INPUT);
+#endif
     sl_gpio_set_pin_mode(pwm_fault->port, pwm_fault->pin, pwm_fault->mux, OUTPUT);
     status = SL_STATUS_OK;
   } while (false);
