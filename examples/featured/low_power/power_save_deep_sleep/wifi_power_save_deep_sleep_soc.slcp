@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Powersave Deep Sleep (SoC)
 category: Example|Wi-Fi
-description: 'Enable power save deep sleep profile with SiWx91x
+description: 'Enable power save deep sleep profile with SiWx91x in Low Power mode
 
   '
 filter:

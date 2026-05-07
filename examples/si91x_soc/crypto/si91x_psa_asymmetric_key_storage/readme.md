@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA Asymmetric Key Storage
+# SiWx91x Platform PSA Asymmetric Key Storage
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA Asymmetric Key Storage](#platform-siwx91x-psa-asymmetric-key-storage)
+- [SiWx91x Platform PSA Asymmetric Key Storage](#platform-siwx91x-psa-asymmetric-key-storage)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

@@ -620,7 +620,7 @@ sl_status_t sli_si91x_usart_send_data_blocking(sl_usart_handle_t usart_handle, c
  * To Send the data in async mode when USART/UART is configured
  *
  * @details
- * This function returns immediately and data transfer happens asyncronously. Once the data transfer compeletes ,
+ * This function returns immediately and data transfer happens asynchronously. Once the data transfer completes ,
  * registered user callback get invoked
  * It takes two arguments,
  *   - data: pointer to the data buffer which stores the data received

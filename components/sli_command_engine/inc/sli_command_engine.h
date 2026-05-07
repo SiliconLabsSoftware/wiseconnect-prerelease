@@ -83,8 +83,22 @@ typedef enum {
   SLI_COMMAND_ENGINE_PACKET_TX_INIT       = (1 << 0), // TX state: initialized, queued but not started
   SLI_COMMAND_ENGINE_PACKET_TX_INPROGRESS = (1 << 1), // TX state: transmission currently in progress
   SLI_COMMAND_ENGINE_PACKET_FLUSHED       = (1 << 2), // TX state: flushed/aborted before completion
-  SLI_COMMAND_ENGINE_PACKET_TX_DONE       = (1 << 3)  // TX state: transmission finished successfully
+  SLI_COMMAND_ENGINE_PACKET_TX_DONE       = (1 << 3), // TX state: transmission finished successfully
+  SLI_COMMAND_ENGINE_TEARDOWN_DONE        = (1 << 4), // Teardown state: teardown completed
 } sli_command_engine_packet_tx_flags_t;
+
+/**
+ * @brief Command engine instance lifecycle (init / deinit).
+ *
+ * While @c SLI_COMMAND_ENGINE_LIFECYCLE_DEINIT, @ref sli_command_engine_receive_packet and
+ * @ref sli_command_engine_send_packet return @c SL_STATUS_NOT_READY so callers do not enqueue
+ * work the worker thread will not process (e.g. during teardown). RX buffer ownership on error
+ * is described on @ref sli_command_engine_receive_packet.
+ */
+typedef enum {
+  SLI_COMMAND_ENGINE_LIFECYCLE_DEINIT = 0, ///< Not accepting RX/TX (default after static init or during deinit)
+  SLI_COMMAND_ENGINE_LIFECYCLE_READY  = 1, ///< Fully initialized; worker may process queues
+} sli_command_engine_lifecycle_t;
 
 /**
  * @brief Enumeration of command engine response types.
@@ -216,16 +230,25 @@ typedef struct {
 } sli_command_engine_packet_type_configuration_t;
 
 /**
- * @brief Callback to Flush command engine events during sli_command_engine_deinit().
+ * @brief Callback to flush one queued or in-flight command during dynamic unregister or deinit.
  *
- * @param instance Pointer to the command engine instance.
- * @param pkt_config Pointer to the packet type configuration.
- * @param tx_info Pointer to TX info containing the data pointer.
+ * Implementations should post dummy/error sync responses or free async metadata and buffers,
+ * mirroring product-specific flush APIs. When this returns true, the command engine will not
+ * free @p metadata or @p metadata->tx_info.data_packet for this node (ownership was transferred
+ * or buffers were already released inside the handler). For @c SLI_COMMAND_ENGINE_PACKET_TX_INPROGRESS,
+ * returning false leaves the engine default path to mark the node flushed without freeing the
+ * data buffer until TX completion.
+ *
+ * @param instance Command engine instance.
+ * @param packet_type Packet type being flushed.
+ * @param pkt_config Per-type configuration (sync/async queues, events).
+ * @param metadata Command metadata for this queue node (same pointer the engine would otherwise free).
+ * @return true if the handler consumed the node (no further free by command engine for this call).
  */
-typedef void (*sli_command_engine_flush_handler_t)(sli_command_engine_t *instance,
+typedef bool (*sli_command_engine_flush_handler_t)(const sli_command_engine_t *instance,
                                                    uint16_t packet_type,
                                                    sli_command_engine_packet_type_configuration_t *pkt_config,
-                                                   sli_command_engine_tx_info_t *tx_info);
+                                                   sli_command_engine_metadata_t *metadata);
 
 /**
  * @brief Command engine configuration structure.
@@ -233,19 +256,17 @@ typedef void (*sli_command_engine_flush_handler_t)(sli_command_engine_t *instanc
  * Contains settings and handler pointers for initializing a command engine instance.
  */
 typedef struct {
-  char name[SLI_COMMAND_ENGINE_THREAD_NAME_LENGTH]; ///< Command engine thread name
-  uint8_t packet_type_count;                        ///< Number of packet types handled (max 10)
-  sli_command_engine_packet_type_configuration_t *packet_type_configuration; ///< Packet type handler list
-  sli_command_engine_get_packet_metadata_t get_packet_metadata;              ///< Metadata extraction handler
-  osPriority_t priority;                                                     ///< Thread priority
-  uint32_t stack_size;                                                       ///< Thread stack size
-  sli_routing_table_t *routing_table;                                        ///< Routing table
-  sli_queue_t *error_event_queue;                                            ///< Error event queue handle
-  uint32_t error_event;                                                      ///< Error event flag
-  osEventFlagsId_t *error_event_id;                                          ///< Event ID for error events
-  sli_buffer_manager_pool_types_t metadata_buffer_pool_type;                 ///< Metadata buffer pool type
-  sli_buffer_manager_pool_types_t error_buffer_pool_type;                    ///< Error buffer pool type
-  sli_command_engine_flush_handler_t flush_handler;                          ///< Flush handler called during deinit
+  char name[SLI_COMMAND_ENGINE_THREAD_NAME_LENGTH];             ///< Command engine thread name
+  sli_command_engine_get_packet_metadata_t get_packet_metadata; ///< Metadata extraction handler
+  osPriority_t priority;                                        ///< Thread priority
+  uint32_t stack_size;                                          ///< Thread stack size
+  sli_routing_table_t *routing_table;                           ///< Routing table
+  sli_queue_t *error_event_queue;                               ///< Error event queue handle
+  uint32_t error_event;                                         ///< Error event flag
+  osEventFlagsId_t *error_event_id;                             ///< Event ID for error events
+  sli_buffer_manager_pool_types_t metadata_buffer_pool_type;    ///< Metadata buffer pool type
+  sli_buffer_manager_pool_types_t error_buffer_pool_type;       ///< Error buffer pool type
+  sli_command_engine_flush_handler_t flush_handler;             ///< Flush handler called during deinit
 } sli_command_engine_configuration_t;
 
 /**
@@ -280,13 +301,13 @@ struct sli_command_engine_s {
   sli_command_engine_configuration_t config;                                ///< Command engine configuration
   osThreadId_t command_engine_threadId;                                     ///< Thread ID
   osEventFlagsId_t command_engine_eventId;                                  ///< Event flags ID
-  sli_command_engine_queue_info_t *queue_info;                              ///< Queue information
   sli_queue_t rx_packet_queue;                                              ///< RX packet queue handle
   sli_queue_t tx_status_packet_queue;                                       ///< TX status packet queue handle
   sli_queue_t control_queue;                                                ///< Control packet queue handle
   sli_command_engine_packet_type_configuration_node_t *dynamic_packet_type; ///< Dynamic packet type configuration
   void *lock;                                                               ///< Instance lock for thread safety
   sl_command_engine_error_status_t *error_buffer;                           ///< Error status buffer
+  volatile uint8_t lifecycle; ///< @ref sli_command_engine_lifecycle_t — observed by RX/TX entry points
 };
 
 /**
@@ -379,9 +400,24 @@ sl_status_t sli_command_engine_is_idle(sli_command_engine_t *instance);
  *            packet_id to track the response packet from the command engine.
  * @return Status of the operation.
  *         - SL_STATUS_OK: Packet sent successfully.
+ *         - SL_STATUS_NOT_READY: Instance is in @ref SLI_COMMAND_ENGINE_LIFECYCLE_DEINIT.
  *         - SL_STATUS_FAIL: Failed to send packet.
  */
 sl_status_t sli_command_engine_send_packet(sli_command_engine_t *instance, sli_command_engine_tx_info_t *tx_info);
+
+/**
+ * @brief Wake the command engine worker to schedule dynamic packet TX.
+ *
+ * Use after external paths adjust @c in_flight_command_count or queues without going through
+ * @ref sli_command_engine_send_packet, so pending work is not stalled with the TX event cleared.
+ *
+ * @param[in] instance Command engine instance.
+ * @return SL_STATUS_OK if the event was posted, SL_STATUS_INVALID_PARAMETER, or SL_STATUS_NOT_READY.
+ */
+/**
+  * @note This API should be removed in the future once the SDK packet flushing logic is removed.
+  */
+sl_status_t sli_command_engine_signal_dynamic_tx(sli_command_engine_t *instance);
 
 /**
  * @brief Receive a packet for the specified command engine instance.
@@ -391,8 +427,11 @@ sl_status_t sli_command_engine_send_packet(sli_command_engine_t *instance, sli_c
  * @param[in] instance Pointer to the command engine instance.
  * @param[in] data Pointer to the received packet data.
  * @return Status code indicating the result of the operation.
- *         - SL_STATUS_OK: Packet received successfully.
- *         - SL_STATUS_FAIL: Failed to receive the packet.
+ *         - SL_STATUS_OK: @p data was enqueued for the worker; the command engine owns it and the caller must not free it.
+ *         - SL_STATUS_NOT_READY: Instance is not accepting RX (including @ref SLI_COMMAND_ENGINE_LIFECYCLE_DEINIT);
+ *           @p data was not enqueued; caller retains ownership (must free or retry as appropriate).
+ *         - SL_STATUS_INVALID_PARAMETER: @p data was not enqueued; caller retains ownership.
+ *         - Other errors (e.g. queue enqueue failure): @p data was not enqueued; caller retains ownership.
  */
 sl_status_t sli_command_engine_receive_packet(sli_command_engine_t *instance, void *data);
 
@@ -406,16 +445,38 @@ sl_status_t sli_command_engine_receive_packet(sli_command_engine_t *instance, vo
 void sli_command_engine_send_packet_tx_status(uint16_t packet_type, sl_status_t status, void *context);
 
 /**
- * @brief Get the RX queue information from the packet type.
+ * @brief Look up per-type queue state and/or full packet configuration for a registered packet type.
  *
- * @param[in] instance Pointer to the command engine instance.
- * @param[in] packet_type The packet type to get the RX queue information for.
- * @param[out] packet_info Pointer to the packet type configuration structure.
- * @return Status of the operation.
- *         - SL_STATUS_OK: RX queue information retrieved successfully.
- *         - SL_STATUS_INVALID_CONFIGURATION: Invalid configuration.
- *         - SL_STATUS_INVALID_PARAMETER: Invalid parameter.
- *         - SL_STATUS_NOT_FOUND: Packet type not found.
+ * Walks the instance's registered packet type list (see @ref sli_command_engine_add_packet_type).
+ * At least one of @p queue_info or @p packet_type_configuration must be non-NULL.
+ *
+ * @param[in]  instance                  Command engine instance.
+ * @param[in]  packet_type              Packet type id to resolve.
+ * @param[out] queue_info               If non-NULL, set to the type's @c queue_info (valid until type is removed).
+ * @param[out] packet_type_configuration If non-NULL, set to the type's @c packet_config pointer.
+ *
+ * @return SL_STATUS_OK if the type is registered.
+ *         SL_STATUS_INVALID_PARAMETER if @p instance is NULL or both output pointers are NULL.
+ *         SL_STATUS_NOT_FOUND if @p packet_type is not registered.
+ */
+sl_status_t sli_command_engine_get_dynamic_packet_info(
+  sli_command_engine_t *instance,
+  uint16_t packet_type,
+  sli_command_engine_queue_info_t **queue_info,
+  sli_command_engine_packet_type_configuration_t **packet_type_configuration);
+
+/**
+ * @brief Get RX-related (sync-response) configuration fields for a registered packet type.
+ *
+ * For per-type @c queue_info (e.g. inflight inspection), use @ref sli_command_engine_get_dynamic_packet_info.
+ *
+ * @param[in]  instance    Command engine instance.
+ * @param[in]  packet_type Dynamic packet type id (same as used with @ref sli_command_engine_add_packet_type).
+ * @param[out] packet_info Filled with sync-response fields from the type's configuration.
+ *
+ * @return SL_STATUS_OK on success.
+ *         SL_STATUS_INVALID_PARAMETER if @p instance or @p packet_info is NULL.
+ *         SL_STATUS_INVALID_CONFIGURATION if the type is not registered or internal pointers are inconsistent.
  */
 sl_status_t sli_command_engine_get_rx_queue_info_from_packet_type(
   sli_command_engine_t *instance,

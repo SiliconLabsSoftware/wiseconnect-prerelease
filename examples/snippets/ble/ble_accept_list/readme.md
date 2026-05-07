@@ -1,17 +1,26 @@
 # BLE - Acceptlist
 
+## High-Level Overview
+
+SiWx91x BLE central example: add peer BD addresses to the link-layer accept list for filtered scanning and auto-connection. Use SoC, PSRAM, or NCP Simplicity Studio projects in this folder.
+
 ## Table of Contents
 
-- [BLE - Acceptlist](#ble---acceptlist)
-  - [Table of Contents](#table-of-contents)
-  - [Purpose/Scope](#purposescope)
-  - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
-    - [Hardware Requirements](#hardware-requirements)
-    - [Software Requirements](#software-requirements)
-    - [Setup Diagram](#setup-diagram)
+- [High-Level Overview](#high-level-overview)
+- [Table of Contents](#table-of-contents)
+- [Purpose/Scope](#purposescope)
+- [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
+  - [Hardware Requirements](#hardware-requirements)
+  - [Software Requirements](#software-requirements)
+  - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
+  - [Setup Diagram](#setup-diagram)
+- [Steps to Run Demo](#steps-to-run-demo)
   - [Getting Started](#getting-started)
-  - [Application Build Environment](#application-build-environment)
-  - [Test the Application](#test-the-application)
+  - [Configuration and Setup](#configuration-and-setup)
+  - [Steps for Execution](#steps-for-execution)
+- [Troubleshooting](#troubleshooting)
+- [Resources](#resources)
+- [Report Bugs and Get Support](#report-bugs-and-get-support)
 
 ## Purpose/Scope
 
@@ -27,7 +36,7 @@ This means that the Controller autonomously establishes a connection with the de
 
 ### Hardware Requirements
 
-- Windows PC with Host interface(UART/ SPI/ SDIO).
+- Windows PC with Host interface (UART / SPI / SDIO).
   - SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes]() for details.
 - **SoC Mode**:
   - Standalone
@@ -56,16 +65,27 @@ This means that the Controller autonomously establishes a connection with the de
     - SPI - EFR32 
 - Smartphone configured as BLE central
 
-
 ### Software Requirements
 
 - Simplicity Studio
 
+### NCP mode: host application and project files
+
+| Mode | Host / target | Project file (this example folder) |
+|------|---------------|--------------------------------------|
+| SoC | Application runs on SiWx91x | `ble_accept_list_soc.slcp` |
+| PSRAM | Application runs on SiWx91x with PSRAM-supported radio board | `ble_accept_list_psram.slcp` |
+| NCP | Application runs on **EFR32** host; SiWx917 is the network co-processor over SPI | `ble_accept_list_ncp.slcp` |
+
+For NCP, create or open the Studio project from **`examples/snippets/ble/ble_accept_list/ble_accept_list_ncp.slcp`**, wire the kit per your board guide, and follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+
 ### Setup Diagram
 
 ![Figure: Setup Diagram for BLE Accept List Example](resources/readme/acceptlist_soc_ncp.png)
-  
-## Getting Started
+
+## Steps to Run Demo
+
+### Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -77,7 +97,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-## Application Build Environment
+### Configuration and Setup
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
@@ -161,7 +181,7 @@ The application can be configured to suit your requirements and development envi
   
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-## Test the Application
+### Steps for Execution
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -185,3 +205,25 @@ Follow the steps as mentioned for the successful execution of the application:
 4. Refer the following ouput image:
 
 ![](resources/readme/output_1.png)
+
+## Troubleshooting
+
+| Symptom | Things to check |
+|--------|------------------|
+| No connection | Confirm the advertiser’s BD address and type match `RSI_BLE_DEV_ADDR` / `RSI_BLE_DEV_ADDR_TYPE` and the bytes in `ble_acceptlist_addr1` (big-endian). Phones often use **random** addresses; set `RSI_BLE_DEV_ADDR_TYPE` to `LE_RANDOM_ADDRESS` for Android/iOS. |
+| No advertising reports | With `SCAN_FILTER_TYPE_ONLY_ACCEPT_LIST`, only accept-listed peers appear. Ensure accept list entries match the advertisers you expect. |
+| Wrong peer connects | You can use either **`RSI_BLE_DEV_ADDR`** or **`RSI_REMOTE_DEVICE_NAME`**; ensure only the intended macro pairing is consistent with your DUT. |
+| NCP: no traffic / boot failure | Verify SPI (or documented host interface), power, and that connectivity firmware on the SiWx917 NCP module is updated per [NCP getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode). Build and flash the **`ble_accept_list_ncp.slcp`** target on the **EFR32** host. |
+| Build or flash errors | Confirm the correct `.slcp` for your kit (SoC vs PSRAM vs NCP) and the WiSeConnect / SDK versions required by the project. |
+
+## Resources
+
+1. [WiSeConnect getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+2. [WiSeConnect developers guide — developing for Silicon Labs hosts](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/)
+3. [Simplicity Connect — creating advertisement sets (mobile)](https://docs.silabs.com/bluetooth/5.0/miscellaneous/mobile/efr-connect-mobile-app)
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)

@@ -3,11 +3,13 @@ label: SL Log Backend UART
 package: platform_siwx91x
 description: >
   This component provides the UART backend interface for the SiWx91x logger.
-category: Device|Si91x|MCU|Service
+category: Device|Si91x|MCU|Service|Log
 quality: evaluation
 metadata:
   sbom:
     license: Zlib
+ui_hints:
+  visibility: never
 provides:
   - name: si91x_log_backend_uart
   - name: log_backend

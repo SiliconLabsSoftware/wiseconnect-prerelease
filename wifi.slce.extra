@@ -940,7 +940,9 @@ extra_files:
 - components/device/silabs/si91x/wireless/crypto/ecdh/inc/sl_si91x_psa_ecdh.h
 - components/device/silabs/si91x/wireless/crypto/ccm/sl_si91x_ccm.slcc
 - components/device/silabs/si91x/wireless/crypto/ccm/src/sl_si91x_ccm.c
+- components/device/silabs/si91x/wireless/crypto/ccm/src/sl_si91x_mp_ccm.c
 - components/device/silabs/si91x/wireless/crypto/ccm/inc/sl_si91x_ccm.h
+- components/device/silabs/si91x/wireless/crypto/ccm/inc/sl_si91x_mp_ccm.h
 - components/device/silabs/si91x/wireless/crypto/trng/sl_si91x_trng.slcc
 - components/device/silabs/si91x/wireless/crypto/trng/sl_si91x_psa_trng.slcc
 - components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c

@@ -5,7 +5,7 @@ description: 'This example project demonstrates the PSA ECDH API in SI91x.
   '
 category: example|crypto
 quality: production
-label: Platform SiWx91x - PSA ECDH
+label: SiWx91x Platform - PSA ECDH
 component:
 - id: sl_main
 - id: freertos

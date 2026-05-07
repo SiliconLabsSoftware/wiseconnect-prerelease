@@ -33,7 +33,6 @@
 #include <stdint.h>
 #include "sl_status.h"
 #include "sli_command_engine.h"
-#include "sli_event_engine.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sl_wifi_types.h"
 
@@ -61,6 +60,7 @@ sl_status_t sli_si91x_wifi_nwp_log_packet_handler(void *packet,
                                                   void *context);
 
 sl_status_t sli_si91x_wifi_event_engine_init(void);
+sl_status_t sli_si91x_wifi_event_engine_deinit(void);
 
 #ifdef SLI_SI91X_ENABLE_BLE
 void sli_si91x_ble_send_packet_tx_status(uint16_t packet_type, sl_status_t status, void *context);

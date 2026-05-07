@@ -32,6 +32,8 @@ requires:
     condition: ["device_si91x"]
   - name: romdriver_romtable_headers 
     condition: ["device_si91x"]
+  - name: segger_rtt_config_siwx91x
+    condition: ["segger_rtt"]
   - name: si91x_log_none  
 define:
   - name: SLI_SI91X_ENABLE_OS

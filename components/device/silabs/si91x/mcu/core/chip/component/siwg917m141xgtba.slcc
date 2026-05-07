@@ -77,6 +77,9 @@ requires:
 - name: freertos_config
   condition:
   - freertos
+- name: psram_aps6404l_sqrh
+  condition:
+  - psram_core
 - name: opn_config
 recommends:
 - id: si91x_mem_config_1

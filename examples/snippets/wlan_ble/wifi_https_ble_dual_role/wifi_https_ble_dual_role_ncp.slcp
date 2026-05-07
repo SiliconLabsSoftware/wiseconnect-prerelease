@@ -1,7 +1,7 @@
 project_name: wifi_https_ble_dual_role_ncp
 package: multi_protocol_siwx91x_app
 quality: production
-label: wifi_https_ble_dual_role_ncp
+label: Wi-Fi Coex - Wi-Fi Client HTTPS BLE Dual Role (NCP)
 category: Example|Wi-Fi_BLE
 description: 'This example demonstrates the ability of SiWx91x device connecting and transferring the data simultaneously in BLE/WiFi wireless interfaces.
 

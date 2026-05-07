@@ -1,8 +1,8 @@
-# Platform SiWx91x Config Timer ICU and OCU with DMA
+# SiWx91x Platform Config Timer ICU and OCU with DMA
 
 ## Table of Contents
 
-- [Platform SiWx91x Config Timer ICU and OCU with DMA](#platform-siwx91x-config-timer-icu-and-ocu-with-dma)
+- [SiWx91x Platform Config Timer ICU and OCU with DMA](#platform-siwx91x-config-timer-icu-and-ocu-with-dma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -108,16 +108,43 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following macros in 'config_timer_icu_ocu_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.h)]file to change the application use case (enable exactly only one at a time).
 
-  ```C
-    #define CT_COUNTER_DMA_MODE_USECASE   1      -  To run DMA counter mode
-    #define CT_COUNTER_INPUT_EVENT_USECASE 1     -  To run input event mode
-  ```
-  - Also enable the relevant CT (Config Timer) configuration settings required for the PWM DMA mode use case to ensure proper operation of the timer in DMA-driven PWM output mode.
-- In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
+- `CT_COUNTER_INPUT_EVENT_USECASE`: When enabled (`SET`), runs the input capture / input event use case where the Config Timer captures the timing of input signal changes and the captured values are read and processed. Enable exactly one use-case macro at a time. By default, it is set to `SET` (enabled).
 
-  ```C
-   #define TIME_PERIOD_VALUE     1000         // Time period in microseconds
-   #define STEP_SIZE_COUNTER_0   400          // Step size for counter0 increments
+  ```c
+    #define CT_COUNTER_INPUT_EVENT_USECASE SET   //< To run input event mode
+  ```
+
+- `CT_COUNTER_DMA_MODE_USECASE`: When enabled (`SET`), runs the DMA counter use case where DMA continuously updates the OCU compare values to generate varied PWM waveforms on CT Output-0 and CT Output-1. Enable exactly one use-case macro at a time. By default, it is set to `CLEAR` (disabled).
+
+  ```c
+    #define CT_COUNTER_DMA_MODE_USECASE    CLEAR //< To run DMA counter mode
+  ```
+
+- Also enable the relevant CT (Config Timer) configuration settings required for the PWM DMA mode use case to ensure proper operation of the timer in DMA-driven PWM output mode.
+- In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value. Modify or update the following macros as necessary to allow flexible customization of the timer's period and compare value.
+
+- `CT_COUNTER_USED`: Selects which Config Timer counter (SL_COUNTER_0 or SL_COUNTER_1) is used for the normal counter application. By default, it is set to SL_COUNTER_0.
+
+  ```c
+   #define CT_COUNTER_USED       SL_COUNTER_0          // Counter number used for normal counter application
+  ```
+
+- `TIME_PERIOD_VALUE`: Time period (in microseconds) used to compute the match value of the counter. By default, it is set to 1000.
+
+  ```c
+   #define TIME_PERIOD_VALUE     1000                   // Time period in microseconds
+  ```
+
+- `STEP_SIZE_COUNTER_0`: Step size used to increment the counter-0 compare values stored in the DMA source array (controls how the duty cycle varies between DMA transfers). By default, it is set to 400.
+
+  ```c
+   #define STEP_SIZE_COUNTER_0   400                    // Step size for counter0 increments
+  ```
+
+- `ARRAY_SIZE`: Number of compare values stored in the DMA source array used to drive the OCU compare values in DMA mode. By default, it is set to 100.
+
+  ```c
+   #define ARRAY_SIZE            100                    // Array size for DMA mode
   ```
   -  Use the **Config Timer** software component in the `.slcp` project file to configure the timer from the Simplicity Studio Component Editor (UC). Search for "Config Timer" or "CT" in the software components list to add or configure this peripheral as needed for ICU or OCU DMA mode operation.
 
@@ -158,7 +185,7 @@ In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconn
 
 - The Config Timer will capture external events (such as rising edge) on the configured input pin.
 - Each captured event's capture value will be read and printed to the console.
-- connect the IN0 pin to button0 pin (F12 which is input pin for button),press and release the button, you can see the capture value updating upon the event occured.
+- connect the IN0 pin to button0 pin (F12 which is input pin for button),press and release the button, you can see the capture value updating upon the event occurred.
 - Following prints will be observed on the console:
 
   > ![Figure: Result](resources/readme/OutputConsole_ICU.png)
@@ -191,3 +218,4 @@ In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconn
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

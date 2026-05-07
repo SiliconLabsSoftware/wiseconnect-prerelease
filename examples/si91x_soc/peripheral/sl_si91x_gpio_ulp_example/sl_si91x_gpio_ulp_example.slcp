@@ -3,13 +3,19 @@ package: platform_siwx91x_app
 description: "This application demonstrates toggling of a ULP GPIO pin for the ULP instance and managing the ULP pin interrupt. \nIt showcases how to configure the ULP GPIO pins for specific tasks and respond to pin interrupt events, \nallowing efficient power management and low-latency interrupt handling in ultra-low-power modes.\n"
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - GPIO ULP EXAMPLE
+label: SiWx91x Platform - GPIO ULP EXAMPLE
 component:
 - id: sl_main
 - id: status
 - id: sl_gpio
 - id: syscalls
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_compact
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 source:
 - path: app.c
 - path: gpio_ulp_example.c

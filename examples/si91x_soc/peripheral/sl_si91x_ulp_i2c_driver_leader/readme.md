@@ -1,8 +1,8 @@
-# Platform SiWx91x ULP I2C Driver Leader
+# SiWx91x Platform ULP I2C Driver Leader
 
 ## Table of Contents
 
-- [Platform SiWx91x ULP I2C Driver Leader](#platform-siwx91x-ulp-i2c-driver-leader)
+- [SiWx91x Platform ULP I2C Driver Leader](#platform-siwx91x-ulp-i2c-driver-leader)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -54,7 +54,7 @@
 - Current_mode enum is set to I2C_SEND_DATA and it calls send_data API to send data to follower & configures follower address through [sl_i2c_driver_send_data_blocking](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-send-data-blocking) for blocking Application.
 - For Blocking usecase : When all bytes are sent then mode changes to I2C_RECEIVE_DATA (Blocking API won't update any transfer complete flag, as control will be blocked until all bytes are sent).
 - Then it receives data from follower through [sl_i2c_driver_receive_data_blocking](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-receive-data-blocking) for blocking Application.
-- For Blocking usecase : When all bytes are recieved then mode changes to I2C_TRANSMISSION_COMPLETED (Blocking API won't update any transfer complete flag, as control will be blocked until all bytes are received).
+- For Blocking usecase : When all bytes are received then mode changes to I2C_TRANSMISSION_COMPLETED (Blocking API won't update any transfer complete flag, as control will be blocked until all bytes are received).
 - Now it compares the data which is received from the follower device to the data which it has sent.
 - If the data is same, it will print Test Case Passed on the console.
 - After this first cycle of data transfer application switches to ULP mode using sl_si91x_power_manager_add_ps_requirement API and reconfig I2C leader params as per ULP mode through [sl_i2c_driver_leader_reconfig_on_power_mode_change](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-leader-reconfig-on-power-mode-change) API.
@@ -115,11 +115,42 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - If project built without selecting configurations, it will take default values from UC.
 - Configure mode, operating-mode and transfer-type of I2C instance using respective instance UC.
 - Change 'Operating Mode' as per bus-speed requirement.
-- After above UC configurations also configure following macros in [`i2c_leader_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.c) file and update/modify following macros if required.
+- After above UC configurations also configure following macros in [`ulp_i2c_leader_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_i2c_driver_leader/ulp_i2c_leader_example.c) file and update/modify following macros if required.
 
-  ```C
-    #define FOLLOWER_I2C_ADDR        // Update I2C follower address
-    #define I2C_SIZE_BUFFERS             // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
+- `FOLLOWER_I2C_ADDR`: 7-bit I2C follower (target) address that the leader communicates with. Must match the `OWN_I2C_ADDR` configured on the follower device. By default, it is set to `0x50`.
+
+  ```c
+    #define FOLLOWER_I2C_ADDR            0x50  // I2C follower address
+  ```
+
+- `I2C_INSTANCE_USED`: Selects the I2C instance used by the application. For ULP application the instance used should be 2 only. By default, it is set to 2.
+
+  ```c
+    #define I2C_INSTANCE_USED            2     // For ULP application instance used should be 2 only
+  ```
+
+- `I2C_BUFFER_SIZE`: Defines the size of the data buffer used for I2C transfer. By default, it is set to 1024.
+
+  ```c
+    #define I2C_BUFFER_SIZE              1024  // Size of data buffer
+  ```
+
+- `MS_DELAY_COUNTER`: Defines the loop counter used for producing a millisecond-scale software delay. By default, it is set to 4600.
+
+  ```c
+    #define MS_DELAY_COUNTER             4600  // Delay count
+  ```
+
+- `TEN_SECOND_DELAY_HP_MODE`: Defines the delay count used to wait for approximately 10 seconds when the application is running in HP mode. By default, it is set to 20000.
+
+  ```c
+    #define TEN_SECOND_DELAY_HP_MODE     20000 // 10 second delay in HP mode
+  ```
+
+- `TEN_SECOND_DELAY_ULP_MODE`: Defines the delay count used to wait for approximately 10 seconds when the application is running in ULP mode. By default, it is set to 10000.
+
+  ```c
+    #define TEN_SECOND_DELAY_ULP_MODE    10000 // 10 second delay in ULP mode
   ```
 
 - Configure the UC as mentioned below.
@@ -136,6 +167,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | SDA | ULP_GPIO_6 [EXP_HEADER-16] |   ULP_GPIO_6 [RX]   | Connect to Follower SDA pin |
 
 ![Figure: Pin Configuration I2C](resources/readme/image507e.png)
+
+> **Note- In case of sleep-wakeup :**
+>
+>- If the project uses UC-generated I2C instances, call `sl_i2c_init_instances()` after wakeup before resuming I2C transfers so the configured I2C instances are restored.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -181,3 +216,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

@@ -3,13 +3,19 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to generate a random number using the built-in random number generation functionality on the Si91x SoC device. \n"
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - HRNG
+label: SiWx91x Platform - HRNG
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: sl_hrng
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 source:
 - path: app.c
 - path: hrng_example.c

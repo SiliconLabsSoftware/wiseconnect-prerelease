@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA ECDSA
+# SiWx91x Platform PSA ECDSA
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA ECDSA](#platform-siwx91x-psa-ecdsa)
+- [SiWx91x Platform PSA ECDSA](#platform-siwx91x-psa-ecdsa)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -89,6 +89,13 @@ curve : SL_SI91X_ECC_SECP256R1
 - To use a wrapped private key directly, set IMPORT_WRAPPED_KEYS macro to 1 in [`psa_ecdsa_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_ecdsa/psa_ecdsa_app.c)
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+
+> **Note**: To enable **sideband crypto**, add the following in the project's `.slcp` file. The `define` entry is at project scope alongside `component`:
+>
+> ```yaml
+> define:
+>   - name: SL_SI91X_SIDE_BAND_CRYPTO
+> ```
 
 ## Test the Application
 

@@ -1,8 +1,8 @@
-# Platform SiWx91x GPIO EXAMPLE
+# SiWx91x Platform GPIO EXAMPLE
 
 ## Table of Contents
 
-- [Platform SiWx91x GPIO EXAMPLE](#platform-siwx91x-gpio-example)
+- [SiWx91x Platform GPIO EXAMPLE](#platform-siwx91x-gpio-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -145,15 +145,25 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following parameters in gpio_example.c (examples/si91x_soc/peripheral/sl_si91x_gpio_example/) file and update/modify following macros if required
+- Configure the following parameters in gpio_example.c (examples/si91x_soc/peripheral/sl_si91x_gpio_example/) file and update/modify following macros if required.
+
+- `AVL_INTR_NO`: Specifies the available interrupt number used by the HP GPIO pin interrupt. By default, it is set to 0.
 
   ```c
     #define AVL_INTR_NO           0  // available interrupt number
-    #define INT_CH                0  // GPIO Pin interrupt 0
-    #define ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE 1  // Set to 1 to enable HP GPIO 66 toggle via ULP GPIO 2
   ```
 
-  - `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 2 mapped to HP GPIO 66 toggling. Set to **0** to disable this feature and only use HP GPIO pin 6 toggle with pin 11 interrupt.
+- `INT_CH`: Specifies the GPIO pin interrupt channel used for the HP GPIO interrupt (GPIO Pin interrupt 0). By default, it is set to 0.
+
+  ```c
+    #define INT_CH                0  // GPIO Pin interrupt 0
+  ```
+
+- `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 2 mapped to HP GPIO 66 toggling. Set to **0** to disable this feature and only use HP GPIO pin 6 toggle with pin 11 interrupt. By default, it is set to 1.
+
+  ```c
+    #define ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE 1  // Set to 1 to enable HP GPIO 66 toggle via ULP GPIO 2
+  ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -187,3 +197,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

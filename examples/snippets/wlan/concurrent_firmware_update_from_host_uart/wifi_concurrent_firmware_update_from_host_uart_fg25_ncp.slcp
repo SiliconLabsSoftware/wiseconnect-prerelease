@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Concurrent Firmware Update From Host UART (NCP)
 category: Example|Wi-Fi
-description: Start a Wi-Fi Client and Wi-Fi Access Point in IPv4 and IPv6 simultaneously through provisioning from HTTP Server
+description: Updating firmware on the SiWx91x Device from the Host MCU UART Peripheral
 filter:
 - name: Wireless Technology
   value:

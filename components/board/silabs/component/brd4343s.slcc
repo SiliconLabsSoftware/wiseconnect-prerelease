@@ -14,8 +14,6 @@ requires:
 - name: siwg917y121mgnxa
 - name: brd4343s_config
 - name: hardware_board_mainboard
-- name: external_flash_none
-- name: external_psram_none
 - name: rsilib_board
 - name: si91x_common_flash
 provides:

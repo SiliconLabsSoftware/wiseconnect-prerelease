@@ -1,4 +1,4 @@
-﻿/***************************************************************************/ /**
+/***************************************************************************/ /**
  * @file
  * @brief
  *******************************************************************************
@@ -167,11 +167,6 @@ uint32_t frontend_switch_control                  = 0;
 static uint32_t feature_bit_map                   = 0;
 //! Currently, initialized_opermode is used only to handle concurrent mode using sl_net_init()
 extern uint16_t initialized_opermode;
-extern sli_queue_t cmd_queues[SI91X_CMD_MAX];
-extern osEventFlagsId_t sli_wifi_events;
-extern volatile uint32_t tx_generic_socket_data_queues_status;
-osMessageQueueId_t sli_command_engine_status_msg_queue = NULL;
-extern osEventFlagsId_t si91x_async_events;
 
 #ifdef SLI_SI91X_ENABLE_BLE
 //! Memory length for driver
@@ -283,11 +278,11 @@ sl_status_t sl_si91x_driver_init_wifi_radio(const sl_wifi_device_configuration_t
   if (SL_WIFI_IGNORE_REGION != config->region_code) {
     // Set the device's region based on configuration
     status = sl_si91x_set_device_region(config->boot_config.oper_mode, config->band, config->region_code);
-    SL_DEBUG_LOG("Region code set to %d\r\n", config->region_code);
+    SL_DEBUG_LOG_V2(DEBUG, "Region code set to %d\r\n", config->region_code);
     VERIFY_STATUS_AND_RETURN(status);
   }
 #else
-  SL_DEBUG_LOG("Region code configuration skipped for Modules\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "Region code configuration skipped for Modules\r\n");
 #endif
 
   // Configure the RTS threshold for WLAN
@@ -533,7 +528,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   // In coex mode, 160 MHz SoC clock is not supported.
   // If 160 MHz is configured in coex mode, it will automatically fall back to 120 MHz.
   if ((boot_config.coex_mode) && (boot_config.custom_feature_bit_map & SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_160MHZ)) {
-    SL_DEBUG_LOG("\r\n 160 MHz clock is not supported in coex mode. Falling back to 120 MHz.\r\n");
+    SL_DEBUG_LOG_V2(WARN, "\r\n 160 MHz clock is not supported in coex mode. Falling back to 120 MHz.\r\n");
     // Clamp the configuration to 120 MHz
     boot_config.custom_feature_bit_map &= ~SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_160MHZ;
     boot_config.custom_feature_bit_map |= SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_120MHZ;

@@ -1,8 +1,8 @@
-# Platform SiWx91x SDC
+# SiWx91x Platform SDC
 
 ## Table of Contents
 
-- [Platform SiWx91x SDC](#platform-siwx91x-sdc)
+- [SiWx91x Platform SDC](#platform-siwx91x-sdc)
 - [Overview](#overview)
 - [About Example Code](#about-example-code)
 - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -102,6 +102,50 @@ Configure UC from the slcp component:
 
     ![SDC Channel Configuration](resources/uc_screen/sl_sdc_channel_uc_screen.png)
 
+- Configure the following macros in [`sdc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sdc/sdc_example.c) file and update/modify following macros, if required.
+
+  - `SDC_VREF`: Reference voltage (in volts) supplied to the SDC/AUX-ADC. Used by the application to convert raw ADC codes to voltages. By default, it is set to 3.3.
+
+    ```c
+    #define SDC_VREF                  3.3 // reference voltage
+    ```
+
+  - `SDC_BUFFER_SIZE`: Size of the user buffer (in samples) that stores SDC samples before the data is printed. By default, it is set to 16.
+
+    ```c
+    #define SDC_BUFFER_SIZE           16  // buffer size
+    ```
+
+  - `SDC_NUMBER_OF_SAMPLES`: Total number of SDC samples collected per acquisition cycle. By default, it is set to `SDC_BUFFER_SIZE`.
+
+    ```c
+    #define SDC_NUMBER_OF_SAMPLES     SDC_BUFFER_SIZE
+    ```
+
+  - `SDC_CHANNEL1_INDEX`: Array index used to access channel 1 data in the per-channel buffers. By default, it is set to 0.
+
+    ```c
+    #define SDC_CHANNEL1_INDEX        0
+    ```
+
+  - `SDC_CHANNEL2_INDEX`: Array index used to access channel 2 data in the per-channel buffers. By default, it is set to 1.
+
+    ```c
+    #define SDC_CHANNEL2_INDEX        1
+    ```
+
+  - `SDC_CHANNEL3_INDEX`: Array index used to access channel 3 data in the per-channel buffers. By default, it is set to 2.
+
+    ```c
+    #define SDC_CHANNEL3_INDEX        2
+    ```
+
+  - `SDC_CHANNEL4_INDEX`: Array index used to access channel 4 data in the per-channel buffers. By default, it is set to 3.
+
+    ```c
+    #define SDC_CHANNEL4_INDEX        3
+    ```
+
 - After running the application, sampled data is stored in the user buffer until the transfer length is reached.
 - The application prints the sampled voltages to the UART console.
 - Apply different voltages (1.8 V to Vref) to the SDC input and observe the console output.
@@ -193,3 +237,4 @@ Refer to the [Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

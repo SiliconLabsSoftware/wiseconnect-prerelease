@@ -1,18 +1,24 @@
 project_name: ble_multiconnection_gatt_test_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Multiconnection GATT Test (NCP)
+label: BLE - NCP Multiconnection GATT Test FreeRTOS
 category: Example|BLE
-description: 'The Application demonstrates how to configure SiWx91x EVK in central/peripheral modes and then connect with multiple peripherals/centrals.
+description: 'Demonstrates multiple simultaneous BLE links on SiWx91x over SPI NCP with FreeRTOS using central and peripheral roles with GATT. Demonstrated by secure connections and multi-peer access.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - NCP
 - name: Project Difficulty
   value:
   - Advanced
+- name: Quality
+  value:
+  - Production
 source:
 - path: ble_device_info.c
 - path: ble_main_task.c

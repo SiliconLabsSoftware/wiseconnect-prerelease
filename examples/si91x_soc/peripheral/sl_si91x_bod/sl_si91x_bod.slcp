@@ -5,7 +5,7 @@ description: 'Demonstrates how to use BOD when the supply voltage is less than t
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - BOD
+label: SiWx91x Platform - BOD
 source:
 - path: bod_example.c
 - path: app.c
@@ -22,6 +22,12 @@ component:
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: sl_bod
 define:
 - name: RSI_M4_INTERFACE

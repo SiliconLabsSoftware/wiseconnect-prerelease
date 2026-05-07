@@ -1,7 +1,7 @@
 project_name: sl_si91x_empty_c_soc
 package: platform_siwx91x_app
 quality: production
-label: Platform SiWx91x - Empty C Example
+label: SiWx91x Platform - Empty C Example
 description: 'Demonstrates how to create an empty configuration that can be used as a starting point to add components and functionality.
 
   '

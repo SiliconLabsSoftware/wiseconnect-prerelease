@@ -131,15 +131,15 @@ static void sli_event_handler_thread(void *args)
   sl_status_t status       = SL_STATUS_FAIL;
   void *data               = NULL;
 
-  SL_DEBUG_LOG("Event Engine thread Started\n");
+  SL_DEBUG_LOG_V2(INFO, "Event Engine thread Started\n");
 
   while (1) {
-    SL_DEBUG_LOG("Event Engine thread waiting for events\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Event Engine thread waiting for events\n");
     // Wait for any of the events
     events_received |=
       sli_event_handler_wait_for_event(event_engine_Id, SLI_EVENT_ENGINE_EVENTS_TO_WAIT_ON, osWaitForever);
 
-    SL_DEBUG_LOG("Got events : 0x%lX in event engine thread\n", events_received);
+    SL_DEBUG_LOG_V2(DEBUG, "Got events : 0x%lX in event engine thread\n", events_received);
 
     if (events_received & SLI_EVENT_ENGINE_THREAD_TERMINATE_EVENT) {
       // Clear the termination event flag
@@ -153,7 +153,7 @@ static void sli_event_handler_thread(void *args)
     }
 
     if (events_received & SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT) {
-      SL_DEBUG_LOG("Handling : SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT.\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Handling : SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT.\n");
       // Clear the registration event flag
       events_received &= ~SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT;
 
@@ -183,7 +183,7 @@ static void sli_event_handler_thread(void *args)
     }
 
     if (events_received & SLI_EVENT_ENGINE_ASYNC_EVENT) {
-      SL_DEBUG_LOG("Handling : SLI_EVENT_ENGINE_ASYNC_EVENT.\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Handling : SLI_EVENT_ENGINE_ASYNC_EVENT.\n");
       bool event_queues_empty               = true;
       sli_event_engine_handler_node_t *list = event_handler_list;
       // Clear the async event flag
@@ -247,9 +247,9 @@ sl_status_t sli_event_engine_init(osEventFlagsId_t *event_engine_eventId)
   // Thread attributes
   const osThreadAttr_t attr = {
     .name       = "event engine",
-    .priority   = osPriorityRealtime1,
+    .priority   = SLI_EVENT_ENGINE_THREAD_PRIORITY,
     .stack_mem  = 0,
-    .stack_size = 1536,
+    .stack_size = SLI_EVENT_ENGINE_THREAD_STACK_SIZE,
     .cb_mem     = 0,
     .cb_size    = 0,
     .attr_bits  = 0u,
@@ -333,8 +333,9 @@ sl_status_t sli_event_engine_register_event(sli_queue_t *event_queue,
     return status;
   }
 
-  SL_DEBUG_LOG("Triggering : 0x%X event for event engine to register events\n",
-               SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT);
+  SL_DEBUG_LOG_V2(DEBUG,
+                  "Triggering : 0x%X event for event engine to register events\n",
+                  SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT);
   // Signal event engine thread that a handler registration is pending
   sli_event_handler_set_event(event_engine_Id, SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT);
 

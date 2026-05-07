@@ -1,8 +1,8 @@
-# Platform SiWx91x CRC
+# SiWx91x Platform CRC
 
 ## Table of Contents
 
-- [Platform SiWx91x CRC](#platform-siwx91x-crc)
+- [SiWx91x Platform CRC](#platform-siwx91x-crc)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -62,11 +62,18 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - **Data width:** Specifies how many bits wide the input data is (e.g., 8-bit, 16-bit, 32-bit)
 - These parameters allow users to customize the CRC implementation for different standards and data types.
 
-- Configure the following parameter in the [`sl_si91x_crc.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_crc.h) file. Update or modify the following macro, if required. The code illustrates the default configurations.
+- Configure the following macros in the [`sl_si91x_crc.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_crc.h) file. Update or modify the following macros, if required. The code illustrates the default configurations.
 
-  ```C
-   #define SL_CRC_POLYNOMIAL      0x04C11DB7 /* Polynomial encryption value */
-   #define SL_CRC_POLY_WIDTH       31        /* Polynomial data width */
+- `SL_CRC_POLYNOMIAL`: Polynomial value used for CRC calculation. By default, it is set to `0x04C11DB7` (the standard CRC-32 polynomial).
+
+  ```c
+    #define SL_CRC_POLYNOMIAL 0x04C11DB7      ///< Polynomial used for CRC calculation
+  ```
+
+- `SL_CRC_POLY_WIDTH`: Width of the CRC polynomial in bits, which defines the CRC output size. By default, it is set to 31.
+
+  ```c
+    #define SL_CRC_POLY_WIDTH       31        /* Polynomial data width */
   ```
 
 > **Note:**
@@ -99,3 +106,4 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

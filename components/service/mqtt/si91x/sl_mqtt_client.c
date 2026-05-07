@@ -41,7 +41,6 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi_utility.h"
 #include "sl_rsi_utility.h"
-#include "sl_log_helper_si91x.h"
 
 /**
  * MQTT CLIENT STATE MACHINE

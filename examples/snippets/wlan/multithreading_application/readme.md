@@ -88,7 +88,7 @@ The application can be configured to suit your requirements and development envi
 
 - STA instance related parameters
 
-  - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name to which the Si91x module gets connected to.
+  - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name to which the SiWx91x module gets connected to.
 
   	```c
   	#define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"
@@ -130,7 +130,7 @@ The application can be configured to suit your requirements and development envi
 >
 > - In `sl_wifi_default_concurrent_configuration`, `oper_mode` must be `SL_SI91X_CONCURRENT_MODE` for this example.
 
-- Configure the following parameters in `ap_throughput.c` to test throughput app as per requirements
+- Configure the following parameters in `ap_throughtput.c` to test throughput app as per requirements
 
   - Client/Server IP Settings
 
@@ -146,12 +146,12 @@ The application can be configured to suit your requirements and development envi
     - The application may be configured to measure throughput using UDP or TCP packets. Choose the measurement type using the `THROUGHPUT_TYPE` macro.
 
       ```c
-      #define THROUGHPUT_TYPE  TCP_TX     // Selects the throughput option
+      #define THROUGHPUT_TYPE  TCP_RX     // Selects the throughput option
 
-      #define TCP_TX           0   // SiWx91x transmits packets to remote TCP client
-      #define TCP_RX           1   // SiWx91x receives packets from remote TCP server
-      #define UDP_TX           2   // SiWx91x transmits packets to remote UDP client
-      #define UDP_RX           3   // SiWx91x receives packets from remote UDP server
+      #define UDP_TX           0   // SiWx91x transmits packets to remote UDP server
+      #define UDP_RX           1   // SiWx91x receives packets from remote UDP client
+      #define TCP_TX           2   // SiWx91x transmits packets to remote TCP server
+      #define TCP_RX           3   // SiWx91x receives packets from remote TCP client
       ```
 
   - Throughput Test options
@@ -161,7 +161,7 @@ The application can be configured to suit your requirements and development envi
       #define BYTES_TO_RECEIVE  (1 << 20)     // To measure RX throughput with 1 MB data transfer
       #define TEST_TIMEOUT      10000         // Throughput test timeout in ms
       ```
-  - Configure the TCP RX window size and TCP RX window division factor to 44 in the socket configuration in **app.c** to achieve high throughput for TCP_RX and TLS_RX.
+  - Configure the TCP RX window size and TCP RX window division factor to 44 in the socket configuration in **ap_throughtput.c** to achieve high throughput for TCP_RX and TLS_RX.
    
     ```c
     static sl_si91x_socket_config_t socket_config = {

@@ -1,8 +1,8 @@
-# Platform SiWx91x I2S LOOPBACK
+# SiWx91x Platform I2S LOOPBACK
 
 ## Table of Contents
 
-- [Platform SiWx91x I2S LOOPBACK](#platform-siwx91x-i2s-loopback)
+- [SiWx91x Platform I2S LOOPBACK](#platform-siwx91x-i2s-loopback)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -120,8 +120,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - Configuration files are generated in **config folder**. If not changed, the code will run on default UC values.
     - Configure the following macros in [`i2s_loopback_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2s_loopback/i2s_loopback_example.c) file and update/modify following macros if required.
 
-      ```C
+    - `I2S_BUFFER_SIZE`: Defines the size of the transmit and receive buffers used for the I2S loopback transfer. By default, it is set to 1024.
+
+      ```c
       #define I2S_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
+      ```
+
+    - `I2S_INSTANCE`: Selects the I2S instance used by the application (0 for I2S0, 1 for ULP_I2S). By default, it is set to 0.
+
+      ```c
+      #define I2S_INSTANCE    0       ///< I2S instance
       ```
 
   - **Pin Configuration**
@@ -170,3 +178,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

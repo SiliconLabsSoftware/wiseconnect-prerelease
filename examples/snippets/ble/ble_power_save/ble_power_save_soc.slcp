@@ -1,18 +1,24 @@
 project_name: ble_power_save_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Power Save (SoC)
+label: BLE - SoC Power Save FreeRTOS
 category: Example|BLE
-description: 'This application demonstrates how to configure the device in power save  profile with Advertising mode.
+description: 'Demonstrates how to configure the device in power save profile with Advertising, Scanning and Connected mode on SiWx91x in SoC FreeRTOS.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

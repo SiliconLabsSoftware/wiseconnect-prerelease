@@ -1,18 +1,24 @@
 project_name: ble_unified_ae_coex_app_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Unified AE Coex App (SoC)
+label: BLE - SoC Unified AE Coex App FreeRTOS
 category: Example|BLE
-description: 'Bluetooth Low energy Extended Advertising features(Central/Peripheral).
+description: 'Bluetooth Low energy Extended Advertising features(Central/Peripheral) on SiWx91x in SoC FreeRTOS.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Advanced
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 - path: root_auto_gen.c

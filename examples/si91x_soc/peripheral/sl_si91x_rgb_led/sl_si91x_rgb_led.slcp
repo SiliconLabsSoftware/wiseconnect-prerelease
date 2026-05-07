@@ -5,7 +5,7 @@ description: 'This application demonstrates how to use RGB LED
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - RGB LED
+label: SiWx91x Platform - RGB LED
 component:
 - id: sl_main
 - id: syscalls
@@ -14,6 +14,12 @@ component:
 - id: sl_si91x_led_917
   instance:
   - led0
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 source:
 - path: app.c
 - path: rgb_led.c

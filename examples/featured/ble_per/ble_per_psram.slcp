@@ -1,18 +1,24 @@
 project_name: ble_per_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: ble_per_psram
+label: BLE PSRAM PER FreeRTOS
 category: Example|BLE
-description: 'This application demonstrates how to configure the necessary parameters to start transmitting or receiving BLE PER packets.
+description: 'Demonstrates BLE Packet Error Rate (PER) TX/RX testing on SiWx91x with PSRAM in SoC FreeRTOS. Demonstrated by configuring parameters to transmit or receive PER packets.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:
@@ -45,7 +51,6 @@ component:
 - id: network_manager
 - id: basic_network_config_manager
 - id: psram_core
-- id: psram_aps6404l_sqh
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: si91x_memory_default_config

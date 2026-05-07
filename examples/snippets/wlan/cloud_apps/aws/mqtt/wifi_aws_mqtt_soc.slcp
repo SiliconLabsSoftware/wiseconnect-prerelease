@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - AWS IoT MQTT Client (SoC)
 category: Example|Wi-Fi
-description: 'Create an AWS IoT ''thing'' that interacts with AWS IoT Core using MQTT publish/subscribe
+description: 'Create an AWS IoT thing that interacts with AWS IoT Core using MQTT publish/subscribe
 
   '
 filter:

@@ -1,8 +1,8 @@
-# Platform SiWx91x I2C Driver Follower
+# SiWx91x Platform I2C Driver Follower
 
 ## Table of Contents
 
-- [Platform SiWx91x I2C Driver Follower](#platform-siwx91x-i2c-driver-follower)
+- [SiWx91x Platform I2C Driver Follower](#platform-siwx91x-i2c-driver-follower)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -114,9 +114,22 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Change 'Operating Mode' as per bus-speed requirement.
 - After the above UC configurations, also configure following macros in [`i2c_follower_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_follower/i2c_follower_example.c) file and update/modify following macros, if required.
 
-  ```C
-    #define OWN_I2C_ADDR             // Update I2C own address
-    #define I2C_SIZE_BUFFERS         // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
+- `OWN_I2C_ADDR`: 7-bit I2C follower address assigned to this device. The leader application must target this same address when communicating. By default, it is set to `0x50`.
+
+  ```c
+    #define OWN_I2C_ADDR             0x50  // Own I2C address
+  ```
+
+- `I2C_BUFFER_SIZE`: Defines the size of the data buffer used for I2C transfer. By default, it is set to 1024.
+
+  ```c
+    #define I2C_BUFFER_SIZE          1024  // Size of data buffer
+  ```
+
+- `MAX_BUFFER_SIZE_BLOCKING`: Defines the maximum buffer size allowed for RX and TX lengths when transferring without DMA. By default, it is set to 80000.
+
+  ```c
+    #define MAX_BUFFER_SIZE_BLOCKING 80000 // Maximum buffer size for RX and TX length when transferring without DMA
   ```
 
 > **Notes**
@@ -159,6 +172,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 > **Note- In case of sleep-wakeup :**
 >
 >- As GPIO configurations will be lost after going to sleep state, the user has to initialize I2C pins and driver again after wakeup, by using [sl_i2c_driver_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-init) API for initializing driver and [sl_si91x_i2c_pin_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-si91x-i2c-pin-init) API for initializing pins.
+>- If the project uses UC-generated I2C instances, call `sl_i2c_init_instances()` after wakeup before resuming I2C transfers so the configured I2C instances are restored.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -193,3 +207,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

@@ -1,18 +1,24 @@
 project_name: ble_heart_rate_profile_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Heart Rate (NCP)
+label: BLE - NCP Heart Rate FreeRTOS
 category: Example|BLE
-description: 'This application demonstrates BLE heart rate profile
+description: 'Demonstrates how to use the BLE Heart Rate Profile over GATT on SiWx91x over SPI NCP with FreeRTOS with HR service and notifications.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - NCP
 - name: Project Difficulty
   value:
   - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

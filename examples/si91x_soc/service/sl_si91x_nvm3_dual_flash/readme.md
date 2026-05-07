@@ -1,8 +1,8 @@
-# Platform SiWx91x NVM3 Dual Flash
+# SiWx91x Platform NVM3 Dual Flash
 
 ## Table of Contents
 
-- [Platform SiWx91x NVM3 Dual Flash](#platform-siwx91x-nvm3-dual-flash)
+- [SiWx91x Platform NVM3 Dual Flash](#platform-siwx91x-nvm3-dual-flash)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -88,6 +88,26 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   the user repack limit should be placed. The default is 0, which means the user and forced repack limits are equal.
 - NVM3_DEFAULT_NVM_SIZE - Size of the NVM3 storage region in flash. This size should be aligned with the flash page size of the device.
 
+- Configure the following application macros in `nvm3_app.c`:
+
+- `MAX_OBJECT_COUNT`: Specifies the maximum number of data objects that can be stored in the NVM3 instance by the application. By default, it is set to 10.
+
+  ```c
+  #define MAX_OBJECT_COUNT  10                                  // Maximum number of data objects saved
+  ```
+
+- `CMD_INPUT`: Specifies the expected number of UART input arguments per command line entered by the user. By default, it is set to 3.
+
+  ```c
+  #define CMD_INPUT         3                                    // UART input command arguments
+  ```
+
+- `STRING_SIZE`: Specifies the maximum length (in bytes) of a single input string accepted by the application. By default, it is set to 260.
+
+  ```c
+  #define STRING_SIZE       260                                  // Maximum string size
+  ```
+
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
@@ -132,3 +152,4 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

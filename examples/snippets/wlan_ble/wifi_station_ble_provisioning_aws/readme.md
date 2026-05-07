@@ -244,6 +244,25 @@ The following are the **non-configurable** macros in the application.
 
 - By default, values are configured as shown above.
 
+#### Dynamic BLE enable/disable demo (optional)
+
+When **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is set to **1** in `wifi_config.h`, the application runs an optional flow that:
+
+1. After DHCP succeeds, the Wi‑Fi task both transitions to **`WIFI_APP_IPCONFIG_DONE_STATE`** and sends **`WIFI_APP_CONNECTION_STATUS`** to the BLE task. The BLE task then handles **`RSI_BLE_WLAN_JOIN_STATUS`** (GATT update for “AP joined”, then quiesce). The Wi‑Fi task’s first action in **`WIFI_APP_IPCONFIG_DONE_STATE`** is to wait on **`ble_disable_done_queue`** until the BLE task completes **BLE disable**. Before the stack **BLE disable** API runs, the BLE task **quiesces** the link: **`rsi_ble_stop_advertising()`**, **`rsi_ble_disconnect()`**, then on **disconnect complete** it calls the disable API (stub until provided) and posts to the queue. If **`rsi_ble_disconnect`** fails synchronously, failure is posted immediately so the Wi‑Fi task does not wait indefinitely for a disconnect event.
+2. Runs a **16k SSL record demo** with **two** TLS 1.2 client sockets to the configurable server: each socket is created, TLS 1.2 is set, and **`connect()`** is called **one after the other** (sequential connects) so that **two concurrent TLS sessions** are open to the same server; optionally 1 byte is sent on each, then both sockets are closed.
+3. Calls **`sl_wifi_disconnect()`** on the station interface (Wi‑Fi stack stays initialized), then requests **BLE re-enable** from the BLE task and waits for completion via `ble_enable_done_queue`.
+4. **Reconnects** to the AP (credential, **`sl_wifi_connect`**, DHCP) without **`sl_wifi_init()`**, then continues to MQTT.
+
+On BLE disable failure, 16k SSL demo failure, BLE re-enable failure, or reconnect failure, the application enters the disconnected state and does not run MQTT. In the disconnected state, the app requests BLE re-enable and waits for it before sending disconnection status to BLE so that the BLE stack can update attributes.
+
+- **Macro:** `SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO` in `wifi_config.h` (set to **0** to disable this flow).
+- **16k SSL demo server:** `SSL_16K_DEMO_SERVER_IP` and `SSL_16K_DEMO_SERVER_PORT` in `wifi_config.h`. Configure these to a TLS 1.2 server reachable from the device. The demo opens **2 concurrent** connections to the same server; the server must accept multiple client connections for the demo to succeed.
+- Boot configuration in `app.c` sets **`SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD`** in `ext_tcp_ip_feature_bit_map` when this option is enabled. No BLE reclaim bit is set in boot config.
+
+**Why BLE enable has an explicit request but BLE disable does not:**  
+BLE **disable** is triggered implicitly: when the WiFi task sends **`WIFI_APP_CONNECTION_STATUS`** (after IP config), the BLE task handles it as “AP joined”, updates the GATT, then **stops advertising**, **disconnects** the peer, and only **after disconnect completes** calls the BLE disable API and posts the result to `ble_disable_done_queue`. (The BLE disable API only stops BLE; the application must end the link first.) No separate “disable request” message is used.  
+BLE **enable** is triggered explicitly: after **station disconnect** (so the 16k SSL demo does not run while associated), the WiFi task must ask the BLE task to turn BLE back on. So the WiFi task sends **`WIFI_APP_BLE_ENABLE_REQUEST`**, the BLE task handles **`RSI_BLE_ENABLE_REQUEST`**, calls the enable API, and posts the result to `ble_enable_done_queue`.
+
 ### Configure the following parameters in `aws_iot_config.h` file present at `<project>/config`
 
 Before configuring the parameters in `aws_iot_config.h`, register the SiWx917 device in the AWS IoT registry by following the steps mentioned in the [Create an AWS Thing](#create-an-aws-thing) section.
@@ -278,7 +297,7 @@ By default, the WiSeConnect SDK contains the Starfield Root CA Certificate in C-
 
 ## Test the Application
 
-The below instructions are provied in [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
+The below instructions are provided in [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
 
 - Build the application.
 - Flash, run, and debug the application.

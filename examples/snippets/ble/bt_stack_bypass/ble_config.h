@@ -30,7 +30,7 @@
 
 #define RSI_BLE_DEV_ADDR_RESOLUTION_ENABLE 0
 
-#define RSI_BT_RESET      ENABLE
+#define RSI_BT_RESET      DISABLE
 #define HCI_RESET_COMMAND 0x000c0301
 
 #define HCI_COMMAND_PKT 0x01
@@ -38,6 +38,11 @@
 #define HCI_SCODATA_PKT 0x03 //HCI Synchronous Data Packet - SCO and eSCO
 #define HCI_EVENT_PKT   0x04
 #define HCI_VENDOR_PKT  0xff
+
+// BTDM Debug Logging Configuration (enable 1 only when testing; logs on Segger RTT)
+#define BTDM_DEBUG_LOGGING  0
+#define MAX_FILE_SIZE       (10000 * 1024) // Configurable maximum file size in bytes
+#define FILE_SIZE_TOLERANCE 240            // Tolerance in bytes to avoid data loss
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #define RSI_BLE_MAX_NBR_ATT_REC 20

@@ -72,6 +72,10 @@
 #include "wifi_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_bt_common_apis.h"
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+#include "errno.h"
+#include "sl_si91x_socket_support.h"
+#endif
 
 #include "aws_iot_config.h"
 #include "aws_iot_shadow_interface.h"
@@ -195,6 +199,10 @@ extern uint8_t magic_word;
 // WLAN include file for configuration
 osSemaphoreId_t rsi_mqtt_sem;
 extern osSemaphoreId_t wlan_thread_sem;
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+extern osMessageQueueId_t ble_disable_done_queue;
+extern osMessageQueueId_t ble_enable_done_queue;
+#endif
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
@@ -292,6 +300,148 @@ void rsi_wlan_app_callbacks_init(void)
   //! Initialize join fail call back
   sl_wifi_set_join_callback_v2(join_callback_handler, NULL);
 }
+
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+/**
+ * @fn         wifi_app_ssl_16k_demo
+ * @brief      Runs two concurrent TLS 1.2 client connections (16k SSL record demo).
+ *             Boot config must set SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD (done in app.c).
+ *             Creates two sockets, sets TLS 1.2 on both, connects are sequential to
+ *             SSL_16K_DEMO_SERVER_IP:PORT, optionally sends 1 byte on each, then closes both.
+ *             On any error, closes any open socket and returns -1.
+ * @return     0 on success, -1 on failure (caller should set DISCONNECTED_STATE).
+ */
+static int wifi_app_ssl_16k_demo(void)
+{
+  int client_socket_1               = -1;
+  int client_socket_2               = -1;
+  struct sockaddr_in server_address = { 0 };
+  socklen_t socket_length           = sizeof(struct sockaddr_in);
+  sl_status_t status;
+  int r;
+
+  memset(&server_address, 0, sizeof(server_address));
+  server_address.sin_family = AF_INET;
+  server_address.sin_port   = SSL_16K_DEMO_SERVER_PORT;
+  status                    = sl_net_inet_addr(SSL_16K_DEMO_SERVER_IP, (uint32_t *)&server_address.sin_addr.s_addr);
+  if (status != SL_STATUS_OK) {
+    LOG_PRINT("\r\n16k SSL demo: invalid server IP\r\n");
+    return -1;
+  }
+
+  /* Create first socket and set TLS 1.2 */
+  client_socket_1 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (client_socket_1 < 0) {
+    LOG_PRINT("\r\n16k SSL demo: socket 1 create failed, errno %d\r\n", errno);
+    return -1;
+  }
+  r = setsockopt(client_socket_1, SOL_TCP, TCP_ULP, TLS_1_2, sizeof(TLS_1_2));
+  if (r < 0) {
+    LOG_PRINT("\r\n16k SSL demo: socket 1 setsockopt TLS failed, errno %d\r\n", errno);
+    close(client_socket_1);
+    return -1;
+  }
+
+  /* Create second socket and set TLS 1.2 */
+  client_socket_2 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (client_socket_2 < 0) {
+    LOG_PRINT("\r\n16k SSL demo: socket 2 create failed, errno %d\r\n", errno);
+    close(client_socket_1);
+    return -1;
+  }
+  r = setsockopt(client_socket_2, SOL_TCP, TCP_ULP, TLS_1_2, sizeof(TLS_1_2));
+  if (r < 0) {
+    LOG_PRINT("\r\n16k SSL demo: socket 2 setsockopt TLS failed, errno %d\r\n", errno);
+    close(client_socket_1);
+    close(client_socket_2);
+    return -1;
+  }
+
+  /* Connect each socket in sequence to the same server (two concurrent TLS sessions after both succeed). */
+  if (connect(client_socket_1, (struct sockaddr *)&server_address, socket_length) < 0) {
+    LOG_PRINT("\r\n16k SSL demo: socket 1 connect failed, errno %d\r\n", errno);
+    close(client_socket_1);
+    close(client_socket_2);
+    return -1;
+  }
+  if (connect(client_socket_2, (struct sockaddr *)&server_address, socket_length) < 0) {
+    LOG_PRINT("\r\n16k SSL demo: socket 2 connect failed, errno %d\r\n", errno);
+    close(client_socket_1);
+    close(client_socket_2);
+    return -1;
+  }
+  LOG_PRINT("\r\n16k SSL demo: 2 TLS connections up (sequential connects, same server)\r\n");
+
+  /* Optional: send 1 byte on each to prove the path */
+  r = send(client_socket_1, "", 1, 0);
+  if (r < 0 && errno != ENOBUFS) {
+    LOG_PRINT("\r\n16k SSL demo: socket 1 send failed, errno %d\r\n", errno);
+    close(client_socket_1);
+    close(client_socket_2);
+    return -1;
+  }
+  r = send(client_socket_2, "", 1, 0);
+  if (r < 0 && errno != ENOBUFS) {
+    LOG_PRINT("\r\n16k SSL demo: socket 2 send failed, errno %d\r\n", errno);
+    close(client_socket_1);
+    close(client_socket_2);
+    return -1;
+  }
+
+  close(client_socket_1);
+  close(client_socket_2);
+  LOG_PRINT("\r\n16k SSL demo: finished (2 TLS sessions)\r\n");
+  return 0;
+}
+
+/**
+ * @brief Reconnect Wi-Fi and configure IP after BLE re-enable (dynamic demo path).
+ *        Wi-Fi stack stays initialized; caller disconnects station before BLE re-enable, so this only
+ *        sets credential, connects, and runs DHCP — no sl_wifi_init().
+ * @return 0 on success, -1 on failure (sets disconnected = 1 on failure).
+ */
+static int wifi_app_init_and_reconnect(void)
+{
+  sl_status_t status;
+  sl_wifi_credential_id_t id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+
+  rsi_wlan_app_callbacks_init();
+
+  status = sl_net_set_credential(id, SL_NET_WIFI_PSK, pwd, strlen((char *)pwd));
+  if (status != SL_STATUS_OK) {
+    LOG_PRINT("\r\nReconnect: set credential failed: 0x%lX\r\n", status);
+    disconnected = 1;
+    return -1;
+  }
+
+  access_point.ssid.length = strlen((char *)coex_ssid);
+  memcpy(access_point.ssid.value, coex_ssid, access_point.ssid.length);
+  access_point.security      = sec_type;
+  access_point.encryption    = SL_WIFI_DEFAULT_ENCRYPTION;
+  access_point.credential_id = id;
+
+  status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
+  if (status != RSI_SUCCESS) {
+    LOG_PRINT("\r\nReconnect: sl_wifi_connect failed: 0x%lX\r\n", status);
+    disconnected = 1;
+    return -1;
+  }
+
+  ip_address.type      = SL_IPV4;
+  ip_address.mode      = SL_IP_MANAGEMENT_DHCP;
+  ip_address.host_name = DHCP_HOST_NAME;
+  status               = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
+  if (status != RSI_SUCCESS) {
+    LOG_PRINT("\r\nReconnect: IP config failed: 0x%lX\r\n", status);
+    disconnected = 1;
+    return -1;
+  }
+
+  connected    = 1;
+  disconnected = 0;
+  return 0;
+}
+#endif
 
 void async_socket_select(fd_set *fd_read, fd_set *fd_write, fd_set *fd_except, int32_t status)
 {
@@ -613,7 +763,7 @@ void wifi_app_task(void)
             a       = 0;
             timeout = 1;
             status  = sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
-            if (status == RSI_SUCCESS) {
+            if (status == SL_STATUS_OK) {
               connected     = 0;
               disassosiated = 1;
               wifi_app_send_to_ble(WIFI_APP_TIMEOUT_NOTIFY, (uint8_t *)&timeout, 1);
@@ -644,6 +794,45 @@ void wifi_app_task(void)
 
       case WIFI_APP_IPCONFIG_DONE_STATE: {
         wifi_app_clear_event(WIFI_APP_IPCONFIG_DONE_STATE);
+
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+        int32_t ble_result;
+        osMessageQueueGet(ble_disable_done_queue, &ble_result, NULL, osWaitForever);
+        if (ble_result != RSI_SUCCESS) {
+          LOG_PRINT("\r\nBLE disable failed (0x%lx), skipping 16k SSL demo.\r\n", (unsigned long)ble_result);
+          disconnected = 1;
+        }
+        if (disconnected || wifi_app_ssl_16k_demo() != 0) {
+          disconnected = 1;
+        }
+        if (disconnected) {
+          wifi_app_set_event(WIFI_APP_DISCONNECTED_STATE);
+          break;
+        }
+        status = sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
+        if (status != SL_STATUS_OK) {
+          LOG_PRINT("\r\n16k SSL demo: sl_wifi_disconnect failed: 0x%lX\r\n", status);
+          disconnected = 1;
+          wifi_app_set_event(WIFI_APP_DISCONNECTED_STATE);
+          break;
+        }
+        wifi_app_send_to_ble(WIFI_APP_BLE_ENABLE_REQUEST, NULL, 0);
+        osMessageQueueGet(ble_enable_done_queue, &ble_result, NULL, osWaitForever);
+        if (ble_result != RSI_SUCCESS) {
+          LOG_PRINT("\r\nBLE re-enable failed (0x%lx), skipping MQTT.\r\n", (unsigned long)ble_result);
+          disconnected = 1;
+          wifi_app_set_event(WIFI_APP_DISCONNECTED_STATE);
+          break;
+        }
+        if (disconnected || wifi_app_init_and_reconnect() != 0) {
+          disconnected = 1;
+        }
+        if (disconnected) {
+          wifi_app_set_event(WIFI_APP_DISCONNECTED_STATE);
+          break;
+        }
+#endif
+
         wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
 
         wifi_app_mqtt_task();
@@ -657,6 +846,16 @@ void wifi_app_task(void)
 
       case WIFI_APP_DISCONNECTED_STATE: {
         wifi_app_clear_event(WIFI_APP_DISCONNECTED_STATE);
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+        /* Re-enable BLE so rsi_ble_set_local_att_value can run when we send
+         * DISCONNECTION_STATUS below. Wait until BLE has finished enabling. */
+        wifi_app_send_to_ble(WIFI_APP_BLE_ENABLE_REQUEST, NULL, 0);
+        int32_t ble_result;
+        osMessageQueueGet(ble_enable_done_queue, &ble_result, NULL, osWaitForever);
+        if (ble_result != RSI_SUCCESS) {
+          LOG_PRINT("\r\nBLE re-enable failed (0x%lx) in disconnect path.\r\n", (unsigned long)ble_result);
+        }
+#endif
         retry = 1;
         wifi_app_send_to_ble(WIFI_APP_DISCONNECTION_STATUS, (uint8_t *)&disconnected, 1);
         wifi_app_set_event(WIFI_APP_FLASH_STATE);
@@ -668,7 +867,7 @@ void wifi_app_task(void)
         wifi_app_clear_event(WIFI_APP_DISCONN_NOTIFY_STATE);
 
         status = sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
-        if (status == RSI_SUCCESS) {
+        if (status == SL_STATUS_OK) {
 #if RSI_WISE_MCU_ENABLE
           rsi_flash_erase((uint32_t)FLASH_ADDR_TO_STORE_AP_DETAILS);
 #endif

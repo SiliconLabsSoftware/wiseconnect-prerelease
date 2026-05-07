@@ -149,6 +149,10 @@ osThreadId_t wifi_app_thread_id;
 osThreadId_t ble_app_thread_id;
 osSemaphoreId_t wlan_ble_thread_sem1, ble_main_task_sem, ble_conn_sem;
 osSemaphoreId_t commonsem;
+#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
+osMessageQueueId_t ble_disable_done_queue;
+osMessageQueueId_t ble_enable_done_queue;
+#endif
 
 //! Function prototypes
 extern void rsi_wlan_app_task(void);
@@ -174,6 +178,10 @@ void rsi_wlan_ble_app_init(void)
   ble_conn_sem         = osSemaphoreNew(1, 0, NULL);
   ble_main_task_sem    = osSemaphoreNew(1, 0, NULL);
   wlan_ble_thread_sem1 = osSemaphoreNew(1, 0, NULL);
+#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
+  ble_disable_done_queue = osMessageQueueNew(1, sizeof(int32_t), NULL);
+  ble_enable_done_queue  = osMessageQueueNew(1, sizeof(int32_t), NULL);
+#endif
 
   //! BLE initialization
   rsi_ble_app_init();
@@ -196,6 +204,13 @@ void rsi_wlan_ble_app_init(void)
   osSemaphoreAcquire(commonsem, osWaitForever);
   return;
 }
+
+#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
+void rsi_wlan_init_wifi(void)
+{
+  sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
+}
+#endif
 
 void app_init(void)
 {

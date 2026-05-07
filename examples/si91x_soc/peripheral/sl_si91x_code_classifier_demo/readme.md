@@ -1,8 +1,8 @@
-# Platform SiWx91x Code Classifier Demo
+# SiWx91x Platform Code Classifier Demo
 
 ## Table of Contents
 
-- [Platform SiWx91x Code Classifier Demo](#platform-siwx91x-code-classifier-demo)
+- [SiWx91x Platform Code Classifier Demo](#platform-siwx91x-code-classifier-demo)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -155,6 +155,22 @@ SL_SI91X_CODE_CLASSIFY(<segment>, <component>, <classifier_type>)
 - The macro is only effective when the **Code Classifier Component** is installed and enabled.
 - For recommended settings, please refer to the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
+## Application Build Environment
+
+- Configure the following macros in [`code_classifier.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_code_classifier_demo/code_classifier.c) file and update/modify following macros, if required.
+
+  - `LED_INSTANCE`: Selects the LED instance toggled by the example to visually indicate application execution. By default, it is set to `led_led0`.
+
+    ```c
+    #define LED_INSTANCE    led_led0 // LED instance
+    ```
+
+  - `TOGGLE_DELAY_MS`: Delay (in milliseconds) between successive LED toggles. By default, it is set to 1000.
+
+    ```c
+    #define TOGGLE_DELAY_MS 1000     // Toggle delay in ms
+    ```
+
 ## Testing the Application
 
 1. Compile and flash the application onto the WPK base board.
@@ -174,3 +190,4 @@ SL_SI91X_CODE_CLASSIFY(<segment>, <component>, <classifier_type>)
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

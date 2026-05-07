@@ -1,10 +1,10 @@
-# Platform SiWx91x Dev Kit
+# SiWx91x Platform Dev Kit
 
 This example collects and processes sensor data from the SiWx91x dev kit board, transmits them over a Wi-Fi network, and displays them on the Simplicity Connect iOS/Android application.
 
 ## Table of Contents
 
-- [Platform SiWx91x Dev Kit](#platform-siwx91x-dev-kit)
+- [SiWx91x Platform Dev Kit](#platform-siwx91x-dev-kit)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -71,6 +71,68 @@ All device activities can be observed on the serial terminal prints. You may use
 
 ## Application Build Environment
 
+- Configure the following Wi-Fi parameters in `wifi_app.c`:
+
+- `WIFI_CLIENT_PROFILE_SSID`: Specifies the SSID of the Wi-Fi network to which the device connects as a station. Update the string with the name of your Wi-Fi network.
+
+  ```c
+  #define WIFI_CLIENT_PROFILE_SSID "YOUR_INITIAL_AP_SSID" // Wi-Fi network SSID
+  ```
+
+- `WIFI_SCAN_TIMEOUT`: Specifies the maximum time (in milliseconds) the Wi-Fi scan operation waits for a response before timing out. By default, it is set to 10000.
+
+  ```c
+  #define WIFI_SCAN_TIMEOUT         10000                   // Wi-Fi scan timeout in ms
+  ```
+
+- `DHCP_HOST_NAME`: Specifies the host name advertised by the DHCP client. By default, it is set to `NULL`, meaning no host name is sent.
+
+  ```c
+  #define DHCP_HOST_NAME            NULL                    // DHCP host name
+  ```
+
+- `APP_RECONN_LOOP_CTR_LIM`: Specifies the maximum number of reconnection attempts before the application gives up on re-establishing the Wi-Fi connection. By default, it is set to 3.
+
+  ```c
+  #define APP_RECONN_LOOP_CTR_LIM   3                       // Reconnection loop counter limit
+  ```
+
+- Configure the following server parameters in `sensor_app.c`:
+
+- `HTTP_SERVER_PORT`: Specifies the HTTP server port used by the application to serve sensor data over HTTP. By default, it is set to 80.
+
+  ```c
+  #define HTTP_SERVER_PORT        80     // HTTP server port
+  ```
+
+- `SERVER_PORT`: Specifies the TCP server port used by the sensor application for data exchange. By default, it is set to 5000.
+
+  ```c
+  #define SERVER_PORT             5000   // Server port
+  ```
+
+- `SCAN_RESULT_BUFFER_SIZE`: Specifies the size (in bytes) of the buffer used to hold Wi-Fi scan results. By default, it is set to 2000.
+
+  ```c
+  #define SCAN_RESULT_BUFFER_SIZE (2000) // Scan result buffer size
+  ```
+
+- Configure the following BLE parameter in `ble_app.c`:
+
+- `RSI_BLE_APP_DEVICE_NAME`: Specifies the Bluetooth Low Energy (BLE) device name advertised by the application. By default, it is set to `"WIFI_SENSOR"`.
+
+  ```c
+  #define RSI_BLE_APP_DEVICE_NAME "WIFI_SENSOR" // BLE device name
+  ```
+
+- Configure the following parameter in `app.c`:
+
+- `RSI_TCP_IP_BYPASS`: Enables or disables the TCP/IP bypass mode. When enabled, the host handles the TCP/IP stack; when disabled, the NWP handles it. By default, it is set to `RSI_DISABLE`.
+
+  ```c
+  #define RSI_TCP_IP_BYPASS RSI_DISABLE // TCP/IP bypass mode
+  ```
+
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Run the Application
@@ -127,3 +189,4 @@ All device activities can be observed on the serial terminal prints. You may use
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

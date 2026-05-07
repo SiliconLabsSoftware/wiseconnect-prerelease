@@ -1,8 +1,8 @@
-# Platform SiWx91x PS1 STATE
+# SiWx91x Platform PS1 STATE
 
 ## Table of Contents
 
-- [Platform SiWx91x PS1 STATE](#platform-siwx91x-ps1-state)
+- [SiWx91x Platform PS1 STATE](#platform-siwx91x-ps1-state)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -11,6 +11,7 @@
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
+  - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
@@ -65,6 +66,22 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
+## Application Build Environment
+
+Configure the following macros in `ps1_state.c` if required:
+
+- `ULP_TIMER_MATCH_VALUE`: Specifies the ULP timer match count used to schedule the wakeup from the PS1 state. By default, it is set to 40000000, which corresponds to approximately 2 seconds when operating with a 20 MHz down-counter reference.
+
+  ```c
+  #define ULP_TIMER_MATCH_VALUE 40000000          // Timer match value for down-counter type with 20MHz clock for 2 seconds
+  ```
+
+- `ULP_TIMER_INSTANCE`: Selects the ULP timer instance used to generate the wakeup event from the PS1 state. By default, it is set to `SL_ULP_TIMER_TIMER0`.
+
+  ```c
+  #define ULP_TIMER_INSTANCE    SL_ULP_TIMER_TIMER0 // ULP timer instance to be used
+  ```
+
 ## Test the Application
 
 Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) for the following tasks:
@@ -91,3 +108,4 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

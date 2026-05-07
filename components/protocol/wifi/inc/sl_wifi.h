@@ -833,8 +833,9 @@ sl_status_t sl_wifi_set_11ax_config(uint8_t guard_interval) SL_DEPRECATED_API_WI
  *   802.11ax (Wi-Fi 6) is not supported in @ref SL_WIFI_ACCESS_POINT_MODE due to firmware limitations.
  ******************************************************************************/
 sl_status_t sl_wifi_set_11ax_config_v2(const sl_wifi_11ax_config_params_t *config_11ax_params);
-/**
-* @brief
+
+/***************************************************************************/ /**
+ * @brief
  *   Start the transmit test.
  *
  * @details
@@ -842,9 +843,13 @@ sl_status_t sl_wifi_set_11ax_config_v2(const sl_wifi_11ax_config_params_t *confi
  *
  *   This is a blocking API.
  *
- *   This API is relevant in PER mode
+ *   This API is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
  *
- * @pre-Pre-conditions:
+ * Note: Use @ref sl_wifi_transmitter_test_base_info_t with the PHY-specific PER-parameter structures
+ *   (@ref sl_wifi_11bgn_per_params_t, @ref sl_wifi_11ac_per_params_t, @ref sl_wifi_11ax_per_params_t, @ref sl_wifi_11be_per_params_t)
+ *   and @ref sl_wifi_transmit_test_start_11bgn, @ref sl_wifi_transmit_test_start_11ac, @ref sl_wifi_transmit_test_start_11ax, or @ref sl_wifi_transmit_test_start_11be instead.
+ *
+ * @pre Pre-conditions:
  * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
  * @param[in] interface
  *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
@@ -852,7 +857,7 @@ sl_status_t sl_wifi_set_11ax_config_v2(const sl_wifi_11ax_config_params_t *confi
  *   Pointer to @ref sl_wifi_transmitter_test_info_t structure containing the configuration for the transmit test.
  *
  * @return
- *   sl_status_t. See [Status Codes] (https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes] (../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details. 
+ *   sl_status_t. See [Status Codes] (https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes] (../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
  *
  * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
  *       - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
@@ -860,45 +865,174 @@ sl_status_t sl_wifi_set_11ax_config_v2(const sl_wifi_11ax_config_params_t *confi
  *       - Start Continuous Wave mode
  * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
  * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
-*************************************************************************************************************************************************************************************************************************/
+ ******************************************************************************/
 sl_status_t sl_wifi_transmit_test_start(sl_wifi_interface_t interface,
-                                        const sl_wifi_transmitter_test_info_t *tx_test_info);
+                                        const sl_wifi_transmitter_test_info_t *tx_test_info)
+  SL_DEPRECATED_API_WISECONNECT_4_1;
 
-/**
- * @brief Start the transmit test with user-defined payload.
+/***************************************************************************/ /**
+ * @brief
+ *     Start the Wi-Fi 4 (802.11b/g/n) transmit test.
  *
- * @details This function starts the transmit test using the provided
- * configuration and user-defined payload. This is a blocking API
- * and is relevant in PER mode.
- * 
- * @pre-Pre-conditions:
+ * @details
+ *     This function starts the transmit test for Wi-Fi 4 (802.11b/g/n) using the provided
+ *     common transmit test configuration, protocol-specific PER parameters, and an optional
+ *     user-defined payload.
+ *
+ *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
+ *
+ * @pre Pre-conditions:
  * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
  * @param[in] tx_test_info
- *  Pointer to @ref sl_wifi_transmitter_test_info_t structure containing the configuration for the transmit test.
+ *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
+ * @param[in] per_params
+ *     Pointer to @ref sl_wifi_11bgn_per_params_t structure containing 802.11b/g/n specific PER parameters.
  * @param[in] payload
- *   Pointer to user-defined payload data.
+ *     Pointer to user-defined payload data. Optional argument, can be NULL.
  * @param[in] payload_length
- *   Length of the user-defined payload in bytes. This value must be less than or equal to
- *   the length specified in `tx_test_info->length` 
- * 
+ *     Length of the user-defined payload in bytes. This value must be less than or equal to
+ *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
+ *
  * @return
- *   sl_status_t. See [Status Codes] (https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes] (../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
- * 
+ *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ *
  * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
- *       - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
- *       - Stop Continuous mode
- *       - Start Continuous Wave mode
+ *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+ *             - Stop Continuous mode
+ *             - Start Continuous Wave mode
  * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
- */
-sl_status_t sl_wifi_transmit_test_start_with_payload(sl_wifi_interface_t interface,
-                                                     const sl_wifi_transmitter_test_info_t *tx_test_info,
-                                                     const uint8_t *payload,
-                                                     uint16_t payload_length);
-/**
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
+ * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
+                                              const sl_wifi_11bgn_per_params_t *per_params,
+                                              const uint8_t *payload,
+                                              uint16_t payload_length);
+
+/***************************************************************************/ /**
+ * @brief
+ *     Start the Wi-Fi 5 (802.11ac) transmit test.
+ *
+ * @details
+ *     This function starts the transmit test for Wi-Fi 5 (802.11ac) using the provided
+ *     common transmit test configuration, VHT-specific PER parameters, and an optional
+ *     user-defined payload.
+ *
+ *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
+ *
+ * @pre Pre-conditions:
+ * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
+ * @param[in] tx_test_info
+ *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
+ * @param[in] per_params
+ *     Pointer to @ref sl_wifi_11ac_per_params_t structure containing 802.11ac (VHT) specific PER parameters.
+ * @param[in] payload
+ *     Pointer to user-defined payload data. Optional argument, can be NULL.
+ * @param[in] payload_length
+ *     Length of the user-defined payload in bytes. This value must be less than or equal to
+ *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
+ *
+ * @return
+ *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ *
+ * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
+ *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+ *             - Stop Continuous mode
+ *             - Start Continuous Wave mode
+ * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
+ * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_start_11ac(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
+                                             const sl_wifi_11ac_per_params_t *per_params,
+                                             const uint8_t *payload,
+                                             uint16_t payload_length);
+
+/***************************************************************************/ /**
+ * @brief
+ *     Start the Wi-Fi 6/6E (802.11ax) transmit test.
+ *
+ * @details
+ *     This function starts the transmit test for Wi-Fi 6/6E (802.11ax) using the provided
+ *     common transmit test configuration, HE-specific PER parameters, and an optional
+ *     user-defined payload.
+ *
+ *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
+ *
+ * @pre Pre-conditions:
+ * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
+ * @param[in] tx_test_info
+ *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
+ * @param[in] per_params
+ *     Pointer to @ref sl_wifi_11ax_per_params_t structure containing 802.11ax (HE) specific PER parameters.
+ * @param[in] payload
+ *     Pointer to user-defined payload data. Optional argument, can be NULL.
+ * @param[in] payload_length
+ *     Length of the user-defined payload in bytes. This value must be less than or equal to
+ *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
+ *
+ * @return
+ *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ *
+ * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
+ *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+ *             - Stop Continuous mode
+ *             - Start Continuous Wave mode
+ * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
+ * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
+                                             const sl_wifi_11ax_per_params_t *per_params,
+                                             const uint8_t *payload,
+                                             uint16_t payload_length);
+
+/***************************************************************************/ /**
+ * @brief
+ *     Start the Wi-Fi 7 (802.11be) transmit test.
+ *
+ * @details
+ *     This function starts the transmit test for Wi-Fi 7 (802.11be) using the provided
+ *     common transmit test configuration, EHT-specific PER parameters, and an optional
+ *     user-defined payload.
+ *
+ *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
+ *
+ * @pre Pre-conditions:
+ * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
+ * @param[in] tx_test_info
+ *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
+ * @param[in] per_params
+ *     Pointer to @ref sl_wifi_11be_per_params_t structure containing 802.11be (EHT) specific PER parameters.
+ * @param[in] payload
+ *     Pointer to user-defined payload data. Optional argument, can be NULL.
+ * @param[in] payload_length
+ *     Length of the user-defined payload in bytes. This value must be less than or equal to
+ *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
+ *
+ * @return
+ *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ *
+ * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
+ *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+ *             - Stop Continuous mode
+ *             - Start Continuous Wave mode
+ * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
+ * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_start_11be(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
+                                             const sl_wifi_11be_per_params_t *per_params,
+                                             const uint8_t *payload,
+                                             uint16_t payload_length);
+
+/***************************************************************************/ /**
  * @brief
  *   Stop the transmit test.
+ *
+ * @note
+ *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_transmit_test_stop_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-power-api#sl-wifi-transmit-test-stop-v2) API. This is retained for backward compatibility.
+ *
  *
  * @details
  *   This function stops the ongoing transmit test on the Si91x device.
@@ -907,17 +1041,39 @@ sl_status_t sl_wifi_transmit_test_start_with_payload(sl_wifi_interface_t interfa
  *
  *   This API is relevant in PER mode.
  *
- * @pre-Pre-conditions:
+ * @pre Pre-conditions:
  * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
  * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t (unused; retained for binary compatibility).
  * @return
- *   sl_status_t. See [Status Codes] (https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes] (../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details. 
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
  *
  * @note
- *  User should configure a minimum delay (approx. 10 milliseconds) before and after @ref sl_wifi_transmit_test_start API to observe a stable output at requested dBm level.
-*****************************************************************************************************************************************************************************************************************************/
-sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface);
+ *   User should configure a minimum delay (approx. 10 milliseconds) before and after @ref sl_wifi_transmit_test_start API to observe a stable output at requested dBm level.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface) SL_DEPRECATED_API_WISECONNECT_4_1;
+
+/***************************************************************************/ /**
+ * @brief
+ *   Stop the transmit test.
+ *
+ * @details
+ *   This function stops the ongoing transmit test. No Wi-Fi interface argument is required;
+ *   behavior matches @ref sl_wifi_transmit_test_stop when the transmit test was started on the device.
+ *
+ *   This is a blocking API.
+ *
+ *   This API is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
+ *
+ * @pre Pre-conditions:
+ * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ *
+ * @note
+ *   User should configure a minimum delay (approx. 10 milliseconds) before and after @ref sl_wifi_transmit_test_start API to observe a stable output at requested dBm level.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_stop_v2(void);
 
 /***************************************************************************/ /**
  * @brief
@@ -2079,24 +2235,6 @@ sl_status_t sl_wifi_stop_wps(sl_wifi_interface_t interface);
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  ******************************************************************************/
 sl_status_t sl_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_statistics_t *statistics);
-
-/***************************************************************************/ /**
- * @brief
- *   Return Wi-Fi extended statistics (v2), including broadcast/multicast filtering counters.
- * @pre Pre-conditions:
- * -
- *   @ref sl_wifi_init should be called before this API.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @param[out] statistics
- *   @ref sl_wifi_statistics_v2_t object that contains Wi-Fi statistics.
- * @note
- *   NWP must return a response payload whose length matches @ref sl_wifi_statistics_v2_t for this API.
- * @todo Move to internal API: this public function is not intended to remain on the public surface long-term.
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- ******************************************************************************/
-sl_status_t sl_wifi_get_statistics_v2(sl_wifi_interface_t interface, sl_wifi_statistics_v2_t *statistics);
 
 /***************************************************************************/ /**
  * @brief

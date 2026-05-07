@@ -1,8 +1,8 @@
-# Platform SiWx91x I2C Driver Leader
+# SiWx91x Platform I2C Driver Leader
 
 ## Table of Contents
 
-- [Platform SiWx91x I2C Driver Leader](#platform-siwx91x-i2c-driver-leader)
+- [SiWx91x Platform I2C Driver Leader](#platform-siwx91x-i2c-driver-leader)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -114,10 +114,35 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Change 'Operating Mode' as per bus-speed requirement.
 - After completing the above UC configurations, configure the following macros in [`i2c_leader_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.c) and [`i2c_leader_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.h) file. Update or modify the following macros, if required.
 
-    ```c
-      #define FOLLOWER_I2C_ADDR        // Update I2C follower address
-      #define I2C_SIZE_BUFFERS             // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
-    ```
+- `FOLLOWER_I2C_ADDR`: 7-bit I2C follower (target) address that the leader communicates with. Must match the `OWN_I2C_ADDR` configured on the follower device. By default, it is set to `0x50`.
+
+  ```c
+    #define FOLLOWER_I2C_ADDR        0x50  // I2C follower address
+  ```
+
+- `I2C_SIZE_BUFFERS`: Defines the number of bytes to send and receive between Leader and Follower. Its value should be less than the maximum buffer size macro value.
+
+  ```c
+    #define I2C_SIZE_BUFFERS             // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
+  ```
+
+- `MAX_BUFFER_SIZE_BLOCKING`: Defines the maximum buffer size allowed for RX and TX lengths when transferring without DMA. By default, it is set to 80000.
+
+  ```c
+    #define MAX_BUFFER_SIZE_BLOCKING 80000 // Maximum buffer size for RX and TX length when transferring without DMA
+  ```
+
+- `I2C_BUFFER_SIZE`: Defines the size of the data buffer used for I2C transfer. By default, it is set to 1024.
+
+  ```c
+    #define I2C_BUFFER_SIZE          1024  // Size of data buffer
+  ```
+
+- `INITIAL_VALUE`: Defines the initial value used to fill the data buffer before transmission. By default, it is set to 0.
+
+  ```c
+    #define INITIAL_VALUE            0     // Initial value of buffer
+  ```
 
 > **Note:** After completing the above configurations, connect the SCL and SDA pins of Leader and Follower and run the application. Observe the results by connecting SDA and SCL pins to the Logic Analyzer. (If required, enable the glitch filter for the SCL channel with time period 100ns,to avoid glitches).
 >
@@ -159,6 +184,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 > **Note- In case of sleep-wakeup :**
 >
 >- As GPIO configurations will be lost after going to sleep state, the user has to initialize the I2C pins and driver again after wakeup by using \ref sl_i2c_driver_init API for initializing driver and \ref sl_si91x_i2c_pin_init API for initializing pins.
+>- If the project uses UC-generated I2C instances, call `sl_i2c_init_instances()` after wakeup before resuming I2C transfers so the configured I2C instances are restored.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -193,3 +219,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

@@ -50,7 +50,7 @@ extern osMutexId_t printf_mutex;
 
 #define CLIENT_ID "WISECONNECT-SDK-MQTT-CLIENT-ID"
 
-#define TOPIC_TO_BE_SUBSCRIBED "THERMOSTAT-DATA\0"
+#define TOPIC_TO_BE_SUBSCRIBED "THERMOSTAT-DATA"
 #define QOS_OF_SUBSCRIPTION    SL_MQTT_QOS_LEVEL_1
 
 #define PUBLISH_TOPIC          "WISECONNECT_SDK_TOPIC"
@@ -82,7 +82,7 @@ extern osMutexId_t printf_mutex;
 
 sl_mqtt_client_t client = { 0 };
 
-uint8_t is_execution_completed = 0;
+volatile uint8_t is_execution_completed = 0;
 
 sl_mqtt_client_credentials_t *client_credentails = NULL;
 
@@ -125,9 +125,9 @@ sl_mqtt_client_last_will_message_t last_will_message = {
 void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message, void *context);
 void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void *event_data, void *context);
 void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error);
-void mqtt_client_cleanup();
+void mqtt_client_cleanup(void);
 void print_char_buffer(char *buffer, uint32_t buffer_length);
-sl_status_t mqtt_example();
+sl_status_t mqtt_example(void);
 
 /******************************************************
  *               Function Definitions
@@ -135,7 +135,7 @@ sl_status_t mqtt_example();
 void mqtt_client_cleanup()
 {
   SL_CLEANUP_MALLOC(client_credentails);
-  //  is_execution_completed = 1;
+  is_execution_completed = 1;
 }
 
 void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message, void *context)
@@ -272,7 +272,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
   }
 }
 
-sl_status_t mqtt_example()
+sl_status_t mqtt_example(void)
 {
   sl_status_t status;
 

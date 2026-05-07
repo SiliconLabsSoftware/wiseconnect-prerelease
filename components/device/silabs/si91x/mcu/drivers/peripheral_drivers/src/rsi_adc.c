@@ -2834,7 +2834,7 @@ rsi_error_t RSI_ADC_ExtTrigConfig(const AUX_ADC_DAC_COMP_Type *pstcADC, adc_extr
  * @brief        This API is used read external triggger status.
  * @param[in]    pstcADC           : Pointer to the AUX_ADC_DAC_COMP_Type structure.
  * @param[in]    ExtrTrigConfig    : ADC external trigger configuration structure variable. .
- * @return       If API return non value then interrupt match value occured
+ * @return       If API return non value then interrupt match value occurred
  */
 uint8_t RSI_ADC_ExtTrigStatusRead(const AUX_ADC_DAC_COMP_Type *pstcADC, adc_extr_config_t ExtrTrigConfig)
 {
@@ -2857,7 +2857,7 @@ uint8_t RSI_ADC_ExtTrigStatusRead(const AUX_ADC_DAC_COMP_Type *pstcADC, adc_extr
  * @brief        This API is used clear external trigger status.
  * @param[in]    pstcADC           : Pointer to the AUX_ADC_DAC_COMP_Type structure.
  * @param[in]    ExtrTrigConfig    : ADC external trigger configuration structure variable. .
- * @return       If API return non value then interrupt match value occured
+ * @return       If API return non value then interrupt match value occurred
  *
  */
 rsi_error_t RSI_ADC_ExtTrigStatusClear(const AUX_ADC_DAC_COMP_Type *pstcADC, adc_extr_config_t ExtrTrigConfig)

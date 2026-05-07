@@ -95,7 +95,7 @@ sl_status_t sli_si91x_submit_rx_pkt(uint32_t timeout)
                                               timeout,
                                               (sli_buffer_t *)&rx_pkt_buffer);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+    SL_DEBUG_LOG_V2(DEBUG, "\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -165,7 +165,7 @@ sl_status_t sli_submit_rx_buffer(uint32_t timeout)
   //! submit to NWP submit packet
   status = sli_si91x_submit_rx_pkt(timeout);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n RX Buffer submission failed with status: %d \r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\n RX Buffer submission failed with status: %d \r\n", status);
   }
 
   unmask_ta_interrupt(RX_PKT_TRANSFER_DONE_INTERRUPT);
@@ -238,7 +238,7 @@ void sli_si91x_config_m4_dma_desc_on_reset(void)
   //! Wait for NWP to wakeup and should be in bootloader
   while (!(P2P_STATUS_REG & TA_is_active))
     ;
-  SL_DEBUG_LOG("\r\nTA is in active state\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\nTA is in active state\r\n");
   //! TBD Need to address why soft reset expecting delay
   osDelay(SLI_SYSTEM_MS_TO_TICKS(100));
   //! Update M4 Tx and Rx DMA descriptors

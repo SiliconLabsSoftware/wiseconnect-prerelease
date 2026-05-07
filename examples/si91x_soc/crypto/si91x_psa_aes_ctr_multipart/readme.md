@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA AES Cipher Multipart
+# SiWx91x Platform PSA AES Cipher Multipart
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA AES Cipher Multipart](#platform-siwx91x-psa-aes-cipher-multipart)
+- [SiWx91x Platform PSA AES Cipher Multipart](#platform-siwx91x-psa-aes-cipher-multipart)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -63,23 +63,23 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - The function by default defines the size of first chunk as 16 bytes and subsequent four middle chunks size as 32 bytes.
 
-- The length of the first chunk of incoming message can be configured by using the below macro
+- `FIRST_CHUNK_SIZE`: Specifies the length (in bytes) of the first chunk of the incoming message processed by the AES multipart operation. By default, it is set to 16.
 
-```c
-#define FISRT_CHUNK_SIZE   16
-```
+  ```c
+  #define FIRST_CHUNK_SIZE   16
+  ```
 
-- The length of the Middle chunk of incoming message can be configured by using the below macro
+- `MIDDLE_CHUNK_SIZE`: Specifies the length (in bytes) of each subsequent middle chunk of the incoming message processed by the AES multipart operation. By default, it is set to 32.
 
-```c
-#define MIDDLE_CHUNK_SIZE   32
-```
+  ```c
+  #define MIDDLE_CHUNK_SIZE   32
+  ```
 
-- The length of the input message/plain text can be configured by using the below macro. By default it is 144 bytes.
+- `AES_TEST_PT_MAX_LEN`: Specifies the total length (in bytes) of the input message/plain text to be encrypted and decrypted. By default, it is set to 144.
 
-```c
-#define AES_TEST_PT_MAX_LEN 144
-```
+  ```c
+  #define AES_TEST_PT_MAX_LEN 144
+  ```
 
 - In AES multipart operation, data must be transmitted in 16-byte aligned chunks.
 
@@ -121,3 +121,4 @@ Follow the steps as mentioned for the successful execution of the application:
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

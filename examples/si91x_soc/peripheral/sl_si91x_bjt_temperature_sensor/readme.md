@@ -1,8 +1,8 @@
-# Platform SiWx91x BJT Temperature Sensor
+# SiWx91x Platform BJT Temperature Sensor
 
 ## Table of Contents
 
-- [Platform SiWx91x BJT Temperature Sensor](#platform-siwx91x-bjt-temperature-sensor)
+- [SiWx91x Platform BJT Temperature Sensor](#platform-siwx91x-bjt-temperature-sensor)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -104,12 +104,29 @@ The BJT temperature sensor requires specific configuration of the ADC and OPAMP 
 
 **Configure the following parameters in [`sl_si91x_bjt_temperature_sensor.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_bjt_temperature_sensor.c) file:**
 
-```c
-#define CHANNEL_NUMBER             0       // ADC channel number
-#define POS_IP_OPAMP               20      // OPAMP input selection for band-gap reference
-#define OPAMP_GAIN_OPAMP           51      // OPAMP gain configuration
-#define OPAMP_CHANNEL              0       // OPAMP instance to use
-```
+- `CHANNEL_NUMBER`: ADC channel used for BJT temperature measurement. The BJT sensor is hardwired to ADC channel 0 and this value must not be changed. By default, it is set to 0.
+
+  ```c
+    #define CHANNEL_NUMBER             0       // ADC channel number
+  ```
+
+- `POS_IP_OPAMP`: ADC input selection that routes the band-gap reference through OPAMP1 to the ADC. This value must remain 20 for correct temperature measurement. By default, it is set to 20.
+
+  ```c
+    #define POS_IP_OPAMP               20      // OPAMP input selection for band-gap reference
+  ```
+
+- `OPAMP_GAIN_OPAMP`: OPAMP gain configuration. A value of 51 selects unity gain, which is required for accurate voltage buffering and calibration. By default, it is set to 51.
+
+  ```c
+    #define OPAMP_GAIN_OPAMP           51      // OPAMP gain configuration
+  ```
+
+- `OPAMP_CHANNEL`: OPAMP instance used for the temperature sensor. OPAMP1 (channel 0) is the only instance with the internal connections needed for this measurement. By default, it is set to 0.
+
+  ```c
+    #define OPAMP_CHANNEL              0       // OPAMP instance to use
+  ```
 
 **Parameter Explanations:**
 
@@ -122,11 +139,23 @@ The BJT temperature sensor requires specific configuration of the ADC and OPAMP 
 
 **Additional Internal Parameters (handled automatically by the driver):**
 
-```c
-#define POS_IP_BJT                 23      // ADC input for BJT sensor output (automatic)
-#define VREF_VALUE                 2.61f   // Default reference voltage (automatic)
-#define SAMPLING_RATE              9000    // ADC sampling rate (automatic)
-```
+- `POS_IP_BJT`: ADC input selection value that routes the BJT temperature sensor output to the ADC. This is handled automatically by the driver. By default, it is set to 23.
+
+  ```c
+    #define POS_IP_BJT                 23      // ADC input for BJT sensor output (automatic)
+  ```
+
+- `VREF_VALUE`: Default ADC reference voltage (in volts) used internally when computing the BJT and band-gap sample voltages. By default, it is set to 2.61f.
+
+  ```c
+    #define VREF_VALUE                 2.61f   // Default reference voltage (automatic)
+  ```
+
+- `SAMPLING_RATE`: ADC sampling rate (in samples per second) used internally for BJT temperature measurements. By default, it is set to 9000.
+
+  ```c
+    #define SAMPLING_RATE              9000    // ADC sampling rate (automatic)
+  ```
 
 **Why These Specific Values?**
 
@@ -246,3 +275,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

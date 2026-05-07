@@ -1,8 +1,8 @@
-# Platform SiWx91x Hello World
+# SiWx91x Platform Hello World
 
 ## Table of Contents
 
-- [Platform SiWx91x Hello World](#platform-siwx91x-hello-world)
+- [SiWx91x Platform Hello World](#platform-siwx91x-hello-world)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

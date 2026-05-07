@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA Multithread
+# SiWx91x Platform PSA Multithread
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA Multithread](#platform-siwx91x-psa-multithread)
+- [SiWx91x Platform PSA Multithread](#platform-siwx91x-psa-multithread)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

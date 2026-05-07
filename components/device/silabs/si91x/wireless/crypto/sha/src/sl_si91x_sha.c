@@ -116,49 +116,57 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
 }
 
 #else
-static sl_status_t sli_si91x_sha_side_band(uint8_t sha_mode, uint8_t *msg, uint16_t msg_length, uint8_t *digest)
+
+static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
+                                              uint8_t *msg,
+                                              uint16_t msg_length,
+                                              uint16_t current_chunk_length,
+                                              uint8_t sha_flags,
+                                              const uint8_t *digest)
 {
-  // Input pointer check
-  if (msg == NULL) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  sl_status_t status               = SL_STATUS_OK;
-  sli_si91x_sha_request_t *request = (sli_si91x_sha_request_t *)malloc(sizeof(sli_si91x_sha_request_t));
+  sl_status_t status                  = SL_STATUS_OK;
+  uint8_t *output_ptr                 = (uint8_t *)digest;
+  sli_si91x_sha_mp_request_t *request = (sli_si91x_sha_mp_request_t *)malloc(sizeof(sli_si91x_sha_mp_request_t));
 
   if (request == NULL) {
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
-  memset(request, 0, sizeof(sli_si91x_sha_request_t));
+  memset(request, 0, sizeof(sli_si91x_sha_mp_request_t));
 
   // Fill Algorithm type SHA - 4
   request->algorithm_type = SHA;
 
   request->algorithm_sub_type = sha_mode;
 
+  // Fill sha flags
+  request->sha_flags = sha_flags;
+
   // Fill total msg length
   request->total_msg_length = msg_length;
+
+  // Fill currnet chunk length
+  request->current_chunk_length = current_chunk_length;
 
   // Fill msg ptr
   request->msg = msg;
 
-  // Fill msg ptr
-  request->output = digest;
+  request->output = output_ptr;
 
   status = sl_si91x_driver_send_side_band_crypto(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
                                                  request,
-                                                 (sizeof(sli_si91x_sha_request_t)),
+                                                 (sizeof(sli_si91x_sha_mp_request_t)),
                                                  SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME));
   free(request);
+  request = NULL;
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
 #endif
-
+#ifndef SL_SI91X_SIDE_BAND_CRYPTO
 sl_status_t sl_si91x_sha(uint8_t sha_mode, const uint8_t *msg, uint16_t msg_length, uint8_t *digest)
 {
-  // Input pointer check
-  if ((msg == NULL) != (msg_length == 0)) {
+  if (((msg == NULL) != (msg_length == 0)) || (digest == NULL)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -171,10 +179,6 @@ sl_status_t sl_si91x_sha(uint8_t sha_mode, const uint8_t *msg, uint16_t msg_leng
   mutex_result = sl_si91x_crypto_mutex_acquire(crypto_sha_mutex);
 #endif
 
-#ifdef SL_SI91X_SIDE_BAND_CRYPTO
-  status = sli_si91x_sha_side_band(sha_mode, (uint8_t *)msg, msg_length, digest);
-  return status;
-#else
   uint16_t total_len = 0;
   uint16_t chunk_len = 0;
   uint16_t offset    = 0;
@@ -232,6 +236,49 @@ sl_status_t sl_si91x_sha(uint8_t sha_mode, const uint8_t *msg, uint16_t msg_leng
       return status;
     }
   }
+
+#if defined(SLI_MULTITHREAD_DEVICE_SI91X)
+  mutex_result = sl_si91x_crypto_mutex_release(crypto_sha_mutex);
+#endif
+
+  return status;
+}
+#endif
+sl_status_t sl_si91x_mp_sha(uint8_t sha_mode,
+                            const uint8_t *msg,
+                            uint16_t msg_length,
+                            uint8_t hash_flags,
+                            const uint8_t *digest)
+{
+  /*
+   * digest is legitimately NULL for FIRST_CHUNK (setup) and MIDDLE_CHUNK
+   * (update) calls where no output is produced yet. A non-NULL digest is
+   * only required when LAST_CHUNK is set, as that is when the final hash
+   * is written out.
+   */
+  if (((msg == NULL) != (msg_length == 0)) || ((hash_flags & LAST_CHUNK) && (digest == NULL))) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  sl_status_t status = SL_STATUS_OK;
+
+#if defined(SLI_MULTITHREAD_DEVICE_SI91X)
+  if (crypto_sha_mutex == NULL) {
+    crypto_sha_mutex = sl_si91x_crypto_threadsafety_init(crypto_sha_mutex);
+  }
+  mutex_result = sl_si91x_crypto_mutex_acquire(crypto_sha_mutex);
+#endif
+
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+  status = sli_si91x_sha_mp_side_band(sha_mode, (uint8_t *)msg, msg_length, msg_length, hash_flags, digest);
+#if defined(SLI_MULTITHREAD_DEVICE_SI91X)
+  mutex_result = sl_si91x_crypto_mutex_release(crypto_sha_mutex);
+#endif
+  return status;
+#else
+  UNUSED_VARIABLE(sha_mode);
+  UNUSED_VARIABLE(hash_flags);
+  status       = SL_STATUS_NOT_SUPPORTED;
 
 #if defined(SLI_MULTITHREAD_DEVICE_SI91X)
   mutex_result = sl_si91x_crypto_mutex_release(crypto_sha_mutex);

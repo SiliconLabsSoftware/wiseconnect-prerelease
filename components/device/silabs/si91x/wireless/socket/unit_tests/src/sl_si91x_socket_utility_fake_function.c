@@ -126,6 +126,8 @@ DEFINE_FAKE_VALUE_FUNC5(sl_status_t,
                         void **);
 DEFINE_FAKE_VALUE_FUNC1(bool, sli_wifi_is_ip_address_zero, const sl_ip_address_t *);
 DEFINE_FAKE_VALUE_FUNC1(uint16_t, sli_wifi_get_wifi_frame_status, const sl_wifi_system_packet_t *);
+DEFINE_FAKE_VALUE_FUNC0(sl_wifi_operation_mode_t, sli_wifi_get_opermode);
+DEFINE_FAKE_VALUE_FUNC1(uint8_t, sli_wifi_get_vap_id_from_operation_mode, const sl_wifi_system_packet_t *);
 DEFINE_FAKE_VALUE_FUNC2(sl_status_t, sli_net_get_vap_for_ip_version, uint8_t *, sl_ip_address_type_t);
 
 // Fake global variables

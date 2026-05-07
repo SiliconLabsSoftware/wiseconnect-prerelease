@@ -1,8 +1,8 @@
-# Platform SiWx91x Empty C++ Example
+# SiWx91x Platform Empty C++ Example
 
 ## Table of Contents
 
-- [Platform SiWx91x Empty C++ Example](#platform-siwx91x-empty-c-example)
+- [SiWx91x Platform Empty C++ Example](#platform-siwx91x-empty-c-example)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Purpose/Scope](#purposescope)

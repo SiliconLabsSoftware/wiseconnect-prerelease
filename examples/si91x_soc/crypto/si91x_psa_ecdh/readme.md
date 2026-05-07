@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA ECDH
+# SiWx91x Platform PSA ECDH
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA ECDH](#platform-siwx91x-psa-ecdh)
+- [SiWx91x Platform PSA ECDH](#platform-siwx91x-psa-ecdh)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -64,6 +64,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 -  Default ecc curve is SEP256R1.
 -  Default key size is 256
 -  To change the ecc curve and key size, set secpr1_key_size_select variable to the correct key_size in [`app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_ecdh/app.c)
+
+> **Note**: To enable **sideband crypto**, add the following in the project's `.slcp` file. The `define` entry is at project scope alongside `component`:
+>
+> ```yaml
+> define:
+>   - name: SL_SI91X_SIDE_BAND_CRYPTO
+> ```
 
 ## Test the Application
 

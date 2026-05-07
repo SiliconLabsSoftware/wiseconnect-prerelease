@@ -1,8 +1,8 @@
-# Platform SiWx91x PCM SECONDARY
+# SiWx91x Platform PCM SECONDARY
 
 ## Table of Contents
 
-- [Platform SiWx91x PCM SECONDARY](#platform-siwx91x-pcm-secondary)
+- [SiWx91x Platform PCM SECONDARY](#platform-siwx91x-pcm-secondary)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -107,13 +107,21 @@ Configuration files are generated in the **config** folder. If not changed, the 
 
 Configure the following macros in [`pcm_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_pcm_secondary/pcm_secondary_example.c) file and update/modify following macros if required.
 
-```C
-#define PCM_SECONDARY_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
-```
+- `PCM_SECONDARY_BUFFER_SIZE`: Size (in samples) of the buffers used to transmit and receive PCM data on the secondary side. By default, it is set to 1024.
+
+  ```c
+  #define PCM_SECONDARY_BUFFER_SIZE 1024                   ///< Transmit/Receive buffer size
+  ```
+
+- `PCM_INSTANCE`: Selects the PCM peripheral instance used by the example. By default, it is set to `SL_SI91X_PCM0_INSTANCE`.
+
+  ```c
+  #define PCM_INSTANCE              SL_SI91X_PCM0_INSTANCE ///< PCM instance
+  ```
 
 - If the resolution is changed to 24-bit or 32-bit, update the typedef for `pcm_data_size_t` to `uint32_t` instead of `uint16_t` to accommodate the larger data size -
 
- ```C
+ ```c
  typedef uint32_t pcm_data_size_t;
  ```
 
@@ -121,9 +129,9 @@ Configure the following macros in [`pcm_secondary_example.c`](https://github.com
 
 To use the ULP_PCM instance instead of the default PCM0 instance:
 
-- Change the `PCM_INSTANCE` macro value to `ULP_PCM` in [`pcm_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_pcm_secondary/pcm_secondary_example.c):
+- `PCM_INSTANCE`: Set this macro to `ULP_PCM` to use the ULP_PCM instance instead of the default PCM0 instance.
 
-  ```C
+  ```c
   #define PCM_INSTANCE ULP_PCM
   ```
 
@@ -180,3 +188,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

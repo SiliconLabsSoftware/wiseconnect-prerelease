@@ -1,8 +1,8 @@
-# Platform SiWx91x File System Common Flash
+# SiWx91x Platform File System Common Flash
 
 ## Table of Contents
 
-- [Platform SiWx91x File System Common Flash](#platform-siwx91x-file-system-common-flash)
+- [SiWx91x Platform File System Common Flash](#platform-siwx91x-file-system-common-flash)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -119,3 +119,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

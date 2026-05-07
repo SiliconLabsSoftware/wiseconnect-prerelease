@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Powersave Standby Associated TCP Client (UART NCP)
 category: Example|Wi-Fi
-description: "Start a Wi-Fi client in ASSOCIATED_POWER_SAVE mode and connects to AP and send data to TCP server \n"
+description: "Start a Wi-Fi client in ASSOCIATED_POWER_SAVE mode and connects to AP and send data to TCP server in Low Power mode \n"
 filter:
 - name: Wireless Technology
   value:

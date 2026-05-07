@@ -33,6 +33,10 @@
 
 #include "sl_si91x_status.h"
 #include "rsi_ble_common_config.h"
+#include "sli_wifi_utility.h"
+#include "sli_wifi_constants.h"
+
+extern bool device_initialized;
 
 /*
   Global Variables
@@ -214,6 +218,52 @@ int32_t rsi_ble_driver_deinit(void)
   rsi_driver_cb->device_state = RSI_DEVICE_STATE_NONE;
   SL_PRINTF(SL_DRIVER_DEINIT_SEMAPHORE_DESTROY_FAILED_26, COMMON, LOG_INFO);
   return RSI_SUCCESS;
+}
+
+/*==============================================*/
+/**
+ * @brief      Enable BLE at runtime. Sends common command with enable sub-command and waits for response.
+ * @return     0 on success, non-zero on failure
+ */
+int32_t rsi_ble_enable(void)
+{
+  sl_status_t status;
+  uint8_t sub_cmd = SLI_BLE_SUB_CMD_ENABLE;
+
+  if (!device_initialized) {
+    return (int32_t)SL_STATUS_NOT_INITIALIZED;
+  }
+  status = sli_wifi_send_command(SLI_COMMON_REQ_ENABLE_DISABLE_BLE,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &sub_cmd,
+                                 sizeof(sub_cmd),
+                                 SLI_COMMON_RSP_BLE_ENABLE_DISABLE_WAIT_TIME,
+                                 NULL,
+                                 NULL);
+  return (int32_t)status;
+}
+
+/*==============================================*/
+/**
+ * @brief      Disable BLE at runtime. Sends common command with disable sub-command and waits for response.
+ * @return     0 on success, non-zero on failure
+ */
+int32_t rsi_ble_disable(void)
+{
+  sl_status_t status;
+  uint8_t sub_cmd = SLI_BLE_SUB_CMD_DISABLE;
+
+  if (!device_initialized) {
+    return (int32_t)SL_STATUS_NOT_INITIALIZED;
+  }
+  status = sli_wifi_send_command(SLI_COMMON_REQ_ENABLE_DISABLE_BLE,
+                                 SLI_WIFI_COMMON_CMD,
+                                 &sub_cmd,
+                                 sizeof(sub_cmd),
+                                 SLI_COMMON_RSP_BLE_ENABLE_DISABLE_WAIT_TIME,
+                                 NULL,
+                                 NULL);
+  return (int32_t)status;
 }
 
 /** @} */

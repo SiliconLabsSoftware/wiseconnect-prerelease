@@ -335,7 +335,7 @@ sl_status_t sli_m4_interrupt_isr(void)
   }
 #endif
   else {
-    SL_DEBUG_LOG("\r\n INVALID INTERRUPT \r\n", 0);
+    SL_DEBUG_LOG_V2(ERROR, "\r\n INVALID INTERRUPT \r\n", 0);
     return SL_STATUS_FAIL;
   }
   return SL_STATUS_OK;

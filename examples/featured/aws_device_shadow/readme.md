@@ -25,7 +25,7 @@
 
 ## Purpose/Scope
 
-This application demonstrates how to securely connect a Silicon Labs Si91x Wi-Fi device to AWS IoT Core to send and receive data.
+This application demonstrates how to securely connect a Silicon Labs SiWx91x Wi-Fi device to AWS IoT Core to send and receive data.
 
 To successfully use this application, developers should be familiar with the operation of [AWS IoT Core](https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html) and the [AWS IoT Device Shadow Service](https://docs.aws.amazon.com/iot/latest/developerguide/iot-device-shadows.html). If you are new to AWS IoT Core, we recommend running through the [AWS IoT Core Tutorial](https://docs.aws.amazon.com/iot/latest/developerguide/iot-tutorials.html) before proceeding.
 In the following text, 'AWS IoT Core' is referred to as 'AWS' for brevity.
@@ -125,7 +125,7 @@ The application can be configured to suit user requirements and the development 
 
 ### STA instance related parameters
 
-  - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name of the Wi-Fi network that shall be advertised and the Si91X module connected to it.
+  - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name of the Wi-Fi network that shall be advertised and the SiWx91x module connected to it.
 
     ```c
     #define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"      

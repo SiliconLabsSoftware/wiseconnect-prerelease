@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Concurrent HTTP Server(SoC)
 category: Example|Wi-Fi
-description: 'Demonstrates how to create HTTP server in Concurrent mode
+description: 'Demonstrates how to create an HTTP Server in concurrent mode.
 
   '
 filter:

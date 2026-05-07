@@ -58,8 +58,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //  <o>Total heap size [bytes] <0-0xFFFFFFFF>
 //  <i> Heap memory size in bytes.
+//  <i> When SiWx91x Memory Manager Redirect is installed, 81920 bytes (80 KB) for single heap.
 //  <i> Default: 51200
+#if defined(SL_SI91X_FREERTOS_HEAP_4_REDIRECT)
+#define configTOTAL_HEAP_SIZE 81920
+#else
 #define configTOTAL_HEAP_SIZE 51200
+#endif
 
 //  <o>Kernel tick frequency [Hz] <0-0xFFFFFFFF>
 //  <i> Kernel tick rate in Hz.
@@ -165,8 +170,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //  <q>Use malloc failed hook
 //  <i> Enable callback function call when out of dynamic memory.
 //  <i> Callback function vApplicationMallocFailedHook implementation is required when malloc failed hook is enabled.
+//  <i> Enabled by default when SiWx91x Memory Manager Redirect is installed to track heap exhaustion.
 //  <i> Default: 0
+#if defined(SL_SI91X_FREERTOS_HEAP_4_REDIRECT)
+#define configUSE_MALLOC_FAILED_HOOK 1
+#else
 #define configUSE_MALLOC_FAILED_HOOK 0
+#endif
 
 //  <o>Queue registry size
 //  <i> Define maximum number of queue objects registered for debug purposes.
@@ -355,6 +365,38 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 #if defined(SL_CATALOG_LOG_BACKEND_SYSTEMVIEW_PRESENT)
 #include "SEGGER_SYSVIEW_FreeRTOS.h"
+
+/* Disable RTOS task suspend/resume traces to avoid logging from scheduler-sensitive paths. */
+#ifdef traceENTER_vTaskSuspendAll
+#undef traceENTER_vTaskSuspendAll
+#define traceENTER_vTaskSuspendAll()
+#endif
+
+#ifdef traceENTER_xTaskResumeAll
+#undef traceENTER_xTaskResumeAll
+#define traceENTER_xTaskResumeAll()
+#endif
+
+#ifdef traceRETURN_vTaskSuspendAll
+#undef traceRETURN_vTaskSuspendAll
+#define traceRETURN_vTaskSuspendAll()
+#endif
+
+#ifdef traceRETURN_xTaskResumeAll
+#undef traceRETURN_xTaskResumeAll
+#define traceRETURN_xTaskResumeAll(xAlreadyYielded)
+#endif
+
+#ifdef traceRETURN_eTaskConfirmSleepModeStatus
+#undef traceRETURN_eTaskConfirmSleepModeStatus
+#define traceRETURN_eTaskConfirmSleepModeStatus(eReturn)
+#endif
+
+#ifdef traceENTER_eTaskConfirmSleepModeStatus
+#undef traceENTER_eTaskConfirmSleepModeStatus
+#define traceENTER_eTaskConfirmSleepModeStatus()
+#endif
+
 #endif
 
 #endif /* FREERTOS_CONFIG_H */

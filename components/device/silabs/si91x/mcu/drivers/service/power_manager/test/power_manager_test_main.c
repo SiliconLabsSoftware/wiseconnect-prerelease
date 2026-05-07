@@ -238,9 +238,11 @@ void test_power_manager_core_entercritical(void)
   UnityPrintf("Testing Power Manager Core Enter Critical \n");
 
   UnityPrintf("Testing with correct parameters \n");
-  sl_si91x_power_manager_core_entercritical();
+  sli_si91x_power_manager_irq_state_t irq_state = sli_si91x_power_manager_core_entercritical();
   UnityPrintf("Power Manager Core Enter Critical successfully \n");
 
+  UnityPrintf("Verifying IRQ state is returned \n");
+  sli_si91x_power_manager_core_exitcritical(irq_state);
   UnityPrintf("Power Manager Core Enter Critical test completed \n");
 }
 
@@ -252,9 +254,17 @@ void test_power_manager_core_exitcritical(void)
   UnityPrintf("\n");
   UnityPrintf("Testing Power Manager Core Exit Critical \n");
 
-  UnityPrintf("Testing with correct parameters \n");
-  sl_si91x_power_manager_core_exitcritical();
+  UnityPrintf("Testing with IRQ previously enabled (irq_state == 0) \n");
+  sli_si91x_power_manager_irq_state_t irq_state = sli_si91x_power_manager_core_entercritical();
+  sli_si91x_power_manager_core_exitcritical(irq_state);
   UnityPrintf("Power Manager Core Exit Critical successfully \n");
+
+  UnityPrintf("Testing nested critical sections \n");
+  sli_si91x_power_manager_irq_state_t outer_state = sli_si91x_power_manager_core_entercritical();
+  sli_si91x_power_manager_irq_state_t inner_state = sli_si91x_power_manager_core_entercritical();
+  sli_si91x_power_manager_core_exitcritical(inner_state);
+  sli_si91x_power_manager_core_exitcritical(outer_state);
+  UnityPrintf("Nested critical sections handled successfully \n");
 
   UnityPrintf("Power Manager Core Exit Critical test completed \n");
 }

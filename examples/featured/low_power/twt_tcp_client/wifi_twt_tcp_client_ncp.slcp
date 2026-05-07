@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - TWT TCP Client (NCP)
 category: Example|Wi-Fi
-description: "Update To keep device in TWT mode \n"
+description: Demonstrates the procedure to setup TWT session and open a TCP client socket and sends data to TCP server socket in Low Power mode
 filter:
 - name: Wireless Technology
   value:

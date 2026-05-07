@@ -1524,7 +1524,7 @@ void rsi_ble_task_on_conn(void *parameters)
           LOG_PRINT("\r\nIn write without response event - conn%d \n", l_conn_id);
 #endif
           status =
-            rsi_ble_set_att_cmd(rsi_connected_dev_addr, write_wwr_handle, max_data_length, (uint8_t *)read_data1);
+            rsi_ble_set_att_cmd_async(rsi_connected_dev_addr, write_wwr_handle, max_data_length, (uint8_t *)read_data1);
           if (status != RSI_SUCCESS) {
             if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
 #if RSI_DEBUG_EN

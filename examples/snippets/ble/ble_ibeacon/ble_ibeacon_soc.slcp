@@ -1,18 +1,24 @@
 project_name: ble_ibeacon_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - iBeacon (SoC)
+label: BLE - SoC iBeacon FreeRTOS
 category: Example|BLE
-description: 'Start a BLE device in peripheral mode
+description: 'Demonstrates how to advertise Apple iBeacon-formatted data on SiWx91x in SoC FreeRTOS BLE peripheral mode. Demonstrated by UUID, major, minor, and TX power in the advertising payload.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

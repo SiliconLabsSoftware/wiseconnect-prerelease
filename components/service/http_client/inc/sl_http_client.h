@@ -91,6 +91,16 @@
  */
 #define SL_HTTPS_CLIENT_CERTIFICATE_INDEX_2 2
 
+/**
+ * @def SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_END_OF_DATA
+ * @brief
+ *   End-of-data code for the final HTTP PUT server response segment on Si91x.
+ * 
+ * @details
+ *   This macro is defined as 9. On Si91x, after the HTTP PUT request body is sent, the Network Processor delivers the server's HTTP response in one or more application callbacks. When @ref sl_http_client_response_t::end_of_data equals this macro, the current callback holds the last part of that server response and the server-response phase for this PUT is complete. Check that @ref sl_http_client_response_t::end_of_data equals this macro before you release PUT context or finish cleanup.
+ */
+#define SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_END_OF_DATA 9
+
 /******************************************************
  *                   Enumerations
  ******************************************************/
@@ -317,7 +327,7 @@ typedef struct {
     ///<     1: Data transmission is complete.
     ///<   Server response (data received from server after transmission):
     ///<     8: More response data is expected.
-    ///<     9: This is the final chunk of the response.
+    ///<     9: This is the final chunk of the response. See @ref SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_END_OF_DATA.
   uint16_t
     http_response_code; ///< HTTP response code from the server. (Si91x chipsets do not support this feature for SL_HTTP_PUT).
   uint8_t version; ///< HTTP version used in the response. (Si91x chipsets do not support this feature).

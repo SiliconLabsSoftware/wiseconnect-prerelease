@@ -1,18 +1,24 @@
 project_name: ble_gatt_long_read_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Gatt Long Read (PSRAM)
+label: BLE - PSRAM Gatt Long Read FreeRTOS
 category: Example|BLE
-description: 'Demonstrates how a GATT client device accesses a GATT server device for long read
+description: 'Demonstrates GATT long read on SiWx91x with PSRAM in SoC FreeRTOS. Demonstrated by reading long characteristic data via prepared ATT procedures.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Advanced
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:
@@ -37,7 +43,6 @@ component:
 - id: basic_network_config_manager
 - id: ble
 - id: psram_core
-- id: psram_aps6404l_sqh
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: sl_power_manager

@@ -1,8 +1,8 @@
-# Platform SiWx91x HRNG
+# SiWx91x Platform HRNG
 
 ## Table of Contents
 
-- [Platform SiWx91x HRNG](#platform-siwx91x-hrng)
+- [SiWx91x Platform HRNG](#platform-siwx91x-hrng)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -82,6 +82,14 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
+- Configure the following macro in [`hrng_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_hrng/hrng_example.c) file and update/modify following macro, if required.
+
+- `HRNG_TRANSFER_SIZE`: Number of 32-bit random values read from the HRNG per transfer and validated for duplicates. By default, it is set to 10.
+
+  ```c
+    #define HRNG_TRANSFER_SIZE 10 // HRNG transfer size
+  ```
+
 - Include the HRNG header file in your project:
 
   #include ["sl_si91x_hrng.h"](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_hrng.h)
@@ -111,3 +119,4 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

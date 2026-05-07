@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Multithread Sockets (NCP)
 category: Example|Wi-Fi
-description: "Start a Wi-Fi client and transmits/receives data to measure WLAN UDP/TCP/TLS throughput performance on multiple threads using a remote iPerf client/server \n"
+description: "Start a Wi-Fi client and transmits/receives data to measure Wi-Fi UDP/TCP/TLS throughput performance on multiple threads using a remote iPerf client/server \n"
 filter:
 - name: Wireless Technology
   value:

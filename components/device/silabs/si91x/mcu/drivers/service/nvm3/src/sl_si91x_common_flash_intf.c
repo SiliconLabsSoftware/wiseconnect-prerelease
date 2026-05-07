@@ -147,7 +147,7 @@ sl_status_t rsi_flash_read(uint32_t *address, unsigned char *data, uint32_t leng
  * The implementation of lock-begin based on free RTOs.
  * @note
  * The default NVM3 protection functions can be substituted by the application
- * if other syncronization functions are available and disabling interrupts for
+ * if other synchronization functions are available and disabling interrupts for
  * extended periods is not desired.
  ******************************************************************************/
 void nvm3_lockBegin(void)

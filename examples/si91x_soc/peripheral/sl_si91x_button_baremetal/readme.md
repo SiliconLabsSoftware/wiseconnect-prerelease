@@ -1,8 +1,8 @@
-# Platform SiWx91x Button Baremetal
+# SiWx91x Platform Button Baremetal
 
 ## Table of Contents
 
-- [Platform SiWx91x Button Baremetal](#platform-siwx91x-button-baremetal)
+- [SiWx91x Platform Button Baremetal](#platform-siwx91x-button-baremetal)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -51,6 +51,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
+- Configure the following macros in [`button_baremetal.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_button_baremetal/button_baremetal.c) file and update/modify following macros, if required.
+
+  - `BUTTON_INSTANCE`: Selects the button instance whose press events toggle the LED. By default, it is set to `button_btn0`.
+
+    ```c
+      #define BUTTON_INSTANCE button_btn0 // Button instance
+    ```
+
+  - `LED_INSTANCE`: Selects the LED instance that is toggled on each button press. By default, it is set to `led_led0`.
+
+    ```c
+      #define LED_INSTANCE    led_led0    // LED instance
+    ```
+
  The application toggles the selected LED on each selected button press.
 
 ### Configuration
@@ -91,6 +105,8 @@ The project uses BTN0 by default. To change the button to BTN1, follow the below
 > - A maximum of 8 HP GPIO buttons, 8 ULP GPIO buttons, and 5 UULP GPIO buttons can be used simultaneously. This limitation arises from the number of available GPIO interrupts allocated for each GPIO type.
 >
 > - By default, the `SL_SI91X_BUTTON_DEBOUNCE` macro is disabled. If debouncing is needed, please enable the `SL_SI91X_BUTTON_DEBOUNCE` macro in studio preprocessor settings.
+>
+> - In case of sleep-wakeup, call `button_init_instances()` and `led_init_instances()` after wakeup before handling button events or toggling LEDs so the configured button and LED instances are restored.
 
 ## Troubleshooting
 

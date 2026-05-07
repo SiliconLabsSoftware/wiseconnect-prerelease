@@ -38,6 +38,7 @@
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
 #include "sl_si91x_driver.h"
+#include "wifi_config.h"
 //BLE Specific inclusions
 #include <rsi_ble_apis.h>
 #include "ble_config.h"
@@ -61,6 +62,10 @@ uint8_t magic_word;
 
 osSemaphoreId_t wlan_thread_sem;
 osSemaphoreId_t ble_thread_sem;
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+osMessageQueueId_t ble_disable_done_queue;
+osMessageQueueId_t ble_enable_done_queue;
+#endif
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
@@ -92,6 +97,9 @@ static const sl_wifi_device_configuration_t config = {
                      (SL_SI91X_CONFIG_FEAT_EXTENSION_VALID | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(1)
 #ifdef RSI_PROCESS_MAX_RX_DATA
                       | SL_SI91X_EXT_TCP_MAX_RECV_LENGTH
+#endif
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+                      | SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD
 #endif
                       ),
                    //!ENABLE_BLE_PROTOCOL in bt_feature_bit_map
@@ -164,6 +172,15 @@ void rsi_wlan_ble_app_init(void *argument)
   }
   LOG_PRINT("\r\n Wi-Fi Initialization Success\r\n");
 
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+  ble_disable_done_queue = osMessageQueueNew(1, sizeof(int32_t), NULL);
+  ble_enable_done_queue  = osMessageQueueNew(1, sizeof(int32_t), NULL);
+  if (ble_disable_done_queue == NULL || ble_enable_done_queue == NULL) {
+    LOG_PRINT("\r\nQueue creation failed.\r\n");
+    return;
+  }
+#endif
+
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (wlan_thread_sem == NULL) {
     LOG_PRINT("Failed to create wlan_thread_sem\r\n");
@@ -205,6 +222,13 @@ void rsi_wlan_ble_app_init(void *argument)
 
   return;
 }
+
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+void rsi_wlan_init_wifi(void)
+{
+  sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
+}
+#endif
 
 void app_init(void)
 {

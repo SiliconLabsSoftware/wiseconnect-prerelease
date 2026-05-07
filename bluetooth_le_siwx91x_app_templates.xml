@@ -477,6 +477,50 @@
     <properties key="readmeFiles" value="examples/snippets/ble/ble_power_save/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="ble_unified_coex_app_psram" label="BLE - Unified Coex App (PSRAM)" description="BLE Unified Component Framework - GAP, GATT, SMP, Extended/Legacy Advertising.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/ble/ble_unified_coex_app/ble_unified_coex_app_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/ble/ble_unified_coex_app/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+  </descriptors>
+  <descriptors name="ble_unified_coex_app_ncp" label="BLE - Unified Coex App (NCP)" description="BLE Unified Component Framework - GAP, GATT, SMP, Extended/Legacy Advertising.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/ble/ble_unified_coex_app/ble_unified_coex_app_ncp.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/ble/ble_unified_coex_app/readme.md" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+  </descriptors>
+  <descriptors name="ble_unified_coex_app_soc" label="BLE - Unified Coex App (SoC)" description="BLE Unified Component Framework - GAP, GATT, SMP, Extended/Legacy Advertising.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/ble/ble_unified_coex_app/ble_unified_coex_app_soc.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343q brd2708a brd2911a" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/ble/ble_unified_coex_app/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+  </descriptors>
   <descriptors name="ble_hid_on_gatt_psram" label="BLE - HID On GATT (PSRAM)" description="This application demonstrates how to configure BLE device as GATT server in BLE peripheral mode and as GATT client in BLE central mode.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />

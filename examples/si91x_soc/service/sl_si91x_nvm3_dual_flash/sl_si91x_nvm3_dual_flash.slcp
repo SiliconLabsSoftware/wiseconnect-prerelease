@@ -5,7 +5,7 @@ description: 'This application demonstrates NVM3 write, read and erase functions
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - NVM3 Dual Flash
+label: SiWx91x Platform - NVM3 Dual Flash
 component:
 - id: sl_main
 - id: freertos

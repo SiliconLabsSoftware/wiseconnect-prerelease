@@ -1,5 +1,5 @@
 id: sli_si91x_wifi_event_handler
-label:  Sli Si91x WiFi handler
+label:  Sli SiWx91x WiFi handler
 package: wifi
 description: >
     SiWx91x-specific TX and RX event handler: processes host-side TX/RX events from the event
@@ -26,4 +26,4 @@ requires:
 - name: sli_routing_utility
 - name: sli_event_engine
 - name: sli_command_engine
-- name: si91x_log_none
+- name: log_none

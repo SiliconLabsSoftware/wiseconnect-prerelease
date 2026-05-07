@@ -1,8 +1,8 @@
-# Platform SiWx91x Secure Attestation
+# SiWx91x Platform Secure Attestation
 
 ## Table of Contents
 
-- [Platform SiWx91x Secure Attestation](#platform-siwx91x-secure-attestation)
+- [SiWx91x Platform Secure Attestation](#platform-siwx91x-secure-attestation)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

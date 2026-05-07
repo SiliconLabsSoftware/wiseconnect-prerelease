@@ -125,10 +125,6 @@
 #define HTTP_STATUS_SERVER_ERROR_MAX 599U //! HTTP 5xx server error codes
 #define HTTP_STATUS_CODE_NONE        0U
 
-//! End of data indications
-// No data pending from host
-#define HTTP_END_OF_DATA 1
-
 #define HTTP_SYNC_RESPONSE  0
 #define HTTP_ASYNC_RESPONSE 1
 
@@ -459,7 +455,7 @@ sl_status_t http_put_response_callback_handler(const sl_http_client_t *client,
   }
   http_rsp_received = HTTP_SUCCESS_RESPONSE;
 
-  if (put_response->end_of_data & HTTP_END_OF_DATA) {
+  if (put_response->end_of_data == SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_END_OF_DATA) {
     end_of_file = HTTP_SUCCESS_RESPONSE;
   }
 

@@ -1,8 +1,8 @@
-# Platform SiWx91x Crypto HMAC
+# SiWx91x Platform Crypto HMAC
 
 ## Table of Contents
 
-- [Platform SiWx91x Crypto HMAC](#platform-siwx91x-crypto-hmac)
+- [SiWx91x Platform Crypto HMAC](#platform-siwx91x-crypto-hmac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

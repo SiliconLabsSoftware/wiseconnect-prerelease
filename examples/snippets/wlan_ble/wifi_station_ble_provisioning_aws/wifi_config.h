@@ -29,6 +29,11 @@
 
 #define RSI_APP_BUF_SIZE 1600
 
+// Set to 1 to enable dynamic BLE enable/disable demo (16k SSL demo). Set to 0 or comment out to disable.
+// See example readme for behavior and server configuration (SSL_16K_DEMO_*).
+// On BLE disable, demo, or BLE re-enable failure the app enters disconnected state and does not run MQTT.
+#define SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO 0
+
 //! Enumeration for states in application
 typedef enum wifi_app_state_e {
   WIFI_APP_INITIAL_STATE          = 0,
@@ -67,7 +72,21 @@ typedef enum rsi_app_cmd_e {
   WIFI_APP_CONNECTION_STATUS    = 2,
   WIFI_APP_DISCONNECTION_STATUS = 3,
   WIFI_APP_DISCONNECTION_NOTIFY = 4,
-  WIFI_APP_TIMEOUT_NOTIFY       = 5
+  WIFI_APP_TIMEOUT_NOTIFY       = 5,
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+  WIFI_APP_BLE_ENABLE_REQUEST = 6
+#endif
 } rsi_app_cmd_t;
+
+#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+/* 16k record SSL demo (TLS 1.2 client) - server to connect to */
+#define SSL_16K_DEMO_SERVER_IP   "192.168.1.1"
+#define SSL_16K_DEMO_SERVER_PORT 443
+
+#include "cmsis_os2.h"
+extern osMessageQueueId_t ble_disable_done_queue;
+extern osMessageQueueId_t ble_enable_done_queue;
+extern void rsi_wlan_init_wifi(void);
+#endif
 
 #endif

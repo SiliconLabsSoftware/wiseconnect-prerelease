@@ -1,18 +1,24 @@
 project_name: ble_longrange_2mbps_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Long Range (SoC)
+label: BLE - SoC Long Range FreeRTOS
 category: Example|BLE
-description: 'This application demonstrates how to configure/connects BLE device as Central  and can be used to update the PHY rates.
+description: 'Demonstrates how to act as a BLE central on SiWx91x in SoC FreeRTOS and switch the link PHY to coded or 2 Mbps. Demonstrated by connection PHY update procedures with a remote peripheral.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

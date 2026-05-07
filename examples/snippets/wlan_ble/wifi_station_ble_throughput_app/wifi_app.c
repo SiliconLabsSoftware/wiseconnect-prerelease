@@ -173,6 +173,53 @@ void wifi_app_callbacks_init(void)
   sl_wifi_set_join_callback_v2(join_callback_handler, NULL);
 }
 
+#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
+/**
+ * @brief Init Wi-Fi (after BLE re-enable), set credential, reconnect to AP, configure IP.
+ *        Call only when Wi-Fi was deinited. Uses SSID, PSK, SECURITY_TYPE from wifi_config.h.
+ * @return 0 on success, -1 on failure.
+ */
+static int32_t wifi_app_init_and_reconnect(void)
+{
+  sl_status_t status;
+  sl_net_ip_configuration_t ip_address        = { 0 };
+  sl_wifi_client_configuration_t access_point = { 0 };
+  sl_wifi_credential_id_t id                  = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+
+  rsi_wlan_init_wifi();
+  wifi_app_callbacks_init();
+
+  status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
+  if (status != SL_STATUS_OK) {
+    LOG_PRINT("\r\nInit+reconnect: set credential failed: 0x%lX\r\n", status);
+    return -1;
+  }
+
+  access_point.ssid.length = strlen((char *)SSID);
+  memcpy(access_point.ssid.value, SSID, access_point.ssid.length);
+  access_point.security      = SECURITY_TYPE;
+  access_point.encryption    = SL_WIFI_DEFAULT_ENCRYPTION;
+  access_point.credential_id = id;
+
+  status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
+  if (status != RSI_SUCCESS) {
+    LOG_PRINT("\r\nInit+reconnect: sl_wifi_connect failed: 0x%lX\r\n", status);
+    return -1;
+  }
+
+  ip_address.type      = SL_IPV4;
+  ip_address.mode      = SL_IP_MANAGEMENT_DHCP;
+  ip_address.host_name = DHCP_HOST_NAME;
+  status               = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
+  if (status != RSI_SUCCESS) {
+    LOG_PRINT("\r\nInit+reconnect: IP config failed: 0x%lX\r\n", status);
+    return -1;
+  }
+
+  return 0;
+}
+#endif
+
 /*====================================================*/
 /**
  * @fn         int32_t application(void)
@@ -241,6 +288,34 @@ int32_t rsi_wlan_app_task()
   print_sl_ip_address(&ip);
 
   wlan_throughput_task();
+
+#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
+  /* If dynamic disable demo enabled: disable BLE -> throughput again -> deinit Wi-Fi -> enable BLE -> init Wi-Fi + reconnect */
+  {
+    int32_t ble_result = RSI_FAILURE;
+    if (rsi_ble_app_request_disable() != RSI_SUCCESS) {
+      LOG_PRINT("\r\nBLE disable request failed\r\n");
+      return -1;
+    }
+    if (osMessageQueueGet(ble_disable_done_queue, &ble_result, NULL, osWaitForever) != osOK
+        || ble_result != RSI_SUCCESS) {
+      LOG_PRINT("\r\nBLE disable failed: %ld\r\n", (long)ble_result);
+      return -1;
+    }
+    wlan_throughput_task();
+    sl_wifi_deinit();
+    rsi_ble_app_request_enable();
+    if (osMessageQueueGet(ble_enable_done_queue, &ble_result, NULL, osWaitForever) != osOK
+        || ble_result != RSI_SUCCESS) {
+      LOG_PRINT("\r\nBLE enable failed: %ld\r\n", (long)ble_result);
+      return -1;
+    }
+    if (wifi_app_init_and_reconnect() != 0) {
+      LOG_PRINT("\r\nInit+reconnect after BLE enable failed\r\n");
+      return -1;
+    }
+  }
+#endif
 
   return 0;
 }

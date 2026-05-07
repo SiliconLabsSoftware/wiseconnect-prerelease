@@ -63,31 +63,41 @@ void hspi_secondary_example_init(void)
 
   sl_hspi_status = sl_si91x_hspi_secondary_init();
   if (sl_hspi_status != SL_STATUS_OK) {
-    DEBUGOUT("\rHSPI Secondary initialization failed ;Error Code : %lu \n", sl_hspi_status);
+    /* Note: All status messages in this example — both success and failure — are
+ * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
+ * on the console at the default log level. This is a demonstration choice, not
+ * a recommendation: in production code, ERROR severity should be reserved for
+ * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
+ * (or SL_PRINT_STRING_DEBUG for verbose trace). */
+    SL_PRINT_STRING_ERROR("\rHSPI Secondary initialization failed ;Error Code : %lu \n", sl_hspi_status);
   }
-  DEBUGOUT("\rHSPI Secondary initialization success\r\n");
+  SL_PRINT_STRING_ERROR("\rHSPI Secondary initialization success\r\n");
   // Register user GPDMA callback function
   sl_hspi_status = sl_si91x_hspi_secondary_register_event_callback(sl_hspi_secondary_callback);
   if (sl_hspi_status != SL_STATUS_OK) {
-    DEBUGOUT("\rHSPI Secondary callback function registration failed ;Error Code : %lu \n", sl_hspi_status);
+    SL_PRINT_STRING_ERROR("\rHSPI Secondary callback function registration "
+                          "failed ;Error Code : %lu \n",
+                          sl_hspi_status);
   }
-  DEBUGOUT("\rHSPI Secondary callback function registration success\r\n");
+  SL_PRINT_STRING_ERROR("\rHSPI Secondary callback function registration success\r\n");
 
 #if (SL_HSPI_DMA == ENABLE && TEST_MEMORY_READ_WRITES == 0)
 
   // HSPI Receive configuration when DMA is enabled
   sl_hspi_status = sl_si91x_hspi_secondary_receive_non_blocking(sl_hspi_xfer_buffer);
   if (sl_hspi_status != SL_STATUS_OK) {
-    DEBUGOUT("\rHSPI Secon        dary receive configuration failed ;Error Code : %lu \n", sl_hspi_status);
+    SL_PRINT_STRING_ERROR("\rHSPI Secon        dary receive configuration "
+                          "failed ;Error Code : %lu \n",
+                          sl_hspi_status);
   }
-  DEBUGOUT("\rHSPI Secondary receive configuration success\r\n");
+  SL_PRINT_STRING_ERROR("\rHSPI Secondary receive configuration success\r\n");
 
   // HSPI Send configuration  when DMA is enabled
   sl_hspi_status = sl_si91x_hspi_secondary_send_non_blocking(sl_hspi_xfer_buffer);
   if (sl_hspi_status != SL_STATUS_OK) {
-    DEBUGOUT("\rHSPI Secondary send  configuration failed ;Error Code : %lu \n", sl_hspi_status);
+    SL_PRINT_STRING_ERROR("\rHSPI Secondary send  configuration failed ;Error Code : %lu \n", sl_hspi_status);
   }
-  DEBUGOUT("\rHSPI Secondary send  configuration success\r\n");
+  SL_PRINT_STRING_ERROR("\rHSPI Secondary send  configuration success\r\n");
 #endif
 }
 
@@ -106,9 +116,9 @@ void hspi_secondary_example_process_action(void)
       check++;
     }
     if (test == 1)
-      DEBUGOUT("\rHSPI receive data completed \r\n");
+      SL_PRINT_STRING_ERROR("\rHSPI receive data completed \r\n");
     else
-      DEBUGOUT("\rHSPI receive data failed \r\n");
+      SL_PRINT_STRING_ERROR("\rHSPI receive data failed \r\n");
     sl_si91x_hspi_secondary_deinit();
   }
 #else
@@ -123,7 +133,7 @@ void hspi_secondary_example_process_action(void)
     // Reconfigure the receive DMA for next receive
     sl_si91x_hspi_secondary_receive_non_blocking(sl_hspi_xfer_buffer);
 #endif
-    DEBUGOUT("\rHSPI receive data completed\r\n");
+    SL_PRINT_STRING_ERROR("\rHSPI receive data completed\r\n");
   }
   // Check if send DMA is done
   if (sl_hspi_send_event) {
@@ -136,7 +146,7 @@ void hspi_secondary_example_process_action(void)
     // Reconfigure the send DMA for next receive
     sl_si91x_hspi_secondary_send_non_blocking(sl_hspi_xfer_buffer);
 #endif
-    DEBUGOUT("\rHSPI send data completed\r\n");
+    SL_PRINT_STRING_ERROR("\rHSPI send data completed\r\n");
   }
 #endif
 }

@@ -389,7 +389,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
     ![](resources/readme/remote_screen4.png)
 
-15. If BLE connection is successful, Si91x enables the Gatt notifications of remote device for RSI_BLE_CLIENT_NOTIFICATIONS_CHAR_UUID_C1 (Heart Rate measurement) and receives notifications/connection interval.
+15. If BLE connection is successful, SiWx91x enables the Gatt notifications of remote device for RSI_BLE_CLIENT_NOTIFICATIONS_CHAR_UUID_C1 (Heart Rate measurement) and receives notifications/connection interval.
    
     ![](resources/readme/remote_screen4_1.png)
     

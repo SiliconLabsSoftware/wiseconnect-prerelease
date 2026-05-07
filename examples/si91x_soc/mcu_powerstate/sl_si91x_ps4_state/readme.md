@@ -1,8 +1,8 @@
-# Platform SiWx91x PS4 STATE
+# SiWx91x Platform PS4 STATE
 
 ## Table of Contents
 
-- [Platform SiWx91x PS4 STATE](#platform-siwx91x-ps4-state)
+- [SiWx91x Platform PS4 STATE](#platform-siwx91x-ps4-state)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -71,6 +71,8 @@ The application can be configured to suit user requirements and development envi
 
 Configure the following parameters to enable your PS4 Active or sleep state.
 
+- `ACTIVE_STATE`: Selects whether the application enters the PS4 sleep state or remains in the PS4 active state. By default, it is set to 0 (sleep state); set it to 1 to enable the PS4 active state.
+
   - By default, the ACTIVE_STATE macro is set to 0, which means the application will enter the sleep state.
 
     ```c
@@ -111,3 +113,4 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

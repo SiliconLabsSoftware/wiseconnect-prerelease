@@ -1,8 +1,8 @@
-# Platform SiWx91x USART Synchronous Master
+# SiWx91x Platform USART Synchronous Master
 
 ## Table of Contents
 
-- [Platform SiWx91x USART Synchronous Master](#platform-siwx91x-usart-synchronous-master)
+- [SiWx91x Platform USART Synchronous Master](#platform-siwx91x-usart-synchronous-master)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -111,6 +111,26 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Connect master (this example) and a board flashed with the slave example: master clock pin (GPIO_8 or GPIO_25 depending on board) to slave clock pin, master TX (GPIO_30) to slave RX, master RX (GPIO_29) to slave TX.
 - The Application has been configured to run in Synchronous Master mode.
 
+- Configure the following macros in [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) if required:
+
+- `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
+
+  ```c
+  #define USART_BUFFER_SIZE     1024   // Data send and receive length
+  ```
+
+- `USART_BAUDRATE`: Specifies the USART baud rate used for transmission and reception. Supported range is 9600-7372800. By default, it is set to 115200.
+
+  ```c
+  #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
+  ```
+
+- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default USART configurations in the non-UC (non Universal Configuration) case. By default, it is set to 0.
+
+  ```c
+  #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non_uc case
+  ```
+
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
@@ -200,3 +220,4 @@ To enable hardware flow control (RTS/CTS):
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

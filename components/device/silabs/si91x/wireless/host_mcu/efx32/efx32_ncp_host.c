@@ -79,9 +79,9 @@ static uint8_t dummy_buffer[1800] = { 0 };
 #else
 
 #define SLI_UART_HANDLE SL_UARTDRV_USART_EXP_PERIPHERAL
-static UARTDRV_Handle_t uartdrv_handle = NULL;
-static bool ncp_initialized            = false;
-
+static UARTDRV_Handle_t uartdrv_handle  = NULL;
+static bool ncp_initialized             = false;
+static bool uartdrv_default_deinit_done = false;
 #endif
 
 unsigned int rx_ldma_channel;
@@ -152,7 +152,10 @@ static void sli_efx32_ncp_uart_init(uint32_t baudrate, bool hfc)
   GPIO_PinOutClear(VCOM_EN_PIN.port, VCOM_EN_PIN.pin);
 
   uartdrv_handle = sl_uartdrv_get_default();
-  UARTDRV_DeInit(uartdrv_handle);
+  if (!uartdrv_default_deinit_done) {
+    UARTDRV_DeInit(uartdrv_handle);
+    uartdrv_default_deinit_done = true;
+  }
 
   // Enable oscillator to NCP USART module
   CMU_ClockEnable(NCP_USART_CMU_CLOCK, true);

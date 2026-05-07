@@ -76,10 +76,16 @@ void gpio_example_init(void)
     status = sl_gpio_driver_init();
     if (status != SL_STATUS_OK) {
       // Prints GPIO initialization fails
-      DEBUGOUT("sl_gpio_driver_init, Error code: %lu\r\n", status);
+      /* Note: All status messages in this example — both success and failure — are
+ * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
+ * on the console at the default log level. This is a demonstration choice, not
+ * a recommendation: in production code, ERROR severity should be reserved for
+ * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
+ * (or SL_PRINT_STRING_DEBUG for verbose trace). */
+      SL_PRINT_STRING_ERROR("sl_gpio_driver_init, Error code: %lu\r\n", status);
       break; // breaks if error occurs
     }
-    DEBUGOUT("GPIO driver initialization is successful \r\n");
+    SL_PRINT_STRING_ERROR("GPIO driver initialization is successful \r\n");
 #if (ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE == 1)
     // Configure SOC peripheral on ULP pin to map HP GPIO to ULP GPIO
     status = gpio_configure_soc_peri_on_ulp_pin();
@@ -93,20 +99,20 @@ void gpio_example_init(void)
     status = sl_gpio_set_configuration(sl_gpio_pin_config);
     if (status != SL_STATUS_OK) {
       // Prints if pin configuration fails
-      DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
+      SL_PRINT_STRING_ERROR("sl_gpio_set_configuration, Error code: %lu\r\n", status);
       break; // breaks if error occurs
     }
-    DEBUGOUT("GPIO driver set pin configuration is successful \r\n");
+    SL_PRINT_STRING_ERROR("GPIO driver set pin configuration is successful \r\n");
     // Configure GPIO pin 11 using pin configuration API.
     // Using this API by default GPIO mode is set as MODE 0. If any other mode is selected for any GPIO use
     // corresponding API sl_gpio_driver_set_pin_mode() is for mode setting.
     status = sl_gpio_set_configuration(sl_gpio_pin_config1);
     if (status != SL_STATUS_OK) {
       // Prints if pin configuration fails
-      DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
+      SL_PRINT_STRING_ERROR("sl_gpio_set_configuration, Error code: %lu\r\n", status);
       break; // breaks if error occurs
     }
-    DEBUGOUT("GPIO driver set pin configuration is successful \r\n");
+    SL_PRINT_STRING_ERROR("GPIO driver set pin configuration is successful \r\n");
     // Configure pin interrupt for GPIO pin. The pin interrupt in this application is performed using external triggering from button.
     // Press button1 for triggering HP GPIO instance pin interrupt
     status = sl_gpio_driver_configure_interrupt(&sl_gpio_pin_config1.port_pin,
@@ -115,10 +121,10 @@ void gpio_example_init(void)
                                                 (sl_gpio_irq_callback_t)&gpio_pin_interrupt0_callback,
                                                 AVL_INTR_NO);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_gpio_configure_pin_interrupt, Error code: %lu\r\n", status);
+      SL_PRINT_STRING_ERROR("sl_gpio_configure_pin_interrupt, Error code: %lu\r\n", status);
       break;
     }
-    DEBUGOUT("GPIO driver interrupt configure is successful \r\n");
+    SL_PRINT_STRING_ERROR("GPIO driver interrupt configure is successful \r\n");
   } while (false);
 }
 /*******************************************************************************
@@ -129,17 +135,17 @@ void gpio_example_process_action(void)
   sl_status_t status;
   status = sl_gpio_driver_toggle_pin(&sl_gpio_pin_config.port_pin); // Toggle HP GPIO pin 6
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("sl_gpio_toggle_pin, Error code: %lu\r\n", status);
+    SL_PRINT_STRING_ERROR("sl_gpio_toggle_pin, Error code: %lu\r\n", status);
   } else {
-    DEBUGOUT("HP GPIO pin %d driver toggle pin is successful \r\n", sl_gpio_pin_config.port_pin.pin);
+    SL_PRINT_STRING_ERROR("HP GPIO pin %d driver toggle pin is successful \r\n", sl_gpio_pin_config.port_pin.pin);
   }
 #if (ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE == 1)
   // Toggle HP GPIO pin mapped via SOC peripheral on ULP pin
   status = sl_gpio_driver_toggle_pin(&sl_gpio_hp_pin_config.port_pin);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("sl_gpio_toggle_pin, Error code: %lu\r\n", status);
+    SL_PRINT_STRING_ERROR("sl_gpio_toggle_pin, Error code: %lu\r\n", status);
   } else {
-    DEBUGOUT("HP GPIO pin %d driver toggle pin is successful \r\n", sl_gpio_hp_pin_config.port_pin.pin);
+    SL_PRINT_STRING_ERROR("HP GPIO pin %d driver toggle pin is successful \r\n", sl_gpio_hp_pin_config.port_pin.pin);
   }
 #endif
 }
@@ -154,22 +160,24 @@ static sl_status_t gpio_configure_soc_peri_on_ulp_pin(void)
 
   status = sl_gpio_set_configuration(sl_gpio_ulp_pin_config);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
+    SL_PRINT_STRING_ERROR("sl_gpio_set_configuration, Error code: %lu\r\n", status);
     return status;
   }
   status = sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode(&sl_gpio_ulp_pin_config.port_pin, SL_GPIO_MODE_0);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode, Error code: %lu\r\n", status);
+    SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode, "
+                          "Error code: %lu\r\n",
+                          status);
     return status;
   }
   status = sl_gpio_set_configuration(sl_gpio_hp_pin_config);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
+    SL_PRINT_STRING_ERROR("sl_gpio_set_configuration, Error code: %lu\r\n", status);
     return status;
   }
-  DEBUGOUT("HP GPIO pin %d is mapped to ULP GPIO %d successfully \r\n",
-           sl_gpio_hp_pin_config.port_pin.pin,
-           sl_gpio_ulp_pin_config.port_pin.pin);
+  SL_PRINT_STRING_ERROR("HP GPIO pin %d is mapped to ULP GPIO %d successfully \r\n",
+                        sl_gpio_hp_pin_config.port_pin.pin,
+                        sl_gpio_ulp_pin_config.port_pin.pin);
   return SL_STATUS_OK;
 }
 #endif
@@ -181,6 +189,6 @@ static void gpio_pin_interrupt0_callback(uint32_t pin_intr)
 {
   if (pin_intr == PIN_INTR_0) {
     // This is with respect to ISR context. Debugout might cause issues sometimes.
-    DEBUGOUT("gpio pin interrupt0\r\n");
+    SL_PRINT_STRING_ERROR("gpio pin interrupt0\r\n");
   }
 }

@@ -19,6 +19,7 @@
 #include "pcm_loopback.h"
 #include "rsi_debug.h"
 #include "rsi_rom_table_si91x.h"
+#include "sl_log_helper.h"
 #include "rsi_rom_clks.h"
 #include <math.h>
 
@@ -79,33 +80,39 @@ void pcm_example_init(void)
     //Initialize PCM peripheral and store driver handle in pcm_driver_handle
     status = sl_si91x_pcm_init(PCM_INSTANCE, &pcm_handle);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("PCM Initialization fail\r\n");
+      /* Note: All status messages in this example — both success and failure — are
+ * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
+ * on the console at the default log level. This is a demonstration choice, not
+ * a recommendation: in production code, ERROR severity should be reserved for
+ * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
+ * (or SL_PRINT_STRING_DEBUG for verbose trace). */
+      SL_PRINT_STRING_ERROR("PCM Initialization fail\r\n");
       break;
     }
-    DEBUGOUT("PCM Initialization success\r\n");
+    SL_PRINT_STRING_ERROR("PCM Initialization success\r\n");
     //Get the status of PCM peripheral
     pcm_status = sl_si91x_pcm_get_status(pcm_handle);
-    DEBUGOUT("PCM status is fetched successfully \n");
-    DEBUGOUT("Frame error: %d\n", pcm_status.frame_error);
-    DEBUGOUT("Rx status: %d\n", pcm_status.rx_busy);
-    DEBUGOUT("Rx overflow status: %d\n", pcm_status.rx_overflow);
-    DEBUGOUT("Tx status: %d\n", pcm_status.tx_busy);
-    DEBUGOUT("Tx underflow status: %d\n", pcm_status.tx_underflow);
+    SL_PRINT_STRING_ERROR("PCM status is fetched successfully \n");
+    SL_PRINT_STRING_ERROR("Frame error: %d\n", pcm_status.frame_error);
+    SL_PRINT_STRING_ERROR("Rx status: %d\n", pcm_status.rx_busy);
+    SL_PRINT_STRING_ERROR("Rx overflow status: %d\n", pcm_status.rx_overflow);
+    SL_PRINT_STRING_ERROR("Tx status: %d\n", pcm_status.tx_busy);
+    SL_PRINT_STRING_ERROR("Tx underflow status: %d\n", pcm_status.tx_underflow);
 
     //Set the required PCM configuration
     status = sl_si91x_pcm_set_configuration(pcm_handle, pcm_sampling_frequency, pcm_resolution, mode);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("PCM configuration set fail\r\n");
+      SL_PRINT_STRING_ERROR("PCM configuration set fail\r\n");
       break;
     }
-    DEBUGOUT("PCM configuration set success\r\n");
+    SL_PRINT_STRING_ERROR("PCM configuration set success\r\n");
     //Register user callback handler
     status = sl_si91x_pcm_register_event_callback(pcm_handle, callback_event);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("PCM user callback register fail\r\n");
+      SL_PRINT_STRING_ERROR("PCM user callback register fail\r\n");
       break;
     }
-    DEBUGOUT("PCM user callback register success\r\n");
+    SL_PRINT_STRING_ERROR("PCM user callback register success\r\n");
     pcm_xfer_config.mode          = mode;
     pcm_xfer_config.protocol      = SL_PCM_PROTOCOL;
     pcm_xfer_config.resolution    = pcm_resolution;
@@ -123,7 +130,7 @@ void pcm_example_init(void)
     status                        = sl_si91x_pcm_config_transmit_receive(pcm_handle, &pcm_xfer_config);
     if (status != SL_STATUS_OK) {
 
-      DEBUGOUT("PCM recive invalid config \r\n");
+      SL_PRINT_STRING_ERROR("PCM recive invalid config \r\n");
       break;
     }
     //Start PCM transfer
@@ -133,10 +140,10 @@ void pcm_example_init(void)
                                    PCM_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT,
                                    PCM_BUFFER_SIZE);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("PCM transfer start failed, status = 0x%lx\r\n", status);
+      SL_PRINT_STRING_ERROR("PCM transfer start failed, status = 0x%lx\r\n", status);
       break;
     }
-    DEBUGOUT("PCM transfer success\r\n");
+    SL_PRINT_STRING_ERROR("PCM transfer start success\r\n");
   } while (false);
 }
 /*******************************************************************************
@@ -150,7 +157,7 @@ void pcm_example_process_action(void)
     if ((sl_si91x_pcm_get_transmit_data_count(pcm_handle) == PCM_BUFFER_SIZE)
         && (sl_si91x_pcm_get_receive_data_count(pcm_handle) == (PCM_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT))) {
       //PCM transfer completed
-      DEBUGOUT("PCM transfer complete\r\n");
+      SL_PRINT_STRING_ERROR("PCM transfer complete\r\n");
       //Compare transmit data and receive data
       compare_loop_back_data();
       // Aborting the PCM send operation
@@ -187,9 +194,9 @@ static void compare_loop_back_data(void)
   }
 
   if (data_index == PCM_BUFFER_SIZE) {
-    DEBUGOUT("Data comparison successful, Loop Back Test Passed \n");
+    SL_PRINT_STRING_ERROR("Data comparison successful, Loop Back Test Passed \n");
   } else {
-    DEBUGOUT("Data comparison failed, Loop Back Test failed \n");
+    SL_PRINT_STRING_ERROR("Data comparison failed, Loop Back Test failed \n");
   }
 }
 
