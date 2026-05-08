@@ -1,7 +1,7 @@
-project_name: wlan_ble_unified_coex_app_soc
+project_name: wlan_ble_unified_coex_app
 package: multi_protocol_siwx91x_app
 quality: production
-label: Wi-Fi Coex - Unified Coex App with Wifi (SoC)
+label: Unified app for Bluetooth and Wifi
 category: Example|BLE
 description: 'Bluetooth Low energy supporting 8Peripheral/2Central connections with Coex.
 

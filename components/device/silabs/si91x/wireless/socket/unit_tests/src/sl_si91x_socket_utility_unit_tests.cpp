@@ -35,8 +35,6 @@
 extern "C" {
 #include "sl_si91x_socket_utility_fake_function.h"
 #include "sl_string.h"
-#include "sli_wifi_constants.h"
-#include "sl_status.h"
 void sli_si91x_create_socket_request(sli_si91x_socket_t *si91x_bsd_socket,
                                      sli_si91x_socket_create_request_t *socket_create_request,
                                      int type,
@@ -384,35 +382,4 @@ TEST(sl_si91x_socket_utility_unit_tests, DriverSendCommandFails)
   // Verify the results
   EXPECT_EQ(status, SL_STATUS_FAIL);
   EXPECT_EQ(sli_wifi_send_command_fake.call_count, 1);
-}
-
-// STA disconnect response (SLI_WIFI_RSP_DISCONNECT) with OK status marks matching client VAP BSD sockets
-// disconnected when the packet VAP matches the client (same path as post-flush BSD sync).
-TEST(sl_si91x_socket_utility_unit_tests, SyncBsdSocketStates_StaDisconnectOk)
-{
-  RESET_FAKE(sli_wifi_get_opermode);
-  RESET_FAKE(sli_wifi_get_vap_id_from_operation_mode);
-  RESET_FAKE(sli_wifi_get_wifi_frame_status);
-
-  sli_wifi_get_opermode_fake.return_val                   = SL_WIFI_CLIENT_MODE;
-  sli_wifi_get_vap_id_from_operation_mode_fake.return_val = (uint8_t)SL_WIFI_CLIENT_VAP_ID;
-  sli_wifi_get_wifi_frame_status_fake.return_val          = SL_STATUS_OK;
-
-  sli_si91x_socket_t mock_socket;
-  memset(&mock_socket, 0, sizeof(mock_socket));
-  mock_socket.state = CONNECTED;
-
-  sl_wifi_system_packet_t packet;
-  memset(&packet, 0, sizeof(packet));
-  packet.command = SLI_WIFI_RSP_DISCONNECT;
-
-  sli_si91x_sockets[0] = &mock_socket;
-  sli_si91x_sync_bsd_socket_states_for_flush_scenarios(&packet);
-  sli_si91x_sockets[0] = NULL;
-
-  EXPECT_EQ(mock_socket.state, DISCONNECTED);
-  EXPECT_EQ(mock_socket.disconnect_reason, SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-  EXPECT_EQ(sli_wifi_get_opermode_fake.call_count, 1u);
-  EXPECT_EQ(sli_wifi_get_vap_id_from_operation_mode_fake.call_count, 1u);
-  EXPECT_EQ(sli_wifi_get_wifi_frame_status_fake.call_count, 1u);
 }

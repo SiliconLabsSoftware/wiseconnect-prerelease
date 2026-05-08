@@ -5,19 +5,13 @@ description: 'This application demonstrates how to use the Power Manager on the 
   '
 category: example|service
 quality: production
-label: SiWx91x Platform - Power Manager Tickless Idle
+label: Platform SiWx91x - Power Manager Tickless Idle
 component:
 - id: sl_main
 - id: freertos
 - id: freertos_heap_4
 - id: syscalls
 - id: si91x_mem_config_3
-- id: si91x_log
-- id: si91x_log_iostream_compact
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: wiseconnect_common
 - id: sl_power_manager
 - id: ulp_timers_instance

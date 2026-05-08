@@ -126,7 +126,7 @@ sl_status_t sl_si91x_default_handler(sl_net_event_t event, sl_wifi_buffer_t *buf
       break;
     }
     default: {
-      SL_DEBUG_LOG_V2(DEBUG, "\r\nUnsupported event\r\n");
+      SL_DEBUG_LOG("\r\nUnsupported event\r\n");
       return SL_STATUS_FAIL; // Return failure for unsupported events
     }
   }

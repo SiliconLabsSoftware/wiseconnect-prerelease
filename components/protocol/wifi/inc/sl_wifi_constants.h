@@ -126,19 +126,6 @@ typedef enum {
 } sl_wifi_security_t;
 
 /**
- * @enum sl_wifi_he_ppdu_type_t
- * @brief HE PPDU type for 802.11ax HE operations (transmit test / PER).
- *
- * Stored as @c uint8_t in structures for firmware layout compatibility.
- */
-typedef enum {
-  SL_WIFI_HE_PPDU_TYPE_SU    = 0, ///< HE SU PPDU
-  SL_WIFI_HE_PPDU_TYPE_ER_SU = 1, ///< HE ER SU PPDU
-  SL_WIFI_HE_PPDU_TYPE_TB    = 2, ///< HE TB PPDU
-  SL_WIFI_HE_PPDU_TYPE_MU    = 3, ///< HE MU PPDU
-} sl_wifi_he_ppdu_type_t;
-
-/**
   * @enum sl_wifi_encryption_t
   * @brief Enumeration for Wi-Fi encryption methods.
   *
@@ -290,7 +277,6 @@ typedef enum {
   SL_WIFI_RATE_PROTOCOL_N_ONLY,  ///< 802.11n rates only (rates go here)
   SL_WIFI_RATE_PROTOCOL_AC_ONLY, ///< 802.11ac rates only (rates go here) (not currently supported)
   SL_WIFI_RATE_PROTOCOL_AX_ONLY, ///< 802.11ax rates only (rates go here)
-  SL_WIFI_RATE_PROTOCOL_BE_ONLY, ///< 802.11be rates only (rates go here)
   SL_WIFI_RATE_PROTOCOL_AUTO,    ///< Automatic rate selection
 } sl_wifi_rate_protocol_t;
 
@@ -629,7 +615,7 @@ typedef enum {
   SL_WIFI_DATA_RATE_18      = 142, ///< Wi-Fi 18 Mbps transfer rate
   SL_WIFI_DATA_RATE_24      = 137, ///< Wi-Fi 24 Mbps transfer rate
   SL_WIFI_DATA_RATE_36      = 141, ///< Wi-Fi 36 Mbps transfer rate
-  SL_WIFI_DATA_RATE_48      = 136, ///< Wi-Fi 48 Mbps transfer rate
+  SL_WIFI_DATA_RATE_48      = 136, ///< Wif-Fi 48 Mbps transfer rate
   SL_WIFI_DATA_RATE_54      = 140, ///< Wi-Fi 54 Mbps transfer rate
   SL_WIFI_DATA_RATE_MCS0    = 256, ///< Wi-Fi MCS index 0 transfer rate
   SL_WIFI_DATA_RATE_MCS1    = 257, ///< Wi-Fi MCS index 1 transfer rate
@@ -641,36 +627,6 @@ typedef enum {
   SL_WIFI_DATA_RATE_MCS7    = 263, ///< Wi-Fi MCS index 7 transfer rate
   SL_WIFI_DATA_RATE_MCS7_SG = 775,
 } sl_wifi_data_rate_t;
-
-/**
-  * @enum sl_wifi_mcs_rate_t
-  * @brief PER / descriptor rate values; numeric values match @ref sl_wifi_data_rate_t (firmware encoding).
-  */
-typedef enum __attribute__((packed)) {
-  SL_WIFI_RATE_1    = 0,                ///< Wi-Fi 1 Mbps transfer rate
-  SL_WIFI_RATE_2    = 2,                ///< Wi-Fi 2 Mbps transfer rate
-  SL_WIFI_RATE_5_5  = 4,                ///< Wi-Fi 5.5 Mbps transfer rate
-  SL_WIFI_RATE_11   = 6,                ///< Wi-Fi 11 Mbps transfer rate
-  SL_WIFI_RATE_6    = 11,               ///< Wi-Fi 6 Mbps transfer rate
-  SL_WIFI_RATE_9    = 15,               ///< Wi-Fi 9 Mbps transfer rate
-  SL_WIFI_RATE_12   = 10,               ///< Wi-Fi 12 Mbps transfer rate
-  SL_WIFI_RATE_18   = 14,               ///< Wi-Fi 18 Mbps transfer rate
-  SL_WIFI_RATE_24   = 9,                ///< Wi-Fi 24 Mbps transfer rate
-  SL_WIFI_RATE_36   = 13,               ///< Wi-Fi 36 Mbps transfer rate
-  SL_WIFI_RATE_48   = 8,                ///< Wi-Fi 48 Mbps transfer rate
-  SL_WIFI_RATE_54   = 12,               ///< Wi-Fi 54 Mbps transfer rate
-  SL_WIFI_RATE_MCS0 = SL_WIFI_RATE_1,   ///< Wi-Fi MCS index 0 transfer rate
-  SL_WIFI_RATE_MCS1 = 1,                ///< Wi-Fi MCS index 1 transfer rate
-  SL_WIFI_RATE_MCS2 = SL_WIFI_RATE_2,   ///< Wi-Fi MCS index 2 transfer rate
-  SL_WIFI_RATE_MCS3 = 3,                ///< Wi-Fi MCS index 3 transfer rate
-  SL_WIFI_RATE_MCS4 = SL_WIFI_RATE_5_5, ///< Wi-Fi MCS index 4 transfer rate (firmware code 4)
-  SL_WIFI_RATE_MCS5 = 5,                ///< Wi-Fi MCS index 5 transfer rate
-  SL_WIFI_RATE_MCS6 = SL_WIFI_RATE_11,  ///< Wi-Fi MCS index 6 transfer rate (firmware code 11; OFDM 6 Mbps)
-  SL_WIFI_RATE_MCS7 = 7,                ///< Wi-Fi MCS index 7 transfer rate
-  SL_WIFI_RATE_MCS8 = SL_WIFI_RATE_48,  ///< Wi-Fi MCS index 8 transfer rate (firmware code 8)
-  SL_WIFI_RATE_MCS9 = SL_WIFI_RATE_24,  ///< Wi-Fi MCS index 9 transfer rate (firmware code 15; OFDM 9 Mbps)
-  SL_WIFI_RATE_MCSF = SL_WIFI_RATE_9,   ///< Wi-Fi MCS index 15 (0xF) transfer rate
-} sl_wifi_mcs_rate_t;
 
 /**
   * @enum sl_wifi_tx_test_mode_t

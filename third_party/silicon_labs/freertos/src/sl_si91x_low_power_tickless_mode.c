@@ -72,7 +72,7 @@ static void sli_schedule_wakeup_timer_expire_handler(sl_sleeptimer_timer_handle_
 
 /**************************************************************************
  * @fn           static void sli_os_schedule_wakeup(TickType_t os_ticks)
- * @brief        This function wakeup core based on the timer value. 
+ * @brief        This function wakeup core based on teh timer value.
  * @param[in]    os_ticks - os ticks value, feeding to the timer
  * @param[out]   None
  *******************************************************************************/

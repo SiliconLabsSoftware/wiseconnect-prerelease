@@ -3,18 +3,12 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to use the I2C interface on the Si91x SoC device using the transfer API. \nIt focuses on configuring the I2C peripheral for communication and using the transfer API for sending and receiving data, \nproviding an efficient, non-blocking way to handle I2C transactions.\n"
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - I2C Driver Leader Using Transfer API
+label: Platform SiWx91x - I2C Driver Leader Using Transfer API
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sl_gpio_peripheral
 - id: i2c_instance
   instance:

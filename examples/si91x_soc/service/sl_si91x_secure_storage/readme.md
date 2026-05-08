@@ -1,4 +1,4 @@
-﻿# MCU Secure Storage
+# MCU Secure Storage
 
 ## Table of Contents
 
@@ -75,12 +75,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - **Project configurator:** In Project Explorer, double-click `sl_si91x_mcu_secure_storage.slcp`. Use the Software Component tab to add or configure components.
 - **Secure Storage config:** Open `config/sl_si91x_secure_storage_config.h` from Project Explorer → config. Use the Configuration tab at the bottom of the editor for options (e.g. Secure Protection).
 - **App defines (in `app.c`):**
-
-- `APP_SLEEP_WAKE_SEM_TIMEOUT_MS`: Specifies the semaphore timeout (in milliseconds) used during the sleep/wake sequence. By default, it is set to `2 * 2000` (4000 ms).
-
-  ```c
-  #define APP_SLEEP_WAKE_SEM_TIMEOUT_MS (2U * 2000U) // Semaphore timeout for sleep/wake (ms)
-  ```
+  - `APP_SECURE_STORAGE_DEBUG_PRINT_VALUES` – Set to 1 to print written and read register values on the console.
+  - `APP_SECURE_STORAGE_REG_VALUE_1` through `APP_SECURE_STORAGE_REG_VALUE_8` – Values written to REG0–REG7 at init.
 
 ## Test the Application
 
@@ -117,4 +113,3 @@ disabled interrupts so WDT is no longer kicked; WDT will reset the system.
 >
 > - Secure storage registers retain values across power cycles. REG0–REG3 are protected by the write key (handled inside the driver); REG4–REG7 have no write key.
 > - Each time the device resets and the app starts, you get another read/compare pass; the WDT at the end of each run simply triggers the next cycle.
-

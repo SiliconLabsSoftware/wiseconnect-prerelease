@@ -1,8 +1,8 @@
-# SiWx91x Platform RTOS Mutex
+# Platform SiWx91x RTOS Mutex
 
 ## Table of Contents
 
-- [SiWx91x Platform RTOS Mutex](#platform-siwx91x-rtos-mutex)
+- [Platform SiWx91x RTOS Mutex](#platform-siwx91x-rtos-mutex)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -58,18 +58,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`blinky.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_mutex/src/blinky.c) file, update/modify following macros if required.
+- Configure the following parameter in [`blinky.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_mutex/src/blinky.c) file, update/modify following macro if required.
 
-- `LED_INSTANCE`: Selects the on-board LED instance controlled by the two threads for toggling. By default, it is set to `led_led0`.
-
-  ```c
-    #define LED_INSTANCE    led_led0 // On-board LED instance
-  ```
-
-- `TOGGLE_DELAY_MS`: Specifies the delay (in milliseconds) between successive LED toggle operations performed by each thread. By default, it is set to 500.
-
-  ```c
-    #define TOGGLE_DELAY_MS 500      // Toggle delay in milliseconds
+  ```C
+    #define TOGGLE_DELAY_MS 500//  configured for 500 ms
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -98,4 +90,3 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

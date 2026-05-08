@@ -59,10 +59,10 @@ requires:
 - name: network_config_manager
 - condition:
   - sl_si91x_lwip_stack
-  name: log_none
+  name: si91x_log_none
 - condition:
   - sl_si91x_network_dual_stack
-  name: log_none
+  name: si91x_log_none
 recommends:
 - id: '%extension-wiseconnect3_sdk%basic_network_config_manager'
   vendor: silabs

@@ -186,14 +186,6 @@ typedef struct rsi_bt_event_le_ltk_request_s {
   uint8_t dev_addr_type;
 } rsi_bt_event_le_ltk_request_t;
 
-/** @cond INTERNAL_HIDDEN */
-// Profile dummy data - used for profile query completion callback context (Internal use only)
-typedef struct profile_dummy_data_s {
-  uint8_t ble_con_id; // Connection ID
-  uint8_t swtch_cnt;  // Switch count: 1 = char query complete, 2 = profile error, 3 = profile query complete
-} profile_dummy_data_t;
-/** @endcond */
-
 //le security keys event Structure
 /**
  * @brief The structure represents security keys event.
@@ -1903,59 +1895,6 @@ typedef struct rsi_ble_scan_req_recvd_s {
   /** uint8[6] Scanner_Address : Address of the Advertising Type */
   uint8_t scanner_addr[DEVICE_ADDR_LEN];
 } rsi_ble_scan_req_recvd_t;
-
-/******************************************************
- * *         Pointer Typedefs for BLE Event Structures
- * ******************************************************/
-// GAP event pointer typedefs
-typedef rsi_ble_event_adv_report_t *rsi_ble_event_adv_report_p;
-typedef rsi_ble_event_conn_status_t *rsi_ble_event_conn_status_p;
-typedef rsi_ble_event_enhance_conn_status_t *rsi_ble_event_enhance_conn_status_p;
-typedef rsi_ble_event_disconnect_t *rsi_ble_event_disconnect_p;
-typedef rsi_ble_event_data_length_update_t *rsi_ble_event_data_length_update_p;
-typedef rsi_ble_event_phy_update_t *rsi_ble_event_phy_update_p;
-typedef rsi_ble_event_remote_conn_param_req_t *rsi_ble_event_remote_conn_param_req_p;
-typedef rsi_ble_event_conn_update_t *rsi_ble_event_conn_update_p;
-typedef rsi_ble_event_remote_features_t *rsi_ble_event_remote_features_p;
-
-// SMP event pointer typedefs
-typedef rsi_bt_event_smp_req_t *rsi_bt_event_smp_req_p;
-typedef rsi_bt_event_smp_resp_t *rsi_bt_event_smp_resp_p;
-typedef rsi_bt_event_smp_passkey_t *rsi_bt_event_smp_passkey_p;
-typedef rsi_bt_event_smp_failed_t *rsi_bt_event_smp_failed_p;
-typedef rsi_bt_event_encryption_enabled_t *rsi_bt_event_encryption_enabled_p;
-typedef rsi_bt_event_smp_passkey_display_t *rsi_bt_event_smp_passkey_display_p;
-typedef rsi_bt_event_sc_passkey_t *rsi_bt_event_sc_passkey_p;
-typedef rsi_bt_event_le_ltk_request_t *rsi_bt_event_le_ltk_request_p;
-typedef rsi_bt_event_le_security_keys_t *rsi_bt_event_le_security_keys_p;
-
-// Extended advertising event pointer typedefs
-typedef rsi_ble_ae_adv_report_t *rsi_ble_ae_adv_report_p;
-typedef rsi_ble_per_adv_sync_estbl_t *rsi_ble_per_adv_sync_estbl_p;
-typedef rsi_ble_per_adv_report_t *rsi_ble_per_adv_report_p;
-typedef rsi_ble_per_adv_sync_lost_t *rsi_ble_per_adv_sync_lost_p;
-typedef rsi_ble_scan_timeout_t *rsi_ble_scan_timeout_p;
-typedef rsi_ble_adv_set_terminated_t *rsi_ble_adv_set_terminated_p;
-typedef rsi_ble_scan_req_recvd_t *rsi_ble_scan_req_recvd_p;
-typedef rsi_ble_event_mtu_t *rsi_ble_event_mtu_p;
-typedef rsi_ble_event_error_resp_t *rsi_ble_event_error_resp_p;
-typedef rsi_ble_event_att_value_t *rsi_ble_event_att_value_p;
-typedef rsi_ble_event_read_by_type1_t *rsi_ble_event_read_by_type1_p;
-typedef rsi_ble_event_profile_by_uuid_t *rsi_ble_event_profile_by_uuid_p;
-typedef rsi_ble_event_profiles_list_t *rsi_ble_event_profiles_list_p;
-typedef rsi_ble_set_att_resp_t *rsi_ble_set_att_resp_p;
-typedef rsi_ble_event_gatt_desc_t *rsi_ble_event_gatt_desc_p;
-typedef rsi_ble_prepare_write_resp_t *rsi_ble_prepare_write_resp_p;
-typedef rsi_ble_event_mtu_exchange_information_t *rsi_ble_event_mtu_exchange_information_p;
-typedef rsi_ble_read_req_t *rsi_ble_read_req_p;
-typedef rsi_ble_event_write_t *rsi_ble_event_write_p;
-typedef rsi_ble_event_prepare_write_t *rsi_ble_event_prepare_write_p;
-typedef rsi_ble_execute_write_t *rsi_ble_execute_write_p;
-typedef rsi_ble_event_le_dev_buf_ind_t *rsi_ble_event_le_dev_buf_ind_p;
-typedef rsi_ble_event_le_dev_buf_ind_t *rsi_ble_event_more_data_req_p;
-typedef rsi_ble_event_le_dev_buf_ind_t *rsi_ble_event_data_transmit_p;
-typedef rsi_ble_event_le_dev_buf_ind_t *rsi_ble_event_set_buffer_config_p;
-typedef rsi_ble_event_le_dev_buf_ind_t *rsi_ble_event_indication_confirmation_p;
 
 /******************************************************
  * *                 Global Variables
@@ -6179,7 +6118,7 @@ typedef void (*rsi_ble_ae_scan_req_recvd_t)(uint16_t resp_status,
 */
 /*==============================================*/
 /**
- * @brief       Register the GATT callbacks (legacy monolithic function - kept for backward compatibility).
+ * @brief       Register the GATT callbacks.
  * @param[in]   ble_on_profiles_list_resp          - Callback for rsi_ble_get_profiles command.
  * @param[in]   ble_on_profile_resp                - Callback for rsi_ble_get_profile command.
  * @param[in]   ble_on_char_services_resp          - Callback for rsi_ble_get_char_services command.
@@ -6187,11 +6126,11 @@ typedef void (*rsi_ble_ae_scan_req_recvd_t)(uint16_t resp_status,
  * @param[in]   ble_on_att_desc_resp               - Callback for rsi_ble_get_att_descriptors command.
  * @param[in]   ble_on_read_resp                   - Callback for all read requests command.
  * @param[in]   ble_on_write_resp                  - Callback for all write commands.
- * @param[in]   ble_on_gatt_event                  - Callback for all GATT write events.
+ * @param[in]   ble_on_gatt_event                  - Callback for all GATT events.
  * @param[in]   ble_on_gatt_prepare_write_event    - Callback for GATT prepare write events.
  * @param[in]   ble_on_execute_write_event         - Callback for GATT execute write events.
  * @param[in]   ble_on_read_req_event              - Callback for read request events.
- * @param[in]   ble_on_mtu_event                   - Callback for MTU exchange events.
+ * @param[in]   ble_on_mtu_event                   - Callback for MTU events.
  * @param[in]   ble_on_gatt_error_resp_event       - Callback for GATT error events.
  * @param[in]   ble_on_gatt_desc_val_resp_event    - Callback for GATT descriptor value events.
  * @param[in]   ble_on_profiles_list_event         - Callback for profiles list events.
@@ -6203,7 +6142,7 @@ typedef void (*rsi_ble_ae_scan_req_recvd_t)(uint16_t resp_status,
  * @param[in]   ble_on_write_resp_event            - Callback for write response events.
  * @param[in]   ble_on_indicate_confirmation_event - Callback for indication confirmation events.
  * @param[in]   ble_on_prepare_write_resp_event    - Callback for prepare write response events.
- * @return      void
+ * 
  */
 void rsi_ble_gatt_register_callbacks(rsi_ble_on_profiles_list_resp_t ble_on_profiles_list_resp,
                                      rsi_ble_on_profile_resp_t ble_on_profile_resp,
@@ -6229,70 +6168,6 @@ void rsi_ble_gatt_register_callbacks(rsi_ble_on_profiles_list_resp_t ble_on_prof
                                      rsi_ble_on_event_indicate_confirmation_t ble_on_indicate_confirmation_event,
                                      rsi_ble_on_event_prepare_write_resp_t ble_on_prepare_write_resp_event);
 
-/*==============================================*/
-/**
- * @brief       Register GATT Common component callback.
- * @param[in]   ble_on_gatt_event  - Callback for GATT write events (shared by Server and Client components).
- * @return      void
- */
-void rsi_ble_gatt_common_register_callbacks(rsi_ble_on_gatt_write_event_t ble_on_gatt_event);
-
-/*==============================================*/
-/**
- * @brief       Register GATT Server component callbacks.
- * @param[in]   ble_on_gatt_prepare_write_event    - Callback for prepare write events.
- * @param[in]   ble_on_execute_write_event         - Callback for execute write events.
- * @param[in]   ble_on_read_req_event              - Callback for read request events.
- * @param[in]   ble_on_indicate_confirmation_event - Callback for indication confirmation events.
- * @return      void
- */
-void rsi_ble_gatt_server_register_callbacks(
-  rsi_ble_on_gatt_prepare_write_event_t ble_on_gatt_prepare_write_event,
-  rsi_ble_on_execute_write_event_t ble_on_execute_write_event,
-  rsi_ble_on_read_req_event_t ble_on_read_req_event,
-  rsi_ble_on_event_indicate_confirmation_t ble_on_indicate_confirmation_event);
-
-/*==============================================*/
-/**
- * @brief       Register GATT Client component callbacks.
- * @param[in]   ble_on_profiles_list_resp          - Callback for rsi_ble_get_profiles command.
- * @param[in]   ble_on_profile_resp                - Callback for rsi_ble_get_profile command.
- * @param[in]   ble_on_char_services_resp          - Callback for rsi_ble_get_char_services command.
- * @param[in]   ble_on_inc_services_resp           - Callback for rsi_ble_get_inc_services command.
- * @param[in]   ble_on_att_desc_resp               - Callback for rsi_ble_get_att_descriptors command.
- * @param[in]   ble_on_read_resp                   - Callback for all read requests command.
- * @param[in]   ble_on_write_resp                  - Callback for all write commands.
- * @param[in]   ble_on_mtu_event                   - Callback for MTU exchange events.
- * @param[in]   ble_on_gatt_error_resp_event       - Callback for GATT error events.
- * @param[in]   ble_on_gatt_desc_val_resp_event    - Callback for GATT descriptor value events.
- * @param[in]   ble_on_profiles_list_event         - Callback for profiles list events.
- * @param[in]   ble_on_profile_by_uuid_event       - Callback for profile by UUID events.
- * @param[in]   ble_on_read_by_char_services_event - Callback for read by characteristic services events.
- * @param[in]   ble_on_read_by_inc_services_event  - Callback for read by included services events.
- * @param[in]   ble_on_read_att_value_event        - Callback for read attribute value events.
- * @param[in]   ble_on_read_resp_event             - Callback for read response events.
- * @param[in]   ble_on_write_resp_event            - Callback for write response events.
- * @param[in]   ble_on_prepare_write_resp_event    - Callback for prepare write response events.
- * @return      void
- */
-void rsi_ble_gatt_client_register_callbacks(rsi_ble_on_profiles_list_resp_t ble_on_profiles_list_resp,
-                                            rsi_ble_on_profile_resp_t ble_on_profile_resp,
-                                            rsi_ble_on_char_services_resp_t ble_on_char_services_resp,
-                                            rsi_ble_on_inc_services_resp_t ble_on_inc_services_resp,
-                                            rsi_ble_on_att_desc_resp_t ble_on_att_desc_resp,
-                                            rsi_ble_on_read_resp_t ble_on_read_resp,
-                                            rsi_ble_on_write_resp_t ble_on_write_resp,
-                                            rsi_ble_on_mtu_event_t ble_on_mtu_event,
-                                            rsi_ble_on_gatt_error_resp_t ble_on_gatt_error_resp_event,
-                                            rsi_ble_on_gatt_desc_val_event_t ble_on_gatt_desc_val_resp_event,
-                                            rsi_ble_on_event_profiles_list_t ble_on_profiles_list_event,
-                                            rsi_ble_on_event_profile_by_uuid_t ble_on_profile_by_uuid_event,
-                                            rsi_ble_on_event_read_by_char_services_t ble_on_read_by_char_services_event,
-                                            rsi_ble_on_event_read_by_inc_services_t ble_on_read_by_inc_services_event,
-                                            rsi_ble_on_event_read_att_value_t ble_on_read_att_value_event,
-                                            rsi_ble_on_event_read_resp_t ble_on_read_resp_event,
-                                            rsi_ble_on_event_write_resp_t ble_on_write_resp_event,
-                                            rsi_ble_on_event_prepare_write_resp_t ble_on_prepare_write_resp_event);
 /*==============================================*/
 /**
  * @brief       Register the GATT Extended responses/events callbacks.

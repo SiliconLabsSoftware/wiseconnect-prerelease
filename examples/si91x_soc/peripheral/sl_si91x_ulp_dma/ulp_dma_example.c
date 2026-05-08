@@ -67,7 +67,7 @@ static ulp_dma_enum_t ulp_dma_current_mode  = ULP_DMA_PROCESS_ACTION;
 static sl_power_state_t current_power_state = SL_SI91X_POWER_MANAGER_PS4;
 uint32_t channel                            = ULP_DMA_CHANNEL;
 sl_dma_callback_t callbacks;
-static sl_dma_init_t dma_init = { ULP_DMA_INSTANCE };
+sl_dma_init_t dma_init = { ULP_DMA_INSTANCE };
 /*******************************************************************************
  * Transfer callback function.
  ******************************************************************************/
@@ -102,27 +102,21 @@ void dma_example_init(void)
     status = sl_si91x_dma_init(&dma_init);
     if (status) {
       // UDMA initialization fail
-      /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-      SL_PRINT_STRING_ERROR("Failed to Initialize UDMA\r\n");
+      DEBUGOUT("\r\nFailed to Initialize UDMA\r\n");
       break;
     } else {
       // UDMA initialization success
-      SL_PRINT_STRING_ERROR("UDMA Initialization Success\r\n");
+      DEBUGOUT("\r\nUDMA Initialization Success\r\n");
     }
     // Allocate channel for transfer
     status = sl_si91x_dma_allocate_channel(ULP_DMA_INSTANCE, &channel, 0);
     if (status) {
       // Channel allocation failed
-      SL_PRINT_STRING_ERROR("Channel not allocated \r\n");
+      DEBUGOUT("\r\nChannel not allocated \r\n");
       break;
     } else {
       // Channel successfully allocated
-      SL_PRINT_STRING_ERROR("Channel Allocated successfully\r\n");
+      DEBUGOUT("\r\nChannel Allocated successfully\r\n");
     }
     callbacks.transfer_complete_cb = transfer_complete_callback_dmadrv;
 
@@ -130,11 +124,11 @@ void dma_example_init(void)
     status = sl_si91x_dma_register_callbacks(ULP_DMA_INSTANCE, channel, &callbacks);
     if (status) {
       // Callback registration success
-      SL_PRINT_STRING_ERROR("Callbacks not registered\r\n");
+      DEBUGOUT("\r\nCallbacks not registered\r\n");
       break;
     } else {
       // Callback not registered
-      SL_PRINT_STRING_ERROR("Callbacks registered\r\n");
+      DEBUGOUT("\r\nCallbacks registered\r\n");
     }
 
     // Filled data in source buffer
@@ -164,10 +158,10 @@ void dma_example_init(void)
 #endif
     if (status) {
       // Transfer start failed
-      SL_PRINT_STRING_ERROR("Transfer start fail\r\n");
+      DEBUGOUT("\r\nTransfer start fail\r\n");
     } else {
       // Transfer started successfully
-      SL_PRINT_STRING_ERROR(" Xfer start\r\n");
+      DEBUGOUT("\r\n Xfer start\r\n");
     }
   } while (0);
 }
@@ -192,7 +186,7 @@ void dma_example_process_action(void)
       if (transfer_done) {
         transfer_done = 0;
         // DMA transfer done
-        SL_PRINT_STRING_ERROR("Transfer completed successfully\r\n");
+        DEBUGOUT("\r\nTransfer completed successfully\r\n");
         // de allocating the dma channel
         sl_si91x_dma_deallocate_channel(ULP_DMA_INSTANCE, channel);
         // current mode being updated with power state transition to change the
@@ -202,7 +196,7 @@ void dma_example_process_action(void)
       break;
     case ULP_POWER_STATE_TRANSITION:
       if (current_power_state == SL_SI91X_POWER_MANAGER_PS4) {
-        SL_PRINT_STRING_ERROR("Switching dma from PS4 -> PS2 state \n");
+        DEBUGOUT("Switching dma from PS4 -> PS2 state \n");
         // Control power management by adjusting clock references and shutting down
         // the power supply
         // This function is for demonstration purpose only. For more details, refer to the README file.
@@ -210,7 +204,7 @@ void dma_example_process_action(void)
         // switching the power state PS4 to PS2 mode.
         status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS2);
         if (status != SL_STATUS_OK) {
-          SL_PRINT_STRING_ERROR("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
+          DEBUGOUT("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
           break;
         }
         /* Calling the trim_eFuse API within the power manager modifies the clock frequency. 
@@ -231,10 +225,10 @@ void dma_example_process_action(void)
         current_power_state = SL_SI91X_POWER_MANAGER_PS2;
         break;
       } else if (current_power_state == SL_SI91X_POWER_MANAGER_PS2) {
-        SL_PRINT_STRING_ERROR("Switching the dma from PS2 -> PS4 state\n");
+        DEBUGOUT("Switching the dma from PS2 -> PS4 state\n");
         status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
         if (status != SL_STATUS_OK) {
-          SL_PRINT_STRING_ERROR("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
+          DEBUGOUT("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
           break;
         }
         /* Due to calling trim_efuse API om power manager it will change the clock
@@ -255,9 +249,9 @@ void dma_example_process_action(void)
       } else {
         //  de initializing the dma
         if (sl_si91x_dma_deinit(ULP_DMA_INSTANCE)) {
-          SL_PRINT_STRING_ERROR("\r\nFailed to Uninitialize UDMA\r\n");
+          DEBUGOUT("\r\nFailed to Uninitialize UDMA\r\n");
         } else {
-          SL_PRINT_STRING_ERROR("\r\nUDMA de-initialization Success\r\n");
+          DEBUGOUT("\r\nUDMA de-initialization Success\r\n");
         }
         ulp_dma_current_mode = ULP_DMA_TRANSMISSION_COMPLETED;
       }
@@ -295,9 +289,10 @@ static void configuring_ps2_power_state(void)
   // Clear the peripheral configuration
   peri.m4ss_peripheral = 0;
   // Ored value for ulpss peripheral.
-  peri.ulpss_peripheral = SL_SI91X_POWER_MANAGER_ULPSS_PG_SSI | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2S
-                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2C | SL_SI91X_POWER_MANAGER_ULPSS_PG_IR
-                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_FIM | SL_SI91X_POWER_MANAGER_ULPSS_PG_AUX;
+  peri.ulpss_peripheral = SL_SI91X_POWER_MANAGER_ULPSS_PG_MISC | SL_SI91X_POWER_MANAGER_ULPSS_PG_SSI
+                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2S | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2C
+                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_IR | SL_SI91X_POWER_MANAGER_ULPSS_PG_FIM
+                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_AUX;
   // Ored value for npss peripheral.
   peri.npss_peripheral = SL_SI91X_POWER_MANAGER_NPSS_PG_MCUWDT | SL_SI91X_POWER_MANAGER_NPSS_PG_MCUPS
                          | SL_SI91X_POWER_MANAGER_NPSS_PG_MCUTS | SL_SI91X_POWER_MANAGER_NPSS_PG_MCUSTORE2
@@ -307,18 +302,18 @@ static void configuring_ps2_power_state(void)
     status = sl_si91x_power_manager_remove_peripheral_requirement(&peri);
     if (status != SL_STATUS_OK) {
       // If status is not OK, return with the error code.
-      SL_PRINT_STRING_ERROR("sl_si91x_power_manager_remove_peripheral_requirement failed, "
-                            "Error Code: 0x%lX",
-                            status);
+      DEBUGOUT("sl_si91x_power_manager_remove_peripheral_requirement failed, "
+               "Error Code: 0x%lX",
+               status);
       break;
     }
     // RAM retention modes are configured and passed into this API.
     status = sl_si91x_power_manager_configure_ram_retention(&config);
     if (status != SL_STATUS_OK) {
       // If status is not OK, return with the error code.
-      SL_PRINT_STRING_ERROR("sl_si91x_power_manager_configure_ram_retention failed, Error "
-                            "Code: 0x%lX",
-                            status);
+      DEBUGOUT("sl_si91x_power_manager_configure_ram_retention failed, Error "
+               "Code: 0x%lX",
+               status);
       break;
     }
   } while (false);

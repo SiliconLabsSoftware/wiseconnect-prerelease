@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Throughput (PSRAM)
 category: Example|Wi-Fi
-description: 'Start a Wi-Fi client and transmits/receives data to measure Wi-Fi UDP/TCP/TLS throughput performance using a remote iPerf client/server
+description: 'Measures Wi-Fi transmit/receive throughput performance using a remote iPerf client/server. The application executes from PSRAM.
 
   '
 filter:
@@ -36,6 +36,7 @@ component:
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: psram_core
+- id: psram_aps6404l_sqh
 - id: bsd_socket
 - id: sl_si91x_asynchronous_socket
 requires:

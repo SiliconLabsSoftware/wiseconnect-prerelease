@@ -97,37 +97,31 @@ void calendar_example_init(void)
                                                      TEST_SECONDS,
                                                      TEST_MILLISECONDS);
     if (status != SL_STATUS_OK) {
-      /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_build_datetime_struct: Invalid Parameters, "
-                            "Error Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_build_datetime_struct: Invalid Parameters, "
+               "Error Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully built datetime structure\n");
+    DEBUGOUT("Successfully built datetime structure\n");
     status = sl_si91x_calendar_set_date_time(&datetime_config);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_set_date_time: Invalid Parameters, Error "
-                            "Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_set_date_time: Invalid Parameters, Error "
+               "Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully set calendar datetime\n");
+    DEBUGOUT("Successfully set calendar datetime\n");
     // Printing datetime for Calendar
     status = sl_si91x_calendar_get_date_time(&get_datetime);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_get_date_time: Invalid Parameters, Error "
-                            "Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_get_date_time: Invalid Parameters, Error "
+               "Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully fetched the calendar datetime \n");
+    DEBUGOUT("Successfully fetched the calendar datetime \n");
     calendar_print_datetime(get_datetime);
-    SL_PRINT_STRING_ERROR("\n");
+    DEBUGOUT("\n");
 
 #if defined(ALARM_EXAMPLE) && (ALARM_EXAMPLE == ENABLE)
     sl_calendar_datetime_config_t alarm_config;
@@ -143,63 +137,63 @@ void calendar_example_init(void)
                                                      ALARM_SECONDS,
                                                      ALARM_MILLISECONDS);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_build_datetime_struct: Invalid Parameters, "
-                            "Error Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_build_datetime_struct: Invalid Parameters, "
+               "Error Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully built datetime structure\n");
+    DEBUGOUT("Successfully built datetime structure\n");
     // Setting the alarm configuration
     status = sl_si91x_calendar_set_alarm(&alarm_config);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_set_alarm: Invalid Parameters, Error Code : "
-                            "%lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_set_alarm: Invalid Parameters, Error Code : "
+               "%lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully configured Alarm\n");
+    DEBUGOUT("Successfully configured Alarm\n");
     status = sl_si91x_calendar_register_alarm_trigger_callback(on_alarm_callback);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_alarm_trigger_callback: Invalid "
-                            "Parameters, Error Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_register_alarm_trigger_callback: Invalid "
+               "Parameters, Error Code : %lu \n",
+               status);
       break;
     }
     // Printing datetime for Alarm
     status = sl_si91x_calendar_get_alarm(&get_alarm);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_get_alarm: Invalid Parameters, Error Code : "
-                            "%lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_get_alarm: Invalid Parameters, Error Code : "
+               "%lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully fetched the alarm datetime \n");
+    DEBUGOUT("Successfully fetched the alarm datetime \n");
     calendar_print_datetime(get_alarm);
-    SL_PRINT_STRING_ERROR("\n");
+    DEBUGOUT("\n");
 #endif
 
 #if defined(SEC_INTR) && (SEC_INTR == ENABLE)
     // One second trigger
     status = sl_si91x_calendar_register_sec_trigger_callback(on_sec_callback);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_sec_trigger_callback: Invalid "
-                            "Parameters, Error Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_register_sec_trigger_callback: Invalid "
+               "Parameters, Error Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully enabled one second trigger \n");
+    DEBUGOUT("Successfully enabled one second trigger \n");
 #endif
 
 #if defined(MILLI_SEC_INTR) && (MILLI_SEC_INTR == ENABLE)
     // One millisecond trigger
     status = sl_si91x_calendar_register_msec_trigger_callback(on_msec_callback);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_register_msec_trigger_callback: Invalid "
-                            "Parameters, Error Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_register_msec_trigger_callback: Invalid "
+               "Parameters, Error Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully enabled one milisecond trigger \n");
+    DEBUGOUT("Successfully enabled one milisecond trigger \n");
 #endif
 
 #if defined(TIME_CONVERSION) && (TIME_CONVERSION == ENABLE)
@@ -207,23 +201,23 @@ void calendar_example_init(void)
     uint32_t ntp  = 0;
     status        = sl_si91x_calendar_convert_unix_time_to_ntp_time(unix, &ntp);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_convert_unix_time_to_ntp_time: Invalid "
-                            "Parameters, Error Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_convert_unix_time_to_ntp_time: Invalid "
+               "Parameters, Error Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Unix Time: %lu\n", unix);
-    SL_PRINT_STRING_ERROR("NTP Time: %lu\n", ntp);
+    DEBUGOUT("Unix Time: %lu\n", unix);
+    DEBUGOUT("NTP Time: %lu\n", ntp);
     uint32_t unix_new = 0;
     status            = sl_si91x_calendar_convert_ntp_time_to_unix_time(ntp, &unix_new);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_calendar_convert_ntp_time_to_unix_time: Invalid "
-                            "Parameters, Error Code : %lu \n",
-                            status);
+      DEBUGOUT("sl_si91x_calendar_convert_ntp_time_to_unix_time: Invalid "
+               "Parameters, Error Code : %lu \n",
+               status);
       break;
     }
-    SL_PRINT_STRING_ERROR("NTP Time: %lu\n", ntp);
-    SL_PRINT_STRING_ERROR("Unix Time: %lu\n", unix_new);
+    DEBUGOUT("NTP Time: %lu\n", ntp);
+    DEBUGOUT("Unix Time: %lu\n", unix_new);
 #endif
   } while (false);
 }
@@ -247,7 +241,7 @@ void calendar_example_process_action(void)
   sl_calendar_datetime_config_t get_datetime;
   if (current_power_state == SL_SI91X_POWER_MANAGER_PS4) {
     do {
-      SL_PRINT_STRING_ERROR("Switching the Calendar from PS4 -> PS2 state\n");
+      DEBUGOUT("Switching the Calendar from PS4 -> PS2 state\n");
       // Control power management by adjusting clock references and shutting down
       // the power supply
       // This function is for demonstration purpose only. For more details, refer to the README file.
@@ -255,7 +249,7 @@ void calendar_example_process_action(void)
       // switching the power state PS4 to PS2 mode.
       status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS2);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
+        DEBUGOUT("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
         break;
       }
       /* Due to calling trim_efuse API om power manager it will change the clock
@@ -268,12 +262,12 @@ void calendar_example_process_action(void)
       // get the datetime for Calendar
       status = sl_si91x_calendar_get_date_time(&get_datetime);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_calendar_get_date_time: Invalid Parameters, Error Code "
-                              ": %lu \n",
-                              status);
+        DEBUGOUT("sl_si91x_calendar_get_date_time: Invalid Parameters, Error Code "
+                 ": %lu \n",
+                 status);
         break;
       }
-      SL_PRINT_STRING_ERROR("Successfully fetched the calendar datetime \n");
+      DEBUGOUT("Successfully fetched the calendar datetime \n");
       // Printing datetime for Calendar
       calendar_print_datetime(get_datetime);
       // current power state is updated to PS2
@@ -282,25 +276,25 @@ void calendar_example_process_action(void)
   }
 #if defined(ALARM_EXAMPLE) && (ALARM_EXAMPLE == ENABLE)
   if (is_alarm_callback_triggered) {
-    SL_PRINT_STRING_ERROR("Alarm Callback is Triggered \n");
+    DEBUGOUT("Alarm Callback is Triggered \n");
     is_alarm_callback_triggered = false;
     if (current_power_state == SL_SI91X_POWER_MANAGER_PS2) {
-      SL_PRINT_STRING_ERROR("Switching the Calendar from PS2 -> PS4 state\n");
+      DEBUGOUT("Switching the Calendar from PS2 -> PS4 state\n");
       // switching the power state from PS2 to PS4 mode
       status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
+        DEBUGOUT("sl_si91x_power_manager_add_ps_requirement: Error Code : %lu \n", status);
         return;
       }
       // get the datetime for Calendar
       status = sl_si91x_calendar_get_date_time(&get_datetime);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_calendar_get_date_time: Invalid Parameters, Error Code "
-                              ": %lu \n",
-                              status);
+        DEBUGOUT("sl_si91x_calendar_get_date_time: Invalid Parameters, Error Code "
+                 ": %lu \n",
+                 status);
         return;
       }
-      SL_PRINT_STRING_ERROR("Successfully fetched the calendar datetime \n");
+      DEBUGOUT("Successfully fetched the calendar datetime \n");
       // Printing datetime for Calendar
       calendar_print_datetime(get_datetime);
       // current power state is updated to last enum after the power state cycle
@@ -314,13 +308,13 @@ void calendar_example_process_action(void)
 #endif
 #if defined(SEC_INTR) && (SEC_INTR == ENABLE)
   if (is_sec_callback_triggered) {
-    SL_PRINT_STRING_ERROR("One Sec Callback is Triggered \n");
+    DEBUGOUT("One Sec Callback is Triggered \n");
     is_sec_callback_triggered = false;
   }
 #endif
 #if defined(MILLI_SEC_INTR) && (MILLI_SEC_INTR == ENABLE)
   if (is_msec_callback_triggered) {
-    SL_PRINT_STRING_ERROR("One Milli-Sec Callback triggered 1000 times\n");
+    DEBUGOUT("One Milli-Sec Callback triggered 1000 times\n");
     is_msec_callback_triggered = false;
   }
 #endif
@@ -334,10 +328,10 @@ void calendar_example_process_action(void)
  ******************************************************************************/
 static void calendar_print_datetime(sl_calendar_datetime_config_t data)
 {
-  SL_PRINT_STRING_ERROR("\n***Calendar time****\n");
-  SL_PRINT_STRING_ERROR("Time Format: hour:%d, min:%d, sec:%d, msec:%d\n", data.Hour, data.Minute, data.Second);
-  SL_PRINT_STRING_ERROR("Date Format: DD/MM/YY: %.2d/%.2d/%.2d \n", data.Day, data.Month, data.Year);
-  SL_PRINT_STRING_ERROR(" Century: %d\n", data.Century);
+  DEBUGOUT("\n***Calendar time****\n");
+  DEBUGOUT("Time Format: hour:%d, min:%d, sec:%d, msec:%d\n", data.Hour, data.Minute, data.Second, data.MilliSeconds);
+  DEBUGOUT("Date Format: DD/MM/YY: %.2d/%.2d/%.2d \n", data.Day, data.Month, data.Year);
+  DEBUGOUT(" Century: %d\n", data.Century);
 }
 
 /*******************************************************************************
@@ -403,9 +397,10 @@ static void configuring_ps2_power_state(void)
                                                                      // management
   config.ulpss_ram_banks = SL_SI91X_POWER_MANAGER_ULPSS_RAM_BANK_2 | SL_SI91X_POWER_MANAGER_ULPSS_RAM_BANK_3;
   // Ored value for ulpss peripheral.
-  peri.ulpss_peripheral = SL_SI91X_POWER_MANAGER_ULPSS_PG_SSI | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2S
-                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2C | SL_SI91X_POWER_MANAGER_ULPSS_PG_IR
-                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_FIM | SL_SI91X_POWER_MANAGER_ULPSS_PG_AUX;
+  peri.ulpss_peripheral = SL_SI91X_POWER_MANAGER_ULPSS_PG_MISC | SL_SI91X_POWER_MANAGER_ULPSS_PG_SSI
+                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2S | SL_SI91X_POWER_MANAGER_ULPSS_PG_I2C
+                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_IR | SL_SI91X_POWER_MANAGER_ULPSS_PG_FIM
+                          | SL_SI91X_POWER_MANAGER_ULPSS_PG_AUX;
   // Ored value for npss peripheral.
   peri.npss_peripheral = SL_SI91X_POWER_MANAGER_NPSS_PG_MCUWDT | SL_SI91X_POWER_MANAGER_NPSS_PG_MCUPS
                          | SL_SI91X_POWER_MANAGER_NPSS_PG_MCUTS | SL_SI91X_POWER_MANAGER_NPSS_PG_MCUSTORE2
@@ -415,18 +410,18 @@ static void configuring_ps2_power_state(void)
     status = sl_si91x_power_manager_remove_peripheral_requirement(&peri);
     if (status != SL_STATUS_OK) {
       // If status is not OK, return with the error code.
-      SL_PRINT_STRING_ERROR("sl_si91x_power_manager_remove_peripheral_requirement failed, "
-                            "Error Code: 0x%lX",
-                            status);
+      DEBUGOUT("sl_si91x_power_manager_remove_peripheral_requirement failed, "
+               "Error Code: 0x%lX",
+               status);
       break;
     }
     // RAM retention modes are configured and passed into this API.
     status = sl_si91x_power_manager_configure_ram_retention(&config);
     if (status != SL_STATUS_OK) {
       // If status is not OK, return with the error code.
-      SL_PRINT_STRING_ERROR("sl_si91x_power_manager_configure_ram_retention failed, Error "
-                            "Code: 0x%lX",
-                            status);
+      DEBUGOUT("sl_si91x_power_manager_configure_ram_retention failed, Error "
+               "Code: 0x%lX",
+               status);
       break;
     }
   } while (false);

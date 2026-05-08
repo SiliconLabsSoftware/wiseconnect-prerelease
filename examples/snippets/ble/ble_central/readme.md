@@ -1,26 +1,17 @@
 # BLE - Central
 
-## High-Level Overview
-
-This application demonstrates how to connect SiWx91x with remote BLE device in central mode.
-
 ## Table of Contents
 
-- [High-Level Overview](#high-level-overview)
-- [Table of Contents](#table-of-contents)
-- [Purpose/Scope](#purposescope)
-- [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
-  - [Hardware Requirements](#hardware-requirements)
-  - [Software Requirements](#software-requirements)
-  - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
-  - [Setup Diagram](#setup-diagram)
-- [Steps to Run Demo](#steps-to-run-demo)
+- [BLE - Central](#ble---central)
+  - [Table of Contents](#table-of-contents)
+  - [Purpose/Scope](#purposescope)
+  - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
+    - [Hardware Requirements](#hardware-requirements)
+    - [Software Requirements](#software-requirements)
+    - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
-  - [Configuration and setup](#configuration-and-setup)
-  - [Steps for execution](#steps-for-execution)
-- [Troubleshooting](#troubleshooting)
-- [Resources](#resources)
-- [Report Bugs and Get Support](#report-bugs-and-get-support)
+  - [Application Build Environment](#application-build-environment)
+  - [Test the Application](#test-the-application)
 
 ## Purpose/Scope
 
@@ -55,23 +46,11 @@ This application demonstrates how to connect SiWx91x with remote BLE device in c
 
    > **Note:** The provided mobile screenshots are from the 2.8.1 version of the Simplicity Connect App(formerly EFR Connect App), it is recommended to use the latest version.
 
-### NCP mode: host application and project files
-
-| Mode | Host / target | Project file (this example folder) |
-|------|----------------|-------------------------------------|
-| SoC | Application runs on SiWx91x. | `ble_central_soc.slcp` |
-| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `ble_central_psram.slcp` |
-| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `ble_central_ncp.slcp` |
-
-Open the `.slcp` for your kit from **`examples/snippets/ble/ble_central/`** in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
-
 ### Setup Diagram
 
 ![Figure: Setup Diagram SoC Mode for BLE PER Example](resources/readme/blecentral_soc_ncp.png)
-
-## Steps to Run Demo
-
-### Getting Started
+  
+## Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -83,7 +62,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-### Configuration and setup
+## Application Build Environment
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
@@ -169,7 +148,7 @@ User must update the below parameters
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-### Steps for execution
+## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -201,26 +180,3 @@ Follow the steps as mentioned for the successful execution of the application:
 7. Refer the following images for console prints:
 
     ![Application Prints Soc](resources/readme/output_1.png)
-
-## Troubleshooting
-
-| Symptom | Things to check |
-|--------|------------------|
-| No connection / scan issues | Confirm the peer address type and `RSI_BLE_DEV_ADDR` / `RSI_REMOTE_DEVICE_NAME` match the peripheral; phones often use random addresses. |
-| NCP: no boot or no HCI traffic | Update SiWx917 connectivity firmware; verify SPI/UART wiring per [NCP getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode). Flash the correct `*_ncp.slcp` (or `*_uart_ncp.slcp`) on the **EFR32** host. |
-| Power save anomalies on NCP expansion board | See the power-save note under **Configuration and setup** and the *Getting started with SiWx91x NCP* guide. |
-| Build or flash errors | Open the `.slcp` that matches your kit (SoC vs PSRAM vs NCP) and matching SDK / WiSeConnect versions. |
-
-
-## Resources
-
-1. [WiSeConnect getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
-2. [WiSeConnect developers guide — developing for Silicon Labs hosts](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/)
-3. [Programming recommended settings](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
-
-
-## Report Bugs and Get Support
-
-Report issues and get help from the Silicon Labs community:
-
-- [Silicon Labs Community](https://www.silabs.com/community)

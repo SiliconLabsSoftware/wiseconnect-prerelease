@@ -1,8 +1,8 @@
 id: sl_si91x_asynchronous_socket
 package: wifi
 description: >
-  SiWx91x Asynchronous Socket
-label: SiWx91x Asynchronous Socket
+  Si91x Asynchronous Socket
+label: Si91x Asynchronous Socket
 category: Device|Si91x|Wireless|Socket
 quality: production
 metadata:
@@ -20,5 +20,5 @@ include:
 
 requires:
 - name: sl_si91x_socket
-- name: log_none
+- name: si91x_log_none
 

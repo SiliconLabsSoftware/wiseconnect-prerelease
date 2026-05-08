@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP Timer
+# Platform SiWx91x ULP Timer
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP Timer](#platform-siwx91x-ulp-timer)
+- [Platform SiWx91x ULP Timer](#platform-siwx91x-ulp-timer)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -99,43 +99,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - SL_ULP_TIMER_TYP (1-microseconds, 256-microseconds & down-counter): for possible values [ulp_timer_type_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#ulp-timer-type-t)
 - SL_ULP_TIMER_DIRECTION (up & down): for possible values [ulp_timer_direction_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#ulp-timer-direction-t)
 - Also, configure the following macros in [`ulp_timer_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_timer/ulp_timer_example.c) file:
-
-- `TIME_IN_MICROSECONDS`: Timer timeout duration in microseconds for which the match value is calculated. By default, it is set to 1000000 (1 second).
-
-  ```c
-    #define TIME_IN_MICROSECONDS  1000000 // timer timeout for 1 second in microseconds
-  ```
-
-- `LED0`: Identifier for the on-board LED-0, which is toggled on every timer timeout interrupt. By default, it is set to 0.
-
-  ```c
-    #define LED0                  0       // For On-board LED-0
-  ```
-
-- `ZERO_INTERRUPT_COUNT`: Reference count used for the zeroth timeout interrupt condition. By default, it is set to 0.
-
-  ```c
-    #define ZERO_INTERRUPT_COUNT  0       // Count for zeroth timeout interrupt
-  ```
-
-- `FIFTH_INTERRUPT_COUNT`: Number of interrupts after which the timer stops its first toggle cycle (LED toggled five times). By default, it is set to 5.
-
-  ```c
-    #define FIFTH_INTERRUPT_COUNT 5       // Count for fifth timeout interrupt
-  ```
-
-- `TENTH_INTERRUPT_COUNT`: Number of interrupts after which the timer completes its second toggle cycle (LED toggled ten times total). By default, it is set to 10.
-
-  ```c
-    #define TENTH_INTERRUPT_COUNT 10      // Count for tenth timeout interrupt
-  ```
-
-- `ULP_TIMER_INSTANCE`: Selects the ULP-timer instance used by the application. Update this value (0, 1, 2, or 3) to switch between timer instances. By default, it is set to 0.
-
-  ```c
-    #define ULP_TIMER_INSTANCE    0       // timer instance used, pass selected timer instance number in place of '0'
-  ```
-
 - Update ULP_TIMER_INSTANCE macro value to change the timer instance to be used for the application.
 - Update SL_TIMER_MATCH_VALUE macro before calling [sl_si91x_ulp_timer_set_configurations](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-set-configurations) API to change the timer match value. Update this macro as per the clock source and timer-type selected.
 - After configuring the above macros, their values are passed to [ulp_timer_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#ulp-timer-config-t) structure type variable sl_timer_handle which is used to configure the timer using the API - [sl_si91x_ulp_timer_set_configurations](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-set-configurations).
@@ -190,4 +153,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

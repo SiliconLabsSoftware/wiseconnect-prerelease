@@ -30,6 +30,7 @@
 #include "sl_si91x_socket_utility.h"
 #include "sl_status.h"
 #include "sl_constants.h"
+#include "sl_log_helper_si91x.h"
 #include "sl_si91x_socket.h"
 #include "sl_si91x_socket_callback_framework.h"
 #include "sl_si91x_socket_types.h"

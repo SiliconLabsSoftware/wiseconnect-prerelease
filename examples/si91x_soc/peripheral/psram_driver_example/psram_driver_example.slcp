@@ -5,13 +5,12 @@ description: 'This application demonstrates the use of PSRAM Driver APIs through
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - Peripheral PSRAM Driver Example
+label: Platform SiWx91x - Peripheral PSRAM Driver Example
 component:
 - id: psram_core
+- id: psram_aps6404l_sqh
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_backend_uart
 source:
 - path: main.c
 toolchain_settings:

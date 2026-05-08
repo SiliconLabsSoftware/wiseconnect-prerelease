@@ -1,7 +1,7 @@
 project_name: wireless_test_uart_ncp
 package: multi_protocol_siwx91x_app
 quality: production
-label: Wi-Fi Coex - Wireless Test (UART NCP)
+label: wireless_test_uart_ncp
 category: Example|Wi-Fi_BLE
 description: 'Demonstrates to run all commands individually
 

@@ -1,7 +1,7 @@
 id: paho_mqtt_embedded
 package: wifi
 description: >
-  Eclipse Paho MQTT C/C++ client for Embedded platforms
+ paho_mqtt_embedded SDK 
 label: paho_mqtt_embedded SDK
 category: Third Party
 quality: production

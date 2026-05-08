@@ -41,8 +41,6 @@ define:
     value: "1"
     condition:
       - sl_si91x_wireless
-  - name: SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
-    value: "1"
 template_contribution:
   - name: device_ram_addr
     value: 1024

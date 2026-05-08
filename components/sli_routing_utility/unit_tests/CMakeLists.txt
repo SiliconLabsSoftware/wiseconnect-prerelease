@@ -1,6 +1,6 @@
 project(sli_routing_utility)
 
-include_directories(../../../tests/unit_tests/inc
+include_directories(../../../../tests/unit_tests/inc
                     ../inc
                     inc
                     ../../gsdk/common/inc

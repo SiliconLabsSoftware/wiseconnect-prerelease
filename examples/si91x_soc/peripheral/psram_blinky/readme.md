@@ -1,8 +1,8 @@
-# SiWx91x Platform PSRAM Blinky
+# Platform SiWx91x PSRAM Blinky
 
 ## Table of Contents
 
-- [SiWx91x Platform PSRAM Blinky](#platform-siwx91x-psram-blinky)
+- [Platform SiWx91x PSRAM Blinky](#platform-siwx91x-psram-blinky)
   - [Table of Contents](#table-of-contents)
   - [Purpo/sescope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -52,17 +52,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following parameter in [`app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/psram_blinky/app.c) file, update/modify following macro if required
 
-  - `LED_INSTANCE`: Selects the LED instance used by the blinky example. By default, it is set to `led_led0`.
-
-    ```c
-    #define LED_INSTANCE    led_led0 // LED instance
-    ```
-
-  - `TOOGLE_DELAY_MS`: Delay (in milliseconds) between successive LED toggles. By default, it is set to 500.
-
-    ```c
-    #define TOOGLE_DELAY_MS 500      // Toggle delay in ms
-    ```
+  ```C
+    #define RSI_BLINK_RATE //  configured for 10 ticks per second
+  ```
 - Sections can be included in PSRAM by installing components present under "PSRAM Linker Configurations" from "SOFTWARE COMPONENTS" GUI. Same can be removed from PSRAM and placed into default memory by uninstalling the respective component from software component selection GUI.
 
 ## PSRAM Linker Component Installation
@@ -106,4 +98,3 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

@@ -1,24 +1,18 @@
 project_name: ble_central_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Central FreeRTOS
+label: BLE - Central (SoC)
 category: Example|BLE
-description: 'Demonstrates how to connect SiWx91x to a remote BLE device in central role using FreeRTOS in SoC mode. This is demonstrated by scanning for peripherals and establishing a BLE link.
+description: 'Start a BLE device in central mode.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

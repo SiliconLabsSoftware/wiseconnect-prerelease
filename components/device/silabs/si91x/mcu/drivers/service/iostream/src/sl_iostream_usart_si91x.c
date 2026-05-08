@@ -36,14 +36,12 @@
 #include "sl_iostream_uart_si91x.h"
 #include "sli_iostream_uart_si91x.h"
 #include "sl_iostream_usart_si91x.h"
+#include "sl_atomic.h"
 #include <string.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "sl_si91x_usart.h"
-#if defined(SL_COMPONENT_CATALOG_PRESENT)
-#include "sl_component_catalog.h"
-#endif
 
 /*******************************************************************************
  *******************************   DEFINES   ***********************************
@@ -54,7 +52,6 @@
  ******************************************************************************/
 sl_usart_handle_t usart_handle;
 volatile boolean_t send_complete = false, transfer_complete = false, receive_complete = false;
-volatile uint8_t si91x_iostream_init_done = 0;
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************
  ******************************************************************************/
@@ -84,7 +81,7 @@ static void set_auto_cr_lf(void *context, bool on)
 {
   sl_iostream_uart_context_t *uart_context = (sl_iostream_uart_context_t *)context;
 
-  uart_context->lf_to_crlf = on;
+  sl_atomic_store(uart_context->lf_to_crlf, on);
 }
 
 /******************************************************************************
@@ -95,7 +92,7 @@ static bool get_auto_cr_lf(void *context)
   sl_iostream_uart_context_t *uart_context = (sl_iostream_uart_context_t *)context;
   bool conversion;
 
-  conversion = uart_context->lf_to_crlf;
+  sl_atomic_load(conversion, uart_context->lf_to_crlf);
 
   return conversion;
 }
@@ -154,15 +151,7 @@ sl_status_t sl_iostream_usart_init(sl_iostream_uart_t *iostream_uart,
   if (config == NULL) {
     return SL_STATUS_NULL_POINTER;
   }
-#if defined(SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_PRESENT)
-  if (si91x_iostream_init_done == 1) {
-    status = sl_si91x_usart_deinit(usart_handle);
-    if (status != SL_STATUS_OK) {
-      return status;
-    }
-    si91x_iostream_init_done = 0;
-  }
-#endif
+
   status = sli_iostream_uart_context_init(iostream_uart,
                                           &usart_context->context,
                                           uart_config,
@@ -202,7 +191,6 @@ sl_status_t sl_iostream_usart_init(sl_iostream_uart_t *iostream_uart,
     return status;
   }
 
-  si91x_iostream_init_done = 1;
   return SL_STATUS_OK;
 }
 
@@ -218,23 +206,14 @@ static sl_status_t usart_tx(void *context, char c)
   sl_status_t status;
   (void)context;
 
-  //send character in blocking mode when logger is enabled
-#if defined(SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_PRESENT)
-  status = sli_si91x_usart_send_data_blocking(usart_handle, &c, 1);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-#else
   // Transfer the char
   status = sl_si91x_usart_send_data(usart_handle, &c, 1);
   if (status != SL_STATUS_OK) {
     return status;
   }
-
   // Wait till transfer comple
   while (!send_complete)
     ;
-#endif
   // Clear the variable to send next byte
   send_complete = false;
 
@@ -252,7 +231,7 @@ static sl_status_t uart_write(void *context, const void *buffer, size_t buffer_l
   uint32_t i                               = 0;
   sl_status_t status                       = SL_STATUS_FAIL;
 
-  lf_to_crlf = uart_context->lf_to_crlf;
+  sl_atomic_load(lf_to_crlf, uart_context->lf_to_crlf);
 
   while (i < buffer_length) {
     if (lf_to_crlf == true) {

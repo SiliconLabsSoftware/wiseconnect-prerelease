@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP I2S
+# Platform SiWx91x ULP I2S
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP I2S](#platform-siwx91x-ulp-i2s)
+- [Platform SiWx91x ULP I2S](#platform-siwx91x-ulp-i2s)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -76,7 +76,10 @@ The data received should match the transmitted data.
      ```c
      #define I2S_LOWPOWER_BUFFER_SIZE   1024  // Samples per buffer in 16-bit mode (uint16_t)
      #define ULP_I2S_INSTANCE           1     // I2S instance index
-     // Each bank = 2048 bytes (2 KB)
+     #define I2S_ULP_BANK_OFFSET        0x800 // 2048 bytes per bank
+     #define I2S_TX_BUF_MEMORY          (ULP_SRAM_START_ADDR + (1 * I2S_ULP_BANK_OFFSET))
+     #define I2S_RX_BUF_MEMORY          (ULP_SRAM_START_ADDR + (2 * I2S_ULP_BANK_OFFSET))
+     // Each bank = 0x800 = 2048 bytes (2 KB)
      ```
 
      - With **16-bit** data (2 bytes/sample), one 2 KB bank holds **1024 samples** → `I2S_LOWPOWER_BUFFER_SIZE = 1024`.
@@ -140,40 +143,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - Configuration files are generated in **config folder**. If not changed, the code will run on default UC values.
     - Configure the following macros in the [`ulp_i2s_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_i2s/ulp_i2s_example.c) file and update/modify following macros, if required.
 
-    - `I2S_ULP_BANK_OFFSET`: Offset (in bytes) between consecutive ULP SRAM banks used by the example. Each bank is 0x800 = 2048 bytes (2 KB). By default, it is set to `0x800`.
-
-      ```c
-      #define I2S_ULP_BANK_OFFSET       0x800 // 2048 bytes per bank
-      ```
-
-    - `I2S_TX_BUF_MEMORY`: Absolute address of the ULP SRAM location used as the I2S transmit buffer. Computed as `ULP_SRAM_START_ADDR + (1 * I2S_ULP_BANK_OFFSET)` so it sits in ULP SRAM bank 1.
-
-      ```c
-      #define I2S_TX_BUF_MEMORY         (ULP_SRAM_START_ADDR + (1 * I2S_ULP_BANK_OFFSET))
-      ```
-
-    - `I2S_RX_BUF_MEMORY`: Absolute address of the ULP SRAM location used as the I2S receive buffer. Computed as `ULP_SRAM_START_ADDR + (2 * I2S_ULP_BANK_OFFSET)` so it sits in ULP SRAM bank 2.
-
-      ```c
-      #define I2S_RX_BUF_MEMORY         (ULP_SRAM_START_ADDR + (2 * I2S_ULP_BANK_OFFSET))
-      ```
-
-    - `I2S_LOWPOWER_BUFFER_SIZE`: Defines the size of the transmit and receive buffers used for the ULP_I2S loopback transfer. By default, it is set to 1024.
-
-      ```c
-      #define I2S_LOWPOWER_BUFFER_SIZE  1024      ///< Transmit/Receive buffer size
-      ```
-
-    - `MS_DELAY_COUNTER`: Defines the loop counter used for producing a millisecond-scale software delay. By default, it is set to 4600.
-
-      ```c
-      #define MS_DELAY_COUNTER          4600      ///< Delay count
-      ```
-
-    - `FIVE_SECOND_DELAY`: Defines the delay count used to wait approximately 5 seconds between power state changes. By default, it is set to 5000.
-
-      ```c
-      #define FIVE_SECOND_DELAY         5000      ///< 5 second delay between state changes
+      ```C
+      #define I2S_LOWPOWER_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
       ```
 
   - **Pin Configuration**
@@ -228,4 +199,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

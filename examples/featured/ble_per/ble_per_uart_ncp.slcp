@@ -1,24 +1,18 @@
 project_name: ble_per_uart_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE UART NCP PER FreeRTOS
+label: ble_per
 category: Example|BLE
-description: 'Demonstrates BLE Packet Error Rate (PER) TX/RX testing on SiWx91x over UART NCP with FreeRTOS. Demonstrated by configuring parameters to transmit or receive PER packets.
+description: 'This application demonstrates how to configure the necessary parameters to start transmitting or receiving BLE PER packets.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

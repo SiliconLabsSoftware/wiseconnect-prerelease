@@ -1,8 +1,8 @@
-# SiWx91x Platform Crypto - GCM_CMAC
+# Platform SiWx91x Crypto - GCM_CMAC
 
 ## Table of Contents
 
-- [SiWx91x Platform Crypto - GCM_CMAC](#platform-siwx91x-crypto---gcm_cmac)
+- [Platform SiWx91x Crypto - GCM_CMAC](#platform-siwx91x-crypto---gcm_cmac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

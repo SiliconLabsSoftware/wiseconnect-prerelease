@@ -148,7 +148,7 @@ sl_status_t sl_memlcd_refresh(const struct sl_memlcd_t *device)
 void sl_memlcd_display_enable(void)
 {
   // Enabling LCD display
-  //enable the display pin in receiver mode
+  //enable the display pin in reciever mode
   sl_si91x_gpio_select_uulp_npss_receiver(SL_BOARD_ENABLE_DISPLAY_PIN, GPIO_RECEIVER_EN);
 
   //set the pin mux mode
@@ -164,7 +164,7 @@ void sl_memlcd_display_enable(void)
 void sl_memlcd_display_disable(void)
 {
   // Disabling LCD display
-  //enable the display pin in receiver mode
+  //enable the display pin in reciever mode
   sl_si91x_gpio_select_uulp_npss_receiver(SL_BOARD_ENABLE_DISPLAY_PIN, GPIO_RECEIVER_EN);
 
   //set the pin mux mode

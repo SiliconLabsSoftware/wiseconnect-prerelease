@@ -1,31 +1,21 @@
 # BLE - AE Peripheral
 
-## High-Level Overview
-
-SiWx91x BLE AE Peripheral example: extended advertising with two advertising sets and optional periodic advertising. Supports SoC, PSRAM, and NCP modes via Simplicity Studio or Keil.
-
 ## Table of Contents
 
 - [BLE - AE Peripheral](#ble---ae-peripheral)
-  - [High-Level Overview](#high-level-overview)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
-    - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
     - [Setup Diagram](#setup-diagram)
-  - [Steps to Run Demo](#steps-to-run-demo)
-    - [Getting Started](#getting-started)
-      - [Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes)
-      - [Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)](#instructions-for-keil-ide-and-stm32f411re-mcu-ncp-mode)
-    - [Configuration and Setup](#configuration-and-setup)
-    - [Steps for Execution](#steps-for-execution)
-      - [Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes-1)
-      - [Instructions for Keil IDE and STM32F411RE MCU](#instructions-for-keil-ide-and-stm32f411re-mcu)
-  - [Troubleshooting](#troubleshooting)
-  - [Resources](#resources)
-  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+  - [Getting Started](#getting-started)
+    - [Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes)
+    - [Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)](#instructions-for-keil-ide-and-stm32f411re-mcu-ncp-mode)
+  - [Application Build Environment](#application-build-environment)
+  - [Test the Application](#test-the-application)
+    - [Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes-1)
+    - [Instructions for Keil IDE and STM32F411RE MCU](#instructions-for-keil-ide-and-stm32f411re-mcu)
 
 ## Purpose/Scope
 
@@ -68,26 +58,13 @@ This application demonstrates how to configure SiWx91x in Advertising Extended p
 > **Note:** The provided mobile screenshots are from the 2.8.1 version of the Simplicity Connect App(formerly EFR Connect App), it is recommended to use the latest version.
 
 
-### NCP mode: host application and project files
-
-| Mode       | Host / target                                                                           | Project file (this example folder)    |
-|------------|-----------------------------------------------------------------------------------------|---------------------------------------|
-| SoC        | Application runs on SiWx91x.                                                            | `ble_ae_peripheral_soc.slcp`          |
-| PSRAM      | Application runs on SiWx91x with PSRAM-capable radio board.                             | `ble_ae_peripheral_psram.slcp`        |
-| NCP (SPI)  | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**.   | `ble_ae_peripheral_ncp.slcp`          |
-| NCP (UART) | Application runs on **EFR32** host; SiWx917 NCP over **UART**.                          | `ble_ae_peripheral_uart_ncp.slcp`     |
-
-Open the `.slcp` for your kit from `examples/snippets/ble/ble_ae_peripheral/` in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
-
 ### Setup Diagram
 
   ![Figure: Setup Diagram SoC Mode for BLE PER Example](resources/readme/ble_ae_peripheral_soc_ncp.png)
   
-## Steps to Run Demo
+## Getting Started
 
-### Getting Started
-
-#### Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)
+### Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -99,7 +76,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-#### Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)
+### Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)
 
   - Install the [Keil IDE](https://www.keil.com/).
   - Download [WiSeConnect SDK](https://github.com/SiliconLabs/wiseconnect)
@@ -114,7 +91,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - Connect the setup to the computer.
   - Open the BLE PER µVision project - **ble_ae_peripheral.uvprojx** by navigating to **WiSeConnect SDK → examples → snippets → ble → ble_ae_peripheral → keil_project**.
 
-### Configuration and Setup
+## Application Build Environment
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
@@ -268,15 +245,14 @@ The application can be configured to suit your requirements and development envi
    
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-### Steps for Execution
+## Test the Application
 
-#### Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)
+### Instructions for Simplicity Studio IDE and Silicon Labs devices (SoC and NCP Modes)
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 - Build the application
 - Flash, run and debug the application
-
-#### Instructions for Keil IDE and STM32F411RE MCU
+### Instructions for Keil IDE and STM32F411RE MCU
 
 - Build the application.
 - Set the Docklight up by connecting STM32's Serial COM port. This enables you to view the application prints.
@@ -300,26 +276,3 @@ Follow the steps as mentioned for the successful execution of the application:
      
     ![Prints in docklight window](resources/readme/output1.png) 
     ![Prints in docklight window](resources/readme/output2.png) 
-
-## Troubleshooting
-
-If you encounter issues while running the BLE AE Peripheral example, check the following:
-
-- Ensure the correct radio board is connected and the connectivity firmware is up to date.
-- Verify `RSI_BLE_LOCAL_NAME` and `RSI_BLE_SET_RAND_ADDR` are set as expected for the device to appear in scans.
-- Confirm `RSI_BLE_ADV_INT_MIN` / `RSI_BLE_ADV_INT_MAX` are within the Bluetooth spec range and min ≤ max.
-- If `ADV_SET2` is enabled, make sure its advertising parameters (`BLE_ADV_HNDL1` and SET2-specific configuration) are populated.
-- If `PERIODIC_ADV_EN` is set, verify the periodic advertising min/max intervals and that the `adv_handle` matches an enabled set.
-- For NCP mode, confirm the SPI/UART wiring between the host MCU and the SiWx91x NCP is correct.
-
-## Resources
-
-- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
-- [WiSeConnect API Reference Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/)
-- [Simplicity Connect Mobile App](https://www.silabs.com/developers/simplicity-connect-mobile-app)
-
-## Report Bugs and Get Support
-
-Report issues and get help from the Silicon Labs community:
-
-- [Silicon Labs Community](https://www.silabs.com/community)

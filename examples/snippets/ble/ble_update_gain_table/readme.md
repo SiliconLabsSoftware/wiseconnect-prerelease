@@ -1,25 +1,16 @@
 # BLE - Update Gain Table 
 
-## High-Level Overview
-
-SiWx91x BLE update gain table example: overwrite the default region-based gain table with user-defined max power and offset values on SoC, PSRAM, and NCP modes using Simplicity Studio.
-
 ## Table of Contents
 
 - [BLE - Update Gain Table](#ble---update-gain-table)
-  - [High-Level Overview](#high-level-overview)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
-  - [Steps to Run Demo](#steps-to-run-demo)
-    - [Getting Started](#getting-started)
-    - [Configuration and Setup](#configuration-and-setup)
-    - [Steps for Execution](#steps-for-execution)
-  - [Troubleshooting](#troubleshooting)
-  - [Resources](#resources)
-  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+  - [Getting Started](#getting-started)
+  - [Application Build Environment](#application-build-environment)
+  - [Test the Application](#test-the-application)
 
 ## Purpose/Scope
 
@@ -57,9 +48,7 @@ Both gain tables must be configured in the correct order to successfully apply c
 
 - Download and install the Silicon Labs [Simplicity Connect App(formerly EFR Connect App) or other BLE Central/Peripheral app.](https://www.silabs.com/developers/simplicity-connect-mobile-app ) in the android smart phones for testing BLE applications. Users can also use their choice of BLE apps available in Android/iOS smart phones.
   
-## Steps to Run Demo
-
-### Getting Started
+## Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -71,7 +60,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-### Configuration and Setup
+## Application Build Environment
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
@@ -236,7 +225,7 @@ uint8_t Si917_BLE_REGION_BASED_LP_CHAIN_10DBM_OFFSET_XX[] = {};  // Fill the use
 > - The Worldwide table is available for BLE only, and must not be modified. 
 > - The values in the worldwide table comply with Bluetooth SIG specifications.
 
-### Steps for Execution
+## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -254,26 +243,4 @@ Follow the steps as mentioned for the successful execution of the application:
 4. Review gain table updates on the serial terminal. Refer the following image for console prints:
 
 ![](resources/readme/update_gain_table_logs.png)
-
-## Troubleshooting
-
-If you encounter issues while running the BLE Update Gain Table example, check the following:
-
-- Ensure the gain table update API is called immediately after the opermode request; calling it later may not take effect.
-- Verify `GAIN_TABLE_AND_MAX_POWER_UPDATE_ENABLE` is set to `1` to apply the user-defined tables.
-- Confirm the `node_id` and `req_type` combination matches the payload array being passed.
-- Make sure the region value (FCC, ETSI, TELEC, WORLDWIDE, KCC) and channel numbers in the payload are within the allowed ranges.
-- The Worldwide table must not be modified — only regional tables (FCC/ETSI/TELEC/KCC) should be customized.
-
-## Resources
-
-- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
-- [WiSeConnect API Reference Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/)
-- [WiSeConnect Developers Guide - Recommended Settings](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
-
-## Report Bugs and Get Support
-
-Report issues and get help from the Silicon Labs community:
-
-- [Silicon Labs Community](https://www.silabs.com/community)
 

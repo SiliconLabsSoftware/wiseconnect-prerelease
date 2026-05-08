@@ -228,42 +228,19 @@ static const power_state_struct_t ps_transition[NO_OF_ACTIVE_STATES] = {
  * Calls the static functions from the constant structure
  * according to the state change requirement.
  * By default it returns SL_STATUS_INVALID_PARAMETER
- *
- * When SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API is not defined, this implements
- * sli_si91x_power_manager_change_power_state (PS0/PS1 uses SL_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL).
- * When the macro is defined, it implements sli_si91x_power_manager_change_power_state_with_critical_irq (PS0/PS1 uses
- * sli_si91x_power_manager_core_exitcritical(critical_irq_state)).
  ******************************************************************************/
-#ifndef SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
 sl_status_t sli_si91x_power_manager_change_power_state(sl_power_state_t from, sl_power_state_t to)
-#else
-sl_status_t sli_si91x_power_manager_change_power_state_with_critical_irq(
-  sl_power_state_t from,
-  sl_power_state_t to,
-  sli_si91x_power_manager_irq_state_t critical_irq_state)
-#endif
 {
   sl_status_t status = SL_STATUS_OK;
-
   if ((from > SL_SI91X_POWER_MANAGER_PS4) || (from < SL_SI91X_POWER_MANAGER_PS2) || (to >= LAST_ENUM_POWER_STATE)) {
     // Validate the power state, if not in range returns error code.
-#ifndef SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
     SL_PRINT_STRING_ERROR("sli_si91x_power_manager_change_power_state: Invalid "
                           "power state transition,line no: %d\r\n",
                           __LINE__);
-#else
-    SL_PRINT_STRING_ERROR("sli_si91x_power_manager_change_power_state_with_critical_irq: Invalid "
-                          "power state transition,line no: %d\r\n",
-                          __LINE__);
-#endif
     return SL_STATUS_INVALID_PARAMETER;
   }
   if ((to == SL_SI91X_POWER_MANAGER_PS1) || (to == SL_SI91X_POWER_MANAGER_PS0)) {
-#ifndef SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
     SL_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL;
-#else
-    sli_si91x_power_manager_core_exitcritical(critical_irq_state);
-#endif
   }
   if (ps_transition[from - PS_OFFSET].to_ps[to].fptr != NULL) {
     // If the from and to state transition function pointer is not null,
@@ -899,7 +876,6 @@ static void ps2_to_ps1_state_change(void)
 
     // If any error code, it returns it otherwise goes to sleep with retention.
     trigger_sleep(&config, SLEEP_WITH_RETENTION);
-
 #if (SL_SI91X_TICKLESS_MODE == 0)
     // Enable the NVIC interrupts.
     __asm volatile("cpsie i" ::: "memory");

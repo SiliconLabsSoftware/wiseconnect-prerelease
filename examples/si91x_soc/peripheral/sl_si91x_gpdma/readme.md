@@ -1,8 +1,8 @@
-# SiWx91x Platform GPDMA
+# Platform SiWx91x GPDMA
 
 ## Table of Contents
 
-- [SiWx91x Platform GPDMA](#platform-siwx91x-gpdma)
+- [Platform SiWx91x GPDMA](#platform-siwx91x-gpdma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -82,54 +82,29 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Set `SL_GPDMA_MAX_CHANNEL` (0–7) to specify the maximum channel used in the application.
 - Configure and update the required macros in the `gpdma_example.c` file as needed.
 
-  - `SL_GPDMA_SIMPLE_TRANSFER`: When enabled, the transfer uses descriptors with predefined values. To use custom descriptor values, disable this macro and set values for the descriptor manually. By default, it is set to 1.
-
-    ```c
-    #define SL_GPDMA_SIMPLE_TRANSFER         1        ///< Enable/Disable simple transfer
+    ```C
+    #define SL_GPDMA_SIMPLE_TRANSFER 1  ///< Enable/Disable simple transfer
+    #define GPDMA_TRANSFER_LENGTH   4096  // Transfer length in bytes
+    #define GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0 4096 //Maximum transfer size per channel
+    #define GPDMA_CHANNEL 0             //GPDMA channel to use for the transfer.
     ```
-
-  - `GPDMA_TRANSFER_LENGTH`: Total length (in bytes) of the memory-to-memory GPDMA transfer to be performed by the example. By default, it is set to 4096.
-
-    ```c
-    #define GPDMA_TRANSFER_LENGTH            4096     // Transfer length in bytes
-    ```
-
-  - `GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0`: Maximum transfer size for the specified channel. This macro should be defined for each channel in use and is used to size the descriptor memory. By default, it is set to 4096.
-
-    ```c
-    #define GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0 4096   // Maximum transfer size per channel
-    ```
-
-  - `GPDMA_CHANNEL`: Selects the GPDMA channel used for the transfer. It can be any value from 0 to `SL_GPDMA_MAX_CHANNEL`, or `0xFF` to automatically select an available channel. By default, it is set to 0.
-
-    ```c
-    #define GPDMA_CHANNEL                    0        // GPDMA channel to use for the transfer
-    ```
-
-  - `SL_SI91X_GPDMA_SOURCE_BURST`: Source burst size used by the GPDMA engine during a transfer. By default, it is set to 16.
-
-    ```c
-    #define SL_SI91X_GPDMA_SOURCE_BURST      16       // Source burst size
-    ```
-
-  - `SL_SI91X_GPDMA_DESTINATION_BURST`: Destination burst size used by the GPDMA engine during a transfer. By default, it is set to 16.
-
-    ```c
-    #define SL_SI91X_GPDMA_DESTINATION_BURST 16       // Destination burst size
-    ```
-
+- When the `SL_GPDMA_SIMPLE_TRANSFER` macro is enabled, the transfer uses descriptors with predefined values.
+- To use custom descriptor values, disable the `SL_GPDMA_SIMPLE_TRANSFER` macro.
+- The `GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0` macro defines the maximum transfer size for the specified channel. This macro should be defined for each channel in use.
+- Set `GPDMA_CHANNEL` to any value from 0 to `SL_GPDMA_MAX_CHANNEL`, or use `0xFF` to automatically select an available channel.
 - If using multiple channels, ensure each channel has its own buffer for storing descriptors.
 - Allocate memory for the descriptors of every channel that is used.
 - The size of the descriptor memory buffer for each channel can be calculated similarly to the `SL_MAX_NUMBER_OF_DESCRIPTORS_CHANNEL0` macro.
-
-  - `SL_MAX_NUMBER_OF_DESCRIPTORS_CHANNEL0`: Computes the number of descriptors required for channel 0 based on `GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0` and `MAX_TRANSFER_PER_DESCRIPTOR`. Define a similar macro for each channel that is used.
-
-    ```c
-    #define SL_MAX_NUMBER_OF_DESCRIPTORS_CHANNEL0 \
-      ((GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0 + MAX_TRANSFER_PER_DESCRIPTOR - 1) / MAX_TRANSFER_PER_DESCRIPTOR)
-    ```
-
+```C
+#define SL_MAX_NUMBER_OF_DESCRIPTORS_CHANNEL0 \
+  ((GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0 + MAX_TRANSFER_PER_DESCRIPTOR - 1) / MAX_TRANSFER_PER_DESCRIPTOR)
+```
 - `MAX_TRANSFER_PER_DESCRIPTOR` specifies the maximum transfer length for each descriptor. The maximum allowed value is 4095 bytes.
+
+   - `SL_GPDMA_SIMPLE_TRANSFER`: When this is enabled, descriptors with predefined values are used for transfer. To use custom descriptor values, disable the  `SL_GPDMA_SIMPLE_TRANSFER` macro and select values for the descriptor.
+   - ` GPDMA_MAX_TRANSFER_LENGTH_CHANNEL0`: This is the maximum transfer that will be done in the given channel. This should be defined for every channel that is used.
+   - Memory should be allocated descriptors of every channel that is used.
+   - Size of the descriptor memory buffer can be calculated in the same way as macro `SL_MAX_NUMBER_OF_DESCRIPTORS_CHANNEL0`.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -149,7 +124,6 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 > - The debug feature of Simplicity Studio will not work after M4 flash is turned off.
 > - Only memory-to-memory transfer is supported in GPDMA.
 > - By default, the FIFO size for each channel is allocated as 8 in allocate channel. The FIFO size should be higher than or equal to AHB burst size.
-> - In case of sleep-wakeup, call `sl_si91x_gpdma_init()` after wakeup before starting a new GPDMA transfer to restore the GPDMA peripheral state.
 
 
 ## Troubleshooting
@@ -166,4 +140,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

@@ -3,7 +3,7 @@ package: platform_nwp_siwx91x_app
 description: "Testing NVM3 in Si91x PSRAM \n"
 category: Example|Service
 quality: production
-label: SiWx91x Platform - NVM3 PSRAM
+label: Platform SiWx91x - NVM3 PSRAM
 component:
 - id: sl_main
 - id: freertos
@@ -19,12 +19,7 @@ component:
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: psram_core
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
+- id: psram_aps6404l_sqh
 source:
 - path: app.c
 include:

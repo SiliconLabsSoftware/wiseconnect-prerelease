@@ -34,9 +34,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
-#ifdef SLI_SI917
-#include "sl_log_helper.h"
-#endif
 
 /** @brief
  *    Macro for marking deprecated functions
@@ -246,16 +243,7 @@ extern void sl_redirect_log(const char *format, ...);
 #define SL_COMPILE_TIME_ASSERT(condition, comment) typedef char assertion_failed__##comment[2 * !!(condition)-1];
 
 // Expands to SL_PRINT_STRING_<level>(fmt, ...). Use level INFO, ERROR, DEBUG, or WARN (must match macro suffix).
-#ifdef SLI_SI917
-#define SL_DEBUG_LOG_V2(level, fmt, ...)         \
-  do {                                           \
-    SL_PRINT_STRING_##level(fmt, ##__VA_ARGS__); \
-  } while (0)
-#else
-#define SL_DEBUG_LOG_V2(level, fmt, ...) \
-  do {                                   \
-  } while (0)
-#endif
+#define SL_DEBUG_LOG_V2(level, fmt, ...) SL_PRINT_STRING_##level(fmt, ##__VA_ARGS__)
 
 typedef uint32_t sl_duration_t;
 

@@ -1,7 +1,7 @@
 project_name: wifi_station_ble_throughput_app_soc
 package: multi_protocol_siwx91x_app
 quality: production
-label: Wi-Fi Coex - Wi-Fi Client BLE Throughput App (SoC)
+label: WLAN Station BLE Throughput App (SOC)
 category: Example|Wi-Fi_BLE
 description: 'Demonstrates throughput measurement of Wi-Fi while BLE is in connection
 

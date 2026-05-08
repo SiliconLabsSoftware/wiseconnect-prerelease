@@ -357,7 +357,7 @@ STATIC INLINE void RSI_UDMA_ErrorStatusClear(RSI_UDMA_HANDLE_T pHandle)
  * @brief		  This API is used to enable the required channel of UDMA
  * @param[in]	  pHandle	: Pointer to driver context handle
  * @param[in]	  dmaCh	  : Channel number(1 to 32)
- * @return 		  RSI_OK if no errors occurred, or an error code    
+ * @return 		  RSI_OK if no errors occured, or an error code    
  */
 STATIC INLINE rsi_error_t RSI_UDMA_ChannelEnable(RSI_UDMA_HANDLE_T pHandle, uint8_t dmaCh)
 {
@@ -377,7 +377,7 @@ STATIC INLINE rsi_error_t RSI_UDMA_ChannelEnable(RSI_UDMA_HANDLE_T pHandle, uint
  * @brief		  This API is used to disable the required channel of UDMA
  * @param[in]	  pHandle : Pointer to driver context handle
  * @param[in]	  dmaCh	  : Channel number(1 to 32)
- * @return 		  RSI_OK if no errors occurred, or an error code    
+ * @return 		  RSI_OK if no errors occured, or an error code    
  */
 STATIC INLINE rsi_error_t RSI_UDMA_ChannelDisable(RSI_UDMA_HANDLE_T pHandle, uint8_t dmaCh)
 {

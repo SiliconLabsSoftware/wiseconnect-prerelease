@@ -1,8 +1,8 @@
-# SiWx91x Platform GPIO DETAILED EXAMPLE
+# Platform SiWx91x GPIO DETAILED EXAMPLE
 
 ## Table of Contents
 
-- [SiWx91x Platform GPIO DETAILED EXAMPLE](#platform-siwx91x-gpio-detailed-example)
+- [Platform SiWx91x GPIO DETAILED EXAMPLE](#platform-siwx91x-gpio-detailed-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -145,18 +145,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-Configure the following parameters in [`gpio_detailed_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_detailed_example/gpio_detailed_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_detailed_example/) file and update/modify following macros if required.
-
-- `DELAY`: Delay (in milliseconds) between consecutive GPIO toggles. By default, it is set to 1000 (1 second).
+Configure the following parameters in [`gpio_detailed_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_detailed_example/gpio_detailed_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_detailed_example/) file and update/modify following macros if required
 
   ```c
-    #define DELAY                1000 // Delay for 1sec
-  ```
-
-- `GPIO_PORT_GROUP_ABCD`: Set to **1** to enable GPIO Ports A/B/C/D configuration and control, which transforms the example from toggling a single GPIO pin to controlling 5 GPIO pins simultaneously. By default, it is set to 0.
-
-  ```c
-    #define GPIO_PORT_GROUP_ABCD 0    // Set to 1 to enable GPIO Ports A/B/C/D configuration and control
+    #define DELAY            1000 // Delay for 1sec
   ```
 
 > **Note**: When GPIO_PORT_GROUP_ABCD is enabled (set to 1), this macro transforms the example from controlling a single GPIO pin to controlling 5 GPIO pins simultaneously, creating a multi-port GPIO demonstration with synchronized toggling behavior. Connect logic analyzer to GPIO_10 (F11), GPIO_6 (P19), GPIO_27 (P29), GPIO_47 (P26), GPIO_49 (P30) on explorer kit [WPK(BRD4002) + BRD4338A] to observe toggles.
@@ -191,4 +183,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

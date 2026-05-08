@@ -67,57 +67,51 @@ void i2s_example_init(void)
   do {
     //Fetch I2S driver version
     i2s_version = sl_si91x_i2s_get_version();
-    /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-    SL_PRINT_STRING_ERROR("I2S version is fetched successfully \n");
-    SL_PRINT_STRING_ERROR("API version is %d.%d.%d\n", i2s_version.release, i2s_version.major, i2s_version.minor);
+    DEBUGOUT("I2S version is fetched successfully \n");
+    DEBUGOUT("API version is %d.%d.%d\n", i2s_version.release, i2s_version.major, i2s_version.minor);
     //Initialize I2S peripheral and store driver handle in i2s_driver_handle
     status = sl_si91x_i2s_init(I2S_INSTANCE, &i2s_driver_handle);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("I2S Initialization fail\r\n");
+      DEBUGOUT("I2S Initialization fail\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("I2S Initialization success\r\n");
+    DEBUGOUT("I2S Initialization success\r\n");
     //Get the status of I2S peripheral
     i2s_status = sl_si91x_i2s_get_status(i2s_driver_handle);
-    SL_PRINT_STRING_ERROR("I2S status is fetched successfully \n");
-    SL_PRINT_STRING_ERROR("Frame error: %d\n", i2s_status.frame_error);
-    SL_PRINT_STRING_ERROR("Rx status: %d\n", i2s_status.rx_busy);
-    SL_PRINT_STRING_ERROR("Rx overflow status: %d\n", i2s_status.rx_overflow);
-    SL_PRINT_STRING_ERROR("Tx status: %d\n", i2s_status.tx_busy);
-    SL_PRINT_STRING_ERROR("Tx underflow status: %d\n", i2s_status.tx_underflow);
+    DEBUGOUT("I2S status is fetched successfully \n");
+    DEBUGOUT("Frame error: %d\n", i2s_status.frame_error);
+    DEBUGOUT("Rx status: %d\n", i2s_status.rx_busy);
+    DEBUGOUT("Rx overflow status: %d\n", i2s_status.rx_overflow);
+    DEBUGOUT("Tx status: %d\n", i2s_status.tx_busy);
+    DEBUGOUT("Tx underflow status: %d\n", i2s_status.tx_underflow);
     //Configure ARM full power mode
     status = sl_si91x_i2s_configure_power_mode(i2s_driver_handle, SL_I2S_FULL_POWER);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("I2S power mode config fail\r\n");
+      DEBUGOUT("I2S power mode config fail\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("I2S power mode config success\r\n");
+    DEBUGOUT("I2S power mode config success\r\n");
     //Register user callback handler
     status = sl_si91x_i2s_register_event_callback(i2s_driver_handle, callback_event);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("I2S user callback register fail\r\n");
+      DEBUGOUT("I2S user callback register fail\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("I2S user callback register success\r\n");
+    DEBUGOUT("I2S user callback register success\r\n");
     i2s_xfer_config.transfer_type = SL_I2S_TRANSMIT;
     //Configure transmitter parameters for i2s transfer
     if (sl_si91x_i2s_config_transmit_receive(i2s_driver_handle, &i2s_xfer_config)) {
-      SL_PRINT_STRING_ERROR("I2S transmit config fail\r\n");
+      DEBUGOUT("I2S transmit config fail\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("I2S transmit config success\r\n");
+    DEBUGOUT("I2S transmit config success\r\n");
     i2s_xfer_config.transfer_type = SL_I2S_RECEIVE;
     //Configure receiver parameters for i2s transfer
     if (sl_si91x_i2s_config_transmit_receive(i2s_driver_handle, &i2s_xfer_config)) {
-      SL_PRINT_STRING_ERROR("I2S receive config fail\r\n");
+      DEBUGOUT("I2S receive config fail\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("I2S receive config success\r\n");
+    DEBUGOUT("I2S receive config success\r\n");
     //Configure I2S receive and transmit DMA channels and start the I2S transfer
     //Since 8-bit resolution is not supported in Si91x I2S module, configure receive data as 16-bit
     //chunks which contains two bytes of 8-bit data.
@@ -127,10 +121,10 @@ void i2s_example_init(void)
                               (uint16_t *)i2s_data_out,
                               I2S_BUFFER_SIZE / 2,
                               I2S_BUFFER_SIZE / 2)) {
-      SL_PRINT_STRING_ERROR("I2S transfer start fail\r\n");
+      DEBUGOUT("I2S transfer start fail\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("I2S transfer success\r\n");
+    DEBUGOUT("I2S transfer success\r\n");
   } while (false);
 }
 /*******************************************************************************
@@ -144,7 +138,7 @@ void i2s_example_process_action(void)
     if ((sl_si91x_i2s_get_transmit_data_count(i2s_driver_handle) == I2S_BUFFER_SIZE / 2)
         && (sl_si91x_i2s_get_receive_data_count(i2s_driver_handle) == I2S_BUFFER_SIZE / 2)) {
       //I2S transfer completed
-      SL_PRINT_STRING_ERROR("I2S transfer complete\r\n");
+      DEBUGOUT("I2S transfer complete\r\n");
       //Compare transmit data and receive data
       compare_loop_back_data();
       // Aborting the I2S send operation
@@ -176,9 +170,9 @@ static void compare_loop_back_data(void)
     }
   }
   if (data_index == I2S_BUFFER_SIZE) {
-    SL_PRINT_STRING_ERROR("Data comparison successful, Loop Back Test Passed \n");
+    DEBUGOUT("Data comparison successful, Loop Back Test Passed \n");
   } else {
-    SL_PRINT_STRING_ERROR("Data comparison failed, Loop Back Test failed \n");
+    DEBUGOUT("Data comparison failed, Loop Back Test failed \n");
   }
 }
 

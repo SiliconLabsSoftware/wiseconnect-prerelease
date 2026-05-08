@@ -1,8 +1,8 @@
-# SiWx91x Platform I2C Driver Leader Using Transfer API
+# Platform SiWx91x I2C Driver Leader Using Transfer API
 
 ## Table of Contents
 
-- [SiWx91x Platform I2C Driver Leader Using Transfer API](#platform-siwx91x-i2c-driver-leader-using-transfer-api)
+- [Platform SiWx91x I2C Driver Leader Using Transfer API](#platform-siwx91x-i2c-driver-leader-using-transfer-api)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -107,30 +107,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - If project built without selecting configurations, it will take default values from UC.
 - Configure mode, operating-mode and transfer-type of I2C instance using respective instance UC.
 - Change 'Operating Mode' as per bus-speed requirement.
-- After completing the above UC configurations, configure the following macros in [`i2c_leader_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader_using_transfer_api/i2c_leader_example.c) and [`i2c_leader_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader_using_transfer_api/i2c_leader_example.h) file. Update or modify the following macros, if required.
+-s After completing the above UC configurations, configure the following macros in [`i2c_leader_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.c) and [`i2c_leader_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2c_driver_leader/i2c_leader_example.h) file. Update or modify the following macros, if required.
 
-- `FOLLOWER_I2C_ADDR`: 7-bit I2C follower (target) address that the leader communicates with. Must match the `OWN_I2C_ADDR` configured on the follower device. By default, it is set to `0x50`.
-
-  ```c
-    #define FOLLOWER_I2C_ADDR        0x50  // I2C follower address
-  ```
-
-- `I2C_BUFFER_SIZE`: Defines the number of bytes to send and receive between Leader and Follower. Its value should be less than the maximum buffer size macro value.
-
-  ```c
+  ```C
+    #define FOLLOWER_I2C_ADDR        // Update I2C follower address
     #define I2C_BUFFER_SIZE             // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
-  ```
-
-- `MAX_BUFFER_SIZE_BLOCKING`: Defines the maximum buffer size allowed for RX and TX lengths when transferring without DMA. By default, it is set to 80000.
-
-  ```c
-    #define MAX_BUFFER_SIZE_BLOCKING 80000 // Maximum buffer size for RX and TX length when transferring without DMA
-  ```
-
-- `INITIAL_VALUE`: Defines the initial value used to fill the data buffer before transmission. By default, it is set to 0.
-
-  ```c
-    #define INITIAL_VALUE            0     // Initial value of buffer
   ```
 
 > **Note:** After above configurations connect SCL and SDA pins of Leader and follower then run the application and observe the results by connecting SDA and SCL pins to logic Analyzer(if require, enable glitch filter for SCL channel with time period 100ns, to avoid glitches).
@@ -172,7 +153,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 > **Note- In case of sleep-wakeup :**
 - As GPIO configurations will be lost after going to sleep state, user has to initialize I2C pins and driver again after wakeup, by using [sl_i2c_driver_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-i2c-driver-init) API for initializing driver and [sl_si91x_i2c_pin_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/i2-c#sl-si91x-i2c-pin-init) API for initializing pins.
-- If the project uses UC-generated I2C instances, call `sl_i2c_init_instances()` after wakeup before resuming I2C transfers so the configured I2C instances are restored.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -209,4 +189,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

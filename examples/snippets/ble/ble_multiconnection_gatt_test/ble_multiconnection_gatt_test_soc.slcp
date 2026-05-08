@@ -1,24 +1,18 @@
 project_name: ble_multiconnection_gatt_test_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Multiconnection GATT Test FreeRTOS
+label: BLE - Multiconnection GATT Test (SoC)
 category: Example|BLE
-description: 'Demonstrates multiple simultaneous BLE links on SiWx91x in SoC FreeRTOS using central and peripheral roles with GATT. Demonstrated by secure connections and multi-peer profile access.
+description: 'The Application demonstrates how to configure SiWx91x EVK in central/peripheral modes and then connect with multiple peripherals/centrals.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Advanced
-- name: Quality
-  value:
-  - Production
 source:
 - path: ble_device_info.c
 - path: ble_main_task.c

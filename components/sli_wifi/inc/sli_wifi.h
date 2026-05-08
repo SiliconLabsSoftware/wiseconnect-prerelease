@@ -233,22 +233,12 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
 sl_status_t sli_wifi_disconnect(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_stop_ap(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_statistics_t *statistics);
-sl_status_t sli_wifi_get_statistics_v2(sl_wifi_interface_t interface, sli_wifi_statistics_v2_t *statistics);
+sl_status_t sli_wifi_get_statistics_v2(sl_wifi_interface_t interface, sl_wifi_statistics_v2_t *statistics);
 sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
                                                 sl_wifi_operational_statistics_t *operational_statistics);
-void sli_wifi_transmitter_test_info_from_base_and_per(const sl_wifi_transmitter_test_base_info_t *test_base_info,
-                                                      const void *per_params,
-                                                      sl_wifi_transmitter_test_info_t *tx_test_info);
-uint16_t sli_wifi_get_encoded_rate(sl_wifi_rate_protocol_t protocol, sl_wifi_mcs_rate_t rate);
 sl_status_t sli_wifi_transmit_test_start(sl_wifi_interface_t interface,
                                          const sl_wifi_transmitter_test_info_t *test_tx_info);
-sl_status_t sli_wifi_transmit_test_start_v2(const sl_wifi_transmitter_test_base_info_t *test_base_info,
-                                            const void *per_params);
-sl_status_t sli_wifi_transmit_test_send_frames(const sl_wifi_transmitter_test_base_info_t *base_info,
-                                               const void *per_params,
-                                               const uint8_t *payload,
-                                               uint16_t payload_length);
-sl_status_t sli_wifi_transmit_test_stop(void);
+sl_status_t sli_wifi_transmit_test_stop(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_frequency_offset(sl_wifi_interface_t interface,
                                       const sl_wifi_freq_offset_t *frequency_calibration);
 sl_status_t sli_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi_dpd_calib_data_t *dpd_calib_data);
@@ -350,34 +340,10 @@ void sli_wifi_prepare_mac_frame_header(const void *buf,
                                        const uint8_t *addr1,
                                        const uint8_t *addr2,
                                        const uint8_t *addr3);
-sl_status_t sli_wifi_send_mac_data_frame(const sl_wifi_transmitter_test_info_t *per_params,
-                                         sl_wifi_system_packet_t *packet,
-                                         uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_v2(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                            const void *per_params,
-                                            sl_wifi_system_packet_t *packet,
-                                            uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_11bgn(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                               const sl_wifi_11bgn_per_params_t *per_params,
-                                               sl_wifi_system_packet_t *packet,
-                                               uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_11ac(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                              const sl_wifi_11ac_per_params_t *per_params,
-                                              sl_wifi_system_packet_t *packet,
-                                              uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_11ax(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                              const sl_wifi_11ax_per_params_t *per_params,
-                                              sl_wifi_system_packet_t *packet,
-                                              uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_11be(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                              const sl_wifi_11be_per_params_t *per_params,
-                                              sl_wifi_system_packet_t *packet,
-                                              uint16_t chunk_length);
-sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, const void *context);
 /**
  * @brief Send IP address information to firmware.
  *
- * @details This API sends the device's IP address (IPv4 and/or IPv6) to the firmware
+ * @details This API sends the device's IP address (IPv4 and/or IPv6) to the firmware 
  *          after the device obtains an IP address. The firmware uses this for BSS Max
  *          Idle Period keepalive functionality (Gratuitous ARP for IPv4, Neighbor
  *          Advertisement for IPv6). This API is called automatically by the SDK when

@@ -1,8 +1,8 @@
-# SiWx91x Platform BOD
+# Platform SiWx91x BOD
 
 ## Table of Contents
 
-- [SiWx91x Platform BOD](#platform-siwx91x-bod)
+- [Platform SiWx91x BOD](#platform-siwx91x-bod)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -58,32 +58,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
   - The threshold and slot values can be configured in [`bod_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_bod/bod_example.h). Alternatively, the slot value and blackout feature can be updated through the UC configuration.
-
-- `SL_BOD_DEFAULT_THRESHOLD`: Default BOD threshold voltage (in volts). A BOD interrupt is triggered when VMCU drops below this value. By default, it is set to `2.7f`.
-
-  ```c
-    #define SL_BOD_DEFAULT_THRESHOLD   2.7f   ///< Default BOD threshold value
-  ```
-
-- `SL_BOD_DEFAULT_SLOT_VALUE`: Default BOD slot value, which controls how often the BOD comparator samples the supply voltage. By default, it is set to 2.
-
-  ```c
+    ```
     #define SL_BOD_DEFAULT_SLOT_VALUE 2  ///< Default BOD Slot value
-  ```
+    #define SL_BOD_DEFAULT_THRESHOLD 2.7f ///< Default BOD threshold value
+    ```
+  - Battery voltage ranges can be customized for improved battery status monitoring by modifying the configurations in [`sl_si91x_bod.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_bod.h`).
 
-- Battery voltage ranges can be customized for improved battery status monitoring by modifying the configurations in [`sl_si91x_bod.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_bod.h`).
-
-- `SL_BOD_MAX_BATTERY_VOLTAGE`: Maximum battery voltage (in volts) used by the BOD driver when reporting battery status. By default, it is set to 3.3f.
-
-  ```c
+    ```
     #define SL_BOD_MAX_BATTERY_VOLTAGE 3.3f ///< Maximum battery voltage for Brown-Out Detector (BOD)
-  ```
-
-- `SL_BOD_MIN_BATTERY_VOLTAGE`: Minimum battery voltage (in volts) used by the BOD driver when reporting battery status. By default, it is set to 1.6f.
-
-  ```c
     #define SL_BOD_MIN_BATTERY_VOLTAGE 1.6f ///< Minimum battery voltage for Brown-Out Detector (BOD)
-  ```
+    ```
 
 - Configure UC from the slcp component.
 
@@ -144,4 +128,3 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

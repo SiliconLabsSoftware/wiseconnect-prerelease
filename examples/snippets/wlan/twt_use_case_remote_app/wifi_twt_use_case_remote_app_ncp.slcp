@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - TWT Use case remote app (NCP)
 category: Example|Wi-Fi
-description: Demonstrates TCP server and UDP server with periodic data transfer.
+description: "Update To keep device in TWT mode \n"
 filter:
 - name: Wireless Technology
   value:

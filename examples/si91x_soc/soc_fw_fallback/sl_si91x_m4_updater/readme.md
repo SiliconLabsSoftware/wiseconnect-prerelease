@@ -1,8 +1,8 @@
-# SiWx91x Platform M4 Updater
+# Platform SiWx91x M4 Updater
 
 ## Table of Contents
 
-- [SiWx91x Platform M4 Updater](#platform-siwx91x-m4-updater)
+- [Platform SiWx91x M4 Updater](#platform-siwx91x-m4-updater)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

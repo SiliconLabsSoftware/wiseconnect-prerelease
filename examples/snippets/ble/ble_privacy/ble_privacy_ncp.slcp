@@ -1,24 +1,18 @@
 project_name: ble_privacy_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Privacy FreeRTOS
+label: BLE - Privacy (NCP)
 category: Example|BLE
-description: 'Demonstrates BLE privacy with resolving-list management on SiWx91x over SPI NCP with FreeRTOS. Demonstrated by private connections to a remote device.
+description: 'This application demonstrates how to configure device with privacy feature by  organizing resolving list and resolution process and how to connect to remote  peripheral device.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

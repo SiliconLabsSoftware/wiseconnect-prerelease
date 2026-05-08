@@ -95,57 +95,50 @@ void ssi_master_example_init(void)
   do {
     // Set the Clock for SSI interface based on configuration
     // The maximum frequency of the SSI Primary bit-rate clock (sclk_out) is one-half the frequency of ssi_clk.
-    /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-    SL_PRINT_STRING_ERROR("Configuring Clock for SSI interface...\n");
-    SL_PRINT_STRING_ERROR("Setting SSI interface clock: sclk_out <= ssi_clk/2\n");
+    DEBUGOUT("Configuring Clock for SSI interface...\n");
+    DEBUGOUT("Setting SSI interface clock: sclk_out <= ssi_clk/2\n");
 #if (SSI_PRIMARY_UC == ENABLE)
     sl_status = sl_si91x_clock_manager_set_pll_freq(INTF_PLL, SL_SSI_PRIMARY_BAUD * 2, SSI_MASTER_INTF_PLL_REF_CLK);
 #else
     sl_status = sl_si91x_clock_manager_set_pll_freq(INTF_PLL, SSI_MASTER_BAUDRATE * 2, SSI_MASTER_INTF_PLL_REF_CLK);
 #endif
     if (sl_status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Failed to set SSI interface clock, Error Code : %lu\n", sl_status);
+      DEBUGOUT("Failed to set SSI interface clock, Error Code : %lu\n", sl_status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SSI interface clock set successfully\n");
+    DEBUGOUT("SSI interface clock set successfully\n");
     // Initialzing the timer
     init_timer_for_sync();
     // Version information of SSI driver
     ssi_version = sl_si91x_ssi_get_version();
-    SL_PRINT_STRING_ERROR("SSI version is fetched successfully \n");
-    SL_PRINT_STRING_ERROR("API version is %d.%d.%d\n", ssi_version.release, ssi_version.major, ssi_version.minor);
+    DEBUGOUT("SSI version is fetched successfully \n");
+    DEBUGOUT("API version is %d.%d.%d\n", ssi_version.release, ssi_version.major, ssi_version.minor);
     // Initialize the SSI driver
     sl_status = sl_si91x_ssi_init(ssi_master_config.device_mode, &ssi_driver_handle);
     if (sl_status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("SSI Initialization Failed, Error Code : %lu \n", sl_status);
+      DEBUGOUT("SSI Initialization Failed, Error Code : %lu \n", sl_status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SSI Initialization Success \n");
+    DEBUGOUT("SSI Initialization Success \n");
 
     // Configure the SSI to Master, 16-bit mode @10000 kBits/sec
     sl_status = sl_si91x_ssi_set_configuration(ssi_driver_handle, &ssi_master_config, ssi_slave_number);
     if (sl_status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Failed to Set Configuration Parameters to SSI, Error Code : %lu \n", sl_status);
+      DEBUGOUT("Failed to Set Configuration Parameters to SSI, Error Code : %lu \n", sl_status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Set Configuration Parameters to SSI \n");
+    DEBUGOUT("Set Configuration Parameters to SSI \n");
     // Register the user callback
     sl_status = sl_si91x_ssi_register_event_callback(ssi_driver_handle, ssi_master_callback_event_handler);
     if (sl_status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("SSI register event callback Failed, Error Code : %lu \n", sl_status);
+      DEBUGOUT("SSI register event callback Failed, Error Code : %lu \n", sl_status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SSI register event callback Success \n");
+    DEBUGOUT("SSI register event callback Success \n");
     // Fetching and printing the current clock division factor
-    SL_PRINT_STRING_ERROR("Current Clock division factor is %lu \n",
-                          sl_si91x_ssi_get_clock_division_factor(ssi_driver_handle));
+    DEBUGOUT("Current Clock division factor is %lu \n", sl_si91x_ssi_get_clock_division_factor(ssi_driver_handle));
     // Fetching and printing the current frame length
-    SL_PRINT_STRING_ERROR("Current Frame Length is %lu \n", sl_si91x_ssi_get_frame_length(ssi_driver_handle));
+    DEBUGOUT("Current Frame Length is %lu \n", sl_si91x_ssi_get_frame_length(ssi_driver_handle));
     if (sl_si91x_ssi_get_frame_length(ssi_driver_handle) >= SSI_MASTER_BIT_WIDTH) {
       size_factor = sizeof(ssi_master_tx_buffer[0]);
     }
@@ -185,16 +178,16 @@ void ssi_master_example_process_action(void)
                                             sizeof(ssi_master_tx_buffer) / size_factor);
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          SL_PRINT_STRING_ERROR("sl_si91x_ssi_transfer_data: Error Code : %lu \n", status);
+          DEBUGOUT("sl_si91x_ssi_transfer_data: Error Code : %lu \n", status);
           ssi_master_current_mode = SSI_MASTER_TRANSMISSION_COMPLETED;
           break;
         }
-        SL_PRINT_STRING_ERROR("SSI transfer begin successfully \n");
+        DEBUGOUT("SSI transfer begin successfully \n");
         ssi_master_begin_transmission = false;
       }
       if (ssi_master_transfer_complete) {
         ssi_master_transfer_complete = false;
-        SL_PRINT_STRING_ERROR("SSI transfer completed successfully \n");
+        DEBUGOUT("SSI transfer completed successfully \n");
         // After comparing the loopback transfer, it compares the data_out and
         // data_in.
         ssi_master_compare_loopback_data();
@@ -222,11 +215,11 @@ void ssi_master_example_process_action(void)
           sl_si91x_ssi_send_data(ssi_driver_handle, ssi_master_tx_buffer, sizeof(ssi_master_tx_buffer) / size_factor);
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          SL_PRINT_STRING_ERROR("sl_si91x_ssi_send_data: Error Code : %lu \n", status);
+          DEBUGOUT("sl_si91x_ssi_send_data: Error Code : %lu \n", status);
           ssi_master_current_mode = SSI_MASTER_TRANSMISSION_COMPLETED;
           break;
         }
-        SL_PRINT_STRING_ERROR("SSI send begin successfully \n");
+        DEBUGOUT("SSI send begin successfully \n");
         ssi_master_begin_transmission = false;
       }
       //Waiting till the send is completed
@@ -237,10 +230,10 @@ void ssi_master_example_process_action(void)
           // If receive macro is enabled, current mode is set to send
           ssi_master_current_mode       = SSI_MASTER_RECEIVE_DATA;
           ssi_master_begin_transmission = true;
-          SL_PRINT_STRING_ERROR("SSI send completed \n");
+          DEBUGOUT("SSI send completed \n");
           break;
         }
-        SL_PRINT_STRING_ERROR("SSI send completed \n");
+        DEBUGOUT("SSI send completed \n");
         // If receive macro is not enabled, current mode is set to completed.
         ssi_master_current_mode = SSI_MASTER_TRANSMISSION_COMPLETED;
       }
@@ -255,18 +248,18 @@ void ssi_master_example_process_action(void)
                                            sizeof(ssi_master_rx_buffer) / size_factor);
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          SL_PRINT_STRING_ERROR("sl_si91x_ssi_receive_data: Error Code : %lu \n", status);
+          DEBUGOUT("sl_si91x_ssi_receive_data: Error Code : %lu \n", status);
           ssi_master_current_mode = SSI_MASTER_TRANSMISSION_COMPLETED;
           break;
         }
-        SL_PRINT_STRING_ERROR("SSI receive begin successfully \n");
+        DEBUGOUT("SSI receive begin successfully \n");
         ssi_master_begin_transmission = false;
         //Waiting till the receive is completed
       }
       if (ssi_master_transfer_complete) {
         // If DMA is enabled, it will wait until transfer_complete flag is set.
         ssi_master_transfer_complete = false;
-        SL_PRINT_STRING_ERROR("SSI receive completed \n");
+        DEBUGOUT("SSI receive completed \n");
         ssi_master_compare_loopback_data();
         // At last, current mode is set to completed
         ssi_master_current_mode = SSI_MASTER_TRANSMISSION_COMPLETED;
@@ -302,9 +295,9 @@ static void ssi_master_compare_loopback_data(void)
     }
   }
   if (ssi_data_index == SSI_MASTER_BUFFER_SIZE) {
-    SL_PRINT_STRING_ERROR("Data comparison successful, Loop Back Test Passed \n");
+    DEBUGOUT("Data comparison successful, Loop Back Test Passed \n");
   } else {
-    SL_PRINT_STRING_ERROR("Data comparison failed, Loop Back Test failed \n");
+    DEBUGOUT("Data comparison failed, Loop Back Test failed \n");
   }
 }
 
@@ -344,15 +337,15 @@ static void init_timer_for_sync(void)
   sl_status_t status;
   status = sl_si91x_ulp_timer_configure_clock(&sl_timer_clk_handle);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("sl_si91x_ulp_timer_configure_clock failed, error code: %ld", status);
+    DEBUGOUT("sl_si91x_ulp_timer_configure_clock failed, error code: %ld", status);
   }
   status = sl_si91x_ulp_timer_set_configuration(&sl_timer_handle_timer0);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("sl_si91x_ulp_timer_set_configuration failed, error code: %ld", status);
+    DEBUGOUT("sl_si91x_ulp_timer_set_configuration failed, error code: %ld", status);
   }
   status = sl_si91x_ulp_timer_set_count(TIMER_0, TIMER_FREQUENCY * INITIAL_COUNT);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("sl_si91x_ulp_timer_set_count failed, error code: %ld", status);
+    DEBUGOUT("sl_si91x_ulp_timer_set_count failed, error code: %ld", status);
   }
 }
 
@@ -369,16 +362,16 @@ static void wait_for_sync(uint16_t time_ms)
 
   status = sl_si91x_ulp_timer_start(TIMER_0);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("sl_si91x_ulp_timer_start failed, error code: %ld", status);
+    DEBUGOUT("sl_si91x_ulp_timer_start failed, error code: %ld", status);
   }
   status = sl_si91x_ulp_timer_get_count(TIMER_0, &start_time);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("sl_si91x_ulp_timer_get_count failed, error code: %ld", status);
+    DEBUGOUT("sl_si91x_ulp_timer_get_count failed, error code: %ld", status);
   }
   do {
     status = sl_si91x_ulp_timer_get_count(TIMER_0, &current_time);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_ulp_timer_get_count failed, error code: %ld", status);
+      DEBUGOUT("sl_si91x_ulp_timer_get_count failed, error code: %ld", status);
     }
   } while (!((current_time - start_time) > end_time));
   sl_si91x_ulp_timer_stop(TIMER_0);

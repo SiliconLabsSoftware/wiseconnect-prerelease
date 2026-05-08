@@ -1,29 +1,19 @@
 # BLE - Gatt Long Read
 
-## High-Level Overview
-
-SiWx91x BLE GATT long read example: demonstrates GATT client/server role configuration to read data larger than the MTU using Simplicity Studio on SoC, PSRAM, and NCP modes.
-
 ## Table of Contents
 
 - [BLE - Gatt Long Read](#ble---gatt-long-read)
-  - [High-Level Overview](#high-level-overview)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites](#prerequisites)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
-    - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
     - [Setup Diagram](#setup-diagram)
-  - [Steps to Run Demo](#steps-to-run-demo)
-   - [Getting Started](#getting-started)
-   - [Configuration and Setup](#configuration-and-setup)
-   - [Steps for Execution](#steps-for-execution)
-      - [BLE GATT\_long\_read Application as a Server](#ble-gatt_long_read-application-as-a-server)
-      - [BLE GATT\_long\_read Application as a Client](#ble-gatt_long_read-application-as-a-client)
-  - [Troubleshooting](#troubleshooting)
-  - [Resources](#resources)
-  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+  - [Getting Started](#getting-started)
+  - [Application Build Environment](#application-build-environment)
+  - [Test the Application](#test-the-application)
+    - [BLE GATT\_long\_read Application as a Server](#ble-gatt_long_read-application-as-a-server)
+    - [BLE GATT\_long\_read Application as a Client](#ble-gatt_long_read-application-as-a-client)
 
 ## Purpose/Scope
 
@@ -70,23 +60,11 @@ This Application explains to the user how to:
 
 - Simplicity Studio IDE
 
-### NCP mode: host application and project files
-
-| Mode      | Host / target                                                                           | Project file (this example folder)  |
-|-----------|-----------------------------------------------------------------------------------------|-------------------------------------|
-| SoC       | Application runs on SiWx91x.                                                            | `ble_gatt_long_read_soc.slcp`       |
-| PSRAM     | Application runs on SiWx91x with PSRAM-capable radio board.                             | `ble_gatt_long_read_psram.slcp`     |
-| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**.   | `ble_gatt_long_read_ncp.slcp`       |
-
-Open the `.slcp` for your kit from `examples/snippets/ble/gatt_long_read/` in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
-
 ### Setup Diagram
 
 ![](resources/readme/blegattlr_soc_ncp.png)  
 
-## Steps to Run Demo
-
-### Getting Started
+## Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -98,7 +76,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-### Configuration and Setup
+## Application Build Environment
 
 The application can be configured to suit user requirements and development environment. Read through the following sections and make any changes if needed.
 
@@ -204,7 +182,7 @@ The application can be configured to suit user requirements and development envi
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-### Steps for Execution
+## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -215,7 +193,7 @@ Follow the steps below for successful execution of the application:
 
 > **Note:** The provided mobile screenshots are from the 2.5.2 version of the Simplicity Connect App(formerly EFR Connect App), it is recommended to use the latest version.
 
-#### BLE GATT_long_read Application as a Server
+### BLE GATT_long_read Application as a Server
 
 1. After the program gets executed, If Silicon Labs device is configured as `SERVER` specified in the macro `GATT_ROLE`, Silicon Labs will be in Advertising state.
 2. Connect any serial console for prints.
@@ -248,7 +226,7 @@ Follow the steps below for successful execution of the application:
 
 ![](resources/readme/blegattlrncpserverprints.png)
 
-#### BLE GATT_long_read Application as a Client
+### BLE GATT_long_read Application as a Client
 
 1. After the program gets executed, If Silicon Labs device is configured as `CLIENT` specified in the macro `GATT_ROLE`, Silicon Labs will be in Advertising state.
 2. Connect any serial console for prints.
@@ -284,25 +262,3 @@ Follow the steps below for successful execution of the application:
 - **NCP** 
 
   ![](resources/readme/blegattlrncpclientprints.png)
-
-## Troubleshooting
-
-If you encounter issues while running the BLE GATT Long Read example, check the following:
-
-- Ensure the correct radio board is connected and the connectivity firmware is up to date.
-- Verify that the `GATT_ROLE` macro is set correctly (SERVER or CLIENT) in `app.c`.
-- When in CLIENT mode, confirm that `RSI_BLE_DEV_ADDR` / `RSI_REMOTE_DEVICE_NAME` matches the remote device.
-- If the MTU does not update after connection, ensure the mobile app/remote device supports MTU exchange and is running a recent version.
-- If the expected prints are not seen, verify the serial console/COM port settings and that the device is flashed successfully.
-
-## Resources
-
-- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
-- [WiSeConnect API Reference Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/)
-- [Simplicity Connect Mobile App](https://www.silabs.com/developers/simplicity-connect-mobile-app)
-
-## Report Bugs and Get Support
-
-Report issues and get help from the Silicon Labs community:
-
-- [Silicon Labs Community](https://www.silabs.com/community)

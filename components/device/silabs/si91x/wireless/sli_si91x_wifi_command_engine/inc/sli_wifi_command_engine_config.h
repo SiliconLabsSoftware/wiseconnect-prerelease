@@ -1,6 +1,6 @@
 /***************************************************************************/ /**
  * @file sli_wifi_command_engine_config.h
- * @brief SI91x WLAN command engine and related thread configuration macros.
+ * @brief
  *******************************************************************************
  * # License
  * <b>Copyright 2025 Silicon Laboratories Inc. www.silabs.com</b>
@@ -37,36 +37,6 @@
  * Include sl_si91x_driver.h or sli_si91x_driver.h in .c files that need driver types. */
 #include "sl_status.h"
 #include "sli_command_engine.h"
-
-/**
- * @brief SLI event engine thread priority for SI91x WLAN command-engine builds.
- *
- * If @c SL_WLAN_EVENT_THREAD_PRIORITY is defined before this header is included, it becomes
- * @c SLI_EVENT_ENGINE_THREAD_PRIORITY (consumed by @c sli_event_engine.h); otherwise the default
- * is @c osPriorityRealtime2. This thread should generally run at a higher CMSIS-RTOS priority than
- * the WLAN command engine worker so async callbacks are not starved.
- */
-#ifndef SL_WLAN_EVENT_THREAD_PRIORITY
-#define SLI_EVENT_ENGINE_THREAD_PRIORITY osPriorityRealtime2
-#else
-#undef SLI_EVENT_ENGINE_THREAD_PRIORITY
-#define SLI_EVENT_ENGINE_THREAD_PRIORITY SL_WLAN_EVENT_THREAD_PRIORITY
-#endif
-
-/**
- * @brief SLI event engine thread stack size (bytes) for SI91x WLAN command-engine builds.
- *
- * Define @c SL_SI91X_EVENT_HANDLER_STACK_SIZE before including this header to override the
- * default of 1536 bytes. Include this header before @c sli_event_engine.h (this file includes
- * it last) so these values apply instead of the generic defaults in @c sli_event_engine.h.
- */
-#ifndef SL_SI91X_EVENT_HANDLER_STACK_SIZE
-#define SLI_EVENT_ENGINE_THREAD_STACK_SIZE 1536
-#else
-#undef SLI_EVENT_ENGINE_THREAD_STACK_SIZE
-#define SLI_EVENT_ENGINE_THREAD_STACK_SIZE SL_SI91X_EVENT_HANDLER_STACK_SIZE
-#endif
-
 #include "sli_event_engine.h"
 #include "sli_queue_manager_types.h"
 #include "sli_routing_utility.h"
@@ -76,20 +46,47 @@
  *               Macro Definitions
  ******************************************************/
 /**
- * @brief CMSIS-RTOS thread priority for the WLAN command engine worker.
+ * @brief Defines the thread priority for the Wi-Fi command engine.
  *
- * Define @c SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY before including this header to override
- * the default @c osPriorityRealtime.
+ * This macro sets the priority level for the Wi-Fi command engine thread.
+ * The default value is set to `osPriorityRealtime`, which is a real-time priority level.
  *
- * @note Prefer a CMSIS-RTOS priority below the SLI event engine thread so handler callbacks are
- *       not starved; configure that thread with @c SL_WLAN_EVENT_THREAD_PRIORITY (see the block
- *       above that feeds @c SLI_EVENT_ENGINE_THREAD_PRIORITY).
- *
- * @note The command engine worker stack size is fixed at 1636 bytes in
- *       @c sli_si91x_wifi_command_engine_config.c (not overridden by a public macro here).
+ * @note
+ * - The priority level of this thread should be second highest after @ref SL_WIFI_ASYNC_EVENT_HANDLER_THREAD_PRIORITY among all the threads in the system.
  */
-#ifndef SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY
-#define SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY osPriorityRealtime
+#ifndef SL_WIFI_COMMAND_ENGINE_THREAD_PRIORITY
+#define SL_WIFI_COMMAND_ENGINE_THREAD_PRIORITY osPriorityRealtime
+#endif
+
+/**
+ * @brief Defines the stack size for the Wi-Fi command engine.
+ *
+ * The default stack size is set to 1636 bytes. This value can be overridden
+ * by defining SL_WIFI_COMMAND_ENGINE_STACK_SIZE before including this file.
+ */
+#ifndef SL_WIFI_COMMAND_ENGINE_STACK_SIZE
+#define SL_WIFI_COMMAND_ENGINE_STACK_SIZE 1636
+#endif
+
+/**
+ * @brief Defines the priority level for the Wi-Fi asynchronous event handler thread.
+ *
+ * This macro sets the priority for the thread that handles asynchronous Wi-Fi events.
+ * The default value is set to `osPriorityRealtime1`, which ensures high-priority
+ * execution for time-sensitive operations.
+ */
+#ifndef SL_WIFI_ASYNC_EVENT_HANDLER_THREAD_PRIORITY
+#define SL_WIFI_ASYNC_EVENT_HANDLER_THREAD_PRIORITY osPriorityRealtime1
+#endif
+
+/**
+ * @brief Defines the stack size for the asynchronous event handler.
+ *
+ * This macro specifies the stack size (in bytes) allocated for the Wi-Fi
+ * asynchronous event handler. The default value is set to 1536 bytes.
+ */
+#ifndef SL_WIFI_ASYNC_EVENT_HANDLER_STACK_SIZE
+#define SL_WIFI_ASYNC_EVENT_HANDLER_STACK_SIZE 1536
 #endif
 
 /******************************************************
@@ -149,7 +146,6 @@ extern sli_command_engine_configuration_t sli_wifi_command_engine_config;
 extern sli_command_engine_t sli_wifi_command_engine;
 
 sl_status_t sli_si91x_wifi_event_engine_init(void);
-sl_status_t sli_si91x_wifi_event_engine_deinit(void);
 
 sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_engine_t *instance,
                                                               void *packet,

@@ -1,8 +1,8 @@
-# SiWx91x Platform Peripheral SDIO Secondary
+# Platform SiWx91x Peripheral SDIO Secondary
 
 ## Table of Contents
 
-- [SiWx91x Platform Peripheral SDIO Secondary](#platform-siwx91x-peripheral-sdio-secondary)
+- [Platform SiWx91x Peripheral SDIO Secondary](#platform-siwx91x-peripheral-sdio-secondary)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -82,23 +82,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Modify BLOCK_LEN and NO_OF_BLOCKS in the [`sdio_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sdio_secondary/sdio_secondary_example.c) file to configure size for application buffer:
 
-  - `BLOCK_LEN`: Length of a single SDIO block (in bytes) used for data transfer between master and secondary. By default, it is set to 256.
-
-    ```c
-    #define BLOCK_LEN         256
-    ```
-
-  - `NO_OF_BLOCKS`: Number of blocks transferred per SDIO operation. By default, it is set to 4.
-
-    ```c
-    #define NO_OF_BLOCKS      4
-    ```
-
-  - `XFER_BUFFER_SIZE`: Total transfer buffer size, derived from `BLOCK_LEN * NO_OF_BLOCKS`. By default, it evaluates to 1 KB (256 * 4).
-
-    ```c
-    #define XFER_BUFFER_SIZE  (BLOCK_LEN * NO_OF_BLOCKS) /* Buffer size is 256B*4 = 1KB */
-    ```
+  ```c
+  #define BLOCK_LEN         256
+  #define NO_OF_BLOCKS      4
+  #define XFER_BUFFER_SIZE  (BLOCK_LEN * NO_OF_BLOCKS) /* Buffer size is 256B*4 = 1KB */
+   ```
 
 ### Pin Configuration
 
@@ -140,7 +128,6 @@ NOTE:
 > **Note:**
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
-> - In case of sleep-wakeup, call `sl_si91x_sdio_secondary_init()` after wakeup before restarting SDIO transfers so the SDIO secondary peripheral state is restored.
 
 ## Troubleshooting
 
@@ -156,4 +143,3 @@ NOTE:
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

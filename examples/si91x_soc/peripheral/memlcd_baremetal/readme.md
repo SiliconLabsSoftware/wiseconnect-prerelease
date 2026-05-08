@@ -1,8 +1,8 @@
-# SiWx91x Platform MEMLCD Baremetal
+# Platform SiWx91x MEMLCD Baremetal
 
 ## Table of Contents
 
-- [SiWx91x Platform MEMLCD Baremetal](#platform-siwx91x-memlcd-baremetal)
+- [Platform SiWx91x MEMLCD Baremetal](#platform-siwx91x-memlcd-baremetal)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -62,22 +62,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-## Application Build Environment
-
-- Configure the following macros in [`memlcd_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/memlcd_baremetal/memlcd_app.c) file and update/modify following macros, if required.
-
-  - `SL_BOARD_ENABLE_DISPLAY_PIN`: GPIO pin number used to enable the MEMLCD display on the target board. By default, it is set to 0.
-
-    ```c
-      #define SL_BOARD_ENABLE_DISPLAY_PIN  0 // Display enable pin
-    ```
-
-  - `SL_BOARD_ENABLE_DISPLAY_PORT`: GPIO port used together with `SL_BOARD_ENABLE_DISPLAY_PIN` to enable the MEMLCD display on the target board. By default, it is set to 0.
-
-    ```c
-      #define SL_BOARD_ENABLE_DISPLAY_PORT 0 // Display enable port
-    ```
-
 ## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
@@ -106,4 +90,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

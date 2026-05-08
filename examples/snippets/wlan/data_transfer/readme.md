@@ -87,7 +87,7 @@ The application can be configured to suit your requirements and development envi
 
 - **STA instance related parameters**
 
-  - WIFI_CLIENT_PROFILE_SSID refers to the name to which the SiWx91x device gets connected to.
+  - WIFI_CLIENT_PROFILE_SSID refers to the name to which the Si91x device gets connected to.
 
   	```c
     #define WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"

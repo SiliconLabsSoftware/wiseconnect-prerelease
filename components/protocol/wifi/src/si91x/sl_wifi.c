@@ -47,7 +47,6 @@
 #include <string.h>
 #include "sli_wifi_constants.h"
 #include "sl_string.h"
-#include "sl_constants.h"
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"
 #endif
@@ -109,6 +108,7 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
     if (status != SL_STATUS_OK) {
       SL_PRINT_STRING_ERROR("\r\nTimestamp Memory Location Configuration Failed with error: 0x%lX\r\n", status);
     }
+#if 0
     /* After shared timestamp memory is configured, synchronize host and captive-core clocks
      * for logging so M4 and NWP log timestamps are comparable. */
     sl_log_sync_timestamp(SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CORE_ID, SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CONTEXT_PTR);
@@ -118,6 +118,7 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
     if (status != SL_STATUS_IN_PROGRESS) {
       SL_PRINT_STRING_ERROR("\r\nNWP Log Configuration Failed with error: 0x%lX\r\n", status);
     }
+#endif
     status = SL_STATUS_OK;
   }
 #endif
@@ -518,6 +519,11 @@ sl_status_t sl_wifi_get_statistics(sl_wifi_interface_t interface, sl_wifi_statis
   return sli_wifi_get_statistics(interface, statistics);
 }
 
+sl_status_t sl_wifi_get_statistics_v2(sl_wifi_interface_t interface, sl_wifi_statistics_v2_t *statistics)
+{
+  return sli_wifi_get_statistics_v2(interface, statistics);
+}
+
 sl_status_t sl_wifi_get_operational_statistics(sl_wifi_interface_t interface,
                                                sl_wifi_operational_statistics_t *operational_statistics)
 {
@@ -533,86 +539,13 @@ sl_status_t sl_wifi_transmit_test_start(sl_wifi_interface_t interface,
   return sli_wifi_transmit_test_start(interface, test_tx_info);
 }
 
-sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_base_info_t *test_base_info,
-                                              const sl_wifi_11bgn_per_params_t *per_params,
-                                              const uint8_t *payload,
-                                              uint16_t payload_length)
+sl_status_t sl_wifi_transmit_test_start_with_payload(sl_wifi_interface_t interface,
+                                                     const sl_wifi_transmitter_test_info_t *tx_test_info,
+                                                     const uint8_t *payload,
+                                                     const uint16_t payload_length)
 {
-  UNUSED_PARAMETER(payload);
-  UNUSED_PARAMETER(payload_length);
-  if (test_base_info == NULL || per_params == NULL) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: null arg\n");
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: not initialized\n");
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  switch (test_base_info->wifi_protocol) {
-    case SL_WIFI_RATE_PROTOCOL_B_ONLY:
-    case SL_WIFI_RATE_PROTOCOL_G_ONLY:
-    case SL_WIFI_RATE_PROTOCOL_N_ONLY:
-      break;
-    default:
-      SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: bad protocol %u\n", (unsigned)test_base_info->wifi_protocol);
-      return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  sl_wifi_transmitter_test_info_t tx_test_info;
-  sli_wifi_transmitter_test_info_from_base_and_per(test_base_info, per_params, &tx_test_info);
-
-  sl_status_t status = sli_wifi_transmit_test_start(SL_WIFI_CLIENT_INTERFACE, &tx_test_info);
-  SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: status=0x%lx\n", (unsigned long)status);
-  return status;
-}
-
-sl_status_t sl_wifi_transmit_test_start_11ac(const sl_wifi_transmitter_test_base_info_t *test_base_info,
-                                             const sl_wifi_11ac_per_params_t *per_params,
-                                             const uint8_t *payload,
-                                             uint16_t payload_length)
-{
-  UNUSED_PARAMETER(payload);
-  UNUSED_PARAMETER(payload_length);
-  if (test_base_info == NULL || per_params == NULL) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: null arg\n");
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: not initialized\n");
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  if (test_base_info->wifi_protocol != SL_WIFI_RATE_PROTOCOL_AC_ONLY) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: bad protocol %u\n", (unsigned)test_base_info->wifi_protocol);
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  sl_wifi_transmitter_test_info_t tx_test_info;
-  sli_wifi_transmitter_test_info_from_base_and_per(test_base_info, per_params, &tx_test_info);
-
-  sl_status_t status = sli_wifi_transmit_test_start(SL_WIFI_CLIENT_INTERFACE, &tx_test_info);
-  SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: status=0x%lx\n", (unsigned long)status);
-  return status;
-}
-
-sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base_info_t *test_base_info,
-                                             const sl_wifi_11ax_per_params_t *per_params,
-                                             const uint8_t *payload,
-                                             uint16_t payload_length)
-{
-  UNUSED_PARAMETER(test_base_info);
-  UNUSED_PARAMETER(per_params);
-  UNUSED_PARAMETER(payload);
-  UNUSED_PARAMETER(payload_length);
-  return SL_STATUS_NOT_SUPPORTED;
-}
-
-sl_status_t sl_wifi_transmit_test_start_11be(const sl_wifi_transmitter_test_base_info_t *test_base_info,
-                                             const sl_wifi_11be_per_params_t *per_params,
-                                             const uint8_t *payload,
-                                             uint16_t payload_length)
-{
-  UNUSED_PARAMETER(test_base_info);
-  UNUSED_PARAMETER(per_params);
+  UNUSED_PARAMETER(interface);
+  UNUSED_PARAMETER(tx_test_info);
   UNUSED_PARAMETER(payload);
   UNUSED_PARAMETER(payload_length);
   return SL_STATUS_NOT_SUPPORTED;
@@ -620,25 +553,10 @@ sl_status_t sl_wifi_transmit_test_start_11be(const sl_wifi_transmitter_test_base
 
 sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 {
-  UNUSED_PARAMETER(interface);
   if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_stop: not initialized\n");
     return SL_STATUS_NOT_INITIALIZED;
   }
-  sl_status_t status = sli_wifi_transmit_test_stop();
-  SL_DEBUG_LOG("sl_wifi_transmit_test_stop: status=0x%lx\n", (unsigned long)status);
-  return status;
-}
-
-sl_status_t sl_wifi_transmit_test_stop_v2(void)
-{
-  if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_stop_v2: not initialized\n");
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  sl_status_t status = sli_wifi_transmit_test_stop();
-  SL_DEBUG_LOG("sl_wifi_transmit_test_stop_v2: status=0x%lx\n", (unsigned long)status);
-  return status;
+  return sli_wifi_transmit_test_stop(interface);
 }
 
 sl_status_t sl_wifi_frequency_offset(sl_wifi_interface_t interface, const sl_wifi_freq_offset_t *frequency_calibration)

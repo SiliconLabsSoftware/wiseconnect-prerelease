@@ -1,8 +1,8 @@
-# SiWx91x Platform DMA
+# Platform SiWx91x DMA
 
 ## Table of Contents
 
-- [SiWx91x Platform DMA](#platform-siwx91x-dma)
+- [Platform SiWx91x DMA](#platform-siwx91x-dma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -83,27 +83,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Configure SL_DMA0_CHANNEL_COUNT(1 - 32) in UC - Number of available channels for UDMA0
 - Configure the following macros in the [`dma_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_dma/dma_example.c) file and update/modify following macros, if required.
 
-  - `DMA_SIMPLE_TRANSFER`: Selects the DMA transfer API. When enabled (1), the example uses `sl_si91x_dma_simple_transfer`; when disabled (0), it uses `sl_si91x_dma_transfer` for more advanced configuration. By default, it is set to 1.
-
-    ```c
+    ```C
     #define DMA_SIMPLE_TRANSFER 1    ///< Enable/Disable simple transfer
-    ```
-
-  - `DMA_INSTANCE`: Selects the DMA controller instance to use for the transfer (0 for UDMA0, 1 for ULP_DMA). By default, it is set to 0.
-
-    ```c
-    #define DMA_INSTANCE        0    ///< DMA0 instance
-    ```
-
-  - `DMA_CHANNEL`: Specifies the DMA channel number to be allocated for the memory-to-memory transfer. By default, it is set to 32.
-
-    ```c
     #define DMA_CHANNEL         32   ///< DMA0 channel number
-    ```
-
-  - `DMA_TRANSFER_SIZE`: Defines the number of data elements to be transferred in a single DMA operation. By default, it is set to 2048.
-
-    ```c
     #define DMA_TRANSFER_SIZE   2048 ///< DMA transfer size
     ```
 
@@ -136,4 +118,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

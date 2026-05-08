@@ -1,24 +1,18 @@
 project_name: ble_datalength_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Datalength FreeRTOS
+label: BLE - Datalength (SoC)
 category: Example|BLE
-description: 'Demonstrates how to negotiate BLE Data Length Extension for larger link PDUs after connecting as a central on SiWx91x in SoC FreeRTOS. Demonstrated by controller BLE procedures with the peer.
+description: 'Start a BLE device in central central role and can be used to set data length  extension with the connected remote device.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

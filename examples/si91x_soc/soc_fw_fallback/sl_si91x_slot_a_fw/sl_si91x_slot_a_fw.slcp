@@ -5,7 +5,7 @@ description: 'Wirelessly updates the M4 firmware from a remote TCP server
   '
 category: Example|si91x_soc
 quality: production
-label: SiWx91x Platform - Firmware Fallback Slot A
+label: Platform SiWx91x - Firmware Fallback Slot A
 component:
 - id: sl_main
 - id: freertos

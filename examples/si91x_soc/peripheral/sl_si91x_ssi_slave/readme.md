@@ -1,8 +1,8 @@
-# SiWx91x Platform SSI SLAVE
+# Platform SiWx91x SSI SLAVE
 
 ## Table of Contents
 
-- [SiWx91x Platform SSI SLAVE](#platform-siwx91x-ssi-slave)
+- [Platform SiWx91x SSI SLAVE](#platform-siwx91x-ssi-slave)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -14,8 +14,8 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
     - [Pin Configuration](#pin-configuration)
-      - [Pin Configuration of the WPK\[BRD4002A\] Base Board, with BRD4338A, BRD4342A, or BRD4343A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-with-brd4338a-brd4342a-or-brd4343a-radio-board)
-      - [Pin Configuration of Explorer kit as slave](#pin-configuration-of-explorer-kit-as-slave)
+      - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with BRD4338A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-brd4338a-radio-board)
+      - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with 917 Radio Board/917Y Module board and Explorer kit](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-917-radio-board917y-module-board-and-explorer-kit)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
@@ -143,64 +143,26 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - `SSI_SLAVE_TRANSFER`: This macro is enabled by default. It sends and receives data in full duplex.
 
-  ```c
+  ```C
     #define SSI_SLAVE_TRANSFER ENABLE    // To use the transfer API
   ```
 
 - `SSI_SLAVE_SEND (or) SSI_SLAVE_RECEIVE`: If SSI_SLAVE_RECEIVE or SSI_SLAVE_SEND is enabled, the SSI slave will receive and send data in half duplex respectively.
 
-  ```c
+  ```C
     #define SSI_SLAVE_SEND     DISABLE   // To use the send API
     #define SSI_SLAVE_RECEIVE  DISABLE   // To use the receive API
   ```
 
 - By default, an 8-bit unsigned integer is declared for the data buffer. If using data-width more than 8 bit, update the variable to 16-bit unsigned integer.
 
-  ```c
+  ```C
   // For data-width less than equal to 8
   static uint8_t ssi_slave_tx_buffer[SSI_SLAVE_BUFFER_SIZE] = { '\0' };
   static uint8_t ssi_slave_rx_buffer[SSI_SLAVE_BUFFER_SIZE] = { '\0' };
   // For data-width greater than 8
   static uint16_t ssi_slave_tx_buffer[SSI_SLAVE_BUFFER_SIZE] = { '\0' };
   static uint16_t ssi_slave_rx_buffer[SSI_SLAVE_BUFFER_SIZE] = { '\0' };
-  ```
-
-- Configure the following macros in [`ssi_slave_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/ssi_slave_example.c) if required:
-
-- `SSI_SLAVE_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
-
-  ```c
-  #define SSI_SLAVE_BUFFER_SIZE      1024     // Length of data to be sent through SPI
-  ```
-
-- `SSI_SLAVE_BIT_WIDTH`: Defines the SSI data bit width used for each transfer frame. By default, it is set to 8.
-
-  ```c
-  #define SSI_SLAVE_BIT_WIDTH        8        // SSI bit width
-  ```
-
-- `SSI_SLAVE_BAUDRATE`: Defines the SSI slave baud rate (bit rate) in bits per second. By default, it is set to 10000000 (10 Mbps).
-
-  ```c
-  #define SSI_SLAVE_BAUDRATE         10000000 // SSI baudrate
-  ```
-
-- `SSI_SLAVE_MAX_BIT_WIDTH`: Defines the maximum supported SSI bit width used for buffer type selection. By default, it is set to 16.
-
-  ```c
-  #define SSI_SLAVE_MAX_BIT_WIDTH    16       // Maximum Bit width
-  ```
-
-- `INITIAL_COUNT`: Defines the initial count value configured at timer initialization. By default, it is set to 7000.
-
-  ```c
-  #define INITIAL_COUNT              7000     // Count configured at timer init
-  ```
-
-- `SYNC_TIME`: Defines the delay value used to synchronize master and slave before starting the transfer. By default, it is set to 5000.
-
-  ```c
-  #define SYNC_TIME                  5000     // Delay to sync master and slave
   ```
 
 - To unregister a user event callback for a specific instance, use the API [sl_si91x_ssi_per_instance_unregister_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-per-instance-unregister-event-callback). Alternatively, to unregister callbacks for all instances simultaneously, use the API [sl_si91x_ssi_unregister_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-unregister-event-callback).
@@ -213,20 +175,22 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 >
 > Configure the following macro in the [`ssi_slave_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/ssi_slave_example.c) file to set the SSI baud rate for the slave:
 >
-> ```c
+> ```C
 > #define SSI_SLAVE_BAUDRATE 2000000  // SSI baudrate
 > ```
 
 ### Pin Configuration
 
-#### Pin Configuration of the WPK[BRD4002A] Base Board, with BRD4338A, BRD4342A, or BRD4343A radio board
+#### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
 
-| Description             | BRD4338A      | BRD4342A      | BRD4343A      |
-| ----------------------- | ------------- | ------------- | ------------- |
-| RTE_SSI_SLAVE_SCK_PIN   | GPIO_26 [P27] | GPIO_26 [P27] | GPIO_26 [P27] |
-| RTE_SSI_SLAVE_CS_PIN    | GPIO_9  [F09] | GPIO_9  [F09] | GPIO_25 [P25] |
-| RTE_SSI_SLAVE_MOSI_PIN  | GPIO_27 [P29] | GPIO_27 [P29] | GPIO_27 [P29] |
-| RTE_SSI_SLAVE_MISO_PIN  | GPIO_28 [P31] | GPIO_28 [P31] | GPIO_28 [P31] |
+| GPIO pin      | Description             |
+| ------------- | ----------------------- |
+| GPIO_26 [P27] | RTE_SSI_SLAVE_SCK_PIN   |
+| GPIO_9  [F09] | RTE_SSI_SLAVE_CS_PIN    |
+| GPIO_27 [P29] | RTE_SSI_SLAVE_MOSI_PIN  |
+| GPIO_28 [P31] | RTE_SSI_SLAVE_MISO_PIN  |
+
+![Figure: Pin Configuration for SSI1](resources/readme/image511d.png)
 
 #### Pin Configuration of Explorer kit as slave
 

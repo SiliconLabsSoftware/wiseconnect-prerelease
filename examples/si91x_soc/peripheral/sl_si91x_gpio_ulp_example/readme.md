@@ -1,8 +1,8 @@
-# SiWx91x Platform GPIO ULP EXAMPLE
+# Platform SiWx91x GPIO ULP EXAMPLE
 
 ## Table of Contents
 
-- [SiWx91x Platform GPIO ULP EXAMPLE](#platform-siwx91x-gpio-ulp-example)
+- [Platform SiWx91x GPIO ULP EXAMPLE](#platform-siwx91x-gpio-ulp-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -149,31 +149,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following parameters in `gpio_ulp_example.c` (examples/si91x_soc/peripheral/sl_si91x_gpio_ulp_example/) file and update/modify following macros if required.
-
-- `DELAY`: Delay (in milliseconds) between consecutive ULP GPIO toggles. By default, it is set to 1000 (1 second).
+- Configure the following parameters in `gpio_ulp_example.c` (examples/si91x_soc/peripheral/sl_si91x_gpio_ulp_example/) file and update/modify following macros if required
 
   ```c
     #define DELAY                  1000 // Delay for 1sec
-  ```
-
-- `ULP_INT_CH`: Specifies the ULP GPIO pin interrupt channel used for the ULP GPIO interrupt (ULP GPIO Pin interrupt 0). By default, it is set to 0.
-
-  ```c
     #define ULP_INT_CH             0    // ULP GPIO Pin interrupt 0
-  ```
-
-- `AVL_INTR_NO`: Specifies the available interrupt number used by the ULP GPIO pin interrupt. By default, it is set to 0.
-
-  ```c
     #define AVL_INTR_NO            0    // available interrupt number
-  ```
-
-- `ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 1 in SOC peripheral mode and toggle HP GPIO 7. Set to **0** to disable this feature. By default, it is set to 0.
-
-  ```c
     #define ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE 0  // Set to 1 to enable ULP peripheral on SOC GPIO 7 and toggle ULP GPIO 1
   ```
+
+  - `ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 1 in SOC peripheral mode and toggle HP GPIO 7. Set to **0** to disable this feature.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -210,4 +195,3 @@ Header connection pin references mentioned here are all specific to BRD4338A. If
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

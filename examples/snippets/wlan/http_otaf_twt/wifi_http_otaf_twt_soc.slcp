@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - HTTP/HTTPS OTAF TWT Update (SoC)
 category: Example|Wi-Fi
-description: 'Demonstrates how to perform firmware upgrade using an HTTP(S) server or a cloud storage server with TWT.
+description: 'Update Firmware from remote AWS or Azure or Apache Server
 
   '
 filter:

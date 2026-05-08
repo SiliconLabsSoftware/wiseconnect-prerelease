@@ -1,9 +1,9 @@
-project_name: wifi_dtls_client_ncp
+project_name: wifi_tls_client_ncp
 package: wifi_app
 quality: production
 label: Wi-Fi - DTLS Client (NCP)
 category: Example|Wi-Fi
-description: 'Demonstrates a UDP client socket with secure connection using DTLS, sending the data on the socket.
+description: 'Open UDP client socket with secure connection using SSL and send the data on socket.
 
   '
 filter:

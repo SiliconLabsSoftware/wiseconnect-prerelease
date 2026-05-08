@@ -5,7 +5,7 @@ description: 'This example project demonstrates the PSA ECDSA API in SI91x.
   '
 category: example|crypto
 quality: production
-label: SiWx91x Platform - PSA ECDSA
+label: Platform SiWx91x - PSA ECDSA
 component:
 - id: sl_main
 - id: freertos

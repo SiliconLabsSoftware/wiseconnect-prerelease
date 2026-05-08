@@ -1,24 +1,18 @@
 project_name: ble_longrange_2mbps_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Long Range FreeRTOS
+label: BLE - Long Range (NCP)
 category: Example|BLE
-description: 'Demonstrates how to act as a BLE central on SiWx91x over SPI NCP with FreeRTOS and switch the link PHY to coded or 2 Mbps. Demonstrated by PHY update procedures with a remote peripheral.
+description: 'This application demonstrates how to configure/connects BLE device as Central  and can be used to update the PHY rates.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

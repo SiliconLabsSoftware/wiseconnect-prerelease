@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - TWT TCP Client (SoC)
 category: Example|Wi-Fi
-description: Demonstrates the procedure to setup TWT session and open a TCP client socket and sends data to TCP server socket in Low Power mode
+description: "Update To keep device in TWT mode \n"
 filter:
 - name: Wireless Technology
   value:

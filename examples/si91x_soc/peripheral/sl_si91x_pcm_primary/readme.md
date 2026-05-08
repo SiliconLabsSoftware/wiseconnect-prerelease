@@ -1,8 +1,8 @@
-# SiWx91x Platform PCM Primary
+# Platform SiWx91x PCM Primary
 
 ## Table of Contents
 
-- [SiWx91x Platform PCM Primary](#platform-siwx91x-pcm-primary)
+- [Platform SiWx91x PCM Primary](#platform-siwx91x-pcm-primary)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -101,15 +101,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Configure the following macros in [`pcm_primary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_pcm_primary/pcm_primary_example.c) file and update/modify the following macros if required.
 
-- `PCM_PRIMARY_BUFFER_SIZE`: Size (in samples) of the buffers used to transmit and receive PCM data between the primary and secondary. By default, it is set to 1024.
-
-  ```c
-   #define PCM_PRIMARY_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
-  ```
+```C
+ #define PCM_PRIMARY_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
+```
 
 - If the resolution is changed to 24-bit or 32-bit, update the typedef for `pcm_data_size_t` to `uint32_t` instead of `uint16_t` to accommodate the larger data size -
 
- ```c
+ ```C
  typedef uint32_t pcm_data_size_t;
  ```
 
@@ -117,9 +115,9 @@ Configure the following macros in [`pcm_primary_example.c`](https://github.com/S
 
 To use the ULP_PCM instance instead of the default PCM0 instance:
 
-- `PCM_INSTANCE`: Selects the PCM peripheral instance used by the example. Set to `ULP_PCM` to use the ULP_PCM instance instead of the default PCM0 instance.
+- Change the `PCM_INSTANCE` macro value to `ULP_PCM` in [`pcm_primary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_pcm_primary/pcm_primary_example.c):
 
-  ```c
+  ```C
   #define PCM_INSTANCE ULP_PCM
   ```
 
@@ -176,4 +174,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

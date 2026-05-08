@@ -1,8 +1,8 @@
-# SiWx91x Platform Logger Example
+# Platform SiWx91x Logger Example
 
 ## Table of Contents
 
-- [SiWx91x Platform Logger Example](#platform-siwx91x-logger-example)
+- [Platform SiWx91x Logger Example](#platform-siwx91x-logger-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -108,11 +108,7 @@ Core behavior is defined in `sl_si91x_logger_example.c`:
 
   The array `m4_ta_combinations[MAX_COMBINATIONS]` defines the sequence of 8 combinations of `m4_state` and `ta_profile.profile` that the app will iterate through.
 
-  - `MAX_COMBINATIONS`: Specifies the number of `m4_state` and `ta_profile.profile` combinations that the application cycles through during the logger test run. By default, it is set to 8.
 
-    ```c
-    #define MAX_COMBINATIONS 8 // Number of M4/TA state combinations cycled through
-    ```
 
   This list is cycled in the orchestrator (`application_start`) loop.
 

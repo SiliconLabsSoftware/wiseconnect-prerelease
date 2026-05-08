@@ -5,7 +5,7 @@ description: 'This example project demonstrates the PSA GCM API in SI91x.
   '
 category: example|crypto
 quality: production
-label: SiWx91x Platform - PSA GCM
+label: Platform SiWx91x - PSA GCM
 component:
 - id: sl_main
 - id: freertos

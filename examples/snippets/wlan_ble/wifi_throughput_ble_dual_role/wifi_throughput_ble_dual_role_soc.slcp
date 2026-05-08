@@ -1,7 +1,7 @@
 project_name: wifi_throughput_ble_dual_role_soc
 package: multi_protocol_siwx91x_app
 quality: production
-label: Wi-Fi Coex - Wi-Fi Throughput BLE Dual Role (SoC)
+label: Wi-Fi Throughtput BLE Dual Role(SOC)
 category: Example|Wi-Fi_BLE
 description: 'This example demonstrates throughput measurements of WLAN/BLE in individual or with protocol combinations in the SiWx91x module.
 

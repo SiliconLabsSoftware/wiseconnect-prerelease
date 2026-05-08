@@ -700,6 +700,50 @@ typedef struct {
 } sl_wifi_statistics_t;
 
 /**
+ * @struct sl_wifi_bc_mc_filter_stats_t
+ * @brief NWP broadcast/multicast filtering statistics (layer-2 path).
+ */
+typedef struct {
+  uint32_t bc_rx_count;   ///< Total number of broadcast frames received by NWP
+  uint32_t bc_drop_count; ///< Total number of broadcast frames dropped in NWP
+  uint32_t bc_pass_count; ///< Total number of broadcast frames accepted by NWP
+  uint32_t mc_rx_count;   ///< Total number of multicast frames received by NWP
+  uint32_t mc_drop_count; ///< Total number of multicast frames dropped by NWP
+  uint32_t mc_pass_count; ///< Total number of multicast frames accepted by NWP
+} sl_wifi_bc_mc_filter_stats_t;
+
+/**
+ * @struct sl_wifi_ppe_filter_stats_t
+ * @brief PPE (packet processing engine) broadcast/multicast filtering statistics.
+ */
+typedef struct {
+  uint16_t bc_rx_count;   ///< Broadcast frames received by DUT (includes traffic when PPE filtering is disabled)
+  uint16_t bc_drop_count; ///< Broadcast frames dropped by PPE
+  uint16_t mc_rx_count;   ///< Multicast frames received by DUT (includes traffic when PPE filtering is disabled)
+  uint16_t mc_drop_count; ///< Multicast frames dropped by PPE
+  uint16_t reserved[4];   ///< Reserved
+} sl_wifi_ppe_filter_stats_t;
+
+/**
+ * @struct sl_wifi_statistics_v2_t
+ * @brief Wi-Fi interface statistics (extended): WLAN counters plus filtering breakdown.
+ * @note WLAN extended counters are not reset after the stats request. Filtering counters are reset after the request.
+ * @todo Move to internal API: this public structure is not intended to remain on the public surface long-term.
+ */
+typedef struct {
+  uint32_t beacon_lost_count; ///< Number of missed beacons (not reset after request)
+  uint32_t beacon_rx_count;   ///< Number of received beacons (not reset after request)
+  uint32_t mcast_rx_count;    ///< Multicast packets received (not reset after request)
+  uint32_t mcast_tx_count;    ///< Multicast packets transmitted (not reset after request)
+  uint32_t ucast_rx_count;    ///< Unicast packets received (not reset after request)
+  uint32_t ucast_tx_count;    ///< Unicast packets transmitted (not reset after request)
+  uint32_t
+    overrun_count; ///< Packets dropped at ingress or egress due to lack of buffer memory (not reset after request)
+  sl_wifi_bc_mc_filter_stats_t nwp_filter_stats; ///< NWP B/M filter stats (reset after request)
+  sl_wifi_ppe_filter_stats_t ppe_filter_stats;   ///< PPE B/M filter stats (reset after request)
+} sl_wifi_statistics_v2_t;
+
+/**
  * @struct sl_wifi_operational_statistics_t
  * @brief Wi-Fi Operational Statistics structure.
  */
@@ -1025,12 +1069,6 @@ typedef struct {
  * This structure contains various parameters for configuring a Wi-Fi TX test,
  * such as enabling the test, setting the power, rate, length, mode, and other
  * related settings.
- *
- * @note Moving forward, this structure will be deprecated. Instead, use the
- * [sl_wifi_transmitter_test_base_info_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-transmitter-test-base-info-t)
- * structure together with PHY-specific PER-parameter structures (@ref sl_wifi_11bgn_per_params_t,
- * @ref sl_wifi_11ac_per_params_t, @ref sl_wifi_11ax_per_params_t, @ref sl_wifi_11be_per_params_t).
- * This is retained for backward compatibility.
  */
 typedef struct {
   uint16_t enable; ///< Enable/disable TX test mode
@@ -1160,123 +1198,12 @@ typedef struct {
 } sl_wifi_transmitter_test_info_t;
 
 /**
- * @struct sl_wifi_transmitter_test_base_info_t
- * @brief Structure representing the common configuration for a Wi-Fi TX test (base).
- *
- * This structure contains the common parameters for configuring a Wi-Fi TX test
- * across all protocol standards (802.11b/g/n, 802.11ac, 802.11ax, 802.11be),
- * such as Wi-Fi protocol selection, enabling the test, setting the power, rate, length, mode,
- * channel, channel bandwidth, aggregation, number of packets, and delay.
- *
- * @note @c wifi_protocol selects which PHY-specific @c per_params structure is used with the
- *       v2 transmit-test APIs; use @ref SL_WIFI_RATE_PROTOCOL_B_ONLY, @ref SL_WIFI_RATE_PROTOCOL_G_ONLY,
- *       or @ref SL_WIFI_RATE_PROTOCOL_N_ONLY with @ref sl_wifi_11bgn_per_params_t;
- *       @ref SL_WIFI_RATE_PROTOCOL_AC_ONLY with @ref sl_wifi_11ac_per_params_t;
- *       @ref SL_WIFI_RATE_PROTOCOL_AX_ONLY with @ref sl_wifi_11ax_per_params_t;
- *       @ref SL_WIFI_RATE_PROTOCOL_BE_ONLY with @ref sl_wifi_11be_per_params_t.
- *       @ref SL_WIFI_RATE_PROTOCOL_AUTO is invalid for these commands.
- */
-typedef struct __attribute__((packed)) {
-  sl_wifi_rate_protocol_t wifi_protocol; ///< PHY for TX test; values from @ref sl_wifi_rate_protocol_t
-  uint16_t enable;                       ///< Enable/disable TX test mode
-  int16_t power;                         ///< TX power in dBm
-  sl_wifi_mcs_rate_t rate;               ///< Transmit data rate; values from @ref sl_wifi_mcs_rate_t
-  uint16_t length;                       ///< TX packet length in bytes
-  uint16_t
-    mode; ///< TX test mode (0 - Burst, 1 - Continuous, 2 - CW DC, 3 - CW single tone -2.5 MHz, 4 - CW single tone +5 MHz)
-  uint16_t channel;     ///< Channel number in 2.4 GHz / 5 GHz / 6 GHz band
-  uint16_t no_of_pkts;  ///< Number of packets to transmit. 0 for continuous transmission until stopped.
-  uint32_t delay;       ///< Delay between packets in microseconds
-  uint16_t channel_bw;  ///< Channel bandwidth
-  uint16_t aggr_enable; ///< Enable/disable aggregation
-  uint16_t aggr_count;  ///< Aggregation count
-} sl_wifi_transmitter_test_base_info_t;
-
-/**
- * @struct sl_wifi_11bgn_per_params_t
- * @brief Structure representing Wi-Fi 4 (802.11b/g/n) specific PER parameters.
- *
- * This structure contains the 802.11b/g/n specific parameters for configuring
- * a Wi-Fi 4 PER transmit test, such as short guard interval, greenfield mode, and short preamble.
- */
-typedef struct __attribute__((packed)) {
-  uint8_t short_gi_enable;        ///< Short guard interval. 0 - disable, 1 - enable
-  uint8_t greenfield_mode_enable; ///< Greenfield mode. 0 - disable, 1 - enable
-  uint8_t short_preamble_enable;  ///< Short preamble. 0 - disable, 1 - enable
-} sl_wifi_11bgn_per_params_t;
-
-/**
- * @struct sl_wifi_11ac_per_params_t
- * @brief Structure representing Wi-Fi 5 (802.11ac) VHT-specific PER parameters.
- *
- * This structure contains the VHT (Very High Throughput) specific parameters for
- * configuring a Wi-Fi 5 (802.11ac) PER transmit test, such as short guard interval.
- */
-typedef struct __attribute__((packed)) {
-  uint8_t short_gi_enable; ///< Short guard interval. 0 - disable, 1 - enable
-} sl_wifi_11ac_per_params_t;
-
-/**
- * @struct sl_wifi_11ax_per_params_t
- * @brief Structure representing Wi-Fi 6/6E (802.11ax) HE-specific PER parameters.
- *
- * This structure contains the HE (High Efficiency) specific parameters for configuring
- * a Wi-Fi 6/6E (802.11ax) PER transmit test, such as coding type, PPDU type, guard interval,
- * spatial reuse, and other HE-specific fields.
- */
-typedef struct __attribute__((packed)) {
-  uint8_t coding_type;                 ///< Coding type. 0 - BCC, 1 - LDPC
-  uint8_t nominal_pe;                  ///< Nominal T-PE value. 0 - 0us, 1 - 8us, 2 - 16us
-  uint8_t ul_dl;                       ///< UL/DL indication. 1 - UL (STA to AP), 0 - DL (AP to STA)
-  sl_wifi_he_ppdu_type_t he_ppdu_type; ///< HE PPDU type; values from @ref sl_wifi_he_ppdu_type_t
-  uint8_t beam_change;                 ///< Spatial mapping of pre-HE and HE fields. 0 - same, 1 - different
-  uint8_t bw;                          ///< BW for PPDU. 0 - 242-tone RU, 1 - upper 106-tone RU
-  uint8_t stbc;                        ///< STBC for PPDU transmission. 0 - no STBC, 1 - STBC (only if DCM is 0)
-  uint8_t tx_bf;                       ///< Beamforming matrix. 0 - no beamforming, 1 - beamforming applied
-  sl_wifi_gi_ltf_t gi_ltf;             ///< HE GI and HE-LTF; values from @ref sl_wifi_gi_ltf_t
-  sl_wifi_dcm_enable_t dcm;            ///< DCM on data symbols; values from @ref sl_wifi_dcm_enable_t
-  uint8_t nsts_midamble;               ///< NSTS and midamble periodicity. Range: 0-7
-  uint8_t spatial_reuse;               ///< Spatial reuse. Range: 0-15. 4 indicates spatial reuse is allowed
-  uint8_t bss_color;                   ///< BSS color value. Range: 0-63
-  uint8_t ru_allocation;               ///< RU allocation subfield for 20 MHz BW. Range: 0-255
-  uint16_t he_siga2_reserved;          ///< HE SIGA2 reserved field. Range: 0-511
-  uint8_t n_heltf_tot;                 ///< Number of HE-LTF to be transmitted. Range: 0-7
-  uint8_t sigb_dcm;                    ///< DCM applied to SIG-B symbols. 0 - disable, 1 - enable
-  uint8_t sigb_mcs;                    ///< MCS for SIG-B symbols. Range: 0-5
-  uint8_t user_idx;                    ///< User index. Range: 0-8
-  uint16_t user_sta_id;                ///< Station ID of the intended user. Range: 0-2047
-  uint8_t sigb_compression;            ///< SIG-B compression field. 0 or 1
-} sl_wifi_11ax_per_params_t;
-
-/**
- * @struct sl_wifi_11be_per_params_t
- * @brief Structure representing Wi-Fi 7 (802.11be) EHT-specific PER parameters.
- *
- * This structure contains the EHT (Extremely High Throughput) specific parameters for
- * configuring a Wi-Fi 7 (802.11be) PER transmit test, such as coding type, PPDU type,
- * guard interval, and other EHT-specific fields.
- */
-typedef struct __attribute__((packed)) {
-  uint8_t coding_type;     ///< Coding type. 0 - BCC, 1 - LDPC
-  uint8_t nominal_pe;      ///< Nominal T-PE value. 0 - 0us, 1 - 8us, 2 - 16us
-  uint8_t ul_dl;           ///< UL/DL indication. 1 - UL (STA to AP), 0 - DL (AP to STA)
-  uint8_t be_ppdu_type;    ///< BE PPDU type
-  uint8_t bw;              ///< BW for PPDU
-  sl_wifi_gi_ltf_t gi_ltf; ///< HE GI and HE-LTF; values from @ref sl_wifi_gi_ltf_t
-  uint8_t spatial_reuse;   ///< Spatial reuse
-  uint8_t ru_allocation;   ///< RU allocation subfield
-  uint8_t n_heltf_tot;     ///< Number of HE-LTF to be transmitted
-  uint8_t eht_sig_mcs;     ///< MCS for EHT SIG symbols
-  uint8_t disregard;       ///< Disregard field
-} sl_wifi_11be_per_params_t;
-
-/**
  * @struct sl_wifi_11ax_config_params_t
  * @brief Structure representing the 11ax configuration parameters for Wi-Fi.
  *
  * This structure contains the 11ax configuration parameters for Wi-Fi.
  */
-typedef struct __attribute__((packed)) {
+typedef struct {
   sl_wifi_gi_ltf_t gi_ltf;         ///< HE guard interval (GI) and HE-LTF symbol length; see @ref sl_wifi_gi_ltf_t.
   sl_wifi_dcm_enable_t dcm_enable; ///< Enable or disable dual carrier modulation (DCM). 0 - Disable DCM, 1 - Enable DCM
   sl_wifi_config_er_su_t

@@ -1,8 +1,8 @@
-# SiWx91x Platform DAC
+# Platform SiWx91x DAC
 
 ## Table of Contents
 
-- [SiWx91x Platform DAC](#platform-siwx91x-dac)
+- [Platform SiWx91x DAC](#platform-siwx91x-dac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -72,19 +72,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following macros in the [`dac_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_dac/dac_example.c) file and update/modify following macros, if required.
-
-- `STATIC_MODE`: Selects the DAC operation mode. Set to 1 for Static mode (constant output voltage) or 0 for FIFO mode (continuous waveform output). By default, it is set to 1.
-
-  ```c
-    #define STATIC_MODE           1         // For static mode set this macro value as '1'
-  ```
-
-- `BUFFER_SIZE`: Size of the DAC sample buffer. Use 1 for Static mode and the number of samples to be played (up to 1024) for FIFO mode. By default, it is set to 1024.
-
-  ```c
-    #define BUFFER_SIZE           1024      // For FIFO mode (set to 1 for static mode)
-  ```
 - Configure UC from the slcp component.
 - Open the **sl_si91x_dac.slcp** project file, select the **Software Component** tab, and search for **DAC** in the search bar.
 - Use the configuration wizard to configure different parameters. Below are the configuration screen, where user can select as per requirement.
@@ -170,4 +157,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

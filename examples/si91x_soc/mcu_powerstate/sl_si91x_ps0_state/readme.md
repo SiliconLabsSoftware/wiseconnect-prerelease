@@ -1,8 +1,8 @@
-# SiWx91x Platform PS0 STATE
+# Platform SiWx91x PS0 STATE
 
 ## Table of Contents
 
-- [SiWx91x Platform PS0 STATE](#platform-siwx91x-ps0-state)
+- [Platform SiWx91x PS0 STATE](#platform-siwx91x-ps0-state)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -86,4 +86,3 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

@@ -694,7 +694,7 @@ sl_status_t sl_si91x_write_calibration_data(const si91x_calibration_data_t *data
  *       - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length. 
  *       - Stop Continuous mode 
  *       - Start Continuous Wave mode 
- * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch. 
+ * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continous wave mode which user wants to switch. 
  ******************************************************************************/
 sl_status_t sl_si91x_transmit_test_start(const sl_wifi_request_tx_test_info_t *tx_test_info);
 

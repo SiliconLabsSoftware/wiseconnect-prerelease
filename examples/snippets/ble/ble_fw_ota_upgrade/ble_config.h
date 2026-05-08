@@ -78,24 +78,6 @@
 //! Select which firmware to upgrade (TA_FW_UP or M4_FW_UP or COMBINED_FW_UP)
 #define FW_UPGRADE_TYPE TA_FW_UP
 
-//! First byte of the 64-byte header of the firmware image: encrypted or non encrypted.
-#define SI91X_OTA_RPS_HEADER_FIRST_BYTE_COMBINED_NON_ENCRYPTED (0x81u)
-#define SI91X_OTA_RPS_HEADER_FIRST_BYTE_COMBINED_ENCRYPTED     (0x8Fu)
-#define SI91X_OTA_RPS_HEADER_FIRST_BYTE_TA_NON_ENCRYPTED       (0x00u)
-#define SI91X_OTA_RPS_HEADER_FIRST_BYTE_TA_ENCRYPTED           (0x0Eu)
-#define SI91X_OTA_RPS_HEADER_FIRST_BYTE_M4_NON_ENCRYPTED       (0x01u)
-#define SI91X_OTA_RPS_HEADER_FIRST_BYTE_M4_ENCRYPTED           (0x0Fu)
-
-#define SI91X_OTA_RPS_HEADER_IS_COMBINED_IMAGE(first_byte)                  \
-  (((first_byte) == SI91X_OTA_RPS_HEADER_FIRST_BYTE_COMBINED_NON_ENCRYPTED) \
-   || ((first_byte) == SI91X_OTA_RPS_HEADER_FIRST_BYTE_COMBINED_ENCRYPTED))
-#define SI91X_OTA_RPS_HEADER_IS_TA_IMAGE(first_byte)                  \
-  (((first_byte) == SI91X_OTA_RPS_HEADER_FIRST_BYTE_TA_NON_ENCRYPTED) \
-   || ((first_byte) == SI91X_OTA_RPS_HEADER_FIRST_BYTE_TA_ENCRYPTED))
-#define SI91X_OTA_RPS_HEADER_IS_M4_IMAGE(first_byte)                  \
-  (((first_byte) == SI91X_OTA_RPS_HEADER_FIRST_BYTE_M4_NON_ENCRYPTED) \
-   || ((first_byte) == SI91X_OTA_RPS_HEADER_FIRST_BYTE_M4_ENCRYPTED))
-
 /*=======================================================================*/
 //! Advertising command parameters
 /*=======================================================================*/

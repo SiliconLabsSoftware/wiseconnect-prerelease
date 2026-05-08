@@ -29,9 +29,6 @@
  ******************************************************************************/
 
 #include "sl_si91x_ccm.h"
-#ifdef SL_SI91X_SIDE_BAND_CRYPTO
-#include "sl_si91x_mp_ccm.h"
-#endif
 #include "sl_si91x_crypto.h"
 #include "sl_status.h"
 #include "sl_constants.h"
@@ -43,46 +40,23 @@
 #endif
 #include <string.h>
 
-/*****************************************************************************
- * Validate CCM configuration parameters.
- *
- * Checks B0 built-in key constraints (if applicable) and nonce length.
- *
- * @param[in] config  CCM configuration to validate.
- *
- * @return SL_STATUS_OK on success, or SL_STATUS_INVALID_PARAMETER.
-******************************************************************************/
 static sl_status_t sli_si91x_ccm_config_check(sl_si91x_ccm_config_t *config)
 {
-  sl_status_t status = SL_STATUS_OK;
-
-#if defined(SLI_SI917B0)
+  // Only 32 bytes M4 OTA built-in key support is present
   if (config->key_config.b0.key_type == SL_SI91X_BUILT_IN_KEY) {
     if (((int)config->key_config.b0.key_size != (int)SL_SI91X_KEY_SIZE_1)
-        || (config->key_config.b0.key_slot != SL_SI91X_KEY_SLOT_1)) {
-      status = SL_STATUS_INVALID_PARAMETER;
-      return status;
-    }
+        || (config->key_config.b0.key_slot != SL_SI91X_KEY_SLOT_1))
+      return SL_STATUS_INVALID_PARAMETER;
   }
-#endif
 
   if ((config->nonce_length < SLI_SI91X_CCM_IV_MIN_SIZE) || (config->nonce_length > SLI_SI91X_CCM_IV_MAX_SIZE)) {
-    status = SL_STATUS_INVALID_PARAMETER;
-    return status;
+    return SL_STATUS_INVALID_PARAMETER;
   }
 
-  return status;
+  return SL_STATUS_OK;
 }
 
 #if defined(SLI_SI917B0)
-#ifndef SL_SI91X_SIDE_BAND_CRYPTO
-/*****************************************************************************
- * Copy B0 key configuration into a single-shot CCM request.
- *
- * @param[in,out] request  Single-shot CCM request whose key_info fields will
- *                         be populated.
- * @param[in]     config   CCM configuration containing the B0 key material.
-******************************************************************************/
 static void sli_si91x_ccm_get_key_info(sli_si91x_ccm_request_t *request, const sl_si91x_ccm_config_t *config)
 {
   request->key_info.key_type                         = config->key_config.b0.key_type;
@@ -97,24 +71,9 @@ static void sli_si91x_ccm_get_key_info(sli_si91x_ccm_request_t *request, const s
          config->key_config.b0.key_buffer,
          config->key_config.b0.key_size);
 }
-#endif /* SL_SI91X_SIDE_BAND_CRYPTO */
-#endif /* SLI_SI917B0 */
+#endif
 
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
-/*****************************************************************************
- * Send a CCM chunk via the non-sideband (NWP command) path.
- *
- * Allocates an sli_si91x_ccm_request_t, populates it from config and the
- * chunk parameters, and sends it to the NWP.  The firmware response is
- * copied into output.
- *
- * @param[in]  config       CCM configuration (key, nonce, AD, tag, msg).
- * @param      chunk_length Number of message bytes in this chunk.
- * @param      ccm_flags    Chunk flags (FIRST_CHUNK, MIDDLE_CHUNK, LAST_CHUNK).
- * @param[out] output       Buffer for encrypted / decrypted output.
- *
- * @return sl_status_t indicating success or failure.
-******************************************************************************/
 static sl_status_t sli_si91x_ccm_pending(sl_si91x_ccm_config_t *config,
                                          uint16_t chunk_length,
                                          uint8_t ccm_flags,
@@ -124,15 +83,11 @@ static sl_status_t sli_si91x_ccm_pending(sl_si91x_ccm_config_t *config,
   sl_wifi_buffer_t *buffer         = NULL;
   sl_wifi_system_packet_t *packet  = NULL;
   sli_si91x_ccm_request_t *request = (sli_si91x_ccm_request_t *)malloc(sizeof(sli_si91x_ccm_request_t));
-  if (request == NULL) {
-    status = SL_STATUS_ALLOCATION_FAILED;
-    return status;
-  }
+
+  SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
 
   status = sli_si91x_ccm_config_check(config);
   if (status != SL_STATUS_OK) {
-    free(request);
-    request = NULL;
     return status;
   }
 
@@ -160,9 +115,8 @@ static sl_status_t sli_si91x_ccm_pending(sl_si91x_ccm_config_t *config,
   sli_si91x_ccm_get_key_info(request, config);
 
 #else
-  /* Assign key_length before use as memcpy size. */
-  request->key_length = config->key_config.a0.key_length;
   memcpy(request->key, config->key_config.a0.key, request->key_length);
+  request->key_length = config->key_config.a0.key_length;
 #endif
 
   status =
@@ -176,66 +130,42 @@ static sl_status_t sli_si91x_ccm_pending(sl_si91x_ccm_config_t *config,
 
   if (status != SL_STATUS_OK) {
     free(request);
-    request = NULL;
-    if (buffer != NULL) {
+    if (buffer != NULL)
       sli_buffer_manager_free_buffer(buffer);
-      buffer = NULL;
-    }
   }
   VERIFY_STATUS_AND_RETURN(status);
 
   packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
 
   memcpy(output, packet->data, packet->length);
-  if (buffer != NULL) {
+  if (buffer != NULL)
     sli_buffer_manager_free_buffer(buffer);
-    buffer = NULL;
-  }
   free(request);
-  request = NULL;
   return status;
 }
 
 #else
-/*****************************************************************************
- * Send a single-shot CCM operation via the side-band crypto interface.
- *
- * Allocates an sli_si91x_ccm_mp_request_t with FIRST_CHUNK | LAST_CHUNK,
- * populates it from config, and sends it in one side-band command.
- *
- * @param[in]  config  CCM configuration (key, nonce, AD, tag, msg, direction).
- * @param[out] output  Buffer for encrypted / decrypted output.
- *
- * @return sl_status_t indicating success or failure.
-******************************************************************************/
 static sl_status_t sli_si91x_ccm_side_band(sl_si91x_ccm_config_t *config, uint8_t *output)
 {
 
-  sl_status_t status                  = SL_STATUS_FAIL;
-  sli_si91x_ccm_mp_request_t *request = (sli_si91x_ccm_mp_request_t *)malloc(sizeof(sli_si91x_ccm_mp_request_t));
-  if (request == NULL) {
-    status = SL_STATUS_ALLOCATION_FAILED;
-    return status;
-  }
+  sl_status_t status               = SL_STATUS_FAIL;
+  sli_si91x_ccm_request_t *request = (sli_si91x_ccm_request_t *)malloc(sizeof(sli_si91x_ccm_request_t));
+
+  SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
 
   status = sli_si91x_ccm_config_check(config);
   if (status != SL_STATUS_OK) {
-    free(request);
-    request = NULL;
     return status;
   }
 
-  memset(request, 0, sizeof(sli_si91x_ccm_mp_request_t));
+  memset(request, 0, sizeof(sli_si91x_ccm_request_t));
 
-  request->algorithm_type = CCM;
-  /* Single-buffer sl_si91x_ccm(): one side-band command carries the full payload (first+last). */
-  request->ccm_flags            = (uint8_t)(FIRST_CHUNK | LAST_CHUNK);
-  request->total_msg_length     = config->msg_length;
-  request->current_chunk_length = config->msg_length;
-  request->encrypt_decryption   = config->encrypt_decrypt;
-  request->ad_length            = config->ad_length;
-  request->tag_length           = config->tag_length;
-  request->nonce_length         = (uint8_t)config->nonce_length;
+  request->algorithm_type     = CCM;
+  request->total_msg_length   = config->msg_length;
+  request->encrypt_decryption = config->encrypt_decrypt;
+  request->ad_length          = config->ad_length;
+  request->tag_length         = config->tag_length;
+  request->nonce_length       = config->nonce_length;
 
   if (config->ad_length > 0) {
     request->ad = (uint8_t *)config->ad;
@@ -246,34 +176,19 @@ static sl_status_t sli_si91x_ccm_side_band(sl_si91x_ccm_config_t *config, uint8_
   request->nonce = (uint8_t *)config->nonce;
   request->tag   = config->tag;
 
-#if defined(SLI_SI917B0)
-  sl_si91x_ccm_mp_get_key_info(request, config);
-#endif
+  sli_si91x_ccm_get_key_info(request, config);
   request->output = output;
 
   status = sl_si91x_driver_send_side_band_crypto(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
                                                  request,
-                                                 (sizeof(sli_si91x_ccm_mp_request_t)),
+                                                 (sizeof(sli_si91x_ccm_request_t)),
                                                  SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME));
   free(request);
-  request = NULL;
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
 #endif
 
-/*****************************************************************************
- * Perform a single-shot CCM encrypt or decrypt operation.
- *
- * Validates config, then dispatches to the side-band or NWP command path
- * depending on the build configuration.  For NWP the message is split
- * into chunks automatically.
- *
- * @param[in]  config  CCM configuration (key, nonce, AD, tag, msg, direction).
- * @param[out] output  Buffer for encrypted / decrypted output.
- *
- * @return sl_status_t indicating success or failure.
-******************************************************************************/
 sl_status_t sl_si91x_ccm(sl_si91x_ccm_config_t *config, uint8_t *output)
 {
   sl_status_t status = SL_STATUS_FAIL;
@@ -284,10 +199,7 @@ sl_status_t sl_si91x_ccm(sl_si91x_ccm_config_t *config, uint8_t *output)
   uint16_t total_length = 0;
 #endif
 
-  if (config->msg == NULL) {
-    status = SL_STATUS_NULL_POINTER;
-    return status;
-  }
+  SL_VERIFY_POINTER_OR_RETURN(config->msg, SL_STATUS_NULL_POINTER);
 
   if (((config->msg == NULL) && (config->msg_length != 0)) || ((config->ad == NULL) && (config->ad_length != 0))
       || (config->nonce == NULL) || (config->tag == NULL) || ((output == NULL) && (config->msg_length != 0))
@@ -296,7 +208,6 @@ sl_status_t sl_si91x_ccm(sl_si91x_ccm_config_t *config, uint8_t *output)
 #endif
   ) {
     status = SL_STATUS_INVALID_PARAMETER;
-    return status;
   }
 
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO

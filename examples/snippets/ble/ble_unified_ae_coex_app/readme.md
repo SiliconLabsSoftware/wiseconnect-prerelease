@@ -1,27 +1,17 @@
 # BLE - Unified AE Coex App
 
-## High-Level Overview
-
-SiWx91x BLE unified extended advertising coex example: configure central and peripheral Extended Advertising with multiple sets using Simplicity Studio on SoC, PSRAM, and NCP modes.
-
 ## Table of Contents
 
 - [BLE - Unified AE Coex App](#ble---unified-ae-coex-app)
-  - [High-Level Overview](#high-level-overview)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
-    - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
     - [Setup Diagram](#setup-diagram)
-  - [Steps to Run Demo](#steps-to-run-demo)
-    - [Getting Started](#getting-started)
-    - [Configuration and Setup](#configuration-and-setup)
-    - [Steps for Execution](#steps-for-execution)
-  - [Troubleshooting](#troubleshooting)
-  - [Resources](#resources)
-  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+  - [Getting Started](#getting-started)
+  - [Application Build Environment](#application-build-environment)
+  - [Test the Application](#test-the-application)
 
 ## Purpose/Scope
 
@@ -55,23 +45,11 @@ This application demonstrates how to configure SiWx91x in Extended Advertising m
 
 - Download and install the Silicon Labs [Simplicity Connect App(formerly EFR Connect App) or other BLE Central/Peripheral app.](https://www.silabs.com/developers/simplicity-connect-mobile-app ) in the android smart phones for testing BLE applications. Users can also use their choice of BLE apps available in Android/iOS smart phones.
 
-### NCP mode: host application and project files
-
-| Mode      | Host / target                                                                           | Project file (this example folder)     |
-|-----------|-----------------------------------------------------------------------------------------|----------------------------------------|
-| SoC       | Application runs on SiWx91x.                                                            | `ble_unified_ae_coex_app_soc.slcp`     |
-| PSRAM     | Application runs on SiWx91x with PSRAM-capable radio board.                             | `ble_unified_ae_coex_app_psram.slcp`   |
-| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**.   | `ble_unified_ae_coex_app_ncp.slcp`     |
-
-Open the `.slcp` for your kit from `examples/snippets/ble/ble_unified_ae_coex_app/` in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
-
 ### Setup Diagram
 
   ![Figure: Setup Diagram NCP and SOC Mode for BLE Unified AE Coex Example](resources/readme/ble_unified_ae_coex_ncp_soc.png)	
    		
-## Steps to Run Demo
-
-### Getting Started
+## Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -83,7 +61,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-### Configuration and Setup
+## Application Build Environment
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
@@ -293,7 +271,7 @@ The application can be configured to suit your requirements and development envi
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-### Steps for Execution
+## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -316,26 +294,3 @@ Follow the steps as mentioned for the successful execution of the application:
      ![Prints in docklight window](resources/readme/output2.png) 
      ![Prints in docklight window](resources/readme/output3.png)
      ![Prints in docklight window](resources/readme/output4.png)
-
-## Troubleshooting
-
-If you encounter issues while running the BLE Unified AE Coex example, check the following:
-
-- Ensure `ADV_ENABLED_DEFAULT` and `SCAN_ENABLED_DEFAULT` are configured according to the role you intend to test.
-- Verify `RSI_BLE_MAX_NBR_PERIPHERALS` and `RSI_BLE_MAX_NBR_CENTRALS` do not exceed the maximum supported connections (1 each).
-- Confirm the remote device name in `RSI_REMOTE_DEVICE_NAME1` matches the peripheral being scanned.
-- Ensure the **remote** supports **Extended Advertising** (Advertising Extensions): peers must use stacks/hardware that advertise or scan extended sets as this app does; centrals need **extended scanning** to discover extended advertisers. Legacy-only advertising/scanning cannot validate this example.
-- If SMP fails, check that `SMP_ENABLE_M1` / `SMP_ENABLE_S1` are enabled on both sides.
-- If power save causes instability, disable it by setting `ENABLE_NWP_POWER_SAVE` to `0` while debugging.
-
-## Resources
-
-- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
-- [WiSeConnect API Reference Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/)
-- [Simplicity Connect Mobile App](https://www.silabs.com/developers/simplicity-connect-mobile-app)
-
-## Report Bugs and Get Support
-
-Report issues and get help from the Silicon Labs community:
-
-- [Silicon Labs Community](https://www.silabs.com/community)

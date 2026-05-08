@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Embedded MQTT CLIENT (SoC)
 category: Example|Wi-Fi
-description: 'Demonstrates how to build an MQTT client and connect with an MQTT broker.
+description: 'Demonstrates how to build an MQTT client and connects with an MQTT broker.
 
   '
 filter:

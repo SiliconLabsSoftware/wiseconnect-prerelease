@@ -1,24 +1,18 @@
 project_name: ble_power_save_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Power Save FreeRTOS
+label: BLE - Power Save (NCP)
 category: Example|BLE
-description: 'Demonstrates how to configure the device in power save profile with Advertising, Scanning and Connected mode on SiWx91x over SPI NCP with FreeRTOS.
+description: 'This application demonstrates how to configure the device in power save  profile with Advertising mode.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

@@ -976,7 +976,7 @@ typedef struct {
 #if defined(SLI_SI91X_MCU_INTERFACE) || defined(DOXYGEN)
 /** \addtogroup SL_SI91X_CONSTANTS
   * @{ */
-/** TA-M4 command IDs. New values may be added in future releases.
+/** TA–M4 command IDs. New values may be added in future releases.
  *  Any code that switches on this enum (e.g. in NWP/TA firmware) must include
  *  a default case to handle unknown values gracefully. */
 /// Managing interactions between the Trusted Application (TA) and the M4 core
@@ -1319,17 +1319,6 @@ typedef struct {
 } sli_si91x_sha_request_t;
 
 typedef struct {
-  uint16_t algorithm_type;
-  uint8_t algorithm_sub_type;
-  uint8_t sha_flags;
-  uint16_t total_msg_length;
-  uint16_t current_chunk_length;
-  uint16_t output_length;
-  uint8_t *msg;
-  uint8_t *output;
-} sli_si91x_sha_mp_request_t;
-
-typedef struct {
   uint8_t algorithm_type;
   uint8_t nonce_length;
   uint16_t encrypt_decryption;
@@ -1344,25 +1333,6 @@ typedef struct {
   uint8_t *msg;
   uint8_t *output;
 } sli_si91x_ccm_request_t;
-
-/** Side-band CCM with chunk flags (multipart / explicit first+last); see @ref sli_si91x_sha_mp_request_t. */
-typedef struct {
-  uint16_t algorithm_type; ///< Must match NWP frame (uint16 per firmware ABI)
-  uint8_t ccm_flags;       ///< @ref FIRST_CHUNK / @ref MIDDLE_CHUNK / @ref LAST_CHUNK
-  uint8_t nonce_length;
-  uint16_t encrypt_decryption;
-  uint16_t total_msg_length;
-  uint16_t current_chunk_length;
-  uint16_t ad_length;
-  uint16_t tag_length;
-  uint16_t output_length;
-  sli_si91x_key_descriptor_t key_info;
-  uint8_t *nonce;
-  uint8_t *ad;
-  uint8_t *tag;
-  uint8_t *msg;
-  uint8_t *output;
-} sli_si91x_ccm_mp_request_t;
 
 typedef struct {
   uint8_t algorithm_type;

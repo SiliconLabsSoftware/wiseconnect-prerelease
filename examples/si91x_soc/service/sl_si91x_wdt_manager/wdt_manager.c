@@ -29,7 +29,7 @@
 #include "sl_si91x_led.h"
 #include "wdt_manager.h"
 #include "cmsis_gcc.h"
-#include "sl_log_helper.h"
+
 /*******************************************************************************
  *******************************   DEFINES   ***********************************
  ******************************************************************************/
@@ -75,17 +75,10 @@ static void on_timeout(sl_sleeptimer_timer_handle_t *handle, void *data);
  ******************************************************************************/
 void wdt_manager_init(void)
 {
-  /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-  SL_PRINT_STRING_ERROR("WDT Manager Example Started\r\n");
-  SL_PRINT_STRING_ERROR("LED will toggle every %d ms\r\n", TOGGLE_DELAY_MS);
-  SL_PRINT_STRING_ERROR("After exactly 10 LED toggles, system will hang and WDT "
-                        "will reset it\r\n");
-  SL_PRINT_STRING_ERROR("WDT manager is active for system reliability\r\n");
+  DEBUGOUT("WDT Manager Example Started\r\n");
+  DEBUGOUT("LED will toggle every %d ms\r\n", TOGGLE_DELAY_MS);
+  DEBUGOUT("After exactly 10 LED toggles, system will hang and WDT will reset it\r\n");
+  DEBUGOUT("WDT manager is active for system reliability\r\n");
 
   // Reset LED toggle counter
   led_toggle_count = 0;
@@ -101,7 +94,7 @@ void wdt_manager_init(void)
   // Toggle LED once to indicate initialization
   sl_si91x_led_toggle(LED_INSTANCE.pin);
   led_toggle_count++;
-  SL_PRINT_STRING_ERROR("LED toggled - Count: %d\r\n", led_toggle_count);
+  DEBUGOUT("LED toggled - Count: %d\r\n", led_toggle_count);
 }
 
 /***************************************************************************/ /**
@@ -123,12 +116,12 @@ void wdt_manager_process_action(void)
     toggle_timeout = false;
 
     // Print debug message to show LED toggle count
-    SL_PRINT_STRING_ERROR("LED toggled - Count: %d\r\n", led_toggle_count);
+    DEBUGOUT("LED toggled - Count: %d\r\n", led_toggle_count);
 
     // After exactly 10 LED toggles, create system hang to trigger WDT reset
     if (led_toggle_count >= 10) {
-      SL_PRINT_STRING_ERROR("System hanging now - WDT will reset the system!\r\n");
-      SL_PRINT_STRING_ERROR("Watch for system reset in a few seconds...\r\n");
+      DEBUGOUT("System hanging now - WDT will reset the system!\r\n");
+      DEBUGOUT("Watch for system reset in a few seconds...\r\n");
 
       // Stop the timer to prevent further LED toggles
       sl_sleeptimer_stop_timer(&timer);

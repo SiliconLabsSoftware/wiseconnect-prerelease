@@ -1,24 +1,18 @@
 project_name: ble_unified_ae_coex_app_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Unified AE Coex App FreeRTOS
+label: BLE - Unified AE Coex App (NCP)
 category: Example|BLE
-description: 'Bluetooth Low energy Extended Advertising features(Central/Peripheral) on SiWx91x over SPI NCP with FreeRTOS.
+description: 'Bluetooth Low energy Extended Advertising features(Central/Peripheral).
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Advanced
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 - path: root_auto_gen.c

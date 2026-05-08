@@ -83,8 +83,10 @@ extern unsigned long _classified_data_section_end_;   /*!< End address for the .
 
 #if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
   && !defined(BSS_SEGMENT_IN_PSRAM)
-extern unsigned long _classified_bss_section_start_; /*!< Start address for the .classified_bss section     */
-extern unsigned long _classified_bss_section_end_;   /*!< End address for the .classified_bss section       */
+extern unsigned long _classified_bss_;               /*!< Start address for the initialization
+                                       values of the .classified_data section.            */
+extern unsigned long _classified_bss_section_start_; /*!< Start address for the .classified_data section     */
+extern unsigned long _classified_bss_section_end_;   /*!< End address for the .classified_data section   */
 #endif
 
 /*---------------------------------------------------------------------------
@@ -250,6 +252,15 @@ void Copy_Table(void)
     *(pulDest++) = *(pulSrc++);
   }
 #endif
+
+#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
+  && !defined(BSS_SEGMENT_IN_PSRAM)
+  /* Copy the classified BSS segment from RAM to PSRAM */
+  pulSrc = &_classified_bss_;
+  for (volatile unsigned long *pulDest = &_classified_bss_section_start_; pulDest < &_classified_bss_section_end_;) {
+    *(pulDest++) = *(pulSrc++);
+  }
+#endif
 }
 
 void Zero_Table(void)
@@ -262,9 +273,8 @@ void Zero_Table(void)
   }
 #if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
   && !defined(BSS_SEGMENT_IN_PSRAM)
-  /* Classified BSS in PSRAM: no load image — zero-init only */
-  pulDest = (uint32_t *)&_classified_bss_section_start_;
-  for (; pulDest < (uint32_t *)&_classified_bss_section_end_;) {
+  pulDest = &_classified_bss_section_start_;
+  for (; pulDest < &_classified_bss_section_end_;) {
     *pulDest++ = 0UL;
   }
 #endif

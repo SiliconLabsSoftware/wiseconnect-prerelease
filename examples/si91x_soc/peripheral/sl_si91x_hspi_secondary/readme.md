@@ -1,8 +1,8 @@
-# SiWx91x Platform HSPI SECONDARY
+# Platform SiWx91x HSPI SECONDARY
 
 ## Table of Contents
 
-- [SiWx91x Platform HSPI SECONDARY](#platform-siwx91x-hspi-secondary)
+- [Platform SiWx91x HSPI SECONDARY](#platform-siwx91x-hspi-secondary)
   - [Table of Contents](#table-of-contents)
   - [About Example Code](#about-example-code)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -57,14 +57,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Configure UC from the slcp component to enable or disable the DMA and to set the buffer size.
 
   ![Figure: hspi_secondary_uc](resources/uc_screen/hspi_secondary_uc.png)
-
-- Configure the following macros in [`hspi_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_hspi_secondary/hspi_secondary_example.c) file and update/modify following macros, if required.
-
-  - `TEST_MEMORY_READ_WRITES`: When enabled, runs additional memory read/write tests from the SPI primary against the HSPI secondary memory. By default, it is set to 0.
-
-    ```c
-    #define TEST_MEMORY_READ_WRITES        0         // Enable memory read/write tests
-    ```
 
 ### Pin Configuration
 
@@ -122,4 +114,3 @@ The SPI Primary writes data to the HSPI Secondary
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

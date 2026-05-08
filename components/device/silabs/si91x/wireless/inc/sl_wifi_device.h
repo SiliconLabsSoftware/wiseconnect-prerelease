@@ -1606,7 +1606,7 @@
  * | 1       | 0       | Internal Switch  | Internal Switch  | Internal Switch  |                                
  * | 1       | 1       | Reserved         | Reserved         | Reserved         |
  * 
- * @note SiWx917 has an integrated on-chip Transmit/Receive (T/R) switch, controlled by internal IC logic, eliminating the need for external GPIOs. In this configuration, RF_BLE_TX (8 dBm) mode is not supported on the LP chain. However, 8 dBm TX power can still be achieved using the HP chain.
+ * @note SiWx917 has an integrated on-chip Transmit/Receive (T/R) switch. This internal RF switch configuration uses internal logic present in the IC, and GPIOs are not needed. RF_BLE_TX (8 dBm) mode is not supported in this configuration.
  * @note VC1, VC2, and VC3 are control voltage pins of the RF switch.
  * @note This configuration is not applicable for devices with internal antennas.
  */
@@ -2116,6 +2116,7 @@
  * @brief Enable BT and BLE stack bypass.
  * @details
  * Enables or disables the BT and BLE stack bypass mode.
+ * @note This bit is applicable only for Zephyr.
  * @note Bit 24 enables the BT and BLE stack bypass mode.
  */
 #define SL_SI91X_BT_BLE_STACK_BYPASS_ENABLE BIT(24)

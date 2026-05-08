@@ -1,24 +1,18 @@
 project_name: ble_update_gain_table_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Update Gain Table FreeRTOS
+label: BLE - Update Gain Table (SoC)
 category: Example|BLE
-description: 'Demonstrates updating the BLE RF gain table on SiWx91x in SoC FreeRTOS. Demonstrated by programming calibrated transmit power settings via the stack.
+description: 'Update BLE gain table.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Advanced
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

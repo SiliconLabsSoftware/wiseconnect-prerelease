@@ -1,8 +1,8 @@
-# SiWx91x Platform PSA CMAC
+# Platform SiWx91x PSA CMAC
 
 ## Table of Contents
 
-- [SiWx91x Platform PSA CMAC](#platform-siwx91x-psa-cmac)
+- [Platform SiWx91x PSA CMAC](#platform-siwx91x-psa-cmac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

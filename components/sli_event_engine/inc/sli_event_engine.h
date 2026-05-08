@@ -1,6 +1,6 @@
 /***************************************************************************/ /**
  * @file sli_event_engine.h
- * @brief SLI event engine: async event dispatch thread and configuration macros.
+ * @brief
  *******************************************************************************
  * # License
  * <b>Copyright 2025 Silicon Laboratories Inc. www.silabs.com</b>
@@ -37,28 +37,8 @@
 #include "sl_slist.h"
 #include "sli_queue_manager.h"
 
-/** Event flag: async work pending for the event engine thread. */
+// Event flag for Event Engine Async Event
 #define SLI_EVENT_ENGINE_ASYNC_EVENT (1 << 18)
-
-/**
- * @brief CMSIS-RTOS priority for the SLI event engine worker thread.
- *
- * Define @c SLI_EVENT_ENGINE_THREAD_PRIORITY before including this header to override the
- * default @c osPriorityRealtime2.
- */
-#ifndef SLI_EVENT_ENGINE_THREAD_PRIORITY
-#define SLI_EVENT_ENGINE_THREAD_PRIORITY (osPriorityRealtime2)
-#endif
-
-/**
- * @brief Stack size in bytes for the SLI event engine worker thread.
- *
- * Define @c SLI_EVENT_ENGINE_THREAD_STACK_SIZE before including this header to override the
- * default 1536 bytes.
- */
-#ifndef SLI_EVENT_ENGINE_THREAD_STACK_SIZE
-#define SLI_EVENT_ENGINE_THREAD_STACK_SIZE (1536)
-#endif
 
 /**
  * @typedef sli_event_engine_handler_t

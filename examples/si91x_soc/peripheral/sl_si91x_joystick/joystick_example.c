@@ -60,23 +60,17 @@ void joystick_example_init(void)
     // if we are not initialize the debug again it will print the garbage data in console output.
     DEBUGINIT();
     if (status != SL_STATUS_OK) {
-      /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-      SL_PRINT_STRING_ERROR("sl_si91x_joystick_init: Error Code : %lu \n", status);
+      DEBUGOUT("sl_si91x_joystick_init: Error Code : %lu \n", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Joystick Initialization Success\n");
+    DEBUGOUT("Joystick Initialization Success\n");
     //Start/Enable the Joystick
     status = sl_si91x_joystick_start(SL_JOYSTICK_ENABLED);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_joystick_start: Error Code : %lu \n", status);
+      DEBUGOUT("sl_si91x_joystick_start: Error Code : %lu \n", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Joystick started Successfully\n");
+    DEBUGOUT("Joystick started Successfully\n");
   } while (false);
 }
 
@@ -95,26 +89,26 @@ void joystick_example_process_action(void)
     //Get the Joystick position.
     status = sl_si91x_joystick_get_position(SL_JOYSTICK_ENABLED, &pos);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_joystick_get_position: Error Code : %lu \n", status);
+      DEBUGOUT("sl_si91x_joystick_get_position: Error Code : %lu \n", status);
     }
     switch (pos) {
       case SL_JOYSTICK_NONE:
-        SL_PRINT_STRING_ERROR("Not Pressed\n");
+        printf("Not Pressed\n");
         break;
       case SL_JOYSTICK_C:
-        SL_PRINT_STRING_ERROR("Center\n");
+        printf("Center\n");
         break;
       case SL_JOYSTICK_N:
-        SL_PRINT_STRING_ERROR("North\n");
+        printf("North\n");
         break;
       case SL_JOYSTICK_S:
-        SL_PRINT_STRING_ERROR("South\n");
+        printf("South\n");
         break;
       case SL_JOYSTICK_E:
-        SL_PRINT_STRING_ERROR("East\n");
+        printf("East\n");
         break;
       case SL_JOYSTICK_W:
-        SL_PRINT_STRING_ERROR("West\n");
+        printf("West\n");
         break;
     }
     delay_timeout = false;

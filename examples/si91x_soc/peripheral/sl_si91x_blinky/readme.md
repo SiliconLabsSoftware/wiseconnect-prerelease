@@ -1,8 +1,8 @@
-# SiWx91x Platform Blinky
+# Platform SiWx91x Blinky
 
 ## Table of Contents
 
-- [SiWx91x Platform Blinky](#platform-siwx91x-blinky)
+- [Platform SiWx91x Blinky](#platform-siwx91x-blinky)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -52,16 +52,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Configure the following parameter in [`blinky.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_blinky/blinky.c) file. Update or modify following macro if required.
 
-- `LED_INSTANCE`: Selects the LED instance that is toggled by the example. By default, it is set to `led_led0`.
-
-  ```c
-    #define LED_INSTANCE    led_led0 // LED instance
-  ```
-
-- `TOOGLE_DELAY_MS`: Delay between consecutive LED toggles, in milliseconds. By default, it is set to 500 ms.
-
-  ```c
-    #define TOOGLE_DELAY_MS 500      // configured for 500 ms
+  ```C
+    #define TOGGLE_DELAY_MS 500//  configured for 500 ms
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -78,7 +70,6 @@ Configure the following parameter in [`blinky.c`](https://github.com/SiliconLabs
 > **Note:**
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
-> - In case of sleep-wakeup, call `led_init_instances()` after wakeup before toggling the LED again so the configured LED instances are restored.
 
 ## Troubleshooting
 
@@ -94,4 +85,3 @@ Configure the following parameter in [`blinky.c`](https://github.com/SiliconLabs
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

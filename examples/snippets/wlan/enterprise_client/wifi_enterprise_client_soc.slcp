@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Enterprise Client Mode (SoC)
 category: Example|Wi-Fi
-description: 'Demonstrates Wi-Fi client connection to an Enterprise AP with 802.1X authentication via a RADIUS server.
+description: 'Start a Wi-Fi Access Point with WPA2 Enterprise security
 
   '
 filter:

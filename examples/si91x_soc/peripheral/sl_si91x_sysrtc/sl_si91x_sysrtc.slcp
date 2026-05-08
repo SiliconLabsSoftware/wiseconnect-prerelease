@@ -5,19 +5,13 @@ description: 'demostrate Sysrtc functionality.
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - SYSRTC
+label: Platform SiWx91x - SYSRTC
 component:
 - id: sl_main
 - id: status
 - id: sl_sysrtc
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sl_si91x_led_917
   instance:
   - led0

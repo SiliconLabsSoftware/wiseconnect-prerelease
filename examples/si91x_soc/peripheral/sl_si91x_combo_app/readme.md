@@ -1,8 +1,8 @@
-# SiWx91x Platform COMBO APPLICATION
+# Platform SiWx91x COMBO APPLICATION
 
 ## Table of Contents
 
-- [SiWx91x Platform COMBO APPLICATION](#platform-siwx91x-combo-application)
+- [Platform SiWx91x COMBO APPLICATION](#platform-siwx91x-combo-application)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
     - [I2C](#1-i2c)
@@ -119,28 +119,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Change 'DMA' to 'Enable' or 'Disable' as per DMA requirement.
 - After the above UC configurations, configure following macros in the `i2c_leader_example.c` file and update/modify following macros, if required.
 
-  - `FOLLOWER_I2C_ADDR`: 7-bit I2C follower (target) address that the leader communicates with. Must match the address configured on the I2C follower device. By default, it is set to `0x50`.
-
-    ```c
-      #define FOLLOWER_I2C_ADDR            0x50  // I2C follower address
-    ```
-
-  - `MAX_BUFFER_SIZE_BLOCKING`: Maximum buffer size (in bytes) allowed for RX and TX length when transferring data without DMA. By default, it is set to 80000.
-
-    ```c
-      #define MAX_BUFFER_SIZE_BLOCKING     80000 // Maximum buffer size for RX and TX length when transferring without DMA
-    ```
-
-  - `MAX_BUFFER_SIZE_NON_BLOCKING`: Maximum buffer size (in bytes) allowed for RX and TX length when transferring data with DMA. By default, it is set to 30000.
-
-    ```c
-      #define MAX_BUFFER_SIZE_NON_BLOCKING 30000 // Maximum buffer size for RX and TX length when transferring with DMA
-    ```
-
-  - `I2C_SIZE_BUFFERS`: Size (in bytes) of the I2C data buffers used for transfer. By default, it is set to 1024.
-
-    ```c
-      #define I2C_SIZE_BUFFERS             1024  // Size of data buffer
+    ```C
+      #define FOLLOWER_I2C_ADDR        // Update I2C follower address
+      #define I2C_SIZE_BUFFERS         // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
     ```
 
   > **Note:** For an I2C0 instance, change the value of following macros in path: `/$project/config/RTE_Device_917.h`.
@@ -259,4 +240,3 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

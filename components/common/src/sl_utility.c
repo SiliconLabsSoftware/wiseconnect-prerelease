@@ -228,7 +228,7 @@ char *sl_inet_ntop6(const unsigned char *input, char *dst, uint32_t size)
 
   // Check for overflow and copy result
   if ((uint32_t)(tp - tmp) > size) {
-    SL_DEBUG_LOG_V2(INFO, "\r\n Error \r\n");
+    printf("\r\n Error \r\n");
     return NULL;
   }
 

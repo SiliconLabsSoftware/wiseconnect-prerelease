@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Multithreading Application (SoC)
 category: Example|Wi-Fi
-description: 'Demonstrates concurrent Wi-Fi Client and Wi-Fi Access point, with an MQTT client on client interface and TCP or UDP socket throughput on AP interface.
+description: 'Enable multithreading with SiWx91x
 
   '
 filter:

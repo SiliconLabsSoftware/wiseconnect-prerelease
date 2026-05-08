@@ -30,7 +30,6 @@
 #include <stdint.h>
 #include <string.h>
 #include "sl_constants.h"
-#include "sl_status.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_si91x_wifi_event_handler.h"
 #include "sli_si91x_wifi_command_engine_packet.h"
@@ -49,6 +48,7 @@
 #include "sli_wifi_utility.h"
 #include "sli_buffer_manager.h"
 #include "sli_queue_manager.h"
+#include "sl_log_helper_si91x.h"
 
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 #include "sl_si91x_socket_utility.h"
@@ -86,20 +86,20 @@ typedef bool (*sli_flush_packet_compare_function_t)(const sli_queue_t *handle,
 /******************************************************
  *               Local Function Declarations
  ******************************************************/
-static bool sli_si91x_wifi_command_engine_flush_metadata(const sli_command_engine_t *instance,
-                                                         uint16_t packet_type,
-                                                         sli_command_engine_packet_type_configuration_t *packet_config,
-                                                         sli_command_engine_metadata_t *metadata);
-
 static bool sli_is_command_in_flight_queue(sli_command_engine_t *instance, uint16_t packet_type, uint16_t frame_id);
 static bool sli_flush_packet_match_all(const sli_queue_t *handle, const void *data, const void *node_match_data);
 static bool sli_flush_packet_mqtt_compare_function(const sli_queue_t *handle, const void *data, const void *context);
-static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_t *instance,
-                                                   sli_command_engine_queue_info_t *queue_info,
+static void sli_process_flush_metadata_node(sli_command_engine_metadata_t *tx_metadata,
+                                            sli_command_engine_packet_type_configuration_t *packet_config,
+                                            uint16_t frame_status);
+static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_queue_info_t *queue_info,
                                                    sli_command_engine_packet_type_configuration_t *packet_config,
                                                    sli_flush_packet_compare_function_t compare_function,
                                                    const void *user_data,
                                                    uint16_t frame_status);
+static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
+                                                 uint16_t packet_type,
+                                                 sl_wifi_buffer_t *rx_buffer);
 static void sli_post_packet_to_event_engine(sl_wifi_buffer_t *rx_buffer);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint16_t packet_type, uint16_t error_status);
@@ -146,6 +146,65 @@ sli_routing_entry_t wifi_command_engine_routing_entries[SLI_WIFI_COMMAND_ENGINE_
 sli_routing_table_t wifi_command_engine_routing_table = { .routing_table      = wifi_command_engine_routing_entries,
                                                           .routing_table_size = SLI_WIFI_COMMAND_ENGINE_MAX_PACKET };
 
+static sli_command_engine_packet_type_configuration_t
+  sli_wifi_command_engine_packet_type_configuration[SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES] = {
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_COMMON_CMD],
+      .sync_response_event         = SL_WIFI_HOST_COMMON_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_COMMON_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_WIFI_CMD],
+      .sync_response_event         = SL_WIFI_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_WIFI_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_NETWORK_CMD],
+      .sync_response_event         = SL_WIFI_NETWORK_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_NETWORK_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_BT_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_BT_CMD],
+      .sync_response_event         = SL_WIFI_BT_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_BLE_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_SOCKET_CMD],
+      .sync_response_event         = SL_WIFI_SOCKET_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_CMD_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT }
+  };
+
 /******************************************************
  *               Global Variable Definitions
  ******************************************************/
@@ -153,16 +212,17 @@ sli_command_engine_t sli_wifi_command_engine = { 0 };
 
 sli_command_engine_configuration_t sli_wifi_command_engine_config = {
   .name                      = "Wi-Fi Command Engine",
+  .packet_type_count         = SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES,
+  .packet_type_configuration = sli_wifi_command_engine_packet_type_configuration,
   .get_packet_metadata       = sli_si91x_wifi_command_engine_get_packet_metadata,
-  .priority                  = SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY,
-  .stack_size                = 1636,
+  .priority                  = SL_WIFI_COMMAND_ENGINE_THREAD_PRIORITY,
+  .stack_size                = SL_WIFI_COMMAND_ENGINE_STACK_SIZE,
   .routing_table             = &wifi_command_engine_routing_table,
   .error_event_queue         = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_ERROR_EVENT],
   .error_event_id            = &sli_wifi_event_engine_event_id,
   .error_event               = SLI_EVENT_ENGINE_ASYNC_EVENT,
   .metadata_buffer_pool_type = SLI_BUFFER_MANAGER_CE_METADATA_POOL,
-  .error_buffer_pool_type    = SLI_BUFFER_MANAGER_CE_METADATA_POOL,
-  .flush_handler             = sli_si91x_wifi_command_engine_flush_metadata,
+  .error_buffer_pool_type    = SLI_BUFFER_MANAGER_CE_METADATA_POOL
 };
 
 /******************************************************
@@ -195,8 +255,8 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
   metadata->tx_info.frame_id           = frame_type;
   metadata->packet_status              = frame_status;
 
-  SL_DEBUG_LOG_V2(DEBUG, "RX-> Q: %u, C: 0x%X, L: %u,", queue_id, frame_type, metadata->tx_info.data_packet_length);
-  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\n", frame_status);
+  SL_DEBUG_LOG_V2(DEBUG, "RX-> Q: %u, C: 0x%X, L: %u.\n", queue_id, frame_type, metadata->tx_info.data_packet_length);
+  SL_DEBUG_LOG_V2(DEBUG, "RX-> S: 0x%x.\n", frame_status);
 
   switch (queue_id) {
     case SLI_WLAN_MGMT_Q: {
@@ -218,7 +278,6 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_COMMON_RSP_NWP_LOGGING:
         case SLI_COMMON_RSP_FEATURE_FRAME:
         case SLI_COMMON_RSP_ULP_NO_RAM_RETENTION:
-        case SLI_COMMON_RSP_ENABLE_DISABLE_BLE:
         case SLI_WIFI_RSP_CARDREADY: {
           metadata->tx_info.packet_type = SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET;
           if (frame_type == SLI_COMMON_RSP_ULP_NO_RAM_RETENTION) {
@@ -406,10 +465,9 @@ static bool sli_flush_packet_mqtt_compare_function(const sli_queue_t *handle, co
   return (metadata->tx_info.frame_id == SLI_WIFI_REQ_EMB_MQTT_CLIENT);
 }
 
-// One metadata node: dummy sync error / free async — same behavior as legacy sli_process_flush_metadata_node.
-static void sli_si91x_process_flush_one_metadata(sli_command_engine_metadata_t *tx_metadata,
-                                                 sli_command_engine_packet_type_configuration_t *packet_config,
-                                                 uint16_t frame_status)
+static void sli_process_flush_metadata_node(sli_command_engine_metadata_t *tx_metadata,
+                                            sli_command_engine_packet_type_configuration_t *packet_config,
+                                            uint16_t frame_status)
 {
   if (tx_metadata == NULL || packet_config == NULL) {
     return;
@@ -442,6 +500,7 @@ static void sli_si91x_process_flush_one_metadata(sli_command_engine_metadata_t *
     if (packet_config->sync_response_queue != NULL) {
       sl_status_t enqueue_status = sli_queue_manager_enqueue(packet_config->sync_response_queue, (void *)tx_metadata);
       if (enqueue_status != SL_STATUS_OK) {
+        // Enqueue failed (e.g., OOM): free metadata to prevent memory leak
         sli_buffer_manager_free_buffer(tx_metadata);
         return;
       }
@@ -464,68 +523,15 @@ static void sli_si91x_process_flush_one_metadata(sli_command_engine_metadata_t *
       }
     }
   } else {
+    // For async responses: just free resources (no dummy error responses needed)
+    // SOCKET_READ_DATA error response is handled by pending command check in sli_flush_socket_queues()
     sli_buffer_manager_free_buffer(tx_metadata->tx_info.data_packet);
     sli_buffer_manager_free_buffer(tx_metadata);
   }
+  return;
 }
 
-// Command-engine queue flush: dummy sync error / free async; INPROGRESS uses a temp copy for the dummy response.
-static bool sli_si91x_wifi_command_engine_flush_metadata(const sli_command_engine_t *instance,
-                                                         uint16_t packet_type,
-                                                         sli_command_engine_packet_type_configuration_t *packet_config,
-                                                         sli_command_engine_metadata_t *tx_metadata)
-{
-  UNUSED_PARAMETER(instance);
-  UNUSED_PARAMETER(packet_type);
-
-  if (tx_metadata == NULL || packet_config == NULL) {
-    return false;
-  }
-
-  const uint16_t frame_status = (uint16_t)SL_STATUS_FAIL;
-
-  if (tx_metadata->tx_status == SLI_COMMAND_ENGINE_PACKET_TX_INPROGRESS) {
-    sli_command_engine_metadata_t *temp_metadata = NULL;
-    sl_status_t allocation_status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_METADATA_POOL,
-                                                                       SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
-                                                                       1000,
-                                                                       (sli_buffer_t *)&temp_metadata);
-    if (allocation_status != SL_STATUS_OK) {
-      tx_metadata->tx_status = SLI_COMMAND_ENGINE_PACKET_FLUSHED;
-      return true;
-    }
-    memcpy(temp_metadata, tx_metadata, sizeof(sli_command_engine_metadata_t));
-    temp_metadata->tx_info.data_packet        = NULL;
-    temp_metadata->tx_info.data_packet_length = 0;
-
-    sli_si91x_process_flush_one_metadata(temp_metadata, packet_config, frame_status);
-
-    tx_metadata->tx_status = SLI_COMMAND_ENGINE_TEARDOWN_DONE;
-    return true;
-  }
-
-  sli_si91x_process_flush_one_metadata(tx_metadata, packet_config, frame_status);
-  return true;
-}
-
-// Flush paths decrement in_flight_command_count without the command engine TX worker running;
-// re-post the dynamic TX event when pending packets can be scheduled again.
-static void sli_si91x_try_rearm_command_engine_dynamic_tx(
-  sli_command_engine_t *instance,
-  const sli_command_engine_queue_info_t *queue_info,
-  const sli_command_engine_packet_type_configuration_t *packet_config)
-{
-  if ((instance == NULL) || (queue_info == NULL) || (packet_config == NULL)) {
-    return;
-  }
-  if (!SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&queue_info->packet_queue)
-      && (queue_info->in_flight_command_count < packet_config->max_in_flight_command_count)) {
-    (void)sli_command_engine_signal_dynamic_tx(instance);
-  }
-}
-
-static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_t *instance,
-                                                   sli_command_engine_queue_info_t *queue_info,
+static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_queue_info_t *queue_info,
                                                    sli_command_engine_packet_type_configuration_t *packet_config,
                                                    sli_flush_packet_compare_function_t compare_function,
                                                    const void *user_data,
@@ -543,7 +549,7 @@ static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_t *instanc
                                                                                     : &sli_flush_packet_match_all;
 
   // Flush packet_queue: drain pending packets not yet sent to firmware (tx_packet_queues).
-  // Each entry is removed and processed for flush (notify/free) via sli_si91x_process_flush_one_metadata.
+  // Each entry is removed and processed for flush (notify/free) via sli_process_flush_metadata_node.
   while (!SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&queue_info->packet_queue)) {
     status = sli_queue_manager_remove_node_from_queue(&queue_info->packet_queue,
                                                       match_handler,
@@ -554,7 +560,7 @@ static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_t *instanc
       break;
     }
 
-    sli_si91x_process_flush_one_metadata(tx_metadata, packet_config, frame_status);
+    sli_process_flush_metadata_node(tx_metadata, packet_config, frame_status);
   }
 
   // Flush inflight_packet_queue: drain packets already sent to firmware (in_flight_queues).
@@ -584,55 +590,47 @@ static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_t *instanc
                                                                          (sli_buffer_t *)&temp_metadata);
       if (allocation_status != SL_STATUS_OK) {
         tx_metadata->tx_status = SLI_COMMAND_ENGINE_PACKET_FLUSHED;
-        sli_si91x_try_rearm_command_engine_dynamic_tx(instance, queue_info, packet_config);
         return allocation_status;
       }
       memcpy(temp_metadata, tx_metadata, sizeof(sli_command_engine_metadata_t));
       temp_metadata->tx_info.data_packet        = NULL;
       temp_metadata->tx_info.data_packet_length = 0;
 
-      sli_si91x_process_flush_one_metadata(temp_metadata, packet_config, frame_status);
+      sli_process_flush_metadata_node(temp_metadata, packet_config, frame_status);
 
       tx_metadata->tx_status = SLI_COMMAND_ENGINE_PACKET_FLUSHED;
 
     } else {
 
-      sli_si91x_process_flush_one_metadata(tx_metadata, packet_config, frame_status);
+      sli_process_flush_metadata_node(tx_metadata, packet_config, frame_status);
     }
   }
 
-  sli_si91x_try_rearm_command_engine_dynamic_tx(instance, queue_info, packet_config);
   return SL_STATUS_OK;
 }
 
 static sl_status_t sli_flush_all_command_engine_static_queues(sli_command_engine_t *instance, uint16_t error_status)
 {
-  if (instance == NULL || error_status == SL_STATUS_OK) {
+  if (instance == NULL || error_status == SL_STATUS_OK || instance->queue_info == NULL) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  sli_command_engine_packet_type_configuration_node_t *dynamic_node = instance->dynamic_packet_type;
-  while (dynamic_node != NULL) {
-    if (dynamic_node->packet_type == SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET
-        || dynamic_node->packet_type == SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET
-        || dynamic_node->packet_type == SLI_WIFI_COMMAND_ENGINE_BLE_COMMAND_PACKET
-        || dynamic_node->packet_type == SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET) {
-      sli_flush_queue_for_packet_type(instance,
-                                      &dynamic_node->queue_info,
-                                      &dynamic_node->packet_config,
-                                      NULL,
-                                      NULL,
-                                      error_status);
+  for (uint8_t packet_type = 0; packet_type < instance->config.packet_type_count; packet_type++) {
+    if (packet_type == SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET) {
+      continue;
     }
-    dynamic_node = dynamic_node->next;
-  }
+    sli_command_engine_queue_info_t *queue_info = &instance->queue_info[packet_type];
+    sli_command_engine_packet_type_configuration_t *packet_config =
+      &instance->config.packet_type_configuration[packet_type];
 
+    sli_flush_queue_for_packet_type(queue_info, packet_config, NULL, NULL, error_status);
+  }
   return SL_STATUS_OK;
 }
 
-static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_command_engine_t *instance,
-                                                                        uint16_t packet_type,
-                                                                        sl_wifi_buffer_t *rx_buffer)
+static sl_status_t sli_handle_packet_flush_logic(sli_command_engine_t *instance,
+                                                 uint16_t packet_type,
+                                                 sl_wifi_buffer_t *rx_buffer)
 {
   sl_status_t status = SL_STATUS_OK;
 
@@ -652,6 +650,20 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
       }
       break;
 
+    case SLI_WIFI_RSP_IPCONFV4:
+      if (frame_status != SL_STATUS_OK
+          && (!sli_is_command_in_flight_queue(instance, packet_type, SLI_WIFI_REQ_IPCONFV4))) {
+        SL_DEBUG_LOG_V2(WARN, "IPCONFV4 fail flush frame_status=0x%X", frame_status);
+        status = sli_flush_all_command_engine_static_queues(instance, frame_status);
+        VERIFY_STATUS_AND_RETURN(status);
+#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
+        uint8_t vap_id = SL_WIFI_CLIENT_VAP_ID;
+        status         = sli_flush_all_socket_queues(instance, (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED, &vap_id, NULL);
+        VERIFY_STATUS_AND_RETURN(status);
+#endif
+      }
+      break;
+
     case SLI_WIFI_RSP_IPCONFV6:
       if (frame_status != SL_STATUS_OK
           && (!sli_is_command_in_flight_queue(instance, packet_type, SLI_WIFI_REQ_IPCONFV6))) {
@@ -666,6 +678,18 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
       }
       break;
 
+    case SLI_WIFI_RSP_IPV4_CHANGE: {
+      uint16_t error_status = (uint16_t)SL_STATUS_SI91X_IP_ADDRESS_ERROR;
+      SL_DEBUG_LOG_V2(INFO, "IPV4_CHANGE flush queues");
+      status = sli_flush_all_command_engine_static_queues(instance, error_status);
+      VERIFY_STATUS_AND_RETURN(status);
+#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
+      uint8_t vap_id = SL_WIFI_CLIENT_VAP_ID;
+      status         = sli_flush_all_socket_queues(instance, (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED, &vap_id, NULL);
+      VERIFY_STATUS_AND_RETURN(status);
+#endif
+    } break;
+
     case SLI_WIFI_RSP_DISCONNECT:
       if (frame_status == SL_STATUS_OK
           && (SL_WIFI_CLIENT_VAP_ID == sli_wifi_get_vap_id_from_operation_mode(rx_packet))) {
@@ -678,7 +702,6 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
         status         = sli_flush_all_socket_queues(instance, (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED, &vap_id, NULL);
         VERIFY_STATUS_AND_RETURN(status);
 #endif
-        sli_post_packet_to_event_engine(rx_buffer);
       }
       break;
 
@@ -711,27 +734,18 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
         sli_post_packet_to_event_engine(rx_buffer);
       }
       break;
-
-#endif // SLI_SI91X_OFFLOAD_NETWORK_STACK
+#endif
 
     case SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE: {
       SL_DEBUG_LOG_V2(INFO, "Received MQTT remote terminate, flushing the queues \r\n");
-      sli_command_engine_queue_info_t *network_queue_info                   = NULL;
-      sli_command_engine_packet_type_configuration_t *network_packet_config = NULL;
-      sl_status_t mqtt_lookup_status =
-        sli_command_engine_get_dynamic_packet_info(instance,
-                                                   SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET,
-                                                   &network_queue_info,
-                                                   &network_packet_config);
-      if ((mqtt_lookup_status == SL_STATUS_OK) && (network_queue_info != NULL) && (network_packet_config != NULL)) {
-        status = sli_flush_queue_for_packet_type(instance,
-                                                 network_queue_info,
-                                                 network_packet_config,
-                                                 sli_flush_packet_mqtt_compare_function,
-                                                 (const void *)rx_packet,
-                                                 frame_status);
-        VERIFY_STATUS_AND_RETURN(status);
-      }
+      status = sli_flush_queue_for_packet_type(
+        &instance->queue_info[SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET],
+        &instance->config.packet_type_configuration[SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET],
+        sli_flush_packet_mqtt_compare_function,
+        (const void *)rx_packet,
+        frame_status);
+
+      VERIFY_STATUS_AND_RETURN(status);
       break;
     }
 
@@ -770,12 +784,7 @@ static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint1
     return SL_STATUS_NOT_FOUND;
   }
 
-  sli_flush_queue_for_packet_type(instance,
-                                  &dynamic_node->queue_info,
-                                  &dynamic_node->packet_config,
-                                  NULL,
-                                  NULL,
-                                  error_status);
+  sli_flush_queue_for_packet_type(&dynamic_node->queue_info, &dynamic_node->packet_config, NULL, NULL, error_status);
 
   if (!socket->is_receive_cmd_pending) {
     return SL_STATUS_OK;
@@ -836,22 +845,52 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
   SL_DEBUG_LOG_V2(INFO, "flush_all_socket_queues err=0x%X\n", (unsigned int)error_status);
   sl_status_t status                              = SL_STATUS_OK;
   sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
+  uint8_t socket_vap_id = (current_operation_mode == SL_WIFI_ACCESS_POINT_MODE) ? SL_WIFI_AP_VAP_ID
+                                                                                : SL_WIFI_CLIENT_VAP_ID;
 
   for (uint8_t index = 0; index < SLI_NUMBER_OF_SOCKETS; index++) {
     if (sli_si91x_sockets[index] == NULL) {
       continue;
     }
-    if (!sli_si91x_socket_matches_vap_and_remote_ip(current_operation_mode,
-                                                    sli_si91x_sockets[index],
-                                                    *vap_id,
-                                                    dest_ip_address)) {
-      continue;
+
+    if (current_operation_mode == SL_SI91X_CONCURRENT_MODE) {
+      socket_vap_id = sli_si91x_sockets[index]->vap_id;
     }
-    uint16_t socket_packet_type =
-      (uint16_t)(sli_si91x_sockets[index]->index + SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES);
-    status = sli_flush_socket_queues(instance, socket_packet_type, error_status);
-    if (status != SL_STATUS_OK) {
-      return status;
+    bool should_flush = (socket_vap_id == *vap_id);
+
+    if (should_flush && dest_ip_address != NULL) {
+      bool is_same = false;
+      if (dest_ip_address->type == SL_IPV4) {
+        const struct sockaddr_in *socket_address = (struct sockaddr_in *)&sli_si91x_sockets[index]->remote_address;
+        is_same = (memcmp(dest_ip_address->ip.v4.bytes, &socket_address->sin_addr.s_addr, SL_IPV4_ADDRESS_LENGTH) == 0);
+      } else {
+        const struct sockaddr_in6 *ipv6_socket_address = &sli_si91x_sockets[index]->remote_address;
+#ifdef SLI_SI91X_NETWORK_DUAL_STACK
+        is_same =
+          (memcmp(dest_ip_address->ip.v6.bytes, &ipv6_socket_address->sin6_addr.un.u8_addr, SL_IPV6_ADDRESS_LENGTH)
+           == 0);
+#else
+#ifndef __ZEPHYR__
+        is_same = (memcmp(dest_ip_address->ip.v6.bytes,
+                          &ipv6_socket_address->sin6_addr.__u6_addr.__u6_addr8,
+                          SL_IPV6_ADDRESS_LENGTH)
+                   == 0);
+#else
+        is_same =
+          (memcmp(dest_ip_address->ip.v6.bytes, &ipv6_socket_address->sin6_addr.s6_addr, SL_IPV6_ADDRESS_LENGTH) == 0);
+#endif
+#endif
+      }
+      should_flush = is_same;
+    }
+
+    if (should_flush) {
+      uint16_t socket_packet_type =
+        (uint16_t)(sli_si91x_sockets[index]->index + SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES);
+      status = sli_flush_socket_queues(instance, socket_packet_type, error_status);
+      if (status != SL_STATUS_OK) {
+        return status;
+      }
     }
   }
 
@@ -870,7 +909,7 @@ static void sli_post_disconnect_event_to_network_manager(sl_net_interface_t inte
   message.interface                     = interface;
   message.event_flags                   = SLI_NET_DISCONNECT_Q_EVENT;
   if (osMessageQueuePut(sli_network_manager_request_queue, &message, SLI_NET_MSG_PRIO_NORMAL, 0) != osOK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue disconnect event for auto-join retry\n");
+    SL_DEBUG_LOG("Failed to enqueue disconnect event for auto-join retry\n");
   }
 }
 
@@ -899,8 +938,7 @@ sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t
   if (instance == NULL || data == NULL) {
     return SL_STATUS_INVALID_PARAMETER;
   }
-  sl_status_t status =
-    sli_si91x_forward_wifi_events_for_network_operations(instance, packet_type, (sl_wifi_buffer_t *)data);
+  sl_status_t status = sli_handle_packet_flush_logic(instance, packet_type, (sl_wifi_buffer_t *)data);
   VERIFY_STATUS_AND_RETURN(status);
 
 #ifdef SL_NET_COMPONENT_INCLUDED
@@ -924,72 +962,30 @@ sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t
     }
   }
 #endif
-
-#ifdef SLI_SI91X_INTERNAL_HTTP_CLIENT
-  const sl_wifi_system_packet_t *http_packet =
-    (const sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((sl_wifi_buffer_t *)data, 0, NULL);
-
-  // If the packet is NULL, there is nothing to do as we cannot determine the status
-  if (http_packet == NULL) {
-    return SL_STATUS_OK;
-  }
-
-  // check whether the frame response contains the end of data field
-  bool is_end_of_data_type = (http_packet->command == SLI_WIFI_RSP_HTTP_CLIENT_GET
-                              || http_packet->command == SLI_WIFI_RSP_HTTP_CLIENT_POST
-                              || http_packet->command == SLI_WIFI_RSP_HTTP_CLIENT_POST_DATA);
-
-  if (!is_end_of_data_type) {
-    return SL_STATUS_OK;
-  }
-
-  sl_status_t http_status = sli_wifi_convert_and_save_firmware_status(sli_wifi_get_wifi_frame_status(http_packet));
-
-  if (http_status != SL_STATUS_OK) {
-    return http_status == SL_STATUS_SI91X_HTTP_GET_CMD_IN_PROGRESS ? SL_STATUS_IN_PROGRESS : SL_STATUS_OK;
-  }
-
-  // The logic to determine the end of the data is understood from switch case of sli_http_client_default_event_handler
-  uint16_t end_of_data = 0;
-  memcpy(&end_of_data, http_packet->data, sizeof(uint16_t));
-
-  return end_of_data ? SL_STATUS_OK : SL_STATUS_IN_PROGRESS;
-#endif
   return SL_STATUS_OK;
-}
-
-static bool sli_inflight_queue_has_matching_frame_id(const sli_command_engine_queue_info_t *queue_info,
-                                                     uint16_t frame_id)
-{
-  if (queue_info == NULL) {
-    return false;
-  }
-
-  for (const sli_queue_node_t *in_flight = queue_info->inflight_packet_queue.head; in_flight != NULL;
-       in_flight                         = in_flight->next) {
-    if (in_flight->data == NULL) {
-      continue;
-    }
-    const sli_command_engine_metadata_t *tx_metadata = (const sli_command_engine_metadata_t *)in_flight->data;
-    if (tx_metadata->tx_info.frame_id == frame_id) {
-      return true;
-    }
-  }
-  return false;
 }
 
 static bool sli_is_command_in_flight_queue(sli_command_engine_t *instance, uint16_t packet_type, uint16_t frame_id)
 {
-  sli_command_engine_queue_info_t *queue_info = NULL;
-  sl_status_t status = sli_command_engine_get_dynamic_packet_info(instance, packet_type, &queue_info, NULL);
-  if ((status != SL_STATUS_OK) || (queue_info == NULL)) {
+  if (instance == NULL || packet_type >= instance->config.packet_type_count) {
     return false;
   }
-  return sli_inflight_queue_has_matching_frame_id(queue_info, frame_id);
+
+  sli_command_engine_queue_info_t *queue_info = &instance->queue_info[packet_type];
+  sli_queue_node_t *in_flight_queue_node      = queue_info->inflight_packet_queue.head;
+  while (in_flight_queue_node != NULL) {
+    const sli_command_engine_metadata_t *tx_metadata =
+      (const sli_command_engine_metadata_t *)in_flight_queue_node->data;
+    if (tx_metadata->tx_info.frame_id == frame_id) {
+      return true;
+    }
+    in_flight_queue_node = in_flight_queue_node->next;
+  }
+  return false;
 }
 
 sl_status_t sli_si91x_wifi_command_engine_packet_handler(
-  void *buffer,
+  void *packet,
   uint32_t packet_size,
   sli_routing_utility_packet_status_handler_t packet_status_handler,
   void *context)
@@ -998,11 +994,7 @@ sl_status_t sli_si91x_wifi_command_engine_packet_handler(
   UNUSED_PARAMETER(context);
   UNUSED_PARAMETER(packet_size);
 
-  sl_status_t status = sli_command_engine_receive_packet(&sli_wifi_command_engine, buffer);
-  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_buffer_manager_free_buffer((sl_wifi_buffer_t *)buffer);
-    return status;
-  }
+  sl_status_t status = sli_command_engine_receive_packet(&sli_wifi_command_engine, packet);
   return status;
 }
 

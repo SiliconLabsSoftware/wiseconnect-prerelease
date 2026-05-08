@@ -5,13 +5,12 @@ description: 'This application demonstrates how to configure the ULP USART (Ultr
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - ULP UART
+label: Platform SiWx91x - ULP UART
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
 - id: sl_gpio
 - id: sl_ulp_uart
 - id: sl_power_manager

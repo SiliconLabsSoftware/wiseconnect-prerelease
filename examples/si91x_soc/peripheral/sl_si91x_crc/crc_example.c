@@ -88,21 +88,15 @@ void crc_example_init(void)
   sl_dma_init_t dma_init = { SL_DMA_INSTANCE };
   sl_dma_callback_t callbacks;
 
-  /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-  SL_PRINT_STRING_ERROR("\n******* CRC EXAMPLE INIT *********\n");
+  DEBUGOUT("\n******* CRC EXAMPLE INIT *********\n");
   do {
     status = sl_si91x_dma_init(&dma_init);
     if (status == SL_STATUS_OK) {
       //UDMA initialization success
-      SL_PRINT_STRING_ERROR("UDMA Initialization Success\r\n");
+      DEBUGOUT("UDMA Initialization Success\r\n");
     } else {
       //UDMA initialization fail
-      SL_PRINT_STRING_ERROR("Failed to Initialize UDMA\r\n");
+      DEBUGOUT("Failed to Initialize UDMA\r\n");
       break;
     }
     //Reset the DMA transfer done flag
@@ -111,10 +105,10 @@ void crc_example_init(void)
     status = sl_si91x_dma_allocate_channel(SL_DMA_INSTANCE, &gchannel, 0);
     if (status == SL_STATUS_OK) {
       //Channel successfully allocated
-      SL_PRINT_STRING_ERROR("Channel Allocated successfully\r\n");
+      DEBUGOUT("Channel Allocated successfully\r\n");
     } else {
       //Channel allocation failed
-      SL_PRINT_STRING_ERROR("Channel not allocated\r\n");
+      DEBUGOUT("Channel not allocated\r\n");
       break;
     }
     //Register transfer complete callback
@@ -124,10 +118,10 @@ void crc_example_init(void)
     status = sl_si91x_dma_register_callbacks(SL_DMA_INSTANCE, gchannel, &callbacks);
     if (status == SL_STATUS_OK) {
       //Callback registration success
-      SL_PRINT_STRING_ERROR("Callbacks registered\r\n");
+      DEBUGOUT("Callbacks registered\r\n");
     } else {
       //Callback not registered
-      SL_PRINT_STRING_ERROR("Callbacks not registered\r\n");
+      DEBUGOUT("Callbacks not registered\r\n");
       break;
     }
 
@@ -156,7 +150,7 @@ static sl_status_t crc_dma_transfer(uint32_t *data, uint32_t data_len)
 
   do {
     if (data == NULL || data_len == 0) {
-      SL_PRINT_STRING_ERROR(" Invalid parameters for CRC DMA transfer.\r\n");
+      DEBUGOUT(" Invalid parameters for CRC DMA transfer.\r\n");
       status = SL_STATUS_INVALID_PARAMETER;
       break;
     }
@@ -169,7 +163,7 @@ static sl_status_t crc_dma_transfer(uint32_t *data, uint32_t data_len)
     // Perform DMA transfer using generic dma transfer API
     status = sl_si91x_dma_transfer(SL_DMA_INSTANCE, gchannel, &dma_transfer_t);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR(" DMA transfer failed. Error code: 0x%08lX\r\n", (unsigned long)status);
+      DEBUGOUT(" DMA transfer failed. Error code: 0x%08lX\r\n", (unsigned long)status);
       break;
     }
   } while (0);
@@ -189,19 +183,19 @@ void crc_example_process_action(void)
   if (counter_for_delay % 100000) {
     return;
   }
-  SL_PRINT_STRING_ERROR("\n******* CRC EXAMPLE START *********\n");
+  DEBUGOUT("\n******* CRC EXAMPLE START *********\n");
 
   /* Software CRC calculation */
   gsw_crc = sw_crc_compute(BUFF_LEN_8BIT_TYPE);
-  SL_PRINT_STRING_ERROR(" Input Data Buffer:\n {\n\t");
+  DEBUGOUT(" Input Data Buffer:\n {\n\t");
   for (index = 0; index < BUFFSIZE; index++) {
     gtx_temp_buff[index] = crc_convert_tx_buffer(gcrc_tx_Buf[index]);
-    SL_PRINT_STRING_ERROR("0x%08lX ", gtx_temp_buff[index]);
+    DEBUGOUT("0x%08lX ", gtx_temp_buff[index]);
 
     if (!((index + 1) % 5))
-      SL_PRINT_STRING_ERROR("\n\t");
+      DEBUGOUT("\n\t");
   }
-  SL_PRINT_STRING_ERROR("\n }\n");
+  DEBUGOUT("\n }\n");
 
   /* CRC_32 polynomial */
   crc_params.polynomial = SL_CRC_POLYNOMIAL;
@@ -219,40 +213,40 @@ void crc_example_process_action(void)
     // configure CRC hardware
     status = sl_si91x_crc_set_config(&crc_params);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR(" CRC hardware initialization failed. Error code: 0x%08lX\r\n", (unsigned long)status);
+      DEBUGOUT(" CRC hardware initialization failed. Error code: 0x%08lX\r\n", (unsigned long)status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR(" CRC hardware initialized successfully.\r\n");
+      DEBUGOUT(" CRC hardware initialized successfully.\r\n");
     }
 
     status = crc_dma_transfer(gtx_temp_buff, BUFFSIZE);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("CRC hardware calculation failed. Error code: 0x%08lX\r\n", (unsigned long)status);
+      DEBUGOUT("CRC hardware calculation failed. Error code: 0x%08lX\r\n", (unsigned long)status);
       return;
     }
 
-    SL_PRINT_STRING_ERROR("\n DMA Data transfer Completed\n");
+    DEBUGOUT("\n DMA Data transfer Completed\n");
     status = sl_si91x_crc_monitor_crc_calc(&crc_params, &ghw_crc);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR(" Failed to monitor CRC calculation. Error code: 0x%08lX\r\n", (unsigned long)status);
+      DEBUGOUT(" Failed to monitor CRC calculation. Error code: 0x%08lX\r\n", (unsigned long)status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR(" Hardware CRC Value: 0x%08lX\r\n", (unsigned long)ghw_crc);
-      SL_PRINT_STRING_ERROR(" Software CRC Value: 0x%08lX\r\n", (unsigned long)gsw_crc);
+      DEBUGOUT(" Hardware CRC Value: 0x%08lX\r\n", (unsigned long)ghw_crc);
+      DEBUGOUT(" Software CRC Value: 0x%08lX\r\n", (unsigned long)gsw_crc);
     }
     if (ghw_crc == gsw_crc) {
-      SL_PRINT_STRING_ERROR("\n Both Matched and CRC TEST PASSED \n");
+      DEBUGOUT("\n Both Matched and CRC TEST PASSED \n");
     } else {
-      SL_PRINT_STRING_ERROR("\n CRC TEST FAILED \n");
+      DEBUGOUT("\n CRC TEST FAILED \n");
       break;
     }
     // Disable the CRC
     status = sl_si91x_crc_disable();
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR(" Failed to disable CRC.\r\n");
+      DEBUGOUT(" Failed to disable CRC.\r\n");
     } else {
-      SL_PRINT_STRING_ERROR(" CRC disabled successfully.\r\n");
+      DEBUGOUT(" CRC disabled successfully.\r\n");
     }
   } while (false);
-  SL_PRINT_STRING_ERROR("\n******* CRC EXAMPLE END *********\n");
+  DEBUGOUT("\n******* CRC EXAMPLE END *********\n");
 }

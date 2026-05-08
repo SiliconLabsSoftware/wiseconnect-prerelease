@@ -865,11 +865,10 @@ void rsi_ble_on_data_receive(uint8_t conn_id)
     uint8_t notify_data[2] = { 1, 0 };
     LOG_PRINT("\r\n in receive notification event -conn%d \n", ble_conn_id);
 
-    status =
-      rsi_ble_set_att_value_async(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr, // enable the notifications
-                                  rsi_ble_conn_info[ble_conn_id].notify_handle + 1,
-                                  2,
-                                  notify_data);
+    status = rsi_ble_set_att_value(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr, // enable the notifications
+                                   rsi_ble_conn_info[ble_conn_id].notify_handle + 1,
+                                   2,
+                                   notify_data);
     if (status != RSI_SUCCESS) {
       if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
         LOG_PRINT("\r\n notify failed with buffer error -conn%d \r\n", ble_conn_id);
@@ -968,10 +967,10 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
 #if RSI_DEBUG_EN
     LOG_PRINT_D("\r\n in write without response event -conn%d \n", ble_conn_id);
 #endif
-    status = rsi_ble_set_att_cmd_async(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
-                                       rsi_ble_conn_info[ble_conn_id].write_wwr_handle,
-                                       rsi_ble_conn_info[ble_conn_id].max_data_length,
-                                       (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
+    status = rsi_ble_set_att_cmd(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
+                                 rsi_ble_conn_info[ble_conn_id].write_wwr_handle,
+                                 rsi_ble_conn_info[ble_conn_id].max_data_length,
+                                 (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
     if (status != RSI_SUCCESS) {
       if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
 #if RSI_DEBUG_EN

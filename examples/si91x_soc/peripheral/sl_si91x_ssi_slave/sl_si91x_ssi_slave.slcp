@@ -5,18 +5,12 @@ description: 'This application demonstrates how to configure and use SSI protoco
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - SSI SLAVE
+label: Platform SiWx91x - SSI SLAVE
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sl_ssi
 - id: sl_ssi_instance
   instance:
@@ -40,6 +34,7 @@ configuration:
   value: UP_COUNTER
 other_file:
 - path: resources/readme/setupdiagram.png
+- path: resources/readme/image511d.png
 - path: resources/uc_screen/ssi_uc_screen.png
 - path: resources/readme/output.png
 ui_hints:

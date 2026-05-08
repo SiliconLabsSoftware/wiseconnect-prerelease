@@ -5,20 +5,15 @@ description: 'This application demonstrates a blinky application running from PS
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - PSRAM Blinky
+label: Platform SiWx91x - PSRAM Blinky
 component:
 - id: sl_main
 - id: sleeptimer
 - id: data_segment_in_psram
 - id: text_segment_in_psram
 - id: psram_core
+- id: psram_aps6404l_sqh
 - id: syscalls
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: si91x_memory_default_config
 - id: sl_si91x_led_917
   instance:

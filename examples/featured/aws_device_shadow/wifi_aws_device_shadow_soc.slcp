@@ -1,7 +1,7 @@
 project_name: wifi_aws_device_shadow_soc
 label: Wi-Fi - AWS Device Shadow (SoC)
 package: wifi_app
-description: Creates an AWS IoT thing that connects to the AWS IoT device shadow service using the MQTT protocol
+description: Creates an AWS IoT 'thing' that connects to the AWS IoT device shadow service using the MQTT protocol
 quality: production
 category: Example|Wi-Fi
 filter:

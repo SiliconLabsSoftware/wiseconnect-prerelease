@@ -1,24 +1,18 @@
 project_name: ble_central_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM Central FreeRTOS
+label: BLE - Central (PSRAM)
 category: Example|BLE
-description: 'Demonstrates how to connect SiWx91x to a remote BLE device in central role with PSRAM in SoC FreeRTOS. This is demonstrated by scanning for peripherals and establishing a BLE link.
+description: 'Start a BLE device in central mode.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:
@@ -43,6 +37,7 @@ component:
 - id: basic_network_config_manager
 - id: ble
 - id: psram_core
+- id: psram_aps6404l_sqh
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: sl_power_manager

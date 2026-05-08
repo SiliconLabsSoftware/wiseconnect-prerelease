@@ -1,24 +1,18 @@
 project_name: ble_throughput_app_uart_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - UART NCP Throughput FreeRTOS
+label: BLE - Throughput (UART NCP)
 category: Example|BLE
-description: 'Demonstrates BLE on-air throughput by exchanging continuous data on SiWx91x over UART NCP with FreeRTOS. Demonstrated by sustained transfers measurable with a sniffer.
+description: 'This application demonstrates how to exchange continuous data to the remote  device to measure the On-Air Throughput using a BLE Sniffer.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

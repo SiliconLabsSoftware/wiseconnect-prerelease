@@ -1,24 +1,18 @@
 project_name: ble_heart_rate_profile_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM Heart Rate FreeRTOS
+label: BLE - Heart Rate (PSRAM)
 category: Example|BLE
-description: 'Demonstrates how to use the BLE Heart Rate Profile over GATT on SiWx91x with PSRAM in SoC FreeRTOS with HR service and notifications.
+description: 'This application demonstrates BLE heart rate profile
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:
@@ -52,6 +46,7 @@ component:
 - id: basic_network_config_manager
 - id: ble
 - id: psram_core
+- id: psram_aps6404l_sqh
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: sl_power_manager

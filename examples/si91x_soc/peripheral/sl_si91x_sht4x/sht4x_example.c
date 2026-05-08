@@ -87,23 +87,23 @@ void sht4x_example_init(void)
     if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) != 1) {
       status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_enable_clock, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_si91x_gpio_driver_enable_clock, Error code: 0x%lx \n", status);
         break;
       }
       status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(SENSOR_ENABLE_GPIO_PIN, NPSS_GPIO_PIN_MUX_MODE0);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_uulp_npss_pin_mux, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_si91x_gpio_driver_set_uulp_npss_pin_mux, Error code: 0x%lx \n", status);
         break;
       }
       status =
         sl_si91x_gpio_driver_set_uulp_npss_direction(SENSOR_ENABLE_GPIO_PIN, (sl_si91x_gpio_direction_t)GPIO_OUTPUT);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_uulp_npss_direction, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_si91x_gpio_driver_set_uulp_npss_direction, Error code: 0x%lx \n", status);
         break;
       }
       status = sl_si91x_gpio_driver_set_uulp_npss_pin_value(SENSOR_ENABLE_GPIO_PIN, SET);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_uulp_npss_pin_value, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_si91x_gpio_driver_set_uulp_npss_pin_value, Error code: 0x%lx \n", status);
         break;
       }
     }
@@ -113,13 +113,7 @@ void sht4x_example_init(void)
 
     status = sl_gpio_driver_get_pin(&sensor_enable_port_pin, &pin_value);
     if (status != SL_STATUS_OK) {
-      /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-      SL_PRINT_STRING_ERROR("sl_gpio_driver_get_pin, Error code: 0x%lx \n", status);
+      DEBUGOUT("sl_gpio_driver_get_pin, Error code: 0x%lx \n", status);
       break;
     }
     if (pin_value != 1) {
@@ -129,24 +123,24 @@ void sht4x_example_init(void)
       status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)M4CLK_GPIO);
 #endif
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_enable_clock, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_si91x_gpio_driver_enable_clock, Error code: 0x%lx \n", status);
         break;
       }
       status = sl_gpio_driver_set_pin_mode(&sensor_enable_port_pin, MODE_0, OUTPUT_VALUE);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_gpio_driver_set_pin_mode, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_gpio_driver_set_pin_mode, Error code: 0x%lx \n", status);
         break;
       }
       status = sl_si91x_gpio_driver_set_pin_direction(SENSOR_ENABLE_GPIO_PORT,
                                                       SENSOR_ENABLE_GPIO_PIN,
                                                       (sl_si91x_gpio_direction_t)GPIO_OUTPUT);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_pin_direction, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_si91x_gpio_driver_set_pin_direction, Error code: 0x%lx \n", status);
         break;
       }
       status = sl_gpio_driver_set_pin(&sensor_enable_port_pin);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_gpio_driver_set_pin, Error code: 0x%lx \n", status);
+        DEBUGOUT("sl_gpio_driver_set_pin, Error code: 0x%lx \n", status);
         break;
       }
     }
@@ -157,14 +151,13 @@ void sht4x_example_init(void)
     /* Initialize I2C bus */
     status = (sl_status_t)sl_i2c_driver_init(I2C, &i2c_config);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_i2c_driver_init : Invalid Parameters, Error Code: 0x%lx \n", status);
+      DEBUGOUT("sl_i2c_driver_init : Invalid Parameters, Error Code: 0x%lx \n", status);
       break;
     }
 
     status = (sl_status_t)sl_i2c_driver_configure_fifo_threshold(I2C, TX_THRESHOLD, RX_THRESHOLD);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_i2c_driver_configure_fifo_threshold : Invalid Parameters, Error Code: 0x%lx \n",
-                            status);
+      DEBUGOUT("sl_i2c_driver_configure_fifo_threshold : Invalid Parameters, Error Code: 0x%lx \n", status);
       break;
     }
 
@@ -179,24 +172,24 @@ void sht4x_example_init(void)
       }
     }
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor initialization un-successful after %d tries, Error Code: 0x%lx \n",
-                            (int)SHT4X_INIT_RETRIES,
-                            status);
-      SL_PRINT_STRING_ERROR("  (0x31 = I2C NACK: no response at 0x44 - check SDA/SCL, VDD/GND, pull-ups)\n");
+      DEBUGOUT("Sensor initialization un-successful after %d tries, Error Code: 0x%lx \n",
+               (int)SHT4X_INIT_RETRIES,
+               status);
+      DEBUGOUT("  (0x31 = I2C NACK: no response at 0x44 - check SDA/SCL, VDD/GND, pull-ups)\n");
       break;
     }
 
     /* Read one measurement to verify sensor */
     status = sl_sht4x_measure_rh_and_temp(sl_si91x_sht4x_sensor, SHT4X_ADDR, &rh_data, &temp_data);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor first measurement failed, Error Code: 0x%lx \n", status);
+      DEBUGOUT("Sensor first measurement failed, Error Code: 0x%lx \n", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Sensor first measurement is successful\n");
-    SL_PRINT_STRING_ERROR("sensor humidity : %lu.%03lu %%\n", (rh_data / 1000), (rh_data % 1000));
-    SL_PRINT_STRING_ERROR("sensor temperature : %ld.%03ld C\n",
-                          (long)(temp_data / 1000),
-                          (long)(temp_data < 0 ? (-temp_data) % 1000 : temp_data % 1000));
+    DEBUGOUT("Sensor first measurement is successful\n");
+    DEBUGOUT("sensor humidity : %lu.%03lu %%\n", (rh_data / 1000), (rh_data % 1000));
+    DEBUGOUT("sensor temperature : %ld.%03ld C\n",
+             (long)(temp_data / 1000),
+             (long)(temp_data < 0 ? (-temp_data) % 1000 : temp_data % 1000));
   } while (false);
 }
 
@@ -210,16 +203,16 @@ void sht4x_example_process_action(void)
   int32_t temp_data  = 0; /* millidegrees C */
   status             = sl_sht4x_measure_rh_and_temp(sl_si91x_sht4x_sensor, SHT4X_ADDR, &rh_data, &temp_data);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("Sensor temperature read failed, Error Code: 0x%lx \n", status);
+    DEBUGOUT("Sensor temperature read failed, Error Code: 0x%lx \n", status);
     /* Delay even on error to throttle retries and maintain 1-second sampling rate */
     sl_si91x_delay_ms(1000);
     return;
   }
-  SL_PRINT_STRING_ERROR("Sensor temperature read is successful\n");
-  SL_PRINT_STRING_ERROR("sensor humidity : %lu.%03lu %%\n", (rh_data / 1000), (rh_data % 1000));
-  SL_PRINT_STRING_ERROR("sensor temperature : %ld.%03ld C\n",
-                        (long)(temp_data / 1000),
-                        (long)(temp_data < 0 ? (-temp_data) % 1000 : temp_data % 1000));
+  DEBUGOUT("Sensor temperature read is successful\n");
+  DEBUGOUT("sensor humidity : %lu.%03lu %%\n", (rh_data / 1000), (rh_data % 1000));
+  DEBUGOUT("sensor temperature : %ld.%03ld C\n",
+           (long)(temp_data / 1000),
+           (long)(temp_data < 0 ? (-temp_data) % 1000 : temp_data % 1000));
   /* Delay 1 s so we read sensor every one second. */
   sl_si91x_delay_ms(1000);
 }

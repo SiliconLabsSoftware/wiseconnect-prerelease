@@ -3,9 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Concurrent Mode Dual IP (NCP)
 category: Example|Wi-Fi
-description: 'Demonstrates concurrent Wi-Fi Client and Wi-Fi Access Point with data transfer in IPv6 UDP on STA and IPv4 TCP RX on AP.
-
-  '
+description: Start a Wi-Fi Access Point in IPv4 and IPv6 simultaneously with WPA2 security
 filter:
 - name: Wireless Technology
   value:

@@ -51,13 +51,7 @@ void bjt_temperature_sensor_example_init(void)
 
   status = sl_si91x_bjt_temperature_sensor_init(sl_bjt_channel_config, sl_bjt_config);
   if (status != SL_STATUS_OK) {
-    /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-    SL_PRINT_STRING_ERROR("sl_si91x_bjt_temp_init: Error Code : %lu \n", status);
+    DEBUGOUT("sl_si91x_bjt_temp_init: Error Code : %lu \n", status);
     return;
   }
   /* Calling sl_si91x_bjt_temperature_sensor_init() changes the frequency of
@@ -68,7 +62,7 @@ void bjt_temperature_sensor_example_init(void)
    * DEBUGOUT() prints will have corrupted characters due to incorrect bit timing.
    */
   DEBUGINIT();
-  SL_PRINT_STRING_ERROR("BJT temperature sensor Initialization Success\n");
+  DEBUGOUT("BJT temperature sensor Initialization Success\n");
 }
 
 /*******************************************************************************
@@ -82,7 +76,7 @@ void bjt_temperature_sensor_example_process_action(void)
   // equivalent voltage of 12 bit adc output.
   status = sl_si91x_bjt_temperature_sensor_read_data(&temperature);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("BJT Temperature sensor read failed, Error Code: 0x%ld \n", status);
+    DEBUGOUT("BJT Temperature sensor read failed, Error Code: 0x%ld \n", status);
   }
-  SL_PRINT_STRING_ERROR("BJT Temperature = %ld\n", (int32_t)temperature);
+  DEBUGOUT("BJT Temperature = %lf\n", temperature);
 }

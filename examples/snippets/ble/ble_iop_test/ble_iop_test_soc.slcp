@@ -1,24 +1,18 @@
 project_name: ble_iop_test_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Interoperability Testing Application FreeRTOS
+label: BLE - Interoperability Testing Application (SoC)
 category: Example|BLE
-description: 'Demonstrates BLE interoperability testing on SiWx91x SoC using the BLE stack and FreeRTOS. Covers IOP GATT services and procedures for interoperability validation scenarios.
+description: 'This application demonstrates Interoperability Test
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

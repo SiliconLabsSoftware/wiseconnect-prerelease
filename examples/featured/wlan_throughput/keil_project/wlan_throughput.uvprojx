@@ -625,12 +625,7 @@
             <File>
               <FileName>sl_net_credentials.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../components/service/network_manager/src/si91x/sl_net_credentials.c</FilePath>
-            </File>
-            <File>
-              <FileName>sli_net_credentials.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../components/service/network_manager/src/sli_net_credentials.c</FilePath>
+              <FilePath>../../../../components/service/network_manager/src/sl_net_credentials.c</FilePath>
             </File>
             <File>
               <FileName>sl_net_basic_profiles.c</FileName>

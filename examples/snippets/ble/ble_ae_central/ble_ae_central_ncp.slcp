@@ -1,24 +1,18 @@
 project_name: ble_ae_central_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP AE Central FreeRTOS
+label: BLE - AE Central (NCP)
 category: Example|BLE
-description: 'Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets on SiWx91x over SPI NCP with FreeRTOS. This is demonstrated by two scan sets in the application.
+description: 'ble_ae_central example application
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Advanced
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

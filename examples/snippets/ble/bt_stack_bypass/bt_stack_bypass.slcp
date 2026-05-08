@@ -1,24 +1,18 @@
 project_name: bt_stack_bypass
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - BT_STACK_BYPASS FreeRTOS
+label: BLE - BT_STACK_BYPASS
 category: Example|BLE
-description: 'Demonstrates raw BLE HCI over UART on SiWx91x in SoC FreeRTOS for low-level controller testing. Demonstrated by bypassing the host stack with direct HCI.
+description: 'Demonstrates how to configure the Raw HCI commands through uart.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

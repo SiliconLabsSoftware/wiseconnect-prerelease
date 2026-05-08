@@ -9,17 +9,11 @@ description: 'SHT4x temperature and humidity sensor example using the compatibil
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - SHT4x
+label: Platform SiWx91x - SHT4x
 component:
 - id: sl_main
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sl_i2c
 - id: enum
 - id: sl_si91x_sht4x

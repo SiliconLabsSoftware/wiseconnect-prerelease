@@ -1,8 +1,8 @@
-# SiWx91x Platform PS2 STATE
+# Platform SiWx91x PS2 STATE
 
 ## Table of Contents
 
-- [SiWx91x Platform PS2 STATE](#platform-siwx91x-ps2-state)
+- [Platform SiWx91x PS2 STATE](#platform-siwx91x-ps2-state)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -72,8 +72,6 @@ The application can be configured to suit user requirements and development envi
 
 Configure the following parameters to enable your PS2 Active or sleep state.
 
-- `ACTIVE_STATE`: Selects whether the application enters the PS2 sleep state or remains in the PS2 active state. By default, it is set to 0 (sleep state); set it to 1 to enable the PS2 active state.
-
   - By default, the ACTIVE_STATE macro is set to 0, which means the application will enter the sleep state.
 
     ```c
@@ -114,4 +112,3 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

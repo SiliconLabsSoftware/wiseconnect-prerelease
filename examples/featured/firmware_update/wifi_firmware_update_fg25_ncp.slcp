@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - NWP or Combined (NWP and M4) Firmware Update via TCP (NCP)
 category: Example|Wi-Fi
-description: 'Wirelessly updates the SiWx91x firmware from a remote TCP server
+description: 'Wirelessly updates the Si91x firmware from a remote TCP server
 
   '
 filter:

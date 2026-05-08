@@ -1,7 +1,7 @@
 project_name: wifi_ble_provisioning_aws_devkit
 package: multi_protocol_siwx91x_app
 quality: production
-label: Wi-Fi Coex - Wi-Fi Client BLE Provisioning with AWS (Devkit)
+label: wifi_ble_provisioning_aws_devkit
 category: Example|Wi-Fi_BLE
 description: 'This application explains how to connect to a Wi-Fi access point using BLE provisioning functionality and then communicates with an AWS server using MQTT for devkit. Data will be continuously published until the device is disconnected from the access point
 

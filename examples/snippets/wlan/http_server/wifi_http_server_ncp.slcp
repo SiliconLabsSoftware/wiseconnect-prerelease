@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - HTTP Server (NCP)
 category: Example|Wi-Fi
-description: 'Demonstrates Wi-Fi station mode, then runs an HTTP server with multiple URI handlers.
+description: 'Demonstrates how to create HTTP server
 
   '
 filter:

@@ -5,7 +5,7 @@ description: 'This example project demonstrates the PSA CMAC APIs in SI91x.
   '
 category: example|crypto
 quality: production
-label: SiWx91x Platform - PSA CMAC
+label: Platform SiWx91x - PSA CMAC
 component:
 - id: sl_main
 - id: freertos

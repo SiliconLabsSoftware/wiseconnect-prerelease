@@ -9,7 +9,7 @@ description: 'This application demonstrates WDT manager integration with LED bli
   '
 category: example|service
 quality: production
-label: SiWx91x Platform - WDT Manager
+label: Platform SiWx91x - WDT Manager
 component:
 - id: sl_main
 - id: sleeptimer
@@ -19,12 +19,6 @@ component:
 - id: sl_wdt_manager
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 source:
 - path: app.c
 - path: wdt_manager.c

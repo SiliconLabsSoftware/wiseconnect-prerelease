@@ -60,11 +60,11 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
 
   // Ensure the WebSocket client is in the correct state
   if (client->state != SL_WEBSOCKET_STATE_DISCONNECTED) {
-    SL_DEBUG_LOG_V2(WARN, "\r\nWebSocket client is not in a disconnected state\r\n");
+    SL_DEBUG_LOG("\r\nWebSocket client is not in a disconnected state\r\n");
     return SL_WEBSOCKET_ERR_INVALID_PARAMETER;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "\r\nStarting synchronous WebSocket connection");
+  SL_DEBUG_LOG("\r\nStarting synchronous WebSocket connection");
 
   int sock_fd     = -1;
   int sock_result = 0;
@@ -106,18 +106,18 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
 #endif
 
   if (sock_fd < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\nFailed to create socket, error: %d\r\n", errno);
+    SL_DEBUG_LOG("\r\nFailed to create socket, error: %d\r\n", errno);
     client->state = SL_WEBSOCKET_STATE_DISCONNECTED;
     return SL_WEBSOCKET_ERR_SOCKET_CREATION;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "\r\nClient Socket created successfully, ID %d\r\n", sock_fd);
+  SL_DEBUG_LOG("\r\nClient Socket created successfully, ID %d\r\n", sock_fd);
   client->socket_fd = sock_fd;
 
   if (client->enable_ssl) {
     sock_result = setsockopt(sock_fd, SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
     if (sock_result < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "\r\nFailed to set SSL options, error: %d\r\n", errno);
+      SL_DEBUG_LOG("\r\nFailed to set SSL options, error: %d\r\n", errno);
       close(sock_fd);
       return SL_WEBSOCKET_ERR_SSL_SETSOCKOPT;
     }
@@ -125,7 +125,7 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
 
   sock_result = sl_si91x_bind(sock_fd, (struct sockaddr *)&client_address, socket_length);
   if (sock_result < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\nSocket bind failed, error: %d\r\n", errno);
+    SL_DEBUG_LOG("\r\nSocket bind failed, error: %d\r\n", errno);
     close(sock_fd);
     client->state = SL_WEBSOCKET_STATE_DISCONNECTED;
     return SL_WEBSOCKET_ERR_SOCKET_BIND;
@@ -134,7 +134,7 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
   // Retrieve the socket using the socket index
   sli_si91x_socket_t *si91x_socket = sli_get_si91x_socket(sock_fd);
   if (!si91x_socket) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\nUnable to retrieve socket information\r\n");
+    SL_DEBUG_LOG("\r\nUnable to retrieve socket information\r\n");
     close(sock_fd);
     client->state = SL_WEBSOCKET_STATE_DISCONNECTED;
     return SL_WEBSOCKET_ERR_SOCKET_CREATION;
@@ -151,7 +151,7 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
                                                                       + resource_length + subprotocol_length);
 
   if (si91x_socket->websocket_info == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\nMemory allocation for WebSocket info failed\r\n");
+    SL_DEBUG_LOG("\r\nMemory allocation for WebSocket info failed\r\n");
     close(sock_fd);
     client->state = SL_WEBSOCKET_STATE_DISCONNECTED;
     return SL_WEBSOCKET_ERR_SOCKET_CREATION;
@@ -171,12 +171,12 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
 
   sock_result = connect(sock_fd, (struct sockaddr *)&server_address, socket_length);
   if (sock_result < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\nFailed to connect socket, error: %d\r\n", errno);
+    SL_DEBUG_LOG("\r\nFailed to connect socket, error: %d\r\n", errno);
     close(sock_fd);
     client->state = SL_WEBSOCKET_STATE_DISCONNECTED;
     return SL_WEBSOCKET_ERR_SOCKET_CONNECT;
   }
-  SL_DEBUG_LOG_V2(INFO, "\r\nSocket successfully connected to the server\r\n");
+  SL_DEBUG_LOG("\r\nSocket successfully connected to the server\r\n");
 
   client->state = SL_WEBSOCKET_STATE_CONNECTED;
   return SL_WEBSOCKET_SUCCESS;

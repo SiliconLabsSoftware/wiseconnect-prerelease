@@ -1,7 +1,7 @@
 id: sl_si91x_mem_pool_buffers
 package: wifi
 description: >
-  SiWx91x Memory Pool based buffer system
+  Si91x Memory Pool based buffer system
 label: Memory Pool Buffers
 category: Device|Si91x|Wireless|Buffer Manager
 quality: production

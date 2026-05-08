@@ -1,8 +1,8 @@
-# SiWx91x Platform Config Timer Basic and OCU without DMA
+# Platform SiWx91x Config Timer Basic and OCU without DMA
 
 ## Table of Contents
 
-- [SiWx91x Platform Config Timer Basic and OCU without DMA](#platform-siwx91x-config-timer-basic-and-ocu-without-dma)
+- [Platform SiWx91x Config Timer Basic and OCU without DMA](#platform-siwx91x-config-timer-basic-and-ocu-without-dma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -105,36 +105,25 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following macros in 'config_timer_ocu_non_dma_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)](enable any one at a time).
 
-- `CT_PWM_MODE_USECASE`: When enabled (`SET`), runs the PWM output use case using the Output Compare Unit to generate waveforms on CT Output-0 and CT Output-1. Enable only one use-case macro at a time. By default, it is set to `CLEAR` (disabled).
-
-  ```c
-    #define CT_PWM_MODE_USECASE     CLEAR //< To run OCU PWM output code
+  ```C
+    #define CT_PWM_MODE_USECASE           1      -  To run PWM output code
+    #define CT_COUNTER_MODE_USECASE       1      -  To run normal counter code
   ```
 
-- `CT_COUNTER_MODE_USECASE`: When enabled (`SET`), runs the normal counter use case where the Config Timer is used as a free-running counter that triggers an interrupt on match. Enable only one use-case macro at a time. By default, it is set to `SET` (enabled).
-
-  ```c
-    #define CT_COUNTER_MODE_USECASE SET   //< To run normal counter code
-  ```
-
-- Also enable the CT configuration macro for the PWM mode use case by setting `CT_PWM_MODE_USECASE` to `SET` and ensuring `CT_COUNTER_MODE_USECASE` is set to `CLEAR` in the `config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] file.
+- Also enable the CT configuration macro for the PWM mode use case by setting `CT_PWM_MODE_USECASE` to `1` and ensuring `CT_COUNTER_MODE_USECASE` is set to `0` in the `config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] file.
 
 - In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value for a counter-mode use case. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
 
-- `TIME_PERIOD_VALUE`: Time period (in microseconds) used to compute the match value of the counter for the counter-mode use case. By default, it is set to 1000.
-
-  ```c
+  ```C
    #define TIME_PERIOD_VALUE     1000         // Time period in microseconds
+
   ```
 
-- Change the following macro in `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)] file to change the counter number used for the counter-mode use case. By default, the application uses counter-0; to use counter-1, change it to `SL_COUNTER_1`.
+  - Change following macros in `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)]file to change counter-number used for counter-mode use case, by default application is using counter-0 to use counter-1 change it to 'SL_COUNTER_1'.
 
-- `CT_COUNTER_USED`: Selects which Config Timer counter (`SL_COUNTER_0` or `SL_COUNTER_1`) is used for the normal counter-mode application. By default, it is set to `SL_COUNTER_0`.
-
-  ```c
-    #define CT_COUNTER_USED   SL_COUNTER_0 // counter number used for normal counter application
+  ```C
+  #define CT_COUNTER_USED            SL_COUNTER_0  -  For using counter-0
   ```
-
 - Use the following CT configurations to run the application either in Normal counter mode (using Counter-0 or Counter-1) or in PWM mode.
 - In Simplicity Studio, search for **"Config Timer"** in the Software Components tab to add or configure the required timer component for your project.
 
@@ -209,4 +198,3 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

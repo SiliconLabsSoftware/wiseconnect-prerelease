@@ -39,7 +39,6 @@
 #include "sl_wifi.h"
 #include "sl_wifi_device.h"
 #include "sl_net_wifi_types.h"
-#include "sl_log_helper.h"
 #include "sl_utility.h"
 #include "sl_si91x_driver.h"
 
@@ -228,15 +227,7 @@ void disconnect_notify_handler(AWS_IoT_Client *pClient, void *data)
 {
   UNUSED_PARAMETER(pClient);
   UNUSED_PARAMETER(data);
-  /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-
-  SL_PRINT_STRING_ERROR("\r\nMQTT disconnected abruptly and pClient state is: %d\r\n",
-                        pClient->clientStatus.clientState);
+  printf("\r\nMQTT disconnected abruptly and pClient state is: %d\r\n", pClient->clientStatus.clientState);
 }
 
 void subscribe_handler(struct _Client *pClient,
@@ -249,9 +240,7 @@ void subscribe_handler(struct _Client *pClient,
   UNUSED_PARAMETER(pTopicName);
   UNUSED_PARAMETER(topicNameLen);
   UNUSED_PARAMETER(data);
-  SL_PRINT_STRING_ERROR("\rData received on the Subscribed Topic: %.*s \r\n",
-                        pParams->payloadLen,
-                        (uint32_t)(uintptr_t)pParams->payload);
+  printf("\rData received on the Subscribed Topic: %.*s \r\n", pParams->payloadLen, (char *)pParams->payload);
 }
 void sl_si91x_aws_task(void)
 {
@@ -268,54 +257,54 @@ void sl_si91x_aws_task(void)
 #if SH_AWS_ENABLE
   sl_semaphore_aws_task_id = osSemaphoreNew(1U, 0U, &sl_aws_semaphore_attr_st);
 #endif
-  SL_PRINT_STRING_ERROR("\r\nWi-Fi Begin\r\n");
+  printf("\r\nWi-Fi Begin\r\n");
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nUnexpected error while initializing Wi-Fi: 0x%lx\r\n", status);
+    printf("\r\nUnexpected error while initializing Wi-Fi: 0x%lx\r\n", status);
     return;
   }
-  SL_PRINT_STRING_ERROR("\r\nWi-Fi is Initialized\r\n");
+  printf("\r\nWi-Fi is Initialized\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nFailed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+    printf("\r\nFailed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
     return;
   }
-  SL_PRINT_STRING_ERROR("\r\nM4-NWP secure handshake is successful\r\n");
+  printf("\r\nM4-NWP secure handshake is successful\r\n");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nError while connecting to Access point: 0x%lx\r\n", status);
+    printf("\r\nError while connecting to Access point: 0x%lx\r\n", status);
     return;
   }
-  SL_PRINT_STRING_ERROR("\r\nConnected to Access point\r\n");
+  printf("\r\nConnected to Access point\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nFailed to get client profile: 0x%lx\r\n", status);
+    printf("\r\nFailed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_PRINT_STRING_ERROR("\r\nGetting client profile is successful\r\n");
+  printf("\r\nGetting client profile is successful\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
-  SL_PRINT_STRING_ERROR("\r\nIP address is ");
+  printf("\r\nIP address is ");
   print_sl_ip_address(&ip_address);
   printf("\r\n");
 
   sh_aws_status = load_certificates_in_flash();
   if (sh_aws_status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\Error while loading certificates: 0x%lx\r\n", sh_aws_status);
+    printf("\r\Error while loading certificates: 0x%lx\r\n", sh_aws_status);
     return;
   }
-  SL_PRINT_STRING_ERROR("\r\nLoaded certificates\r\n");
+  printf("\r\nLoaded certificates\r\n");
 
   sh_aws_status = start_aws_mqtt();
   if (sh_aws_status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nUnexpected error occurred in AWS connection: 0x%lx\r\n", sh_aws_status);
+    printf("\r\nUnexpected error occurred in AWS connection: 0x%lx\r\n", sh_aws_status);
     return;
   }
 }
@@ -330,12 +319,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_starfield_ca,
                                  sizeof(aws_starfield_ca) - 1);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nLoading TLS CA certificate in to FLASH Failed, "
-                          "Error Code : 0x%lX\r\n",
-                          status);
+    printf("\r\nLoading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_PRINT_STRING_ERROR("\r\nLoading TLS CA certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
+  printf("\r\nLoading TLS CA certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
 
   // Load SSL Client certificate
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX),
@@ -343,12 +330,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_client_certificate,
                                  sizeof(aws_client_certificate) - 1);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nLoading TLS certificate in to FLASH failed, "
-                          "Error Code : 0x%lX\r\n",
-                          status);
+    printf("\r\nLoading TLS certificate in to FLASH failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_PRINT_STRING_ERROR("\r\nLoading TLS Client certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
+  printf("\r\nLoading TLS Client certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
 
   // Load SSL Client private key
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX),
@@ -356,12 +341,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_client_private_key,
                                  sizeof(aws_client_private_key) - 1);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nLoading TLS Client private key in to FLASH "
-                          "Failed, Error Code : 0x%lX\r\n",
-                          status);
+    printf("\r\nLoading TLS Client private key in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_PRINT_STRING_ERROR("\r\nLoading TLS Client private key at index %d Successful\r\n", CERTIFICATE_INDEX);
+  printf("\r\nLoading TLS Client private key at index %d Successful\r\n", CERTIFICATE_INDEX);
 
   return SL_STATUS_OK;
 }
@@ -387,12 +370,12 @@ sl_status_t start_aws_mqtt(void)
           mac_addr.octet[3],
           mac_addr.octet[4],
           mac_addr.octet[5]);
-  SL_PRINT_STRING_ERROR("\r\n client_id:%s \r\n", (uint32_t)(uintptr_t)mac_id);
+  printf("\r\n client_id:%s \r\n", mac_id);
 
   sl_wifi_firmware_version_t fw_version = { 0 };
   sh_aws_status                         = sl_wifi_get_firmware_version(&fw_version);
   if (sh_aws_status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", sh_aws_status);
+    printf("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", sh_aws_status);
   } else {
     print_firmware_version(&fw_version);
   }
@@ -430,10 +413,10 @@ sl_status_t start_aws_mqtt(void)
         rc = aws_iot_mqtt_init(&mqtt_client, &mqtt_init_params);
         if (SUCCESS != rc) {
           application_state = AWS_MQTT_INIT_STATE;
-          SL_PRINT_STRING_ERROR("\r\nMQTT Initialization failed with error: 0x%x\r\n", rc);
+          printf("\r\nMQTT Initialization failed with error: 0x%x\r\n", rc);
         } else {
           application_state = AWS_MQTT_CONNECT_STATE;
-          SL_PRINT_STRING_ERROR("\r\nMQTT Initialization success\r\n");
+          printf("\r\nMQTT Initialization success\r\n");
         }
 
       } break;
@@ -441,14 +424,14 @@ sl_status_t start_aws_mqtt(void)
         rc = aws_iot_mqtt_connect(&mqtt_client, &mqtt_connect_params);
         if (SUCCESS != rc) {
           if (rc == NETWORK_ALREADY_CONNECTED_ERROR) {
-            SL_PRINT_STRING_ERROR("\r\nNetwork is already connected\r\n");
+            printf("\r\nNetwork is already connected\r\n");
 
           } else {
-            SL_PRINT_STRING_ERROR("\r\nMQTT connect failed with error: 0x%x\r\n", rc);
+            printf("\r\nMQTT connect failed with error: 0x%x\r\n", rc);
             application_state = AWS_MQTT_DISCONNECT;
           }
         } else {
-          SL_PRINT_STRING_ERROR("\r\nConnected to AWS IoT Cloud\n");
+          printf("\r\nConnected to AWS IoT Cloud\n");
           application_state = AWS_MQTT_SUBSCRIBE_STATE;
         }
 
@@ -463,7 +446,7 @@ sl_status_t start_aws_mqtt(void)
 
         if (SUCCESS != rc) {
           if (NETWORK_DISCONNECTED_ERROR == rc) {
-            SL_PRINT_STRING_ERROR("\r\nSubscription failed with error: 0x%x\r\n", rc);
+            printf("\r\nSubscription failed with error: 0x%x\r\n", rc);
             application_state = AWS_MQTT_CONNECT_STATE;
           } else if (NETWORK_ATTEMPTING_RECONNECT == rc) {
             // If the client is attempting to reconnect skip the rest of the loop
@@ -471,7 +454,7 @@ sl_status_t start_aws_mqtt(void)
           }
           application_state = AWS_MQTT_SUBSCRIBE_STATE;
         } else {
-          SL_PRINT_STRING_ERROR("\rSubscribed to the specified topic with QoS%d\n", SUBSCRIBE_QOS);
+          printf("\rSubscribed to the specified topic with QoS%d\n", SUBSCRIBE_QOS);
           application_state = AWS_SELECT_CONNECT_STATE;
         }
 
@@ -482,11 +465,11 @@ sl_status_t start_aws_mqtt(void)
 #if SH_AWS_ENABLE
           sl_semawstaskacq_status = osSemaphoreRelease(sl_semaphore_app_task_id_2);
           if (sl_semawstaskacq_status != osOK) {
-            SL_PRINT_STRING_ERROR("\r\n  osSemaphoreRelease failed :%d \r\n", sl_semawstaskacq_status);
+            DEBUGOUT("\r\n  osSemaphoreRelease failed :%d \r\n", sl_semawstaskacq_status);
           }
           sl_semawstaskacq_status = osSemaphoreAcquire(sl_semaphore_aws_task_id, osWaitForever);
           if (sl_semawstaskacq_status != osOK) {
-            SL_PRINT_STRING_ERROR("\r\n osSemaphoreAcquire failed :%d \r\n", sl_semawstaskacq_status);
+            DEBUGOUT("\r\n osSemaphoreAcquire failed :%d \r\n", sl_semawstaskacq_status);
           }
 #endif
           if (!select_given) {
@@ -494,12 +477,12 @@ sl_status_t start_aws_mqtt(void)
             memset(&read_fds, 0, sizeof(fd_set));
 
             FD_SET(mqtt_client.networkStack.socket_id, &read_fds);
-            SL_PRINT_STRING_ERROR("\rSocket ID: %d\n", mqtt_client.networkStack.socket_id);
+            printf("\rSocket ID: %d\n", mqtt_client.networkStack.socket_id);
 
             sh_aws_status =
               sl_si91x_select(mqtt_client.networkStack.socket_id + 1, &read_fds, NULL, NULL, NULL, async_socket_select);
 
-            SL_PRINT_STRING_ERROR("\rSelect status: 0x%lX\r\n", sh_aws_status);
+            printf("\rSelect status: 0x%lX\r\n", sh_aws_status);
           }
 
           // waiting for the semaphore release
@@ -518,7 +501,7 @@ sl_status_t start_aws_mqtt(void)
       case AWS_MQTT_RECEIVE_STATE: {
         rc = aws_iot_shadow_yield(&mqtt_client, 1);
         if (SUCCESS == rc) {
-          SL_PRINT_STRING_ERROR("\rYield is successful\n");
+          printf("\rYield is successful\n");
         }
         application_state = AWS_SELECT_CONNECT_STATE;
 
@@ -526,7 +509,7 @@ sl_status_t start_aws_mqtt(void)
 
       case AWS_MQTT_PUBLISH_STATE: {
 #if SH_AWS_ENABLE
-        SL_PRINT_STRING_ERROR("\rData to be published: %s\n", (uint32_t)(uintptr_t)mqtt_publish_payload);
+        printf("\rData to be published: %s\n", mqtt_publish_payload);
 
         publish_iot_msg.qos        = PUBLISH_QOS;
         publish_iot_msg.payload    = mqtt_publish_payload;
@@ -546,15 +529,15 @@ sl_status_t start_aws_mqtt(void)
         rc = aws_iot_mqtt_publish(&mqtt_client, PUBLISH_ON_TOPIC, strlen(PUBLISH_ON_TOPIC), &publish_iot_msg);
 
         if (rc != SUCCESS) {
-          SL_PRINT_STRING_ERROR("\r\nMQTT Publish with QoS%d failed with error: 0x%x\n", PUBLISH_QOS, rc);
+          printf("\r\nMQTT Publish with QoS%d failed with error: 0x%x\n", PUBLISH_QOS, rc);
           application_state = AWS_MQTT_DISCONNECT;
           break;
         }
 
         else if (rc == MQTT_REQUEST_TIMEOUT_ERROR) {
-          SL_PRINT_STRING_ERROR("\r\nACK not received for QoS%d publish\r\n", PUBLISH_QOS);
+          printf("\r\nACK not received for QoS%d publish\r\n", PUBLISH_QOS);
         } else {
-          SL_PRINT_STRING_ERROR("\rQoS%d publish is successful\r\n", PUBLISH_QOS);
+          printf("\rQoS%d publish is successful\r\n", PUBLISH_QOS);
         }
 
 #if ENABLE_NWP_POWER_SAVE
@@ -563,9 +546,9 @@ sl_status_t start_aws_mqtt(void)
         if (!powersave_given) {
           rc = sl_wifi_set_performance_profile_v2(&performance_profile);
           if (rc != SL_STATUS_OK) {
-            SL_PRINT_STRING_ERROR("\r\nPower save configuration Failed, Error Code : 0x%X\r\n", rc);
+            printf("\r\nPower save configuration Failed, Error Code : 0x%X\r\n", rc);
           }
-          SL_PRINT_STRING_ERROR("\r\nAssociated Power Save is enabled\r\n");
+          printf("\r\nAssociated Power Save is enabled\r\n");
           powersave_given = 1;
         }
         application_state = AWS_SELECT_CONNECT_STATE;
@@ -577,7 +560,7 @@ sl_status_t start_aws_mqtt(void)
       case AWS_MQTT_DISCONNECT: {
         rc = aws_iot_mqtt_disconnect(&mqtt_client);
         if (SUCCESS != rc) {
-          SL_PRINT_STRING_ERROR("\r\nMQTT disconnection error\r\n");
+          printf("\r\nMQTT disconnection error\r\n");
           application_state = AWS_MQTT_INIT_STATE;
         }
         application_state = AWS_MQTT_INIT_STATE;
@@ -593,7 +576,7 @@ sl_status_t start_aws_mqtt(void)
         case RSI_WLAN_DISCONNECT: {
           rc = sl_net_down();
           if (SUCCESS != rc) {
-              SL_PRINT_STRING_ERROR("\r\nWLAN disconnection error\r\n");
+            printf("\r\nWLAN disconnection error\r\n");
             application_state = WLAN_DISCONNECT;
           }
           sl_si91x_host_delay_ms(100);

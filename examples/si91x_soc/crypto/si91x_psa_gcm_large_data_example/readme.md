@@ -1,8 +1,8 @@
-# SiWx91x Platform PSA GCM Large Data Example
+# Platform SiWx91x PSA GCM Large Data Example
 
 ## Table of Contents
 
-- [SiWx91x Platform PSA GCM Large Data Example](#platform-siwx91x-psa-gcm-large-data-example)
+- [Platform SiWx91x PSA GCM Large Data Example](#platform-siwx91x-psa-gcm-large-data-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -62,20 +62,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - Add mbedtls_gcm in component section of slcp file
   - Undefine the macro SLI_AEAD_DEVICE_SI91X
 
-- Configure the following macros in `psa_gcm_app.c` if required:
-
-- `CHUNK_LENGTH`: Specifies the length (in bytes) of each data chunk processed during the multipart GCM encryption/decryption operation. By default, it is set to 1024.
-
-  ```c
-  #define CHUNK_LENGTH 1024                               // Length of each data chunk
-  ```
-
-- `CHUNK_COUNT`: Specifies the total number of chunks to be processed, computed as the maximum plaintext length divided by `CHUNK_LENGTH`.
-
-  ```c
-  #define CHUNK_COUNT  GCM_TEST_PT_MAX_LEN / CHUNK_LENGTH // Number of chunks
-  ```
-
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
@@ -107,4 +93,3 @@ Follow the steps as mentioned for the successful execution of the application:
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

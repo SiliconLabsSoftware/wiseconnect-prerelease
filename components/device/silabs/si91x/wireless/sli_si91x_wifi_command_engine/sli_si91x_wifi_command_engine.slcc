@@ -1,5 +1,5 @@
 id: sli_si91x_wifi_command_engine
-label: Sli SiWx91x WiFi Command Engine
+label: Sli Si91x WiFi Command Engine
 package: wifi
 description: >
     Core Command Engine thread configuration for SiWx91x Wi-Fi: schedules TX requests, processes RX
@@ -30,4 +30,4 @@ requires:
     - name: sli_event_engine
     - name: sli_buffer_manager
     - name: sli_si91x_wifi_event_handler
-    - name: log_none
+    - name: si91x_log_none

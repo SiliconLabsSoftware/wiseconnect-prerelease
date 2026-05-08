@@ -153,23 +153,17 @@ void sysrtc_example_init(void)
     // Configuring SYSRTC clock source
     status = sl_si91x_sysrtc_configure_clock(&sl_sysrtc_clk_config_handle);
     if (status != SL_STATUS_OK) {
-      /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-      SL_PRINT_STRING_ERROR("sl_si91x_sysrtc_configure_clock, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_sysrtc_configure_clock, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC clock configuration is done successfully \n");
+    DEBUGOUT("SYSRTC clock configuration is done successfully \n");
     // Initializing and Enabling SYSRTC.
     status = sl_si91x_sysrtc_init(&sysrtc_handle);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_sysrtc_init, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_sysrtc_init, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC initialization is done successfully \n");
+    DEBUGOUT("SYSRTC initialization is done successfully \n");
 #if ((SL_SYSRTC_COMPARE_CHANNEL0_ENABLE == 1) || (SL_SYSRTC_COMPARE_CHANNEL1_ENABLE == 1))
     uint32_t compare_value = SYSRTC_COMPARE_VALUE;
 #if (SYSRTC_PRS == 1)
@@ -185,34 +179,34 @@ void sysrtc_example_init(void)
     // Configuring sysrtc group0, enabling its compare channel
     status = sl_si91x_sysrtc_configure_group(SL_SYSRTC_GROUP, &sysrtc_group_config_handle);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_sysrtc_configure_group, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_sysrtc_configure_group, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC group configuration is done successfully \n");
+    DEBUGOUT("SYSRTC group configuration is done successfully \n");
 #if (SYSRTC_PRS == 1)
     status = sl_si91x_sysrtc_set_compare_output_prs_gpio(SL_SYSRTC_GROUP, COMPARE_CHANNEL, sysrtc_prs_pin);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_sysrtc_set_compare_output_gpio, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_sysrtc_set_compare_output_gpio, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC PRS_OUT GPIO pin configuration is done successfully \n");
+    DEBUGOUT("SYSRTC PRS_OUT GPIO pin configuration is done successfully \n");
 #endif
     // Registering SYSRTC callback and enabling interrupts
     status =
       sl_si91x_sysrtc_register_callback(sysrtc_callback, &callback_flag_data, SL_SYSRTC_GROUP, &interrupt_enabled);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_sysrtc_register_callback, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_sysrtc_register_callback, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC callback registered successfully\n");
+    DEBUGOUT("SYSRTC callback registered successfully\n");
     // Setting counter start value
     sl_si91x_sysrtc_set_count(counter_value1);
     //Setting compare value.
     status = sl_si91x_sysrtc_set_compare_value(SL_SYSRTC_GROUP, COMPARE_CHANNEL, compare_value);
-    SL_PRINT_STRING_ERROR("\r\nSYSRTC group compare value set successfully\r\n");
+    DEBUGOUT("\r\nSYSRTC group compare value set successfully\r\n");
     // Starting Sysrtc
     sl_si91x_sysrtc_start();
-    SL_PRINT_STRING_ERROR("\nStarted SYSRTC successfully\n");
+    DEBUGOUT("\nStarted SYSRTC successfully\n");
 #endif
 #if (SL_SYSRTC_CAPTURE_CHANNEL0_ENABLE == 1)
 #if (SYSRTC_PRS == 1)
@@ -225,19 +219,18 @@ void sysrtc_example_init(void)
     // Configuring sysrtc group0, enabling its compare channel
     status = sl_si91x_sysrtc_set_capture_input_prs_gpio(SL_SYSRTC_GROUP, sysrtc_prs_pin);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_sysrtc_set_gpio_as_capture_input, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_sysrtc_set_gpio_as_capture_input, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC PRS_IN gpio pin configuration is done successfully \n");
+    DEBUGOUT("SYSRTC PRS_IN gpio pin configuration is done successfully \n");
 
     status = sl_gpio_set_configuration(sl_gpio_pin_config);
     if (status != SL_STATUS_OK) {
       // Prints if pin configuration fails
-      SL_PRINT_STRING_ERROR("sl_gpio_set_configuration, Error code: %lu\r\n", status);
+      DEBUGOUT("sl_gpio_set_configuration, Error code: %lu\r\n", status);
       break; // breaks if error occurs
     }
-    SL_PRINT_STRING_ERROR("GPIO set pin configuration is successful for ULP_GPIO %d \r\n",
-                          sl_gpio_pin_config.port_pin.pin);
+    DEBUGOUT("GPIO set pin configuration is successful for ULP_GPIO %d \r\n", sl_gpio_pin_config.port_pin.pin);
 #else
     uint32_t current_count = 0;
     uint32_t compare_value = SYSRTC_COMPARE_VALUE;
@@ -251,23 +244,23 @@ void sysrtc_example_init(void)
     // Configuring sysrtc group0, enabling its compare channel
     status = sl_si91x_sysrtc_configure_group(SL_SYSRTC_GROUP, &sysrtc_group_config_handle);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_sysrtc_configure_group, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_sysrtc_configure_group, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC group configuration is done successfully \n");
+    DEBUGOUT("SYSRTC group configuration is done successfully \n");
     // Registering SYSRTC callback and enabling interrupts
     status =
       sl_si91x_sysrtc_register_callback(sysrtc_callback, &callback_flag_data, SL_SYSRTC_GROUP, &interrupt_enabled);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_config_timer_register_callback, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_config_timer_register_callback, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC callback registered successfully\n");
+    DEBUGOUT("SYSRTC callback registered successfully\n");
     // Setting counter start value
     sl_si91x_sysrtc_set_count(counter_value1);
     // Starting Sysrtc
     sl_si91x_sysrtc_start();
-    SL_PRINT_STRING_ERROR("\nStarted SYSRTC successfully\n");
+    DEBUGOUT("\nStarted SYSRTC successfully\n");
 #if (SYSRTC_PRS == 1)
     sl_gpio_driver_set_pin(&sl_gpio_pin_config.port_pin);
 #else
@@ -286,15 +279,15 @@ void sysrtc_example_init(void)
     status =
       sl_si91x_sysrtc_register_callback(sysrtc_callback, &callback_flag_data, SL_SYSRTC_GROUP, &interrupt_enabled);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_config_timer_register_callback, Error code: %lu", status);
+      DEBUGOUT("sl_si91x_config_timer_register_callback, Error code: %lu", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("SYSRTC callback registered successfully\n");
+    DEBUGOUT("SYSRTC callback registered successfully\n");
     // Setting counter start value
     sl_si91x_sysrtc_set_count(counter_value2);
     // Starting Sysrtc
     sl_si91x_sysrtc_start();
-    SL_PRINT_STRING_ERROR("\nStarted SYSRTC successfully\n");
+    DEBUGOUT("\nStarted SYSRTC successfully\n");
 #endif
   } while (false);
 }
@@ -314,7 +307,7 @@ void sysrtc_example_process_action(void)
 ******************************************************************************/
 void sysrtc_callback(void *callback_flags)
 {
-  SL_PRINT_STRING_ERROR("In handler... \n");
+  DEBUGOUT("In handler... \n");
   // to avoid unused variable warning
   (void)callback_flags;
   state = !state;
@@ -346,7 +339,7 @@ void sysrtc_callback(void *callback_flags)
 #if (SL_SYSRTC_CAPTURE_CHANNEL0_ENABLE)
   //Stopping the timer instance, after capture interrupt.
   sl_si91x_sysrtc_get_capture_value(SL_SYSRTC_GROUP, &capture_val);
-  SL_PRINT_STRING_ERROR("capture value :%ld \n", capture_val);
+  DEBUGOUT("capture value :%ld \n", capture_val);
   sl_si91x_sysrtc_stop();
   // Deinit sysrtc and unregistering callback
   sl_si91x_sysrtc_deinit();

@@ -1,8 +1,8 @@
-# SiWx91x Platform PSA SHA
+# Platform SiWx91x PSA SHA
 
 ## Table of Contents
 
-- [SiWx91x Platform PSA SHA](#platform-siwx91x-psa-sha)
+- [Platform SiWx91x PSA SHA](#platform-siwx91x-psa-sha)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -19,9 +19,7 @@
 
 ## Purpose/Scope
 
-- This application demonstrates the PSA Crypto SHA hash functionality, including:
-  - **One-shot hashing** via `psa_hash_compute` for single-buffer inputs.
-  - **Multipart (streaming) hashing** via `psa_hash_setup` / `psa_hash_update` / `psa_hash_finish` / `psa_hash_abort` for incremental input processing.
+- This application contains an example code to demonstrate PSA SHA.
 
 ## Prerequisites/Setup Requirements
 
@@ -55,28 +53,17 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Application Build Environment
 
 - The user can run the application to verify the following SHA modes:
-  - SHA-1
-  - SHA-224
-  - SHA-256
-  - SHA-384
-  - SHA-512
-- Each SHA mode runs two tests:
-  1. **One-shot** — computes the hash in a single `psa_hash_compute` call.
-  2. **Multipart** — streams the same message in 4-byte chunks via `psa_hash_setup` / `psa_hash_update` / `psa_hash_finish`, followed by `psa_hash_abort`.
-- Enable the desired SHA algorithm in [`psa_sha_app.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_sha/psa_sha_app.h) by enabling the corresponding macro.
-- By default SHA-256 is enabled.
+- SHA 1
+- SHA 256
+- SHA 384
+- SHA 512
+- Enable the desired SHA algorithm in [`psa_sha_app.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_sha/psa_sha_app.h) by enabling the corresponding macro
+- By defauit SHA 256 is enabled
 * To use software fallback instead of hardware accelerators:
   - Add mbedtls_shaxxx in component section of slcp file
   - Undefine the macro SLI_SHA_DEVICE_SI91X
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
-
-> **Note**: To enable **sideband crypto**, add the following in the project's `.slcp` file. The `define` entry is at project scope alongside `component`:
->
-> ```yaml
-> define:
->   - name: SL_SI91X_SIDE_BAND_CRYPTO
-> ```
 
 ## Test the Application
 

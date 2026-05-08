@@ -1,8 +1,8 @@
-# SiWx91x Platform QSPI
+# Platform SiWx91x QSPI
 
 ## Table of Contents
 
-- [SiWx91x Platform QSPI](#platform-siwx91x-qspi)
+- [Platform SiWx91x QSPI](#platform-siwx91x-qspi)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

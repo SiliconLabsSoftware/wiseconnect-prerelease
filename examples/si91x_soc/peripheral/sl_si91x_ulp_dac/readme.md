@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP DAC
+# Platform SiWx91x ULP DAC
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP DAC](#platform-siwx91x-ulp-dac)
+- [Platform SiWx91x ULP DAC](#platform-siwx91x-ulp-dac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -70,38 +70,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Application Build Environment
 
 ### Application Configuration Parameters
-
-- Configure the following macros in the [`sl_ulp_dac_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_dac/sl_ulp_dac_example.c) file and update/modify following macros, if required.
-
-- `STATIC_MODE`: Selects the DAC operation mode. Set to 1 for Static mode (constant output voltage) or 0 for FIFO mode (continuous waveform output). By default, it is set to 1.
-
-  ```c
-    #define STATIC_MODE           1         // For static mode set this macro value as '1'
-  ```
-
-- `BUFFER_SIZE`: Size of the DAC sample buffer. Use 1 for Static mode and up to 1024 for FIFO mode. By default, it is set to 1024.
-
-  ```c
-    #define BUFFER_SIZE           1024      // For FIFO mode (set to 1 for static mode)
-  ```
-
-- `VREF_VALUE`: DAC reference voltage (in volts) used to compute the analog output for a given digital input sample. By default, it is set to 3.3f.
-
-  ```c
-    #define VREF_VALUE            3.3f      // Reference voltage
-  ```
-
-- `MS_DELAY_COUNTER`: Loop delay count used to generate a short millisecond-level wait inside the example. By default, it is set to 4600.
-
-  ```c
-    #define MS_DELAY_COUNTER      4600      // Delay count
-  ```
-
-- `FIVE_SECOND_DELAY`: Delay, in milliseconds, used between PS4 and PS2 power-state transitions. By default, it is set to 5000.
-
-  ```c
-    #define FIVE_SECOND_DELAY     5000      // giving the 5 second delay in between state changes
-  ```
 
 - Configure UC from the slcp component.
 - Open **sl_si91x_ulp_dac.slcp** project file select **software component** tab and search for **DAC** in search bar.
@@ -195,4 +163,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

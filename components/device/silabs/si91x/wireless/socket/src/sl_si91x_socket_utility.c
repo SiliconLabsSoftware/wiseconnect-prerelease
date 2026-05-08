@@ -33,6 +33,7 @@
 #include "sl_si91x_socket_callback_framework.h"
 #include "sl_status.h"
 #include "sl_constants.h"
+#include "sl_log_helper_si91x.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_protocol_types.h"
 #include "sl_si91x_socket_constants.h"
@@ -335,135 +336,6 @@ sl_status_t sli_si91x_vap_shutdown(uint8_t vap_id, sli_si91x_bsd_disconnect_reas
   }
 
   return SL_STATUS_OK;
-}
-
-bool sli_si91x_socket_matches_vap_and_remote_ip(sl_wifi_operation_mode_t opermode,
-                                                const sli_si91x_socket_t *socket,
-                                                uint8_t filter_vap_id,
-                                                const sl_ip_address_t *dest_ip_address)
-{
-  if (socket == NULL) {
-    return false;
-  }
-
-  uint8_t socket_vap_id = (opermode == SL_WIFI_ACCESS_POINT_MODE) ? SL_WIFI_AP_VAP_ID : SL_WIFI_CLIENT_VAP_ID;
-  if (opermode == SL_SI91X_CONCURRENT_MODE) {
-    socket_vap_id = socket->vap_id;
-  }
-  bool matches = (socket_vap_id == filter_vap_id);
-
-  if (matches && dest_ip_address != NULL) {
-    bool is_same = false;
-    if (dest_ip_address->type == SL_IPV4) {
-      const struct sockaddr_in *socket_address = (const struct sockaddr_in *)&socket->remote_address;
-      is_same = (memcmp(dest_ip_address->ip.v4.bytes, &socket_address->sin_addr.s_addr, SL_IPV4_ADDRESS_LENGTH) == 0);
-    } else {
-      const struct sockaddr_in6 *ipv6_socket_address = &socket->remote_address;
-#ifdef SLI_SI91X_NETWORK_DUAL_STACK
-      is_same =
-        (memcmp(dest_ip_address->ip.v6.bytes, &ipv6_socket_address->sin6_addr.un.u8_addr, SL_IPV6_ADDRESS_LENGTH) == 0);
-#else
-#ifndef __ZEPHYR__
-      is_same = (memcmp(dest_ip_address->ip.v6.bytes,
-                        &ipv6_socket_address->sin6_addr.__u6_addr.__u6_addr8,
-                        SL_IPV6_ADDRESS_LENGTH)
-                 == 0);
-#else
-      is_same =
-        (memcmp(dest_ip_address->ip.v6.bytes, &ipv6_socket_address->sin6_addr.s6_addr, SL_IPV6_ADDRESS_LENGTH) == 0);
-#endif
-#endif
-    }
-    matches = is_same;
-  }
-
-  return matches;
-}
-
-static void sli_si91x_mark_bsd_sockets_disconnected_matching(uint8_t filter_vap_id,
-                                                             const sl_ip_address_t *dest_ip_address,
-                                                             sli_si91x_bsd_disconnect_reason_t reason)
-{
-  sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
-
-  for (uint8_t index = 0; index < SLI_NUMBER_OF_SOCKETS; index++) {
-    if (sli_si91x_sockets[index] == NULL) {
-      continue;
-    }
-    if (!sli_si91x_socket_matches_vap_and_remote_ip(current_operation_mode,
-                                                    sli_si91x_sockets[index],
-                                                    filter_vap_id,
-                                                    dest_ip_address)) {
-      continue;
-    }
-    sli_si91x_sockets[index]->state             = DISCONNECTED;
-    sli_si91x_sockets[index]->disconnect_reason = reason;
-  }
-}
-
-void sli_si91x_sync_bsd_socket_states_for_flush_scenarios(const sl_wifi_system_packet_t *packet)
-{
-  if (packet == NULL) {
-    return;
-  }
-
-  uint16_t frame_status = sli_wifi_get_wifi_frame_status(packet);
-
-  switch (packet->command) {
-    case SLI_WIFI_RSP_JOIN:
-      if (frame_status != SL_STATUS_OK) {
-        sli_si91x_mark_bsd_sockets_disconnected_matching(SL_WIFI_CLIENT_VAP_ID,
-                                                         NULL,
-                                                         SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-      }
-      break;
-    case SLI_WIFI_RSP_IPCONFV4:
-      if (frame_status != SL_STATUS_OK) {
-        sli_si91x_mark_bsd_sockets_disconnected_matching(SL_WIFI_CLIENT_VAP_ID,
-                                                         NULL,
-                                                         SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-      }
-      break;
-    case SLI_WIFI_RSP_IPCONFV6:
-      if (frame_status != SL_STATUS_OK) {
-        sli_si91x_mark_bsd_sockets_disconnected_matching(SL_WIFI_CLIENT_VAP_ID,
-                                                         NULL,
-                                                         SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-      }
-      break;
-    case SLI_WIFI_RSP_IPV4_CHANGE:
-      sli_si91x_mark_bsd_sockets_disconnected_matching(SL_WIFI_CLIENT_VAP_ID,
-                                                       NULL,
-                                                       SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-      break;
-    case SLI_WIFI_RSP_DISCONNECT:
-      if (frame_status == SL_STATUS_OK && (SL_WIFI_CLIENT_VAP_ID == sli_wifi_get_vap_id_from_operation_mode(packet))) {
-        sli_si91x_mark_bsd_sockets_disconnected_matching(SL_WIFI_CLIENT_VAP_ID,
-                                                         NULL,
-                                                         SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-      }
-      break;
-    case SLI_WIFI_RSP_CLIENT_DISCONNECTED: {
-      sl_ip_address_t dest_ip_address = { 0 };
-      sl_status_t st                  = sli_si91x_get_dest_ip_address_from_ap_client_disconnect_resp(
-        (const sli_si91x_ap_disconnect_resp_t *)packet->data,
-        &dest_ip_address);
-      if (st == SL_STATUS_OK && !sli_wifi_is_ip_address_zero(&dest_ip_address)) {
-        sli_si91x_mark_bsd_sockets_disconnected_matching(SL_WIFI_AP_VAP_ID,
-                                                         &dest_ip_address,
-                                                         SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-      }
-    } break;
-    case SLI_WIFI_RSP_AP_STOP:
-      if (frame_status == SL_STATUS_OK) {
-        sli_si91x_mark_bsd_sockets_disconnected_matching(SL_WIFI_AP_VAP_ID,
-                                                         NULL,
-                                                         SLI_SI91X_BSD_DISCONNECT_REASON_INTERFACE_DOWN);
-      }
-      break;
-    default:
-      break;
-  }
 }
 
 void sli_si91x_handle_websocket(sli_si91x_socket_create_request_t *socket_create_request,
@@ -1645,13 +1517,11 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
   sl_wifi_system_packet_t *rx_packet = (sl_wifi_system_packet_t *)rx_buffer->data;
 
   if (rx_packet->command != SLI_RECEIVE_RAW_DATA) {
-    sli_buffer_manager_free_buffer(rx_buffer);
     return SL_STATUS_NOT_SUPPORTED;
   }
   // Handle the case when raw data is received
   const sl_si91x_socket_metadata_t *firmware_socket_response = (sl_si91x_socket_metadata_t *)rx_packet->data;
   if (firmware_socket_response == NULL) {
-    sli_buffer_manager_free_buffer(rx_buffer);
     return SL_STATUS_NULL_POINTER;
   }
   uint8_t *data      = (rx_packet->data + firmware_socket_response->offset);
@@ -1662,8 +1532,7 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
   const uint8_t host_socket_id_from_fw = (uint8_t)(firmware_socket_response->socket_id & 0x00FFU);
   for (uint8_t host_socket_index = 0; host_socket_index < SLI_NUMBER_OF_SOCKETS; host_socket_index++) {
     if ((sli_si91x_sockets[host_socket_index] != NULL)
-        && (host_socket_id_from_fw == sli_si91x_sockets[host_socket_index]->id)
-        && (sli_si91x_sockets[host_socket_index]->state != LISTEN)) {
+        && (host_socket_id_from_fw == sli_si91x_sockets[host_socket_index]->id)) {
       host_socket = host_socket_index;
     }
   }
@@ -1672,7 +1541,6 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
   const sli_si91x_socket_t *client_socket = sli_get_si91x_socket(host_socket);
   //Verifying socket existence
   if (client_socket == NULL) {
-    sli_buffer_manager_free_buffer(rx_buffer);
     return SL_STATUS_NOT_FOUND;
   }
 
@@ -1684,10 +1552,7 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
       sli_command_engine_get_rx_queue_info_from_packet_type(&sli_wifi_command_engine,
                                                             (uint16_t)(client_socket->index + SI91X_CMD_MAX),
                                                             &packet_type_info);
-    if (status != SL_STATUS_OK) {
-      sli_buffer_manager_free_buffer(rx_buffer);
-      return status;
-    }
+    VERIFY_STATUS_AND_RETURN(status);
 
     sli_command_engine_metadata_t *metadata = NULL;
     // Allocate metadata buffer (hybrid allocation allows pool + heap fallback)
@@ -1700,7 +1565,7 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
       sli_buffer_manager_free_buffer(rx_buffer);
       return SL_STATUS_ALLOCATION_FAILED;
     }
-
+    VERIFY_STATUS_AND_RETURN(status);
     metadata->packet_status              = sli_wifi_get_wifi_frame_status(rx_packet);
     metadata->tx_info.data_packet        = rx_buffer;
     metadata->tx_info.data_packet_length = (rx_packet->length & 0x0FFF);

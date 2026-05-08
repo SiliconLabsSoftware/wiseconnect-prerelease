@@ -78,38 +78,32 @@ void si70xx_example_init(void)
       // Enable GPIO ULP_CLK
       status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
       if (status != SL_STATUS_OK) {
-        /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_enable_clock, Error code: %lu", status);
+        DEBUGOUT("sl_si91x_gpio_driver_enable_clock, Error code: %lu", status);
         break;
       }
-      SL_PRINT_STRING_ERROR("GPIO driver clock enable is successful \n");
+      DEBUGOUT("GPIO driver clock enable is successful \n");
       // Set NPSS GPIO pin MUX
       status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(SENSOR_ENABLE_GPIO_PIN, NPSS_GPIO_PIN_MUX_MODE0);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_uulp_npss_pin_mux, Error code: %lu", status);
+        DEBUGOUT("sl_si91x_gpio_driver_set_uulp_npss_pin_mux, Error code: %lu", status);
         break;
       }
-      SL_PRINT_STRING_ERROR("GPIO driver uulp pin mux selection is successful \n");
+      DEBUGOUT("GPIO driver uulp pin mux selection is successful \n");
       // Set NPSS GPIO pin direction
       status =
         sl_si91x_gpio_driver_set_uulp_npss_direction(SENSOR_ENABLE_GPIO_PIN, (sl_si91x_gpio_direction_t)GPIO_OUTPUT);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_uulp_npss_direction, Error code: %lu", status);
+        DEBUGOUT("sl_si91x_gpio_driver_set_uulp_npss_direction, Error code: %lu", status);
         break;
       }
-      SL_PRINT_STRING_ERROR("GPIO driver uulp pin direction selection is successful \n");
+      DEBUGOUT("GPIO driver uulp pin direction selection is successful \n");
       // Set UULP GPIO pin
       status = sl_si91x_gpio_driver_set_uulp_npss_pin_value(SENSOR_ENABLE_GPIO_PIN, SET);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_uulp_npss_pin_value, Error code: %lu", status);
+        DEBUGOUT("sl_si91x_gpio_driver_set_uulp_npss_pin_value, Error code: %lu", status);
         break;
       }
-      SL_PRINT_STRING_ERROR("GPIO driver set uulp pin value is successful \n");
+      DEBUGOUT("GPIO driver set uulp pin value is successful \n");
     }
 #else
     sl_gpio_t sensor_enable_port_pin = { SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN };
@@ -117,7 +111,7 @@ void si70xx_example_init(void)
 
     status = sl_gpio_driver_get_pin(&sensor_enable_port_pin, &pin_value);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_gpio_driver_get_pin, Error code: %lu", status);
+      DEBUGOUT("sl_gpio_driver_get_pin, Error code: %lu", status);
       break;
     }
     if (pin_value != 1) {
@@ -128,33 +122,33 @@ void si70xx_example_init(void)
       status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)M4CLK_GPIO);
 #endif
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_enable_clock, Error code: %lu", status);
+        DEBUGOUT("sl_si91x_gpio_driver_enable_clock, Error code: %lu", status);
         break;
       }
-      SL_PRINT_STRING_ERROR("GPIO driver clock enable is successful \n");
+      DEBUGOUT("GPIO driver clock enable is successful \n");
 
       // Set the pin mode for GPIO pins.
       status = sl_gpio_driver_set_pin_mode(&sensor_enable_port_pin, MODE_0, OUTPUT_VALUE);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_gpio_driver_set_pin_mode, Error code: %lu, line %d", status, __LINE__);
+        DEBUGOUT("sl_gpio_driver_set_pin_mode, Error code: %lu", status);
         break;
       }
-      SL_PRINT_STRING_ERROR("GPIO driver pin mode select is successful \n");
+      DEBUGOUT("GPIO driver pin mode select is successful \n");
       // Select the direction of GPIO pin whether Input/ Output
       status = sl_si91x_gpio_driver_set_pin_direction(SENSOR_ENABLE_GPIO_PORT,
                                                       SENSOR_ENABLE_GPIO_PIN,
                                                       (sl_si91x_gpio_direction_t)GPIO_OUTPUT);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_pin_direction, Error code: %lu, line %d", status, __LINE__);
+        DEBUGOUT("sl_si91x_gpio_driver_set_pin_direction, Error code: %lu", status);
         break;
       }
       // Set GPIO pin
       status = sl_gpio_driver_set_pin(&sensor_enable_port_pin); // Set ULP GPIO pin
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_gpio_driver_set_pin, Error code: %lu, line %d", status, __LINE__);
+        DEBUGOUT("sl_gpio_driver_set_pin, Error code: %lu", status);
         break;
       }
-      SL_PRINT_STRING_ERROR("GPIO driver set pin value is successful \n");
+      DEBUGOUT("GPIO driver set pin value is successful \n");
     }
 #endif
 
@@ -171,26 +165,25 @@ void si70xx_example_init(void)
     // Initialize I2C bus
     status = sl_i2c_driver_init(I2C, &i2c_config);
     if (status != SL_I2C_SUCCESS) {
-      SL_PRINT_STRING_ERROR("sl_i2c_driver_init : Invalid Parameters, Error Code: 0x%ld \n", status);
+      DEBUGOUT("sl_i2c_driver_init : Invalid Parameters, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Successfully initialized and configured i2c leader\n");
+      DEBUGOUT("Successfully initialized and configured i2c leader\n");
     }
     status = sl_i2c_driver_configure_fifo_threshold(I2C, TX_THRESHOLD, RX_THRESHOLD);
     if (status != SL_I2C_SUCCESS) {
-      SL_PRINT_STRING_ERROR("sl_i2c_driver_configure_fifo_threshold : Invalid Parameters, Error Code: 0x%ld \n",
-                            status);
+      DEBUGOUT("sl_i2c_driver_configure_fifo_threshold : Invalid Parameters, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Successfully configured i2c TX & RX FIFO thresholds\n");
+      DEBUGOUT("Successfully configured i2c TX & RX FIFO thresholds\n");
     }
     // reset the sensor
     status = sl_si91x_si70xx_reset(I2C, SI70XX_SLAVE_ADDR);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor reset un-successful, Error Code: 0x%ld \n", status);
+      DEBUGOUT("Sensor reset un-successful, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Successfully reset sensor\n");
+      DEBUGOUT("Successfully reset sensor\n");
     }
     /* After reset, Si70xx needs 5–15 ms (datasheet). Retry init until success or timeout. */
     uint8_t retry_ms;
@@ -202,75 +195,72 @@ void si70xx_example_init(void)
       }
     }
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor initialization un-successful (no ACK after %u ms), Error Code: 0x%ld, line %d",
-                            retry_ms,
-                            status,
-                            __LINE__);
+      DEBUGOUT("Sensor initialization un-successful (no ACK after %u ms), Error Code: 0x%ld \n", retry_ms, status);
       break;
     }
-    SL_PRINT_STRING_ERROR("Successfully initialized sensor\n");
+    DEBUGOUT("Successfully initialized sensor\n");
     // Initializes sensor and reads electronic ID 2nd byte (single attempt)
     status = sl_si91x_si70xx_init(I2C, SI70XX_SLAVE_ADDR, SL_EID_SECOND_BYTE);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor initialization un-successful, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor initialization un-successful, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Successfully reset sensor\n");
+      DEBUGOUT("Successfully reset sensor\n");
     }
     // Get sensor internal firmware version of sensor
     status = sl_si91x_si70xx_get_firmware_revision(I2C, SI70XX_SLAVE_ADDR, &firm_rev);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor firmware version un-successful, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor firmware version un-successful, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Successfully firmware version of sensor is read\n");
+      DEBUGOUT("Successfully firmware version of sensor is read\n");
     }
-    SL_PRINT_STRING_ERROR("firmware version:%x\n", firm_rev);
+    DEBUGOUT("firmware version:%x\n", firm_rev);
     // write register data into sensor
     status = sl_si91x_si70xx_write_control_register(I2C, SI70XX_SLAVE_ADDR, SL_RH_T_USER_REG, USER_REG_1);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor user register 1 write data failed, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor user register 1 write data failed, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Sensor user register 1 write data is successful\n");
+      DEBUGOUT("Sensor user register 1 write data is successful\n");
     }
     // Reads register data from sensor
     status = sl_si91x_si70xx_read_control_register(I2C, SI70XX_SLAVE_ADDR, SL_RH_T_USER_REG, &value);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor user register 1 read failed, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor user register 1 read failed, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Sensor user register 1 read is successful\n");
+      DEBUGOUT("Sensor user register 1 read is successful\n");
     }
-    SL_PRINT_STRING_ERROR("user register data:%x\n", value);
+    DEBUGOUT("user register data:%x\n", value);
     // Reads temperature from humidity from sensor
     status = sl_si91x_si70xx_read_temp_from_rh(I2C, SI70XX_SLAVE_ADDR, &humidity, &temperature);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor temperature read failed, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor temperature read failed, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Sensor temperature read is successful\n");
+      DEBUGOUT("Sensor temperature read is successful\n");
     }
-    SL_PRINT_STRING_ERROR("sensor humidity :%ld\n", humidity);
-    SL_PRINT_STRING_ERROR("sensor temperature :%ld\n", temperature);
+    DEBUGOUT("sensor humidity :%ld\n", humidity);
+    DEBUGOUT("sensor temperature :%ld\n", temperature);
     // measure humidity data from sensor
     status = sl_si91x_si70xx_measure_humidity(I2C, SI70XX_SLAVE_ADDR, &humidity);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor humidity read failed, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor humidity read failed, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Sensor humidity read is successful\n");
+      DEBUGOUT("Sensor humidity read is successful\n");
     }
-    SL_PRINT_STRING_ERROR("sensor humidity :%ld\n", humidity);
+    DEBUGOUT("sensor humidity :%ld\n", humidity);
     // measure temperature data from sensor
     status = sl_si91x_si70xx_measure_temperature(I2C, SI70XX_SLAVE_ADDR, &temperature);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor temperature read failed, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor temperature read failed, Error Code: 0x%ld \n", status);
       break;
     } else {
-      SL_PRINT_STRING_ERROR("Sensor temperature read is successful\n");
+      DEBUGOUT("Sensor temperature read is successful\n");
     }
-    SL_PRINT_STRING_ERROR("sensor temperature :%ld\n", temperature);
+    DEBUGOUT("sensor temperature :%ld\n", temperature);
   } while (false);
 }
 
@@ -288,12 +278,12 @@ void si70xx_example_process_action(void)
     // Reads humidity(hold master mode) measurement from sensor
     status = sl_si91x_si70xx_measure_rh_and_temp(I2C, SI70XX_SLAVE_ADDR, &humidity, &temperature);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("Sensor temperature read failed, Error Code: 0x%ld, line %d", status, __LINE__);
+      DEBUGOUT("Sensor temperature read failed, Error Code: 0x%ld \n", status);
     } else {
-      SL_PRINT_STRING_ERROR("Sensor temperature read is successful\n");
+      DEBUGOUT("Sensor temperature read is successful\n");
     }
-    SL_PRINT_STRING_ERROR("sensor humidity :%ld\n", humidity);
-    SL_PRINT_STRING_ERROR("sensor temperature :%ld\n", temperature);
+    DEBUGOUT("sensor humidity :%ld\n", humidity);
+    DEBUGOUT("sensor temperature :%ld\n", temperature);
   }
 }
 

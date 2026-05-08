@@ -5,7 +5,7 @@ description: 'This application demonstrates the PS0 sleep with NWP shutdown.
   '
 category: example|mcu powerstate
 quality: production
-label: SiWx91x Platform - PS0 STATE
+label: Platform SiWx91x - PS0 STATE
 component:
 - id: sl_main
 - id: status
@@ -14,12 +14,6 @@ component:
 - id: sl_power_manager
 - id: debug_ulp_component
 - id: pm_ps2_component
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 template_contribution:
 - name: user_files_ps2
   value: ps0_state.*

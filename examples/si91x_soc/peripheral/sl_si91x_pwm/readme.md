@@ -1,8 +1,8 @@
-# SiWx91x Platform PWM
+# Platform SiWx91x PWM
 
 ## Table of Contents
 
-- [SiWx91x Platform PWM](#platform-siwx91x-pwm)
+- [Platform SiWx91x PWM](#platform-siwx91x-pwm)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -90,7 +90,6 @@ This application demonstrates the Pulse Width Modulation (PWM) to generate a per
 >2. channel_0, channel_1, channel_2 and channel_3 are the names pre-defined for the PWM channels.
 >3. For user-defined instances, you may have to define hardware-specific definitions in the `sl_si91x_pwm_init_channel_0_config.h` file (path: /$project/config/sl_si91x_pwm_init_channel_0_config.h).
 >4. The user can directly use APIs in the application by passing appropriate structure members if they do not want to configure from UC.
->5. In case of sleep-wakeup, call `sl_pwm_init_instances()` after wakeup before restarting PWM output so the configured PWM instances are restored.
 
 ## Prerequisites/Setup Requirements
 
@@ -130,61 +129,30 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   - Global Parameters
 
-    - `EVENT_COUNT`: Maximum number of PWM events the example waits for before exiting the event-handling loop. By default, it is set to 10.
-
-      ```c
-        #define EVENT_COUNT       10    // Count of events that can generate
-      ```
-
-    - `PRESCALE_A`: PWM Prescale_A value used to divide the input clock for PWM channel A. By default, it is set to `0x100`.
-
-      ```c
-        #define PRESCALE_A        0x100 // PWM Prescale_A value
-      ```
-
-    - `DEADTIME_A`: Number of dead-time clock cycles inserted between complementary PWM outputs for Dead Time A. By default, it is set to 32.
-
-      ```c
-        #define DEADTIME_A        32    // PWM deadtime_A
-      ```
-
-    - `DT_COUNTER_A`: Dead time counter A alignment selector. Configure `0x00` for Center Aligned, `0x01` for Lead Edge Aligned, or `0x10` for Tail Edge Aligned. By default, it is set to `0x00` (Center Aligned).
-
-      ```c
-        #define DT_COUNTER_A      0x00  // Dead time counter A enable
-      ```
-
-    - `DUTY_CYCLE_UPDATE`: Enables the duty cycle updating bit in the register so that runtime duty cycle writes take effect. By default, it is set to `0x01`.
-
-      ```c
-        #define DUTY_CYCLE_UPDATE 0x01  // Enable duty cycle updating bit in register
-      ```
-
-    - `OUTPUT_VALUE`: Default output logic level used when configuring GPIO pins associated with the PWM. By default, it is set to 1.
-
-      ```c
-        #define OUTPUT_VALUE      1     // Output value set
-      ```
-
-    - `SL_ULP_PORT`: GPIO ULP port identifier used when configuring ULP pins for PWM channel 3. By default, it is set to 4.
-
-      ```c
-        #define SL_ULP_PORT       4     // GPIO ULP port
-      ```
+    ```C
+      #define EVENT_COUNT       10    // Count of events that can generate interrupt.
+      #define PRESCALE_A        0x100 // PWM Prescale_A value
+      #define DEADTIME_A        0x08  // PWM deadtime_A
+      #define DT_COUNTER_A      0x00  // Dead time counter A enable
+      #define DUTY_CYCLE_UPDATE 0x01  // Enable duty cycle updating bit in register
+    ```
 
   - Channel-specific Parameters
 
-    - `FAULT_A_ENABLE`: Bitmask used to enable Fault A for channel 0 when the FAULT feature is exercised. Combine options with bitwise OR for multiple channels. By default, it is set to `0x11`.
+    ```C
+    #define INTR_EVENT       0x01  /* Set channel-specific interrupts for time match and fault events.
+                                      Use bitwise OR to combine flags for multiple channels. */
+    ```
 
-      ```c
-        #define FAULT_A_ENABLE 0x11                          // Fault A enable for channel 0
-      ```
+    ```C
+    #define FAULT_A_ENABLE   0x11  /* Configure fault mode and output polarity per channel.
+                                      Combine options with bitwise OR for desired channel settings. */
+    ```
 
-    - `INTR_EVENT`: PWM interrupt event that the application waits on. Use bitwise OR to combine flags for multiple channels. By default, it is set to `SL_RISE_TIME_PERIOD_MATCH_CH0` (rise PWM time period match on channel 0).
-
-      ```c
-        #define INTR_EVENT     SL_RISE_TIME_PERIOD_MATCH_CH0 // Rise PWM time period match channel 0 event
-      ```
+    ```C
+    #define DT_ENABLE        0x01  /* Enable dead time per channel
+                                      Use OR logic to set for multiple channels. */
+    ```
 
 - Configure UC from the slcp component.
 - Open the **sl_si91x_pwm.slcp** project file, select the **Software Component** tab, and search for **PWM** in the search bar.
@@ -291,4 +259,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

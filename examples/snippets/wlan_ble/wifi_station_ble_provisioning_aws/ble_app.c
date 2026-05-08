@@ -89,9 +89,6 @@
 #define RSI_BLE_RECEIVE_REMOTE_FEATURES 0x18
 #define RSI_BLE_DATA_LENGTH_CHANGE      0x19
 #define RSI_BLE_GATT_WRITE_EVENT        0x1A
-#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-#define RSI_BLE_ENABLE_REQUEST 0x1B
-#endif
 
 #define RSI_FW_VERSION 0x01
 
@@ -141,12 +138,6 @@ extern sl_net_ip_configuration_t ip_address;
 
 extern osSemaphoreId_t ble_thread_sem;
 extern uint16_t scanbuf_size;
-#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-extern osMessageQueueId_t ble_disable_done_queue;
-extern osMessageQueueId_t ble_enable_done_queue;
-/** Set when join-status path starts disconnect; cleared when disable is signaled or disconnect fails. */
-static uint8_t ble_disable_after_disconnect_pending;
-#endif
 
 /******************************************************
  *               Function Declarations
@@ -155,33 +146,6 @@ extern void wifi_app_set_event(uint32_t event_num);
 void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *resp_enh_conn);
 void rsi_ble_configurator_init(void);
 void rsi_ble_configurator_task(void *argument);
-
-#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-/*==============================================*/
-/**
- * @fn         app_ble_enable
- * @brief      Calls rsi_ble_enable() for runtime BLE enable.
- * @return     int32_t - RSI_SUCCESS on success, or stack error (e.g. SL_STATUS_NOT_INITIALIZED).
- */
-static int32_t app_ble_enable(void)
-{
-  return rsi_ble_enable();
-}
-
-/*==============================================*/
-/**
- * @fn         app_ble_disable
- * @brief      Calls rsi_ble_disable() for runtime BLE disable.
- *             Call only after application quiesce: advertising stopped, link disconnected
- *             (BLE disable only stops BLE; it does not tear down connections).
- * @return     int32_t - RSI_SUCCESS on success, or stack error (e.g. SL_STATUS_NOT_INITIALIZED).
- */
-static int32_t app_ble_disable(void)
-{
-  return rsi_ble_disable();
-}
-#endif /* SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO */
-
 /*==============================================*/
 /**
  * @fn         rsi_ble_add_char_serv_att
@@ -768,16 +732,6 @@ void rsi_ble_configurator_task(void *argument)
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
         LOG_PRINT("\r\nDisconnected - remote_dev_addr : %s\r\n",
                   rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
-#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-        if (ble_disable_after_disconnect_pending != 0) {
-          ble_disable_after_disconnect_pending = 0;
-          {
-            int32_t ret = app_ble_disable();
-            osMessageQueuePut(ble_disable_done_queue, &ret, 0, osWaitForever);
-          }
-          break;
-        }
-#endif
         // set device in advertising mode.
 adv:
         status = rsi_ble_start_advertising();
@@ -922,25 +876,6 @@ adv:
                                     RSI_BLE_MAX_DATA_LEN,
                                     data); // set the local attribute value.
         LOG_PRINT("AP joined successfully\r\n\n");
-#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-        /* Quiesce BLE before calling BLE disable: stop advertising, disconnect; disable runs after
-         * RSI_BLE_DISCONN_EVENT. The BLE stack's disable API only stops BLE; link must be down first. */
-        {
-          int32_t ret;
-          status = rsi_ble_stop_advertising();
-          if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\nrsi_ble_stop_advertising before BLE disable: 0x%lx (continuing)\r\n", status);
-          }
-          ble_disable_after_disconnect_pending = 1;
-          status                               = rsi_ble_disconnect((const int8_t *)conn_event_to_app.dev_addr);
-          if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\nrsi_ble_disconnect before BLE disable failed: 0x%lx\r\n", status);
-            ble_disable_after_disconnect_pending = 0;
-            ret                                  = status;
-            osMessageQueuePut(ble_disable_done_queue, &ret, 0, osWaitForever);
-          }
-        }
-#else
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
                                             CONN_INTERVAL_MIN,
                                             CONN_INTERVAL_MAX,
@@ -951,7 +886,6 @@ adv:
                     "= %lx \r\n",
                     status);
         }
-#endif
         //   conn_params_updated = 1;
         //  rsi_ble_app_clear_event(RSI_APP_BLE_GATT_SERVICE_RESP_DESCRIPTOR);
       } break;
@@ -964,13 +898,6 @@ adv:
         rsi_ble_app_clear_event(RSI_BLE_CONN_UPDATE_EVENT);
 
       } break;
-#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-      case RSI_BLE_ENABLE_REQUEST: {
-        rsi_ble_app_clear_event(RSI_BLE_ENABLE_REQUEST);
-        int32_t ret = app_ble_enable();
-        osMessageQueuePut(ble_enable_done_queue, &ret, 0, osWaitForever);
-      } break;
-#endif
       case RSI_BLE_RECEIVE_REMOTE_FEATURES: {
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
@@ -1099,11 +1026,6 @@ void wifi_app_send_to_ble(uint16_t msg_type, uint8_t *data, uint16_t data_len)
     case WIFI_APP_TIMEOUT_NOTIFY:
       rsi_ble_app_set_event(RSI_BLE_WLAN_TIMEOUT_NOTIFY);
       break;
-#if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-    case WIFI_APP_BLE_ENABLE_REQUEST:
-      rsi_ble_app_set_event(RSI_BLE_ENABLE_REQUEST);
-      break;
-#endif
     default:
       break;
   }

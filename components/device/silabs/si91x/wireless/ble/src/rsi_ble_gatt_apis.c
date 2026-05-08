@@ -1611,7 +1611,7 @@ int32_t rsi_ble_set_wo_resp_notify_buf_info(const uint8_t *dev_addr, uint8_t buf
  * @fn         int32_t rsi_ble_notify_value(uint8_t *dev_addr, uint16_t handle,
  *                                          uint16_t data_len, uint8_t *p_data)
  * @brief      Notify the local value to the remote device. This is a Blocking API.
- *             If the API returns RSI_ERROR_BLE_DEV_BUF_FULL  (-31) error then wait until the \ref rsi_ble_on_le_more_data_req_t event gets received from the module.
+ *             If the API returns RSI_ERROR_BLE_DEV_BUF_FULL  (-31) error then wait untill the \ref rsi_ble_on_le_more_data_req_t event gets received from the module.
  * @pre        \ref rsi_ble_connect() API needs to be called before this API.
  * @param[in]  dev_addr - remote device address
  * @param[in]  handle 	- local attribute handle

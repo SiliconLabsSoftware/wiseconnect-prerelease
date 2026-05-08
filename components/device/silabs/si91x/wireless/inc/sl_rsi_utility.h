@@ -61,6 +61,27 @@ typedef struct {
 /// Medium Transmit Power Threshold for Wi-Fi.
 #define SLI_SI91X_MEDIUM_TRANSMIT_POWER_THRESHOLD 4
 
+/**
+ * @brief Defines the priority level for the event thread.
+ *
+ * This macro sets the priority level for the event thread.
+ * The priority level is set to `osPriorityRealtime1`, which is a real-time priority level.
+ * 
+ * @note
+ * - The priority level of this thread should be highest among all the threads in the system.
+ */
+#ifndef SL_WLAN_EVENT_THREAD_PRIORITY
+#define SL_WLAN_EVENT_THREAD_PRIORITY osPriorityRealtime1
+#endif
+
+/**
+ * Stack size of the event handler thread that processes all Wi-Fi and networking callbacks.
+ * This value can be overridden by defining a new value for SL_SI91X_EVENT_HANDLER_STACK_SIZE in your project or
+ * adding -DSL_SI91X_EVENT_HANDLER_STACK_SIZE=<new value> to your compiler command line options.
+ */
+#ifndef SL_SI91X_EVENT_HANDLER_STACK_SIZE
+#define SL_SI91X_EVENT_HANDLER_STACK_SIZE 1536
+#endif
 typedef uint32_t sl_si91x_host_timestamp_t;
 
 /* Indicates the current performance profile */

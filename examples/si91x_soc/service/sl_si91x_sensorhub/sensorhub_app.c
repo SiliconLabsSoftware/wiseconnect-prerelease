@@ -140,38 +140,33 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
   }
 
   if (SL_MAX_NUM_SENSORS == sens_ind) {
-    /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-    SL_PRINT_STRING_ERROR("Sensor not Found!");
+    DEBUGOUT("Sensor not Found!");
     return;
   }
 
   switch (event) {
     case SL_SENSOR_CREATION_FAILED:
-      SL_PRINT_STRING_ERROR("%s Not created\r\n", (uintptr_t)sensor_hub_info_t[sens_ind].sensor_name);
+      DEBUGOUT("%s Not created\r\n", sensor_hub_info_t[sens_ind].sensor_name);
       break;
     case SL_SENSOR_STARTED:
-      SL_PRINT_STRING_ERROR("Sensor Started:%u \r\n", sensor_id);
+      DEBUGOUT("Sensor Started:%u \r\n", sensor_id);
       break;
     case SL_SENSOR_STOPPED:
-      SL_PRINT_STRING_ERROR("Sensor Stopped:%u \r\n", sensor_id);
+      DEBUGOUT("Sensor Stopped:%u \r\n", sensor_id);
       break;
     case SL_SENSOR_DATA_READY:
-      SL_PRINT_STRING_ERROR("\r\n %s ", (uintptr_t)sensor_hub_info_t[sens_ind].sensor_name);
-      SL_PRINT_STRING_ERROR("\r\n Sensor data Ready:%u \t", sensor_id);
+
+      DEBUGOUT("\r\n %s ", sensor_hub_info_t[sens_ind].sensor_name);
+      DEBUGOUT("\r\n Sensor data Ready:%u \t", sensor_id);
 
       if (SL_SENSOR_ADXL345_ID == sensor_id) {
         if (sensor_hub_info_t[sens_ind].sensor_mode == SL_SH_INTERRUPT_MODE) {
-          SL_PRINT_STRING_ERROR("Axis X = %f, \t",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.x);
-          SL_PRINT_STRING_ERROR("Axis Y = %f, \t",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.y);
-          SL_PRINT_STRING_ERROR("Axis Z = %f \t\n ",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.z);
+          DEBUGOUT("Axis X = %f, \t",
+                   (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.x);
+          DEBUGOUT("Axis Y = %f, \t",
+                   (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.y);
+          DEBUGOUT("Axis Z = %f \t\n ",
+                   (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.z);
 #if SH_AWS_ENABLE
           snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                    sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -188,12 +183,12 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #endif
         } else if (sensor_hub_info_t[sens_ind].sensor_mode == SL_SH_POLLING_MODE) {
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_THRESHOLD) {
-            SL_PRINT_STRING_ERROR("\r\n Axis X = %f, \t",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.x);
-            SL_PRINT_STRING_ERROR("\r\n Axis Y = %f, \t",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.y);
-            SL_PRINT_STRING_ERROR("\r\n Axis Z = %f \t\r\n ",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.z);
+            DEBUGOUT("Axis X = %f, \t",
+                     (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.x);
+            DEBUGOUT("Axis Y = %f, \t",
+                     (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.y);
+            DEBUGOUT("Axis Z = %f \t\r\n ",
+                     (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].accelerometer.z);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -213,15 +208,12 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
             for (uint32_t i = 0;
                  i < sensor_hub_info_t[sens_ind].data_deliver.timeout / sensor_hub_info_t[sens_ind].sampling_interval;
                  i++) {
-              SL_PRINT_STRING_ERROR(
-                "\r\n Axis X = %f, \t",
-                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.x);
-              SL_PRINT_STRING_ERROR(
-                "\r\n Axis Y = %f, \t",
-                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.y);
-              SL_PRINT_STRING_ERROR(
-                "\r\n Axis Z = %f \r\n ",
-                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.z);
+              DEBUGOUT("\r\n Axis X = %f, \t",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.x);
+              DEBUGOUT("Axis Y = %f, \t",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.y);
+              DEBUGOUT("Axis Z = %f \r\n ",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.z);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -243,15 +235,12 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_NUM_OF_SAMPLES) {
             for (uint32_t i = 0; i < sensor_hub_info_t[sens_ind].data_deliver.numofsamples; i++) {
-              SL_PRINT_STRING_ERROR(
-                "\r\n Axis:- X = %f, \t",
-                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.x);
-              SL_PRINT_STRING_ERROR(
-                "\r\n Y = %f, \t",
-                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.y);
-              SL_PRINT_STRING_ERROR(
-                "\r\n Z = %f  \t",
-                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.z);
+              DEBUGOUT("\r\n Axis:- X = %f, \t",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.x);
+              DEBUGOUT("Y = %f, \t",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.y);
+              DEBUGOUT("Z = %f  \t",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.z);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -275,14 +264,12 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
       }
       if (SL_SENSOR_APDS9960_ID == sensor_id) {
         if (sensor_hub_info_t[sens_ind].sensor_mode == SL_SH_INTERRUPT_MODE) {
-          SL_PRINT_STRING_ERROR("\r\n R = %f, \t",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.r);
-          SL_PRINT_STRING_ERROR("G = %f, \t",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.g);
-          SL_PRINT_STRING_ERROR("B = %f \t\n ",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.b);
-          SL_PRINT_STRING_ERROR("Proximity = %f ;\t\n",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.proximity);
+          DEBUGOUT("R = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.r);
+          DEBUGOUT("G = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.g);
+          DEBUGOUT("B = %f \t\n ", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.b);
+          DEBUGOUT("Proximity = %f ;\t\n",
+                   (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.proximity);
+          //   DEBUGOUT("Gesture = %c \t\n", (char)sensor_hub_info_t[sens_ind].sens_data_ptr->sensor_data[0].gesture);
 #if SH_AWS_ENABLE
           snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                    sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -305,16 +292,11 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
         } else if (sensor_hub_info_t[sens_ind].sensor_mode == SL_SH_POLLING_MODE) {
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_THRESHOLD) {
             DEBUGOUT("R = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.r);
-            SL_PRINT_STRING_ERROR("\r\n R = %f, \t",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.r);
-            SL_PRINT_STRING_ERROR("\r\n G = %f, \t",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.g);
-            SL_PRINT_STRING_ERROR("\r\n B = %f \t\n ",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.b);
-            SL_PRINT_STRING_ERROR("\r\n Proximity = %f ;\t\n",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.proximity);
-            //  SL_PRINT_STRING_ERROR("Gesture = %c \t\n",
-            //  (char)sensor_hub_info_t[sens_ind].sens_data_ptr->sensor_data[0].gesture);
+            DEBUGOUT("G = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.g);
+            DEBUGOUT("B = %f \t\n ", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.b);
+            DEBUGOUT("Proximity = %f ;\t\n",
+                     (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].rgbw.proximity);
+            //  DEBUGOUT("Gesture = %c \t\n", (char)sensor_hub_info_t[sens_ind].sens_data_ptr->sensor_data[0].gesture);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -338,14 +320,11 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
             for (uint32_t i = 0;
                  i < sensor_hub_info_t[sens_ind].data_deliver.timeout / sensor_hub_info_t[sens_ind].sampling_interval;
                  i++) {
-              SL_PRINT_STRING_ERROR("\r\n Proximity = %f ;\t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.proximity);
-              SL_PRINT_STRING_ERROR("\r\n R = %f, \t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.r);
-              SL_PRINT_STRING_ERROR("\r\n G = %f, \t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.g);
-              SL_PRINT_STRING_ERROR("\r\n B = %f \t\n ",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.b);
+              DEBUGOUT("Proximity = %f ;\t",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.proximity);
+              DEBUGOUT(" R = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.r);
+              DEBUGOUT(" G = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.g);
+              DEBUGOUT(" B = %f \t\n ", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.b);
               // DEBUGOUT("Gesture = %c \t\n", (char)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].gesture);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
@@ -373,14 +352,12 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_NUM_OF_SAMPLES) {
             for (uint32_t i = 0; i < sensor_hub_info_t[sens_ind].data_deliver.numofsamples; i++) {
-              SL_PRINT_STRING_ERROR("\r\n R = %f, \t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.r);
-              SL_PRINT_STRING_ERROR("\r\n G = %f, \t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.g);
-              SL_PRINT_STRING_ERROR("\r\n B = %f \t; ",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.b);
-              SL_PRINT_STRING_ERROR("\r\n Proximity = %f ",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.proximity);
+              DEBUGOUT("\r\n R = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.r);
+              DEBUGOUT(" G = %f, \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.g);
+              DEBUGOUT(" B = %f \t; ", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.b);
+              DEBUGOUT(" Proximity = %f ",
+                       (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.proximity);
+              //  DEBUGOUT("Gesture = %c \t\n", (char)sensor_hub_info_t[sens_ind].sens_data_ptr->sensor_data[i].gesture);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -410,8 +387,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 
       if (SL_SENSOR_LM75_ID == sensor_id) {
         if (sensor_hub_info_t[sens_ind].sensor_mode == SL_SH_INTERRUPT_MODE) {
-          SL_PRINT_STRING_ERROR("\r\n %f \t",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].temperature);
+          DEBUGOUT("%f \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].temperature);
 #if SH_AWS_ENABLE
           snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                    sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -423,8 +399,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
             for (uint32_t i = 0;
                  i < sensor_hub_info_t[sens_ind].data_deliver.timeout / sensor_hub_info_t[sens_ind].sampling_interval;
                  i++) {
-              SL_PRINT_STRING_ERROR("\r\n %f \t ",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].temperature);
+              DEBUGOUT(" %f \t ", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].temperature);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -436,8 +411,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_NUM_OF_SAMPLES) {
             for (uint32_t i = 0; i < sensor_hub_info_t[sens_ind].data_deliver.numofsamples; i++) {
-              SL_PRINT_STRING_ERROR("\r\n %f \t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].temperature);
+              DEBUGOUT("%f \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].temperature);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -450,8 +424,6 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_THRESHOLD) {
             DEBUGOUT("%f \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].temperature);
-            SL_PRINT_STRING_ERROR("\r\n %f \t",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].temperature);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -464,8 +436,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 
       if (SL_SENSOR_BH1750_ID == sensor_id) {
         if (sensor_hub_info_t[sens_ind].sensor_mode == SL_SH_INTERRUPT_MODE) {
-          SL_PRINT_STRING_ERROR("\r\n %f \t",
-                                (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].light);
+          DEBUGOUT("%f \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].light);
 #if SH_AWS_ENABLE
           snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                    sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -477,8 +448,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
             for (uint32_t i = 0;
                  i < sensor_hub_info_t[sens_ind].data_deliver.timeout / sensor_hub_info_t[sens_ind].sampling_interval;
                  i++) {
-              SL_PRINT_STRING_ERROR("\r\n %f \t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].light);
+              DEBUGOUT("%f \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].light);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -490,8 +460,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_NUM_OF_SAMPLES) {
             for (uint32_t i = 0; i < sensor_hub_info_t[sens_ind].data_deliver.numofsamples; i++) {
-              SL_PRINT_STRING_ERROR("\r\n %f \t",
-                                    (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].light);
+              DEBUGOUT("%f \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].light);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -504,8 +473,6 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_THRESHOLD) {
             DEBUGOUT("%f \t", (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].light);
-            SL_PRINT_STRING_ERROR("\r\n %f \t",
-                                  (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].light);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -525,7 +492,6 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #ifdef SH_ADC_ENABLE
           for (uint32_t i = 0; i < bus_intf_info.adc_config.adc_ch_cfg.num_of_samples[JS_ADC_CHANNEL]; i++) {
             DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
-            SL_PRINT_STRING_ERROR("\r\n %dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -550,15 +516,15 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
                      / (float)SL_SH_ADC_MAX_OP_VALUE)
                     * SL_SH_ADC_VREF_VALUE);
 
-            SL_PRINT_STRING_ERROR("\r\n SDC Channel_Id:[%d]\tSample: %lfV", sdc_channel_id, (double)vout);
+            DEBUGOUT("\n\r SDC Channel_Id:[%d]\tSample: %lfV", sdc_channel_id, (double)vout);
 #else
-          SL_PRINT_STRING_ERROR("\r\n SDC_Samples:");
+          DEBUGOUT("SDC_Samples:");
           for (uint32_t i = 0; i <= bus_intf_info.sh_sdc_config.sh_sdc_sample_ther; i++) {
             //DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].sh_sdc_data[i]);
             vout = (((float)(sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].sh_sdc_data[i])
                      / (float)SL_SH_ADC_MAX_OP_VALUE)
                     * SL_SH_ADC_VREF_VALUE);
-            SL_PRINT_STRING_ERROR("\r\n %lfV \t", (double)vout);
+            DEBUGOUT(" %lfV \t", (double)vout);
 #endif
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
@@ -576,7 +542,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
             for (uint32_t i = 0;
                  i < sensor_hub_info_t[sens_ind].data_deliver.timeout / sensor_hub_info_t[sens_ind].sampling_interval;
                  i++) {
-              SL_PRINT_STRING_ERROR("\r\n %dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
+              DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -588,7 +554,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_NUM_OF_SAMPLES) {
             for (uint32_t i = 0; i < sensor_hub_info_t[sens_ind].data_deliver.numofsamples; i++) {
-              SL_PRINT_STRING_ERROR("\r\n %dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
+              DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -600,7 +566,6 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_THRESHOLD) {
             DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[0]);
-            SL_PRINT_STRING_ERROR("\r\n %dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[0]);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -622,7 +587,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #endif
 #endif
 #ifdef SH_ADC_ENABLE
-        SL_PRINT_STRING_ERROR("\r\n Single ended input: %lfV \t", (double)vout);
+        DEBUGOUT("Single ended input: %lfV \t", (double)vout);
 #endif
       }
 
@@ -630,7 +595,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
         float vout = 0;
         if (sensor_hub_info_t[sens_ind].sensor_mode == SL_SH_INTERRUPT_MODE) {
           for (uint32_t i = 0; i < bus_intf_info.adc_config.adc_ch_cfg.num_of_samples[GUVA_ADC_CHANNEL]; i++) {
-            SL_PRINT_STRING_ERROR("\r\n %d \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
+            DEBUGOUT("%d \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -644,7 +609,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
             for (uint32_t i = 0;
                  i < sensor_hub_info_t[sens_ind].data_deliver.timeout / sensor_hub_info_t[sens_ind].sampling_interval;
                  i++) {
-              SL_PRINT_STRING_ERROR("\r\n %dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
+              DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -656,7 +621,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_NUM_OF_SAMPLES) {
             for (uint32_t i = 0; i < sensor_hub_info_t[sens_ind].data_deliver.numofsamples; i++) {
-              SL_PRINT_STRING_ERROR("\r\n %dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
+              DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -668,7 +633,6 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
           }
           if (sensor_hub_info_t[sens_ind].data_deliver.data_mode == SL_SH_THRESHOLD) {
             DEBUGOUT("%dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[0]);
-            SL_PRINT_STRING_ERROR("\r\n %dmV \t", sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[0]);
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
@@ -686,7 +650,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
                  "Single-ended output: %lfV    ",
                  (double)vout);
 #endif
-        SL_PRINT_STRING_ERROR("\r\n Single ended input: %lfV \t", (double)vout);
+        DEBUGOUT("Single ended input: %lfV \t", (double)vout);
       }
 
       if (SL_SENSOR_ADC_GY_61_ID == sensor_id) {
@@ -699,7 +663,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
                                           GY61_G_SCALE_MIN,
                                           GY61_G_SCALE_MAX))
             / -100.0;
-          SL_PRINT_STRING_ERROR("\r\n X = %gg, \t", x_g);
+          DEBUGOUT("X = %gg, \t", x_g);
         }
 #endif
 #ifdef GY61_Y_AXIS_ADC_CHANNEL
@@ -711,7 +675,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
                                           GY61_G_SCALE_MIN,
                                           GY61_G_SCALE_MAX))
             / -100.0;
-          SL_PRINT_STRING_ERROR("\r\n Y = %gg, \t", y_g);
+          DEBUGOUT("Y = %gg, \t", y_g);
         }
 #endif
 #ifdef GY61_Z_AXIS_ADC_CHANNEL
@@ -723,45 +687,45 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
                                           GY61_G_SCALE_MIN,
                                           GY61_G_SCALE_MAX))
             / -100.0;
-          SL_PRINT_STRING_ERROR("\r\n Z = %gg \t", z_g);
+          DEBUGOUT("Z = %gg \t", z_g);
         }
 #endif
       }
 
-      SL_PRINT_STRING_ERROR("\r\n data_deliver.mode:%d \r\n", sensor_hub_info_t[sens_ind].data_deliver.data_mode);
+      DEBUGOUT(" data_deliver.mode:%d \r\n", sensor_hub_info_t[sens_ind].data_deliver.data_mode);
       // Acknowledge data reception
       event_ack = sensor_id;
 
 #if SH_AWS_ENABLE
       sl_sem_status = osSemaphoreRelease(sl_semaphore_aws_task_id);
       if (sl_sem_status != osOK) {
-        SL_PRINT_STRING_ERROR("\r\n event post osSemaphoreRelease failed :%d \r\n", sl_sem_status);
+        DEBUGOUT("\r\n event post osSemaphoreRelease failed :%d \r\n", sl_sem_status);
       }
       sl_sem_status = osSemaphoreAcquire(sl_semaphore_app_task_id_2, osWaitForever);
       if (sl_sem_status != osOK) {
-        SL_PRINT_STRING_ERROR("\r\n osSemaphoreAcquire failed :%d \r\n", sl_sem_status);
+        DEBUGOUT("\r\n osSemaphoreAcquire failed :%d \r\n", sl_sem_status);
       }
 #endif
       break;
 
     case SL_SENSOR_CNFG_INVALID:
-      SL_PRINT_STRING_ERROR("\r\n SL_SENSOR_CNFG_INVALID:%u \r\n", sensor_id);
+      DEBUGOUT(" SL_SENSOR_CNFG_INVALID:%u \r\n", sensor_id);
 
       break;
     case SL_SENSOR_START_FAILED:
-      SL_PRINT_STRING_ERROR("\r\n Sensor START failed:%u \r\n", sensor_id);
+      DEBUGOUT("Sensor START failed:%u \r\n", sensor_id);
 
       break;
     case SL_SENSOR_STOP_FAILED:
-      SL_PRINT_STRING_ERROR("\r\n Sensor STOP failed:%u \r\n", sensor_id);
+      DEBUGOUT("Sensor STOP failed:%u \r\n", sensor_id);
 
       break;
     case SL_SENSOR_DELETED:
-      SL_PRINT_STRING_ERROR("Sensor deleted:%u \r\n", sensor_id);
+      DEBUGOUT("Sensor deleted:%u \r\n", sensor_id);
       break;
 
     case SL_SENSOR_DELETE_FAILED:
-      SL_PRINT_STRING_ERROR("Sensor deleted failed:%u \r\n", sensor_id);
+      DEBUGOUT("Sensor deleted failed:%u \r\n", sensor_id);
       break;
     default:
       break;
@@ -809,7 +773,7 @@ static sl_status_t initialize_wireless(void)
   DEBUGINIT();
   if (status != SL_STATUS_OK) {
     // If status is not OK, return with the error code.
-    SL_PRINT_STRING_ERROR("sl_wifi_init failed, Error Code: 0x%lX \n", status);
+    DEBUGOUT("sl_wifi_init failed, Error Code: 0x%lX \n", status);
     return status;
   }
   uint8_t xtal_enable = 1;
@@ -817,7 +781,7 @@ static sl_status_t initialize_wireless(void)
   status = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
     // If status is not OK, return with error code.
-    SL_PRINT_STRING_ERROR("sl_si91x_m4_ta_secure_handshake failed, Error Code: 0x%lX \n", status);
+    DEBUGOUT("sl_si91x_m4_ta_secure_handshake failed, Error Code: 0x%lX \n", status);
     return status;
   }
   // Wireless Sleep with ram retention
@@ -840,7 +804,7 @@ void wireless_sleep(void)
   status = sl_wifi_set_performance_profile_v2(&ta_performance_profile);
   if (status != SL_STATUS_OK) {
     // If status is not OK, return with error code.
-    SL_PRINT_STRING_ERROR("sl_wifi_set_performance_profile_v2 failed, Error Code: 0x%lX \n", status);
+    DEBUGOUT("sl_wifi_set_performance_profile_v2 failed, Error Code: 0x%lX \n", status);
     return;
   }
   // Wifi Profile (TA Mode) is set to standby power save with RAM retention.
@@ -850,7 +814,7 @@ void wireless_sleep(void)
   status = sl_wifi_set_performance_profile_v2(&ta_performance_profile);
   if (status != SL_STATUS_OK) {
     // If status is not OK, return with error code.
-    SL_PRINT_STRING_ERROR("sl_wifi_set_performance_profile_v2 failed, Error Code: 0x%lX \n", status);
+    DEBUGOUT("sl_wifi_set_performance_profile_v2 failed, Error Code: 0x%lX \n", status);
     return;
   }
 }
@@ -877,14 +841,14 @@ void sl_si91x_sensorhub_app_task(void)
   sl_app_semaphore_attr_st.cb_size   = 0U;
   sl_app_semaphore_attr_st.name      = NULL;
 
-  SL_PRINT_STRING_ERROR("\r\n Start Sensor HUB APP Task \r\n");
+  DEBUGOUT("\r\n Start Sensor HUB APP Task \r\n");
   sl_semaphore_app_task_id = osSemaphoreNew(1U, 0U, &sl_app_semaphore_attr_st);
 #ifndef SH_AWS_ENABLE
   // Initialize the wireless interface and put the TA in Standby with RAM retention mode.
   status = initialize_wireless();
   if (status != SL_STATUS_OK) {
     // If status is not OK, return with the error code.
-    SL_PRINT_STRING_ERROR("Wireless API initialization failed, Error Code: 0x%lX \n", status);
+    DEBUGOUT("Wireless API initialization failed, Error Code: 0x%lX \n", status);
     return;
   }
 #endif
@@ -892,14 +856,14 @@ void sl_si91x_sensorhub_app_task(void)
   // Register callback handler for getting different events from the sensor hub
   status = sl_si91x_sensorhub_notify_cb_register(sl_si91x_sensor_event_handler, (sl_sensor_id_t *)&event_ack);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\n Unable to create call back info: %lu \r\n", status);
+    DEBUGOUT("\r\n Unable to create call back info: %lu \r\n", status);
     while (1)
       ;
   }
   // Initialize sensor interface
   status = sl_si91x_sensorhub_init();
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\n Sensor Hub Init failed \r\n");
+    DEBUGOUT("\r\n Sensor Hub Init failed \r\n");
     while (1)
       ;
   }
@@ -907,7 +871,7 @@ void sl_si91x_sensorhub_app_task(void)
   // sensor hub scan
   sensor_scan_cnt = sl_si91x_sensorhub_detect_sensors((sl_sensor_id_t *)&sl_sensor_scan_info, SL_MAX_NUM_SENSORS);
   if (sensor_scan_cnt == 0) {
-    SL_PRINT_STRING_ERROR("\r\n No sensor is detected \r\n");
+    DEBUGOUT("\r\n No sensor is detected \r\n");
     while (1)
       ;
   }
@@ -916,15 +880,13 @@ void sl_si91x_sensorhub_app_task(void)
   for (uint32_t sensor_cnt = 0; sensor_cnt < sensor_scan_cnt; sensor_cnt++) {
     status = sl_si91x_sensorhub_create_sensor(sl_sensor_scan_info[sensor_cnt]);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("\r\n Unable to create sensor %d,Error Code:%lu \r\n",
-                            sl_sensor_scan_info[sensor_cnt],
-                            status);
+      DEBUGOUT("\r\n Unable to create sensor %d,Error Code:%lu \r\n", sl_sensor_scan_info[sensor_cnt], status);
     }
   }
   // Start the sensor HUb Tasks
   status = sl_si91x_sensor_hub_start();
   if (status != RSI_OK) {
-    SL_PRINT_STRING_ERROR("\r\n  Sensor HUB start failed \r\n");
+    DEBUGOUT("\r\n  Sensor HUB start failed \r\n");
     while (1)
       ;
   }
@@ -933,7 +895,7 @@ void sl_si91x_sensorhub_app_task(void)
 
   sl_semapptaskacq_status = osSemaphoreAcquire(sl_semaphore_app_task_id_2, osWaitForever);
   if (sl_semapptaskacq_status != osOK) {
-    SL_PRINT_STRING_ERROR("\r\n osSemaphoreAcquire failed :%d \r\n", sl_semapptaskacq_status);
+    DEBUGOUT("\r\n osSemaphoreAcquire failed :%d \r\n", sl_semapptaskacq_status);
   }
 #endif
   // Start the sensors
@@ -941,14 +903,14 @@ void sl_si91x_sensorhub_app_task(void)
     // start a sensor, data ready events will be posted once data is acquired successfully
     status = sl_si91x_sensorhub_start_sensor(sl_sensor_scan_info[sensor_cnt]);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("\r\n Unable to start sensor %d \r\n", sl_sensor_scan_info[sensor_cnt]);
+      DEBUGOUT("\r\n Unable to start sensor %d \r\n", sl_sensor_scan_info[sensor_cnt]);
     }
   }
   while (1) {
     // waiting for the semaphore release
     sl_semapptaskacq_status = osSemaphoreAcquire(sl_semaphore_app_task_id, osWaitForever);
     if (sl_semapptaskacq_status != osOK) {
-      SL_PRINT_STRING_ERROR("\r\n osSemaphoreAcquire failed :%d \r\n", sl_semapptaskacq_status);
+      DEBUGOUT("\r\n osSemaphoreAcquire failed :%d \r\n", sl_semapptaskacq_status);
     }
   }
 }

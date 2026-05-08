@@ -5,7 +5,7 @@ description: 'This example project demonstrates the PSA GCM API on large data in
   '
 category: example|crypto
 quality: production
-label: SiWx91x Platform - PSA GCM Large Data Example
+label: Platform SiWx91x - PSA GCM Large Data Example
 component:
 - id: sl_main
 - id: freertos

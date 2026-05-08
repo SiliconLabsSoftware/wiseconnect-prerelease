@@ -1,24 +1,18 @@
 project_name: ble_central_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Central FreeRTOS
+label: BLE - Central (NCP)
 category: Example|BLE
-description: 'Demonstrates how to connect SiWx91x to a remote BLE device in central role over SPI NCP with FreeRTOS. This is demonstrated by scanning for peripherals and establishing a BLE link.
+description: 'Start a BLE device in central mode.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

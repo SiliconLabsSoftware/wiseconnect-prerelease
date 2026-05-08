@@ -1,8 +1,8 @@
-# SiWx91x Platform NVM3 Common Flash
+# Platform SiWx91x NVM3 Common Flash
 
 ## Table of Contents
 
-- [SiWx91x Platform NVM3 Common Flash](#platform-siwx91x-nvm3-common-flash)
+- [Platform SiWx91x NVM3 Common Flash](#platform-siwx91x-nvm3-common-flash)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -94,14 +94,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   the user repack limit should be placed. The default is 0, which means the user and forced repack limits are equal.
 - NVM3_DEFAULT_NVM_SIZE - Size of the NVM3 storage region in flash. This size should be aligned with the flash page size of the device.
 
-- Configure the following application macros in `app.c`:
-
-- `MAX_OBJECT_COUNT`: Specifies the maximum number of data objects that can be stored in the NVM3 instance by the application. By default, it is set to 10.
-
-  ```c
-  #define MAX_OBJECT_COUNT    10                                  // Maximum number of data objects saved
-  ```
-
 ## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
@@ -125,4 +117,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

@@ -1,8 +1,8 @@
-# SiWx91x Platform EFUSE
+# Platform SiWx91x EFUSE
 
 ## Table of Contents
 
-- [SiWx91x Platform EFUSE](#platform-siwx91x-efuse)
+- [Platform SiWx91x EFUSE](#platform-siwx91x-efuse)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -85,69 +85,17 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following macros in [`efuse_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_efuse/efuse_example.c) file and update/modify following macros if required. The chip set provides 256 efuse bits as one-time programmable memory location. These bits are 32-bit addressing with each address containing 8-bits. The 255th efuse bit is reserved with a default value to '1'.
 
-- `WRITE_ADD_1`: First eFuse address used by the example for set/get/read and (optional) write operations. By default, it is set to `0x00001`.
-
-  ```c
+  ```C
     #define WRITE_ADD_1         0x00001        // efuse address 1
-  ```
-
-- `WRITE_ADD_2`: Second eFuse address used by the example for set/get/read and (optional) write operations. By default, it is set to `0x00002`.
-
-  ```c
     #define WRITE_ADD_2         0x00002        // efuse address 2
-  ```
-
-- `CLOCK`: Clock value passed to the FSM/memory-mapped read APIs. This value depends on the clock frequency of the eFuse controller. By default, it is set to 100.
-
-  ```c
-    #define CLOCK               100            // Clock
-  ```
-
-- `BIT_POS_0`: Bit position 0 within an eFuse address, used when writing individual bits. By default, it is set to 0.
-
-  ```c
-    #define BIT_POS_0           0              // Bit position 0
-  ```
-
-- `BIT_POS_1`: Bit position 1 within an eFuse address, used when writing individual bits. By default, it is set to 1.
-
-  ```c
-    #define BIT_POS_1           1              // Bit position 1
-  ```
-
-- `BIT_POS_3`: Bit position 3 within an eFuse address, used when writing individual bits. By default, it is set to 3.
-
-  ```c
-    #define BIT_POS_3           3              // Bit position 3
-  ```
-
-- `BIT_POS_5`: Bit position 5 within an eFuse address, used when writing individual bits. By default, it is set to 5.
-
-  ```c
-    #define BIT_POS_5           5              // Bit position 5
-  ```
-
-- `MATCH_BYTE`: Expected byte value used to validate the byte read back from `WRITE_ADD_1` in FSM and memory-mapped read modes. By default, it is set to `0x2A`.
-
-  ```c
-    #define MATCH_BYTE          0x2A           // 1 byte to be read
-  ```
-
-- `MATCH_WORD`: Expected word value used to validate the word read back from addresses `WRITE_ADD_1` and `WRITE_ADD_2` in memory-mapped read-word mode. By default, it is set to `0x032A`.
-
-  ```c
-    #define MATCH_WORD          0x032A         // 1 word to be read
-  ```
-
-- `HOLD`: eFuse controller hold/strobe count, which depends on the clock frequency of the eFuse controller and controls read/program timing. By default, it is set to 40.
-
-  ```c
     #define HOLD                40             // count value depends on clock frequency of EFUSE controller
-  ```
-
-- `WRITE_ENABLE`: Enables writing into the eFuse. Since eFuse is one-time programmable, keep this set to 0 unless you explicitly intend to program eFuse bits. By default, it is set to 0.
-
-  ```c
+    #define CLOCK               100            // Clock
+    #define BIT_POS_0           0              // Bit position 0
+    #define BIT_POS_1           1              // Bit position 1
+    #define BIT_POS_3           3              // Bit position 3
+    #define BIT_POS_5           5              // Bit position 5
+    #define MATCH_BYTE          0x2A           // 1 byte to be read
+    #define MATCH_WORD          0x032A         // 1 word to be read
     #define WRITE_ENABLE        0              // Enables efuse write
   ```
 
@@ -185,4 +133,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

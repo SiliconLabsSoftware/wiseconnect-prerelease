@@ -1,8 +1,8 @@
-# SiWx91x Platform Crypto ECDH
+# Platform SiWx91x Crypto ECDH
 
 ## Table of Contents
 
-- [SiWx91x Platform Crypto ECDH](#platform-siwx91x-crypto-ecdh)
+- [Platform SiWx91x Crypto ECDH](#platform-siwx91x-crypto-ecdh)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

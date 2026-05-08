@@ -1,8 +1,8 @@
-# SiWx91x Platform OPAMP
+# Platform SiWx91x OPAMP
 
 ## Table of Contents
 
-- [SiWx91x Platform OPAMP](#platform-siwx91x-opamp)
+- [Platform SiWx91x OPAMP](#platform-siwx91x-opamp)
 - [Overview](#overview)
 - [About Example Code](#about-example-code)
 - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -48,10 +48,6 @@ The following configurations are used in this example:
 - In this example, first the OPAMP is initialized by enabling clocks and BOD through [`sl_si91x_opamp_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/opamp#sl-si91x-opamp-init) API.
 - Sets OPAMP instance and OPAMP feature configuration [`sl_si91x_opamp_set_configuration`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/opamp#sl-si91x-opamp-set-configuration) API (inputs are configured as per the usecase macros enabled).
 - Optional integration with DAC for external voltage comparison.
-
-> **Note- In case of sleep-wakeup :**
->
->- Call `sl_opamp_init_instances()` after wakeup before using OPAMP again so the configured OPAMP instances are restored.
 
 ## Prerequisites/Setup Requirements
 
@@ -99,81 +95,14 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following macros in [`opamp_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_opamp/opamp_example.c) file and update/modify following macros if required.
 
-- `OPAMP_VIN_P_SEL`: Selects the OPAMP positive (non-inverting) input pin from the VinP mux. By default, it is set to 0.
-
-  ```c
-    #define OPAMP_VIN_P_SEL   0  // Positive input pin selection
-  ```
-
-- `OPAMP_VREF_SEL`: Selects the OPAMP reference voltage source / input used internally by the driver. By default, it is set to 10.
-
-  ```c
-    #define OPAMP_VREF_SEL    10 // Reference voltage selection
-  ```
-
-- `OPAMP_ENABLE`: Enables or disables the OPAMP. Set to 1 to enable and 0 to disable. By default, it is set to 1.
-
-  ```c
-    #define OPAMP_ENABLE      1  // Enable OPAMP
-  ```
-
-- `OPAMP_LP_MODE`: Enables or disables OPAMP low-power mode. Set to 1 to enable low-power mode; 0 disables it. By default, it is set to 0.
-
-  ```c
-    #define OPAMP_LP_MODE     0  // Low power mode disabled
-  ```
-
-- `OPAMP_R1_SEL`: Selects the value of the R1 feedback resistor for PGA/comparator configurations. By default, it is set to 0.
-
-  ```c
-    #define OPAMP_R1_SEL      0  // R1 resistor selection
-  ```
-
-- `OPAMP_R2_SEL`: Selects the value of the R2 feedback resistor for PGA/comparator configurations. By default, it is set to 8.
-
-  ```c
-    #define OPAMP_R2_SEL      8  // R2 resistor selection
-  ```
-
-- `OPAMP_OUT_MUX_EN`: Enables or disables the OPAMP output mux. Set to 1 to enable output routing to a GPIO pin. By default, it is set to 1.
-
-  ```c
-    #define OPAMP_OUT_MUX_EN  1  // Output mux enabled
-  ```
-
-- `OPAMP_OUT_MUX_SEL`: Selects the OPAMP output mux destination (which GPIO pin the OPAMP output is routed to). By default, it is set to 1.
-
-  ```c
-    #define OPAMP_OUT_MUX_SEL 1  // Output mux selection
-  ```
-
-- `OPAMP1_VINN_SEL`: Selects the negative (inverting) input for OPAMP1 from the VinN mux. By default, it is set to 4.
-
-  ```c
-    #define OPAMP1_VINN_SEL   4  // For OPAMP1
-  ```
-
-- `OPAMP2_VINN_SEL`: Selects the negative (inverting) input for OPAMP2 from the VinN mux. By default, it is set to 3.
-
-  ```c
-    #define OPAMP2_VINN_SEL   3  // For OPAMP2
-  ```
-
-- `OPAMP3_VINN_SEL`: Selects the negative (inverting) input for OPAMP3 from the VinN mux. By default, it is set to 3.
-
-  ```c
-    #define OPAMP3_VINN_SEL   3  // For OPAMP3
-  ```
-
 1. Select OPAMP Reference Voltage
     - 2500: 2.5 V
     - 3300: 3.3 V
 
-- `OPAMP_REF_VOLT`: OPAMP reference voltage in millivolts. Use 2500 for 2.5 V or 3300 for 3.3 V. By default, it is set to 3300.
-
-  ```c
+    ```C
+    // OPAMP Reference Voltage
     #define OPAMP_REF_VOLT 3300
-  ```
+    ```
 
 2. Select OPAMP feature:
     - SL_OPAMP_UNITY_GAIN: Unity Gain
@@ -187,37 +116,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - SL_OPAMP_TRANS_IMPEDANCE_AMPLIFIER: Trans-Impedance Amplifier
     - SL_OPAMP_INSTRUMENTATION_AMPLIFIER: Instrumentation Amplifier
 
-- `SL_OPAMP_CONFIGURATION_SELECTION`: Selects the OPAMP feature/configuration used by the example (see the list above). By default, it is set to SL_OPAMP_UNITY_GAIN.
-
-  ```c
+    ```C
+    // OPAMP feature
     #define SL_OPAMP_CONFIGURATION_SELECTION SL_OPAMP_UNITY_GAIN
-  ```
+    ```
 
 3. If DAC integration is required, enable it from UC to enable INPUT_DAC_NEG_INPUT_EXTERNAL macro:
 
-- `DAC_SAMPLING_RATE`: DAC sampling rate in samples per second used when DAC is enabled as an OPAMP input source. By default, it is set to 5000000.
-
-  ```c
+    ```C
+    // DAC
     #define DAC_SAMPLING_RATE          5000000
-  ```
-
-- `NUMBER_OF_INPUT_SAMPLE`: Number of input samples written to the DAC when used with OPAMP. By default, it is set to 1.
-
-  ```c
     #define NUMBER_OF_INPUT_SAMPLE     1
-  ```
-
-- `MAX_DAC_INPUT_SAMPLE_VALUE`: Maximum allowed 10-bit DAC input sample value. By default, it is set to 1023.
-
-  ```c
     #define MAX_DAC_INPUT_SAMPLE_VALUE 1023
-  ```
-
-- `DAC_INPUT_SAMPLE_VALUE`: Digital DAC input sample value used to drive the OPAMP input (equivalent analog voltage is computed from Vref). By default, it is set to 1023.
-
-  ```c
     #define DAC_INPUT_SAMPLE_VALUE     1023
-  ```
+    ```
 
     - DAC operation mode: static mode
     - Sample rate: Sample rate can be configurable to DAC, sample rate unit is samples/second.
@@ -539,4 +451,3 @@ When using the **Two OPAMP Differential Amplifier** configuration, ensure that *
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

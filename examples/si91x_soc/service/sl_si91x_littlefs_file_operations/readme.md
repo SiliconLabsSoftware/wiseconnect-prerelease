@@ -1,8 +1,8 @@
-# SiWx91x Platform LittleFS Basic File Operations
+# Platform SiWx91x LittleFS Basic File Operations
 
 ## Table of Contents
 
-- [SiWx91x Platform LittleFS Basic File Operations](#platform-siwx91x-littlefs-basic-file-operations)
+- [Platform SiWx91x LittleFS Basic File Operations](#platform-siwx91x-littlefs-basic-file-operations)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

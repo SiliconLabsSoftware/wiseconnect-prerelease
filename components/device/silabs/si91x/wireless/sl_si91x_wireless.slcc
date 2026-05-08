@@ -1,10 +1,10 @@
 id: sl_si91x_wireless
 package: wifi
-description: 'SiWx91x Wireless Subsystem provides an API to manage the Wireless Subsystem
-  in the SiWx91x SoC
+description: 'Si91x Wireless Subsystem provides an API to manage the Wireless Subsystem
+  in the Si91x SoC
 
   '
-label: SiWx91x Wireless Subsystem
+label: Si91x Wireless Subsystem
 category: Device|Si91x|Wireless
 quality: production
 metadata:
@@ -172,7 +172,7 @@ requires:
 - name: wifi
 - name: wifi_resources
 - name: sli_hal_si91x
-- name: log_none
+- name: si91x_log_none
 recommends:
 - id: '%extension-wiseconnect3_sdk%sl_si91x_internal_stack'
   vendor: silabs

@@ -82,27 +82,21 @@ void dma_example_init(void)
     status = sl_si91x_dma_init(&dma_init);
     if (status) {
       //UDMA initialization fail
-      /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-      SL_PRINT_STRING_ERROR("\r\nFailed to Initialize UDMA\r\n");
+      DEBUGOUT("\r\nFailed to Initialize UDMA\r\n");
       break;
     } else {
       //UDMA initialization success
-      SL_PRINT_STRING_ERROR("\r\nUDMA Initialization Success\r\n");
+      DEBUGOUT("\r\nUDMA Initialization Success\r\n");
     }
     //Allocate channel for transfer
     status = sl_si91x_dma_allocate_channel(DMA_INSTANCE, &channel, 0);
     if (status) {
       //Channel allocation failed
-      SL_PRINT_STRING_ERROR("\r\nChannel not allocated\r\n");
+      DEBUGOUT("\r\nChannel not allocated\r\n");
       break;
     } else {
       //Channel successfully allocated
-      SL_PRINT_STRING_ERROR("\r\nChannel Allocated successfully\r\n");
+      DEBUGOUT("\r\nChannel Allocated successfully\r\n");
     }
     callbacks.transfer_complete_cb = transfer_complete_callback_dmadrv;
 
@@ -110,11 +104,11 @@ void dma_example_init(void)
     status = sl_si91x_dma_register_callbacks(DMA_INSTANCE, channel, &callbacks);
     if (status) {
       //Callback registration success
-      SL_PRINT_STRING_ERROR("\r\nCallbacks not registered\r\n");
+      DEBUGOUT("\r\nCallbacks not registered\r\n");
       break;
     } else {
       //Callback not registered
-      SL_PRINT_STRING_ERROR("\r\nCallbacks registered\r\n");
+      DEBUGOUT("\r\nCallbacks registered\r\n");
     }
 
     // Filled data in source buffer
@@ -144,10 +138,10 @@ void dma_example_init(void)
 #endif
     if (status) {
       //Transfer start failed
-      SL_PRINT_STRING_ERROR("\r\nTransfer start fail\r\n");
+      DEBUGOUT("\r\nTransfer start fail\r\n");
     } else {
       //Transfer started successfully
-      SL_PRINT_STRING_ERROR("\r\n Xfer start\r\n");
+      DEBUGOUT("\r\n Xfer start\r\n");
     }
   } while (0);
 }
@@ -159,12 +153,12 @@ void dma_example_process_action(void)
 {
   if (transfer_done) {
     //DMA transfer done
-    SL_PRINT_STRING_ERROR("\r\nTransfer completed successfully\r\n");
+    DEBUGOUT("\r\nTransfer completed successfully\r\n");
     //De-initialize DMA peripheral
     if (sl_si91x_dma_deinit(DMA_INSTANCE)) {
-      SL_PRINT_STRING_ERROR("\r\nFailed to Uninitialize UDMA\r\n");
+      DEBUGOUT("\r\nFailed to Uninitialize UDMA\r\n");
     } else {
-      SL_PRINT_STRING_ERROR("\r\nUDMA Uninitialization Success\r\n");
+      DEBUGOUT("\r\nUDMA Uninitialization Success\r\n");
     }
     transfer_done = 0;
   }

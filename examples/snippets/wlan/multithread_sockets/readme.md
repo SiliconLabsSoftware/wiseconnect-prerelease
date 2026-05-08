@@ -104,7 +104,7 @@ The application can be configured to suit user requirements and development envi
 
    - STA instance related parameters
 
-     - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which Wi-Fi network that shall be advertised and SiWx91x module is connected to it.
+     - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which Wi-Fi network that shall be advertised and Si91X module is connected to it.
 
         ```c
         #define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"      
@@ -126,7 +126,7 @@ The application can be configured to suit user requirements and development envi
 
 **Path for app.c in Simplicity Studio IDE:**
 
-- The `app.c` file will be located at **wifi_multithread_sockets_soc**.
+- The `app.c` file will be located at **wifi_wlan_throughput_soc**.
 
 Configure the following parameters in `app.c` to test throughput app as per requirements.
 
@@ -199,27 +199,27 @@ The following macros are used to define the type of sockets in the application:
 
 ### Macros
 
-- **`SOCKET_TYPE_NONE` (Value: `0`)**
+- **`NONE` (Value: `0`)**
   - Indicates that the socket does not require synchronization or asynchronous handling.
   - **Usage:** This is recommended for **TX sockets** as they do not require sync or async functionality.
 
-- **`SOCKET_TYPE_ASYNC` (Value: `1`)**
+- **`ASYNC_SOCKET` (Value: `1`)**
   - Represents an asynchronous socket type.
   - **Usage:** This macro is used for **RX sockets** when the user specifies asynchronous behavior.
 
-- **`SOCKET_TYPE_SYNC` (Value: `2`)**
+- **`SYNC_SOCKET` (Value: `2`)**
   - Represents a synchronous socket type.
   - **Usage:** This macro is used for **RX sockets** when the user specifies synchronous behavior.
 
 ### Guidelines for Socket Usage
 
 - **TX Sockets:**  
-  Always use the `SOCKET_TYPE_NONE` macro for TX sockets as synchronization is not required.
+  Always use the `NONE` macro for TX sockets as synchronization is not required.
   
 - **RX Sockets:**  
-  Depending on the user requirement, use either `SOCKET_TYPE_ASYNC` or `SOCKET_TYPE_SYNC`:
-  - Use `SOCKET_TYPE_ASYNC` for non-blocking operations where data is received asynchronously.
-  - Use `SOCKET_TYPE_SYNC` for blocking operations where data is received synchronously.
+  Depending on the user requirement, use either `ASYNC_SOCKET` or `SYNC_SOCKET`:
+  - Use `ASYNC_SOCKET` for non-blocking operations where data is received asynchronously.
+  - Use `SYNC_SOCKET` for blocking operations where data is received synchronously.
 
 ### create_newsocket_with_new_osthread API
 
@@ -231,12 +231,12 @@ This API creates a new socket and spawns an associated OS thread to handle the s
 
 ```c
 osThreadId_t create_newsocket_with_new_osthread(socket_handler sock_handler,
-                                                uint32_t port_number,
+                                                uint32_t Portnumber,
                                                 char *ip_address,
                                                 char *thread_name,
                                                 uint8_t thread_priority,
                                                 uint32_t thread_size,
-                                                uint8_t socket_type);
+                                                uint8_t flag);
 ```
 
 #### Parameters
@@ -244,12 +244,12 @@ osThreadId_t create_newsocket_with_new_osthread(socket_handler sock_handler,
 | **Parameter**       | **Type**             | **Description**                                                                                             |
 |---------------------|----------------------|-------------------------------------------------------------------------------------------------------------|
 | `sock_handler`      | `socket_handler`    | A callback function pointer for handling the socket operations (for example, sending or receiving data).           |
-| `port_number`       | `uint32_t`          | The port number on which the socket will operate.                                                          |
-| `ip_address`        | `char *`            | The IP address for the socket connection (use `""` for server-side sockets that don't require an address).  |
+| `Portnumber`        | `uint32_t`          | The port number on which the socket will operate.                                                          |
+| `ip_address`        | `char *`            | The IP address for the socket connection (use `NULL` for server-side sockets that don't require an address).|
 | `thread_name`       | `char *`            | The name of the OS thread that will be created for this socket.                                            |
 | `thread_priority`   | `uint8_t`           | The priority of the OS thread (for example, `osPriorityLow`).                                                     |
 | `thread_size`       | `uint32_t`          | The stack size of the OS thread in bytes (for example, `1024 * 4`).                                               |
-| `socket_type`       | `uint8_t`           | The socket type or behavior flag (for example, `SOCKET_TYPE_SYNC` for synchronized operations or `SOCKET_TYPE_ASYNC` for asynchronous). |
+| `flag`              | `uint8_t`           | The socket type or behavior flag (for example, `SYNC_SOCKET` for synchronized operations or `ASYNC_SOCKET` for asynchronous). |
 
 #### **Return Value**  
 
@@ -272,11 +272,11 @@ Creates a socket to send data to a TCP server running on `192.168.0.156` at port
 ```c
 create_newsocket_with_new_osthread(send_data_to_tcp_server,
                                    5001,
-                                   "192.168.0.156",    // Server IP
-                                   "TCP_TX",           // Thread name
-                                   osPriorityLow,      // Thread priority
-                                   (1024 * 4),         // Thread stack size
-                                   SOCKET_TYPE_NONE);  // TX does not need sync/async
+                                   "192.168.0.156", // Server IP
+                                   "TCP_TX",        // Thread name
+                                   osPriorityLow,   // Thread priority
+                                   (1024 * 4),      // Thread stack size
+                                   NONE);           // NONE
 ```
 
 ##### **Creating a TCP Receiver Socket**
@@ -286,11 +286,11 @@ Creates a socket to receive data from a TCP client on port `5004`.
 ```c
 create_newsocket_with_new_osthread(receive_data_from_tcp_client,
                                    5004,
-                                   "",                  // Empty for server-side
-                                   "TCP_RX",           // Thread name
-                                   osPriorityLow,      // Thread priority
-                                   (1024 * 4),         // Thread stack size
-                                   SOCKET_TYPE_SYNC);  // Synchronous socket
+                                   NULL,            // NULL for server-side
+                                   "TCP_RX",        // Thread name
+                                   osPriorityLow,   // Thread priority
+                                   (1024 * 4),      // Thread stack size
+                                   SYNC_SOCKET);    // Synchronous socket
 ```
 
 ##### **Creating Another TCP Receiver Socket**

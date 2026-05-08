@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - TCP Tx on Periodic Wakeup (NCP)
 category: Example|Wi-Fi
-description: 'The application demonstrates TCP TX on Periodic Wakeup.
+description: 'The application demonstrates TCP TX with Periodic Wakeup
 
   '
 filter:

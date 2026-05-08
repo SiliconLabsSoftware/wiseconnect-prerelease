@@ -57,8 +57,7 @@
 #define NO_OF_DAY_IN_MONTH_3     30                 // Number of days in even month
 #define NO_OF_DAY_IN_MONTH_4     31                 // Number of days in odd month
 #define NO_OF_MONTH_IN_YEAR      12                 // Number of months in a year
-#define NEXT_OCCURRENCE          1                  // Next time occurrence
-#define NEXT_OCCURENECE          NEXT_OCCURRENCE    // Legacy alias
+#define NEXT_OCCURENECE          1                  // Next time occurence
 #define RESET_DAY                1                  // Reset day after incrementing month
 #define RESET_MONTH              1                  // Reset month after incrementing year
 #define LEAP_YEAR_VALIDATION     4                  // Value to validate the leap year
@@ -554,7 +553,7 @@ static void set_periodic_alarm(uint32_t alarm_time)
   set_alarm_config.MilliSeconds = set_alarm_config.MilliSeconds + (alarm_time % NO_OF_MSEC_IN_SEC);
   if (set_alarm_config.MilliSeconds >= NO_OF_MSEC_IN_SEC) {
     set_alarm_config.MilliSeconds -= NO_OF_MSEC_IN_SEC;
-    set_alarm_config.Second += NEXT_OCCURRENCE;
+    set_alarm_config.Second += NEXT_OCCURENECE;
   }
 
   alarm_time /= NO_OF_MSEC_IN_SEC;
@@ -562,7 +561,7 @@ static void set_periodic_alarm(uint32_t alarm_time)
   set_alarm_config.Second = set_alarm_config.Second + (alarm_time % NO_OF_SEC_IN_MIN);
   if (set_alarm_config.Second >= NO_OF_SEC_IN_MIN) {
     set_alarm_config.Second -= NO_OF_SEC_IN_MIN;
-    set_alarm_config.Minute += NEXT_OCCURRENCE;
+    set_alarm_config.Minute += NEXT_OCCURENECE;
   }
 
   alarm_time /= NO_OF_SEC_IN_MIN;
@@ -570,7 +569,7 @@ static void set_periodic_alarm(uint32_t alarm_time)
   set_alarm_config.Minute = set_alarm_config.Minute + (alarm_time % NO_OF_MIN_IN_HOUR);
   if (set_alarm_config.Minute >= NO_OF_MIN_IN_HOUR) {
     set_alarm_config.Minute -= NO_OF_MIN_IN_HOUR;
-    set_alarm_config.Hour += NEXT_OCCURRENCE;
+    set_alarm_config.Hour += NEXT_OCCURENECE;
   }
 
   alarm_time /= NO_OF_MIN_IN_HOUR;
@@ -578,17 +577,17 @@ static void set_periodic_alarm(uint32_t alarm_time)
   set_alarm_config.Hour = set_alarm_config.Hour + alarm_time;
   if (set_alarm_config.Hour >= NO_OF_HOUR_IN_DAY) {
     set_alarm_config.Hour -= NO_OF_HOUR_IN_DAY;
-    set_alarm_config.Day += NEXT_OCCURRENCE;
+    set_alarm_config.Day += NEXT_OCCURENECE;
   }
 
   if (set_alarm_config.Day > NO_OF_DAY_IN_MONTH_1) {
     if (set_alarm_config.Month == February) {
       if (set_alarm_config.Year % LEAP_YEAR_VALIDATION) {
         set_alarm_config.Day = RESET_DAY;
-        set_alarm_config.Month += NEXT_OCCURRENCE;
+        set_alarm_config.Month += NEXT_OCCURENECE;
       } else if (set_alarm_config.Day > NO_OF_DAY_IN_MONTH_2) {
         set_alarm_config.Day = RESET_DAY;
-        set_alarm_config.Month += NEXT_OCCURRENCE;
+        set_alarm_config.Month += NEXT_OCCURENECE;
       }
     }
 
@@ -596,26 +595,26 @@ static void set_periodic_alarm(uint32_t alarm_time)
       if (!(set_alarm_config.Month % DAY_IN_MONTH_VALIDATION)) {
         if (set_alarm_config.Day > NO_OF_DAY_IN_MONTH_3) {
           set_alarm_config.Day = RESET_DAY;
-          set_alarm_config.Month += NEXT_OCCURRENCE;
+          set_alarm_config.Month += NEXT_OCCURENECE;
         } else if (set_alarm_config.Day > NO_OF_DAY_IN_MONTH_4) {
           set_alarm_config.Day = RESET_DAY;
-          set_alarm_config.Month += NEXT_OCCURRENCE;
+          set_alarm_config.Month += NEXT_OCCURENECE;
         }
       }
     } else if (!(set_alarm_config.Month % DAY_IN_MONTH_VALIDATION)) {
       if (set_alarm_config.Day > NO_OF_DAY_IN_MONTH_4) {
         set_alarm_config.Day = RESET_DAY;
-        set_alarm_config.Month += NEXT_OCCURRENCE;
+        set_alarm_config.Month += NEXT_OCCURENECE;
       } else if (set_alarm_config.Day > NO_OF_DAY_IN_MONTH_3) {
         set_alarm_config.Day = RESET_DAY;
-        set_alarm_config.Month += NEXT_OCCURRENCE;
+        set_alarm_config.Month += NEXT_OCCURENECE;
       }
     }
   }
 
   if (set_alarm_config.Month > NO_OF_MONTH_IN_YEAR) {
     set_alarm_config.Month = RESET_MONTH;
-    set_alarm_config.Year += NEXT_OCCURRENCE;
+    set_alarm_config.Year += NEXT_OCCURENECE;
   }
 #if (SL_SI91X_32KHZ_RC_CALIBRATION_ENABLED == ENABLE)
   // The flag is cleared indicating execution is happening through driver files.

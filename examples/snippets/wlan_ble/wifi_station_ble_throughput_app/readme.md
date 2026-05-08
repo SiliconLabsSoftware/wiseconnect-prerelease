@@ -17,7 +17,7 @@
 
 ## Purpose/Scope
 
-The coex application demonstrates throughput measurement of Wi‑Fi while a BLE central is connected. With **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** set to **1**, the application also runs a **second** throughput pass after BLE is disabled (see [Application Build Environment](#application-build-environment)).
+The coex application demonstrates throughput measurement of Wi-Fi while BLE is in connection.
 
 The coex application has WLAN and BLE tasks and acts as an interface between a smartphone and a PC. A smartphone interacts with the BLE task, while both PC and Silicon Labs device would be connected to a Wireless Access Point, thus both are connected together wirelessly when a smartphone connects to Silicon Labs device. Data transfer will happen between the Station and AP.
 
@@ -26,7 +26,7 @@ The coex application has WLAN and BLE tasks and acts as an interface between a s
 ### Hardware Requirements
 
 - Windows PC with Host interface (UART / SPI).
-- SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-constants#sl-si91x-operation-mode-t) for details.
+- SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes]() for details.
 - **SoC Mode**:
   - Standalone
     - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
@@ -83,17 +83,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
-1. Open `wifi_config.h` (or `wifi_app_config.h`) and edit the following parameters:
+1. Open `wifi_app_config.h` file and edit the following parameters:
 
-    - **Optional: Dynamic BLE disable for throughput**
-
-      Set `SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO` to `1` to run **two** WLAN throughput passes: first with BLE still connected (after Wi‑Fi is up), then again after BLE has been disabled. When **`0`**, the app connects over Wi‑Fi and runs a **single** `wlan_throughput_task()` with BLE connected as usual. In this tree, `wifi_config.h` may default this macro to **`1`** for the demo; set it to **`0`** for the single-pass behavior only.
-
-      When dynamic disable is enabled, the sequence is: (1) **`wlan_throughput_task()`** while BLE is up; (2) **`rsi_ble_app_request_disable()`** — the BLE task **quiesces** (`rsi_ble_stop_advertising`, `rsi_ble_disconnect` using the peer address), completes the disable stub after **`RSI_BLE_DISCONN_EVENT`**, and posts to **`ble_disable_done_queue`**; if **`rsi_ble_disconnect`** fails synchronously, the failure is posted immediately and advertising is not restarted from the disconnect path; (3) **`wlan_throughput_task()`** again with BLE off; (4) **`sl_wifi_deinit()`**; (5) **`rsi_ble_app_request_enable()`** and wait on **`ble_enable_done_queue`**; (6) **`wifi_app_init_and_reconnect()`** (`rsi_wlan_init_wifi()`, credential, **`sl_wifi_connect`**, DHCP). This path **deinitializes Wi‑Fi** and brings it back up, unlike the AWS provisioning example which keeps the Wi‑Fi stack initialized and only disconnects the station.
-
-      ```c
-      #define SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO 1   /* 0 = one throughput pass with BLE only; 1 = second pass after BLE off */
-      ```
 
     - **Wi-Fi Configuration**
 

@@ -40,7 +40,6 @@
 #include "rsi_bt_common_apis.h"
 #include "sl_constants.h"
 #include "rsi_common_apis.h"
-#include "wifi_config.h"
 
 //! local device name
 #define RSI_BLE_DEVICE_NAME (void *)"BLE_THROUGHPUT_APP"
@@ -65,10 +64,6 @@
 #define RSI_BLE_GATT_WRITE_EVENT          0x11
 #define RSI_BLE_MORE_DATA_REQ_EVENT       0x12
 #define RSI_DATA_TRANSMIT_EVENT           0x13
-#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
-#define RSI_BLE_DISABLE_REQUEST 0x14
-#define RSI_BLE_ENABLE_REQUEST  0x15
-#endif
 
 //! error code
 #define BT_HCI_COMMAND_DISALLOWED 0x4E0C
@@ -92,20 +87,6 @@ static uint8_t device_found            = 0;
 static uint8_t conn_params_updated     = 0;
 
 extern osSemaphoreId_t ble_main_task_sem, ble_conn_sem;
-
-#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
-/** Set when disable path runs rsi_ble_disconnect; cleared when BLE disable is signaled or disconnect fails. */
-static uint8_t ble_disable_after_disconnect_pending;
-
-static int32_t app_ble_disable(void)
-{
-  return rsi_ble_disable();
-}
-static int32_t app_ble_enable(void)
-{
-  return rsi_ble_enable();
-}
-#endif
 
 void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *resp_enh_conn);
 
@@ -617,15 +598,6 @@ void rsi_ble_app_task(void)
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
 
-#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
-        if (ble_disable_after_disconnect_pending != 0) {
-          ble_disable_after_disconnect_pending = 0;
-          status                               = app_ble_disable();
-          osMessageQueuePut(ble_disable_done_queue, &status, 0, osWaitForever);
-          break;
-        }
-#endif
-
         //! clear all pending events
         rsi_ble_app_clear_all_event();
 
@@ -671,43 +643,8 @@ void rsi_ble_app_task(void)
           }
         }
       } break;
-#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
-      case RSI_BLE_DISABLE_REQUEST: {
-        rsi_ble_app_clear_event(RSI_BLE_DISABLE_REQUEST);
-        /* Quiesce before BLE disable: stop advertising, disconnect; app_ble_disable runs after RSI_BLE_DISCONN_EVENT. */
-        status = rsi_ble_stop_advertising();
-        if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nrsi_ble_stop_advertising before BLE disable: 0x%lx (continuing)\r\n", status);
-        }
-        ble_disable_after_disconnect_pending = 1;
-        status                               = rsi_ble_disconnect((const int8_t *)remote_dev_address);
-        if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nrsi_ble_disconnect before BLE disable failed: 0x%lx\r\n", status);
-          ble_disable_after_disconnect_pending = 0;
-          osMessageQueuePut(ble_disable_done_queue, &status, 0, osWaitForever);
-        }
-      } break;
-      case RSI_BLE_ENABLE_REQUEST: {
-        rsi_ble_app_clear_event(RSI_BLE_ENABLE_REQUEST);
-        status = app_ble_enable();
-        osMessageQueuePut(ble_enable_done_queue, &status, 0, osWaitForever);
-      } break;
-#endif
       default: {
       }
     }
   }
 }
-
-#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
-int32_t rsi_ble_app_request_disable(void)
-{
-  rsi_ble_app_set_event(RSI_BLE_DISABLE_REQUEST);
-  return RSI_SUCCESS;
-}
-int32_t rsi_ble_app_request_enable(void)
-{
-  rsi_ble_app_set_event(RSI_BLE_ENABLE_REQUEST);
-  return RSI_SUCCESS;
-}
-#endif

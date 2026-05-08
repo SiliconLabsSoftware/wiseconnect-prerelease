@@ -5,18 +5,12 @@ description: 'This application demonstrates how to use the QEI on the SI91x SoC 
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - QEI
+label: Platform SiWx91x - QEI
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sl_qei
 - instance:
   - timer0

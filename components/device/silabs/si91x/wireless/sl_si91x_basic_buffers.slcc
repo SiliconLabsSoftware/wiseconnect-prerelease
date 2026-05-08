@@ -1,7 +1,7 @@
 id: sl_si91x_basic_buffers
 package: wifi
 description: >
-  This component implements a malloc-based buffer system for the SiWx91x
+  This component implements a malloc-based buffer system for the Si91x
 label: Basic Buffer Manager
 category: Device|Si91x|Wireless|Buffer Manager
 quality: production

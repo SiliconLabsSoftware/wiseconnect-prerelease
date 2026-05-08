@@ -3,19 +3,13 @@ package: platform_siwx91x_app
 description: "This application demonstrates the usage of the UULP (Ultra Ultra Low Power) pin interrupt. \nIt shows how to configure UULP pins to generate interrupts while the system operates in ultra-low power modes, \nallowing for energy-efficient wake-up and event detection.\n"
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - GPIO UULP EXAMPLE
+label: Platform SiWx91x - GPIO UULP EXAMPLE
 component:
 - id: sl_main
 - id: status
 - id: sl_gpio
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_compact
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 source:
 - path: app.c
 - path: gpio_uulp_example.c

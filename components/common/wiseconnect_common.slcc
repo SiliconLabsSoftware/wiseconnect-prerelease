@@ -32,8 +32,6 @@ requires:
 - name: atomic
 - name: cmsis_core
 - name: malloc_thread_safety
-- name: log_none
-  condition: ["device_si91x"]
 
 toolchain_settings:
   - option: gcc_compiler_option

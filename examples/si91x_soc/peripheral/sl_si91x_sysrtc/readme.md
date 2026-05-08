@@ -1,8 +1,8 @@
-# SiWx91x Platform SYSRTC
+# Platform SiWx91x SYSRTC
 
 ## Table of Contents
 
-- [SiWx91x Platform SYSRTC](#platform-siwx91x-sysrtc)
+- [Platform SiWx91x SYSRTC](#platform-siwx91x-sysrtc)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -73,10 +73,10 @@
 - Then a overflow interrupt is generated and toggles LED one time.
 ### For PRS_IN / PRS_OUT GPIO Configuration
 If you are configuring PRS_IN or PRS_OUT through GPIOs:
-- GPIOs must be selected from the UC (Universal Configurator).
-- For compare channels, the corresponding GPIO pin which is selected as PRS_OUT will be toggled when the compare match occurs.
-- For capture channels, use ulp_gpio_8 (or other mapped GPIO) and connect it to the corresponding GPIO pin which is selected as PRS_IN.
-- To enable GPIO-based PRS configuration, define the macro in `SYSRTC_PRS` in [sysrtc_example.c](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c)
+- 	GPIOs must be selected from the UC (Universal Configurator).
+- 	For compare channels, the corresponding GPIO pin which is selected as PRS_OUT will be toggled when the compare match occurs.
+- 	For capture channels, use ulp_gpio_8 (or other mapped GPIO) and connect it to the corresponding GPIO pin which is selected as PRS_IN.
+- 	To enable GPIO-based PRS configuration, define the macro in `SYSRTC_PRS` in [sysrtc_example.c](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c)
 ### if compare channel0 or compare channel1 is enabled and PRS_OUT pin selected through UC
   - If `SYSRTC_PRS` macro is enabled in [sysrtc_example.c](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c) file.
   - Then SYSRTC groups are configured as per UC values through [sl_si91x_sysrtc_configure_group](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-configure-group) API.
@@ -151,36 +151,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - For updating/modifying counter and compare value use `COUNTER_VALUE` macro & `SYSRTC_COMPARE_VALUE` (for 32.768 KHZ clock) macros respectively, present in [`sysrtc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sysrtc/sysrtc_example.c) file.
 
-- `SYSRTC_COMPARE_VALUE`: Compare channel value used to generate a 1-second interrupt at a 32.768 kHz XTAL clock frequency. By default, it is set to 32768.
-
-  ```c
-    #define SYSRTC_COMPARE_VALUE 32768 // Channel compare value for 32.768khz XTAL clock frequency
-  ```
-
-- `COUNTER_VALUE1`: Starting value loaded into the SYSRTC counter register before compare/capture operations. By default, it is set to 0.
-
-  ```c
-    #define COUNTER_VALUE1       0     // Counter register start value
-  ```
-
-- `COUNTER_VALUE2`: Counter register value used when demonstrating the overflow interrupt behavior. By default, it is set to 0.
-
-  ```c
-    #define COUNTER_VALUE2       0     // Counter register value for overflow interrupt
-  ```
-
-- `TENTH_INTERRUPT`: Number of compare interrupts after which the SYSRTC is stopped (LED toggled ten times). By default, it is set to 10.
-
-  ```c
-    #define TENTH_INTERRUPT      10    // for tenth interrupt count
-  ```
-
-- `LED1`: Identifier for the on-board LED toggled on every SYSRTC interrupt. By default, it is set to 1.
-
-  ```c
-    #define LED1                 1     // For On-board LED-0
-  ```
-
 ### Macros for SYSRTC Configurations
 
 - `SL_SYSRTC_RUN_ENABLE_DURING_DEBUG`, for enabling sysrtc run during debug
@@ -234,4 +204,3 @@ If PRS_IN/PRS_OUT are configured through GPIO,for compare out observe the PRS_OU
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

@@ -1,6 +1,6 @@
 /*******************************************************************************
 * @file  app.c
-* @brief BLE HCI raw (stack bypass) — SoC (Si91x) or NCP host (EFR32 + Si91x module)
+* @brief 
 *******************************************************************************
 * # License
 * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
@@ -14,13 +14,28 @@
 * sections of the MSLA applicable to Source Code.
 *
 ******************************************************************************/
+/*************************************************************************
+ *
+ */
 
+/*================================================================================
+ * @brief : This file contains example application for BLE Heart Rate Profile
+ * @section Description :
+ * This application demonstrates how to configure Heart rate as GATT server in
+ * BLE peripheral mode and explains how to do indicate operation with GATT server
+ * from connected remote device using GATT client.
+ =================================================================================*/
+
+/**
+ * Include files
+ * */
+//! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
-#include <stddef.h>
+//! BLE include file to refer BLE APIs
 #include <string.h>
 #include <stdio.h>
 
@@ -31,19 +46,12 @@
 #include "rsi_bt_common.h"
 #include "rsi_bt_common_apis.h"
 #include "rsi_common_apis.h"
-#include "sl_si91x_driver.h"
-
-#ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_usart.h"
-#include "sl_si91x_hal_soc_soft_reset.h"
-#include "USART.h"
 #include "rsi_debug.h"
-#else
-#include "sl_iostream.h"
-#include "sl_iostream_handles.h"
-#include "em_device.h"
-#include "app_rtt_logging.h"
-#endif
+#include "sl_si91x_hal_soc_soft_reset.h"
+#include "sl_si91x_driver.h"
+#include "sl_si91x_clock_manager.h"
+#include "USART.h"
 
 #define UART_READING_HCI_PKT_TYPE    0
 #define UART_READING_HCI_OPCODE      1
@@ -62,6 +70,7 @@
 #define SOC_PLL_CLK  ((uint32_t)(80000000)) // 80MHz default SoC PLL Clock as source to Processor
 
 //static uint8_t uart_data_in[BUFFER_SIZE];
+sl_usart_handle_t uart_handle;
 
 /*=======================================================================*/
 //!    Powersave configurations
@@ -119,31 +128,19 @@ rx_uart_queue_t g_uart_rx_queue;
 rx_uart_pkt_t g_uart_rx_pkt[MAX_UART_RX_QUEUE_SIZE];
 
 /* uart */
-#ifdef SLI_SI91X_MCU_INTERFACE
-sl_usart_handle_t uart_handle;
-
 extern ARM_DRIVER_USART Driver_USART0;
-static ARM_DRIVER_USART *USARTdrv = &Driver_USART0;
-ARM_USART_CAPABILITIES drv_capabilities;
-#endif
 
-#if BTDM_DEBUG_LOGGING
-#include "SEGGER_RTT.h"
-osSemaphoreId_t bt_debug_logs_sem;
-static uint8_t si91x_application_debug_buffer[1024] = { 0 };
-extern void rsi_task_bt_debug_logs(void);
-#endif
-#ifndef SLI_SI91X_MCU_INTERFACE
-// RTT Console buffer for Channel 2 (application console logs)
-static uint8_t rtt_console_buffer[1024] = { 0 };
-#endif
+static ARM_DRIVER_USART *USARTdrv = &Driver_USART0;
+
+ARM_USART_CAPABILITIES drv_capabilities;
 
 sl_status_t status;
 
 static uint32_t ble_app_event_map;
-static uint32_t ble_app_event_map1;
 static uint8_t uart_rx_in_progress;
 osSemaphoreId_t ble_main_task_sem;
+static uint32_t ble_app_event_map;
+static uint32_t ble_app_event_map1;
 
 volatile uint32_t read_tx_cnt = 0;
 volatile uint32_t read_rx_cnt = 0;
@@ -156,11 +153,7 @@ uint8_t pkt_len       = 0;
 uint16_t cmd_length   = 0;
 uint8_t dummy_tx      = 0;
 rsi_data_packet_t rsi_data_packet;
-
-#ifdef SLI_SI91X_MCU_INTERFACE
 void uart_callback_event(uint32_t event);
-#endif
-
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
@@ -185,10 +178,10 @@ static const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE),
                    .bt_feature_bit_map = (RSI_BT_FEATURE_BITMAP),
 #ifdef RSI_PROCESS_MAX_RX_DATA
-                   .ext_tcp_ip_feature_bit_map = (RSI_EXT_TCPIP_FEATURE_BITMAP | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID
+                   .ext_tcp_ip_feature_bit_map = (RSI_EXT_TCPIP_FEATURE_BITMAP | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID
                                                   | SL_SI91X_EXT_TCP_MAX_RECV_LENGTH),
 #else
-                   .ext_tcp_ip_feature_bit_map = (RSI_EXT_TCPIP_FEATURE_BITMAP | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID),
+                   .ext_tcp_ip_feature_bit_map = (RSI_EXT_TCPIP_FEATURE_BITMAP | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
 #endif
                    //!ENABLE_BLE_PROTOCOL in bt_feature_bit_map
                    .ble_feature_bit_map =
@@ -196,7 +189,7 @@ static const sl_wifi_device_configuration_t config = {
                        | SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS)
                        | SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV)
                        | SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC))
-                      | SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENTION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX)
+                      | SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENSION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX)
                       | SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS)
                       | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
 #if RSI_BLE_GATT_ASYNC_ENABLE
@@ -228,10 +221,7 @@ static const sl_wifi_device_configuration_t config = {
 #if RSI_BLE_AE_MAX_ADV_SETS
                       | SL_SI91X_BLE_AE_MAX_ADV_SETS(RSI_BLE_AE_MAX_ADV_SETS)
 #endif
-#if BTDM_DEBUG_LOGGING
-                      | BIT(25)
-#endif
-                      | SL_SI91X_BT_BLE_STACK_BYPASS_ENABLE),
+                        ),
                    .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
                                               | RSI_CONFIG_FEATURE_BITMAP) }
 };
@@ -247,75 +237,15 @@ const osThreadAttr_t thread_attributes = {
   .tz_module  = 0,
 };
 
-#if BTDM_DEBUG_LOGGING
-const osThreadAttr_t bt_debug_logs_thread_attributes = {
-  .name       = "bt_debug_logs_thread",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
-  .stack_size = 3072,
-  .priority   = osPriorityNormal,
-  .tz_module  = 0,
-};
-#endif
-
-#ifndef SLI_SI91X_MCU_INTERFACE
-static const osThreadAttr_t hci_iostream_rx_thread_attributes = {
-  .name       = "hci_iostream_rx",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
-  .stack_size = 3072,
-  .priority   = 0,
-  .tz_module  = 0,
-};
-
-static void hci_iostream_rx_thread(void *argument);
-#endif
-
-#ifndef SLI_SI91X_MCU_INTERFACE
-static sl_status_t iostream_rx(uint8_t *buf, size_t len)
-{
-  for (size_t i = 0; i < len; i++) {
-    char c;
-    sl_status_t s = sl_iostream_getchar(SL_IOSTREAM_STDIN, &c);
-    if (s != SL_STATUS_OK) {
-      return s;
-    }
-    buf[i] = (uint8_t)c;
-  }
-  return SL_STATUS_OK;
-}
-
-static sl_status_t iostream_tx(const uint8_t *buf, size_t len)
-{
-  sl_iostream_t *out = sl_iostream_recommended_console_stream;
-  if (out == NULL) {
-    return SL_STATUS_FAIL;
-  }
-  return sl_iostream_write(out, buf, len);
-}
-
-static void iostream_usart_init(void)
-{
-#if !defined(__CROSSWORKS_ARM) && defined(__GNUC__)
-  setvbuf(stdout, NULL, _IONBF, 0);
-  setvbuf(stdin, NULL, _IONBF, 0);
-#endif
-}
-#endif
-
 void rsi_ble_app_init_events()
 {
-  ble_app_event_map  = 0;
-  ble_app_event_map1 = 0;
+  ble_app_event_map = 0;
   return;
 }
 
 void rsi_ble_app_set_event(uint32_t event_num)
 {
+
   if (event_num < 32) {
     ble_app_event_map |= BIT(event_num);
   } else {
@@ -339,6 +269,7 @@ void rsi_ble_app_set_event(uint32_t event_num)
  */
 static void rsi_ble_app_clear_event(uint32_t event_num)
 {
+
   if (event_num < 32) {
     ble_app_event_map &= ~BIT(event_num);
   }
@@ -417,7 +348,7 @@ void rsi_ble_on_rcp_resp_rcvd(uint16_t status, rsi_ble_event_rcp_rcvd_info_t *re
   return;
 }
 
-void get_pkt_length(void)
+void get_pkt_length()
 {
   if (rx_buffer[0] == HCI_COMMAND_PKT) {
     rx_buffer[3] = (uint8_t)cmd_length;
@@ -428,104 +359,10 @@ void get_pkt_length(void)
   }
 }
 
-#ifndef SLI_SI91X_MCU_INTERFACE
-/* NCP: synchronous UART � advance all HCI framing states in one call (SoC uses ISR per step). */
-static void read_user_packet_iostream_rx(void)
-{
-  for (;;) {
-    switch (uart_rx_state) {
-      case UART_READING_HCI_PKT_TYPE: {
-        pkt_len++;
-        status = iostream_rx(&rx_buffer[1], 2);
-        if (status != SL_STATUS_OK) {
-          LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
-          return;
-        }
-        uart_rx_state = UART_READING_HCI_OPCODE;
-      } break;
-      case UART_READING_HCI_OPCODE: {
-        pkt_len += 2;
-        if (rx_buffer[0] == HCI_COMMAND_PKT) {
-          status = iostream_rx((uint8_t *)&cmd_length, 1);
-          if (status != SL_STATUS_OK) {
-            LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
-            return;
-          }
-          uart_rx_state = UART_READING_HCI_LEN;
-        } else {
-          status = iostream_rx((uint8_t *)&cmd_length, 2);
-          if (status != SL_STATUS_OK) {
-            LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
-            return;
-          }
-          uart_rx_state = UART_READING_HCI_LEN;
-        }
-      } break;
-      case UART_READING_HCI_LEN: {
-        get_pkt_length();
-        if (cmd_length == 0) {
-          uart_rx_state = UART_READING_HCI_PKT_TYPE;
-          uart_tx_done  = 1;
-#if RSI_BT_RESET
-          if (*(uint32_t *)rx_buffer == HCI_RESET_COMMAND) {
-            (void)sl_wifi_deinit();
-            NVIC_SystemReset();
-          } else
-#endif
-          {
-            rsi_ble_app_set_event(RSI_APP_EVENT_UART);
-          }
-          return;
-        }
-        status = iostream_rx(&rx_buffer[pkt_len], cmd_length);
-        if (status != SL_STATUS_OK) {
-          LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
-          return;
-        }
-        uart_rx_state = UART_RECEIVING_ACTUAL_PACKET;
-      } break;
-      case UART_RECEIVING_ACTUAL_PACKET: {
-        uart_rx_state = UART_READING_HCI_PKT_TYPE;
-        uart_tx_done  = 1;
-        rsi_ble_app_set_event(RSI_APP_EVENT_UART);
-        return;
-      }
-      default:
-        return;
-    }
-  }
-}
-
-/** NCP VCOM HCI RX thread: iostream_rx + read_user_packet_iostream_rx.
- *  Semaphore released by rsi_ble_hci_raw_task after each completed packet (uart_tx_done) so rx_buffer
- *  is not overwritten before rsi_data_tx_send. On framing error, thread releases the sem to retry. */
-static void hci_iostream_rx_thread(void *argument)
-{
-  UNUSED_PARAMETER(argument);
-
-  if (sl_iostream_vcom_handle != NULL) {
-    (void)sl_iostream_set_default(sl_iostream_vcom_handle);
-  }
-
-  for (;;) {
-    status = iostream_rx(&rx_buffer[0], 1);
-    if (status != SL_STATUS_OK) {
-      LOG_PRINT("iostream_rx first byte: Error Code : %lu \n", (unsigned long)status);
-      continue;
-    }
-    uart_rx_state = UART_READING_HCI_PKT_TYPE;
-    pkt_len       = 0;
-    read_user_packet_iostream_rx();
-  }
-}
-#endif
-
-#ifdef SLI_SI91X_MCU_INTERFACE
 void read_user_packet(void)
 {
   uint8_t *rx_ptr = rx_buffer;
   UNUSED_PARAMETER(rx_ptr);
-
   switch (uart_rx_state) {
     case UART_READING_HCI_PKT_TYPE: {
       pkt_len++;
@@ -610,7 +447,7 @@ void uart_callback_event(uint32_t event)
       }
       break;
     case SL_USART_EVENT_RECEIVE_COMPLETE:
-      read_rx_cnt = USARTdrv->GetRxCount();
+      read_tx_cnt = USARTdrv->GetTxCount();
       read_user_packet();
       break;
     case SL_USART_EVENT_TRANSFER_COMPLETE:
@@ -639,16 +476,14 @@ void uart_callback_event(uint32_t event)
       break;
   }
 }
-#endif
 
-static void rsi_data_tx_send(void)
+static void rsi_data_tx_send()
 {
   memcpy(&rsi_data_packet.data[0], rx_buffer, (cmd_length + pkt_len));
   pkt_len = 0;
   rsi_bt_driver_send_cmd(RSI_BLE_REQ_HCI_RAW, &rsi_data_packet, NULL);
 }
 
-#ifdef SLI_SI91X_MCU_INTERFACE
 /*******************************************************************************
  * USART Example Initialization function
  ******************************************************************************/
@@ -661,40 +496,36 @@ int32_t rsi_ble_app_init_uart(void)
     // Initialize the UART
     status = sl_si91x_usart_init(USART_0, &uart_handle);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_initialize: Error Code : %lu \n", status);
+      printf("sl_si91x_usart_initialize: Error Code : %lu \n", status);
       break;
     }
-    DEBUGOUT("UART initialization is successful \n");
+    printf("UART initialization is successful \n");
     // Configure the UART configurations
     status = sl_si91x_usart_set_configuration(uart_handle, &uart_config);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
+      printf("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
       break;
     }
-    DEBUGOUT("UART configuration is successful \n");
+    printf("UART configuration is successful \n");
     // Register user callback function
     status = sl_si91x_usart_multiple_instance_register_event_callback(USART_0, uart_callback_event);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
+      printf("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
       break;
     }
-    DEBUGOUT("UART user event callback registered successfully \n");
+    printf("UART user event callback registered successfully \n");
     sl_si91x_usart_get_configurations(USART_0, &get_config);
-    DEBUGOUT("Baud Rate = %ld \n", get_config.baudrate);
+    printf("Baud Rate = %ld \n", get_config.baudrate);
   } while (false);
   return status;
 }
-#endif
 
 uint8_t tx_buf_dummy[7] = { 0x04, 0x0E, 0x04, 0x01, 0x03, 0x0C, 0x00 };
-
 void rsi_ble_hci_raw_task(void *argument)
 {
   UNUSED_PARAMETER(argument);
   sl_status_t status     = 0;
   int32_t temp_event_map = 0;
-
-#ifdef SLI_SI91X_MCU_INTERFACE
 #if RSI_BT_RESET
   uint32_t reg_read = 0;
   /* checking the bit(5) in MCU_STORAGE_REG2 to know the WWD reset source */
@@ -718,19 +549,6 @@ void rsi_ble_hci_raw_task(void *argument)
     dummy_tx            = 1;
   }
 #endif
-#else
-  iostream_usart_init();
-
-  // Configure RTT Channel 2 for console logging (NCP mode)
-  // Channel 0: Default RTT Terminal
-  // Channel 1: BTDM controller logs
-  // Channel 2: Application console logs
-  SEGGER_RTT_ConfigUpBuffer(2,
-                            "Console_Logs",
-                            rtt_console_buffer,
-                            sizeof(rtt_console_buffer),
-                            SEGGER_RTT_MODE_NO_BLOCK_SKIP);
-#endif
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
@@ -739,15 +557,6 @@ void rsi_ble_hci_raw_task(void *argument)
   } else {
     LOG_PRINT("\r\n Wi-Fi Initialization Successful\n");
   }
-
-#if BTDM_DEBUG_LOGGING
-  SEGGER_RTT_ConfigUpBuffer(1,
-                            "Si91x_ApplicationDebugBuffer",
-                            si91x_application_debug_buffer,
-                            sizeof(si91x_application_debug_buffer),
-                            SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
-  LOG_PRINT("\r\nRTT config is successful\n");
-#endif
 
 #if RSI_SET_REGION_SUPPORT && !SL_SI91X_ACX_MODULE
   status = sl_si91x_set_device_region(0, 0, 4);
@@ -764,52 +573,15 @@ void rsi_ble_hci_raw_task(void *argument)
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
 
-#if BTDM_DEBUG_LOGGING
-  bt_debug_logs_sem = osSemaphoreNew(1, 0, NULL);
-  //! Create task for btdm debug logs
-  osThreadId_t bt_debug_logs_thread_id =
-    osThreadNew((osThreadFunc_t)rsi_task_bt_debug_logs, NULL, &bt_debug_logs_thread_attributes);
-  if (bt_debug_logs_thread_id == NULL) {
-    LOG_PRINT("\r\nbt_debug_logs_thread failed to create\r\n");
-    return;
-  }
-  LOG_PRINT("\r\nbt_debug_logs_thread created and started\n");
-  osSemaphoreRelease(bt_debug_logs_sem);
-#endif
-
   //! initialize the event map
   rsi_ble_app_init_events();
 
-#ifdef SLI_SI91X_MCU_INTERFACE
   // Receives data
   status = sl_si91x_usart_receive_data(uart_handle, &rx_buffer[0], 1);
   if (status != SL_STATUS_OK) {
     // If it fails to execute the API, it will not execute rest of the things
     return;
   }
-#else
-  (void)osThreadNew((osThreadFunc_t)hci_iostream_rx_thread, NULL, &hci_iostream_rx_thread_attributes);
-#endif
-
-#if ENABLE_NWP_POWER_SAVE
-  LOG_PRINT("\r\n keep module in to power save \r\n");
-
-  //! initiating power save in BLE mode
-  status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
-  if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Failed to initiate BLE power save \r\n");
-    return;
-  }
-
-  //! initiating power save in BLE only mode, for coex mode, wifi power save is called in wifiapp.c
-  status = sl_wifi_set_performance_profile_v2(&wifi_profile);
-  if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Failed to initiate Wi-Fi power save  :%lx\r\n", status);
-    return;
-  }
-  LOG_PRINT("\r\n Module is in power save \r\n");
-#endif
-
   while (1) {
     //! checking for received events
     temp_event_map = rsi_ble_app_get_event();
@@ -826,7 +598,6 @@ void rsi_ble_hci_raw_task(void *argument)
         rsi_data_tx_send();
       } break;
       case RSI_APP_EVENT_RCP: {
-#ifdef SLI_SI91X_MCU_INTERFACE
         __disable_irq();
         rx_uart_queue_t *rx_queue = &g_uart_rx_queue;
         if ((rx_queue->pkt_cnt) && (uart_rx_in_progress == 0)) {
@@ -844,39 +615,15 @@ void rsi_ble_hci_raw_task(void *argument)
         }
         rsi_ble_app_clear_event(RSI_APP_EVENT_RCP);
         __enable_irq();
-#else
-        {
-          rx_uart_queue_t *rx_queue = &g_uart_rx_queue;
-          if ((rx_queue->pkt_cnt) && (uart_rx_in_progress == 0)) {
-            rx_uart_pkt_t *rx_pkt = rx_queue->head;
-            if (rx_pkt != NULL) {
-              status = iostream_tx(rx_pkt->tx_buf, (size_t)(rx_pkt->cmd_len + 1));
-              if (status != SL_STATUS_OK) {
-                DEBUGOUT("iostream_tx: Error Code : %lu \n", status);
-              } else {
-                DEBUGOUT("iostream_tx success\n");
-              }
-              rx_pkt->pkt_in_use = 0;
-              DEL_FROM_LIST(rx_queue);
-              if (g_uart_rx_queue.pkt_cnt) {
-                rsi_ble_app_set_event(RSI_APP_EVENT_RCP);
-              }
-            }
-          }
-          rsi_ble_app_clear_event(RSI_APP_EVENT_RCP);
-        }
-#endif
       } break;
     }
     if (uart_tx_done == 1) {
       uart_tx_done = 0;
-#ifdef SLI_SI91X_MCU_INTERFACE
       // Receives data
       status = sl_si91x_usart_receive_data(uart_handle, &rx_buffer[0], 1);
       if (status != SL_STATUS_OK) {
         return;
       }
-#endif
     }
   }
 }
@@ -886,14 +633,7 @@ void rsi_ble_hci_raw_task(void *argument)
  ******************************************************************************/
 void app_init(void)
 {
-#if BTDM_DEBUG_LOGGING || !defined(SLI_SI91X_MCU_INTERFACE)
-  // Initialize RTT for BTDM logging or NCP console logging
-  SEGGER_RTT_Init();
-#endif
-
-#ifdef SLI_SI91X_MCU_INTERFACE
   rsi_ble_app_init_uart();
-#endif
   osThreadNew((osThreadFunc_t)rsi_ble_hci_raw_task, NULL, &thread_attributes);
 }
 

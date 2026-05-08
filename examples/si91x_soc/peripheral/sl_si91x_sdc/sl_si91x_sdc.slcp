@@ -5,7 +5,7 @@ description: 'This application demonstrates the how to configure and use the SDC
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - SDC
+label: Platform SiWx91x - SDC
 component:
 - id: sl_main
 - id: status
@@ -26,12 +26,6 @@ component:
 - id: sl_power_manager
 - id: pm_ps2_component
 - id: debug_ulp_component
-- id: si91x_log
-- id: si91x_log_iostream_compact
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sdc_component
 source:
 - path: sdc_example.c

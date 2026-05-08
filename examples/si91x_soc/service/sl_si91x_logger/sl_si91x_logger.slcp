@@ -5,7 +5,7 @@ description: 'This application demonstrates the logger service on the SI91x SoC 
   '
 category: example|service
 quality: production
-label: SiWx91x Platform - Logger Example
+label: Platform SiWx91x - Logger Example
 component:
 - id: sl_main
 - id: freertos
@@ -22,11 +22,7 @@ component:
 - id: wifi_resources
 - id: sl_si91x_basic_buffers
 - id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
+- id: si91x_log_backend_uart
 source:
 - path: app.c
 - path: sl_si91x_logger_example.c

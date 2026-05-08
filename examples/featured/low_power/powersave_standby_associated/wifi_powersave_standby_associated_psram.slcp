@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Powersave Standby Associated (PSRAM)
 category: Example|Wi-Fi
-description: "Start a Wi-Fi client in ASSOCIATED_POWER_SAVE mode and connects to AP and send data to UDP server in Low Power mode \n"
+description: "Start a Wi-Fi client in ASSOCIATED_POWER_SAVE mode and connects to AP and send data to UDP server \n"
 filter:
 - name: Wireless Technology
   value:
@@ -31,6 +31,7 @@ component:
 - id: data_segment_in_psram
 - id: udma_linker_config
 - id: psram_core
+- id: psram_aps6404l_sqh
 - id: wifi
 - id: sl_si91x_internal_stack
 - id: wifi_resources

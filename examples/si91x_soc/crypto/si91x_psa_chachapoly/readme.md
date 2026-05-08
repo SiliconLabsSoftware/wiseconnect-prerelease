@@ -1,8 +1,8 @@
-# SiWx91x Platform PSA CHACHAPOLY
+# Platform SiWx91x PSA CHACHAPOLY
 
 ## Table of Contents
 
-- [SiWx91x Platform PSA CHACHAPOLY](#platform-siwx91x-psa-chachapoly)
+- [Platform SiWx91x PSA CHACHAPOLY](#platform-siwx91x-psa-chachapoly)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

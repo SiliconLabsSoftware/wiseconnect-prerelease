@@ -143,14 +143,3 @@ upgrade:
       - script: upgrade_component_nvm3_network_manager.lua
         description: >
                           
-  - sdk:
-      id: wiseconnect3_sdk
-      vendor: silabs
-      version: "4.1.0"
-    component:
-      - trigger: psram_aps6404l_sqh
-        description: >
-                                
-        status: automatic  
-        remove:
-           - psram_aps6404l_sqh

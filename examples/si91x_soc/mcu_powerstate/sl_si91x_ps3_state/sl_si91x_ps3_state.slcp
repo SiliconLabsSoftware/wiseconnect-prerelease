@@ -5,7 +5,7 @@ description: 'This application demonstrates the PS3 sleep and active state with 
   '
 category: example|mcu powerstate
 quality: production
-label: SiWx91x Platform - PS3 State
+label: Platform SiWx91x - PS3 State
 component:
 - id: sl_main
 - id: status
@@ -13,8 +13,6 @@ component:
 - id: si91x_mem_config_3
 - id: sl_power_manager
 - id: debug_ulp_component
-- id: si91x_log
-- id: si91x_log_backend_uart
 - id: pm_ps2_component
 template_contribution:
 - name: user_files_ps2

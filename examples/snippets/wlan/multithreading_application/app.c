@@ -1,14 +1,6 @@
 /***************************************************************************/ /**
  * @file
  * @brief Multithreading Application
- *
- * Demonstrates concurrent Wi-Fi STA + SoftAP operation with two independent
- * workloads running in parallel:
- *   Thread 1 (application): STA + AP init, then runs MQTT client on STA.
- *   Thread 2 (ap_thread):   Runs a throughput test (TCP/UDP) on the AP VAP.
- *
- * The printf_mutex is created BEFORE launching the second thread to ensure
- * LOG_PRINT is always safe.
  *******************************************************************************
  * # License
  * <b>Copyright 2022 Silicon Laboratories Inc. www.silabs.com</b>
@@ -35,7 +27,10 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-
+/**
+ * Include files
+ **/
+//! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "cmsis_os2.h"
 #include "sl_wifi.h"
@@ -47,7 +42,6 @@
 #include "sl_si91x_driver.h"
 #include "sl_net_wifi_types.h"
 #include "app.h"
-
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -60,10 +54,17 @@
 #define WIFI_CLIENT_SECURITY_TYPE   SL_WIFI_WPA_WPA2_MIXED
 #define WIFI_CLIENT_ENCRYPTION_TYPE SL_WIFI_CCMP_ENCRYPTION
 
-#define DEFAULT_WIFI_MODULE_IP_ADDRESS 0x0A0AA8C0 // 192.168.10.10
-#define DEFAULT_WIFI_SN_MASK_ADDRESS   0x00FFFFFF // 255.255.255.0
-#define DEFAULT_WIFI_GATEWAY_ADDRESS   0x0A0AA8C0 // 192.168.10.10
+//! IP address of the module
+//! E.g: 0x0A0AA8C0 == 192.168.10.10
+#define DEFAULT_WIFI_MODULE_IP_ADDRESS 0x0A0AA8C0
 
+//! IP address of netmask
+//! E.g: 0x00FFFFFF == 255.255.255.0
+#define DEFAULT_WIFI_SN_MASK_ADDRESS 0x00FFFFFF
+
+//! IP address of Gateway
+//! E.g: 0x0A0AA8C0 == 192.168.10.10
+#define DEFAULT_WIFI_GATEWAY_ADDRESS 0x0A0AA8C0
 /*=======================================================================*/
 // NWP buffer allocation parameters
 /*=======================================================================*/
@@ -79,8 +80,12 @@
 #ifndef GLOBAL_POOL_RATIO
 #define GLOBAL_POOL_RATIO 1
 #endif
+/******************************************************
+ *                    Constants
+ ******************************************************/
 
 /******************************************************
+
  *               Variable Definitions
  ******************************************************/
 osMutexId_t printf_mutex                           = 0;
@@ -158,9 +163,9 @@ static const sl_net_wifi_client_profile_t wifi_client_profile = {
         .type = SL_IPV4,
         .host_name = NULL,
         .ip = {{{0}}},
+
     }
 };
-
 sl_net_wifi_psk_credential_entry_t wifi_client_credential = { .type        = SL_NET_WIFI_PSK,
                                                               .data_length = sizeof(WIFI_CLIENT_CREDENTIAL) - 1,
                                                               .data        = WIFI_CLIENT_CREDENTIAL };
@@ -168,7 +173,6 @@ sl_net_wifi_psk_credential_entry_t wifi_client_credential = { .type        = SL_
 sl_net_wifi_psk_credential_entry_t wifi_ap_credential = { .type        = SL_NET_WIFI_PSK,
                                                           .data_length = sizeof(WIFI_AP_CREDENTIAL) - 1,
                                                           .data        = WIFI_AP_CREDENTIAL };
-
 static sl_net_wifi_ap_profile_t wifi_ap_profile = {
     .config = {
         .ssid.value = WIFI_AP_PROFILE_SSID,
@@ -194,8 +198,8 @@ static sl_net_wifi_ap_profile_t wifi_ap_profile = {
         .host_name = NULL,
         .ip = {
             .v4.ip_address.value = DEFAULT_WIFI_MODULE_IP_ADDRESS,
-            .v4.gateway.value = DEFAULT_WIFI_GATEWAY_ADDRESS,
-            .v4.netmask.value = DEFAULT_WIFI_SN_MASK_ADDRESS
+        .v4.gateway.value = DEFAULT_WIFI_GATEWAY_ADDRESS,
+        .v4.netmask.value = DEFAULT_WIFI_SN_MASK_ADDRESS
         },
     }
 };
@@ -203,9 +207,8 @@ static sl_net_wifi_ap_profile_t wifi_ap_profile = {
 /******************************************************
  *               Function Declarations
  ******************************************************/
-extern sl_status_t mqtt_example(void);
-extern void throughput(void);
-
+extern void mqtt_example();
+extern void throughput();
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -217,16 +220,7 @@ void application(void *argument)
   int32_t status                   = SL_STATUS_OK;
   sl_wifi_channel_t client_channel = { 0 };
 
-  // Create the mutex FIRST, before any LOG_PRINT usage, to avoid calling
-  // osMutexAcquire on an uninitialised handle.
-  printf_mutex = osMutexNew(NULL);
-  if (printf_mutex == NULL) {
-    printf("Failed to create printf_mutex\r\n");
-    return;
-  }
-
-  // --- STA interface bring-up ---
-
+  //! Wi-Fi initialization
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &mqtt_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
     LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
@@ -272,10 +266,9 @@ void application(void *argument)
   print_sl_ip_address(&ip_address);
   LOG_PRINT("\r\nWi-Fi client connected\r\n");
 
-  // --- AP interface bring-up ---
-
+  //! AP initialization
   status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &mqtt_concurrent_configuration, NULL, NULL);
-  if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
+  if (status != SL_STATUS_OK) {
     LOG_PRINT("\r\nFailed to start Wi-Fi AP interface: 0x%lx\r\n", status);
     return;
   }
@@ -294,14 +287,14 @@ void application(void *argument)
     LOG_PRINT("\r\nFailed to set AP profile: 0x%lx\r\n", status);
     return;
   }
-  LOG_PRINT("\r\nSuccess to set AP profile\r\n");
+  LOG_PRINT("\r\nSuccess to set AP profile \r\n");
 
   status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
                                  wifi_ap_credential.type,
                                  &wifi_ap_credential.data,
                                  wifi_ap_credential.data_length);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("Failed to set AP credentials: 0x%lx\r\n", status);
+    LOG_PRINT("Failed to set credentials: 0x%lx\r\n", status);
     return;
   }
   LOG_PRINT("\nAP set credential success\n");
@@ -311,7 +304,7 @@ void application(void *argument)
     LOG_PRINT("\r\nFailed to get AP profile: 0x%lx\r\n", status);
     return;
   }
-  LOG_PRINT("\r\nSuccess to get AP profile\r\n");
+  LOG_PRINT("\r\nSuccess to AP profile\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &ap_profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -326,26 +319,25 @@ void application(void *argument)
   }
   LOG_PRINT("\r\nAP started\r\n");
 
-  // --- Launch the AP throughput thread ---
-
-  osThreadId_t ap_tid = osThreadNew((osThreadFunc_t)throughput, NULL, &ap_thread_attributes);
-  if (ap_tid == NULL) {
-    LOG_PRINT("Failed to create AP throughput thread\r\n");
+  printf_mutex = osMutexNew(NULL);
+  if (printf_mutex == NULL) {
+    LOG_PRINT("\r\nFailed to create printf_mutex\r\n");
+    return;
   }
 
-  // --- Run MQTT on this thread ---
+  if (osThreadNew((osThreadFunc_t)throughput, NULL, &ap_thread_attributes) == NULL) {
+    LOG_PRINT("Failed to create ap thread\n");
+  }
 
   mqtt_example();
 
   while (1) {
     osDelay(osWaitForever);
   }
+  return;
 }
 
 void app_init(void)
 {
-  osThreadId_t tid = osThreadNew((osThreadFunc_t)application, NULL, &station_thread_attributes);
-  if (tid == NULL) {
-    printf("Failed to create application thread\r\n");
-  }
+  osThreadNew((osThreadFunc_t)application, NULL, &station_thread_attributes);
 }

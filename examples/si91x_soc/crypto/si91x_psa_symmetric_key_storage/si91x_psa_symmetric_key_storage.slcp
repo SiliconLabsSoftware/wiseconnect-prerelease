@@ -5,7 +5,7 @@ description: 'This application demonstrates Key generate, import, export and PSA
   '
 category: example|crypto
 quality: production
-label: SiWx91x Platform - PSA symmetric key storage
+label: Platform SiWx91x - PSA symmetric key storage
 component:
 - id: sl_main
 - id: freertos

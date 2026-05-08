@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Paho MQTT OVER WEBSOCKET
 category: Example|Wi-Fi
-description: 'Demonstrates how SiWx91x device is configured as an MQTT client over WebSocket, connects to an MQTT broker, subscribes to a topic, and publishes messages on a particular MQTT topic using the Paho MQTT library.
+description: 'Demonstrates how SiWx91x device is configured as an MQTT client over Websocket, connects to an MQTT broker, subscribes to a topic, and publishes messages on a particular MQTT topic using the Paho MQTT library
 
   '
 filter:

@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP GPIO
+# Platform SiWx91x ULP GPIO
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP GPIO](#platform-siwx91x-ulp-gpio)
+- [Platform SiWx91x ULP GPIO](#platform-siwx91x-ulp-gpio)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -130,94 +130,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following parameters in the [`ulp_gpio_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_gpio/ulp_gpio_example.c) file and update/modify following macros, if required.
 
-- `PORT0`: Identifier for GPIO Port 0, used when configuring pins on port 0. By default, it is set to 0.
-
   ```c
-  #define PORT0             0      // PORT 0
-  ```
-
-- `AVL_INTR_NO`: Specifies the available interrupt number used by the GPIO pin interrupt. By default, it is set to 0.
-
-  ```c
-  #define AVL_INTR_NO       0      // available interrupt number
-  ```
-
-- `POLARITY`: Polarity configuration for the GPIO pin interrupt. By default, it is set to 0.
-
-  ```c
-  #define POLARITY          0      // Polarity for GPIO pin
-  ```
-
-- `INT_CH`: Specifies the HP GPIO pin interrupt channel (GPIO Pin interrupt 0). By default, it is set to 0.
-
-  ```c
-  #define INT_CH            0      // GPIO Pin interrupt 0
-  ```
-
-- `ULP_INT_CH`: Specifies the ULP GPIO pin interrupt channel (ULP GPIO Pin interrupt 0). By default, it is set to 0.
-
-  ```c
-  #define ULP_INT_CH        0      // ULP GPIO Pin interrupt 0
-  ```
-
-- `MODE_0`: Initialization value for the GPIO pin mode (MODE 0). By default, it is set to 0.
-
-  ```c
-  #define MODE_0            0      // Initializing GPIO MODE_0 value
-  ```
-
-- `PORT1`: Identifier for GPIO Port 1, used when configuring pins on port 1. By default, it is set to 1.
-
-  ```c
-  #define PORT1             1      // PORT 1
-  ```
-
-- `OUTPUT_VALUE`: Value to drive on the GPIO pin when configured as output. By default, it is set to 1.
-
-  ```c
-  #define OUTPUT_VALUE      1      // GPIO output value
-  ```
-
-- `PIN_COUNT`: Number of interrupts needed for the group interrupt configuration. By default, it is set to 2.
-
-  ```c
-  #define PIN_COUNT         2      // Number of interrupts needed
-  ```
-
-- `GRP_COUNT`: Count of group interrupt pins per group. By default, it is set to 2.
-
-  ```c
-  #define GRP_COUNT         2      // Count of group interrupt pins
-  ```
-
-- `PAD_SELECT_9`: Reserved GPIO PAD selection number (9), which is pre-configured for another function and must not be enabled. By default, it is set to 9.
-
-  ```c
-  #define PAD_SELECT_9      9      // GPIO PAD selection number
-  ```
-
-- `MAX_PAD_SELECT`: Maximum valid GPIO PAD selection number. By default, it is set to 34.
-
-  ```c
-  #define MAX_PAD_SELECT    34     // Maximum GPIO PAD selection number
-  ```
-
-- `FIVE_SECOND_DELAY`: Delay (in milliseconds) used within the example for power state transitions. By default, it is set to 5000 (5 seconds).
-
-  ```c
-  #define FIVE_SECOND_DELAY 5000   // Delay for 5 sec
-  ```
-
-- `UULP_GPIO_INTR_2`: Specifies the UULP GPIO pin interrupt number used by the example. By default, it is set to 2.
-
-  ```c
-  #define UULP_GPIO_INTR_2  2      // UULP GPIO pin interrupt 2
-  ```
-
-- `TOGGLE_COUNT`: Number of times the GPIO toggle/transition sequence is repeated. By default, it is set to 10.
-
-  ```c
-  #define TOGGLE_COUNT      10     // Count for number of times to repeat
+  #define PORT0                    0      // GPIO Port number(0 to 4)
+  #define PIN_COUNT                2      // Number of interrupts needed
+  #define POLARITY                 0      // Polarity for GPIO pin
+  #define GRP_CNT                  2      // Count of group interrupt pins
+  #define INT_CH                   0      // GPIO Pin interrupt 0
+  #define NPSS_INTR                2      // NPSS GPIO interrupt number
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -265,4 +184,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

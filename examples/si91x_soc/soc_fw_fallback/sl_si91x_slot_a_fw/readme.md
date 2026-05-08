@@ -1,8 +1,8 @@
-# SiWx91x Platform Firmware Fallback Slot A
+# Platform SiWx91x Firmware Fallback Slot A
 
 ## Table of Contents
 
-- [SiWx91x Platform Firmware Fallback Slot A](#platform-siwx91x-firmware-fallback-slot-a)
+- [Platform SiWx91x Firmware Fallback Slot A](#platform-siwx91x-firmware-fallback-slot-a)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -94,19 +94,19 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
 
 ### STA Instance-related Parameters
 
-- `DEFAULT_WIFI_CLIENT_PROFILE_SSID`: Specifies the SSID of the Wi-Fi access point to which the SiWx91x module connects as a station. Update this string with the name of your Wi-Fi network.
+- DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which the Wi-Fi network shall be advertised and Si91X module is connected to it.
 
   ```c
   #define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"
   ```
 
-- `DEFAULT_WIFI_CLIENT_CREDENTIAL`: Specifies the passphrase/secret key used when the access point is configured in WPA-PSK or WPA2-PSK security modes. Update with your access point's passphrase.
+- DEFAULT_WIFI_CLIENT_CREDENTIAL refers to the secret key if the access point is configured in WPA-PSK/WPA2-PSK security modes.
 
   ```c
   #define DEFAULT_WIFI_CLIENT_CREDENTIAL                 "YOUR_AP_PASSPHRASE"
   ```
 
-- `DEFAULT_WIFI_CLIENT_SECURITY_TYPE`: Selects the security mode used to connect to the access point. Supported modes are listed in `sl_wifi_security_t`. By default, it is set to `SL_WIFI_WPA2`.
+- DEFAULT_WIFI_CLIENT_SECURITY_TYPE refers to the security type of the access point. The supported security modes are mentioned in `sl_wifi_security_t`.
 
   ```c
   #define DEFAULT_WIFI_CLIENT_SECURITY_TYPE               SL_WIFI_WPA2
@@ -114,37 +114,52 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
 
 - Other STA instance configurations can be modified if required in `default_wifi_client_profile` configuration structure.
 
-- `SL_APP_TOGGLE_SLOT_INFO`: Controls firmware slot switching when a Wi-Fi connection fails. By default, it is set to 0, which keeps the device on the current slot; set it to 1 to enable automatic switching to the alternate firmware slot when Wi-Fi cannot connect.
+- SL_APP_TOGGLE_SLOT_INFO controls firmware slot switching when WiFi fails. By default (0), the device stays on the current slot. Setting it to 1 enables automatic switching to the alternate firmware slot if WiFi cannot connect.
 
   ```c
   #define SL_APP_TOGGLE_SLOT_INFO 0
   ```
 
-- `SL_APP_UPDATE_FIRMWARE_SLOT`: Controls whether the firmware slot information for M4 and NWP cores is updated after a successful firmware update. By default, it is set to 0 (disabled); set it to 1 to enable firmware slot updates.
+- The firmware slot update functionality is controlled by the following macro:
 
   ```c
   #define SL_APP_UPDATE_FIRMWARE_SLOT 0
   ```
 
-- `SL_APP_COMBINED_IMAGE_SUPPORT`: Enables or disables support for processing multiple firmware images in sequence (combined image update). By default, it is set to 0 (disabled); set it to 1 to process multiple images (e.g., M4 and NWP) in a single update session while maintaining the socket connection between images.
+  - Purpose: Controls whether the firmware slot information for M4 and NWP cores is updated after a successful firmware update.
+    - Default Value: 0 (Disabled)
+    - Possible Values:
+      - 0: Disable firmware slot updates.
+      - 1: Enable firmware slot updates.
+
+- Combined Image Support is controlled by the following macro:
 
   ```c
   #define SL_APP_COMBINED_IMAGE_SUPPORT 0
   ```
 
-  - **Note:** When enabled, the socket connection remains open between images to allow downloading the second image. The socket is closed only after all images are processed.
+  - Purpose: Enables or disables support for processing multiple firmware images in sequence (combined image update). When enabled, the application can handle two images (e.g., M4 and NWP) in a single update session.
+    - Default Value: 0 (Disabled)
+    - Possible Values:
+      - 0: Disable combined image support. Process only a single firmware image per update session.
+      - 1: Enable combined image support. Process multiple images sequentially, updating slot information after each image and maintaining the socket connection between images.
+    - **Note:** When enabled, the socket connection remains open between images to allow downloading the second image. The socket is closed only after all images are processed.
 
-- `DISABLE_AB_DEBUG_LOGS`: Controls whether debug logs are enabled or disabled in the A/B Firmware Fallback module. By default, it is set to 1 (debug logs disabled). The macro is defined in [`components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c).
+- Debug Logging Configuration
+  - The **DISABLE_AB_DEBUG_LOGS** macro controls whether debug logs are enabled or disabled in the A/B Firmware Fallback module. By default, debug logs are disabled.
 
-  ```c
-  #define DISABLE_AB_DEBUG_LOGS 1
-  ```
+    ```c
+    #define DISABLE_AB_DEBUG_LOGS 1
+    ```
 
-- `SL_SI91X_FALLBACK_SLOT_ENCRYPTION`: Enables enhanced sleep/wakeup support with encryption capabilities for firmware fallback operations (SPL "FW fallback" feature). By default, it is set to 0 (disabled). Enable only when Encrypted XIP of M4 is enabled and define it in your project's preprocessor settings.
+  - The macro is defined in the following file:  [`components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c)
 
-  ```c
-  #define SL_SI91X_FALLBACK_SLOT_ENCRYPTION 0  // Disabled by default
-  ```
+- Encryption and Fallback Slot Configuration
+  - The **SL_SI91X_FALLBACK_SLOT_ENCRYPTION** macro enables sleep/wakeup support and is part of the SPL "FW fallback" feature. Enable this macro only when Encrypted XIP of M4 is enabled. Define it in your project's preprocessor settings.
+
+    ```c
+    #define SL_SI91X_FALLBACK_SLOT_ENCRYPTION 0  // Disabled by default
+    ```
 
   - **Important Requirements when enabling this macro:**
     1. **Encrypted XIP of M4 must be enabled** - This macro should only be used when encryption features are active
@@ -153,13 +168,18 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
     4. **You MUST use the updater application** for examples that have this macro enabled
     5. **DO NOT use Commander** for examples that have this macro enabled. Please consider this a slot example.
 
+  - **Purpose:** This macro enables enhanced sleep/wakeup support with encryption capabilities for firmware fallback operations. It's an SPL (Silicon Labs) specific feature that requires proper board configuration and OTA deployment methods.
+
   - **Warning:** When enabled, this macro will display compile-time warnings to ensure developers understand the requirements. These warnings can be disabled by commenting out the `#pragma message` lines in the header file.
 
-- `SL_APP_BURN_NWP_SECURITY_VERSION`: Controls whether the application burns the NWP security version after a successful Wi-Fi connection. By default, it is set to 0 (disabled); set it to 1 to enable. When enabled, the app calls `sl_si91x_burn_nwp_security_version()` with the active NWP firmware address obtained from slot info. Use only if your update flow requires burning a new security version.
+- Burn NWP Security Version (optional)
+  - The **SL_APP_BURN_NWP_SECURITY_VERSION** macro controls whether the app burns the NWP security version after a successful Wi-Fi connection. Disabled by default.
 
-  ```c
-  #define SL_APP_BURN_NWP_SECURITY_VERSION 0  // 0: Disabled, 1: Enabled
-  ```
+    ```c
+    #define SL_APP_BURN_NWP_SECURITY_VERSION 0  // 0: Disabled, 1: Enabled
+    ```
+
+  - When enabled, the app calls `sl_si91x_burn_nwp_security_version()` with the active NWP firmware address obtained from slot info. Use only if your update flow requires burning a new security version.
 
 - After completing the OTA update process, it is recommended to perform a system reset using the [`sl_si91x_soc_nvic_reset()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-common/soft-reset-functions#sl-si91x-soc-nvic-reset) function. This ensures that the updated firmware is properly loaded, and the system is initialized with the new firmware.
 
@@ -173,22 +193,9 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
 
 - In the Project Explorer pane, open the **app.c** file.
 
-- `SERVER_IP_ADDRESS`: Specifies the IPv4 address of the remote TCP server hosting the firmware image. Update it to match the IP of the host PC running the TCP server on your network. By default, it is set to `"192.168.0.158"`.
-
-  ```c
-  #define SERVER_IP_ADDRESS  "192.168.0.158"   // Server IP address
-  ```
-
-- `SERVER_PORT`: Specifies the TCP port number of the remote TCP server hosting the firmware image. It must match the port used when launching the TCP server on the host PC. By default, it is set to 5000.
-
   ```c
   #define SERVER_PORT        5000             // TCP server port of the remote TCP server
-  ```
-
-- `RECV_BUFFER_SIZE`: Specifies the size (in bytes) of the receive buffer used to read firmware data from the TCP server. By default, it is set to 1027.
-
-  ```c
-  #define RECV_BUFFER_SIZE   1027             // Receive data buffer size
+  #define SERVER_IP_ADDRESS  "192.168.0.100"  // Server IP address
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -237,5 +244,4 @@ To establish the TCP server with firmware file on remote PC, follow the steps be
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-
 

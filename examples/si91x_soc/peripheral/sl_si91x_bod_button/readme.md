@@ -1,8 +1,8 @@
-# SiWx91x Platform BOD Button
+# Platform SiWx91x BOD Button
 
 ## Table of Contents
 
-- [SiWx91x Platform BOD Button](#platform-siwx91x-bod-button)
+- [Platform SiWx91x BOD Button](#platform-siwx91x-bod-button)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -60,46 +60,21 @@ For details on the project folder structure, refer to the [WiSeConnect Examples]
     -  The voltage ranges for the buttons are mapped and defined in the `sl_si91x_bod.c` file. Users can refer to this file to set appropriate ranges for their application needs.
   - To configure the voltage range for three buttons, define the following macros in `bod_button_example.h`:
   - **Button 1:**
-
-- `SL_BOD_BUTTON1_MIN_VOLTAGE_PERCENTAGE`: Minimum voltage for Button 1, expressed as a percentage of VBAT, used as the lower bound of Button 1's detection region.
-
-  ```c
+    ```
     #define SL_BOD_BUTTON1_MIN_VOLTAGE_PERCENTAGE <value> ///< Minimum voltage percentage for Button 1
-  ```
-
-- `SL_BOD_BUTTON1_MAX_VOLTAGE_PERCENTAGE`: Maximum voltage for Button 1, expressed as a percentage of VBAT, used as the upper bound of Button 1's detection region.
-
-  ```c
     #define SL_BOD_BUTTON1_MAX_VOLTAGE_PERCENTAGE <value> ///< Maximum voltage percentage for Button 1
-  ```
-
+    ```
   - **Button 2:**
-
-- `SL_BOD_BUTTON2_MIN_VOLTAGE_PERCENTAGE`: Minimum voltage for Button 2, expressed as a percentage of VBAT, used as the lower bound of Button 2's detection region.
-
-  ```c
+    ```
     #define SL_BOD_BUTTON2_MIN_VOLTAGE_PERCENTAGE <value> ///< Minimum voltage percentage for Button 2
-  ```
-
-- `SL_BOD_BUTTON2_MAX_VOLTAGE_PERCENTAGE`: Maximum voltage for Button 2, expressed as a percentage of VBAT, used as the upper bound of Button 2's detection region.
-
-  ```c
     #define SL_BOD_BUTTON2_MAX_VOLTAGE_PERCENTAGE <value> ///< Maximum voltage percentage for Button 2
-  ```
 
+    ```
   - **Button 3:**
-
-- `SL_BOD_BUTTON3_MIN_VOLTAGE_PERCENTAGE`: Minimum voltage for Button 3, expressed as a percentage of VBAT, used as the lower bound of Button 3's detection region.
-
-  ```c
+    ```
     #define SL_BOD_BUTTON3_MIN_VOLTAGE_PERCENTAGE <value> ///< Minimum voltage percentage for Button 3
-  ```
-
-- `SL_BOD_BUTTON3_MAX_VOLTAGE_PERCENTAGE`: Maximum voltage for Button 3, expressed as a percentage of VBAT, used as the upper bound of Button 3's detection region.
-
-  ```c
     #define SL_BOD_BUTTON3_MAX_VOLTAGE_PERCENTAGE <value> ///< Maximum voltage percentage for Button 3
-  ```
+      ```
 **To configure the voltage range for three button using UC**:
 
  - Open  the **sl_si91x_bod_button.slcp** project file, select the **Software Component** tab and search for the **BOD** in search bar.
@@ -154,4 +129,3 @@ The console will as below. (Interrupt operations are not there in the Console Ou
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

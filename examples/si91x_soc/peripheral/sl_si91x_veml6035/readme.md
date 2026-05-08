@@ -1,8 +1,8 @@
-# SiWx91x Platform VEML6035
+# Platform SiWx91x VEML6035
 
 ## Table of Contents
 
-- [SiWx91x Platform VEML6035](#platform-siwx91x-veml6035)
+- [Platform SiWx91x VEML6035](#platform-siwx91x-veml6035)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -56,17 +56,10 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - Configure the following macros in [`veml6035_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_veml6035/veml6035_example.c) file. .Update or  modify the following macros, if required.
 
- 
-  - `DELAY_PERIODIC_MS1`: Periodic sleeptimer timeout in milliseconds used to pace sensor readings. By default, it is set to 2000 ms (2 seconds).
+  - `DELAY_PERIODIC_MS1` : Select the delay for data display. By default, the delay is kept as 2 seconds.
 
-    ```c
-      #define DELAY_PERIODIC_MS1 2000                  // sleeptimer1 periodic timeout in ms
-    ```
-
-  - `SYNC_TIME`: Synchronization/settling time for the VEML6035 sensor, in milliseconds. By default, it is set to 10.
-
-    ```c
-      #define SYNC_TIME          10                    // Sync time for sensor
+    ```C
+    #define DELAY_PERIODIC_MS1 2000    // sleeptimer1 periodic timeout in ms
     ```
 
   - `I2C instance`: Select I2C instance for communication through UC from the VEML6035 slcp component. By default I2C2 is selected.
@@ -128,4 +121,3 @@ See the instructions [Creating a Project](https://docs.silabs.com/wiseconnect/la
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

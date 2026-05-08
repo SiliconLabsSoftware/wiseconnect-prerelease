@@ -33,22 +33,10 @@
  ******************************************************************************/
 #include "sl_iostream.h"
 #include "sl_iostream_handles.h"
-
-#if defined(SL_COMPONENT_CATALOG_PRESENT)
-#include "sl_component_catalog.h"
-#endif
-#if defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT)
 #include "sl_si91x_iostream_rtt.h"
-#endif
-#if defined(SL_CATALOG_IOSTREAM_SWO_SI91X_PRESENT)
 #include "sl_si91x_iostream_swo.h"
-#endif
-#if defined(SL_CATALOG_IOSTREAM_VUART_SI91X_PRESENT)
 #include "sl_si91x_iostream_vuart.h"
-#endif
-#if defined(SL_CATALOG_IOSTREAM_DEBUG_SI91X_PRESENT)
 #include "sl_si91x_iostream_debug.h"
-#endif
 #include "sl_iostream_uart_si91x.h"
 #include "sl_log_iostream_recommends.h"
 
@@ -64,29 +52,22 @@ void sl_si91x_iostream_set_console_instance()
       case SL_IOSTREAM_TYPE_91X_UART:
         current_priority = 0;
         break;
-#if defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT)
+
       case SL_SI91X_IOSTREAM_TYPE_RTT_OUTPUT:
         current_priority = 1;
         break;
-#endif
 
-#if defined(SL_CATALOG_IOSTREAM_SWO_SI91X_PRESENT)
       case SL_SI91X_IOSTREAM_TYPE_SWO:
         current_priority = 2;
         break;
-#endif
 
-#if defined(SL_CATALOG_IOSTREAM_VUART_SI91X_PRESENT)
       case SL_SI91X_IOSTREAM_TYPE_VUART:
         current_priority = 3;
         break;
-#endif
 
-#if defined(SL_CATALOG_IOSTREAM_DEBUG_SI91X_PRESENT)
       case SL_SI91X_IOSTREAM_TYPE_DEBUG_OUTPUT:
         current_priority = 4;
         break;
-#endif
 
       default:
         continue;

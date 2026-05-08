@@ -42,6 +42,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "sli_wifi_utility.h"
+#include "sl_log_helper_si91x.h"
 // Define a bit mask for DHCP unicast offer
 #define SL_SI91X_DHCP_UNICAST_OFFER ((uint32_t)1U << 3)
 

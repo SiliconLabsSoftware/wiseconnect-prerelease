@@ -5,18 +5,12 @@ description: 'This application demonstrates how to configure and use the OPAMP f
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - OPAMP
+label: Platform SiWx91x - OPAMP
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: rsilib_userconfig
 - id: romdriver_egpio
 - id: rsilib_clock_update

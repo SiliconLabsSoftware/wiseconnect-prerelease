@@ -1,8 +1,8 @@
-# SiWx91x Platform RTOS Message Queue
+# Platform SiWx91x RTOS Message Queue
 
 ## Table of Contents
 
-- [SiWx91x Platform RTOS Message Queue](#platform-siwx91x-rtos-message-queue)
+- [Platform SiWx91x RTOS Message Queue](#platform-siwx91x-rtos-message-queue)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -23,7 +23,7 @@
 
 - The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts embedded with multiple peripherals. The following concepts are demonstrated:
   - Message Queues
-- This application contains a comprehensive sample application which includes multiple peripherals listed below
+- This application contains a comprehensive sample application which includes multiple perpherals listed below
   - I2C (as a Follower)
   - USART
 - This example creates separate threads for each above mentioned peripheral.
@@ -108,34 +108,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`app.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/app.h) if required.
+- After the above UC configurations, also configure following macros in [`i2c_follower_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/src/i2c_follower_app.c) file and update/modify following macros, if required.
 
-- `BUFFER_SIZE`: Specifies the size (in bytes) of the data buffers shared by the I2C and USART threads for send and receive operations. This value must match the buffer size used by the leader application. By default, it is set to 15.
-
-  ```c
-    #define BUFFER_SIZE      15  // Data send and receive length
-  ```
-
-- `MSGQUEUE_OBJECTS`: Specifies the maximum number of messages each CMSIS-RTOS2 message queue can hold at any time. By default, it is set to 1.
-
-  ```c
-    #define MSGQUEUE_OBJECTS 1   // number of Message Queue Objects
-  ```
-
-- Configure the following macros in [`usart_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/src/usart_app.c) if required.
-
-- `USART_BAUDRATE`: Specifies the USART communication baud rate for asynchronous data transfer. Supported range is 9600-7372800. By default, it is set to 115200.
-
-  ```c
-    #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
-  ```
-
-- Configure the following macro in [`i2c_follower_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/src/i2c_follower_app.c) if required.
-
-- `OWN_I2C_ADDR`: Specifies the 7-bit I2C follower address assigned to this device. The leader application must target this same address when communicating. By default, it is set to `0x50`.
-
-  ```c
-    #define OWN_I2C_ADDR           0x50    // Own I2C address
+  ```C
+    #define I2C_INSTANCE_USED        // Update it with i2c instance number used for this application: 0 for i2c0, 1 for i2c1 and 2 for i2c2
+    #define OWN_I2C_ADDR             // Update I2C own address
+    #define I2C_SIZE_BUFFERS         // To change the number of bytes to send and receive.Its value should be less than maximum buffer size macro value.
   ```
 
 ### I2C Pin Configuration
@@ -185,7 +163,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1.Create i2c_driver_leader example and change I2C_BUFFER_SIZE macro value to 15.
-  ```c
+  ```C
     #define I2C_BUFFER_SIZE          15  // Size of data buffer
   ```
 2. Create and build msg_queue application
@@ -215,4 +193,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

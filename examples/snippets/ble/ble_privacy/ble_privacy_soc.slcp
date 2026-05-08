@@ -1,24 +1,18 @@
 project_name: ble_privacy_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Privacy FreeRTOS
+label: BLE - Privacy (SoC)
 category: Example|BLE
-description: 'Demonstrates BLE privacy with resolving-list management and address resolution on SiWx91x in SoC FreeRTOS. Demonstrated by private connections to a remote device.
+description: 'This application demonstrates how to configure device with privacy feature by  organizing resolving list and resolution process and how to connect to remote  peripheral device.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

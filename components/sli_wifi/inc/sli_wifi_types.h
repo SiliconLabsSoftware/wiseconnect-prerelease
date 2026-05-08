@@ -732,47 +732,4 @@ typedef struct {
   uint8_t config_data[];  ///< Opaque tail; C99 flexible array member, size @a length.
 } sli_wifi_fw_config_req_t;
 
-// -----------------------------------------------------------------------------
-// Extended Wi-Fi statistics (internal; SLI_WIFI_REQ_EXT_STATS response layout)
-// -----------------------------------------------------------------------------
-
-/**
- * @brief Broadcast/multicast filtering statistics (wireless stack path). Internal use.
- */
-typedef struct {
-  uint32_t bc_rx_count;   ///< Broadcast frames received
-  uint32_t bc_drop_count; ///< Broadcast frames dropped
-  uint32_t bc_pass_count; ///< Broadcast frames accepted
-  uint32_t mc_rx_count;   ///< Multicast frames received
-  uint32_t mc_drop_count; ///< Multicast frames dropped
-  uint32_t mc_pass_count; ///< Multicast frames accepted
-} sli_wifi_bc_mc_filter_stats_t;
-
-/**
- * @brief PPE broadcast/multicast filtering statistics. Internal use.
- */
-typedef struct {
-  uint16_t bc_rx_count;   ///< Broadcast frames received by DUT
-  uint16_t bc_drop_count; ///< Broadcast frames dropped by PPE
-  uint16_t mc_rx_count;   ///< Multicast frames received by DUT
-  uint16_t mc_drop_count; ///< Multicast frames dropped by PPE
-  uint16_t reserved[4];   ///< Reserved
-} sli_wifi_ppe_filter_stats_t;
-
-/**
- * @brief Extended Wi-Fi statistics (WLAN counters plus B/M filter breakdown). Internal use.
- * @note WLAN counters are not reset after the stats request; filter counters are reset after the request.
- */
-typedef struct {
-  uint32_t beacon_lost_count;
-  uint32_t beacon_rx_count;
-  uint32_t mcast_rx_count;
-  uint32_t mcast_tx_count;
-  uint32_t ucast_rx_count;
-  uint32_t ucast_tx_count;
-  uint32_t overrun_count;
-  sli_wifi_bc_mc_filter_stats_t nwp_filter_stats;
-  sli_wifi_ppe_filter_stats_t ppe_filter_stats;
-} sli_wifi_statistics_v2_t;
-
 #endif // SLI_WIFI_TYPES_H

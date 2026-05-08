@@ -5,7 +5,7 @@ description: 'This example project configures QSPI read and write from flash.
   '
 category: example|Service
 quality: production
-label: SiWx91x Platform - File System Common Flash
+label: Platform SiWx91x - File System Common Flash
 component:
 - id: sl_main
 - id: freertos
@@ -13,12 +13,6 @@ component:
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sl_si91x_internal_stack
 - id: sl_si91x_littlefs_common_flash
 source:

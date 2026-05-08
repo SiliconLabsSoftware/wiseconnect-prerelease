@@ -1,24 +1,18 @@
 project_name: ble_ibeacon_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP iBeacon FreeRTOS
+label: BLE - iBeacon (NCP)
 category: Example|BLE
-description: 'Demonstrates how to advertise Apple iBeacon-formatted data on SiWx91x over SPI NCP with FreeRTOS in BLE peripheral mode. Demonstrated by UUID, major, minor, and TX power in advertising.
+description: 'Start a BLE device in peripheral mode
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

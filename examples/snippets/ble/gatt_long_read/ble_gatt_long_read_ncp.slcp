@@ -1,24 +1,18 @@
 project_name: ble_gatt_long_read_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Gatt Long Read FreeRTOS
+label: BLE - Gatt Long Read (NCP)
 category: Example|BLE
-description: 'Demonstrates GATT long read on SiWx91x over SPI NCP with FreeRTOS. Demonstrated by reading long characteristic data via prepared ATT procedures.
+description: 'Demonstrates how a GATT client device accesses a GATT server device for long read
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Advanced
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

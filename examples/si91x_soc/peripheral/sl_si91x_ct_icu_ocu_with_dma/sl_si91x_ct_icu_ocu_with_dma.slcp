@@ -5,7 +5,7 @@ description: 'Demonstrates the Config Timer Input Capture and Output Compare fea
   '
 category: example|peripheral
 quality: production
-label: SiWx91x Platform - Config Timer ICU and OCU with DMA
+label: Platform SiWx91x - Config Timer ICU and OCU with DMA
 readme:
 - path: readme.md
 source:
@@ -21,12 +21,6 @@ component:
 - id: status
 - id: syscalls
 - id: si917_memory_default_config
-- id: si91x_log
-- id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 - id: sl_config_timer
 other_file:
 - path: resources/readme/image502e.png

@@ -1,24 +1,18 @@
 project_name: ble_secureconnection_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Secure Connection FreeRTOS
+label: BLE - Secure Connection (SoC)
 category: Example|BLE
-description: 'Demonstrates the SMP (Security Manager Protocol) pairing and a secured passkey pairing feature on SiWx91x in SoC FreeRTOS.
+description: 'This application demonstrates the SMP (Security Manager Protocol) pairing and  a secured passkey pairing feature.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - SoC
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

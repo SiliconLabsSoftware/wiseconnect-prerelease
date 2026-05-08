@@ -120,8 +120,6 @@ typedef enum rsi_power_save_profile_type_e {
 
 extern int32_t rsi_ble_driver_init(uint8_t *buffer, uint32_t length);
 extern int32_t rsi_ble_driver_deinit(void);
-extern int32_t rsi_ble_enable(void);
-extern int32_t rsi_ble_disable(void);
 extern int32_t rsi_get_fw_version(uint8_t *response, uint16_t length);
 extern int32_t rsi_get_module_type(uint8_t *response);
 extern int32_t rsi_common_debug_log(int32_t assertion_type, int32_t assertion_level);

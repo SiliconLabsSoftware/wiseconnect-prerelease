@@ -55,44 +55,38 @@ void adc_static_mode_example_init(void)
   do {
     // Version information of ADC driver
     version = sl_si91x_adc_get_version();
-    /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-    SL_PRINT_STRING_ERROR("ADC version is fetched successfully \n");
-    SL_PRINT_STRING_ERROR("API version is %d.%d.%d\n", version.release, version.major, version.minor);
+    DEBUGOUT("ADC version is fetched successfully \n");
+    DEBUGOUT("API version is %d.%d.%d\n", version.release, version.major, version.minor);
     status = sl_si91x_adc_init(sl_adc_channel_config, sl_adc_config, vref_value);
     /* Due to calling trim_efuse API on ADC init in driver it will change the
       clock frequency, if we are not initialize the debug again it will print
       the garbage data in console output. */
     DEBUGINIT();
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_adc_init: Error Code : %lu \n", status);
+      DEBUGOUT("sl_si91x_adc_init: Error Code : %lu \n", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("ADC Initialization Success\n");
+    DEBUGOUT("ADC Initialization Success\n");
     // Configure ADC channel.
     status = sl_si91x_adc_set_channel_configuration(sl_adc_channel_config, sl_adc_config);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_adc_channel_set_configuration: Error Code : %lu \n", status);
+      DEBUGOUT("sl_si91x_adc_channel_set_configuration: Error Code : %lu \n", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("ADC Channel Configuration Successfully \n");
+    DEBUGOUT("ADC Channel Configuration Successfully \n");
     // Register user callback function
     status = sl_si91x_adc_register_event_callback(callback_event);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_adc_register_event_callback: Error Code : %lu \n", status);
+      DEBUGOUT("sl_si91x_adc_register_event_callback: Error Code : %lu \n", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("ADC user event callback registered successfully \n");
+    DEBUGOUT("ADC user event callback registered successfully \n");
     status = sl_si91x_adc_start(sl_adc_config);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_adc_start: Error Code : %lu \n", status);
+      DEBUGOUT("sl_si91x_adc_start: Error Code : %lu \n", status);
       break;
     }
-    SL_PRINT_STRING_ERROR("ADC started Successfully\n");
+    DEBUGOUT("ADC started Successfully\n");
   } while (false);
 }
 
@@ -110,7 +104,7 @@ void adc_static_mode_example_process_action(void)
       data_sample_complete_flag = false;
       status                    = sl_si91x_adc_read_data_static(sl_adc_channel_config, sl_adc_config, &adc_value);
       if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_adc_read_data_static: Error Code : %lu \n", status);
+        DEBUGOUT("sl_si91x_adc_read_data_static: Error Code : %lu \n", status);
       }
       // Read the data from register and store it in variable.
       adc_output[0] = (int16_t)adc_value;
@@ -128,13 +122,13 @@ void adc_static_mode_example_process_action(void)
       // For differential type it will give vout.
       if (sl_adc_channel_config.input_type[channel_num]) {
         vout = vout - (vref_value / 2);
-        SL_PRINT_STRING_ERROR("Differential ended input  :%ldmV\n", (int32_t)(vout * 1000.0f));
+        DEBUGOUT("Differential ended input  :%lf\n", (double)vout);
       } else {
-        SL_PRINT_STRING_ERROR("ADC Channel[%d] Measured input :%ldmV\n", channel_num, (int32_t)(vout * 1000.0f));
+        DEBUGOUT("ADC Channel[%d] Measured input :%lf\n", channel_num, (double)vout);
       }
       if (sl_adc_config.num_of_channel_enable > 1) {
         if (channel_num >= (sl_adc_config.num_of_channel_enable - 1)) {
-          SL_PRINT_STRING_ERROR("\n\n");
+          DEBUGOUT("\n\n");
         }
       }
     }

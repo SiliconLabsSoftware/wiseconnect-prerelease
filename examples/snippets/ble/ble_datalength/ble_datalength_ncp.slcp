@@ -1,24 +1,18 @@
 project_name: ble_datalength_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Datalength FreeRTOS
+label: BLE - Datalength (NCP)
 category: Example|BLE
-description: 'Demonstrates how to negotiate BLE Data Length Extension for larger link PDUs as a central on SiWx91x over SPI NCP with FreeRTOS. Demonstrated by controller BLE procedures with the peer.
+description: 'Start a BLE device in central central role and can be used to set data length  extension with the connected remote device.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

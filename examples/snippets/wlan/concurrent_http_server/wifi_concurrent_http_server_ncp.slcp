@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Concurrent HTTP Server(NCP)
 category: Example|Wi-Fi
-description: 'Demonstrates how to create an HTTP Server in concurrent mode.
+description: 'Start a Wi-Fi Access Point with WPA2 security
 
   '
 filter:

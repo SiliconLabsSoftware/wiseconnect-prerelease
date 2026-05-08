@@ -593,7 +593,7 @@ sl_i2c_status_t sl_i2c_driver_receive_data_blocking(sl_i2c_instance_t i2c_instan
       if (i2c_instance_state[i2c_instance].mode == SL_I2C_FOLLOWER_MODE) {
         // Getting the tick count according to the system clock frequency and the timeout value.
         uint32_t i2c_tick_count = get_i2c_tick_count(TIMEOUT);
-        // Waiting for receive fifo not empty interrupt or timeout, any one event can terminate the loop. Here the timeout is of 2 sec.
+        // Waiting for recieve fifo not empty interrupt or timeout, any one event can terminate the loop. Here the timeout is of 2 sec.
         while (!(i2c->IC_STATUS_b.RFNE || (i2c_tick_count-- <= TIMEOUT_EXPIRY)))
           ;
         if (i2c_tick_count <= TIMEOUT_EXPIRY) {
@@ -608,7 +608,7 @@ sl_i2c_status_t sl_i2c_driver_receive_data_blocking(sl_i2c_instance_t i2c_instan
       } else {
         // Getting the tick count according to the system clock frequency and the timeout value.
         uint32_t i2c_tick_count = get_i2c_tick_count(TIMEOUT);
-        // Waiting for receive fifo not empty interrupt or timeout, any one event can terminate the loop. Here the timeout is of 2 sec.
+        // Waiting for recieve fifo not empty interrupt or timeout, any one event can terminate the loop. Here the timeout is of 2 sec.
         while (!(i2c->IC_STATUS_b.RFNE || (i2c_tick_count-- <= TIMEOUT_EXPIRY))) {
           if (i2c->IC_RAW_INTR_STAT_b.TX_ABRT) {
             // Breaking the loop, if abort occurred due to NACK from Slave

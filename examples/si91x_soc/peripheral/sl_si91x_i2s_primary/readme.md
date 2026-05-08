@@ -1,8 +1,8 @@
-# SiWx91x Platform I2S PRIMARY
+# Platform SiWx91x I2S PRIMARY
 
 ## Table of Contents
 
-  - [SiWx91x Platform I2S PRIMARY](#platform-siwx91x-i2s-primary)
+  - [Platform SiWx91x I2S PRIMARY](#platform-siwx91x-i2s-primary)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -111,17 +111,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following macros in [`i2s_primary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2s_primary/i2s_primary_example.c) file and update/modify following macros if required.
 
-- `I2S_PRIMARY_BUFFER_SIZE`: Defines the size of the transmit and receive buffers used by the I2S primary. By default, it is set to 1024.
-
-  ```c
-  #define I2S_PRIMARY_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
-  ```
-
-- `I2S_INSTANCE`: Selects the I2S instance used by the application (0 for I2S0, 1 for ULP_I2S). By default, it is set to 0.
-
-  ```c
-  #define I2S_INSTANCE            0       ///< I2S instance
-  ```
+```C
+#define I2S_PRIMARY_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
+```
 
 ### Pin Configuration for I2S primary
 
@@ -169,4 +161,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

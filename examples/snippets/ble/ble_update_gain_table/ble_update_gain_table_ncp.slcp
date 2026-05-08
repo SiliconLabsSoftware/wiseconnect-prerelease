@@ -1,24 +1,18 @@
 project_name: ble_update_gain_table_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Update Gain Table FreeRTOS
+label: BLE - Update Gain Table (NCP)
 category: Example|BLE
-description: 'Demonstrates updating the BLE RF gain table on SiWx91x over SPI NCP with FreeRTOS. Demonstrated by programming calibrated transmit power via the stack.
+description: 'Update BLE Gain table.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
-- name: Device Type
-  value:
-  - NCP
 - name: Project Difficulty
   value:
   - Beginner
-- name: Quality
-  value:
-  - Production
 source:
 - path: app.c
 include:

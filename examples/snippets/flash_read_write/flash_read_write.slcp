@@ -3,7 +3,9 @@ package: wifi_app
 quality: production
 label: flash_read_write
 category: Example|Wi-Fi
-description: Demonstrates the usage of sl_si91x_command_to_write_common_flash (write and optional sector erase) and sl_si91x_command_to_read_common_flash APIs in SiWx91x.
+description: 'Flash Read Write Application
+
+  '
 filter:
 - name: Wireless Technology
   value:

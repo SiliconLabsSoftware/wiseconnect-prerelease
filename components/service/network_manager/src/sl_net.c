@@ -83,13 +83,6 @@ static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
   sl_net_profile_id_t profile_id = SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID;
 
 #ifdef SLI_NVM3_CONFIG_MANAGER
-  // Initialize NVM3 once for credentials and profiles (shared by all interfaces)
-  if (!nvm3_default_initialized) {
-    status = nvm3_initDefault();
-    VERIFY_STATUS_AND_RETURN(status);
-    nvm3_default_initialized = true;
-  }
-
   // When NVM3 is enabled, use NVM profile + NVM credential only when both are valid in NVM.
   // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
   sl_net_wifi_client_profile_t stored_profile;
@@ -176,13 +169,6 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
   }
 
 #ifdef SLI_NVM3_CONFIG_MANAGER
-  // Initialize NVM3 once for credentials and profiles (shared by all interfaces)
-  if (!nvm3_default_initialized) {
-    status = nvm3_initDefault();
-    VERIFY_STATUS_AND_RETURN(status);
-    nvm3_default_initialized = true;
-  }
-
   // When NVM3 is enabled, use NVM profile + NVM credential only when both are valid in NVM.
   // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
   sl_net_wifi_ap_profile_t stored_ap_profile;
@@ -259,6 +245,15 @@ sl_status_t sl_net_init(sl_net_interface_t interface,
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
     return status;
   }
+
+#ifdef SLI_NVM3_CONFIG_MANAGER
+  // Initialize NVM3 once for credentials and profiles (shared by all interfaces)
+  if (!nvm3_default_initialized) {
+    status = nvm3_initDefault();
+    VERIFY_STATUS_AND_RETURN(status);
+    nvm3_default_initialized = true;
+  }
+#endif
 
   switch (SL_NET_INTERFACE_TYPE(interface)) {
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_1_INTERFACE)

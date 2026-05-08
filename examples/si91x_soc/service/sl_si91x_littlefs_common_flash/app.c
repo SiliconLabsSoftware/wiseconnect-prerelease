@@ -131,61 +131,55 @@ void application_start(const void *unused)
   uint32_t status;
   uint32_t boot_count = 0;
 
-  /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-  SL_PRINT_STRING_ERROR("\r\nInitializing wireless stack\r\n");
+  DEBUGOUT("\r\nInitializing wireless stack\r\n");
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("\r\nFailed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    DEBUGOUT("\r\nFailed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_PRINT_STRING_ERROR("\r\nWireless stack initialized successfully\r\n");
+  DEBUGOUT("\r\nWireless stack initialized successfully\r\n");
 
-  SL_PRINT_STRING_ERROR("\r\nMounting file system\r\n");
+  DEBUGOUT("\r\nMounting file system\r\n");
   // mount the filesystem
   err = lfs_mount(&lfs, &cfg);
 
   // reformat if we can't mount the filesystem
   // this should only happen on the first boot
   if (err) {
-    SL_PRINT_STRING_ERROR("\r\nFile system not found, formatting\r\n");
+    DEBUGOUT("\r\nFile system not found, formatting\r\n");
     err = lfs_format(&lfs, &cfg);
     err = lfs_mount(&lfs, &cfg);
-    SL_PRINT_STRING_ERROR("\r\nFile system formatted and mounted\r\n");
+    DEBUGOUT("\r\nFile system formatted and mounted\r\n");
   } else {
-    SL_PRINT_STRING_ERROR("\r\nFile system mounted successfully\r\n");
+    DEBUGOUT("\r\nFile system mounted successfully\r\n");
   }
 
-  SL_PRINT_STRING_ERROR("\r\nBoot count operations\r\n");
+  DEBUGOUT("\r\nBoot count operations\r\n");
   // read current count
   err = lfs_file_open(&lfs, &file, "boot_count", LFS_O_RDWR | LFS_O_CREAT);
   if (err) {
-    SL_PRINT_STRING_ERROR("\r\nFailed to open the file \r\n");
+    DEBUGOUT("\r\nFailed to open the file \r\n");
     return;
   }
-  SL_PRINT_STRING_ERROR("\r\nBoot count file opened\r\n");
+  DEBUGOUT("\r\nBoot count file opened\r\n");
 
   lfs_file_read(&lfs, &file, &boot_count, sizeof(boot_count));
-  SL_PRINT_STRING_ERROR("\r\nCurrent boot count read: %ld\r\n", boot_count);
+  DEBUGOUT("\r\nCurrent boot count read: %ld\r\n", boot_count);
 
   // update boot count
   boot_count += 1;
   lfs_file_rewind(&lfs, &file);
   lfs_file_write(&lfs, &file, &boot_count, sizeof(boot_count));
-  SL_PRINT_STRING_ERROR("\r\nBoot count written: %ld\r\n", boot_count);
+  DEBUGOUT("\r\nBoot count written: %ld\r\n", boot_count);
 
   // remember the storage is not updated until the file is closed successfully
   lfs_file_close(&lfs, &file);
-  SL_PRINT_STRING_ERROR("\r\nBoot count file closed\r\n");
+  DEBUGOUT("\r\nBoot count file closed\r\n");
 
   // release any resources we were using
   lfs_unmount(&lfs);
-  SL_PRINT_STRING_ERROR("\r\nFile system unmounted\r\n");
+  DEBUGOUT("\r\nFile system unmounted\r\n");
 
   // print the boot count
-  SL_PRINT_STRING_ERROR("\r\nboot_count: %ld\r\n", boot_count);
+  DEBUGOUT("\r\nboot_count: %ld\r\n", boot_count);
 }

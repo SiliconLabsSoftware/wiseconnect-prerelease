@@ -1,8 +1,8 @@
-# SiWx91x Platform Crypto AES
+# Platform SiWx91x Crypto AES
 
 ## Table of Contents
 
-- [SiWx91x Platform Crypto AES](#platform-siwx91x-crypto-aes)
+- [Platform SiWx91x Crypto AES](#platform-siwx91x-crypto-aes)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

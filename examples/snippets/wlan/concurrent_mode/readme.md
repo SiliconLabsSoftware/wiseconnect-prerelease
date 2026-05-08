@@ -92,7 +92,7 @@ The application can be configured to suit your requirements and development envi
 
 - STA instance related parameters:
 
-  - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name to which the SiWx91x module gets connected to.
+  - DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name to which the Si91x module gets connected to.
 
   	```c
   	#define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"

@@ -1,8 +1,8 @@
-# SiWx91x Platform Crypto ECDSA
+# Platform SiWx91x Crypto ECDSA
 
 ## Table of Contents
 
-- [SiWx91x Platform Crypto ECDSA](#platform-siwx91x-crypto-ecdsa)
+- [Platform SiWx91x Crypto ECDSA](#platform-siwx91x-crypto-ecdsa)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

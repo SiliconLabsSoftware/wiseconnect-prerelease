@@ -1196,23 +1196,20 @@ adv:
               memcpy(&firmware_chunk_fw_payload[0], &app_ble_write_event.att_value[0], app_ble_write_event.length);
 
 #if (FW_UPGRADE_TYPE == COMBINED_FW_UP)
-              const uint8_t header = firmware_header_data[0];
-              if (!SI91X_OTA_RPS_HEADER_IS_COMBINED_IMAGE(header)) {
+              if (firmware_header_data[0] != 0x81) {
                 printf("\r\n wrong firmware selected \n");
                 return SL_FW_ERROR;
               }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[48]);
 #elif (FW_UPGRADE_TYPE == TA_FW_UP)
-              const uint8_t header = firmware_header_data[0];
-              if (!SI91X_OTA_RPS_HEADER_IS_TA_IMAGE(header)) {
+              if (firmware_header_data[0] != 0) {
                 printf("\r\n wrong firmware selected \n");
                 return SL_FW_ERROR;
               }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[8]);
               fw_size += FW_HEADER_SIZE;
 #elif (FW_UPGRADE_TYPE == M4_FW_UP)
-              const uint8_t header = firmware_header_data[0];
-              if (!SI91X_OTA_RPS_HEADER_IS_M4_IMAGE(header)) {
+              if (firmware_header_data[0] != 1) {
                 printf("\r\n wrong firmware selected \n");
                 return SL_FW_ERROR;
               }

@@ -634,7 +634,7 @@ rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
   NPSS_GPIO_CONFIG_REG = npss_gpio_config;
 #endif
   /* After wake-up, Set the SCDC voltage to the actual value*/
-  /* As this function is located in flash accessing this function only after getting controls*/
+  /* As this function is located in flash accessing this fucntion only after getting controls*/
   set_scdc(SL_SCDC_ACTIVE);
 
   /*Update the REG Access SPI division factor to increase the SPI read/write speed*/
