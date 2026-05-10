@@ -1,18 +1,28 @@
 # BLE - iBeacon
 
+## High-Level Overview
+
+SiWx91x BLE iBeacon example: configure the iBeacon advertising data format (UUID, major, minor, TX power) in BLE peripheral mode using Simplicity Studio on SoC, PSRAM, and NCP modes.
+
 ## Table of Contents
 
 - [BLE - iBeacon](#ble---ibeacon)
+  - [High-Level Overview](#high-level-overview)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [iBeacon Overview](#ibeacon-overview)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
+    - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
     - [Setup Diagram](#setup-diagram)
-  - [Getting Started](#getting-started)
-  - [Application Build Environment](#application-build-environment)
-  - [Test the Application](#test-the-application)
+  - [Steps to Run Demo](#steps-to-run-demo)
+    - [Getting Started](#getting-started)
+    - [Configuration and Setup](#configuration-and-setup)
+    - [Steps for Execution](#steps-for-execution)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs and Get Support](#report-bugs-and-get-support)
 
 ## Purpose/Scope
 
@@ -95,11 +105,23 @@ The iBeacon advertise data format is as follows :
 
 > **Note:** The provided mobile screenshots are from the 2.8.1 version of the Simplicity Connect App(formerly EFR Connect App), it is recommended to use the latest version.
 
+### NCP mode: host application and project files
+
+| Mode      | Host / target                                                                           | Project file (this example folder) |
+|-----------|-----------------------------------------------------------------------------------------|------------------------------------|
+| SoC       | Application runs on SiWx91x.                                                            | `ble_ibeacon_soc.slcp`             |
+| PSRAM     | Application runs on SiWx91x with PSRAM-capable radio board.                             | `ble_ibeacon_psram.slcp`           |
+| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**.   | `ble_ibeacon_ncp.slcp`             |
+
+Open the `.slcp` for your kit from `examples/snippets/ble/ble_ibeacon/` in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+
 ### Setup Diagram
 
 ![](resources/readme/ble_ibeacon_soc_ncp.png)
   
-## Getting Started
+## Steps to Run Demo
+
+### Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -111,7 +133,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-## Application Build Environment
+### Configuration and Setup
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
@@ -149,7 +171,7 @@ The application can be configured to suit your requirements and development envi
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-## Test the Application
+### Steps for Execution
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -182,3 +204,20 @@ Follow the steps for the successful execution of the program:
 6. Refer the following images for console prints:
 
     ![](resources/readme/output1.png)
+
+## Troubleshooting
+
+- **Build, flash, or debug issues:** Verify the WiseConnect / SiSDK version matches this example's requirements and the correct board target is selected in Simplicity Studio.
+- **Device connection and firmware:** Confirm the connection and firmware update steps in [Getting Started](#getting-started) completed successfully.
+
+## Resources
+
+1. [WiSeConnect getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+2. [Developing for Silicon Labs hosts (install Studio, extension, device, firmware, project)](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/)
+3. [WiSeConnect examples (folder structure)](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)

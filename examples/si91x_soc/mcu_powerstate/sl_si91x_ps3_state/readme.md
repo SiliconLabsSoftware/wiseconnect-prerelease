@@ -1,8 +1,8 @@
-# Platform SiWx91x PS3 State
+# SiWx91x Platform PS3 State
 
 ## Table of Contents
 
-- [Platform SiWx91x PS3 State](#platform-siwx91x-ps3-state)
+- [SiWx91x Platform PS3 State](#platform-siwx91x-ps3-state)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -70,13 +70,15 @@ The application can be configured to suit user requirements and development envi
 
 Configure the following parameters to enable your PS3 Active or sleep state.
 
+- `ACTIVE_STATE`: Selects whether the application enters the PS3 sleep state or remains in the PS3 active state. By default, it is set to 0 (sleep state); set it to 1 to enable the PS3 active state.
+
   - By default, the ACTIVE_STATE macro is set to 0, which means the application will enter the sleep state.
 
     ```c
     #define ACTIVE_STATE                                      0
     ```
 
-    - To enable the PS3 active state, configure the ACTIVE_STATE macro to 1.
+  - To enable the PS3 active state, configure the ACTIVE_STATE macro to 1.
 
     ```c
     #define ACTIVE_STATE                                      1
@@ -110,3 +112,4 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

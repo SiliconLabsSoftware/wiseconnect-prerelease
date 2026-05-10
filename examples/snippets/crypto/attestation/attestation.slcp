@@ -1,5 +1,5 @@
 project_name: attestation
-label: Platform SiWx91x - Secure Attestation
+label: SiWx91x Platform - Secure Attestation
 description: 'Demonstates how to request and get attestation token.
 
   '

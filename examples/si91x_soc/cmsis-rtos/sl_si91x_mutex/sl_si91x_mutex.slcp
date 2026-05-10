@@ -5,7 +5,7 @@ description: 'This application demonstrates how to use RTOS concept Mutex in an 
   '
 category: example|cmsis-rtos
 quality: production
-label: Platform SiWx91x - RTOS Mutex
+label: SiWx91x Platform - RTOS Mutex
 component:
 - id: sl_main
 - id: status
@@ -14,6 +14,12 @@ component:
 - id: freertos
 - id: freertos_heap_4
 - id: sleeptimer
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: sl_si91x_led_917
   instance:
   - led0

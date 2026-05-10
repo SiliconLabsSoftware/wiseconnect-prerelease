@@ -28,6 +28,8 @@
 #include "sl_si91x_power_manager_wakeup_handler.h"
 #endif
 
+#include "sli_code_classification.h"
+
 #if (SL_SI91X_TICKLESS_MODE == 1)
 /*******************************************************************************
  **************************** Local variables  *********************************
@@ -67,17 +69,6 @@ typedef enum {
  **************************** Local functions  *********************************
  ******************************************************************************/
 
-/* Schedule wakeup timer call-back handler */
-static void sli_schedule_wakeup_timer_expire_handler(sl_sleeptimer_timer_handle_t *handle, void *data);
-
-/**************************************************************************
- * @fn           static void sli_os_schedule_wakeup(TickType_t os_ticks)
- * @brief        This function wakeup core based on teh timer value.
- * @param[in]    os_ticks - os ticks value, feeding to the timer
- * @param[out]   None
- *******************************************************************************/
-static void sli_os_schedule_wakeup(TickType_t os_ticks);
-
 /**************************************************************************
  * @fn           void vTaskStepTick(const TickType_t xTicksToJump)
  * @brief        This function is to initialize the RTC alarm IRQHandler.
@@ -92,7 +83,6 @@ void vTaskStepTick(const TickType_t xTicksToJump);
  * @param[in]    None
  * @param[out]   None
  *******************************************************************************/
-void sl_power_manager_sleep_on_isr_exit();
 
 /**************************************************************************
  * @fn           eSleepModeStatus eTaskConfirmSleepModeStatus(void);
@@ -113,6 +103,23 @@ BaseType_t xTaskIncrementTick(void);
 extern uint32_t frontend_switch_control;
 sl_status_t sl_si91x_power_manager_sleep(void);
 boolean_t sl_si91x_power_manager_is_ok_to_sleep(void);
+
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+void vPortSetupTimerInterrupt(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+SL_WEAK void sli_iot_power_set_expected_idle(TickType_t expected_idle);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+static void sli_schedule_wakeup_timer_expire_handler(sl_sleeptimer_timer_handle_t *handle, void *data);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+static void sli_os_schedule_wakeup(TickType_t os_ticks);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+SL_WEAK bool sli_iot_power_ok_to_sleep(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+bool sl_power_manager_is_ok_to_sleep(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
+void sl_power_manager_sleep_on_isr_exit(void);
 
 #define DEFAULT_TICK_FREQUENCY 32000 // Default frequency
 #define SLEEP_TRANSITION_DELAY 96    // This is the post sleep transition delay

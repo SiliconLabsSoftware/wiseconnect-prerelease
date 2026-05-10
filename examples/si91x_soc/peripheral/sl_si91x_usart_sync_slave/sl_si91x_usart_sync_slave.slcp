@@ -5,12 +5,18 @@ description: 'This application demonstrates the usage of USART in slave mode, tr
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - USART Synchronous Slave
+label: SiWx91x Platform - USART Synchronous Slave
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: sl_usart
 source:
 - path: app.c

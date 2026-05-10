@@ -431,7 +431,7 @@ typedef struct {
       __IOM unsigned int DEST_ADDR_CONTIGUOUS : 1; /*!< [26..26] Indicates Address is
                                              contiguous from previous      */
       __IOM unsigned int RETRY_ON_ERROR : 1;       /*!< [27..27] When this bit is set, if
-                                             we recieve HRESPERR, We will retry
+                                             we receive HRESPERR, We will retry
                                              the DMA for that channel. */
       __IOM unsigned int LINK_INTERRUPT : 1;       /*!< [28..28] This bit is set in link list
                                   descriptor.Hard ware will send an interrupt

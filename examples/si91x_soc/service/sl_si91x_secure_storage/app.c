@@ -203,13 +203,19 @@ static void application_thread(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to start Wi-Fi Client interface: 0x%lx\r\n", status);
+    /* Note: All status messages in this example — both success and failure — are
+ * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
+ * on the console at the default log level. This is a demonstration choice, not
+ * a recommendation: in production code, ERROR severity should be reserved for
+ * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
+ * (or SL_PRINT_STRING_DEBUG for verbose trace). */
+    SL_PRINT_STRING_ERROR("\r\nFailed to start Wi-Fi Client interface: 0x%lx\r\n", status);
     app_exit();
   }
 
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\n\r\nFailed to fetch firmware version: 0x%lx\r\n", status);
+    SL_PRINT_STRING_ERROR("\r\n\r\nFailed to fetch firmware version: 0x%lx\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -219,30 +225,31 @@ static void application_thread(void *argument)
                                                  app_secure_storage_reg_write_values,
                                                  APP_SECURE_STORAGE_NUM_REGISTERS);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to write secure storage registers: 0x%lx\r\n", status);
+    SL_PRINT_STRING_ERROR("\r\nFailed to write secure storage registers: 0x%lx\r\n", status);
     app_exit();
   }
 #if APP_SECURE_STORAGE_DEBUG_PRINT_VALUES
   for (uint32_t i = 0; i < APP_SECURE_STORAGE_NUM_REGISTERS; i++) {
-    DEBUGOUT("\r\nWrite secure storage register[%lu]: 0x%08lX\r\n",
-             (unsigned long)i,
-             (unsigned long)app_secure_storage_reg_write_values[i]);
+    SL_PRINT_STRING_ERROR("\r\nWrite secure storage register[%lu]: 0x%08lX\r\n",
+                          (unsigned long)i,
+                          (unsigned long)app_secure_storage_reg_write_values[i]);
   }
 #endif
   status = sl_si91x_secure_storage_enable_protection_and_lock();
   if (status == SL_STATUS_NOT_AVAILABLE) {
-    DEBUGOUT("\r\nSecure protection disabled in config\r\n");
+    SL_PRINT_STRING_ERROR("\r\nSecure protection disabled in config\r\n");
     app_exit();
   } else if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to enable MCU secure storage protection: 0x%lx\r\n", status);
+    SL_PRINT_STRING_ERROR("\r\nFailed to enable MCU secure storage protection: 0x%lx\r\n", status);
     app_exit();
   } else {
-    DEBUGOUT("\r\nMCU secure storage protection enabled, secure storage write disabled\r\n");
+    SL_PRINT_STRING_ERROR("\r\nMCU secure storage protection enabled, secure storage write "
+                          "disabled\r\n");
   }
 
   status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\n\r\nPower save configuration Failed, Error Code : 0x%lX\r\n", status);
+    SL_PRINT_STRING_ERROR("\r\n\r\nPower save configuration Failed, Error Code : 0x%lX\r\n", status);
     app_exit();
   }
 
@@ -250,14 +257,15 @@ static void application_thread(void *argument)
                                                 app_secure_storage_read_values,
                                                 APP_SECURE_STORAGE_NUM_REGISTERS);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to read secure storage registers: 0x%lx\r\n", status);
+    SL_PRINT_STRING_ERROR("\r\nFailed to read secure storage registers: 0x%lx\r\n", status);
     app_exit();
   }
   sl_app_verify_secure_storage_read_values(app_secure_storage_read_values,
                                            app_secure_storage_reg_write_values,
                                            APP_SECURE_STORAGE_NUM_REGISTERS);
   /* Disable interrupts so WDT is no longer kicked; WDT will reset the system. */
-  DEBUGOUT("\r\ndisabled interrupts so WDT is no longer kicked; WDT will reset the system. \r\n");
+  SL_PRINT_STRING_ERROR("\r\ndisabled interrupts so WDT is no longer kicked; WDT will reset "
+                        "the system. \r\n");
   __disable_irq();
   while (1) {
     ; /* Idle; no sleep/wake loop */
@@ -307,10 +315,11 @@ sl_status_t sl_app_write_secure_storage_registers(const mcu_secure_storage_regis
     }
   }
   if (all_match) {
-    DEBUGOUT("\r\nRegister Read and before write values matched, skipping write.\r\n");
+    SL_PRINT_STRING_ERROR("\r\nRegister Read and before write values matched, skipping "
+                          "write.\r\n");
     return SL_STATUS_OK;
   }
-  DEBUGOUT("\r\nRegister Read and write values differ, writing registers.\r\n");
+  SL_PRINT_STRING_ERROR("\r\nRegister Read and write values differ, writing registers.\r\n");
 
   for (i = 0; i < count; i++) {
     status = sl_si91x_secure_storage_write_register(registers[i], values[i]);
@@ -370,23 +379,25 @@ void sl_app_verify_secure_storage_read_values(const uint32_t *read_values,
   uint32_t mismatch_count = 0;
 #if (APP_SECURE_STORAGE_DEBUG_PRINT_VALUES == 1)
   for (i = 0; i < count; i++) {
-    DEBUGOUT("\r\nRead secure storage register[%lu]: 0x%08lX\r\n", (unsigned long)i, (unsigned long)read_values[i]);
+    SL_PRINT_STRING_ERROR("\r\nRead secure storage register[%lu]: 0x%08lX\r\n",
+                          (unsigned long)i,
+                          (unsigned long)read_values[i]);
   }
 #endif
 
   for (i = 0; i < count; i++) {
     if (read_values[i] != expected_values[i]) {
-      DEBUGOUT("\r\nRegister[%lu] MISMATCH: expected 0x%08lX, read 0x%08lX\r\n",
-               (unsigned long)i,
-               (unsigned long)expected_values[i],
-               (unsigned long)read_values[i]);
+      SL_PRINT_STRING_ERROR("\r\nRegister[%lu] MISMATCH: expected 0x%08lX, read 0x%08lX\r\n",
+                            (unsigned long)i,
+                            (unsigned long)expected_values[i],
+                            (unsigned long)read_values[i]);
       mismatch_count++;
     }
   }
   if (mismatch_count == 0) {
-    DEBUGOUT("\r\nAll register values matched.\r\n");
+    SL_PRINT_STRING_ERROR("\r\nAll register values matched.\r\n");
   } else {
-    DEBUGOUT("\r\n%lu register(s) failed.\r\n", (unsigned long)mismatch_count);
+    SL_PRINT_STRING_ERROR("\r\n%lu register(s) failed.\r\n", (unsigned long)mismatch_count);
   }
 }
 

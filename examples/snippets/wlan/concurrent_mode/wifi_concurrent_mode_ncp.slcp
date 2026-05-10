@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Concurrent Mode (NCP)
 category: Example|Wi-Fi
-description: 'Start a Wi-Fi Access Point with WPA2 security
+description: 'Demonstrates concurrent Wi-Fi Client and Wi-Fi Access Point using DHCP STA, WPA2 AP and performs UDP/TCP socket throughput test.
 
   '
 filter:

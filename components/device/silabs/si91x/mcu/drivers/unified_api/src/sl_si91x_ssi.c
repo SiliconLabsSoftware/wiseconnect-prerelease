@@ -88,7 +88,7 @@ static uint8_t convert_handle_to_instance(sl_ssi_handle_t ssi_handle);
  ******************************************************************************/
 /*******************************************************************************
  * To configure clock with input clock config structure for SSI. It validates
- * the clock frequency validate_clock_paramters function. If the clock frequency
+ * the clock frequency validate_clock_parameters function. If the clock frequency
  * is in range, it activates the clock for SSI peripheral. RSI errors are converted
  * to SL errors via convert_rsi_to_sl_error_code function.
  *

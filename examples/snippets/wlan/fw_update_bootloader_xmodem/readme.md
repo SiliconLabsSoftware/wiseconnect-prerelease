@@ -21,11 +21,11 @@
 
 ## Purpose/Scope
 
-This application demonstrates how to flash the firmware on the Si91x device from the Host MCU using XMODEM protocol. The system consists of three main components:
+This application demonstrates how to flash the firmware on the SiWx91x device from the Host MCU using XMODEM protocol. The system consists of three main components:
 
   - Host PC: Contains the firmware file and the Tera Term (Xmodem protcol) for updating firmware
-  - Host MCU: Acts as an intermediary between the PC and the Si91x device. It receives firmware data from the PC over UART and transfers it to the Si91x device via SPI.
-  - Si91x Device: The target embedded system that needs a firmware update. It receives firmware data from the Host MCU and updates its firmware.
+  - Host MCU: Acts as an intermediary between the PC and the SiWx91x device. It receives firmware data from the PC over UART and transfers it to the SiWx91x device via SPI.
+  - SiWx91x Device: The target embedded system that needs a firmware update. It receives firmware data from the Host MCU and updates its firmware.
   
 ## Prerequisites/Setup Requirements
 

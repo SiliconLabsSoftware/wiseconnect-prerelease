@@ -1,18 +1,24 @@
 project_name: ble_ae_central_uart_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - AE Central (UART NCP)
+label: BLE - UART NCP AE Central FreeRTOS
 category: Example|BLE
-description: 'ble_ae_central example application
+description: 'Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets on SiWx91x over UART NCP with FreeRTOS. This is demonstrated by two scan sets in the application.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - NCP
 - name: Project Difficulty
   value:
   - Advanced
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

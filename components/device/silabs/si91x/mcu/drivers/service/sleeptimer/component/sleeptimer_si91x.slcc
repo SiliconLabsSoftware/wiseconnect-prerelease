@@ -27,11 +27,16 @@ define:
   - name: SI91X_PLATFORM
     value: 1
   - name: SL_SLEEP_TIMER
+  - name: SL_CODE_COMPONENT_SLEEPTIMER_SI91X
+    value: sleeptimer_si91x
 requires:
   - name: sleeptimer
   - name: rsilib_sysrtc
   - name: log_none
 conflicts:
   - name: sl_sysrtc
+template_contribution:
+  - name: code_classification_components
+    value: sleeptimer_si91x
 provides:
   - name: sleeptimer_si91x

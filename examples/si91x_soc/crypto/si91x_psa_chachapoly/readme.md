@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA CHACHAPOLY
+# SiWx91x Platform PSA CHACHAPOLY
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA CHACHAPOLY](#platform-siwx91x-psa-chachapoly)
+- [SiWx91x Platform PSA CHACHAPOLY](#platform-siwx91x-psa-chachapoly)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -59,8 +59,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ### Application Configuration Parameters
 
  * Wrapped key support is provided for AES,Chachapoly,HMAC,GCM with CBC/ECB mode. This example demonstrate the use of wrapped key with AES-ChachaPoly using wrap CBC mode.
- * To wrap the input key and use it, set WRAP_INPUT_KEYS macro to 1 in [`psa_chachapoly_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_chachapoly/psa_chachapoly_app.c)
- * To use a wrapped key directly, set IMPORT_WRAPPED_KEYS macro to 1 in [`psa_chachapoly_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_chachapoly/psa_chachapoly_app.c)
+ * To wrap the input key and use it, set WRAP_INPUT_KEYS macro to 1 in [`psa_chachapoly_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/crypto/si91x_psa_chachapoly/psa_chachapoly_app.c)
+ * To use a wrapped key directly, set IMPORT_WRAPPED_KEYS macro to 1 in [`psa_chachapoly_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/crypto/si91x_psa_chachapoly/psa_chachapoly_app.c)
  * To use software fallback instead of hardware accelerators for plain key:
   - Add mbedtls_chachapoly in component section of slcp file
   - Undefine the macro SLI_AEAD_DEVICE_SI91X

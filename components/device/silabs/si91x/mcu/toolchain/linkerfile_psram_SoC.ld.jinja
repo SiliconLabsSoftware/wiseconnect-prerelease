@@ -142,6 +142,13 @@ ENTRY(Reset_Handler)
  
 SECTIONS
 {
+	/* Fallback symbols for copy_functions_to_ram() in startup_si91x.c.
+	   PSRAM linker has no text_ram section; these zero-length spans make the copy loop a no-op. */
+	PROVIDE(__ramfuncs_start__     = 0);
+	PROVIDE(__ramfuncs_end__       = 0);
+	PROVIDE(__lma_ramfuncs_start__ = 0);
+	PROVIDE(__lma_ramfuncs_end__   = 0);
+
 	.text :
 	{
 		KEEP(*(.isr_vector))
@@ -465,8 +472,7 @@ SECTIONS
 
   {%- if psram_present and psram_linker_config_enabled and not bss_segment_in_psram %}
 	. = _last_psram_location;
-	_classified_bss_ = _last_ram_location;
-	
+
 	.classified_bss (NOLOAD) :
 	{
 		_classified_bss_section_start_ = .;

@@ -1,8 +1,8 @@
-# Platform SiWx91x ULP ADC
+# SiWx91x Platform ULP ADC
 
 ## Table of Contents
 
-- [Platform SiWx91x ULP ADC](#platform-siwx91x-ulp-adc)
+- [SiWx91x Platform ULP ADC](#platform-siwx91x-ulp-adc)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -49,7 +49,7 @@ This application also switches between PS4 and PS2 power states, samples, collec
 
 - This example demonstrates ADC in FIFO/Static mode of operation. It reads the sampled data and converts it into equivalent input voltage.
 - Various parameters like Number of channel, ADC operation mode, Input Type, Sampling Rate and Sample Length can be configured using UC.
-- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains the channel instance configuration.
+- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains the channel instance configuration.
 - This example is working in both FIFO and static mode of ADC operations.
 
 - The firmware version of API is fetched using [sl_si91x_adc_get_version](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-si91x-adc-get-version), which includes the release version, major version and minor version [sl_adc_version_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-adc-version-t).
@@ -120,6 +120,38 @@ Configure UC from the slcp component.
 - ADC output will print the configured number of samples output voltage on UART console.
 - Apply the different voltages (1.8V to Vref) to ADC input and observe console outputs as per input.
 - Provided input voltage and console output data should match.
+
+- Configure the following macros in [`sl_ulp_adc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_adc/sl_ulp_adc_example.c) file, if required:
+
+- `CHANNEL_SAMPLE_LENGTH`: Number of ADC samples collected per channel for one operation. By default, it is set to 1023.
+
+  ```c
+    #define CHANNEL_SAMPLE_LENGTH 1023       // Number of ADC sample collect for operation
+  ```
+
+- `ADC_MAX_OP_VALUE`: Maximum 12-bit raw value that can be read from the ADC data register. By default, it is set to 4095.
+
+  ```c
+    #define ADC_MAX_OP_VALUE      4095       // Maximum output value get from adc data register
+  ```
+
+- `VREF_VALUE`: ADC reference voltage (in volts) used to compute the equivalent input voltage. By default, it is set to 3.3.
+
+  ```c
+    #define VREF_VALUE            3.3        // reference voltage
+  ```
+
+- `MS_DELAY_COUNTER`: Loop delay count used to generate a short millisecond-level wait inside the example. By default, it is set to 4600.
+
+  ```c
+    #define MS_DELAY_COUNTER      4600       // Delay count
+  ```
+
+- `FIVE_SECOND_DELAY`: Delay, in milliseconds, used between PS4 and PS2 power-state transitions. By default, it is set to 5000.
+
+  ```c
+    #define FIVE_SECOND_DELAY     5000       // 5 second delay between state changes
+  ```
 
 ### Pin Configuration
 
@@ -197,7 +229,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 >
 >- The user can configure the input selection GPIO in the example application if the default GPIO is work around.
 >- ADC input selection rather than GPIO (like OP-AMP, DAC and Temperature sensor) user can create their own instances and configure them as per other input selection.
->- In the [`sl_ulp_adc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_adc/sl_ulp_adc_example.c) file, update the [sl_adc_channel_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-adc-channel-config-t) channel parameter to reflect the installed channel number.
+>- In the [`sl_ulp_adc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_adc/sl_ulp_adc_example.c) file, update the [sl_adc_channel_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-adc-channel-config-t) channel parameter to reflect the installed channel number.
 >
  >Use the following formula to find equivalent input voltage of ADC:
 >
@@ -240,3 +272,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

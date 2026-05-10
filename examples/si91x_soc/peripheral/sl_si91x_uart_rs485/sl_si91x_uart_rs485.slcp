@@ -5,12 +5,18 @@ description: 'This example project configures UART RS485 in multidrop mode and t
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - UART RS485
+label: SiWx91x Platform - UART RS485
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si917_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: sl_clock_manager
 - id: sl_gpio
 - id: rsilib_usart_rs485

@@ -1,8 +1,8 @@
-# Platform SiWx91x Sensorhub
+# SiWx91x Platform Sensorhub
 
 ## Table of Contents
 
-- [Platform SiWx91x Sensorhub](#platform-siwx91x-sensorhub)
+- [SiWx91x Platform Sensorhub](#platform-siwx91x-sensorhub)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
   - [Framework](#framework)
@@ -109,10 +109,41 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### SensorHub Configuration Parameters
 
-1. Configure the number of sensor info in [`sensors_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/sensors_config.h) file.
+1. Configure the number of sensor info in [`sensors_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/sensors_config.h) file.
+
+   - `SL_MAX_NUM_SENSORS`: Specifies the maximum number of sensors that the SensorHub can manage simultaneously. By default, it is set to 5.
+
     ```c
     #define SL_MAX_NUM_SENSORS 5 // Maximum sensors present in the system
     ```
+
+1. Configure the application task stack size in `sensorhub_app.c`:
+
+   - `SL_APP_TASK_STACK_SIZE`: Specifies the stack size (in bytes) allocated to the sensor application task. By default, it is set to 4096.
+
+    ```c
+    #define SL_APP_TASK_STACK_SIZE 4096 // Stack size of sensor_app task
+    ```
+
+1. Configure the SPI parameters in `sensorhub_config.c`:
+
+   - `SPI_BAUD`: Specifies the SPI baud rate (in Hz) used to communicate with SPI-connected sensors. By default, it is set to 1000000.
+
+     ```c
+     #define SPI_BAUD        1000000 // Speed at which data transmitted through SPI
+     ```
+
+   - `SPI_BIT_WIDTH`: Specifies the SPI data bus width (in bits) per transfer. By default, it is set to 8.
+
+     ```c
+     #define SPI_BIT_WIDTH   8       // SPI bus width
+     ```
+
+   - `SPI_CHIP_SELECT`: Selects the SPI chip-select line used to address the target sensor. By default, it is set to 0.
+
+     ```c
+     #define SPI_CHIP_SELECT 0       // SPI Chip Select number
+     ```
 
 2. Configure the following parameters in the
  file:
@@ -208,7 +239,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 4. **ADC Configurations**:
     - Configure the macro SH_ADC_ENABLE=1 in the preprocessor settings to enable ADC support.
-    - Configure the following parameters in the [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c) file to change the ADC's mode from FIFO to STATIC and vice versa.
+    - Configure the following parameters in the [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c) file to change the ADC's mode from FIFO to STATIC and vice versa.
 
       ```c
       .adc_config.adc_cfg.operation_mode = SL_ADC_STATIC_MODE
@@ -219,32 +250,51 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - **ADC static mode:-**
         - SensorHub polling mode is supported
         - ADC is capable of reading only one Sample at a time and generates an interrupt in static mode.
-        configure as shown below in [`adc_sensor_hal.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/adc_sensor/adc_sensor_hal.h) file:
+        configure as shown below in [`adc_sensor_hal.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/adc_sensor/adc_sensor_hal.h) file:
 
-          ```C
-          #define SL_SH_ADC_CH0_NUM_SAMPLES 1
-          #define SL_SH_ADC_SENSOR0_NUM_OF_SAMPLES 5
-          ```
+          - `SL_SH_ADC_CH0_NUM_SAMPLES`: Specifies the number of ADC samples collected per interrupt on channel 0. In static mode it is set to 1 (one sample per interrupt).
+
+            ```c
+            #define SL_SH_ADC_CH0_NUM_SAMPLES 1
+            ```
+
+          - `SL_SH_ADC_SENSOR0_NUM_OF_SAMPLES`: Specifies the number of ADC samples processed per sensor read operation for sensor 0. In static mode it is set to 5.
+
+            ```c
+            #define SL_SH_ADC_SENSOR0_NUM_OF_SAMPLES 5
+            ```
 
     - **ADC FIFO mode:-**
       - The SensorHUB interrupt mode configurations are utilized in conjunction with **ADC FIFO mode**.
-      - Configure the following parameter [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c) file:
+      - Configure the following parameter [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c) file:
 
         ```c
         .adc_config.adc_cfg.operation_mode = SL_ADC_FIFO_MODE,
         ```
 
       - In the SensorHub interrupt mode, The ADC will continuously sample 4 channels, regardless of the number of channels enabled in sets of 4 (0-3).
-      configure as shown below in [`adc_sensor_hal.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/adc_sensor/adc_sensor_hal.h) file:
+      configure as shown below in [`adc_sensor_hal.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensors/inc/adc_sensor/adc_sensor_hal.h) file:
 
-        ```C
+        - `SL_SH_ADC_CH0_NUM_SAMPLES`: Specifies the number of ADC samples collected per interrupt on channel 0 in FIFO mode. Set to a value between 100 and 1023 when using a sample rate >= 100; for a single-sample configuration (value 1) use a sampling rate below 100 and fewer than 3 channels. In FIFO mode it is set to 100.
+
+          ```c
           // Set SL_SH_ADC_CH0_NUM_SAMPLES to a value between 100 and 1023 if you are using sample rate >= 100
           // If you want to set SL_SH_ADC_CH0_NUM_SAMPLES to 1 and use <= 2 channels, you should use a lower sampling rate (less than 100)
           // Using any other combination may result in undefined behavior due to an immediate ADC interrupt.
           #define SL_SH_ADC_CH0_NUM_SAMPLES         100
+          ```
+
+        - `SL_SH_ADC_SAMPLING_RATE`: Specifies the ADC sampling rate used in FIFO mode. By default, it is set to 100.
+
+          ```c
           #define SL_SH_ADC_SAMPLING_RATE           100
+          ```
+
+        - `SL_SH_ADC_SENSOR0_NUM_OF_SAMPLES`: Specifies the number of ADC samples processed per sensor read operation for sensor 0 in FIFO mode. By default, it is set to 1.
+
+          ```c
           #define SL_SH_ADC_SENSOR0_NUM_OF_SAMPLES  1
-        ```
+          ```
 
       * ADC can read between 1 and 1023 samples at a time and generates interrupts when operating in FIFO mode.
 
@@ -261,7 +311,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - For SDC Multichannel enable the **SDC_MUTI_CHANNEL_ENABLE** macro in the preprocessor settings
     - Disable the remaining sensor configurations.
     - one sensor hub configuration structure is enough for the all connected sensors.
-    - Configure the following parameters in [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c)
+    - Configure the following parameters in [`sensorhub_config.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_config.c)
     - SDC will support only for the JoyStick
 
       ```c
@@ -286,7 +336,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
     - **SDC Power Save(PS-1)**
       - The SensorHUB interrupt mode configurations are utilized in conjunction with **SDC mode**.
-          ```C
+          ```c
           SL_SH_PS1_STATE=1
           //Enabling this macro will move the core from PS2 Active state to PS1 state by using the Power_Task
           ```
@@ -301,9 +351,9 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 
 1. After creating the project add **SH_AWS_ENABLE=1** macro in the preprocessor settings.
 2. Now refer to ***Wi-Fi - AWS IoT MQTT Client (SoC)*** example readme.
-3. Make the relevant changes according to the above example readme in [`sl_net_default_values.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/resources/defaults/sl_net_default_values.h),  [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/resources/defaults/aws_iot_config.h) present in *config* folder
-4. Modify the relevant changes in [`sensorhub_aws_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_aws_app.c) also.
-5. Increase the buffer size AWS_IOT_MQTT_TX_BUF_LEN to 1024 in [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/resources/defaults/aws_iot_config.h)
+3. Make the relevant changes according to the above example readme in [`sl_net_default_values.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/sl_net_default_values.h),  [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/aws_iot_config.h) present in *config* folder
+4. Modify the relevant changes in [`sensorhub_aws_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sensorhub/sensorhub_aws_app.c) also.
+5. Increase the buffer size AWS_IOT_MQTT_TX_BUF_LEN to 1024 in [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/aws_iot_config.h)
 
 ## Sensor Pins Setup
 
@@ -381,3 +431,4 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

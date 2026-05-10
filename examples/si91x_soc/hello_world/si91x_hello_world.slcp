@@ -3,11 +3,17 @@ package: platform_siwx91x_app
 description: "This application demonstrates how to use hello world example that can be used as a starting point \nto add components and functionality to the SiWx91x SoC.\n"
 category: Example|si91x_soc
 quality: production
-label: Platform SiWx91x - Hello World
+label: SiWx91x Platform - Hello World
 component:
 - id: sl_main
 - id: syscalls
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 source:
 - path: app.c
 include:

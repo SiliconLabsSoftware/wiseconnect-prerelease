@@ -5,7 +5,7 @@ description: 'This application demonstrates the PS1 state with NWP shutdown.
   '
 category: example|mcu powerstate
 quality: production
-label: Platform SiWx91x - PS1 STATE
+label: SiWx91x Platform - PS1 STATE
 component:
 - id: sl_main
 - id: status
@@ -17,6 +17,12 @@ component:
   - timer0
 - id: calendar_ulp_component
 - id: timer_ulp_component
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: debug_ulp_component
 - id: pm_ps2_component
 template_contribution:

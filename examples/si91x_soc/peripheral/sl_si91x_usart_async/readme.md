@@ -1,8 +1,8 @@
-# Platform SiWx91x USART Asynchronous
+# SiWx91x Platform USART Asynchronous
 
 ## Table of Contents
 
-- [Platform SiWx91x USART Asynchronous](#platform-siwx91x-usart-asynchronous)
+- [SiWx91x Platform USART Asynchronous](#platform-siwx91x-usart-asynchronous)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -39,7 +39,7 @@ This application demonstrates how to configure Universal Synchronous Asynchronou
 
 ## About Example Code
 
-- [`usart_async_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_async/usart_async_example.c) - This example code demonstrates how to configure the USART to send and receive data.
+- [`usart_async_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_async/usart_async_example.c) - This example code demonstrates how to configure the USART to send and receive data.
 - In this example, first USART gets initialized (if not already) with clock and DMA configurations if DMA is enabled using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).
 **Note:** If the UART/USART instance is already selected for debug output logs, initialization will return `SL_STATUS_NOT_AVAILABLE`.
 - After USART initialization, USART is configured with the default configurations from UC along with the USART transmit and receive lines using [`sl_si91x_usart_set_configuration`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration).
@@ -89,6 +89,26 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - By default, `USART0 Clock Source` is configured to `ULP REF CLK` in UC. Select `SOC PLL CLK`.
 
+- Configure the following macros in [`usart_async_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_async/usart_async_example.c) if required:
+
+- `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
+
+  ```c
+  #define USART_BUFFER_SIZE     1024   // Data send and receive length
+  ```
+
+- `USART_BAUDRATE`: Specifies the USART baud rate used for transmission and reception. Supported range is 9600-7372800. By default, it is set to 115200.
+
+  ```c
+  #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
+  ```
+
+- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default USART configurations in the non-UC (non Universal Configuration) case. By default, it is set to 0.
+
+  ```c
+  #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non_uc case
+  ```
+
 ## Pin Configuration
 
   | USART PINS     | GPIO    | Breakout pin  | Explorer kit Breakout pin | UART-TTL cable |
@@ -103,7 +123,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Set the SL_USART_FLOW_CONTROL_TYPE parameter to SL_USART_FLOW_CONTROL_RTS_CTS to enable USART flow control.
 - Make the following two macros in `RTE_Device_917.h`  to '1' to map RTS and CTS pins to WSTK/WPK Main Board EXP header or breakout pins.
 
-  ```C
+  ```c
   #define RTE_USART0_CTS_PORT_ID    1
   #define RTE_USART0_RTS_PORT_ID    1
   ```
@@ -150,3 +170,4 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

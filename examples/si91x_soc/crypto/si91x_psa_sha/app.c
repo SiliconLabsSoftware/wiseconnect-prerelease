@@ -30,6 +30,7 @@
 
 #include "app.h"
 #include "psa_sha_app.h"
+#include "rsi_debug.h"
 
 #include <string.h>
 #include "cmsis_os2.h"
@@ -96,10 +97,10 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  printf("\r\nWi-Fi Init Success\r\n");
+  DEBUGOUT("\r\nWi-Fi Init Success\r\n");
 
   app_process_action();
 }

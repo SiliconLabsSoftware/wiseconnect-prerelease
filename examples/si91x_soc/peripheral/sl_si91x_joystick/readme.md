@@ -1,8 +1,8 @@
-# Platform SiWx91x JOYSTICK
+# SiWx91x Platform JOYSTICK
 
 ## Table of Contents
 
-- [Platform SiWx91x JOYSTICK](#platform-siwx91x-joystick)
+- [SiWx91x Platform JOYSTICK](#platform-siwx91x-joystick)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -54,6 +54,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Application Build Environment
 
 ### Application Configuration Parameters
+
+- Configure the following macro in [`joystick_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_joystick/joystick_example.c) file and update/modify following macro, if required.
+
+  - `DELAY_MS1_PERIODIC`: Periodic sleeptimer timeout in milliseconds that sets how often the joystick position is sampled and printed. By default, it is set to 400 ms.
+
+    ```c
+      #define DELAY_MS1_PERIODIC 400      //sleeptimer1 periodic timeout in ms
+    ```
+
 - Open the **sl_si91x_joystick.slcp** project file, select the **software component** tab, and search for **joystick** in the search bar.
   - Configure the UC as described below.
 ![Figure: sl_joystick_uc_screen](resources/uc_screen/sl_joystick_uc_screen.png)
@@ -161,3 +170,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

@@ -36,6 +36,7 @@
 #include "sl_rsi_utility.h"
 #include "rsi_m4.h"
 #include "rsi_ipmu.h"
+#include "sli_code_classification.h"
 
 #ifdef SL_WIFI_COMPONENT_INCLUDED
 #include "sl_si91x_host_interface.h"
@@ -50,6 +51,13 @@ osEventFlagsId_t ta_events = NULL;
 
 static bool m4_is_using_xtal_without_ta_notification;
 static bool m4_using_xtal;
+
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+void sl_si91x_host_clear_sleep_indicator(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+void IRQ074_Handler(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+sl_status_t sli_si91x_bus_read_interrupt_status(uint16_t *int_status);
 
 /** @addtogroup SOC4
 * @{
@@ -335,7 +343,7 @@ sl_status_t sli_m4_interrupt_isr(void)
   }
 #endif
   else {
-    SL_DEBUG_LOG("\r\n INVALID INTERRUPT \r\n", 0);
+    SL_DEBUG_LOG_V2(ERROR, "\r\n INVALID INTERRUPT \r\n", 0);
     return SL_STATUS_FAIL;
   }
   return SL_STATUS_OK;

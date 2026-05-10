@@ -1,8 +1,8 @@
-# Platform SiWx91x IOSTREAM USART Baremetal
+# SiWx91x Platform IOSTREAM USART Baremetal
 
 ## Table of Contents
 
-- [Platform SiWx91x IOSTREAM USART Baremetal](#platform-siwx91x-iostream-usart-baremetal)
+- [SiWx91x Platform IOSTREAM USART Baremetal](#platform-siwx91x-iostream-usart-baremetal)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -20,7 +20,7 @@
 
 ## Purpose/Scope
 
-  This application demonstrates how to configure IOSTREAM USART In asyncronous mode, it will send and receive data.
+  This application demonstrates how to configure IOSTREAM USART In asynchronous mode, it will send and receive data.
 
 ## Overview
 
@@ -88,6 +88,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | ULP_GPIO_TX_PIN | ULP_GPIO_11[F6] |   ULP_GPIO_11   |
   | ULP_GPIO_RX_PIN | ULP_GPIO_9 [F7] |   ULP_GPIO_9    |
 
+### Application Configuration Parameters
+
+- Configure the following parameter in `app_iostream_usart.c`:
+
+- `BUFFER_SIZE`: Specifies the size (in bytes) of the input buffer used by the iostream USART application to hold a single line of user input. By default, it is set to 80.
+
+  ```c
+  #define BUFFER_SIZE 80 // Input buffer size
+  ```
+
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
@@ -141,3 +151,4 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

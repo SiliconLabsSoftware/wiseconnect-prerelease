@@ -1,16 +1,24 @@
 project_name: ble_hid_on_gatt_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - HID On GATT (SoC)
+label: BLE - SoC HID On GATT FreeRTOS
 category: Example|BLE
-description: "This application demonstrates how to configure BLE device as GATT server in BLE peripheral mode and as GATT client in BLE central mode. \n"
+description: 'Demonstrates how to configure BLE device as GATT server in BLE peripheral mode and as GATT client in BLE central mode on SiWx91x in SoC FreeRTOS.
+
+  '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

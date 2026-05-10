@@ -1,8 +1,8 @@
-# Platform SiWx91x ULP DMA
+# SiWx91x Platform ULP DMA
 
 ## Table of Contents
 
-- [Platform SiWx91x ULP DMA](#platform-siwx91x-ulp-dma)
+- [SiWx91x Platform ULP DMA](#platform-siwx91x-ulp-dma)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -35,7 +35,7 @@
 
 ## About Example Code
 
-- [`ulp_dma_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_dma/ulp_dma_example.c) file demonstrates how to use DMA peripheral to perform memory to memory transfers
+- [`ulp_dma_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_dma/ulp_dma_example.c) file demonstrates how to use DMA peripheral to perform memory to memory transfers
 - In this example first dma initialization is done using [sl_si91x_dma_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/dma#sl-si91x-dma-init)
 - Then [sl_si91x_dma_allocate_channel](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/dma#sl-si91x-dma-allocate-channel) is used to allocate ULP_DMA_CHANNEL for transfer.
 - After configuring channel, callbacks are registered using [sl_si91x_dma_register_callbacks](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/dma#sl-si91x-dma-register-callbacks)
@@ -86,13 +86,43 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Open **sl_si91x_ulp_dma.slcp** project file select **software component** tab and search for **SL_DMA** in search bar.
 - Configure SL_ULP_DMA_CHANNEL_COUNT(0 - 12) - Number of available channels for ULP_DMA
-- Configure the following macros in [`ulp_dma_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_dma/ulp_dma_example.c) file and update/modify following macros if required.
+- Configure the following macros in [`ulp_dma_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_dma/ulp_dma_example.c) file and update/modify following macros if required.
 
-```C
-#define ULP_DMA_SIMPLE_TRANSFER 1    ///< Enable/Disable simple transfer
-#define ULP_DMA_CHANNEL         12   ///< ULP_DMA channel number 12
-#define ULP_DMA_TRANSFER_SIZE   2048 ///< DMA transfer size
-```
+- `MS_DELAY_COUNTER`: Loop count used as a software delay reference inside the example. By default, it is set to 4600.
+
+  ```c
+  #define MS_DELAY_COUNTER        4600 ///< Delay count
+  ```
+
+- `FIVE_SECOND_DELAY`: Delay (in milliseconds) applied between power state changes in the example. By default, it is set to 5000.
+
+  ```c
+  #define FIVE_SECOND_DELAY       5000 ///< 5 second delay between state changes
+  ```
+
+- `ULP_DMA_SIMPLE_TRANSFER`: Selects the DMA transfer API. When enabled (1), the example uses `sl_si91x_dma_simple_transfer`; when disabled (0), it uses `sl_si91x_dma_transfer`. By default, it is set to 1.
+
+  ```c
+  #define ULP_DMA_SIMPLE_TRANSFER 1    ///< Enable/Disable simple transfer
+  ```
+
+- `ULP_DMA_INSTANCE`: Selects the DMA controller instance to use (1 for ULP_DMA). By default, it is set to 1.
+
+  ```c
+  #define ULP_DMA_INSTANCE        1    ///< ULP_DMA instance
+  ```
+
+- `ULP_DMA_CHANNEL`: Specifies the ULP_DMA channel number to be allocated for the memory-to-memory transfer. By default, it is set to 12.
+
+  ```c
+  #define ULP_DMA_CHANNEL         12   ///< ULP_DMA channel number 12
+  ```
+
+- `ULP_DMA_TRANSFER_SIZE`: Defines the number of data elements to be transferred in a single DMA operation. By default, it is set to 2048.
+
+  ```c
+  #define ULP_DMA_TRANSFER_SIZE   2048 ///< DMA transfer size
+  ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -139,3 +169,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

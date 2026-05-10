@@ -30,10 +30,12 @@
 
 #include "rsi_sysrtc.h"
 #include "sl_sysrtc_board.h"
+#include "sli_code_classification.h"
 
 #if defined(SI91X_SYSRTC_COUNT) && (SI91X_SYSRTC_COUNT > 0)
 
 // SYSRTC Default pins for compare group is taken as Mode 3
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_SYSRTC, SL_CODE_CLASS_TIME_CRITICAL)
 STATIC INLINE void RSI_NPSSGPIO_SetPinMux(uint8_t pin, uint8_t mux)
 {
   MCU_RET->NPSS_GPIO_CNTRL[pin].NPSS_GPIO_CTRLS_b.NPSS_GPIO_MODE = mux;
@@ -48,6 +50,7 @@ STATIC INLINE void RSI_NPSSGPIO_SetPinMux(uint8_t pin, uint8_t mux)
  *           0- Disable
  *@return  : none
  * */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_SYSRTC, SL_CODE_CLASS_TIME_CRITICAL)
 STATIC INLINE void RSI_NPSSGPIO_InputBufferEn(uint8_t pin, boolean_t enable)
 {
   MCU_RET->NPSS_GPIO_CNTRL[pin].NPSS_GPIO_CTRLS_b.NPSS_GPIO_REN = enable;
@@ -61,6 +64,7 @@ STATIC INLINE void RSI_NPSSGPIO_InputBufferEn(uint8_t pin, boolean_t enable)
  *           0- Output Direction
  *@return  : none
  * */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_SYSRTC, SL_CODE_CLASS_TIME_CRITICAL)
 STATIC INLINE void RSI_NPSSGPIO_SetDir(uint8_t pin, boolean_t dir)
 {
   MCU_RET->NPSS_GPIO_CNTRL[pin].NPSS_GPIO_CTRLS_b.NPSS_GPIO_OEN = dir;

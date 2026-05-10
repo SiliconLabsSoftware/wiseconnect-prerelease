@@ -5,7 +5,7 @@ description: 'This application demonstrates MCU Secure Storage Registers.
   '
 category: example|service
 quality: production
-label: Platform SiWx91x - MCU Secure Storage
+label: SiWx91x Platform - MCU Secure Storage
 component:
 - id: freertos
 - id: freertos_heap_4
@@ -21,6 +21,12 @@ component:
 - id: sl_uart
 - id: syscalls
 - id: wifi
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: wifi_resources
 - id: wiseconnect_common
 - id: sl_wdt_manager

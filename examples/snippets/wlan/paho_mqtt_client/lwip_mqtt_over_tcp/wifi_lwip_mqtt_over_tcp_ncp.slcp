@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Paho LwIP MQTT OVER TCP (NCP)
 category: Example|Wi-Fi
-description: 'Demonstrates how SiWx91x device is configured as an MQTT client over TCP, connects to an MQTT broker, subscribes to a topic, and publishes messages on a particular MQTT topic using the Paho MQTT library with lwip support
+description: 'Demonstrates how SiWx91x device is configured as an MQTT client over TCP, connects to an MQTT broker, subscribes to a topic, and publishes messages on a particular MQTT topic using the Paho MQTT library with lwip support.
 
   '
 filter:

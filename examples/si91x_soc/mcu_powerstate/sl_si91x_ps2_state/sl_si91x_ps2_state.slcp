@@ -5,7 +5,7 @@ description: 'This application demonstrates the PS2 sleep and active state with 
   '
 category: example|mcu powerstate
 quality: production
-label: Platform SiWx91x - PS2 STATE
+label: SiWx91x Platform - PS2 STATE
 component:
 - id: sl_main
 - id: status
@@ -13,6 +13,12 @@ component:
 - id: si91x_mem_config_3
 - id: sl_power_manager
 - id: debug_ulp_component
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: pm_ps2_component
 template_contribution:
 - name: user_files_ps2

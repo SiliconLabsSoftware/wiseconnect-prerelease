@@ -107,14 +107,14 @@ static void sli_handle_mqtt_client_asynch_events(sli_command_engine_response_t *
 
     if (mqtt_client == NULL) {
       // Drop MQTT client event, if the client is either connecting or disconnected
-      SL_DEBUG_LOG("Dropping mqtt client event, Si91x Event: %hu", raw_rx_packet->command);
+      SL_DEBUG_LOG_V2(DEBUG, "Dropping mqtt client event, Si91x Event: %hu", raw_rx_packet->command);
       return;
     }
 
     if (mqtt_client->state == SL_MQTT_CLIENT_DISCONNECTED) {
       // Drop MQTT client event disconnect, if the client is already in disconnected
       // This can happen if MQTT client is already disconnected state and NWP sends a rejoin failure event.
-      SL_DEBUG_LOG("Dropping mqtt disconnect event: %hu", raw_rx_packet->command);
+      SL_DEBUG_LOG_V2(DEBUG, "Dropping mqtt disconnect event: %hu", raw_rx_packet->command);
       return;
     }
 
@@ -147,7 +147,7 @@ static void sli_handle_mqtt_client_asynch_events(sli_command_engine_response_t *
     return;
   }
 
-  SL_DEBUG_LOG("sli_handle_mqtt_client_asynch_events: event %x", sdk_context->event);
+  SL_DEBUG_LOG_V2(DEBUG, "sli_handle_mqtt_client_asynch_events: event %x", sdk_context->event);
 
   uint16_t si91x_event_status = sli_wifi_get_wifi_frame_status(raw_rx_packet);
   sl_status_t event_status    = sli_wifi_convert_and_save_firmware_status(si91x_event_status);
@@ -193,6 +193,9 @@ static bool sli_handle_sntp_client_events(sli_command_engine_response_t *respons
 static void sli_handle_socket_events(const sli_command_engine_metadata_t *data, sl_wifi_system_packet_t *packet)
 {
   UNUSED_PARAMETER(data);
+#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
+  sli_si91x_sync_bsd_socket_states_for_flush_scenarios(packet);
+#endif
   // Handle SI91X socket-related events
   bool is_socket_command =
     (packet->command == SLI_WIFI_REQ_SOCKET_ACCEPT || packet->command == SLI_WIFI_RSP_REMOTE_TERMINATE
@@ -239,13 +242,13 @@ void sl_net_si91x_event_dispatch_handler(sli_command_engine_response_t *response
 
   status = sli_convert_si91x_event_to_sl_net_event(&packet->command, &service_event, packet);
   if (status == SL_STATUS_OK) {
-    SL_DEBUG_LOG("><<<< Got net event : %u\n", service_event);
+    SL_DEBUG_LOG_V2(DEBUG, "><<<< Got net event : %u\n", service_event);
     sl_si91x_default_handler(service_event, buffer);
   }
 #ifdef SLI_SI91X_INTERNAL_HTTP_CLIENT
   // Check for sl_http_client_event_t
   else if (sli_convert_si91x_event_to_sl_http_client_event(&packet->command, &http_event) == SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n>>> HTTP Event received: %u <<<\r\n", http_event);
+    SL_DEBUG_LOG_V2(DEBUG, "\r\n>>> HTTP Event received: %u <<<\r\n", http_event);
     void *http_sdk_context                       = NULL;
     sli_command_engine_metadata_t *http_metadata = sli_wifi_get_response_metadata(response);
 

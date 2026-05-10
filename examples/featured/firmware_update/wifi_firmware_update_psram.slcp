@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - NWP or Combined (NWP and M4) Firmware Update via TCP (PSRAM)
 category: Example|Wi-Fi
-description: 'Wirelessly updates the Si91x firmware from a remote TCP server
+description: 'Wirelessly updates the SiWx91x firmware from a remote TCP server
 
   '
 filter:
@@ -32,7 +32,6 @@ component:
 - id: data_segment_in_psram
 - id: udma_linker_config
 - id: psram_core
-- id: psram_aps6404l_sqh
 - id: wifi
 - id: sl_si91x_internal_stack
 - id: wifi_resources

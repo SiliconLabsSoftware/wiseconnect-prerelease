@@ -1,8 +1,8 @@
-# Platform SiWx91x GPIO UULP EXAMPLE
+# SiWx91x Platform GPIO UULP EXAMPLE
 
 ## Table of Contents
 
-- [Platform SiWx91x GPIO UULP EXAMPLE](#platform-siwx91x-gpio-uulp-example)
+- [SiWx91x Platform GPIO UULP EXAMPLE](#platform-siwx91x-gpio-uulp-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -147,10 +147,17 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following parameters in [`gpio_uulp_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_uulp_example/gpio_uulp_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_uulp_example/) file and update/modify following macros if required
+- Configure the following parameters in [`gpio_uulp_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_uulp_example/gpio_uulp_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_uulp_example/) file and update/modify following macros if required.
+
+- `UULP_GPIO_INTR_2`: Specifies the UULP (Ultra Ultra Low Power) GPIO pin interrupt number used by the example. By default, it is set to 2.
 
   ```c
     #define UULP_GPIO_INTR_2 2      // UULP (Ultra Ultra Low Power) GPIO pin interrupt 2
+  ```
+
+- `AVL_INTR_NO`: Specifies the available interrupt number used by the UULP GPIO pin interrupt. By default, it is set to 0.
+
+  ```c
     #define AVL_INTR_NO      0      // available interrupt number
   ```
 
@@ -185,3 +192,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

@@ -39,6 +39,7 @@
 #ifdef SL_CATALOG_KERNEL_PRESENT
 #include "cmsis_os2.h"
 osMutexId_t si91x_prints_mutex = NULL;
+osMutexId_t si91x_sbrk_mutex   = NULL;
 #endif
 
 void ARM_UART_SignalEvent(uint32_t event);
@@ -127,6 +128,13 @@ void ARM_UART_SignalEvent(uint32_t event)
  */
 void Board_Debug_Init(void)
 {
+#ifdef SL_CATALOG_KERNEL_PRESENT
+  /* Create sbrk mutex before any early return so _sbrk can use it in PS2 or other paths. */
+  if (si91x_sbrk_mutex == NULL) {
+    si91x_sbrk_mutex = osMutexNew(NULL);
+  }
+#endif
+
   // Check if system power state in PS2 (ULP mode)
 #if defined(DEBUG_UART_UC) \
   && ((SL_DEBUG_INSTANCE == SL_M4_USART0_INSTANCE) || (SL_DEBUG_INSTANCE == SL_M4_UART1_INSTANCE))

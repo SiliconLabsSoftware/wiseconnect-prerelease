@@ -18,3 +18,8 @@ provides:
 define:
   - name: SL_SI91X_TICKLESS_MODE
     unless: [SL_SI91X_PM_STATE_TRANSITION]
+  - name: SL_CODE_COMPONENT_SI91X_TICKLESS
+    value: si91x_tickless
+template_contribution:
+  - name: code_classification_components
+    value: si91x_tickless

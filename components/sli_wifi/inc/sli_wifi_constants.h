@@ -245,6 +245,7 @@ typedef enum {
   SLI_WIFI_REQ_GET_TIMEOUT                  = 0x3C, ///< Get Timeout
   SLI_WIFI_REQ_SET_MAC_ADDRESS              = 0x17, ///< Set MAC Address
   SLI_WIFI_REQ_QUERY_GO_PARAMS              = 0x4E, ///< Query GO Parameters
+  SLI_WIFI_REQ_BC_MC_FILTER_STATS           = 0x60, ///< Broadcast/Multicast Filter Statistics
   SLI_WIFI_REQ_EXT_STATS                    = 0x68, ///< Extended Statistics  // Neither part 22q2 nor alpha 2
   SLI_WIFI_REQ_GET_STATS                    = 0xF1, ///< Get Statistics
   SLI_WIFI_REQ_FREQ_OFFSET                  = 0xF3, ///< Frequency Offset
@@ -276,6 +277,7 @@ typedef enum {
   SLI_WIFI_REQ_FWUP                         = 0x99, ///< Firmware upgrade (same as WIFI_RAIL)
   SLI_WIFI_REQ_VENDOR_IE                    = 0x38, ///< vendor-specific IE Request
   SLI_COMMON_REQ_NWP_LOGGING                = 0x82, ///< NWP Logging
+  SLI_COMMON_REQ_ENABLE_DISABLE_BLE         = 0x2B, ///< Common BLE Enable/Disable
 
   /* Additional request commands (unified from WLAN) */
   SLI_WIFI_REQ_SET_SLEEP_TIMER           = 0x16,
@@ -355,6 +357,7 @@ typedef enum {
 typedef enum {
   SLI_WIFI_RSP_CONFIG                       = 0xBE, ///< Wi-Fi Config
   SLI_WIFI_RSP_OPERMODE                     = 0x10, ///< Wi-Fi Operation Mode
+  SLI_COMMON_RSP_ENABLE_DISABLE_BLE         = 0x2B, ///< Common BLE Enable/Disable response
   SLI_WIFI_RSP_INIT                         = 0x12, ///< Wi-Fi Initialization
   SLI_WIFI_RSP_BAND                         = 0x11, ///< Wi-Fi
   SLI_WIFI_RSP_SCAN                         = 0x13, ///< Wi-Fi Scan
@@ -378,6 +381,7 @@ typedef enum {
   SLI_WIFI_RSP_GET_TIMEOUT                  = 0x3C, ///< Get Timeout
   SLI_WIFI_RSP_SET_MAC_ADDRESS              = 0x17, ///< Set MAC Address
   SLI_WIFI_RSP_QUERY_GO_PARAMS              = 0x4E, ///< Query GO Parameters
+  SLI_WIFI_RSP_BC_MC_FILTER_STATS           = 0x60, ///< Broadcast/Multicast Filter Statistics
   SLI_WIFI_RSP_EXT_STATS                    = 0x68, ///< Extended Statistics  // Neither part 22q2 nor alpha 2
   SLI_WIFI_RSP_GET_STATS                    = 0xF1, ///< Get Statistics
   SLI_WIFI_RSP_RX_STATS                     = 0xA2, ///< RX Statistics
@@ -568,6 +572,13 @@ typedef enum {
 /// Timeout value for Power Mode response command
 #define SLI_WIFI_RSP_PWRMODE_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+/// Sub-command IDs for SLI_COMMON_REQ_ENABLE_DISABLE_BLE payload
+#define SLI_BLE_SUB_CMD_ENABLE  0x01
+#define SLI_BLE_SUB_CMD_DISABLE 0x02
+
+/// Timeout value for BLE Enable/Disable response command
+#define SLI_COMMON_RSP_BLE_ENABLE_DISABLE_WAIT_TIME \
+  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for PUF Start response command
 #define SLI_COMMON_RSP_PUF_START_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
@@ -655,6 +666,9 @@ typedef enum {
 /// Timeout value for ext stats response command
 #define SLI_WIFI_RSP_EXT_STATS_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+/// Timeout value for broadcast/multicast filter statistics response command
+#define SLI_WIFI_RSP_BC_MC_FILTER_STATS_WAIT_TIME \
+  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for set rtc timer response command
 #define SLI_COMMON_RSP_SET_RTC_TIMER_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
@@ -714,6 +728,10 @@ typedef enum {
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for sending IP address info command
 #define SLI_WIFI_RSP_SEND_IP_ADDRESS_INFO_WAIT_TIME \
+  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+
+/// Timeout value for transmit test start response command
+#define SLI_WIFI_RSP_TRANSMIT_TEST_START_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 
 /// Wi-Fi commands wait time out defines

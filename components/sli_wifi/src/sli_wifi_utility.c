@@ -142,7 +142,8 @@ sl_status_t sli_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wi
   UNUSED_PARAMETER(interface);
 
   if (listen_interval.listen_interval_multiplier < DEFAULT_LISTEN_INTERVAL_MULTIPLIER) {
-    SL_DEBUG_LOG("\r\n listen_interval_multiplier minimum value should be 1, Updating to the minimum value.\r\n");
+    SL_DEBUG_LOG_V2(WARN,
+                    "\r\n listen_interval_multiplier minimum value should be 1, Updating to the minimum value.\r\n");
     listen_interval.listen_interval_multiplier = DEFAULT_LISTEN_INTERVAL_MULTIPLIER;
   }
   client_listen_interval            = listen_interval.listen_interval;
@@ -768,8 +769,8 @@ static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli
   const sli_wifi_cipher_suite_t *akms = (sli_wifi_cipher_suite_t *)(akmslc + 2);
   uint8_t wlan_gcs_oui[3]             = { 0x00, 0x0F, 0xAC };
 
-  SL_DEBUG_LOG("RSN OUI %02x:%02x:%02x.\n", rsn->gcs.cs_oui[0], rsn->gcs.cs_oui[1], rsn->gcs.cs_oui[2]);
-  SL_DEBUG_LOG("Pairwise cipher suite count: %u.\n", pcsc);
+  SL_DEBUG_LOG_V2(DEBUG, "RSN OUI %02x:%02x:%02x.\n", rsn->gcs.cs_oui[0], rsn->gcs.cs_oui[1], rsn->gcs.cs_oui[2]);
+  SL_DEBUG_LOG_V2(DEBUG, "Pairwise cipher suite count: %u.\n", pcsc);
 
   if (!memcmp(rsn->gcs.cs_oui, wlan_gcs_oui, 3)) {
     // If WPA vendor IE was also present, report WPA/WPA2 mixed (PSK); enterprise stays WPA2_ENTERPRISE
@@ -1042,6 +1043,7 @@ sl_status_t sli_wifi_send_command_packet(uint32_t command,
     case SLI_WIFI_REQ_PWRMODE:
     case SLI_WIFI_REQ_OPERMODE:
     case SLI_COMMON_RSP_SOFT_RESET:
+    case SLI_COMMON_RSP_ENABLE_DISABLE_BLE:
       tx_info.flags |= SLI_COMMAND_ENGINE_REQUEST_WITH_GLOBAL_TX_BLOCK;
       break;
     default:
@@ -1184,9 +1186,10 @@ static bool rx_packet_identity_handler(const sli_queue_t *handle, const void *da
   uint16_t *packet_id                     = (uint16_t *)node_match_data;
   sli_command_engine_metadata_t *metadata = (sli_command_engine_metadata_t *)data;
 
-  SL_DEBUG_LOG("Comparing expected packetID : %u with packetId of queue node : %u..!\n",
-               *packet_id,
-               metadata->tx_info.packet_id);
+  SL_DEBUG_LOG_V2(DEBUG,
+                  "Comparing expected packetID : %u with packetId of queue node : %u..!\n",
+                  *packet_id,
+                  metadata->tx_info.packet_id);
   if (*packet_id == metadata->tx_info.packet_id) {
     return true;
   }
@@ -1216,14 +1219,16 @@ sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_typ
 
   if (wait_type == SLI_WIFI_WAIT_ON_THREAD_ID) {
     // Wait for thread event flags for the response
-    SL_DEBUG_LOG("Waiting on Thread Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
-                 packet_type_info.sync_response_event,
-                 (unsigned int)packet_type_info.sync_response_event_id,
-                 (unsigned int)packet_type_info.sync_response_queue);
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "Waiting on Thread Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
+                    packet_type_info.sync_response_event,
+                    (unsigned int)packet_type_info.sync_response_event_id,
+                    (unsigned int)packet_type_info.sync_response_queue);
     events = osThreadFlagsWait(packet_type_info.sync_response_event, osFlagsWaitAny, (uint32_t)wait_period);
-    SL_DEBUG_LOG("Got Thread Events: 0x%lX for queue 0x%X\n",
-                 events,
-                 (unsigned int)packet_type_info.sync_response_queue);
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "Got Thread Events: 0x%lX for queue 0x%X\n",
+                    events,
+                    (unsigned int)packet_type_info.sync_response_queue);
     if (events == (uint32_t)osErrorTimeout || events == (uint32_t)osErrorResource) {
       // Timeout or resource error
       return SL_STATUS_TIMEOUT;
@@ -1249,10 +1254,11 @@ sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_typ
     uint32_t start_time   = osKernelGetTickCount();
     uint32_t elapsed_time = 0;
     do {
-      SL_DEBUG_LOG("Waiting on Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
-                   packet_type_info.sync_response_event,
-                   (unsigned int)packet_type_info.sync_response_event_id,
-                   (unsigned int)packet_type_info.sync_response_queue);
+      SL_DEBUG_LOG_V2(DEBUG,
+                      "Waiting on Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
+                      packet_type_info.sync_response_event,
+                      (unsigned int)packet_type_info.sync_response_event_id,
+                      (unsigned int)packet_type_info.sync_response_queue);
 
       events = osEventFlagsWait(*packet_type_info.sync_response_event_id,
                                 packet_type_info.sync_response_event,
@@ -1264,7 +1270,10 @@ sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_typ
         return SL_STATUS_TIMEOUT;
       }
 
-      SL_DEBUG_LOG("Got Events: 0x%lX for queue 0x%X\n", events, (unsigned int)packet_type_info.sync_response_queue);
+      SL_DEBUG_LOG_V2(DEBUG,
+                      "Got Events: 0x%lX for queue 0x%X\n",
+                      events,
+                      (unsigned int)packet_type_info.sync_response_queue);
 
       // Enter atomic section to safely access the queue
       CORE_irqState_t state = CORE_EnterAtomic();

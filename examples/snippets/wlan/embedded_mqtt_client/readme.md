@@ -25,7 +25,7 @@ In this application, SiWx91x is configured as a Wi-Fi station and connects to an
 
 The SDK supports receiving large incoming MQTT payloads through fragmentation and reassembly:
 
-- **Transparent to Application**: The SDK automatically handles the reassembly of fragmented MQTT messages. Applications receive complete messages in their message handler callback without any special handling required.
+- **Transparent to Application**: The SDK automatically reassembles fragmented MQTT messages, so applications receive complete messages in their handler callbacks without requiring any special handling.
 
 **Configuration:**
 
@@ -109,7 +109,7 @@ In the Project explorer pane, expand the **config** folder and open the ``sl_net
 
 - STA instance related parameters
 
-	- DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which the Wi-Fi network shall be advertised. The Si91X module is connected to it.
+	- DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which the Wi-Fi network shall be advertised. The SiWx91x module is connected to it.
 	
 	```c
   	#define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"      

@@ -1,8 +1,8 @@
-# Platform SiWx91x USART Synchronous Slave
+# SiWx91x Platform USART Synchronous Slave
 
 ## Table of Contents
 
-- [Platform SiWx91x USART Synchronous Slave](#platform-siwx91x-usart-synchronous-slave)
+- [SiWx91x Platform USART Synchronous Slave](#platform-siwx91x-usart-synchronous-slave)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -42,7 +42,7 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 
 ## About Example Code
 
-- [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_slave/usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous slave mode.
+- [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_slave/usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous slave mode.
 - In this example, first USART gets initialized if not already initialized with clock and DMA configurations using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).
 **Note:** If the UART/USART instance is already selected for debug output logs, initialization returns `SL_STATUS_NOT_AVAILABLE` (informational; the example continues using the existing instance).
 - After initialization, USART configured (clock, pins, synchronous mode, etc.) using [`sl_si91x_usart_set_configuration()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration) either from UC parameters or from user-defined macros.
@@ -52,7 +52,7 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 
 ### Configuration Macros
 
-The header file [`usart_sync_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_slave/usart_sync_example.h) exposes build-time macros:
+The header file [`usart_sync_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_slave/usart_sync_example.h) exposes build-time macros:
 
 | Macro | Purpose | Effect if Disabled | Error Returned? |
 |-------|---------|--------------------|-----------------|
@@ -108,6 +108,26 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - By default, `USART0 SYNC Mode` is disabled in UC. Enable it for synchronous communication.
 - By default, the CLK pin is not configured in UC. Select the required CLK pin.
 - Connect the boards: master clock (GPIO_8 or GPIO_25) ↔ slave clock, master TX (GPIO_30) → slave RX (GPIO_29), slave TX (GPIO_30) → master RX (GPIO_29). (Clock direction is from master to slave.)
+
+- Configure the following macros in [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_slave/usart_sync_example.c) if required:
+
+- `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
+
+  ```c
+  #define USART_BUFFER_SIZE     1024   // Data send and receive length
+  ```
+
+- `USART_BAUDRATE`: Specifies the USART baud rate used for transmission and reception. Supported range is 9600-7372800. By default, it is set to 115200.
+
+  ```c
+  #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
+  ```
+
+- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default USART configurations in the non-UC (non Universal Configuration) case. By default, it is set to 0.
+
+  ```c
+  #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non_uc case
+  ```
 
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
 
@@ -202,3 +222,4 @@ If the Pin Tool is not working, UC changes plus manual verification in `RTE_Devi
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

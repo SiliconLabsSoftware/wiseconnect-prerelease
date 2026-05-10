@@ -41,11 +41,11 @@
 #include "cmsis_os2.h"
 #include "sl_cmsis_utility.h"
 #include "sli_wifi_utility.h"
-#include "sl_log_helper_si91x.h"
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "rsi_m4.h"
 #endif
+#include "sli_code_classification.h"
 /******************************************************
  *               Structures and Typedefs
 ******************************************************/
@@ -75,34 +75,47 @@ typedef struct {
 /******************************************************
  *               Function Declarations
 ******************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static void sli_hal_si91x_thread(void *args);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static sl_status_t sli_hal_si91x_send_packet(void *packet,
                                              sli_queue_t *tx_queue,
                                              uint32_t event_flag,
                                              uint32_t packet_size,
                                              sli_routing_utility_packet_status_handler_t packet_status_handler,
                                              void *context);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buffer);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static uint32_t sli_hal_si91x_wait_for_event(uint32_t event_mask, uint32_t timeout);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static uint32_t sli_hal_si91x_get_wait_time(bool Is_rx_buffer_submitted,
                                             uint32_t events_received,
                                             uint32_t interrupt_status);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static void sli_hal_si91x_handle_ble_tx_event(uint32_t *events_received);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static void sli_hal_si91x_handle_wifi_tx_event(uint32_t *events_received);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
                                           bool *is_rx_buffer_submitted,
                                           uint32_t *events_received);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 static void sli_hal_si91x_handle_thread_terminate_event(void);
+
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
+static void sli_cleanup_flags_and_queues(void);
 
 sl_status_t sli_si91x_req_wakeup(void);
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_submit_rx_buffer(uint32_t timeout);
 /******************************************************
  *               Variable Definitions
@@ -264,12 +277,9 @@ static void sli_hal_si91x_handle_wifi_tx_event(uint32_t *events_received)
 
   SL_DEBUG_LOG_V2(DEBUG, "Packet Sent Attempt status: %d", status);
 
-  // get the frame_type from the packet to check if it is a socket data or raw data frame_type
-  uint16_t frame_type = ((sl_wifi_system_packet_t *)(hal_packet->data))->command;
-  // Free the data buffer for specific frame_types
-  if (frame_type == SLI_SEND_SOCKET_DATA || frame_type == SLI_SEND_RAW_DATA) {
-    sli_buffer_manager_free_buffer(hal_packet->data);
-  }
+  // TX buffer ownership transfers with async HAL TX: release after TX attempt
+  // so the command engine TX-ACK path only clears metadata pointers (see FLUSHED handling).
+  sli_buffer_manager_free_buffer(hal_packet->data);
   // Free the HAL packet metadata
   sli_buffer_manager_free_buffer(hal_packet);
 
@@ -289,8 +299,8 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
   uint16_t frame_status                 = (uint16_t)(packet->desc[12] + (packet->desc[13] << 8));
   rx_buffer->length                     = (uint16_t)(packet->length & 0x0FFF);
 
-  SL_DEBUG_LOG_V2(DEBUG, "H RX-> Q: %u, C: 0x%X, L: %lu.\n", firmware_queue_id, packet->command, rx_buffer->length);
-  SL_DEBUG_LOG_V2(DEBUG, "H RX-> S: 0x%x.\n", frame_status);
+  SL_DEBUG_LOG_V2(DEBUG, "H RX-> Q: %u, C: 0x%X, L: %lu,", firmware_queue_id, packet->command, rx_buffer->length);
+  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\n", frame_status);
 
   if (SLI_HAL_SI91X_IS_FLASH_COMMAND(packet->command)) {
     sli_si91x_update_flash_command_status(false);

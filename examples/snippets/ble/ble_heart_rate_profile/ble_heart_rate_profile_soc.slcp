@@ -1,18 +1,24 @@
 project_name: ble_heart_rate_profile_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Heart Rate (SoC)
+label: BLE - SoC Heart Rate FreeRTOS
 category: Example|BLE
-description: 'This application demonstrates BLE heart rate profile
+description: 'Demonstrates how to use the BLE Heart Rate Profile over GATT on SiWx91x in SoC FreeRTOS with HR service and notifications.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

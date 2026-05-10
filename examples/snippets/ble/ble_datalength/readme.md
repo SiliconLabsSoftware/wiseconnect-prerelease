@@ -1,17 +1,26 @@
 # BLE - Datalength
 
+## High-Level Overview
+
+This application demonstrates how to set data length extension with the connected remote device by configuring the SiWx91x module in a central role.
+
 ## Table of Contents
 
-- [BLE - Datalength](#ble---datalength)
-  - [Table of Contents](#table-of-contents)
-  - [Purpose/Scope](#purposescope)
-  - [Prerequisites](#prerequisites)
-    - [Hardware Requirements](#hardware-requirements)
-    - [Software Requirements](#software-requirements)
-    - [Setup Diagram](#setup-diagram)
+- [High-Level Overview](#high-level-overview)
+- [Table of Contents](#table-of-contents)
+- [Purpose/Scope](#purposescope)
+- [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
+  - [Hardware Requirements](#hardware-requirements)
+  - [Software Requirements](#software-requirements)
+  - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
+  - [Setup Diagram](#setup-diagram)
+- [Steps to Run Demo](#steps-to-run-demo)
   - [Getting Started](#getting-started)
-  - [Application Build Environment](#application-build-environment)
-  - [Test the Application](#test-the-application)
+  - [Configuration and setup](#configuration-and-setup)
+  - [Steps for execution](#steps-for-execution)
+- [Troubleshooting](#troubleshooting)
+- [Resources](#resources)
+- [Report Bugs and Get Support](#report-bugs-and-get-support)
 
 ## Purpose/Scope
 
@@ -20,8 +29,7 @@ This application demonstrates how to set data length extension with the connecte
 Packet length extension refers to increasing the size of the packet data unit (PDU) from 27 to 251 bytes during data transfer during connection events.
 After connecting, both the central and peripheral devices can initiate this procedure at any time.
 
-## Prerequisites
-
+## Prerequisites/Setup Requirements
 ### Hardware Requirements
 
 - Windows PC with Host interface(UART/ SPI/ SDIO).
@@ -46,10 +54,23 @@ After connecting, both the central and peripheral devices can initiate this proc
 
 - Download and install the Silicon Labs [Simplicity Connect App(formerly EFR Connect App) or other BLE Central/Peripheral app.](https://www.silabs.com/developers/simplicity-connect-mobile-app ) in the android smart phones for testing BLE applications. Users can also use their choice of BLE apps available in Android/iOS smart phones.
 
+### NCP mode: host application and project files
+
+| Mode | Host / target | Project file (this example folder) |
+|------|----------------|-------------------------------------|
+| SoC | Application runs on SiWx91x. | `ble_datalength_soc.slcp` |
+| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `ble_datalength_psram.slcp` |
+| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `ble_datalength_ncp.slcp` |
+
+Open the `.slcp` for your kit from **`examples/snippets/ble/ble_datalength/`** in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+
 ### Setup Diagram
 
 ![Figure: Setup Diagram SoC Mode for BLE Chat Example](resources/readme/ble_datalength_soc_ncp.png)
-## Getting Started
+
+## Steps to Run Demo
+
+### Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -61,7 +82,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-## Application Build Environment
+### Configuration and setup
 
 The application can be configured to suit you requirements and development environment. Go through the following sections and make any changes if needed.
 
@@ -99,7 +120,7 @@ The application can be configured to suit you requirements and development envir
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-## Test the Application
+### Steps for execution
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -128,3 +149,27 @@ Follow the steps below for the successful execution of the application:
 
 
    ![](resources/readme/output_2.png)
+
+## Troubleshooting
+
+| Symptom | Things to check |
+|--------|------------------|
+| No connection / scan issues | Confirm the peer address type and `RSI_BLE_DEV_ADDR` / `RSI_REMOTE_DEVICE_NAME` match the peripheral; phones often use random addresses. |
+| No data length change / procedure fails after connection | Use a peripheral whose stack supports **LE Data Length Extension**. This demo only works as intended with remotes that support DLE; legacy peripherals without it cannot complete the exchange. |
+| NCP: no boot or no HCI traffic | Update SiWx917 connectivity firmware; verify SPI/UART wiring per [NCP getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode). Flash the correct `*_ncp.slcp` (or `*_uart_ncp.slcp`) on the **EFR32** host. |
+| Power save anomalies on NCP expansion board | See the power-save note under **Configuration and setup** and the *Getting started with SiWx91x NCP* guide. |
+| Build or flash errors | Open the `.slcp` that matches your kit (SoC vs PSRAM vs NCP) and matching SDK / WiSeConnect versions. |
+
+
+## Resources
+
+1. [WiSeConnect getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+2. [WiSeConnect developers guide — developing for Silicon Labs hosts](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/)
+3. [Programming recommended settings](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)

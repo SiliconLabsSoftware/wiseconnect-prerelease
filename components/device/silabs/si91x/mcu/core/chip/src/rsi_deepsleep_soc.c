@@ -44,8 +44,44 @@
 #endif
 
 #include "cmsis_version.h"
+#include "sli_code_classification.h"
 
 void fpuInit(void);
+
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+void RSI_Save_Context(void);
+
+#if defined(__CC_ARM)
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+__asm void RSI_PS_SaveCpuContext(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+__asm void RSI_PS_RestoreCpuContext(void);
+#endif
+
+#if defined(__GNUC__)
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+void RSI_PS_SaveCpuContext(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+void RSI_PS_RestoreCpuContext(void);
+#endif
+
+#if defined(__ICCARM__)
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+void RSI_PS_SaveCpuContext(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+void RSI_PS_RestoreCpuContext(void);
+#endif
+
+#ifdef SLI_SI91X_MCU_COMMON_FLASH_MODE
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+void RSI_Set_Cntrls_To_M4(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+void RSI_Set_Cntrls_To_TA(void);
+#endif
+
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
+rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode);
+
 #define NWPAON_MEM_HOST_ACCESS_CTRL_CLEAR_1 (*(volatile uint32_t *)(0x41300000 + 0x4))
 #define NWPAON_MEM_HOST_ACCESS_CTRL_SET_1   (*(volatile uint32_t *)(0x41300000 + 0x0))
 #define M4SS_TASS_CTRL_SET_REG              (*(volatile uint32_t *)(0x24048400 + 0x34))
@@ -122,6 +158,7 @@ void RSI_Save_Context(void)
  *
  */
 #ifdef SLI_SI91X_ENABLE_OS
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
 STATIC INLINE void RSI_Restore_Context(void)
 {
   __set_CONTROL(control_reg_val);
@@ -347,6 +384,7 @@ void RSI_Set_Cntrls_To_TA(void)
  * @brief       to request NWP to program flash
  * @return      none
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_RSILIB_CHIP, SL_CODE_CLASS_TIME_CRITICAL)
 STATIC INLINE void request_nwp_to_program_flash(uint8_t in_ps2_state)
 {
   if (!in_ps2_state && !(M4SS_P2P_INTR_SET_REG & M4_USING_FLASH)) {
@@ -634,7 +672,7 @@ rsi_error_t RSI_PS_EnterDeepSleep(SLEEP_TYPE_T sleepType, uint8_t lf_clk_mode)
   NPSS_GPIO_CONFIG_REG = npss_gpio_config;
 #endif
   /* After wake-up, Set the SCDC voltage to the actual value*/
-  /* As this function is located in flash accessing this fucntion only after getting controls*/
+  /* As this function is located in flash accessing this function only after getting controls*/
   set_scdc(SL_SCDC_ACTIVE);
 
   /*Update the REG Access SPI division factor to increase the SPI read/write speed*/

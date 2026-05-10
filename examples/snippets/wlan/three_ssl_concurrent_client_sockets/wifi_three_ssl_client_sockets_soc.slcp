@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Three TLS Concurrent Client Sockets (SoC)
 category: Example|Wi-Fi
-description: "This application demonstrates how SiWx91x will connect to three different SSL servers with three different set of SSL certificates  \n"
+description: This application demonstrates how SiWx91x will connect to three different SSL servers with three different sets of SSL certificates.
 filter:
 - name: Wireless Technology
   value:

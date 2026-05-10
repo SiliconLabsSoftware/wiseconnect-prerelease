@@ -1,8 +1,8 @@
-# Platform SiWx91x Crypto SHA
+# SiWx91x Platform Crypto SHA
 
 ## Table of Contents
 
-- [Platform SiWx91x Crypto SHA](#platform-siwx91x-crypto-sha)
+- [SiWx91x Platform Crypto SHA](#platform-siwx91x-crypto-sha)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

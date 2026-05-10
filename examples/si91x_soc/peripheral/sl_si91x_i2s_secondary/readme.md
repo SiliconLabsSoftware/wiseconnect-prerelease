@@ -1,8 +1,8 @@
-# Platform SiWx91x I2S SECONDARY
+# SiWx91x Platform I2S SECONDARY
 
 ## Table of Contents
 
-- [Platform SiWx91x I2S SECONDARY](#platform-siwx91x-i2s-secondary)
+- [SiWx91x Platform I2S SECONDARY](#platform-siwx91x-i2s-secondary)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -114,10 +114,18 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - **SL_I2S0_SAMPLING_RATE**: I2S0 sampling rate can be configured through this macro. Valid sampling rate values are 8kHz, 11.025kHz, 16kHz, 22.05kHz, 24kHz, 32kHz, 44.1kHz, 48kHz, 88.2kHz, 96kHz and 192kHz.
     - **SL_I2S0_CHANNEL**: I2S0 channel number (0-channel no 0, 1-channel no 1).
     - Configuration files are generated in the **config folder**. If not changed, the code will run on default UC values.
-    - Configure the following macros in [`i2s_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2s_secondary/i2s_secondary_example.c) file and update/modify following macros, if required.
+    - Configure the following macros in [`i2s_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2s_secondary/i2s_secondary_example.c) file and update/modify following macros, if required.
 
-      ```C
+    - `I2S_SECONDARY_BUFFER_SIZE`: Defines the size of the transmit and receive buffers used by the I2S secondary. By default, it is set to 1024.
+
+      ```c
       #define I2S_SECONDARY_BUFFER_SIZE 1024    ///< Transmit/Receive buffer size
+      ```
+
+    - `I2S_INSTANCE`: Selects the I2S instance used by the application (0 for I2S0, 1 for ULP_I2S). By default, it is set to 0.
+
+      ```c
+      #define I2S_INSTANCE              0       ///< I2S instance
       ```
 
   - **Pin Configuration**
@@ -171,3 +179,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

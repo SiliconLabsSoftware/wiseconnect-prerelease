@@ -1,8 +1,8 @@
-# Platform SiWx91x UART RS485
+# SiWx91x Platform UART RS485
 
 ## Table of Contents
 
-- [Platform SiWx91x UART RS485](#platform-siwx91x-uart-rs485)
+- [SiWx91x Platform UART RS485](#platform-siwx91x-uart-rs485)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -133,18 +133,62 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
+- Configure the following macros in [`uart_rs485_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart_rs485/uart_rs485_example.c) if required:
+
+- `UART_RS485_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive RS485 UART data. By default, it is set to 1024.
+
+  ```c
+  #define UART_RS485_BUFFER_SIZE     1024   // Data send and receive length
+  ```
+
+- `UART_RS485_BAUDRATE`: Specifies the UART baud rate used for RS485 transmission and reception. By default, it is set to 115200.
+
+  ```c
+  #define UART_RS485_BAUDRATE        115200 // Baud rate set to 115200
+  ```
+
+- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default UART configurations in the non-UC (non Universal Configuration) case. By default, it is set to 0.
+
+  ```c
+  #define NON_UC_DEFAULT_CONFIG      0      // Enable this macro to set the default configurations in non_uc case
+  ```
+
+- `RS485_SLAVE1`: Address identifier used to select the first RS485 slave node. By default, it is set to 1.
+
+  ```c
+  #define RS485_SLAVE1               1      // RS485 slave1
+  ```
+
+- `RS485_SLAVE2`: Address identifier used to select the second RS485 slave node. By default, it is set to 2.
+
+  ```c
+  #define RS485_SLAVE2               2      // RS485 slave2
+  ```
+
+- `TRANSMISSION_COUNT_TRIGGER`: Defines the number of send/receive cycles to be executed by the example. By default, it is set to 3.
+
+  ```c
+  #define TRANSMISSION_COUNT_TRIGGER 3      // Defines the number of send/receive cycles
+  ```
+
+- `DELAY_MS`: Delay (in milliseconds) inserted between send/receive mode transitions. By default, it is set to 30.
+
+  ```c
+  #define DELAY_MS                   30     // 30ms delay added between transitions
+  ```
+
 - This example demonstrates RS485 multi-slave communication using three Simplicity Studio projects: one master (sending) and two slaves (receiving). Below are the necessary configurations and changes required in the application code.
 
   - Master Project:
-    - Set `current_mode = SL_UART_RS485_SEND` and `current_slave = RS485_SLAVE1`in [`uart_rs485_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart_rs485/uart_rs485_example.c) application.
+    - Set `current_mode = SL_UART_RS485_SEND` and `current_slave = RS485_SLAVE1`in [`uart_rs485_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart_rs485/uart_rs485_example.c) application.
     - This configures the master to transmit data to RS485_SLAVE1 in half-duplex mode, once SLAVE1 data transfer is done, current slave is changed to RS485_SLAVE2 and sends data to RS485_SLAVE2 in one direction(master sends, SLAVE2 receives).
 
   - Slave Project 1:
-    - Set `current_mode = SL_UART_RS485_RECEIVE` and `current_slave = RS485_SLAVE1` in [`uart_rs485_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart_rs485/uart_rs485_example.c) application.
+    - Set `current_mode = SL_UART_RS485_RECEIVE` and `current_slave = RS485_SLAVE1` in [`uart_rs485_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart_rs485/uart_rs485_example.c) application.
     - This configures the slave to listen for and process messages addressed to `RS485_HW_SLAVE1_ADDRESS`.
 
   - Slave Project 2:
-    - Set `current_mode = SL_UART_RS485_RECEIVE` and `current_slave = RS485_SLAVE2` in [`uart_rs485_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart_rs485/uart_rs485_example.c) application.
+    - Set `current_mode = SL_UART_RS485_RECEIVE` and `current_slave = RS485_SLAVE2` in [`uart_rs485_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart_rs485/uart_rs485_example.c) application.
     - This configures the slave to handle messages directed to `RS485_HW_SLAVE2_ADDRESS`.
 
 - This setup enables the master project to transmit data to two distinct slave projects, using RS485 addressing. The same steps apply to software-controlled half-duplex mode.
@@ -267,3 +311,4 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

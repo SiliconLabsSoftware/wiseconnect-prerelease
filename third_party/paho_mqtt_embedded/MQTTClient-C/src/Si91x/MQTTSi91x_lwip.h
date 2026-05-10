@@ -152,29 +152,29 @@ int mqtt_set_tls_certificates(Network *n, TLS_cert_ctx_t *tls_config);
  *
  * @param[in] n        Pointer to the initialized Network structure.
  * @param[in] hostname Null-terminated string used as the TLS SNI hostname (passed through to the TLS
- *                     stack). Typical values are a broker DNS name (e.g. "broker.example.com") or an
- *                     IP literal when that matches how the server certificate is issued. Maximum
+ *                     stack). Typical values are a broker DNS name (for example, "broker.example.com") or an
+ *                     IP literal when that matches how the server certificate is issued. The maximum
  *                     length is 255 bytes (upper bound aligned with DNS name length and SNI usage).
- *                     This function checks only that @p hostname is non-NULL, non-empty, and within
- *                     that length; it does not validate DNS label, FQDN, or IPv4/IPv6 syntax.
- *                     When TLS is used, a non-NULL, non-empty hostname is required; otherwise
+ *                     This function checks only that the @p hostname is non-NULL, non-empty, and within
+ *                     that length. It does not validate DNS label, FQDN, or IPv4/IPv6 syntax.
+ *                     When TLS is used, a non-NULL, non-empty hostname is required; otherwise,
  *                     NetworkConnect() returns NETWORK_ERROR_TLS_HOSTNAME_REQUIRED (-4).
  *
- * @return 0 on success. -1 if @p n is NULL, @p hostname is NULL, empty, or longer than 255 bytes;
- *         in those cases the stored hostname is cleared and a subsequent NetworkConnect() with TLS
+ * @return 0 on success. -1 if @p n is NULL or @p hostname is NULL, empty, or longer than 255 bytes.
+ *         In these cases, the stored hostname is cleared and a subsequent NetworkConnect() with TLS
  *         will fail with NETWORK_ERROR_TLS_HOSTNAME_REQUIRED (-4).
  *
  * @details
- * - Call this before NetworkConnect() when using TLS. The hostname must match the broker's
- *   certificate CN or SAN for verification to succeed.
- * - Rejected inputs are NULL, empty string, or length over 255 bytes (stored hostname cleared,
- *   return -1). Any other string is accepted; callers must supply a name suitable for SNI and
- *   certificate verification. If not set, NetworkConnect() fails with
- *   NETWORK_ERROR_TLS_HOSTNAME_REQUIRED (-4).
- * - Prefer a string constant or macro (e.g. MQTT_BROKER_TLS_HOSTNAME); the hostname must remain
- *   valid until NetworkDisconnect() is called (do not pass a short-lived or stack buffer).
- * - After NetworkDisconnect(), tls_hostname is cleared; call this again before reconnecting
- *   with TLS.
+ * - Call this before NetworkConnect() when using TLS. The hostname must match the
+ *   broker certificate CN or SAN for verification to succeed.
+ * - Rejected inputs are NULL, an empty string, or a length over 255 bytes. Rejected inputs clear
+ *   the stored hostname and return -1. Any other string is accepted; callers must supply a name
+ *   suitable for SNI and certificate verification. If this value is not set, NetworkConnect()
+ *   fails with NETWORK_ERROR_TLS_HOSTNAME_REQUIRED (-4).
+ * - A string constant or macro, such as MQTT_BROKER_TLS_HOSTNAME, is recommended. The hostname
+ *   must remain valid until NetworkDisconnect() is called. Do not pass a short-lived or stack
+ *   buffer.
+ * - NetworkDisconnect() clears tls_hostname. Set this value again before reconnecting with TLS.
  */
 int NetworkSetTlsHostname(Network *n, const char *hostname);
 #endif

@@ -13,7 +13,7 @@ include_directories(
     ../../socket/inc
     ../../sl_net/inc
     ../../../../../../service/bsd_socket/inc
-    ../../../../../../tests/unit_tests/inc
+    ../../../../../../../tests/unit_tests/inc
     ../inc
     ../../inc
     ../../sli_si91x_wifi_command_engine/inc

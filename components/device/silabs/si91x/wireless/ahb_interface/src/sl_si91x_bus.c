@@ -43,6 +43,7 @@
 #include <stdlib.h>
 #include "sl_rsi_utility.h"
 #include "sli_wifi_utility.h"
+#include "sli_code_classification.h"
 
 /******************************************************
  * *               Global Variables
@@ -60,6 +61,20 @@ sl_wifi_buffer_t *rx_pkt_buffer         = NULL;
  * ******************************************************/
 void sli_si91x_raise_pkt_pending_interrupt_to_ta(void);
 sl_status_t sli_hal_si91x_notify_events(uint32_t flags);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+sl_status_t sl_si91x_bus_init(void);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+sl_status_t sli_si91x_submit_rx_pkt(uint32_t timeout);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+sl_status_t sli_si91x_bus_read_frame(sl_wifi_buffer_t **buffer);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+sl_status_t sli_si91x_bus_write_frame(sl_wifi_system_packet_t *packet,
+                                      const uint8_t *payloadparam,
+                                      uint16_t size_param);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+sl_status_t sli_submit_rx_buffer(uint32_t timeout);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+sl_status_t sl_si91x_bus_deinit(void);
 
 /******************************************************
  * *               Function Definitions
@@ -95,7 +110,7 @@ sl_status_t sli_si91x_submit_rx_pkt(uint32_t timeout)
                                               timeout,
                                               (sli_buffer_t *)&rx_pkt_buffer);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+    SL_DEBUG_LOG_V2(DEBUG, "\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -165,7 +180,7 @@ sl_status_t sli_submit_rx_buffer(uint32_t timeout)
   //! submit to NWP submit packet
   status = sli_si91x_submit_rx_pkt(timeout);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("\r\n RX Buffer submission failed with status: %d \r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\n RX Buffer submission failed with status: %d \r\n", status);
   }
 
   unmask_ta_interrupt(RX_PKT_TRANSFER_DONE_INTERRUPT);
@@ -238,7 +253,7 @@ void sli_si91x_config_m4_dma_desc_on_reset(void)
   //! Wait for NWP to wakeup and should be in bootloader
   while (!(P2P_STATUS_REG & TA_is_active))
     ;
-  SL_DEBUG_LOG("\r\nTA is in active state\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\nTA is in active state\r\n");
   //! TBD Need to address why soft reset expecting delay
   osDelay(SLI_SYSTEM_MS_TO_TICKS(100));
   //! Update M4 Tx and Rx DMA descriptors

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <model:MDescriptors xmlns:model="http://www.silabs.com/ss/Studio.ecore">
-  <descriptors name="wireless_test_ncp" label="Wireless Test (NCP)" description="The Wireless Test application is a command-line interface (CLI) application designed to showcase various functionalities and capabilities of SiWx91x in different scenarios and configuration modes. It serves as a quick reference guide and a hands-on demonstration of SiWx91x core features for developers and users.">
+  <descriptors name="wireless_test_ncp" label="Wi-Fi Coex - Wireless Test (NCP)" description="The Wireless Test application is a command-line interface (CLI) application designed to showcase various functionalities and capabilities of SiWx91x in different scenarios and configuration modes. It serves as a quick reference guide and a hands-on demonstration of SiWx91x core features for developers and users.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wireless_test/wireless_test_ncp.slcp" />
@@ -15,7 +15,7 @@
     <properties key="readmeFiles" value="examples/snippets/wireless_test/readme.md" />
     <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="wireless_test_uart_ncp" label="Wireless Test (UART NCP)" description="The Wireless Test application is a command-line interface (CLI) application designed to showcase various functionalities and capabilities of SiWx91x in different scenarios and configuration modes. It serves as a quick reference guide and a hands-on demonstration of SiWx91x core features for developers and users.">
+  <descriptors name="wireless_test_uart_ncp" label="Wi-Fi Coex - Wireless Test (UART NCP)" description="The Wireless Test application is a command-line interface (CLI) application designed to showcase various functionalities and capabilities of SiWx91x in different scenarios and configuration modes. It serves as a quick reference guide and a hands-on demonstration of SiWx91x core features for developers and users.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wireless_test/wireless_test_uart_ncp.slcp" />
@@ -30,7 +30,7 @@
     <properties key="readmeFiles" value="examples/snippets/wireless_test/readme.md" />
     <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="wireless_test_soc" label="Wireless Test (SoC)" description="The Wireless Test application is a command-line interface (CLI) application designed to showcase various functionalities and capabilities of SiWx91x in different scenarios and configuration modes. It serves as a quick reference guide and a hands-on demonstration of SiWx91x core features for developers and users.">
+  <descriptors name="wireless_test_soc" label="Wi-Fi Coex - Wireless Test (SOC)" description="The Wireless Test application is a command-line interface (CLI) application designed to showcase various functionalities and capabilities of SiWx91x in different scenarios and configuration modes. It serves as a quick reference guide and a hands-on demonstration of SiWx91x core features for developers and users.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wireless_test/wireless_test_soc.slcp" />
@@ -134,10 +134,10 @@
     <properties key="readmeFiles" value="examples/snippets/wlan_ble/wlan_ble_unified_ae_coex_app/readme.md" />
     <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
   </descriptors>
-  <descriptors name="out_of_box_demo" label="Out of Box Demo (SoC)" description="This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.">
+  <descriptors name="wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)" description="This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/wlan_ble/out_of_box_demo/out_of_box_demo.slcp" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan_ble/out_of_box_demo/wifi_out_of_box_demo_soc.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339a brd4339b brd4340b brd4343q brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m100xntba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />

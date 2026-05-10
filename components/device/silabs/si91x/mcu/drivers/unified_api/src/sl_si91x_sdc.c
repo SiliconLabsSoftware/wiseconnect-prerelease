@@ -65,7 +65,7 @@ sl_si91x_sdc_calibration_data sdc_calibration_data = { 0 }; //Structure for stor
 ******************************************************************************************************************************************/
 
 /**
- * @brief Set up adc neccessary configurations for sdc
+ * @brief Set up adc necessary configurations for sdc
  *
  * This function performs the necessary configurations of ADC hardware,
  * needed for SDC working

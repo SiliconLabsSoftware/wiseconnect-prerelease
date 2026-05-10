@@ -1,9 +1,9 @@
 project_name: wifi_firmware_flashing_from_host_uart_xmodem_bootloader_ncp
 package: wifi_app
 quality: production
-label: Firmware Update via Bootloader using Xmodem (NCP)
+label: Wi-Fi - Firmware Update via Bootloader using Xmodem (NCP)
 category: Example|Wi-Fi
-description: 'Firmware flashing of Si91x device using host uart xmodem bootloader
+description: 'Demonstrates firmware flashing of SiWx91x device using host uart xmodem bootloader.
 
   '
 filter:

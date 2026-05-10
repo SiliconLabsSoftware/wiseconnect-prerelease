@@ -5,12 +5,18 @@ description: 'This application demonstrates the memory to memory transfer for GP
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - GPDMA
+label: SiWx91x Platform - GPDMA
 component:
 - id: sl_main
 - id: status
 - id: sl_gpdma
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 source:
 - path: app.c
 - path: gpdma_example.c

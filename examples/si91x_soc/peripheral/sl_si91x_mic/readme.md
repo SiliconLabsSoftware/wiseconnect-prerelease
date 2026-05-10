@@ -1,8 +1,8 @@
-# Platform SiWx91x Mic
+# SiWx91x Platform Mic
 
 ## Table of Contents
 
-  - [Platform SiWx91x Mic](#platform-siwx91x-mic)
+  - [SiWx91x Platform Mic](#platform-siwx91x-mic)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
@@ -49,19 +49,19 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following parameters in [`mic_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_mic/mic_example.c) file, update/modify following macro if required.
+- Configure the following parameters in [`mic_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_mic/mic_example.c) file, update/modify following macro if required.
 
-  ```C
+  - `MIC_N_CHANNELS`: Selects mono (1) or stereo (2) microphone capture. With 1 (mono) a single channel is captured which reduces CPU load and buffer usage, and the console reports one dBSPL value. With 2 (stereo) two channels are captured and dBSPL is reported per channel (ensure both mic channels are available/wired on your board). By default, it is set to 2.
+
+    ```c
     #define MIC_N_CHANNELS         2  // Number of Mic channels
-  ```
+    ```
 
-  Note: `MIC_N_CHANNELS` selects mono (1) or stereo (2).
-  - 1 (mono): Captures a single microphone channel. This reduces CPU load and memory/buffer usage; the console reports one dBSPL value.
-  - 2 (stereo): Captures two microphone channels. Overall sample throughput and buffer consumption increase; the console reports dBSPL per channel when supported. Ensure both mic channels are available/wired on your board.
+  - `MIC_SAMPLE_BUFFER_SIZE`: Size (in samples) of the buffer used to collect microphone samples before processing. By default, it is set to 512.
 
-  ```C
+    ```c
     #define MIC_SAMPLE_BUFFER_SIZE 512 // Mic buffer size to collect mic samples
-  ```
+    ```
 
 ## Test the Application
 
@@ -84,3 +84,4 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

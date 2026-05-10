@@ -4,7 +4,7 @@ description: >
   The SL Wi-Fi HAL (Hardware Abstraction Layer) provides an interface for the
   SL Wi-Fi driver to interact with the underlying hardware. It abstracts the
   hardware details and provides a consistent API for the driver to use.
-label: Si91x Wireless Subsystem HAL
+label: SiWx91x Wireless Subsystem HAL
 category: Device|Si91x|Wireless
 quality: production
 metadata:
@@ -26,10 +26,15 @@ include:
 
 define:
 - name: SL_WIFI_COMPONENT_INCLUDED
+- name: SL_CODE_COMPONENT_SLI_HAL_SI91X
+  value: sli_hal_si91x
+template_contribution:
+- name: code_classification_components
+  value: sli_hal_si91x
 
 requires:
 - name: sli_routing_utility
-- name: si91x_log_none
+- name: log_none
 - condition: ["device_si91x"]
   name: sl_si91x_mcu
 - condition: ["device_si91x"]

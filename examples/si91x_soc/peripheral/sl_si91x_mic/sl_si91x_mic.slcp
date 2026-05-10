@@ -5,7 +5,7 @@ description: 'This application demonstrates how to use an I2S microphone.
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - Mic
+label: SiWx91x Platform - Mic
 component:
 - id: sl_main
 - id: status
@@ -15,6 +15,12 @@ component:
 - id: i2s_instance
   instance:
   - i2s0
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 source:
 - path: app.c
 - path: mic_example.c

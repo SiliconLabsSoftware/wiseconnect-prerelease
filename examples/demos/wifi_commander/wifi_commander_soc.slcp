@@ -1,7 +1,7 @@
 project_name: wifi_commander_soc
 package: wifi_app
 quality: production
-label: wifi_commander_soc
+label: Wi-Fi - Commander (SoC)
 category: Example|Wi-Fi
 description: 'Demonstrates to run all commands individually
 

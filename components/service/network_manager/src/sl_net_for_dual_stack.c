@@ -58,8 +58,6 @@
 #include "lwip/timeouts.h"
 #include "sli_wifi_utility.h"
 #include "sl_cmsis_utility.h"
-#include "sl_log_helper_si91x.h"
-#include "sl_log_helper_si91x.h"
 
 #define NETIF_IPV4_ADDRESS(X, Y) (uint8_t)(((X) >> (8 * Y)) & 0xFF)
 #define MAC_48_BIT_SET           (1)
@@ -165,22 +163,12 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
   if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0)))
       && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0)
       && (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0)) {
-    SL_DEBUG_LOG("%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-                 __func__,
-                 dst_mac[0],
-                 dst_mac[1],
-                 dst_mac[2],
-                 dst_mac[3],
-                 dst_mac[4],
-                 dst_mac[5],
-                 src_mac[0],
-                 src_mac[1],
-                 src_mac[2],
-                 src_mac[3],
-                 src_mac[4],
-                 src_mac[5],
-                 b[12],
-                 b[13]);
+    SL_DEBUG_LOG_V2(DEBUG, "%s: DROP, [%02x:%02x:", __func__, dst_mac[0], dst_mac[1]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x:", dst_mac[2], dst_mac[3], dst_mac[4]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x]<-", dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
     return;
   }
 #endif
@@ -194,23 +182,12 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
       bufferoffset += q->len;
     }
 
-    SL_DEBUG_LOG("%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-                 __func__,
-                 bufferoffset,
-                 dst_mac[0],
-                 dst_mac[1],
-                 dst_mac[2],
-                 dst_mac[3],
-                 dst_mac[4],
-                 dst_mac[5],
-                 src_mac[0],
-                 src_mac[1],
-                 src_mac[2],
-                 src_mac[3],
-                 src_mac[4],
-                 src_mac[5],
-                 b[12],
-                 b[13]);
+    SL_DEBUG_LOG_V2(DEBUG, "%s: ACCEPT %d,", __func__, bufferoffset);
+    SL_DEBUG_LOG_V2(DEBUG, " [%02x:%02x:%02x:", dst_mac[0], dst_mac[1], dst_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]<-", dst_mac[3], dst_mac[4], dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
 
     if (netif->input(p, netif) != ERR_OK) {
       gOverrunCount++;

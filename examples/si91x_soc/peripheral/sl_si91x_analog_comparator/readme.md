@@ -1,8 +1,8 @@
-# Platform SiWx91x ANALOG COMPARATOR
+# SiWx91x Platform ANALOG COMPARATOR
 
 ## Table of Contents
 
-- [Platform SiWx91x ANALOG COMPARATOR](#platform-siwx91x-analog-comparator)
+- [SiWx91x Platform ANALOG COMPARATOR](#platform-siwx91x-analog-comparator)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -53,7 +53,7 @@ The following configurations are used in this example:
 
 ## About Example Code
 
- - [`analog_comparator_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_analog_comparator/analog_comparator_example.c) - This example file demonstrates how to use analog comparator to compare external pin inputs, external pin input to internal voltages, and internal voltages.
+ - [`analog_comparator_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_analog_comparator/analog_comparator_example.c) - This example file demonstrates how to use analog comparator to compare external pin inputs, external pin input to internal voltages, and internal voltages.
 - In this example, the first analog comparator is initialized by enabling clocks through [sl_si91x_analog_comparator_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-si91x-analog-comparator-init) API.
 - Sets non-inverting, inverting inputs, hysterisis value and filter for the comparator used through [sl_si91x_analog_comparator_set_configurations](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-si91x-analog-comparator-set-configurations) API (inputs are configured as per the usecase macros enabled).
 - Registers callback for comparator interrupts and enable its interrupts through [sl_si91x_analog_comparator_register_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-si91x-analog-comparator-register-callback) API:
@@ -80,7 +80,7 @@ The following configurations are used in this example:
     - Then the comparator will compare DAC output with reference scalar output and initializes DAC through DAC_init() function & sets DAC input value & sampling rate.
     - It also sets reference scaler output by setting its scale factor value through [sl_si91x_analog_comparator_set_reference_scaler_output](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-si91x-analog-comparator-set-reference-scaler-output).
 
-- In all of the above use cases, if non-inverting input voltage is greater than inverting input voltage, the comparator interrupt will occur and it will toggle ULP-GPIO-5 (for comparator-1) or ULP-GPIO-1 (for comparator-2) continously unless non-inverting voltage is greater.
+- In all of the above use cases, if non-inverting input voltage is greater than inverting input voltage, the comparator interrupt will occur and it will toggle ULP-GPIO-5 (for comparator-1) or ULP-GPIO-1 (for comparator-2) continuously unless non-inverting voltage is greater.
 
 ## Prerequisites/Setup Requirements
 
@@ -127,70 +127,84 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configure the following macros in the `analog_comparator_example.c` file and update/modify following macros, if required.
 
+- `ANALOG_COMPARATOR_USED`: Selects which analog comparator instance is used by the application. Set to `1` for comparator1 and `2` for comparator2. By default, it is set to `2`.
+
   ```c
-  // Update below macro as per instance used for application.
-  // Update '1' for using comparator1  & '2' for using comparator2
-  #define ANALOG_COMPARATOR_USED     2
-
-  // Enable below macro to compare external inputs.
-  // For this comparision select 'External input-1' as non-inverting input &
-  // inverting input from UC, so both inputs will fed from GPIOs.
-  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL  ENABLE
-
-  // Enable below macro to compare external input to reference scaler output.
-  // For this comparision select 'External input-1' as non-inverting input &
-  // select 'Reference scaler' as inverting input from UC.
-  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER  DISABLE
-
-  // Enable below macro to compare external input to resistor bank output.
-  // For this comparision select 'External input-1' as non-inverting input &
-  // select 'Resistor bank output' as inverting input from UC.
-  #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK  DISABLE
-
-  // Enable below macro to compare reference scaler output to resistor bank output,
-  // For this comparision select 'Resistor bank output' as non-inverting input &
-  // select 'Reference scaler output' as inverting input from UC.
-  #define COMPARE_POS_INPUT_REF_SCALAR_NEG_INPUT_RESISTOR_BANK DISABLE
-
-  // Enable below macro to compare OPAMP output with external voltage
-  // For this comparision select 'OPAMP1 output' as non-inverting input &
-  // select 'External input-1' as inverting input from UC.
-  #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_EXTERNAL DISABLE
-
-  // Enable below macro to compare OPAMP output with reference scaler voltage
-  // For this comparision select 'OPAMP1 output' as non-inverting input &
-  // select 'Reference scaler output' as inverting input from UC.
-  #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_REF_SCALER DISABLE
-
-  // Enable below macro to compare OPAMP output internal resistor bank voltage
-  // For this comparision select 'OPAMP1 output' as non-inverting input &
-  // select 'Resistor bank output' as inverting input from UC.
-  #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_RESISTOR_BANK DISABLE
-
-  // Enable to compare DAC output with external voltage
-  // For this comparision select 'DAC output' as non-inverting input &
-  // select 'External input-1' as inverting input from UC.
-  #define COMPARE_POS_INPUT_DAC_NEG_INPUT_EXTERNAL DISABLE
-
-  // Enable to compare DAC output with external voltage
-  // For this comparision select 'DAC output' as non-inverting input &
-  // select 'Reference scaler output' as inverting input from UC.
-  #define COMPARE_POS_INPUT_DAC_NEG_INPUT_REF_SCALER DISABLE
+    #define ANALOG_COMPARATOR_USED     2
   ```
 
-- Note :
-  1. Only one MACRO should be enable from above Compare MACROs at a time.
-  2. Use Comparator-2 for 917 boards.
-  3. To compare external input to buffer output, enable macro 'COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL' and
-  select 'External input-1' as non-inverting input and 'Reference buffer ouput' as inverting input from UC. The reference buffer
-  will produce a fixed output of 1.2v only
+- Comparison-mode selection macros: Enable exactly one of the following macros in `analog_comparator_example.c` to choose which pair of inputs the selected comparator compares. The corresponding non-inverting and inverting inputs must also be selected from UC as noted in each macro's description. By default, only `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL` is enabled.
 
-    // Change below macro value to change resistor bank output voltage,
-    // for possible values see [sl_analog_comparator_threshold_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-threshold-values-t) enum present in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h) file.
-    #define THRESHOLD_VALUE
-    // Change below macro value to change reference scaler output voltage,
-    // for possible values see [sl_analog_comparator_scale_factor_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-scale-factor-values-t) present in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h) file.
+  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL`: Compares two external pin inputs (both fed from GPIOs). In UC, select 'External input-1' as non-inverting input and an external input as inverting input. By default, it is set to `ENABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL       ENABLE
+    ```
+
+  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER`: Compares an external input to the internal reference scaler output. In UC, select 'External input-1' as non-inverting input and 'Reference scaler' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER     DISABLE
+    ```
+
+  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK`: Compares an external input to the internal resistor bank output. In UC, select 'External input-1' as non-inverting input and 'Resistor bank output' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK  DISABLE
+    ```
+
+  - `COMPARE_POS_INPUT_RESISTOR_BANK_NEG_INPUT_REF_SCALER`: Compares the resistor bank output to the reference scaler output. In UC, select 'Resistor bank output' as non-inverting input and 'Reference scaler output' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_RESISTOR_BANK_NEG_INPUT_REF_SCALER DISABLE
+    ```
+
+  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_EXTERNAL`: Compares the OPAMP1 output with an external voltage. In UC, select 'OPAMP1 output' as non-inverting input and 'External input-1' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_EXTERNAL          DISABLE
+    ```
+
+  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_REF_SCALER`: Compares the OPAMP1 output with the reference scaler voltage. In UC, select 'OPAMP1 output' as non-inverting input and 'Reference scaler output' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_REF_SCALER        DISABLE
+    ```
+
+  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_RESISTOR_BANK`: Compares the OPAMP1 output with the internal resistor bank voltage. In UC, select 'OPAMP1 output' as non-inverting input and 'Resistor bank output' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_RESISTOR_BANK     DISABLE
+    ```
+
+  - `COMPARE_POS_INPUT_DAC_NEG_INPUT_EXTERNAL`: Compares the DAC output with an external voltage. In UC, select 'DAC output' as non-inverting input and 'External input-1' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_DAC_NEG_INPUT_EXTERNAL            DISABLE
+    ```
+
+  - `COMPARE_POS_INPUT_DAC_NEG_INPUT_REF_SCALER`: Compares the DAC output with the reference scaler voltage. In UC, select 'DAC output' as non-inverting input and 'Reference scaler output' as inverting input. By default, it is set to `DISABLE`.
+
+    ```c
+    #define COMPARE_POS_INPUT_DAC_NEG_INPUT_REF_SCALER          DISABLE
+    ```
+
+- Note:
+  1. Only one macro should be enabled from the above `COMPARE_POS_INPUT_*` macros at a time.
+  2. Use Comparator-2 for 917 boards.
+  3. To compare external input to buffer output, enable `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL` and select 'External input-1' as non-inverting input and 'Reference buffer output' as inverting input from UC. The reference buffer produces a fixed output of 1.2 V only.
+
+- `THRESHOLD_VALUE`: Threshold value that selects the resistor bank output voltage. For possible values, see [sl_analog_comparator_threshold_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-threshold-values-t) in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h). By default, it is set to `SL_COMPARATOR_THRESHOLD_VALUE_FOR_2_15_VOLT`, which configures the resistor bank output to 2.15 V.
+
+  ```c
+    #define THRESHOLD_VALUE SL_COMPARATOR_THRESHOLD_VALUE_FOR_2_15_VOLT // To change resistor bank output to 2.15 volts
+  ```
+
+- `SCALE_FACT_VAL`: Scale-factor value that selects the reference scaler output voltage. For possible values, see [sl_analog_comparator_scale_factor_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-scale-factor-values-t) in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h).
+
+  ```c
     #define SCALE_FACT_VAL
+  ```
 
 
 ### Pin Configuration
@@ -286,3 +300,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

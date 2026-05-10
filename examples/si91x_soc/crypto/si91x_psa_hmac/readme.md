@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA HMAC
+# SiWx91x Platform PSA HMAC
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA HMAC](#platform-siwx91x-psa-hmac)
+- [SiWx91x Platform PSA HMAC](#platform-siwx91x-psa-hmac)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -73,6 +73,13 @@ The following hash algorithms are supported in this example:
   - Undefine the macro SLI_MAC_DEVICE_SI91X
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+
+> **Note**: To enable **sideband crypto**, add the following in the project's `.slcp` file. The `define` entry is at project scope alongside `component`:
+>
+> ```yaml
+> define:
+>   - name: SL_SI91X_SIDE_BAND_CRYPTO
+> ```
 
 ## Test the Application
 

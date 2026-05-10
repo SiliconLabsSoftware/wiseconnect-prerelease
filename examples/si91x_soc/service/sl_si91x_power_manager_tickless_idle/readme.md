@@ -1,8 +1,8 @@
-# Platform SiWx91x Power Manager Tickless Idle
+# SiWx91x Platform Power Manager Tickless Idle
 
 ## Table of Contents
 
-- [Platform SiWx91x Power Manager Tickless Idle](#platform-siwx91x-power-manager-tickless-idle)
+- [SiWx91x Platform Power Manager Tickless Idle](#platform-siwx91x-power-manager-tickless-idle)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -53,6 +53,8 @@ You can configure the application to suit your requirements and development envi
 
 To enable transitions from the active state to sleep or standby state, configure the parameters outlined below accordingly.
 
+- `SL_SI91X_STANDBY`: Selects whether the application transitions through sleep states or standby states. By default, it is set to 0 (sleep transitions); set it to 1 to enable standby-state transitions.
+
   - By default, the SL_SI91X_STANDBY macro is configured with a value of 0, indicating that the application performs the following sequence of power state transitions:
   - PS3 State => PS3 Sleep => PS3 State =>PS2 State => PS2 Sleep => PS2 State => PS1 State => PS2 State => PS4 State => PS4 Sleep => PS4 State => PS3 State and repeat.
 
@@ -65,6 +67,20 @@ To enable transitions from the active state to sleep or standby state, configure
 
     ```c
     #define SL_SI91X_STANDBY                                      1
+    ```
+
+- Configure the following macros in `power_manager_tickless_idle_example.c`:
+
+- `ULP_TIMER_MATCH_VALUE`: Specifies the ULP timer match count used to schedule the periodic wakeup interval. By default, it is set to 10000000, which corresponds to approximately 500 ms with a 20 MHz down-counter reference.
+
+    ```c
+    #define ULP_TIMER_MATCH_VALUE 10000000   // Timer match value for down-counter type with 20mhz clock for 500 ms
+    ```
+
+- `BUTTON_INSTANCE_0`: Selects the on-board button instance used as a wakeup source for the application. By default, it is set to `button_btn0`.
+
+    ```c
+    #define BUTTON_INSTANCE_0     button_btn0 // Button instance for wakeup
     ```
 
 ## Prerequisites/Setup Requirements
@@ -127,3 +143,4 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

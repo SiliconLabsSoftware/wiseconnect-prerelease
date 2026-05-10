@@ -1,9 +1,31 @@
 id: si91x_log_iostream_compact
-label: SL Log Si91x Backend Iostream compact
+label: Log Backend I/O Stream – Compact Binary Output
 package: platform_siwx91x
-description: >
-   This component provides iostream for si91x logger component.
-category: Device|Si91x|MCU|Service
+description: |
+  Compact binary output for the I/O Stream log backend. Events are emitted individually as 
+  raw sl_log_event_t records (timestamp, event_id, args, core_id, version) with no framing or 
+  text formatting. Decode host-side using the companion Log_script.py tool.
+
+  NOTE:
+  1. When writing log messages, always:
+     - Use only the "%lu" format specifier; cast every argument to (uint32_t).
+       Strings cannot be rendered by this backend (decode them on the host
+       using the companion Log_script.py tool).
+     - Enclose every log print statement in its own block within any control
+       flow structure (such as if, else, for, while, etc.).
+
+       Example:
+         if (condition) {
+           SL_PRINT_STRING_INFO("value: %lu", (uint32_t)i);
+         }
+         for (int i = 0; i < N; i++) {
+           SL_PRINT_STRING_DEBUG("count: %lu", (uint32_t)i);
+         }
+
+  2. By default, RTT will be installed as the I/O Stream transport. To install
+     UART VCOM instead, follow the documentation.
+
+category: Device|Si91x|MCU|Service|Log
 quality: evaluation
 metadata:
   sbom:
@@ -12,6 +34,12 @@ root_path: components/device/silabs/si91x/mcu/drivers/service/sl_log
 provides:
   - name: si91x_log_iostream_compact
   - name: si91x_log_iostream
+  - name: iostream_recommended_console 
+    condition: [device_si91x]   
+  - name: log_backend
+    condition: [si91x_log_backend_uart]
+  - name: log_backend
+    condition: [log_backend_systemview]  
 requires:
   - name: si91x_iostream_transport
   - name: log_backend_iostream_compact

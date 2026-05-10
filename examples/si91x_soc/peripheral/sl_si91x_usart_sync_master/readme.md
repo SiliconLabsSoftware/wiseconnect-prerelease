@@ -1,8 +1,8 @@
-# Platform SiWx91x USART Synchronous Master
+# SiWx91x Platform USART Synchronous Master
 
 ## Table of Contents
 
-- [Platform SiWx91x USART Synchronous Master](#platform-siwx91x-usart-synchronous-master)
+- [SiWx91x Platform USART Synchronous Master](#platform-siwx91x-usart-synchronous-master)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -41,7 +41,7 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 
 ## About Example Code
 
-- [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous master mode.
+- [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous master mode.
 - In this example, first USART gets initialized if it was not already initialized with the clock and DMA configurations if DMA is enabled using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).
 
 - If the UART/USART instance is already selected for debug output logs, initialization returns `SL_STATUS_NOT_AVAILABLE` (this is informational; the application continues using the existing instance).
@@ -52,14 +52,14 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 
 ### Configuration Macros
 
-The header file [`usart_sync_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.h) exposes build-time macros:
+The header file [`usart_sync_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.h) exposes build-time macros:
 
 | Macro | Purpose | Effect if Disabled | Error Returned? |
 |-------|---------|--------------------|-----------------|
 | `SL_USART_SYNCH_MODE` | Ensures the example validates synchronous mode operation. | Example runs but will not explicitly assert synchronous usage; configuration may fall back to default UC settings. | No – operation continues. |
 | `USE_SEND` | (Reserved for continuous send sequencing) Intended to enable repeated transmit cycles. | Currently unused in code; disabling has no effect. | No. |
 | `USE_RECEIVE` | (Reserved for continuous receive sequencing) Intended to enable repeated capture cycles. | Currently unused in code; disabling has no effect. | No. |
-| `NON_UC_DEFAULT_CONFIG` in [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) | Use hard-coded default configuration instead of UC component settings. | UC (Universal Configuration) values are used. | No – configuration API returns standard status. |
+| `NON_UC_DEFAULT_CONFIG` in [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) | Use hard-coded default configuration instead of UC component settings. | UC (Universal Configuration) values are used. | No – configuration API returns standard status. |
 
 These macros do not cause failures when disabled; they gate optional or illustrative behavior. If you require custom pin/baud/synchronous settings without UC, enable `NON_UC_DEFAULT_CONFIG` and adjust the structure values in `usart_sync_example.c`.
 
@@ -111,6 +111,26 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Connect master (this example) and a board flashed with the slave example: master clock pin (GPIO_8 or GPIO_25 depending on board) to slave clock pin, master TX (GPIO_30) to slave RX, master RX (GPIO_29) to slave TX.
 - The Application has been configured to run in Synchronous Master mode.
 
+- Configure the following macros in [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) if required:
+
+- `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
+
+  ```c
+  #define USART_BUFFER_SIZE     1024   // Data send and receive length
+  ```
+
+- `USART_BAUDRATE`: Specifies the USART baud rate used for transmission and reception. Supported range is 9600-7372800. By default, it is set to 115200.
+
+  ```c
+  #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
+  ```
+
+- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default USART configurations in the non-UC (non Universal Configuration) case. By default, it is set to 0.
+
+  ```c
+  #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non_uc case
+  ```
+
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
@@ -154,7 +174,7 @@ To enable hardware flow control (RTS/CTS):
 3. Assign RTS and CTS pins either:
 
 - Through the UC pin assignment widget (preferred), OR
-- Manually by editing [`RTE_Device_917.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/core/chip/config/RTE_Device_917.h) and locating the USART0 RTS/CTS section.
+- Manually by editing [`RTE_Device_917.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/core/chip/config/RTE_Device_917.h) and locating the USART0 RTS/CTS section.
 
 4. Use the following default mapping if your Pin Tool is unavailable:
 
@@ -200,3 +220,4 @@ To enable hardware flow control (RTS/CTS):
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

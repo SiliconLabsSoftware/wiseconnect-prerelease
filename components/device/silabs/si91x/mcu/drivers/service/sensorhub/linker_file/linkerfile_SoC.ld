@@ -42,6 +42,13 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
+  /* Fallback symbols for copy_functions_to_ram() in startup_si91x.c.
+     Sensor hub linker has no text_ram section; these zero-length spans make the copy loop a no-op. */
+  PROVIDE(__ramfuncs_start__     = 0);
+  PROVIDE(__ramfuncs_end__       = 0);
+  PROVIDE(__lma_ramfuncs_start__ = 0);
+  PROVIDE(__lma_ramfuncs_end__   = 0);
+
   .text :
   {
     KEEP(*(.isr_vector))
@@ -376,6 +383,20 @@ SECTIONS
 
     /* _edata is used in startup code */
     _edata = __data_end__;
+  } > ram AT> rom
+
+  .copy.table :
+  {
+    . = ALIGN(4);
+    __copy_table_start__ = .;
+    __copy_table_end__ = .;
+  } > ram AT> rom
+
+  .zero.table :
+  {
+    . = ALIGN(4);
+    __zero_table_start__ = .;
+    __zero_table_end__ = .;
   } > ram AT> rom
 
   .bss (NOLOAD) :

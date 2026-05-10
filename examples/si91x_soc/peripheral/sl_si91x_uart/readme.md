@@ -1,8 +1,8 @@
-# Platform SiWx91x UART
+# SiWx91x Platform UART
 
 ## Table of Contents
 
-- [Platform SiWx91x UART](#platform-siwx91x-uart)
+- [SiWx91x Platform UART](#platform-siwx91x-uart)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -38,7 +38,7 @@
 
 ## About Example Code
 
-- [`uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart/uart_example.c) - This example code demonstrates how to configure the UART to send and receive data.
+- [`uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart/uart_example.c) - This example code demonstrates how to configure the UART to send and receive data.
 - In this example, first UART gets initialized if it is not initialized already with clock and DMA configurations if DMA is enabled using [sl_si91x_usart_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).
 **Note:** If the UART/USART instance is already selected for debug output logs, initialization will return `SL_STATUS_NOT_AVAILABLE`.
 - After UART initialization, the UART is configured with the default configurations from UC along with the UART transmit and receive lines using [sl_si91x_usart_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration).
@@ -86,6 +86,26 @@ Configuration of UART at UC (Universal Configuration):
 
   > ![Figure: Selecting UC](resources/uc_screen/uart_uc.png)
 
+- Configure the following macros in [`uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_uart/uart_example.c) if required:
+
+- `UART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive UART data. By default, it is set to 1024.
+
+  ```c
+  #define UART_BUFFER_SIZE      1024   // Data send and receive length
+  ```
+
+- `UART_BAUDRATE`: Specifies the UART baud rate used for transmission and reception. Supported range is 9600-7372800. By default, it is set to 115200.
+
+  ```c
+  #define UART_BAUDRATE         115200 // Baud rate <9600-7372800>
+  ```
+
+- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default UART configurations in the non-UC (non Universal Configuration) case. By default, it is set to 0.
+
+  ```c
+  #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non_uc case
+  ```
+
 ## Pin Configuration
 
   | UART PINS     |  GPIO   |  917 Breakout pin |  Explorer kit Breakout pin |  UART-TTL cable |
@@ -98,7 +118,7 @@ Configuration of UART at UC (Universal Configuration):
 - Set the SL_USART_FLOW_CONTROL_TYPE parameter to SL_USART_FLOW_CONTROL_RTS_CTS to enable UART flow control.
 - Make sure the following two macros in `RTE_Device_917.h(path: /$project/config/RTE_Device_917.h)` are set to '1' to map RTS and CTS pins to WSTK/WPK Main Board EXP header or breakout pins.
 
-  ```C
+  ```c
   #define RTE_UART1_CTS_PORT_ID    1
   #define RTE_UART1_RTS_PORT_ID    1
   ```
@@ -146,3 +166,4 @@ Configuration of UART at UC (Universal Configuration):
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

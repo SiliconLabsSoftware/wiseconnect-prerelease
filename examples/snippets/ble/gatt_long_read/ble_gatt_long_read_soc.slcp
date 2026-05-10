@@ -1,18 +1,24 @@
 project_name: ble_gatt_long_read_soc
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - Gatt Long Read (SoC)
+label: BLE - SoC Gatt Long Read FreeRTOS
 category: Example|BLE
-description: 'Demonstrates how a GATT client device accesses a GATT server device for long read
+description: 'Demonstrates GATT long read from client to server on SiWx91x in SoC FreeRTOS. Demonstrated by reading long characteristic data via prepared ATT procedures.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Advanced
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

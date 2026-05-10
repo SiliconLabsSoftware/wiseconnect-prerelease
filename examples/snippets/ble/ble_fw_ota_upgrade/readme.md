@@ -1,22 +1,31 @@
 # BLE - FW OTA Upgrade
 
+## High-Level Overview
+
+This application demonstrates how to update the SiWx91x module firmware over-the-air (OTA) by receiving a firmware image from a remote BLE central (e.g., smartphone or PC tool).
+
 ## Table of Contents
 
-- [BLE - FW OTA Upgrade](#ble---fw-ota-upgrade)
-  - [Table of Contents](#table-of-contents)
-  - [Purpose/Scope](#purposescope)
-  - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
-    - [Hardware Requirements](#hardware-requirements)
-    - [Software Requirements](#software-requirements)
-    - [Setup Diagram](#setup-diagram)
+- [High-Level Overview](#high-level-overview)
+- [Table of Contents](#table-of-contents)
+- [Purpose/Scope](#purposescope)
+- [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
+  - [Hardware Requirements](#hardware-requirements)
+  - [Software Requirements](#software-requirements)
+  - [NCP mode: host application and project files](#ncp-mode-host-application-and-project-files)
+  - [Setup Diagram](#setup-diagram)
+- [Steps to Run Demo](#steps-to-run-demo)
   - [Getting Started](#getting-started)
-  - [Application Build Environment](#application-build-environment)
-  - [Test the Application](#test-the-application)
+  - [Configuration and setup](#configuration-and-setup)
+  - [Steps for execution](#steps-for-execution)
     - [Build and Run](#build-and-run)
     - [Firmware File Format](#firmware-file-format)
     - [Firmware Upgrade with Si Connect Mobile App](#firmware-upgrade-with-si-connect-mobile-app)
     - [Firmware Upgrade with Python Script](#firmware-upgrade-with-python-script)
-  - [Appendix](#appendix)
+    - [Appendix](#appendix)
+- [Troubleshooting](#troubleshooting)
+- [Resources](#resources)
+- [Report Bugs and Get Support](#report-bugs-and-get-support)
 
 ## Purpose/Scope
 
@@ -26,7 +35,6 @@ Supported upgrade methods:
 
 - **Si Connect mobile app** (Android / iOS) scan, connect, and upload a `.gbl` firmware file.
 - **Python script** PC-based tool to scan for the device, connect, and send firmware in chunks.
-
 
 ## Prerequisites/Setup Requirements
 
@@ -60,13 +68,25 @@ Supported upgrade methods:
 
 > **Note:** The provided mobile screenshots are from the Si Connect app; it is recommended to use the latest version.
 
+### NCP mode: host application and project files
+
+| Mode | Host / target | Project file (this example folder) |
+|------|----------------|-------------------------------------|
+| SoC | Application runs on SiWx91x. | `ble_fw_ota_upgrade_soc.slcp` |
+| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `ble_fw_ota_upgrade_psram.slcp` |
+| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `ble_fw_ota_upgrade_ncp.slcp` |
+
+Open the `.slcp` for your kit from **`examples/snippets/ble/ble_fw_ota_upgrade/`** in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+
 ### Setup Diagram
 
 ![](resources/readme/ble_fw_ota_upgrade_soc_ncp.png)
 
 Follow the [Getting Started with SiWx91x](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-soc-mode) guides for hardware connections and Simplicity Studio setup. Ensure the SiWx91x module is loaded with the latest connectivity firmware as described in [SiWx91x Firmware Update](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started).
 
-## Getting Started
+## Steps to Run Demo
+
+### Getting Started
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -78,7 +98,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
-## Application Build Environment
+### Configuration and setup
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
@@ -100,7 +120,9 @@ The application can be configured to suit your requirements and development envi
 
 > **Note:** ble_config.h files are already set with desired configuration in respective example folders; user need not change for each example. For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-## Test the Application
+### Steps for execution
+
+#### Build and Run
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
@@ -229,3 +251,27 @@ A Python-based OTA tool is provided to run on a PC: scan for the device, connect
 - Before upgrading firmware, the user should disable power save mode.
 - This Application support only single connection(GATT server) only.
 - If FW upgrade failed or wrong FW selected Then reconnect the Device and intiate the FW upgrade.
+
+## Troubleshooting
+
+| Symptom | Things to check |
+|--------|------------------|
+| No connection / scan issues | Confirm the peer address type and `RSI_BLE_DEV_ADDR` / `RSI_REMOTE_DEVICE_NAME` match the peripheral; phones often use random addresses. |
+| Slow OTA or lower-than-expected transfer speed | Connection interval strongly affects throughput—**speed is proportional to how often connection events occur**; adjust connection parameters in `ble_config.h` (and ensure the central honors them). Trade-offs apply for power and compatibility. |
+| NCP: no boot or no HCI traffic | Update SiWx917 connectivity firmware; verify SPI/UART wiring per [NCP getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode). Flash the correct `*_ncp.slcp` (or `*_uart_ncp.slcp`) on the **EFR32** host. |
+| Power save anomalies on NCP expansion board | See the power-save note in the **Configuration and Setup** section and the *Getting started with SiWx91x NCP* guide. |
+| Build or flash errors | Open the `.slcp` that matches your kit (SoC vs PSRAM vs NCP) and matching SDK / WiSeConnect versions. |
+
+
+## Resources
+
+1. [WiSeConnect getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+2. [WiSeConnect developers guide — developing for Silicon Labs hosts](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/)
+3. [Programming recommended settings](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)

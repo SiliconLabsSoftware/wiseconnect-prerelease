@@ -1,8 +1,8 @@
-# Platform SiWx91x Sleeptimer
+# SiWx91x Platform Sleeptimer
 
 ## Table of Contents
 
-- [Platform SiWx91x Sleeptimer](#platform-siwx91x-sleeptimer)
+- [SiWx91x Platform Sleeptimer](#platform-siwx91x-sleeptimer)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -59,10 +59,17 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - On si91x devices, sleeptimer uses only the SYSRTC peripheral, and there is no UC for this component.
 
-- Configure the following parameter in [`sleeptimer.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/service/sl_si91x_sleeptimer/sleeptimer.c) file, update/modify following macro if required
+- Configure the following macros in [`sleeptimer.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sleeptimer/sleeptimer.c) file, update/modify following macros if required
 
-  ```C
+- `TOOGLE_DELAY_MS1_ONESHOT`: Specifies the one-shot timer delay (in milliseconds) after which the LED toggle is triggered once. By default, it is configured for 5000 ms.
+
+  ```c
     #define TOOGLE_DELAY_MS1_ONESHOT //  configured for 5000 ms
+  ```
+
+- `TOOGLE_DELAY_MS1_PERIODIC`: Specifies the periodic timer interval (in milliseconds) at which the LED is toggled repeatedly. By default, it is configured for 400 ms.
+
+  ```c
     #define TOOGLE_DELAY_MS1_PERIODIC // configured for 400 ms
   ```
 
@@ -94,3 +101,4 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

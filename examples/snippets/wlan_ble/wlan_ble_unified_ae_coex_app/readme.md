@@ -481,7 +481,7 @@ Follow the steps as mentioned for the successful execution of the application:
 
    **Note:** According to the application flow, both WLAN and BLE tasks are running in separate threads. Depending on the user's choice, either the WLAN connection will establish first or the BLE connection will establish first.
 
-2. By default, the Si91x device is configured for two extended advertising sets and extended scanning. Its advertising can be validated with any remote device that supports the AE feature. The following image shows the Si91x device's extended advertising sets as seen in the SiConnect app.
+2. By default, the SiWx91x device is configured for two extended advertising sets and extended scanning. Its advertising can be validated with any remote device that supports the AE feature. The following image shows the SiWx91x device's extended advertising sets as seen in the SiConnect app.
 
      ![](resources/readme/remote_scanner.png)
 
@@ -516,7 +516,7 @@ Follow the steps as mentioned for the successful execution of the application:
 
 ### Peripheral Connection
 
-   1. If extended scanning is enabled, the Si91x device will scan for the advertising devices using the configured scan parameters.
+   1. If extended scanning is enabled, the SiWx91x device will scan for the advertising devices using the configured scan parameters.
 
    2. To make a remote peripheral connection, advertise the remote device with the specific name defined in the RSI_REMOTE_DEVICE_NAME1 macro.
 
@@ -530,7 +530,7 @@ Follow the steps as mentioned for the successful execution of the application:
 
 ### BLE Data Transfer
 
-   1. Click on the **Notify** property to enable notifications for continuous data transfer from the Si91x device.
+   1. Click on the **Notify** property to enable notifications for continuous data transfer from the SiWx91x device.
     When notifications are enabled, the **Notify** option will be highlighted as shown in the following image.
 
        ![](resources/readme/notification_enable.png)

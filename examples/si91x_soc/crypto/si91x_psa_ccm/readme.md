@@ -1,8 +1,8 @@
-# Platform SiWx91x PSA CCM
+# SiWx91x Platform PSA CCM
 
 ## Table of Contents
 
-- [Platform SiWx91x PSA CCM](#platform-siwx91x-psa-ccm)
+- [SiWx91x Platform PSA CCM](#platform-siwx91x-psa-ccm)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -59,13 +59,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ### Application Configuration Parameters
 
  * Wrapped key support is provided for AES,Chachapoly,HMAC,GCM with CBC/ECB mode. This example demonstrate the use of wrapped key with AES-CCM using wrap CBC mode.
- * To wrap the input key and use it, set WRAP_INPUT_KEYS macro to 1 in [`psa_ccm_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_ccm/psa_ccm_app.c)
- * To use a wrapped key directly, set IMPORT_WRAPPED_KEYS macro to 1 in [`psa_ccm_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/crypto/si91x_psa_ccm/psa_ccm_app.c)
+ * To wrap the input key and use it, set WRAP_INPUT_KEYS macro to 1 in [`psa_ccm_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/crypto/si91x_psa_ccm/psa_ccm_app.c)
+ * To use a wrapped key directly, set IMPORT_WRAPPED_KEYS macro to 1 in [`psa_ccm_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/crypto/si91x_psa_ccm/psa_ccm_app.c)
  * To use software fallback instead of hardware accelerators for plain key:
   - Add mbedtls_ccm in component section of slcp file
   - Undefine the macro SLI_AEAD_DEVICE_SI91X
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+
+> **Note**: To enable **sideband crypto**, add the following in the project's `.slcp` file. The `define` entry is at project scope alongside `component`:
+>
+> ```yaml
+> define:
+>   - name: SL_SI91X_SIDE_BAND_CRYPTO
+> ```
 
 ## Test the Application
 

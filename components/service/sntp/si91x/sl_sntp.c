@@ -130,7 +130,7 @@ sl_status_t sli_si91x_sntp_event_handler(sli_command_engine_response_t *command_
   }
 
   if (command_engine_response->type != SLI_COMMAND_ENGINE_METADATA_RESPONSE) {
-    SL_DEBUG_LOG("Expected meta data response, received packet only :( returning without handling");
+    SL_DEBUG_LOG_V2(ERROR, "Expected meta data response, received packet only :( returning without handling");
     return SL_STATUS_FAIL;
   }
 

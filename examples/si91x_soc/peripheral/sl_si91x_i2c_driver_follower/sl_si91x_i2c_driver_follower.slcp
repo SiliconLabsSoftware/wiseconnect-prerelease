@@ -5,12 +5,18 @@ description: 'This application demonstrates how to use the I2C interface on the 
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - I2C Driver Follower
+label: SiWx91x Platform - I2C Driver Follower
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: sl_i2c
 - id: sl_gpio_peripheral
 - id: sl_dma

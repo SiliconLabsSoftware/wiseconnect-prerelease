@@ -1,8 +1,8 @@
-# Platform SiWx91x RGB LED
+# SiWx91x Platform RGB LED
 
 ## Table of Contents
 
-- [Platform SiWx91x RGB LED](#platform-siwx91x-rgb-led)
+- [SiWx91x Platform RGB LED](#platform-siwx91x-rgb-led)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -46,6 +46,22 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
+## Application Build Environment
+
+- Configure the following macros in [`rgb_led.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_rgb_led/rgb_led.c) file and update/modify following macros, if required.
+
+  - `RGB_LED`: Selects the RGB LED instance driven by the example. By default, it is set to `led_led0`.
+
+    ```c
+      #define RGB_LED     led_led0 // RGB LED instance
+    ```
+
+  - `COLOR_COUNT`: Number of colors that the example cycles through on the RGB LED. By default, it is set to 10.
+
+    ```c
+      #define COLOR_COUNT 10       // Number of colors to cycle through
+    ```
+
 ## Test the Application
 
 1. Activates the RGB LED on the board, cycling through various colors at 100ms intervals.
@@ -56,6 +72,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 > - Currently, the RGB LED functionality is limited to a single instance.
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
+>
+> - In case of sleep-wakeup, call `rgb_led_init_instances()` after wakeup before driving the RGB LED again so the configured RGB LED instance is restored.
 
 ## Troubleshooting
 
@@ -71,3 +89,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

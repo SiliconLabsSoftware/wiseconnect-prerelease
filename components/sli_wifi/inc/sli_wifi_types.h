@@ -732,4 +732,43 @@ typedef struct {
   uint8_t config_data[];  ///< Opaque tail; C99 flexible array member, size @a length.
 } sli_wifi_fw_config_req_t;
 
+// -----------------------------------------------------------------------------
+// Extended Wi-Fi statistics (internal; SLI_WIFI_REQ_EXT_STATS response layout)
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief NWP broadcast/multicast filter statistics (wireless stack path). Internal use.
+ * @note Counters in this block are reset after each extended-statistics request.
+ */
+typedef struct {
+  uint32_t bc_rx_count;   ///< Number of Broadcast frames received by NWP
+  uint32_t bc_drop_count; ///< Number of Broadcast frames dropped in NWP
+  uint32_t bc_pass_count; ///< Number of Broadcast frames accepted by NWP
+  uint32_t mc_rx_count;   ///< Number of Multicast frames received by NWP
+  uint32_t mc_drop_count; ///< Number of Multicast frames dropped by NWP
+  uint32_t mc_pass_count; ///< Number of Multicast frames accepted by NWP
+} sli_wifi_bc_mc_filter_stats_t;
+
+/**
+ * @brief PPE broadcast/multicast filter statistics on the DUT. Internal use.
+ * @note Counters in this block are reset after each extended-statistics request.
+ */
+typedef struct {
+  uint16_t bc_rx_count;   ///< Number of Broadcast frames received by PPE
+  uint16_t bc_drop_count; ///< Number of Broadcast frames dropped by PPE
+  uint16_t mc_rx_count;   ///< Number of Multicast frames received by PPE
+  uint16_t mc_drop_count; ///< Number of Multicast frames dropped by PPE
+  uint16_t reserved[4];   ///< Reserved
+} sli_wifi_ppe_filter_stats_t;
+
+/**
+ * @brief Extended Wi-Fi statistics v2: NWP and PPE B/M filter counters only. Internal use.
+ * @note Firmware resets these statistics after a read (successful statistics request/response).
+ * @note For wire layout variants accepted by @ref sli_wifi_get_statistics_v2, see that API.
+ */
+typedef struct {
+  sli_wifi_bc_mc_filter_stats_t nwp_filter_stats; ///< NWP B/M filter statistics
+  sli_wifi_ppe_filter_stats_t ppe_filter_stats;   ///< PPE B/M filter statistics
+} sli_wifi_statistics_v2_t;
+
 #endif // SLI_WIFI_TYPES_H

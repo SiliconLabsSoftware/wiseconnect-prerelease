@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - TWT Use case remote app (SoC)
 category: Example|Wi-Fi
-description: "Update To keep device in TWT mode \n"
+description: Demonstrates TCP server and UDP server with periodic data transfer.
 filter:
 - name: Wireless Technology
   value:

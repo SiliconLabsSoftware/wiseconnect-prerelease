@@ -22,6 +22,8 @@
       condition: [device_supports_external_flash]
     - name: external_psram_8mb
       condition: [device_supports_external_psram]
+    - name: psram_aps6404l_sqh
+      condition: [device_supports_external_psram]
 - template_contribution:
     - name: psram_present
       value: 1 

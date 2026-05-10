@@ -5,13 +5,19 @@ description: 'This application demonstrates how to toggle GPIO pins and utilize 
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - GPIO DETAILED EXAMPLE
+label: SiWx91x Platform - GPIO DETAILED EXAMPLE
 component:
 - id: sl_main
 - id: status
 - id: sl_gpio
 - id: syscalls
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 source:
 - path: app.c
 - path: gpio_detailed_example.c

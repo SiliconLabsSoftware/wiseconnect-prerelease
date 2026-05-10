@@ -5,7 +5,7 @@ description: 'This application demonstrates the usage of QSPI configured for rea
   '
 category: example|Service
 quality: production
-label: Platform SiWx91x - LittleFS Basic File Operations
+label: SiWx91x Platform - LittleFS Basic File Operations
 component:
 - id: sl_main
 - id: freertos

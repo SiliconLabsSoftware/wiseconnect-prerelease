@@ -108,6 +108,15 @@ component_path:
  - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
  - path: third_party/littlefs/component
  - path: components/device/silabs/si91x/wireless/ble
+ - path: components/device/silabs/si91x/wireless/ble_unified
+ - path: components/device/silabs/si91x/wireless/ble_unified_framework
+  # Protocol / feature implementation sources (application-as-component)
+ - path: components/device/silabs/si91x/wireless/gap
+ - path: components/device/silabs/si91x/wireless/ext_adv
+ - path: components/device/silabs/si91x/wireless/legacy_adv
+ - path: components/device/silabs/si91x/wireless/gatt
+ - path: components/device/silabs/si91x/wireless/smp
+  # Root-level BLE advertising/scan installer .slcc (extended, legacy, default)
  - path: netstack_silabs_lwip/component
 documentation:
  - docset: platform_siwx91x

@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: at_commands_soc
 category: Example|Wi-Fi_BLE
-description: 'Demonstrates to run all commands individually
+description: 'The AT commands application is a command-line interface (CLI) application designed to showcase various functionalities and capabilities of SiWx91x in different scenarios and configuration modes. It serves as a quick reference guide and a hands-on demonstration of SiWx91x core features for developers and users.
 
   '
 filter:

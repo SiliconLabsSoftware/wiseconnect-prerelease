@@ -5,12 +5,18 @@ description: 'This application demonstrates UDMA functionality.
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - ULP DMA
+label: SiWx91x Platform - ULP DMA
 component:
 - id: sl_main
 - id: status
 - id: syscalls
 - id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_compact
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: sl_dma
 - id: sl_power_manager
 - id: debug_ulp_component

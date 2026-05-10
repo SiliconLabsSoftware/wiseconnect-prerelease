@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - Network Dual Stack NWP M4 (NCP)
 category: Example|Wi-Fi
-description: 'Wi-Fi Network Dual Stack Example for NCP mode
+description: 'Demonstrates IPv4/IPv6 on NWP Wi-Fi offload and on M4 lwIP, with TCP/UDP traffic on both stacks.
 
   '
 filter:

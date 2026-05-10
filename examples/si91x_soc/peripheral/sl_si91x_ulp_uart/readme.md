@@ -1,8 +1,8 @@
-# Platform SiWx91x ULP UART
+# SiWx91x Platform ULP UART
 
 ## Table of Contents
 
-- [Platform SiWx91x ULP UART](#platform-siwx91x-ulp-uart)
+- [SiWx91x Platform ULP UART](#platform-siwx91x-ulp-uart)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -38,7 +38,7 @@ This application demonstrates how to configure ULP UART In asynchronous mode, it
 
 ## About Example Code
 
-- [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) - This example code demonstrates how to configure the UART to send and receive data in loopback mode.
+- [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) - This example code demonstrates how to configure the UART to send and receive data in loopback mode.
 - In this example, the UART is first initialized—if not already done—using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init), along with clock, power mode and DMA configurations when DMA is enabled.
 **Note:** If the UART/USART instance is selected for debug output logs, initialization will return `SL_STATUS_NOT_AVAILABLE`.
 - After UART initialization, ULP UART is configured with default configurations from UC along with UART transmit and receive lines using the [`sl_si91x_usart_set_configuration()`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-set-configuration).
@@ -84,8 +84,96 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
    ![Figure: ulpuart_uc](resources/readme/ulpuart_uc.png)
 
+- Configure the following macros in [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) if required:
+
+- `ULP_UART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive ULP UART data. By default, it is set to 1024.
+
+  ```c
+  #define ULP_UART_BUFFER_SIZE  1024   // Data send and receive length
+  ```
+
+- `USART_BAUDRATE`: Specifies the ULP UART baud rate used for transmission and reception. Supported range is 9600-7372800. By default, it is set to 115200.
+
+  ```c
+  #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
+  ```
+
+- `ULP_GPIO_PIN`: Selects the ULP GPIO pin used as the receive line reference. By default, it is set to 2.
+
+  ```c
+  #define ULP_GPIO_PIN          2      // ULP GPIO to receive
+  ```
+
+- `ULP_GPIO_TOGGLE`: Selects the ULP GPIO pin that is toggled when TX and RX data match. By default, it is set to 8.
+
+  ```c
+  #define ULP_GPIO_TOGGLE       8      // ULP GPIO to toggle
+  ```
+
+- `OUTPUT_VALUE`: Defines the logic level driven on the GPIO output. By default, it is set to 1.
+
+  ```c
+  #define OUTPUT_VALUE          1      // GPIO output value
+  ```
+
+- `ULP_GPIO_PORT`: Specifies the GPIO port number used for ULP GPIO operations. By default, it is set to 4.
+
+  ```c
+  #define ULP_GPIO_PORT         4      // GPIO Port no
+  ```
+
+- `SET`: Convenience macro used to drive a GPIO or flag to its set state. By default, it is set to 1.
+
+  ```c
+  #define SET                   1      // Macro to set
+  ```
+
+- `FIRST_ITERATION`: Identifier for the first iteration which transitions from High Power (PS4) to Ultra Low Power (PS2) state. By default, it is set to 1.
+
+  ```c
+  #define FIRST_ITERATION       1    // First iteration from High Power to Ultra Low Power state
+  ```
+
+- `SECOND_ITERATION`: Identifier for the second iteration which transitions from Ultra Low Power (PS2) back to High Power state. By default, it is set to 2.
+
+  ```c
+  #define SECOND_ITERATION      2    // Second iteration from Ultra Low Power state to High Power
+  ```
+
+- `THIRD_ITERATION`: Identifier for the third iteration which de-initializes the UART. By default, it is set to 3.
+
+  ```c
+  #define THIRD_ITERATION       3    // Third iteration deinitialization of uart
+  ```
+
+- `MS_DELAY_COUNTER`: Loop count used to generate a short millisecond-level delay. By default, it is set to 4600.
+
+  ```c
+  #define MS_DELAY_COUNTER      4600 // Delay count
+  ```
+
+- `FIVE_SECOND_DELAY`: Delay (in milliseconds) inserted between power state changes. By default, it is set to 5000.
+
+  ```c
+  #define FIVE_SECOND_DELAY     5000 // 5 second delay between state changes
+  ```
+
+- `MINIMUM_COUNT_VALUE`: Lower bound used when iterating/comparing toggle counts. By default, it is set to 0.
+
+  ```c
+  #define MINIMUM_COUNT_VALUE   0    // Minimum count value
+  ```
+
+- `MAXIMUM_COUNT_VALUE`: Upper bound used for the number of comparison pin triggers for reference. By default, it is set to 10.
+
+  ```c
+  #define MAXIMUM_COUNT_VALUE   10   // Maximum comparison pin triggering for reference
+  ```
+
 - Data send and receive from VCOM console is for one iteration only. On VCOM console, set the configuration such that the received data is sent back on the same port.
-- To check continuous data transfer, modify the following macro to ENABLE in the [`ulp_uart_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.h) file.
+- To check continuous data transfer, modify the following macro to ENABLE in the [`ulp_uart_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.h) file.
+
+- `USE_SEND`: When set to ENABLE, the application continuously sends data over ULP UART so that continuous transfer/toggling can be observed. By default, it is set to DISABLE.
 
   ```c
   #define USE_SEND    ENABLE
@@ -132,9 +220,9 @@ Follow the steps below for successful execution of the application:
 >- In this application, we are changing the power state from PS4 to PS2 and vice - versa.
 >- Once the power state changes from PS4 to PS2 and vice - versa, you have to reconfigure the uart configs once again using sl_si91x_usart_set_configuration() API  because of frequency change. Refer to  file for more info.
 >
-- Once the power state changes from PS4 to PS2 and vice - versa, you have to reconfigure the uart configs once again using sl_si91x_usart_set_configuration() API  because of frequency change. Refer to [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) file for more info.
-- Once the power state changes from PS4 to PS2 and vice - versa, you have to reconfigure the uart configs once again using sl_si91x_usart_set_configuration() API  because of frequency change. Refer to [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) file for more info.
-- Once the power state changes from PS4 to PS2 and vice - versa, you have to reconfigure the uart configs once again using sl_si91x_usart_set_configuration() API  because of frequency change. Refer to [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) file for more info.
+- Once the power state changes from PS4 to PS2 and vice - versa, you have to reconfigure the uart configs once again using sl_si91x_usart_set_configuration() API  because of frequency change. Refer to [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) file for more info.
+- Once the power state changes from PS4 to PS2 and vice - versa, you have to reconfigure the uart configs once again using sl_si91x_usart_set_configuration() API  because of frequency change. Refer to [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) file for more info.
+- Once the power state changes from PS4 to PS2 and vice - versa, you have to reconfigure the uart configs once again using sl_si91x_usart_set_configuration() API  because of frequency change. Refer to [`ulp_uart_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_uart/ulp_uart_example.c) file for more info.
 >
 >- CTS and RTS only works when not using ROM driver for UART
 >
@@ -207,3 +295,4 @@ Follow the steps below for successful execution of the application:
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

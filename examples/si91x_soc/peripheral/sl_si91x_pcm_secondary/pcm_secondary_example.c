@@ -79,25 +79,31 @@ void pcm_secondary_example_init(void)
     //Initialize PCM peripheral and store driver handle in i2s_driver_handle
     status = sl_si91x_pcm_init(PCM_INSTANCE, &pcm_handle);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("PCM Initialization fail\r\n");
+      /* Note: All status messages in this example — both success and failure — are
+ * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
+ * on the console at the default log level. This is a demonstration choice, not
+ * a recommendation: in production code, ERROR severity should be reserved for
+ * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
+ * (or SL_PRINT_STRING_DEBUG for verbose trace). */
+      SL_PRINT_STRING_ERROR("PCM Initialization fail");
       break;
     }
-    DEBUGOUT("PCM Initialization success\r\n");
+    SL_PRINT_STRING_ERROR("PCM Initialization success");
     //Register user callback handler
     status = sl_si91x_pcm_register_event_callback(pcm_handle, callback_event);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("PCM user callback register fail\r\n");
+      SL_PRINT_STRING_ERROR("PCM user callback register fail");
       break;
     } else {
-      DEBUGOUT("PCM user callback register success\r\n");
+      SL_PRINT_STRING_ERROR("PCM user callback register success");
     }
 
     status = sl_si91x_pcm_set_configuration(pcm_handle, pcm_sampling_frequency, pcm_resolution, mode);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("PCM configuration set fail\r\n");
+      SL_PRINT_STRING_ERROR("PCM configuration set fail");
       break;
     } else {
-      DEBUGOUT("PCM configuration set success\r\n");
+      SL_PRINT_STRING_ERROR("PCM configuration set success");
     }
 
   } while (false);
@@ -106,9 +112,9 @@ void pcm_secondary_example_init(void)
   // Secondary waits for button press on primary before starting PCM operations
   status = secondary_sync_wait();
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Secondary device synchronization failed with error code: 0x%lx\r\n", status);
+    SL_PRINT_STRING_ERROR("Secondary device synchronization failed with error code: 0x%lx", status);
   } else {
-    DEBUGOUT("Secondary device synchronized successfully with primary device\r\n");
+    SL_PRINT_STRING_ERROR("Secondary device synchronized successfully with primary device");
   }
 }
 /*******************************************************************************
@@ -122,11 +128,11 @@ void pcm_secondary_example_process_action(void)
       do {
         //Configure PCM transmit DMA channel
         if (sl_si91x_pcm_transmit_data(pcm_handle, pcm_secondary_data_out, PCM_SECONDARY_BUFFER_SIZE)) {
-          DEBUGOUT("PCM transmit start fail\r\n");
+          SL_PRINT_STRING_ERROR("PCM transmit start fail");
           state = INVALID_STATE;
           break;
         } else {
-          DEBUGOUT("PCM transmit start success\r\n");
+          SL_PRINT_STRING_ERROR("PCM transmit start success");
         }
       } while (false);
       state = WAIT_STATE;
@@ -135,17 +141,17 @@ void pcm_secondary_example_process_action(void)
     case RECEIVE_DATA:
       do {
         // Delay added to synchronize secondary receive with primary transmission.
-        for (int i = 0; i < 11000; i++) {
+        for (int i = 0; i < 15000; i++) {
           __asm("nop");
         }
         if (sl_si91x_pcm_receive_data(pcm_handle,
                                       pcm_secondary_data_in,
                                       (PCM_SECONDARY_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT))) {
-          DEBUGOUT("PCM receive start fail\r\n");
+          SL_PRINT_STRING_ERROR("PCM receive start fail");
           state = INVALID_STATE;
           break;
         } else {
-          DEBUGOUT("PCM receive start success\r\n");
+          SL_PRINT_STRING_ERROR("PCM receive start success");
         }
       } while (false);
       state = WAIT_STATE;
@@ -185,14 +191,15 @@ static void compare_loop_back_data(void)
     // If the data in and data out are same, it will be continued else, the for
     // loop will be break.
     if (pcm_secondary_data_in[data_index] != pcm_secondary_data_out[data_index]) {
+
       break;
     }
   }
 
   if (data_index == PCM_SECONDARY_BUFFER_SIZE) {
-    DEBUGOUT("Data comparison successful\n");
+    SL_PRINT_STRING_ERROR("Data comparison successful");
   } else {
-    DEBUGOUT("Data comparison failed\n");
+    SL_PRINT_STRING_ERROR("Data comparison failed");
   }
 }
 
@@ -279,7 +286,7 @@ static sl_status_t secondary_sync_wait()
   }
 
   // Wait for button 0 press on primary device to synchronize
-  DEBUGOUT("Waiting for primary button 0 press to sync with primary.\r\n");
+  SL_PRINT_STRING_ERROR("Waiting for primary button 0 press to sync with primary.");
 
   while (1) {
     // Read the GPIO pin state
@@ -287,7 +294,7 @@ static sl_status_t secondary_sync_wait()
 
     // Check if button is pressed on primary device (active low)
     if (pin_value == 0) {
-      DEBUGOUT("Button press detected, synchronization completed\r\n");
+      SL_PRINT_STRING_ERROR("Button press detected, synchronization completed");
       sl_si91x_delay_ms(10);
       break;
     }

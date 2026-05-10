@@ -631,7 +631,7 @@ sl_status_t sl_si91x_gspi_send_data_blocking(sl_gspi_handle_t gspi_handle,
 }
 
 /*******************************************************************************
- * Sends and recieves the data to the slave device simultaneously
+ * Sends and receives the data to the slave device simultaneously
  * It takes three arguments, 
  *   - data_in: pointer to the data buffer which stores the received data
  *   - data_out: pointer to the data buffer which stores the data that needs to 

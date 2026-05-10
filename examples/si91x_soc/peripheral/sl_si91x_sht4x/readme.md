@@ -1,8 +1,8 @@
-# Platform SiWx91x SHT4x
+# SiWx91x Platform SHT4x
 
 ## Table of Contents
 
-  - [Platform SiWx91x SHT4x](#platform-siwx91x-sht4x)
+  - [SiWx91x Platform SHT4x](#platform-siwx91x-sht4x)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
     - [Software Requirements](#software-requirements)
@@ -57,6 +57,22 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
+- Configure the following macros in [`sht4x_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sht4x/sht4x_example.c) file and update/modify following macros, if required.
+
+  
+
+  - `SHT4X_INIT_RETRIES`: Maximum number of retries that `sl_sht4x_init()` performs before giving up. By default, it is set to 10.
+
+    ```c
+      #define SHT4X_INIT_RETRIES  10                 // retries for sl_sht4x_init
+    ```
+
+  - `SHT4X_INIT_RETRY_MS`: Delay in milliseconds between consecutive `sl_sht4x_init()` retry attempts. By default, it is set to 1 ms.
+
+    ```c
+      #define SHT4X_INIT_RETRY_MS 1                  // delay between init retries
+    ```
+
 - `I2C instance`: Select I2C instance for communication through UC from the SHT4x Humidity and Temperature Sensor slcp component.
   By default I2C2 is selected.
 - Make sure you install "SHT4x Humidity and Temperature Sensor" component.
@@ -102,3 +118,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

@@ -14,8 +14,6 @@ root_path: components/device/silabs/si91x/mcu/toolchain
 provides:
   - name: wiseconnect_toolchain_gcc_standard
   - name: toolchain_linker_type
-  - name: toolchain_gcc
-    condition: [device_si91x]
 template_file:
   - path: linkerfile_psram_SoC.ld.jinja
     condition: [wiseconnect_toolchain_psram_linker]

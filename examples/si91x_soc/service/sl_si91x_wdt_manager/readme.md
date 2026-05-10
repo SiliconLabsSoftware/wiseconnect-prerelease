@@ -1,8 +1,8 @@
-# Platform SiWx91x WDT Manager
+# SiWx91x Platform WDT Manager
 
 ## Table of Contents
 
-- [Platform SiWx91x WDT Manager](#platform-siwx91x-wdt-manager)
+- [SiWx91x Platform WDT Manager](#platform-siwx91x-wdt-manager)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -91,8 +91,17 @@ The example uses the following components:
 
 ### Configuration Options
 
-- **TOGGLE_DELAY_MS**: LED toggle interval (default: 1000 ms)
-- **LED_INSTANCE**: LED instance to use (default: led_led0)
+- `LED_INSTANCE`: Selects the on-board LED instance used by the WDT manager example to indicate periodic liveness toggling. By default, it is set to `led_led0`.
+
+  ```c
+  #define LED_INSTANCE    led_led0 // On-board LED instance
+  ```
+
+- `TOGGLE_DELAY_MS`: Specifies the interval (in milliseconds) at which the on-board LED is toggled. By default, it is set to 1000.
+
+  ```c
+  #define TOGGLE_DELAY_MS 1000     // LED toggle interval in ms
+  ```
 
 ## Test the Application
 
@@ -161,3 +170,4 @@ Watch for system reset in a few seconds...
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

@@ -1,8 +1,8 @@
-# Platform SiWx91x ADC Static Mode
+# SiWx91x Platform ADC Static Mode
 
 ## Table of Contents
 
-- [Platform SiWx91x ADC Static Mode](#platform-siwx91x-adc-static-mode)
+- [SiWx91x Platform ADC Static Mode](#platform-siwx91x-adc-static-mode)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -67,7 +67,7 @@ This application demonstrates the ADC peripheral, including:
 6. The application reads the latest sample from the active channel.
 
 - Various parameters like Number of Channel, ADC Operation Mode, Input Type, Sampling Rate, and Sample Length can be configured using UC.
-- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains channel instance configuration.
+- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains channel instance configuration.
 - This example is working on ADC static mode and it samples the data with **NON-DMA** mode.
 - **Ping/Pong DMA buffers are NOT used in static mode** - data is read directly from ADC data registers.
 - The firmware version of API is fetched using [sl_si91x_adc_get_version](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-si91x-adc-get-version) which includes the release version, major version and minor version [sl_adc_version_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-adc-version-t).
@@ -138,6 +138,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - ADC output will print the configured number of samples output voltage on UART console.
 - Apply the different voltages (1.8V to Vref) to ADC input and observe console outputs as per input.
 - Provided input voltage and console output data should match.
+
+- Configure the following macros in [`adc_static_mode_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_adc_static_mode/adc_static_mode_example.c) file, if required:
+
+- `ADC_MAX_OP_VALUE`: Maximum 12-bit output value that can be read from the ADC data register. By default, it is set to 4095.
+
+  ```c
+    #define ADC_MAX_OP_VALUE 4095   // Maximum output value get from adc data register
+  ```
+
+- `VREF_VALUE`: ADC reference voltage (in volts) used to convert the digital sample to an equivalent input voltage. By default, it is set to 3.3.
+
+  ```c
+    #define VREF_VALUE       3.3    // reference voltage
+  ```
 
 ### Pin Configuration
 
@@ -247,3 +261,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

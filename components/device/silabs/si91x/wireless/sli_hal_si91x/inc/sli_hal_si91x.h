@@ -29,6 +29,7 @@
  ******************************************************************************/
 #include "sli_routing_utility_types.h"
 #include "sli_hal_si91x_constants.h"
+#include "sli_code_classification.h"
 /**
  * @brief Initialize the HAL instance.
  *        This API is responsible for initializing all the components, tasks and variables/resources
@@ -36,6 +37,7 @@
  *
  * @return Status of the initialization.
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_init(void);
 
 /**
@@ -53,6 +55,7 @@ sl_status_t sli_hal_si91x_init(void);
  *         This API should return SL_STATUS_IN_PROGRESS if the API is sending data asynchronously in which case the sender has to wait for TX Acknowledgement.
  *         This API should return appropriate error values for all other error cases
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_command_send_packet(void *packet,
                                               uint32_t packet_size,
                                               sli_routing_utility_packet_status_handler_t packet_status_handler,
@@ -73,6 +76,7 @@ sl_status_t sli_hal_si91x_command_send_packet(void *packet,
  *         This API should return SL_STATUS_IN_PROGRESS if the API is sending data asynchronously in which case the sender has to wait for TX Acknowledgement.
  *         This API should return appropriate error values for all other error cases
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_data_send_packet(void *packet,
                                            uint32_t packet_size,
                                            sli_routing_utility_packet_status_handler_t packet_status_handler,
@@ -93,6 +97,7 @@ sl_status_t sli_hal_si91x_data_send_packet(void *packet,
  *         This API should return SL_STATUS_IN_PROGRESS if the API is sending data asynchronously in which case the sender has to wait for TX Acknowledgement.
  *         This API should return appropriate error values for all other error cases
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_common_send_packet(void *packet,
                                              uint32_t packet_size,
                                              sli_routing_utility_packet_status_handler_t packet_status_handler,
@@ -113,6 +118,7 @@ sl_status_t sli_hal_si91x_common_send_packet(void *packet,
  *         This API should return SL_STATUS_IN_PROGRESS if the API is sending data asynchronously in which case the sender has to wait for TX Acknowledgement.
  *         This API should return appropriate error values for all other error cases
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_ble_send_packet(void *packet,
                                           uint32_t packet_size,
                                           sli_routing_utility_packet_status_handler_t packet_status_handler,
@@ -126,6 +132,7 @@ sl_status_t sli_hal_si91x_ble_send_packet(void *packet,
  *
  * @return Status of the deinitialization.
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_deinit(void);
 
 /**
@@ -135,4 +142,5 @@ sl_status_t sli_hal_si91x_deinit(void);
  * @param[in] flags Event flags (e.g. SLI_HAL_SI91X_RX_EVENT).
  * @return Status of the operation.
  */
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_notify_events(uint32_t flags);

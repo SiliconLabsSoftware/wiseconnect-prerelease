@@ -28,9 +28,6 @@
  *
  ******************************************************************************/
 #include "sli_si91x_wifi_event_handler.h"
-#include "sli_command_engine.h"
-#include "sli_event_engine.h"
-#include "sli_wifi_command_engine_config.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
 #include "sl_si91x_protocol_types.h"
@@ -45,7 +42,6 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi_power_profile.h"
 #include "sl_additional_status.h"
-#include "sl_log_helper_si91x.h"
 
 #ifdef SL_NET_COMPONENT_INCLUDED
 #include "sl_net_types.h"
@@ -531,6 +527,14 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
   }
 
   return status;
+}
+
+sl_status_t sli_si91x_wifi_event_engine_deinit(void)
+{
+  sl_status_t status = sli_event_engine_deinit();
+  VERIFY_STATUS_AND_RETURN(status);
+
+  return SL_STATUS_OK;
 }
 
 #ifdef SLI_SI91X_ENABLE_BLE

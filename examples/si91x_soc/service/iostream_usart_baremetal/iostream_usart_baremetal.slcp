@@ -5,18 +5,20 @@ description: 'This application demonstrates how to use the I/O Stream service in
   '
 category: example|peripheral
 quality: production
-label: Platform SiWx91x - IOSTREAM USART Baremetal
+label: SiWx91x Platform - IOSTREAM USART Baremetal
 component:
 - id: sl_main
 - id: stdio
 - id: atomic
 - id: sl_common
 - id: iostream_retarget_stdio
+- id: sl_usart_iostream
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
 - id: iostream_uart_si91x
   instance:
   - vcom
-- id: sl_usart_iostream
-- id: iostream_si91x
 - id: si91x_memory_default_config
 source:
 - path: app.c

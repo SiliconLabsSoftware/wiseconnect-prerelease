@@ -48,6 +48,7 @@ extern dac_config_t dac_callback_fun;
 #endif
 
 #include "rsi_udma_wrapper.h"
+#include "sli_code_classification.h"
 
 //UDMA Defines////
 RSI_UDMA_HANDLE_T udmaHandle0;
@@ -109,6 +110,9 @@ UDMA_RESOURCES UDMA1_Resources = {
     UDMA1_Table          // SRAM base address
 };
 #endif /* RTE_UDMA1 */
+
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_CMSIS_UDMA, SL_CODE_CLASS_TIME_CRITICAL)
+void uDMAx_IRQHandler(UDMA_RESOURCES *udma, RSI_UDMA_DESC_T *UDMA_Table, UDMA_Channel_Info *chnl_info);
 
 /*==============================================*/
 /**

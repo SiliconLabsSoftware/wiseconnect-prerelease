@@ -1,8 +1,8 @@
-# Platform SiWx91x M4 Updater Security
+# SiWx91x Platform M4 Updater Security
 
 ## Table of Contents
 
-- [Platform SiWx91x M4 Updater Security](#platform-siwx91x-m4-updater-security)
+- [SiWx91x Platform M4 Updater Security](#platform-siwx91x-m4-updater-security)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

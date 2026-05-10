@@ -1,8 +1,8 @@
-# Platform SiWx91x GPIO GROUP EXAMPLE
+# SiWx91x Platform GPIO GROUP EXAMPLE
 
 ## Table of Contents
 
-- [Platform SiWx91x GPIO GROUP EXAMPLE](#platform-siwx91x-gpio-group-example)
+- [SiWx91x Platform GPIO GROUP EXAMPLE](#platform-siwx91x-gpio-group-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -206,11 +206,24 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following parameters in [`gpio_group_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_group_example/gpio_group_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_group_example/) file and update/modify following macros if required
+- Configure the following parameters in [`gpio_group_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_group_example/gpio_group_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_group_example/) file and update/modify following macros if required.
+
+- `PIN_COUNT`: Specifies the number of interrupts needed for the group interrupt configuration. By default, it is set to 4.
 
   ```c
     #define PIN_COUNT        4      // Number of interrupts needed
+  ```
+
+- `GRP_COUNT`: Specifies the count of group interrupt pins per group. By default, it is set to 2.
+
+  ```c
     #define GRP_COUNT        2      // Count of group interrupt pins
+  ```
+
+- `NUMBER_OF_PINS`: Specifies the total number of pins used for the pin configuration set. By default, it is set to 4.
+
+  ```c
+    #define NUMBER_OF_PINS   4      // Total number of pins for pin configuration set
   ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
@@ -244,3 +257,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

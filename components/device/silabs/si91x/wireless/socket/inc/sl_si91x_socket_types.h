@@ -34,7 +34,12 @@
 #include "sl_si91x_types.h"
 #include "cmsis_os2.h" // CMSIS RTOS2
 #ifdef SLI_SI91X_NETWORK_DUAL_STACK
+#include "lwipopts.h"
+#if LWIP_SOCKET
 #include "lwip/sockets.h"
+#else
+#include "sli_si91x_socket_defs.h"
+#endif
 #else
 #ifndef __ZEPHYR__
 #include "socket.h"
@@ -229,7 +234,16 @@ typedef enum {
 #define SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA 256
 
 #ifdef SLI_SI91X_NETWORK_DUAL_STACK
-#if !LWIP_IPV6
+#if LWIP_SOCKET && !LWIP_IPV4
+struct sockaddr_in {
+  u8_t sin_len;            /* length of this structure    */
+  sa_family_t sin_family;  /* AF_INET                     */
+  in_port_t sin_port;      /* Transport layer port #      */
+  struct in_addr sin_addr; /* IPv4 address                */
+  char sin_zero[8];        /* padding                     */
+};
+#endif
+#if LWIP_SOCKET && !LWIP_IPV6
 struct sockaddr_in6 {
   u8_t sin6_len;             /* length of this structure    */
   sa_family_t sin6_family;   /* AF_INET6                    */

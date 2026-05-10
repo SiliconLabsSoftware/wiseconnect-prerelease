@@ -3,7 +3,7 @@ package: wifi_app
 quality: production
 label: Wi-Fi - WPS PBC (NCP)
 category: Example|Wi-Fi
-description: 'Start WPS Push Button Configuration (PBC) to connect to an Access Point
+description: 'Start WPS Push Button Configuration (PBC) to connect to an Access Point.
 
   '
 filter:

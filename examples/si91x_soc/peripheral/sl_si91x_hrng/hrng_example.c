@@ -54,8 +54,16 @@ void hrng_example_init(void)
     /* Enable the HRNG module */
     status = sl_si91x_hrng_init();
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("Failed to initialize HRNG\n");
+      /* Note: All status messages in this example — both success and failure — are
+ * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
+ * on the console at the default log level. This is a demonstration choice, not
+ * a recommendation: in production code, ERROR severity should be reserved for
+ * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
+ * (or SL_PRINT_STRING_DEBUG for verbose trace). */
+      SL_PRINT_STRING_ERROR("Failed to initialize HRNG\n");
       break;
+    } else {
+      SL_PRINT_STRING_ERROR("Successfully initialized HRNG\n");
     }
   } while (false);
 }
@@ -76,7 +84,7 @@ static sl_status_t checkRandomNumRepeat(uint32_t *random_buff, uint32_t len)
   for (i = 0; i < len - 1; i++) {
     for (j = i + 1; j < len; j++) {
       if (random_buff[i] == random_buff[j]) {
-        DEBUGOUT("Repeated numbers found: %lu at index %ld and %ld\n", random_buff[i], i, j);
+        SL_PRINT_STRING_ERROR("Repeated numbers found: %lu at index %ld and %ld\n", random_buff[i], i, j);
         return status;
       }
     }
@@ -101,10 +109,10 @@ static sl_status_t hrng_read_and_process(sl_si91x_hrng_mode_t mode, const char *
 
   status = sl_si91x_hrng_start(mode);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to start HRNG\n");
+    SL_PRINT_STRING_ERROR("Failed to start HRNG\n");
     return status;
   } else {
-    DEBUGOUT("Successfully started HRNG in %s mode\n", mode_name);
+    SL_PRINT_STRING_ERROR("Successfully started HRNG with %s mode\n", mode_name);
   }
 
 #ifndef LFSR_MODE_EN
@@ -114,25 +122,29 @@ static sl_status_t hrng_read_and_process(sl_si91x_hrng_mode_t mode, const char *
 #endif
 
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to read HRNG data\n");
+    SL_PRINT_STRING_ERROR("Failed to read HRNG data\n");
     return status;
+  } else {
+    SL_PRINT_STRING_ERROR("Successfully read HRNG data\n");
   }
 
   status = sl_si91x_hrng_stop();
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to stop HRNG\n");
+    SL_PRINT_STRING_ERROR("Failed to stop HRNG\n");
     return status;
+  } else {
+    SL_PRINT_STRING_ERROR("Successfully stopped HRNG\n");
   }
 
   for (int i = 0; i < HRNG_TRANSFER_SIZE; i++) {
-    DEBUGOUT("Random Byte [%d]: %lu\n", i, random_bytes[i]);
+    SL_PRINT_STRING_ERROR("Random Byte [%d]: %lu\n", i, random_bytes[i]);
   }
 
   status = checkRandomNumRepeat(random_bytes, HRNG_TRANSFER_SIZE);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Random numbers are repeated\n");
+    SL_PRINT_STRING_ERROR("Random numbers are repeated\n");
   } else {
-    DEBUGOUT("Random numbers are not repeated\n");
+    SL_PRINT_STRING_ERROR("Random numbers are not repeated\n");
   }
 
   return status;
@@ -151,19 +163,24 @@ void hrng_example_process_action(void)
 
   /* Soft reset enabled state */
   sl_si91x_hrng_soft_reset_set();
+
   hrng_read_and_process(SL_SI91X_HRNG_PSEUDO_RANDOM, "PSEUDO_RANDOM (soft reset enabled)");
 
   /* PSEUDO_RANDOM mode */
   sl_si91x_hrng_soft_reset_clear();
+
   hrng_read_and_process(SL_SI91X_HRNG_PSEUDO_RANDOM, "PSEUDO_RANDOM");
 
   /* TRUE_RANDOM mode */
+
   hrng_read_and_process(SL_SI91X_HRNG_TRUE_RANDOM, "TRUE_RANDOM");
 
   /* Disable the HRNG */
   status = sl_si91x_hrng_deinit();
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to de-initialize HRNG\n");
+    SL_PRINT_STRING_ERROR("Failed to de-initialize HRNG\n");
+  } else {
+    SL_PRINT_STRING_ERROR("Successfully de-initialized HRNG\n");
   }
   while (1)
     ;

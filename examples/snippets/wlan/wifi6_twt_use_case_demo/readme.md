@@ -144,13 +144,13 @@ In general, it is advisable to start the server before the client since the clie
     #define UDP_SERVER_PORT 5005
     ```
 
-  - SERVER_IP_ADDRESS_TCP refers remote peer IP address (Si91x remote module/ any end user application device IP) to connect with TCP server socket.
+  - SERVER_IP_ADDRESS_TCP refers remote peer IP address (SiWx91x remote module/ any end user application device IP) to connect with TCP server socket.
 
     ```c
     #define SERVER_IP_ADDRESS_TCP "192.168.50.68"
     ```
 
-  - SERVER_IP_ADDRESS_UDP refers remote peer IP address (Si91x remote module/ any end user application device IP) to connect with UDP server socket.
+  - SERVER_IP_ADDRESS_UDP refers remote peer IP address (SiWx91x remote module/ any end user application device IP) to connect with UDP server socket.
 
     ```c
     #define SERVER_IP_ADDRESS_UDP "192.168.50.136"

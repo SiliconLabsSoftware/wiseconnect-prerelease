@@ -1,8 +1,8 @@
-# Platform SiWx91x ULP CALENDAR
+# SiWx91x Platform ULP CALENDAR
 
 ## Table of Contents
 
-- [Platform SiWx91x ULP CALENDAR](#platform-siwx91x-ulp-calendar)
+- [SiWx91x Platform ULP CALENDAR](#platform-siwx91x-ulp-calendar)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
@@ -100,31 +100,123 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Set any of the macro in calender_example.h whose functionality needs to be tested.
+- Set any of the macros in `calendar_example.h` whose functionality needs to be tested.
 
-- To enable alarm trigger callback set the ALARM_EXAMPLE macro.
+- `ALARM_EXAMPLE`: If ALARM_EXAMPLE is enabled, it prints "Alarm Callback is Triggered" on console when the alarm is triggered. By default, it is set to 1.
 
-  ```C
-   #define ALARM_EXAMPLE       1 ///< To enable alarm trigger \n
+  ```c
+    #define ALARM_EXAMPLE       1 ///< To enable alarm trigger \n
   ```
 
-- To enable second trigger callback set the SEC_INTR macro.
+- `SEC_INTR`: If SEC_INTR is enabled, every one second "One Sec Callback is Triggered" print is displayed on the serial console. By default, it is set to 1.
 
-   ```C
-    #define SEC_INTR           1 ///< To enable one second trigger \n
-   ```
+  ```c
+    #define SEC_INTR            1 ///< To enable one second trigger \n
+  ```
 
-- To enable millisecond trigger callback set the MILLI_SEC_INTR macro.
+- `MILLI_SEC_INTR`: If MILLI_SEC_INTR is enabled, every one second "One Milli-Sec Callback triggered 1000 times" print is displayed on the serial console. By default, it is set to 1.
 
-   ```C
-    #define MILLI_SEC_INTR     1 ///< To enable one millisecond trigger \n
-   ```
+  ```c
+    #define MILLI_SEC_INTR      1 ///< To enable one millisecond trigger \n
+  ```
 
-- To enable time conversion set the TIME_CONVERSION macro.
+- `TIME_CONVERSION`: If TIME_CONVERSION is enabled, time conversion between Unix and NTP is printed on serial console. By default, it is set to 1.
 
-   ```C
-    #define TIME_CONVERSION    1 ///< To enable time conversion trigger \n
-   ```
+  ```c
+    #define TIME_CONVERSION     1 ///< To enable time conversion trigger \n
+  ```
+
+- Configure the following macros in the [`ulp_calendar_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_calendar/ulp_calendar_example.c) file and update/modify following macros, if required.
+
+- `MAX_SECOND`: Total number of seconds in one minute, used as a bound when iterating time values. By default, it is set to 60u.
+
+  ```c
+    #define MAX_SECOND          60u        // Total seconds in one minute
+  ```
+
+- `MAX_MINUTE`: Total number of minutes in one hour, used as a bound when iterating time values. By default, it is set to 60u.
+
+  ```c
+    #define MAX_MINUTE          60u        // Total minutes in one hour
+  ```
+
+- `MAX_HOUR`: Total number of hours in one day, used as a bound when iterating time values. By default, it is set to 24u.
+
+  ```c
+    #define MAX_HOUR            24u        // Total hours in one day
+  ```
+
+- `SECONDS_IN_HOUR`: Total number of seconds in one hour, used in time calculations. By default, it is set to 3600u.
+
+  ```c
+    #define SECONDS_IN_HOUR     3600u      // Total seconds in one hour
+  ```
+
+- `UNIX_TEST_TIMESTAMP`: Unix timestamp used as a reference value for time-conversion tests (2001-02-02 18:10:00). By default, it is set to 981117600u.
+
+  ```c
+    #define UNIX_TEST_TIMESTAMP 981117600u // Unix Time Stamp for 2001-02-02 18:10:00
+  ```
+
+- `MS_DEBUG_DELAY`: Number of one-millisecond trigger counts required before a debug print is emitted from the millisecond callback. By default, it is set to 1000u.
+
+  ```c
+    #define MS_DEBUG_DELAY      1000u      // Debug prints after every 1000 counts (callback trigger)
+  ```
+
+- `ALARM_CENTURY`: Century value used when building the alarm date-time. By default, it is set to 2u.
+
+  ```c
+    #define ALARM_CENTURY      2u
+  ```
+
+- `ALARM_YEAR`: Year value used when building the alarm date-time. By default, it is set to 1u.
+
+  ```c
+    #define ALARM_YEAR         1u
+  ```
+
+- `ALARM_MONTH`: Month used when building the alarm date-time. By default, it is set to February.
+
+  ```c
+    #define ALARM_MONTH        February
+  ```
+
+- `ALARM_DAY_OF_WEEK`: Day of the week used when building the alarm date-time. By default, it is set to Friday.
+
+  ```c
+    #define ALARM_DAY_OF_WEEK  Friday
+  ```
+
+- `ALARM_DAY`: Day of the month used when building the alarm date-time. By default, it is set to 2u.
+
+  ```c
+    #define ALARM_DAY          2u
+  ```
+
+- `ALARM_HOUR`: Hour used when building the alarm date-time. By default, it is set to 18u.
+
+  ```c
+    #define ALARM_HOUR         18u
+  ```
+
+- `ALARM_MINUTE`: Minute used when building the alarm date-time. By default, it is set to 10u.
+
+  ```c
+    #define ALARM_MINUTE       10u
+  ```
+
+- `ALARM_SECONDS`: Seconds value used when building the alarm date-time. By default, it is set to 15u.
+
+  ```c
+    #define ALARM_SECONDS      15u
+  ```
+
+- `ALARM_MILLISECONDS`: Milliseconds value used when building the alarm date-time. By default, it is set to 100u.
+
+  ```c
+    #define ALARM_MILLISECONDS 100u
+  ```
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -166,3 +258,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

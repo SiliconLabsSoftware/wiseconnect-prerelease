@@ -1,8 +1,8 @@
-# Platform SiWx91x ICM40627
+# SiWx91x Platform ICM40627
 
 ## Table of Contents
 
-- [Platform SiWx91x ICM40627](#platform-siwx91x-icm40627)
+- [SiWx91x Platform ICM40627](#platform-siwx91x-icm40627)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)
@@ -54,11 +54,11 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Application Build Environment
 
-- Configure the following macros in the [`icm40627_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_icm40627/icm40627_example.c) file and update/modify following macros, if required.
+- Configure the following macros in the [`icm40627_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_icm40627/icm40627_example.c) file and update/modify following macros, if required.
 
 - `DELAY_PERIODIC_MS1`: Select the delay for data display. By default, the delay is kept as 2 seconds.
 
-    ```C
+    ```c
     #define DELAY_PERIODIC_MS1  2000      //sleeptimer1 periodic timeout in ms
     ```
 
@@ -87,3 +87,4 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

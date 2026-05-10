@@ -1,8 +1,8 @@
-# Platform SiWx91x Peripheral PSRAM Driver Example
+# SiWx91x Platform Peripheral PSRAM Driver Example
 
 ## Table of Contents
 
-- [Platform SiWx91x Peripheral PSRAM Driver Example](#platform-siwx91x-peripheral-psram-driver-example)
+- [SiWx91x Platform Peripheral PSRAM Driver Example](#platform-siwx91x-peripheral-psram-driver-example)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
@@ -52,6 +52,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
+- Configure the following macros in [`main.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/psram_driver_example/main.c) file and update/modify following macros, if required.
+
+  - `READ_WRITE_LENGTH`: Number of bytes transferred in each PSRAM read/write test (auto mode, manual mode, and DMA mode). By default, it is set to 256.
+
+    ```c
+    #define READ_WRITE_LENGTH       256 // Read/write length
+    ```
+
+  - `BIT_8_READ_WRITE_LENGTH`: Number of bytes used for the 8-bit wide PSRAM read/write tests. By default, it is set to 32.
+
+    ```c
+    #define BIT_8_READ_WRITE_LENGTH 32  // 8-bit read/write length
+    ```
+
 - PSRAM Read-Write type and interface mode can be configured from "PSRAM Core" component under "Software Components" tab via GUI.
 
 ## PSRAM Core Component Installation
@@ -97,3 +111,4 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
+

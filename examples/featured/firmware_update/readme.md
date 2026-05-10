@@ -114,7 +114,7 @@ The application can be configured to suit user requirements and development envi
 
 ### STA Instance Related Parameters
 
-- DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which the Wi-Fi network shall be advertised. The Si91X module is connected to it.
+- DEFAULT_WIFI_CLIENT_PROFILE_SSID refers to the name with which the Wi-Fi network shall be advertised. The SiWx91x module is connected to it.
 
   	```c
   	#define DEFAULT_WIFI_CLIENT_PROFILE_SSID               "YOUR_AP_SSID"      
@@ -211,14 +211,14 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ### Build and Run the TCP Server (Linux PC)
 
-  1. Copy the TCP server application [firmware_update_tcp_server_9117.c](https://github.com/SiliconLabs/wiseconnect/blob/v4.0.1-content-for-docs/examples/featured/firmware_update/firmware_update_tcp_server_9117.c) provided with the application source to a Linux PC connected to the Wi-Fi access point.
+  1. Copy the TCP server application [firmware_update_tcp_server_9117.c](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/featured/firmware_update/firmware_update_tcp_server_9117.c) provided with the application source to a Linux PC connected to the Wi-Fi access point.
   2. Compile the application
   
      ```c
 	  user@linux:~$ gcc firmware_update_tcp_server_9117.c -o ota_server.bin
 	  ```
 
-  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.0.1-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
+  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
 
       ```c
       user@linux:~$ ./ota_server.bin 5001 SiWG917-B.2.x.x.x.x.x.rps
@@ -232,7 +232,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
       ![Figure: cygwin server compilation](resources/readme/cygwin_server_compilation.png)
   
-  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.0.1-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
+  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
 
       ```c
       ./ota_server 5001 SiWG917-B.2.x.x.x.x.x.rps
