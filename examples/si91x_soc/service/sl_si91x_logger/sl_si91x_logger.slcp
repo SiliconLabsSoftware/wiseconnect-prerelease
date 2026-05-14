@@ -20,7 +20,6 @@ component:
 - id: network_manager
 - id: basic_network_config_manager
 - id: wifi_resources
-- id: sl_si91x_basic_buffers
 - id: si91x_log
 - id: si91x_log_iostream_formatted
 - id: iostream_si91x

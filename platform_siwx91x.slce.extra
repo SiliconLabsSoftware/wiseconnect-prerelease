@@ -1590,6 +1590,9 @@ extra_files:
 - components/board/silabs/config/brd4187c/sl_device_init_emu_config.h
 - components/board/silabs/config/brd4187c/sl_device_init_hfxo_config.h
 - components/board/silabs/config/brd4187c/sl_power_manager_config.h
+- components/board/silabs/config/brd4120a/si91x_ncp_spi_config.h
+- components/board/silabs/config/brd4120a/sl_board_configuration.h
+- components/board/silabs/config/brd4120a/si91x_ncp_uart_config.h
 - components/board/silabs/config/brd2911a/sl_gpio_board.h
 - components/board/silabs/config/brd2911a/sl_si91x_led_init_led0_config.h
 - components/board/silabs/config/brd2911a/sl_board_control.h

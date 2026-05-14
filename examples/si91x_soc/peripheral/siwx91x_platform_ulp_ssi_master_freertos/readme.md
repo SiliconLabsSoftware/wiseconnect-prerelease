@@ -72,6 +72,7 @@ For half-duplex communication (that is, send and receive), a primary / secondary
 - The task loops on `ulp_ssi_current_mode`: under `SL_ULP_SSI_PROCESS_ACTION` it clears stale semaphore tokens, runs the enabled transfer/send/receive paths from `ulp_ssi_freertos.h`, blocks in `ulp_ssi_wait_transfer_done()` when needed, and may run `ulp_ssi_compare_loopback()`. `SL_ULP_SSI_POWER_STATE_TRANSITION` tears down and reinitializes SSI while switching PS4 ↔ PS2, then the flow idles in `SL_ULP_SSI_TRANSMISSION_COMPLETED`.
 - `ulp_ssi_event_callback` releases `ulp_ssi_xfer_sem` only on `SSI_EVENT_TRANSFER_COMPLETE`.
 
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -217,6 +218,13 @@ For the **BRD4343C** pin table above (CS1 on **ULP_GPIO_4** [P17]), apply the up
    static uint32_t ulp_ssi_slave_number = SSI_SLAVE_1;
    ```
 ## Test the Application
+
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 

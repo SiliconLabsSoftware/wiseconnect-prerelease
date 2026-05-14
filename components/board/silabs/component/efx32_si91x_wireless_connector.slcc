@@ -56,6 +56,10 @@ include:
       - path: sl_power_manager_config.h
       - path: sl_sleeptimer_config.h
     condition: [brd4187c]
+  - path: "config/brd4120a"
+    file_list:
+      - path: sl_board_configuration.h
+    condition: [brd4120a]
   - path: "config/brd4271a"
     condition: [brd4271a]
     file_list:

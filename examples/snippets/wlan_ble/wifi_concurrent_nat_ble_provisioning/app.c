@@ -188,20 +188,20 @@ void rsi_wlan_ble_app_init(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
-  LOG_PRINT("\r\n Wi-Fi Initialization Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, " Wi-Fi Initialization Success");
 
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (wlan_thread_sem == NULL) {
-    LOG_PRINT("Failed to create wlan_thread_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem");
     return;
   }
 
   ble_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_thread_sem == NULL) {
-    LOG_PRINT("Failed to create ble_thread_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem");
     return;
   }
 
@@ -209,15 +209,15 @@ void rsi_wlan_ble_app_init(void *argument)
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nm4_ta_secure_handshake Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
 #endif
 
 #if !AP_ONLY_MODE
   if (osThreadNew((osThreadFunc_t)ble_configurator_task, NULL, &ble_thread_attributes) == NULL) {
-    LOG_PRINT("Failed to create BLE thread\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create BLE thread");
   }
 
   // BLE initialization

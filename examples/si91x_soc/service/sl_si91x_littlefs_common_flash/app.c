@@ -14,6 +14,7 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+#include <inttypes.h>
 #include "lfs.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"

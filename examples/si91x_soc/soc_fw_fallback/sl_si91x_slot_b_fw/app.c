@@ -40,6 +40,7 @@
 #include "socket.h"
 #include <string.h>
 #include <stddef.h>
+#include <inttypes.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_hal_soc_soft_reset.h"
@@ -267,7 +268,7 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_firmware_update_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     while (1)
       ; // Halt execution in case of failure
   }
@@ -284,7 +285,7 @@ static void application_start(void *argument)
   // Retrieve the current firmware version
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to fetch firmware version: 0x%lx\r\n", status);
+    DEBUGOUT("\r\nFailed to fetch firmware version: 0x%x\r\n", (unsigned int)status);
   } else {
     print_firmware_version(&version);
   }
@@ -303,7 +304,7 @@ static void application_start(void *argument)
     }
     sl_si91x_soc_nvic_reset(); //Reset the system to apply the new slot configuration
 #endif
-    DEBUGOUT("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+    DEBUGOUT("Failed to bring Wi-Fi client interface up: 0x%x\r\n", (unsigned int)status);
     osThreadExit(); // Exit thread on failure
   }
   DEBUGOUT("\r\nWi-Fi Client Connected\r\n");
@@ -319,9 +320,9 @@ static void application_start(void *argument)
     if (nwp_fw_addr != 0) {
       sl_status_t burn_status = sl_si91x_burn_nwp_security_version(nwp_fw_addr);
       if (burn_status != SL_STATUS_OK) {
-        DEBUGOUT("\r\nFailed to burn NWP security version: 0x%lX at 0x%lX\r\n", burn_status, nwp_fw_addr);
+        DEBUGOUT("\r\nFailed to burn NWP security version: 0x%X at 0x%X\r\n", burn_status, nwp_fw_addr);
       } else {
-        DEBUGOUT("\r\nBurned NWP security version at 0x%lX\r\n", nwp_fw_addr);
+        DEBUGOUT("\r\nBurned NWP security version at 0x%X\r\n", nwp_fw_addr);
       }
     } else {
       DEBUGOUT("\r\nSkipping NWP security version burn: invalid NWP address\r\n");
@@ -411,10 +412,14 @@ static sl_status_t firmware_update_process(int client_socket)
         }
         status = sl_si91x_verify_image(ota_image_start_address);
         if (status != SL_STATUS_SI91X_FW_UPDATE_DONE) {
-          DEBUGOUT("\r\nFirmware verify check fail:%lX %lX\r\n", status, ota_image_start_address);
+          DEBUGOUT("\r\nFirmware verify check fail:%X %X\r\n",
+                   (unsigned int)status,
+                   (unsigned int)ota_image_start_address);
           return STATE_ERROR;
         } else {
-          DEBUGOUT("\r\nFirmware verify check success:%lX %lX\r\n", status, ota_image_start_address);
+          DEBUGOUT("\r\nFirmware verify check success:%X %X\r\n",
+                   (unsigned int)status,
+                   (unsigned int)ota_image_start_address);
 
           // Update slot information after image verification
 #if SL_APP_UPDATE_FIRMWARE_SLOT
@@ -427,7 +432,7 @@ static sl_status_t firmware_update_process(int client_socket)
                                                          ota_image_size,
                                                          SL_SI91X_AB_OTA_IMAGE_TYPE_M4);
               if (status != SL_STATUS_OK) {
-                DEBUGOUT("Failed to update M4 slot, error: %lu\n", status);
+                DEBUGOUT("Failed to update M4 slot, error: %u\n", (unsigned int)status);
               } else {
                 DEBUGOUT("\r\n Successfully updated M4 slot information \r\n");
               }
@@ -441,7 +446,7 @@ static sl_status_t firmware_update_process(int client_socket)
                                                          ota_image_size,
                                                          SL_SI91X_AB_OTA_IMAGE_TYPE_NWP);
               if (status != SL_STATUS_OK) {
-                DEBUGOUT("Failed to update NWP slot, error: %lu\n", status);
+                DEBUGOUT("Failed to update NWP slot, error: %u\n", (unsigned int)status);
               } else {
                 DEBUGOUT("\r\n Successfully updated NWP slot information \r\n");
               }
@@ -625,15 +630,15 @@ static sl_status_t sl_app_processing_response(int client_socket,
 
       if (ota_fw_upgrade_type == 1) {
         // Erase flash memory in chunks(4096)
-        DEBUGOUT("\r\nFirmware flash erase progress for updater image.....%lX %lX \r\n",
-                 remaining_size,
-                 current_erase_addr);
+        DEBUGOUT("\r\nFirmware flash erase progress for updater image.....%X %X \r\n",
+                 (unsigned int)remaining_size,
+                 (unsigned int)current_erase_addr);
         status = sl_app_flash_erase_inactive_m4_slot(ota_config.ota_image_size);
         if (status != SL_STATUS_OK) {
-          DEBUGOUT("\r\nFirmware flash erase fail for updater image: %lX\r\n", status);
+          DEBUGOUT("\r\nFirmware flash erase fail for updater image: %X\r\n", (unsigned int)status);
           return STATE_ERROR; // Fatal error: Cannot write new firmware without erasing flash
         }
-        DEBUGOUT("\r\nFirmware flash erase success for updater image:%lX\r\n", status);
+        DEBUGOUT("\r\nFirmware flash erase success for updater image:%X\r\n", (unsigned int)status);
       } else {
         // Erase flash memory in chunks(4096)
         while (remaining_size > 0) {
@@ -641,14 +646,16 @@ static sl_status_t sl_app_processing_response(int client_socket,
 
           status = sl_si91x_flash_erase(current_erase_addr, erase_size);
           if (status != SL_STATUS_OK) {
-            DEBUGOUT("\r\nFirmware flash erase fail at address 0x%lX: %lX\r\n", current_erase_addr, status);
+            DEBUGOUT("\r\nFirmware flash erase fail at address 0x%X: %X\r\n",
+                     (unsigned int)current_erase_addr,
+                     (unsigned int)status);
             return STATE_ERROR; // Fatal error: Cannot write new firmware without erasing flash
           }
           current_erase_addr += erase_size;
           remaining_size -= erase_size;
         }
       }
-      DEBUGOUT("\r\nFirmware flash erase success:%lu\r\n", status);
+      DEBUGOUT("\r\nFirmware flash erase success:%u\r\n", (unsigned int)status);
 
       DEBUGOUT("\r\nchunk writing progress.....\r\n");
     } else {
@@ -698,21 +705,21 @@ void sl_app_display_ab_slot_info(const sl_si91x_fw_ab_slot_management_t *slot_in
   }
 
   DEBUGOUT("\r\n========= Firmware Fallback A/B Slot Information =========");
-  DEBUGOUT("\r\nMagic Word: 0x%lX", (unsigned long)slot_info->slot_magic_word);
+  DEBUGOUT("\r\nMagic Word: 0x%X", (unsigned int)slot_info->slot_magic_word);
 
   // M4 Slot Information
   DEBUGOUT("\r\n---- M4 Slot Information ----");
   DEBUGOUT("\r\nM4 Slot A:");
   DEBUGOUT("\r\n  Slot ID: %u", slot_info->m4_slot_info.m4_slot_A.slot_id);
-  DEBUGOUT("\r\n  Image Offset: 0x%lX",
-           (unsigned long)slot_info->m4_slot_info.m4_slot_A.slot_image_offset & 0x00FFFFFF);
-  DEBUGOUT("\r\n  Image Size: 0x%lX bytes", (unsigned long)slot_info->m4_slot_info.m4_slot_A.image_size);
+  DEBUGOUT("\r\n  Image Offset: 0x%X",
+           (unsigned int)(slot_info->m4_slot_info.m4_slot_A.slot_image_offset & 0x00FFFFFF));
+  DEBUGOUT("\r\n  Image Size: 0x%X bytes", (unsigned int)slot_info->m4_slot_info.m4_slot_A.image_size);
 
   DEBUGOUT("\r\nM4 Slot B:");
   DEBUGOUT("\r\n  Slot ID: %u", slot_info->m4_slot_info.m4_slot_B.slot_id);
-  DEBUGOUT("\r\n  Image Offset: 0x%lX",
-           (unsigned long)slot_info->m4_slot_info.m4_slot_B.slot_image_offset & 0x00FFFFFF);
-  DEBUGOUT("\r\n  Image Size: 0x%lX bytes", (unsigned long)slot_info->m4_slot_info.m4_slot_B.image_size);
+  DEBUGOUT("\r\n  Image Offset: 0x%X",
+           (unsigned int)(slot_info->m4_slot_info.m4_slot_B.slot_image_offset & 0x00FFFFFF));
+  DEBUGOUT("\r\n  Image Size: 0x%X bytes", (unsigned int)slot_info->m4_slot_info.m4_slot_B.image_size);
 
   DEBUGOUT("\r\nCurrently Active M4 Slot: %c",
            slot_info->m4_slot_info.current_active_M4_slot == SLOT_A
@@ -723,22 +730,22 @@ void sl_app_display_ab_slot_info(const sl_si91x_fw_ab_slot_management_t *slot_in
   DEBUGOUT("\r\n---- NWP Slot Information ----");
   DEBUGOUT("\r\nNWP Slot A:");
   DEBUGOUT("\r\n  Slot ID: %u", slot_info->nwp_slot_info.nwp_slot_A.slot_id);
-  DEBUGOUT("\r\n  Image Offset: 0x%lX",
-           (unsigned long)slot_info->nwp_slot_info.nwp_slot_A.slot_image_offset & 0x00FFFFFF);
-  DEBUGOUT("\r\n  Image Size: 0x%lX bytes", (unsigned long)slot_info->nwp_slot_info.nwp_slot_A.image_size);
+  DEBUGOUT("\r\n  Image Offset: 0x%X",
+           (unsigned int)(slot_info->nwp_slot_info.nwp_slot_A.slot_image_offset & 0x00FFFFFF));
+  DEBUGOUT("\r\n  Image Size: 0x%X bytes", (unsigned int)slot_info->nwp_slot_info.nwp_slot_A.image_size);
 
   DEBUGOUT("\r\nNWP Slot B:");
   DEBUGOUT("\r\n  Slot ID: %u", slot_info->nwp_slot_info.nwp_slot_B.slot_id);
-  DEBUGOUT("\r\n  Image Offset: 0x%lX",
-           (unsigned long)slot_info->nwp_slot_info.nwp_slot_B.slot_image_offset & 0x00FFFFFF);
-  DEBUGOUT("\r\n  Image Size: 0x%lX bytes", (unsigned long)slot_info->nwp_slot_info.nwp_slot_B.image_size);
+  DEBUGOUT("\r\n  Image Offset: 0x%X",
+           (unsigned int)(slot_info->nwp_slot_info.nwp_slot_B.slot_image_offset & 0x00FFFFFF));
+  DEBUGOUT("\r\n  Image Size: 0x%X bytes", (unsigned int)slot_info->nwp_slot_info.nwp_slot_B.image_size);
 
   DEBUGOUT("\r\nCurrently Active NWP Slot: %c",
            slot_info->nwp_slot_info.current_active_nwp_slot == SLOT_A
              ? 'A'
              : (slot_info->nwp_slot_info.current_active_nwp_slot == SLOT_B ? 'B' : 'N'));
 
-  DEBUGOUT("\r\nSlot Structure CRC: 0x%lX", (unsigned long)slot_info->slot_struct_crc);
+  DEBUGOUT("\r\nSlot Structure CRC: 0x%X", (unsigned int)slot_info->slot_struct_crc);
   DEBUGOUT("\r\n=============================================\r\n");
 }
 
@@ -770,7 +777,7 @@ static void sl_app_handle_ab_slot_info(sl_si91x_fw_ab_slot_management_t *app_ab_
   status =
     sl_si91x_ab_upgrade_set_slot_info(rom_address - SL_SI91X_CHUNK_LENGTH, rom_length, SL_SI91X_AB_OTA_IMAGE_TYPE_M4);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to update M4 slot, error: %lu\n", status);
+    DEBUGOUT("Failed to update M4 slot, error: %u\n", (unsigned int)status);
   } else {
     DEBUGOUT("\r\n Successfully updated M4 slot information \r\n");
   }
@@ -780,7 +787,7 @@ static void sl_app_handle_ab_slot_info(sl_si91x_fw_ab_slot_management_t *app_ab_
                                              DEFAULT_NWP_IMAGE_SIZE,
                                              SL_SI91X_AB_OTA_IMAGE_TYPE_NWP);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to update NWP slot, error: %lu\n", status);
+    DEBUGOUT("Failed to update NWP slot, error: %u\n", (unsigned int)status);
   } else {
     DEBUGOUT("Successfully updated NWP slot information\r\n");
   }
@@ -791,7 +798,7 @@ static void sl_app_handle_ab_slot_info(sl_si91x_fw_ab_slot_management_t *app_ab_
   if (status == SL_STATUS_OK) {
     DEBUGOUT("\r\nUpdated slot information retrieved successfully.\r\n");
   } else {
-    DEBUGOUT("\r\nFailed to retrieve updated slot information, error: %lu\n", status);
+    DEBUGOUT("\r\nFailed to retrieve updated slot information, error: %u\n", (unsigned int)status);
   }
 }
 
@@ -858,7 +865,7 @@ static sl_status_t sl_app_write_firmware_chunk_to_flash(uint8_t *recv_buffer,
 
     status = sl_si91x_fw_fallback_ota_flash_write(&fw_config, recv_buffer);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("\r\nFirmware flash Write fail (header):%lu\r\n", status);
+      DEBUGOUT("\r\nFirmware flash Write fail (header):%u\r\n", (unsigned int)status);
       return STATE_ERROR;
     }
 
@@ -872,7 +879,7 @@ static sl_status_t sl_app_write_firmware_chunk_to_flash(uint8_t *recv_buffer,
 
     status = sl_si91x_fw_fallback_ota_flash_write(&fw_config, recv_buffer + SLI_SI91X_RPS_HEADER_SIZE);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("\r\nFirmware flash Write fail (firmware):%lu\r\n", status);
+      DEBUGOUT("\r\nFirmware flash Write fail (firmware):%u\r\n", (unsigned int)status);
       return STATE_ERROR;
     }
 
@@ -885,7 +892,7 @@ static sl_status_t sl_app_write_firmware_chunk_to_flash(uint8_t *recv_buffer,
     // All other chunks: write as single chunk
     status = sl_si91x_fw_fallback_ota_flash_write(&fw_config, recv_buffer);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("\r\nFirmware flash Write fail:%lu\r\n", status);
+      DEBUGOUT("\r\nFirmware flash Write fail:%u\r\n", (unsigned int)status);
       return STATE_ERROR;
     }
 
@@ -919,8 +926,8 @@ static uint32_t sl_app_calculate_flash_offset_for_updater(void)
 
     // Check for invalid slot offset values (0xFF or 0x00)
     if (updater_flash_offset_updater == 0xFFFFFFFF || updater_flash_offset_updater == 0x00) {
-      DEBUGOUT("\r\nError: Invalid Slot B offset (0x%lX) for updater image\r\n",
-               (unsigned long)updater_flash_offset_updater);
+      DEBUGOUT("\r\nError: Invalid Slot B offset (0x%" PRIx32 ") for updater image\r\n",
+               (uint32_t)updater_flash_offset_updater);
       return 0; // Return 0 to indicate error
     }
   } else if (global_slot_info.m4_slot_info.current_active_M4_slot == SLOT_B) {
@@ -929,8 +936,8 @@ static uint32_t sl_app_calculate_flash_offset_for_updater(void)
 
     // Check for invalid slot offset values (0xFF or 0x00)
     if (updater_flash_offset_updater == 0xFFFFFFFF || updater_flash_offset_updater == 0x00) {
-      DEBUGOUT("\r\nError: Invalid Slot A offset (0x%lX) for updater image\r\n",
-               (unsigned long)updater_flash_offset_updater);
+      DEBUGOUT("\r\nError: Invalid Slot A offset (0x%" PRIx32 ") for updater image\r\n",
+               (uint32_t)updater_flash_offset_updater);
       return 0; // Return 0 to indicate error
     }
   } else {
@@ -942,19 +949,19 @@ static uint32_t sl_app_calculate_flash_offset_for_updater(void)
   // Additional check for updater OTA images: ensure updater_flash_offset matches any M4 slot offset address
   if (updater_flash_offset_updater != global_slot_info.m4_slot_info.m4_slot_A.slot_image_offset
       && updater_flash_offset_updater != global_slot_info.m4_slot_info.m4_slot_B.slot_image_offset) {
-    DEBUGOUT("\r\nError: updater_flash_offset (0x%lX) does not match any M4 slot offset address\r\n",
-             (unsigned long)updater_flash_offset_updater);
-    DEBUGOUT("\r\nSlot A offset: 0x%lX, Slot B offset: 0x%lX\r\n",
-             (unsigned long)global_slot_info.m4_slot_info.m4_slot_A.slot_image_offset,
-             (unsigned long)global_slot_info.m4_slot_info.m4_slot_B.slot_image_offset);
+    DEBUGOUT("\r\nError: updater_flash_offset (0x%" PRIx32 ") does not match any M4 slot offset address\r\n",
+             (uint32_t)updater_flash_offset_updater);
+    DEBUGOUT("\r\nSlot A offset: 0x%" PRIx32 ", Slot B offset: 0x%" PRIx32 "\r\n",
+             (uint32_t)global_slot_info.m4_slot_info.m4_slot_A.slot_image_offset,
+             (uint32_t)global_slot_info.m4_slot_info.m4_slot_B.slot_image_offset);
     return 0; // Return 0 to indicate error
   }
 
-  DEBUGOUT("\r\nInitial updater_flash_offset: 0x%lX\r\n", (unsigned long)updater_flash_offset_updater);
+  DEBUGOUT("\r\nInitial updater_flash_offset: 0x%" PRIx32 "\r\n", (uint32_t)updater_flash_offset_updater);
 
   // Use the updater flash offset for all chunks
   flash_offset_to_use = updater_flash_offset_updater;
-  DEBUGOUT("\r\nflash_offset_to_use for updater image: 0x%lX\r\n", (unsigned long)flash_offset_to_use);
+  DEBUGOUT("\r\nflash_offset_to_use for updater image: 0x%" PRIx32 "\r\n", (uint32_t)flash_offset_to_use);
 
   return flash_offset_to_use;
 }
@@ -981,14 +988,18 @@ static sl_status_t sl_app_flash_erase_inactive_m4_slot(uint32_t ota_image_size)
   }
 
   flash_offset_for_updater_image = updater_flash_erase_offset;
-  DEBUGOUT("\r\nFirmware flash erase 0x%lX %lX:\r\n", flash_offset_for_updater_image, ota_image_size);
+  DEBUGOUT("\r\nFirmware flash erase 0x%X %X:\r\n",
+           (unsigned int)flash_offset_for_updater_image,
+           (unsigned int)ota_image_size);
   // Erase flash memory in chunks (4096 bytes)
   while (ota_image_size > 0) {
     uint32_t erase_size = (ota_image_size > SL_SI91X_CHUNK_LENGTH) ? SL_SI91X_CHUNK_LENGTH : ota_image_size;
 
     status = sl_si91x_flash_erase(updater_flash_erase_offset, erase_size);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("\r\nFirmware flash erase fail at address 0x%lX: %lX\r\n", updater_flash_erase_offset, status);
+      DEBUGOUT("\r\nFirmware flash erase fail at address 0x%X: %X\r\n",
+               (unsigned int)updater_flash_erase_offset,
+               (unsigned int)status);
       return status; // Fatal error: Cannot write new firmware without erasing flash
     }
     updater_flash_erase_offset += erase_size;

@@ -28,11 +28,7 @@ component:
 - id: rsilib_clock_update
 - id: sl_main
 - id: iostream_retarget_stdio
-- instance:
-  - vcom
-  id: iostream_uart_si91x
 - id: sl_usart_iostream
-- id: iostream_si91x
 - id: cmsis_usart
 - id: rsilib_userconfig
 - id: rsilib_usart
@@ -40,6 +36,13 @@ component:
 - id: brd4002a
 - id: udma_linker_config
 - id: cmsis_udma
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- instance:
+  - vcom
+  id: iostream_uart_si91x
 requires:
 - name: sl_main
 - name: bsd_socket

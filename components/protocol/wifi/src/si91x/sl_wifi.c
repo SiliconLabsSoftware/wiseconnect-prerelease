@@ -103,8 +103,9 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
 #endif
   sl_status_t status = SL_STATUS_OK;
   status             = sl_si91x_driver_init(configuration, event_handler);
-#if defined(SL_CATALOG_LOG_COMPONENT_PRESENT) && defined(SLI_SI91X_MCU_INTERFACE)
+#if defined(SL_CATALOG_LOG_COMPONENT_PRESENT)
   if (status == SL_STATUS_OK) {
+#if defined(SLI_SI91X_MCU_INTERFACE)
     status = sl_si91x_configure_timestamp_memory_location(sizeof(uint32_t), &sl_si91x_log_host_timesync_address);
     if (status != SL_STATUS_OK) {
       SL_PRINT_STRING_ERROR("\r\nTimestamp Memory Location Configuration Failed with error: 0x%lX\r\n", status);
@@ -112,6 +113,7 @@ sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
     /* After shared timestamp memory is configured, synchronize host and captive-core clocks
      * for logging so M4 and NWP log timestamps are comparable. */
     sl_log_sync_timestamp(SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CORE_ID, SL_SI91X_WIFI_LOG_INIT_TIMESYNC_CONTEXT_PTR);
+#endif
     sl_log_level_t level        = sl_log_get_loglevel();
     sli_nwp_log_config_t config = { .log_config_level = (uint8_t)level };
     status                      = sli_nwp_log_configure(&config);

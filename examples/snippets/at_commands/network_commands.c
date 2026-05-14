@@ -627,31 +627,6 @@ static sl_status_t convert_string_to_sl_ipv6_address(char *line, uint16_t *ipv6)
   return SL_STATUS_OK;
 }
 
-// ?
-sl_status_t dns_hostgetbyname_command_handler(console_args_t *arguments)
-{
-#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
-  sl_ip_address_t ip_address = { 0 };
-  sl_status_t status;
-
-  const char *host_name  = (const char *)arguments->arg[0];
-  const uint32_t timeout = GET_OPTIONAL_COMMAND_ARG(arguments, 1, 20000, const uint32_t);
-  sl_net_dns_resolution_ip_type_t ip_type =
-    GET_OPTIONAL_COMMAND_ARG(arguments, 2, SL_NET_DNS_TYPE_IPV4, sl_net_dns_resolution_ip_type_t);
-
-  status = sl_net_dns_resolve_hostname(host_name, timeout, ip_type, &ip_address);
-  if (status == SL_STATUS_IN_PROGRESS) {
-    return SL_STATUS_OK;
-  }
-  print_sl_ip_address(&ip_address);
-
-  VERIFY_STATUS_AND_RETURN(status);
-  return status;
-#else
-  return SL_STATUS_NOT_SUPPORTED;
-#endif
-}
-
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 sl_status_t ping_response_callback_handler(sl_net_event_t event, sl_status_t status, void *data, uint32_t user_data)
 {
@@ -660,14 +635,14 @@ sl_status_t ping_response_callback_handler(sl_net_event_t event, sl_status_t sta
 
   if (SL_NET_PING_RESPONSE_EVENT == event) {
     if (status != SL_STATUS_OK) {
-      printf("\n Ping request failed! \n");
+      SL_DEBUG_LOG_V2(ERROR, " Ping request failed! ");
       return status;
     } else {
-      printf(" Ping reply received from %u.%u.%u.%u \n\n",
-             response->ping_address.ipv4_address[0],
-             response->ping_address.ipv4_address[1],
-             response->ping_address.ipv4_address[2],
-             response->ping_address.ipv4_address[3]);
+      SL_DEBUG_LOG_V2(INFO,
+                      " Ping reply received from %u.%u.",
+                      response->ping_address.ipv4_address[0],
+                      response->ping_address.ipv4_address[1]);
+      SL_DEBUG_LOG_V2(INFO, "%u.%u ", response->ping_address.ipv4_address[2], response->ping_address.ipv4_address[3]);
     }
   }
 

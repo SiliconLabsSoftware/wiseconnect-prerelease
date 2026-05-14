@@ -75,6 +75,13 @@ component:
 - id: fwup_at_commands
 - id: uart_at_commands
 - id: sl_uart
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror

@@ -144,6 +144,21 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - It is recommended to have maximum depth for FIFO threshold. Almost Full refers to the RX FIFO and Almost Empty refers to TX FIFO.
   - Configuration files are generated in **config folder**. If not changed, the code will run on default UC values.
 
+- **GPDMA Descriptor Configuration**
+
+  - When using GSPI with GPDMA for TX and RX, the number of DMA descriptors is configurable.
+  - Each GPDMA descriptor can transfer up to 4 KB (4095 bytes) in a single operation.
+  - By default, the number of descriptors for both TX and RX is set to 32.
+  - To transfer larger amounts of data, increase the number of descriptors as needed, ensuring that the total number of bytes to be transferred does not exceed `(number of descriptors) * 4KB`.
+  - Configure the following macros as needed in the GSPI common config or through the configuration wizard:
+
+    ```c
+    #define GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_TX 32 // Number of GPDMA descriptors for TX, default 32
+    #define GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_RX 32 // Number of GPDMA descriptors for RX, default 32
+    ```
+
+  - **Note:** If your total transfer size exceeds `(number of descriptors) * 4095` bytes, increase the number of descriptors accordingly to accommodate the entire transfer.
+
 - Configure the following macros in [`gspi_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gspi/gspi_example.c) if required:
 
 - `GSPI_BUFFER_SIZE`: Defines the size of the data buffer used for GSPI transfer. By default, it is set to 1024.
@@ -262,6 +277,12 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 > **Note:**
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If the user wants to write their own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to their custom interrupt handler.
+>
+> - When GPDMA (DMA mode) is enabled for GSPI, setting the threshold value will have no effect; the threshold setting is ignored when using GPDMA transfers.
+>
+> - When DMA is enabled, UDMA is used by default. GPDMA will be used only if GPDMA is explicitly enabled through configuration.
+
+
 
 ## Troubleshooting
 

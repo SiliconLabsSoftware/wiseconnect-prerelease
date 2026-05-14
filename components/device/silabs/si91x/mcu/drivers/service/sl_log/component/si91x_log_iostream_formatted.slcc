@@ -44,6 +44,7 @@ provides:
 requires:
   - name: si91x_iostream_transport
   - name: log
+  - name: log_platform_core
 recommends:
   - id: si91x_log 
   - id: iostream_rtt_si91x

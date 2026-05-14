@@ -51,9 +51,6 @@
 #include "rsi_bt_common.h"
 #include "rsi_bt_common_apis.h"
 #include "rsi_common_apis.h"
-#if (SL_SI91X_TICKLESS_MODE == 0 && defined(SLI_SI91X_MCU_INTERFACE))
-#include "sl_si91x_power_manager.h"
-#endif
 /*=======================================================================*/
 //   ! MACROS
 /*=======================================================================*/
@@ -65,9 +62,6 @@
 //   ! GLOBAL VARIABLES
 /*=======================================================================*/
 osThreadId_t ble_app_task_handle[TOTAL_CONNECTIONS] = { NULL };
-#if SLI_SI91X_MCU_INTERFACE && ENABLE_NWP_POWER_SAVE
-osThreadId_t ble_sleep_task_handle = NULL;
-#endif
 uint8_t ble_conn_id = 0xFF, peripheral_connection_in_prgs = 0, peripheral_con_req_pending = 0;
 uint16_t rsi_scan_in_progress;
 uint32_t ble_main_app_event_task_map;
@@ -1677,50 +1671,6 @@ void rsi_ble_on_sc_method(rsi_bt_event_sc_method_t *scmethod)
   }
 }
 #endif
-#if (SL_SI91X_TICKLESS_MODE == 0 && SLI_SI91X_MCU_INTERFACE && ENABLE_NWP_POWER_SAVE)
-/*==============================================*/
-/**
- * @fn         check_pending_events
- * @brief      this function checks the pending event to be handled by the application before going to sleep.
- * @param[in]  none
- * @param[out] none
- * @return     True / False.
- * @section description
- * this function checks the pending event to be handled by the application before going to sleep.
- */
-uint32_t check_pending_events()
-{
-  uint32_t ix, pending_event = 0;
-  for (ix = 0; ix < TOTAL_CONNECTIONS; ix++) {
-    if ((ble_app_event_task_map[ix] != 0) || (ble_app_event_task_map1[ix] != 0) || (ble_temp_event_map[ix] != 0)) {
-      pending_event = 1;
-      return pending_event;
-    }
-  }
-  return pending_event;
-}
-
-/*==============================================*/
-/**
- * @fn         rsi_common_sleep_task
- * @brief      this function creates the task for triggering m4 sleep.
- * @param[in]  none
- * @param[out] none
- * @return     none.
- * @section description
- * this function function creates the task for triggering m4 sleep.
- */
-void rsi_common_sleep_task()
-{
-  while (1) {
-    //! if events are not received loop will be continued.
-    if ((!(P2P_STATUS_REG & TA_wakeup_M4)) && !(check_pending_events())) {
-      P2P_STATUS_REG &= ~M4_wakeup_TA;
-      sl_si91x_power_manager_sleep();
-    }
-  }
-}
-#endif
 /*==============================================*/
 /**
  * @fn         rsi_ble_dual_role
@@ -1916,19 +1866,6 @@ void rsi_ble_main_app_task()
   if (status != RSI_SUCCESS) {
     LOG_PRINT("\n BLE dual role init failed\r\n");
   }
-#if (SL_SI91X_TICKLESS_MODE == 0 && SLI_SI91X_MCU_INTERFACE && ENABLE_NWP_POWER_SAVE)
-  const osThreadAttr_t sleep_thread_attributes = {
-    .name       = "sleep_thread",
-    .attr_bits  = 0,
-    .cb_mem     = 0,
-    .cb_size    = 0,
-    .stack_mem  = 0,
-    .stack_size = 2048,
-    .priority   = osPriorityBelowNormal,
-    .tz_module  = 0,
-  };
-  ble_sleep_task_handle = osThreadNew((osThreadFunc_t)rsi_common_sleep_task, NULL, &sleep_thread_attributes);
-#endif
   while (1) {
     //! checking for events list
     event_id = rsi_ble_app_get_event();

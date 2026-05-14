@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include <string.h>
+#include <inttypes.h>
 #include "sensor_hub.h"
 #include "rsi_debug.h"
 #include "rsi_os.h"
@@ -442,7 +443,7 @@ static sl_sensor_impl_type_t *sensorhub_get_sensor_implementation(int32_t sensor
   uint32_t count = sl_si91x_get_implementation_size();
 
   for (uint32_t i = 0; i < count; i++) {
-    if (sensor_impls[i].type == sensor_id) {
+    if ((int32_t)sensor_impls[i].type == sensor_id) {
       return &sensor_impls[i];
     }
   }
@@ -598,7 +599,6 @@ static sl_status_t sensorhub_gpio_interrupt_config(uint16_t gpio_pin, sl_si91x_g
       SL_PRINT_STRING_ERROR("sensorhub_gpio_interrupt_config: sl_gpio_driver_init failed st=0x%04lX,line no : %d\r\n",
                             (unsigned long)status,
                             (int)__LINE__);
-
       break; // breaks if error occurs
     }
 
@@ -608,7 +608,6 @@ static sl_status_t sensorhub_gpio_interrupt_config(uint16_t gpio_pin, sl_si91x_g
         "sensorhub_gpio_interrupt_config: sl_gpio_set_configuration failed st=0x%04lX,line no : %d\r\n",
         (unsigned long)status,
         (int)__LINE__);
-
       break; // breaks if error occurs
     }
 
@@ -619,7 +618,6 @@ static sl_status_t sensorhub_gpio_interrupt_config(uint16_t gpio_pin, sl_si91x_g
         "sensorhub_gpio_interrupt_config: set_uulp_pad_configuration failed st=0x%04lX,line no : %d\r\n",
         (unsigned long)status,
         (int)__LINE__);
-
       break;
     }
     status = sl_gpio_driver_configure_interrupt(&sl_gpio_pin_config1.port_pin,
@@ -632,7 +630,6 @@ static sl_status_t sensorhub_gpio_interrupt_config(uint16_t gpio_pin, sl_si91x_g
         "sensorhub_gpio_interrupt_config: sl_gpio_driver_configure_interrupt failed st=0x%04lX,line no : %d\r\n",
         (unsigned long)status,
         (int)__LINE__);
-
       break;
     }
   } while (false);
@@ -739,7 +736,6 @@ static sl_status_t sensorhub_adc_init(void)
       SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_deinit failed st=0x%04lX,line no : %d\r\n",
                             (unsigned long)status,
                             (int)__LINE__);
-
       return SL_STATUS_FAIL;
     }
   }
@@ -750,7 +746,6 @@ static sl_status_t sensorhub_adc_init(void)
     SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_init failed st=0x%04lX,line no : %d\r\n",
                           (unsigned long)status,
                           (int)__LINE__);
-
     return SL_STATUS_FAIL;
   } else {
     bus_intf_info.adc_config.adc_init = 1;
@@ -763,7 +758,6 @@ static sl_status_t sensorhub_adc_init(void)
       SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_register_event_callback failed st=0x%04lX,line no : %d\r\n",
                             (unsigned long)status,
                             (int)__LINE__);
-
       return SL_STATUS_FAIL;
     }
   }
@@ -778,7 +772,6 @@ static sl_status_t sensorhub_adc_init(void)
     SL_PRINT_STRING_ERROR("sensorhub_adc_init: adc_start failed st=0x%04lX,line no : %d\r\n",
                           (unsigned long)status,
                           (int)__LINE__);
-
     return SL_STATUS_FAIL;
   }
 
@@ -966,7 +959,6 @@ sl_status_t sl_si91x_sensor_hub_start()
     SL_PRINT_STRING_ERROR("sl_si91x_sensor_hub_start: subscribe_ps_transition_event failed st=0x%04lX,line no : %d\r\n",
                           (unsigned long)pm_subs_status,
                           (int)__LINE__);
-
     return SL_STATUS_FAIL;
   }
   SL_PRINT_STRING_DEBUG("Power Manager transition event is subscribed \n");
@@ -1022,9 +1014,9 @@ sl_status_t sl_si91x_sensorhub_detect_sensors(sl_sensor_id_t *sensor_id_info, ui
         if (bus_errors.i2c) {
           status = sensorhub_i2c_sensors_scan(sensor_hub_info_t[cnt].address);
           if (status != SL_STATUS_OK) {
-            SL_PRINT_STRING_ERROR("\r\n Failed to Scan sensor: %s I2C error code: %lu \r\n",
-                                  (uintptr_t)sensor_hub_info_t[cnt].sensor_name,
-                                  status);
+            SL_PRINT_STRING_ERROR("\r\n Failed to Scan sensor: %s I2C error code: %ld \r\n",
+                                  (unsigned long)(uintptr_t)sensor_hub_info_t[cnt].sensor_name,
+                                  (unsigned long)status);
           }
         }
         break;

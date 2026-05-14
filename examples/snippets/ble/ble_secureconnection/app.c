@@ -586,15 +586,7 @@ void ble_smp_test_app(void *argument)
     event_id = rsi_ble_app_get_event();
 
     if (event_id == -1) {
-#if ((SL_SI91X_TICKLESS_MODE == 0) && SLI_SI91X_MCU_INTERFACE && ENABLE_NWP_POWER_SAVE)
-      //! if events are not received loop will be continued.
-      if ((!(P2P_STATUS_REG & TA_wakeup_M4))) {
-        P2P_STATUS_REG &= ~M4_wakeup_TA;
-        sl_si91x_power_manager_sleep();
-      }
-#else
       osSemaphoreAcquire(ble_main_task_sem, osWaitForever);
-#endif
       continue;
     }
 

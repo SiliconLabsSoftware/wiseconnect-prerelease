@@ -663,7 +663,7 @@ void rsi_ble_configurator_init(void)
 
   // set device in advertising mode.
   rsi_ble_start_advertising();
-  LOG_PRINT("\r\nBLE Advertising Started...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "BLE Advertising Started...");
 }
 
 /*==============================================*/
@@ -687,7 +687,7 @@ void rsi_ble_configurator_task(void *argument)
 
   scanresult = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scanresult == NULL) {
-    LOG_PRINT("Failed to allocate memory for scan result\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result");
     return;
   }
   memset(scanresult, 0, scanbuf_size);
@@ -707,13 +707,14 @@ void rsi_ble_configurator_task(void *argument)
         // clear the served event
         rsi_ble_app_clear_event(RSI_BLE_ENH_CONN_EVENT);
 
-        LOG_PRINT("\r\nConnected - remote_dev_addr : %s\r\n",
-                  rsi_6byte_dev_address_to_ascii(remote_dev_addr, conn_event_to_app.dev_addr));
+        SL_DEBUG_LOG_V2(INFO,
+                        "Connected - remote_dev_addr : %s",
+                        (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, conn_event_to_app.dev_addr));
 
         //MTU exchange
         status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, BLE_MTU_SIZE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n MTU request failed with error code %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, " MTU request failed with error code %lx", status);
         }
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
                                             CONN_INTERVAL_DEFAULT_MIN,
@@ -721,7 +722,7 @@ void rsi_ble_configurator_task(void *argument)
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT_DEFAULT);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n rsi_ble_conn_params_update command failed : %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, " rsi_ble_conn_params_update command failed : %lx", status);
         }
       } break;
 
@@ -730,16 +731,17 @@ void rsi_ble_configurator_task(void *argument)
 
         // clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-        LOG_PRINT("\r\nDisconnected - remote_dev_addr : %s\r\n",
-                  rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
+        SL_DEBUG_LOG_V2(INFO,
+                        "Disconnected - remote_dev_addr : %s",
+                        (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
         // set device in advertising mode.
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nstart advertising cmd failed with error code = %lx \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "start advertising cmd failed with error code = %lx ", status);
           goto adv;
         } else {
-          LOG_PRINT("\r\nStarted Advertising \n");
+          SL_DEBUG_LOG_V2(INFO, "Started Advertising ");
         }
       } break;
 
@@ -751,7 +753,7 @@ adv:
         switch (cmdid) {
           // Scan command request
           case '3': {
-            LOG_PRINT("Received scan request\r\n");
+            SL_DEBUG_LOG_V2(INFO, "Received scan request");
             retry = 0;
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_SCAN_STATE);
@@ -767,7 +769,7 @@ adv:
           // Sending Security type
           case '5': {
             sec_type = ((app_ble_write_event.att_value[3]) - '0');
-            LOG_PRINT("In Security Request\r\n");
+            SL_DEBUG_LOG_V2(INFO, "In Security Request");
             rsi_ble_app_set_event(RSI_SECTYPE);
           } break;
 
@@ -775,7 +777,7 @@ adv:
           case '6': {
             memset(data, 0, sizeof(data));
             strcpy((char *)pwd, (const char *)&app_ble_write_event.att_value[3]);
-            LOG_PRINT("PWD from ble app\r\n");
+            SL_DEBUG_LOG_V2(INFO, "PWD from ble app");
             wifi_app_set_event(WIFI_APP_JOIN_STATE);
           } break;
 
@@ -793,7 +795,7 @@ adv:
           // FW version request
           case '8': {
             rsi_ble_app_set_event(RSI_APP_FW_VERSION);
-            LOG_PRINT("FW version request\r\n");
+            SL_DEBUG_LOG_V2(INFO, "FW version request");
           } break;
 
           default:
@@ -803,7 +805,7 @@ adv:
         // Send write response AFTER processing (ATT_REC_MAINTAIN_IN_HOST requirement)
         int32_t status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("ERROR: gatt write response failed for cmd '%c', error: 0x%lX\r\n", cmdid, status);
+          SL_DEBUG_LOG_V2(ERROR, "ERROR: gatt write response failed for cmd '%c', error: 0x%lX", cmdid, status);
         }
       } break;
 
@@ -900,7 +902,7 @@ adv:
           osDelay(10);
         }
 
-        LOG_PRINT("Displayed scan list in Silabs app\r\n\n");
+        SL_DEBUG_LOG_V2(INFO, "Displayed scan list in Silabs app");
       } break;
 
       // WLAN connection response status (response to '2' command)
@@ -939,16 +941,17 @@ adv:
         rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl,
                                     RSI_BLE_MAX_DATA_LEN,
                                     data); // set the local attribute value.
-        LOG_PRINT("AP joined successfully\r\n\n");
+        SL_DEBUG_LOG_V2(INFO, "AP joined successfully");
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
                                             CONN_INTERVAL_MIN,
                                             CONN_INTERVAL_MAX,
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nconn params update cmd failed with status "
-                    "= %lx \r\n",
-                    status);
+          SL_DEBUG_LOG_V2(ERROR,
+                          "conn params update cmd failed with status "
+                          "= %lx ",
+                          status);
         }
         //   conn_params_updated = 1;
         //  rsi_ble_app_clear_event(RSI_APP_BLE_GATT_SERVICE_RESP_DESCRIPTOR);
@@ -969,9 +972,10 @@ adv:
         if (remote_dev_feature.remote_features[0] & 0x20) {
           status = rsi_ble_set_data_len(conn_event_to_app.dev_addr, TX_LEN, TX_TIME);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n set data length cmd failed with error code = "
-                      "%lx \n",
-                      status);
+            SL_DEBUG_LOG_V2(ERROR,
+                            " set data length cmd failed with error code = "
+                            "%lx ",
+                            status);
             rsi_ble_app_set_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
           }
         }

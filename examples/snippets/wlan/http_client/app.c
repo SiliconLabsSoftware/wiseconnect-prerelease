@@ -209,17 +209,17 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &http_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
     return;
   }
-  printf("\r\nWi-Fi Init Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Success");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);
   if (status != SL_STATUS_OK) {
-    printf("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
     return;
   }
-  printf("\r\nWi-Fi Client Connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
 
 #if HTTPS_ENABLE && LOAD_CERTIFICATE
   // Load SSL CA certificate
@@ -228,18 +228,18 @@ static void application_start(void *argument)
                                  cacert,
                                  sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    printf("\r\nLoading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
     return;
   }
-  printf("\r\nLoad TLS CA certificate at index %d Success\r\n", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", CERTIFICATE_INDEX);
 #endif
 
   status = http_client_application();
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error while HTTP client operation: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while HTTP client operation: 0x%lX", status);
     return;
   }
-  printf("\r\nApplication Demonstration Completed Successfully!\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Application Demonstration Completed Successfully!");
 }
 
 sl_status_t http_client_application(void)
@@ -295,7 +295,7 @@ sl_status_t http_client_application(void)
 
   status = sl_http_client_init(&client_configuration, &client_handle);
   VERIFY_STATUS_AND_RETURN(status);
-  printf("\r\nHTTP Client init success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Client init success");
 
   sl_http_client_tcp_tls_advanced_options_t tcp_tls_opts = {
     .tcp_keepalive_initial_time_sec   = 120,
@@ -306,7 +306,7 @@ sl_status_t http_client_application(void)
   };
   status = sl_http_client_set_tcp_tls_advanced_configuration(&client_handle, &tcp_tls_opts);
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  printf("\r\nHTTP Client TCP/TLS advanced configuration set\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Client TCP/TLS advanced configuration set");
 
 #if EXTENDED_HEADER_ENABLE
   //! Add extended headers
@@ -331,7 +331,7 @@ sl_status_t http_client_application(void)
   //! Initialize callback method for HTTP PUT request
   status = sl_http_client_request_init(&client_request, http_put_response_callback_handler, "This is HTTP client");
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  printf("\r\nHTTP PUT request init success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP PUT request init success");
 
   //! Send HTTP PUT request
   status = sl_http_client_send_request(&client_handle, &client_request);
@@ -369,7 +369,7 @@ sl_status_t http_client_application(void)
     }
   }
 
-  printf("\r\nHTTP PUT request Success!\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP PUT request Success!");
   reset_http_handles();
 
   //! Configure HTTP GET request
@@ -378,7 +378,7 @@ sl_status_t http_client_application(void)
   //! Initialize callback method for HTTP GET request
   status = sl_http_client_request_init(&client_request, http_get_response_callback_handler, "This is HTTP client");
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  printf("\r\nHTTP Get request init success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Get request init success");
 
   //! Send HTTP GET request
   status = sl_http_client_send_request(&client_handle, &client_request);
@@ -388,7 +388,7 @@ sl_status_t http_client_application(void)
     CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
-  printf("\r\nHTTP GET request Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP GET request Success");
   reset_http_handles();
 
   //! Configure HTTP POST request
@@ -399,7 +399,7 @@ sl_status_t http_client_application(void)
   //! Initialize callback method for HTTP POST request
   status = sl_http_client_request_init(&client_request, http_post_response_callback_handler, "This is HTTP client");
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  printf("\r\nHTTP Post request init success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Post request init success");
 
   //! Send HTTP POST request
   status = sl_http_client_send_request(&client_handle, &client_request);
@@ -409,7 +409,7 @@ sl_status_t http_client_application(void)
     CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
-  printf("\r\nHTTP POST request Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP POST request Success");
   reset_http_handles();
 
 #if EXTENDED_HEADER_ENABLE
@@ -419,7 +419,7 @@ sl_status_t http_client_application(void)
 
   status = sl_http_client_deinit(&client_handle);
   VERIFY_STATUS_AND_RETURN(status);
-  printf("\r\nHTTP Client deinit success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Client deinit success");
   free(client_credentials);
 
   return status;

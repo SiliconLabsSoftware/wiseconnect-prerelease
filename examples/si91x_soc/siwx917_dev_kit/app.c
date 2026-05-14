@@ -138,7 +138,7 @@ void rsi_wlan_ble_app_init(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, NULL, network_event_handler);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    LOG_PRINT("\r\nWireless Initialization Failed, Error Code : 0x%lX\r\n", status);
+    LOG_PRINT("\r\nWireless Initialization Failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   LOG_PRINT("\r\nWireless Initialization Success\r\n");
@@ -159,7 +159,7 @@ void rsi_wlan_ble_app_init(void *argument)
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+    printf("\r\nFailed to bring m4_ta_secure_handshake: 0x%x\r\n", (unsigned int)status);
     return;
   }
 #endif

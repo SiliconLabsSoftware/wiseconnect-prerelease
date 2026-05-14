@@ -74,9 +74,16 @@
 #endif
 
 #define CONTINUOUS_THROUGHPUT \
-  1                          /* Enable this only while measuring wlan alone throughput
+  1 /* Enable this only while measuring wlan alone throughput
                               1- Measure throughput for every interval of 'TEST_TIMEOUT'
                               0- Measure throughput only once for interval of 'TEST_TIMEOUT' */
+
+/* Continuous mode loops inside wlan_throughput_task(); dynamic BLE disable (second pass) is unsupported. */
+#if CONTINUOUS_THROUGHPUT
+#undef SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
+#define SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO 0
+#endif
+
 #define RSI_DNS_CLIENT     0 //! Enable if using DNS client (when using server hostname instead of ip addr)
 #define TX_RX_RATIO_ENABLE 0
 #define RSI_TLS_BIT_ENABLE 0

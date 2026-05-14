@@ -36,6 +36,7 @@
 // Include files
 #include "rsi_ccp_user_config.h"
 #include "sensor_hub.h"
+#include <inttypes.h>
 #include <stdio.h>
 #include "rsi_os.h"
 #include "rsi_debug.h"
@@ -225,17 +226,17 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_ADXL345_ID_%lu_x: %f    ",
+                       "SL_SENSOR_ADXL345_ID_%" PRIu32 "_x: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.x);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_ADXL345_ID_%lu_y: %f    ",
+                       "SL_SENSOR_ADXL345_ID_%" PRIu32 "_y: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.y);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_ADXL345_ID_%lu_z: %f    ",
+                       "SL_SENSOR_ADXL345_ID_%" PRIu32 "_z: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.z);
 #endif
@@ -255,17 +256,17 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_ADXL345_ID_%lu_x: %f    ",
+                       "SL_SENSOR_ADXL345_ID_%" PRIu32 "_x: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.x);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_ADXL345_ID_%lu_y: %f    ",
+                       "SL_SENSOR_ADXL345_ID_%" PRIu32 "_y: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.y);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_ADXL345_ID_%lu_z: %f    ",
+                       "SL_SENSOR_ADXL345_ID_%" PRIu32 "_z: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].accelerometer.z);
 #endif
@@ -350,22 +351,22 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_r: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_r: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.r);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_g: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_g: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.g);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_b: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_b: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.b);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_prox: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_prox: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.proximity);
 #endif
@@ -384,22 +385,22 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_r: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_r: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.r);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_g: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_g: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.g);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_b: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_b: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.b);
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_APDS9960_ID_%lu_prox: %f    ",
+                       "SL_SENSOR_APDS9960_ID_%" PRIu32 "_prox: %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].rgbw.proximity);
 #endif
@@ -428,7 +429,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_LM75_ID_%lu: %f    ",
+                       "SL_SENSOR_LM75_ID_%" PRIu32 ": %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].temperature);
 #endif
@@ -441,7 +442,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_LM75_ID_%lu: %f    ",
+                       "SL_SENSOR_LM75_ID_%" PRIu32 ": %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].temperature);
 #endif
@@ -482,7 +483,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_BH1750_ID_%lu: %f    ",
+                       "SL_SENSOR_BH1750_ID_%" PRIu32 ": %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].light);
 #endif
@@ -495,7 +496,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_BH1750_ID_%lu: %f    ",
+                       "SL_SENSOR_BH1750_ID_%" PRIu32 ": %f    ",
                        (i + 1),
                        (double)sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[i].light);
 #endif
@@ -529,7 +530,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                     "SL_SENSOR_JOYSTICK_ID_%lu: %dmV    ",
+                     "SL_SENSOR_JOYSTICK_ID_%" PRIu32 ": %dmV    ",
                      (i + 1),
                      sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #endif
@@ -563,7 +564,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                     "SL_SENSOR_JOYSTICK_ID_%lu: C_ID[%d] %dmV    ",
+                     "SL_SENSOR_JOYSTICK_ID_%" PRIu32 ": C_ID[%d] %dmV    ",
                      (i + 1),
                      sdc_channel_id,
                      sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].sh_sdc_data[i]);
@@ -580,7 +581,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_JOYSTICK_ID_%lu: %dmV    ",
+                       "SL_SENSOR_JOYSTICK_ID_%" PRIu32 ": %dmV    ",
                        (i + 1),
                        sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #endif
@@ -592,7 +593,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_JOYSTICK_ID_%lu: %dmV    ",
+                       "SL_SENSOR_JOYSTICK_ID_%" PRIu32 ": %dmV    ",
                        (i + 1),
                        sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #endif
@@ -634,7 +635,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
             snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                      sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                     "SL_SENSOR_GUVA_S12D_ID_%lu: %d    ",
+                     "SL_SENSOR_GUVA_S12D_ID_%" PRIu32 ": %d    ",
                      (i + 1),
                      sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #endif
@@ -648,7 +649,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_GUVA_S12D_ID_%lu: %d    ",
+                       "SL_SENSOR_GUVA_S12D_ID_%" PRIu32 ": %d    ",
                        (i + 1),
                        sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #endif
@@ -660,7 +661,7 @@ void sl_si91x_sensor_event_handler(uint8_t sensor_id, uint8_t event)
 #if SH_AWS_ENABLE
               snprintf(mqtt_publish_payload + strlen(mqtt_publish_payload),
                        sizeof(mqtt_publish_payload) - strlen(mqtt_publish_payload),
-                       "SL_SENSOR_GUVA_S12D_ID_%lu: %d    ",
+                       "SL_SENSOR_GUVA_S12D_ID_%" PRIu32 ": %d    ",
                        (i + 1),
                        sensor_hub_info_t[sens_ind].sensor_data_ptr->sensor_data[0].adc[i]);
 #endif

@@ -345,6 +345,10 @@ __STATIC_INLINE void sli_si91x_power_manager_core_exitcritical(sli_si91x_power_m
     __ISB();
   }
 }
+
+sl_status_t sli_si91x_power_manager_sleep(void);
+void sli_si91x_power_manager_standby(void);
+
 /** @endcond */
 
 // -----------------------------------------------------------------------------
@@ -732,24 +736,24 @@ sl_status_t sl_si91x_power_manager_unsubscribe_ps_transition_event(
  * 
  * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  ******************************************************************************/
-sl_status_t sl_si91x_power_manager_sleep(void);
-/***************************************************************************/
-/**
- * @note Applications using RTOS with tickless mode enabled must not call this API.
- *       This API is not supposed to be used directly in the application and is called
- *       automatically when the system is in an idle state with tickless mode.
- */
+sl_status_t sl_si91x_power_manager_sleep(void) SL_DEPRECATED_API_WISECONNECT_4_1;
+
 /***************************************************************************/
 /**
  * @brief To move into standby state and wait for the interrupt.
- * 
+ *
  * @details Standby transition is possible from PS4, PS3, and PS2 states only.
  *          Transition from sleep, PS1, or PS0 is not supported.
- * 
+ *
+ * @note Applications using RTOS with tickless mode enabled must not call this API.
+ *       This API is not supposed to be used directly in the application and is called
+ *       automatically when the system is in an idle state with tickless mode.
+ *
  * @pre Pre-conditions:
  * - \ref sl_si91x_power_manager_init
+ *
  ******************************************************************************/
-void sl_si91x_power_manager_standby(void);
+void sl_si91x_power_manager_standby(void) SL_DEPRECATED_API_WISECONNECT_4_1;
 
 /***************************************************************************/
 /**

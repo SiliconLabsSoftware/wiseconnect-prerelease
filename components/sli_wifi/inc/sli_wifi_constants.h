@@ -123,6 +123,8 @@ typedef enum {
 /// Lower 16 bits hold raw wait time value
 #define SLI_WIFI_WAIT_TIME_BIT_MASK 0x1FFFFFFF
 
+#define SLI_WIFI_DNS_RETRY_COUNT 1
+
 typedef enum {
   SLI_WIFI_RETURN_IMMEDIATELY              = 0,
   SLI_WIFI_ASYNC_RESPONSE_BIT              = (1UL << 29),
@@ -133,7 +135,7 @@ typedef enum {
   SLI_WIFI_WAIT_FOR_COMMAND_RESPONSE       = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | (1000 & SLI_WIFI_WAIT_TIME_BIT_MASK)),
   SLI_WIFI_WAIT_FOR_SOCKET_ACCEPT_RESPONSE = (SLI_WIFI_WAIT_FOR_RESPONSE_BIT | (5000 & SLI_WIFI_WAIT_TIME_BIT_MASK)),
   SLI_WIFI_WAIT_FOR_COMMAND_SUCCESS        = (3000 & SLI_WIFI_WAIT_TIME_BIT_MASK),
-  SLI_WIFI_WAIT_FOR_DNS_RESOLUTION         = (20000 & SLI_WIFI_WAIT_TIME_BIT_MASK),
+  SLI_WIFI_WAIT_FOR_DNS_RESOLUTION         = (10 & SLI_WIFI_WAIT_TIME_BIT_MASK), // DNS timeout is in seconds
 } sli_wifi_wait_period_t;
 
 #define SLI_WIFI_WAIT_FOR(x)          (sli_wifi_wait_period_t)(x)

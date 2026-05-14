@@ -142,15 +142,15 @@ void rsi_wlan_ble_app(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
-  LOG_PRINT("\r\n Wi-Fi initialization is successful\n");
+  SL_DEBUG_LOG_V2(INFO, " Wi-Fi initialization is successful");
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to fetch firmware version: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx", status);
   } else {
     print_firmware_version(&version);
   }
@@ -174,20 +174,9 @@ void rsi_wlan_ble_app(void *argument)
 #endif
       no_ble_events = rsi_ble_app_get_event();
       if (!(wifi_app_cb.event_map & RSI_SEND_EVENT) && (no_ble_events == -1)) {
-#if (SL_SI91X_TICKLESS_MODE == 0)
-        if ((!(P2P_STATUS_REG & TA_wakeup_M4))) {
-          P2P_STATUS_REG &= ~M4_wakeup_TA;
-          LOG_PRINT("M4 in Sleep\r\n");
-          sl_si91x_power_manager_sleep();
-          LOG_PRINT("M4 wake up\r\n");
-#if (ENABLE_ALARM || ENABLE_NPSS_GPIO_2)
-          wifi_ble_send_data();
-#endif
-        }
-#else
-        LOG_PRINT("M4 in Sleep\r\n");
+        SL_DEBUG_LOG_V2(INFO, "M4 in Sleep");
         rc = osSemaphoreAcquire(data_received_semaphore, osWaitForever);
-        LOG_PRINT("M4 wake up\r\n");
+        SL_DEBUG_LOG_V2(INFO, "M4 wake up");
         if (button_is_pressed == true) {
           wifi_ble_send_data();
           button_is_pressed = 0;
@@ -195,7 +184,6 @@ void rsi_wlan_ble_app(void *argument)
         if (rc == osErrorTimeout) {
           wifi_ble_send_data();
         }
-#endif
       }
     }
 #endif

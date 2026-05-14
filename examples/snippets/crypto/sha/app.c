@@ -114,7 +114,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -132,7 +132,7 @@ sl_status_t sha_process(void)
   // Compute digest using SHA
   status = sl_si91x_sha(SL_SI91X_SHA_512, (uint8_t *)message, strlen(message), digest);
   if (status != SL_STATUS_OK) {
-    printf("\r\n SHA Failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\n SHA Failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nSHA success\r\n");

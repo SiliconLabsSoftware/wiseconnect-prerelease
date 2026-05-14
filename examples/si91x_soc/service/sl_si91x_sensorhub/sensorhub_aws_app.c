@@ -32,6 +32,7 @@
  * sensor data collected from the sensorhub task to the cloud. (NWP powersave is also supported)
  ******************************************************************************/
 
+#include <inttypes.h>
 #include <string.h>
 #include "cmsis_os2.h"
 #include "sl_status.h"

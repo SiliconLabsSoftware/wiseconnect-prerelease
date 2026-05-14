@@ -20,6 +20,7 @@
  * This example demonstrates data transfer through SDIO. The device acts as a
  * secondary which interfaces with an external sdio host/master.
 ============================================================================**/
+#include <inttypes.h>
 #include "sdio_secondary_example.h"
 #include "UDMA.h"
 #include "clock_update.h"

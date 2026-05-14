@@ -20,6 +20,7 @@
 #include "sl_si91x_logger_example.h"
 #include "FreeRTOS.h"
 #include "sl_log_helper.h"
+#include <inttypes.h>
 
 /*******************************************************************************
  ***************************  Defines / Macros  ********************************
@@ -118,13 +119,13 @@ static sl_status_t set_m4_power_state(sl_power_state_t target)
   // Add and remove the PS requirement to trigger transition
   status = sl_si91x_power_manager_add_ps_requirement(target);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("Add PS req fail %lu", status);
+    SL_PRINT_STRING_ERROR("Add PS req fail %u", (unsigned int)status);
     return status;
   }
 
   status = sl_si91x_power_manager_remove_ps_requirement(target);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("Remove PS req fail %lu", status);
+    SL_PRINT_STRING_ERROR("Remove PS req fail %u", (unsigned int)status);
     return status;
   }
 
@@ -154,7 +155,7 @@ static sl_status_t set_ta_profile(sl_wifi_performance_profile_v2_t *profile)
 
   sl_status_t status = sl_wifi_set_performance_profile_v2(profile);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("TA set profile failed %lu", status);
+    SL_PRINT_STRING_ERROR("TA set profile failed %u", (unsigned int)status);
   }
 
   SL_PRINT_STRING_ERROR("TA set profile success, current profile %lu", profile->profile);
@@ -177,7 +178,7 @@ static void ta_task_start(void *arg)
   // Initialize Wi‑Fi and network processor
   sl_status_t status = initialize_wireless();
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("Wireless init fail 0x%lX", status);
+    SL_PRINT_STRING_ERROR("Wireless init fail 0x%X", (unsigned int)status);
     return;
   }
 
@@ -338,19 +339,19 @@ static sl_status_t initialize_wireless(void)
   // Initialize Wi‑Fi stack and load firmware
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("WiFi init fail 0x%lX", status);
+    SL_PRINT_STRING_ERROR("WiFi init fail 0x%X", (unsigned int)status);
     return status;
   }
 
   // Retrieve MAC address
   status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   if (status != SL_STATUS_OK)
-    SL_PRINT_STRING_ERROR("MAC fail 0x%lX", status);
+    SL_PRINT_STRING_ERROR("MAC fail 0x%X", (unsigned int)status);
 
   // Retrieve firmware version
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("FW ver fail 0x%lX", status);
+    SL_PRINT_STRING_ERROR("FW ver fail 0x%X", (unsigned int)status);
   }
 
   SL_PRINT_STRING_ERROR("EXIT: initialize_wireless");

@@ -131,7 +131,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -153,7 +153,7 @@ static void application_start(void *argument)
 
   status = sl_si91x_wrap(&wrap_config, wrapped_key);
   if (status != SL_STATUS_OK) {
-    printf("\r\nWrap failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nWrap failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWrap success\r\n");
@@ -173,7 +173,7 @@ static void application_start(void *argument)
 
   status = sl_si91x_hmac(&hmac_config, digest);
   if (status != SL_STATUS_OK) {
-    printf("\r\nHMAC failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nHMAC failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nHMAC success\r\n");

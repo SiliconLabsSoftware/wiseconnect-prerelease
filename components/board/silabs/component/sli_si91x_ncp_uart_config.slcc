@@ -33,3 +33,7 @@ include:
     condition: [brd4270a]
     file_list:
       - path: si91x_ncp_uart_config.h
+  - path: "brd4120a"
+    condition: [brd4120a]
+    file_list:
+      - path: si91x_ncp_uart_config.h

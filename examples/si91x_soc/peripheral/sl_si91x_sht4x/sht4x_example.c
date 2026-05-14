@@ -18,6 +18,7 @@
  *
  ******************************************************************************/
 
+#include <inttypes.h>
 #include "rsi_debug.h"
 #include "sl_sht4x.h"
 #include "sl_i2cspm.h"

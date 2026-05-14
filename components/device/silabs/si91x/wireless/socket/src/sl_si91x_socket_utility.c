@@ -1762,7 +1762,7 @@ sl_status_t sli_si91x_send_socket_data(sli_si91x_socket_t *si91x_socket,
 
   // Route (send) the packet via routing utility (may be async)
   return sli_routing_utility_route_packet(&wifi_command_engine_routing_table,
-                                          SLI_WIFI_DATA_PACKET,
+                                          SLI_WIFI_SOCKET_DATA_PACKET,
                                           packet,
                                           (packet->length & 0xFFF),
                                           (void *)(&si91x_socket->index));

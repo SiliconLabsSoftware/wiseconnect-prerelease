@@ -25,6 +25,10 @@ component:
 - id: uartdrv_usart
   instance:
   - exp
+- id: log_none
+- id: log_backend_iostream
+- id: log_backend_iostream_formatted
+- id: log_platform_specific
 requires:
 - name: sl_main
 - name: bsd_socket

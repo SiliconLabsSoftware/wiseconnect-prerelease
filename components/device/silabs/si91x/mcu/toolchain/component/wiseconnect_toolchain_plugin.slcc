@@ -20,9 +20,11 @@ library:
   - system: gcc
     unless:
       - wiseconnect_toolchain_gcc_override
+      - toolchain_llvm
   - system: nosys
     unless:
       - wiseconnect_toolchain_gcc_override
+      - toolchain_llvm
   - system: c
   - system: m
 toolchain_settings:

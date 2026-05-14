@@ -28,6 +28,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
+#include <inttypes.h>
 #include "cmsis_os2.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
@@ -119,8 +120,8 @@ void application_start(const void *unused)
   UNUSED_PARAMETER(unused);
   uint32_t err            = 0;
   sl_status_t status      = SL_STATUS_OK;
-  uint8_t write_data1[12] = { "Silicon labs" };
-  uint8_t write_data2[4]  = { "NVM3" };
+  uint8_t write_data1[13] = "Silicon labs";
+  uint8_t write_data2[5]  = "NVM3";
 
   /* Required ordering on SiWx91x SoC common flash: wireless init must complete
    * before any NVM3 API (including nvm3_initDefault()), because common-flash

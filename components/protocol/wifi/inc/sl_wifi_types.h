@@ -37,11 +37,80 @@
 #include "sl_slist.h"
 #include <stdint.h>
 
-// Default Timeout Configuration
-#define SL_WIFI_DEFAULT_AUTH_ASSOCIATION_TIMEOUT  0xFFFF
-#define SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME  0xFFFF
-#define SL_WIFI_DEFAULT_KEEP_ALIVE_TIMEOUT        0xFFFF
+/**
+ * @name Wi-Fi layout and size constants
+ *
+ * Numbers used for array sizes and protocol layout: SSID and PIN buffers, QoS queue count,
+ * how 16/32-bit values are stored in @c uint8_t arrays, padding bytes, scan bitmaps,
+ * statistics structs, firmware headers, and CTUNE data.
+ * @{
+ */
+
+/** Max SSID size in an 802.11 SSID information element (32 bytes in the IE body, not counting IE header). */
+#define SL_WIFI_MAX_SSID_IE_OCTETS 32U
+
+/** Legacy alias for @ref SL_WIFI_MAX_SSID_LENGTH (NWP/host SSID buffers, often includes space for a null terminator). */
+#define SL_WIFI_SSID_LEN SL_WIFI_MAX_SSID_LENGTH
+
+/** Length of the WPS PIN digit buffer in @ref sl_wifi_wps_pin_t (ASCII digits, not null-terminated). */
+#define SL_WIFI_WPS_PIN_DIGIT_LENGTH 8U
+
+/** Size of null-terminated WPS PIN string buffer (8 digits plus null terminator). */
+#define SL_WIFI_WPS_PIN_STRING_MAX_CHARS 9U
+
+/** Network credential key size in @ref sl_wifi_wps_response_t */
+#define SL_WIFI_WPS_KEY_LENGTH 32U
+
+/** P2P SSID suffix field length in @ref sl_wifi_p2p_configuration_t. */
+#define SL_WIFI_P2P_SSID_SUFFIX_LENGTH 6U
+
+/** Four WMM/EDCA access categories (BE, BK, VI, VO); size of @ref sl_wifi_transceiver_parameters_t::cw_params. */
+#define SL_WIFI_EDCA_AC_COUNT 4U
+
+/** Two bytes: a 16-bit value stored as little-endian @c uint8_t[2] on the host or NWP. */
+#define SL_WIFI_FIELD_UINT16_OCTETS 2U
+
+/** Size of @c start[] in @ref sl_wifi_rx_stats_request_t (start/stop in the low byte; high byte 0). */
+#define SL_WIFI_RX_STATS_REQUEST_CMD_OCTETS SL_WIFI_FIELD_UINT16_OCTETS
+
+/** Size of @c channel[] in @ref sl_wifi_rx_stats_request_t. */
+#define SL_WIFI_RX_STATS_REQUEST_CHANNEL_OCTETS SL_WIFI_FIELD_UINT16_OCTETS
+
+/** Size of each beacon-related @c uint8_t[2] field in @ref sl_wifi_operational_statistics_t. */
+#define SL_WIFI_OPERATIONAL_STATISTICS_FIELD_UINT16_OCTETS SL_WIFI_FIELD_UINT16_OCTETS
+
+/** Size of @c index[] in @ref sl_wifi_wep_credential_t (active WEP key index). */
+#define SL_WIFI_WEP_CREDENTIAL_KEY_INDEX_OCTETS SL_WIFI_FIELD_UINT16_OCTETS
+
+/** Number of @c uint32_t words in @ref sl_wifi_scan_configuration_t::channel_bitmap_5g (5 GHz channel bitmap). */
+#define SL_WIFI_SCAN_CHANNEL_BITMAP_5G_WORDS 8U
+
+/** Number of @c uint32_t entries in @ref sl_wifi_firmware_header_t::mic. */
+#define SL_WIFI_FIRMWARE_HEADER_MIC_U32_COUNT 4U
+
+/** Number of @c uint32_t samples in @ref sl_wifi_response_get_ctune_data_t::ctune_data. */
+#define SL_WIFI_CTUNE_DATA_WORDS 2U
+
+/** @} */
+
+/**
+ * @name Default Wi-Fi timeout placeholders
+ *
+ * Use these when a Wi-Fi API asks for a time value but you want the radio firmware to pick its own
+ * default. For most timeouts, pass @c 0xFFFF (65535). For passive scan time, pass @c 0.
+ * @{
+ */
+
+/** Tell the firmware to use its default auth/association timeout. */
+#define SL_WIFI_DEFAULT_AUTH_ASSOCIATION_TIMEOUT 0xFFFF
+/** Tell the firmware to use its default dwell time on each channel during active scan. */
+#define SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME 0xFFFF
+/** Tell the firmware to use its default keep-alive timeout. */
+#define SL_WIFI_DEFAULT_KEEP_ALIVE_TIMEOUT 0xFFFF
+/** Passive scan: @c 0 means use the default passive scan dwell time. */
 #define SL_WIFI_DEFAULT_PASSIVE_CHANNEL_SCAN_TIME 0
+
+/** @} */
 
 /// Wi-Fi transceiver mode configurations
 #define MAX_PAYLOAD_LEN                     2020
@@ -84,7 +153,6 @@
 #define SL_STATUS_CS_BUSY                   0x2
 #define SL_STATUS_UNKNOWN_PEER              0x3
 #define TRANSCEIVER_RX_PKT_TA_MATCH_BIT     BIT(20)
-#define SL_WIFI_SSID_LEN                    34
 
 /** @addtogroup SL_WIFI_CONSTANTS
   * @{ */
@@ -180,8 +248,8 @@ typedef struct {
  * Specifies the Service Set Identifier (SSID) used in Wi-Fi networks.
  */
 typedef struct {
-  uint8_t value[32]; ///< SSID value
-  uint8_t length;    ///< Length of the SSID
+  uint8_t value[SL_WIFI_MAX_SSID_IE_OCTETS]; ///< SSID value
+  uint8_t length;                            ///< Length of the SSID
 } sl_wifi_ssid_t;
 
 /**
@@ -221,25 +289,25 @@ typedef struct {
   uint32_t scan_count; ///< Number of available scan results
   uint32_t reserved;   ///< Reserved
   struct {
-    uint8_t rf_channel;    ///< Channel number of the AP
-    uint8_t security_mode; ///< Security mode of the AP
-    uint8_t rssi_val;      ///< RSSI value of the AP
-    uint8_t network_type;  ///< AP network type
-    uint8_t ssid[34];      ///< SSID of the AP
-    uint8_t bssid[6];      ///< BSSID of the AP
-    uint8_t reserved[2];   ///< Reserved
-  } scan_info[];           ///< Array of scan result data
+    uint8_t rf_channel;                        ///< Channel number of the AP
+    uint8_t security_mode;                     ///< Security mode of the AP
+    uint8_t rssi_val;                          ///< RSSI value of the AP
+    uint8_t network_type;                      ///< AP network type
+    uint8_t ssid[SL_WIFI_MAX_SSID_LENGTH];     ///< SSID of the AP
+    uint8_t bssid[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< BSSID of the AP
+    uint8_t reserved[2];                       ///< Reserved
+  } scan_info[];                               ///< Array of scan result data
 } sl_wifi_scan_result_t;
 
 /// Extended Wi-Fi scan result
 typedef struct {
-  uint8_t rf_channel;    ///< Channel number of the AP
-  uint8_t security_mode; ///< Security mode of the AP
-  uint8_t rssi;          ///< RSSI value of the AP
-  uint8_t network_type;  ///< Network type of the AP
-  uint8_t ssid[34];      ///< SSID of the AP
-  uint8_t bssid[6];      ///< BSSID of the AP
-  uint16_t seen_count;   ///< Number of times the same AP was observed in the received frames
+  uint8_t rf_channel;                        ///< Channel number of the AP
+  uint8_t security_mode;                     ///< Security mode of the AP
+  uint8_t rssi;                              ///< RSSI value of the AP
+  uint8_t network_type;                      ///< Network type of the AP
+  uint8_t ssid[SL_WIFI_MAX_SSID_LENGTH];     ///< SSID of the AP
+  uint8_t bssid[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< BSSID of the AP
+  uint16_t seen_count;                       ///< Number of times the same AP was observed in the received frames
 } sl_wifi_extended_scan_result_t;
 
 /// Extended Wi-Fi scan result parameters
@@ -327,8 +395,9 @@ typedef struct {
   uint32_t flags;                  ///< Reserved
   uint32_t periodic_scan_interval; ///< Duration in milliseconds between periodic scans
   uint16_t channel_bitmap_2g4;     ///< Bitmap of selected 2.4 GHz channels
-  uint32_t channel_bitmap_5g[8];   ///< Bitmap of selected 5 GHz channels (Not supported in SiWx91x devices)
-  uint8_t lp_mode;                 ///< Enable LP mode, 1 - Enable LP mode, 0 - Disable LP mode
+  uint32_t channel_bitmap_5g
+    [SL_WIFI_SCAN_CHANNEL_BITMAP_5G_WORDS]; ///< Bitmap of selected 5 GHz channels (Not supported in SiWx91x devices)
+  uint8_t lp_mode;                          ///< Enable LP mode, 1 - Enable LP mode, 0 - Disable LP mode
 } sl_wifi_scan_configuration_t;
 
 /**
@@ -520,7 +589,7 @@ typedef struct {
  * These keys are used for authentication and securing the Wi-Fi connection.
  */
 typedef struct {
-  uint8_t index[2];                                           ///< Index of the active WEP key
+  uint8_t index[SL_WIFI_WEP_CREDENTIAL_KEY_INDEX_OCTETS];     ///< Index of the active WEP key
   uint8_t key[SL_WIFI_WEP_KEY_COUNT][SL_WIFI_WEP_KEY_LENGTH]; ///< WEP Keys
 } sl_wifi_wep_credential_t;
 
@@ -707,10 +776,10 @@ typedef struct {
   uint8_t operating_mode; ///< Operating mode of the Wi-Fi interface
   uint8_t
     dtim_period; ///< DTIM (Delivery Traffic Indication Message) period. Indicates the number of beacon intervals between DTIM frames
-  uint8_t ideal_beacon_info[2]; ///< Idle beacon information
-  uint8_t busy_beacon_info[2];  ///< Busy beacon information
+  uint8_t ideal_beacon_info[SL_WIFI_OPERATIONAL_STATISTICS_FIELD_UINT16_OCTETS]; ///< Ideal beacon information
+  uint8_t busy_beacon_info[SL_WIFI_OPERATIONAL_STATISTICS_FIELD_UINT16_OCTETS];  ///< Busy beacon information
   uint8_t beacon_interval
-    [2]; ///< Beacon Interval. Indicates the time interval between successive beacons, in Time Units (TUs).
+    [SL_WIFI_OPERATIONAL_STATISTICS_FIELD_UINT16_OCTETS]; ///< Beacon interval. Indicates the time interval between successive beacons, in Time Units (TUs).
 } sl_wifi_operational_statistics_t;
 
 /**
@@ -718,10 +787,10 @@ typedef struct {
  * @brief Wi-Fi Direct (P2P) configuration structure.
  */
 typedef struct {
-  uint16_t group_owner_intent; ///< Group owner intent
-  const char *device_name;     ///< Device name
-  sl_wifi_channel_t channel;   ///< Wi-Fi channel. This is of type @ref sl_wifi_channel_t
-  char ssid_suffix[6];         ///< SSID suffix
+  uint16_t group_owner_intent;                      ///< Group owner intent
+  const char *device_name;                          ///< Device name
+  sl_wifi_channel_t channel;                        ///< Wi-Fi channel. This is of type @ref sl_wifi_channel_t
+  char ssid_suffix[SL_WIFI_P2P_SSID_SUFFIX_LENGTH]; ///< SSID suffix
 } sl_wifi_p2p_configuration_t;
 
 /**
@@ -740,7 +809,7 @@ typedef union {
  * @brief Wi-Fi WPS PIN object that is an 8 digit number.
  */
 typedef struct {
-  char digits[8]; ///< Array to store digits of WPS Pin
+  char digits[SL_WIFI_WPS_PIN_DIGIT_LENGTH]; ///< Array to store digits of WPS Pin
 } sl_wifi_wps_pin_t;
 
 /**
@@ -756,7 +825,7 @@ typedef struct {
     role; ///< Role of the device. Refer [sl_wifi_wps_role_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-wps-role-t)
   sl_wifi_wps_mode_t
     mode; ///< WPS mode. Refer [sl_wifi_wps_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-wps-mode-t)
-  char optional_pin[9]; ///< PIN-based WPS configuration. Null-terminated string
+  char optional_pin[SL_WIFI_WPS_PIN_STRING_MAX_CHARS]; ///< PIN-based WPS configuration. Null-terminated string
   bool
     auto_connect; ///< Set to true to enable auto connect after WPS, false to only receive credentials without connecting
 } sl_wifi_wps_config_t;
@@ -770,13 +839,13 @@ typedef struct {
  */
 #pragma pack(1)
 typedef struct {
-  uint32_t status;       ///< Status of the WPS operation
-  uint8_t ssid[32];      ///< SSID of the connected network
-  uint8_t ssid_len;      ///< Length of the SSID
-  uint8_t security_type; ///< Security type
-  uint8_t key[32];       ///< Network key
-  uint8_t mac_addr[6];   ///< MAC address of the access point
-  uint32_t reserved;     ///< Reserved for future use
+  uint32_t status;                              ///< Status of the WPS operation
+  uint8_t ssid[SL_WIFI_MAX_SSID_IE_OCTETS];     ///< SSID of the connected network
+  uint8_t ssid_len;                             ///< Length of the SSID
+  uint8_t security_type;                        ///< Security type
+  uint8_t key[SL_WIFI_WPS_KEY_LENGTH];          ///< Network key
+  uint8_t mac_addr[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< MAC address of the access point
+  uint32_t reserved;                            ///< Reserved for future use
 } sl_wifi_wps_response_t;
 #pragma pack()
 
@@ -1000,8 +1069,8 @@ typedef struct {
  * This structure is only supported on SiWx353 devices, not on SiWx91x devices.
  */
 typedef struct {
-  uint32_t flags;         ///< Flags indicating the presence of CTUNE data
-  uint32_t ctune_data[2]; ///< CTUNE data values
+  uint32_t flags;                                ///< Flags indicating the presence of CTUNE data
+  uint32_t ctune_data[SL_WIFI_CTUNE_DATA_WORDS]; ///< CTUNE data values
 } sl_wifi_response_get_ctune_data_t;
 
 /**
@@ -1013,9 +1082,9 @@ typedef struct {
  */
 typedef struct {
   /// 0 - start, 1 - stop
-  uint8_t start[2];
-  /// channel number
-  uint8_t channel[2];
+  uint8_t start[SL_WIFI_RX_STATS_REQUEST_CMD_OCTETS];
+  /// Channel number
+  uint8_t channel[SL_WIFI_RX_STATS_REQUEST_CHANNEL_OCTETS];
 } sl_wifi_rx_stats_request_t;
 
 /**
@@ -1362,12 +1431,12 @@ typedef struct {
     rate; ///< Rates shall be provided as per @ref sl_wifi_data_rate_t. Only 11b/g rates shall be supported
   uint32_t
     token; ///< Used for synchronization between data packets sent and reports received. Application provides token/identifier as per PPDU. MAC layer sends the same token/identifier in status report along with the status of the transmitted packet
-  uint8_t addr1[6]; ///< Receiver MAC address
-  uint8_t addr2[6]; ///< Transmitter MAC address
-  uint8_t addr3[6]; ///< Destination MAC address
-  uint8_t addr4[6]; ///< Source MAC address. Initialization of addr4 is optional
-  uint8_t channel;  ///< Channel is currently not supported.
-  uint8_t tx_power; ///< Transmission power is currently not supported.
+  uint8_t addr1[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< Receiver MAC address
+  uint8_t addr2[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< Transmitter MAC address
+  uint8_t addr3[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< Destination MAC address
+  uint8_t addr4[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< Source MAC address. Initialization of addr4 is optional
+  uint8_t channel;                           ///< Channel is currently not supported.
+  uint8_t tx_power;                          ///< Transmission power is currently not supported.
 } sl_wifi_transceiver_tx_data_control_t;
 
 /**
@@ -1397,8 +1466,8 @@ typedef struct {
   uint8_t
     retransmit_count; ///< Retransmit count. Common across all peers and access categories and valid only for unicast data frames. Valid range is 1 to 15
   uint16_t flags;     ///< Reserved
-  sl_wifi_transceiver_cw_config_t
-    cw_params[4]; ///< CW params for respective queues. AC index: Best Effort - 0, Background - 1, Video - 2, Voice - 3
+  sl_wifi_transceiver_cw_config_t cw_params
+    [SL_WIFI_EDCA_AC_COUNT]; ///< CW params for respective queues. AC index: Best Effort - 0, Background - 1, Video - 2, Voice - 3
 } sl_wifi_transceiver_parameters_t;
 
 /**
@@ -1426,7 +1495,7 @@ typedef struct {
   /// | 1            | Shall be set for auto-rate enable. To enable auto-rate, application needs to provide peer_supported_rate_bitmap    |
   uint8_t flags;
   /// MAC address of peer to be added or deleted.
-  uint8_t peer_mac_address[6];
+  uint8_t peer_mac_address[SL_WIFI_MAC_ADDRESS_LENGTH];
   /// Rate bitmap of peer station
   /// | peer_supported_rate_bitmap | Data rate  |
   /// | :--------------------------| :----------|
@@ -1457,7 +1526,9 @@ typedef struct {
     flags; ///< Bit 0 is set to 1 to enable filtering for the specified MAC addresses, else set to 0 to disable filtering
   uint8_t
     num_of_mcast_addr; ///< Number of multicast addresses. Valid values are 1, and 2. This field is ignored when filtering is disabled
-  uint8_t mac[2][6]; ///< List of multicast addresses. This field is ignored when filtering is disabled
+  uint8_t
+    mac[2]
+       [SL_WIFI_MAC_ADDRESS_LENGTH]; ///< List of multicast addresses. This field is ignored when filtering is disabled
 } sl_wifi_transceiver_mcast_filter_t;
 
 /**
@@ -1541,7 +1612,7 @@ typedef struct {
   uint8_t
     rssi; ///< RSSI VALUE. If value of rssi is 100, RSSI information is not available. In State-I, this represents the RSSI of AP at the time of trigger. In State-II, this represent the RSSI of next association. In State-III, this represents the RSSI at the time of final association.
   uint8_t bssid
-    [6]; ///< BSSID of AP. If the value of AP BSSID is 00:00:00:00:00:00, MAC information is not available. In State-I, it represents the MAC of AP at the time of scan trigger. In State-II, this represents the MAC of next association. In State-III, this represents the MAC at the time of association.
+    [SL_WIFI_MAC_ADDRESS_LENGTH]; ///< BSSID of AP. If the value of AP BSSID is 00:00:00:00:00:00, MAC information is not available. In State-I, it represents the MAC of AP at the time of scan trigger. In State-II, this represents the MAC of next association. In State-III, this represents the MAC at the time of association.
 } sl_wifi_module_state_stats_response_t;
 #pragma pack()
 
@@ -1580,10 +1651,10 @@ typedef struct {
   sl_wifi_system_fw_version_info_t fw_version_info; ///< Firmware version information
   uint32_t flash_location; ///< Address location in flash memory where the firmware image is stored
   uint32_t crc;            ///< Cyclic Redundancy Check (CRC) value of the firmware image
-  uint32_t mic[4];         ///< Message Integrity Code (MIC) of the firmware image
-  uint32_t reserved;       ///< Reserved fields for future use
-  sl_wifi_fw_version_ext_info_t fw_version_ext_info; ///< Firmware version extended information
-  uint32_t reserved1[4];                             ///< Reserved fields for future use
+  uint32_t mic[SL_WIFI_FIRMWARE_HEADER_MIC_U32_COUNT]; ///< Message Integrity Code (MIC) of the firmware image
+  uint32_t reserved;                                   ///< Reserved fields for future use
+  sl_wifi_fw_version_ext_info_t fw_version_ext_info;   ///< Firmware version extended information
+  uint32_t reserved1[4];                               ///< Reserved fields for future use
 } sl_wifi_firmware_header_t;
 
 /**

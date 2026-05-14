@@ -113,27 +113,27 @@ void app_init(void)
 static void print_wps_response(const sl_wifi_wps_response_t *response)
 {
   if (response == NULL) {
-    printf("WPS Response: NULL\r\n");
+    SL_DEBUG_LOG_V2(WARN, "WPS Response: NULL");
     return;
   }
-  printf("SSID: ");
+  SL_DEBUG_LOG_V2(INFO, "SSID: ");
   if (response->ssid_len > 0 && response->ssid_len <= 32) {
     for (size_t i = 0; i < response->ssid_len; i++) {
-      printf("%c", response->ssid[i]);
+      SL_DEBUG_LOG_V2(DEBUG, "%c", response->ssid[i]);
     }
   } else {
-    printf("(empty)");
+    SL_DEBUG_LOG_V2(INFO, "(empty)");
   }
-  printf("\r\n");
+  SL_DEBUG_LOG_V2(INFO, "");
 
-  printf("SSID Length: %u bytes\r\n", response->ssid_len);
-  printf("Security Type: 0x%02X\r\n", response->security_type);
-  printf("Status: 0x%08lX\r\n", response->status);
-  printf("Key: ");
+  SL_DEBUG_LOG_V2(INFO, "SSID Length: %u bytes", response->ssid_len);
+  SL_DEBUG_LOG_V2(INFO, "Security Type: 0x%02X", response->security_type);
+  SL_DEBUG_LOG_V2(INFO, "Status: 0x%08lX", response->status);
+  SL_DEBUG_LOG_V2(INFO, "Key: ");
   for (int i = 0; i < KEY_LENGTH; i++) {
-    printf("%02X", response->key[i]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02X", response->key[i]);
   }
-  printf("\r\n");
+  SL_DEBUG_LOG_V2(INFO, "");
 }
 
 static void application_start(void *argument)
@@ -143,16 +143,16 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wps_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to start Wi-Fi Client interface: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lX", status);
     return;
   }
-  printf("\r\nWi-Fi client interface up success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up success");
   status = wps_pbc();
   if (status != SL_STATUS_OK) {
-    printf("\r\nWPS connection failed: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "WPS connection failed: 0x%lX", status);
     return;
   }
-  printf("\r\nWPS connection successful\r\n");
+  SL_DEBUG_LOG_V2(INFO, "WPS connection successful");
 
   while (1) {
     osDelay(2000);
@@ -164,7 +164,7 @@ static sl_status_t wps_pbc(void)
   sl_wifi_wps_config_t wps_config     = { 0 };
   sl_wifi_wps_response_t wps_response = { 0 };
   sl_status_t status;
-  printf("Starting WPS PBC procedure...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Starting WPS PBC procedure...");
   // Configure WPS settings
   wps_config.role         = SL_WIFI_WPS_ENROLLEE_ROLE;
   wps_config.mode         = SL_WIFI_WPS_PUSH_BUTTON_MODE;
@@ -172,10 +172,10 @@ static sl_status_t wps_pbc(void)
   memset(wps_config.optional_pin, 0, sizeof(wps_config.optional_pin));
   status = sl_wifi_start_wps_v2(SL_WIFI_CLIENT_INTERFACE, wps_config, &wps_response);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to start WPS PBC: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start WPS PBC: 0x%lX", status);
     return status;
   }
-  printf("\r\nWPS procedure completed successfully!\r\n");
+  SL_DEBUG_LOG_V2(INFO, "WPS procedure completed successfully!");
   print_wps_response(&wps_response);
   if (wps_config.auto_connect == false) {
     sl_wifi_client_configuration_t client_config = { 0 };
@@ -200,29 +200,30 @@ static sl_status_t wps_pbc(void)
                                      pmk_credential.value,
                                      KEY_LENGTH);
       if (status != SL_STATUS_OK) {
-        printf("\r\nFailed to set PMK credential: 0x%lX\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to set PMK credential: 0x%lX", status);
         return status;
       }
       // Set credential ID in client configuration
       client_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
     }
 
-    printf("\r\nConnecting to SSID: %.*s with security type: 0x%X\r\n",
-           (int)client_config.ssid.length,
-           client_config.ssid.value,
-           client_config.security);
+    SL_DEBUG_LOG_V2(INFO,
+                    "Connecting to SSID: %.*s with security type: 0x%X",
+                    (int)client_config.ssid.length,
+                    (uintptr_t)client_config.ssid.value,
+                    client_config.security);
 
     if (client_config.ssid.length == 0) {
-      printf("\r\nClient configuration is invalid (empty SSID)\r\n");
+      SL_DEBUG_LOG_V2(ERROR, "Client configuration is invalid (empty SSID)");
       return SL_STATUS_INVALID_PARAMETER;
     }
 
     status = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &client_config, SLI_WIFI_CONNECT_TIMEOUT);
     if (status != SL_STATUS_OK) {
-      printf("\r\nFailed to connect to Wi-Fi: 0x%lX\r\n", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to connect to Wi-Fi: 0x%lX", status);
       return status;
     }
-    printf("\r\nConnected to Wi-Fi successfully!\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Connected to Wi-Fi successfully!");
 
     // Configure IP after successful connection
     sl_net_ip_configuration_t ip_address = { 0 };
@@ -232,7 +233,7 @@ static sl_status_t wps_pbc(void)
 
     status = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
     if (status != SL_STATUS_OK) {
-      printf("\r\nIP Configuration failed, error: 0x%lX\r\n", status);
+      SL_DEBUG_LOG_V2(ERROR, "IP Configuration failed, error: 0x%lX", status);
       return status;
     }
 
@@ -240,7 +241,7 @@ static sl_status_t wps_pbc(void)
     sl_ip_address_t ip = { 0 };
     ip.type            = ip_address.type;
     ip.ip.v4.value     = ip_address.ip.v4.ip_address.value;
-    printf("\r\nIP Configuration successful\r\n");
+    SL_DEBUG_LOG_V2(INFO, "IP Configuration successful");
     print_sl_ip_address(&ip);
   }
   return status;

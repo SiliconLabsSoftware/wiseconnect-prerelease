@@ -91,7 +91,8 @@
 // HTTP OTAF
 #define HTTP_OTAF 2
 
-#define DNS_TIMEOUT         20000
+#define DNS_TIMEOUT         10
+#define RETRY_COUNT         1
 #define MAX_DNS_RETRY_COUNT 5
 #define OTAF_TIMEOUT        600000
 #ifdef AWS_ENABLE
@@ -270,16 +271,16 @@ void application_start(const void *unused)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lX", status);
     return;
   }
-  printf("\r\nWi-Fi Init is successful\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init is successful");
 
 #if LOAD_CERTIFICATE
   if (FLAGS & HTTPS_SUPPORT) {
     status = clear_and_load_certificates_in_flash();
     if (status != SL_STATUS_OK) {
-      printf("\r\nUnexpected error while loading certificate: 0x%lX\r\n", status);
+      SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lX", status);
       return;
     }
   }
@@ -287,17 +288,17 @@ void application_start(const void *unused)
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
     return;
   }
-  printf("\r\nConnected to Wi-Fi\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Connected to Wi-Fi");
 
   status = http_otaf_app();
   if (status != SL_STATUS_OK) {
-    printf("\r\nFirmware update failed: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware update failed: 0x%lX", status);
     return;
   }
-  printf("\r\nFirmware update is successful\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Firmware update is successful");
 }
 
 #if LOAD_CERTIFICATE
@@ -321,9 +322,9 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   // Load SSL CA certificate
   status = sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cert, cert_length);
   if (status != SL_STATUS_OK) {
-    printf("\r\nLoading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
   } else {
-    printf("\r\nLoad TLS CA certificate at index %d Success\r\n", 0);
+    SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 0);
   }
 
   return status;
@@ -354,15 +355,19 @@ sl_status_t http_otaf_app()
   int32_t dns_retry_count = MAX_DNS_RETRY_COUNT;
   do {
     //! Getting IP address of the AWS server using DNS request
-    status = sl_net_dns_resolve_hostname((const char *)hostname, DNS_TIMEOUT, SL_NET_DNS_TYPE_IPV4, &dns_query_rsp);
+    status = sl_net_dns_resolve_hostname_v2((const char *)hostname,
+                                            DNS_TIMEOUT,
+                                            RETRY_COUNT,
+                                            SL_NET_DNS_TYPE_IPV4,
+                                            &dns_query_rsp);
     dns_retry_count--;
   } while ((dns_retry_count != 0) && (status != SL_STATUS_OK));
 
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error while resolving dns, Error 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%lX", status);
     return status;
   }
-  printf("\r\nResolving dns Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Resolving dns Success");
 
   server_address = dns_query_rsp.ip.v4.value;
   sprintf((char *)server_ip,
@@ -373,32 +378,32 @@ sl_status_t http_otaf_app()
           (server_address & 0xff000000) >> 24);
 
 #ifdef AWS_ENABLE
-  printf("\nResolved AWS S3 Bucket IP address = %s\n", server_ip);
-  printf("\r\nFirmware download from AWS S3 Bucket is in progress...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Resolved AWS S3 Bucket IP address = %s", (uintptr_t)server_ip);
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AWS S3 Bucket is in progress...");
 #elif AZURE_ENABLE
-  printf("\nResolved AZURE Blob Storage IP address = %s\n", server_ip);
-  printf("\r\nFirmware download from AZURE Blob Storage is in progress...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Resolved AZURE Blob Storage IP address = %s", (uintptr_t)server_ip);
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AZURE Blob Storage is in progress...");
 #endif
 
 #else
   strcpy(server_ip, HTTP_SERVER_IP_ADDRESS);
-  printf("\r\nLocal Apache Server IP Address: %s\r\n", HTTP_HOSTNAME);
+  SL_DEBUG_LOG_V2(INFO, "Local Apache Server IP Address: %s", (uintptr_t)HTTP_HOSTNAME);
 #endif
   status = set_twt();
   if (status != SL_STATUS_OK) {
-    printf("\r\nError while configuring TWT parameters: 0x%lx \r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while configuring TWT parameters: 0x%lx ", status);
     return status;
   }
-  printf("\r\nTWT Config Done\r\n");
+  SL_DEBUG_LOG_V2(INFO, "TWT Config Done");
 
   if (twt_active_session == 1) {
     status = sl_wifi_reschedule_twt(twt_response.twt_flow_id, SL_WIFI_SUSPEND_INDEFINITELY, 0);
     if (status != SL_STATUS_OK) {
-      printf("\r\nSuspending TWT Failed: 0x%lx \r\n", status);
+      SL_DEBUG_LOG_V2(ERROR, "Suspending TWT Failed: 0x%lx ", status);
       return status;
     } else {
       twt_active_session = 0;
-      printf("\r\nSuspend TWT Done\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Suspend TWT Done");
     }
   }
 
@@ -406,20 +411,20 @@ sl_status_t http_otaf_app()
     performance_profile.profile = HIGH_PERFORMANCE;
     status                      = sl_wifi_set_performance_profile_v2(&performance_profile);
     if (status != SL_STATUS_OK) {
-      printf("\r\nPowersave Disabling Failed, Error Code : 0x%lX\r\n", status);
+      SL_DEBUG_LOG_V2(ERROR, "Powersave Disabling Failed, Error Code : 0x%lX", status);
       return status;
     } else {
       power_save_enabled = 0;
-      printf("\r\nPower Save Disabled\n");
+      SL_DEBUG_LOG_V2(INFO, "Power Save Disabled");
     }
   }
 
 #ifdef AWS_ENABLE
-  printf("\r\nFirmware download from AWS S3 Bucket is in progress...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AWS S3 Bucket is in progress...");
 #elif AZURE_ENABLE
-  printf("\r\nFirmware download from AZURE Blob Storage is in progress...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AZURE Blob Storage is in progress...");
 #else
-  printf("\r\nFirmware download from Local Apache Server is in progress...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from Local Apache Server is in progress...");
 #endif
   sl_si91x_http_otaf_params_t http_params = { 0 };
 
@@ -434,7 +439,7 @@ sl_status_t http_otaf_app()
 
   status = sl_si91x_http_otaf_v2(&http_params);
 
-  printf("\r\nFirmware update status: 0x%lX\r\n", status);
+  SL_DEBUG_LOG_V2(INFO, "Firmware update status: 0x%lX", status);
   if (SL_STATUS_IN_PROGRESS == status) {
     const uint32_t start = osKernelGetTickCount();
 
@@ -446,39 +451,39 @@ sl_status_t http_otaf_app()
   }
 
   if (status != SL_STATUS_OK) {
-    printf("\r\nFirmware update FAILED with error: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware update FAILED with error: 0x%lX", status);
     return status;
   } else {
 #ifdef AWS_ENABLE
-    printf("\r\nCompleted firmware download using AWS\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using AWS");
 #elif AZURE_ENABLE
-    printf("\r\nCompleted firmware download using AZURE\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using AZURE");
 #else
-    printf("\r\nCompleted firmware download using Local Apache Server\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using Local Apache Server");
 #endif
-    printf("\r\nUpdating the firmware...\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Updating the firmware...");
   }
 
 #if (FW_UPDATE_TYPE == TA_FW_UPDATE)
   status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
   if (status != SL_STATUS_OK) {
-    printf("\r\nError while wifi deinit: 0x%lX \r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX ", status);
     return status;
   }
-  printf("\r\nWi-Fi Deinit is successful\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful");
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lX", status);
     return status;
   }
-  printf("\r\nWi-Fi Init success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init success");
 
   status = sl_wifi_get_firmware_version(&version);
   VERIFY_STATUS_AND_RETURN(status);
   print_firmware_version(&version);
 #else
-  printf("\r\nSoC Soft Reset initiated!\r\n");
+  SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!");
   sl_si91x_soc_nvic_reset();
 #endif
 
@@ -505,17 +510,17 @@ sl_status_t set_twt(void)
   //! Enable Broadcast data filter
   status = sl_wifi_filter_broadcast(5000, 1, 1);
   VERIFY_STATUS_AND_RETURN(status);
-  printf("\r\nEnabled Broadcast Data Filter\n");
+  SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
 
   //! Apply power save profile
   performance_profile.profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
   status                      = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nPowersave Configuration Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%lX", status);
     return status;
   } else {
     power_save_enabled = 1;
-    printf("\r\nAssociated Power Save Enabled\n");
+    SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
   }
   return SL_STATUS_OK;
 }
@@ -538,66 +543,66 @@ static sl_status_t twt_callback_handler(sl_wifi_event_t event,
   switch (event) {
     case SL_WIFI_TWT_RESPONSE_EVENT:
       twt_active_session = 1;
-      printf("\r\nTWT Setup success");
+      SL_DEBUG_LOG_V2(INFO, "TWT Setup success");
       break;
     case SL_WIFI_TWT_UNSOLICITED_SESSION_SUCCESS_EVENT:
       twt_active_session = 1;
-      printf("\r\nUnsolicited TWT Setup success");
+      SL_DEBUG_LOG_V2(INFO, "Unsolicited TWT Setup success");
       break;
     case SL_WIFI_TWT_AP_REJECTED_EVENT:
-      printf("\r\nTWT Setup Failed. TWT Setup rejected by AP");
+      SL_DEBUG_LOG_V2(ERROR, "TWT Setup Failed. TWT Setup rejected by AP");
       break;
     case SL_WIFI_TWT_OUT_OF_TOLERANCE_EVENT:
-      printf("\r\nTWT Setup Failed. TWT response out of tolerance limits");
+      SL_DEBUG_LOG_V2(ERROR, "TWT Setup Failed. TWT response out of tolerance limits");
       break;
     case SL_WIFI_TWT_RESPONSE_NOT_MATCHED_EVENT:
-      printf("\r\nTWT Setup Failed. TWT Response not matched with the request parameters");
+      SL_DEBUG_LOG_V2(ERROR, "TWT Setup Failed. TWT Response not matched with the request parameters");
       break;
     case SL_WIFI_TWT_UNSUPPORTED_RESPONSE_EVENT:
-      printf("\r\nTWT Setup Failed. TWT Response Unsupported");
+      SL_DEBUG_LOG_V2(ERROR, "TWT Setup Failed. TWT Response Unsupported");
       break;
     case SL_WIFI_TWT_FAIL_MAX_RETRIES_REACHED_EVENT:
-      printf("\r\nTWT Setup Failed. Max retries reached");
+      SL_DEBUG_LOG_V2(ERROR, "TWT Setup Failed. Max retries reached");
       break;
     case SL_WIFI_TWT_INACTIVE_DUE_TO_ROAMING_EVENT:
-      printf("\r\nTWT session inactive due to roaming");
+      SL_DEBUG_LOG_V2(WARN, "TWT session inactive due to roaming");
       break;
     case SL_WIFI_TWT_INACTIVE_DUE_TO_DISCONNECT_EVENT:
-      printf("\r\nTWT session inactive due to wlan disconnection");
+      SL_DEBUG_LOG_V2(WARN, "TWT session inactive due to wlan disconnection");
       break;
     case SL_WIFI_TWT_TEARDOWN_SUCCESS_EVENT:
-      printf("\r\nTWT session teardown success");
+      SL_DEBUG_LOG_V2(INFO, "TWT session teardown success");
       break;
     case SL_WIFI_TWT_AP_TEARDOWN_SUCCESS_EVENT:
-      printf("\r\nTWT session teardown from AP");
+      SL_DEBUG_LOG_V2(INFO, "TWT session teardown from AP");
       break;
     case SL_WIFI_TWT_INACTIVE_NO_AP_SUPPORT_EVENT:
-      printf("\r\nConnected AP Does not support TWT");
+      SL_DEBUG_LOG_V2(WARN, "Connected AP Does not support TWT");
       break;
     case SL_WIFI_RESCHEDULE_TWT_SUCCESS_EVENT:
-      printf("\r\nTWT rescheduled");
+      SL_DEBUG_LOG_V2(INFO, "TWT rescheduled");
       break;
     case SL_WIFI_TWT_INFO_FRAME_EXCHANGE_FAILED_EVENT:
-      printf("\r\nTWT rescheduling failed due to a failure in the exchange of TWT information frames.");
+      SL_DEBUG_LOG_V2(WARN, "TWT rescheduling failed due to a failure in the exchange of TWT information frames.");
       break;
     default:
-      printf("TWT Setup Failed.");
+      SL_DEBUG_LOG_V2(ERROR, "TWT Setup Failed.");
   }
   if (event < SL_WIFI_TWT_TEARDOWN_SUCCESS_EVENT) {
-    printf("\r\n wake duration : 0x%X", result->wake_duration);
-    printf("\r\n wake_duration_unit: 0x%X", result->wake_duration_unit);
-    printf("\r\n wake_int_exp : 0x%X", result->wake_int_exp);
-    printf("\r\n negotiation_type : 0x%X", result->negotiation_type);
-    printf("\r\n wake_int_mantissa : 0x%X", result->wake_int_mantissa);
-    printf("\r\n implicit_twt : 0x%X", result->implicit_twt);
-    printf("\r\n un_announced_twt : 0x%X", result->un_announced_twt);
-    printf("\r\n triggered_twt : 0x%X", result->triggered_twt);
-    printf("\r\n twt_channel : 0x%X", result->twt_channel);
-    printf("\r\n twt_protection : 0x%X", result->twt_protection);
-    printf("\r\n twt_flow_id : 0x%X\r\n", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " wake duration : 0x%X", result->wake_duration);
+    SL_DEBUG_LOG_V2(DEBUG, " wake_duration_unit: 0x%X", result->wake_duration_unit);
+    SL_DEBUG_LOG_V2(DEBUG, " wake_int_exp : 0x%X", result->wake_int_exp);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " wake_int_mantissa : 0x%X", result->wake_int_mantissa);
+    SL_DEBUG_LOG_V2(DEBUG, " implicit_twt : 0x%X", result->implicit_twt);
+    SL_DEBUG_LOG_V2(DEBUG, " un_announced_twt : 0x%X", result->un_announced_twt);
+    SL_DEBUG_LOG_V2(DEBUG, " triggered_twt : 0x%X", result->triggered_twt);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_channel : 0x%X", result->twt_channel);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_protection : 0x%X", result->twt_protection);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
   } else if (event < SL_WIFI_TWT_EVENTS_END) {
-    printf("\r\n twt_flow_id : 0x%X", result->twt_flow_id);
-    printf("\r\n negotiation_type : 0x%X\r\n", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
   }
   return SL_STATUS_OK;
 }

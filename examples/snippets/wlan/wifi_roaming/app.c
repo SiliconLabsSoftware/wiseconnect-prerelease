@@ -36,6 +36,7 @@
 #include "sl_net.h"
 #include "sl_net_si91x.h"
 #include "sl_wifi_callback_framework.h"
+#include <stdint.h>
 #include <string.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -149,33 +150,33 @@ static void application_start(void *argument)
   //! Initialize the Wi-Fi client interface
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to start Wi-Fi Client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
     return;
   }
-  printf("\r\nWi-Fi client init success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client init success");
 
   //! Bring up the Wi-Fi client interface
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
     return;
   }
-  printf("\r\nWi-Fi client connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   //! Filter broadcast packets
   status = sl_wifi_filter_broadcast(BROADCAST_DROP_THRESHOLD, BROADCAST_IN_TIM, BROADCAST_TIM_TILL_NEXT_COMMAND);
   if (status != SL_STATUS_OK) {
-    printf("\r\nsl_wifi_filter_broadcast Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_filter_broadcast Failed, Error Code : 0x%lX", status);
     return;
   }
 
   //! set performance profile
   status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nPower save configuration Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", status);
     return;
   }
-  printf("\r\nPower save configuration success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Power save configuration success");
 
   //! Register the module status handler
   sl_wifi_set_callback_v2(SL_WIFI_STATS_RESPONSE_EVENTS, module_status_handler, NULL);
@@ -190,7 +191,7 @@ static void application_start(void *argument)
 
   status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
   if (status != SL_STATUS_OK) {
-    printf("\r\nsl_wifi_set_advanced_scan_configuration failed with status %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_advanced_scan_configuration failed with status %lx", status);
     return;
   }
 
@@ -208,16 +209,16 @@ static void application_start(void *argument)
 
   status = sl_wifi_set_roam_configuration(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &roam_configuration);
   if (status != SL_STATUS_OK) {
-    printf("\r\nRoam failed with status %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Roam failed with status %lx", status);
     return;
   } else {
-    printf("\r\nRoaming configuration set successfully\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Roaming configuration set successfully");
   }
 
   //! Start the scan
   status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
   if (SL_STATUS_IN_PROGRESS == status) {
-    printf("\r\nScanning...\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Scanning...");
     const uint32_t start = osKernelGetTickCount();
 
     while (!scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT) {
@@ -228,26 +229,19 @@ static void application_start(void *argument)
   }
 
   if (status != SL_STATUS_OK) {
-    printf("\r\nscan failed with status %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "scan failed with status %lx", status);
     return;
   }
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-#if (SL_SI91X_TICKLESS_MODE == 0)
-  sl_si91x_power_manager_sleep();
-  while (1) {
-    osThreadYield();
-  }
-#else
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    printf("Failed to create semaphore\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
     return;
   }
   // Waiting forever using semaphore to put M4 to sleep in tick less mode
   osSemaphoreAcquire(wait_semaphore, osWaitForever);
-#endif
 #else
   while (1) {
     osThreadYield();
@@ -269,20 +263,15 @@ static sl_status_t module_status_handler(sl_wifi_event_t event,
 
   sl_wifi_module_state_stats_response_t *notif = (sl_wifi_module_state_stats_response_t *)data;
 
-  printf("\r\n---> Module status handler event with length : %lu\r\n", data_length);
-  printf("  <> Timestamp : %lu, state_code : 0x%02X, reason_code : 0x%02X, channel : %u, rssi : -%u.\n",
-         notif->timestamp,
-         notif->state_code,
-         notif->reason_code,
-         notif->channel,
-         notif->rssi);
-  printf("  <> BSSID : %x:%x:%x:%x:%x:%x.\n",
-         notif->bssid[0],
-         notif->bssid[1],
-         notif->bssid[2],
-         notif->bssid[3],
-         notif->bssid[4],
-         notif->bssid[5]);
+  SL_DEBUG_LOG_V2(DEBUG, "---> Module status handler event with length : %lu", data_length);
+  SL_DEBUG_LOG_V2(DEBUG,
+                  "  <> Timestamp : %lu, state_code : 0x%02X, reason_code : 0x%02X.",
+                  notif->timestamp,
+                  notif->state_code,
+                  notif->reason_code);
+  SL_DEBUG_LOG_V2(DEBUG, "  <> channel : %u, rssi : -%u.", notif->channel, notif->rssi);
+  SL_DEBUG_LOG_V2(DEBUG, "  <> BSSID : %x:%x:%x:", notif->bssid[0], notif->bssid[1], notif->bssid[2]);
+  SL_DEBUG_LOG_V2(DEBUG, "%x:%x:%x.", notif->bssid[3], notif->bssid[4], notif->bssid[5]);
 
   //! Display the status information
   print_status_info(notif->state_code, notif->reason_code);
@@ -294,25 +283,21 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
-  printf("%ld scan results:\n", scan_result->scan_count);
-  if (scan_result->scan_count)
-    printf("\n   %s %24s %s", "SSID", "SECURITY", "NETWORK");
-  printf("%12s %12s %s\n", "BSSID", "CHANNEL", "RSSI");
+  SL_DEBUG_LOG_V2(INFO, "%ld scan results:", scan_result->scan_count);
+  if (scan_result->scan_count) {
+    SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
+  }
+  SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
   for (uint32_t a = 0; a < scan_result->scan_count; ++a) {
     bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
-    printf("%-24s %4u,  %4u, ",
-           scan_result->scan_info[a].ssid,
-           scan_result->scan_info[a].security_mode,
-           scan_result->scan_info[a].network_type);
-    printf("  %02x:%02x:%02x:%02x:%02x:%02x, %4u,  -%u\n",
-           bssid[0],
-           bssid[1],
-           bssid[2],
-           bssid[3],
-           bssid[4],
-           bssid[5],
-           scan_result->scan_info[a].rf_channel,
-           scan_result->scan_info[a].rssi_val);
+    SL_DEBUG_LOG_V2(INFO,
+                    "%-24s %4u,  %4u, ",
+                    (uintptr_t)scan_result->scan_info[a].ssid,
+                    scan_result->scan_info[a].security_mode,
+                    scan_result->scan_info[a].network_type);
+    SL_DEBUG_LOG_V2(INFO, "  %02x:%02x:%02x:", bssid[0], bssid[1], bssid[2]);
+    SL_DEBUG_LOG_V2(INFO, "%02x:%02x:%02x, ", bssid[3], bssid[4], bssid[5]);
+    SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
   }
 
   return SL_STATUS_OK;
@@ -356,31 +341,31 @@ void print_status_info(uint8_t state_code, uint8_t reason_code)
    */
   switch (state_code & 0xF0) {
     case 0x00:
-      printf("State: Startup (Initial state or idle state)\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Startup (Initial state or idle state)");
       break;
     case 0x10:
-      printf("State: Beacon Loss\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Beacon Loss");
       break;
     case 0x20:
-      printf("State: De-authentication from AP\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: De-authentication from AP");
       break;
     case 0x50:
-      printf("State: Current AP is best\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Current AP is best");
       break;
     case 0x60:
-      printf("State: Better AP found while roaming\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Better AP found while roaming");
       break;
     case 0x70:
-      printf("State: No AP found\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: No AP found");
       break;
     case 0x80:
-      printf("State: Associated or joined to an Access point\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Associated or joined to an Access point");
       break;
     case 0x90:
-      printf("State: Unassociated (Disconnected from host or join failure)\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Unassociated (Disconnected from host or join failure)");
       break;
     default:
-      printf("State: Unknown state code\n");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Unknown state code");
       break;
   }
 
@@ -440,157 +425,157 @@ void print_status_info(uint8_t state_code, uint8_t reason_code)
    */
   switch (reason_code) {
     case 0x00:
-      printf("Reason: Initial state or idle state\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Initial state or idle state");
       break;
     case 0x01:
-      printf("Reason: No response from AP for authentication request (Authentication denial)\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: No response from AP for authentication request (Authentication denial)");
       break;
     case 0x02:
-      printf("Reason: Association denial (Association timeout or failure)\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Association denial (Association timeout or failure)");
       break;
     case 0x03:
-      printf("Reason: User-configured AP is not present\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: User-configured AP is not present");
       break;
     case 0x05:
-      printf("Reason: Four-way Handshake failure\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Four-way Handshake failure");
       break;
     case 0x06:
-      printf("Reason: Deauthentication from user\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Deauthentication from user");
       break;
     case 0x07:
-      printf("Reason: PSK not configured\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: PSK not configured");
       break;
     case 0x08:
-      printf("Reason: Key-handshake failure during rejoin/roaming/after connection\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Key-handshake failure during rejoin/roaming/after connection");
       break;
     case 0x09:
-      printf("Reason: Roaming not enabled\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Roaming not enabled");
       break;
     case 0x10:
-      printf("Reason: Beacon Loss (failover Roam)\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Beacon Loss (failover Roam)");
       break;
     case 0x20:
-      printf("Reason: De-authentication from AP\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: De-authentication from AP");
       break;
     case 0x28:
-      printf("Reason: TLS CA Cert not present\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS CA Cert not present");
       break;
     case 0x29:
-      printf("Reason: TLS PRIVATE key not present\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS PRIVATE key not present");
       break;
     case 0x2A:
-      printf("Reason: TLS Client Cert not present\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS Client Cert not present");
       break;
     case 0x2B:
-      printf("Reason: TLS no Cert present\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS no Cert present");
       break;
     case 0x2C:
-      printf("Reason: PEAP CA Cert not present\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: PEAP CA Cert not present");
       break;
     case 0x2D:
-      printf("Reason: Server Cert Invalid Key Type\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Invalid Key Type");
       break;
     case 0x2E:
-      printf("Reason: Server Intermediate CA Invalid Key Type\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA Invalid Key Type");
       break;
     case 0x2F:
-      printf("Reason: Server Root CA Invalid Key Type\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Invalid Key Type");
       break;
     case 0x30:
-      printf("Reason: Client Cert Invalid Key Type\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Invalid Key Type");
       break;
     case 0x31:
-      printf("Reason: Client Root CA Invalid Key Type\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Invalid Key Type");
       break;
     case 0x37:
-      printf("Reason: Server Cert 4096-bit length support is not enabled\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert 4096-bit length support is not enabled");
       break;
     case 0x38:
-      printf("Reason: Server Intermediate CA 4096-bit length support is not enabled\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA 4096-bit length support is not enabled");
       break;
     case 0x39:
-      printf("Reason: Server Root CA 4096-bit length support is not enabled\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA 4096-bit length support is not enabled");
       break;
     case 0x3A:
-      printf("Reason: Client Cert 4096-bit length support is not enabled\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert 4096-bit length support is not enabled");
       break;
     case 0x3B:
-      printf("Reason: Client Root CA 4096-bit length support is not enabled\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA 4096-bit length support is not enabled");
       break;
     case 0x3C:
-      printf("Reason: Server Cert Invalid Sign Alg\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Invalid Sign Alg");
       break;
     case 0x3D:
-      printf("Reason: Server Intermediate CA Invalid Sign Alg\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA Invalid Sign Alg");
       break;
     case 0x3E:
-      printf("Reason: Server Root CA Invalid Sign Length\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Invalid Sign Length");
       break;
     case 0x3F:
-      printf("Reason: Client Cert Invalid Sign Alg\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Invalid Sign Alg");
       break;
     case 0x40:
-      printf("Reason: Client Root CA Invalid Sign Length\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Invalid Sign Length");
       break;
     case 0x41:
-      printf("Reason: Server Intermediate CA not Present\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA not Present");
       break;
     case 0x42:
-      printf("Reason: Server Root CA Parse Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Parse Error");
       break;
     case 0x43:
-      printf("Reason: Server Intermediate Root CA Parse Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate Root CA Parse Error");
       break;
     case 0x44:
-      printf("Reason: Server Cert Parse Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Parse Error");
       break;
     case 0x45:
-      printf("Reason: Client Cert Parse Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Parse Error");
       break;
     case 0x46:
-      printf("Reason: Incorrect Private Key Password\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Incorrect Private Key Password");
       break;
     case 0x47:
-      printf("Reason: EAP Failure Received\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: EAP Failure Received");
       break;
     case 0x48:
-      printf("Reason: Client Cert Bad Date Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Bad Date Error");
       break;
     case 0x49:
-      printf("Reason: Server Cert Bad Date Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Bad Date Error");
       break;
     case 0x4A:
-      printf("Reason: Server Root CA Bad Date Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Bad Date Error");
       break;
     case 0x4B:
-      printf("Reason: Client Root CA Bad Date Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Bad Date Error");
       break;
     case 0x4C:
-      printf("Reason: Server Intermediate Root CA Bad Date Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate Root CA Bad Date Error");
       break;
     case 0x4D:
-      printf("Reason: Pem Header Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Header Error");
       break;
     case 0x4E:
-      printf("Reason: Pem Footer Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Footer Error");
       break;
     case 0x4F:
-      printf("Reason: Client Intermediate CA Invalid Sign Length\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA Invalid Sign Length");
       break;
     case 0x50:
-      printf("Reason: Client Intermediate CA Invalid Length\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA Invalid Length");
       break;
     case 0x52:
-      printf("Reason: Client Intermediate CA invalid Key Type\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA invalid Key Type");
       break;
     case 0x53:
-      printf("Reason: Pem Error\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Error");
       break;
     case 0x54:
-      printf("Reason: Pathlen certificate is Invalid\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pathlen certificate is Invalid");
       break;
     default:
-      printf("Reason: Unknown reason code\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Unknown reason code");
       break;
   }
 }

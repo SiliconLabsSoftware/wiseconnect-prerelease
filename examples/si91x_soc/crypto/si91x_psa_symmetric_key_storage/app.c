@@ -29,6 +29,7 @@
  ******************************************************************************/
 
 #include "app.h"
+#include <inttypes.h>
 #include "nvm3_generic.h"
 #include "psa_symmetric_key_storage_app.h"
 
@@ -98,7 +99,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -106,7 +107,7 @@ static void application_start(void *argument)
   /* nvm3 initialization */
   uint32_t err;
   err = nvm3_initDefault();
-  printf("\r\n NVM3 init status %ld \r\n", err);
+  printf("\r\n NVM3 init status %" PRIu32 " \r\n", err);
 
   app_process_action();
 }

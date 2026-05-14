@@ -39,6 +39,7 @@
 #include "sli_hal_si91x.h"
 #include "sli_wifi_constants.h"
 #include "cmsis_os2.h" // CMSIS RTOS2
+#include "sl_common.h"
 #include "sl_cmsis_utility.h"
 #include "sl_si91x_types.h"
 #include "sl_si91x_core_utilities.h"
@@ -360,3 +361,17 @@ sl_status_t sli_configure_sni(const sli_si91x_tls_extension_info_t *sni_extensio
   return SL_STATUS_OK;
 }
 #endif
+
+// Weak fallback so applications that drop the deprecated buffer components
+// (sl_si91x_basic_buffers / sl_si91x_mem_pool_buffers[_with_quota]) still
+// resolve this public API symbol. When any deprecated component is selected,
+// its strong definition preempts this one. The explicit NULL / bounds check
+// preserves the legacy contract (return NULL when offset >= buffer->length,
+// including length == 0); sli_wifi_host_get_buffer_data uses a looser check.
+SL_WEAK void *sl_si91x_host_get_buffer_data(sl_wifi_buffer_t *buffer, uint16_t offset, uint16_t *data_length)
+{
+  if ((buffer == NULL) || (offset >= buffer->length)) {
+    return NULL;
+  }
+  return sli_wifi_host_get_buffer_data(buffer, offset, data_length);
+}

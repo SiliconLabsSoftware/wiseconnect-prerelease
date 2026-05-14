@@ -34,8 +34,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/sntp_client/wifi_embedded_sntp_client_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -64,8 +64,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/sntp_client/wifi_embedded_sntp_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -94,8 +94,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/tls_client/wifi_tls_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -109,8 +109,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_otaf/wifi_http_otaf_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -124,8 +124,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_otaf/wifi_http_otaf_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -154,8 +154,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/cloud_apps/aws/mqtt/wifi_aws_mqtt_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -199,8 +199,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/cloud_apps/azure/wifi_azure_iot_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -214,8 +214,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/station_ping/wifi_station_ping_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -229,8 +229,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/station_ping/wifi_station_ping_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -259,8 +259,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/three_ssl_concurrent_client_sockets/wifi_three_ssl_client_sockets_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -289,8 +289,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/three_ssl_concurrent_client_sockets/wifi_three_ssl_client_sockets_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -304,8 +304,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/twt_use_case_remote_app/wifi_twt_use_case_remote_app_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -334,8 +334,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/tcp_tx_on_periodic_wakeup/wifi_tcp_tx_on_periodic_wakeup_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -349,8 +349,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/tcp_tx_on_periodic_wakeup/wifi_tcp_tx_on_periodic_wakeup_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -378,8 +378,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_server/wifi_http_server_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -393,8 +393,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_server/wifi_http_server_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -438,8 +438,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/dtls_client/wifi_dtls_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -453,8 +453,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/ap_throughput/wifi_ap_throughput_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -483,8 +483,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/lwip_tcp_client/wifi_lwip_tcp_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -498,8 +498,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/lwip_tcp_client/wifi_lwip_tcp_client_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -543,8 +543,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/calibration_app/wifi_calibration_app_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -558,8 +558,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/calibration_app/wifi_calibration_app_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -588,8 +588,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/multithreading_application/wifi_multithreading_application_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -603,8 +603,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_mode_dual_ip/wifi_concurrent_mode_dual_ip_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -678,8 +678,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/websocket_client/wifi_websocket_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -708,8 +708,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/enterprise_client/wifi_enterprise_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -738,8 +738,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/embedded_mqtt_client_twt/wifi_embedded_mqtt_client_twt_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -768,8 +768,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/embedded_mqtt_client_twt/wifi_embedded_mqtt_client_twt_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -783,8 +783,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/embedded_mqtt_client/wifi_embedded_mqtt_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -828,8 +828,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/mdns_discovery/wifi_mdns_discovery_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -843,8 +843,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/mdns_discovery/wifi_mdns_discovery_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -873,8 +873,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/paho_mqtt_client/mqtt_over_websocket/wifi_mqtt_over_websocket_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -903,8 +903,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/paho_mqtt_client/lwip_mqtt_over_tcp/wifi_lwip_mqtt_over_tcp_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -933,8 +933,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/paho_mqtt_client/mqtt_over_tcp/wifi_mqtt_over_tcp_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -948,8 +948,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/multithread_sockets/wifi_multithread_sockets_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -978,8 +978,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi6_twt_use_case_demo/wifi6_twt_use_case_demo_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -993,8 +993,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi6_twt_use_case_demo/wifi6_twt_use_case_demo_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1023,8 +1023,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_http_server/wifi_concurrent_http_server_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1053,8 +1053,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_otaf_twt/wifi_http_otaf_twt_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1097,8 +1097,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/data_transfer/wifi_data_transfer_application_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1112,8 +1112,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/user_gain_table/wifi_user_gain_table_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1127,8 +1127,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/user_gain_table/wifi_user_gain_table_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1157,8 +1157,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/provisioning/wifi_provisioning_via_access_point_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1187,8 +1187,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/provisioning/wifi_provisioning_via_access_point_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1232,8 +1232,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_http_server_provisioning/wifi_concurrent_http_server_provisioning_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1277,8 +1277,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_roaming/wifi_roaming_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1292,8 +1292,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_roaming/wifi_roaming_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1307,8 +1307,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/station_ping_v6/wifi_station_ping_v6_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1322,8 +1322,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/station_ping_v6/wifi_station_ping_v6_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1382,8 +1382,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_mode/wifi_concurrent_mode_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1397,8 +1397,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_mode/wifi_concurrent_mode_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1442,8 +1442,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/access_point/wifi_access_point_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1457,8 +1457,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/access_point/wifi_access_point_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1487,8 +1487,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_client/wifi_http_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1502,8 +1502,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wlan_rf_test/wlan_rf_test_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1517,8 +1517,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wlan_rf_test/wlan_rf_test_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1547,8 +1547,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_net_dual_stack_nwp_m4/wifi_net_dual_stack_nwp_m4_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1577,8 +1577,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wps_pbc/wifi_wps_pbc_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1607,8 +1607,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/fw_update_bootloader_xmodem/wifi_firmware_flashing_from_host_uart_xmodem_bootloader_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg24.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1652,8 +1652,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wlan_throughput_v6/wifi_wlan_throughput_v6_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1667,8 +1667,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/select_app/wifi_select_app_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1727,8 +1727,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/firmware_update/wifi_firmware_update_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1742,8 +1742,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/firmware_update/wifi_firmware_update_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1802,8 +1802,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/aws_device_shadow/wifi_aws_device_shadow_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1817,8 +1817,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/aws_device_shadow/wifi_aws_device_shadow_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1832,8 +1832,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/wlan_throughput/wifi_wlan_throughput_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1862,8 +1862,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/wlan_throughput/wifi_wlan_throughput_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1892,8 +1892,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/twt_tcp_client/wifi_twt_tcp_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1937,8 +1937,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/power_save_deep_sleep/wifi_power_save_deep_sleep_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1952,8 +1952,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/power_save_deep_sleep/wifi_power_save_deep_sleep_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -1982,8 +1982,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/powersave_standby_associated/wifi_powersave_standby_associated_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -2012,8 +2012,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/powersave_standby_associated/wifi_powersave_standby_associated_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -2057,8 +2057,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/powersave_standby_associated_tcp_client/wifi_powersave_standby_associated_tcp_client_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />
@@ -2072,8 +2072,8 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/powersave_standby_associated_tcp_client/wifi_powersave_standby_associated_tcp_client_uart_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c" />
-    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.fg25.*" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc" />
     <properties key="quality" value="production" />

@@ -682,7 +682,7 @@ void rsi_ble_configurator_init(void)
 
   status = sl_wifi_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFirmware version query failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nFirmware version query failed, Error Code : 0x%X\r\n", (unsigned int)status);
   }
 }
 
@@ -730,7 +730,7 @@ void rsi_ble_configurator_task(void *argument)
         //MTU exchange
         status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, BLE_MTU_SIZE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n MTU request failed with error code %lx", status);
+          LOG_PRINT("\n MTU request failed with error code %x", (unsigned int)status);
         }
 
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
@@ -739,7 +739,7 @@ void rsi_ble_configurator_task(void *argument)
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT_DEFAULT);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n rsi_ble_conn_params_update command failed : %lx", status);
+          LOG_PRINT("\n rsi_ble_conn_params_update command failed : %x", (unsigned int)status);
         }
 
       } break;
@@ -755,7 +755,7 @@ void rsi_ble_configurator_task(void *argument)
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nStart advertising command failed, Error code = %lx \n", status);
+          LOG_PRINT("\r\nStart advertising command failed, Error code = %x \n", (unsigned int)status);
           goto adv;
         } else {
           LOG_PRINT("\r\nBLE Advertising started\n");
@@ -775,7 +775,7 @@ adv:
           memcpy(&data[2], &firmware_version, sizeof(sl_wifi_firmware_version_t));
           rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, data);
         } else {
-          LOG_PRINT("\r\nFirmware version query failed, Error Code : 0x%lX\r\n", status);
+          LOG_PRINT("\r\nFirmware version query failed, Error Code : 0x%X\r\n", (unsigned int)status);
         }
       } break;
 
@@ -903,8 +903,8 @@ adv:
                                             SUPERVISION_TIMEOUT);
         if (status != RSI_SUCCESS) {
           LOG_PRINT("\r\nconn params update cmd failed with status "
-                    "= %lx \r\n",
-                    status);
+                    "= 0x%x \r\n",
+                    (unsigned int)status);
         }
 
       } break;
@@ -974,7 +974,7 @@ adv:
         //! Send GATT write response to client with success status
         status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("Failed to send GATT write response, status: 0x%lx\n", status);
+          LOG_PRINT("Failed to send GATT write response, status: 0x%x\n", (unsigned int)status);
         }
       } break;
 
@@ -995,8 +995,8 @@ adv:
           status = rsi_ble_set_data_len(conn_event_to_app.dev_addr, TX_LEN, TX_TIME);
           if (status != RSI_SUCCESS) {
             LOG_PRINT("\n set data length cmd failed with error code = "
-                      "%lx \n",
-                      status);
+                      "0x%x \n",
+                      (unsigned int)status);
             rsi_ble_app_set_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
           }
         }

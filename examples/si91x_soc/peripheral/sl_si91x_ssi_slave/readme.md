@@ -224,7 +224,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | Description             | BRD4338A      | BRD4342A      | BRD4343A      |
 | ----------------------- | ------------- | ------------- | ------------- |
 | RTE_SSI_SLAVE_SCK_PIN   | GPIO_26 [P27] | GPIO_26 [P27] | GPIO_26 [P27] |
-| RTE_SSI_SLAVE_CS_PIN    | GPIO_9  [F09] | GPIO_9  [F09] | GPIO_25 [P25] |
+| RTE_SSI_SLAVE_CS_PIN    | GPIO_9  [F09] | GPIO_9  [P25] | GPIO_25 [P25] |
 | RTE_SSI_SLAVE_MOSI_PIN  | GPIO_27 [P29] | GPIO_27 [P29] | GPIO_27 [P29] |
 | RTE_SSI_SLAVE_MISO_PIN  | GPIO_28 [P31] | GPIO_28 [P31] | GPIO_28 [P31] |
 

@@ -1,4 +1,4 @@
-# SiWx91x Platform Crypto AES
+#SiWx91x Platform Crypto AES
 
 ## Table of Contents
 
@@ -63,7 +63,7 @@ Open `app.c` file and configure the following parameters accordingly:
 - The length of the input message/plain text can be configured by using the below macro
 
   ```c
-  #define BUFFER_SIZE 16
+#define BUFFER_SIZE 16
   ```
 
 - *msg* refers to plain data which is passed to AES engine.
@@ -73,7 +73,7 @@ Open `app.c` file and configure the following parameters accordingly:
 - Based on the below macro, the given key can be wrapped by passing valid **sl_si91x_wrap_config_t** configuration to `sl_si91x_wrap()` and outputs the *wrapped_key*.
 
   ```c
-  #define USE_WRAPPED_KEYS 0
+#define USE_WRAPPED_KEYS 0
   ```
 
 - According to NIST, the AES algorithm is capable of using cryptographic keys of 128, 192, and 256 bits to encrypt and decrypt data in block sizes of 128 bits (16 bytes). This means that each block of data processed by the AES algorithm should be aligned to 16-byte boundaries. 
@@ -81,7 +81,7 @@ Open `app.c` file and configure the following parameters accordingly:
 - The input message can be aligned to 16 bytes by enabling below macro.
 
   ```c
-  #define PKCS_7_PADDING 1
+#define PKCS_7_PADDING 1
   ```
 
 - After filling the appropriate **sl_si91x_aes_config_t** configuration, `sl_si91x_aes()` stores the output in the provided encrypted_buffer/decrypted_buffer. 
@@ -89,23 +89,43 @@ Open `app.c` file and configure the following parameters accordingly:
 - To enable AES multipart support, set the macro USE_MULTIPART to 1.
 
   ```c
-  #define USE_MULTIPART    1
+#define USE_MULTIPART 1
   ```
 
 - This AES multipart demonstrates how to split the encryption and decryption process into multiple chunks and handle each chunk separately. 
 
-- The function `sl_si91x_aes_multipart()` is used to perform AES encryption or decryption on large messages by splitting them into smaller chunks. The function allows you to define the size of each chunk by chunk_len bytes.
+- On the legacy (non-sideband) crypto path the function `sl_si91x_aes_multipart()` is used to perform AES encryption or decryption on large messages by splitting them into smaller chunks. The function allows you to define the size of each chunk by chunk_len bytes.
 
   - chunk_len: Specifies the number of bytes per chunk.
   - aes_flags: The flags (BIT(0), BIT(1), BIT(2)) indicate whether the chunk is the first, middle, or last chunk in the sequence respectively.
 
+- When the build defines `SL_SI91X_SIDE_BAND_CRYPTO`, the legacy `sl_si91x_aes_multipart()` symbol is intentionally not provided. The example dispatches at compile time to the dedicated sideband multipart APIs declared in `sl_si91x_mp_aes.h`:
+
+  - `sl_si91x_mp_aes_init()`  - called once before the chunk loop; programs the firmware AES context with key, IV (CBC/CTR), mode and direction.
+  - `sl_si91x_mp_aes_update()` - called for every non-final chunk.
+  - `sl_si91x_mp_aes_final()`  - called for the last chunk; finalizes and tears the firmware context down.
+
 - In AES multipart operation, data must be transmitted in 16-byte aligned chunks. Padding should not be applied to the first and middle chunks to preserve the original message. If the final chunk is not 16 bytes aligned, padding should only be added to the final chunk.
 
-- In Multipart API, while sending less than or equal to 1408 bytes of data to the NWP in a single transmission, the user should include both the first and last chunks in the AES flags.
+- On the legacy non-sideband path, the wire descriptor embeds the chunk in a 1408-byte buffer, so each call must keep `chunk_len <= 1408`. The sideband path uses pointer-based wire descriptors and the firmware splits arbitrary lengths into 1408-byte hardware windows internally for HW-lock fairness, so the sideband path is only bounded by the wire field width (`uint16`, 65535 bytes per chunk).
+
+- In Multipart API, while sending less than or equal to 1408 bytes of data to the NWP in a single transmission on the legacy path, the user should include both the first and last chunks in the AES flags.
 
 - Multipart support will not be available in the event of power loss. Operations will need to restart from the beginning.
 
 - When the user sends data by setting the first chunk, NWP treats it as the start of the data.
+
+- When `USE_MULTIPART` is set to 1, an additional multi-mode multipart matrix runs after the existing CTR multipart encrypt/decrypt demo (`run_aes_multipart_matrix`). It exercises ECB / CBC / CTR through the same compile-time sideband / non-sideband dispatch and verifies an encrypt -> decrypt -> `memcmp` round-trip per case. Cases:
+
+  | # | Mode | Chunks | Total | Notes |
+  |---|------|--------|-------|-------|
+  | 1 | ECB  | 128 + 256 + 128 + 384 + 128 | 1024 | All chunks 16-aligned (ECB requirement) |
+  | 2 | CBC  | 128 + 256 + 128 + 384 + 128 | 1024 | Exercises FW IV-chain across chunks |
+  | 3 | CTR  | 128 + 256 + 128 + 384 + 128 | 1024 | Exercises FW counter advance across chunks |
+  | 4 | CTR  | 128 + 256 + 128 + 384 + 117 | 1013 | Last chunk byte-tail (non-block-aligned); drives FW Phase-1 / Phase-3 keystream carry-over |
+  | 5 | CTR  | 1424 (single chunk)         | 1424 | **Sideband-only.** Single chunk forces the firmware to split into two `MAX_DATA_LENGTH_FOR_AES` (1408-byte) HW windows, releasing the AES/SHA HW lock between them |
+
+  The matrix uses its own buffers (`mp_msg`, `mp_ct`, `mp_pt`) and routes its output through `DEBUGOUT(...)` from `rsi_debug.h`.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
@@ -119,8 +139,9 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Note
 
-- The SDK is limited to handling RX packet lengths up to 1616 bytes, as the rx_buffer is capped at this size. Receiving messages larger than this limit may result in data corruption. To mitigate this, the AES application restricts the input message length to 1408 bytes.
-- In the Multipart API, ensure that the chunk length does not exceed 1408 bytes. If the chunk length surpasses this limit, the API will return an error.
+- The SDK is limited to handling RX packet lengths up to 1616 bytes, as the rx_buffer is capped at this size. Receiving messages larger than this limit may result in data corruption. To mitigate this, the AES application restricts the input message length to 1408 bytes on the legacy non-sideband path.
+- In the legacy non-sideband Multipart API, ensure that the chunk length does not exceed 1408 bytes. If the chunk length surpasses this limit, the API will return an error.
+- On the sideband path each chunk is bounded only by the `uint16` wire-field width (65535 bytes); the firmware splits chunks internally into 1408-byte HW windows for AES/SHA hardware-lock fairness. Case 5 of the multi-mode matrix above exercises this.
 
 ## Note
 

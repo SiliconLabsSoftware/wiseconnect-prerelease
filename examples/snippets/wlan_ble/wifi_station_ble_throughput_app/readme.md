@@ -83,17 +83,38 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
-1. Open `wifi_config.h` (or `wifi_app_config.h`) and edit the following parameters:
+1. Open `wifi_config.h` and edit the following parameters:
 
     - **Optional: Dynamic BLE disable for throughput**
 
-      Set `SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO` to `1` to run **two** WLAN throughput passes: first with BLE still connected (after Wi‑Fi is up), then again after BLE has been disabled. When **`0`**, the app connects over Wi‑Fi and runs a **single** `wlan_throughput_task()` with BLE connected as usual. In this tree, `wifi_config.h` may default this macro to **`1`** for the demo; set it to **`0`** for the single-pass behavior only.
-
-      When dynamic disable is enabled, the sequence is: (1) **`wlan_throughput_task()`** while BLE is up; (2) **`rsi_ble_app_request_disable()`** — the BLE task **quiesces** (`rsi_ble_stop_advertising`, `rsi_ble_disconnect` using the peer address), completes the disable stub after **`RSI_BLE_DISCONN_EVENT`**, and posts to **`ble_disable_done_queue`**; if **`rsi_ble_disconnect`** fails synchronously, the failure is posted immediately and advertising is not restarted from the disconnect path; (3) **`wlan_throughput_task()`** again with BLE off; (4) **`sl_wifi_deinit()`**; (5) **`rsi_ble_app_request_enable()`** and wait on **`ble_enable_done_queue`**; (6) **`wifi_app_init_and_reconnect()`** (`rsi_wlan_init_wifi()`, credential, **`sl_wifi_connect`**, DHCP). This path **deinitializes Wi‑Fi** and brings it back up, unlike the AWS provisioning example which keeps the Wi‑Fi stack initialized and only disconnects the station.
+      - **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** in `wifi_config.h`:
+        - **`1`** — Runs **two** WLAN throughput passes: first with BLE still connected (after Wi‑Fi is up), then again after BLE has been disabled.
+        - **`0`** (default in this tree) — One **`wlan_throughput_task()`** with BLE connected as usual after Wi‑Fi comes up.
+      - **Runtime sequence when the macro is `1`:**
+        1. **`wlan_throughput_task()`** while BLE is up.
+        2. **`rsi_ble_app_request_disable()`** — BLE task **quiesces** (`rsi_ble_stop_advertising`, **`rsi_ble_disconnect`** using the peer address), completes the disable stub after **`RSI_BLE_DISCONN_EVENT`**, and posts to **`ble_disable_done_queue`**. If **`rsi_ble_disconnect`** fails synchronously, the failure is posted immediately and advertising is not restarted from the disconnect path.
+        3. **`wlan_throughput_task()`** again with BLE off.
+        4. **`sl_wifi_disconnect()`** (drops station association).
+        5. **`rsi_ble_app_request_enable()`** and wait on **`ble_enable_done_queue`**.
+        6. **`wifi_app_init_and_reconnect()`** — set credential, **`sl_wifi_connect`**, DHCP (no **`sl_wifi_init()`**).
+      - **`rsi_ble_stop_advertising()`** may return an error if advertising was already stopped; the example continues.
 
       ```c
-      #define SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO 1   /* 0 = one throughput pass with BLE only; 1 = second pass after BLE off */
+      #define SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO 0   /* 0 = one throughput pass with BLE; 1 = second pass after BLE off */
       ```
+
+      - **`CONTINUOUS_THROUGHPUT`** and **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** are **mutually exclusive** at build time in `wifi_config.h`:
+        - When **`CONTINUOUS_THROUGHPUT`** is **`1`**, **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** is forced to **`0`** (the dynamic BLE disable / second-pass / reconnect segment is **not** compiled). Continuous mode loops inside **`wlan_throughput_task()`**, which never returns to run that segment.
+        - When you need **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** **`1`**, set **`CONTINUOUS_THROUGHPUT`** to **`0`** so the second pass after BLE disable can run.
+
+    - **Runtime BLE enable/disable return codes (SDK)**
+
+      Runtime **`rsi_ble_enable()`** and **`rsi_ble_disable()`** check internal BLE state before sending a firmware command; you do not need to call **`rsi_ble_state_is_enabled()`** in application code for a redundant call to be skipped.
+
+      - **`rsi_ble_enable()`** — On success, BLE was off and the enable command completes. Otherwise you may see **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already enabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`** if the device is not initialized.
+      - **`rsi_ble_disable()`** — On success, BLE was on and the disable command completes. Otherwise you may see **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already disabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`**.
+
+      The BLE task posts the **`int32_t`** status from those APIs to **`ble_enable_done_queue`** / **`ble_disable_done_queue`**, so **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** can appear there when the stack was already in the target state. This example treats non-success on those queues as failure; your product code may treat that specific code as a benign no-op if you only need idempotent enable/disable. Other BLE APIs may return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if called while the stack is disabled.
 
     - **Wi-Fi Configuration**
 
@@ -111,22 +132,23 @@ The application can be configured to suit your requirements and development envi
       #define DEVICE_PORT        <local_port>   // Local port to use
       #define SERVER_PORT        <remote_port>  // Remote server port
       #define SERVER_IP_ADDRESS  "192.168.0.100"    // Remote server IP address
-      #define BUF_SIZE           1400               //! Memory length for send buffer
+      // BUFFER_SIZE is selected in wifi_config.h from TCP_BUFFER_SIZE / UDP_BUFFER_SIZE / TLS_BUFFER_SIZE based on THROUGHPUT_TYPE
       #define SOCKET_ASYNC_FEATURE 1                // Type of Socket used. Synchronous = 0, Asynchronous = 1
       ```
 
     - **Throughput Measurement Types**
 
-      The application may be configured to measure throughput using UDP, TCP, TLS packets. Choose the measurement type using the `THROUGHPUT_TYPE` macro.
+      The application may be configured to measure throughput using UDP, TCP, or TLS. Set `THROUGHPUT_TYPE` to one of `UDP_RX`, `UDP_TX`, `TCP_TX`, `TCP_RX`, `TLS_TX`, or `TLS_RX` in `wifi_config.h`.
 
       ```c
-      #define THROUGHPUT_TYPE  TCP_TX     // Selects the throughput option; see the following diagrams. 
-      #define TCP_TX           0          // SiWx91x transmits packets to remote TCP client
-      #define TCP_RX           1          // SiWx91x receives packets from remote TCP server
-      #define UDP_TX           2          // SiWx91x transmits packets to remote UDP client
-      #define UDP_RX           3          // SiWx91x receives packets from remote UDP server
-      #define TLS_TX           4          // SiWx91x transmits packets to remote TLS client
-      #define TLS_RX           5          // SiWx91x receives packets from remote TLS server
+      #define UDP_RX 1   // SiWx91x UDP server — receives from a remote UDP client (iPerf `-c` to module)
+      #define UDP_TX 2   // SiWx91x UDP client — transmits to a remote UDP server (iPerf `-s` on PC)
+      #define TCP_TX 4   // SiWx91x TCP client — transmits to a remote TCP server (iPerf `-s` on PC)
+      #define TCP_RX 8   // SiWx91x TCP server — receives from a remote TCP client (iPerf `-c` to module)
+      #define TLS_TX 16  // SiWx91x TLS client — transmits to a remote TLS server
+      #define TLS_RX 32  // SiWx91x TLS client — receives from a remote TLS server (Python TLS server on PC)
+
+      #define THROUGHPUT_TYPE TCP_RX   // Example selection (change to match your test)
       ```
 
 2. To Load certificate to device flash. (The Certificate could be loaded once and need not be loaded for every boot up.)
@@ -207,6 +229,8 @@ The application can be configured to suit your requirements and development envi
 
 2. To measure **WLAN throughput**, run the below iPerf commands or tls scripts.
 
+   > **Note (RX timing):** For asynchronous RX modes (`UDP_RX` / `TCP_RX`) the throughput timer starts when the **first RX packet** is received (not when the receive function is entered). This avoids counting “idle wait” time before traffic starts and is the intended throughput measurement behavior.
+
 3. To measure **UDP Tx** throughput, configure module as UDP client and open UDP server in remote port using following command. To establish UDP Server on remote PC, open [iPerf Application](https://sourceforge.net/projects/iperf2/files/iperf-2.0.8-win.zip/download) and run the below command from the installed folder's path in the command prompt.
 
     ```sh
@@ -221,6 +245,8 @@ The application can be configured to suit your requirements and development envi
     ```sh
     iperf.exe -c <Module_IP> -u -p <DEVICE_PORT> -i 1 -b<Bandwidth> -t <duration in sec>
     ```
+
+    > **Note:** In async `UDP_RX` single-shot mode, the module waits indefinitely until the first packet is received (there is no timeout if the client never starts). The throughput measurement window starts when the first packet arrives.
   
     Example: iperf.exe -c 192.168.0.1 -u -p 5001 -i 1 -b50M -t 100
   
@@ -242,6 +268,8 @@ The application can be configured to suit your requirements and development envi
             iperf.exe -c <Module_IP> -p <DEVICE_PORT> -i 1 -t <duration in sec>
     ```
 
+    > **Note:** In async `TCP_RX` single-shot mode, the module waits indefinitely until the first packet is received (there is no timeout if the client never starts). The throughput measurement window starts when the first packet arrives.
+
    Example: iperf.exe -c 192.168.0.1 -p 5001 -i 1 -t 100
 
     ![](resources/readme/remote_screen7.png)
@@ -260,11 +288,11 @@ The application can be configured to suit your requirements and development envi
 
     ![](resources/readme/remote_screen8.png)
 
-8. To measure **TLS Rx** throughput, configure module in TLS client and follow below steps to run TLS server in windows
+8. To measure **TLS Rx** throughput, configure the module for `TLS_RX` in `wifi_config.h` and follow the steps below to run the TLS server on Windows.
 
-   - Copy SSL_tx_throughput.py from **release/resources/scripts/** to **release/resources/certificate**.
+   - Copy `SSL_tx_throughput.py` from **release/resources/scripts/** to **release/resources/certificates/**.
 
-   - Change the port number from "5001" to the value configured in "TLS_RX_SERVER_PORT".
+   - Change the port number from `5001` to the value configured as **`TLS_SERVER_PORT`** in `wifi_config.h`.
 
    - Open the command prompt in folder release/resources/certificates/ and run the following command:
 
@@ -286,6 +314,6 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 1. Build the application.
 2. Flash, run and debug the application
 
-3. Observe the output prints on serial terminal  
+3. Observe the output prints on serial terminal
 
    ![](resources/readme/output1.png)

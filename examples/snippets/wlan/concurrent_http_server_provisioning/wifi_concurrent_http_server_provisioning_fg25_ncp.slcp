@@ -42,6 +42,10 @@ component:
 - id: bsd_socket
 - id: sl_si91x_asynchronous_socket
 - id: sl_si91x_wireless
+- id: log_none
+- id: log_backend_iostream
+- id: log_backend_iostream_formatted
+- id: log_platform_specific
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror

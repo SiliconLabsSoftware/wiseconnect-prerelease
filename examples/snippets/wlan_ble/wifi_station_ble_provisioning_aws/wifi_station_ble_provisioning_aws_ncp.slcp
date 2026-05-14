@@ -3,7 +3,7 @@ package: multi_protocol_siwx91x_app
 quality: production
 label: Wi-Fi Coex - Wi-Fi Client BLE Provisioning with AWS (NCP)
 category: Example|Wi-Fi_BLE
-description: 'This application explains how to connect to a Wi-Fi access point using BLE provisioning functionality and then communicates with an AWS server using MQTT. Data will be continuously published until the device is disconnected from the access point
+description: 'This application explains how to connect to a Wi-Fi access point using BLE provisioning functionality and then communicates with an AWS server using MQTT. Data will be continuously published until the device is disconnected from the access point. Optional dynamic BLE enable disable; see readme.md.
 
   '
 filter:
@@ -47,6 +47,10 @@ component:
 - id: basic_network_config_manager
 - id: sl_si91x_asynchronous_socket
 - id: aws_sdk
+- id: log_none
+- id: log_backend_iostream
+- id: log_backend_iostream_formatted
+- id: log_platform_specific
 toolchain_settings:
 - option: gcc_linker_option
   value: -u _printf_float

@@ -510,6 +510,21 @@
     <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_littlefs/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="sl_si91x_logger_backend_example" label="SiWx91x Platform - Logger Backend Example" description="Demonstrates how to use logger Service with all existing backends.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_logger_backend_example/sl_si91x_logger_backend_example.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_logger_backend_example/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
+  </descriptors>
   <descriptors name="siwx917_dev_kit" label="Wi-Fi - SiWx917 Dev Kit (BRD2605A/BRD2605B)" description="Demonstrates the features of the SiWx917 Dev Kit Board. This can be tested with the Simplicity Connect mobile app.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />

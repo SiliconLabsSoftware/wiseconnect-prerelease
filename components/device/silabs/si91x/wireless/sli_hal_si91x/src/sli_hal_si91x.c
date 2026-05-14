@@ -72,6 +72,10 @@ typedef struct {
 #define SLI_HAL_SI91X_IS_FLASH_COMMAND(command)                                                \
   (((command) == SLI_COMMON_RSP_TA_M4_COMMANDS) || ((command) == SLI_WIFI_REQ_SET_CERTIFICATE) \
    || ((command) == SLI_COMMON_RSP_SOFT_RESET)) ///< Check if the command is a flash command
+
+#define SLI_HAL_SI91X_IS_GLOBAL_FRAME(command)                                      \
+  (((command) == SLI_WIFI_RSP_OPERMODE) || ((command) == SLI_COMMON_RSP_SOFT_RESET) \
+   || ((command) == SLI_COMMON_RSP_PWRMODE) || ((command) == SLI_COMMON_RSP_ENABLE_DISABLE_BLE))
 /******************************************************
  *               Function Declarations
 ******************************************************/
@@ -130,6 +134,11 @@ static osThreadId_t hal_thread_ID = NULL;
 
 // Event flags
 static osEventFlagsId_t sli_hal_si91x_events = NULL;
+
+// Global frame pending flag
+// Power save, soft reset, operational mode response are global frames
+// Other commands are not allowed to be sent while a global frame is being processed by the TA
+static bool is_global_frame_pending = false;
 
 // Routing entries for HAL
 static sli_routing_entry_t hal_si91x_routing_entires[SLI_HAL_SI91X_MAX] = { [SLI_HAL_SI91X_WIFI_COMMON_PACKET] = {
@@ -223,6 +232,8 @@ static uint32_t sli_hal_si91x_get_wait_time(bool Is_rx_buffer_submitted,
     // If there are no events, check if the RX buffer has been submitted
     // If the RX buffer has been submitted, wait indefinitely
     wait_time = !Is_rx_buffer_submitted ? 0 : osWaitForever;
+  } else if (is_global_frame_pending && !(events_received & SLI_HAL_SI91X_RX_EVENT)) {
+    wait_time = osWaitForever;
   } else if ((events_received & SLI_HAL_SI91X_WIFI_TX_EVENT) && (interrupt_status & SLI_WIFI_BUFFER_FULL)) {
     wait_time = SLI_SYSTEM_MS_TO_TICKS(10); // If the wifi TX event is set and the buffer is full, process immediately
   } else if ((events_received & SLI_HAL_SI91X_BLE_TX_EVENT) && (interrupt_status & SLI_BLE_BUFFER_FULL)) {
@@ -304,6 +315,13 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
 
   if (SLI_HAL_SI91X_IS_FLASH_COMMAND(packet->command)) {
     sli_si91x_update_flash_command_status(false);
+  }
+
+  // Since we received response for global frame, reset the flag
+  // to indicate that we can now send other commands
+  if (SLI_HAL_SI91X_IS_GLOBAL_FRAME(packet->command)) {
+    is_global_frame_pending = false;
+    SL_DEBUG_LOG_V2(DEBUG, "Global lock released: command 0x%x", (uint16_t)packet->command);
   }
 
   uint16_t packet_type = 0;
@@ -402,11 +420,13 @@ static void sli_hal_si91x_thread(void *args)
       sli_hal_si91x_handle_rx_event(rx_buffer, &Is_rx_buffer_submitted, &events_received);
     }
 
-    if ((events_received & SLI_HAL_SI91X_WIFI_TX_EVENT) && !(interrupt_status & SLI_WIFI_BUFFER_FULL)) {
+    if ((events_received & SLI_HAL_SI91X_WIFI_TX_EVENT) && !(interrupt_status & SLI_WIFI_BUFFER_FULL)
+        && !is_global_frame_pending) {
       sli_hal_si91x_handle_wifi_tx_event(&events_received);
     }
 
-    if (events_received & SLI_HAL_SI91X_BLE_TX_EVENT && !(interrupt_status & SLI_BLE_BUFFER_FULL)) {
+    if (events_received & SLI_HAL_SI91X_BLE_TX_EVENT && !(interrupt_status & SLI_BLE_BUFFER_FULL)
+        && !is_global_frame_pending) {
       sli_hal_si91x_handle_ble_tx_event(&events_received);
     }
 
@@ -461,6 +481,11 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
     sli_si91x_update_flash_command_status(true);
   }
 
+  if (status == SL_STATUS_OK && SLI_HAL_SI91X_IS_GLOBAL_FRAME(buffer->command)) {
+    is_global_frame_pending = true;
+    SL_DEBUG_LOG_V2(DEBUG, "Global lock set: command 0x%x", (uint16_t)buffer->command);
+  }
+
   sl_si91x_host_clear_sleep_indicator();
 
   sli_si91x_update_tx_command_status(false);
@@ -470,6 +495,8 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
 static void sli_cleanup_flags_and_queues(void)
 {
   sl_status_t queue_deinit_status = SL_STATUS_FAIL;
+
+  is_global_frame_pending = false;
 
   queue_deinit_status = sli_queue_manager_deinit(&wifi_tx_queue_handle, NULL, NULL);
   SLI_HAL_SI91X_LOG_MESSAGE_ON_ERROR(queue_deinit_status, SL_STATUS_OK, "Wi-Fi TX queue deinit failed with status %d");

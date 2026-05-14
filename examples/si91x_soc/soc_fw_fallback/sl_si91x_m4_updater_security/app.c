@@ -28,6 +28,7 @@
 #include "sl_si91x_driver.h"
 #include <string.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include "rsi_debug.h"
 #include "sl_si91x_fw_fallback.h"
 
@@ -127,14 +128,14 @@ static void application_start(void *argument)
   // Initialize the Wi-Fi client interface
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_firmware_update_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
+    DEBUGOUT("Failed to start Wi-Fi Client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
 
   // Get the firmware version
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to fetch firmware version: 0x%lx\r\n", status);
+    DEBUGOUT("\r\nFailed to fetch firmware version: 0x%x\r\n", (unsigned int)status);
     while (1)
       ; // Halt execution in case of failure
   } else {
@@ -144,14 +145,14 @@ static void application_start(void *argument)
   // Get active slot addresses
   status = sl_si91x_app_get_active_slot_addresses(&active_slot_info);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to get active slot addresses: 0x%lx\r\n", status);
+    DEBUGOUT("\r\nFailed to get active slot addresses: 0x%x\r\n", (unsigned int)status);
     while (1)
       ; // Halt execution in case of failure
   } else {
-    DEBUGOUT("\r\nActive M4 Slot: %s (Address: 0x%08lx)\r\n",
+    DEBUGOUT("\r\nActive M4 Slot: %s (Address: 0x%08" PRIx32 ")\r\n",
              (active_slot_info.m4_active_slot == SLOT_A) ? "A" : "B",
              active_slot_info.m4_active_slot_address);
-    DEBUGOUT("Active NWP Slot: %s (Address: 0x%08lx)\r\n",
+    DEBUGOUT("Active NWP Slot: %s (Address: 0x%08" PRIx32 ")\r\n",
              (active_slot_info.nwp_active_slot == SLOT_A) ? "A" : "B",
              active_slot_info.nwp_active_slot_address);
   }
@@ -159,31 +160,37 @@ static void application_start(void *argument)
   // Verify the image for the NWP active slot
   status = sl_si91x_verify_image(active_slot_info.nwp_active_slot_address);
   if (status != SL_STATUS_SI91X_FW_UPDATE_DONE) {
-    DEBUGOUT("\r\nFailed to verify image: 0x%lx 0x%lx\r\n", status, active_slot_info.nwp_active_slot_address);
+    DEBUGOUT("\r\nFailed to verify image: 0x%x 0x%x\r\n",
+             (unsigned int)status,
+             (unsigned int)active_slot_info.nwp_active_slot_address);
     while (1)
       ; // Halt execution in case of failure
   } else {
-    DEBUGOUT("\r\nImage verified successfully: 0x%lx\r\n", active_slot_info.nwp_active_slot_address);
+    DEBUGOUT("\r\nImage verified successfully: 0x%x\r\n", (unsigned int)active_slot_info.nwp_active_slot_address);
   }
 
   // Verify the image for the M4 active slot
   status = sl_si91x_verify_image(active_slot_info.m4_active_slot_address);
   if (status != SL_STATUS_SI91X_FW_UPDATE_DONE) {
-    DEBUGOUT("\r\nFailed to verify image: 0x%lx 0x%lx\r\n", status, active_slot_info.m4_active_slot_address);
+    DEBUGOUT("\r\nFailed to verify image: 0x%x 0x%x\r\n",
+             (unsigned int)status,
+             (unsigned int)active_slot_info.m4_active_slot_address);
     while (1)
       ; // Halt execution in case of failure
   } else {
-    DEBUGOUT("\r\nImage verified successfully: 0x%lx\r\n", active_slot_info.m4_active_slot_address);
+    DEBUGOUT("\r\nImage verified successfully: 0x%x\r\n", (unsigned int)active_slot_info.m4_active_slot_address);
   }
 
   //Request to load QSPI keys
   status = sl_si91x_fallback_load_qspi_keys(active_slot_info.m4_active_slot_address);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nFailed to load keys: 0x%lx 0x%lx\r\n", status, active_slot_info.m4_active_slot_address);
+    DEBUGOUT("\r\nFailed to load keys: 0x%x 0x%x\r\n",
+             (unsigned int)status,
+             (unsigned int)active_slot_info.m4_active_slot_address);
     while (1)
       ; // Halt execution in case of failure
   } else {
-    DEBUGOUT("\r\nLoad Keys successfully: 0x%lx\r\n", active_slot_info.m4_active_slot_address);
+    DEBUGOUT("\r\nLoad Keys successfully: 0x%x\r\n", (unsigned int)active_slot_info.m4_active_slot_address);
   }
 
   // Perform a soft reset NWP FW

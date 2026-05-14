@@ -62,6 +62,10 @@ component:
 - id: console
 - id: console_variables
 - id: iot_socket
+- id: log_none
+- id: log_backend_iostream
+- id: log_backend_iostream_formatted
+- id: log_platform_specific
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror

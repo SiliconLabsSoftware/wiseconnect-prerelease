@@ -575,7 +575,7 @@ sl_status_t sl_si91x_qei_set_configuration(sl_qei_control_t state, sl_qei_config
 {
   sl_status_t status;
   do {
-    if ((config == NULL)) {
+    if (config == NULL) {
       // Set status to null pointer error
       status = SL_STATUS_NULL_POINTER;
       SL_PRINT_STRING_ERROR("sl_si91x_qei_set_configuration: handle NULL,line no : %d\r\n", (int)__LINE__);

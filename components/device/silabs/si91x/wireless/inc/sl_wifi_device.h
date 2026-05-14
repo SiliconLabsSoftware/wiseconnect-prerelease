@@ -1760,6 +1760,12 @@
 #define SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(total_selects) (total_selects << 12)
 
 /**
+ * @def SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS
+ * @brief Default select count passed to @ref SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS in default device configurations.
+ */
+#define SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS 10U
+
+/**
  * @def SL_SI91X_EXT_TCP_IP_WAIT_FOR_SOCKET_CLOSE
  * @brief Enable socket wait close.
  * @details
@@ -2741,6 +2747,9 @@ typedef struct {
 } si91x_calibration_data_t;
 
 // driver TX/RX packet structure
+/** Command header size in @ref sl_wifi_system_packet_t (bytes). Same value as @c SLI_FRAME_DESC_LEN (16). */
+#define SL_SI91X_WIFI_PACKET_DESC_SIZE SLI_FRAME_DESC_LEN
+
 /// Wi-Fi packet structure
 typedef struct {
   union {
@@ -2750,8 +2759,8 @@ typedef struct {
       uint8_t unused
         [12]; ///< Contains command status and other additional information. Unused for TX and only used for RX packets.
     };
-    uint8_t desc[16]; ///< packet header
-  };                  ///< Command header
+    uint8_t desc[SL_SI91X_WIFI_PACKET_DESC_SIZE]; ///< packet header
+  };                                              ///< Command header
 
   uint8_t data[]; ///< Data to be transmitted or received
 } sl_wifi_system_packet_t;
@@ -2829,7 +2838,8 @@ static const sl_wifi_device_configuration_t sl_wifi_default_client_configuration
                       ),
                    .bt_feature_bit_map = 0,
                    .ext_tcp_ip_feature_bit_map =
-                     (SL_SI91X_EXT_TCP_IP_WINDOW_SCALING | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(10)),
+                     (SL_SI91X_EXT_TCP_IP_WINDOW_SCALING
+                      | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS)),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
                    .config_feature_bit_map  = 0 }
@@ -2855,7 +2865,8 @@ static const sl_wifi_device_configuration_t sl_wifi_default_enterprise_client_co
                       ),
                    .bt_feature_bit_map = 0,
                    .ext_tcp_ip_feature_bit_map =
-                     (SL_SI91X_EXT_TCP_IP_WINDOW_SCALING | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(10)),
+                     (SL_SI91X_EXT_TCP_IP_WINDOW_SCALING
+                      | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS)),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
                    .config_feature_bit_map  = 0 }
@@ -3016,7 +3027,7 @@ typedef struct {
     profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
   uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
   uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint16_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
+  uint16_t listen_interval;  ///< Listen interval in milliseconds.
   uint16_t
     monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
   sl_wifi_twt_request_t twt_request; ///< Target Wake Time (TWT) request settings.
@@ -3033,7 +3044,7 @@ typedef struct {
     profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
   uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
   uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint32_t listen_interval;  ///< Listen interval in time units (1 TU = 1024 microseconds).
+  uint32_t listen_interval;  ///< Listen interval in milliseconds.
   uint16_t
     monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
   sl_wifi_twt_request_t twt_request; ///< Target Wake Time (TWT) request settings.

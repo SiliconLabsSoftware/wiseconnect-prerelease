@@ -58,6 +58,7 @@ This project runs the **ULP I2C leader** (instance **2**) under **FreeRTOS**: bl
 - **`ulp_i2c_run_send_receive_compare()`** runs once per **`PROCESS_ACTION`** visit; the state advances to **`SL_ULP_I2C_POWER_STATE_TRANSITION`**.
 - From **PS4**, the task **deinits** I2C, requests **PS2**, **`DEBUGINIT()`**, **`configuring_ps2_power_state()`**, **`sl_i2c_driver_leader_reconfig_on_power_mode_change(SL_I2C_ULP_MODE)`**, re-inits, delays **`FOLLOWER_RESET_WINDOW_MS`**, sets **`current_power_state`** to **PS2**, and resumes **`PROCESS_ACTION`**. From **PS2**, it **deinits**, requests **PS4**, **`DEBUGINIT()`**, **`leader_reconfig(SL_I2C_HP_MODE)`**, re-inits, delays, sets **`LAST_ENUM_POWER_STATE`**, and runs one more **`PROCESS_ACTION`**. The following transition leg **deinits** again and idles in **`SL_ULP_I2C_TRANSMISSION_COMPLETED`** with `osDelay(1000)`.
 
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -121,6 +122,13 @@ Ensure **RTE_Device_917.h** (under **$project/config/**) matches your pinmux for
 > **Recommended settings:** [WiseConnect recommended settings](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
 
 ## Test the Application
+
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 
 1. Flash the **follower** application with **OWN_I2C_ADDR** matching **FOLLOWER_I2C_ADDR** and behavior compatible with a **write (1024 B)** followed by **read (1024 B)** (echo or fixed pattern).
 2. Connect **SCL** and **SDA** between leader and follower boards (common ground).

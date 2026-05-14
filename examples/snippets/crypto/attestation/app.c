@@ -96,7 +96,7 @@ void application_start(const void *unused)
   sl_status_t status = SL_STATUS_OK;
   status             = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init success\r\n");
@@ -157,7 +157,7 @@ void sl_decode()
 {
   struct q_useful_buf_c signed_cose;
   struct q_useful_buf_c returned_payload;
-  struct t_cose_key key_pair;
+  struct t_cose_key key_pair = { 0 };
   struct t_cose_sign1_verify_ctx verify_ctx;
 
   //! Assigning the token received for verification

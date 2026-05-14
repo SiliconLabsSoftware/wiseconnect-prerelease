@@ -53,6 +53,7 @@ This project runs **ULP I2S (instance 1)** as **master** under **FreeRTOS**: ele
 - **`SL_ULP_I2S_PROCESS_ACTION`** waits on **`ulp_i2s_wait_transfer_done()`**, copies **`I2S_RX_BUF_MEMORY`**, checks **`sl_si91x_i2s_get_transmit_data_count`** / **`get_receive_data_count`**, runs **`compare_loop_back_data()`**, then enters **`SL_ULP_I2S_POWER_STATE_TRANSITION`**.
 - **PS4 → PS2:** **`ulp_i2s_deinit()`**, spin on **`sl_si91x_power_manager_ps2_pre_check`** with **`osDelay(5)`**, **`add_ps_requirement(PS2)`**, **`DEBUGINIT()`**, **`configuring_ps2_power_state()`**, **`ulp_i2s_application_init()`**, **`current_power_state = PS2`**. **PS2 → PS4:** **`ulp_i2s_deinit()`**, **`add_ps_requirement(PS4)`**, **`DEBUGINIT()`**, re-init, **`LAST_ENUM_POWER_STATE`**, one more **`PROCESS_ACTION`**. Final branch **`ulp_i2s_deinit()`** then **`SL_ULP_I2S_TRANSMISSION_COMPLETED`** idles with **`osDelay(1000)`**.
 
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -114,6 +115,13 @@ Ensure **RTE_Device_917.h** under **$project/config/** matches your pinmux for t
 > **Recommended settings:** [WiseConnect recommended settings](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
 
 ## Test the Application
+
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 
 1. Tie **I2S DOUT** to **I2S DIN** (loopback).
 2. Build and run **siwx91x_platform_ulp_i2s_freertos**.

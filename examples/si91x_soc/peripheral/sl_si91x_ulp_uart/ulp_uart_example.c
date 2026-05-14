@@ -15,6 +15,7 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+#include <inttypes.h>
 #include "ulp_uart_example.h"
 #include "rsi_debug.h"
 #include "rsi_egpio.h"

@@ -125,7 +125,7 @@ void data_callback(uint32_t sock_no,
   sl_websocket_opcode_t opcode = sl_si91x_get_opcode_from_socket_id(firmware_socket_response->socket_id);
 
   if (opcode == SL_WEBSOCKET_OPCODE_PING) {
-    printf("Ping response received, sending Pong ");
+    SL_DEBUG_LOG_V2(INFO, "Ping response received, sending Pong ");
     // Send the pong response
     sl_websocket_send_request_t send_request;
     send_request.opcode           = SL_WEBSOCKET_OPCODE_PONG | SL_WEBSOCKET_FIN_BIT;
@@ -133,17 +133,17 @@ void data_callback(uint32_t sock_no,
     send_request.length           = length;
     sl_websocket_error_t ws_error = sl_websocket_send_frame(&ws_handle, &send_request);
     if (ws_error != SL_WEBSOCKET_SUCCESS) {
-      printf("\r\nError while sending pong frame:%d", ws_error);
+      SL_DEBUG_LOG_V2(ERROR, "Error while sending pong frame:%d", ws_error);
       return;
     }
-    printf("\r\nPong Send success");
+    SL_DEBUG_LOG_V2(INFO, "Pong Send success");
     //After sending the pong response we are closing the socket in this application
     is_ping_received = true;
     return;
   } else if (opcode == SL_WEBSOCKET_OPCODE_CLOSE) {
     // Validate the length
     if (length < 2) {
-      printf("Close frame received with insufficient length. No status code or reason available.\r\n");
+      SL_DEBUG_LOG_V2(WARN, "Close frame received with insufficient length. No status code or reason available.");
       return;
     }
 
@@ -152,21 +152,21 @@ void data_callback(uint32_t sock_no,
 
     // Check if there is a reason text
     if (length == 2) {
-      printf("Close frame received. Status code: %d, No reason available.\r\n", status_code);
+      SL_DEBUG_LOG_V2(INFO, "Close frame received. Status code: %d, No reason available.", status_code);
       return;
     }
 
     // Extract reason from the buffer
     char *reason = (char *)malloc(length - 2 + 1); // +1 for null-terminator
     if (reason == NULL) {
-      printf("Memory allocation failed for reason text.\r\n");
+      SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for reason text.");
       return;
     }
     memcpy(reason, buffer + 2, length - 2);
     reason[length - 2] = '\0';
 
     // Print the status code and reason
-    printf("Close frame received. Status code: %d, Reason: %s\r\n", status_code, reason);
+    SL_DEBUG_LOG_V2(INFO, "Close frame received. Status code: %d, Reason: %s", status_code, (uintptr_t)reason);
 
     // Free the allocated memory
     free(reason);
@@ -174,16 +174,20 @@ void data_callback(uint32_t sock_no,
   }
 
   // Print data as characters
-  printf("\r\nData Received: ");
+  SL_DEBUG_LOG_V2(DEBUG, "Data Received: ");
   for (uint32_t i = 0; i < length; i++) {
-    printf("%c", buffer[i]);
+    SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[i]);
   }
-  printf("\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "");
 }
 
 void remote_terminate_callback(int socket_id, uint16_t port_number, uint32_t bytes_sent)
 {
-  printf("Remote client terminated on socket %d, port %d , bytes_sent %ld\r\n", socket_id, port_number, bytes_sent);
+  SL_DEBUG_LOG_V2(INFO,
+                  "Remote client terminated on socket %d, port %d , bytes_sent %ld",
+                  socket_id,
+                  port_number,
+                  bytes_sent);
 }
 
 static void application_start(void *argument)
@@ -195,24 +199,24 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &websocket_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to start Wi-Fi Client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
     return;
   }
-  printf("\r\nWi-Fi client interface init success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
     return;
   }
-  printf("\r\nWi-Fi client connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    printf("Failed to get client profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
     return;
   }
-  printf("\r\nSuccess to get client profile\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
 
   if (profile.ip.type == SL_IPV4) {
     ip_address.type = SL_IPV4;
@@ -222,28 +226,28 @@ static void application_start(void *argument)
     sl_ip_address_t link_local_address = { 0 };
     memcpy(&link_local_address.ip.v6, &profile.ip.ip.v6.link_local_address, SL_IPV6_ADDRESS_LENGTH);
     link_local_address.type = SL_IPV6;
-    printf("Link Local Address: ");
+    SL_DEBUG_LOG_V2(INFO, "Link Local Address: ");
     print_sl_ip_address(&link_local_address);
 
     sl_ip_address_t global_address = { 0 };
     memcpy(&global_address.ip.v6, &profile.ip.ip.v6.global_address, SL_IPV6_ADDRESS_LENGTH);
     global_address.type = SL_IPV6;
-    printf("Global Address: ");
+    SL_DEBUG_LOG_V2(INFO, "Global Address: ");
     print_sl_ip_address(&global_address);
 
     sl_ip_address_t gateway = { 0 };
     memcpy(&gateway.ip.v6, &profile.ip.ip.v6.gateway, SL_IPV6_ADDRESS_LENGTH);
     gateway.type = SL_IPV6;
-    printf("Gateway Address: ");
+    SL_DEBUG_LOG_V2(INFO, "Gateway Address: ");
     print_sl_ip_address(&gateway);
   }
 
   sl_websocket_error_t ws_error = create_and_send_websocket_data();
   if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    printf("\r\ncreate_and_send_websocket_data failed with error:%d\r\n", ws_error);
+    SL_DEBUG_LOG_V2(ERROR, "create_and_send_websocket_data failed with error:%d", ws_error);
     return;
   }
-  printf("\r\nExample Demonstration Completed\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed");
 }
 
 sl_websocket_error_t create_and_send_websocket_data(void)
@@ -270,18 +274,18 @@ sl_websocket_error_t create_and_send_websocket_data(void)
                                                cacert,
                                                sizeof(cacert) - 1);
     if (status != SL_STATUS_OK) {
-      printf("\r\nLoading TLS CA certificate into FLASH Failed, Error Code : 0x%lX\r\n", status);
+      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate into FLASH Failed, Error Code : 0x%lX", status);
       return SL_WEBSOCKET_ERR_SSL_SETSOCKOPT;
     }
-    printf("\r\nLoad SSL CA certificate at index %d Success\r\n", CERTIFICATE_INDEX);
+    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success", CERTIFICATE_INDEX);
   }
 
   sl_websocket_error_t ws_error = sl_websocket_init(&ws_handle, &ws_config);
   if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    printf("\r\nError in sl_websocket_init:%d", ws_error);
+    SL_DEBUG_LOG_V2(ERROR, "Error in sl_websocket_init:%d", ws_error);
     return ws_error;
   }
-  printf("\r\nWebSocket Init done");
+  SL_DEBUG_LOG_V2(INFO, "WebSocket Init done");
 
   // Advanced TCP/TLS options - customize as needed
   // For ssl_ciphers_bitmap, use values from sl_si91x_socket_constants.h, e.g.:
@@ -296,17 +300,17 @@ sl_websocket_error_t create_and_send_websocket_data(void)
   };
   ws_error = sl_websocket_set_tcp_tls_advanced_configuration(&ws_handle, &ws_tcp_tls_opts);
   if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    printf("\r\nError setting WebSocket TCP/TLS advanced configuration:%d", ws_error);
+    SL_DEBUG_LOG_V2(ERROR, "Error setting WebSocket TCP/TLS advanced configuration:%d", ws_error);
     return ws_error;
   }
-  printf("\r\nWebSocket TCP/TLS advanced configuration set");
+  SL_DEBUG_LOG_V2(INFO, "WebSocket TCP/TLS advanced configuration set");
 
   ws_error = sl_websocket_connect(&ws_handle);
   if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    printf("\r\nError while websocket connect:%d", ws_error);
+    SL_DEBUG_LOG_V2(ERROR, "Error while websocket connect:%d", ws_error);
     return ws_error;
   }
-  printf("\r\nWebSocket connect Success");
+  SL_DEBUG_LOG_V2(INFO, "WebSocket connect Success");
 
   const char *data = "hello server";
 
@@ -319,7 +323,7 @@ sl_websocket_error_t create_and_send_websocket_data(void)
   while (count > 0) {
     ws_error = sl_websocket_send_frame(&ws_handle, &send_request);
     if (ws_error != SL_WEBSOCKET_SUCCESS) {
-      printf("\r\nError while websocket send frame:%d", ws_error);
+      SL_DEBUG_LOG_V2(ERROR, "Error while websocket send frame:%d", ws_error);
       break;
     }
     count--;
@@ -332,17 +336,17 @@ sl_websocket_error_t create_and_send_websocket_data(void)
 
   ws_error = sl_websocket_close(&ws_handle);
   if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    printf("\r\nError while websocket close:%d", ws_error);
+    SL_DEBUG_LOG_V2(ERROR, "Error while websocket close:%d", ws_error);
     return ws_error;
   }
-  printf("\r\nWebSocket close success");
+  SL_DEBUG_LOG_V2(INFO, "WebSocket close success");
 
   ws_error = sl_websocket_deinit(&ws_handle);
   if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    printf("\r\nError while websocket deinit:%d", ws_error);
+    SL_DEBUG_LOG_V2(ERROR, "Error while websocket deinit:%d", ws_error);
     return ws_error;
   }
-  printf("\r\nWebSocket deinit success");
+  SL_DEBUG_LOG_V2(INFO, "WebSocket deinit success");
 
   return SL_WEBSOCKET_SUCCESS;
 }

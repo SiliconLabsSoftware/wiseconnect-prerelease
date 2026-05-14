@@ -33,6 +33,13 @@ component:
 - id: basic_network_config_manager
 - id: bsd_socket
 - id: sl_si91x_asynchronous_socket
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 requires:
 - name: device_needs_ram_execution
   condition:

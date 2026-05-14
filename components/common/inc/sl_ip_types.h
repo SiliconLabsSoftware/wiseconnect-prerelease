@@ -73,8 +73,8 @@ typedef union {
 
 /// IPv6 address object
 typedef union {
-  uint32_t value[4];                     ///< IPv6 address as uint32_t[4]
-  uint8_t bytes[SL_IPV6_ADDRESS_LENGTH]; ///< IPv6 address as uint8_t array
+  uint32_t value[SL_IPV6_ADDRESS_U32_COUNT]; ///< IPv6 address as uint32_t[4]
+  uint8_t bytes[SL_IPV6_ADDRESS_LENGTH];     ///< IPv6 address as uint8_t array
 } sl_ipv6_address_t;
 
 /// Generic IP Address Structure. Supports both IPv4 and IPv6 addresses

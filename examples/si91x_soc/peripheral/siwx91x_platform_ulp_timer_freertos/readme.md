@@ -50,6 +50,7 @@
 - The task allocates **`ulp_timer_tick_sem`** (**counting**, max **`ULP_TIMER_TICK_SEM_MAX`**), runs **`initialize_wireless()`**, subscribes **`ulp_timer_pm_transition_callback`**, **`add_ps_requirement(PS4)`**, then **`ulp_timer_application_init()`**.
 - The main loop **`ulp_timer_wait_tick()`** when idle (unless parameter/PS flags require immediate **`ulp_timer_process_action_body`**); **`ulp_timer_process_action_body`** advances **`ulp_timer_current_mode`**, handles **`timer_parameter_change_flag`** / **`timer_callback_unregister_flag`**, and when **`interrupt_count == TENTH_INTERRUPT_COUNT`** sequences **[sl_si91x_power_manager_remove_ps_requirement](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/power-manager#sl-si91x-power-manager-remove-ps-requirement)** (**PS4**), **`ps2_pre_check`** polling, **`add_ps_requirement(PS2)`**, **`DEBUGINIT()`**, **`configuring_ps2_power_state()`**, then later **`add_ps_requirement(PS4)`** back — mirroring the flags **`ps4_to_ps2_transition_done`** / **`ps2_to_ps4_transition_done`** — before **`sl_si91x_ulp_timer_deinit()`** and **`SL_ULP_TIMER_TRANSMISSION_COMPLETED`** (`osDelay(1000)` idle).
 
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -145,6 +146,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
+
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 

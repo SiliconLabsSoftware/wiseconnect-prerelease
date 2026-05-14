@@ -1282,6 +1282,32 @@ typedef struct {
   uint8_t *output;
 } sli_si91x_aes_request_t;
 
+/**
+ * @brief Side-band AES request with chunk flags (multipart / explicit FIRST|LAST atomic).
+ *
+ * Companion to ::sli_si91x_aes_request_t for the multipart AES sideband path.
+ * Mirrors the firmware-side ::sl_sb_aes_req_t layout (sideband only) by adding
+ * @c current_chunk_length to the legacy one-shot shape. Used by the host whenever
+ * @c aes_flags carries any of @ref FIRST_CHUNK, @ref MIDDLE_CHUNK, @ref LAST_CHUNK,
+ * including the FIRST|LAST atomic case (@ref SL_SI91X_CRYPTO_FLAG_SIDE_BAND).
+ */
+typedef struct {
+  uint8_t algorithm_type;              ///< Always AES.
+  uint8_t algorithm_sub_type;          ///< @ref SL_SI91X_AES_CBC / @ref SL_SI91X_AES_ECB / @ref SL_SI91X_AES_CTR.
+  uint8_t aes_flags;                   ///< @ref FIRST_CHUNK / @ref MIDDLE_CHUNK / @ref LAST_CHUNK.
+  uint16_t total_msg_length;           ///< Informational; not enforced as a global bound by FW.
+  uint16_t current_chunk_length;       ///< Bytes carried in this request. Bounded only by the
+                                       ///< uint16 wire-field width; firmware splits the chunk
+                                       ///< internally into HW windows for shared AES/SHA
+                                       ///< engine lock fairness.
+  uint16_t encrypt_decryption;         ///< @ref SL_SI91X_AES_ENCRYPT or @ref SL_SI91X_AES_DECRYPT.
+  uint16_t output_length;              ///< Output length expected back from FW for this chunk.
+  sli_si91x_key_descriptor_t key_info; ///< Key descriptor (built-in / wrapped / plain).
+  uint8_t *IV;                         ///< IV (CBC) / counter (CTR); ignored for ECB.
+  uint8_t *msg;                        ///< Pointer to the chunk input buffer.
+  uint8_t *output;                     ///< Pointer to the chunk output buffer.
+} sli_si91x_aes_mp_request_t;
+
 typedef struct {
   uint32_t key_type;
   uint16_t padding;

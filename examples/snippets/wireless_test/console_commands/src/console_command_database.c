@@ -144,6 +144,7 @@ static const char *_sl_net_dns_resolve_hostname_arg_help[] = {
   0,
   0,
   0,
+  0,
 };
 
 static const console_descriptive_command_t _sl_net_dns_resolve_hostname_command = {
@@ -152,6 +153,7 @@ static const console_descriptive_command_t _sl_net_dns_resolve_hostname_command 
   .handler       = sl_dns_hostgetbyname_command_handler,
   .argument_list = { CONSOLE_ARG_STRING,
                      CONSOLE_OPTIONAL_ARG('t', CONSOLE_ARG_UINT),
+                     CONSOLE_OPTIONAL_ARG('r', CONSOLE_ARG_UINT),
                      CONSOLE_OPTIONAL_ARG('i', CONSOLE_ENUM_ARG(sl_net_dns_resolution_ip_type_t)),
                      CONSOLE_ARG_END }
 };

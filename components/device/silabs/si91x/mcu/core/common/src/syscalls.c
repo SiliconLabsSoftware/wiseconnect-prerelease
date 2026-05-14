@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include "errno.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -469,6 +470,7 @@ static int scanf_data_format(const char *line_ptr, char *format, va_list args_pt
       }
     }
   }
+  (void)n_decode;
   return (int)nassigned;
 }
 int _read(char *fmt_ptr, ...)

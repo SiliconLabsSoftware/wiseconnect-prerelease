@@ -864,8 +864,6 @@ extra_files:
 - components/sli_wifi/src/sli_wifi_power_profile.c
 - components/device/silabs/si91x/wireless/src/sl_rsi_utility.c
 - components/device/silabs/si91x/wireless/memory/malloc_buffers.c
-- components/device/silabs/si91x/wireless/memory/static_buffer.c
-- components/device/silabs/si91x/wireless/memory/lwip_buffers.c
 - components/device/silabs/si91x/wireless/memory/mem_pool_buffers.c
 - components/device/silabs/si91x/wireless/memory/mem_pool_buffer_quota.c
 - components/device/silabs/si91x/wireless/crypto/_docleaf-wiseconnect-api-reference-guide-crypto.yml

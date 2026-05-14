@@ -46,7 +46,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" line="195" column="13" declfile="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" declline="195" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" line="198" column="13" declfile="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" declline="198" declcolumn="13"/>
       </memberdef>
       <memberdef kind="function" id="group__CRYPTO__AES__FUNCTIONS_1ga0f48a13beb7db143b748ae6678eb490f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>sl_status_t</type>
@@ -111,7 +111,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" line="217" column="13" declfile="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" declline="217" declcolumn="13"/>
+        <location file="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" line="221" column="13" declfile="components/device/silabs/si91x/wireless/crypto/aes/inc/sl_si91x_aes.h" declline="221" declcolumn="13"/>
       </memberdef>
       </sectiondef>
     <briefdescription>

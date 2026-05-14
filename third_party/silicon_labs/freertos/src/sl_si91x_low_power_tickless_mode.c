@@ -101,7 +101,7 @@ eSleepModeStatus eTaskConfirmSleepModeStatus(void);
 BaseType_t xTaskIncrementTick(void);
 
 extern uint32_t frontend_switch_control;
-sl_status_t sl_si91x_power_manager_sleep(void);
+sl_status_t sli_si91x_power_manager_sleep(void);
 boolean_t sl_si91x_power_manager_is_ok_to_sleep(void);
 
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_TICKLESS, SL_CODE_CLASS_TIME_CRITICAL)
@@ -243,10 +243,10 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
       sl_si91x_power_manager_wakeup_init();
 #endif
       // Call the API to enable the standby state.
-      sl_si91x_power_manager_standby();
+      sli_si91x_power_manager_standby();
     } else {
       // Call the API to enable the sleep state.
-      sl_si91x_power_manager_sleep();
+      sli_si91x_power_manager_sleep();
     }
 
     sl_power_manager_sleep_on_isr_exit();

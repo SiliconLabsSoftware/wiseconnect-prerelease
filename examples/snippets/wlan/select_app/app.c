@@ -89,41 +89,42 @@ static void application_start(void *argument)
   sl_net_wifi_client_profile_t profile = { 0 };
 
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
     return;
   }
-  printf("\r\nWi-Fi client interface up success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up success");
 
   // Bring up network interface
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
     return;
   }
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    printf("Failed to get client profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
     return;
   }
 
-  printf("\r\nSuccess to get client profile\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
   print_sl_ip_address(&ip_address);
 
-  printf("Wi-Fi client connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   socket_select();
 }
 
 void close_sockets(int client_socket, int server_socket)
 {
-  if (client_socket > 0)
+
+  if (client_socket >= 0)
     close(client_socket);
 
-  if (server_socket > 0)
+  if (server_socket >= 0)
     close(server_socket);
 
   return;
@@ -153,38 +154,38 @@ void socket_select()
 
   // Create socket
   server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  printf("\n server socket: %d", server_socket);
+  SL_DEBUG_LOG_V2(INFO, " server socket: %d", server_socket);
   if (server_socket < 0) {
-    printf("\r\nSocket creation failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
     return;
   }
-  printf("\r\nSocket creation Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Socket creation Success");
 
   // Bind socket
   socket_return_value = bind(server_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    printf("\r\nSocket bind failed with bsd error: %d\r\n", errno);
-    close(server_socket);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    close_sockets(-1, server_socket);
     return;
   }
-  printf("\r\n Socket bind success \r\n");
+  SL_DEBUG_LOG_V2(INFO, " Socket bind success ");
 
   // Socket listen
   socket_return_value = listen(server_socket, BACKLOG);
   if (socket_return_value < 0) {
-    printf("\r\nSocket listen failed with bsd error: %d\r\n", errno);
-    close(server_socket);
+    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d", errno);
+    close_sockets(-1, server_socket);
     return;
   }
-  printf("\r\n Socket listening on port = %d\r\n", DEVICE_PORT);
+  SL_DEBUG_LOG_V2(INFO, " Socket listening on port = %d", DEVICE_PORT);
 
   //socket accept
   client_socket = accept(server_socket, (struct sockaddr *)&remote_socket_address, &socket_length);
-  printf("\r\n Client socket = %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, " Client socket = %d", client_socket);
 
   if (client_socket < 0) {
-    printf("\r\nSocket accept failed with bsd error: %d\r\n", errno);
-    close(server_socket);
+    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d", errno);
+    close_sockets(-1, server_socket);
     return;
   }
 
@@ -200,9 +201,9 @@ void socket_select()
     if (errno == 0) {
       // get the error code returned by the firmware
       sl_status_t status = sl_wifi_get_saved_firmware_status();
-      printf("\r\nSocket select failed with bsd error: %d and status = 0x%lx\r\n", errno, status);
+      SL_DEBUG_LOG_V2(ERROR, "Socket select failed with bsd error: %d and status = 0x%lx", errno, status);
     } else {
-      printf("\r\nSocket select failed with bsd error: %d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket select failed with bsd error: %d", errno);
     }
 
     close_sockets(client_socket, server_socket);
@@ -210,7 +211,7 @@ void socket_select()
   }
 
   if (total_set_fds_count == 0) {
-    printf("\r\n No data available on any file descriptor \r\n");
+    SL_DEBUG_LOG_V2(DEBUG, " No data available on any file descriptor ");
     close_sockets(client_socket, server_socket);
     return;
   }
@@ -222,7 +223,7 @@ void socket_select()
     }
   }
 
-  printf("\r\n Data received successfully \r\n");
+  SL_DEBUG_LOG_V2(INFO, " Data received successfully ");
   close_sockets(client_socket, server_socket);
-  printf("\r\n Socket close success\r\n");
+  SL_DEBUG_LOG_V2(INFO, " Socket close success");
 }

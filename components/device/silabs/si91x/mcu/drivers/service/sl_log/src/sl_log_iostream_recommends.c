@@ -49,7 +49,9 @@
 #if defined(SL_CATALOG_IOSTREAM_DEBUG_SI91X_PRESENT)
 #include "sl_si91x_iostream_debug.h"
 #endif
+#if defined(SL_CATALOG_IOSTREAM_SI91X_PRESENT)
 #include "sl_iostream_uart_si91x.h"
+#endif
 #include "sl_log_iostream_recommends.h"
 
 void sl_si91x_iostream_set_console_instance()
@@ -61,9 +63,11 @@ void sl_si91x_iostream_set_console_instance()
     uint32_t current_priority;
 
     switch (sl_iostream_instances_info[i]->type) {
+#if defined(SL_CATALOG_IOSTREAM_SI91X_PRESENT)
       case SL_IOSTREAM_TYPE_91X_UART:
         current_priority = 0;
         break;
+#endif
 #if defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT)
       case SL_SI91X_IOSTREAM_TYPE_RTT_OUTPUT:
         current_priority = 1;

@@ -28,6 +28,7 @@
  * If no channels enabled, application enables overflow interrupt of selected group, generates
  * interrupt on overflow and toggles LED once
  ===================================================================================*/
+#include <inttypes.h>
 #include "sl_si91x_sysrtc.h"
 #include "sl_si91x_sysrtc_config.h"
 #include "sysrtc_example.h"

@@ -107,6 +107,7 @@ This application demonstrates **HP**, **ULP**, and **UULP** GPIO usage in a **Fr
 - Under **`SL_ULP_GPIO_PROCESS_ACTION`**, a **`do` … `while (gpio_toggle_count++ < TOGGLE_COUNT)`** burst runs each pass: when **`ULP_GPIO_PIN`** matches **`SET`**, it toggles **ULP_GPIO_2** via **`sl_gpio_driver_toggle_pin`**; when **`UULP_GPIO_PIN`** is enabled it pulses **UULP_GPIO_0** with **`sl_si91x_gpio_driver_set_uulp_npss_pin_value`**. Then the state advances to **`SL_ULP_POWER_STATE_TRANSITION`**.
 - From **PS4**, that branch requests **PS2** (`sl_si91x_power_manager_add_ps_requirement`), runs **`DEBUGINIT()`** and **`configuring_ps2_power_state()`**, sets **`current_power_state`** to **PS2**, and returns to **`PROCESS_ACTION`** without GPIO teardown. From **PS2**, it requests **PS4**, **`DEBUGINIT()`**, sets **`current_power_state`** to **`LAST_ENUM_POWER_STATE`**, and runs one more **`PROCESS_ACTION`** burst; the next transition pass calls **`sl_gpio_driver_deinit`** and idles in **`SL_ULP_GPIO_TERMINATED`** with `osDelay(1000)`.
 
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -238,6 +239,13 @@ Edit only when you intentionally change IRQ wiring, PAD rules, grouping, or paci
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
+
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 

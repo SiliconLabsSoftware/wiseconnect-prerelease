@@ -20,6 +20,7 @@
 // -----------------------------------------------------------------------------
 #include "app.h"
 
+#include <inttypes.h>
 #include <string.h>
 #include "cmsis_os2.h"
 #include "sl_net.h"
@@ -149,7 +150,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -178,7 +179,7 @@ void app_process_action(void)
   psa_status_t ret;
   ret = psa_crypto_init();
   if (ret != PSA_SUCCESS) {
-    printf("PSA Crypto Init failed with status : %ld\n", ret);
+    printf("PSA Crypto Init failed with status : %" PRId32 "\n", ret);
   } else {
     printf("PSA Crypto Init Success\n");
   }

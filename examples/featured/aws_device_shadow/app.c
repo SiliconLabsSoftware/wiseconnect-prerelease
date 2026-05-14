@@ -139,34 +139,34 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error while doing init: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while doing init: 0x%lx", status);
     return;
   }
-  printf("\r\nWiFi Init Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "WiFi Init Success");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
     return;
   }
-  printf("\r\nm4_ta_secure_handshake Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("\r\nError while connecting to Access point: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while connecting to Access point: 0x%lx", status);
     return;
   }
-  printf("\r\nConnected to Access point\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Connected to Access point");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to get client profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
     return;
   }
-  printf("\r\nClient profile fetched successfully\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Client profile fetched successfully");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -174,27 +174,27 @@ static void application_start(void *argument)
 
   status = load_certificates_in_flash();
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error while loading certificates: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificates: 0x%lx", status);
     return;
   }
-  printf("\r\nCertificate loading success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Certificate loading success");
 
 #if ENABLE_NWP_POWER_SAVE
   sl_wifi_performance_profile_v2_t performance_profile = { .profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY };
   status                                               = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nPower save configuration Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", status);
     return;
   }
-  printf("\r\nAssociated Power Save Enabled\n");
+  SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
 #endif
 
   status = start_aws_device_shadow();
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error occurred in AWS Device shadow: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error occurred in AWS Device shadow: 0x%lx", status);
     return;
   }
-  printf("\r\nAWS Device shadow Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "AWS Device shadow Success");
 }
 
 sl_status_t load_certificates_in_flash()
@@ -206,7 +206,7 @@ sl_status_t load_certificates_in_flash()
                                  aws_starfield_ca,
                                  sizeof(aws_starfield_ca));
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error while loading CA certificate: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading CA certificate: 0x%lx", status);
     return status;
   }
 
@@ -215,7 +215,7 @@ sl_status_t load_certificates_in_flash()
                                  aws_client_certificate,
                                  sizeof(aws_client_certificate));
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error while loading Client certificate: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading Client certificate: 0x%lx", status);
     return status;
   }
 
@@ -224,9 +224,9 @@ sl_status_t load_certificates_in_flash()
                                  aws_client_private_key,
                                  sizeof(aws_client_private_key));
   if (status != SL_STATUS_OK) {
-    printf("\r\nUnexpected error while loading private key: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading private key: 0x%lx", status);
   } else {
-    printf("\r\nCertificate loading success\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Certificate loading success");
   }
 
   return status;
@@ -256,7 +256,7 @@ sl_status_t start_aws_device_shadow()
 
   sl_status_t status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   if (status != SL_STATUS_OK) {
-    printf("\r\nError while fetching mac address: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while fetching mac address: 0x%lx", status);
     return status;
   }
   print_mac_address(&mac_addr);
@@ -270,14 +270,14 @@ sl_status_t start_aws_device_shadow()
           mac_addr.octet[4],
           mac_addr.octet[5]);
   sprintf(client_id, "silabs_%s", mac_id);
-  printf("\r\nClient ID: %s\r\n", client_id);
+  SL_DEBUG_LOG_V2(INFO, "Client ID: %s", (uintptr_t)client_id);
 
   rc = aws_iot_shadow_init(&mqtt_client, &shadow_init_parameters);
   if (rc < 0) {
-    printf("\r\nShadow Initialization failed with aws error: %d\r\n", rc);
+    SL_DEBUG_LOG_V2(ERROR, "Shadow Initialization failed with aws error: %d", rc);
     return rc;
   }
-  printf("\r\nShadow Initialization Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Shadow Initialization Success");
 
   shadow_connect_parameters.pMyThingName    = AWS_IOT_MY_THING_NAME;
   shadow_connect_parameters.pMqttClientId   = client_id;
@@ -285,10 +285,10 @@ sl_status_t start_aws_device_shadow()
 
   rc = aws_iot_shadow_connect(&mqtt_client, &shadow_connect_parameters);
   if (rc < 0) {
-    printf("\r\nShadow Connection failed with aws error: %d\r\n", rc);
+    SL_DEBUG_LOG_V2(ERROR, "Shadow Connection failed with aws error: %d", rc);
     return rc;
   }
-  printf("\r\nShadow Connection Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Shadow Connection Success");
 
   window_actuator.pKey       = "Window Open";
   window_actuator.pData      = &window_open_state;
@@ -304,10 +304,10 @@ sl_status_t start_aws_device_shadow()
 
   rc = aws_iot_shadow_register_delta(&mqtt_client, &window_actuator);
   if (rc != SUCCESS) {
-    printf("\r\nShadow Register Delta failed with aws error: %d\r\n", rc);
+    SL_DEBUG_LOG_V2(ERROR, "Shadow Register Delta failed with aws error: %d", rc);
     return rc;
   }
-  printf("\r\nShadow Register Delta\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Shadow Register Delta");
 
   temperature = STARTING_ROOM_TEMPERATURE;
 
@@ -319,7 +319,7 @@ sl_status_t start_aws_device_shadow()
     simulate_room_temperature(&temperature, &window_open_state);
     rc = aws_iot_shadow_init_json_document(json_document_buffer, size_of_json_document_buffer);
     if (rc != SUCCESS) {
-      printf("\r\nFailed to initialize JSON buffer with error: %d\r\n", rc);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to initialize JSON buffer with error: %d", rc);
       continue;
     }
 
@@ -329,19 +329,19 @@ sl_status_t start_aws_device_shadow()
                                      &temperature_handler,
                                      &window_actuator);
     if (rc != SUCCESS) {
-      printf("\r\nFailed to add reported value in JSON buffer with error: %d\r\n", rc);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to add reported value in JSON buffer with error: %d", rc);
       continue;
     }
-    printf("\r\nAdding reported value in JSON buffer success\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Adding reported value in JSON buffer success");
 
     rc = aws_iot_finalize_json_document(json_document_buffer, size_of_json_document_buffer);
     if (rc != SUCCESS) {
-      printf("\r\nFailed to finalize JSON buffer with error: %d\r\n", rc);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to finalize JSON buffer with error: %d", rc);
       continue;
     }
-    printf("\r\nJSON finalization buffer Success\r\n");
+    SL_DEBUG_LOG_V2(INFO, "JSON finalization buffer Success");
 
-    printf("\r\nUpdate Shadow: %s\r\n", json_document_buffer);
+    SL_DEBUG_LOG_V2(DEBUG, "Update Shadow: %s", (uintptr_t)json_document_buffer);
 
     rc = aws_iot_shadow_update(&mqtt_client,
                                AWS_IOT_MY_THING_NAME,
@@ -351,11 +351,11 @@ sl_status_t start_aws_device_shadow()
                                40,
                                true);
     if (rc != SUCCESS) {
-      printf("\r\nFailed to update JSON buffer with error: %d\r\n", rc);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to update JSON buffer with error: %d", rc);
       continue;
     }
   }
-  printf("\r\nSuccess to update JSON buffer\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to update JSON buffer");
 
   return rc;
 }
@@ -389,11 +389,11 @@ static void shadow_update_status_callback(const char *p_thing_name,
   UNUSED_PARAMETER(p_context_data);
 
   if (SHADOW_ACK_TIMEOUT == status) {
-    printf("\r\nUpdate Timed out!!\r\n");
+    SL_DEBUG_LOG_V2(WARN, "Update Timed out!!");
   } else if (SHADOW_ACK_REJECTED == status) {
-    printf("\r\nUpdate Rejected!!\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Update Rejected!!");
   } else if (SHADOW_ACK_ACCEPTED == status) {
-    printf("\r\nUpdate Accepted!!\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Update Accepted!!");
   }
 }
 
@@ -403,6 +403,6 @@ static void window_actuate_callback(const char *p_json_string, uint32_t json_str
   UNUSED_PARAMETER(json_string_data_len);
 
   if (p_context != NULL) {
-    printf("Delta - Window state changed to %d", *(bool *)(p_context->pData));
+    SL_DEBUG_LOG_V2(INFO, "Delta - Window state changed to %d", *(bool *)(p_context->pData));
   }
 }

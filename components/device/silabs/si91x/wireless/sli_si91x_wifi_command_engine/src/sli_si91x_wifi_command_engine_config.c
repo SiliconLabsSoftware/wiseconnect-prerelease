@@ -160,15 +160,23 @@ sli_routing_entry_t wifi_command_engine_routing_entries[SLI_WIFI_COMMAND_ENGINE_
     .packet_status_handler     = sli_command_engine_send_packet_tx_status,
     .packet_type = SLI_WIFI_COMMAND_PACKET,
   },
+  // LWIP and Transceiver RAW Data packets are sent using this packet type
   [SLI_WIFI_DATA_PACKET] = {
+    .destination_packet_handler = sli_hal_si91x_data_send_packet,
+    .packet_status_handler     = NULL,
+    .packet_type = SLI_WIFI_DATA_PACKET,
+  },
+  // Only Internal socket data packets are sent using this packet type
+  [SLI_WIFI_SOCKET_DATA_PACKET] = {
     .destination_packet_handler = sli_hal_si91x_data_send_packet,
 #ifdef SLI_SI91X_SOCKETS
     .packet_status_handler     = sli_si91x_send_tx_packet_status_handler,
 #else
     .packet_status_handler     = NULL,
 #endif
-    .packet_type = SLI_WIFI_DATA_PACKET,
+    .packet_type = SLI_WIFI_SOCKET_DATA_PACKET,
   },
+  // Only BLE packets are sent using this packet type
   [SLI_BT_PACKET] = {
     .destination_packet_handler = sli_hal_si91x_ble_send_packet,
 #ifdef SLI_SI91X_ENABLE_BLE
@@ -351,6 +359,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_WIFI_RSP_EMB_MQTT_CLIENT:
         case SLI_WIFI_RSP_EMB_MQTT_PUBLISH_PKT:
         case SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE:
+        case SLI_WIFI_RSP_DISCOVER_SERVICE:
         case SLI_WIFI_RSP_MDNSD:
         case SLI_WIFI_RSP_NAT:
         case SLI_WIFI_RSP_HTTP_CLIENT_GET:
@@ -987,7 +996,11 @@ sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t
     return http_status == SL_STATUS_SI91X_HTTP_GET_CMD_IN_PROGRESS ? SL_STATUS_IN_PROGRESS : SL_STATUS_OK;
   }
 
-  // The logic to determine the end of the data is understood from switch case of sli_http_client_default_event_handler
+  // If the first 2 bytes of the received data are 0x0000, the HTTP GET response from the
+  // server is an intermediate response and more response packets are expected. In that case
+  // the command in flight is not decremented and the queue remains blocked (SL_STATUS_IN_PROGRESS).
+  // If the first 2 bytes are non-zero (e.g. 0x0001), the payload marks end of data and
+  // processing completes normally (SL_STATUS_OK).
   uint16_t end_of_data = 0;
   memcpy(&end_of_data, http_packet->data, sizeof(uint16_t));
 

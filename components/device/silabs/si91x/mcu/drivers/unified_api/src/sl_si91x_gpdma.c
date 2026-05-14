@@ -210,7 +210,10 @@ static void sli_si91x_gpdma_hresp_callback(sl_si91x_gpdma_handle_t pDrv,
 
   (void)pDrv;
   (void)pDescriptor;
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_HRESP_ERROR_CB]();
+  sl_gpdma_callback_t callback = sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_HRESP_ERROR_CB];
+  if (callback != NULL) {
+    callback();
+  }
 }
 
 /*
@@ -223,7 +226,11 @@ void sli_si91x_gpdma_desc_fetch_done_callback(sl_si91x_gpdma_handle_t pDrv,
 {
   (void)pDrv;
   (void)pDescriptor;
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_DESCRIPTOR_FETCH_DONE_CB]();
+  sl_gpdma_callback_t callback =
+    sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_DESCRIPTOR_FETCH_DONE_CB];
+  if (callback != NULL) {
+    callback();
+  }
 }
 
 /*
@@ -238,7 +245,11 @@ static void sli_si91x_gpdma_transfer_done_callback(sl_si91x_gpdma_handle_t pDrv,
   (void)pDrv;
   (void)pDescriptor;
   sl_si91x_gpdma_resources_Data_t *pRes = sl_si91x_get_gpdma_resources();
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_TRANSFER_DONE_CB]();
+  sl_gpdma_callback_t callback =
+    sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_TRANSFER_DONE_CB];
+  if (callback != NULL) {
+    callback();
+  }
   pRes->channel_allocation_bitmap &= ~(1 << (channel_no));
 }
 
@@ -252,7 +263,11 @@ void sli_si91x_gpdma_gpdmac_error_callback(sl_si91x_gpdma_handle_t pDrv,
 {
   (void)pDrv;
   (void)pDescriptor;
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_GPDMAC_ERROR_CB]();
+  sl_gpdma_callback_t callback =
+    sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_GPDMAC_ERROR_CB];
+  if (callback != NULL) {
+    callback();
+  }
 }
 
 /*
@@ -263,18 +278,49 @@ static void sli_si91x_gpdma_build_descriptor_list(sl_si91x_gpdma_descriptor_t *d
                                                   uint32_t transfer_size)
 {
   sl_si91x_gpdma_descriptor_t *descriptor_memory = desc_memory;
-  uint32_t no_of_descripotrs          = (transfer_size + MAX_TRANSFER_PER_DESCRIPTOR - 1) / MAX_TRANSFER_PER_DESCRIPTOR;
-  descriptor_memory[0].chnlCtrlConfig = descriptor->chnlCtrlConfig;
-  descriptor_memory[0].miscChnlCtrlConfig = descriptor->miscChnlCtrlConfig;
-  for (uint8_t i = 1; i < no_of_descripotrs; i++) {
-    descriptor_memory[i].chnlCtrlConfig                  = descriptor->chnlCtrlConfig;
-    descriptor_memory[i].miscChnlCtrlConfig              = descriptor->miscChnlCtrlConfig;
-    descriptor_memory[i - 1].pNextLink                   = (uint32_t *)(&descriptor[i]);
-    descriptor_memory[i].chnlCtrlConfig.srcAddContiguous = 1;
-    descriptor_memory[i].chnlCtrlConfig.dstAddContiguous = 1;
-    transfer_size -= MAX_TRANSFER_PER_DESCRIPTOR;
+  uint32_t no_of_descripotrs = (transfer_size + MAX_TRANSFER_PER_DESCRIPTOR - 1) / MAX_TRANSFER_PER_DESCRIPTOR;
+
+  // Distribute the bytes evenly across the chain rather than using
+  // MAX_TRANSFER_PER_DESCRIPTOR for every descriptor and dumping the
+  // remainder into the last one. This produces uniform descriptor sizes
+  // and avoids degenerate tails (e.g. a 1-byte last descriptor in a chain
+  // whose other descriptors carry 4095 bytes), which keeps the AHB burst
+  // pattern uniform across the chain.
+  //
+  // Invariants from the math:
+  //   per_desc  <= MAX_TRANSFER_PER_DESCRIPTOR
+  //   last_size <= per_desc   (and last_size >= 1)
+  //   sum(transSize) == transfer_size
+  uint32_t per_desc  = (transfer_size + no_of_descripotrs - 1) / no_of_descripotrs;
+  uint32_t last_size = transfer_size - per_desc * (no_of_descripotrs - 1);
+
+  descriptor_memory[0].chnlCtrlConfig           = descriptor->chnlCtrlConfig;
+  descriptor_memory[0].miscChnlCtrlConfig       = descriptor->miscChnlCtrlConfig;
+  descriptor_memory[0].chnlCtrlConfig.transSize = (no_of_descripotrs == 1) ? last_size : per_desc;
+
+  for (uint32_t i = 1; i < no_of_descripotrs; i++) {
+    descriptor_memory[i].chnlCtrlConfig           = descriptor->chnlCtrlConfig;
+    descriptor_memory[i].miscChnlCtrlConfig       = descriptor->miscChnlCtrlConfig;
+    descriptor_memory[i].chnlCtrlConfig.transSize = (i == no_of_descripotrs - 1) ? last_size : per_desc;
+    descriptor_memory[i - 1].pNextLink            = (uint32_t *)(&descriptor_memory[i]);
+    if (descriptor_memory[i].chnlCtrlConfig.transType == SL_GPDMA_MEMORY_TO_PERIPHERAL) {
+      descriptor_memory[i].chnlCtrlConfig.srcAddContiguous = 1;
+      descriptor_memory[i].chnlCtrlConfig.dstAddContiguous = 0;
+    } else if (descriptor_memory[i].chnlCtrlConfig.transType == SL_GPDMA_PERIPHERAL_TO_MEMORY) {
+      descriptor_memory[i].chnlCtrlConfig.dstAddContiguous = 1;
+      descriptor_memory[i].chnlCtrlConfig.srcAddContiguous = 0;
+    } else {
+      descriptor_memory[i].chnlCtrlConfig.srcAddContiguous = 1;
+      descriptor_memory[i].chnlCtrlConfig.dstAddContiguous = 1;
+    }
   }
-  descriptor_memory[no_of_descripotrs - 1].chnlCtrlConfig.transSize = transfer_size;
+
+  // Terminate the chain explicitly: the last descriptor must have
+  // linkListOn = DISABLE and pNextLink = NULL, otherwise the GPDMA
+  // controller will fetch a phantom descriptor from stale / zero memory
+  // and either abort or transfer garbage after the legitimate chain.
+  descriptor_memory[no_of_descripotrs - 1].chnlCtrlConfig.linkListOn = SL_LINK_LIST_MODE_DISABLE;
+  descriptor_memory[no_of_descripotrs - 1].pNextLink                 = NULL;
 }
 
 /*
@@ -409,7 +455,7 @@ sl_status_t sl_si91x_gpdma_allocate_fifo(uint32_t channel_number, uint32_t fifo_
   } else {
     fifo_start_address = (unsigned int)((pRes->top_fifo) & 0x3F);
     RSI_GPDMA_SET_CHANNEL_FIFO_SIZE((sl_si91x_gpdma_handle_t)pDrv, channel_number, fifo_size, fifo_start_address);
-    pRes->top_fifo += fifo_size;
+    pRes->top_fifo += fifo_size + 1;
     sl_gpdma_channel_allocation_data_t[channel_number].fifo_size = fifo_size;
   }
   return SL_STATUS_OK;
@@ -486,7 +532,7 @@ sl_status_t sl_si91x_gpdma_allocate_channel(uint32_t *channel_no, uint32_t prior
   sl_gpdma_channel_allocation_data_t[*channel_no].max_transfer_Size = max_transfer_size;
   pRes->channel_allocation_bitmap &= ~(1 << *channel_no);
   RSI_GPDMA_SET_CHANNEL_PRIORITY((sl_si91x_gpdma_handle_t)pDrv, *channel_no, priority);
-  status = sl_si91x_gpdma_allocate_fifo(*channel_no, 8);
+  status = sl_si91x_gpdma_allocate_fifo(*channel_no, 7);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_allocate_channel: allocate_fifo st=0x%04lX,line no : %d\r\n",
                           (unsigned long)status,
@@ -761,6 +807,9 @@ sl_status_t sl_si91x_gpdma_transfer(uint32_t channel_number, void *pSource, void
                           (unsigned long)SL_STATUS_INVALID_PARAMETER,
                           (int)__LINE__);
     return SL_STATUS_INVALID_PARAMETER;
+  } else {
+    descriptors[0].src  = (void *)((uintptr_t)pSource);
+    descriptors[0].dest = (void *)((uintptr_t)pDestination);
   }
   status = sl_si91x_gpdma_get_channel_status(channel_number);
   if (status != SL_STATUS_GPDMA_CHANNEL_ALREADY_ALLOCATED) {
@@ -769,9 +818,28 @@ sl_status_t sl_si91x_gpdma_transfer(uint32_t channel_number, void *pSource, void
                           (int)__LINE__);
     return status;
   }
-  for (uint32_t i = 0; i < number_of_descriptors; i++) {
-    descriptors[i].src  = (void *)((uintptr_t)pSource + i * MAX_TRANSFER_PER_DESCRIPTOR);
-    descriptors[i].dest = (void *)((uintptr_t)pDestination + i * MAX_TRANSFER_PER_DESCRIPTOR);
+  // Use ">=" so that the boundary case (max_transfer_Size == MAX_TRANSFER_PER_DESCRIPTOR)
+  // also gets src/dest assigned here. The matching check on the GSPI side covers
+  // strictly smaller transfers via the descriptor template.
+  //
+  // The per-descriptor offset is the running sum of transSize so this works
+  // correctly even when bytes are distributed unevenly across descriptors
+  // (see sli_si91x_gpdma_build_descriptor_list).
+  if (sl_gpdma_channel_allocation_data_t[channel_number].max_transfer_Size >= MAX_TRANSFER_PER_DESCRIPTOR) {
+    uint32_t offset = 0;
+    for (uint32_t i = 0; i < number_of_descriptors; i++) {
+      if (descriptors[0].chnlCtrlConfig.transType == SL_GPDMA_MEMORY_TO_PERIPHERAL) {
+        descriptors[i].src  = (void *)((uintptr_t)pSource + offset);
+        descriptors[i].dest = (void *)((uintptr_t)pDestination);
+      } else if (descriptors[0].chnlCtrlConfig.transType == SL_GPDMA_PERIPHERAL_TO_MEMORY) {
+        descriptors[i].src  = (void *)((uintptr_t)pSource);
+        descriptors[i].dest = (void *)((uintptr_t)pDestination + offset);
+      } else {
+        descriptors[i].src  = (void *)((uintptr_t)pSource + offset);
+        descriptors[i].dest = (void *)((uintptr_t)pDestination + offset);
+      }
+      offset += descriptors[i].chnlCtrlConfig.transSize;
+    }
   }
   if (sl_gpdma_channel_allocation_data_t[channel_number].link_list_mode_disable == false) {
     RSI_GPDMA_Enable_Link_List_Mode((void *)pDrv, channel_number);

@@ -485,8 +485,9 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
 {
   conn_event_to_app.dev_addr_type = resp_enh_conn->dev_addr_type;
   memcpy(conn_event_to_app.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
-  LOG_PRINT("\r\nRemote BLE device connected (address - %s)\r\n",
-            rsi_6byte_dev_address_to_ascii(remote_dev_addr, resp_enh_conn->dev_addr));
+  SL_DEBUG_LOG_V2(INFO,
+                  "Remote BLE device connected (address - %s)",
+                  (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, resp_enh_conn->dev_addr));
   conn_event_to_app.status = resp_enh_conn->status;
   rsi_ble_app_set_event(RSI_BLE_ENH_CONN_EVENT);
 }
@@ -503,8 +504,9 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
 static void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t *resp_conn)
 {
   memcpy(&conn_event_to_app, resp_conn, sizeof(rsi_ble_event_conn_status_t));
-  LOG_PRINT("\r\nRemote BLE device connected (address - %s)\r\n",
-            rsi_6byte_dev_address_to_ascii(remote_dev_addr, conn_event_to_app.dev_addr));
+  SL_DEBUG_LOG_V2(INFO,
+                  "Remote BLE device connected (address - %s)",
+                  (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, conn_event_to_app.dev_addr));
   rsi_ble_app_set_event(RSI_BLE_ENH_CONN_EVENT);
 }
 
@@ -522,8 +524,9 @@ static void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconn
 {
   UNUSED_PARAMETER(reason);
   memcpy(&disconn_event_to_app, resp_disconnect, sizeof(rsi_ble_event_disconnect_t));
-  LOG_PRINT("\r\nRemote BLE device disconnected (address - %s)\r\n",
-            rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
+  SL_DEBUG_LOG_V2(INFO,
+                  "Remote BLE device disconnected (address - %s)",
+                  (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
   rsi_ble_app_set_event(RSI_BLE_DISCONN_EVENT);
 }
 
@@ -688,14 +691,14 @@ void rsi_ble_configurator_init(void)
 
   // set device in advertising mode.
   rsi_ble_start_advertising();
-  LOG_PRINT("\r\nBLE Advertising Started ...\r\n");
-  LOG_PRINT("\r\nDevice advertising as: ")
-  LOG_PRINT(RSI_BLE_APP_DEVICE_NAME);
-  LOG_PRINT("\r\n");
+  SL_DEBUG_LOG_V2(INFO, "BLE Advertising Started ...");
+  SL_DEBUG_LOG_V2(INFO, "Device advertising as: ");
+  SL_DEBUG_LOG_V2(INFO, RSI_BLE_APP_DEVICE_NAME);
+  SL_DEBUG_LOG_V2(INFO, "");
 
   status = sl_wifi_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFirmware version query failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version query failed, Error Code : 0x%lX", status);
   } else {
     GLIB_drawStringOnLine(&glibContext, " ", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
     GLIB_drawStringOnLine(&glibContext, "BLE advertising", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
@@ -743,7 +746,7 @@ void rsi_ble_configurator_task(void *argument)
 
   scanresult = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scanresult == NULL) {
-    LOG_PRINT("\r\nFailed to allocate memory for scan results\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan results");
     return;
   }
   memset(scanresult, 0, scanbuf_size);
@@ -766,7 +769,7 @@ void rsi_ble_configurator_task(void *argument)
         //MTU exchange
         status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, BLE_MTU_SIZE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n MTU request failed with error code %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, " MTU request failed with error code %lx", status);
         }
 
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
@@ -775,7 +778,7 @@ void rsi_ble_configurator_task(void *argument)
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT_DEFAULT);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n rsi_ble_conn_params_update command failed : %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, " rsi_ble_conn_params_update command failed : %lx", status);
         }
 
       } break;
@@ -791,10 +794,10 @@ void rsi_ble_configurator_task(void *argument)
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nStart advertising command failed, Error code = %lx \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start advertising command failed, Error code = %lx ", status);
           goto adv;
         } else {
-          LOG_PRINT("\r\nBLE Advertising started\n");
+          SL_DEBUG_LOG_V2(INFO, "BLE Advertising started");
         }
       } break;
 
@@ -811,7 +814,7 @@ adv:
           memcpy(&data[2], &firmware_version, sizeof(sl_wifi_firmware_version_t));
           rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, data);
         } else {
-          LOG_PRINT("\r\nFirmware version query failed, Error Code : 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Firmware version query failed, Error Code : 0x%lX", status);
         }
       } break;
 
@@ -891,7 +894,7 @@ adv:
           osDelay(10);
         }
 
-        LOG_PRINT("Displayed scan list in Silabs app\n\n");
+        SL_DEBUG_LOG_V2(INFO, "Displayed scan list in Silabs app");
       } break;
 
       // WLAN connection response status (response to '2' command)
@@ -938,9 +941,10 @@ adv:
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nconn params update cmd failed with status "
-                    "= %lx \r\n",
-                    status);
+          SL_DEBUG_LOG_V2(ERROR,
+                          "conn params update cmd failed with status "
+                          "= %lx ",
+                          status);
         }
 
       } break;
@@ -991,7 +995,7 @@ adv:
 
           // WLAN disconnect request
           case '4': {
-            LOG_PRINT("WLAN disconnect request received\n");
+            SL_DEBUG_LOG_V2(INFO, "WLAN disconnect request received");
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_DISCONN_NOTIFY_STATE);
           } break;
@@ -1003,14 +1007,14 @@ adv:
           } break;
 
           default:
-            LOG_PRINT("Default command case\n\n");
+            SL_DEBUG_LOG_V2(INFO, "Default command case");
             break;
         }
 
         //! Send GATT write response to client with success status
         status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\nFailed to send GATT write response, status: 0x%lx\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to send GATT write response, status: 0x%lx", status);
         }
       } break;
 
@@ -1030,9 +1034,10 @@ adv:
         if (remote_dev_feature.remote_features[0] & 0x20) {
           status = rsi_ble_set_data_len(conn_event_to_app.dev_addr, TX_LEN, TX_TIME);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n set data length cmd failed with error code = "
-                      "%lx \n",
-                      status);
+            SL_DEBUG_LOG_V2(ERROR,
+                            " set data length cmd failed with error code = "
+                            "%lx ",
+                            status);
             rsi_ble_app_set_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
           }
         }

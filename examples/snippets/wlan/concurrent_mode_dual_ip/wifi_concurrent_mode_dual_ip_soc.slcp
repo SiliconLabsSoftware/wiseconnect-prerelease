@@ -37,6 +37,13 @@ component:
 - id: bsd_socket
 - id: sl_si91x_asynchronous_socket
 - id: sl_si91x_wireless
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror

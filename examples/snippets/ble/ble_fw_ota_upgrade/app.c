@@ -1240,7 +1240,15 @@ adv:
                 LOG_PRINT("\r\n Time in sec:%ld\r\n", (stop_timer - start_timer) / 1000);
                 LOG_PRINT("\r\n TA Firmware transfer complete!\r\n");
                 LOG_PRINT("\r\n Safe upgrade in Progress. Please wait....\r\n");
-                status = sl_si91x_driver_deinit();
+                //! To reclaim memory back After FW OTA upgrade over
+                status = rsi_ble_disable();
+                if (status != SL_STATUS_OK) {
+                  LOG_PRINT("\r\nBLE Disable Failed, Error Code : 0x%lX\r\n", status);
+                  return status;
+                } else {
+                  printf("\r\n BLE Disable Successful\n");
+                }
+                status = sl_wifi_deinit();
                 printf("\r\nWi-Fi Deinit status : %lx\r\n", status);
                 VERIFY_STATUS_AND_RETURN(status);
 

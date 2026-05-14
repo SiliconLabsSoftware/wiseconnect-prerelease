@@ -257,10 +257,10 @@ static void application_start(void *argument)
 
         status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_v6_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
-          printf("\r\nFailed to start Wi-Fi client interface: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
           return;
         }
-        printf("\r\nWi-Fi Client interface init\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface init");
 
         sl_wifi_set_callback_v2(SL_WIFI_CLIENT_CONNECTED_EVENTS, ap_connected_event_handler, NULL);
         sl_wifi_set_callback_v2(SL_WIFI_CLIENT_DISCONNECTED_EVENTS, ap_disconnected_event_handler, NULL);
@@ -268,61 +268,61 @@ static void application_start(void *argument)
         //  Client profile set
         status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_0, &wifi_client_profile);
         if (status != SL_STATUS_OK) {
-          printf("\r\nFailed to set client profile: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to set client profile: 0x%lx", status);
           return;
         }
-        printf("\r\nWi-Fi set client profile success\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi set client profile success");
 
         status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
                                        wifi_client_credential.type,
                                        &wifi_client_credential.data,
                                        wifi_client_credential.data_length);
         if (status != SL_STATUS_OK) {
-          printf("Failed to set credentials: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials: 0x%lx", status);
           return;
         }
-        printf("\r\nWi-Fi set credential success\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi set credential success");
 
         //  STA Scan, Connect and IPv4 + IPv6 config
         status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_0);
         if (status != SL_STATUS_OK) {
-          printf("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
           return;
         }
-        printf("\r\nWi-Fi client interface successful\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface successful");
 
         status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_0, &profile);
         if (status != SL_STATUS_OK) {
-          printf("\r\nFailed to get client profile: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
           return;
         }
 
         if (profile.ip.type & SL_IPV4) {
           ip_address.type = SL_IPV4;
           memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
-          printf("\r\nClient IPv4 : ");
+          SL_DEBUG_LOG_V2(INFO, "Client IPv4 : ");
           print_sl_ip_address(&ip_address);
-          printf("\r\n");
+          SL_DEBUG_LOG_V2(INFO, "");
         }
 
         if (profile.ip.type & SL_IPV6) {
-          printf("\r\nClient IPv6 : ");
+          SL_DEBUG_LOG_V2(INFO, "Client IPv6 : ");
           sl_ip_address_t link_local_address = { 0 };
           link_local_address.ip.v6           = profile.ip.ip.v6.link_local_address;
           link_local_address.type            = SL_IPV6;
-          printf("\nLink Local Address: ");
+          SL_DEBUG_LOG_V2(INFO, "Link Local Address: ");
           print_sl_ip_address(&link_local_address);
 
           sl_ip_address_t global_address = { 0 };
           global_address.ip.v6           = profile.ip.ip.v6.global_address;
           global_address.type            = SL_IPV6;
-          printf("Global Address: ");
+          SL_DEBUG_LOG_V2(INFO, "Global Address: ");
           print_sl_ip_address(&global_address);
 
           sl_ip_address_t gateway = { 0 };
           gateway.ip.v6           = profile.ip.ip.v6.gateway;
           gateway.type            = SL_IPV6;
-          printf("Gateway Address: ");
+          SL_DEBUG_LOG_V2(INFO, "Gateway Address: ");
           print_sl_ip_address(&gateway);
         }
 
@@ -340,10 +340,10 @@ static void application_start(void *argument)
 
         status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_v6_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
-          printf("\r\nFailed to start Wi-Fi AP interface: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx", status);
           return;
         }
-        printf("\r\nWi-Fi AP interface init\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP interface init");
 
         sl_net_inet_addr(DEFAULT_WIFI_AP_MODULE_IP4_ADDRESS, (uint32_t *)&wifi_ap_profile.ip.ip.v4.ip_address.bytes);
         sl_net_inet_addr(DEFAULT_WIFI_AP_NS_MODULE_IP4_ADDRESS, (uint32_t *)&wifi_ap_profile.ip.ip.v4.netmask.bytes);
@@ -354,7 +354,7 @@ static void application_start(void *argument)
                                      hex_addr,
                                      (unsigned int *)ip_addr);
         if (return_value != 0x1) {
-          printf("\r\nIPv6 conversion failed.\r\n");
+          SL_DEBUG_LOG_V2(ERROR, "IPv6 conversion failed.");
           return;
         }
         return_value = sl_inet_pton6(DEFAULT_WIFI_AP_GATEWAY6_ADDRESS,
@@ -362,7 +362,7 @@ static void application_start(void *argument)
                                      hex_addr,
                                      (unsigned int *)gateway);
         if (return_value != 0x1) {
-          printf("\r\nIPv6 conversion failed.\r\n");
+          SL_DEBUG_LOG_V2(ERROR, "IPv6 conversion failed.");
           return;
         }
 
@@ -372,10 +372,10 @@ static void application_start(void *argument)
         if (state == AP_NEXT) {
           status = sl_wifi_get_channel(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &client_channel);
           if (status != SL_STATUS_OK) {
-            printf("\r\nFailed to get client channel: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to get client channel: 0x%lx", status);
             return;
           }
-          printf("\r\nSuccess to get client channel\r\n");
+          SL_DEBUG_LOG_V2(INFO, "Success to get client channel");
 
           wifi_ap_profile.config.channel.channel = client_channel.channel;
         } else if (state == AP_FIRST) {
@@ -385,63 +385,63 @@ static void application_start(void *argument)
         //  AP profile set
         status = sl_net_set_profile(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_0, &wifi_ap_profile);
         if (status != SL_STATUS_OK) {
-          printf("\r\nFailed to set AP profile: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to set AP profile: 0x%lx", status);
           return;
         }
-        printf("\r\nWi-Fi set AP profile success\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi set AP profile success");
 
         status = sl_net_set_credential(SL_NET_USER_CREDENTIAL_ID,
                                        wifi_ap_credential.type,
                                        &wifi_ap_credential.data,
                                        wifi_ap_credential.data_length);
         if (status != SL_STATUS_OK) {
-          printf("Failed to set credentials: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials: 0x%lx", status);
           return;
         }
-        printf("\r\nWi-Fi set credential success\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi set credential success");
 
         //  AP IPv4 + IPv6 config and AP Start
         status = sl_net_up(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_0);
         if (status != SL_STATUS_OK) {
-          printf("Failed to bring Wi-Fi AP interface up: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi AP interface up: 0x%lx", status);
           return;
         }
 
         status = sl_net_get_profile(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_0, &wifi_ap_profile);
         if (status != SL_STATUS_OK) {
-          printf("Failed to get AP profile: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to get AP profile: 0x%lx", status);
           return;
         }
 
         if (wifi_ap_profile.ip.type & SL_IPV4) {
           ip_address.type = SL_IPV4;
-          printf("\r\nAP IPv4 : ");
+          SL_DEBUG_LOG_V2(INFO, "AP IPv4 : ");
           memcpy(&ip_address.ip.v4.bytes, &wifi_ap_profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
           print_sl_ip_address(&ip_address);
-          printf("\r\n");
+          SL_DEBUG_LOG_V2(INFO, "");
         }
 
         if (wifi_ap_profile.ip.type & SL_IPV6) {
-          printf("\r\nAP IPv6 : ");
+          SL_DEBUG_LOG_V2(INFO, "AP IPv6 : ");
           sl_ip_address_t link_local_address = { 0 };
           link_local_address.ip.v6           = wifi_ap_profile.ip.ip.v6.link_local_address;
           link_local_address.type            = SL_IPV6;
-          printf("\nLink Local Address: ");
+          SL_DEBUG_LOG_V2(INFO, "Link Local Address: ");
           print_sl_ip_address(&link_local_address);
           sl_ip_address_t global_address = { 0 };
           global_address.ip.v6           = wifi_ap_profile.ip.ip.v6.global_address;
           global_address.type            = SL_IPV6;
-          printf("Global Address: ");
+          SL_DEBUG_LOG_V2(INFO, "Global Address: ");
           print_sl_ip_address(&global_address);
 
           sl_ip_address_t gateway = { 0 };
           gateway.ip.v6           = wifi_ap_profile.ip.ip.v6.gateway;
           gateway.type            = SL_IPV6;
-          printf("Gateway Address: ");
+          SL_DEBUG_LOG_V2(INFO, "Gateway Address: ");
           print_sl_ip_address(&gateway);
         }
 
-        printf("\r\nAP started\r\n");
+        SL_DEBUG_LOG_V2(INFO, "AP started");
 
         if (state == AP_ALONE) {
           state = DATA_TRANSFER;
@@ -456,16 +456,16 @@ static void application_start(void *argument)
         for (size_t i = 0; i < sizeof(data_buffer); i++)
           data_buffer[i] = 'A' + (i % 26);
 
-        printf("\r\nSending UDP Data over IPv6 on STA VAP\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Sending UDP Data over IPv6 on STA VAP");
         send_data_to_udp_server();
 
-        printf("\r\nReceving TCP Data over IPv4 on AP VAP\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Receving TCP Data over IPv4 on AP VAP");
         receive_data_from_tcp_client();
         state = QUIT;
         break;
 
       case QUIT:
-        printf("\nExitting");
+        SL_DEBUG_LOG_V2(INFO, "Exitting");
         goto EXIT;
     }
   }
@@ -493,9 +493,9 @@ static sl_status_t ap_connected_event_handler(sl_wifi_event_t event,
     return status_code;
   }
 
-  printf("Remote Client connected: ");
+  SL_DEBUG_LOG_V2(INFO, "Remote Client connected: ");
   print_mac_address((sl_mac_address_t *)data);
-  printf("\n");
+  SL_DEBUG_LOG_V2(INFO, "");
 
   return SL_STATUS_OK;
 }
@@ -513,9 +513,9 @@ static sl_status_t ap_disconnected_event_handler(sl_wifi_event_t event,
     return status_code;
   }
 
-  printf("Remote Client disconnected: ");
+  SL_DEBUG_LOG_V2(INFO, "Remote Client disconnected: ");
   print_mac_address((sl_mac_address_t *)data);
-  printf("\n");
+  SL_DEBUG_LOG_V2(INFO, "");
 
   return SL_STATUS_OK;
 }
@@ -531,18 +531,18 @@ void receive_data_from_tcp_client(void)
 
   sl_status_t status = sl_si91x_config_socket(socket_config);
   if (status != SL_STATUS_OK) {
-    printf("Socket config failed: %ld\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld", status);
   }
-  printf("\r\nSocket config Done\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Socket config Done");
 
   int read_bytes                = 1;
   uint32_t total_bytes_received = 0;
   server_socket                 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (server_socket < 0) {
-    printf("\r\nSocket creation failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
     return;
   }
-  printf("\r\nServer Socket ID : %d\r\n", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d", server_socket);
 
   socket_return_value = setsockopt(server_socket,
                                    SOL_SOCKET,
@@ -550,7 +550,7 @@ void receive_data_from_tcp_client(void)
                                    &high_performance_socket,
                                    sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    printf("\r\nSet Socket option failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
     close(client_socket);
     return;
   }
@@ -563,28 +563,28 @@ void receive_data_from_tcp_client(void)
 
   socket_return_value = bind(server_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    printf("\r\nSocket bind failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
     close(server_socket);
     return;
   }
 
   socket_return_value = listen(server_socket, BACK_LOG);
   if (socket_return_value < 0) {
-    printf("\r\nSocket listen failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d", errno);
     close(server_socket);
     return;
   }
-  printf("\r\nListening on Local Port : %d\r\n", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port : %d", LISTENING_PORT);
 
   client_socket = accept(server_socket, NULL, NULL);
   if (client_socket < 0) {
-    printf("\r\nSocket accept failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d", errno);
     close(server_socket);
     return;
   }
-  printf("\r\nClient Socket ID : %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %d", client_socket);
 
-  printf("\r\nTCP_RX Throughput test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test start");
   start = osKernelGetTickCount();
   while (1) {
     read_bytes = recv(client_socket, data_buffer, sizeof(data_buffer), 0);
@@ -595,10 +595,10 @@ void receive_data_from_tcp_client(void)
         if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
           continue;
         } else {
-          printf("\r\nrecv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
+          SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx", errno, status);
         }
       } else {
-        printf("\r\nrecv failed with BSD error = %d\r\n", errno);
+        SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d", errno);
       }
       break;
     }
@@ -606,12 +606,12 @@ void receive_data_from_tcp_client(void)
     now                  = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\nTest Time Out: %ld ms\r\n", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms", (now - start));
       break;
     }
   }
-  printf("\r\nTCP_RX Throughput test finished\r\n");
-  printf("\r\nTotal bytes received : %ld\r\n", total_bytes_received);
+  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test finished");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld", total_bytes_received);
 
   close(client_socket);
   close(server_socket);
@@ -629,10 +629,10 @@ void send_data_to_udp_server(void)
 
   client_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    printf("\r\nSocket creation failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
     return;
   }
-  printf("\r\nSocket ID : %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
 
   server_address6.sin6_family = AF_INET6;
   server_address6.sin6_port   = SERVER_PORT;
@@ -642,11 +642,11 @@ void send_data_to_udp_server(void)
                              address_buffer,
                              (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
   if (status != 0x1) {
-    printf("\r\nIPv6 conversion failed.\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "IPv6 conversion failed.");
     return;
   }
 
-  printf("\r\nUDP_TX Throughput test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test start");
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
     sent_bytes =
@@ -655,19 +655,19 @@ void send_data_to_udp_server(void)
     if (sent_bytes < 0) {
       if (errno == ENOBUFS)
         continue;
-      printf("\r\nSocket send failed with bsd error: %d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d", errno);
       close(client_socket);
       break;
     }
     total_bytes_sent = total_bytes_sent + sent_bytes;
 
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\nTime Out: %ld\r\n", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Time Out: %ld", (now - start));
       break;
     }
   }
-  printf("\r\nUDP_TX Throughput test finished\r\n");
-  printf("\r\nTotal bytes sent : %ld\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test finished");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %ld", total_bytes_sent);
 
   close(client_socket);
 }

@@ -15,6 +15,7 @@
  *
  ******************************************************************************/
 
+#include <inttypes.h>
 #include "sl_si91x_usart.h"
 #include "rsi_debug.h"
 #include "usart_async_example.h"

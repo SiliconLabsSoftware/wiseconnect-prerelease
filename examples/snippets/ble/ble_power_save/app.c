@@ -511,17 +511,7 @@ void ble_app_task(void *argument)
     temp_event_map = rsi_ble_app_get_event();
     if (temp_event_map == RSI_FAILURE) {
       //! if events are not received loop will be continued.
-#if ((SL_SI91X_TICKLESS_MODE == 0) && (defined SLI_SI91X_MCU_INTERFACE && ENABLE_NWP_POWER_SAVE))
-      //! if events are not received loop will be continued.
-
-      if ((!(P2P_STATUS_REG & TA_wakeup_M4)) && (ble_app_event_map == 0) && (ble_app_event_map1 == 0)) {
-        P2P_STATUS_REG &= ~M4_wakeup_TA;
-        LOG_PRINT("\r\n triggering M4 sleep\r\n");
-        sl_si91x_power_manager_sleep();
-      }
-#else
       osSemaphoreAcquire(ble_main_task_sem, osWaitForever);
-#endif
       continue;
     }
 

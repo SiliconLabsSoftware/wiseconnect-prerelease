@@ -39,6 +39,7 @@ requires:
   - name: cmsis_gspi
   - name: sl_dma
   - name: log_none
+  - name: sl_gpdma
 documentation:
     docset: wiseconnect
     document: wiseconnect-api-reference-guide-si91x-peripherals/gspi

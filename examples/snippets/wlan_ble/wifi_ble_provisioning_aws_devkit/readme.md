@@ -12,6 +12,7 @@
   - [Getting Started](#getting-started)
     - [Create an application](#create-an-application)
     - [Configure the following parameters in `aws_iot_config.h` file present at `<project>/config`](#configure-the-following-parameters-in-aws_iot_configh-file-present-at-projectconfig)
+    - [Prepare the AWS Certificate for the Si Connect Mobile App](#prepare-the-aws-certificate-for-the-si-connect-mobile-app)
   - [Test the Application](#test-the-application)
     - [Application Output](#application-output)
     - [MQTT Connection](#mqtt-connection)
@@ -21,7 +22,7 @@
   
 ## Purpose / Scope
 
-In this application, the Bluetooth Low Energy (BLE) and Simplicity Connect Application (formerly EFR Connect App) are used for provisioning the SiWx917 to a Wi-Fi Network. SiWx917 acts as a Wi-Fi station and connects to the AWS cloud via MQTT.
+In this application, the Bluetooth Low Energy (BLE) and Si Connect App (formerly Simplicity Connect / EFR Connect App) are used for provisioning the SiWx917 to a Wi-Fi Network. Once provisioned, SiWx917 acts as a Wi-Fi station and connects to the AWS cloud via MQTT.
 
 The user can enable the required LED from the mobile app. The mobile app will publish the required LED state to MQTT_TOPIC1. SiWx917 subscribes to MQTT_TOPIC1 and enables the requested LED.
 
@@ -38,13 +39,13 @@ The application also publishes the real-time sensor data (LUX, Temperature, Humi
 - **SoC Mode**:
   - Kits
     - BRD2605A/BRD2605B (SiWG917 Dev Kit Board)
-- Android Phone or iPhone with Simplicity Connect App (formerly EFR Connect App), which is available in Play Store and App Store (or) Windows PC with windows Silicon labs connect application.
+- Android Phone or iPhone with Si Connect App (formerly Simplicity Connect / EFR Connect App), which is available in Play Store and App Store (or) Windows PC with Windows Silicon Labs connect application.
 
 ### Software Requirements
 
 - [Simplicity Studio](https://www.silabs.com/developers/simplicity-studio)
-- Silicon Labs [Simplicity Connect App (formerly EFR Connect App)](https://www.silabs.com/developers/simplicity-connect-mobile-app?tab=downloads), the app can be downloaded from Google Play store/Apple App store.
-  > IMPORTANT: This example requires Simplicity Connect version 2.9.3 or later.
+- Silicon Labs [Si Connect App (formerly Simplicity Connect / EFR Connect App)](https://www.silabs.com/developers/simplicity-connect-mobile-app?tab=downloads), the app can be downloaded from Google Play store/Apple App store.
+  > IMPORTANT: This example requires Si Connect App version 3.2.0 or later. Earlier versions do not prompt for the AWS certificate and endpoint configuration required by this application.
 
 ### Setup Diagram
 
@@ -93,9 +94,66 @@ By default, the WiSeConnect SDK contains the Starfield Root CA Certificate in C-
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
+### Prepare the AWS Certificate for the Si Connect Mobile App
+
+Starting with **Si Connect App version 3.2.0**, the mobile app prompts you to provide AWS certificate and endpoint details during the provisioning flow. You must prepare the following items before running the application:
+
+1. **Create a PKCS#12 (.p12) certificate bundle**
+
+   The Si Connect app requires the device certificate and private key in PKCS#12 format. Use the device certificate and private key files that were downloaded when you [created the AWS Thing](#create-an-aws-thing).
+
+   Run the following command using OpenSSL to create the `.p12` file (the device certificate and key alone are sufficient -- the Si Connect app does not require the root CA inside the bundle):
+
+   ```sh
+   openssl pkcs12 -export -out aws_device_cert.p12 \
+     -inkey <device-private-key>.pem.key \
+     -in <device-certificate>.pem.crt
+   ```
+
+   You will be prompted to set an **export password**. Remember this password -- you will need to enter it in the Si Connect app.
+
+   > **Note (OpenSSL 3.x):** OpenSSL 3.0 and later use modern PBE/MAC defaults that some mobile keystores (notably older Android versions and some iOS releases) cannot import. If the Si Connect app rejects the generated `.p12`, regenerate it with the `-legacy` flag, or specify legacy algorithms explicitly:
+   >
+   > ```sh
+   > openssl pkcs12 -export -legacy -out aws_device_cert.p12 \
+   >   -inkey <device-private-key>.pem.key \
+   >   -in <device-certificate>.pem.crt
+   > ```
+
+   > **Tip:** If you need to bundle the AWS root CA into the `.p12` (not required by Si Connect, but useful for testing with other tools), download the Starfield / Amazon root CA from Amazon Trust Services and add `-certfile <downloaded-ca>.pem`:
+   >
+   > - [https://www.amazontrust.com/repository/SFSRootCAG2.pem](https://www.amazontrust.com/repository/SFSRootCAG2.pem) (Starfield Services Root CA G2)
+   > - [https://www.amazontrust.com/repository/AmazonRootCA1.pem](https://www.amazontrust.com/repository/AmazonRootCA1.pem) (Amazon Root CA 1)
+   >
+   > The SDK ships the Starfield CA only as a C-array header (`<SDK>/resources/certificates/aws_starfield_ca.pem.h`), which OpenSSL cannot consume directly.
+
+2. **Transfer the .p12 file to your mobile device**
+
+   Copy the generated `aws_device_cert.p12` file to your Android or iOS device (e.g., via email, cloud storage, or USB transfer).
+
+3. **Note down the AWS IoT Endpoint URL**
+
+   This is the same endpoint configured in `AWS_IOT_MQTT_HOST` in `aws_iot_config.h`. You can find it in the [AWS IoT Console](https://console.aws.amazon.com/iot/home) under **Settings > Device data endpoint**. It has the format:
+
+   ```text
+   <unique-id>.iot.<region>.amazonaws.com
+   ```
+
+During the mobile app provisioning flow, you will be prompted to provide:
+
+| Mobile App Field       | Value to Enter                                                                 |
+|------------------------|--------------------------------------------------------------------------------|
+| **Certificate file**   | Select the `aws_device_cert.p12` file transferred to your device               |
+| **Certificate password** | The export password you set when creating the `.p12` file                    |
+| **Endpoint URL**       | Your AWS IoT device data endpoint (e.g., `a2m21kovu9tcsh-ats.iot.us-east-2.amazonaws.com`) |
+| **Subscriber topic**   | The MQTT topic to subscribe to for sensor data (e.g., `MQTT_TOPIC2`)           |
+| **Publisher topic**    | The MQTT topic to publish LED control commands to (e.g., `MQTT_TOPIC1`)        |
+
+> **Note on topic perspective:** The **Subscriber topic** and **Publisher topic** field labels above are from the **mobile app's** perspective -- the topic the mobile app subscribes to (to receive sensor data) and the topic the mobile app publishes to (to send LED commands). From the **device firmware's** perspective these are reversed: in `wifi_app.c`, `MQTT_TOPIC1` is the topic the SiWx917 *subscribes* to (to receive LED commands) and `MQTT_TOPIC2` is the topic the SiWx917 *publishes* to (to send sensor data).
+
 ## Test the Application
 
-The following instructions are provied in [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
+The following instructions are provided in [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
 
 - Build the application.
 - Flash, run, and debug the application.
@@ -104,7 +162,7 @@ Complete the following steps for successful execution of the application:
 
 1. Connect any serial console for prints.
 
-2. When the SiWx917 EVK enters BLE advertising mode, launch the **Simplicity Connect App (formerly EFR Connect App)**.
+2. When the SiWx917 EVK enters BLE advertising mode, launch the **Si Connect App** (formerly Simplicity Connect / EFR Connect App).
 
 3. Click on **Demo** and select **AWS IoT**.
 
@@ -126,9 +184,17 @@ Complete the following steps for successful execution of the application:
 
 8. Once the Silicon Labs module is successfully connected to the Wi-Fi network, the BLE connection is automatically disconnected from the application side since it is no longer needed for provisioning.
 
-9. After the Wi-Fi connection is established, you will be prompted to enter the publish and subscribe topics.
+9. After the Wi-Fi connection is established, the Si Connect app navigates to the AWS configuration screen. You will be prompted to provide the following details (see [Prepare the AWS Certificate for the Si Connect Mobile App](#prepare-the-aws-certificate-for-the-si-connect-mobile-app) for how to obtain these values):
+
+   - **Certificate file**: Tap to browse and select the `.p12` certificate file you transferred to your device.
+   - **Certificate password**: Enter the export password you set when creating the `.p12` file.
+   - **Endpoint URL**: Enter your AWS IoT device data endpoint (e.g., `a2m21kovu9tcsh-ats.iot.us-east-2.amazonaws.com`).
+   - **Subscriber topic**: Enter the MQTT topic to subscribe to for sensor data (e.g., `MQTT_TOPIC2`).
+   - **Publisher topic**: Enter the MQTT topic to publish LED control commands to (e.g., `MQTT_TOPIC1`).
 
    ![](resources/readme/Mobile_app_ui_2.png)
+
+   > **Note:** In Si Connect App versions prior to 3.2.0, only the subscriber and publisher topics were required. Starting with version 3.2.0, the certificate and endpoint fields are mandatory.
 
 10. The application starts publishing sensor data to AWS via MQTT, and this information will be displayed on the mobile app dashboard.
 
@@ -153,11 +219,11 @@ Complete the following steps for successful execution of the application:
 
 ### MQTT Connection
 
-After successfully connecting to Wi-Fi, the application establishes a connection to AWS IoT Core. It subscribes to a topic (`MQTT_TOPIC2`) and publishes a message on another topic (`MQTT_TOPIC1`). The application then waits to receive data published on the subscribed topic from the cloud.
+After successfully connecting to Wi-Fi, the application establishes a connection to AWS IoT Core. It subscribes to a topic (`MQTT_TOPIC1`) to receive LED control commands and publishes sensor data on another topic (`MQTT_TOPIC2`). The application then waits to receive data published on the subscribed topic from the cloud.
 
 1. Go to the mobile app and enable the required LED.
 
-2. Realtime sensor data will be displayed on the mobile app dashboard. You can also see the published data by subscribing to the topic (MQTT_TOPIC1) in AWS console.
+2. Realtime sensor data will be displayed on the mobile app dashboard. You can also see the published sensor data by subscribing to the topic (MQTT_TOPIC2) in AWS console.
 
    ![](resources/readme/publish_status_from_AWS.png)
 

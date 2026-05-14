@@ -604,6 +604,7 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp);
 uint16_t rsi_bt_global_cb_init(struct rsi_driver_cb_s *driver_cb, uint8_t *buffer);
 uint16_t rsi_driver_process_bt_resp_handler(void *rx_pkt);
 uint16_t rsi_bt_get_proto_type(uint16_t rsp_type, rsi_bt_cb_t **bt_cb);
+bool rsi_ble_is_device_connected(void);
 
 /** @addtogroup BT_BLE_CONSTANTS
  *  @{

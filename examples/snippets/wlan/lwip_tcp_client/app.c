@@ -134,41 +134,41 @@ static void application_start(void *argument)
   sl_wifi_performance_profile_v2_t performance_profile = { .profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY };
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, &wifi_client_context, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
     return;
   }
-  printf("Wi-Fi Client interface success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface success");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
     return;
   }
-  printf("m4_ta_secure_handshake Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
     return;
   }
-  printf("Wi-Fi client connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   status = sl_wifi_filter_broadcast(5000, 1, 1);
   if (status != SL_STATUS_OK) {
-    printf("\r\nsl_wifi_filter_broadcast Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_filter_broadcast Failed, Error Code : 0x%lX", status);
     return;
   }
-  printf("Filter Broadcast Done\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Filter Broadcast Done");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    printf("Failed to get client profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
     return;
   }
-  printf("\r\nSuccess to get client profile\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -177,28 +177,22 @@ static void application_start(void *argument)
   // set performance profile
   status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nPower save configuration Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", status);
     return;
   }
-  printf("\r\nPerformance profile set\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Performance profile set");
 
   send_data_to_tcp_server();
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-
-#if (SL_SI91X_TICKLESS_MODE == 0)
-  sl_si91x_power_manager_sleep();
-#else
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    printf("Failed to create semaphore\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
     return;
   }
   // Waiting forever using semaphore to put M4 to sleep in tick less mode
   osSemaphoreAcquire(wait_semaphore, osWaitForever);
-#endif
-
 #endif
 }
 
@@ -222,19 +216,19 @@ void send_data_to_tcp_server()
   //!Create socket
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    printf("\r\nSocket creation failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
     return;
   }
-  printf("\r\nTCP Socket Create Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "TCP Socket Create Success");
 
   //! Socket connect
   return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (return_value < 0) {
-    printf("\r\nSocket connect failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket connect failed with bsd error: %d", errno);
     close(client_socket);
     return;
   }
-  printf("\r\nTCP Socket Connect Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "TCP Socket Connect Success");
 
   //! send data
   while (packet_count < NUMBER_OF_PACKETS) {
@@ -244,14 +238,14 @@ void send_data_to_tcp_server()
       if (errno == ENOBUFS || errno == EAGAIN || errno == EWOULDBLOCK) {
         transient_retry_total++;
         if (transient_retry_total >= TX_STALL_ABORT_RETRIES) {
-          printf("\r\nTX stall detected at packet %d (errno=%d)\r\n", packet_count, errno);
+          SL_DEBUG_LOG_V2(WARN, "TX stall detected at packet %d (errno=%d)", packet_count, errno);
           close(client_socket);
           return;
         }
         osDelay(TX_TRANSIENT_RETRY_DELAY_MS);
         continue;
       }
-      printf("\r\nSend failed with bsd error:%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Send failed with bsd error:%d", errno);
       close(client_socket);
       return;
     }
@@ -263,11 +257,11 @@ void send_data_to_tcp_server()
     }
   }
 
-  printf("\r\n%d packets sent success\r\n", packet_count);
+  SL_DEBUG_LOG_V2(INFO, "%d packets sent success", packet_count);
 
   //!Socket close
   close(client_socket);
-  printf("\r\nSocket close success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Socket close success");
 
   return;
 }

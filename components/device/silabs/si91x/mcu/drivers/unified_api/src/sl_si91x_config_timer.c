@@ -787,35 +787,35 @@ sl_status_t sl_si91x_config_timer_configure_action_event(sl_config_action_event_
     or_value |= ((event_config_handle->or_event_valid_bits_counter0) << 8);
     or_value |= ((event_config_handle->or_event_counter1) << 16);
     or_value |= ((event_config_handle->or_event_valid_bits_counter1) << 24);
-    if ((event_config_handle->action == START)) {
+    if (event_config_handle->action == START) {
       RSI_CT_StartEventConfig(CT, and_value, or_value);
       break;
     }
-    if ((event_config_handle->action == STOP)) {
+    if (event_config_handle->action == STOP) {
       RSI_CT_StopEventConfig(CT, and_value, or_value);
       break;
     }
-    if ((event_config_handle->action == CONTINUE)) {
+    if (event_config_handle->action == CONTINUE) {
       RSI_CT_ContinueEventConfig(CT, and_value, or_value);
       break;
     }
-    if ((event_config_handle->action == HALT)) {
+    if (event_config_handle->action == HALT) {
       RSI_CT_HaltEventConfig(CT, and_value, or_value);
       break;
     }
-    if ((event_config_handle->action == INCREMENT)) {
+    if (event_config_handle->action == INCREMENT) {
       RSI_CT_IncrementEventConfig(CT, and_value, or_value);
       break;
     }
-    if ((event_config_handle->action == CAPTURE)) {
+    if (event_config_handle->action == CAPTURE) {
       RSI_CT_CaptureEventConfig(CT, and_value, or_value);
       break;
     }
-    if ((event_config_handle->action == INTERRUPT)) {
+    if (event_config_handle->action == INTERRUPT) {
       RSI_CT_InterruptEventConfig(CT, and_value, or_value);
       break;
     }
-    if ((event_config_handle->action == OUTPUT)) {
+    if (event_config_handle->action == OUTPUT) {
       RSI_CT_OutputEventConfig(CT, and_value, or_value);
       break;
     }

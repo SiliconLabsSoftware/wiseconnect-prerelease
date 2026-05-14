@@ -27,6 +27,8 @@
  * Silicon Labs Module starts advertising and with BLE Provisioning the Access Point
  * details are fetched.
  * Silicon Labs device is configured as a WiFi station and connects to an Access Point.
+ * When SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO is 1: quiesce + rsi_ble_disable after join,
+ * RSI_BLE_ENABLE_REQUEST / rsi_ble_enable for Wi-Fi task requests — see readme.md.
  =================================================================================*/
 
 /**
@@ -743,8 +745,9 @@ void rsi_ble_configurator_task(void *argument)
         // clear the served event
         rsi_ble_app_clear_event(RSI_BLE_ENH_CONN_EVENT);
 
-        LOG_PRINT("\r\nConnected - remote_dev_addr : %s\r\n",
-                  rsi_6byte_dev_address_to_ascii(remote_dev_addr, conn_event_to_app.dev_addr));
+        SL_DEBUG_LOG_V2(INFO,
+                        "Connected - remote_dev_addr : %s",
+                        (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, conn_event_to_app.dev_addr));
 
         //MTU exchange
         status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, BLE_MTU_SIZE);
@@ -766,8 +769,9 @@ void rsi_ble_configurator_task(void *argument)
 
         // clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-        LOG_PRINT("\r\nDisconnected - remote_dev_addr : %s\r\n",
-                  rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
+        SL_DEBUG_LOG_V2(INFO,
+                        "Disconnected - remote_dev_addr : %s",
+                        (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
 #if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
         if (ble_disable_after_disconnect_pending != 0) {
           ble_disable_after_disconnect_pending = 0;
@@ -1009,7 +1013,7 @@ adv:
           case '2': { // SSID
             memset(coex_ssid, 0, sizeof(coex_ssid));
             strcpy((char *)coex_ssid, (const char *)&app_ble_write_event.att_value[3]);
-            LOG_PRINT("SSID set to: %s\r\n", coex_ssid);
+            SL_DEBUG_LOG_V2(INFO, "SSID set to: %s", (uintptr_t)coex_ssid);
             rsi_ble_app_set_event(RSI_SSID);
           } break;
 

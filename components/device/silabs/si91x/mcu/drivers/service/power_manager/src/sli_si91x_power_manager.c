@@ -685,7 +685,7 @@ static void ps4_to_ps0_state_change(void)
   // Initializing and configuring the wakeup sources as per UC inputs, if available
   status_ps4_to_ps0 = sl_si91x_power_manager_wakeup_init();
   if (status_ps4_to_ps0 != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("Error Code: 0x%lX, Power State Transition Failed \n", status_ps4_to_ps0);
+    SL_PRINT_STRING_ERROR("Error Code: 0x%lX, Power State Transition Failed \n", (unsigned long)status_ps4_to_ps0);
     return;
   }
 #endif
@@ -770,7 +770,7 @@ static void ps3_to_ps0_state_change(void)
   // Initializing and configuring the wakeup sources as per UC inputs, if available
   status_ps3_to_ps0 = sl_si91x_power_manager_wakeup_init();
   if (status_ps3_to_ps0 != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("Error Code: 0x%lX, Power State Transition Failed \n", status_ps3_to_ps0);
+    SL_PRINT_STRING_ERROR("Error Code: 0x%lX, Power State Transition Failed \n", (unsigned long)status_ps3_to_ps0);
     return;
   }
 #endif

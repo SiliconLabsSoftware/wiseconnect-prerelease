@@ -29,6 +29,9 @@
  ******************************************************************************/
 
 #include "sl_si91x_aes.h"
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+#include "sl_si91x_mp_aes.h"
+#endif
 #include "sl_si91x_crypto.h"
 #include "sl_status.h"
 #include "sl_constants.h"
@@ -100,38 +103,56 @@ static sl_status_t sli_si91x_aes_pending(const sl_si91x_aes_config_t *config,
 }
 
 #else
+/*****************************************************************************
+ * Send a single-shot AES operation via the side-band crypto interface.
+ *
+ * Allocates an sli_si91x_aes_mp_request_t with FIRST_CHUNK | LAST_CHUNK,
+ * populates it from config, and sends it in one side-band command. This
+ * mirrors sli_si91x_ccm_side_band() in sl_si91x_ccm.c so atomic AES and
+ * atomic CCM follow the same dispatch pattern; the multipart variant
+ * lives in sl_si91x_mp_aes.c.
+ *
+ * @param[in]  config  AES configuration (key, IV, mode, msg, direction).
+ * @param[out] output  Buffer for encrypted / decrypted output.
+ *
+ * @return sl_status_t indicating success or failure.
+******************************************************************************/
 static sl_status_t sli_si91x_aes_side_band(const sl_si91x_aes_config_t *config, uint8_t *output)
 {
+  sl_status_t status                  = SL_STATUS_FAIL;
+  sli_si91x_aes_mp_request_t *request = (sli_si91x_aes_mp_request_t *)malloc(sizeof(sli_si91x_aes_mp_request_t));
+  if (request == NULL) {
+    return SL_STATUS_ALLOCATION_FAILED;
+  }
 
-  sl_status_t status               = SL_STATUS_FAIL;
-  sli_si91x_aes_request_t *request = (sli_si91x_aes_request_t *)malloc(sizeof(sli_si91x_aes_request_t));
-  SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
-
-  memset(request, 0, sizeof(sli_si91x_aes_request_t));
+  memset(request, 0, sizeof(sli_si91x_aes_mp_request_t));
 
   request->algorithm_type     = AES;
-  request->algorithm_sub_type = config->aes_mode;
-  request->aes_flags          = SL_SI91X_CRYPTO_FLAG_SIDE_BAND;
-  request->total_msg_length   = config->msg_length;
-  request->encrypt_decryption = config->encrypt_decrypt;
+  request->algorithm_sub_type = (uint8_t)config->aes_mode;
+  /* Single-buffer sl_si91x_aes(): one side-band command carries the full payload (first+last). */
+  request->aes_flags            = (uint8_t)(FIRST_CHUNK | LAST_CHUNK);
+  request->total_msg_length     = config->msg_length;
+  request->current_chunk_length = config->msg_length;
+  request->encrypt_decryption   = config->encrypt_decrypt;
+
   if (config->iv != NULL) {
     request->IV = (uint8_t *)config->iv;
   }
-  request->msg    = (uint8_t *)config->msg;
+  if (config->msg_length > 0) {
+    request->msg = (uint8_t *)config->msg;
+  }
   request->output = output;
 
-  request->key_info.key_type                         = config->key_config.b0.key_type;
-  request->key_info.key_detail.key_size              = config->key_config.b0.key_size;
-  request->key_info.key_detail.key_spec.key_slot     = config->key_config.b0.key_slot;
-  request->key_info.key_detail.key_spec.wrap_iv_mode = config->key_config.b0.wrap_iv_mode;
-  memcpy(request->key_info.key_detail.key_spec.wrap_iv, config->key_config.b0.wrap_iv, SL_SI91X_IV_SIZE);
-  memcpy(request->key_info.key_detail.key_spec.key_buffer, config->key_config.b0.key_buffer, SL_SI91X_KEY_BUFFER_SIZE);
+#if defined(SLI_SI917B0)
+  sli_si91x_aes_mp_get_key_info(request, config);
+#endif
 
   status = sl_si91x_driver_send_side_band_crypto(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
                                                  request,
-                                                 (sizeof(sli_si91x_aes_request_t)),
+                                                 sizeof(sli_si91x_aes_mp_request_t),
                                                  SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME));
   free(request);
+  request = NULL;
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -220,6 +241,7 @@ sl_status_t sl_si91x_aes(sl_si91x_aes_config_t *config, uint8_t *output)
 #endif
 }
 
+#ifndef SL_SI91X_SIDE_BAND_CRYPTO
 sl_status_t sl_si91x_aes_multipart(const sl_si91x_aes_config_t *config,
                                    uint16_t chunk_length,
                                    uint8_t aes_flags,
@@ -241,13 +263,7 @@ sl_status_t sl_si91x_aes_multipart(const sl_si91x_aes_config_t *config,
     return SL_STATUS_NOT_SUPPORTED;
   }
 
-  // If side band crypto is enabled, call the side band function
-#ifdef SL_SI91X_SIDE_BAND_CRYPTO
-  (void)chunk_length;
-  (void)aes_flags;
-  return sli_si91x_aes_side_band(config, output);
-#else
   // calling sli_si91x_aes_pending with the provided arguments
   return sli_si91x_aes_pending(config, chunk_length, aes_flags, output);
-#endif
 }
+#endif

@@ -1,9 +1,9 @@
 /***************************************************************************/ /**
  * @file
- * @brief
+ * @brief NCP SPI configuration file.
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -27,25 +27,42 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-#include "lwip/pbuf.h"
-#include <stdlib.h>
-#include <stddef.h>
+#ifndef SL_NCP_SPI_CONFIGURATION_H
+#define SL_NCP_SPI_CONFIGURATION_H
 
-sl_status_t sli_si91x_host_allocate_buffer(sl_wifi_buffer_t **buffer,
-                                           sl_si91x_buffer_type_t type,
-                                           uint32_t buffer_size,
-                                           uint32_t wait_duration_ms)
-{
-  struct pbuf **buf = (struct pbuf **)buffer;
-  *buf              = pbuf_alloc(0, buffer_size, 0);
-  return SL_STATUS_OK;
-}
+// <<< Use Configuration Wizard in Context Menu >>>
 
-void *sl_si91x_host_get_buffer_data(sl_wifi_buffer_t *buffer, uint16_t offset, uint16_t *data_length)
-{
-}
+// <<< end of configuration section >>>
 
-void sli_si91x_host_free_buffer(sl_wifi_buffer_t *buffer)
-{
-  pbuf_free((struct pbuf *)buffer);
-}
+// <<< sl:start pin_tool >>>
+// <gpio> SLEEP_CONFIRM
+// $[GPIO_SLEEP_CONFIRM]
+#define SI91X_NCP_SLEEP_CONFIRM_PORT gpioPortB
+#define SI91X_NCP_SLEEP_CONFIRM_PIN  6
+
+// [GPIO_SLEEP_CONFIRM]$
+
+// <gpio> WAKE_INDICATOR
+// $[GPIO_WAKE_INDICATOR]
+#define SI91X_NCP_WAKE_INDICATOR_PORT gpioPortB
+#define SI91X_NCP_WAKE_INDICATOR_PIN  8
+
+// [GPIO_WAKE_INDICATOR]$
+
+// <gpio> RESET
+// $[GPIO_RESET]
+#define SI91X_NCP_RESET_PORT gpioPortD
+#define SI91X_NCP_RESET_PIN  2
+
+// [GPIO_RESET]$
+
+// <gpio> INTERRUPT
+// $[GPIO_INTERRUPT]
+#define SI91X_NCP_INTERRUPT_PORT gpioPortD
+#define SI91X_NCP_INTERRUPT_PIN  3
+
+// [GPIO_INTERRUPT]$
+
+// <<< sl:end pin_tool >>>
+
+#endif // SL_NCP_SPI_CONFIGURATION_H

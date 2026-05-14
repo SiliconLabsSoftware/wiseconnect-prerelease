@@ -371,7 +371,7 @@ extern bool echo_enable;
 void parse_echo_command(char *command_line)
 {
   if (echo_enable == 1) {
-    printf("%s\r\n", command_line);
+    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)command_line);
   }
 }
 

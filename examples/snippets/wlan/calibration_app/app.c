@@ -210,30 +210,30 @@ static void application_start(void *argument)
 {
   UNUSED_PARAMETER(argument);
   sl_status_t status;
-  printf("\r\n initializing usart \r\n");
+  SL_DEBUG_LOG_V2(INFO, " initializing usart ");
   iostream_usart_init();
-  printf("\r\n initialised usart \r\n");
+  SL_DEBUG_LOG_V2(INFO, " initialised usart ");
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &calibration_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
     return;
   } else {
-    printf("Wi-Fi initialization successful\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization successful");
   }
 
   status = sl_si91x_transmit_test_start(&tx_test_info);
   if (status != SL_STATUS_OK) {
-    printf("Transmit test start failed: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit test start failed: 0x%lx", status);
     return;
   } else {
-    printf("Transmit test started\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Transmit test started");
   }
 
   status = calibration_app();
 
   if (status != SL_STATUS_OK) {
-    printf("Calibration test failed with status 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Calibration test failed with status 0x%lx", status);
     return;
   }
 }
@@ -261,17 +261,25 @@ void iostream_rx()
 
 void display_calib_cmd_usage()
 {
-  printf("Calibration commands usage:\r\n");
-  printf("*************************************************************************************************************"
-         "**************************************************************\r\n");
-  printf("sl_freq_offset=<freq_offset_in_KHz>\r\n");
-  printf("sl_calib_write=<target>,<flags>,<gain_offset_low>,<gain_offset_mid>,<gain_offset_high>,<xo_ctune>,<gain_"
-         "offset_ch14>\r\n");
-  printf("sl_evm_offset=<index>,<evm_offset>\r\n");
-  printf("sl_evm_write=<target>,<flags>,<evm_offset_11B>,<evm_offset_11G_36M_54M_11N_MCS3_MCS7>,<evm_offset_11G_6M_24M_"
-         "11N_MCS0_MCS2>,<evm_offset_11N_MCS0>,<evm_offset_11N_MCS7>\r\n");
-  printf("*************************************************************************************************************"
-         "**************************************************************\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Calibration commands usage:");
+  SL_DEBUG_LOG_V2(
+    INFO,
+    "*************************************************************************************************************"
+    "**************************************************************");
+  SL_DEBUG_LOG_V2(INFO, "sl_freq_offset=<freq_offset_in_KHz>");
+  SL_DEBUG_LOG_V2(
+    INFO,
+    "sl_calib_write=<target>,<flags>,<gain_offset_low>,<gain_offset_mid>,<gain_offset_high>,<xo_ctune>,<gain_"
+    "offset_ch14>");
+  SL_DEBUG_LOG_V2(INFO, "sl_evm_offset=<index>,<evm_offset>");
+  SL_DEBUG_LOG_V2(
+    INFO,
+    "sl_evm_write=<target>,<flags>,<evm_offset_11B>,<evm_offset_11G_36M_54M_11N_MCS3_MCS7>,<evm_offset_11G_6M_24M_"
+    "11N_MCS0_MCS2>,<evm_offset_11N_MCS0>,<evm_offset_11N_MCS7>");
+  SL_DEBUG_LOG_V2(
+    INFO,
+    "*************************************************************************************************************"
+    "**************************************************************");
 }
 
 void validate_input_cmd()
@@ -377,14 +385,14 @@ sl_status_t calibration_app()
   while (1) {
     display_calib_cmd_usage();
 
-    printf("Enter the calibration command:\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Enter the calibration command:");
 
     while (!end_of_cmd) {
       iostream_rx();
     }
     end_of_cmd = false;
 
-    printf("Command read complete\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Command read complete");
 
     cmd_len = validate_and_set_cmd_index();
     offset  = cmd_len;
@@ -395,10 +403,10 @@ sl_status_t calibration_app()
           freq_calib_pkt.frequency_offset_in_khz = temp4B;
           status                                 = sl_si91x_frequency_offset(&freq_calib_pkt);
           if (status != SL_STATUS_OK) {
-            printf("Frequency offset correction failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Frequency offset correction failed: 0x%lx", status);
             //return status;
           } else {
-            printf("Frequency offset correction successful\r\n");
+            SL_DEBUG_LOG_V2(INFO, "Frequency offset correction successful");
           }
           offset = 0;
           temp4B = 0;
@@ -434,26 +442,28 @@ sl_status_t calibration_app()
           }
           status = sl_si91x_calibration_write(calib_pkt);
           if (status != SL_STATUS_OK) {
-            printf("Calibration data write failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Calibration data write failed: 0x%lx", status);
             return status;
           } else {
-            printf("Calibration data write successful\r\n");
+            SL_DEBUG_LOG_V2(INFO, "Calibration data write successful");
           }
           target.target = calib_pkt.target;
           status        = sl_si91x_calibration_read(target, &calib_read_pkt);
           if (status != SL_STATUS_OK) {
-            printf("Calibration data read failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Calibration data read failed: 0x%lx", status);
             return status;
           } else {
-            printf("Calibration data read successful\r\n");
-            printf(
-              "target %d, gain_offset_low:%d, gain_offset_2:%d, gain_offset_3:%d,xo_tune:%d,gain_offset_ch14:%d\r\n",
-              calib_read_pkt.target,
-              calib_read_pkt.gain_offset[0],
-              calib_read_pkt.gain_offset[1],
-              calib_read_pkt.gain_offset[2],
-              calib_read_pkt.xo_ctune,
-              calib_read_pkt.gain_offset_ch14);
+            SL_DEBUG_LOG_V2(INFO, "Calibration data read successful");
+            SL_DEBUG_LOG_V2(DEBUG,
+                            "target %d, gain_offset_low:%d, gain_offset_2:%d",
+                            calib_read_pkt.target,
+                            calib_read_pkt.gain_offset[0],
+                            calib_read_pkt.gain_offset[1]);
+            SL_DEBUG_LOG_V2(DEBUG,
+                            ", gain_offset_3:%d,xo_tune:%d,gain_offset_ch14:%d",
+                            calib_read_pkt.gain_offset[2],
+                            calib_read_pkt.xo_ctune,
+                            calib_read_pkt.gain_offset_ch14);
           }
           offset = 0;
           temp1B = 0;
@@ -462,10 +472,10 @@ sl_status_t calibration_app()
         case EVM_OFFSET:
           status = sl_si91x_transmit_test_stop();
           if (status != SL_STATUS_OK) {
-            printf("Transmit test stop failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Transmit test stop failed: 0x%lx", status);
             return status;
           } else {
-            printf("Transmit test stopped\r\n");
+            SL_DEBUG_LOG_V2(INFO, "Transmit test stopped");
           }
           if (buffer[offset] != '\0') {
             offset += parse_cmd(&temp1B, PARSE_1_BYTE, (uint8_t *)&buffer[offset]);
@@ -477,19 +487,19 @@ sl_status_t calibration_app()
           }
           status = sl_si91x_evm_offset(&evm_offset_pkt);
           if (status != SL_STATUS_OK) {
-            printf("EVM offset correction failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "EVM offset correction failed: 0x%lx", status);
             return status;
           } else {
-            printf("EVM offset correction successful\r\n");
+            SL_DEBUG_LOG_V2(INFO, "EVM offset correction successful");
           }
           offset = 0;
           temp1B = 0;
           status = sl_si91x_transmit_test_start(&tx_test_info);
           if (status != SL_STATUS_OK) {
-            printf("Transmit test start failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Transmit test start failed: 0x%lx", status);
             return status;
           } else {
-            printf("Transmit test started\r\n");
+            SL_DEBUG_LOG_V2(INFO, "Transmit test started");
           }
           break;
         case EVM_WRITE:
@@ -523,27 +533,27 @@ sl_status_t calibration_app()
           }
           status = sl_si91x_evm_write(&evm_write_pkt);
           if (status != SL_STATUS_OK) {
-            printf("EVM offset correction failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "EVM offset correction failed: 0x%lx", status);
             return status;
           } else {
-            printf("EVM offset correction successful\r\n");
+            SL_DEBUG_LOG_V2(INFO, "EVM offset correction successful");
           }
           break;
         case DPD_CALIB_WRITE:
           status = sl_process_dpd_calibration(&dpd_calib_pkt);
           if (status != SL_STATUS_OK) {
-            printf("DPD calibration failed: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "DPD calibration failed: 0x%lx", status);
             return status;
           } else {
-            printf("DPD claibration successful\r\n");
+            SL_DEBUG_LOG_V2(INFO, "DPD claibration successful");
           }
           break;
         default:
-          printf("Invalid command\r\n");
+          SL_DEBUG_LOG_V2(WARN, "Invalid command");
           break;
       }
     } else {
-      printf("Invalid command\r\n");
+      SL_DEBUG_LOG_V2(WARN, "Invalid command");
     }
 
     memset(buffer, 0, sizeof(buffer));
@@ -560,10 +570,10 @@ sl_status_t sl_process_dpd_calibration(sl_si91x_get_dpd_calib_data_t *dpd_power_
   calib_pkt.flags                        = 256;
   status                                 = sl_si91x_transmit_test_stop();
   if (status != SL_STATUS_OK) {
-    printf("Transmit failed to stop %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit failed to stop %lx", status);
     return status;
   } else {
-    printf("Transmit command stopped\n");
+    SL_DEBUG_LOG_V2(INFO, "Transmit command stopped");
   }
 
   for (i = 0; i < MAX_DPD_TRAINING_CHANNELS; i++) {
@@ -573,45 +583,45 @@ sl_status_t sl_process_dpd_calibration(sl_si91x_get_dpd_calib_data_t *dpd_power_
       tx_test_info.channel = channel_sel[i];
       status               = sl_si91x_transmit_test_start(&tx_test_info);
       if (status != SL_STATUS_OK) {
-        printf("Transmit failed with channel num %lx\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "Transmit failed with channel num %lx", status);
         return status;
       } else {
-        printf("Transmit command started with channel num %x\r\n", channel_sel[i]);
+        SL_DEBUG_LOG_V2(INFO, "Transmit command started with channel num %x", channel_sel[i]);
       }
       osDelay(1000);
 
       status = sl_si91x_transmit_test_stop();
       if (status != SL_STATUS_OK) {
-        printf("Transmit failed to stop %lx\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "Transmit failed to stop %lx", status);
         return status;
       } else {
-        printf("Transmit command stopped\n");
+        SL_DEBUG_LOG_V2(INFO, "Transmit command stopped");
       }
       osDelay(1000);
     }
     if (i == MAX_DPD_TRAINING_CHANNELS - 1) {
       status = sl_si91x_dpd_calibration(dpd_power_inx);
       if (status != SL_STATUS_OK) {
-        printf("rsi_calibration_dpd_failed %lx\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_calibration_dpd_failed %lx", status);
         return status;
       } else {
-        printf("calib-val coellecting\n");
+        SL_DEBUG_LOG_V2(INFO, "calib-val coellecting");
       }
       osDelay(1000);
       status = sl_si91x_calibration_write(calib_pkt);
       if (status != SL_STATUS_OK) {
-        printf("rsi_calib_write failed with error %lx\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_calib_write failed with error %lx", status);
         return status;
       } else {
-        printf("calib-write pass\n");
+        SL_DEBUG_LOG_V2(INFO, "calib-write pass");
       }
     } else {
       status = sl_si91x_dpd_calibration(dpd_power_inx);
       if (status != SL_STATUS_OK) {
-        printf("rsi_calibration_dpd_failed %lx\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_calibration_dpd_failed %lx", status);
         return status;
       } else {
-        printf("calib val collect\n");
+        SL_DEBUG_LOG_V2(INFO, "calib val collect");
       }
     }
     osDelay(1000);

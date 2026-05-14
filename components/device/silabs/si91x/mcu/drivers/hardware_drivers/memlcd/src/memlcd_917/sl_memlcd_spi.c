@@ -78,7 +78,7 @@ sl_status_t sli_memlcd_spi_init(uint32_t spi_baud)
   // Uninitialize the SPI driver
   status_spi = SPIdrv->Uninitialize();
   if (status_spi != ARM_DRIVER_OK) {
-    SL_PRINT_STRING_ERROR("\r\n SPI Uninitialization Failed, Error Code : %ld\r\n", status_spi);
+    SL_PRINT_STRING_ERROR("\r\n SPI Uninitialization Failed, Error Code : %ld\r\n", (long)status_spi);
     SL_PRINT_STRING_ERROR("memlcd_spi: Uninitialize failed, code=%ld", (long)status_spi);
     return SL_STATUS_FAIL;
   }
@@ -86,7 +86,7 @@ sl_status_t sli_memlcd_spi_init(uint32_t spi_baud)
   // Initialize the SPI driver
   status_spi = SPIdrv->Initialize(mySPI_callback_spi);
   if (status_spi != ARM_DRIVER_OK) {
-    SL_PRINT_STRING_ERROR("\r\n SPI Initialization Failed, Error Code : %ld\r\n", status_spi);
+    SL_PRINT_STRING_ERROR("\r\n SPI Initialization Failed, Error Code : %ld\r\n", (long)status_spi);
     SL_PRINT_STRING_ERROR("memlcd_spi: Initialize failed, code=%ld", (long)status_spi);
     return SL_STATUS_FAIL;
   }
@@ -94,7 +94,7 @@ sl_status_t sli_memlcd_spi_init(uint32_t spi_baud)
   // Power up the SPI peripheral
   status_spi = SPIdrv->PowerControl(ARM_POWER_FULL);
   if (status_spi != ARM_DRIVER_OK) {
-    SL_PRINT_STRING_ERROR("\r\n Failed to Set Power to SPI, Error Code : %ld\r\n", status_spi);
+    SL_PRINT_STRING_ERROR("\r\n Failed to Set Power to SPI, Error Code : %ld\r\n", (long)status_spi);
     return SL_STATUS_FAIL;
   }
 
@@ -108,7 +108,7 @@ sl_status_t sli_memlcd_spi_init(uint32_t spi_baud)
   if (status_spi != ARM_DRIVER_OK) {
     SL_PRINT_STRING_ERROR("\r\n Failed to Set Configuration Parameters to SPI, "
                           "Error Code : %ld\r\n",
-                          status_spi);
+                          (long)status_spi);
     return SL_STATUS_FAIL;
   }
 
@@ -119,7 +119,7 @@ sl_status_t sli_memlcd_spi_shutdown()
   ARM_DRIVER_SPI *SPIdrv = &Driver_SSI_ULP_MASTER;
   status_spi             = SPIdrv->PowerControl(ARM_POWER_OFF);
   if (status_spi != ARM_DRIVER_OK) {
-    SL_PRINT_STRING_ERROR("\r\n Failed to Set Power to SPI, Error Code : %ld\r\n", status_spi);
+    SL_PRINT_STRING_ERROR("\r\n Failed to Set Power to SPI, Error Code : %ld\r\n", (long)status_spi);
     return SL_STATUS_FAIL;
   }
 
@@ -142,7 +142,7 @@ sl_status_t sli_memlcd_spi_tx(const void *data, unsigned len)
   if (status_spi != ARM_DRIVER_OK) {
     SL_PRINT_STRING_ERROR("\r\n Failed to Active Slave Select Line for SPI "
                           "Transfer, Error Code : %ld\r\n",
-                          status_spi);
+                          (long)status_spi);
     return SL_STATUS_FAIL;
   }
 

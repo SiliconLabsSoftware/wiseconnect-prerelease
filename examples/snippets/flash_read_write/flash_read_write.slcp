@@ -23,7 +23,6 @@ component:
 - id: sl_main
 - id: freertos
 - id: freertos_heap_4
-- id: sl_si91x_mem_pool_buffers
 - id: syscalls
 - id: si91x_memory_default_config
 - id: wiseconnect_common

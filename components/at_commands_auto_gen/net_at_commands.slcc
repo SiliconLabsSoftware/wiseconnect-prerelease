@@ -111,12 +111,6 @@ template_contribution:
           - "uint16"
           - "uint8"
           - "uint8"
-      dns-resolve-hostname:
-        handler: dns_hostgetbyname_command_handler
-        arguments:
-          - "string"
-          - "uint32"
-          - "uint8"
       http-otaf:
         handler: http_otaf_upgrade_command_handler
         arguments:

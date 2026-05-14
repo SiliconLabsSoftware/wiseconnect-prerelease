@@ -396,10 +396,10 @@ typedef struct {
 /// per stats command request structure
 typedef struct {
   /// 0 - start , 1 -stop
-  uint8_t start[2];
+  uint8_t start[SL_WIFI_RX_STATS_REQUEST_CMD_OCTETS];
 
   /// channel number
-  uint8_t channel[2];
+  uint8_t channel[SL_WIFI_RX_STATS_REQUEST_CHANNEL_OCTETS];
 } sli_wifi_request_rx_stats_t;
 
 typedef struct {

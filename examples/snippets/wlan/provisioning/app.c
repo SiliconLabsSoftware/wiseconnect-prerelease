@@ -198,9 +198,9 @@ static sl_status_t join_callback_handler(sl_wifi_event_t event,
 {
   UNUSED_PARAMETER(result);
   UNUSED_PARAMETER(arg);
-  printf("in join CB\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "in join CB");
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    printf("F: Join Event received with %lu bytes payload\n", result_length);
+    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload", result_length);
     return status_code;
   }
   return SL_STATUS_OK;
@@ -214,7 +214,7 @@ static void application_start(void *argument)
   sl_ip_address_t ip_address            = { 0 };
   sl_http_server_config_t server_config = { 0 };
 
-  printf("\r\nWi-Fi Provisioning demo started\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Provisioning demo started");
 
   while (1) {
     switch (app_state) {
@@ -225,22 +225,22 @@ static void application_start(void *argument)
         // Initialize the Wi-Fi AP interface with default configuration
         status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, (const void *)&sl_wifi_default_ap_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
-          printf("Failed to start Wi-Fi AP interface: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx", status);
           return;
         }
 
         // Set callbacks for AP client connection and disconnection events
         sl_wifi_set_callback_v2(SL_WIFI_CLIENT_CONNECTED_EVENTS, ap_connected_event_handler, NULL);
         sl_wifi_set_callback_v2(SL_WIFI_CLIENT_DISCONNECTED_EVENTS, ap_disconnected_event_handler, NULL);
-        printf("Wi-Fi AP initialized\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP initialized");
 
         // Bring the Wi-Fi AP interface up
         status = sl_net_up(SL_NET_WIFI_AP_INTERFACE, SL_NET_DEFAULT_WIFI_AP_PROFILE_ID);
         if (status != SL_STATUS_OK) {
-          printf("Failed to bring Wi-Fi AP interface up: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi AP interface up: 0x%lx", status);
           return;
         }
-        printf("Wi-Fi AP started\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP started");
 
         // Configure and start the HTTP server for provisioning
         server_config.port            = HTTP_SERVER_PORT;
@@ -251,25 +251,30 @@ static void application_start(void *argument)
 
         status = sl_http_server_init(&server_handle, &server_config);
         if (status != SL_STATUS_OK) {
-          printf("HTTP server init failed:%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "HTTP server init failed:%lx", status);
           return;
         }
         status = sl_http_server_start(&server_handle);
         if (status != SL_STATUS_OK) {
-          printf("Server start fail:%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Server start fail:%lx", status);
           return;
         }
-        printf("Provisioning HTTP server started\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Provisioning HTTP server started");
 
         sl_net_get_profile(SL_NET_WIFI_AP_INTERFACE,
                            SL_NET_DEFAULT_WIFI_AP_PROFILE_ID,
                            (sl_net_profile_t *)&ap_profile);
-        printf("\r\nConnect to access point \"%s\" from your device\r\n", ap_profile.config.ssid.value);
-        printf("Go to http://%u.%u.%u.%u/ on your browser to provisioning of Wi-Fi\r\n",
-               ap_profile.ip.ip.v4.ip_address.bytes[0],
-               ap_profile.ip.ip.v4.ip_address.bytes[1],
-               ap_profile.ip.ip.v4.ip_address.bytes[2],
-               ap_profile.ip.ip.v4.ip_address.bytes[3]);
+        SL_DEBUG_LOG_V2(INFO,
+                        "Connect to access point \"%s\" from your device",
+                        (uintptr_t)ap_profile.config.ssid.value);
+        SL_DEBUG_LOG_V2(INFO,
+                        "Go to http://%u.%u.",
+                        ap_profile.ip.ip.v4.ip_address.bytes[0],
+                        ap_profile.ip.ip.v4.ip_address.bytes[1]);
+        SL_DEBUG_LOG_V2(INFO,
+                        "%u.%u/ on your browser to provisioning of Wi-Fi",
+                        ap_profile.ip.ip.v4.ip_address.bytes[2],
+                        ap_profile.ip.ip.v4.ip_address.bytes[3]);
         app_state = PROVISIONING_STATE;
         break;
       }
@@ -278,30 +283,30 @@ static void application_start(void *argument)
         // Stop and deinitialize the HTTP server
         status = sl_http_server_stop(&server_handle);
         if (status != SL_STATUS_OK) {
-          printf("Server stop fail:%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Server stop fail:%lx", status);
           return;
         }
         status = sl_http_server_deinit(&server_handle);
         if (status != SL_STATUS_OK) {
-          printf("Server deinit fail:%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Server deinit fail:%lx", status);
           return;
         }
-        printf("HTTP Server deinitialized\r\n");
+        SL_DEBUG_LOG_V2(INFO, "HTTP Server deinitialized");
 
         status = sl_net_deinit(SL_NET_WIFI_AP_INTERFACE);
         if (status != SL_STATUS_OK) {
-          printf("Ap deinit : 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Ap deinit : 0x%lx", status);
           return;
         }
-        printf("Wi-Fi AP deinitialized\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP deinitialized");
 
         // Initialize the Wi-Fi client interface
         status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_client_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
-          printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
           return;
         }
-        printf("Wi-Fi client interface initialized\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface initialized");
 
         sl_wifi_security_t sec_type = string_to_security_type(wifi_client_security_type);
         sl_wifi_credential_id_t id;
@@ -314,7 +319,7 @@ static void application_start(void *argument)
           status =
             sl_net_set_credential(id, SL_NET_WIFI_PSK, wifi_client_credential, strlen((char *)wifi_client_credential));
           if (status != SL_STATUS_OK) {
-            printf("Failed to set Wi-Fi client credential: 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to set Wi-Fi client credential: 0x%lx", status);
             return;
           }
         }
@@ -338,17 +343,17 @@ static void application_start(void *argument)
         //  Keeping the station ipv4 record in profile_id_0
         status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_0, &wifi_client_profile_4);
         if (status != SL_STATUS_OK) {
-          printf("Failed to set client profile: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to set client profile: 0x%lx", status);
           return;
         }
-        printf("Wi-Fi set client profile v4 success\r\n");
-        printf("SSID %s\r\n", provisioned_access_point.ssid.value);
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi set client profile v4 success");
+        SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)provisioned_access_point.ssid.value);
 
         // Connect to the provisioned access point
         sl_wifi_set_join_callback_v2(join_callback_handler, NULL);
         status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &provisioned_access_point, 25000);
         if (status != SL_STATUS_OK) {
-          printf("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
           // If scan failed retry again after 5 seconds
           if (status == SL_STATUS_SI91X_NO_AP_FOUND) {
             if (retry) {
@@ -361,7 +366,7 @@ static void application_start(void *argument)
           }
           status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
           if (status != SL_STATUS_OK) {
-            printf("STA deinit : 0x%lx\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "STA deinit : 0x%lx", status);
           }
           app_state = PROVISIONING_INIT_STATE;
           break;
@@ -370,27 +375,27 @@ static void application_start(void *argument)
         // Configure IP address and start the HTTP server for the client mode
         status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_0, &profile);
         if (status != SL_STATUS_OK) {
-          printf("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
           return;
         }
 
         status = sl_si91x_configure_ip_address(&profile.ip, SL_SI91X_WIFI_CLIENT_VAP_ID);
         if (status != SL_STATUS_OK) {
-          printf("IPv4 address configuration is failed : 0x%lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "IPv4 address configuration is failed : 0x%lx", status);
           return;
         }
 
-        printf("IPv4 address configuration complete\r\n");
+        SL_DEBUG_LOG_V2(INFO, "IPv4 address configuration complete");
         memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
-        printf("Client IPv4: ");
+        SL_DEBUG_LOG_V2(INFO, "Client IPv4: ");
         print_sl_ipv4_address(&ip_address.ip.v4);
-        printf("\r\n");
+        SL_DEBUG_LOG_V2(INFO, "");
 
         app_state = DISCONNECTING_STATE;
         break;
       }
       case DISCONNECTING_STATE: {
-        printf("Wi-Fi Provisioning demo is successfully completed\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Provisioning demo is successfully completed");
         disconnect_complete = true;
         break;
       }
@@ -429,9 +434,9 @@ static sl_status_t ap_connected_event_handler(sl_wifi_event_t event,
     return status_code;
   }
 
-  printf("Remote Client connected: ");
+  SL_DEBUG_LOG_V2(INFO, "Remote Client connected: ");
   print_mac_address((sl_mac_address_t *)data);
-  printf("\r\n");
+  SL_DEBUG_LOG_V2(INFO, "");
   return SL_STATUS_OK;
 }
 
@@ -448,9 +453,9 @@ static sl_status_t ap_disconnected_event_handler(sl_wifi_event_t event,
     return status_code;
   }
 
-  printf("Remote Client disconnected: ");
+  SL_DEBUG_LOG_V2(INFO, "Remote Client disconnected: ");
   print_mac_address((sl_mac_address_t *)data);
-  printf("\r\n");
+  SL_DEBUG_LOG_V2(INFO, "");
 
   return SL_STATUS_OK;
 }
@@ -459,7 +464,7 @@ static sl_status_t index_request_handler(sl_http_server_t *handle, sl_http_serve
 {
   sl_http_server_response_t http_response = DEFAULT_HTTP_RESPONSE_METHOD_NOT_ALLOWED;
 
-  printf("Got request %s with data length : %lu\r\n", req->uri.path, req->request_data_length);
+  SL_DEBUG_LOG_V2(INFO, "Got request %s with data length : %lu", (uintptr_t)req->uri.path, req->request_data_length);
 
   // Handle GET requests for the index page
   if (req->type == SL_HTTP_REQUEST_GET) {
@@ -511,7 +516,7 @@ static sl_status_t connect_page_request_handler(sl_http_server_t *handle, sl_htt
 {
   sl_http_server_response_t http_response = DEFAULT_HTTP_RESPONSE_METHOD_NOT_ALLOWED;
 
-  printf("Got request %s with data length : %lu\r\n", req->uri.path, req->request_data_length);
+  SL_DEBUG_LOG_V2(INFO, "Got request %s with data length : %lu", (uintptr_t)req->uri.path, req->request_data_length);
 
   // Handle GET requests for the connect page
   if (req->type == SL_HTTP_REQUEST_GET) {
@@ -530,7 +535,7 @@ static sl_status_t connect_data_handler(sl_http_server_t *handle, sl_http_server
 {
   sl_http_server_response_t http_response = DEFAULT_HTTP_RESPONSE_METHOD_NOT_ALLOWED;
 
-  printf("Got request %s with data length : %lu\r\n", req->uri.path, req->request_data_length);
+  SL_DEBUG_LOG_V2(INFO, "Got request %s with data length : %lu", (uintptr_t)req->uri.path, req->request_data_length);
 
   // Handle POST requests for connection data
   if (req->type == SL_HTTP_REQUEST_POST) {
@@ -685,17 +690,17 @@ static sl_status_t wifi_scan_request_handler(sl_http_server_t *handle, sl_http_s
     char *scan_result_buffer                             = (char *)malloc(SCAN_RESULT_BUFFER_SIZE);
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 
-    printf("Got request %s with data length : %lu\r\n", req->uri.path, req->request_data_length);
+    SL_DEBUG_LOG_V2(INFO, "Got request %s with data length : %lu", (uintptr_t)req->uri.path, req->request_data_length);
     memset(scan_result_buffer, 0, SCAN_RESULT_BUFFER_SIZE);
 
-    printf("WLAN scan started \r\n");
+    SL_DEBUG_LOG_V2(INFO, "WLAN scan started ");
     scan_complete   = false;
     callback_status = SL_STATUS_FAIL;
 
     sl_wifi_set_scan_callback_v2(wlan_app_scan_callback_handler, (void *)scan_result_buffer);
     status = sl_wifi_start_scan(SL_WIFI_AP_INTERFACE, NULL, &wifi_scan_configuration);
     if (SL_STATUS_IN_PROGRESS == status) {
-      printf("Scanning...\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Scanning...");
       const uint32_t start = osKernelGetTickCount();
 
       // Wait for scan completion or timeout
@@ -705,7 +710,9 @@ static sl_status_t wifi_scan_request_handler(sl_http_server_t *handle, sl_http_s
       status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
     }
     if (status != RSI_SUCCESS) {
-      printf("WLAN Scan failed %lx. Please make sure the latest connectivity firmware is used.\r\n", status);
+      SL_DEBUG_LOG_V2(ERROR,
+                      "WLAN Scan failed %lx. Please make sure the latest connectivity firmware is used.",
+                      status);
       http_response.response_code        = SL_HTTP_RESPONSE_INTERNAL_SERVER_ERROR;
       http_response.data                 = (uint8_t *)METHOD_INTERNAL_SERVER_ERROR;
       http_response.current_data_length  = sizeof(METHOD_INTERNAL_SERVER_ERROR) - 1;
@@ -713,7 +720,7 @@ static sl_status_t wifi_scan_request_handler(sl_http_server_t *handle, sl_http_s
 
       sl_http_server_send_response(handle, &http_response);
     } else {
-      printf("Scan done state \r\n");
+      SL_DEBUG_LOG_V2(INFO, "Scan done state ");
       uint32_t data_length               = strlen((const char *)scan_result_buffer);
       uint32_t tx_length                 = (data_length > HTTP_CHUNK_SIZE ? HTTP_CHUNK_SIZE : data_length);
       http_response.response_code        = SL_HTTP_RESPONSE_OK;

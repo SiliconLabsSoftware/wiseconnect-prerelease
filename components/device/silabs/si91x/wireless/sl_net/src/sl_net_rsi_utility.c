@@ -139,14 +139,14 @@ sl_status_t sli_convert_si91x_event_to_sl_net_event(const uint16_t *event,
 bool sli_wifi_is_ip_address_zero(const sl_ip_address_t *ip_addr)
 {
   if (ip_addr->type == SL_IPV4) {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < SL_IPV4_ADDRESS_LENGTH; i++) {
       if (ip_addr->ip.v4.bytes[i] != 0) {
         return false; // Non-zero byte found
       }
     }
     return true; // All bytes are zero
   } else if (ip_addr->type == SL_IPV6) {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < SL_IPV6_ADDRESS_LENGTH; i++) {
       if (ip_addr->ip.v6.bytes[i] != 0) {
         return false; // Non-zero byte found
       }

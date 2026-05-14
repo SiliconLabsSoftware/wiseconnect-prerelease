@@ -103,22 +103,22 @@ int32_t rsi_initiate_power_save(void)
 {
   int32_t status = RSI_SUCCESS;
 
-  LOG_PRINT("\r\n keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, " keep module in to power save ");
 
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Failed to initiate power save in BLE mode \r\n");
+    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode ");
     return status;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in Wi-Fi mode :%ld", status);
     return status;
   }
-  LOG_PRINT("\r\n Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, " Module is in power save ");
   return status;
 }
 #endif
@@ -616,14 +616,14 @@ int32_t rsi_ble_app_task(void)
 
       //! clear the served event
       rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
-      LOG_PRINT("\r\nModule connected\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Module connected");
       ble_connection_done = 1;
     } break;
 
     case RSI_BLE_DISCONN_EVENT: {
       //! event invokes when disconnection was completed
       //!
-      LOG_PRINT("\r\nModule disconnected\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Module disconnected");
 
       //! clear the served event
       rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
@@ -642,7 +642,7 @@ adv:
       //! clear the served event
       rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
 
-      LOG_PRINT("Data from Wi-Fi to BLE: %s\n", rsi_ble_app_data);
+      SL_DEBUG_LOG_V2(INFO, "Data from Wi-Fi to BLE: %s", (uintptr_t)rsi_ble_app_data);
       //! set the local attribute value.
       rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, rsi_ble_app_data);
     } break;
@@ -650,13 +650,13 @@ adv:
       //! Process GATT write from BLE client in task context (ATT_REC_MAINTAIN_IN_HOST requirement)
       rsi_ble_app_clear_event(RSI_BLE_GATT_CLIENT_WRITE_EVENT);
       //! Process the data - send BLE data to WLAN
-      printf("Data from BLE to Wi-Fi: %s\n", app_ble_write_event.att_value);
+      SL_DEBUG_LOG_V2(INFO, "Data from BLE to Wi-Fi: %s", (uintptr_t)app_ble_write_event.att_value);
       rsi_ble_app_send_to_wlan(RSI_DATA, app_ble_write_event.att_value, app_ble_write_event.length);
 
       //! Send write response AFTER processing (ATT_REC_MAINTAIN_IN_HOST requirement)
       status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
       if (status != RSI_SUCCESS) {
-        LOG_PRINT("ERROR: GATT write response failed, error: 0x%lX\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "ERROR: GATT write response failed, error: 0x%lX", status);
       }
     } break;
     default:

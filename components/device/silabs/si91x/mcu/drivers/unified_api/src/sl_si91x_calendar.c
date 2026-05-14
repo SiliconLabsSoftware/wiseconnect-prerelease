@@ -933,8 +933,9 @@ sl_status_t sl_si91x_calendar_convert_unix_time_to_calendar_datetime(uint32_t un
 
     unix_time = (unix_time - leap_day) - (TIME_DAY_PER_YEAR * full_year); // Subtracts days of previous year
 
-    while (unix_time >= days_in_month[leap_year_flag][current_month]) {
-      unix_time -= days_in_month[leap_year_flag][current_month]; // Subtracts the number of days of the passed month
+    while (unix_time >= (uint32_t)days_in_month[leap_year_flag][current_month]) {
+      unix_time -=
+        (uint32_t)days_in_month[leap_year_flag][current_month]; // Subtracts the number of days of the passed month
       current_month++;
     }
     cal_date_time->Month = (RTC_MONTH_T)(current_month + 1);
@@ -1001,8 +1002,16 @@ sl_status_t sl_si91x_calendar_convert_calendar_datetime_to_unix_time(sl_calendar
       leap_year_flag = 1;
     }
 
-    for (int i = 0; i < (cal_date_time->Month - 1); i++) {
-      month_days += days_in_month[leap_year_flag][i]; // Add the number of days of the month of the year
+    {
+      uint32_t month_limit = (uint32_t)cal_date_time->Month;
+      if (month_limit > 0U) {
+        month_limit -= 1U;
+      } else {
+        month_limit = 0U;
+      }
+      for (uint32_t i = 0; i < month_limit; i++) {
+        month_days += days_in_month[leap_year_flag][i]; // Add the number of days of the month of the year
+      }
     }
 
     month_days += (cal_date_time->Day - 1); // Add full days of the current month
@@ -1117,9 +1126,12 @@ void SLI_MSEC_SEC_IRQHandler(void)
 static bool is_valid_time(uint32_t time, time_conversion_enum format, int32_t time_zone)
 {
   bool valid_time = false;
-  // Check for overflow.
-  if ((time_zone < 0 && time > abs(time_zone)) || (time_zone >= 0 && (time <= UINT32_MAX - (uint32_t)time_zone))) {
-    valid_time = true;
+  // Check for overflow (compare unsigned to unsigned; abs() is int).
+  if (time_zone < 0) {
+    int tz_abs = abs(time_zone);
+    valid_time = (time > (uint32_t)tz_abs);
+  } else {
+    valid_time = (time <= UINT32_MAX - (uint32_t)time_zone);
   }
   if (format == TIME_FORMAT_UNIX) {
     // Check if Unix time stamp is an unsigned 31 bits.

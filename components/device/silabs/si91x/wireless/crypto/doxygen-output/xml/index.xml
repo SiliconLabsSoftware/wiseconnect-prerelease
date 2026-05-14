@@ -193,6 +193,7 @@
     <member refid="structsli__si91x__psa__aes__multipart__config__t_1a1ab4ecfe0a303b313670ece04c137cea" kind="variable"><name>iv_flag</name></member>
     <member refid="structsli__si91x__psa__aes__multipart__config__t_1a6d3ea246de929e38cf81d4b82b489632" kind="variable"><name>key_config</name></member>
     <member refid="structsli__si91x__psa__aes__multipart__config__t_1a91ada830340c28febe9030ce2c5e8868" kind="variable"><name>chunk_flag</name></member>
+    <member refid="structsli__si91x__psa__aes__multipart__config__t_1add351e8570f5ade1b9b3b5f4afa2f644" kind="variable"><name>processed_length</name></member>
   </compound>
   <compound refid="sl__si91x__aes_8h" kind="file"><name>sl_si91x_aes.h</name>
     <member refid="group__CRYPTO__AES__CONSTANTS_1ga2be33478ea68e099978c931604211cd5" kind="define"><name>SL_SI91X_AES_BLOCK_SIZE</name></member>
@@ -212,6 +213,8 @@
     <member refid="group__CRYPTO__AES__CONSTANTS_1ggabcfc4a6c04b3af6fd6c10c2ec6f3a55aae0b9e5345083dd96f14215894eaf54c3" kind="enumvalue"><name>SL_SI91X_AES_KEY_SIZE_256</name></member>
     <member refid="group__CRYPTO__AES__FUNCTIONS_1gaf508565bc1ffbe903d3496a7b712dd2f" kind="function"><name>sl_si91x_aes</name></member>
     <member refid="group__CRYPTO__AES__FUNCTIONS_1ga0f48a13beb7db143b748ae6678eb490f" kind="function"><name>sl_si91x_aes_multipart</name></member>
+  </compound>
+  <compound refid="sl__si91x__mp__aes_8h" kind="file"><name>sl_si91x_mp_aes.h</name>
   </compound>
   <compound refid="sl__si91x__psa__aes_8h" kind="file"><name>sl_si91x_psa_aes.h</name>
     <member refid="sl__si91x__psa__aes_8h_1ae96293999f0f774032a000a7835f60de" kind="function"><name>sli_si91x_crypto_cipher_encrypt</name></member>
@@ -440,6 +443,19 @@
     <member refid="group__CRYPTO__SHA__CONSTANTS_1ggad91977604ccf5c4aa71e01f20ea94db7ace7c653f78c4689720eea2c0546c765c" kind="enumvalue"><name>SL_SI91X_SHA_224_DIGEST_LEN</name></member>
     <member refid="group__CRYPTO__SHA__FUNCTIONS_1ga07c135c1af4b38b665f3c027a76dadfb" kind="function"><name>sl_si91x_sha</name></member>
     <member refid="group__CRYPTO__SHA__FUNCTIONS_1ga4d9682247a22bfaec30750aa0bc34b35" kind="function"><name>sl_si91x_mp_sha</name></member>
+  </compound>
+  <compound refid="sl__si91x__sha3_8h" kind="file"><name>sl_si91x_sha3.h</name>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ga4b972c8a1896db5fa8f936e258828fd4" kind="define"><name>SL_SI91X_SHA3_LEN_INVALID</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gaa848d8dd7e0b85df23f3a402334be6b8" kind="enum"><name>sl_si91x_crypto_sha3_mode_t</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a4041997e7ab096781c78eb716b8537be" kind="enumvalue"><name>SL_SI91X_SHA3_512</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8af8452a83ca491d468207b027e272320d" kind="enumvalue"><name>SL_SI91X_SHA3_384</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a70bc94c82224815007dbfef0716c57d7" kind="enumvalue"><name>SL_SI91X_SHA3_256</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a1a57ca6f27cc195f45214399f04ea363" kind="enumvalue"><name>SL_SI91X_SHA3_224</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ga411034c2503df573a40e73de4f2c5caf" kind="enum"><name>sl_si91x_sha3_length_t</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa35a57fcce5d7971a96e7669003da3a0c" kind="enumvalue"><name>SL_SI91X_SHA3_224_DIGEST_LEN</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa31cab399f13d9a9d16c930b88683e109" kind="enumvalue"><name>SL_SI91X_SHA3_256_DIGEST_LEN</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa911c7b03f0a62bf5d01bc35e39b5ba27" kind="enumvalue"><name>SL_SI91X_SHA3_384_DIGEST_LEN</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa9719c41b754f9b64809cf3b0eda340dc" kind="enumvalue"><name>SL_SI91X_SHA3_512_DIGEST_LEN</name></member>
   </compound>
   <compound refid="sl__si91x__psa__trng_8h" kind="file"><name>sl_si91x_psa_trng.h</name>
     <member refid="sl__si91x__psa__trng_8h_1a99bfe8e6b8deb1a5812047238a256119" kind="function"><name>sl_si91x_psa_get_random</name></member>
@@ -763,6 +779,19 @@
     <member refid="group__CRYPTO__THREAD__FUNCTIONS_1ga9d8427af69aed30d206eca15dfca306a" kind="function"><name>sl_si91x_crypto_threadsafety_init</name></member>
     <member refid="group__CRYPTO__THREAD__FUNCTIONS_1ga27227706c866093d3d27ce71baf0c62a" kind="function"><name>sl_si91x_crypto_mutex_acquire</name></member>
     <member refid="group__CRYPTO__THREAD__FUNCTIONS_1ga372a749320b84990f4b13bc2443c9df4" kind="function"><name>sl_si91x_crypto_mutex_release</name></member>
+  </compound>
+  <compound refid="group__CRYPTO__SHA3__CONSTANTS" kind="group"><name>CRYPTO_SHA3_CONSTANTS</name>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gaa848d8dd7e0b85df23f3a402334be6b8" kind="enum"><name>sl_si91x_crypto_sha3_mode_t</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a4041997e7ab096781c78eb716b8537be" kind="enumvalue"><name>SL_SI91X_SHA3_512</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8af8452a83ca491d468207b027e272320d" kind="enumvalue"><name>SL_SI91X_SHA3_384</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a70bc94c82224815007dbfef0716c57d7" kind="enumvalue"><name>SL_SI91X_SHA3_256</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a1a57ca6f27cc195f45214399f04ea363" kind="enumvalue"><name>SL_SI91X_SHA3_224</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ga411034c2503df573a40e73de4f2c5caf" kind="enum"><name>sl_si91x_sha3_length_t</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa35a57fcce5d7971a96e7669003da3a0c" kind="enumvalue"><name>SL_SI91X_SHA3_224_DIGEST_LEN</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa31cab399f13d9a9d16c930b88683e109" kind="enumvalue"><name>SL_SI91X_SHA3_256_DIGEST_LEN</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa911c7b03f0a62bf5d01bc35e39b5ba27" kind="enumvalue"><name>SL_SI91X_SHA3_384_DIGEST_LEN</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa9719c41b754f9b64809cf3b0eda340dc" kind="enumvalue"><name>SL_SI91X_SHA3_512_DIGEST_LEN</name></member>
+    <member refid="group__CRYPTO__SHA3__CONSTANTS_1ga4b972c8a1896db5fa8f936e258828fd4" kind="define"><name>SL_SI91X_SHA3_LEN_INVALID</name></member>
   </compound>
   <compound refid="dir_7ba012e751dd9f653521d4760571a855" kind="dir"><name>components/device/silabs/si91x/wireless/crypto/aes</name>
   </compound>

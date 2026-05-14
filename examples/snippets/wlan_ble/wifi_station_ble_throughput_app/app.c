@@ -38,6 +38,9 @@
 #include <stdio.h>
 #include <string.h>
 
+//! Application include file
+#include "app.h"
+
 //! BLE include file to refer BLE APIs
 #include "ble_config.h"
 #include "rsi_common_apis.h"
@@ -76,7 +79,7 @@ const osThreadAttr_t wifi_thread_attributes = {
   .cb_mem     = 0,
   .cb_size    = 0,
   .stack_mem  = 0,
-  .stack_size = 2048,
+  .stack_size = 4096,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
 };
@@ -166,10 +169,10 @@ void rsi_wlan_ble_app_init(void)
   //! WiSeConnect initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
-  LOG_PRINT("\r\nWi-Fi initialization is successful\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful");
 
 #if ENABLE_TLS && LOAD_CERTIFICATE
   clear_and_load_certificates_in_flash();
@@ -189,14 +192,14 @@ void rsi_wlan_ble_app_init(void)
   //! Thread created for WIFI task
   wifi_app_thread_id = osThreadNew((osThreadFunc_t)rsi_wlan_app_task, NULL, &wifi_thread_attributes);
   if (wifi_app_thread_id == NULL) {
-    LOG_PRINT("\r\nwifi_app_thread failed to create\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create");
     return;
   }
 
   //! Thread created for BLE task
   ble_app_thread_id = osThreadNew((osThreadFunc_t)rsi_ble_app_task, NULL, &ble_thread_attributes);
   if (ble_app_thread_id == NULL) {
-    LOG_PRINT("\r\nwifi_app_thread failed to create\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create");
     return;
   }
 
@@ -206,6 +209,8 @@ void rsi_wlan_ble_app_init(void)
 }
 
 #if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
+/* Optional sl_wifi_init helper; dynamic throughput reconnect uses wifi_app_init_and_reconnect()
+ * without calling this (same pattern as wifi_station_ble_provisioning_aws). */
 void rsi_wlan_init_wifi(void)
 {
   sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);

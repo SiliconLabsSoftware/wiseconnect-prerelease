@@ -300,7 +300,7 @@ sl_status_t sl_si91x_configure_timestamp_memory_location(uint8_t addr_len, const
 
 /***************************************************************************/ /**
  * @brief
- *   Sets different timeouts given by sl_si91x_timeout_type_t for the Si91x device.
+ *   Sets different timeouts given by sl_wifi_timeout_type_t for the Si91x device.
  * 
  * @deprecated This API will be deprecated in the future releases. Use [sl_wifi_configure_timeout](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-configure-timeout) instead.
  * 
@@ -313,7 +313,7 @@ sl_status_t sl_si91x_configure_timestamp_memory_location(uint8_t addr_len, const
  *   This API should be called after [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init).
  * 
  * @param[in] timeout_type
- *   Identifies which timeout type to set. Possible values are defined in @ref sl_si91x_timeout_type_t.
+ *   Identifies which timeout type to set. Possible values are defined in [sl_wifi_timeout_type_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-timeout-type-t).
  * 
  * @param[in] timeout_value
  *   The timeout value to set. The time resolution depends on the timeout_type.
@@ -326,7 +326,7 @@ sl_status_t sl_si91x_configure_timestamp_memory_location(uint8_t addr_len, const
  *   - If there is no IP configuration, NULL Data Packets are used as the WLAN Keep-Alive packet. 
  *   - As an alternative, users can use @ref sl_si91x_set_timeout to set all timeouts before calling `sl_wifi_init()`.
  *******************************************************************************/
-sl_status_t sl_si91x_configure_timeout(sl_si91x_timeout_type_t timeout_type,
+sl_status_t sl_si91x_configure_timeout(sl_wifi_timeout_type_t timeout_type,
                                        uint16_t timeout_value) SL_DEPRECATED_API_WISECONNECT_4_1;
 
 /***************************************************************************/ /**

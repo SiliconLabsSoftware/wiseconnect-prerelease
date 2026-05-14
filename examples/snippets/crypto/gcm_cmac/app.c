@@ -145,7 +145,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -210,7 +210,7 @@ sl_status_t gcm_encryption(void)
 
   status = sl_si91x_wrap(&wrap_config, wrapped_key);
   if (status != SL_STATUS_OK) {
-    printf("\r\nWrap failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nWrap failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nWrap success\r\n");
@@ -236,7 +236,7 @@ sl_status_t gcm_encryption(void)
 #endif
   status = sl_si91x_gcm(&config_gcm, encrypted_buffer);
   if (status != SL_STATUS_OK) {
-    printf("\r\nGCM encryption failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nGCM encryption failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   memcpy(encryption_tag, encrypted_buffer + sizeof(plaintext), SL_SI91X_TAG_SIZE);
@@ -296,7 +296,7 @@ sl_status_t gcm_decryption(void)
 #endif
   status = sl_si91x_gcm(&config_gcm, decrypted_buffer);
   if (status != SL_STATUS_OK) {
-    printf("\r\nGCM decryption failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nGCM decryption failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nGCM Decryption Success\r\n");
@@ -350,7 +350,7 @@ sl_status_t cmac_compute(void)
 
   status = sl_si91x_wrap(&wrap_config, wrapped_key);
   if (status != SL_STATUS_OK) {
-    printf("\r\nWrap failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nWrap failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nWrap success\r\n");
@@ -372,7 +372,7 @@ sl_status_t cmac_compute(void)
   // Expected CMAC MAC: aa f3 d8 f1 de 56 40 c2 32 f5 b1 69 b9 c9 11 e6
   status = sl_si91x_gcm(&config_cmac, mac_buffer);
   if (status != SL_STATUS_OK) {
-    printf("\r\nCMAC Compute failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nCMAC Compute failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nCMAC Compute Success\r\n");

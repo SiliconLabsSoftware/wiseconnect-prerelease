@@ -225,22 +225,22 @@ int32_t rsi_initiate_power_save(void)
 {
   int32_t status = RSI_SUCCESS;
 
-  LOG_PRINT("\r\nKeep module into power save\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Keep module into power save");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\nFailed to initiate power save in BLE mode\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode");
     return status;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
     return status;
   }
 
-  LOG_PRINT("\r\nModule is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
   return status;
 }
 #endif
@@ -365,7 +365,7 @@ int8_t rsi_ble_initialize_conn_buffer(rsi_ble_conn_config_t *ble_conn_spec_conf)
       ble_conn_spec_conf[CENTRAL2].buff_mode_sel.max_data_length    = RSI_BLE_MAX_DATA_LEN_C2;
     }
   } else {
-    LOG_PRINT("\r\n Invalid buffer passed \r\n");
+    SL_DEBUG_LOG_V2(ERROR, " Invalid buffer passed ");
     status = RSI_FAILURE;
   }
   return status;
@@ -407,15 +407,15 @@ void rsi_common_app_task(void)
   //! WiSeConnect initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
-  LOG_PRINT("\r\nWi-Fi initialization is successful\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful");
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
   } else {
     print_firmware_version(&version);
   }
@@ -430,7 +430,7 @@ void rsi_common_app_task(void)
   //! create mutex
   power_cmd_mutex = osMutexNew(NULL);
   if (power_cmd_mutex == NULL) {
-    LOG_PRINT("\nFailed to create mutex object\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create mutex object");
     return;
   }
 #endif
@@ -441,7 +441,7 @@ void rsi_common_app_task(void)
 #if WLAN_SYNC_REQ
   sync_coex_ble_sem = osSemaphoreNew(1, 0, NULL); //! This lock will be used from wlan task to be done.
   if (sync_coex_ble_sem == NULL) {
-    LOG_PRINT("\r\nFailed to create sync_coex_ble_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create sync_coex_ble_sem");
     return;
   }
 #endif
@@ -451,7 +451,7 @@ void rsi_common_app_task(void)
   // Invoke new thread for Wi-Fi
   wlan_app_thread_id = osThreadNew((osThreadFunc_t)rsi_wlan_app_thread, NULL, &wlan_thread_attributes);
   if (wlan_app_thread_id == NULL) {
-    LOG_PRINT("\r\rsi_wlan_app_thread failed to create\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "si_wlan_app_thread failed to create");
     return;
   }
 #else
@@ -463,21 +463,21 @@ void rsi_common_app_task(void)
   //! fill the configurations in local structure based on compilation macros
   status = rsi_fill_user_config();
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\nFailed to fill the configurations in local buffer\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to fill the configurations in local buffer");
     return;
   }
 
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    LOG_PRINT("\r\nFailed to create ble_main_task_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem");
     return;
   }
 
   if (RSI_BLE_MAX_NBR_PERIPHERALS > 0) {
     ble_peripheral_conn_sem = osSemaphoreNew(1, 0, NULL);
     if (ble_peripheral_conn_sem == NULL) {
-      LOG_PRINT("\r\nFailed to create ble_peripheral_conn_sem\r\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_peripheral_conn_sem");
       return;
     }
   }
@@ -485,7 +485,7 @@ void rsi_common_app_task(void)
 #if RSI_ENABLE_WLAN_TEST && WLAN_THROUGHPUT_TEST
   ble_wlan_throughput_sync_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_wlan_throughput_sync_sem == NULL) {
-    LOG_PRINT("\r\nFailed to create ble_wlan_throughput_sync_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_wlan_throughput_sync_sem");
     return;
   }
 #endif
@@ -498,7 +498,7 @@ void app_init(void)
 {
   common_app_thread_id = osThreadNew((osThreadFunc_t)rsi_common_app_task, NULL, &thread_attributes);
   if (common_app_thread_id == NULL) {
-    LOG_PRINT("\r\rsi_common_app_task failed to create\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "si_common_app_task failed to create");
     return;
   }
 }

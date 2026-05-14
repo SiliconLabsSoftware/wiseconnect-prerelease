@@ -15,6 +15,7 @@
  *
  ******************************************************************************/
 
+#include <inttypes.h>
 #include "sl_si91x_hrng.h"
 #include "sl_si91x_clock_manager.h"
 #include "rsi_debug.h"

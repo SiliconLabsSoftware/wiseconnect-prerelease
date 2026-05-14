@@ -61,6 +61,7 @@ This application demonstrates ULP UART operation under **FreeRTOS**, including:
 - **`SL_ULP_UART_PROCESS_ACTION`** drains semaphores, sends (and optionally receives/compares), looping while **`ulp_uart_count`** is between **`MINIMUM_COUNT_VALUE`** and **`MAXIMUM_COUNT_VALUE`** when both directions are enabled; failures tear down and jump to **`SL_ULP_UART_TRANSMISSION_COMPLETED`**.
 - **`SL_ULP_UART_POWER_STATE_TRANSITION`**: from **PS4**, **`ulp_uart_teardown()`**, **`ps2_pre_check`** polling, **`add_ps_requirement(PS2)`**, **`DEBUGINIT()`**, **`configuring_ps2_power_state()`**, **`sl_si91x_delay_ms(1000)`**, GPIO + UART re-init, **`current_power_state = PS2`**. From **PS2**, teardown, **`sl_si91x_delay_ms(1000)`**, **`add_ps_requirement(PS4)`**, **`DEBUGINIT()`**, re-init, **`LAST_ENUM_POWER_STATE`**. Final **`else`** leg teardown → **`SL_ULP_UART_TRANSMISSION_COMPLETED`** (`osDelay` idle).
 
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -129,6 +130,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
+
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 

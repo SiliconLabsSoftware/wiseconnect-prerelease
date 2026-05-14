@@ -50,6 +50,13 @@ component:
 - instance:
   - btn0
   id: sl_si91x_button_917
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 requires:
 - name: component_catalog
 - name: sl_si91x_mcu

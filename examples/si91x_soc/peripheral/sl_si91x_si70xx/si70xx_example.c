@@ -14,6 +14,7 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+#include <inttypes.h>
 #include "rsi_debug.h"
 #include "sl_si91x_si70xx.h"
 #include "si70xx_example.h"

@@ -32,6 +32,13 @@ component:
 - id: rsilib_userconfig
 - id: rsilib_chip
 - id: sl_si91x_mcu
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 requires:
 - name: sl_main
 - name: bsd_socket

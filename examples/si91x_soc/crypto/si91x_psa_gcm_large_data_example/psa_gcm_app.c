@@ -15,6 +15,7 @@
  *
  ******************************************************************************/
 #include "psa_gcm_app.h"
+#include <inttypes.h>
 #include "psa/crypto.h"
 #include "sl_si91x_psa_wrap.h"
 #include <stdio.h>
@@ -598,7 +599,7 @@ void test_psa_gcm()
   if (status == PSA_SUCCESS) {
     printf("\n PSA crypto library initialization Success \n");
   } else {
-    printf("\n PSA crypto library initialization failed with error: %ld\n", status);
+    printf("\n PSA crypto library initialization failed with error: %" PRId32 "\n", status);
     SL_ASSERT(FALSE);
   }
 
@@ -616,7 +617,7 @@ void test_psa_gcm()
   if (status == PSA_SUCCESS) {
     printf("\n Key import Success \n");
   } else {
-    printf("\n Key import Failed with error: %ld\n", status);
+    printf("\n Key import Failed with error: %" PRId32 "\n", status);
     SL_ASSERT(FALSE);
   }
 
@@ -639,7 +640,7 @@ void test_psa_gcm()
     if (status == 0 && memcmp(cipher_tag_buffer[chunk_no], res_test_data[chunk_no], CHUNK_LENGTH) == 0) {
       printf("\n Chunk-wise Encryption Success \n");
     } else {
-      printf("\n Chunk-wise Encryption Failed with error: %ld\n", status);
+      printf("\n Chunk-wise Encryption Failed with error: %" PRId32 "\n", status);
       SL_ASSERT(FALSE);
     }
     memcpy(encryption_tag[chunk_no], cipher_tag_buffer[chunk_no] + CHUNK_LENGTH, SL_SI91X_TAG_SIZE);
@@ -666,7 +667,7 @@ void test_psa_gcm()
     if (status == 0 && memcmp(decryption_output[chunk_no], &msg_test_data[i], CHUNK_LENGTH) == 0) {
       printf("\n Chunk-wise Decryption Success \n");
     } else {
-      printf("\n Chunk-wise Decryption Failed with error: %ld\n", status);
+      printf("\n Chunk-wise Decryption Failed with error: %" PRId32 "\n", status);
       SL_ASSERT(FALSE);
     }
     memcpy(decryption_tag[chunk_no], decryption_output[chunk_no] + CHUNK_LENGTH, SL_SI91X_TAG_SIZE);
@@ -683,6 +684,6 @@ void test_psa_gcm()
   // Destroy plain key for AES GCM
   status = psa_destroy_key(key_id);
   if (status != PSA_SUCCESS) {
-    printf("Destroy key failed with error: %ld\n", status);
+    printf("Destroy key failed with error: %" PRId32 "\n", status);
   }
 }

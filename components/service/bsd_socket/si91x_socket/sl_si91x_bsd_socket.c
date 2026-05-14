@@ -1016,9 +1016,17 @@ struct hostent *gethostbyname(const char *name)
   }
 // Retrieve host information based on address type
 #ifdef SLI_SI91X_ENABLE_IPV6
-  status = sl_net_dns_resolve_hostname(name, SLI_WIFI_WAIT_FOR_DNS_RESOLUTION, SL_NET_DNS_TYPE_IPV6, &host_ip_address);
+  status = sl_net_dns_resolve_hostname_v2(name,
+                                          SLI_WIFI_WAIT_FOR_DNS_RESOLUTION,
+                                          SLI_WIFI_DNS_RETRY_COUNT,
+                                          SL_NET_DNS_TYPE_IPV6,
+                                          &host_ip_address);
 #else
-  status = sl_net_dns_resolve_hostname(name, SLI_WIFI_WAIT_FOR_DNS_RESOLUTION, SL_NET_DNS_TYPE_IPV4, &host_ip_address);
+  status = sl_net_dns_resolve_hostname_v2(name,
+                                          SLI_WIFI_WAIT_FOR_DNS_RESOLUTION,
+                                          SLI_WIFI_DNS_RETRY_COUNT,
+                                          SL_NET_DNS_TYPE_IPV4,
+                                          &host_ip_address);
 #endif
 
   // Handle the DNS resolution result
@@ -1059,11 +1067,17 @@ struct hostent *gethostbyname2(const char *name, int af)
 
   // Retrieve host information based on address type
   if (af == AF_INET6) {
-    status =
-      sl_net_dns_resolve_hostname(name, SLI_WIFI_WAIT_FOR_DNS_RESOLUTION, SL_NET_DNS_TYPE_IPV6, &host_ip_address);
+    status = sl_net_dns_resolve_hostname_v2(name,
+                                            SLI_WIFI_WAIT_FOR_DNS_RESOLUTION,
+                                            SLI_WIFI_DNS_RETRY_COUNT,
+                                            SL_NET_DNS_TYPE_IPV6,
+                                            &host_ip_address);
   } else {
-    status =
-      sl_net_dns_resolve_hostname(name, SLI_WIFI_WAIT_FOR_DNS_RESOLUTION, SL_NET_DNS_TYPE_IPV4, &host_ip_address);
+    status = sl_net_dns_resolve_hostname_v2(name,
+                                            SLI_WIFI_WAIT_FOR_DNS_RESOLUTION,
+                                            SLI_WIFI_DNS_RETRY_COUNT,
+                                            SL_NET_DNS_TYPE_IPV4,
+                                            &host_ip_address);
   }
 
   // Handle the DNS resolution result

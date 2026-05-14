@@ -15,13 +15,13 @@ source:
 - path: src/sl_si91x_socket_utility.c
 include:
 - path: inc
-- path: inc
   file_list:
     - path: sl_bsd_utility.h
     - path: sl_si91x_socket_callback_framework.h
     - path: sl_si91x_socket_constants.h
     - path: sl_si91x_socket_types.h
     - path: sl_si91x_socket_utility.h
+    - path: sli_si91x_socket_defs.h
 
 define:
 - name: SLI_SI91X_SOCKETS

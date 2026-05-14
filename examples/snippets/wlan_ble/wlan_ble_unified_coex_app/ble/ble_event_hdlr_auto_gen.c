@@ -84,7 +84,7 @@ APP_WEAK void rsi_ble_event_adv_report_driver_callback(rsi_ble_event_adv_report_
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_adv_report_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -125,7 +125,7 @@ APP_WEAK void rsi_ble_event_disconnect_driver_callback(rsi_ble_event_disconnect_
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_disconnect_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -164,7 +164,7 @@ APP_WEAK void rsi_ble_event_conn_status_driver_callback(rsi_ble_event_conn_statu
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_conn_status_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -204,7 +204,7 @@ APP_WEAK void rsi_ble_event_enhance_conn_status_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_enhance_conn_status_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -246,7 +246,7 @@ APP_WEAK void rsi_ble_event_mtu_exchange_information_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_mtu_exchange_information_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -287,7 +287,7 @@ APP_WEAK void rsi_ble_event_mtu_driver_callback(rsi_ble_event_mtu_t *rsi_ble_eve
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_mtu_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -326,7 +326,7 @@ APP_WEAK void rsi_ble_event_le_dev_buf_ind_driver_callback(rsi_ble_event_le_dev_
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_le_dev_buf_ind_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -366,7 +366,7 @@ APP_WEAK void rsi_ble_event_remote_features_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_remote_features_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -406,7 +406,7 @@ APP_WEAK void rsi_ble_event_data_length_update_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_data_length_update_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -447,7 +447,7 @@ APP_WEAK void rsi_ble_event_phy_update_driver_callback(rsi_ble_event_phy_update_
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_phy_update_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -489,7 +489,7 @@ APP_WEAK void rsi_ble_event_remote_conn_param_req_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_remote_conn_param_req_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -532,7 +532,7 @@ APP_WEAK void rsi_ble_event_conn_update_driver_callback(rsi_ble_event_conn_updat
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_conn_update_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -572,7 +572,7 @@ APP_WEAK void rsi_ble_read_req_driver_callback(uint16_t status, rsi_ble_read_req
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_read_req_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -613,7 +613,7 @@ APP_WEAK void rsi_ble_event_error_resp_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_error_resp_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -652,7 +652,7 @@ APP_WEAK void rsi_ble_event_gatt_desc_driver_callback(rsi_ble_event_gatt_desc_t 
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_gatt_desc_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -694,7 +694,7 @@ APP_WEAK void rsi_ble_event_read_by_type1_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_read_by_type1_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -736,7 +736,7 @@ APP_WEAK void rsi_ble_event_profile_by_uuid_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_profile_by_uuid_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -777,7 +777,7 @@ APP_WEAK void rsi_ble_event_profiles_list_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_profiles_list_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -817,7 +817,7 @@ APP_WEAK void rsi_ble_event_write_driver_callback(uint16_t status, rsi_ble_event
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_write_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -858,7 +858,7 @@ APP_WEAK void rsi_ble_event_prepare_write_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_prepare_write_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -898,7 +898,7 @@ APP_WEAK void rsi_ble_execute_write_driver_callback(uint16_t status, rsi_ble_exe
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_execute_write_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -938,7 +938,7 @@ APP_WEAK void rsi_ble_set_att_resp_driver_callback(uint16_t status, rsi_ble_set_
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_set_att_resp_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -977,7 +977,7 @@ APP_WEAK void rsi_ble_prepare_write_resp_driver_callback(rsi_ble_prepare_write_r
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_prepare_write_resp_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1018,7 +1018,7 @@ APP_WEAK void rsi_ble_event_att_value_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_event_att_value_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1060,7 +1060,7 @@ APP_WEAK void rsi_ble_event_indication_confirmation_driver_callback(uint16_t sta
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_set_att_resp_t));
   //! assert if malloc failed
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1100,7 +1100,7 @@ APP_WEAK void rsi_ble_ae_adv_report_driver_callback(uint16_t status, rsi_ble_ae_
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_ae_adv_report_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1141,7 +1141,7 @@ APP_WEAK void rsi_ble_per_adv_sync_estbl_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_per_adv_sync_estbl_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1181,7 +1181,7 @@ APP_WEAK void rsi_ble_per_adv_report_driver_callback(uint16_t status, rsi_ble_pe
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_per_adv_report_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1222,7 +1222,7 @@ APP_WEAK void rsi_ble_per_adv_sync_lost_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_per_adv_sync_lost_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1262,7 +1262,7 @@ APP_WEAK void rsi_ble_scan_timeout_driver_callback(uint16_t status, rsi_ble_scan
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_scan_timeout_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1303,7 +1303,7 @@ APP_WEAK void rsi_ble_adv_set_terminated_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_adv_set_terminated_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1343,7 +1343,7 @@ APP_WEAK void rsi_ble_scan_req_recvd_driver_callback(uint16_t status, rsi_ble_sc
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_scan_req_recvd_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1382,7 +1382,7 @@ APP_WEAK void rsi_ble_event_smp_req_driver_callback(rsi_bt_event_smp_req_t *rsi_
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_smp_req_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1421,7 +1421,7 @@ APP_WEAK void rsi_ble_event_smp_resp_driver_callback(rsi_bt_event_smp_resp_t *rs
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_smp_resp_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1460,7 +1460,7 @@ APP_WEAK void rsi_ble_event_smp_passkey_driver_callback(rsi_bt_event_smp_passkey
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_smp_passkey_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1501,7 +1501,7 @@ APP_WEAK void rsi_ble_event_smp_failed_driver_callback(uint16_t status,
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_smp_failed_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1543,7 +1543,7 @@ APP_WEAK void rsi_ble_event_encryption_enabled_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_encryption_enabled_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1585,7 +1585,7 @@ APP_WEAK void rsi_ble_event_smp_passkey_display_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_smp_passkey_display_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1626,7 +1626,7 @@ APP_WEAK void rsi_ble_event_sc_passkey_driver_callback(rsi_bt_event_sc_passkey_t
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_sc_passkey_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1665,7 +1665,7 @@ APP_WEAK void rsi_ble_event_le_ltk_request_driver_callback(rsi_bt_event_le_ltk_r
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_le_ltk_request_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1705,7 +1705,7 @@ APP_WEAK void rsi_ble_event_le_security_keys_driver_callback(
   //! allocate message
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_bt_event_le_security_keys_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1747,7 +1747,7 @@ APP_WEAK void rsi_ble_event_data_transmit_driver_callback(uint8_t conn_id)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1788,7 +1788,7 @@ APP_WEAK void rsi_ble_event_smp_pending_driver_callback(uint8_t *conn_id)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1830,7 +1830,7 @@ APP_WEAK void rsi_ble_event_advertisement_restart_driver_callback(void)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_conn_info_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1872,7 +1872,7 @@ APP_WEAK void rsi_ble_event_scan_restart_driver_callback(void)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(rsi_ble_conn_info_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1914,7 +1914,7 @@ APP_WEAK void rsi_ble_event_on_data_receive_driver_callback(uint8_t conn_id)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1955,7 +1955,7 @@ APP_WEAK void rsi_ble_event_conn_update_req_driver_callback(uint8_t *conn_id)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -1997,7 +1997,7 @@ APP_WEAK void rsi_ble_event_set_buffer_config_driver_callback(uint8_t *conn_id)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -2039,7 +2039,7 @@ APP_WEAK void rsi_ble_event_select_data_transfer_driver_callback(uint8_t *conn_i
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -2081,7 +2081,7 @@ APP_WEAK void rsi_ble_event_profile_discovery_driver_callback(uint8_t *conn_id)
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -2123,7 +2123,7 @@ APP_WEAK void rsi_ble_event_profile_dummy_driver_callback(profile_dummy_data_t *
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(profile_dummy_data_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");
@@ -2165,7 +2165,7 @@ APP_WEAK void rsi_ble_event_connection_procedure_timeout_driver_callback(uint8_t
 
   msg = malloc(sizeof(generic_event_message_t) + sizeof(uint8_t));
   if (msg == NULL) {
-    printf("Out of Memory assert\n");
+    SL_DEBUG_LOG_V2(INFO, "Out of Memory assert");
     _assert((uint8_t *)"Out Of Memory\n", __LINE__);
   } else {
     LOG_PRINT_D("Malloc passed\n");

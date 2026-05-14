@@ -109,8 +109,28 @@
         .mode = SL_IP_MANAGEMENT_DHCP, \
         .type = REQUIRED_IP_TYPE, \
         .host_name = NULL, \
-        .ip = {{{0}}}, \
-    }                  \
+        .ip = { \
+            .v4 = { \
+                .ip_address = { .value = 0u }, \
+                .gateway = { .value = 0u }, \
+                .netmask = { .value = 0u }, \
+            }, \
+            .v6 = { \
+                .link_local_address = { .value = { 0u, 0u, 0u, 0u } }, \
+                .global_address = { .value = { 0u, 0u, 0u, 0u } }, \
+                .gateway = { .value = { 0u, 0u, 0u, 0u } }, \
+            }, \
+        }, \
+        .dhcp_config = { \
+            .min_discover_retry_interval = 0, \
+            .max_discover_retry_interval = 0, \
+            .min_request_retry_interval = 0, \
+            .max_request_retry_interval = 0, \
+            .max_discover_retries = 0, \
+            .max_request_retries = 0, \
+        }, \
+    }, \
+    .priority = 0                  \
   }
 
 //For open security networks (SL_WIFI_OPEN), use SL_WIFI_NO_CREDENTIAL_ID.
@@ -142,9 +162,24 @@
       .type      = SL_IPV4, \
       .host_name = NULL, \
       .ip        = { \
-         .v4.ip_address.value = DEFAULT_WIFI_MODULE_IP_ADDRESS, \
-         .v4.gateway.value    = DEFAULT_WIFI_GATEWAY_ADDRESS, \
-         .v4.netmask.value    = DEFAULT_WIFI_SN_MASK_ADDRESS \
+         .v4 = { \
+           .ip_address.value = DEFAULT_WIFI_MODULE_IP_ADDRESS, \
+           .gateway.value    = DEFAULT_WIFI_GATEWAY_ADDRESS, \
+           .netmask.value    = DEFAULT_WIFI_SN_MASK_ADDRESS, \
+         }, \
+         .v6 = { \
+           .link_local_address = { .value = { 0u, 0u, 0u, 0u } }, \
+           .global_address     = { .value = { 0u, 0u, 0u, 0u } }, \
+           .gateway            = { .value = { 0u, 0u, 0u, 0u } }, \
+         }, \
+      }, \
+      .dhcp_config = { \
+        .min_discover_retry_interval = 0, \
+        .max_discover_retry_interval = 0, \
+        .min_request_retry_interval = 0, \
+        .max_request_retry_interval = 0, \
+        .max_discover_retries = 0, \
+        .max_request_retries = 0, \
       }, \
     }                        \
   }

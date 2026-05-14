@@ -26,6 +26,8 @@ template_file:
   - path: init/sl_iostream_init_si91x_uart.c.jinja
   - path: init/sl_iostream_init_si91x_uart.h.jinja
 template_contribution:
+  - name: component_catalog
+    value: iostream_si91x
   - name: event_handler
     value:
       event: iostream_instance_init_stage_1

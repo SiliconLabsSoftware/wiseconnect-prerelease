@@ -163,7 +163,10 @@ requires:
   name: emlib
 - condition:
   - device_efx
-  name: dmadrv
+  name: dma_manager
+- condition:
+  - device_efx
+  name: dma_channel
 - condition:
   - device_efx
   name: sl_si91x_ncp_bus
@@ -177,8 +180,6 @@ requires:
 - name: log_none
 recommends:
 - id: '%extension-wiseconnect3_sdk%sl_si91x_internal_stack'
-  vendor: silabs
-- id: '%extension-wiseconnect3_sdk%sl_si91x_basic_buffers'
   vendor: silabs
 template_contribution:
 - name: code_classification_components

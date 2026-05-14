@@ -37,14 +37,21 @@
 #endif
 #include "sl_si91x_driver.h"
 #include "sl_si91x_sha.h"
+#ifdef SL_SI91X_SHA3_ENABLE
+#include "sl_si91x_sha3.h"
+#endif
 #include <string.h>
 #include "sli_wifi_utility.h"
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
-static const uint8_t sha_digest_len_table[] = { [SL_SI91X_SHA_1]   = SL_SI91X_SHA_1_DIGEST_LEN,
-                                                [SL_SI91X_SHA_256] = SL_SI91X_SHA_256_DIGEST_LEN,
-                                                [SL_SI91X_SHA_384] = SL_SI91X_SHA_384_DIGEST_LEN,
-                                                [SL_SI91X_SHA_512] = SL_SI91X_SHA_512_DIGEST_LEN,
-                                                [SL_SI91X_SHA_224] = SL_SI91X_SHA_224_DIGEST_LEN };
+static const uint8_t sha_digest_len_table[] = {
+  [SL_SI91X_SHA_1] = SL_SI91X_SHA_1_DIGEST_LEN,       [SL_SI91X_SHA_224] = SL_SI91X_SHA_224_DIGEST_LEN,
+  [SL_SI91X_SHA_256] = SL_SI91X_SHA_256_DIGEST_LEN,   [SL_SI91X_SHA_384] = SL_SI91X_SHA_384_DIGEST_LEN,
+  [SL_SI91X_SHA_512] = SL_SI91X_SHA_512_DIGEST_LEN,
+#ifdef SL_SI91X_SHA3_ENABLE
+  [SL_SI91X_SHA3_224] = SL_SI91X_SHA3_224_DIGEST_LEN, [SL_SI91X_SHA3_256] = SL_SI91X_SHA3_256_DIGEST_LEN,
+  [SL_SI91X_SHA3_384] = SL_SI91X_SHA3_384_DIGEST_LEN, [SL_SI91X_SHA3_512] = SL_SI91X_SHA3_512_DIGEST_LEN,
+#endif
+};
 
 static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
                                          const uint8_t *msg,
@@ -63,8 +70,17 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
 
   memset(request, 0, sizeof(sli_si91x_sha_request_t));
 
-  // Fill Algorithm type SHA - 4
+// Fill Algorithm type
+// SHA1/SHA2 use algorithm_type = SHA (4)
+// SHA3 uses algorithm_type = SHA3 (16)
+#ifdef SL_SI91X_SHA3_ENABLE
+  if ((sha_mode == SL_SI91X_SHA3_224) || (sha_mode == SL_SI91X_SHA3_256) || (sha_mode == SL_SI91X_SHA3_384)
+      || (sha_mode == SL_SI91X_SHA3_512)) {
+    request->algorithm_type = SHA3;
+  }
+#else
   request->algorithm_type = SHA;
+#endif
 
   request->algorithm_sub_type = sha_mode;
 
@@ -134,8 +150,17 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
 
   memset(request, 0, sizeof(sli_si91x_sha_mp_request_t));
 
-  // Fill Algorithm type SHA - 4
+// Fill Algorithm type
+// SHA1/SHA2 use algorithm_type = SHA (4)
+// SHA3 uses algorithm_type = SHA3 (16)
+#ifdef SL_SI91X_SHA3_ENABLE
+  if ((sha_mode == SL_SI91X_SHA3_224) || (sha_mode == SL_SI91X_SHA3_256) || (sha_mode == SL_SI91X_SHA3_384)
+      || (sha_mode == SL_SI91X_SHA3_512)) {
+    request->algorithm_type = SHA3;
+  }
+#else
   request->algorithm_type = SHA;
+#endif
 
   request->algorithm_sub_type = sha_mode;
 

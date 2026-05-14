@@ -18,6 +18,7 @@
 #include "ulp_calendar_example.h"
 
 #include "rsi_debug.h"
+#include <inttypes.h>
 #include "sl_si91x_calendar.h"
 #include "sl_si91x_power_manager.h"
 #include "sl_si91x_wireless_shutdown.h"

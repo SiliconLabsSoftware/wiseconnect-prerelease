@@ -68,6 +68,7 @@ Studio-generated **`sl_adc_config`** / **`sl_adc_channel_config`** are declared 
 - Under `SL_ULP_ADC_PROCESS_ACTION`, `ulp_adc_wait_sample_done()` blocks until `callback_event` posts the semaphore (`SL_INTERNAL_DMA` when single-channel or `channel_no` matches `adc_channel`; `SL_ADC_STATIC_MODE_EVENT` in static mode); the task then runs FIFO or static read helpers and advances to `SL_ULP_ADC_POWER_STATE_TRANSITION`.
 - That branch tears down the ADC (unregister, stop, deinit), switches PS4 → PS2 or PS2 → PS4 (`sl_si91x_power_manager_ps2_pre_check` polling where applicable), runs `configuring_ps2_power_state()` on PS2 entry, re-runs `ulp_adc_application_init()`, then either resumes sampling or, after the final pass, enters `SL_ULP_ADC_TRANSMISSION_COMPLETED` and idles with `osDelay(1000)`.
 
+
 ## Prerequisites/Setup Requirements
 
 ### Hardware Requirements
@@ -214,6 +215,13 @@ Configure UC from the slcp component.
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
 ## Test the Application
+
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 

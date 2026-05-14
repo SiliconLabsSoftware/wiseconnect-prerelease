@@ -602,17 +602,9 @@ void ble_per(void *unused)
                 per_stats.rssi,
                 per_stats.id_pkts_rcvd);
     }
-#if ((SL_SI91X_TICKLESS_MODE == 0) && SLI_SI91X_MCU_INTERFACE && ENABLE_NWP_POWER_SAVE)
-    if (!(P2P_STATUS_REG & TA_wakeup_M4)) {
-      P2P_STATUS_REG &= ~M4_wakeup_TA;
-      LOG_PRINT("\r\n M4 sleep");
-      sl_si91x_power_manager_sleep();
-    }
-#else
     //To get tx_done logs properly and to avoid application hang issue due to continuous stats added 1sec delay.
     //It is applicable for both sdk 2.9 and 3.0
     osDelay(1000);
-#endif
   }
   return;
 }

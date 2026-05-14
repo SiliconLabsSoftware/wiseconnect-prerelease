@@ -229,14 +229,14 @@ static void print_ip_addresses(sl_net_wifi_client_profile_t *profile)
   if ((profile->ip.type & SL_IPV4) == SL_IPV4) {
     ip_address.type = SL_IPV4;
     memcpy(&ip_address.ip.v4.bytes, &profile->ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
-    printf("IPv4 Address: ");
+    SL_DEBUG_LOG_V2(INFO, "IPv4 Address: ");
     print_sl_ip_address(&ip_address);
   }
 
   if ((profile->ip.type & SL_IPV6) == SL_IPV6) {
     ip_address.type = SL_IPV6;
     memcpy(&ip_address.ip.v6.bytes, &profile->ip.ip.v6.global_address.bytes, sizeof(sl_ipv6_address_t));
-    printf("IPv6 Address: ");
+    SL_DEBUG_LOG_V2(INFO, "IPv6 Address: ");
     print_sl_ip_address(&ip_address);
   }
 }
@@ -264,9 +264,9 @@ void data_callback(uint32_t sock_no,
     start            = osKernelGetTickCount();
     first_data_frame = 0;
     if (TCP_MODE) {
-      printf("\r\nOffload TCP_RX test start\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Offload TCP_RX test start");
     } else {
-      printf("\r\nOffload UDP_RX test start\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Offload UDP_RX test start");
     }
   }
 
@@ -295,18 +295,18 @@ void send_data_to_tcp_server(void)
 
   client_socket = sl_si91x_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv4] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Socket ID: %d", client_socket);
 
   if (sl_si91x_connect(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[Offload IPv4] Connect failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Connect failed: %d", errno);
     sl_si91x_shutdown(client_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv4] Connected to TCP server\r\n");
-  printf("\r\n[Offload IPv4] TCP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] TCP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -317,18 +317,18 @@ void send_data_to_tcp_server(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[Offload IPv4] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv4] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Timeout");
       break;
     }
   }
 
-  printf("\r\n[Offload IPv4] TCP_TX test finished\r\n");
-  printf("\r\n[Offload IPv4] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] TCP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Total bytes sent: %lu", total_bytes_sent);
 
   sl_si91x_shutdown(client_socket, 0);
 }
@@ -346,47 +346,47 @@ void receive_data_from_tcp_client(void)
 
   server_socket = sl_si91x_socket_async(AF_INET, SOCK_STREAM, IPPROTO_TCP, &data_callback);
   if (server_socket < 0) {
-    printf("\r\n[Offload IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv4] Server Socket ID: %d\r\n", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Server Socket ID: %d", server_socket);
 
   server_address.sin_family      = AF_INET;
   server_address.sin_addr.s_addr = INADDR_ANY;
   server_address.sin_port        = LISTENING_PORT;
 
   if (sl_si91x_bind(server_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[Offload IPv4] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Bind failed: %d", errno);
     sl_si91x_shutdown(server_socket, 0);
     return;
   }
 
   if (sl_si91x_listen(server_socket, BACKLOG) < 0) {
-    printf("\r\n[Offload IPv4] Listen failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Listen failed: %d", errno);
     sl_si91x_shutdown(server_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv4] Listening on port %d\r\n", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Listening on port %d", LISTENING_PORT);
 
   client_socket = sl_si91x_accept(server_socket, NULL, 0);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv4] Accept failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Accept failed: %d", errno);
     sl_si91x_shutdown(server_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv4] Client Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Client Socket ID: %d", client_socket);
 
   start = osKernelGetTickCount();
   while (!has_data_received) {
     if ((osKernelGetTickCount() - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv4] TCP_RX timeout (no data received)\r\n");
+      SL_DEBUG_LOG_V2(WARN, "[Offload IPv4] TCP_RX timeout (no data received)");
       break;
     }
     osThreadYield();
   }
 
-  printf("\r\n[Offload IPv4] TCP_RX test finished\r\n");
-  printf("\r\n[Offload IPv4] Total bytes received: %lu\r\n", bytes_read);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] TCP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Total bytes received: %lu", bytes_read);
 
   sl_si91x_shutdown(client_socket, 0);
   sl_si91x_shutdown(server_socket, 0);
@@ -406,11 +406,11 @@ void send_data_to_udp_server(void)
 
   client_socket = sl_si91x_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv4] Socket ID: %d\r\n", client_socket);
-  printf("\r\n[Offload IPv4] UDP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Socket ID: %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] UDP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -418,7 +418,7 @@ void send_data_to_udp_server(void)
       sl_si91x_sendto(client_socket, data_buffer, BUFFER_SIZE, 0, (struct sockaddr *)&server_address, socket_length);
     now = osKernelGetTickCount();
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv4] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Timeout");
       break;
     }
     if (sent_bytes < 0) {
@@ -426,14 +426,14 @@ void send_data_to_udp_server(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[Offload IPv4] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
   }
 
-  printf("\r\n[Offload IPv4] UDP_TX test finished\r\n");
-  printf("\r\n[Offload IPv4] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] UDP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Total bytes sent: %lu", total_bytes_sent);
 
   sl_si91x_shutdown(client_socket, 0);
 }
@@ -450,32 +450,32 @@ void receive_data_from_udp_client(void)
 
   client_socket = sl_si91x_socket_async(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &data_callback);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv4] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Socket ID: %d", client_socket);
 
   server_address.sin_family = AF_INET;
   server_address.sin_port   = LISTENING_PORT;
 
   if (sl_si91x_bind(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[Offload IPv4] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv4] Bind failed: %d", errno);
     sl_si91x_shutdown(client_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv4] Listening on port %d\r\n", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Listening on port %d", LISTENING_PORT);
 
   start = osKernelGetTickCount();
   while (!has_data_received) {
     if ((osKernelGetTickCount() - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv4] UDP_RX timeout (no data received)\r\n");
+      SL_DEBUG_LOG_V2(WARN, "[Offload IPv4] UDP_RX timeout (no data received)");
       break;
     }
     osThreadYield();
   }
 
-  printf("\r\n[Offload IPv4] UDP_RX test finished\r\n");
-  printf("\r\n[Offload IPv4] Total bytes received: %lu\r\n", bytes_read);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] UDP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv4] Total bytes received: %lu", bytes_read);
 
   sl_si91x_shutdown(client_socket, 0);
 }
@@ -501,24 +501,24 @@ void send_data_to_tcp_server_v6(void)
                     address_buffer,
                     (unsigned int *)server_address.sin6_addr.un.u32_addr)
       != 1) {
-    printf("\r\n[Offload IPv6] Address conversion failed\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Address conversion failed");
     return;
   }
 
   client_socket = sl_si91x_socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv6] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Socket ID: %d", client_socket);
 
   if (sl_si91x_connect(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[Offload IPv6] Connect failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Connect failed: %d", errno);
     sl_si91x_shutdown(client_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv6] Connected to TCP server\r\n");
-  printf("\r\n[Offload IPv6] TCP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] TCP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -529,18 +529,18 @@ void send_data_to_tcp_server_v6(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[Offload IPv6] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv6] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Timeout");
       break;
     }
   }
 
-  printf("\r\n[Offload IPv6] TCP_TX test finished\r\n");
-  printf("\r\n[Offload IPv6] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] TCP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Total bytes sent: %lu", total_bytes_sent);
 
   sl_si91x_shutdown(client_socket, 0);
 }
@@ -558,46 +558,46 @@ void receive_data_from_tcp_client_v6(void)
 
   server_socket = sl_si91x_socket_async(AF_INET6, SOCK_STREAM, IPPROTO_TCP, &data_callback);
   if (server_socket < 0) {
-    printf("\r\n[Offload IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv6] Server Socket ID: %d\r\n", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Server Socket ID: %d", server_socket);
 
   server_address.sin6_family = AF_INET6;
   server_address.sin6_port   = LISTENING_PORT_V6;
 
   if (sl_si91x_bind(server_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[Offload IPv6] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Bind failed: %d", errno);
     sl_si91x_shutdown(server_socket, 0);
     return;
   }
 
   if (sl_si91x_listen(server_socket, BACKLOG) < 0) {
-    printf("\r\n[Offload IPv6] Listen failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Listen failed: %d", errno);
     sl_si91x_shutdown(server_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv6] Listening on port %d\r\n", LISTENING_PORT_V6);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Listening on port %d", LISTENING_PORT_V6);
 
   client_socket = sl_si91x_accept(server_socket, NULL, 0);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv6] Accept failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Accept failed: %d", errno);
     sl_si91x_shutdown(server_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv6] Client Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Client Socket ID: %d", client_socket);
 
   start = osKernelGetTickCount();
   while (!has_data_received) {
     if ((osKernelGetTickCount() - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv6] TCP_RX timeout (no data received)\r\n");
+      SL_DEBUG_LOG_V2(WARN, "[Offload IPv6] TCP_RX timeout (no data received)");
       break;
     }
     osThreadYield();
   }
 
-  printf("\r\n[Offload IPv6] TCP_RX test finished\r\n");
-  printf("\r\n[Offload IPv6] Total bytes received: %lu\r\n", bytes_read);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] TCP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Total bytes received: %lu", bytes_read);
 
   sl_si91x_shutdown(client_socket, 0);
   sl_si91x_shutdown(server_socket, 0);
@@ -620,17 +620,17 @@ void send_data_to_udp_server_v6(void)
                     address_buffer,
                     (unsigned int *)server_address.sin6_addr.un.u32_addr)
       != 1) {
-    printf("\r\n[Offload IPv6] Address conversion failed\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Address conversion failed");
     return;
   }
 
   client_socket = sl_si91x_socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv6] Socket ID: %d\r\n", client_socket);
-  printf("\r\n[Offload IPv6] UDP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Socket ID: %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] UDP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -638,7 +638,7 @@ void send_data_to_udp_server_v6(void)
       sl_si91x_sendto(client_socket, data_buffer, BUFFER_SIZE, 0, (struct sockaddr *)&server_address, socket_length);
     now = osKernelGetTickCount();
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv6] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Timeout");
       break;
     }
     if (sent_bytes < 0) {
@@ -646,14 +646,14 @@ void send_data_to_udp_server_v6(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[Offload IPv6] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
   }
 
-  printf("\r\n[Offload IPv6] UDP_TX test finished\r\n");
-  printf("\r\n[Offload IPv6] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] UDP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Total bytes sent: %lu", total_bytes_sent);
 
   sl_si91x_shutdown(client_socket, 0);
 }
@@ -670,32 +670,32 @@ void receive_data_from_udp_client_v6(void)
 
   client_socket = sl_si91x_socket_async(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &data_callback);
   if (client_socket < 0) {
-    printf("\r\n[Offload IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[Offload IPv6] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Socket ID: %d", client_socket);
 
   server_address.sin6_family = AF_INET6;
   server_address.sin6_port   = LISTENING_PORT_V6;
 
   if (sl_si91x_bind(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[Offload IPv6] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[Offload IPv6] Bind failed: %d", errno);
     sl_si91x_shutdown(client_socket, 0);
     return;
   }
-  printf("\r\n[Offload IPv6] Listening on port %d\r\n", LISTENING_PORT_V6);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Listening on port %d", LISTENING_PORT_V6);
 
   start = osKernelGetTickCount();
   while (!has_data_received) {
     if ((osKernelGetTickCount() - start) > TEST_TIMEOUT) {
-      printf("\r\n[Offload IPv6] UDP_RX timeout (no data received)\r\n");
+      SL_DEBUG_LOG_V2(WARN, "[Offload IPv6] UDP_RX timeout (no data received)");
       break;
     }
     osThreadYield();
   }
 
-  printf("\r\n[Offload IPv6] UDP_RX test finished\r\n");
-  printf("\r\n[Offload IPv6] Total bytes received: %lu\r\n", bytes_read);
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] UDP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[Offload IPv6] Total bytes received: %lu", bytes_read);
 
   sl_si91x_shutdown(client_socket, 0);
 }
@@ -759,18 +759,18 @@ void send_lwip_data_to_tcp_server(void)
 
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv4] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Socket ID: %d", client_socket);
 
   if (connect(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[LWIP IPv4] Connect failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Connect failed: %d", errno);
     close(client_socket);
     return;
   }
-  printf("\r\n[LWIP IPv4] Connected to TCP server\r\n");
-  printf("\r\n[LWIP IPv4] TCP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] TCP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -781,18 +781,18 @@ void send_lwip_data_to_tcp_server(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[LWIP IPv4] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[LWIP IPv4] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Timeout");
       break;
     }
   }
 
-  printf("\r\n[LWIP IPv4] TCP_TX test finished\r\n");
-  printf("\r\n[LWIP IPv4] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] TCP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Total bytes sent: %lu", total_bytes_sent);
 
   close(client_socket);
 }
@@ -810,50 +810,50 @@ void receive_lwip_data_from_tcp_client(void)
 
   server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (server_socket < 0) {
-    printf("\r\n[LWIP IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv4] Server Socket ID: %d\r\n", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Server Socket ID: %d", server_socket);
 
   server_address.sin_family      = AF_INET;
   server_address.sin_addr.s_addr = INADDR_ANY;
   server_address.sin_port        = htons(HOST_LISTENING_PORT);
 
   if (bind(server_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[LWIP IPv4] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Bind failed: %d", errno);
     close(server_socket);
     return;
   }
 
   if (listen(server_socket, BACKLOG) < 0) {
-    printf("\r\n[LWIP IPv4] Listen failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Listen failed: %d", errno);
     close(server_socket);
     return;
   }
-  printf("\r\n[LWIP IPv4] Listening on port %d\r\n", HOST_LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Listening on port %d", HOST_LISTENING_PORT);
 
   client_socket = accept(server_socket, NULL, NULL);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv4] Accept failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Accept failed: %d", errno);
     close(server_socket);
     return;
   }
-  printf("\r\n[LWIP IPv4] Client Socket ID: %d\r\n", client_socket);
-  printf("\r\n[LWIP IPv4] TCP_RX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Client Socket ID: %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] TCP_RX test start");
 
   start = osKernelGetTickCount();
   do {
     read_bytes = recv(client_socket, data_buffer, BUFFER_SIZE, 0);
     if (read_bytes < 0) {
-      printf("\r\n[LWIP IPv4] Receive failed: %d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Receive failed: %d", errno);
       break;
     }
     total_bytes_received += read_bytes;
     now = osKernelGetTickCount();
   } while ((read_bytes > 0) && ((now - start) < TEST_TIMEOUT));
 
-  printf("\r\n[LWIP IPv4] TCP_RX test finished\r\n");
-  printf("\r\n[LWIP IPv4] Total bytes received: %lu\r\n", total_bytes_received);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] TCP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Total bytes received: %lu", total_bytes_received);
 
   close(client_socket);
   close(server_socket);
@@ -875,11 +875,11 @@ void send_lwip_data_to_udp_server(void)
 
   client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv4] Socket ID: %d\r\n", client_socket);
-  printf("\r\n[LWIP IPv4] UDP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Socket ID: %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] UDP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -890,18 +890,18 @@ void send_lwip_data_to_udp_server(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[LWIP IPv4] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[LWIP IPv4] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Timeout");
       break;
     }
   }
 
-  printf("\r\n[LWIP IPv4] UDP_TX test finished\r\n");
-  printf("\r\n[LWIP IPv4] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] UDP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Total bytes sent: %lu", total_bytes_sent);
 
   close(client_socket);
 }
@@ -918,36 +918,36 @@ void receive_lwip_data_from_udp_client(void)
 
   client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv4] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv4] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Socket ID: %d", client_socket);
 
   server_address.sin_family      = AF_INET;
   server_address.sin_addr.s_addr = INADDR_ANY;
   server_address.sin_port        = htons(HOST_LISTENING_PORT);
 
   if (bind(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[LWIP IPv4] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Bind failed: %d", errno);
     close(client_socket);
     return;
   }
-  printf("\r\n[LWIP IPv4] Listening on port %d\r\n", HOST_LISTENING_PORT);
-  printf("\r\n[LWIP IPv4] UDP_RX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Listening on port %d", HOST_LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] UDP_RX test start");
 
   start = osKernelGetTickCount();
   do {
     read_bytes = recvfrom(client_socket, data_buffer, BUFFER_SIZE, 0, NULL, NULL);
     if (read_bytes < 0) {
-      printf("\r\n[LWIP IPv4] Receive failed: %d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv4] Receive failed: %d", errno);
       break;
     }
     total_bytes_received += read_bytes;
     now = osKernelGetTickCount();
   } while ((total_bytes_received < BYTES_TO_RECEIVE) && ((now - start) < TEST_TIMEOUT));
 
-  printf("\r\n[LWIP IPv4] UDP_RX test finished\r\n");
-  printf("\r\n[LWIP IPv4] Total bytes received: %lu\r\n", total_bytes_received);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] UDP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv4] Total bytes received: %lu", total_bytes_received);
 
   close(client_socket);
 }
@@ -971,24 +971,24 @@ void send_lwip_data_to_tcp_server_v6(void)
   server_address.sin6_port   = htons(HOST_SERVER_PORT_V6);
 
   if (inet_pton(AF_INET6, SERVER_IP_V6, &server_address.sin6_addr) <= 0) {
-    printf("\r\n[LWIP IPv6] Invalid server address\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Invalid server address");
     return;
   }
 
   client_socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv6] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Socket ID: %d", client_socket);
 
   if (connect(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[LWIP IPv6] Connect failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Connect failed: %d", errno);
     close(client_socket);
     return;
   }
-  printf("\r\n[LWIP IPv6] Connected to TCP server\r\n");
-  printf("\r\n[LWIP IPv6] TCP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] TCP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -999,18 +999,18 @@ void send_lwip_data_to_tcp_server_v6(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[LWIP IPv6] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[LWIP IPv6] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Timeout");
       break;
     }
   }
 
-  printf("\r\n[LWIP IPv6] TCP_TX test finished\r\n");
-  printf("\r\n[LWIP IPv6] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] TCP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Total bytes sent: %lu", total_bytes_sent);
 
   close(client_socket);
 }
@@ -1028,49 +1028,49 @@ void receive_lwip_data_from_tcp_client_v6(void)
 
   server_socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if (server_socket < 0) {
-    printf("\r\n[LWIP IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv6] Server Socket ID: %d\r\n", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Server Socket ID: %d", server_socket);
 
   server_address.sin6_family = AF_INET6;
   server_address.sin6_port   = htons(HOST_LISTENING_PORT_V6);
 
   if (bind(server_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[LWIP IPv6] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Bind failed: %d", errno);
     close(server_socket);
     return;
   }
 
   if (listen(server_socket, BACKLOG) < 0) {
-    printf("\r\n[LWIP IPv6] Listen failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Listen failed: %d", errno);
     close(server_socket);
     return;
   }
-  printf("\r\n[LWIP IPv6] Listening on port %d\r\n", HOST_LISTENING_PORT_V6);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Listening on port %d", HOST_LISTENING_PORT_V6);
 
   client_socket = accept(server_socket, NULL, NULL);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv6] Accept failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Accept failed: %d", errno);
     close(server_socket);
     return;
   }
-  printf("\r\n[LWIP IPv6] Client Socket ID: %d\r\n", client_socket);
-  printf("\r\n[LWIP IPv6] TCP_RX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Client Socket ID: %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] TCP_RX test start");
 
   start = osKernelGetTickCount();
   do {
     read_bytes = recv(client_socket, data_buffer, BUFFER_SIZE, 0);
     if (read_bytes < 0) {
-      printf("\r\n[LWIP IPv6] Receive failed: %d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Receive failed: %d", errno);
       break;
     }
     total_bytes_received += read_bytes;
     now = osKernelGetTickCount();
   } while ((read_bytes > 0) && ((now - start) < TEST_TIMEOUT));
 
-  printf("\r\n[LWIP IPv6] TCP_RX test finished\r\n");
-  printf("\r\n[LWIP IPv6] Total bytes received: %lu\r\n", total_bytes_received);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] TCP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Total bytes received: %lu", total_bytes_received);
 
   close(client_socket);
   close(server_socket);
@@ -1090,17 +1090,17 @@ void send_lwip_data_to_udp_server_v6(void)
   server_address.sin6_port   = htons(HOST_SERVER_PORT_V6);
 
   if (inet_pton(AF_INET6, SERVER_IP_V6, &server_address.sin6_addr) <= 0) {
-    printf("\r\n[LWIP IPv6] Invalid server address\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Invalid server address");
     return;
   }
 
   client_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv6] Socket ID: %d\r\n", client_socket);
-  printf("\r\n[LWIP IPv6] UDP_TX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Socket ID: %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] UDP_TX test start");
 
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
@@ -1111,18 +1111,18 @@ void send_lwip_data_to_udp_server_v6(void)
         osDelay(1);
         continue;
       }
-      printf("\r\n[LWIP IPv6] Send failed: errno=%d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Send failed: errno=%d", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\n[LWIP IPv6] Timeout\r\n");
+      SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Timeout");
       break;
     }
   }
 
-  printf("\r\n[LWIP IPv6] UDP_TX test finished\r\n");
-  printf("\r\n[LWIP IPv6] Total bytes sent: %lu\r\n", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] UDP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Total bytes sent: %lu", total_bytes_sent);
 
   close(client_socket);
 }
@@ -1139,35 +1139,35 @@ void receive_lwip_data_from_udp_client_v6(void)
 
   client_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    printf("\r\n[LWIP IPv6] Socket create failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Socket create failed: %d", errno);
     return;
   }
-  printf("\r\n[LWIP IPv6] Socket ID: %d\r\n", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Socket ID: %d", client_socket);
 
   server_address.sin6_family = AF_INET6;
   server_address.sin6_port   = htons(HOST_LISTENING_PORT_V6);
 
   if (bind(client_socket, (struct sockaddr *)&server_address, socket_length) < 0) {
-    printf("\r\n[LWIP IPv6] Bind failed: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Bind failed: %d", errno);
     close(client_socket);
     return;
   }
-  printf("\r\n[LWIP IPv6] Listening on port %d\r\n", HOST_LISTENING_PORT_V6);
-  printf("\r\n[LWIP IPv6] UDP_RX test start\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Listening on port %d", HOST_LISTENING_PORT_V6);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] UDP_RX test start");
 
   start = osKernelGetTickCount();
   do {
     read_bytes = recvfrom(client_socket, data_buffer, BUFFER_SIZE, 0, NULL, NULL);
     if (read_bytes < 0) {
-      printf("\r\n[LWIP IPv6] Receive failed: %d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "[LWIP IPv6] Receive failed: %d", errno);
       break;
     }
     total_bytes_received += read_bytes;
     now = osKernelGetTickCount();
   } while ((total_bytes_received < BYTES_TO_RECEIVE) && ((now - start) < TEST_TIMEOUT));
 
-  printf("\r\n[LWIP IPv6] UDP_RX test finished\r\n");
-  printf("\r\n[LWIP IPv6] Total bytes received: %lu\r\n", total_bytes_received);
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] UDP_RX test finished");
+  SL_DEBUG_LOG_V2(INFO, "[LWIP IPv6] Total bytes received: %lu", total_bytes_received);
 
   close(client_socket);
 }
@@ -1197,7 +1197,7 @@ void lwip_data_traffic_thread(void *argument)
       }
     }
 #else
-    printf("\r\n[LWIP] IPv6 not enabled - skipping\r\n");
+    SL_DEBUG_LOG_V2(WARN, "[LWIP] IPv6 not enabled - skipping");
 #endif
   } else {
     if (TCP_MODE) {
@@ -1230,39 +1230,39 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, &wifi_client_context, NULL);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to init Wi-Fi client: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to init Wi-Fi client: 0x%lX", status);
     return;
   }
-  printf("\r\nWi-Fi client interface initialized\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface initialized");
 
   status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
                                  SL_NET_WIFI_PSK,
                                  DEFAULT_WIFI_CLIENT_CREDENTIAL,
                                  strlen(DEFAULT_WIFI_CLIENT_CREDENTIAL));
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to set credentials: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials: 0x%lX", status);
     return;
   }
 
   status =
     sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &wifi_client_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to set profile: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set profile: 0x%lX", status);
     return;
   }
 
-  printf("\r\nConnecting to Wi-Fi...\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Connecting to Wi-Fi...");
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to bring up Wi-Fi: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring up Wi-Fi: 0x%lX", status);
     return;
   }
-  printf("\r\nWi-Fi client connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   status =
     sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &wifi_client_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to get profile: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get profile: 0x%lX", status);
     return;
   }
 
@@ -1270,25 +1270,28 @@ static void application_start(void *argument)
 
   status = sl_si91x_config_socket(socket_config);
   if (status != SL_STATUS_OK) {
-    printf("\r\nSocket config failed: 0x%lX\r\n", status);
-    printf("\r\nOffload test skipped.\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: 0x%lX", status);
+    SL_DEBUG_LOG_V2(WARN, "Offload test skipped.");
   }
 
   memset(data_buffer, 'A', sizeof(data_buffer));
 
-  printf("\r\n========== Configuration ==========\r\n");
-  printf("  IPV6_MODE:          %d (%s)\r\n", IPV6_MODE, IPV6_MODE ? "IPv6" : "IPv4");
-  printf("  TCP_MODE:           %d (%s)\r\n", TCP_MODE, TCP_MODE ? "TCP" : "UDP");
-  printf("  TX_MODE:            %d (%s)\r\n", TX_MODE, TX_MODE ? "TX" : "RX");
-  printf("  HOST_DATA_TRANSFER: %d (%s)\r\n", HOST_DATA_TRANSFER, HOST_DATA_TRANSFER ? "Offload+LWIP" : "Offload");
-  printf("===================================\r\n");
+  SL_DEBUG_LOG_V2(INFO, "========== Configuration ==========");
+  SL_DEBUG_LOG_V2(INFO, "  IPV6_MODE:          %d (%s)", IPV6_MODE, (uintptr_t)(IPV6_MODE ? "IPv6" : "IPv4"));
+  SL_DEBUG_LOG_V2(INFO, "  TCP_MODE:           %d (%s)", TCP_MODE, (uintptr_t)(TCP_MODE ? "TCP" : "UDP"));
+  SL_DEBUG_LOG_V2(INFO, "  TX_MODE:            %d (%s)", TX_MODE, (uintptr_t)(TX_MODE ? "TX" : "RX"));
+  SL_DEBUG_LOG_V2(INFO,
+                  "  HOST_DATA_TRANSFER: %d (%s)",
+                  HOST_DATA_TRANSFER,
+                  (uintptr_t)(HOST_DATA_TRANSFER ? "Offload+LWIP" : "Offload"));
+  SL_DEBUG_LOG_V2(INFO, "===================================");
 
 #if HOST_DATA_TRANSFER
   osThreadId_t lwip_thread_id = NULL;
 
   lwip_thread_id = osThreadNew((osThreadFunc_t)lwip_data_traffic_thread, NULL, &traffic_thread_attributes);
   if (lwip_thread_id == NULL) {
-    printf("\r\nFailed to create LWIP thread\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create LWIP thread");
     return;
   }
 #endif
@@ -1297,7 +1300,7 @@ static void application_start(void *argument)
     send_and_receive_offload_data_traffic();
   }
 
-  printf("\r\n========== Test Completed ==========\r\n");
+  SL_DEBUG_LOG_V2(INFO, "========== Test Completed ==========");
 
   while (1) {
     osDelay(1000);

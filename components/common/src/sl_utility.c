@@ -28,6 +28,7 @@
  ******************************************************************************/
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "sl_utility.h"
 #include "sl_constants.h"
@@ -41,12 +42,24 @@
 #include "sli_wifi_utility.h"
 extern bool device_initialized;
 
+#if ((!defined(SLI_SI91X_MCU_INTERFACE)) && (defined(SL_CATALOG_LOG_COMPONENT_PRESENT)))
+#define SLI_UTILITY_NCP_SL_LOG_ENABLED 1
+#else
+#define SLI_UTILITY_NCP_SL_LOG_ENABLED 0
+#endif
+
+#if SLI_UTILITY_NCP_SL_LOG_ENABLED
+#include "cmsis_os2.h"
+/** Read index for sl_log_backend_write when writing one stacked sl_log_event_t (not a ring slot). */
+#define SLI_NWP_LOG_BACKEND_READ_INDEX (0U)
+/** Number of events passed to sl_log_backend_write per call when draining NWP RX records. */
+#define SLI_NWP_LOG_BACKEND_EVENT_COUNT (1U)
+
+#endif
+
 #define NWP_LOGGING_ENABLE  1
 #define NWP_TSF_GRANULARITY 10
 #define NWP_MAX_LOG_BUFFER  1024
-
-/** Max length of IPv6 address string including null (e.g. "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255") */
-#define SL_IPV6_ADDRESS_STRING_MAX_LENGTH 46
 
 #ifdef SPRINTF_CHAR
 #define SPRINTF(x) strlen(sprintf /**/ x)
@@ -211,7 +224,7 @@ char *sl_inet_ntop6(const unsigned char *input, char *dst, uint32_t size)
 {
   char tmp[SL_IPV6_ADDRESS_STRING_MAX_LENGTH];
   unsigned int words[SL_IPV6_ADDRESS_LENGTH / 2];
-  unsigned int ip_big_endian[SL_IPV6_ADDRESS_LENGTH / 4];
+  unsigned int ip_big_endian[SL_IPV6_ADDRESS_U32_COUNT];
 
   // Convert to big endian
   sli_little_to_big_endian((const unsigned int *)input, (unsigned char *)ip_big_endian, SL_IPV6_ADDRESS_LENGTH);
@@ -507,6 +520,35 @@ sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config)
   return status;
 }
 
+#if SLI_UTILITY_NCP_SL_LOG_ENABLED
+
+/** Time on the host MCU when NWP log records are ingested (NCP path); replaces NWP wire timestamp. */
+static uint32_t sli_log_nwp_event_host_timestamp_us(void)
+{
+  uint32_t tick_freq = osKernelGetTickFreq();
+  if (tick_freq == 0U) {
+    /* Kernel not ready or invalid freq; return 0 us (do not return tick count). */
+    return 0U;
+  }
+  uint32_t tick = osKernelGetTickCount();
+  return (uint32_t)(((uint64_t)tick * 1000000ULL) / (uint64_t)tick_freq);
+}
+
+/** @param host_timestamp_us Host ingest time (µs); same for all events in one RX packet when batched. */
+static void sli_log_fill_event(const sl_log_event_t *nwp, sl_log_event_t *out, uint32_t host_timestamp_us)
+{
+  out->timestamp = host_timestamp_us;
+  out->event_id  = nwp->event_id;
+  out->args[0]   = nwp->args[0];
+  out->args[1]   = nwp->args[1];
+  out->args[2]   = nwp->args[2];
+  out->arg_count = nwp->arg_count;
+  out->core_id   = nwp->core_id;
+  out->flags     = nwp->flags;
+  out->version   = nwp->version;
+}
+#endif
+
 // Weak implementation of the function to handle log packets received from the NWP.
 //The user can override this function to handle the log packets as needed. But it should be non-blocking.
 __WEAK void sli_handle_nwp_log_packet(const uint8_t *data, uint16_t length)
@@ -516,4 +558,24 @@ __WEAK void sli_handle_nwp_log_packet(const uint8_t *data, uint16_t length)
   for (int i = 0; i < length; i++) {
     SL_DEBUG_LOG("%02x ", data[i]);
   }
+
+#if SLI_UTILITY_NCP_SL_LOG_ENABLED
+
+  if (data == NULL || length == 0) {
+    return;
+  }
+  if ((length % sizeof(sl_log_event_t)) != 0) {
+    return;
+  }
+  uint32_t count       = (uint32_t)length / (uint32_t)sizeof(sl_log_event_t);
+  sl_log_event_t event = { 0 };
+  sl_log_event_t *nwp  = (sl_log_event_t *)data;
+  uint32_t ingest_ts   = sli_log_nwp_event_host_timestamp_us();
+
+  for (uint32_t i = 0; i < count; i++) {
+    sli_log_fill_event(&nwp[i], &event, ingest_ts);
+    sl_log_backend_write(&event, SLI_NWP_LOG_BACKEND_READ_INDEX, SLI_NWP_LOG_BACKEND_EVENT_COUNT);
+  }
+
+#endif
 }

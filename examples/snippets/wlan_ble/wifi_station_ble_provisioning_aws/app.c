@@ -99,7 +99,7 @@ static const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_EXT_TCP_MAX_RECV_LENGTH
 #endif
 #if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-                      | SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD
+                      | SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD // 16k record TLS for wifi_app_ssl_16k_demo
 #endif
                       ),
                    //!ENABLE_BLE_PROTOCOL in bt_feature_bit_map
@@ -167,29 +167,29 @@ void rsi_wlan_ble_app_init(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
-  LOG_PRINT("\r\n Wi-Fi Initialization Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, " Wi-Fi Initialization Success");
 
 #if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
   ble_disable_done_queue = osMessageQueueNew(1, sizeof(int32_t), NULL);
   ble_enable_done_queue  = osMessageQueueNew(1, sizeof(int32_t), NULL);
   if (ble_disable_done_queue == NULL || ble_enable_done_queue == NULL) {
-    LOG_PRINT("\r\nQueue creation failed.\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Queue creation failed.");
     return;
   }
 #endif
 
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (wlan_thread_sem == NULL) {
-    LOG_PRINT("Failed to create wlan_thread_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem");
     return;
   }
 
   ble_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_thread_sem == NULL) {
-    LOG_PRINT("Failed to create ble_thread_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem");
     return;
   }
 
@@ -197,22 +197,22 @@ void rsi_wlan_ble_app_init(void *argument)
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nm4_ta_secure_handshake Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
 #endif
 
   if (osThreadNew((osThreadFunc_t)rsi_ble_configurator_task, NULL, &ble_thread_attributes) == NULL) {
-    LOG_PRINT("Failed to create BLE thread\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create BLE thread");
   }
 
   status = rsi_wlan_mqtt_certs_init();
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\nSet Certificate Issue, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Set Certificate Issue, Error Code : 0x%lX", status);
     return;
   } else {
-    LOG_PRINT("\r\nSet Certificate Success\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Set Certificate Success");
   }
 
   // BLE initialization
@@ -224,6 +224,8 @@ void rsi_wlan_ble_app_init(void *argument)
 }
 
 #if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
+/* Optional sl_wifi_init helper; reconnect path uses wifi_app_init_and_reconnect() without
+ * calling this in the current example — see readme "Optional: Dynamic BLE...". */
 void rsi_wlan_init_wifi(void)
 {
   sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);

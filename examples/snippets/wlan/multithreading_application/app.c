@@ -229,108 +229,108 @@ void application(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &mqtt_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
-  LOG_PRINT("\r\nWi-Fi initialization is successful\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful");
 
   status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_1, &wifi_client_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to set client profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set client profile: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nWi-Fi set client profile success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi set client profile success");
 
   status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
                                  wifi_client_credential.type,
                                  &wifi_client_credential.data,
                                  wifi_client_credential.data_length);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("Failed to set credentials: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\nWi-Fi set credential success\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi set credential success");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_1);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nWi-Fi Client interface up\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface up");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_1, &client_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to get client profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nSuccess to get client profile\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &client_profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
 
-  LOG_PRINT("\r\n IP Address of client:");
+  SL_DEBUG_LOG_V2(INFO, " IP Address of client:");
   print_sl_ip_address(&ip_address);
-  LOG_PRINT("\r\nWi-Fi client connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   // --- AP interface bring-up ---
 
   status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &mqtt_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    LOG_PRINT("\r\nFailed to start Wi-Fi AP interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nWi-Fi AP interface init\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP interface init");
 
   status = sl_wifi_get_channel(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &client_channel);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to get client channel: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client channel: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nSuccess to get client channel\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client channel");
 
   wifi_ap_profile.config.channel.channel = client_channel.channel;
   status = sl_net_set_profile(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_1, &wifi_ap_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to set AP profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set AP profile: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nSuccess to set AP profile\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to set AP profile");
 
   status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
                                  wifi_ap_credential.type,
                                  &wifi_ap_credential.data,
                                  wifi_ap_credential.data_length);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("Failed to set AP credentials: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set AP credentials: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\nAP set credential success\n");
+  SL_DEBUG_LOG_V2(INFO, "AP set credential success");
 
   status = sl_net_get_profile(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_1, &ap_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to get AP profile: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get AP profile: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nSuccess to get AP profile\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Success to get AP profile");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &ap_profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
 
-  LOG_PRINT("\r\n IP Address of AP:");
+  SL_DEBUG_LOG_V2(INFO, " IP Address of AP:");
   print_sl_ip_address(&ip_address);
 
   status = sl_net_up(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_1);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFailed to bring Wi-Fi AP interface up: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi AP interface up: 0x%lx", status);
     return;
   }
-  LOG_PRINT("\r\nAP started\r\n");
+  SL_DEBUG_LOG_V2(INFO, "AP started");
 
   // --- Launch the AP throughput thread ---
 
   osThreadId_t ap_tid = osThreadNew((osThreadFunc_t)throughput, NULL, &ap_thread_attributes);
   if (ap_tid == NULL) {
-    LOG_PRINT("Failed to create AP throughput thread\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create AP throughput thread");
   }
 
   // --- Run MQTT on this thread ---

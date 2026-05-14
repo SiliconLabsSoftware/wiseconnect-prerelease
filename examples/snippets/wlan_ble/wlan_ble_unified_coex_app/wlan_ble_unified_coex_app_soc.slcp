@@ -75,6 +75,12 @@ component:
 - id: bsd_socket
 - id: aws_sdk
 - id: sl_power_manager
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 requires:
 - name: device_needs_ram_execution
   condition:

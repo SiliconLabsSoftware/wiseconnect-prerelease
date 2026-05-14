@@ -13,6 +13,7 @@
     <includedby refid="sl__si91x__hmac_8h" local="yes">components/device/silabs/si91x/wireless/crypto/hmac/inc/sl_si91x_hmac.h</includedby>
     <includedby refid="sli__si91x__crypto__driver__functions_8h" local="yes">components/device/silabs/si91x/wireless/crypto/inc/sli_si91x_crypto_driver_functions.h</includedby>
     <includedby refid="sl__si91x__sha_8h" local="yes">components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha.h</includedby>
+    <includedby refid="sl__si91x__sha3_8h" local="yes">components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h</includedby>
     <includedby refid="sl__si91x__psa__trng_8h" local="yes">components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_psa_trng.h</includedby>
     <includedby refid="sl__si91x__trng_8h" local="yes">components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h</includedby>
     <includedby refid="sl__si91x__psa__wrap_8h" local="yes">components/device/silabs/si91x/wireless/crypto/wrap/inc/sl_si91x_psa_wrap.h</includedby>
@@ -91,9 +92,11 @@
         </childnode>
         <childnode refid="16" relation="include">
         </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
         <childnode refid="13" relation="include">
         </childnode>
-        <childnode refid="17" relation="include">
+        <childnode refid="18" relation="include">
         </childnode>
       </node>
       <node id="12">
@@ -111,10 +114,14 @@
         <link refid="sl__si91x__sha_8h_source"/>
       </node>
       <node id="15">
+        <label>components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h</label>
+        <link refid="sl__si91x__sha3_8h_source"/>
+      </node>
+      <node id="16">
         <label>components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_psa_trng.h</label>
         <link refid="sl__si91x__psa__trng_8h_source"/>
       </node>
-      <node id="16">
+      <node id="17">
         <label>components/device/silabs/si91x/wireless/crypto/trng/inc/sl_si91x_trng.h</label>
         <link refid="sl__si91x__trng_8h"/>
       </node>
@@ -122,7 +129,7 @@
         <label>components/device/silabs/si91x/wireless/crypto/wrap/inc/sl_si91x_psa_wrap.h</label>
         <link refid="sl__si91x__psa__wrap_8h_source"/>
       </node>
-      <node id="17">
+      <node id="18">
         <label>components/device/silabs/si91x/wireless/crypto/wrap/inc/sl_si91x_wrap.h</label>
         <link refid="sl__si91x__wrap_8h"/>
       </node>

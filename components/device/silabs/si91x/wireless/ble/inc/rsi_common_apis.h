@@ -35,6 +35,7 @@
 #include "rsi_common.h"
 #endif
 #include <stdint.h>
+#include <stdbool.h>
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -122,6 +123,8 @@ extern int32_t rsi_ble_driver_init(uint8_t *buffer, uint32_t length);
 extern int32_t rsi_ble_driver_deinit(void);
 extern int32_t rsi_ble_enable(void);
 extern int32_t rsi_ble_disable(void);
+extern void rsi_ble_set_opermode_state(bool is_ble_enabled);
+extern bool rsi_ble_state_is_enabled(void);
 extern int32_t rsi_get_fw_version(uint8_t *response, uint16_t length);
 extern int32_t rsi_get_module_type(uint8_t *response);
 extern int32_t rsi_common_debug_log(int32_t assertion_type, int32_t assertion_level);

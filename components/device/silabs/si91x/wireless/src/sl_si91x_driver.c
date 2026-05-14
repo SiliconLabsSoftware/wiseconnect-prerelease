@@ -562,6 +562,11 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   if (config->boot_config.coex_mode == SL_SI91X_BLE_MODE || config->boot_config.coex_mode == SL_SI91X_WLAN_BLE_MODE) {
     // Wait for BT card ready
     rsi_bt_common_init();
+    // Set BLE runtime state to enabled
+    rsi_ble_set_opermode_state(true);
+  } else {
+    // Set BLE runtime state to disabled if BLE is not enabled in coex_mode
+    rsi_ble_set_opermode_state(false);
   }
 #endif
 
@@ -787,11 +792,12 @@ sl_status_t sl_si91x_driver_raw_send_command(uint8_t command,
 
   // Route (send) the packet via routing utility (may be async).
   uint32_t packet_size = (packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t);
-  return sli_routing_utility_route_packet(&wifi_command_engine_routing_table,
-                                          SLI_WIFI_DATA_PACKET,
-                                          packet,
-                                          (uint16_t)packet_size,
-                                          NULL);
+  status               = sli_routing_utility_route_packet(&wifi_command_engine_routing_table,
+                                            SLI_WIFI_DATA_PACKET,
+                                            packet,
+                                            (uint16_t)packet_size,
+                                            NULL);
+  return (SL_STATUS_IN_PROGRESS == status) ? SL_STATUS_OK : status;
 }
 
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
@@ -1568,7 +1574,7 @@ void sl_si91x_set_timeout(const sl_wifi_timeout_t *timeout_config)
   return;
 }
 
-sl_status_t sl_si91x_configure_timeout(sl_si91x_timeout_type_t timeout_type, uint16_t timeout_value)
+sl_status_t sl_si91x_configure_timeout(sl_wifi_timeout_type_t timeout_type, uint16_t timeout_value)
 {
   if (timeout_type > SL_SI91X_CHANNEL_PASSIVE_SCAN_TIMEOUT) {
     return SL_STATUS_INVALID_PARAMETER;
@@ -1639,6 +1645,9 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
   // Fill length in first 2 host_desc bytes
   packet->length = (ext_desc_size + mac_hdr_len + payload_len) & 0xFFF;
 
+  // fill the firmware queue id in the packet descriptor
+  packet->desc[1] |= (SLI_WLAN_DATA_Q << 4);
+
   // Fill packet type
   host_desc = packet->desc;
 
@@ -1692,7 +1701,12 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
     }
   }
 
-  status = sli_hal_si91x_data_send_packet(packet, packet->length & 0xFFF, NULL, NULL);
+  // invoke routing utility to send the packet to the firmware
+  status = sli_routing_utility_route_packet(&wifi_command_engine_routing_table,
+                                            SLI_WIFI_DATA_PACKET,
+                                            packet,
+                                            (packet->length & 0xFFF),
+                                            NULL);
   return (SL_STATUS_IN_PROGRESS == status) ? SL_STATUS_OK : status;
 }
 

@@ -81,6 +81,12 @@
 /// IPv6 address length in bytes.
 #define SL_IPV6_ADDRESS_LENGTH 16
 
+/// Number of 32-bit words in an IPv6 address.
+#define SL_IPV6_ADDRESS_U32_COUNT 4
+
+/// Max length of an IPv6 address string in characters, including the terminating null.
+#define SL_IPV6_ADDRESS_STRING_MAX_LENGTH 46
+
 /// MAC address length
 #define SL_MAC_ADDRESS_LENGTH 6
 

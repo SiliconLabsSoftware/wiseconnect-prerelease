@@ -45,6 +45,7 @@
 #include "sl_si91x_host_interface.h"
 #include "sli_buffer_manager.h"
 #include "rsi_ble_common_config.h"
+#include "rsi_common_apis.h"
 
 sl_status_t sli_si91x_allocate_command_buffer(sl_wifi_buffer_t **host_buffer,
                                               void **buffer,
@@ -2321,6 +2322,12 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
 
     return RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE;
   }
+
+  if (!rsi_ble_state_is_enabled()) {
+    SL_PRINTF(SL_RSI_ERROR_COMMAND_GIVEN_IN_WORNG_STATE, BLUETOOTH, LOG_ERROR, "COMMAND: %2x, BLE is disabled", cmd);
+
+    return RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE;
+  }
   // Get timeout based on cmd
   calculate_timeout_ms = rsi_bt_get_timeout(cmd, protocol_type);
   if (bt_cb->bt_cmd_sem == NULL || (osSemaphoreAcquire(bt_cb->bt_cmd_sem, calculate_timeout_ms) != osOK)) {
@@ -2612,6 +2619,29 @@ static void rsi_ble_update_buff_for_err_resp(int32_t status)
 
     le_cb->remote_ble_index = 0;
   }
+}
+
+/*==============================================*/
+/**
+ * @brief      Check if any BLE devices are connected
+ * @return     true if at least one BLE device is connected, false otherwise
+ */
+bool rsi_ble_is_device_connected(void)
+{
+  rsi_bt_cb_t *le_cb = rsi_driver_cb->ble_cb;
+
+  if (le_cb == NULL) {
+    return false;
+  }
+
+  // Check if any device in remote_ble_info array is marked as used (connected)
+  for (uint8_t inx = 0; inx < (RSI_BLE_MAX_NBR_PERIPHERALS + RSI_BLE_MAX_NBR_CENTRALS); inx++) {
+    if (le_cb->remote_ble_info[inx].used) {
+      return true;
+    }
+  }
+
+  return false;
 }
 /** @} */
 

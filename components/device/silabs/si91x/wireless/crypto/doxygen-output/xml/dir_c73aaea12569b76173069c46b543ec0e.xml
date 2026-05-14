@@ -4,6 +4,7 @@
     <compoundname>components/device/silabs/si91x/wireless/crypto/sha/inc</compoundname>
     <innerfile refid="sl__si91x__psa__sha_8h">sl_si91x_psa_sha.h</innerfile>
     <innerfile refid="sl__si91x__sha_8h">sl_si91x_sha.h</innerfile>
+    <innerfile refid="sl__si91x__sha3_8h">sl_si91x_sha3.h</innerfile>
     <briefdescription>
     </briefdescription>
     <detaileddescription>

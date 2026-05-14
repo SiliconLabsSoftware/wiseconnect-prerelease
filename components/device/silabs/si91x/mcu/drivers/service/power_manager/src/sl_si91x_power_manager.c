@@ -262,7 +262,7 @@ sl_status_t sl_si91x_power_manager_unsubscribe_ps_transition_event(
  * If the sleep mode transition is not successful, then it returns error code.
  * Configuration of sleep parameters are handled in the internal function.
  ******************************************************************************/
-sl_status_t sl_si91x_power_manager_sleep(void)
+sl_status_t sli_si91x_power_manager_sleep(void)
 {
   sl_status_t status;
 
@@ -321,18 +321,33 @@ sl_status_t sl_si91x_power_manager_sleep(void)
   // If it reaches here, then returns SL_STATUS_OK
   return SL_STATUS_OK;
 }
+/*******************************************************************************
+ * Internal alias for @ref sl_si91x_power_manager_sleep (same behavior).
+ ******************************************************************************/
+sl_status_t sl_si91x_power_manager_sleep(void)
+{
+  return sli_si91x_power_manager_sleep();
+}
 
 /*******************************************************************************
  * Transit to standby state and will wait for the interrupt.
  * WFI instruction is called to move the soc power mode to standby mode.
  ******************************************************************************/
-void sl_si91x_power_manager_standby(void)
+void sli_si91x_power_manager_standby(void)
 {
   if (sli_si91x_power_manager_is_valid_transition(current_state, SL_SI91X_POWER_MANAGER_STANDBY)) {
     // Validates the state transition for sleep, if valid it transits to standby mode.
     __WFI();
     notify_power_state_transition(SL_SI91X_POWER_MANAGER_STANDBY, current_state);
   }
+}
+
+/*******************************************************************************
+ * Internal alias for @ref sl_si91x_power_manager_standby (same behavior).
+ ******************************************************************************/
+void sl_si91x_power_manager_standby(void)
+{
+  sli_si91x_power_manager_standby();
 }
 
 /*******************************************************************************

@@ -222,7 +222,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -238,7 +238,7 @@ static void application_start(void *argument)
                                         output_y,
                                         output_z);
   if (status != SL_STATUS_OK) {
-    printf("\r\nECDH point addition failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECDH point addition failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nECDH point addition success\r\n");
@@ -256,7 +256,7 @@ static void application_start(void *argument)
                                            output_y,
                                            output_z);
   if (status != SL_STATUS_OK) {
-    printf("\r\nECDH point subtraction failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECDH point subtraction failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nECDH point subtraction success\r\n");
@@ -274,7 +274,7 @@ static void application_start(void *argument)
                                               output_z,
                                               reverse);
   if (status != SL_STATUS_OK) {
-    printf("\r\nECDH point multiplication failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECDH point multiplication failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nECDH point multiplication success\r\n");
@@ -284,7 +284,7 @@ static void application_start(void *argument)
   status =
     sl_si91x_ecdh_point_double(SL_SI91X_ECDH_256, p_double_x, p_double_y, p_double_z, output_x, output_y, output_z);
   if (status != SL_STATUS_OK) {
-    printf("\r\nECDH point double failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECDH point double failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nECDH point double success\r\n");
@@ -294,7 +294,7 @@ static void application_start(void *argument)
   status =
     sl_si91x_ecdh_point_affine(SL_SI91X_ECDH_192, p_affine_x, p_affine_y, p_affine_z, output_x, output_y, output_z);
   if (status != SL_STATUS_OK) {
-    printf("\r\nECDH point affine failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECDH point affine failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nECDH point affine success\r\n");

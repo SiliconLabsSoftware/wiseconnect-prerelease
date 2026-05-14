@@ -16,7 +16,6 @@ component:
 - id: si91x_memory_default_config
 - id: sl_power_manager
 - id: sl_si91x_internal_stack
-- id: sl_si91x_mem_pool_buffers_with_quota
 - id: sl_si91x_mcu_secure_storage
 - id: sl_uart
 - id: syscalls

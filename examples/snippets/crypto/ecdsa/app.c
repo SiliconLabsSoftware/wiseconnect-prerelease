@@ -137,7 +137,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("Failed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -185,7 +185,7 @@ sl_status_t ecdsa_generate_key_pair(void)
 
   status = sl_si91x_ecdsa(&config, public_key_gen);
   if (status != SL_STATUS_OK) {
-    printf("\r\nECC key pair generation failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECC key pair generation failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nECC key pair generation success\r\n");
@@ -222,7 +222,7 @@ sl_status_t ecdsa_sign_message(void)
 
   status = sl_si91x_wrap(&wrap_config, wrapped_key);
   if (status != SL_STATUS_OK) {
-    printf("\r\nWrap failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nWrap failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nWrap success\r\n");
@@ -236,7 +236,7 @@ sl_status_t ecdsa_sign_message(void)
   status = sl_si91x_ecdsa(&config, signature);
 
   if (status != SL_STATUS_OK) {
-    printf("\r\nECDSA signature generation failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECDSA signature generation failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nECDSA signature generation success\r\n");
@@ -268,7 +268,7 @@ sl_status_t ecdsa_verify_message(void)
 
   status = sl_si91x_ecdsa(&config, verify_output);
   if (status != SL_STATUS_OK || *verify_output != 1) {
-    printf("\r\nECDSA signature verification failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nECDSA signature verification failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;
   }
   printf("\r\nECDSA signature verification success\r\n");

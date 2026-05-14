@@ -538,7 +538,10 @@ sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_inte
     sl_wifi_listen_interval_v2_t listen_interval;
     sli_wifi_get_listen_interval_v2(module_interface, &listen_interval);
     // narrowing conversion from Enum of uint16 to uint8
-    sli_wifi_get_saved_rate(&join_request->data_rate);
+    sl_wifi_rate_t saved_data_rate;
+    status = sli_wifi_get_saved_rate(&saved_data_rate);
+    VERIFY_STATUS_AND_RETURN(status);
+    join_request->data_rate = (uint8_t)saved_data_rate;
     memcpy(join_request->ssid, client_configuration->ssid.value, client_configuration->ssid.length);
 
     join_request->ssid_len      = client_configuration->ssid.length;
@@ -562,7 +565,10 @@ sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_inte
 
     const sl_wifi_ap_configuration_t *ap_configuration = (const sl_wifi_ap_configuration_t *)configuration;
 
-    sli_wifi_get_saved_rate(&join_request->data_rate);
+    sl_wifi_rate_t saved_ap_data_rate;
+    status = sli_wifi_get_saved_rate(&saved_ap_data_rate);
+    VERIFY_STATUS_AND_RETURN(status);
+    join_request->data_rate = (uint8_t)saved_ap_data_rate;
     memcpy(join_request->ssid, ap_configuration->ssid.value, ap_configuration->ssid.length);
 
     join_request->ssid_len      = ap_configuration->ssid.length;

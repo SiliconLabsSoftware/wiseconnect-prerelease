@@ -14,6 +14,7 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+#include <inttypes.h>
 #include "sl_si91x_calendar.h"
 #include "calendar_example.h"
 #include "rsi_debug.h"
@@ -130,7 +131,7 @@ void calendar_example_init(void)
     /** Demo APIs related to Unix timestamp conversions */
     datetime_for_unix_demo = get_datetime;
     sl_si91x_calendar_convert_calendar_datetime_to_unix_time(&datetime_for_unix_demo, &unix_timestamp);
-    DEBUGOUT("\nIts equivalent Unix timestamp: %lu\n", unix_timestamp);
+    DEBUGOUT("\nIts equivalent Unix timestamp: %u\n", (unsigned int)unix_timestamp);
 
     unix_timestamp += 300; // increment by 5min (300 in sec), to demo Unix-to-calendar conversion
     SL_PRINT_STRING_ERROR("\nUnix Timestamp incremented by 5min");

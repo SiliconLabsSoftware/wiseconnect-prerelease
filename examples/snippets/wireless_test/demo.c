@@ -127,12 +127,12 @@ void application_start(const void *unused)
 
   SL_DEBUG_LOG("app start\n");
 
-  printf("Ready\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Ready");
 
   console_line_ready = 0;
 
   while (1) {
-    printf("\r\n> \r\n");
+    SL_DEBUG_LOG_V2(INFO, "> ");
 #ifndef SLI_SI91X_MCU_INTERFACE
     while (!end_of_cmd) {
       iostream_rx();
@@ -149,18 +149,18 @@ void application_start(const void *unused)
     if (result == SL_STATUS_OK) {
       SL_DEBUG_LOG("Processing command\n");
       if (command->handler) {
-        printf("\r\n");
+        SL_DEBUG_LOG_V2(INFO, "");
         uint32_t start_time = osKernelGetTickCount();
         result              = command->handler(&args);
         uint32_t duration   = osKernelGetTickCount() - start_time;
         print_status(result, duration);
       }
     } else if (result == SL_STATUS_COMMAND_IS_INVALID) {
-      printf("\r\nArgs: ");
+      SL_DEBUG_LOG_V2(INFO, "Args: ");
       print_command_args(command);
       print_status(SL_STATUS_INVALID_PARAMETER, 0);
     } else {
-      printf("\r\nNot supported\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Not supported");
     }
     console_line_ready = 0;
   }
@@ -168,19 +168,26 @@ void application_start(const void *unused)
 
 void print_status(sl_status_t status, uint32_t duration)
 {
-  printf("\r\n0x%05lX: (%lums) %s\r\n", status, duration, (status == SL_STATUS_OK) ? "Success" : "");
+  SL_DEBUG_LOG_V2(INFO,
+                  "0x%05lX: (%lums) %s",
+                  status,
+                  duration,
+                  (uintptr_t)((status == SL_STATUS_OK) ? "Success" : ""));
 }
 
 sl_status_t help_command_handler(console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
   for (uint8_t a = 0; a < console_command_database.length; ++a) {
-    printf("\r\n");
-    printf("%s", console_command_database.entries[a].key);
-    printf("  ");
+    SL_DEBUG_LOG_V2(INFO, "");
+    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)console_command_database.entries[a].key);
+    SL_DEBUG_LOG_V2(INFO, "  ");
     print_command_args((console_descriptive_command_t *)console_command_database.entries[a].value);
-    printf("\r\n   ");
-    printf(((console_descriptive_command_t *)console_command_database.entries[a].value)->description);
+    SL_DEBUG_LOG_V2(INFO, "   ");
+    SL_DEBUG_LOG_V2(
+      INFO,
+      "%s",
+      (uintptr_t)((console_descriptive_command_t *)console_command_database.entries[a].value)->description);
   }
   return SL_STATUS_OK;
 }
@@ -235,36 +242,39 @@ static void print_command_args(const console_descriptive_command_t *command)
   for (int a = 0; command->argument_list[a] != CONSOLE_ARG_END; ++a) {
     if (command->argument_list[a] & CONSOLE_ARG_OPTIONAL) {
       char option_char[2] = { (char)command->argument_list[a] & CONSOLE_ARG_OPTIONAL_CHARACTER_MASK, 0 };
-      printf("[-");
-      printf("%s", option_char);
-      printf(" ");
+      SL_DEBUG_LOG_V2(INFO, "[-");
+      SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)option_char);
+      SL_DEBUG_LOG_V2(INFO, " ");
       is_optional = true;
       continue;
     } else if (command->argument_list[a] & CONSOLE_ARG_ENUM) {
-      printf("{");
+      SL_DEBUG_LOG_V2(INFO, "{");
       uint8_t enum_index = command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK;
       for (int b = 0; console_argument_types[enum_index][b] != NULL;
            /* Increment occurs in internal logic */) {
-        printf("%s", console_argument_types[enum_index][b]);
+        SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)console_argument_types[enum_index][b]);
         if (console_argument_types[enum_index][++b]) {
-          printf("|");
+          SL_DEBUG_LOG_V2(INFO, "|");
         }
       }
-      printf("}");
+      SL_DEBUG_LOG_V2(INFO, "}");
     } else {
-      printf("<");
+      SL_DEBUG_LOG_V2(INFO, "<");
       if (command->argument_help && command->argument_help[a]) {
-        printf("%s", command->argument_help[a]);
+        SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)command->argument_help[a]);
       } else {
-        printf(console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
+        SL_DEBUG_LOG_V2(
+          INFO,
+          "%s",
+          (uintptr_t)console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
       }
-      printf(">");
+      SL_DEBUG_LOG_V2(INFO, ">");
     }
     if (is_optional) {
-      printf("] ");
+      SL_DEBUG_LOG_V2(INFO, "] ");
       is_optional = false;
     } else {
-      printf(" ");
+      SL_DEBUG_LOG_V2(INFO, " ");
     }
   }
 }

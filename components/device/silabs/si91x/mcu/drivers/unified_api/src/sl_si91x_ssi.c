@@ -341,7 +341,23 @@ sl_status_t sl_si91x_ssi_set_configuration(sl_ssi_handle_t ssi_handle,
       input_mode |= ARM_SPI_SS_MASTER_SW;
       input_mode |= SL_SSI_MASTER_ACTIVE;
     } else {
-      input_mode |= ARM_SPI_SS_MASTER_HW_OUTPUT;
+      boolean_t is_dma_enabled = false;
+#if defined(SL_SSI_PRIMARY_DMA_CONFIG_ENABLE) && (SL_SSI_PRIMARY_DMA_CONFIG_ENABLE == 1)
+      if (ssi_handle == &Driver_SSI_MASTER) {
+        is_dma_enabled = true;
+      }
+#endif
+#if defined(SL_SSI_ULP_PRIMARY_DMA_CONFIG_ENABLE) && (SL_SSI_ULP_PRIMARY_DMA_CONFIG_ENABLE == 1)
+      if (ssi_handle == &Driver_SSI_ULP_MASTER) {
+        is_dma_enabled = true;
+      }
+#endif
+      // When DMA is enabled from UC, use HW slave-select output; otherwise drive CS in software.
+      if (is_dma_enabled) {
+        input_mode |= ARM_SPI_SS_MASTER_HW_OUTPUT;
+      } else {
+        input_mode |= ARM_SPI_SS_MASTER_SW;
+      }
       input_mode |= SL_SSI_MASTER_ACTIVE;
     }
 

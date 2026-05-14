@@ -25,6 +25,13 @@ component:
 - id: si91x_memory_default_config
 - id: si91x_debug
 - id: syscalls
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- instance:
+  - vcom
+  id: iostream_uart_si91x
 requires:
 - name: sl_main
 - name: http_client

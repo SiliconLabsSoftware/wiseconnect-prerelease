@@ -134,7 +134,7 @@ sl_status_t send_data(void);
  ******************************************************/
 static inline void print_errno(void)
 {
-  printf("\r\nerrno: %d\r\n", errno);
+  SL_DEBUG_LOG_V2(DEBUG, "errno: %d", errno);
 }
 
 /******************************************************
@@ -171,71 +171,60 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
     return;
   }
   status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   if (status == SL_STATUS_OK) {
-    printf("Device MAC address: %x:%x:%x:%x:%x:%x\r\n",
-           mac_addr.octet[0],
-           mac_addr.octet[1],
-           mac_addr.octet[2],
-           mac_addr.octet[3],
-           mac_addr.octet[4],
-           mac_addr.octet[5]);
+    SL_DEBUG_LOG_V2(INFO, "Device MAC address: %x:%x:%x:", mac_addr.octet[0], mac_addr.octet[1], mac_addr.octet[2]);
+    SL_DEBUG_LOG_V2(INFO, "%x:%x:%x", mac_addr.octet[3], mac_addr.octet[4], mac_addr.octet[5]);
   } else {
-    printf("Failed to get mac address: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get mac address: 0x%lx", status);
   }
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to fetch firmware version: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx", status);
   } else {
     print_firmware_version(&version);
   }
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    printf("Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
     return;
   }
-  printf("\r\nWi-Fi client connected\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   status = sl_wifi_filter_broadcast(BROADCAST_DROP_THRESHOLD, BROADCAST_IN_TIM, BROADCAST_TIM_TILL_NEXT_COMMAND);
   if (status != SL_STATUS_OK) {
-    printf("\r\nsl_wifi_filter_broadcast Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_filter_broadcast Failed, Error Code : 0x%lX", status);
     return;
   }
   // set performance profile
   status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\nPower save configuration Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", status);
     return;
   }
 
 #if ENABLE_DATA_TRANSFER
   status = send_data();
   if (status != SL_STATUS_OK) {
-    printf("\r\nSend data failed with status %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Send data failed with status %lx", status);
     return;
   }
 #endif
-  printf("\r\nExample Demonstration Completed\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-
-#if (SL_SI91X_TICKLESS_MODE == 0)
-  sl_si91x_power_manager_sleep();
-#else
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    printf("Failed to create semaphore\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
     return;
   }
   // Waiting forever using semaphore to put M4 to sleep in tick less mode
   osSemaphoreAcquire(wait_semaphore, osWaitForever);
-#endif
-
 #endif
 }
 
@@ -250,10 +239,10 @@ sl_status_t send_data(void)
   //create UDP socket
   int32_t socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (socket_fd < 0) {
-    printf("\r\nSocket Create failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d", errno);
     return SL_STATUS_FAIL;
   }
-  printf("\r\nUDP Client Socket Creation Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "UDP Client Socket Creation Success");
 
   sl_net_inet_addr((char *)SERVER_IP_ADDRESS, (uint32_t *)&server_ip);
 
@@ -267,7 +256,7 @@ sl_status_t send_data(void)
     if (bytes_sent < 0) {
       if (errno == ENOBUFS)
         continue;
-      printf("\r\nSend failed with bsd error: %d\r\n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Send failed with bsd error: %d", errno);
       close(socket_fd);
       return SL_STATUS_FAIL;
     }
@@ -275,7 +264,7 @@ sl_status_t send_data(void)
     packet_count++;
   }
 
-  printf("\r\nTotal number of bytes sent: %ld\r\n", total_num_of_bytes);
+  SL_DEBUG_LOG_V2(INFO, "Total number of bytes sent: %ld", total_num_of_bytes);
   close(socket_fd);
 
   return SL_STATUS_OK;
