@@ -161,7 +161,7 @@ static void application_start(void *argument)
   sl_ip_address_t remote_ip_address = { 0 };
 
   status = sl_inet_pton6(REMOTE_IP_ADDRESS,
-                         REMOTE_IP_ADDRESS + strlen(REMOTE_IP_ADDRESS),
+                         &REMOTE_IP_ADDRESS[strlen(REMOTE_IP_ADDRESS)],
                          address_buffer,
                          (unsigned int *)remote_ip_address.ip.v6.value);
   if (status != 0x1) {

@@ -113,7 +113,7 @@ static sl_status_t hrng_read_and_process(sl_si91x_hrng_mode_t mode, const char *
     SL_PRINT_STRING_ERROR("Failed to start HRNG\n");
     return status;
   } else {
-    SL_PRINT_STRING_ERROR("Successfully started HRNG with %s mode\n", mode_name);
+    SL_PRINT_STRING_ERROR("Successfully started HRNG with %s mode\n", (uintptr_t)mode_name);
   }
 
 #ifndef LFSR_MODE_EN

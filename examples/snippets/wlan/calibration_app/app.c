@@ -244,7 +244,7 @@ void iostream_rx()
   static uint8_t index = 0;
   sl_iostream_getchar(SL_IOSTREAM_STDIN, &c);
   if (c > 0) {
-    if ((c == '\n')) {
+    if (c == '\n') {
       if (buffer[index - 1] == '\r') {
         buffer[index - 1] = '\0';
         index             = 0;

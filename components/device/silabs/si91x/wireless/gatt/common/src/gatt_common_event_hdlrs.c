@@ -52,6 +52,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #include "rsi_utils.h" // RSI utilities (UNUSED_PARAMETER, LOG_PRINT_D)
 #include <stdio.h>     // Standard I/O (printf)
+#include <inttypes.h>
 
 // GAP-owned variables (defined in gap_user_event_hdlrs.c)
 extern rsi_ble_conn_info_t rsi_ble_conn_info[TOTAL_CONNECTIONS];
@@ -90,7 +91,7 @@ void rsi_conn_update_req_event(uint8_t conn_id)
       if (status == RSI_ERROR_BLE_ATT_CMD_IN_PROGRESS) {
         printf("\r\n rsi_ble_conn_params_update procedure is already in progress -conn%d \r\n", ble_conn_id);
       } else {
-        printf("\r\n failed to update connection paramaters error:0x%lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n failed to update connection paramaters error:0x%" PRIX32 " -conn%d \r\n", status, ble_conn_id);
       }
     } else {
       printf("\r\n connection params request was successfull -conn%d \n", ble_conn_id);

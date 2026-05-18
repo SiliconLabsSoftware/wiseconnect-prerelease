@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
-#ifdef SLI_SI917
+#if (defined(SLI_SI917) && defined(SL_CATALOG_LOG_COMPONENT_PRESENT))
 #include "sl_log_helper.h"
 #endif
 
@@ -252,14 +252,15 @@ extern void sl_redirect_log(const char *format, ...);
 #define SL_COMPILE_TIME_ASSERT(condition, comment) typedef char assertion_failed__##comment[2 * !!(condition)-1];
 
 // Expands to SL_PRINT_STRING_<level>(fmt, ...). Use level INFO, ERROR, DEBUG, or WARN (must match macro suffix).
-#ifdef SLI_SI917
+#if (defined(SLI_SI917) && defined(SL_CATALOG_LOG_COMPONENT_PRESENT))
 #define SL_DEBUG_LOG_V2(level, fmt, ...)         \
   do {                                           \
     SL_PRINT_STRING_##level(fmt, ##__VA_ARGS__); \
   } while (0)
 #else
-#define SL_DEBUG_LOG_V2(level, fmt, ...) \
-  do {                                   \
+#define SL_DEBUG_LOG_V2(level, fmt, ...)                                                  \
+  do {                                                                                    \
+    sl_redirect_log("%s:%s:%d:" fmt "\r\n", __FILE__, __func__, __LINE__, ##__VA_ARGS__); \
   } while (0)
 #endif
 

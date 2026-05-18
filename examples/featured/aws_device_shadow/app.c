@@ -341,7 +341,7 @@ sl_status_t start_aws_device_shadow()
     }
     SL_DEBUG_LOG_V2(INFO, "JSON finalization buffer Success");
 
-    SL_DEBUG_LOG_V2(DEBUG, "Update Shadow: %s", (uintptr_t)json_document_buffer);
+    SL_DEBUG_LOG_V2(INFO, "Update Shadow: %s", (uintptr_t)json_document_buffer);
 
     rc = aws_iot_shadow_update(&mqtt_client,
                                AWS_IOT_MY_THING_NAME,

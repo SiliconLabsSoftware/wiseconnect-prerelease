@@ -264,6 +264,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_COMMON_RSP_FEATURE_FRAME:
         case SLI_COMMON_RSP_ULP_NO_RAM_RETENTION:
         case SLI_COMMON_RSP_ENABLE_DISABLE_BLE:
+        case SLI_COMMON_RSP_FW_FALLBACK_FROM_HOST:
         case SLI_WIFI_RSP_CARDREADY: {
           metadata->tx_info.packet_type = SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET;
           if (frame_type == SLI_COMMON_RSP_ULP_NO_RAM_RETENTION) {

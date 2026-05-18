@@ -47,6 +47,10 @@ component:
 - id: wifi_resources
 - id: network_manager
 - id: basic_network_config_manager
+- id: log_none
+- id: log_backend_iostream
+- id: log_backend_iostream_formatted
+- id: log_platform_specific
 toolchain_settings:
 - option: gcc_linker_option
   value: -u _printf_float

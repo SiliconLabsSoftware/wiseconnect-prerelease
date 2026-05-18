@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "generic_command_handling.h"
 #include "rsi_common_apis.h"
+#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 #ifndef SLI_SI91X_MCU_INTERFACE
 #include "app_rtt_logging.h"
@@ -42,7 +44,7 @@ void command_parser(uint8_t argc, uint8_t **argv)
     if (cmd_lut_entry != NULL) {
       //! check command handler
       if (cmd_lut_entry->handler == NULL) {
-        LOG_PRINT("\r\n call generic command handler\r\n");
+        SL_DEBUG_LOG_V2(INFO, "call generic command handler");
         break;
       } else {
         cmd_lut_entry->handler((argc - (max_no_of_args + 1)), &argv[current_cmd_index + 1]);
@@ -81,7 +83,7 @@ void command_parser(uint8_t argc, uint8_t **argv)
             //! call display sub_module function
             display_submodule(&argv[current_cmd_index], current_module_lut);
           } else {
-            LOG_PRINT("\r\n sub_modules LUT not present\r\n");
+            SL_DEBUG_LOG_V2(INFO, "sub_modules LUT not present");
             break;
           }
           //! check if modules_lut_entry->commands != NULL then update the current_command_lut and call display function
@@ -90,20 +92,20 @@ void command_parser(uint8_t argc, uint8_t **argv)
             //! call display command function
             display_command(&argv[current_cmd_index], current_command_lut);
           } else {
-            LOG_PRINT("\r\n commands LUT not present\r\n");
+            SL_DEBUG_LOG_V2(INFO, "commands LUT not present");
             break;
           }
           break;
         }
       } else {
-        LOG_PRINT("\r\n call current_module_lut custom_handler\r\n");
+        SL_DEBUG_LOG_V2(INFO, "call current_module_lut custom_handler");
         break;
       }
     } else { //! if user input wrong sub_module and commands then call display function
-      LOG_PRINT("\r\n Command parser: Enter correct module_name \r\n");
+      SL_DEBUG_LOG_V2(INFO, "Command parser: Enter correct module_name ");
       //! call display sub_module function
       display_submodule(&argv[current_cmd_index], current_module_lut);
-      LOG_PRINT("\r\n Command parser: Enter correct command_name \r\n");
+      SL_DEBUG_LOG_V2(INFO, "Command parser: Enter correct command_name ");
       //! call display command function
       display_command(&argv[current_cmd_index], current_command_lut);
       break;
@@ -166,7 +168,7 @@ void display_submodule(uint8_t __attribute__((unused)) * *argv, module_lut_entry
   }
   if (current_module->module_name != NULL) {
     //! if module_name != NULL then print the list of module_name
-    LOG_PRINT("sub_module present : \n%s", buff);
+    SL_DEBUG_LOG_V2(INFO, "sub_module present : \n%s", (uintptr_t)(buff));
   }
 }
 
@@ -188,6 +190,6 @@ void display_command(uint8_t __attribute__((unused)) * *argv, command_lut_entry_
   }
   if (current_command->command_name != NULL) {
     //! if command_name != NULL then print the list of commands
-    LOG_PRINT("command present : \n%s", buff);
+    SL_DEBUG_LOG_V2(INFO, "command present : \n%s", (uintptr_t)(buff));
   }
 }

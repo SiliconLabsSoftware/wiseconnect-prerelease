@@ -35,6 +35,7 @@
 #include "errno.h"
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
+#include "sl_log_helper.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_utility.h"
@@ -108,6 +109,17 @@ rsi_ble_event_write_t app_ble_write_event;
 rsi_ble_resp_add_serv_t ota_serv_response;
 
 sl_wifi_firmware_version_t version = { 0 };
+
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
 
 static const sl_wifi_device_configuration_t
   config = { .boot_option = LOAD_NWP_FW,
@@ -215,7 +227,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
                                     uint8_t char_prop)
 {
   if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE) {
-    LOG_PRINT("no data memory for att rec values");
+    SL_DEBUG_LOG_V2(INFO, "no data memory for att rec values");
     return;
   }
 
@@ -587,8 +599,7 @@ static void rsi_ble_app_init_events()
 {
   ble_app_event_map  = 0;
   ble_app_event_mask = 0xFFFFFFFF;
-  ble_app_event_mask = ble_app_event_mask; // To suppress warning while
-                                           // compiling
+  (void)ble_app_event_mask;
   return;
 }
 
@@ -715,7 +726,7 @@ static void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconn
   UNUSED_PARAMETER(reason);
   memcpy(&disconn_event_to_app, resp_disconnect, sizeof(rsi_ble_event_disconnect_t));
   rsi_ble_app_set_event(RSI_BLE_DISCONN_EVENT);
-  LOG_PRINT("\r\nReason for disconnection: %x \r\n", reason);
+  SL_DEBUG_LOG_V2(INFO, "Reason for disconnection: %x ", reason);
 }
 
 /*==============================================*/
@@ -825,7 +836,7 @@ int32_t rsi_ble_gatt_write_event_handler(rsi_ble_event_write_t *app_ble_write_ev
       //! Send gatt write response
       status = rsi_ble_gatt_write_response(conn_event_to_app.dev_addr, 0);
       if (status != SL_STATUS_OK)
-        printf("rsi_ble_gatt_write_response failed to send response: 0x%lX\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_ble_gatt_write_response failed to send response: 0x%lX", status);
     } else {
       //! Error : 0x07 - Invalid request,  0x0D - Invalid attribute value length
       err = 0x07;
@@ -836,7 +847,7 @@ int32_t rsi_ble_gatt_write_event_handler(rsi_ble_event_write_t *app_ble_write_ev
       status =
         rsi_ble_att_error_response(conn_event_to_app.dev_addr, *(uint16_t *)app_ble_write_event->handle, opcode, err);
       if (status != SL_STATUS_OK)
-        printf("rsi_ble_att_error_response failed to send response: 0x%lX\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_ble_att_error_response failed to send response: 0x%lX", status);
     }
   }
   return status;
@@ -938,15 +949,15 @@ void rsi_ble_ota_fwup_gatt_server(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   } else {
-    printf("\r\n Wi-Fi Initialization Successful\n");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
   }
 
   status = update_firmware();
   if (status == SL_FW_ERROR)
-    printf("reconnect the Device and select the Proper FW \n");
+    SL_DEBUG_LOG_V2(INFO, "reconnect the Device and select the Proper FW ");
 }
 
 sl_status_t update_firmware()
@@ -960,18 +971,18 @@ sl_status_t update_firmware()
   status = rsi_bt_get_local_device_address(str_local_dev_address_6byte);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Could not get BD Address of the module, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Could not get BD Address of the module, Error Code : 0x%lX", status);
     return status;
   }
 
   else {
     rsi_6byte_dev_address_to_ascii(str_local_dev_address, str_local_dev_address_6byte);
-    LOG_PRINT("\r\n BD Address of the module : %s\r\n", str_local_dev_address);
+    SL_DEBUG_LOG_V2(INFO, "BD Address of the module : %s", (uintptr_t)(str_local_dev_address));
   }
 
   status = sl_wifi_get_firmware_version(&version);
   VERIFY_STATUS_AND_RETURN(status);
-  printf("\r\nFirmware version before update:\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Firmware version before update:");
   print_firmware_version(&version);
 
   //! registering the GAP callback functions
@@ -1038,7 +1049,7 @@ sl_status_t update_firmware()
   if (status != RSI_SUCCESS) {
     return status;
   } else {
-    LOG_PRINT("\r\n Advertising started\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Advertising started");
   }
   //! waiting for events from controller.
   while (1)
@@ -1060,11 +1071,11 @@ sl_status_t update_firmware()
         rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
         //! Converting the 6 byte address to ASCII.
         rsi_6byte_dev_address_to_ascii(str_remote_address, conn_event_to_app.dev_addr);
-        LOG_PRINT("\r\n Module connected to address : %s \r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
 
         status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, RSI_BLE_MAX_DATA_LEN);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n MTU request failed with status = %lx \r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "MTU request failed with status = %lx ", status);
         }
       } break; //! end of RSI_BLE_CONN_EVENT case
 
@@ -1075,9 +1086,9 @@ sl_status_t update_firmware()
         if (mtu_size > RSI_BLE_MAX_DATA_LEN) {
           status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, RSI_BLE_MAX_DATA_LEN);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\n MTU request failed with status = %lx \r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "MTU request failed with status = %lx ", status);
           } else {
-            LOG_PRINT("\r\n MTU Requested\r\n");
+            SL_DEBUG_LOG_V2(INFO, "MTU Requested");
           }
         }
 
@@ -1098,9 +1109,7 @@ sl_status_t update_firmware()
                                               CONNECTION_LATENCY,
                                               SUPERVISION_TIMEOUT);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\n Connection Parameters update request failed with "
-                      "status = %lx \r\n",
-                      status);
+            SL_DEBUG_LOG_V2(ERROR, "Connection Parameters update request failed with status = %lx ", status);
           }
         }
 
@@ -1116,10 +1125,8 @@ sl_status_t update_firmware()
           if (status != RSI_SUCCESS) {
             break;
           } else {
-            LOG_PRINT("\r\nBuf configuration done for notify and set_att cmds buf "
-                      "mode = %d , max buff count =%d \n",
-                      DLE_BUFFER_MODE,
-                      DLE_BUFFER_COUNT);
+            SL_DEBUG_LOG_V2(INFO, "Buf configuration done for notify and set_att cmds buf mode = %d", DLE_BUFFER_MODE);
+            SL_DEBUG_LOG_V2(INFO, ", max buff count =%d ", DLE_BUFFER_COUNT);
           }
         }
 
@@ -1133,9 +1140,7 @@ sl_status_t update_firmware()
         if (remote_dev_feature.remote_features[0] & 0x20) {
           status = rsi_ble_set_data_len(conn_event_to_app.dev_addr, TX_LEN, TX_TIME);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n set data length cmd failed with error code = "
-                      "%lx \n",
-                      status);
+            SL_DEBUG_LOG_V2(ERROR, "set data length cmd failed with error code = %lx ", status);
             rsi_ble_app_set_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
           }
         }
@@ -1157,15 +1162,15 @@ sl_status_t update_firmware()
       case RSI_BLE_DISCONN_EVENT: {
 
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-        LOG_PRINT("\r\n Module got Disconnected\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Module got Disconnected");
         //! set device in advertising mode.
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n advertising failed %lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "advertising failed %lx", status);
           goto adv;
         } else {
-          LOG_PRINT("\r\n module advertising \r\n");
+          SL_DEBUG_LOG_V2(INFO, "module advertising ");
         }
 
       } break;
@@ -1198,14 +1203,14 @@ adv:
 #if (FW_UPGRADE_TYPE == COMBINED_FW_UP)
               const uint8_t header = firmware_header_data[0];
               if (!SI91X_OTA_RPS_HEADER_IS_COMBINED_IMAGE(header)) {
-                printf("\r\n wrong firmware selected \n");
+                SL_DEBUG_LOG_V2(ERROR, "wrong firmware selected ");
                 return SL_FW_ERROR;
               }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[48]);
 #elif (FW_UPGRADE_TYPE == TA_FW_UP)
               const uint8_t header = firmware_header_data[0];
               if (!SI91X_OTA_RPS_HEADER_IS_TA_IMAGE(header)) {
-                printf("\r\n wrong firmware selected \n");
+                SL_DEBUG_LOG_V2(ERROR, "wrong firmware selected ");
                 return SL_FW_ERROR;
               }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[8]);
@@ -1213,20 +1218,20 @@ adv:
 #elif (FW_UPGRADE_TYPE == M4_FW_UP)
               const uint8_t header = firmware_header_data[0];
               if (!SI91X_OTA_RPS_HEADER_IS_M4_IMAGE(header)) {
-                printf("\r\n wrong firmware selected \n");
+                SL_DEBUG_LOG_V2(ERROR, "wrong firmware selected ");
                 return SL_FW_ERROR;
               }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[8]);
               fw_size += FW_HEADER_SIZE;
 
 #endif
-              printf("Firmware size: %ld bytes\n", fw_size);
+              SL_DEBUG_LOG_V2(INFO, "Firmware size: %ld bytes", fw_size);
               total_number_of_chunks = (fw_size % app_ble_write_event.length)
                                          ? ((fw_size / app_ble_write_event.length) + 1)
                                          : (fw_size / app_ble_write_event.length);
-              printf("\r\n no of payload chunks :%d\n", total_number_of_chunks);
+              SL_DEBUG_LOG_V2(DEBUG, "no of payload chunks :%d", total_number_of_chunks);
               status = sl_si91x_fwup_start(firmware_header_data);
-              LOG_PRINT("\r\n Firmware transfer in progress. Please wait...  \r\n");
+              SL_DEBUG_LOG_V2(INFO, "Firmware transfer in progress. Please wait...  ");
               start_timer = osKernelGetTickCount();
               chunk_number++;
               status = sl_si91x_fwup_load(firmware_chunk_fw_payload, app_ble_write_event.length);
@@ -1237,57 +1242,58 @@ adv:
               if (status == SL_STATUS_SI91X_FW_UPDATE_DONE) {
                 stop_timer = osKernelGetTickCount();
 #if (FW_UPGRADE_TYPE == TA_FW_UP)
-                LOG_PRINT("\r\n Time in sec:%ld\r\n", (stop_timer - start_timer) / 1000);
-                LOG_PRINT("\r\n TA Firmware transfer complete!\r\n");
-                LOG_PRINT("\r\n Safe upgrade in Progress. Please wait....\r\n");
+                SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
+                SL_DEBUG_LOG_V2(INFO, "TA Firmware transfer complete!");
+                SL_DEBUG_LOG_V2(INFO, "Safe upgrade in Progress. Please wait....");
                 //! To reclaim memory back After FW OTA upgrade over
                 status = rsi_ble_disable();
                 if (status != SL_STATUS_OK) {
-                  LOG_PRINT("\r\nBLE Disable Failed, Error Code : 0x%lX\r\n", status);
+                  SL_DEBUG_LOG_V2(ERROR, "BLE Disable Failed, Error Code : 0x%lX", status);
                   return status;
                 } else {
-                  printf("\r\n BLE Disable Successful\n");
+                  SL_DEBUG_LOG_V2(INFO, "BLE Disable Successful");
                 }
                 status = sl_wifi_deinit();
-                printf("\r\nWi-Fi Deinit status : %lx\r\n", status);
+                SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit status : %lx", status);
                 VERIFY_STATUS_AND_RETURN(status);
 
                 osDelay(30000);
                 status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
                 if (status != SL_STATUS_OK) {
-                  LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+                  SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
                   return status;
                 } else {
-                  printf("\r\n Wi-Fi Initialization Successful\n");
+                  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
                 }
 
                 status = sl_wifi_get_firmware_version(&version);
                 VERIFY_STATUS_AND_RETURN(status);
 
-                printf("\r\nFirmware version after update:\r\n");
+                SL_DEBUG_LOG_V2(INFO, "Firmware version after update:");
                 print_firmware_version(&version);
 
 #elif (FW_UPGRADE_TYPE == M4_FW_UP)
-                LOG_PRINT("\r\n Time in sec:%ld\r\n", (stop_timer - start_timer) / 1000);
-                LOG_PRINT("\r\n M4 Firmware transfer complete!\r\n");
+                SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
+                SL_DEBUG_LOG_V2(INFO, "M4 Firmware transfer complete!");
                 sl_si91x_soc_nvic_reset();
 
 #elif (FW_UPGRADE_TYPE == COMBINED_FW_UP)
-                LOG_PRINT("\r\n Time in sec:%ld\r\n", (stop_timer - start_timer) / 1000);
-                LOG_PRINT("\r\n TA_M4 Combined Firmware transfer complete!\r\n");
+                SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
+                SL_DEBUG_LOG_V2(INFO, "TA_M4 Combined Firmware transfer complete!");
                 sl_si91x_soc_nvic_reset();
 #endif
                 return status;
               } else if (status != SL_STATUS_OK) {
                 const char *desc = fw_update_status_string(status);
                 if (desc != NULL) {
-                  LOG_PRINT("\r\n Firmware upgrade failed: %s (0x%lx)\r\n", desc, (unsigned long)status);
+                  SL_DEBUG_LOG_V2(ERROR, "Firmware upgrade failed: %s", (uintptr_t)(desc));
+                  SL_DEBUG_LOG_V2(ERROR, "(0x%lx)", (unsigned long)status);
                 } else {
-                  LOG_PRINT("\r\n Firmware upgrade failed. Status: 0x%lx\r\n", (unsigned long)status);
+                  SL_DEBUG_LOG_V2(ERROR, "Firmware upgrade failed. Status: 0x%lx", (unsigned long)status);
                 }
               } else {
                 if (chunk_number == total_number_of_chunks)
-                  LOG_PRINT("\r\n Firmware upgrade failed!\r\n");
+                  SL_DEBUG_LOG_V2(ERROR, "Firmware upgrade failed!");
                 chunk_number++;
               }
             }

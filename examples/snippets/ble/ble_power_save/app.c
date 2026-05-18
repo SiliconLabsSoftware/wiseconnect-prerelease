@@ -22,6 +22,7 @@
 //! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
+#include "sl_log_helper.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
@@ -84,6 +85,17 @@ osSemaphoreId_t ble_peripheral_conn_sem;
 osSemaphoreId_t ble_main_task_sem;
 static volatile uint32_t ble_app_event_map;
 static volatile uint32_t ble_app_event_map1;
+
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
@@ -358,22 +370,22 @@ int32_t rsi_initiate_power_save(void)
 {
   int32_t status = RSI_SUCCESS;
 
-  LOG_PRINT("\r\n keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Failed to initiate power save in BLE mode \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
     return status;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
     return status;
   }
 
-  LOG_PRINT("\r\n Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
   return status;
 }
 #endif
@@ -402,16 +414,16 @@ void ble_app_task(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   } else {
-    LOG_PRINT("\r\n Wi-Fi Initialization Success\n");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
   } else {
     print_firmware_version(&version);
   }
@@ -436,27 +448,27 @@ void ble_app_task(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n ble get local device address cmd failed with reason code : %lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble get local device address cmd failed with reason code : %lX ", status);
     return;
   }
   rsi_6byte_dev_address_to_ascii(local_dev_addr, (uint8_t *)rsi_app_resp_get_dev_addr);
-  LOG_PRINT("\n Get local device address: %s \n", local_dev_addr);
+  SL_DEBUG_LOG_V2(INFO, "Get local device address: %s ", (uintptr_t)(local_dev_addr));
 
   //! set the local device name
   status = rsi_bt_set_local_name((uint8_t *)RSI_BLE_LOCAL_NAME);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n ble set local name cmd failed with reason code : %lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble set local name cmd failed with reason code : %lX ", status);
     return;
   }
-  LOG_PRINT("\n Local name set to: %s\n", RSI_BLE_LOCAL_NAME);
+  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s", (uintptr_t)(RSI_BLE_LOCAL_NAME));
 
   //! get the local device name
   status = rsi_bt_get_local_name(&rsi_app_resp_get_local_name);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n ble get local name cmd failed with reason code : %lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble get local name cmd failed with reason code : %lX ", status);
     return;
   }
-  LOG_PRINT("\n Get local name: %s\n", rsi_app_resp_get_local_name.name);
+  SL_DEBUG_LOG_V2(INFO, "Get local name: %s", (uintptr_t)(rsi_app_resp_get_local_name.name));
 
   ble_peripheral_conn_sem = osSemaphoreNew(1, 0, NULL);
 
@@ -470,10 +482,10 @@ void ble_app_task(void *argument)
   rsi_ble_set_advertise_data(adv, strlen(RSI_BLE_LOCAL_NAME) + 5);
 
   //! start the advertising
-  LOG_PRINT("\n Start advertising \n");
+  SL_DEBUG_LOG_V2(INFO, "Start advertising ");
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n ble start advertising failed with reason code : %lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble start advertising failed with reason code : %lX ", status);
     return;
   }
   SET_BIT1(rsi_ble_states_bitmap, RSI_ADV_STATE);
@@ -481,20 +493,20 @@ void ble_app_task(void *argument)
 
 #if ((BLE_ROLE == CENTRAL_ROLE) || (BLE_ROLE == DUAL_ROLE))
   //! start scanning
-  LOG_PRINT("\n Start scanning \n");
+  SL_DEBUG_LOG_V2(INFO, "Start scanning ");
   status = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n ble start scanning failed with reason code : %lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble start scanning failed with reason code : %lX ", status);
     return;
   }
   SET_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE);
 #endif
 #if ENABLE_NWP_POWER_SAVE
   if (!powersave_cmd_given) {
-    LOG_PRINT("\r\n Initiating PowerSave\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Initiating PowerSave");
     status = rsi_initiate_power_save();
     if (status != RSI_SUCCESS) {
-      LOG_PRINT("\r\n Failed to initiate power save in BLE mode \r\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
       return;
     }
     powersave_cmd_given = 1;
@@ -502,7 +514,7 @@ void ble_app_task(void *argument)
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   P2P_STATUS_REG &= ~M4_wakeup_TA;
-  // LOG_PRINT("\n RSI_BLE_REQ_PWRMODE\n ");
+  // SL_DEBUG_LOG_V2(INFO, "RSI_BLE_REQ_PWRMODE\n ");
 #endif
 #endif
   while (1) {
@@ -511,8 +523,18 @@ void ble_app_task(void *argument)
     temp_event_map = rsi_ble_app_get_event();
     if (temp_event_map == RSI_FAILURE) {
       //! if events are not received loop will be continued.
+#if ((SL_SI91X_TICKLESS_MODE == 0) && (defined SLI_SI91X_MCU_INTERFACE && ENABLE_NWP_POWER_SAVE))
+      //! if events are not received loop will be continued.
+
+      if ((!(P2P_STATUS_REG & TA_wakeup_M4)) && (ble_app_event_map == 0) && (ble_app_event_map1 == 0)) {
+        P2P_STATUS_REG &= ~M4_wakeup_TA;
+        SL_DEBUG_LOG_V2(INFO, "triggering M4 sleep");
+        sl_si91x_power_manager_sleep();
+      }
+#else
       osSemaphoreAcquire(ble_main_task_sem, osWaitForever);
       continue;
+#endif
     }
 
     //! if any event is received, it will be served.
@@ -524,14 +546,14 @@ void ble_app_task(void *argument)
         //! initiate stop scanning command.
         status = rsi_ble_stop_scanning();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n ble stop scanning failed with reason code : %lX \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "ble stop scanning failed with reason code : %lX ", status);
           return;
         }
 
         //! initiating the connection with remote BLE device
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n ble connect command failed with reason code : %lX \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "ble connect command failed with reason code : %lX ", status);
           return;
         }
 
@@ -544,10 +566,10 @@ void ble_app_task(void *argument)
         temp_event_map1 = rsi_ble_app_get_event();
 
         if ((temp_event_map1 == -1) || (!(temp_event_map1 & RSI_APP_EVENT_CONNECTED))) {
-          LOG_PRINT("\r\n Initiating connect cancel command \n");
+          SL_DEBUG_LOG_V2(INFO, "Initiating connect cancel command ");
           status = rsi_ble_connect_cancel((int8_t *)remote_dev_bd_addr);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\n ble connect cancel cmd status = %lX \n", status);
+            SL_DEBUG_LOG_V2(INFO, "ble connect cancel cmd status = %lX ", status);
           } else {
             CLR_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE);
             rsi_ble_app_set_event(RSI_APP_EVENT_DISCONNECTED);
@@ -557,24 +579,24 @@ void ble_app_task(void *argument)
       } break;
       case RSI_APP_EVENT_CONNECTED: {
         //! remote device connected event
-        LOG_PRINT("\n Connection is success .............\n");
+        SL_DEBUG_LOG_V2(INFO, "Connection is success .............");
         //! clear the connected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_CONNECTED);
 
       } break;
       case RSI_APP_EVENT_DISCONNECTED: {
         //! remote device disconnected event
-        LOG_PRINT("\n In disconnect event............ \n ");
+        SL_DEBUG_LOG_V2(INFO, "In disconnect event............ \n ");
         //! clear the disconnected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_DISCONNECTED);
 
-        LOG_PRINT("\n Keep module in to active state \n");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state ");
 #if ENABLE_NWP_POWER_SAVE
-        LOG_PRINT("\r\n Keep module in to active state \r\n");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state ");
         //! initiating Active mode in BT mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n Failed to keep Module in ACTIVE mode \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
           return;
         }
 
@@ -582,18 +604,18 @@ void ble_app_task(void *argument)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("\r\n Failed to keep module in HIGH_PERFORMANCE mode \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
           return;
         }
 #endif
         if (((BLE_ROLE == PERIPHERAL_ROLE) || (BLE_ROLE == DUAL_ROLE))
             && (!(CHK_BIT1(rsi_ble_states_bitmap, RSI_ADV_STATE)))) {
           //! set device in advertising mode.
-          LOG_PRINT("\n Start advertising \n");
+          SL_DEBUG_LOG_V2(INFO, "Start advertising ");
 adv:
           status = rsi_ble_start_advertising();
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\n ble start advertising failed with reason code : %lX \n", status);
+            SL_DEBUG_LOG_V2(ERROR, "ble start advertising failed with reason code : %lX ", status);
             goto adv;
           }
           SET_BIT1(rsi_ble_states_bitmap, RSI_ADV_STATE);
@@ -602,17 +624,17 @@ adv:
             && (!(CHK_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE)))) {
           device_found = false;
           //! set device in scanning mode.
-          LOG_PRINT("\n Start scanning \n");
+          SL_DEBUG_LOG_V2(INFO, "Start scanning ");
 scan:
           status = rsi_ble_start_scanning();
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\n ble start scanning failed with reason code : %lX \n", status);
+            SL_DEBUG_LOG_V2(ERROR, "ble start scanning failed with reason code : %lX ", status);
             goto scan;
           }
           SET_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE);
         }
 #if ENABLE_NWP_POWER_SAVE
-        LOG_PRINT("\r\n Keep module in to power save \r\n");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to power save ");
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
           return;
@@ -622,10 +644,10 @@ scan:
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("\r\n Failed to keep module in power save \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
           return;
         }
-        LOG_PRINT("\r\n Module is in power save \r\n");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
 #endif
       } break;
     }

@@ -40,3 +40,6 @@ toolchain_settings:
     value: -Wall -Werror -Wno-error=deprecated-declarations
   - option: llvm_compiler_option
     value: -Wall -Werror -Wno-error=deprecated-declarations
+  - option: llvm_compiler_option
+    value: -Wno-format -Wno-varargs    
+    condition: ["aws_sdk"]

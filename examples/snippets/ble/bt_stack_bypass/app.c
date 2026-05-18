@@ -17,6 +17,7 @@
 
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
+#include "sl_log_helper.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
@@ -160,6 +161,17 @@ rsi_data_packet_t rsi_data_packet;
 #ifdef SLI_SI91X_MCU_INTERFACE
 void uart_callback_event(uint32_t event);
 #endif
+
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
@@ -438,7 +450,7 @@ static void read_user_packet_iostream_rx(void)
         pkt_len++;
         status = iostream_rx(&rx_buffer[1], 2);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
+          SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
           return;
         }
         uart_rx_state = UART_READING_HCI_OPCODE;
@@ -448,14 +460,14 @@ static void read_user_packet_iostream_rx(void)
         if (rx_buffer[0] == HCI_COMMAND_PKT) {
           status = iostream_rx((uint8_t *)&cmd_length, 1);
           if (status != SL_STATUS_OK) {
-            LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
+            SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
             return;
           }
           uart_rx_state = UART_READING_HCI_LEN;
         } else {
           status = iostream_rx((uint8_t *)&cmd_length, 2);
           if (status != SL_STATUS_OK) {
-            LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
+            SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
             return;
           }
           uart_rx_state = UART_READING_HCI_LEN;
@@ -479,7 +491,7 @@ static void read_user_packet_iostream_rx(void)
         }
         status = iostream_rx(&rx_buffer[pkt_len], cmd_length);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("iostream_rx: Error Code : %lu \n", (unsigned long)status);
+          SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
           return;
         }
         uart_rx_state = UART_RECEIVING_ACTUAL_PACKET;
@@ -510,7 +522,7 @@ static void hci_iostream_rx_thread(void *argument)
   for (;;) {
     status = iostream_rx(&rx_buffer[0], 1);
     if (status != SL_STATUS_OK) {
-      LOG_PRINT("iostream_rx first byte: Error Code : %lu \n", (unsigned long)status);
+      SL_DEBUG_LOG_V2(ERROR, "iostream_rx first byte: Error Code : %lu ", (unsigned long)status);
       continue;
     }
     uart_rx_state = UART_READING_HCI_PKT_TYPE;
@@ -532,7 +544,7 @@ void read_user_packet(void)
       status = sl_si91x_usart_receive_data(uart_handle, &rx_buffer[1], 2);
       if (status != SL_STATUS_OK) {
         // If it fails to execute the API, it will not execute rest of the things
-        DEBUGOUT("sl_si91x_uart_receive_data: Error Code : %lu \n", status);
+        SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_receive_data: Error Code : %lu ", status);
       }
       uart_rx_state = UART_READING_HCI_OPCODE;
     } break;
@@ -542,14 +554,14 @@ void read_user_packet(void)
         status = sl_si91x_usart_receive_data(uart_handle, &cmd_length, 1);
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          DEBUGOUT("sl_si91x_uart_receive_data: Error Code : %lu \n", status);
+          SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_receive_data: Error Code : %lu ", status);
         }
         uart_rx_state = UART_READING_HCI_LEN;
       } else {
         status = sl_si91x_usart_receive_data(uart_handle, &cmd_length, 2);
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          DEBUGOUT("sl_si91x_uart_receive_data: Error Code : %lu \n", status);
+          SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_receive_data: Error Code : %lu ", status);
         }
         uart_rx_state = UART_READING_HCI_LEN;
       }
@@ -572,7 +584,7 @@ void read_user_packet(void)
         status = sl_si91x_usart_receive_data(uart_handle, &rx_buffer[pkt_len], cmd_length);
         if (status != SL_STATUS_OK) {
           // If it fails to execute the API, it will not execute rest of the things
-          DEBUGOUT("sl_si91x_uart_receive_data: Error Code : %lu \n", status);
+          SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_receive_data: Error Code : %lu ", status);
         }
         uart_rx_state = UART_RECEIVING_ACTUAL_PACKET;
       }
@@ -661,26 +673,26 @@ int32_t rsi_ble_app_init_uart(void)
     // Initialize the UART
     status = sl_si91x_usart_init(USART_0, &uart_handle);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_initialize: Error Code : %lu \n", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_initialize: Error Code : %lu ", status);
       break;
     }
-    DEBUGOUT("UART initialization is successful \n");
+    SL_DEBUG_LOG_V2(DEBUG, "UART initialization is successful ");
     // Configure the UART configurations
     status = sl_si91x_usart_set_configuration(uart_handle, &uart_config);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_set_configuration: Error Code : %lu ", status);
       break;
     }
-    DEBUGOUT("UART configuration is successful \n");
+    SL_DEBUG_LOG_V2(DEBUG, "UART configuration is successful ");
     // Register user callback function
     status = sl_si91x_usart_multiple_instance_register_event_callback(USART_0, uart_callback_event);
     if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_register_event_callback: Error Code : %lu ", status);
       break;
     }
-    DEBUGOUT("UART user event callback registered successfully \n");
+    SL_DEBUG_LOG_V2(DEBUG, "UART user event callback registered successfully ");
     sl_si91x_usart_get_configurations(USART_0, &get_config);
-    DEBUGOUT("Baud Rate = %ld \n", get_config.baudrate);
+    SL_DEBUG_LOG_V2(DEBUG, "Baud Rate = %ld ", get_config.baudrate);
   } while (false);
   return status;
 }
@@ -699,18 +711,18 @@ void rsi_ble_hci_raw_task(void *argument)
   uint32_t reg_read = 0;
   /* checking the bit(5) in MCU_STORAGE_REG2 to know the WWD reset source */
   reg_read = *(volatile uint32_t *)(0x24048138);
-  DEBUGOUT("\n Reset reason : 0x%ld \n", reg_read);
+  SL_DEBUG_LOG_V2(DEBUG, "Reset reason : 0x%ld ", reg_read);
   if (reg_read & BIT(5)) {
     //! If we are sending response immediately for hci reset command remote device not able to understand it. So adding the delay.
     status = sl_si91x_usart_send_data(uart_handle, tx_buf_dummy, (tx_buf_dummy[2] + 3));
     if (status != SL_STATUS_OK) {
       // If it fails to execute the API, it will not execute rest of the things
-      DEBUGOUT("sl_si91x_uart_send_data: Error Code : %lu \n", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_send_data: Error Code : %lu ", status);
     }
     status = sl_si91x_usart_receive_data(uart_handle, rx_buffer, sizeof(rx_buffer));
     if (status != SL_STATUS_OK) {
       // If it fails to execute the API, it will not execute rest of the things
-      DEBUGOUT("sl_si91x_uart_receive_data: Error Code : %lu \n", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_receive_data: Error Code : %lu ", status);
     }
     /* clearing bit(5) in MCU_STORAGE_REG2 */
     *(volatile uint32_t *)(0x24048138) &= ~BIT(5);
@@ -734,10 +746,10 @@ void rsi_ble_hci_raw_task(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   } else {
-    LOG_PRINT("\r\n Wi-Fi Initialization Successful\n");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
   }
 
 #if BTDM_DEBUG_LOGGING
@@ -746,16 +758,16 @@ void rsi_ble_hci_raw_task(void *argument)
                             si91x_application_debug_buffer,
                             sizeof(si91x_application_debug_buffer),
                             SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
-  LOG_PRINT("\r\nRTT config is successful\n");
+  SL_DEBUG_LOG_V2(INFO, "RTT config is successful");
 #endif
 
 #if RSI_SET_REGION_SUPPORT && !SL_SI91X_ACX_MODULE
   status = sl_si91x_set_device_region(0, 0, 4);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\nSet Region Failed, Error Code : %ld\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Set Region Failed, Error Code : %ld", status);
     return;
   } else {
-    LOG_PRINT("\r\nSet Region Success\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Set Region Success");
   }
 #endif
 
@@ -770,10 +782,10 @@ void rsi_ble_hci_raw_task(void *argument)
   osThreadId_t bt_debug_logs_thread_id =
     osThreadNew((osThreadFunc_t)rsi_task_bt_debug_logs, NULL, &bt_debug_logs_thread_attributes);
   if (bt_debug_logs_thread_id == NULL) {
-    LOG_PRINT("\r\nbt_debug_logs_thread failed to create\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "bt_debug_logs_thread failed to create");
     return;
   }
-  LOG_PRINT("\r\nbt_debug_logs_thread created and started\n");
+  SL_DEBUG_LOG_V2(DEBUG, "bt_debug_logs_thread created and started");
   osSemaphoreRelease(bt_debug_logs_sem);
 #endif
 
@@ -792,22 +804,22 @@ void rsi_ble_hci_raw_task(void *argument)
 #endif
 
 #if ENABLE_NWP_POWER_SAVE
-  LOG_PRINT("\r\n keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
 
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Failed to initiate BLE power save \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate BLE power save ");
     return;
   }
 
   //! initiating power save in BLE only mode, for coex mode, wifi power save is called in wifiapp.c
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Failed to initiate Wi-Fi power save  :%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate Wi-Fi power save  :%lx", status);
     return;
   }
-  LOG_PRINT("\r\n Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
 #endif
 
   while (1) {
@@ -835,9 +847,9 @@ void rsi_ble_hci_raw_task(void *argument)
             status = sl_si91x_usart_send_data(uart_handle, rx_pkt->tx_buf, (rx_pkt->cmd_len + 1));
             if (status != SL_STATUS_OK) {
               // If it fails to execute the API, it will not execute rest of the things
-              DEBUGOUT("sl_si91x_uart_send_data: Error Code : %lu \n", status);
+              SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_send_data: Error Code : %lu ", status);
             } else {
-              DEBUGOUT("sl_si91x_uart_send_data success\n");
+              SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_uart_send_data success");
             }
             uart_rx_in_progress = 1;
           }
@@ -852,9 +864,9 @@ void rsi_ble_hci_raw_task(void *argument)
             if (rx_pkt != NULL) {
               status = iostream_tx(rx_pkt->tx_buf, (size_t)(rx_pkt->cmd_len + 1));
               if (status != SL_STATUS_OK) {
-                DEBUGOUT("iostream_tx: Error Code : %lu \n", status);
+                SL_DEBUG_LOG_V2(DEBUG, "iostream_tx: Error Code : %lu ", status);
               } else {
-                DEBUGOUT("iostream_tx success\n");
+                SL_DEBUG_LOG_V2(DEBUG, "iostream_tx success");
               }
               rx_pkt->pkt_in_use = 0;
               DEL_FROM_LIST(rx_queue);

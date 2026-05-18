@@ -140,8 +140,24 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
                                               uint8_t sha_flags,
                                               const uint8_t *digest)
 {
-  sl_status_t status                  = SL_STATUS_OK;
-  uint8_t *output_ptr                 = (uint8_t *)digest;
+  sl_status_t status  = SL_STATUS_OK;
+  uint8_t *output_ptr = (uint8_t *)digest;
+// Fill Algorithm type
+// SHA1/SHA2 use algorithm_type = SHA (4)
+// SHA3 uses algorithm_type = SHA3 (16)
+#ifdef SL_SI91X_SHA3_ENABLE
+
+  sli_si91x_sha_request_t *request = (sli_si91x_sha_request_t *)malloc(sizeof(sli_si91x_sha_request_t));
+
+  if (request == NULL) {
+    return SL_STATUS_ALLOCATION_FAILED;
+  }
+
+  memset(request, 0, sizeof(sli_si91x_sha_request_t));
+  (void)current_chunk_length;
+  (void)sha_flags;
+#else
+
   sli_si91x_sha_mp_request_t *request = (sli_si91x_sha_mp_request_t *)malloc(sizeof(sli_si91x_sha_mp_request_t));
 
   if (request == NULL) {
@@ -149,6 +165,7 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
   }
 
   memset(request, 0, sizeof(sli_si91x_sha_mp_request_t));
+#endif
 
 // Fill Algorithm type
 // SHA1/SHA2 use algorithm_type = SHA (4)
@@ -164,14 +181,16 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
 
   request->algorithm_sub_type = sha_mode;
 
+#ifndef SL_SI91X_SHA3_ENABLE
   // Fill sha flags
-  request->sha_flags = sha_flags;
+  request->sha_flags            = sha_flags;
+  request->current_chunk_length = current_chunk_length;
+#endif
 
   // Fill total msg length
   request->total_msg_length = msg_length;
 
   // Fill currnet chunk length
-  request->current_chunk_length = current_chunk_length;
 
   // Fill msg ptr
   request->msg = msg;
@@ -180,7 +199,11 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
 
   status = sl_si91x_driver_send_side_band_crypto(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
                                                  request,
+#ifdef SL_SI91X_SHA3_ENABLE
+                                                 (sizeof(sli_si91x_sha_request_t)),
+#else
                                                  (sizeof(sli_si91x_sha_mp_request_t)),
+#endif
                                                  SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME));
   free(request);
   request = NULL;

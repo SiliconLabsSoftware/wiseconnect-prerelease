@@ -37,6 +37,7 @@
 #include "rsi_bt_common_apis.h"
 #include "rsi_common_utils.h"
 #include "assert.h"
+#include "sl_log_helper.h"
 
 #ifndef SLI_SI91X_MCU_INTERFACE
 #include "app_rtt_logging.h"
@@ -624,7 +625,8 @@ void rsi_app_init_queue(rsi_app_queue_t *queue)
 }
 void _assert(uint8_t *msg, uint16_t line_number)
 {
-  LOG_PRINT("\r\n %s %u \n", msg, line_number);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)(msg));
+  SL_DEBUG_LOG_V2(INFO, "%u ", line_number);
   while (1)
     ;
 }

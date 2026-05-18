@@ -31,6 +31,7 @@
 //! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
+#include "sl_log_helper.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
@@ -112,6 +113,17 @@ static rsi_ble_ae_adv_report_t ble_app_ae_adv_report;
 
 osSemaphoreId_t ble_peripheral_conn_sem;
 osSemaphoreId_t ble_main_task_sem;
+
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
@@ -301,7 +313,7 @@ void rsi_ble_simple_central_on_ae_periodic_adv_sync_lost_event(uint16_t status,
 {
   UNUSED_PARAMETER(status);
 
-  LOG_PRINT("\n \n Periodic Adv Sync Lost Event : sync handle = %d \r\n", ae_per_sync_lost->sync_handle);
+  SL_DEBUG_LOG_V2(INFO, "\n Periodic Adv Sync Lost Event : sync handle = %d ", ae_per_sync_lost->sync_handle);
 
   rsi_ble_app_set_event(RSI_APP_EVENT_AE_PER_ADV_SYNC_LOST);
 }
@@ -311,7 +323,7 @@ void rsi_ble_simple_central_on_ae_scan_timeout_event(uint16_t status, rsi_ble_sc
   UNUSED_PARAMETER(status);
   UNUSED_PARAMETER(ae_scan_timeout);
 
-  LOG_PRINT("\n \n AE Scan time-out event \r\n");
+  SL_DEBUG_LOG_V2(INFO, "\n AE Scan time-out event ");
 
   rsi_ble_app_set_event(RSI_APP_EVENT_AE_SCAN_TIMEOUT);
 }
@@ -320,10 +332,10 @@ void rsi_ble_simple_central_on_ae_adv_set_terminated_event(uint16_t status, rsi_
 {
   UNUSED_PARAMETER(status);
 
-  LOG_PRINT("\n \n Adv set terminated event :status = %d \r\n", ae_adv_set->status);
-  LOG_PRINT_D("\n \n \t \t adv handle = %d \r\n", ae_adv_set->adv_handle);
-  LOG_PRINT_D("\n \n \t \t connection handle = %d \r\n", ae_adv_set->conn_handle);
-  LOG_PRINT_D("\n \n \t \t No.of Completed AE events = %d \r\n", ae_adv_set->num_completed_ae_events);
+  SL_DEBUG_LOG_V2(INFO, "\n Adv set terminated event :status = %d ", ae_adv_set->status);
+  SL_DEBUG_LOG_V2(DEBUG, "\n \t \t adv handle = %d ", ae_adv_set->adv_handle);
+  SL_DEBUG_LOG_V2(DEBUG, "\n \t \t connection handle = %d ", ae_adv_set->conn_handle);
+  SL_DEBUG_LOG_V2(DEBUG, "\n \t \t No.of Completed AE events = %d ", ae_adv_set->num_completed_ae_events);
 
   rsi_ble_app_set_event(RSI_APP_EVENT_AE_ADV_SET_TERMINATED);
 }
@@ -334,11 +346,11 @@ void rsi_ble_simple_central_on_ae_scan_req_recvd_event(uint16_t status, rsi_ble_
 
   uint8_t scanner_addr[18] = { 0 };
 
-  LOG_PRINT("\n \n AE scan request received event :adv handle = %d \r\n", ae_scan_req->adv_handle);
-  LOG_PRINT_D("\n \n \t \t scanner addr type = %d \r\n", ae_scan_req->scanner_addr_type);
+  SL_DEBUG_LOG_V2(INFO, "\n AE scan request received event :adv handle = %d ", ae_scan_req->adv_handle);
+  SL_DEBUG_LOG_V2(DEBUG, "\n \t \t scanner addr type = %d ", ae_scan_req->scanner_addr_type);
 
   rsi_6byte_dev_address_to_ascii((uint8_t *)scanner_addr, (uint8_t *)ae_scan_req->scanner_addr);
-  LOG_PRINT_D("\n \n \t \t Adv addr = %s\r\n", scanner_addr);
+  SL_DEBUG_LOG_V2(DEBUG, "\n \t \t Adv addr = %s", (uintptr_t)(scanner_addr));
 
   rsi_ble_app_set_event(RSI_APP_EVENT_AE_SCAN_REQ_RECVD);
 }
@@ -440,44 +452,44 @@ void ble_extended_adv_callbacks_register(void)
                                                      (void *)rsi_ble_simple_central_on_ae_adv_report_event);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n RSI_BLE_ON_ADV_EXT_ADVERTISE_REPORT_EVENT callback registering failed \n");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_ON_ADV_EXT_ADVERTISE_REPORT_EVENT callback registering failed ");
   }
   status =
     rsi_ble_adv_ext_events_register_callbacks(RSI_BLE_ON_ADV_EXT_PERIODIC_ADV_SYNC_ESTBL_EVENT,
                                               (void *)rsi_ble_simple_central_on_ae_periodic_adv_sync_estbl_event);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n RSI_BLE_ON_ADV_EXT_PERIODIC_ADV_SYNC_ESTBL_EVENT callback registering failed \n");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_ON_ADV_EXT_PERIODIC_ADV_SYNC_ESTBL_EVENT callback registering failed ");
   }
   status = rsi_ble_adv_ext_events_register_callbacks(RSI_BLE_ON_ADV_EXT_PERIODIC_ADVERTISE_REPORT_EVENT,
                                                      (void *)rsi_ble_simple_central_on_ae_periodic_adv_report_event);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n RSI_BLE_ON_ADV_EXT_PERIODIC_ADVERTISE_REPORT_EVENT callback registering failed \n");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_ON_ADV_EXT_PERIODIC_ADVERTISE_REPORT_EVENT callback registering failed ");
   }
   status = rsi_ble_adv_ext_events_register_callbacks(RSI_BLE_ON_ADV_EXT_PERIODIC_ADV_SYNC_LOST_EVENT,
                                                      (void *)rsi_ble_simple_central_on_ae_periodic_adv_sync_lost_event);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n RSI_BLE_ON_ADV_EXT_PERIODIC_ADV_SYNC_LOST_EVENT callback registering failed \n");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_ON_ADV_EXT_PERIODIC_ADV_SYNC_LOST_EVENT callback registering failed ");
   }
   status = rsi_ble_adv_ext_events_register_callbacks(RSI_BLE_ON_ADV_EXT_SCAN_TIMEOUT_EVENT,
                                                      (void *)rsi_ble_simple_central_on_ae_scan_timeout_event);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n RSI_BLE_ON_ADV_EXT_SCAN_TIMEOUT_EVENT callback registering failed \n");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_ON_ADV_EXT_SCAN_TIMEOUT_EVENT callback registering failed ");
   }
   status = rsi_ble_adv_ext_events_register_callbacks(RSI_BLE_ON_ADV_EXT_ADVERTISE_SET_TERMINATED_EVENT,
                                                      (void *)rsi_ble_simple_central_on_ae_adv_set_terminated_event);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n RSI_BLE_ON_ADV_EXT_ADVERTISE_SET_TERMINATED_EVENT callback registering failed \n");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_ON_ADV_EXT_ADVERTISE_SET_TERMINATED_EVENT callback registering failed ");
   }
   status = rsi_ble_adv_ext_events_register_callbacks(RSI_BLE_ON_ADV_EXT_SCAN_REQUEST_RECEIVED_EVENT,
                                                      (void *)rsi_ble_simple_central_on_ae_scan_req_recvd_event);
 
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n RSI_BLE_ON_ADV_EXT_SCAN_REQUEST_RECEIVED_EVENT callback registering failed \n");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_ON_ADV_EXT_SCAN_REQUEST_RECEIVED_EVENT callback registering failed ");
   }
 }
 
@@ -501,16 +513,16 @@ void ble_ae_central(void)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   } else {
-    LOG_PRINT("\r\n Wi-Fi Initialization Success\n");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
   } else {
     print_firmware_version(&version);
   }
@@ -518,30 +530,30 @@ void ble_ae_central(void)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Get local device address failed = %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    LOG_PRINT("\r\n Local device address %s \r\n", local_dev_addr);
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
   }
 
 #if ENABLE_NWP_POWER_SAVE
-  LOG_PRINT("\r\n Keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Keep module in to power save ");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Failed to initiate power save in BLE mode \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
     return;
   }
 
-  LOG_PRINT("\r\n Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
 #endif
 
   //! BLE register GAP callbacks
@@ -579,9 +591,9 @@ void ble_ae_central(void)
 #endif
   status = rsi_ble_ae_set_scan_params(&ae_set_scan_params);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT(" \n set ae scan params failed with status 0x%lX\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n set ae scan params failed with status 0x%lX", status);
   } else {
-    LOG_PRINT(" \n set ae scan params success \n");
+    SL_DEBUG_LOG_V2(INFO, "\n set ae scan params success ");
   }
   // AE scan enable
   rsi_ble_ae_set_scan_enable_t ae_set_scan_enable = { 0 };
@@ -591,10 +603,10 @@ void ble_ae_central(void)
   ae_set_scan_enable.period                       = BLE_SCAN_PERIOD;
   status                                          = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT(" \n set ae scan enable failed with 0x%lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n set ae scan enable failed with 0x%lX ", status);
     return;
   } else {
-    LOG_PRINT(" \n set ae scan enable success \n");
+    SL_DEBUG_LOG_V2(INFO, "\n set ae scan enable success ");
   }
 #if BLE_AE_PERIODIC_LIST_USED
   rsi_ble_ae_dev_to_periodic_list_t ae_add_dev = { 0 };
@@ -605,9 +617,9 @@ void ble_ae_central(void)
   // AE Add Device to Periodic Adv list
   status = rsi_ble_ae_dev_to_periodic_list(&ae_add_dev);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n Adding device to Periodic list failed with 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Adding device to Periodic list failed with 0x%lX", status);
   } else {
-    LOG_PRINT("\n successfully added remote device to Periodic Adv List \n");
+    SL_DEBUG_LOG_V2(INFO, "successfully added remote device to Periodic Adv List ");
   }
 #endif
   // AE Periodic create sync
@@ -618,21 +630,21 @@ void ble_ae_central(void)
   ae_per_sync_create.options       = BLE_AE_OPTIONS;
   ae_per_sync_create.skip          = BLE_AE_ADV_SKIP;
   ae_per_sync_create.sync_timeout  = BLE_AE_SYNC_TIMOUT;
-  LOG_PRINT("\n size of create sync structure is %d\n", sizeof(ae_per_sync_create));
+  SL_DEBUG_LOG_V2(DEBUG, "size of create sync structure is %d", sizeof(ae_per_sync_create));
   status = rsi_ble_ae_set_periodic_sync(BLE_AE_PER_SYNC_CREATE, &ae_per_sync_create);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT(" \n set ae periodic sync failed with 0x%lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n set ae periodic sync failed with 0x%lX ", status);
   } else {
-    LOG_PRINT(" \n set ae periodic sync success \n");
+    SL_DEBUG_LOG_V2(INFO, "\n set ae periodic sync success ");
   }
 #if BLE_AE_PERIODIC_SYNC_CANCEL
   // AE Periodic create cancel sync
   status = rsi_ble_ae_set_periodic_sync(BLE_AE_PER_SYNC_CANCEL, &ae_per_sync_create);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT(" \n set ae periodic sync cancel failed with 0x%lX \n ", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n set ae periodic sync cancel failed with 0x%lX \n ", status);
     return;
   } else {
-    LOG_PRINT(" \n set ae periodic sync cancel success \n");
+    SL_DEBUG_LOG_V2(INFO, "\n set ae periodic sync cancel success ");
   }
 #endif
 
@@ -646,10 +658,10 @@ void ble_ae_central(void)
   status = rsi_ble_ae_dev_to_periodic_list(&ae_remv_dev);
   if(status != RSI_SUCCESS)
   {
-    LOG_PRINT("\n Removing device from AE periodic list failed with 0x%lX",status);
+    SL_DEBUG_LOG_V2(ERROR, "Removing device from AE periodic list failed with 0x%lX", status);
   }
   else{
-      LOG_PRINT("\n successfully removed remote device from Periodic Adv List \n");
+      SL_DEBUG_LOG_V2(INFO, "successfully removed remote device from Periodic Adv List ");
   }
 #endif
 
@@ -663,18 +675,18 @@ void ble_ae_central(void)
   ae_clear_dev.type          = BLE_AE_CLEAR_PER_LIST;
   status                     = rsi_ble_ae_dev_to_periodic_list(&ae_clear_dev);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\n Clearing Periodic device list failed with 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Clearing Periodic device list failed with 0x%lX", status);
   } else {
-    LOG_PRINT("\n successfully cleared Periodic Adv List \n");
+    SL_DEBUG_LOG_V2(INFO, "successfully cleared Periodic Adv List ");
   }
 
   // AE Read Periodic Advertiser list size
   status = rsi_ble_ae_read_periodic_adv_list_size(&size);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT(" \n read ae periodic adv list size cmd failed with 0x%lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n read ae periodic adv list size cmd failed with 0x%lX ", status);
     return;
   } else {
-    LOG_PRINT(" \n read ae periodic adv list size cmd success and size is %d \n", size);
+    SL_DEBUG_LOG_V2(INFO, "\n read ae periodic adv list size cmd success and size is %d ", size);
   }
 #endif
 
@@ -682,12 +694,11 @@ void ble_ae_central(void)
   rsi_ble_tx_pwr_t tx_pwr;
   status = rsi_ble_read_transmit_power(&tx_pwr);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT(" \n read tx_power cmd failed with 0x%lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n read tx_power cmd failed with 0x%lX ", status);
     return;
   } else {
-    LOG_PRINT(" \n read tx power cmd success and  \n min_tx_pwr = %i \n max_tx_pwr = %i \n",
-              tx_pwr.min_tx_pwr,
-              tx_pwr.max_tx_pwr);
+    SL_DEBUG_LOG_V2(INFO, "\n read tx power cmd success and  \n min_tx_pwr = %i", tx_pwr.min_tx_pwr);
+    SL_DEBUG_LOG_V2(INFO, "\n max_tx_pwr = %i ", tx_pwr.max_tx_pwr);
   }
 
 #if 0
@@ -696,12 +707,13 @@ void ble_ae_central(void)
   status = rsi_ble_read_rf_path_compensation(&rf_path_comp);
   if(status != RSI_SUCCESS)
   {
-    LOG_PRINT (" \n read rf path comp cmd failed with 0x%lX \n",status);
+    SL_DEBUG_LOG_V2(ERROR, "\n read rf path comp cmd failed with 0x%lX ", status);
     return;
   }
   else
   {
-    LOG_PRINT (" \n read rf path comp cmd success and  \n tx_path_value  = %i \n rx_path_value = %i \n",rf_path_comp->tx_path_value,rf_path_comp->rx_path_value);
+    SL_DEBUG_LOG_V2(INFO, "\n read rf path comp cmd success and  \n tx_path_value  = %i", rf_path_comp->tx_path_value);
+    SL_DEBUG_LOG_V2(INFO, "\n rx_path_value = %i ", rf_path_comp->rx_path_value);
   }
 
 
@@ -709,7 +721,7 @@ void ble_ae_central(void)
   status = rsi_ble_write_rf_path_compensation(10,10);
   if(status != RSI_SUCCESS)
   {
-    LOG_PRINT (" \n write rf path comp cmd failed with 0x%lX \n");
+    SL_DEBUG_LOG_V2(ERROR, "\n write rf path comp cmd failed with 0x%lX ");
     return;
   }
 
@@ -736,7 +748,7 @@ void ble_ae_central(void)
 
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_addr);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("connect status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "connect status: 0x%lX", status);
         }
 
       } break;
@@ -754,13 +766,14 @@ void ble_ae_central(void)
         ae_set_scan_enable.period            = BLE_SCAN_PERIOD;
         status                               = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT(" \n set ae scan disable failed with 0x%lX \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "\n set ae scan disable failed with 0x%lX ", status);
         } else {
-          LOG_PRINT(" \n set ae scan diasable success \n");
+          SL_DEBUG_LOG_V2(INFO, "\n set ae scan diasable success ");
         }
 
         rsi_6byte_dev_address_to_ascii((uint8_t *)remote_dev_addr, (uint8_t *)ble_app_ae_adv_report.remote_addr);
-        LOG_PRINT("\n ae report rec for %s with type %d\n", remote_dev_addr, ble_app_ae_adv_report.remote_addr_type);
+        SL_DEBUG_LOG_V2(INFO, "ae report rec for %s", (uintptr_t)(remote_dev_addr));
+        SL_DEBUG_LOG_V2(INFO, "with type %d", ble_app_ae_adv_report.remote_addr_type);
 #if 0
         rsi_delay_ms(1000);
         device_found = 0;
@@ -772,9 +785,9 @@ void ble_ae_central(void)
         ae_set_scan_enable.period                       = BLE_SCAN_PERIOD;
         status                                          = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
         if (status != RSI_SUCCESS) {
-            LOG_PRINT(" \n set ae scan enable failed with 0x%lX \n", status);
+            SL_DEBUG_LOG_V2(ERROR, "\n set ae scan enable failed with 0x%lX ", status);
         } else
-          LOG_PRINT(" \n set ae scan enable success \n");
+          SL_DEBUG_LOG_V2(INFO, "\n set ae scan enable success ");
 #else
 
         /**************************************************/
@@ -801,20 +814,20 @@ void ble_ae_central(void)
           ble_extended_create_conn.init_params[ix].MaxCELen        = CONNECTION_EVENT_LEN_MAX;
         }
 
-        LOG_PRINT("\r\n Initiating connect command \n");
+        SL_DEBUG_LOG_V2(INFO, "Initiating connect command ");
         status = rsi_ble_extended_connect_with_params(&ble_extended_create_conn);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("connect status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "connect status: 0x%lX", status);
         } else {
 
           osSemaphoreAcquire(ble_peripheral_conn_sem, osWaitForever);
           temp_event_map1 = rsi_ble_app_get_event();
 
           if ((temp_event_map1 == -1) || (!(temp_event_map1 & RSI_APP_EVENT_CONNECTED))) {
-            LOG_PRINT("\r\n Initiating connect cancel command \n");
+            SL_DEBUG_LOG_V2(INFO, "Initiating connect cancel command ");
             status = rsi_ble_connect_cancel((int8_t *)remote_dev_bd_addr);
             if (status != RSI_SUCCESS) {
-              LOG_PRINT("\r\n ble connect cancel cmd status = %lx \n", status);
+              SL_DEBUG_LOG_V2(INFO, "ble connect cancel cmd status = %lx ", status);
             } else {
               rsi_ble_app_set_event(RSI_APP_EVENT_DISCONNECTED);
             }
@@ -834,9 +847,9 @@ void ble_ae_central(void)
         ae_per_sync_terminate.sync_handle                                  = BLE_AE_ADV_SID;
         status = rsi_ble_ae_set_periodic_sync(BLE_AE_PER_SYNC_TERMINATE, &ae_per_sync_terminate);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT(" \n set ae periodic sync terminate failed with 0x%lX \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "\n set ae periodic sync terminate failed with 0x%lX ", status);
         } else {
-          LOG_PRINT(" \n set ae periodic sync terminate success \n");
+          SL_DEBUG_LOG_V2(INFO, "\n set ae periodic sync terminate success ");
         }
 #endif
         //! clear the event.
@@ -891,9 +904,8 @@ void ble_ae_central(void)
 
         rsi_6byte_dev_address_to_ascii((uint8_t *)remote_dev_addr,
                                        (uint8_t *)rsi_app_enhanced_connected_device.dev_addr);
-        LOG_PRINT("\n Remote device connected %s with type %d\n",
-                  remote_dev_addr,
-                  rsi_app_enhanced_connected_device.dev_addr_type);
+        SL_DEBUG_LOG_V2(INFO, "Remote device connected %s", (uintptr_t)(remote_dev_addr));
+        SL_DEBUG_LOG_V2(INFO, "with type %d", rsi_app_enhanced_connected_device.dev_addr_type);
 
         /**************************************************/
         /************ Extended Advertising Enable *********/
@@ -907,9 +919,9 @@ void ble_ae_central(void)
         ae_set_scan_enable.period            = BLE_SCAN_PERIOD;
         status                               = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT(" \n set ae scan enable failed with 0x%lX \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "\n set ae scan enable failed with 0x%lX ", status);
         } else
-          LOG_PRINT(" \n set ae scan enable success \n");
+          SL_DEBUG_LOG_V2(INFO, "\n set ae scan enable success ");
 
       } break;
 
@@ -933,9 +945,9 @@ void ble_ae_central(void)
         ae_set_scan_enable.period            = BLE_SCAN_PERIOD;
         status                               = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT(" \n set ae scan enable failed with 0x%lX \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "\n set ae scan enable failed with 0x%lX ", status);
         } else
-          LOG_PRINT(" \n set ae scan enable success \n");
+          SL_DEBUG_LOG_V2(INFO, "\n set ae scan enable success ");
       } break;
     }
   }

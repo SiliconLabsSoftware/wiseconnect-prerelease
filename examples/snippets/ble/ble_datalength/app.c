@@ -23,6 +23,7 @@
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_constants.h"
+#include "sl_log_helper.h"
 #include "cmsis_os2.h"
 #include "sl_utility.h"
 #include "FreeRTOSConfig.h"
@@ -90,6 +91,17 @@ uint8_t str_remote_address[18] = { '\0' };
 osSemaphoreId_t ble_main_task_sem;
 static volatile uint32_t ble_app_event_map;
 static volatile uint32_t ble_app_event_map1;
+
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
@@ -365,16 +377,16 @@ void ble_central(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   } else {
-    LOG_PRINT("\r\n Wi-Fi Initialization Success\n");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
   } else {
     print_firmware_version(&version);
   }
@@ -382,11 +394,11 @@ void ble_central(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Get local device address failed = %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    LOG_PRINT("\r\n Local device address %s \r\n", local_dev_addr);
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
   }
 
   //! BLE register GAP callbacks
@@ -428,7 +440,7 @@ void ble_central(void *argument)
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    LOG_PRINT("Failed to create ble_main_task_sem semaphore\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore");
     return;
   }
 
@@ -438,31 +450,31 @@ void ble_central(void *argument)
   //! start scanning
   status = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n start_scanning status: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX", status);
     return;
   }
 
-  LOG_PRINT("\r\n Started scanning\r\n");
-  LOG_PRINT("\r\n BLE remote device name : %s\r\n", RSI_REMOTE_DEVICE_NAME);
+  SL_DEBUG_LOG_V2(INFO, "Started scanning");
+  SL_DEBUG_LOG_V2(INFO, "BLE remote device name : %s", (uintptr_t)(RSI_REMOTE_DEVICE_NAME));
 
 #if ENABLE_NWP_POWER_SAVE
-  LOG_PRINT("\r\n keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
 
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Failed to initiate power save in BLE mode \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Failed to initiate power save in Wi-Fi mode :%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx", status);
     return;
   }
 
-  LOG_PRINT("\r\n Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
 #endif
 
   while (1) {
@@ -476,12 +488,12 @@ void ble_central(void *argument)
     switch (temp_event_map) {
       case RSI_APP_EVENT_ADV_REPORT: {
         //! advertise report event.
-        LOG_PRINT("\r\n In Advertising Event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In Advertising Event");
         //! clear the advertise report event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_ADV_REPORT);
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n Connect status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "Connect status: 0x%lX", status);
         }
       } break;
 
@@ -489,13 +501,13 @@ void ble_central(void *argument)
         //! remote device connected event
         rsi_ble_app_clear_event(RSI_APP_EVENT_CONNECTED);
         rsi_6byte_dev_address_to_ascii(str_remote_address, rsi_app_connected_device.dev_addr);
-        LOG_PRINT("\r\n Module connected to address : %s \r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
         //! clear the connected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_CONNECTED);
       } break;
 
       case RSI_APP_EVENT_DATA_LENGTH_CHANGE: {
-        LOG_PRINT("\r\n In event length change event");
+        SL_DEBUG_LOG_V2(INFO, "In event length change event");
         //! remote device disconnected event
 
         //! clear the disconnected event.
@@ -504,16 +516,16 @@ void ble_central(void *argument)
 
       case RSI_APP_EVENT_DISCONNECTED: {
         //! remote device disconnected event
-        LOG_PRINT("\r\n Module got disconnected\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Module got disconnected");
         //! clear the disconnected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_DISCONNECTED);
 
 #if ENABLE_NWP_POWER_SAVE
-        LOG_PRINT("\r\n Keep module in to active state \r\n");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state ");
         //! initiating Active mode in BT mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n Failed to keep Module in ACTIVE mode \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
           return;
         }
 
@@ -521,7 +533,7 @@ void ble_central(void *argument)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("\r\n Failed to keep module in HIGH_PERFORMANCE mode \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
           return;
         }
 #endif
@@ -529,11 +541,11 @@ void ble_central(void *argument)
         device_found = 0;
         status       = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n start_scanning status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX", status);
         }
 
 #if ENABLE_NWP_POWER_SAVE
-        LOG_PRINT("\r\n Keep module in to power save \r\n");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to power save ");
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
           return;
@@ -543,14 +555,14 @@ void ble_central(void *argument)
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("\r\n Failed to keep module in power save \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
           return;
         }
-        LOG_PRINT("\r\n Module is in power save \r\n");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
 #endif
       } break;
       case RSI_BLE_MTU_EVENT: {
-        LOG_PRINT("\r\n In MTU event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In MTU event");
         //! event invokes when write/notification events received
 
         //! clear the served event
@@ -558,7 +570,7 @@ void ble_central(void *argument)
 
         status = rsi_ble_read_max_data_len(&blereadmaxdatalen);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n Failed to read max data len, error status : %lx\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to read max data len, error status : %lx", status);
           return;
         }
 loop:

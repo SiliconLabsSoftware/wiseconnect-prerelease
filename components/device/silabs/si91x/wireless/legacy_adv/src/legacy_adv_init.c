@@ -37,6 +37,7 @@
 #include "rsi_ble_apis.h" // BLE APIs: rsi_ble_set_advertise_data(), rsi_ble_start_advertising(), rsi_ble_start_scanning()
 #include <legacy_adv_config.h> // LEGACY_ADV_DATA_MAX_LEN
 #include <gap_config.h> // RSI_BT_LOCAL_NAME, RSI_BLE_MAX_NBR_CENTRALS, RSI_BLE_MAX_NBR_PERIPHERALS, ADV_ENABLED_DEFAULT, SCAN_ENABLED_DEFAULT
+#include <inttypes.h>
 
 /*=======================================================================*/
 /**
@@ -89,7 +90,7 @@ int32_t ble_legacy_adv_init(void)
     printf("\r\n Setting advertising data with device name: %s\r\n", device_name);
     status = rsi_ble_set_advertise_data(adv, name_len + 5); // Total length = Flags (3) + Length (1) + Type (1) + Name
     if (status != RSI_SUCCESS) {
-      printf("\r\n Failed to set advertising data: 0x%lx\r\n", status);
+      printf("\r\n Failed to set advertising data: 0x%" PRIX32 "\r\n", status);
       return status;
     }
 
@@ -98,7 +99,7 @@ int32_t ble_legacy_adv_init(void)
     printf("\r\n Starting legacy advertising...\r\n");
     status = rsi_ble_start_advertising();
     if (status != RSI_SUCCESS) {
-      printf("\r\n Failed to start advertising: 0x%lx\r\n", status);
+      printf("\r\n Failed to start advertising: 0x%" PRIX32 "\r\n", status);
       return status;
     }
     printf("\r\n Legacy advertising started successfully\r\n");
@@ -113,7 +114,7 @@ int32_t ble_legacy_adv_init(void)
     printf("\r\n Starting legacy scanning...\r\n");
     status = rsi_ble_start_scanning();
     if (status != RSI_SUCCESS) {
-      printf("\r\n Failed to start scanning: 0x%lx\r\n", status);
+      printf("\r\n Failed to start scanning: 0x%" PRIX32 "\r\n", status);
       return status;
     }
     printf("\r\n Legacy scanning started successfully\r\n");

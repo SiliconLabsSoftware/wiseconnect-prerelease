@@ -90,6 +90,21 @@
     <properties key="readmeFiles" value="examples/snippets/crypto/gcm_cmac/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="crypto_sha3" label="Crypto - SHA3" description="Hash the data using SHA3">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/crypto/sha3/crypto_sha3.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/crypto/sha3/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
   <descriptors name="crypto_ecdh" label="Crypto - ECDH" description="Demonstrate the use of ECDH APIs">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />

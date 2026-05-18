@@ -43,6 +43,38 @@
 #include "sli_wifi_device_core_utilities.h"
 
 #define DEFAULT_BEACON_MISS_IGNORE_LIMIT 1
+
+// 802.11 information element: Element ID (1 octet) + Length (1 octet) before optional body.
+#define SLI_WIFI_IE_ELEMENT_ID_LENGTH_OCTETS (2u)
+// Upper bound on IE iterations for one beacon/probe MPDU (minimum IE density + one slack step).
+#define SLI_WIFI_BEACON_IE_GUARD_MAX_ITERATIONS(tagged_octets_) \
+  ((uint32_t)(tagged_octets_) / SLI_WIFI_IE_ELEMENT_ID_LENGTH_OCTETS + 1u)
+
+// IEEE 802.11 SSID element: 0-32 octets in the Information field (buffer SLI_WIFI_SSID_LEN includes NUL).
+#define SLI_WIFI_SSID_IE_MAX_OCTETS (32u)
+
+// RSN IE (802.11): version (2) + Group Cipher Suite (4) + Pairwise Cipher Suite Count (2) before pairwise list.
+#define SLI_WIFI_RSN_IE_MIN_DATA_OCTETS           (10u)
+#define SLI_WIFI_RSN_DATA_OCTETS_BEFORE_PCSC_LIST (8u)
+
+// Little-endian 16-bit field size (e.g. AKM suite count in RSN / WPA IE).
+#define SLI_WIFI_LE16_FIELD_OCTETS (2u)
+
+// Defensive cap on AKM suites parsed from an IE (corrupt length fields).
+#define SLI_WIFI_MAX_AKM_SUITES_PARSE (24u)
+
+// IEEE 802.11 cipher suite selector type: 802.1X / EAPOL (RSN/WPA AKM suite type 1).
+#define SLI_WIFI_CIPHER_SUITE_TYPE_IEEE_802_1X (1u)
+
+// Microsoft WPA IE (vendor specific): fixed layout before pairwise cipher suite list (802.11 + WPA IE).
+#define SLI_WIFI_WPA_VENDOR_IE_MIN_OCTETS              (12u)
+#define SLI_WIFI_WPA_VENDOR_PAIRWISE_COUNT_OFFSET_LSB  (10u)
+#define SLI_WIFI_WPA_VENDOR_PAIRWISE_SUITE_LIST_OFFSET (12u)
+#define SLI_WIFI_WPA_VENDOR_OUI_TYPE0                  (0x00u)
+#define SLI_WIFI_WPA_VENDOR_OUI_TYPE1                  (0x50u)
+#define SLI_WIFI_WPA_VENDOR_OUI_TYPE2                  (0xF2u)
+#define SLI_WIFI_WPA_VENDOR_TYPE_WPA                   (0x01u)
+
 static uint32_t client_listen_interval            = 1000;
 static uint32_t client_listen_interval_multiplier = 1;
 
@@ -614,19 +646,28 @@ void sli_handle_wifi_beacon(sl_wifi_system_packet_t *packet)
       memcpy(scan_info.bssid, wifi_frame->bssid, SLI_WIFI_HARDWARE_ADDRESS_LENGTH);
       ies_length                        = packet->length - SLI_WIFI_MINIMUM_FRAME_LENGTH;
       sli_wifi_data_tagged_info_t *info = (sli_wifi_data_tagged_info_t *)wifi_frame->tagged_info;
-      const uint16_t ie_header_len      = (uint16_t)sizeof(sli_wifi_data_tagged_info_t);
+      uint32_t ie_guard                 = 0U;
+      // Upper bound for IE walks: each IE uses at least SLI_WIFI_IE_ELEMENT_ID_LENGTH_OCTETS (ID + Length).
+      // Tie the guard to the initial tagged-parameter length so valid long beacons are not truncated.
+      const uint16_t tagged_bytes_total      = ies_length;
+      const uint32_t max_ie_guard_iterations = SLI_WIFI_BEACON_IE_GUARD_MAX_ITERATIONS(tagged_bytes_total);
 
-      while (ies_length >= ie_header_len) {
-        uint16_t data_len = info->data_length;
-        uint32_t ie_total = (uint32_t)ie_header_len + (uint32_t)data_len;
-
-        if (ie_total > (uint32_t)ies_length) {
+      while (ies_length != 0U) {
+        if (++ie_guard > max_ie_guard_iterations) {
           break;
         }
-
+        // data_length is uint8_t; promote to uint16_t so step fits the MPDU slice in ies_length.
+        const uint16_t ie_hdr_len = (uint16_t)sizeof(sli_wifi_data_tagged_info_t);
+        if (ies_length < ie_hdr_len) {
+          break;
+        }
+        uint16_t step = (uint16_t)(ie_hdr_len + (uint16_t)info->data_length);
+        if (step > ies_length) {
+          break;
+        }
         sli_process_tag_info(info, &scan_info);
-        ies_length = (uint16_t)((uint32_t)ies_length - ie_total);
-        info       = (sli_wifi_data_tagged_info_t *)((uint8_t *)info + ie_total);
+        ies_length = (uint16_t)(ies_length - step);
+        info       = (sli_wifi_data_tagged_info_t *)((uint8_t *)info + step);
       }
 
       // Ensure transient flag is never stored (defensive if more code sets it later)
@@ -728,7 +769,10 @@ static uint32_t sli_get_key_management_info(const sli_wifi_cipher_suite_t *akms,
   if (NULL == akms) {
     return 0;
   }
-
+  // Limit AKM suite count to a safe upper bound (defensive against corrupt IE length fields).
+  if (akmsc > SLI_WIFI_MAX_AKM_SUITES_PARSE) {
+    akmsc = SLI_WIFI_MAX_AKM_SUITES_PARSE;
+  }
   for (int i = 0; i < akmsc; i++) {
     oui_type = ((akms[i].cs_oui[0] << 24) | (akms[i].cs_oui[1] << 16) | (akms[i].cs_oui[2] << 8) | akms[i].cs_type);
 
@@ -761,12 +805,33 @@ static uint32_t sli_get_key_management_info(const sli_wifi_cipher_suite_t *akms,
 // Helper function to process RSN element
 static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli_scan_info_t *scan_info)
 {
-  scan_info->security_mode            = SL_WIFI_WPA2_ENTERPRISE;
-  const sli_wifi_rsn_element_t *rsn   = (const sli_wifi_rsn_element_t *)info->data;
-  uint16_t pcsc                       = (uint16_t)(rsn->pcsc[0] | (rsn->pcsc[1] << 8));
-  const uint8_t *akmslc               = (rsn->pcsl + (pcsc * sizeof(sli_wifi_cipher_suite_t)));
-  uint16_t akmsc                      = (uint16_t)(akmslc[0] | (akmslc[1] << 8));
-  const sli_wifi_cipher_suite_t *akms = (sli_wifi_cipher_suite_t *)(akmslc + 2);
+  // RSN IE must hold version (2), group cipher (4), and pairwise cipher count (2) before variable fields.
+  // Truncated IE: leave security_mode unchanged (capabilities and earlier IEs remain authoritative).
+  if (info->data_length < SLI_WIFI_RSN_IE_MIN_DATA_OCTETS) {
+    return;
+  }
+  scan_info->security_mode          = SL_WIFI_WPA2_ENTERPRISE;
+  const sli_wifi_rsn_element_t *rsn = (const sli_wifi_rsn_element_t *)info->data;
+  const uint8_t *const rsn_end      = info->data + info->data_length;
+  uint16_t pcsc                     = (uint16_t)(rsn->pcsc[0] | (rsn->pcsc[1] << 8));
+  uint16_t max_pcsc                 = (uint16_t)((info->data_length - SLI_WIFI_RSN_DATA_OCTETS_BEFORE_PCSC_LIST)
+                                 / (uint16_t)sizeof(sli_wifi_cipher_suite_t));
+  if (pcsc > max_pcsc) {
+    pcsc = max_pcsc;
+  }
+  // Derive AKM suite count offset only after pcsc is clamped (defensive against corrupt IE counts).
+  const uint8_t *akmslc = (const uint8_t *)rsn->pcsl + ((size_t)pcsc * sizeof(sli_wifi_cipher_suite_t));
+  // rsn_end is one past the last IE octet; need SLI_WIFI_LE16_FIELD_OCTETS for little-endian AKM suite count.
+  if (akmslc + SLI_WIFI_LE16_FIELD_OCTETS > rsn_end) {
+    return;
+  }
+  uint16_t akmsc = (uint16_t)(akmslc[0] | (akmslc[1] << 8));
+  uint16_t max_akmsc =
+    (uint16_t)((size_t)(rsn_end - (akmslc + SLI_WIFI_LE16_FIELD_OCTETS)) / sizeof(sli_wifi_cipher_suite_t));
+  if (akmsc > max_akmsc) {
+    akmsc = max_akmsc;
+  }
+  const sli_wifi_cipher_suite_t *akms = (const sli_wifi_cipher_suite_t *)(akmslc + SLI_WIFI_LE16_FIELD_OCTETS);
   uint8_t wlan_gcs_oui[3]             = { 0x00, 0x0F, 0xAC };
 
   SL_DEBUG_LOG_V2(DEBUG, "RSN OUI %02x:%02x:%02x.\n", rsn->gcs.cs_oui[0], rsn->gcs.cs_oui[1], rsn->gcs.cs_oui[2]);
@@ -777,7 +842,7 @@ static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli
     scan_info->security_mode = (scan_info->wpa_vendor_ie_seen) ? SL_WIFI_WPA_WPA2_MIXED : SL_WIFI_WPA2;
     uint32_t key             = sli_get_key_management_info(akms, akmsc);
 
-    if (akms[0].cs_type == 1) {
+    if ((akmsc > 0u) && (akms[0].cs_type == SLI_WIFI_CIPHER_SUITE_TYPE_IEEE_802_1X)) {
       scan_info->security_mode = SL_WIFI_WPA2_ENTERPRISE;
     }
 
@@ -800,50 +865,50 @@ static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli
 // Helper function to process Vendor Specific element
 static void sli_process_vendor_specific_element(const sli_wifi_data_tagged_info_t *info, sli_scan_info_t *scan_info)
 {
-  const uint8_t *d                     = info->data;
-  uint16_t len                         = info->data_length;
-  uint16_t pairwise_cipher_suite_count = 0;
-  uint16_t akm_suite_count             = 0;
-  // First variable-length field (pairwise suites) starts after fixed 12-octet header.
-  uint32_t off = 12;
+  const uint8_t *wpa_ie = info->data;
+  uint16_t len          = info->data_length;
 
-  // Not a WPA vendor IE or truncated before pairwise count.
-  if (len < 12 || d[0] != 0x00 || d[1] != 0x50 || d[2] != 0xF2 || d[3] != 0x01) {
-    return;
-  }
-  scan_info->wpa_vendor_ie_seen = true; // Record that WPA IE is present (for WPA/WPA2 mixed detection)
-
-  // Pairwise cipher suite list.
-  pairwise_cipher_suite_count = (uint16_t)(d[10] | ((uint16_t)d[11] << 8));
-  if (pairwise_cipher_suite_count > ((uint32_t)len - off) >> 2) {
-    return;
-  }
-  off += (uint32_t)pairwise_cipher_suite_count << 2;
-  if ((uint32_t)len - off < 2u) {
+  if (len < SLI_WIFI_WPA_VENDOR_IE_MIN_OCTETS || wpa_ie[0] != SLI_WIFI_WPA_VENDOR_OUI_TYPE0
+      || wpa_ie[1] != SLI_WIFI_WPA_VENDOR_OUI_TYPE1 || wpa_ie[2] != SLI_WIFI_WPA_VENDOR_OUI_TYPE2
+      || wpa_ie[3] != SLI_WIFI_WPA_VENDOR_TYPE_WPA) {
     return;
   }
 
-  // Read AKM suite count as uint16 little-endian from d[off] and d[off+1] into `akm_suite_count`.
-  // After `off += 2`, `off` points at the first of `akm_suite_count` AKM suites; each suite is 4 octets (OUI + type).
-  akm_suite_count = (uint16_t)(d[off] | ((uint16_t)d[off + 1] << 8));
-  off += 2;
-  if (akm_suite_count > ((uint32_t)len - off) >> 2) {
+  const uint8_t *const vendor_end = wpa_ie + len;
+
+  // Pairwise (unicast) cipher suite count is LE16 at SLI_WIFI_WPA_VENDOR_PAIRWISE_COUNT_OFFSET_LSB; list follows.
+  uint16_t ucsc       = (uint16_t)(wpa_ie[SLI_WIFI_WPA_VENDOR_PAIRWISE_COUNT_OFFSET_LSB]
+                             | ((uint16_t)wpa_ie[SLI_WIFI_WPA_VENDOR_PAIRWISE_COUNT_OFFSET_LSB + 1U] << 8));
+  const uint8_t *ucsl = wpa_ie + SLI_WIFI_WPA_VENDOR_PAIRWISE_SUITE_LIST_OFFSET;
+  size_t max_ucsc     = (size_t)(vendor_end - ucsl) / sizeof(sli_wifi_cipher_suite_t);
+  // Reject truncated IEs: do not clamp counts (that would promote OPEN/WEP to WPA on corrupt data).
+  if (ucsc > max_ucsc) {
     return;
   }
+  const uint8_t *list_count = ucsl + ((size_t)ucsc * sizeof(sli_wifi_cipher_suite_t));
+  if ((list_count + SLI_WIFI_LE16_FIELD_OCTETS) > vendor_end) {
+    return;
+  }
+
+  uint16_t akmsc                      = (uint16_t)(list_count[0] | (list_count[1] << 8));
+  const sli_wifi_cipher_suite_t *akms = (const sli_wifi_cipher_suite_t *)(list_count + SLI_WIFI_LE16_FIELD_OCTETS);
+  size_t rem                          = (size_t)(vendor_end - (const uint8_t *)akms);
+  uint16_t max_akmsc                  = (uint16_t)(rem / sizeof(sli_wifi_cipher_suite_t));
+  if (akmsc > max_akmsc) {
+    return;
+  }
+
+  // Layout matches declared counts; record WPA IE for WPA/WPA2 mixed detection and refine security_mode.
+  scan_info->wpa_vendor_ie_seen = true;
 
   // If RSN was not seen yet, WPA IE implies WPA; refine using AKM (802.1X vs PSK).
   if (scan_info->security_mode == SL_WIFI_OPEN || scan_info->security_mode == SL_WIFI_WEP) {
     scan_info->security_mode = SL_WIFI_WPA;
-    // Last AKM suite type 1 == 802.1X (enterprise).
-    if (akm_suite_count != 0 && d[off + ((uint32_t)akm_suite_count - 1u) * 4u + 3u] == 1) {
+    if ((akmsc > 0u) && (akms[akmsc - 1u].cs_type == SLI_WIFI_CIPHER_SUITE_TYPE_IEEE_802_1X)) {
       scan_info->security_mode = SL_WIFI_WPA_ENTERPRISE;
     }
-  } else if (scan_info->security_mode == SL_WIFI_WPA2 || scan_info->security_mode == SL_WIFI_WPA2_ENTERPRISE) {
-    // RSN was processed first; AP advertises both WPA2 and WPA (vendor IE) => WPA/WPA2 mixed
-    if (scan_info->security_mode != SL_WIFI_WPA2_ENTERPRISE) {
-      scan_info->security_mode = SL_WIFI_WPA_WPA2_MIXED;
-    }
-    // Keep WPA2_ENTERPRISE as-is (no separate mixed enterprise type)
+  } else if (scan_info->security_mode == SL_WIFI_WPA2) {
+    scan_info->security_mode = SL_WIFI_WPA_WPA2_MIXED;
   }
 }
 
@@ -851,10 +916,16 @@ static void sli_process_vendor_specific_element(const sli_wifi_data_tagged_info_
 static void sli_process_tag_info(const sli_wifi_data_tagged_info_t *info, sli_scan_info_t *scan_info)
 {
   switch (info->tag) {
-    case SLI_WLAN_TAG_SSID:
-      memcpy(scan_info->ssid, info->data, info->data_length);
-      scan_info->ssid[info->data_length] = 0;
+    case SLI_WLAN_TAG_SSID: {
+      // IEEE 802.11 SSID element body is at most SLI_WIFI_SSID_IE_MAX_OCTETS octets; scan_info.ssid[] is NUL-terminated.
+      uint8_t n = info->data_length;
+      if (n > SLI_WIFI_SSID_IE_MAX_OCTETS) {
+        n = SLI_WIFI_SSID_IE_MAX_OCTETS;
+      }
+      memcpy(scan_info->ssid, info->data, n);
+      scan_info->ssid[n] = 0;
       break;
+    }
 
     case SLI_WLAN_TAG_RSN:
       sli_process_rsn_element(info, scan_info);

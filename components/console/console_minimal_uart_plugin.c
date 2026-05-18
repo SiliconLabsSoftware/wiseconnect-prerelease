@@ -268,7 +268,7 @@ void console_print_command_args(const console_descriptive_command_t *command)
     if (command->argument_list[a] & CONSOLE_ARG_OPTIONAL) {
       char option_char[2] = { (char)command->argument_list[a] & CONSOLE_ARG_OPTIONAL_CHARACTER_MASK, 0 };
       printf("[-");
-      printf(option_char);
+      printf("%s", option_char);
       printf(" ");
       ++argument_help_offset;
       is_optional = true;
@@ -277,7 +277,7 @@ void console_print_command_args(const console_descriptive_command_t *command)
       printf("{");
       uint8_t enum_index = command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK;
       for (int b = 0; console_argument_types[enum_index][b] != NULL;) {
-        printf(console_argument_types[enum_index][b]);
+        printf("%s", console_argument_types[enum_index][b]);
         if (console_argument_types[enum_index][++b]) {
           printf("|");
         }
@@ -286,9 +286,9 @@ void console_print_command_args(const console_descriptive_command_t *command)
     } else {
       printf("<");
       if (command->argument_help && command->argument_help[a - argument_help_offset]) {
-        printf(command->argument_help[a - argument_help_offset]);
+        printf("%s", command->argument_help[a - argument_help_offset]);
       } else {
-        printf(console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
+        printf("%s", console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
       }
       printf(">");
     }
@@ -335,10 +335,10 @@ static void print_command_database(const console_database_t *database, const cha
 
     printf("\r\n");
     if (prefix != NULL) {
-      printf(prefix);
+      printf("%s", prefix);
       printf(".");
     }
-    printf(database->entries[a].key);
+    printf("%s", database->entries[a].key);
 
     // Check if this is a sub-command
     if (command->argument_list[0] == CONSOLE_ARG_SUB_COMMAND) {
@@ -346,22 +346,22 @@ static void print_command_database(const console_database_t *database, const cha
       printf(".");
       if (command->description) {
         printf(" : ");
-        printf(command->description);
+        printf("%s", command->description);
       }
       printf("\r\n");
       for (uint32_t b = 0; b < temp->length; b++) {
         printf("  - ");
-        printf(temp->entries[b].key);
+        printf("%s", temp->entries[b].key);
         printf(" : ");
         const console_descriptive_command_t *sub_command = temp->entries[b].value;
-        printf(sub_command->description);
+        printf("%s", sub_command->description);
         printf("\r\n");
       }
     } else {
       printf("  ");
       console_print_command_args((const console_descriptive_command_t *)database->entries[a].value);
       printf("\r\n   ");
-      printf(((const console_descriptive_command_t *)database->entries[a].value)->description);
+      printf("%s", ((const console_descriptive_command_t *)database->entries[a].value)->description);
     }
     printf("\r\n");
   }

@@ -92,7 +92,7 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, NULL, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFailed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    printf("\r\nFailed to start Wi-Fi client interface: 0x%x\r\n", (unsigned int)status);
     return;
   }
 
@@ -113,7 +113,7 @@ static void application_start(void *argument)
   if (status == SL_STATUS_OK) {
     printf("\r\nData successfully written to M4 flash memory.\r\n");
   } else {
-    printf("\r\nError writing data to M4 flash memory: 0x%lx\r\n", status);
+    printf("\r\nError writing data to M4 flash memory: 0x%x\r\n", (unsigned int)status);
     return;
   }
 
@@ -147,7 +147,7 @@ static void application_start(void *argument)
   if (status == SL_STATUS_OK) {
     printf("\r\nSuccessfully erased the NWP flash memory.\r\n");
   } else {
-    printf("\r\nError erasing NWP flash memory: 0x%lx\r\n", status);
+    printf("\r\nError erasing NWP flash memory: 0x%x\r\n", (unsigned int)status);
     return;
   }
 
@@ -161,7 +161,7 @@ static void application_start(void *argument)
   if (status == SL_STATUS_OK) {
     printf("\r\nSuccessfully written to the NWP flash memory.\r\n");
   } else {
-    printf("\r\nError writing to NWP flash memory: 0x%lx\r\n", status);
+    printf("\r\nError writing to NWP flash memory: 0x%x\r\n", (unsigned int)status);
     return;
   }
 
@@ -175,7 +175,7 @@ static void application_start(void *argument)
                data_read_buffer,
                DISPLAY_LENGTH);
   } else {
-    printf("\r\nError reading data from NWP flash memory: 0x%lx\r\n", status);
+    printf("\r\nError reading data from NWP flash memory: 0x%x\r\n", (unsigned int)status);
     return;
   }
 

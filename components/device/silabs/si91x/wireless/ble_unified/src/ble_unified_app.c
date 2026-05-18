@@ -35,6 +35,7 @@
 #include "rsi_common_apis.h"
 #include "rsi_bt_common_apis.h"
 #include <stdio.h>
+#include <inttypes.h>
 
 extern generic_task_cb_t ble_generic_cb;
 extern generic_event_handler_lut_entry_t ble_events_lut[];
@@ -83,7 +84,7 @@ void rsi_ble_main_app_task(void)
   // Initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to initiate BLE power save: 0x%lx\r\n", status);
+    printf("\r\n Failed to initiate BLE power save: 0x%" PRIX32 "\r\n", status);
     return;
   }
 
@@ -91,7 +92,7 @@ void rsi_ble_main_app_task(void)
   // Initiating power save in BLE only mode, for coex mode, wifi power save is called in wifiapp.c
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    printf("\r\n Failed to initiate Wi-Fi power save: 0x%lx\r\n", status);
+    printf("\r\n Failed to initiate Wi-Fi power save: 0x%" PRIX32 "\r\n", status);
     return;
   }
 #endif

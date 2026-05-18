@@ -46,6 +46,13 @@ component:
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: sl_power_manager
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 requires:
 - name: device_needs_ram_execution
   condition:

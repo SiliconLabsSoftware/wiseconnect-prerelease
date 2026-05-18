@@ -45,6 +45,7 @@
 #include "rsi_bt_common_apis.h"
 #include <gap_config.h> // resolved via -I: config/ble_config/ (user override) first, then component inc/
 #include "gap.h"
+#include <inttypes.h>
 
 /*=======================================================================*/
 //! Forward declarations of GAP utility functions
@@ -102,7 +103,7 @@ int32_t ble_gap_init(void)
   printf("\r\n Filling user configuration...\r\n");
   status = rsi_fill_ble_user_config();
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to fill user configuration: 0x%lx\r\n", status);
+    printf("\r\n Failed to fill user configuration: 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n User configuration successful\r\n");
@@ -117,7 +118,7 @@ int32_t ble_gap_init(void)
   printf("\r\n Getting local device address...\r\n");
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to get local device address: 0x%lx\r\n", status);
+    printf("\r\n Failed to get local device address: 0x%" PRIX32 "\r\n", status);
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
     printf("\r\n Local device address = %s\r\n", local_dev_addr);
@@ -131,7 +132,7 @@ int32_t ble_gap_init(void)
   printf("\r\n Setting the Local IRK Value\r\n");
   status = rsi_ble_set_local_irk_value(local_irk);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Setting the Local IRK Value Failed: 0x%lx\r\n", status);
+    printf("\r\n Setting the Local IRK Value Failed: 0x%" PRIX32 "\r\n", status);
     return status;
   }
 
@@ -146,7 +147,7 @@ int32_t ble_gap_init(void)
   printf("\r\n Setting coex role priorities...\r\n");
   status = rsi_ble_set_coex_roles_priority(role_priority_payload);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Setting the coex roles priority Failed: 0x%lx\r\n", status);
+    printf("\r\n Setting the coex roles priority Failed: 0x%" PRIX32 "\r\n", status);
     return status;
   } else {
     printf("\r\n Setting the coex roles priority Successful\r\n");

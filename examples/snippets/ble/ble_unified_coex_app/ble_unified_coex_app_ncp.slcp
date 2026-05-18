@@ -31,6 +31,10 @@ component:
 - id: iostream_retarget_stdio
 - id: iostream_recommended_stream
 - id: iostream_stdlib_config
+- id: log_none
+- id: log_backend_iostream
+- id: log_backend_iostream_formatted
+- id: log_platform_specific
 - id: wiseconnect_common
 - id: wifi
 - id: sl_si91x_internal_stack

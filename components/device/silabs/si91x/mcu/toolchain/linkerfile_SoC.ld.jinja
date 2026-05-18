@@ -649,5 +649,14 @@ SECTIONS
 
 	.debug_misc 0 : { *(.debug_*); *(.zdebug_*); }
 
-ASSERT(__etext <= (ORIGIN(rom) + LENGTH(rom)), "ERROR: Flash overflow code/data exceed ROM region - code and constants will not fit in flash")
+/*
+ * Flash overflow guard.
+ *
+ * Verifies that the total flash footprint - code/rodata (ending at __etext)
+ * plus the initialized .data LMA placed `AT> rom` - fits within the configured
+ * `rom` region. Without this check, an oversized image can link successfully
+ * and only fail at programming time.
+ */
+ASSERT(((__etext + SIZEOF(.data)) <= (ORIGIN(rom) + LENGTH(rom))),
+       "ERROR: Flash overflow - code + initialized data exceed ROM region (firmware will not fit in flash).")
 }

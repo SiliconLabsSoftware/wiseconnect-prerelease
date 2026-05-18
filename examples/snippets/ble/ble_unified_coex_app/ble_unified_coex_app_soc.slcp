@@ -35,6 +35,13 @@ component:
 - id: basic_network_config_manager
 - id: ble
 - id: ble_unified
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: gap
 - id: si91x_ble_adv_scan_default_config
 - id: smp

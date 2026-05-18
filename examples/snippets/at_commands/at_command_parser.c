@@ -74,7 +74,7 @@ static bool escape(char *i, const char *end);
 
 static inline uint8_t at_command_parse_enum_arg(const char *line, const char *const *options);
 
-static sl_status_t at_command_strtoul(unsigned long *out_val, const char *str, int base);
+static sl_status_t at_command_strtoul(uint32_t *out_val, const char *str, int base);
 
 static sl_status_t at_command_parse_arg(console_argument_type_t type, char *line, uint32_t *arg_result);
 
@@ -277,7 +277,7 @@ static inline uint8_t at_command_parse_enum_arg(const char *line, const char *co
   return 0xFF;
 }
 
-static sl_status_t at_command_strtoul(unsigned long *out_val, const char *str, int base)
+static sl_status_t at_command_strtoul(uint32_t *out_val, const char *str, int base)
 {
   if (out_val == NULL) {
     return SL_STATUS_COMMAND_IS_INVALID;
@@ -295,7 +295,7 @@ static sl_status_t at_command_strtoul(unsigned long *out_val, const char *str, i
     return SL_STATUS_COMMAND_IS_INVALID;
   }
 
-  *out_val = val;
+  *out_val = (uint32_t)val;
   return SL_STATUS_OK;
 }
 

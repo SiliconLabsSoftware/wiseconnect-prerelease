@@ -451,7 +451,7 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
 
-  AT_PRINTF("at+WIFI_SCAN_RESULTS=%lu,,", scan_result->scan_count);
+  AT_PRINTF("at+WIFI_SCAN_RESULTS=%" PRIu32 ",,", scan_result->scan_count);
   if (scan_result->scan_count) {
     for (unsigned int a = 0; a < scan_result->scan_count; ++a) {
       bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
@@ -620,7 +620,7 @@ sl_status_t wifi_get_signal_strength_command_handler(console_args_t *arguments)
   status = sl_wifi_get_signal_strength(interface, &signal_strength);
   VERIFY_STATUS_AND_RETURN(status);
 
-  AT_PRINTF("%ld", signal_strength);
+  AT_PRINTF("%" PRId32, signal_strength);
   return status;
 }
 
@@ -910,7 +910,7 @@ sl_status_t wifi_get_performance_profile_command_handler(console_args_t *argumen
   VERIFY_STATUS_AND_RETURN(status);
 
   PRINT_AT_CMD_SUCCESS;
-  AT_PRINTF("%d %d %d %ld %d",
+  AT_PRINTF("%d %d %d %" PRIu32 " %d",
             performance_profile.profile,
             performance_profile.dtim_aligned_type,
             performance_profile.num_of_dtim_skip,

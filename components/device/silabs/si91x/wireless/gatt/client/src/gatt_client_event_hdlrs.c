@@ -58,6 +58,8 @@
 #include <string.h> // String manipulation (35+ uses)
                     // Functions: memcpy, memset, strlen (buffer operations, address handling)
 
+#include <inttypes.h>
+
 // Component Headers (5 headers, 200+ entities)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #include "gap.h" // GAP structures and APIs (100+ entities)
@@ -182,7 +184,7 @@ void rsi_ble_profile_discovery(uint8_t conn_id)
               return;
             } else {
               printf("\r\n failed to get characteristics descriptor of the remote GATT server with "
-                     "error:0x%lx -m1 \r\n",
+                     "error:0x%" PRIX32 " -m1 \r\n",
                      status);
               return;
             }
@@ -471,7 +473,7 @@ void rsi_ble_on_data_receive(uint8_t conn_id)
       if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
         printf("\r\n notify failed with buffer error -conn%d \r\n", ble_conn_id);
       } else {
-        printf("\r\n notify value failed with status = %lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n notify value failed with status = 0x%" PRIX32 " -conn%d \r\n", status, ble_conn_id);
       }
     }
   }
@@ -490,7 +492,7 @@ void rsi_ble_on_data_receive(uint8_t conn_id)
       if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
         printf("\r\n indication failed with buffer error -conn%d \r\n", ble_conn_id);
       } else {
-        printf("\r\n indication failed with status = %lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n indication failed with status = 0x%" PRIX32 " -conn%d \r\n", status, ble_conn_id);
       }
     }
   }
@@ -541,7 +543,7 @@ void rsi_ble_gatt_client_data_transmit(uint8_t ble_conn_id)
 
         more_data_state_beta[ble_conn_id].data_transmit = 1;
       } else {
-        printf("\r\n write with response failed with status = %lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n write with response failed with status = 0x%" PRIX32 " -conn%d \r\n", status, ble_conn_id);
       }
     } else {
       rsi_ble_conn_info[ble_conn_id].write_cnt++;
@@ -577,10 +579,10 @@ void rsi_ble_gatt_client_data_transmit(uint8_t ble_conn_id)
 
         status = rsi_ble_disconnect((int8_t *)rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr);
         if (status != RSI_SUCCESS) {
-          printf("\ndisconnect command failed with reason %lx\n", status);
+          printf("\ndisconnect command failed with reason 0x%" PRIX32 "\n", status);
         }
       } else {
-        printf("\r\n write without response failed with status = 0x%lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n write without response failed with status = 0x%" PRIX32 " -conn%d \r\n", status, ble_conn_id);
       }
     } else {
       rsi_ble_conn_info[ble_conn_id].wwr_count++;

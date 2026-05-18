@@ -678,4 +678,24 @@ SECTIONS
  
 {%- endif %}  /* littlefs_enable */
 {%- endif %}  /* Flash Present */
+
+/*
+ * Flash overflow guards.
+ *
+ * Verify that the firmware image fits in the available flash region:
+ *   - `rom`   : code + initialized `.data` LMA, when text is in internal flash.
+ *   - `psram` : sum of all PSRAM-resident sections (the QSPI XIP-mapped flash),
+ *               when text/data are placed in PSRAM.
+ * Without these checks, an oversized image can link successfully and only fail
+ * at programming time.
+ */
+{%- if flash_present and not text_segment_in_psram %}
+ASSERT(((__etext + SIZEOF(.data)) <= (ORIGIN(rom) + LENGTH(rom))),
+       "FLASH memory overflowed: firmware exceeds available flash (rom) region. Reduce code/data or move sections to PSRAM.")
+{%- endif %}
+
+{%- if psram_present and psram_linker_config_enabled %}
+ASSERT((_last_psram_location <= (ORIGIN(psram) + LENGTH(psram))),
+       "FLASH memory overflowed: firmware exceeds available flash (PSRAM-mapped) region. Reduce code/data/bss placed in PSRAM or select a part with a larger flash.")
+{%- endif %}
 }

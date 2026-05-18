@@ -272,6 +272,7 @@ static void sli_process_request(sl_http_server_t *handle, int client_socket)
 
     // Search for end of the header
     char *sep_pos = strstr(sol, "\r\n\r\n");
+
     SL_DEBUG_LOG_V2(DEBUG, "Got chunk: %s", (uintptr_t)sol);
 
     if (NULL != sep_pos) {

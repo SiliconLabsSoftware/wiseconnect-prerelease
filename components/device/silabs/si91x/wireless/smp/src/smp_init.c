@@ -19,6 +19,7 @@
 #include <stdio.h>   // printf() - debug messages
 #include <stdbool.h> // bool type
 #include <string.h>  // memcpy()
+#include <inttypes.h>
 
 // SMP Component headers
 #include <smp_config.h> // SMP configuration - resolved via -I: config/ble_config/ (user override) first, then component inc/
@@ -95,7 +96,7 @@ int32_t ble_smp_init(void)
 
   status = rsi_ble_set_smp_pairing_cap_data(&smp_capabilities);
   if (status != RSI_SUCCESS) {
-    printf("\n rsi_ble_set_smp_pairing_cap_data failed: 0x%lx\n", status);
+    printf("\n rsi_ble_set_smp_pairing_cap_data failed: 0x%" PRIX32 "\n", status);
     return status;
   }
 

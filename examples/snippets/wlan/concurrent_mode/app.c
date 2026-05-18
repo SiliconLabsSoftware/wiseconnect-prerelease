@@ -146,8 +146,6 @@ static const sl_net_wifi_client_profile_t wifi_client_profile = {
         .mode = SL_IP_MANAGEMENT_DHCP,
         .type = SL_IPV4,
         .host_name = NULL,
-        .ip = {{{0}}},
-
     }
 };
 
@@ -269,6 +267,9 @@ void data_callback(uint32_t sock_no,
         break;
       case TCP_RX:
         SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test start");
+        break;
+      default:
+        SL_DEBUG_LOG_V2(ERROR, "Invalid Throughput test");
         break;
     }
     first_data_frame = 0;

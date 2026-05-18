@@ -45,6 +45,7 @@
 
 //! Common include file
 #include "rsi_common_apis.h"
+#include "sl_log_helper.h"
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_m4_ps.h"
 #endif
@@ -201,6 +202,17 @@ uint8_t Si917_BLE_REGION_BASED_LP_CHAIN_10DBM_OFFSET_XX[128] = {//{{{
 #endif
 // clang-format on
 
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
+
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
@@ -298,16 +310,16 @@ void update_gain_table(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   } else {
-    LOG_PRINT("\r\n Wi-Fi Initialization Success\n");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
   } else {
     print_firmware_version(&version);
   }
@@ -315,11 +327,11 @@ void update_gain_table(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Get local device address failed = %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    LOG_PRINT("\r\n Local device address %s \r\n", local_dev_addr);
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
   }
 
   memcpy(_Si917_BLE_REGION_BASED_MAXPOWER_XX, Si917_BLE_REGION_BASED_MAXPOWER, sizeof(Si917_BLE_REGION_BASED_MAXPOWER));
@@ -332,9 +344,9 @@ void update_gain_table(void *argument)
                                                           _Si917_BLE_REGION_BASED_MAXPOWER_XX,
                                                           UPDATE_GAIN_TABLE_MAX_POWER);
   if (status != 0) {
-    LOG_PRINT("update gain table max_pwr Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "update gain table max_pwr Failed, Error Code : 0x%lX", status);
   } else {
-    LOG_PRINT("update gain table max_pwr successful\n")
+    SL_DEBUG_LOG_V2(INFO, "update gain table max_pwr successful");
   }
 
   status = rsi_bt_cmd_update_gain_table_offset_or_max_pwr(BLE_NODE,
@@ -342,9 +354,9 @@ void update_gain_table(void *argument)
                                                           _Si917_BLE_REGION_BASED_MAXPOWER_VS_OFFSET_XX,
                                                           UPDATE_GAIN_TABLE_OFFSET);
   if (status != 0) {
-    LOG_PRINT("update gain table_offset Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "update gain table_offset Failed, Error Code : 0x%lX", status);
   } else {
-    LOG_PRINT("update gain table offset successful\n")
+    SL_DEBUG_LOG_V2(INFO, "update gain table offset successful");
   }
 
   //! structure update for the LP_CHAIN 0dBm OFFSET
@@ -353,9 +365,9 @@ void update_gain_table(void *argument)
                                                           Si917_BLE_REGION_BASED_LP_CHAIN_0DBM_OFFSET_XX,
                                                           BLE_GAIN_TABLE_LP_CHAIN_0DBM_OFFSET_UPDATE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n update for the LP_CHAIN 0dBm OFFSET cmd failed with status = %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "update for the LP_CHAIN 0dBm OFFSET cmd failed with status = %lx", status);
   } else {
-    LOG_PRINT("\r\n update for the LP_CHAIN 0dBm OFFSET successful \r\n");
+    SL_DEBUG_LOG_V2(INFO, "update for the LP_CHAIN 0dBm OFFSET successful ");
   }
 
   //! structure update for the LP_CHAIN 10dBm OFFSET
@@ -364,9 +376,9 @@ void update_gain_table(void *argument)
                                                           Si917_BLE_REGION_BASED_LP_CHAIN_10DBM_OFFSET_XX,
                                                           BLE_GAIN_TABLE_LP_CHAIN_10DBM_OFFSET_UPDATE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n update for the LP_CHAIN 10dBm OFFSET cmd failed with status = %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "update for the LP_CHAIN 10dBm OFFSET cmd failed with status = %lx", status);
   } else {
-    LOG_PRINT("\r\n update for the LP_CHAIN 10dBm OFFSET successful \r\n");
+    SL_DEBUG_LOG_V2(INFO, "update for the LP_CHAIN 10dBm OFFSET successful ");
   }
 }
 

@@ -45,6 +45,13 @@ component:
 - id: ble
 - id: wireless_wakeup_ulp_component
 - id: sl_si91x_soc_soft_reset
+- id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 requires:
 - name: device_needs_ram_execution
   condition:

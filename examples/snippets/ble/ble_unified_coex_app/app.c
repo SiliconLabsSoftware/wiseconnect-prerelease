@@ -22,6 +22,7 @@
 #include "sl_wifi_callback_framework.h"
 #include "ble_config.h"
 #include <stdio.h>
+#include "sl_log_helper.h"
 
 /******************************************************
  * Forward Declarations
@@ -47,6 +48,17 @@ static const osThreadAttr_t ble_thread_attributes = {
  * Required for BLE operation on Si91x wireless interface
  * BLE-specific configuration comes from ble_config.h
  ******************************************************/
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
+
 static sl_wifi_device_configuration_t ble_device_config = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
@@ -83,11 +95,11 @@ void app_init(const void *unused)
   // Initialize WiFi/wireless interface (required for BLE on Si91x)
   status = sl_wifi_init(&ble_device_config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    printf("\r\n WiFi/Wireless initialization failed: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "WiFi/Wireless initialization failed: 0x%lx", status);
     return;
   }
 
-  printf("\r\n BLE Unified Application Initialized\r\n");
+  SL_DEBUG_LOG_V2(INFO, "BLE Unified Application Initialized");
 
   // Create BLE task - enters unified event loop (never returns)
   osThreadNew((osThreadFunc_t)ble_task, NULL, &ble_thread_attributes);

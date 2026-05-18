@@ -112,17 +112,17 @@ void connect_timeout_handler(TimerHandle_t xTimer)
 void rsi_ble_event_scan_restart(uint16_t __attribute__((unused)) status, void __attribute__((unused)) * event_data)
 {
   //! Add handling here
-  if (SCAN_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_PERIPHERALS) {
-    rsi_scan_restart_event();
-  }
+#if (SCAN_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_PERIPHERALS)
+  rsi_scan_restart_event();
+#endif
 }
 
 void rsi_ble_event_advertisement_restart(uint16_t __attribute__((unused)) status,
                                          void __attribute__((unused)) * event_data)
 {
-  if (ADV_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_CENTRALS) {
-    rsi_adv_restart_event();
-  }
+#if (ADV_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_CENTRALS)
+  rsi_adv_restart_event();
+#endif
 }
 
 void rsi_ble_event_adv_report(uint16_t status, void *event_data)

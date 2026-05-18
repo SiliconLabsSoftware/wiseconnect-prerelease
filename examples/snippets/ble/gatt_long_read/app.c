@@ -35,6 +35,7 @@
 //! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
+#include "sl_log_helper.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
@@ -139,6 +140,17 @@ static rsi_ble_event_read_by_type1_t char_servs;
 /******************************************************
  *               GLOBAL Variable Definitions
  ******************************************************/
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
+
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
@@ -291,16 +303,15 @@ void print_data_pkt(unsigned char *input_buf, uint16_t buf_len)
 {
   uint16_t ix;
 
-  LOG_PRINT("buf_len: %d\r\n", buf_len);
+  SL_DEBUG_LOG_V2(INFO, "buf_len: %d", buf_len);
   for (ix = 0; ix < buf_len; ix++) {
     if (ix % 16 == 0) {
-      LOG_PRINT("\r\n");
+      SL_DEBUG_LOG_V2(INFO, "\n");
     } else if (ix % 8 == 0) {
-      LOG_PRINT("\t\t");
+      SL_DEBUG_LOG_V2(INFO, "\t\t");
     }
-    LOG_PRINT(" 0x%02X ", input_buf[ix]);
+    SL_DEBUG_LOG_V2(INFO, "0x%02X ", input_buf[ix]);
   }
-  LOG_PRINT("\r\n");
 
   return;
 }
@@ -326,7 +337,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
                                     uint8_t char_prop)
 {
   if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE) {
-    LOG_PRINT("no data memory for att rec values");
+    SL_DEBUG_LOG_V2(INFO, "no data memory for att rec values");
     return;
   }
 
@@ -805,14 +816,14 @@ void rsi_ble_simple_gatt_test(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
 
-  printf("\r\nWi-Fi  initialization is successful\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi  initialization is successful");
   status = sl_wifi_get_firmware_version(&fw_version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
   } else {
     print_firmware_version(&fw_version);
   }
@@ -820,11 +831,11 @@ void rsi_ble_simple_gatt_test(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Get local device address failed = %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    LOG_PRINT("\r\n Local device address %s \r\n", local_dev_addr);
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
   }
 
 #if (GATT_ROLE == SERVER)
@@ -871,7 +882,7 @@ void rsi_ble_simple_gatt_test(void *argument)
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    LOG_PRINT("\r\nFailed to create ble_main_task_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem");
     return;
   }
   //!  initializing the application events map
@@ -894,35 +905,35 @@ void rsi_ble_simple_gatt_test(void *argument)
   if (status != RSI_SUCCESS) {
     return;
   }
-  LOG_PRINT("\r\nStart advertising\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Start advertising");
 #endif
 
 #if (GATT_ROLE == CLIENT)
   //! start scanning
   status = rsi_ble_start_scanning();
-  LOG_PRINT("start scanning\n");
+  SL_DEBUG_LOG_V2(INFO, "start scanning");
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("start_scanning status: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX", status);
     return;
   }
 #endif
 #if ENABLE_NWP_POWER_SAVE
-  LOG_PRINT("\r\n keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Failed to initiate power save in BLE mode \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\n Failed to initiate power save in Wi-Fi mode :%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx", status);
     return;
   }
 
-  LOG_PRINT("\r\n Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
 #endif
   //! waiting for events from controller.
   while (1) {
@@ -939,10 +950,10 @@ void rsi_ble_simple_gatt_test(void *argument)
         //! advertise report event.
         //! clear the advertise report event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_ADV_REPORT);
-        LOG_PRINT("\r\nIn Advertising Event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In Advertising Event");
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("connect status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "connect status: 0x%lX", status);
         }
 
       } break;
@@ -954,7 +965,7 @@ void rsi_ble_simple_gatt_test(void *argument)
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
         rsi_6byte_dev_address_to_ascii(str_remote_address, conn_event_to_app.dev_addr);
-        LOG_PRINT("\r\n Module connected to address : %s \r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
 
 #if (GATT_ROLE == CLIENT)
         memset(&service_uuid, 0, sizeof(service_uuid));
@@ -963,13 +974,13 @@ void rsi_ble_simple_gatt_test(void *argument)
 
         status = rsi_ble_get_profile_async(conn_event_to_app.dev_addr, service_uuid, NULL);
         if (status != 0) {
-          LOG_PRINT("\n rsi_ble_get_profile_async failed with %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_profile_async failed with %lx", status);
         }
 #endif
 #if (GATT_ROLE == SERVER)
         status = rsi_ble_mtu_exchange_event((uint8_t *)conn_event_to_app.dev_addr, RSI_BLE_MTU_SIZE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("MTU CMD status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "MTU CMD status: 0x%lX", status);
         }
 #endif
 
@@ -980,13 +991,13 @@ void rsi_ble_simple_gatt_test(void *argument)
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-        LOG_PRINT("\r\nModule got Disconnected\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Module got Disconnected");
 #if ENABLE_NWP_POWER_SAVE
-        LOG_PRINT("\r\n keep module in to active state \r\n");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to active state ");
         //! initiating Active mode in BT mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\r\n Failed to keep Module in ACTIVE mode \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
           return;
         }
 
@@ -994,7 +1005,7 @@ void rsi_ble_simple_gatt_test(void *argument)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("\r\n Failed to keep module in HIGH_PERFORMANCE mode \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
           return;
         }
 #endif
@@ -1009,14 +1020,14 @@ adv:
 #if (GATT_ROLE == CLIENT)
         //! start scanning
         device_found = 0;
-        LOG_PRINT("\r\nStart scanning \n");
+        SL_DEBUG_LOG_V2(INFO, "Start scanning ");
         status = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("start_scanning status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX", status);
         }
 #endif
 #if ENABLE_NWP_POWER_SAVE
-        LOG_PRINT("\r\n keep module in to power save \r\n");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
           return;
@@ -1026,14 +1037,14 @@ adv:
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          LOG_PRINT("\r\n Failed to keep module in power save \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
           return;
         }
-        LOG_PRINT("\r\n Module is in power save \r\n");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
 #endif
       } break;
       case RSI_BLE_GATT_WRITE_EVENT: {
-        LOG_PRINT("\r\nIn BLE GATT write event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In BLE GATT write event");
         //! event invokes when write/notification events received
 
         //! clear the served event
@@ -1066,7 +1077,7 @@ adv:
             //! Update value length
             attribute->len = app_ble_write_event.length;
 
-            LOG_PRINT("\r\n received data from remote device: %s \n", (char *)attribute->value);
+            SL_DEBUG_LOG_V2(INFO, "received data from remote device: %s ", (uintptr_t)((char *)attribute->value));
 
             //! Send gatt write response
             rsi_ble_gatt_write_response(conn_event_to_app.dev_addr, 0);
@@ -1091,7 +1102,7 @@ adv:
         rsi_ble_notify_value(conn_event_to_app.dev_addr, rsi_ble_att1_val_hndl, RSI_BLE_MAX_DATA_LEN, (uint8_t *)data);
       } break;
       case RSI_BLE_READ_REQ_EVENT: {
-        LOG_PRINT("\r\nIn BLE read request event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In BLE read request event");
         //! event invokes when write/notification events received
 
         //! clear the served event
@@ -1106,7 +1117,7 @@ adv:
       } break;
 
       case RSI_BLE_GATT_PROFILE_RESP_EVENT: {
-        LOG_PRINT("\r\nIn BLE GATT profile response event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In BLE GATT profile response event");
         //! event invokes when get profile response received
 
         //! clear the served event
@@ -1120,13 +1131,13 @@ adv:
                                                  *(uint16_t *)rsi_ble_service.end_handle,
                                                  NULL);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("rsi_ble_get_char_services_async status: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_char_services_async status: 0x%lX", status);
         }
 #endif
       } break;
 
       case RSI_BLE_GATT_CHAR_SERVICES_RESP_EVENT: {
-        LOG_PRINT("\r\nIn BLE GATT characteristics of services response event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In BLE GATT characteristics of services response event");
         //! event invokes when get characteristics of the service response received
 
         //! clear the served event
@@ -1135,8 +1146,8 @@ adv:
 #if (GATT_ROLE == CLIENT)
         //! verifying the immediate alert characteristic
         for (ix = 0; ix < char_servs.num_of_services; ix++) {
-          LOG_PRINT("Character services of  profile : ");
-          LOG_PRINT(" uuid: 0x%04x\r\n", char_servs.char_services[ix].char_data.char_uuid.val.val16);
+          SL_DEBUG_LOG_V2(INFO, "Character services of  profile : ");
+          SL_DEBUG_LOG_V2(INFO, "uuid: 0x%04x", char_servs.char_services[ix].char_data.char_uuid.val.val16);
           if (char_servs.char_services[ix].char_data.char_uuid.val.val16 == RSI_BLE_CLIENT_ATTRIBUTE_1_UUID) {
             rsi_ble_att1_val_hndl = char_servs.char_services[ix].char_data.char_handle;
 
@@ -1145,7 +1156,7 @@ adv:
                                                RSI_MIN(mtu_size - 3, 100),
                                                (uint8_t *)&client_data);
             if (status != RSI_SUCCESS) {
-              LOG_PRINT("rsi_ble_set_att_cmd_async status: 0x%lX\r\n", status);
+              SL_DEBUG_LOG_V2(INFO, "rsi_ble_set_att_cmd_async status: 0x%lX", status);
             }
             //! set the event to calculate RSSI value
             // #ifndef RSI_SAMPLE_HAL
@@ -1159,7 +1170,7 @@ adv:
       } break;
 
       case RSI_BLE_MTU_EVENT: {
-        LOG_PRINT("\r\nIn MTU event\r\n");
+        SL_DEBUG_LOG_V2(INFO, "In MTU event");
         //! event invokes when write/notification events received
 
         //! clear the served event

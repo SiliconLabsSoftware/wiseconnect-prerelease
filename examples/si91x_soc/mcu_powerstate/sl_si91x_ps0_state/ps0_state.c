@@ -31,6 +31,8 @@ void low_power_configuration(void);
 void ps0_state_init(void)
 {
   sl_status_t status;
+  // Print the required state
+  SL_PRINT_STRING_ERROR("PS0 Sleep State \n");
   // change the TASS reference clock to MHz RC.
   RSI_ChangeTassRefClock();
   // Power downs the domains.
@@ -43,7 +45,6 @@ void ps0_state_init(void)
  * a recommendation: in production code, ERROR severity should be reserved for
  * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
  * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-  SL_PRINT_STRING_ERROR("PS0 Sleep State \n");
   // PS0 state requirement is added, it transits to PS0 sleep state.
   status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS0);
   if (status != SL_STATUS_OK) {

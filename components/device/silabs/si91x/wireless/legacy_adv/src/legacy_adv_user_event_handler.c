@@ -57,6 +57,7 @@
 #include "FreeRTOS.h"                // FreeRTOS definitions
 #include "timers.h"                  // FreeRTOS timer definitions
 #include "ble_event_hdlr_auto_gen.h" // Event handler registration, event IDs
+#include <inttypes.h>
 
 /*=======================================================================*/
 //! GLOBAL VARIABLES
@@ -109,7 +110,7 @@ void rsi_scan_restart_event()
   if (scan_state_dut != scan_off) {
     status = rsi_ble_stop_scanning();
     if (status != RSI_SUCCESS) {
-      printf("\r\n scanning stop failed, cmd status = 0x%lX -conn\n", status);
+      printf("\r\n scanning stop failed, cmd status = 0x%" PRIX32 " -conn\n", status);
     } else {
       scan_state_dut = scan_off;
     }
@@ -130,7 +131,7 @@ void rsi_scan_restart_event()
       //! Open scan channel with custom parameters (interval: 33.125ms, window: 14.375ms)
       status = rsi_ble_start_scanning_with_values(&change_scan_param);
       if (status != RSI_SUCCESS) {
-        printf("\r\n scan channel failed to open 0x%lX \n", status);
+        printf("\r\n scan channel failed to open 0x%" PRIX32 " \n", status);
       } else {
         scan_state_dut = non_connectable_scan;
       }
@@ -140,7 +141,7 @@ void rsi_scan_restart_event()
       if (!peripheral_con_req_pending) {
         status = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          printf("\r\n scanning start failed, cmd status = 0x%lX -conn\n", status);
+          printf("\r\n scanning start failed, cmd status = 0x%" PRIX32 " -conn\n", status);
           rsi_ble_event_scan_restart_driver_callback(); // Retry via callback
         } else {
           scan_state_dut = connectable_scan;
@@ -174,7 +175,7 @@ void rsi_adv_restart_event()
   if (adv_state_dut == adv_enabled) {
     status = rsi_ble_stop_advertising();
     if (status != RSI_SUCCESS) {
-      printf("\r\n advertising failed to stop, with status = 0x%lX -conn\n", status);
+      printf("\r\n advertising failed to stop, with status = 0x%" PRIX32 " -conn\n", status);
 
     } else {
       adv_state_dut = adv_disabled;
@@ -200,7 +201,7 @@ void rsi_adv_restart_event()
     status = rsi_ble_start_advertising();
     printf("\r\n Advertising Restarted \n");
     if (status != RSI_SUCCESS) {
-      printf("\r\n advertising failed with status = 0x%lX -conn \n", status);
+      printf("\r\n advertising failed with status = 0x%" PRIX32 " -conn \n", status);
     } else {
 #if WLAN_TRANSIENT_CASE
       ble_adv_is_there = 1; // Update coex state
@@ -216,7 +217,7 @@ void rsi_adv_restart_event()
   else if ((central_count == RSI_BLE_MAX_NBR_CENTRALS) && (adv_state_dut == adv_disabled)) {
     status = rsi_ble_start_advertising_with_values(&change_adv_param);
     if (status != RSI_SUCCESS) {
-      printf("\r\n advertising with values failed with status = 0x%lX -conn \n", status);
+      printf("\r\n advertising with values failed with status = 0x%" PRIX32 " -conn \n", status);
     } else {
       adv_state_dut = adv_enabled_non_connectable;
     }

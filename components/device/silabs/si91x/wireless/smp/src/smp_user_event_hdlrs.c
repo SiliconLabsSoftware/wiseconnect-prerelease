@@ -32,6 +32,7 @@
 // Standard C library
 #include <stdio.h>  // printf() - debug and error messages (64 uses)
 #include <string.h> // memcpy() - memory operations (used throughout)
+#include <inttypes.h>
 
 // SMP Component headers
 #include <smp_config.h> // SMP configuration - resolved via -I: config/ble_config/ (user override) first, then component inc/
@@ -443,7 +444,7 @@ void rsi_ble_event_sc_passkey(uint16_t __attribute__((unused)) status, void *eve
   memcpy(&rsi_ble_conn_info[ble_conn_id].rsi_event_sc_passkey, sc_passkey, sizeof(rsi_bt_event_sc_passkey_t));
   printf("\r\n in smp sc passkey event -conn%d \r\n", ble_conn_id);
 
-  printf("\r\n In passkey event, remote addr: %s, passkey: %lu -conn%u \r\n",
+  printf("\r\n In passkey event, remote addr: %s, passkey: %" PRIu32 " -conn%u \r\n",
          rsi_ble_conn_info[ble_conn_id].remote_dev_addr,
          rsi_ble_conn_info[ble_conn_id].rsi_event_sc_passkey.passkey,
          ble_conn_id);

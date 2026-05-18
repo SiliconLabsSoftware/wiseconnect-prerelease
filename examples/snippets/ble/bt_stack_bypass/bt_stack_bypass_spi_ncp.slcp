@@ -64,6 +64,10 @@ component:
 - id: basic_network_config_manager
 - id: ble
 - id: iot_socket
+- id: log_none
+- id: log_backend_iostream
+- id: log_backend_iostream_formatted
+- id: log_platform_specific
 toolchain_settings:
 - value: -Wall -Werror
   option: gcc_compiler_option

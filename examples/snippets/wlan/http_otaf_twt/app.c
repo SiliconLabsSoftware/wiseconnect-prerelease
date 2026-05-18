@@ -371,11 +371,11 @@ sl_status_t http_otaf_app()
 
   server_address = dns_query_rsp.ip.v4.value;
   sprintf((char *)server_ip,
-          "%ld.%ld.%ld.%ld",
-          server_address & 0x000000ff,
-          (server_address & 0x0000ff00) >> 8,
-          (server_address & 0x00ff0000) >> 16,
-          (server_address & 0xff000000) >> 24);
+          "%u.%u.%u.%u",
+          (unsigned int)(server_address & 0x000000ff),
+          (unsigned int)((server_address & 0x0000ff00) >> 8),
+          (unsigned int)((server_address & 0x00ff0000) >> 16),
+          (unsigned int)((server_address & 0xff000000) >> 24));
 
 #ifdef AWS_ENABLE
   SL_DEBUG_LOG_V2(INFO, "Resolved AWS S3 Bucket IP address = %s", (uintptr_t)server_ip);

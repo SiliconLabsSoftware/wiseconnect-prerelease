@@ -166,9 +166,7 @@ static const sl_net_wifi_client_profile_t wifi_client_profile = {
     .ip = {
         .mode = SL_IP_MANAGEMENT_DHCP,
         .type = (SL_IPV4|SL_IPV6),
-        .host_name = NULL,
-        .ip = {{{0}}},
-
+        .host_name = NULL
     }
 };
 
@@ -195,8 +193,7 @@ static sl_net_wifi_ap_profile_t wifi_ap_profile = {
     .ip = {
         .mode = SL_IP_MANAGEMENT_STATIC_IP,
         .type = (SL_IPV4|SL_IPV6),
-        .host_name = NULL,
-        .ip = {{{0}}},
+        .host_name = NULL
     }
 };
 
@@ -350,7 +347,7 @@ static void application_start(void *argument)
         sl_net_inet_addr(DEFAULT_WIFI_AP_GATEWAY4_ADDRESS, (uint32_t *)&wifi_ap_profile.ip.ip.v4.gateway.bytes);
 
         return_value = sl_inet_pton6(DEFAULT_WIFI_AP_MODULE_IP6_ADDRESS,
-                                     DEFAULT_WIFI_AP_MODULE_IP6_ADDRESS + strlen(DEFAULT_WIFI_AP_MODULE_IP6_ADDRESS),
+                                     &DEFAULT_WIFI_AP_MODULE_IP6_ADDRESS[strlen(DEFAULT_WIFI_AP_MODULE_IP6_ADDRESS)],
                                      hex_addr,
                                      (unsigned int *)ip_addr);
         if (return_value != 0x1) {
@@ -358,7 +355,7 @@ static void application_start(void *argument)
           return;
         }
         return_value = sl_inet_pton6(DEFAULT_WIFI_AP_GATEWAY6_ADDRESS,
-                                     DEFAULT_WIFI_AP_GATEWAY6_ADDRESS + strlen(DEFAULT_WIFI_AP_GATEWAY6_ADDRESS),
+                                     &DEFAULT_WIFI_AP_GATEWAY6_ADDRESS[strlen(DEFAULT_WIFI_AP_GATEWAY6_ADDRESS)],
                                      hex_addr,
                                      (unsigned int *)gateway);
         if (return_value != 0x1) {
@@ -638,7 +635,7 @@ void send_data_to_udp_server(void)
   server_address6.sin6_port   = SERVER_PORT;
 
   int status = sl_inet_pton6(SERVER_IP,
-                             SERVER_IP + strlen(SERVER_IP),
+                             &SERVER_IP[strlen(SERVER_IP)],
                              address_buffer,
                              (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
   if (status != 0x1) {

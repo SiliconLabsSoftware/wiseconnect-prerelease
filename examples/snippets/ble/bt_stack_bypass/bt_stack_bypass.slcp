@@ -40,6 +40,7 @@ component:
 - id: syscalls
 - id: sl_usart
 - id: sl_clock_manager
+- id: log_none
 requires:
 - name: sl_main
 - name: network_manager

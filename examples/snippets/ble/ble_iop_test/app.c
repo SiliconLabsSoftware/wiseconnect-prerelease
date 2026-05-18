@@ -24,6 +24,7 @@
 #include "errno.h"
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
+#include "sl_log_helper.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_utility.h"
@@ -214,6 +215,17 @@ uint8_t conn_params[12] = { CONN_INTERVAL_MIN_LSB,   CONN_INTERVAL_MIN_MSB,   CO
                             SUPERVISION_TIMEOUT_LSB, SUPERVISION_TIMEOUT_MSB, MIN_CE_LENGTH_LSB,
                             MIN_CE_LENGTH_MSB,       MAX_CE_LENGTH_LSB };
 
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
+
 static const sl_wifi_device_configuration_t
   config = { .boot_option = LOAD_NWP_FW,
              .mac_address = NULL,
@@ -383,9 +395,9 @@ void throughput_calculation(uint32_t start_timer, uint32_t stop_timer, uint32_t 
 
   timing     = (((float)(stop_timer - start_timer)) / 1000);
   throughput = (((float)(packet_count * RSI_BLE_MAX_DATA_LEN * 8)) / timing);
-  LOG_PRINT("\r\nThroughput : %.07f bps\n", (float)throughput);
-  LOG_PRINT("\r\nThroughput : %.07f kbps\n", (float)(throughput / 1000));
-  LOG_PRINT("\r\n Time duration in sec:%0.2f \n", timing);
+  SL_DEBUG_LOG_V2(INFO, "Throughput : %.07f bps", (float)throughput);
+  SL_DEBUG_LOG_V2(INFO, "Throughput : %.07f kbps", (float)(throughput / 1000));
+  SL_DEBUG_LOG_V2(INFO, "Time duration in sec:%0.2f ", timing);
 }
 
 /*============================================================================*/
@@ -402,7 +414,7 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
   memcpy(remote_dev_address, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
   rsi_6byte_dev_address_to_ascii(str_remote_address, resp_enh_conn->dev_addr);
 
-  LOG_PRINT("Connected Device Address: %s\n", str_remote_address);
+  SL_DEBUG_LOG_V2(INFO, "Connected Device Address: %s", (uintptr_t)(str_remote_address));
 
   rsi_ble_app_set_event(RSI_BLE_CONN_EVENT);
 }
@@ -2233,17 +2245,15 @@ void handle_phase3_control_char()
 {
   if (app_ble_write_event.length == 3) {
     memcpy(gattdb_control_value, app_ble_write_event.att_value, app_ble_write_event.length);
-    LOG_PRINT("Write request received: OS Type: 0x%02X, "
-              "Security Level: 0x%02X.\n",
-              (gattdb_control_value[0] & 0xFF),
-              gattdb_control_value[1]);
+    SL_DEBUG_LOG_V2(INFO, "Write request received: OS Type: 0x%02X", (gattdb_control_value[0] & 0xFF));
+    SL_DEBUG_LOG_V2(INFO, ", Security Level: 0x%02X.", gattdb_control_value[1]);
     // Handle Mobile OS Type
     switch (gattdb_control_value[0] & 0xFF) {
       case ANDROID:
-        LOG_PRINT("Mobile OS: Android.\n");
+        SL_DEBUG_LOG_V2(INFO, "Mobile OS: Android.");
         break;
       case IOS:
-        LOG_PRINT("Mobile OS: iOS.\n");
+        SL_DEBUG_LOG_V2(INFO, "Mobile OS: iOS.");
         break;
       default:
         break;
@@ -2251,24 +2261,21 @@ void handle_phase3_control_char()
     // Handle Security Level
     switch (gattdb_control_value[1] & 0xFF) {
       case rsi_bt_connection_mode1_level2: {
-        LOG_PRINT("Security Level: Mode 1 Level 2."
-                  "(Unauthenticated pairing with encryption).\n");
+        SL_DEBUG_LOG_V2(INFO, "Security Level: Mode 1 Level 2.(Unauthenticated pairing with encryption).");
         connection_security = rsi_bt_connection_mode1_level2;
         clear_ltk_list();
         rsi_ble_disconnect((int8_t *)app_ble_write_event.dev_addr);
         break;
       }
       case rsi_bt_connection_mode1_level3: {
-        LOG_PRINT("Security Level: Mode 1 Level 3"
-                  "    (Authenticated pairing with encryption).\n");
+        SL_DEBUG_LOG_V2(INFO, "Security Level: Mode 1 Level 3    (Authenticated pairing with encryption).");
         connection_security = rsi_bt_connection_mode1_level3;
         clear_ltk_list();
         rsi_ble_disconnect((int8_t *)app_ble_write_event.dev_addr);
         break;
       }
       case rsi_bt_connection_mode1_level4: {
-        LOG_PRINT("Security Level: Mode 1 Level 4,"
-                  "(Authenticated Secure Connections pairing).\n");
+        SL_DEBUG_LOG_V2(INFO, "Security Level: Mode 1 Level 4,(Authenticated Secure Connections pairing).");
         connection_security = rsi_bt_connection_mode1_level4;
         clear_ltk_list();
         rsi_ble_disconnect((int8_t *)app_ble_write_event.dev_addr);
@@ -2304,7 +2311,7 @@ int32_t handle_ota_process(uint16_t handle_value)
         memcpy(&firmware_header_data[0], &app_ble_write_event.att_value[0], 64);
         memcpy(&firmware_chunk_fw_payload[0], &app_ble_write_event.att_value[0], app_ble_write_event.length);
         status = sl_si91x_fwup_start(firmware_header_data);
-        LOG_PRINT("\r\n Firmware transfer in progress. Please wait....\r\n");
+        SL_DEBUG_LOG_V2(INFO, "Firmware transfer in progress. Please wait....");
         start_timer = osKernelGetTickCount();
         chunk_number++;
         status = sl_si91x_fwup_load(firmware_chunk_fw_payload, app_ble_write_event.length);
@@ -2316,33 +2323,33 @@ int32_t handle_ota_process(uint16_t handle_value)
         if (status == FW_UP_SUCCESS) {
           stop_timer = osKernelGetTickCount();
 #if (FW_UPGRADE_TYPE == TA_FW_UP)
-          LOG_PRINT("\r\n Time in sec:%ld\r\n", (stop_timer - start_timer) / 1000);
-          LOG_PRINT("\r\n TA Firmware transfer complete!\r\n");
-          LOG_PRINT("\r\n Safe upgrade in Progress. Please wait....\r\n");
+          SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
+          SL_DEBUG_LOG_V2(INFO, "TA Firmware transfer complete!");
+          SL_DEBUG_LOG_V2(INFO, "Safe upgrade in Progress. Please wait....");
 
           status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
-          printf("\r\nWi-Fi Deinit status : %lx\r\n", status);
+          SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit status : %lx", status);
           VERIFY_STATUS_AND_RETURN(status);
           osDelay(29000);
 
           status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
           if (status != SL_STATUS_OK) {
-            LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
             return status;
           } else {
-            printf("\r\n Wi-Fi Initialization Successful\n");
+            SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
           }
 
           status = sl_wifi_get_firmware_version(&version);
           VERIFY_STATUS_AND_RETURN(status);
-          printf("\r\nFirmware version after update:\r\n");
+          SL_DEBUG_LOG_V2(INFO, "Firmware version after update:");
           print_firmware_version(&version);
           return SL_STATUS_OK;
 #endif
 
 #if (FW_UPGRADE_TYPE == M4_FW_UP)
-          LOG_PRINT("\r\n Time in sec:%ld\r\n", (stop_timer - start_timer) / 1000);
-          LOG_PRINT("\r\n M4 Firmware transfer complete!\r\n");
+          SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
+          SL_DEBUG_LOG_V2(INFO, "M4 Firmware transfer complete!");
 #endif
           return status;
         }
@@ -2377,9 +2384,9 @@ void handle_prepare_write_request(rsi_ble_event_prepare_write_t app_ble_prepare_
                                                  app_ble_prepare_event.length,
                                                  app_ble_prepare_event.att_value);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.2: prepare write len255 successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.2: prepare write len255 successful");
     } else {
-      LOG_PRINT("Test Case 5.2: prepare write len255 failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.2: prepare write len255 failed");
     }
     //! Test Case 5.5 --> Receives value 0x00 of 255 bytes, error response sent
   } else if (handle_value == char_type_handle.char_const_len255) {
@@ -2388,9 +2395,9 @@ void handle_prepare_write_request(rsi_ble_event_prepare_write_t app_ble_prepare_
                                         RSI_BLE_ATT_WRITE_REQUEST,
                                         WRITE_NOT_PERIMITTED);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.5: const len255 success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.5: const len255 success");
     } else {
-      LOG_PRINT("Test Case 5.5: const len255 failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.5: const len255 failed");
     }
     //! Test Case 5.7 --> Receives value 0...254 of 255 bytes, write response sent
   } else if (handle_value == char_type_handle.char_usr_len255) {
@@ -2403,9 +2410,9 @@ void handle_prepare_write_request(rsi_ble_event_prepare_write_t app_ble_prepare_
                                                  app_ble_prepare_event.length,
                                                  app_ble_prepare_event.att_value);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.7: User len255 success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.7: User len255 success");
     } else {
-      LOG_PRINT("Test Case 5.7: User len255 failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.7: User len255 failed");
     }
   }
 }
@@ -2427,12 +2434,12 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
       //! Test Case 4.5 --> Receives value 0x00 of 1 byte
       if (handle_value == iop_test_prop.write_without_resp_len1) {
         memcpy(&write_value_len1, write_event->att_value, write_event->length);
-        LOG_PRINT("Test Case 4.5: Write without response len1 Successful\n");
+        SL_DEBUG_LOG_V2(INFO, "Test Case 4.5: Write without response len1 Successful");
         //! Test Case 4.6 --> Receives value 0x00 of 255 byte
       } else if (handle_value == iop_test_prop.write_without_resp_len255) {
         memcpy(&write_value, write_event->att_value, write_event->length);
         write_value_length = write_event->length;
-        LOG_PRINT("Test Case 4.6: Write without response with len255 SUccessfull\n");
+        SL_DEBUG_LOG_V2(INFO, "Test Case 4.6: Write without response with len255 SUccessfull");
         //! Test Case 6.1 --> Unack OTA update
       }
 #if FWUP_UPGRADE
@@ -2447,9 +2454,9 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
         memcpy(&write_value_len1, write_event->att_value, write_event->length);
         result = rsi_ble_gatt_write_response(write_event->dev_addr, 0);
         if (result == RSI_SUCCESS) {
-          LOG_PRINT("Test Case 4.3: Write only len1 Successful\n");
+          SL_DEBUG_LOG_V2(INFO, "Test Case 4.3: Write only len1 Successful");
         } else {
-          LOG_PRINT("Test Case 4.3: Write only len1 Failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 4.3: Write only len1 Failed");
         }
         //! Test Case 4.4 --> Receives 0x00 value of 255 byte, write response sent
       } else if (handle_value == iop_test_prop.write_only_len255) {
@@ -2457,18 +2464,18 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
         write_value_length = write_event->length;
         result             = rsi_ble_gatt_write_response(write_event->dev_addr, 0);
         if (result == RSI_SUCCESS) {
-          LOG_PRINT("Test Case 4.4:Write Response Successful\n");
+          SL_DEBUG_LOG_V2(INFO, "Test Case 4.4:Write Response Successful");
         } else {
-          LOG_PRINT("Test Case 4.4:Write Response Failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 4.4:Write Response Failed");
         }
         //! Test Case 5.1 --> Receives 0x55 value of 1 byte, write response sent
       } else if (handle_value == char_type_handle.char_len1) {
         write_value_len1 = write_event->att_value[0];
         result           = rsi_ble_gatt_write_response(write_event->dev_addr, 0);
         if (result == RSI_SUCCESS) {
-          LOG_PRINT("Test Case 5.1: write len1 response Successful\n");
+          SL_DEBUG_LOG_V2(INFO, "Test Case 5.1: write len1 response Successful");
         } else {
-          LOG_PRINT("Test Case 5.1: write len1 response Failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 5.1: write len1 response Failed");
         }
         //! Test Case 5.3 --> Receives 0x55/0x66 value of 1/4 byte, write response sent
       } else if (handle_value == char_type_handle.char_len_var4) {
@@ -2477,9 +2484,9 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
           memcpy(&iop_test_chr_user_var_4_arr, write_event->att_value, iop_test_chr_user_var_4_len);
           result = rsi_ble_gatt_write_response(write_event->dev_addr, 0);
           if (result == RSI_SUCCESS) {
-            LOG_PRINT("Test Case 5.3: Var len4 write Successful\n");
+            SL_DEBUG_LOG_V2(INFO, "Test Case 5.3: Var len4 write Successful");
           } else {
-            LOG_PRINT("Test Case 5.3: Var len4 write Failed\n");
+            SL_DEBUG_LOG_V2(ERROR, "Test Case 5.3: Var len4 write Failed");
           }
         }
         //! Test Case 5.4 --> Receives 0x55 value of 1 byte, write response sent
@@ -2489,9 +2496,9 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
                                             RSI_BLE_ATT_WRITE_REQUEST,
                                             WRITE_NOT_PERIMITTED);
         if (result == RSI_SUCCESS) {
-          LOG_PRINT("Test Case 5.4: const len1 error response Successful\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 5.4: const len1 error response Successful");
         } else {
-          LOG_PRINT("Test Case 5.4: const len1 error response Failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 5.4: const len1 error response Failed");
         }
         //! Test Case 5.5 --> Receives 1...254 value of 255 byte, error response sent
       } else if (handle_value == char_type_handle.char_const_len255) {
@@ -2500,9 +2507,9 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
                                             RSI_BLE_ATT_WRITE_REQUEST,
                                             WRITE_NOT_PERIMITTED);
         if (result == RSI_SUCCESS) {
-          LOG_PRINT("Test Case 5.5: const len255 error response Successful\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 5.5: const len255 error response Successful");
         } else {
-          LOG_PRINT("Test Case 5.5: const len255 error response Failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 5.5: const len255 error response Failed");
         }
         //! Test Case 5.6 --> Receives 0x55 value of 1 byte, write response sent
       } else if (handle_value == char_type_handle.char_usr_len1) {
@@ -2510,9 +2517,9 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
           user_len1 = write_event->att_value[0];
           result    = rsi_ble_gatt_write_response(write_event->dev_addr, 0);
           if (result == RSI_SUCCESS) {
-            LOG_PRINT("Test Case 5.6: User len255 write response Successful\n");
+            SL_DEBUG_LOG_V2(INFO, "Test Case 5.6: User len255 write response Successful");
           } else {
-            LOG_PRINT("Test Case 5.6: User len255 write response Failed\n");
+            SL_DEBUG_LOG_V2(ERROR, "Test Case 5.6: User len255 write response Failed");
           }
         }
         //! Test Case 5.7 --> Receives 0...254 value of 255 byte, write response sent
@@ -2521,9 +2528,9 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
         write_value_length = write_event->length;
         result             = rsi_ble_gatt_write_response(write_event->dev_addr, 0);
         if (result == RSI_SUCCESS) {
-          LOG_PRINT("Test Case 5.7: User len255 write response Successful\n");
+          SL_DEBUG_LOG_V2(INFO, "Test Case 5.7: User len255 write response Successful");
         } else {
-          LOG_PRINT("Test Case 5.7: User len255 write response Failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 5.7: User len255 write response Failed");
         }
         //! Test Case 5.8 --> Receives 0x55/0x66 value of 1/4 byte, write response sent
       } else if (handle_value == char_type_handle.char_usr_len_var4) {
@@ -2532,9 +2539,9 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
           memcpy(&iop_test_chr_user_var_4_arr, write_event->att_value, iop_test_chr_user_var_4_len);
           result = rsi_ble_gatt_write_response(write_event->dev_addr, 0);
           if (result == RSI_SUCCESS) {
-            LOG_PRINT("Test Case 5.8: User var len4 write response Successful\n");
+            SL_DEBUG_LOG_V2(INFO, "Test Case 5.8: User var len4 write response Successful");
           } else {
-            LOG_PRINT("Test Case 5.8: User var len4 write response Failed\n");
+            SL_DEBUG_LOG_V2(ERROR, "Test Case 5.8: User var len4 write response Failed");
           }
         }
         //! Test Case 6.2 -->Ack OTA upgrade
@@ -2548,23 +2555,23 @@ void handle_write_response(rsi_ble_event_write_t *write_event)
       else if ((*(uint16_t *)app_ble_write_event.handle) == iop_phase3.phase3_control_handle) {
         result = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (result == RSI_SUCCESS) {
-          LOG_PRINT("Test Case 7: Write response success\n");
+          SL_DEBUG_LOG_V2(INFO, "Test Case 7: Write response success");
         } else {
-          LOG_PRINT("Test Case 7: Write response failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Test Case 7: Write response failed");
         }
         osDelay(500);
         handle_phase3_control_char();
         //! Test Case 7.1 -->Throughput notification enable and disable is handled
       } else if ((*(uint16_t *)app_ble_write_event.handle - 1) == iop_phase3.tp_notify_handle) {
         if (app_ble_write_event.att_value[0] == NOTIFY_ENABLE) {
-          LOG_PRINT("\r\n Remote device enabled the notification \n");
+          SL_DEBUG_LOG_V2(INFO, "Remote device enabled the notification ");
           //! set the data transfer event
           notifies_enabled = 0x01;
           tx_pkt_cnt       = 0;
           tx_start_timer   = osKernelGetTickCount();
           rsi_ble_app_set_event(RSI_DATA_TRANSMIT_EVENT);
         } else if (app_ble_write_event.att_value[0] == NOTIFY_DISABLE) {
-          LOG_PRINT("\r\n Remote device disabled the notification \n");
+          SL_DEBUG_LOG_V2(INFO, "Remote device disabled the notification ");
           //! clear the data transfer event
           notifies_enabled = 0x00;
           tx_stop_timer    = osKernelGetTickCount();
@@ -2612,26 +2619,26 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
   if (handle == test_iop_service1.stack_version) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, 8, (const uint8_t *)&version);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 3:Stack Version sent Successfully\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 3:Stack Version sent Successfully");
     } else {
-      LOG_PRINT("Test Case 3:Reading Stack Version Failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 3:Reading Stack Version Failed");
     }
     //! Test Case 3 --> Sends connection parameter
   } else if (handle == test_iop_service1.conn_param) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, 12, conn_params);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 3:Connection Params sent Successfully\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 3:Connection Params sent Successfully");
     } else {
-      LOG_PRINT("Test Case 3:Reading Connection Params Failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 3:Reading Connection Params Failed");
     }
     //! Test Case 4.1 --> Receives read request for data len1 for 0x55
   } else if (handle == iop_test_prop.read_only_len1) {
     result =
       rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(read_only_len1), (uint8_t *)&read_only_len1);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.1: Read only len1 Success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.1: Read only len1 Success");
     } else {
-      LOG_PRINT("Test Case 4.1: Read only len1 Failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 4.1: Read only len1 Failed");
     }
     //! Test Case 4.2 --> Receives read request for data len255 for 0..254
   } else if (handle == iop_test_prop.read_only_len255) {
@@ -2644,9 +2651,9 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
         rsi_ble_gatt_read_response(dev_addr, type, handle, offset, bytes_to_send, (uint8_t *)&read_only_len255[offset]);
     }
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.2: len255 read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.2: len255 read successful");
     } else {
-      LOG_PRINT("Test Case 4.2: len255 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 4.2: len255 read failed");
     }
     //! Test Case 5.1 --> Receives read request for data len1 for 0x55
   } else if (handle == char_type_handle.char_len1) {
@@ -2657,9 +2664,9 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
                                         sizeof(write_value_len1),
                                         (uint8_t *)&write_value_len1);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.1: len1 read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.1: len1 read successful");
     } else {
-      LOG_PRINT("Test Case 5.1: len1 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.1: len1 read failed");
     }
     //! Test Case 4.2 --> Receives read request for data len255 for 0..254
   } else if (handle == char_type_handle.char_len255) {
@@ -2672,9 +2679,9 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
         rsi_ble_gatt_read_response(dev_addr, type, handle, offset, bytes_to_send, (uint8_t *)&read_only_len255[offset]);
     }
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.2: len255 read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.2: len255 read successful");
     } else {
-      LOG_PRINT("Test Case 4.2: len255 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 4.2: len255 read failed");
     }
     //! Test Case 5.3 --> Receives read request for data len1/len45 for 0x55/0x66
   } else if (handle == char_type_handle.char_len_var4) {
@@ -2685,18 +2692,18 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
                                         iop_test_chr_user_var_4_len,
                                         (uint8_t *)&iop_test_chr_user_var_4_arr);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.3: var len4 read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.3: var len4 read successful");
     } else {
-      LOG_PRINT("Test Case 5.3: var len4 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.3: var len4 read failed");
     }
     //! Test Case 5.4 --> Receives read request for data len1 for 0x55
   } else if (handle == char_type_handle.char_const_len1) {
     uint8_t const_len1 = 0x55;
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(const_len1), (uint8_t *)&const_len1);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.4: const len1 read success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.4: const len1 read success");
     } else {
-      LOG_PRINT("Test Case 5.4: const len1 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.4: const len1 read failed");
     }
     //! Test Case 5.5 --> Receives read request for data len255 for 0...254
   } else if (handle == char_type_handle.char_const_len255) {
@@ -2709,17 +2716,17 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
         rsi_ble_gatt_read_response(dev_addr, type, handle, offset, bytes_to_send, (uint8_t *)&read_only_len255[offset]);
     }
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.5: const len255 read success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.5: const len255 read success");
     } else {
-      LOG_PRINT("Test Case 5.5: const len255 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.5: const len255 read failed");
     }
     //! Test Case 5.6 --> Receives read request for data len1 for 0x55
   } else if (handle == char_type_handle.char_usr_len1) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(user_len1), (uint8_t *)&user_len1);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.6: user len1 read success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.6: user len1 read success");
     } else {
-      LOG_PRINT("Test Case 5.6: user len1 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.6: user len1 read failed");
     }
     //! Test Case 5.7 --> Receives read request for data len255 for 0..254
   } else if (handle == char_type_handle.char_usr_len255) {
@@ -2738,9 +2745,9 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
                                           (uint8_t *)&write_value_usr_len255[offset]);
     }
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.7: user len255 read success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.7: user len255 read success");
     } else {
-      LOG_PRINT("Test Case 5.7: user len255 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 5.7: user len255 read failed");
     }
     //! Test Case 5.3 --> Receives read request for data len1/len45 for 0x55/0x66
   } else if (handle == char_type_handle.char_usr_len_var4) {
@@ -2751,49 +2758,49 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
                                         iop_test_chr_user_var_4_len,
                                         (uint8_t *)&iop_test_chr_user_var_4_arr);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 5.8: user var len4 read success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.8: user var len4 read success");
     } else {
-      LOG_PRINT("Test Case 5.8: user var len4 read success\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 5.8: user var len4 read success");
     }
     //! Model number is sent
   } else if (handle == device_info.model_number_handle) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(MODEL_STRING), (uint8_t *)MODEL_STRING);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Model number Read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Model number Read successful");
     } else {
-      LOG_PRINT("Model Number Read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Model Number Read failed");
     }
     //! Device name is sent
   } else if (handle == device_info.device_name_handle) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(MODEL_STRING), (uint8_t *)MODEL_STRING);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Device Name Read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Device Name Read successful");
     } else {
-      LOG_PRINT("Device Name Read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Device Name Read failed");
     }
     //! Test Case 8.1 --> Receives read request, 0x55 will be sent
   } else if (handle == iop_phase3.handle_justworks) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(value), (uint8_t *)&value);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 8.1: Read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 8.1: Read successful");
     } else {
-      LOG_PRINT("Test Case 8.1: Read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 8.1: Read failed");
     }
     //! Test Case 8.2 --> Receives read request, 0x55 will be sent
   } else if (handle == iop_phase3.handle_auth) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(value), (uint8_t *)&value);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 8.2: Read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 8.2: Read successful");
     } else {
-      LOG_PRINT("Test Case 8.2: Read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 8.2: Read failed");
     }
     //! Test Case 8.3 --> Receives read request, 0x55 will be sent
   } else if (handle == iop_phase3.handle_bonding) {
     result = rsi_ble_gatt_read_response(dev_addr, type, handle, offset, sizeof(value), (uint8_t *)&value);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 8.3: Read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 8.3: Read successful");
     } else {
-      LOG_PRINT("Test Case 8.3: Read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 8.3: Read failed");
     }
     //! Test Case 4.5 --> Receives read request for len1, 0x55 will be sent
   } else if (handle == iop_test_prop.write_without_resp_len1) {
@@ -2804,9 +2811,9 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
                                         sizeof(write_value_len1),
                                         (uint8_t *)&write_value_len1);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.5: Read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.5: Read successful");
     } else {
-      LOG_PRINT("Test Case 4.5: Read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 4.5: Read failed");
     }
     //! Test Case 4.6 --> Receives read request, 0...254 will be sent
   } else if (handle == iop_test_prop.write_without_resp_len255) {
@@ -2819,12 +2826,12 @@ void handle_read_req(uint8_t *dev_addr, uint16_t handle, uint16_t offset, uint8_
         rsi_ble_gatt_read_response(dev_addr, type, handle, offset, bytes_to_send, (uint8_t *)&write_value_send[offset]);
     }
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.6: len255 read successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.6: len255 read successful");
     } else {
-      LOG_PRINT("Test Case 4.6 : len255 read failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 4.6 : len255 read failed");
     }
   } else {
-    LOG_PRINT("Invalid handle for Read Request\n");
+    SL_DEBUG_LOG_V2(ERROR, "Invalid handle for Read Request");
   }
 }
 
@@ -2856,9 +2863,9 @@ void handle_notification(void)
                                   sizeof(data_len1_notify),
                                   &data_len1_notify);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.7:Notification len1 sent successfully\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.7:Notification len1 sent successfully");
     } else {
-      LOG_PRINT("Test Case 4.7:Notification len1 sent failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 4.7:Notification len1 sent failed");
     }
     //! Test Case 4.8 --> Sends notification of length MTU-3
   } else if (*((uint16_t *)app_ble_write_event.handle) == (iop_test_prop.notify_len3 + 1)) {
@@ -2867,9 +2874,9 @@ void handle_notification(void)
                                   mtu_size - 3,
                                   iop_test_notification_250_arr);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.8:Notification len255 sent successfully\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.8:Notification len255 sent successfully");
     } else {
-      LOG_PRINT("Test Case 4.8:Notification len255 sent failed\n");
+      SL_DEBUG_LOG_V2(ERROR, "Test Case 4.8:Notification len255 sent failed");
     }
   }
 }
@@ -2889,7 +2896,7 @@ void handle_indication(void)
   if (*((uint16_t *)app_ble_write_event.handle) == iop_test_prop.indicate_len1 + 1) {
     result = rsi_ble_indicate_value(app_ble_write_event.dev_addr, iop_test_prop.indicate_len1, 1, &data_len1_notify);
     if (result == RSI_SUCCESS) {
-      LOG_PRINT("Test Case 4.9:Indication len1 successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.9:Indication len1 successful");
     }
     //! Test Case 4.10 --> Sends indication of length MTU-3 byte
   } else if (*((uint16_t *)app_ble_write_event.handle) == iop_test_prop.indicate_len3 + 1) {
@@ -2898,7 +2905,7 @@ void handle_indication(void)
                                     240 - 3,
                                     iop_test_notification_250_arr);
     if (result == 0) {
-      LOG_PRINT("Test Case 4.10:Indication MTU-3 successful\n");
+      SL_DEBUG_LOG_V2(INFO, "Test Case 4.10:Indication MTU-3 successful");
     }
   }
 }
@@ -2938,15 +2945,15 @@ void ble_iop_test_app(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nWi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
     return;
   }
-  LOG_PRINT("\r\nWireless Initialization Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success");
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    LOG_PRINT("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
   } else {
     print_firmware_version(&version);
   }
@@ -2954,11 +2961,11 @@ void ble_iop_test_app(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\r\n Get local device address failed = %lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    LOG_PRINT("\r\n Local device address %s \r\n", local_dev_addr);
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
   }
 
   //! registering the GAP callback functions
@@ -3018,7 +3025,7 @@ void ble_iop_test_app(void *argument)
 #endif
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    LOG_PRINT("Failed to create ble_main_task_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem");
     return;
   }
 
@@ -3061,9 +3068,9 @@ void ble_iop_test_app(void *argument)
   //! start advertising
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    LOG_PRINT("\nstart advertising cmd failed with error code = %lx \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "start advertising cmd failed with error code = %lx ", status);
   } else {
-    LOG_PRINT("\nStarted advertising, local name : %s\n", (char *)RSI_BLE_DEVICE_NAME);
+    SL_DEBUG_LOG_V2(INFO, "Started advertising, local name : %s", (uintptr_t)((char *)RSI_BLE_DEVICE_NAME));
   }
 
   //! waiting for events from controller.
@@ -3087,7 +3094,7 @@ void ble_iop_test_app(void *argument)
         //! Setting MTU Exchange event
         status = rsi_ble_mtu_exchange_event(remote_dev_address, MAX_MTU_SIZE);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n MTU request cmd failed with error code = %lx \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "MTU request cmd failed with error code = %lx ", status);
         }
 
         //! initiating the SMP pairing process
@@ -3095,13 +3102,13 @@ void ble_iop_test_app(void *argument)
           ix = rsi_get_ltk_list(ble_dev_ltk_list, &temp_le_ltk_req);
 
           if (ix != -1) {
-            LOG_PRINT("Device is bonded\n");
+            SL_DEBUG_LOG_V2(INFO, "Device is bonded");
             break;
           }
 
           status = rsi_ble_smp_pair_request(remote_dev_address, smp_capabilities.io_capability, mitm_req);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n Initiating SMP Pairing process failed with status %lx \n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Initiating SMP Pairing process failed with status %lx ", status);
           }
         }
 
@@ -3109,7 +3116,7 @@ void ble_iop_test_app(void *argument)
 
       case RSI_BLE_DISCONN_EVENT: {
         //! event invokes when disconnection was completed
-        LOG_PRINT("\n Disconnected, str_remote_address : %s\r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "Disconnected, str_remote_address : %s", (uintptr_t)(str_remote_address));
 
 #if FWUP_UPGRADE
         //! Once OTA is done, reboot the device over OTA disconnection
@@ -3131,7 +3138,7 @@ void ble_iop_test_app(void *argument)
           smp_capabilities.auth_req             = AUTH_REQ_SC_BIT;
           status                                = rsi_ble_set_smp_pairing_cap_data(&smp_capabilities);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n rsi_ble_set_smp_pairing_cap_data = %lx", status);
+            SL_DEBUG_LOG_V2(INFO, "rsi_ble_set_smp_pairing_cap_data = %lx", status);
           }
 
         } else if (connection_security == rsi_bt_connection_mode1_level3) {
@@ -3146,7 +3153,7 @@ void ble_iop_test_app(void *argument)
           smp_capabilities.auth_req             = AUTH_REQ_MITM_BIT | AUTH_REQ_SC_BIT;
           status                                = rsi_ble_set_smp_pairing_cap_data(&smp_capabilities);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n rsi_ble_set_smp_pairing_cap_data = %lx", status);
+            SL_DEBUG_LOG_V2(INFO, "rsi_ble_set_smp_pairing_cap_data = %lx", status);
           }
 
         } else if (connection_security == rsi_bt_connection_mode1_level4) {
@@ -3161,7 +3168,7 @@ void ble_iop_test_app(void *argument)
           smp_capabilities.auth_req             = AUTH_REQ_BITS;
           status                                = rsi_ble_set_smp_pairing_cap_data(&smp_capabilities);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n rsi_ble_set_smp_pairing_cap_data = %lx", status);
+            SL_DEBUG_LOG_V2(INFO, "rsi_ble_set_smp_pairing_cap_data = %lx", status);
           }
 
         } else if (connection_security == security_level_privacy) {
@@ -3176,7 +3183,7 @@ void ble_iop_test_app(void *argument)
           smp_capabilities.auth_req             = AUTH_REQ_BITS;
           status                                = rsi_ble_set_smp_pairing_cap_data(&smp_capabilities);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n rsi_ble_set_smp_pairing_cap_data = %lx", status);
+            SL_DEBUG_LOG_V2(INFO, "rsi_ble_set_smp_pairing_cap_data = %lx", status);
           }
           connection_security = rsi_bt_connection_mode1_level1;
         }
@@ -3192,27 +3199,27 @@ void ble_iop_test_app(void *argument)
         //! start advertising
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n Start advertising cmd failed with error code = %lx \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx ", status);
         } else {
-          LOG_PRINT("\n Started Advertising \n");
+          SL_DEBUG_LOG_V2(INFO, "Started Advertising ");
         }
 
       } break;
 #if SMP_ENABLE
       case RSI_BLE_SMP_REQ_EVENT: {
-        LOG_PRINT("\n In SMP request event, str_remote_address : %s\r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "In SMP request event, str_remote_address : %s", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_REQ_EVENT);
         //! initiating the SMP pairing process
         status = rsi_ble_smp_pair_request(remote_dev_address, smp_capabilities.io_capability, mitm_req);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n Failed to send pair request = %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to send pair request = %lx", status);
         }
       } break;
 
       case RSI_BLE_SMP_RESP_EVENT: {
-        LOG_PRINT("\n In SMP response event, str_remote_address : %s\r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "In SMP response event, str_remote_address : %s", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_RESP_EVENT);
@@ -3220,13 +3227,13 @@ void ble_iop_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_pair_response(remote_dev_address, smp_capabilities.io_capability, mitm_req);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n Failed to send SMP pair response with status %lx \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to send SMP pair response with status %lx ", status);
         }
 
       } break;
 
       case RSI_BLE_SMP_PASSKEY_EVENT: {
-        LOG_PRINT("\n In SMP passkey event, str_remote_address : %s\r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "In SMP passkey event, str_remote_address : %s", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_PASSKEY_EVENT);
@@ -3234,13 +3241,14 @@ void ble_iop_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_passkey(remote_dev_address, RSI_BLE_SMP_PASSKEY);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n Failed to send smp passkey with status %lx \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to send smp passkey with status %lx ", status);
         }
 
       } break;
       case RSI_BLE_SMP_PASSKEY_DISPLAY_EVENT: {
-        LOG_PRINT("\r\nIn SMP passkey display event\r\n");
-        LOG_PRINT("\n Remote addr: %s, passkey: %s\r\n", str_remote_address, smp_passkey);
+        SL_DEBUG_LOG_V2(INFO, "In SMP passkey display event");
+        SL_DEBUG_LOG_V2(INFO, "Remote addr: %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, ", passkey: %s", (uintptr_t)(smp_passkey));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_PASSKEY_DISPLAY_EVENT);
@@ -3258,22 +3266,22 @@ void ble_iop_test_app(void *argument)
         }
 
         if ((ix != -1) && (ble_dev_ltk != NULL)) {
-          LOG_PRINT("\n positive reply\n");
+          SL_DEBUG_LOG_V2(INFO, "positive reply");
           //!  give le ltk req reply cmd with positive reply
           status = rsi_ble_ltk_req_reply(temp_le_ltk_req.dev_addr,
                                          (1 | (ble_dev_ltk->enc_enable) | (ble_dev_ltk->sc_enable << 7)),
                                          ble_dev_ltk->localltk);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\n Failed to restart smp pairing with status: 0x%lx \r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to restart smp pairing with status: 0x%lx ", status);
           }
         }
 
         else {
-          LOG_PRINT("\n Negative reply\n");
+          SL_DEBUG_LOG_V2(INFO, "Negative reply");
           //! give le ltk req reply cmd with negative reply
           status = rsi_ble_ltk_req_reply(temp_le_ltk_req.dev_addr, 0, NULL);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("Failed to send LTK negative reply with status %lx \n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to send LTK negative reply with status %lx ", status);
           }
 
           rsi_ble_disconnect((int8_t *)temp_le_ltk_req.dev_addr);
@@ -3281,7 +3289,8 @@ void ble_iop_test_app(void *argument)
       } break;
 
       case RSI_BLE_SC_PASSKEY_EVENT: {
-        LOG_PRINT("\n Remote addr: %s, passkey: %06ld \r\n", str_remote_address, passkey);
+        SL_DEBUG_LOG_V2(INFO, "Remote addr: %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, ", passkey: %06ld ", passkey);
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SC_PASSKEY_EVENT);
@@ -3310,7 +3319,8 @@ void ble_iop_test_app(void *argument)
         //get resolvlist size
         status = rsi_ble_get_resolving_list_size(&app_resp_resolvlist_size);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n line %d -> status: 0x%lx\r\n", __LINE__, status);
+          SL_DEBUG_LOG_V2(INFO, "line %d", __LINE__);
+          SL_DEBUG_LOG_V2(INFO, "-> status: 0x%lx", status);
           return;
         }
 
@@ -3318,7 +3328,8 @@ void ble_iop_test_app(void *argument)
         status =
           rsi_ble_set_addr_resolution_enable(RSI_BLE_DEV_ADDR_RESOLUTION_ENABLE, RSI_BLE_SET_RESOLVABLE_PRIV_ADDR_TOUT);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("\n line %d -> status: 0x%lx\r\n", __LINE__, status);
+          SL_DEBUG_LOG_V2(INFO, "line %d", __LINE__);
+          SL_DEBUG_LOG_V2(INFO, "-> status: 0x%lx", status);
           return;
         }
 
@@ -3329,14 +3340,15 @@ void ble_iop_test_app(void *argument)
           RSI_BLE_PRIVACY_MODE);
 
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("line %d -> status: 0x%lx\r\n", __LINE__, status);
+          SL_DEBUG_LOG_V2(INFO, "line %d", __LINE__);
+          SL_DEBUG_LOG_V2(INFO, "-> status: 0x%lx", status);
           return;
         }
       } break;
 
       case RSI_BLE_SMP_FAILED_EVENT: {
         //! initiate SMP protocol as a Central
-        LOG_PRINT("smp_failed, str_remote_address: %s\r\n", str_remote_address);
+        SL_DEBUG_LOG_V2(ERROR, "smp_failed, str_remote_address: %s", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_FAILED_EVENT);
@@ -3377,13 +3389,13 @@ void ble_iop_test_app(void *argument)
 
         status = rsi_ble_set_wo_resp_notify_buf_info(remote_dev_address, DLE_BUFFER_MODE, DLE_BUFFER_COUNT);
         if (status != RSI_SUCCESS) {
-          LOG_PRINT("Configure buffer mode failed with status %lx \n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Configure buffer mode failed with status %lx ", status);
         }
 
         if (remote_dev_feature.remote_features[0] & 0x20) {
           status = rsi_ble_set_data_len(remote_dev_address, TX_LEN, TX_TIME);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\n Set data length cmd failed with error code = %lx \n", status);
+            SL_DEBUG_LOG_V2(ERROR, "Set data length cmd failed with error code = %lx ", status);
           }
         }
       } break;
@@ -3408,9 +3420,9 @@ void ble_iop_test_app(void *argument)
 
         result = rsi_ble_gatt_write_response(app_ble_execute_write_event.dev_addr, 1);
         if (result == 0) {
-          LOG_PRINT("Execute write response success\n");
+          SL_DEBUG_LOG_V2(INFO, "Execute write response success");
         } else {
-          LOG_PRINT("Execute write response failed\n");
+          SL_DEBUG_LOG_V2(ERROR, "Execute write response failed");
         }
         break;
 
@@ -3442,7 +3454,7 @@ void ble_iop_test_app(void *argument)
                                               CONN_LATENCY,
                                               SUPERVISION_TIMEOUT);
           if (status != RSI_SUCCESS) {
-            LOG_PRINT("\r\n conn params update cmd failed with status = %lx \r\n", status);
+            SL_DEBUG_LOG_V2(ERROR, "conn params update cmd failed with status = %lx ", status);
           } else {
             conn_params_updated = 1;
           }
@@ -3457,7 +3469,7 @@ void ble_iop_test_app(void *argument)
               rsi_ble_app_clear_event(RSI_DATA_TRANSMIT_EVENT);
               break;
             } else {
-              LOG_PRINT("\r\n Sending notification for TP failed with status = %lx \r\n", status);
+              SL_DEBUG_LOG_V2(ERROR, "Sending notification for TP failed with status = %lx ", status);
               rsi_ble_app_clear_event(RSI_DATA_TRANSMIT_EVENT);
             }
           } else {

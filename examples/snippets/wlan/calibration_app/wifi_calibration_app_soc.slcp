@@ -24,6 +24,7 @@ define:
 - name: USART_CONFIG
 component:
 - id: si91x_memory_default_config
+- id: syscalls
 - id: stdio
 - id: rsilib_clock_update
 - id: sl_main

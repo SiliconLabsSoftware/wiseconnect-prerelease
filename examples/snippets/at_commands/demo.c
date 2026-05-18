@@ -254,7 +254,7 @@ void print_command_args(const console_descriptive_command_t *command)
       if (command->argument_help && command->argument_help[a]) {
         AT_PRINTF("%s", command->argument_help[a]);
       } else {
-        AT_PRINTF(console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
+        AT_PRINTF("%s", console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
       }
       AT_PRINTF(">");
     }

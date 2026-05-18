@@ -50,6 +50,7 @@
 // Standard C library
 #include <stdio.h>  // printf() - debug and error messages (38 uses)
 #include <string.h> // memcpy(), memset(), memcmp() - memory operations (10 uses)
+#include <inttypes.h>
 
 // GAP Component headers (for multi-protocol connection state)
 #include "gap.h" // rsi_ble_conn_info[], TOTAL_CONNECTIONS, RSI_REM_DEV_ADDR_LEN (22 uses)
@@ -141,10 +142,10 @@ void rsi_ble_gatt_server_data_transmit(uint8_t ble_conn_id)
 
           status = rsi_ble_disconnect((int8_t *)rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr);
           if (status != RSI_SUCCESS) {
-            printf("\ndisconnect command failed with reason %lx\n", status);
+            printf("\ndisconnect command failed with reason 0x%" PRIX32 "\n", status);
           }
         } else {
-          printf("\r\n indication %d failed with error code %lx -conn%d\n",
+          printf("\r\n indication %d failed with error code 0x%" PRIX32 " -conn%d\n",
                  rsi_ble_conn_info[ble_conn_id].indication_cnt,
                  status,
                  ble_conn_id);
@@ -195,10 +196,10 @@ void rsi_ble_gatt_server_data_transmit(uint8_t ble_conn_id)
 
           status = rsi_ble_disconnect((int8_t *)rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr);
           if (status != RSI_SUCCESS) {
-            printf("\ndisconnect command failed with reason %lx\n", status);
+            printf("\ndisconnect command failed with reason 0x%" PRIX32 "\n", status);
           }
         } else {
-          printf("\r\n notify %d failed with error code %lx  -conn%d\n",
+          printf("\r\n notify %d failed with error code 0x%" PRIX32 "  -conn%d\n",
                  rsi_ble_conn_info[ble_conn_id].notfy_cnt,
                  status,
                  ble_conn_id);
