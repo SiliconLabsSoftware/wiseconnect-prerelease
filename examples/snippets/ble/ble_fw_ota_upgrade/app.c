@@ -64,7 +64,6 @@
 #define BLE_ATT_REC_SIZE 500
 #define NO_OF_VAL_ATT    5
 #define FW_HEADER_SIZE   64
-#define SL_FW_ERROR      2
 //! global parameters list
 static uint8_t chunk_data              = 0;
 static uint16_t chunk_number           = 1;
@@ -767,30 +766,6 @@ static void rsi_ble_on_conn_update_complete_event(rsi_ble_event_conn_update_t *r
 
 /*==============================================*/
 /**
- * @brief Convert known FW update status codes to a short description string.
- *        Used when status != SL_STATUS_SI91X_FW_UPDATE_DONE for logging.
- */
-static const char *fw_update_status_string(sl_status_t status)
-{
-  switch (status) {
-    case SL_STATUS_SI91X_FW_UPDATE_FAILED:
-      return "Firmware update failed";
-    case SL_STATUS_SI91X_FW_UP_CORRUPTED_RPS_HEADER:
-      return "Corrupted RPS header or empty RPS file";
-    case SL_STATUS_SI91X_FW_UP_WRONG_PACKET_INFO:
-      return "Wrong packet info";
-    case SL_STATUS_SI91X_INVALID_LENGTH:
-      return "Invalid length (payload > image size)";
-    case SL_STATUS_SI91X_ALLOCATION_FAILED:
-      return "Memory allocation failed in NWP";
-    case SL_STATUS_SI91X_INSUFFICIENT_FLASH_MEMORY:
-      return "Insufficient flash memory";
-    default:
-      return NULL;
-  }
-}
-/*==============================================*/
-/**
  * @fn         rsi_ble_gatt_write_event_handler
  * @brief      Processes a GATT write for one OTA characteristic handle.
  * @param[in]  app_ble_write_event, write request data from the stack (handle, length, payload).
@@ -956,8 +931,6 @@ void rsi_ble_ota_fwup_gatt_server(void *argument)
   }
 
   status = update_firmware();
-  if (status == SL_FW_ERROR)
-    SL_DEBUG_LOG_V2(INFO, "reconnect the Device and select the Proper FW ");
 }
 
 sl_status_t update_firmware()
@@ -1201,26 +1174,11 @@ adv:
               memcpy(&firmware_chunk_fw_payload[0], &app_ble_write_event.att_value[0], app_ble_write_event.length);
 
 #if (FW_UPGRADE_TYPE == COMBINED_FW_UP)
-              const uint8_t header = firmware_header_data[0];
-              if (!SI91X_OTA_RPS_HEADER_IS_COMBINED_IMAGE(header)) {
-                SL_DEBUG_LOG_V2(ERROR, "wrong firmware selected ");
-                return SL_FW_ERROR;
-              }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[48]);
 #elif (FW_UPGRADE_TYPE == TA_FW_UP)
-              const uint8_t header = firmware_header_data[0];
-              if (!SI91X_OTA_RPS_HEADER_IS_TA_IMAGE(header)) {
-                SL_DEBUG_LOG_V2(ERROR, "wrong firmware selected ");
-                return SL_FW_ERROR;
-              }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[8]);
               fw_size += FW_HEADER_SIZE;
 #elif (FW_UPGRADE_TYPE == M4_FW_UP)
-              const uint8_t header = firmware_header_data[0];
-              if (!SI91X_OTA_RPS_HEADER_IS_M4_IMAGE(header)) {
-                SL_DEBUG_LOG_V2(ERROR, "wrong firmware selected ");
-                return SL_FW_ERROR;
-              }
               fw_size = rsi_bytes4R_to_uint32(&firmware_header_data[8]);
               fw_size += FW_HEADER_SIZE;
 
@@ -1241,60 +1199,13 @@ adv:
               //! received and loaded successfully
               if (status == SL_STATUS_SI91X_FW_UPDATE_DONE) {
                 stop_timer = osKernelGetTickCount();
-#if (FW_UPGRADE_TYPE == TA_FW_UP)
                 SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
                 SL_DEBUG_LOG_V2(INFO, "TA Firmware transfer complete!");
                 SL_DEBUG_LOG_V2(INFO, "Safe upgrade in Progress. Please wait....");
-                //! To reclaim memory back After FW OTA upgrade over
-                status = rsi_ble_disable();
-                if (status != SL_STATUS_OK) {
-                  SL_DEBUG_LOG_V2(ERROR, "BLE Disable Failed, Error Code : 0x%lX", status);
-                  return status;
-                } else {
-                  SL_DEBUG_LOG_V2(INFO, "BLE Disable Successful");
-                }
-                status = sl_wifi_deinit();
-                SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit status : %lx", status);
-                VERIFY_STATUS_AND_RETURN(status);
-
-                osDelay(30000);
-                status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
-                if (status != SL_STATUS_OK) {
-                  SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
-                  return status;
-                } else {
-                  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
-                }
-
-                status = sl_wifi_get_firmware_version(&version);
-                VERIFY_STATUS_AND_RETURN(status);
-
-                SL_DEBUG_LOG_V2(INFO, "Firmware version after update:");
-                print_firmware_version(&version);
-
-#elif (FW_UPGRADE_TYPE == M4_FW_UP)
-                SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
-                SL_DEBUG_LOG_V2(INFO, "M4 Firmware transfer complete!");
-                sl_si91x_soc_nvic_reset();
-
-#elif (FW_UPGRADE_TYPE == COMBINED_FW_UP)
-                SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
-                SL_DEBUG_LOG_V2(INFO, "TA_M4 Combined Firmware transfer complete!");
+#ifdef SLI_SI91X_MCU_INTERFACE
                 sl_si91x_soc_nvic_reset();
 #endif
                 return status;
-              } else if (status != SL_STATUS_OK) {
-                const char *desc = fw_update_status_string(status);
-                if (desc != NULL) {
-                  SL_DEBUG_LOG_V2(ERROR, "Firmware upgrade failed: %s", (uintptr_t)(desc));
-                  SL_DEBUG_LOG_V2(ERROR, "(0x%lx)", (unsigned long)status);
-                } else {
-                  SL_DEBUG_LOG_V2(ERROR, "Firmware upgrade failed. Status: 0x%lx", (unsigned long)status);
-                }
-              } else {
-                if (chunk_number == total_number_of_chunks)
-                  SL_DEBUG_LOG_V2(ERROR, "Firmware upgrade failed!");
-                chunk_number++;
               }
             }
           }

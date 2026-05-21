@@ -44,6 +44,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -76,6 +77,11 @@
 #define ADV_PASSIVE_SCAN_DURATION    20
 #define ADV_MULTIPROBE               0
 #define ADV_SCAN_PERIODICITY         10
+
+/* Defaults aligned with example apps (sl_wifi_filter_broadcast migration). */
+#define BCAST_FILTER_ENABLE (1U)
+#define MCAST_FILTER_ENABLE (1U)
+#define FILTER_MODE         (0U)
 
 #define MAX_RECEIVE_STATS_COUNT 5
 
@@ -1283,7 +1289,7 @@ sl_status_t wifi_load_certificate_handler(console_args_t *arguments)
 
 exit:
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
   }
   return status;
 }
@@ -1794,11 +1800,16 @@ static sl_status_t twt_callback_handler(sl_wifi_event_t event,
 sl_status_t sl_wifi_filter_broadcast_command_handler(console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
-  sl_status_t status                     = SL_STATUS_OK;
-  uint16_t beacon_drop_threshold         = 5000;
-  uint8_t filter_bcast_in_tim            = 1;
-  uint8_t filter_bcast_tim_till_next_cmd = 1;
-  status = sl_wifi_filter_broadcast(beacon_drop_threshold, filter_bcast_in_tim, filter_bcast_tim_till_next_cmd);
+  sl_status_t status                                        = SL_STATUS_OK;
+  uint16_t beacon_drop_threshold                            = 5000;
+  sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
+  groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
+  groupcast_filter_config.enable_mcast_filter               = (uint8_t)MCAST_FILTER_ENABLE;
+  groupcast_filter_config.filter_mode                       = (uint8_t)FILTER_MODE;
+
+  status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
+  VERIFY_STATUS_AND_RETURN(status);
+  status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, beacon_drop_threshold);
   VERIFY_STATUS_AND_RETURN(status);
   return SL_STATUS_OK;
 }

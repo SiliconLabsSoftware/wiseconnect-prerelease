@@ -540,8 +540,6 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
                                               const uint8_t *payload,
                                               uint16_t payload_length)
 {
-  UNUSED_PARAMETER(payload);
-  UNUSED_PARAMETER(payload_length);
   if (test_base_info == NULL || per_params == NULL) {
     SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: null arg\n");
     return SL_STATUS_INVALID_PARAMETER;
@@ -549,6 +547,11 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
   if (!device_initialized) {
     SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: not initialized\n");
     return SL_STATUS_NOT_INITIALIZED;
+  }
+  /* Si91x legacy PER path does not transport a host-provided payload; reject rather than silently drop it. */
+  if (payload != NULL && payload_length > 0) {
+    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: payload not supported on Si91x\n");
+    return SL_STATUS_NOT_SUPPORTED;
   }
   switch (test_base_info->wifi_protocol) {
     case SL_WIFI_RATE_PROTOCOL_B_ONLY:
@@ -575,25 +578,9 @@ sl_status_t sl_wifi_transmit_test_start_11ac(const sl_wifi_transmitter_test_base
 {
   UNUSED_PARAMETER(payload);
   UNUSED_PARAMETER(payload_length);
-  if (test_base_info == NULL || per_params == NULL) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: null arg\n");
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: not initialized\n");
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  if (test_base_info->wifi_protocol != SL_WIFI_RATE_PROTOCOL_AC_ONLY) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: bad protocol %u\n", (unsigned)test_base_info->wifi_protocol);
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  sl_wifi_transmitter_test_info_t tx_test_info;
-  sli_wifi_transmitter_test_info_from_base_and_per(test_base_info, per_params, &tx_test_info);
-
-  sl_status_t status = sli_wifi_transmit_test_start(SL_WIFI_CLIENT_INTERFACE, &tx_test_info);
-  SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ac: status=0x%lx\n", (unsigned long)status);
-  return status;
+  UNUSED_PARAMETER(test_base_info);
+  UNUSED_PARAMETER(per_params);
+  return SL_STATUS_NOT_SUPPORTED;
 }
 
 sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base_info_t *test_base_info,
@@ -601,11 +588,30 @@ sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base
                                              const uint8_t *payload,
                                              uint16_t payload_length)
 {
-  UNUSED_PARAMETER(test_base_info);
-  UNUSED_PARAMETER(per_params);
-  UNUSED_PARAMETER(payload);
-  UNUSED_PARAMETER(payload_length);
-  return SL_STATUS_NOT_SUPPORTED;
+  if (test_base_info == NULL || per_params == NULL) {
+    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: null arg\n");
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  if (!device_initialized) {
+    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: not initialized\n");
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+  if (test_base_info->wifi_protocol != SL_WIFI_RATE_PROTOCOL_AX_ONLY) {
+    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: bad protocol %u\n", (unsigned)test_base_info->wifi_protocol);
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  /* Si91x legacy PER path does not transport a host-provided payload; reject rather than silently drop it. */
+  if (payload != NULL && payload_length > 0) {
+    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: payload not supported on Si91x\n");
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  sl_wifi_transmitter_test_info_t tx_test_info;
+  sli_wifi_transmitter_test_info_from_base_and_per(test_base_info, per_params, &tx_test_info);
+
+  sl_status_t status = sli_wifi_transmit_test_start(SL_WIFI_CLIENT_INTERFACE, &tx_test_info);
+  SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: status=0x%lx\n", (unsigned long)status);
+  return status;
 }
 
 sl_status_t sl_wifi_transmit_test_start_11be(const sl_wifi_transmitter_test_base_info_t *test_base_info,

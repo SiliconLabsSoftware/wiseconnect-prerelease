@@ -29,6 +29,7 @@
  ******************************************************************************/
 #include <string.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include "errno.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_status.h"
@@ -61,6 +62,12 @@
 #define TWT_SCAN_TIMEOUT  10000
 #define SEND_TCP_DATA     0
 #define TWT_AUTO_CONFIG   1
+
+/* Defaults migrated from sl_wifi_filter_broadcast(5000, 1, 1). */
+#define BCAST_FILTER_ENABLE      (1U)
+#define MCAST_FILTER_ENABLE      (1U)
+#define FILTER_MODE              (0U)
+#define BEACON_DROP_THRESHOLD_MS (5000U)
 
 // Use case based TWT selection params
 #define TWT_RX_LATENCY      60000 // in milli seconds
@@ -170,14 +177,14 @@ void application_start()
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &twt_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
@@ -215,7 +222,7 @@ void application_start()
 
   status = set_twt();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while configuring TWT parameters: 0x%lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while configuring TWT parameters: 0x%" PRIx32 " ", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "TWT Config Done");
@@ -223,7 +230,7 @@ void application_start()
 #if SEND_TCP_DATA
   status = send_data();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while sending data: 0x%lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while sending data: 0x%" PRIx32 " ", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Data Sent");
@@ -258,8 +265,15 @@ sl_status_t set_twt(void)
   // A small delay is added so that the asynchronous response from TWT is printed in correct format.
   osDelay(100);
 
-  //! Enable Broadcast data filter
-  status = sl_wifi_filter_broadcast(5000, 1, 1);
+  //! Enable groupcast filter and beacon drop threshold
+  sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
+  groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
+  groupcast_filter_config.enable_mcast_filter               = (uint8_t)MCAST_FILTER_ENABLE;
+  groupcast_filter_config.filter_mode                       = (uint8_t)FILTER_MODE;
+
+  status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
+  VERIFY_STATUS_AND_RETURN(status);
+  status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
   VERIFY_STATUS_AND_RETURN(status);
   SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
 
@@ -267,7 +281,7 @@ sl_status_t set_twt(void)
   performance_profile.profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
   status                      = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
   SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");

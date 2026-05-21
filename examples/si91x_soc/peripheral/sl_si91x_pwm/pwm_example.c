@@ -252,7 +252,7 @@ void pwm_example_init(void)
 void pwm_example_process_action(void)
 {
   if (event_flag) {
-    SL_PRINT_STRING_ERROR("event flag is raised \n");
+    SL_PRINT_STRING_ERROR("PWM enable interrupt flag is successful \n");
     for (uint8_t i = 0; i < EVENT_COUNT; i++) {
       if (flag[i] == 1) {
         SL_PRINT_STRING_ERROR("event %d raised\n", i);

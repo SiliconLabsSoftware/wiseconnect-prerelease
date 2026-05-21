@@ -388,7 +388,7 @@ void send_data_to_tcp_server(void)
   server_address6.sin6_port   = SERVER_PORT;
 
   int status = sl_inet_pton6(SERVER_IP,
-                             SERVER_IP + strlen(SERVER_IP),
+                             &SERVER_IP[strlen(SERVER_IP)],
                              address_buffer,
                              (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
   if (status != 0x1) {
@@ -609,7 +609,7 @@ void send_data_to_udp_server(void)
   server_address6.sin6_port   = SERVER_PORT;
 
   int status = sl_inet_pton6(SERVER_IP,
-                             SERVER_IP + strlen(SERVER_IP),
+                             &SERVER_IP[strlen(SERVER_IP)],
                              address_buffer,
                              (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
   if (status != 0x1) {
@@ -786,7 +786,7 @@ void receive_data_from_tls_server(void)
   server_address6.sin6_family = AF_INET6;
   server_address6.sin6_port   = SERVER_PORT;
   int ret_status              = sl_inet_pton6(SERVER_IP,
-                                 SERVER_IP + strlen(SERVER_IP),
+                                 &SERVER_IP[strlen(SERVER_IP)],
                                  address_buffer,
                                  (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
   if (ret_status != 0x1) {
@@ -848,7 +848,7 @@ void receive_data_from_tls_server(void)
   server_address6.sin6_port   = SERVER_PORT;
 
   int ret_status = sl_inet_pton6(SERVER_IP,
-                                 SERVER_IP + strlen(SERVER_IP),
+                                 &SERVER_IP[strlen(SERVER_IP)],
                                  address_buffer,
                                  (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
   if (ret_status != 0x1) {
@@ -928,7 +928,7 @@ void send_data_to_tls_server(void)
   server_address6.sin6_port   = SERVER_PORT;
 
   int status = sl_inet_pton6(SERVER_IP,
-                             SERVER_IP + strlen(SERVER_IP),
+                             &SERVER_IP[strlen(SERVER_IP)],
                              address_buffer,
                              (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
   if (status != 0x1) {

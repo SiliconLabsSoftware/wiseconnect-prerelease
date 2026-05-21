@@ -237,7 +237,12 @@ sl_status_t set_nvm_profile_command_handler(console_args_t *arguments)
               .mode = SL_IP_MANAGEMENT_DHCP,
               .type = SL_IPV4,
               .host_name = NULL,
-              .ip = {{{0}}},
+              .ip.v4.ip_address.value = 0,
+              .ip.v4.gateway.value = 0,
+              .ip.v4.netmask.value = 0,
+              .ip.v6.link_local_address.value = { 0, 0, 0, 0 },
+              .ip.v6.global_address.value = { 0, 0, 0, 0 },
+              .ip.v6.gateway.value = { 0, 0, 0, 0 },
           }
       };
 
@@ -276,7 +281,12 @@ sl_status_t set_nvm_profile_command_handler(console_args_t *arguments)
     		      .mode = SL_IP_MANAGEMENT_DHCP,
     		      .type = SL_IPV4,
               .host_name = NULL,
-              .ip = {{{0}}},
+              .ip.v4.ip_address.value = 0,
+              .ip.v4.gateway.value = 0,
+              .ip.v4.netmask.value = 0,
+              .ip.v6.link_local_address.value = { 0, 0, 0, 0 },
+              .ip.v6.global_address.value = { 0, 0, 0, 0 },
+              .ip.v6.gateway.value = { 0, 0, 0, 0 },
     		    }
       };
 

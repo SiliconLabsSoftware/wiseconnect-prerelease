@@ -70,6 +70,7 @@
 #define MQTT_CLIENT_TX_BUFFER_SIZE 1500
 #define MQTT_CONNECT_TIME_OUT      20000
 #define KEEP_ALIVE_PERIOD          100
+#define MQTT_LOG_PAYLOAD_MAX       256
 
 // Global variables
 volatile int halt         = 0;
@@ -135,6 +136,7 @@ typedef struct mqtt_client_s {
  *               Function Declarations
 ******************************************************/
 static void application_start(void *argument);
+static int mqtt_demo_cleanup(mqtt_client_t *mqtt_client, bool topic_subscribed, bool mqtt_connected, int app_status);
 
 int paho_mqtt_over_websocket_demo();
 
@@ -146,6 +148,34 @@ void app_init(void)
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
 }
 
+static int mqtt_demo_cleanup(mqtt_client_t *mqtt_client, bool topic_subscribed, bool mqtt_connected, int app_status)
+{
+  int status = 0;
+
+  if (topic_subscribed) {
+    status = MQTTUnsubscribe(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED);
+    if (status != SL_STATUS_OK && app_status == 0) {
+      SL_DEBUG_LOG_V2(ERROR, "Unsubscription Failed: 0x%X", status);
+      app_status = status;
+    }
+  }
+
+  if (mqtt_connected) {
+    status = MQTTDisconnect(&mqtt_client->client);
+    if (status != SL_STATUS_OK && app_status == 0) {
+      SL_DEBUG_LOG_V2(ERROR, "Disconnect Failed: 0x%X", status);
+      app_status = status;
+    }
+  }
+
+  if (mqtt_client != NULL && mqtt_client->client.ipstack != NULL) {
+    NetworkDisconnect(mqtt_client->client.ipstack);
+  }
+
+  SL_DEBUG_LOG_V2(INFO, "Execution completed!");
+  return app_status;
+}
+
 // Message arrival callback
 void message_arrived(MessageData *md)
 {
@@ -153,7 +183,14 @@ void message_arrived(MessageData *md)
     SL_DEBUG_LOG_V2(ERROR, "Received NULL message!");
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Message: %.*s", md->message->payloadlen, (uintptr_t)(char *)md->message->payload);
+  char payload_log[MQTT_LOG_PAYLOAD_MAX];
+  size_t payload_len = (size_t)md->message->payloadlen;
+  if (payload_len >= sizeof(payload_log)) {
+    payload_len = sizeof(payload_log) - 1;
+  }
+  memcpy(payload_log, md->message->payload, payload_len);
+  payload_log[payload_len] = '\0';
+  SL_DEBUG_LOG_V2(INFO, "Message: %s", (uintptr_t)payload_log);
   halt = 1;
 }
 
@@ -232,6 +269,9 @@ static void application_start(void *argument)
 int paho_mqtt_over_websocket_demo()
 {
   int status;
+  int app_status             = 0;
+  bool mqtt_connected        = false;
+  bool topic_subscribed      = false;
   uint16_t flags             = 0;
   mqtt_client_t *mqtt_client = NULL;
   MQTTMessage publish_msg;
@@ -276,16 +316,20 @@ int paho_mqtt_over_websocket_demo()
 
   if (status == NETWORK_ERROR_NULL_STRUCTURE) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.");
-    return status;
+    app_status = status;
+    return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.");
-    return status;
+    app_status = status;
+    return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   } else if (status == NETWORK_ERROR_INVALID_TYPE) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.");
-    return status;
+    app_status = status;
+    return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   } else if (status != 0) {
     SL_DEBUG_LOG_V2(ERROR, "WebSocket Connection Failed: %d", status);
-    return status;
+    app_status = status;
+    return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
 
   // Set up MQTT connection parameters
@@ -302,16 +346,20 @@ int paho_mqtt_over_websocket_demo()
   status = MQTTConnect(&mqtt_client->client, &connectData);
   if (status != 0) {
     SL_DEBUG_LOG_V2(ERROR, "MQTT Connection Failed: %d", status);
-    return status;
+    app_status = status;
+    return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
+  mqtt_connected = true;
   SL_DEBUG_LOG_V2(INFO, "MQTT Connected Successfully!");
 
   // Subscribe to topic
   status = MQTTSubscribe(&mqtt_client->client, (char *)TOPIC_TO_BE_SUBSCRIBED, (enum QoS)QOS, message_arrived);
   if (status != 0) {
     SL_DEBUG_LOG_V2(ERROR, "Subscription Failed: %d", status);
-    return status;
+    app_status = status;
+    return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
+  topic_subscribed = true;
   SL_DEBUG_LOG_V2(INFO, "Subscribed to topic: %s", (uintptr_t)TOPIC_TO_BE_SUBSCRIBED);
 
   // Prepare publish message
@@ -331,7 +379,8 @@ int paho_mqtt_over_websocket_demo()
   status = MQTTPublish(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED, &publish_msg);
   if (status != 0) {
     SL_DEBUG_LOG_V2(ERROR, "MQTT Publish Failed: %d", status);
-    return status;
+    app_status = status;
+    return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
   SL_DEBUG_LOG_V2(INFO, "Published to Topic successfully");
 
@@ -340,29 +389,11 @@ int paho_mqtt_over_websocket_demo()
     status = MQTTYield(&mqtt_client->client, 60000);
     if (status != SL_STATUS_OK) {
       SL_DEBUG_LOG_V2(ERROR, "Receive Data Failed, Error Code: 0x%X", status);
-      return status;
+      app_status = status;
+      return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
     } else {
       SL_DEBUG_LOG_V2(DEBUG, "Receive Data Success");
     }
   }
-
-  // Cleanup
-  status = MQTTUnsubscribe(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED);
-  if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unsubscription Failed: 0x%X", status);
-    return status;
-  }
-
-  status = MQTTDisconnect(&mqtt_client->client);
-  if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Disconnect Failed: 0x%X", status);
-    return status;
-  }
-
-  if (mqtt_client->client.ipstack) {
-    NetworkDisconnect(mqtt_client->client.ipstack);
-  }
-
-  SL_DEBUG_LOG_V2(INFO, "Execution completed!");
-  return 0;
+  return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
 }

@@ -183,7 +183,7 @@ template_contribution:
       event_profile_dummy:
         callback_params:
           - name: profile_dummy_data
-            type: profile_dummy_data_t*
+            type: sli_profile_dummy_data_t*
         event_data:
           name: profile_dummy_data
   - name: agents_slab

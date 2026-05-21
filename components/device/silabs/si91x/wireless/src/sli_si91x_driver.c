@@ -598,3 +598,15 @@ sl_status_t sli_convert_si91x_status_to_sl_status(si91x_status_t si91x_status)
       return SL_STATUS_FAIL;
   }
 }
+
+sl_status_t sli_wifi_send_data_packet(const void *data, uint16_t length, const void *context)
+{
+  // Route (send) the packet via routing utility (may be async)
+  sl_status_t status = sli_routing_utility_route_packet(&wifi_command_engine_routing_table,
+                                                        SLI_WIFI_DATA_PACKET,
+                                                        data,
+                                                        (length & 0xFFF),
+                                                        context);
+
+  return (SL_STATUS_IN_PROGRESS == status) ? SL_STATUS_OK : status;
+}

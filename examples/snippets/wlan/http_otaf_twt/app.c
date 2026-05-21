@@ -32,6 +32,7 @@
 #include "sl_net.h"
 #include "sl_wifi_types.h"
 #include <string.h>
+#include <inttypes.h>
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "firmware_upgradation.h"
@@ -60,6 +61,12 @@
 #define TWT_SCAN_TIMEOUT   10000
 #define TWT_AUTO_CONFIG    1
 #define COMBINED_FW_UPDATE 2
+
+/* Defaults migrated from sl_wifi_filter_broadcast(5000, 1, 1). */
+#define BCAST_FILTER_ENABLE      (1U)
+#define MCAST_FILTER_ENABLE      (1U)
+#define FILTER_MODE              (0U)
+#define BEACON_DROP_THRESHOLD_MS (5000U)
 
 #define MAX_TX_AND_RX_LATENCY_LIMIT 22118400 // 6hrs in milli seconds
 
@@ -271,7 +278,7 @@ void application_start(const void *unused)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init is successful");
@@ -280,7 +287,7 @@ void application_start(const void *unused)
   if (FLAGS & HTTPS_SUPPORT) {
     status = clear_and_load_certificates_in_flash();
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%" PRIx32 "", (uint32_t)status);
       return;
     }
   }
@@ -288,14 +295,14 @@ void application_start(const void *unused)
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Connected to Wi-Fi");
 
   status = http_otaf_app();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware update failed: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware update failed: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Firmware update is successful");
@@ -322,7 +329,9 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   // Load SSL CA certificate
   status = sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cert, cert_length);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR,
+                    "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%" PRIx32 "",
+                    (uint32_t)status);
   } else {
     SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 0);
   }
@@ -364,7 +373,7 @@ sl_status_t http_otaf_app()
   } while ((dns_retry_count != 0) && (status != SL_STATUS_OK));
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
   SL_DEBUG_LOG_V2(INFO, "Resolving dns Success");
@@ -391,7 +400,7 @@ sl_status_t http_otaf_app()
 #endif
   status = set_twt();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while configuring TWT parameters: 0x%lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while configuring TWT parameters: 0x%" PRIx32 " ", (uint32_t)status);
     return status;
   }
   SL_DEBUG_LOG_V2(INFO, "TWT Config Done");
@@ -399,7 +408,7 @@ sl_status_t http_otaf_app()
   if (twt_active_session == 1) {
     status = sl_wifi_reschedule_twt(twt_response.twt_flow_id, SL_WIFI_SUSPEND_INDEFINITELY, 0);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Suspending TWT Failed: 0x%lx ", status);
+      SL_DEBUG_LOG_V2(ERROR, "Suspending TWT Failed: 0x%" PRIx32 " ", (uint32_t)status);
       return status;
     } else {
       twt_active_session = 0;
@@ -411,7 +420,7 @@ sl_status_t http_otaf_app()
     performance_profile.profile = HIGH_PERFORMANCE;
     status                      = sl_wifi_set_performance_profile_v2(&performance_profile);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Powersave Disabling Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Powersave Disabling Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
       return status;
     } else {
       power_save_enabled = 0;
@@ -439,7 +448,7 @@ sl_status_t http_otaf_app()
 
   status = sl_si91x_http_otaf_v2(&http_params);
 
-  SL_DEBUG_LOG_V2(INFO, "Firmware update status: 0x%lX", status);
+  SL_DEBUG_LOG_V2(INFO, "Firmware update status: 0x%" PRIx32 "", (uint32_t)status);
   if (SL_STATUS_IN_PROGRESS == status) {
     const uint32_t start = osKernelGetTickCount();
 
@@ -451,7 +460,7 @@ sl_status_t http_otaf_app()
   }
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware update FAILED with error: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware update FAILED with error: 0x%" PRIx32 "", (uint32_t)status);
     return status;
   } else {
 #ifdef AWS_ENABLE
@@ -467,14 +476,14 @@ sl_status_t http_otaf_app()
 #if (FW_UPDATE_TYPE == TA_FW_UPDATE)
   status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%" PRIx32 " ", (uint32_t)status);
     return status;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful");
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init success");
@@ -507,8 +516,15 @@ sl_status_t set_twt(void)
   // A small delay is added so that the asynchronous response from TWT is printed in correct format.
   osDelay(100);
 
-  //! Enable Broadcast data filter
-  status = sl_wifi_filter_broadcast(5000, 1, 1);
+  //! Enable groupcast filter and beacon drop threshold
+  sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
+  groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
+  groupcast_filter_config.enable_mcast_filter               = (uint8_t)MCAST_FILTER_ENABLE;
+  groupcast_filter_config.filter_mode                       = (uint8_t)FILTER_MODE;
+
+  status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
+  VERIFY_STATUS_AND_RETURN(status);
+  status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
   VERIFY_STATUS_AND_RETURN(status);
   SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
 
@@ -516,7 +532,7 @@ sl_status_t set_twt(void)
   performance_profile.profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
   status                      = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return status;
   } else {
     power_save_enabled = 1;

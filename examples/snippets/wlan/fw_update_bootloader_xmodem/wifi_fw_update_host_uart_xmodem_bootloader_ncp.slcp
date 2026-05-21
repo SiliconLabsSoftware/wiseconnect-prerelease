@@ -1,4 +1,4 @@
-project_name: wifi_firmware_flashing_from_host_uart_xmodem_bootloader_ncp
+project_name: wifi_fw_update_host_uart_xmodem_bootloader_ncp
 package: wifi_app
 quality: production
 label: Wi-Fi - Firmware Update via Bootloader using Xmodem (NCP)

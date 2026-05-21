@@ -192,7 +192,7 @@ A Python-based OTA tool is provided to run on a PC: scan for the device, connect
 2. Run the script:
 
    ```sh
-   python Si917-OTA Firmware Update Python Script.py
+   python Si917-OTA_Firmware_Update_Python_Script.py
    ```
 
 3. Click **START**. The script scans for the device named **BLE_OTA_FWUP**, connects, and displays device info (name, MAC, firmware version). By default it is configured for TA firmware upgrade.
@@ -201,14 +201,14 @@ A Python-based OTA tool is provided to run on a PC: scan for the device, connect
 
 #### TA Firmware Upgrade (Python)
 
-1. Click **Update Firmware**, browse to the TA **.gbl** file, and open it.
+1. Click **Update Firmware**, browse to the TA **.rps** file, and open it.
 2. Click **Start Firmware Update** in the dialog to begin. The script sends the firmware in chunks; the device programs flash and reboots on success.
 3. Check the serial console for OTA progress and completion.
 
 #### M4 Firmware Upgrade (Python)
 
-1. Build an M4 example (e.g., **BLE - Heart Rate (SoC)**) and convert/rename the output to **.gbl**.
-2. In the Python tool, click **Update Firmware** and select the M4 **.gbl** file.
+1. Build an M4 example (e.g., **BLE - Heart Rate (SoC)**) and convert/rename the output to **.rps**.
+2. In the Python tool, click **Update Firmware** and select the M4 **.rps** file.
 3. Click **Start Firmware Update** to upload. After completion, the device reboots with the new M4 application.
 
 > **Note:** The provided mobile and Python screenshots may differ slightly from the latest app/script versions; the workflow remains the same.
@@ -249,8 +249,13 @@ A Python-based OTA tool is provided to run on a PC: scan for the device, connect
 - Anti-rollback feature is not supported for this application.
 - During the firmware upgrade, the mobile device running the Si Connect app should not enter sleep mode. Keep the screen on or disable sleep/auto-lock for the duration of the OTA transfer to avoid interrupting the upgrade.
 - Before upgrading firmware, the user should disable power save mode.
-- This Application support only single connection(GATT server) only.
-- If FW upgrade failed or wrong FW selected Then reconnect the Device and intiate the FW upgrade.
+- This application supports only a **single BLE connection** (one GATT client to the OTA server).
+- If the upgrade fails or the wrong image type was transferred, disconnect, reconnect to the device, and start the OTA transfer again.
+
+- **`FW_UPGRADE_TYPE` (in `ble_config.h`) and the `.gbl` file you send must agree.** Configure `FW_UPGRADE_TYPE` before building, then transfer the matching firmware from Si Connect App:
+  - **`TA_FW_UP`** — Use a TA (connectivity/NWP/transceiver) **.gbl** only.
+  - **`M4_FW_UP`** — Use an M4 (host application) image prepared as **.gbl**. *(SoC/PSRAM only; not supported on NCP.)*
+  - **`COMBINED_FW_UP`** — Use a **combined TA+M4** **.gbl** produced with the Commander steps in [Steps to Create a Combined Image](#steps-to-create-a-combined-image). A TA-only or M4-only `.gbl` does not match this mode.
 
 ## Troubleshooting
 

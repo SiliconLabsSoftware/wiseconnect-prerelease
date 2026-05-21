@@ -38,6 +38,7 @@
 #include "sl_net.h"
 #include <string.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include "lwip/sockets.h"
 #include "sl_net_for_lwip.h"
 #include "sl_si91x_driver.h"
@@ -51,6 +52,12 @@
 /******************************************************
  *                      Macros
  ******************************************************/
+/* Defaults migrated from sl_wifi_filter_broadcast(5000, 1, 1). */
+#define BCAST_FILTER_ENABLE      (1U)
+#define MCAST_FILTER_ENABLE      (1U)
+#define FILTER_MODE              (0U)
+#define BEACON_DROP_THRESHOLD_MS (5000U)
+
 /******************************************************
  *                    Constants
  ******************************************************/
@@ -134,7 +141,7 @@ static void application_start(void *argument)
   sl_wifi_performance_profile_v2_t performance_profile = { .profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY };
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, &wifi_client_context, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface success");
@@ -143,7 +150,7 @@ static void application_start(void *argument)
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
@@ -151,21 +158,32 @@ static void application_start(void *argument)
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
-  status = sl_wifi_filter_broadcast(5000, 1, 1);
+  sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
+  groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
+  groupcast_filter_config.enable_mcast_filter               = (uint8_t)MCAST_FILTER_ENABLE;
+  groupcast_filter_config.filter_mode                       = (uint8_t)FILTER_MODE;
+
+  status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_filter_broadcast Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_groupcast_filter_config failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+    return;
+  }
+
+  status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_beacon_drop_threshold failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Filter Broadcast Done");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
@@ -177,7 +195,7 @@ static void application_start(void *argument)
   // set performance profile
   status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Performance profile set");

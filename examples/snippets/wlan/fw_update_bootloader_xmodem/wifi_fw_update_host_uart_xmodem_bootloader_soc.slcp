@@ -1,4 +1,4 @@
-project_name: wifi_firmware_flashing_from_host_uart_xmodem_bootloader_soc
+project_name: wifi_fw_update_host_uart_xmodem_bootloader_soc
 package: wifi_app
 quality: production
 label: Wi-Fi - Firmware Update via Bootloader using Xmodem (SoC)

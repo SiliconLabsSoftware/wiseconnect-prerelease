@@ -1,4 +1,4 @@
-project_name: wifi_powersave_standby_associated_tcp_client_uart_ncp
+project_name: wifi_powersave_standby_assoc_tcp_client_uart_ncp
 package: wifi_app
 quality: production
 label: Wi-Fi - Powersave Standby Associated TCP Client (UART NCP)

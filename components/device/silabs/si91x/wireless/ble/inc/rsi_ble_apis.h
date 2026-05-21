@@ -188,10 +188,10 @@ typedef struct rsi_bt_event_le_ltk_request_s {
 
 /** @cond INTERNAL_HIDDEN */
 // Profile dummy data - used for profile query completion callback context (Internal use only)
-typedef struct profile_dummy_data_s {
+typedef struct sli_profile_dummy_data_s {
   uint8_t ble_con_id; // Connection ID
   uint8_t swtch_cnt;  // Switch count: 1 = char query complete, 2 = profile error, 3 = profile query complete
-} profile_dummy_data_t;
+} sli_profile_dummy_data_t;
 /** @endcond */
 
 //le security keys event Structure

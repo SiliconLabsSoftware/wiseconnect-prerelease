@@ -9,6 +9,8 @@ metadata:
   sbom:
     license: Zlib AND Apache-2.0
 component_root_path: "components/board/silabs"
+define:
+  - name: SLI_SI91X_NCP_INTERFACE
 provides:
   - name: efx32_si91x_wireless_connector
 ui_hints:

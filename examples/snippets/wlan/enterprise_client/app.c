@@ -84,7 +84,6 @@ static const sl_net_wifi_client_profile_t wifi_client_enterprise_eap_profile = {
         .mode = SL_IP_MANAGEMENT_DHCP,
         .type = SL_IPV4,
         .host_name = NULL,
-        .ip = {{{0}}},
         .dhcp_config = {
             .min_discover_retry_interval = 5,
             .max_discover_retry_interval = 10,

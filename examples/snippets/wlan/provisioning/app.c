@@ -28,6 +28,7 @@
  *
  ******************************************************************************/
 
+#include <inttypes.h>
 #include "stdbool.h"
 #include "sl_net.h"
 #include "app.h"
@@ -636,8 +637,10 @@ static sl_status_t wlan_app_scan_callback_handler(sl_wifi_event_t event,
 
   if (scan_result->scan_count) {
     uint32_t buffer_length = SCAN_RESULT_BUFFER_SIZE - 1;
-    int32_t index =
-      snprintf(scan_result_buffer, buffer_length, "{\"count\": \"%lu\", \"scan_results\": [", scan_result->scan_count);
+    int32_t index          = snprintf(scan_result_buffer,
+                             buffer_length,
+                             "{\"count\": \"%" PRIu32 "\", \"scan_results\": [",
+                             scan_result->scan_count);
     scan_result_buffer += index;
     buffer_length -= index;
 

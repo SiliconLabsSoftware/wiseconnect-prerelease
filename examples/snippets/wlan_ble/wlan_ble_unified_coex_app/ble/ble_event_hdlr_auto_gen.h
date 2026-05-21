@@ -623,7 +623,7 @@ void rsi_ble_event_select_data_transfer_driver_callback(uint8_t *conn_id);
 /*==============================================*/
 void rsi_ble_event_profile_discovery_driver_callback(uint8_t *conn_id);
 
-void rsi_ble_event_profile_dummy_driver_callback(profile_dummy_data_t *profile_dummy_data);
+void rsi_ble_event_profile_dummy_driver_callback(sli_profile_dummy_data_t *profile_dummy_data);
 /*==============================================*/
 void rsi_ble_event_connection_procedure_timeout_driver_callback(uint8_t conn_id);
 

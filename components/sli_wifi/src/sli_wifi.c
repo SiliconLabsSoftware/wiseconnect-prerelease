@@ -1661,7 +1661,7 @@ sl_status_t sli_wifi_get_operational_statistics(sl_wifi_interface_t interface,
  * instead of @ref sli_wifi_transmit_test_start_v2.
  *
  * @a per_params must match @a base->wifi_protocol. @c rate_flags is @c rate_flags_raw as built in
- * @ref sli_wifi_send_mac_data_frame_11bgn / @ref sli_wifi_send_mac_data_frame_11ac (before the internal @c << 2).
+ * @ref sli_wifi_send_mac_data_frame_11bgn (and the SiWx3xx 11ac PER MAC path, before the internal @c << 2).
  */
 void sli_wifi_transmitter_test_info_from_base_and_per(const sl_wifi_transmitter_test_base_info_t *test_base_info,
                                                       const void *per_params,
@@ -3680,8 +3680,7 @@ sl_status_t sli_wifi_send_mac_data_frame(const sl_wifi_transmitter_test_info_t *
   packet->desc[14] |= 1;
 
   // Calling the routing utility to route the packet
-  status =
-    sli_wifi_send_data_packet((void *)packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
+  status = sli_wifi_send_data_packet(packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
 
   if (status != SL_STATUS_OK) {
     sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
@@ -3755,6 +3754,7 @@ sl_status_t sli_wifi_send_mac_data_frame_11bgn(const sl_wifi_transmitter_test_ba
       break;
     }
     default:
+
       return SL_STATUS_INVALID_PARAMETER;
   }
   rate_flags = (rate_flags_raw << 2);
@@ -3785,86 +3785,7 @@ sl_status_t sli_wifi_send_mac_data_frame_11bgn(const sl_wifi_transmitter_test_ba
   packet->desc[14] |= 1;
 
   // Calling the routing utility to route the packet
-  status =
-    sli_wifi_send_data_packet((void *)packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
-
-  if (status != SL_STATUS_OK) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-  }
-  return status;
-}
-
-/** 11ac PER: VHT desc[8] (no greenfield); PER_CONT_MODE only in data[0] (no PHY mode checks). */
-sl_status_t sli_wifi_send_mac_data_frame_11ac(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                              const sl_wifi_11ac_per_params_t *per_params,
-                                              sl_wifi_system_packet_t *packet,
-                                              uint16_t chunk_length)
-{
-  unsigned int temp_word;
-  unsigned int rate_flags     = 0;
-  unsigned int ch_bw          = 0;
-  unsigned char extended_desc = 4;
-  sl_status_t status;
-
-  if (packet == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-
-  if (!device_initialized) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-
-  if (chunk_length <= FRAME_DESC_SZ) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  // Clear the packet descriptor and copy the command data if available
-  memset(packet->desc, 0, sizeof(packet->desc));
-
-  packet->length  = (chunk_length - FRAME_DESC_SZ) & 0xFFF;
-  packet->command = (uint16_t)SLI_SEND_MAC_FRAME;
-
-  *(uint32_t *)&packet->desc[4] = (MIN_802_11_HDR_LEN << 8) | (BIT(2) << 16); //MIN_HDR_LEN Insert Seq no
-
-  if (tx_test_info->aggr_enable) {
-    temp_word = ((ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
-    *(uint32_t *)&packet->desc[12] |= (QOS_EN);
-  } else {
-    temp_word = ((BROADCAST_IND | ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
-  }
-
-  // Reconstruct rate_flags from per_params and common base (channel_bw)
-  uint16_t rate_flags_raw = per_params->short_gi_enable | (tx_test_info->channel_bw << 2);
-  rate_flags              = (rate_flags_raw << 2);
-  ch_bw                   = (rate_flags & 0x00F0);
-
-  if (ch_bw & BIT(4))
-    ch_bw = 0;
-
-  uint16_t rate = sli_wifi_get_encoded_rate(tx_test_info->wifi_protocol, tx_test_info->rate);
-  if (rate_flags & 0x0004) //checking short_GI
-  {
-    rate |= BIT(9);
-  }
-
-  *(uint32_t *)&packet->desc[4] |= (temp_word | extended_desc);
-
-  *(uint32_t *)&packet->desc[8] = ((rate & 0x3ff) | (ch_bw << 12));
-
-  *(uint32_t *)&packet->data[0] = (tx_test_info->power) & 0xff;
-  if (tx_test_info->mode == PER_CONT_MODE) {
-    *(uint32_t *)&packet->data[0] |= (3 << 8);
-  }
-
-  // Modify the packet's descriptor to include the firmware queue ID in the length field
-  packet->desc[1] |= (5 << 4);
-  packet->desc[14] |= 1;
-
-  // Calling the routing utility to route the packet
-  status =
-    sli_wifi_send_data_packet((void *)packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
+  status = sli_wifi_send_data_packet(packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
 
   if (status != SL_STATUS_OK) {
     sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
@@ -3943,86 +3864,7 @@ sl_status_t sli_wifi_send_mac_data_frame_11ax(const sl_wifi_transmitter_test_bas
   packet->desc[14] |= 1;
 
   // Calling the routing utility to route the packet
-  status =
-    sli_wifi_send_data_packet((void *)packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
-
-  if (status != SL_STATUS_OK) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-  }
-  return status;
-}
-
-/** 11be EHT PER: MU/SU bbp_info from tx_test_info->rate bit 7 only; PER_CONT_MODE in data[0]; no enable_11ax gate. */
-sl_status_t sli_wifi_send_mac_data_frame_11be(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                              const sl_wifi_11be_per_params_t *per_params,
-                                              sl_wifi_system_packet_t *packet,
-                                              uint16_t chunk_length)
-{
-  unsigned int temp_word;
-  unsigned int bbp_info          = 0;
-  unsigned int rate_field_params = 0;
-  unsigned char extended_desc    = 4;
-  sl_status_t status;
-
-  if (packet == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-
-  if (!device_initialized) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-
-  if (chunk_length <= FRAME_DESC_SZ) {
-    sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  // Clear the packet descriptor and copy the command data if available
-  memset(packet->desc, 0, sizeof(packet->desc));
-
-  packet->length  = (chunk_length - FRAME_DESC_SZ) & 0xFFF;
-  packet->command = (uint16_t)SLI_SEND_MAC_FRAME;
-
-  *(uint32_t *)&packet->desc[4] = (MIN_802_11_HDR_LEN << 8) | (BIT(2) << 16); //MIN_HDR_LEN Insert Seq no
-
-  if (tx_test_info->aggr_enable) {
-    temp_word = ((ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
-    *(uint32_t *)&packet->desc[12] |= (QOS_EN);
-  } else {
-    temp_word = ((BROADCAST_IND | ENABLE_MAC_INFO) << 16); //In mac_info set bit0 and bit9 for bcast pkt
-  }
-
-  if (tx_test_info->rate & BIT(7)) {
-    bbp_info = ((per_params->bw << 0) | (per_params->be_ppdu_type << 4) | (per_params->ul_dl << 6)
-                | (per_params->eht_sig_mcs << 7));
-  } else {
-    bbp_info = (per_params->coding_type << 0) | (per_params->nominal_pe << 1) | (per_params->ul_dl << 3)
-               | (per_params->be_ppdu_type << 4) | (per_params->bw << 7) | (per_params->gi_ltf << 11);
-  }
-  rate_field_params = (per_params->nominal_pe << RATE_OFFSET_NOMINAL_PE)
-                      | (per_params->coding_type << RATE_OFFSET_CODING_TYPE)
-                      | (per_params->gi_ltf << RATE_OFFSET_GI_LTF);
-
-  uint16_t rate = sli_wifi_get_encoded_rate(tx_test_info->wifi_protocol, tx_test_info->rate);
-
-  *(uint32_t *)&packet->desc[4] |= (temp_word | extended_desc);
-
-  *(uint32_t *)&packet->desc[8] = ((rate & SLI_11AX_BE_RATE_MASK) | BIT(10) | rate_field_params);
-  *(uint32_t *)&packet->desc[8] |= (bbp_info << 16);
-
-  *(uint32_t *)&packet->data[0] = (tx_test_info->power) & 0xff;
-  if (tx_test_info->mode == PER_CONT_MODE) {
-    *(uint32_t *)&packet->data[0] |= (3 << 8);
-  }
-
-  // Modify the packet's descriptor to include the firmware queue ID in the length field
-  packet->desc[1] |= (5 << 4);
-  packet->desc[14] |= 1;
-
-  // Calling the routing utility to route the packet
-  status =
-    sli_wifi_send_data_packet((void *)packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
+  status = sli_wifi_send_data_packet(packet, ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t)), NULL);
 
   if (status != SL_STATUS_OK) {
     sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
@@ -4047,37 +3889,43 @@ static sl_status_t sli_wifi_transmit_test_send_mac_data_chunk(const sl_wifi_tran
                                                 packet,
                                                 chunk_length);
     case SL_WIFI_RATE_PROTOCOL_AC_ONLY:
-      return sli_wifi_send_mac_data_frame_11ac(base_info,
-                                               (const sl_wifi_11ac_per_params_t *)per_params,
-                                               packet,
-                                               chunk_length);
+    case SL_WIFI_RATE_PROTOCOL_BE_ONLY:
+      /* 11ac / 11be PER MAC framing is implemented only on the SiWx3xx (Everest) port, which routes
+       * its own chunk-builder through sli_wifi_transmit_test_send_payload. The shared send_frames
+       * path should never see AC/BE here. */
+      SL_DEBUG_LOG_V2(ERROR,
+                      "tx test send_mac_data_chunk: 11ac/11be MAC framing is SiWx3xx-only (use "
+                      "sl_wifi_transmit_test_start_11ac/11be)\n");
+      sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
+      return SL_STATUS_NOT_SUPPORTED;
     case SL_WIFI_RATE_PROTOCOL_AX_ONLY:
       return sli_wifi_send_mac_data_frame_11ax(base_info,
                                                (const sl_wifi_11ax_per_params_t *)per_params,
                                                packet,
                                                chunk_length);
-    case SL_WIFI_RATE_PROTOCOL_BE_ONLY:
-      return sli_wifi_send_mac_data_frame_11be(base_info,
-                                               (const sl_wifi_11be_per_params_t *)per_params,
-                                               packet,
-                                               chunk_length);
     case SL_WIFI_RATE_PROTOCOL_AUTO:
     default:
       SL_DEBUG_LOG_V2(ERROR, "tx test send_mac_data_chunk: invalid protocol %u\n", (unsigned)base_info->wifi_protocol);
+      sli_buffer_manager_free_buffer((sli_buffer_t *)packet);
       return SL_STATUS_INVALID_PARAMETER;
   }
 }
 
-static sl_status_t sli_wifi_transmit_test_send_payload(const sl_wifi_transmitter_test_base_info_t *base_info,
-                                                       const void *per_params,
-                                                       const uint8_t *payload,
-                                                       uint16_t payload_length)
+sl_status_t sli_wifi_transmit_test_send_payload(const sl_wifi_transmitter_test_base_info_t *base_info,
+                                                const void *per_params,
+                                                const uint8_t *payload,
+                                                uint16_t payload_length,
+                                                sli_wifi_transmit_test_chunk_builder_t build_chunk)
 {
   sl_wifi_system_packet_t *packet;
   uint16_t chunk_length;
   uint16_t data_length;
   uint16_t remaining_length = base_info->length;
   sl_status_t status        = SL_STATUS_OK;
+
+  if (build_chunk == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
 
   const uint16_t max_memcpy_chunk =
     (uint16_t)(SLI_WIFI_BUFFER_BLOCK_SIZE - (SLI_WIFI_HEADER_SIZE + SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE));
@@ -4101,7 +3949,7 @@ static sl_status_t sli_wifi_transmit_test_send_payload(const sl_wifi_transmitter
 
       memcpy(packet->data + SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE, payload + payload_offset, this_chunk);
 
-      status = sli_wifi_transmit_test_send_mac_data_chunk(base_info, per_params, packet, this_chunk);
+      status = build_chunk(base_info, per_params, packet, this_chunk);
 
       if (status != SL_STATUS_OK) {
         SL_DEBUG_LOG_V2(ERROR, "tx test send_payload: user chunk failed status=0x%lx\n", (unsigned long)status);
@@ -4138,11 +3986,18 @@ static sl_status_t sli_wifi_transmit_test_send_payload(const sl_wifi_transmitter
         data_length = (uint16_t)(chunk_length - header_and_fcs);
       }
 
-      for (uint16_t i = 0; i < data_length; i++) {
-        payload_start[i] = (i % 2) ? 0x55 : 0xAA;
+      /* Fill with 0xAA, 0x55, 0xAA, 0x55, ... using 16-bit stores; handle odd tail byte. */
+      uint16_t i               = 0;
+      const uint16_t pair_stop = (uint16_t)(data_length & ~1U);
+      for (; i < pair_stop; i += 2) {
+        payload_start[i]     = 0xAA;
+        payload_start[i + 1] = 0x55;
+      }
+      if (i < data_length) {
+        payload_start[i] = 0xAA;
       }
 
-      status = sli_wifi_transmit_test_send_mac_data_chunk(base_info, per_params, packet, chunk_length);
+      status = build_chunk(base_info, per_params, packet, chunk_length);
 
       if (status != SL_STATUS_OK) {
         SL_DEBUG_LOG_V2(ERROR, "tx test send_payload: pattern chunk failed status=0x%lx\n", (unsigned long)status);
@@ -4185,7 +4040,11 @@ sl_status_t sli_wifi_transmit_test_send_frames(const sl_wifi_transmitter_test_ba
   status = sli_wifi_transmit_test_start_v2(base_info, per_params);
   VERIFY_STATUS_AND_RETURN(status);
 
-  status = sli_wifi_transmit_test_send_payload(base_info, per_params, payload, payload_length);
+  status = sli_wifi_transmit_test_send_payload(base_info,
+                                               per_params,
+                                               payload,
+                                               payload_length,
+                                               sli_wifi_transmit_test_send_mac_data_chunk);
   SL_DEBUG_LOG_V2(DEBUG, "tx test send_frames: status=0x%lx\n", (unsigned long)status);
   return status;
 }

@@ -1,4 +1,4 @@
-project_name: wifi_concurrent_firmware_update_from_host_uart_fg25_ncp
+project_name: wifi_concurrent_fw_update_host_uart_fg25_ncp
 package: wifi_app
 quality: production
 label: Wi-Fi - Concurrent Firmware Update From Host UART (NCP)

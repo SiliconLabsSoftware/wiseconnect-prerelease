@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 #include "gap.h"          // For rsi_ble_conn_info_t, rsi_ble_conn_config_t definitions
-#include "rsi_ble_apis.h" // For profile_dummy_data_t (used by BLE event handler auto-gen and GATT client)
+#include "rsi_ble_apis.h" // For sli_profile_dummy_data_t (used by BLE event handler auto-gen and GATT client)
 
 /*=======================================================================*/
 //! GATT Client Error Codes

@@ -202,7 +202,7 @@ void rsi_ble_task_on_conn(void *parameters)
   uint16_t indication_cnt           = 0;
   uint8_t no_of_profiles = 0, total_remote_profiles = 0;
   uint8_t l_num_of_services = 0, l_char_property = 0;
-  uint8_t profs_evt_cnt = 0, prof_evt_cnt = 0, char_for_serv_cnt = 0, char_desc_cnt = 0;
+  uint8_t profs_evt_cnt = 0, prof_evt_cnt = 0, char_for_serv_cnt = 0;
   uint8_t i = 0, profile_index_for_char_query = 0, temp1 = 0, temp2 = 0;
   uint8_t temp_prepare_write_value[250];
   uint16_t temp_prepare_write_value_len            = 0;
@@ -1066,7 +1066,6 @@ void rsi_ble_task_on_conn(void *parameters)
         if (temp1 < total_remote_profiles) {
           temp2++;
           rsi_ble_clear_event_based_on_conn(l_conn_id, RSI_BLE_GATT_DESC_SERVICES);
-          char_desc_cnt++;
           char_desc_resp_recvd = false;
         } else {
           SL_DEBUG_LOG_V2(INFO, "Remote device profiles discovery completed - conn%d ", l_conn_id);

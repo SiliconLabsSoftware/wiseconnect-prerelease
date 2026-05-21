@@ -50,6 +50,7 @@
 
 #include "cmsis_os2.h"
 #include <rsi_common_apis.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "sl_si91x_socket_utility.h"
@@ -139,7 +140,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
   UNUSED_PARAMETER(arg);
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    printf("F: Join Event received with %lu bytes payload\n", result_length);
+    printf("F: Join Event received with %" PRIu32 " bytes payload\n", result_length);
     wlan_app_cb.state = WLAN_UNCONNECTED_STATE;
     if (osThreadGetState(wifi_app_thread_id) == osThreadBlocked) {
       osThreadResume(wifi_app_thread_id);
@@ -173,7 +174,7 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    printf("\r\nLoading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nLoading TLS CA certificate in to FLASH Failed, Error Code : 0x%" PRIX32 "\r\n", (uint32_t)status);
     return status;
   }
   printf("\r\nLoad TLS CA certificate at index %d Success\r\n", 0);
@@ -186,7 +187,7 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
-  printf("%lu Scan results:\n", scan_result->scan_count);
+  printf("%" PRIu32 " Scan results:\n", scan_result->scan_count);
 
   if (scan_result->scan_count) {
     printf("\n   %s %24s %s", "SSID", "SECURITY", "NETWORK");
@@ -273,7 +274,7 @@ void wlan_app_thread(void *unused)
           status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
         }
         if (status != SL_STATUS_OK) {
-          printf("WLAN Scan failed %lx\r\n", status);
+          printf("WLAN Scan failed %" PRIX32 "\r\n", (uint32_t)status);
           break;
         } else {
 #if !WIFI_CONTINUOUS_SCAN_MODE_ONLY
@@ -292,7 +293,7 @@ void wlan_app_thread(void *unused)
 
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
         if (SL_STATUS_OK == status) {
-          printf("Credentials set, id : %lu\n", id);
+          printf("Credentials set, id : %" PRIu32 "\n", (uint32_t)id);
 
           access_point.ssid.length = strlen((char *)SSID);
           memcpy(access_point.ssid.value, SSID, access_point.ssid.length);
@@ -304,7 +305,7 @@ void wlan_app_thread(void *unused)
           status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
         }
         if (status != SL_STATUS_OK) {
-          printf("WLAN connection failed %lx\r\n", status);
+          printf("WLAN connection failed %" PRIX32 "\r\n", (uint32_t)status);
           break;
         } else {
           wlan_app_cb.state = WLAN_CONNECTED_STATE; //! update WLAN application state to connected state
@@ -320,7 +321,7 @@ void wlan_app_thread(void *unused)
         // Configure IP
         status = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
         if (status != SL_STATUS_OK) {
-          printf("IP Config failed %lx\r\n", status);
+          printf("IP Config failed %" PRIX32 "\r\n", (uint32_t)status);
           break;
         } else {
           wlan_app_cb.state = WLAN_IPCONFIG_DONE_STATE;
@@ -338,7 +339,7 @@ void wlan_app_thread(void *unused)
           sl_wifi_performance_profile_v2_t wifi_profile = { .profile = ASSOCIATED_POWER_SAVE };
           status                                        = sl_wifi_set_performance_profile_v2(&wifi_profile);
           if (status != SL_STATUS_OK) {
-            printf("\r\n Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
+            printf("\r\n Failed to initiate power save in Wi-Fi mode :%" PRIX32 "\r\n", (uint32_t)status);
           }
 
           powersave_cmd_given = true;
@@ -373,7 +374,7 @@ void wlan_throughput_task()
   sl_status_t status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    printf("\r\nLoading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
+    printf("\r\nLoading TLS CA certificate in to FLASH Failed, Error Code : 0x%" PRIX32 "\r\n", (uint32_t)status);
     return;
   }
   printf("\r\nLoad SSL CA certificate at index %d Success\r\n", 0);
@@ -424,7 +425,7 @@ void data_callback(uint32_t sock_no,
 
   if (first_data_frame) {
     start = osKernelGetTickCount();
-    printf("\r\nClient Socket ID : %ld\r\n", sock_no);
+    printf("\r\nClient Socket ID : %" PRIu32 "\r\n", sock_no);
     switch (THROUGHPUT_TYPE) {
       case UDP_RX:
         printf("\r\nUDP_RX Throughput test start\r\n");
@@ -510,12 +511,12 @@ void send_data_to_tcp_server(void)
     total_bytes_sent = total_bytes_sent + sent_bytes;
 
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\nTime Out: %ld\r\n", (now - start));
+      printf("\r\nTime Out: %" PRIu32 "\r\n", (uint32_t)(now - start));
       break;
     }
   }
   printf("\r\nTCP_TX Throughput test finished\r\n");
-  printf("\r\nTotal bytes sent : %ld\r\n", total_bytes_sent);
+  printf("\r\nTotal bytes sent : %" PRIu32 "\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 
@@ -533,7 +534,7 @@ void receive_data_from_tcp_client(void)
 
   sl_status_t status = sl_si91x_config_socket(socket_config);
   if (status != SL_STATUS_OK) {
-    printf("Socket config failed: %ld\r\n", status);
+    printf("Socket config failed: %" PRIX32 "\r\n", (uint32_t)status);
   }
   printf("\r\nSocket config Done\r\n");
 
@@ -587,7 +588,7 @@ void receive_data_from_tcp_client(void)
   now = osKernelGetTickCount();
 
   printf("\r\nTCP_RX Throughput test finished\r\n");
-  printf("\r\nTotal bytes received : %ld\r\n", bytes_read);
+  printf("\r\nTotal bytes received : %" PRIu32 "\r\n", (uint32_t)bytes_read);
 
   sl_si91x_shutdown(server_socket, 0);
   sl_si91x_shutdown(client_socket, 0);
@@ -650,7 +651,7 @@ void receive_data_from_tcp_client(void)
         if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
           continue;
         } else {
-          printf("\r\nrecv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
+          printf("\r\nrecv failed with BSD error = %d and status = 0x%" PRIX32 "\r\n", errno, (uint32_t)status);
         }
       } else {
         printf("\r\nrecv failed with BSD error = %d\r\n", errno);
@@ -661,12 +662,12 @@ void receive_data_from_tcp_client(void)
     now                  = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\nTest Time Out: %ld ms\r\n", (now - start));
+      printf("\r\nTest Time Out: %" PRIu32 " ms\r\n", (uint32_t)(now - start));
       break;
     }
   }
   printf("\r\nTCP_RX Throughput test finished\r\n");
-  printf("\r\nTotal bytes received : %ld\r\n", total_bytes_received);
+  printf("\r\nTotal bytes received : %" PRIu32 "\r\n", total_bytes_received);
 
   measure_and_print_throughput(total_bytes_received, (now - start));
 
@@ -701,7 +702,7 @@ void send_data_to_udp_server(void)
       sendto(client_socket, data_buffer, UDP_BUFFER_SIZE, 0, (struct sockaddr *)&server_address, socket_length);
     now = osKernelGetTickCount();
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\nTime Out: %ld\r\n", (now - start));
+      printf("\r\nTime Out: %" PRIu32 "\r\n", (uint32_t)(now - start));
       break;
     }
     if (sent_bytes < 0) {
@@ -714,7 +715,7 @@ void send_data_to_udp_server(void)
     total_bytes_sent = total_bytes_sent + sent_bytes;
   }
   printf("\r\nUDP_TX Throughput test finished\r\n");
-  printf("\r\nTotal bytes sent : %ld\r\n", total_bytes_sent);
+  printf("\r\nTotal bytes sent : %" PRIu32 "\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 
@@ -754,7 +755,7 @@ void receive_data_from_udp_client(void)
   }
   now = osKernelGetTickCount();
   printf("\r\nUDP_RX Async Throughput test finished\r\n");
-  printf("\r\nTotal bytes received : %ld\r\n", bytes_read);
+  printf("\r\nTotal bytes received : %" PRIu32 "\r\n", (uint32_t)bytes_read);
 
   measure_and_print_throughput(bytes_read, (now - start));
 
@@ -792,7 +793,7 @@ void receive_data_from_udp_client(void)
         if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
           continue;
         } else {
-          printf("\r\nrecv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
+          printf("\r\nrecv failed with BSD error = %d and status = 0x%" PRIX32 "\r\n", errno, (uint32_t)status);
         }
       } else {
         printf("\r\nrecv failed with BSD error = %d\r\n", errno);
@@ -802,12 +803,12 @@ void receive_data_from_udp_client(void)
     total_bytes_received = total_bytes_received + read_bytes;
     now                  = osKernelGetTickCount();
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\nTest Time Out: %ld ms\r\n", (now - start));
+      printf("\r\nTest Time Out: %" PRIu32 " ms\r\n", (uint32_t)(now - start));
       break;
     }
   }
   printf("\r\nUDP_RX Throughput test finished\r\n");
-  printf("\r\nTotal bytes received : %ld\r\n", total_bytes_received);
+  printf("\r\nTotal bytes received : %" PRIu32 "\r\n", total_bytes_received);
 
   measure_and_print_throughput(total_bytes_received, (now - start));
 
@@ -826,7 +827,7 @@ void receive_data_from_tls_server(void)
 
   sl_status_t status = sl_si91x_config_socket(socket_config);
   if (status != SL_STATUS_OK) {
-    printf("Socket config failed: %ld\r\n", status);
+    printf("Socket config failed: %" PRIX32 "\r\n", (uint32_t)status);
   }
   printf("Socket config Done\r\n");
 
@@ -878,7 +879,7 @@ void receive_data_from_tls_server(void)
   now = osKernelGetTickCount();
 
   printf("\r\nTCP_RX Throughput test finished\r\n");
-  printf("\r\nTotal bytes received : %ld\r\n", bytes_read);
+  printf("\r\nTotal bytes received : %" PRIu32 "\r\n", (uint32_t)bytes_read);
 
   sl_si91x_shutdown(client_socket, 0);
   measure_and_print_throughput(bytes_read, (now - start));
@@ -934,7 +935,7 @@ void receive_data_from_tls_server(void)
         if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
           continue;
         } else {
-          printf("\r\nrecv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
+          printf("\r\nrecv failed with BSD error = %d and status = 0x%" PRIX32 "\r\n", errno, (uint32_t)status);
         }
       } else {
         printf("\r\nrecv failed with BSD error = %d\r\n", errno);
@@ -945,12 +946,12 @@ void receive_data_from_tls_server(void)
       now                  = osKernelGetTickCount();
 
       if ((now - start) > TEST_TIMEOUT) {
-        printf("\r\nTest Time Out: %ld ms\r\n", (now - start));
+        printf("\r\nTest Time Out: %" PRIu32 " ms\r\n", (uint32_t)(now - start));
         break;
       }
     }
     printf("\r\nTLS_RX Throughput test finished\r\n");
-    printf("\r\nTotal bytes received : %ld\r\n", total_bytes_received);
+    printf("\r\nTotal bytes received : %" PRIu32 "\r\n", total_bytes_received);
 
     measure_and_print_throughput(total_bytes_received, (now - start));
 
@@ -1010,12 +1011,12 @@ void send_data_to_tls_server(void)
     total_bytes_sent = total_bytes_sent + sent_bytes;
 
     if ((now - start) > TEST_TIMEOUT) {
-      printf("\r\nTime Out: %ld\r\n", (now - start));
+      printf("\r\nTime Out: %" PRIu32 "\r\n", (uint32_t)(now - start));
       break;
     }
   }
   printf("\r\nTLS_TX Throughput test finished\r\n");
-  printf("\r\nTotal bytes sent : %ld\r\n", total_bytes_sent);
+  printf("\r\nTotal bytes sent : %" PRIu32 "\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 

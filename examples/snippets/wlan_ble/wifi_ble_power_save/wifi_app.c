@@ -31,6 +31,7 @@
 #include "select.h"
 #include "cmsis_os2.h"
 #include "rsi_common_apis.h"
+#include <inttypes.h>
 #include <string.h>
 #include "sl_si91x_socket_constants.h"
 #include "sl_si91x_driver.h"
@@ -72,6 +73,12 @@
 #define DHCP_HOST_NAME NULL
 #define TIMEOUT_MS     25000
 #define LOW            0
+
+/* Defaults migrated from sl_wifi_filter_broadcast(5000, 1, 1). */
+#define BCAST_FILTER_ENABLE      (1U)
+#define MCAST_FILTER_ENABLE      (1U)
+#define FILTER_MODE              (0U)
+#define BEACON_DROP_THRESHOLD_MS (5000U)
 
 //! application control block
 wifi_app_cb_t wifi_app_cb;
@@ -206,7 +213,9 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR,
+                    "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%" PRIx32 "",
+                    (uint32_t)status);
   } else {
     SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success", 0);
   }
@@ -225,7 +234,7 @@ void rsi_wlan_app_task(void)
       //! Load certificates
       status = clear_and_load_certificates_in_flash();
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lX", status);
+        SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%" PRIx32 "", (uint32_t)status);
         return;
       } else
 #endif
@@ -238,7 +247,7 @@ void rsi_wlan_app_task(void)
 
         status = sl_wifi_get_pairwise_master_key(SL_WIFI_CLIENT_INTERFACE, type, &ssid, PSK, pairwise_master_key);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Get Pairwise Master Key Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Get Pairwise Master Key Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
           return;
         }
         SL_DEBUG_LOG_V2(INFO, "Get Pairwise Master Key Success");
@@ -271,14 +280,14 @@ void rsi_wlan_app_task(void)
 
         status = sl_wifi_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to start set join configuration: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start set join configuration: 0x%" PRIx32 "", (uint32_t)status);
           return;
         }
 
         SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)access_point.ssid.value);
         status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
         } else {
           SL_DEBUG_LOG_V2(INFO, " WLAN connection is successful");
           wifi_app_cb.state = WIFI_APP_CONNECTED_STATE;
@@ -308,11 +317,23 @@ void rsi_wlan_app_task(void)
         return;
       }
 
-      // Enable Broadcast data filter
-      status = sl_wifi_filter_broadcast(5000, 1, 1);
-      if (status == RSI_SUCCESS) {
-        SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
+      // Enable groupcast filter and beacon drop threshold
+      sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
+      groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
+      groupcast_filter_config.enable_mcast_filter               = (uint8_t)MCAST_FILTER_ENABLE;
+      groupcast_filter_config.filter_mode                       = (uint8_t)FILTER_MODE;
+
+      status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
+      if (status != SL_STATUS_OK) {
+        SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32 "", (uint32_t)status);
+        return;
       }
+      status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
+      if (status != SL_STATUS_OK) {
+        SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32 "", (uint32_t)status);
+        return;
+      }
+      SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
 
 #endif
       break;

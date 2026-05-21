@@ -207,8 +207,7 @@ static sl_net_wifi_client_profile_t wifi_client_profile = {
     .ip = {
         .mode = SL_IP_MANAGEMENT_DHCP,
         .type = (SL_IPV4 | SL_IPV6),
-        .host_name = NULL,
-        .ip = {{{0}}},
+        .host_name = NULL
     }};
 
 static sl_net_wifi_lwip_context_t wifi_client_context;
@@ -497,7 +496,7 @@ void send_data_to_tcp_server_v6(void)
   server_address.sin6_port   = SERVER_PORT_V6;
 
   if (sl_inet_pton6(SERVER_IP_V6,
-                    SERVER_IP_V6 + strlen(SERVER_IP_V6),
+                    &SERVER_IP_V6[strlen(SERVER_IP_V6)],
                     address_buffer,
                     (unsigned int *)server_address.sin6_addr.un.u32_addr)
       != 1) {
@@ -616,7 +615,7 @@ void send_data_to_udp_server_v6(void)
   server_address.sin6_port   = SERVER_PORT_V6;
 
   if (sl_inet_pton6(SERVER_IP_V6,
-                    SERVER_IP_V6 + strlen(SERVER_IP_V6),
+                    &SERVER_IP_V6[strlen(SERVER_IP_V6)],
                     address_buffer,
                     (unsigned int *)server_address.sin6_addr.un.u32_addr)
       != 1) {

@@ -271,7 +271,7 @@ The SL Log core (`si91x_log`) routes events to **exactly one** installed backend
      ![Figure: Add Message File - change ELF section name to .log_fmt](resources/readme/systemview_11_change_the_section_to_log_fmt.png)
 
    - **Description files.** Add description files so events decode with the right names. For example, include the FreeRTOS description file when the firmware uses FreeRTOS, and include any Silicon Labs captive or companion-core description files supplied with the SDK, such as `SYSVIEW_CaptiveCore.txt`, when symbols are needed for the wireless or secondary core in a multi-core trace. Store user description files in the project's `Users/<username>/.sysview` directory.
-   - The `SYSVIEW_CaptiveCore.txt` description file is provided with the WiseConnect SDK at `wiseconnect/utilities/nwp_log_descriptor/SYSVIEW_CaptiveCore.txt`.
+   - The `SYSVIEW_CaptiveCore.txt` description file is provided with the WiseConnect SDK at `wiseconnect/connectivity_firmware /nwp_log_descriptor/SYSVIEW_CaptiveCore.txt`.
 
 6. **Start recording.** Attach the probe, reset or run the target, then use Target / Go (per SEGGER documentation) to start capturing. Logger events appear in the Events list when the firmware is built with `log_backend_systemview` and RTT is configured correctly.
 

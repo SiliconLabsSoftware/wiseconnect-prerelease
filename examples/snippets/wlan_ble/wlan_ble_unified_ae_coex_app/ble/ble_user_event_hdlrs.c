@@ -3,6 +3,7 @@
 //   ! INCLUDES
 /*=======================================================================*/
 #include <stdio.h>
+#include <inttypes.h>
 #include <rsi_common_app.h>
 #include "ble_private.h"
 #include "ble_event_hdlr_auto_gen.h"
@@ -16,7 +17,7 @@
 extern rsi_parsed_conf_t rsi_parsed_conf;
 
 ble_confg_info_t ble_confgs;
-profile_dummy_data_t profile_dummy_data;
+sli_profile_dummy_data_t profile_dummy_data;
 uint8_t central_count    = 0;
 uint8_t peripheral_count = 0;
 adv_state_t adv_state_dut;
@@ -382,8 +383,8 @@ int32_t add_derived_key_to_ltk_list(rsi_ble_dev_ltk_list_t *ble_dev_ltk_list, rs
 void rsi_ble_event_profile_dummy(uint16_t status, void *event_data)
 {
   uint8_t ble_conn_id;
-  uint8_t temp_switch_count                      = 0;
-  profile_dummy_data_t *profile_dummy_data_event = (profile_dummy_data_t *)event_data;
+  uint8_t temp_switch_count                          = 0;
+  sli_profile_dummy_data_t *profile_dummy_data_event = (sli_profile_dummy_data_t *)event_data;
   //! Add handling here
   ble_conn_id       = profile_dummy_data_event->ble_con_id;
   temp_switch_count = profile_dummy_data_event->swtch_cnt;
@@ -577,7 +578,7 @@ void rsi_scan_restart_event()
     ae_set_scan_enable.period            = BLE_AE_SCAN_PERIOD;
     status                               = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
     if (status != RSI_SUCCESS) {
-      printf(" \n set ae scan disable failed with 0x%lX \n", status);
+      printf(" \n set ae scan disable failed with 0x%" PRIX32 " \n", (uint32_t)status);
     } else {
       scan_state_dut = scan_off;
       printf(" \n set ae scan disable success \n");
@@ -591,7 +592,7 @@ void rsi_scan_restart_event()
     if (peripheral_count <= RSI_BLE_MAX_NBR_PERIPHERALS) {
       status = ble_ext_scan_enable();
       if (status != RSI_SUCCESS) {
-        printf("\r\n scanning start failed, cmd status = %lx -conn\n", status);
+        printf("\r\n scanning start failed, cmd status = %" PRIX32 " -conn\n", (uint32_t)status);
         rsi_ble_event_scan_restart_driver_callback();
       } else {
         scan_state_dut = connectable_scan;
@@ -643,7 +644,7 @@ void rsi_adv_restart_event()
       //SAPI function call for enabling extended advertising for set 1
       status = rsi_ble_start_ae_advertising(&ble_ae_adv);
       if (status != RSI_SUCCESS) {
-        printf("\r\n advertising failed to stop, with status = 0x%lx -conn\n", status);
+        printf("\r\n advertising failed to stop, with status = 0x%" PRIX32 " -conn\n", (uint32_t)status);
 
       } else {
         adv_state_dut = adv_disabled;
@@ -653,12 +654,12 @@ void rsi_adv_restart_event()
 #endif
     }
 
-    if ((adv_state_dut == adv_disabled)) {
+    if (adv_state_dut == adv_disabled) {
       //! advertise device with default interval
       status = ble_ae_set_1_advertising_enable();
       printf("\r\n Advertising Restarted \n");
       if (status != RSI_SUCCESS) {
-        printf("\r\n advertising failed with status = 0x%lx -conn \n", status);
+        printf("\r\n advertising failed with status = 0x%" PRIX32 " -conn \n", (uint32_t)status);
       } else {
 #if WLAN_TRANSIENT_CASE
         ble_adv_is_there = 1;
@@ -931,7 +932,7 @@ void rsi_ble_on_data_receive(uint8_t conn_id)
       if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
         printf("\r\n notify failed with buffer error -conn%d \r\n", ble_conn_id);
       } else {
-        printf("\r\n notify value failed with status = %lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n notify value failed with status = %" PRIX32 " -conn%d \r\n", (uint32_t)status, ble_conn_id);
       }
     }
   }
@@ -950,7 +951,7 @@ void rsi_ble_on_data_receive(uint8_t conn_id)
       if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
         printf("\r\n indication failed with buffer error -conn%d \r\n", ble_conn_id);
       } else {
-        printf("\r\n indication failed with status = %lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n indication failed with status = %" PRIX32 " -conn%d \r\n", (uint32_t)status, ble_conn_id);
       }
     }
   }
@@ -1008,7 +1009,7 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
 
         more_data_state_beta[ble_conn_id].data_transmit = 1;
       } else {
-        printf("\r\n write with response failed with status = %lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n write with response failed with status = %" PRIX32 " -conn%d \r\n", (uint32_t)status, ble_conn_id);
       }
     } else {
       rsi_ble_conn_info[ble_conn_id].write_cnt++;
@@ -1044,10 +1045,12 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
 
         status = rsi_ble_disconnect((int8_t *)rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr);
         if (status != RSI_SUCCESS) {
-          printf("\ndisconnect command failed with reason %lx\n", status);
+          printf("\ndisconnect command failed with reason %" PRIX32 "\n", (uint32_t)status);
         }
       } else {
-        printf("\r\n write without response failed with status = 0x%lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n write without response failed with status = 0x%" PRIX32 " -conn%d \r\n",
+               (uint32_t)status,
+               ble_conn_id);
       }
     } else {
       rsi_ble_conn_info[ble_conn_id].wwr_count++;
@@ -1084,12 +1087,12 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
 
           status = rsi_ble_disconnect((int8_t *)rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr);
           if (status != RSI_SUCCESS) {
-            printf("\ndisconnect command failed with reason %lx\n", status);
+            printf("\ndisconnect command failed with reason %" PRIX32 "\n", (uint32_t)status);
           }
         } else {
-          printf("\r\n indication %d failed with error code %lx -conn%d\n",
+          printf("\r\n indication %d failed with error code %" PRIX32 " -conn%d\n",
                  rsi_ble_conn_info[ble_conn_id].indication_cnt,
-                 status,
+                 (uint32_t)status,
                  ble_conn_id);
         }
       } else {
@@ -1137,12 +1140,12 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
 
           status = rsi_ble_disconnect((int8_t *)rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr);
           if (status != RSI_SUCCESS) {
-            printf("\ndisconnect command failed with reason %lx\n", status);
+            printf("\ndisconnect command failed with reason %" PRIX32 "\n", (uint32_t)status);
           }
         } else {
-          printf("\r\n notify %d failed with error code %lx  -conn%d\n",
+          printf("\r\n notify %d failed with error code %" PRIX32 "  -conn%d\n",
                  rsi_ble_conn_info[ble_conn_id].notfy_cnt,
-                 status,
+                 (uint32_t)status,
                  ble_conn_id);
         }
       } else {
@@ -1199,7 +1202,9 @@ void rsi_conn_update_req_event(uint8_t conn_id)
       if (status == RSI_ERROR_BLE_ATT_CMD_IN_PROGRESS) {
         printf("\r\n rsi_ble_conn_params_update procedure is already in progress -conn%d \r\n", ble_conn_id);
       } else {
-        printf("\r\n failed to update connection paramaters error:0x%lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n failed to update connection paramaters error:0x%" PRIX32 " -conn%d \r\n",
+               (uint32_t)status,
+               ble_conn_id);
       }
     } else {
       printf("\r\n connection params request was successfull -conn%d \n", ble_conn_id);
@@ -1570,7 +1575,9 @@ void rsi_ble_req_gatt_profile(uint8_t conn_id)
       else if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
         printf("\r\n rsi_ble_get_profiles_async failed with buffer full error -conn%d \r\n", ble_conn_id);
       } else {
-        printf("\r\n get profile async call failed with error code :%lx -conn%d \r\n", status, ble_conn_id);
+        printf("\r\n get profile async call failed with error code :%" PRIX32 " -conn%d \r\n",
+               (uint32_t)status,
+               ble_conn_id);
       }
     }
   }
@@ -2421,8 +2428,8 @@ void rsi_ble_profile_discovery(uint8_t conn_id)
               return;
             } else {
               printf("\r\n failed to get characteristics descriptor of the remote GATT server with "
-                     "error:0x%lx -m1 \r\n",
-                     status);
+                     "error:0x%" PRIX32 " -m1 \r\n",
+                     (uint32_t)status);
               return;
             }
           }
@@ -4070,7 +4077,7 @@ void rsi_bt_event_sc_passkey(uint16_t __attribute__((unused)) status, void *even
   memcpy(&rsi_ble_conn_info[ble_conn_id].rsi_event_sc_passkey, sc_passkey, sizeof(rsi_bt_event_sc_passkey_t));
   printf("\r\n in smp sc passkey event -conn%d \r\n", ble_conn_id);
 
-  printf("\r\n In passkey event, remote addr: %s, passkey: %lu -conn%u \r\n",
+  printf("\r\n In passkey event, remote addr: %s, passkey: %" PRIu32 " -conn%u \r\n",
          rsi_ble_conn_info[ble_conn_id].remote_dev_addr,
          rsi_ble_conn_info[ble_conn_id].rsi_event_sc_passkey.passkey,
          ble_conn_id);
@@ -4447,7 +4454,7 @@ void rsi_ble_on_terminate(uint16_t __attribute__((unused)) status, void __attrib
 
   status = rsi_ble_start_ae_advertising(&ble_ae_adv);
   if (status != RSI_SUCCESS) {
-    printf("set ae adv enable failed with 0x%lX \n", status);
+    printf("set ae adv enable failed with 0x%" PRIX32 " \n", (uint32_t)status);
   } else {
     printf("set ae adv enable success \n");
   }

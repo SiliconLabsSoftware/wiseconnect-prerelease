@@ -248,6 +248,34 @@ sl_status_t sli_wifi_transmit_test_send_frames(const sl_wifi_transmitter_test_ba
                                                const void *per_params,
                                                const uint8_t *payload,
                                                uint16_t payload_length);
+
+/**
+ * @brief Chunk-builder callback used by @ref sli_wifi_transmit_test_send_payload.
+ *
+ * Each callback invocation receives a freshly allocated CE-data-pool packet with @c chunk_length bytes
+ * already laid out (user payload or pseudo-random pattern). The callback is responsible for filling
+ * the firmware descriptor (rate, BBP, queue ID, etc.) for its PHY and routing it via
+ * @ref sli_wifi_send_data_packet. On any non-OK status the callback must release @c packet.
+ */
+typedef sl_status_t (*sli_wifi_transmit_test_chunk_builder_t)(const sl_wifi_transmitter_test_base_info_t *base_info,
+                                                              const void *per_params,
+                                                              sl_wifi_system_packet_t *packet,
+                                                              uint16_t chunk_length);
+
+/**
+ * @brief Drive PER payload + pattern-fill chunk loop, dispatching each chunk via @a build_chunk.
+ *
+ * Allocates CE-data-pool packets, copies user payload (when supplied), then fills any remaining
+ * bytes with a 16-bit @c 0xAA55 test pattern, and calls @a build_chunk per chunk. Owns the buffer
+ * lifecycle on the per-chunk path; the callback owns release on its own failure path.
+ *
+ * Used by both the shared 11bgn/11ax send path and the SiWx3xx-port 11ac/11be send path.
+ */
+sl_status_t sli_wifi_transmit_test_send_payload(const sl_wifi_transmitter_test_base_info_t *base_info,
+                                                const void *per_params,
+                                                const uint8_t *payload,
+                                                uint16_t payload_length,
+                                                sli_wifi_transmit_test_chunk_builder_t build_chunk);
 sl_status_t sli_wifi_transmit_test_stop(void);
 sl_status_t sli_wifi_frequency_offset(sl_wifi_interface_t interface,
                                       const sl_wifi_freq_offset_t *frequency_calibration);
@@ -353,27 +381,28 @@ void sli_wifi_prepare_mac_frame_header(const void *buf,
 sl_status_t sli_wifi_send_mac_data_frame(const sl_wifi_transmitter_test_info_t *per_params,
                                          sl_wifi_system_packet_t *packet,
                                          uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_v2(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                            const void *per_params,
-                                            sl_wifi_system_packet_t *packet,
-                                            uint16_t chunk_length);
 sl_status_t sli_wifi_send_mac_data_frame_11bgn(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
                                                const sl_wifi_11bgn_per_params_t *per_params,
                                                sl_wifi_system_packet_t *packet,
                                                uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_11ac(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                              const sl_wifi_11ac_per_params_t *per_params,
-                                              sl_wifi_system_packet_t *packet,
-                                              uint16_t chunk_length);
 sl_status_t sli_wifi_send_mac_data_frame_11ax(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
                                               const sl_wifi_11ax_per_params_t *per_params,
                                               sl_wifi_system_packet_t *packet,
                                               uint16_t chunk_length);
-sl_status_t sli_wifi_send_mac_data_frame_11be(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                              const sl_wifi_11be_per_params_t *per_params,
-                                              sl_wifi_system_packet_t *packet,
-                                              uint16_t chunk_length);
-sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, const void *context);
+/**
+ * @brief Route an already-formed Wi-Fi data packet to firmware.
+ *
+ * @param[in] data Pointer to packet bytes; must not be modified through this pointer by this API
+ *            (matches @c sli_routing_utility_route_packet's @c const void * packet parameter).
+ *
+ * @note Buffer-ownership contract: callers retain ownership of @a data on all return paths.
+ *       On the Si91x port, @c sli_routing_utility_route_packet does NOT free the packet on success,
+ *       so any cleanup (including the PER MAC chunk-builders) must continue to release the buffer
+ *       only on failure. Do NOT change this without auditing every caller in
+ *       @ref sli_wifi_send_mac_data_frame_11bgn / @ref sli_wifi_send_mac_data_frame_11ax and the
+ *       SiWx3xx 11ac/11be chunk-builders.
+ */
+sl_status_t sli_wifi_send_data_packet(const void *data, uint16_t length, const void *context);
 /**
  * @brief Send IP address information to firmware.
  *

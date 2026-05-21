@@ -15,7 +15,7 @@
 extern rsi_parsed_conf_t rsi_parsed_conf;
 
 ble_confg_info_t ble_confgs;
-profile_dummy_data_t profile_dummy_data;
+sli_profile_dummy_data_t profile_dummy_data;
 uint8_t central_count    = 0;
 uint8_t peripheral_count = 0;
 adv_state_t adv_state_dut;
@@ -328,8 +328,8 @@ int32_t add_derived_key_to_ltk_list(rsi_ble_dev_ltk_list_t *ble_dev_ltk_list, rs
 void rsi_ble_event_profile_dummy(uint16_t status, void *event_data)
 {
   uint8_t ble_conn_id;
-  uint8_t temp_switch_count                      = 0;
-  profile_dummy_data_t *profile_dummy_data_event = (profile_dummy_data_t *)event_data;
+  uint8_t temp_switch_count                          = 0;
+  sli_profile_dummy_data_t *profile_dummy_data_event = (sli_profile_dummy_data_t *)event_data;
   //! Add handling here
   ble_conn_id       = profile_dummy_data_event->ble_con_id;
   temp_switch_count = profile_dummy_data_event->swtch_cnt;

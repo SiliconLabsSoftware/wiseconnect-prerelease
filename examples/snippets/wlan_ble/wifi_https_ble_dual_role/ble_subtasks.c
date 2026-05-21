@@ -972,6 +972,7 @@ void rsi_ble_task_on_conn(void *parameters)
           temp2++;
           rsi_ble_clear_event_based_on_conn(l_conn_id, RSI_BLE_GATT_DESC_SERVICES);
           char_desc_cnt++;
+          (void)char_desc_cnt; //! suppress unused variable warning
           char_desc_resp_recvd = false;
         } else {
           SL_DEBUG_LOG_V2(INFO, "Remote device profiles discovery completed - conn%d ", l_conn_id);

@@ -119,7 +119,7 @@ __attribute__((weak)) uint8_t smp_in_progress = 0;
 /*=======================================================================*/
 //! GATT Client Module Variables
 /*=======================================================================*/
-profile_dummy_data_t profile_dummy_data;
+sli_profile_dummy_data_t profile_dummy_data;
 // rsi_conn_update_req_event() is defined in gatt_common_event_hdlrs.c (shared by server and client)
 // Declaration available via gatt_common.h
 
@@ -1470,8 +1470,8 @@ void rsi_ble_event_profile_discovery(uint16_t __attribute__((unused)) status, vo
 void rsi_ble_event_profile_dummy(uint16_t status, void *event_data)
 {
   uint8_t ble_conn_id;
-  uint8_t temp_switch_count                      = 0;
-  profile_dummy_data_t *profile_dummy_data_event = (profile_dummy_data_t *)event_data;
+  uint8_t temp_switch_count                          = 0;
+  sli_profile_dummy_data_t *profile_dummy_data_event = (sli_profile_dummy_data_t *)event_data;
   //! Add handling here
   ble_conn_id       = profile_dummy_data_event->ble_con_id;
   temp_switch_count = profile_dummy_data_event->swtch_cnt;

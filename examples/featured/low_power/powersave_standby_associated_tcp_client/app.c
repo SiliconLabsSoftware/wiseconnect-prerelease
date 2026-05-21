@@ -41,6 +41,7 @@
 #include "sl_wifi_callback_framework.h"
 #include "sl_si91x_driver.h"
 #include <string.h>
+#include <inttypes.h>
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_power_manager.h"
 #include "sl_si91x_m4_ps.h"
@@ -49,16 +50,19 @@
 /******************************************************
  *                      Macros
  ******************************************************/
-#define SERVER_IP_ADDRESS               "2401:4901:1221:10eb:ddf3:2995:542c:3f9a"
-#define DATA                            "HellofromTCPclient!!!"
-#define SERVER_PORT                     5001
-#define NUMBER_OF_PACKETS               1000
-#define BROADCAST_DROP_THRESHOLD        5000
-#define BROADCAST_IN_TIM                1
-#define BROADCAST_TIM_TILL_NEXT_COMMAND 1
-#define TCP_KEEP_ALIVE_TIME             240
-#define TCP_BUFFER_SIZE                 1460
-#define SEND_TCP_DATA                   0
+#define SERVER_IP_ADDRESS   "2401:4901:1221:10eb:ddf3:2995:542c:3f9a"
+#define DATA                "HellofromTCPclient!!!"
+#define SERVER_PORT         5001
+#define NUMBER_OF_PACKETS   1000
+#define TCP_KEEP_ALIVE_TIME 240
+#define TCP_BUFFER_SIZE     1460
+#define SEND_TCP_DATA       0
+
+/* Defaults migrated from sl_wifi_filter_broadcast(5000, 1, 1). */
+#define BCAST_FILTER_ENABLE      (1U)
+#define MCAST_FILTER_ENABLE      (1U)
+#define FILTER_MODE              (0U)
+#define BEACON_DROP_THRESHOLD_MS (5000U)
 
 /******************************************************
  *                    Constants
@@ -101,14 +105,6 @@ static void application_start(void *argument);
 sl_status_t send_data_to_tcp_server(void);
 
 /******************************************************
- *               Static Inline Functions
- ******************************************************/
-static inline void print_errno(void)
-{
-  SL_DEBUG_LOG_V2(DEBUG, "errno: %d", errno);
-}
-
-/******************************************************
  *               Variable Definitions
  ******************************************************/
 
@@ -142,7 +138,7 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to start Wi-Fi Client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to start Wi-Fi Client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
@@ -150,11 +146,11 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(INFO, " Device MAC address: %x:%x:%x:", mac_addr.octet[0], mac_addr.octet[1], mac_addr.octet[2]);
     SL_DEBUG_LOG_V2(INFO, "%x:%x:%x", mac_addr.octet[3], mac_addr.octet[4], mac_addr.octet[5]);
   } else {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to get mac address: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to get mac address: 0x%" PRIx32 "", (uint32_t)status);
   }
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to fetch firmware version: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to fetch firmware version: 0x%" PRIx32 "", (uint32_t)status);
   } else {
     print_firmware_version(&version);
   }
@@ -165,29 +161,41 @@ static void application_start(void *argument)
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, " Wi-Fi client connected");
 
-  status = sl_wifi_filter_broadcast(BROADCAST_DROP_THRESHOLD, BROADCAST_IN_TIM, BROADCAST_TIM_TILL_NEXT_COMMAND);
+  sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
+  groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
+  groupcast_filter_config.enable_mcast_filter               = (uint8_t)MCAST_FILTER_ENABLE;
+  groupcast_filter_config.filter_mode                       = (uint8_t)FILTER_MODE;
+
+  status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " sl_wifi_filter_broadcast Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, " sl_wifi_set_groupcast_filter_config failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
+
+  status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, " sl_wifi_set_beacon_drop_threshold failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+    return;
+  }
+
   // set performance profile
   status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Power save configuration Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, " Power save configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
 
   status = send_data_to_tcp_server();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Send data failed with status %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Send data failed with status 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Send data completed successfully %lx", status);
+  SL_DEBUG_LOG_V2(INFO, " Send data completed successfully 0x%" PRIx32 "", (uint32_t)status);
   SL_DEBUG_LOG_V2(INFO, " Example Demonstration Completed");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -213,7 +221,7 @@ sl_status_t send_data_to_tcp_server(void)
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to get client profile: 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
   SL_DEBUG_LOG_V2(INFO, " Client profile is fetched successfully");
@@ -280,7 +288,7 @@ sl_status_t send_data_to_tcp_server(void)
     uint8_t address_buffer[SL_IPV6_ADDRESS_LENGTH];
 
     status = sl_inet_pton6(SERVER_IP_ADDRESS,
-                           SERVER_IP_ADDRESS + strlen(SERVER_IP_ADDRESS),
+                           &SERVER_IP_ADDRESS[strlen(SERVER_IP_ADDRESS)],
                            address_buffer,
                            (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
     if (status != 0x1) {

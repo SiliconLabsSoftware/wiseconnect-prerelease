@@ -37,6 +37,7 @@
 #include "sl_wifi.h"
 #include "sl_wifi_device.h"
 #include "string.h"
+#include <inttypes.h>
 #include "sl_wifi_callback_framework.h"
 #include "sl_net_wifi_types.h"
 
@@ -49,6 +50,12 @@
  *                    Constants
  ******************************************************/
 #define ENABLE_MQTT_SUBSCRIBE_PUBLISH 0
+
+/* Defaults migrated from sl_wifi_filter_broadcast(5000, 1, 1). */
+#define BCAST_FILTER_ENABLE      (1U)
+#define MCAST_FILTER_ENABLE      (1U)
+#define FILTER_MODE              (0U)
+#define BEACON_DROP_THRESHOLD_MS (5000U)
 
 #define MQTT_BROKER_PORT 8886
 
@@ -229,21 +236,21 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_mqtt_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Start Wi-Fi client interface Success ");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
@@ -367,7 +374,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
                                       0,
                                       TOPIC_TO_BE_SUBSCRIBED);
   if (status != SL_STATUS_IN_PROGRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to unsubscribe : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to unsubscribe : 0x%" PRIx32 "", (uint32_t)status);
 
     mqtt_client_cleanup();
     return;
@@ -433,7 +440,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
                                         mqtt_client_message_handler,
                                         TOPIC_TO_BE_SUBSCRIBED);
       if (status != SL_STATUS_IN_PROGRESS) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to subscribe : 0x%lX", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to subscribe : 0x%" PRIx32 "", (uint32_t)status);
 
         mqtt_client_cleanup();
         return;
@@ -441,7 +448,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
 
       status = sl_mqtt_client_publish(client, &message_to_be_published, 0, &message_to_be_published);
       if (status != SL_STATUS_IN_PROGRESS) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to publish message: 0x%lX", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to publish message: 0x%" PRIx32 "", (uint32_t)status);
 
         mqtt_client_cleanup();
         return;
@@ -476,7 +483,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
 
       status = sl_mqtt_client_disconnect(client, 0);
       if (status != SL_STATUS_IN_PROGRESS) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to disconnect : 0x%lX", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to disconnect : 0x%" PRIx32 "", (uint32_t)status);
 
         mqtt_client_cleanup();
         return;
@@ -508,8 +515,15 @@ sl_status_t mqtt_example()
   sl_status_t status;
   sl_wifi_performance_profile_v2_t performance_profile = { 0 };
 
-  //! Enable Broadcast data filter
-  status = sl_wifi_filter_broadcast(5000, 1, 1);
+  //! Enable groupcast filter and beacon drop threshold
+  sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
+  groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
+  groupcast_filter_config.enable_mcast_filter               = (uint8_t)MCAST_FILTER_ENABLE;
+  groupcast_filter_config.filter_mode                       = (uint8_t)FILTER_MODE;
+
+  status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
+  VERIFY_STATUS_AND_RETURN(status);
+  status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
   VERIFY_STATUS_AND_RETURN(status);
   SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
 
@@ -518,7 +532,9 @@ sl_status_t mqtt_example()
     status =
       sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR,
+                      "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%" PRIx32 "",
+                      (uint32_t)status);
       return status;
     }
     SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 0);
@@ -549,7 +565,7 @@ sl_status_t mqtt_example()
 
     if (status != SL_STATUS_OK) {
       mqtt_client_cleanup();
-      SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials: 0x%lX ", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials: 0x%" PRIx32 " ", (uint32_t)status);
 
       return status;
     }
@@ -559,7 +575,7 @@ sl_status_t mqtt_example()
 
   status = sl_mqtt_client_init(&client, mqtt_client_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to init mqtt client: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to init mqtt client: 0x%" PRIx32 "", (uint32_t)status);
 
     mqtt_client_cleanup();
     return status;
@@ -569,7 +585,7 @@ sl_status_t mqtt_example()
   status =
     sl_mqtt_client_connect(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
   if (status != SL_STATUS_IN_PROGRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to mqtt broker: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to mqtt broker: 0x%" PRIx32 "", (uint32_t)status);
 
     mqtt_client_cleanup();
     return status;
@@ -595,7 +611,7 @@ sl_status_t mqtt_example()
   performance_profile.profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
   status                      = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
   SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
