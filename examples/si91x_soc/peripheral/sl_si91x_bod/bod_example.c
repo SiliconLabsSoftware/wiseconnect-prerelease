@@ -102,7 +102,7 @@ void bod_example_init(void)
       SL_PRINT_STRING_ERROR("\r\n BOD Configurations Failed\r\n");
       break;
     } else {
-      SL_PRINT_STRING_ERROR("\r\n BOD Threshold Value is %.2f V\r\n", threshold_value);
+      SL_PRINT_STRING_ERROR("\r\n BOD Threshold Value is %ld mV\r\n", (int32_t)(threshold_value * 1000.0f));
     }
 
     // Enable BOD interrupt
@@ -134,8 +134,8 @@ void bod_example_process_action(void)
                                   vbat_percentage);
           } else {
             SL_PRINT_STRING_ERROR(" Your Vbatt status is less than the threshold voltage i.e "
-                                  "%.2fV battery Percentage is -- %.3f%% \r\n\n",
-                                  vbatt,
+                                  "%ldmV battery Percentage is -- %.3f%% \r\n\n",
+                                  (int32_t)(vbatt * 1000.0f),
                                   vbat_percentage);
           }
           // Clear the BOD interrupt flag

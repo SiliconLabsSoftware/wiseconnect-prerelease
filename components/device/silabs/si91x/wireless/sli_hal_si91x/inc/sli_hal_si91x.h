@@ -27,6 +27,10 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
+
+#ifndef _SLI_HAL_SI91X_H_
+#define _SLI_HAL_SI91X_H_
+
 #include "sli_routing_utility_types.h"
 #include "sli_hal_si91x_constants.h"
 #include "sli_code_classification.h"
@@ -144,3 +148,14 @@ sl_status_t sli_hal_si91x_deinit(void);
  */
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_HAL_SI91X, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_hal_si91x_notify_events(uint32_t flags);
+
+/**
+ * @brief Gets the thread priority of the HAL thread.
+ *
+ * This function returns the thread priority of the HAL thread.
+ *
+ * @return osPriority_t Thread priority of the HAL thread.
+ */
+osPriority_t sli_hal_si91x_get_thread_priority(void);
+
+#endif // _SLI_HAL_SI91X_H_

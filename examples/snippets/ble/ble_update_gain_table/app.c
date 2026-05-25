@@ -45,7 +45,7 @@
 
 //! Common include file
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_m4_ps.h"
 #endif
@@ -202,6 +202,7 @@ uint8_t Si917_BLE_REGION_BASED_LP_CHAIN_10DBM_OFFSET_XX[128] = {//{{{
 #endif
 // clang-format on
 
+#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
 /*
  * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
  * Active only for backends that emit the proprietary stream (IOStream
@@ -212,6 +213,7 @@ void vApplicationIdleHook(void)
 {
   sl_log_flush();
 }
+#endif
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,

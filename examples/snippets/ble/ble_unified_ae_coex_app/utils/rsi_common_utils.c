@@ -37,7 +37,7 @@
 #include "rsi_bt_common_apis.h"
 #include "rsi_common_utils.h"
 #include "assert.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 #ifdef MXRT_595s
 #include "sl_hal_mcu_uart.h"
 

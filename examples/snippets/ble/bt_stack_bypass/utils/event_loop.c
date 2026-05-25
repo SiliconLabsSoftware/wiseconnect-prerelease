@@ -35,7 +35,7 @@
 #include "stdint.h"
 #include "rsi_bt_common_apis.h"
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 #ifndef SLI_SI91X_MCU_INTERFACE
 #include "app_rtt_logging.h"

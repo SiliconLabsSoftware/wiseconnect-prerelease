@@ -117,4 +117,13 @@ sl_status_t sli_event_engine_register_event(sli_queue_t *event_queue,
                                             uint32_t event,
                                             sli_event_engine_handler_t handler);
 
+/**
+ * @brief Gets the thread priority of the event engine thread.
+ *
+ * This function returns the thread priority of the event engine thread.
+ *
+ * @return osPriority_t Thread priority of the event engine thread.
+ */
+osPriority_t sli_event_engine_get_thread_priority(void);
+
 #endif // SLI_ASYNC_EVENT_HANDLER_H

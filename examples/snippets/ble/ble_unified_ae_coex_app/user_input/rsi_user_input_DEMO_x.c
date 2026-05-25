@@ -2,7 +2,7 @@
 #include <rsi_common_app.h>
 #include <stdio.h>
 #include <string.h>
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 #ifdef M4_UART
 #include "USART.h"
 #endif

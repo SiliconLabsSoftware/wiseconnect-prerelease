@@ -82,6 +82,36 @@ Open `app.c` file and configure the following parameters accordingly
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
+> **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
+
+> **Note**: To enable **sideband crypto**, Use **one** of the following methods, depending on your workflow:
+>
+> **Option 1 — Edit the example's `.slcp` file (the `.slcp` inside the example folder, not the project `.slcp`):**
+>
+> Add the `define` entry at example scope:
+>
+> ```yaml
+> define:
+>   - name: SL_SI91X_SIDE_BAND_CRYPTO
+> ```
+>
+> **Option 2 — Add the macro using Configurators 2.0:**
+>
+> 1. Create the desired PSA example project and open it in any compatible IDE.
+> 2. In the project explorer, right-click the project and select **Open Configurators 2.0**.
+>
+>    ![Right-click menu — Open Configurators 2.0](resources/readme/sideband_open_configurators.png)
+>
+> 3. In the configurator view, switch to the **Build Configurator** tab.
+>
+>    ![Configurators 2.0 — Build Configurator tab](resources/readme/sideband_build_configurator.png)
+>
+> 4. Under **Compiler Flags → C**, add `-DSL_SI91X_SIDE_BAND_CRYPTO` to the options list and save the configuration.
+>
+>    ![Build Configurator — Compiler Flags](resources/readme/sideband_compiler_flags.png)
+>
+> 5. **Clean** the project and then **rebuild** it for the change to take effect.
+
 ## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:

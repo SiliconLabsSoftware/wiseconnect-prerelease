@@ -10,7 +10,7 @@
 #include "rsi_ble_common_config.h"
 #include "sl_si91x_status.h"
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 extern rsi_parsed_conf_t rsi_parsed_conf;
 

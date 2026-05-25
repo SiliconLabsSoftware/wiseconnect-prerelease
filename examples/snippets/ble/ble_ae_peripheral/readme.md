@@ -26,7 +26,7 @@ SiWx91x BLE AE Peripheral example: extended advertising with two advertising set
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
   - [Report Bugs and Get Support](#report-bugs-and-get-support)
-
+  - [Limitations for this App](#limitations-for-this-app)
 ## Purpose/Scope
 
 This application demonstrates how to configure SiWx91x in Advertising Extended peripheral mode. the application is designed with 2 adv sets and has the provision of periodic advertising for a set
@@ -323,3 +323,7 @@ If you encounter issues while running the BLE AE Peripheral example, check the f
 Report issues and get help from the Silicon Labs community:
 
 - [Silicon Labs Community](https://www.silabs.com/community)
+
+## Limitations for this App
+
+- The SL logging framework is not supported for AE feature.

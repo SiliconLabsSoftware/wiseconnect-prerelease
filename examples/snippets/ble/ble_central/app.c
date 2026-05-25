@@ -45,7 +45,7 @@
 #include "rsi_bt_common.h"
 #include "rsi_bt_common_apis.h"
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 #if SL_SI91X_TICKLESS_MODE == 0 && defined(SLI_SI91X_MCU_INTERFACE)
 #include "sl_si91x_m4_ps.h"
 #include "sl_si91x_power_manager.h"
@@ -106,6 +106,7 @@ osSemaphoreId_t ble_main_task_sem;
 static volatile uint32_t ble_app_event_map;
 static volatile uint32_t ble_app_event_map1;
 
+#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
 /*
  * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
  * Active only for backends that emit the proprietary stream (IOStream
@@ -116,6 +117,7 @@ void vApplicationIdleHook(void)
 {
   sl_log_flush();
 }
+#endif
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,

@@ -27,6 +27,7 @@ SiWx91x BLE AE Central example: scan on 1M and Coded PHY with two scan sets and 
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
   - [Report Bugs and Get Support](#report-bugs-and-get-support)
+  - [Limitations for this App](#limitations-for-this-app)
 
 ## Purpose/Scope
 
@@ -266,3 +267,7 @@ If you encounter issues while running the BLE AE Central example, check the foll
 Report issues and get help from the Silicon Labs community:
 
 - [Silicon Labs Community](https://www.silabs.com/community)
+
+## Limitations for this App
+
+ - The SL logging framework is not supported for AE feature

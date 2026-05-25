@@ -11,7 +11,7 @@
 
 #include "stdint.h"
 #include "stdio.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 //#include "fsl_debug_console.h"
 
 int32_t ble_ae_set_1_advertising_enable(void);

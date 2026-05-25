@@ -131,7 +131,8 @@ void code_classifier_example_process_action(void)
 
     // Time-Critical Event Logging
     // Indicating whether a time-sensitive event has been triggered.
-    SL_PRINT_STRING_ERROR("Time-Critical Event Triggered ? Yes : No \n");
+    SL_PRINT_STRING_ERROR("Time-Critical Event Triggered: %s\n",
+                          time_critical_event_triggered ? (uintptr_t) "Yes" : (uintptr_t) "No");
   }
 }
 

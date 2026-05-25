@@ -11,6 +11,9 @@ component_root_path: ./components/at_commands_auto_gen
 provides:
   - name: ble_at_commands
 
+source:
+  - path: ble_commands_compat.c
+
 template_contribution:
   - name: console_commands
     value:

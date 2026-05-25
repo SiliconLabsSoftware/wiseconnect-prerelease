@@ -34,7 +34,7 @@
 #include "stdint.h"
 #include "rsi_bt_common_apis.h"
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 /*==============================================*/
 /**

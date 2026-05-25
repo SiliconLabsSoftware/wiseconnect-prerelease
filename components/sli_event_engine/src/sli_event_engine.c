@@ -354,3 +354,11 @@ sl_status_t sli_event_engine_register_event(sli_queue_t *event_queue,
 
   return SL_STATUS_OK; // Registration succeeded
 }
+
+osPriority_t sli_event_engine_get_thread_priority(void)
+{
+  if (NULL == event_handler_thread_id) {
+    return osPriorityNone;
+  }
+  return osThreadGetPriority(event_handler_thread_id);
+}

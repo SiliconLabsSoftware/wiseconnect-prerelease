@@ -546,8 +546,12 @@ sl_status_t sli_hal_si91x_init(void)
   // Create and start HAL thread
   if (NULL == hal_thread_ID) {
     const osThreadAttr_t attr = {
-      .name       = SLI_HAL_SI91X_THREAD_NAME,
-      .priority   = osPriorityRealtime1,
+      .name = SLI_HAL_SI91X_THREAD_NAME,
+#ifdef SL_WLAN_HAL_THREAD_PRIORITY
+      .priority = SL_WLAN_HAL_THREAD_PRIORITY,
+#else
+      .priority = osPriorityRealtime1,
+#endif
       .stack_mem  = 0,
       .stack_size = SLI_HAL_SI91X_THREAD_STACK,
       .cb_mem     = 0,
@@ -683,4 +687,12 @@ sl_status_t sli_hal_si91x_notify_events(uint32_t flags)
   }
 
   return result;
+}
+
+osPriority_t sli_hal_si91x_get_thread_priority(void)
+{
+  if (NULL == hal_thread_ID) {
+    return osPriorityNone;
+  }
+  return osThreadGetPriority(hal_thread_ID);
 }

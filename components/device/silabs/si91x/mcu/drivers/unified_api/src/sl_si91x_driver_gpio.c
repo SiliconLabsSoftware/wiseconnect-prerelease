@@ -286,7 +286,7 @@ sl_status_t sl_gpio_set_configuration(sl_si91x_gpio_pin_config_t pin_config)
       break;
   }
   // Check if the GPIO port is the Ultra-Low Power GPIO port.
-  if (pin_config.port_pin.port == SL_GPIO_ULP_PORT) {
+  if ((unsigned int)pin_config.port_pin.port == SL_GPIO_ULP_PORT) {
     // Enable pad selection for the pin.
     status = sl_si91x_gpio_driver_enable_pad_selection(ulp_gpio_pad[pin_config.port_pin.pin]);
     if (status != SL_STATUS_OK) {
@@ -316,7 +316,7 @@ sl_status_t sl_gpio_set_configuration(sl_si91x_gpio_pin_config_t pin_config)
                                     (sl_si91x_gpio_direction_t)pin_config.direction);
   }
   // Check if the GPIO port is the Ultra-Ultra Low Power GPIO port.
-  if (pin_config.port_pin.port == SL_GPIO_UULP_PORT) {
+  if ((unsigned int)pin_config.port_pin.port == SL_GPIO_UULP_PORT) {
     // Enable uulp pad receiver for the pin.
     status = sl_si91x_gpio_driver_select_uulp_npss_receiver(pin_config.port_pin.pin, SET);
     if (status != SL_STATUS_OK) {
@@ -411,7 +411,7 @@ sl_status_t sl_gpio_driver_configure_interrupt(sl_gpio_t *gpio,
       break;
   }
   // Check if the GPIO port is the Ultra-Low Power GPIO port.
-  if (gpio->port == SL_GPIO_ULP_PORT) {
+  if ((unsigned int)gpio->port == SL_GPIO_ULP_PORT) {
     // Check if the GPIO pin or interrupt number exceeds the maximum allowed values.
     if (int_no > GPIO_ULP_INTERRUPT_MAX_VALUE) {
       SL_PRINT_STRING_ERROR("sl_gpio_driver_configure_interrupt: int_no ULP st=0x%04lX,line no : %d\r\n",
@@ -435,7 +435,7 @@ sl_status_t sl_gpio_driver_configure_interrupt(sl_gpio_t *gpio,
     sl_si91x_gpio_configure_ulp_pin_interrupt((uint8_t)int_no, (sl_si91x_gpio_interrupt_config_flag_t)flags, gpio->pin);
   }
   // Check if the GPIO port is the Ultra-Ultra Low Power GPIO port.
-  if (gpio->port == SL_GPIO_UULP_PORT) {
+  if ((unsigned int)gpio->port == SL_GPIO_UULP_PORT) {
     // Check if the GPIO pin or interrupt number exceeds the maximum allowed values.
     if (int_no > GPIO_UULP_PIN_MAX_VALUE) {
       SL_PRINT_STRING_ERROR("sl_gpio_driver_configure_interrupt: int_no UULP st=0x%04lX,line no : %d\r\n",

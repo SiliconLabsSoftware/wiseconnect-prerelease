@@ -32,7 +32,6 @@
 //! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
-#include "sl_log_helper.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
@@ -103,6 +102,7 @@ int8_t rsi_app_resp_tx_power                  = 0;
 uint32_t rsi_app_resp_max_no_of_supp_adv_sets = 0;
 static uint16_t rsi_app_resp_max_adv_data_len = 0;
 
+#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
 /*
  * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
  * Active only for backends that emit the proprietary stream (IOStream
@@ -113,6 +113,7 @@ void vApplicationIdleHook(void)
 {
   sl_log_flush();
 }
+#endif
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,

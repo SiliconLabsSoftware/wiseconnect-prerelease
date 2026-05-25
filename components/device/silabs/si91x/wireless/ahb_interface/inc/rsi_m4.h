@@ -57,7 +57,9 @@
 
 #define M4SS_P2P_INT_BASE_ADDRESS 0x46008000
 #define MCU_PWR_CTRL_BASE_ADDR    0x24048400
-#define MISC_CFG_HOST_CTRL        *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x0C)
+#ifndef MISC_CFG_HOST_CTRL
+#define MISC_CFG_HOST_CTRL *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x0C)
+#endif
 #ifndef M4SS_P2P_INTR_SET_REG
 #define M4SS_P2P_INTR_SET_REG *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x16C)
 #endif

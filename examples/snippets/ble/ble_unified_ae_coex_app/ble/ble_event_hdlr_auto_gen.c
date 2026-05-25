@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "rsi_common_utils.h"
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 generic_task_cb_t ble_generic_cb;
 

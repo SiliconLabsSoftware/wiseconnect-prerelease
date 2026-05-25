@@ -20,7 +20,7 @@
     - [Pairing Procedure](#pairing-procedure)
     - [Peripheral Connection](#peripheral-connection)
     - [BLE Data Transfer](#ble-data-transfer)
-  - [Limitations for this App](#limitations-for-this-app)
+  - [Limitations](#limitations)
 
 ## Purpose/Scope
 
@@ -556,11 +556,11 @@ Follow the steps as mentioned for the successful execution of the application:
       ![Prints in docklight window](resources/readme/output_log3.png)
      ![Prints in docklight window](resources/readme/output_log4.png)
 
-## Limitations for this App
+## Limitations
 
 - PSRAM is not supported for this feature.
-- This feature is supported only with TA_480K_M4SS_192K and TA_416K_M4SS_256K RAM configurations.
-- This feature is supported only with power save enabled.
+- Wi-Fi + AE BLE feature is supported only with TA_480K_M4SS_192K and TA_416K_M4SS_256K RAM configurations.
+- Wi-Fi + AE BLE is supported only with power save enabled.
 - TWT(Target Wake Times) based wakeup is not supported.
 - A maximum of 2 BLE connections are supported when the AE+CoEx feature is enabled.
 - The scan interval and window are recommended to be in a 3:1 ratio.
@@ -569,3 +569,4 @@ Follow the steps as mentioned for the successful execution of the application:
 - DUT does not save bonding information.
 - Bonding information needs to be removed from remote device before issuing reconnection.
 - WLAN/BLE throughputs will be less in coexistence cases due to BLE flow control missing in SDK.
+- The SL logging framework is not supported for AE feature.

@@ -1,6 +1,6 @@
 #include "generic_command_handling.h"
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/

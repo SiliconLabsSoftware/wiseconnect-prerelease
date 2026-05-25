@@ -722,6 +722,13 @@ static sl_status_t uulp_gpio_configuration(uint8_t pin, uint8_t polarity)
     polarity_flag = SL_GPIO_INTERRUPT_LEVEL_HIGH;
   } else if (polarity == POLARITY_LOW) {
     polarity_flag = SL_GPIO_INTERRUPT_LEVEL_LOW;
+  } else {
+    status = SL_STATUS_INVALID_PARAMETER;
+    SL_PRINT_STRING_ERROR("uulp_gpio_configuration: invalid polarity, status: "
+                          "0x%04lX, line no: %d\r\n",
+                          (unsigned long)status,
+                          __LINE__);
+    return status;
   }
   status = sl_si91x_gpio_driver_configure_uulp_interrupt(polarity_flag, pin, (void *)&gpio_uulp_pin_interrupt_callback);
   if (status != SL_STATUS_OK) {

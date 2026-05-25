@@ -74,12 +74,7 @@ The following hash algorithms are supported in this example:
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 
-> **Note**: To enable **sideband crypto**, add the following in the project's `.slcp` file. The `define` entry is at project scope alongside `component`:
->
-> ```yaml
-> define:
->   - name: SL_SI91X_SIDE_BAND_CRYPTO
-> ```
+> **Note**: PSA_HMAC has no support for Sideband.
 
 ## Test the Application
 

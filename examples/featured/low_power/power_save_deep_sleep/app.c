@@ -38,6 +38,8 @@
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_power_manager.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 
 /******************************************************
@@ -133,14 +135,16 @@ static void application_start(void *argument)
   SL_DEBUG_LOG_V2(INFO, "NWP is in power save mode");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-  SL_DEBUG_LOG_V2(INFO, "M4 in Sleep");
+  taskENTER_CRITICAL();
+  SL_DEBUG_LOG_V2(INFO, "M4 in Deep Sleep");
   status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS0);
   if (status != SL_STATUS_OK) {
     // If status is not OK, return with the error code.
     SL_DEBUG_LOG_V2(ERROR, "sl_si91x_power_manager_add_ps_requirement failed, Error Code: 0x%lX", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "M4 wake up");
+    SL_DEBUG_LOG_V2(INFO, "M4 Deep Sleep wake up");
   }
+  taskEXIT_CRITICAL();
 
 #else
   osDelay(30000);

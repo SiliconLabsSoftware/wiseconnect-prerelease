@@ -24,7 +24,6 @@
 #include "errno.h"
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
-#include "sl_log_helper.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_utility.h"
@@ -215,6 +214,7 @@ uint8_t conn_params[12] = { CONN_INTERVAL_MIN_LSB,   CONN_INTERVAL_MIN_MSB,   CO
                             SUPERVISION_TIMEOUT_LSB, SUPERVISION_TIMEOUT_MSB, MIN_CE_LENGTH_LSB,
                             MIN_CE_LENGTH_MSB,       MAX_CE_LENGTH_LSB };
 
+#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
 /*
  * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
  * Active only for backends that emit the proprietary stream (IOStream
@@ -225,6 +225,7 @@ void vApplicationIdleHook(void)
 {
   sl_log_flush();
 }
+#endif
 
 static const sl_wifi_device_configuration_t
   config = { .boot_option = LOAD_NWP_FW,

@@ -35,7 +35,6 @@
 #include "errno.h"
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
-#include "sl_log_helper.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_utility.h"
@@ -61,9 +60,10 @@
 #include "sl_si91x_hal_soc_soft_reset.h"
 #endif
 
-#define BLE_ATT_REC_SIZE 500
-#define NO_OF_VAL_ATT    5
-#define FW_HEADER_SIZE   64
+#define BLE_ATT_REC_SIZE          500
+#define NO_OF_VAL_ATT             5
+#define FW_HEADER_SIZE            64
+#define BT_HCI_COMMAND_DISALLOWED 0x4E0C
 //! global parameters list
 static uint8_t chunk_data              = 0;
 static uint16_t chunk_number           = 1;
@@ -109,6 +109,7 @@ rsi_ble_resp_add_serv_t ota_serv_response;
 
 sl_wifi_firmware_version_t version = { 0 };
 
+#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
 /*
  * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
  * Active only for backends that emit the proprietary stream (IOStream
@@ -119,6 +120,7 @@ void vApplicationIdleHook(void)
 {
   sl_log_flush();
 }
+#endif
 
 static const sl_wifi_device_configuration_t
   config = { .boot_option = LOAD_NWP_FW,
@@ -964,7 +966,7 @@ sl_status_t update_firmware()
                                  rsi_ble_on_disconnect_event,
                                  NULL,
                                  rsi_ble_on_phy_update_complete_event,
-                                 NULL,
+                                 rsi_ble_data_length_change_event,
                                  rsi_ble_on_enhance_conn_status_event,
                                  NULL,
                                  rsi_ble_on_conn_update_complete_event,
@@ -1064,12 +1066,6 @@ sl_status_t update_firmware()
             SL_DEBUG_LOG_V2(INFO, "MTU Requested");
           }
         }
-
-        //! Else if MTU is already equal to 232, then proceed to PHY update event
-        else {
-          status = rsi_ble_setphy((int8_t *)conn_event_to_app.dev_addr, TX_PHY_RATE, RX_PHY_RATE, CODDED_PHY_RATE);
-        }
-
       } break; //! end of RSI_BLE_MTU_EX_EVENT case
 
       case RSI_BLE_PHY_UPDATE_EVENT: {
@@ -1116,6 +1112,17 @@ sl_status_t update_firmware()
             SL_DEBUG_LOG_V2(ERROR, "set data length cmd failed with error code = %lx ", status);
             rsi_ble_app_set_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
           }
+        } else if (remote_dev_feature.remote_features[1] & 0x01) {
+          status =
+            rsi_ble_setphy((int8_t *)(int8_t *)conn_event_to_app.dev_addr, TX_PHY_RATE, RX_PHY_RATE, CODDED_PHY_RATE);
+          if (status != RSI_SUCCESS) {
+            if (status != BT_HCI_COMMAND_DISALLOWED) {
+              //retry the same command
+              rsi_ble_app_set_event(RSI_APP_EVENT_DATA_LENGTH_CHANGE);
+            } else {
+              SL_DEBUG_LOG_V2(ERROR, "Set phy cmd failed with error code = %lx ", status);
+            }
+          }
         }
 
       } break;
@@ -1128,6 +1135,17 @@ sl_status_t update_firmware()
       } break;
       case RSI_APP_EVENT_DATA_LENGTH_CHANGE: {
         rsi_ble_app_clear_event(RSI_APP_EVENT_DATA_LENGTH_CHANGE);
+        if (remote_dev_feature.remote_features[1] & 0x01) {
+          status = rsi_ble_setphy((int8_t *)conn_event_to_app.dev_addr, TX_PHY_RATE, RX_PHY_RATE, CODDED_PHY_RATE);
+          if (status != RSI_SUCCESS) {
+            if (status != BT_HCI_COMMAND_DISALLOWED) {
+              //retry the same command
+              rsi_ble_app_set_event(RSI_APP_EVENT_DATA_LENGTH_CHANGE);
+            } else {
+              SL_DEBUG_LOG_V2(ERROR, "Set phy cmd failed with error code = %lx ", status);
+            }
+          }
+        }
       } break;
 
       //! This event is invoked when the module gets diconnected before completion

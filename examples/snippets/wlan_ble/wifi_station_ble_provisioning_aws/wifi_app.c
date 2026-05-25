@@ -414,11 +414,16 @@ static int wifi_app_init_and_reconnect(void)
 
   rsi_wlan_app_callbacks_init();
 
-  status = sl_net_set_credential(id, SL_NET_WIFI_PSK, pwd, strlen((char *)pwd));
-  if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Reconnect: set credential failed: 0x%lX", status);
-    disconnected = 1;
-    return -1;
+  if (sec_type != SL_WIFI_OPEN) {
+    status = sl_net_set_credential(id, SL_NET_WIFI_PSK, pwd, strlen((char *)pwd));
+    if (status != SL_STATUS_OK) {
+      SL_DEBUG_LOG_V2(ERROR, "Reconnect: set credential failed: 0x%lX", status);
+      disconnected = 1;
+      return -1;
+    }
+  } else {
+    /* OPEN: no PSK — match WIFI_APP_JOIN_STATE (zero-length PSK is SL_STATUS_INVALID_PARAMETER). */
+    id = SL_WIFI_NO_CREDENTIAL_ID;
   }
 
   access_point.ssid.length = strlen((char *)coex_ssid);

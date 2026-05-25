@@ -34,7 +34,7 @@
 #include "ble_private.h"
 #include "ble_config.h"
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 /*=======================================================================*/
 //   ! function protoypes
 /*=======================================================================*/

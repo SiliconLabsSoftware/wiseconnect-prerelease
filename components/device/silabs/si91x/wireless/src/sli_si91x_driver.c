@@ -33,7 +33,9 @@
 #include "sl_si91x_driver.h"
 
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "cmsis_os2.h"
 #include "sl_cmsis_utility.h"
@@ -484,6 +486,35 @@ sl_status_t sli_get_nwp_timestamp(uint32_t *timestamp)
   return status;
 }
 
+static sl_status_t sli_si91x_check_thread_priority_order(void)
+{
+  // check the order of priorties of the Event engine, HAL and Command engine
+  osPriority_t hal_thread_priority            = sli_hal_si91x_get_thread_priority();
+  osPriority_t command_engine_thread_priority = sli_wifi_command_engine_config.priority;
+  osPriority_t event_engine_thread_priority   = sli_event_engine_get_thread_priority();
+
+  // check the order of priorties of the Event engine, HAL and Command engine
+  // order is Event engine > HAL > Command engine
+  if (event_engine_thread_priority > hal_thread_priority && hal_thread_priority > command_engine_thread_priority) {
+    SL_DEBUG_LOG_V2(INFO,
+                    ("\r\nevent_engine_thread_priority: %" PRIu32 ", hal_thread_priority: %" PRIu32
+                     ", command_engine_thread_priority: %" PRIu32 "\r\nThread priority order is correct \r\n"),
+                    (uint32_t)event_engine_thread_priority,
+                    (uint32_t)hal_thread_priority,
+                    (uint32_t)command_engine_thread_priority);
+    return SL_STATUS_OK;
+  }
+  SL_DEBUG_LOG_V2(ERROR,
+                  ("\r\nevent_engine_thread_priority: %" PRIu32 ", hal_thread_priority: %" PRIu32
+                   ", command_engine_thread_priority: %" PRIu32 "\r\n"
+                   "Expected order is Event engine > HAL > Command engine\r\n"),
+                  (uint32_t)event_engine_thread_priority,
+                  (uint32_t)hal_thread_priority,
+                  (uint32_t)command_engine_thread_priority);
+
+  return SL_STATUS_INVALID_CONFIGURATION;
+}
+
 uint32_t sli_si91x_get_config_feature_bit_map(void)
 {
   return config_feature_bit_map;
@@ -511,6 +542,9 @@ sl_status_t sli_si91x_wifi_platform_init(void)
   VERIFY_STATUS_AND_RETURN(status);
 
   status = sli_si91x_wifi_command_engine_init();
+  VERIFY_STATUS_AND_RETURN(status);
+
+  status = sli_si91x_check_thread_priority_order();
   VERIFY_STATUS_AND_RETURN(status);
 
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO

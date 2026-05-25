@@ -22,7 +22,7 @@ SiWx91x BLE unified extended advertising coex example: configure central and per
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
   - [Report Bugs and Get Support](#report-bugs-and-get-support)
-
+  - [Limitations for this App](#limitations-for-this-app)
 ## Purpose/Scope
 
 This application demonstrates how to configure SiWx91x in Extended Advertising mode (Central/Peripheral).
@@ -339,3 +339,7 @@ If you encounter issues while running the BLE Unified AE Coex example, check the
 Report issues and get help from the Silicon Labs community:
 
 - [Silicon Labs Community](https://www.silabs.com/community)
+
+## Limitations for this App
+
+- The SL logging framework is not supported for AE feature.

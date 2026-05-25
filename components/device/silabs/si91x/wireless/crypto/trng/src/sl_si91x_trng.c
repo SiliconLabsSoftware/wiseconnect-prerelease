@@ -221,9 +221,10 @@ sl_status_t sl_si91x_trng_program_key(uint32_t *trng_key, uint16_t key_length)
 sl_status_t sl_si91x_trng_get_random_num(uint32_t *random_number, uint16_t length)
 {
   sl_status_t status;
-  sl_wifi_buffer_t *buffer        = NULL;
+  sl_wifi_buffer_t *buffer = NULL;
+#ifndef SL_SI91X_SIDE_BAND_CRYPTO
   sl_wifi_system_packet_t *packet = NULL;
-
+#endif
   if ((random_number == NULL) || (length == 0) || (length > 1024)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -276,12 +277,12 @@ sl_status_t sl_si91x_trng_get_random_num(uint32_t *random_number, uint16_t lengt
   SL_ASSERT(packet->length == (request->total_msg_length * sizeof(uint32_t)));
   SL_ASSERT(length <= packet->length);
   memcpy(random_number, packet->data, length);
-#endif
 #if SLI_SI91X_TRNG_DUPLICATE_CHECK
   //! Check for any duplicate elements
   if (packet != NULL)
     status = sl_si91x_duplicate_element((uint32_t *)packet->data, length / sizeof(uint32_t));
 #endif // SLI_SI91X_TRNG_DUPLICATE_CHECK
+#endif // SL_SI91X_SIDE_BAND_CRYPTO
   free(request);
   if (buffer != NULL)
     sli_buffer_manager_free_buffer(buffer);

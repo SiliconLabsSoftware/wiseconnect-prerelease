@@ -22,7 +22,7 @@
 #include "sl_wifi_callback_framework.h"
 #include "ble_config.h"
 #include <stdio.h>
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 /******************************************************
  * Forward Declarations
@@ -48,6 +48,7 @@ static const osThreadAttr_t ble_thread_attributes = {
  * Required for BLE operation on Si91x wireless interface
  * BLE-specific configuration comes from ble_config.h
  ******************************************************/
+#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
 /*
  * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
  * Active only for backends that emit the proprietary stream (IOStream
@@ -58,6 +59,7 @@ void vApplicationIdleHook(void)
 {
   sl_log_flush();
 }
+#endif
 
 static sl_wifi_device_configuration_t ble_device_config = {
   .boot_option = LOAD_NWP_FW,

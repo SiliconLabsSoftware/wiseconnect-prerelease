@@ -2,7 +2,7 @@
 #include "event_loop.h"
 #include <stdlib.h>
 #include "rsi_common_apis.h"
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 generic_command_handler_lut_entry_t ble_commands_hdlr_lut[] = {
   { ble_module_req_adv_cmd_handler },

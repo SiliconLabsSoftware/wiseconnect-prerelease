@@ -4204,7 +4204,7 @@ typedef struct { /*!< (@ 0x44000100) USART0 Structure */
 
     struct {
       __IOM unsigned int DLF : 6; /*!< [5..0] Fractional part of divisor. */
-      __IM unsigned int : 1;
+      __IM unsigned int RESERVED0 : 1;
       __IM unsigned int RESERVED1 : 25; /*!< [31..7] reserved1 */
     } DLF_b;
   };
@@ -7457,10 +7457,10 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
                                     accepted */
       __IOM unsigned int AES_KEY_SIZE : 1;     /*!< [1..1] Size of the AES key 0:
                                            128-bit 1: 256-bit */
-      __IM unsigned int : 5;
+      __IM unsigned int RESERVED0 : 5;
       __IOM unsigned int AES_KEY_SRC : 1; /*!< [7..7] Source of the AES key 0:
                                           Interface 1: Register */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED1 : 24;
     } AES_KCR_b;
   };
 
@@ -7470,7 +7470,7 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
     struct {
       __IOM unsigned int AES_MODE : 8; /*!< [7..0] The AES Mode register defines
                                        which mode of AES is used.           */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED0 : 24;
     } AES_MODE_REG_b;
   };
 
@@ -7480,7 +7480,7 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
     struct {
       __IOM unsigned int AES_ACTION : 2; /*!< [1..0] The AES Mode register defines
                                          which mode of AES is used.           */
-      __IM unsigned int : 30;
+      __IM unsigned int RESERVED0 : 30;
     } AES_ACT_REG_b;
   };
   __IM unsigned int RESERVED[5];
@@ -7491,18 +7491,18 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
     struct {
       __IM unsigned int AES_BUSY : 1; /*!< [0..0] Indicates that the AES core is
                                       processing data                     */
-      __IM unsigned int : 1;
+      __IM unsigned int RESERVED0 : 1;
       __IM unsigned int AES_CLEAR_DONE : 1;  /*!< [2..2] Indicates that the Clear
                                              action is finished  */
       __IM unsigned int AES_KEY_PRESENT : 1; /*!< [3..3] Indicates that the Clear
                                              action is finished */
-      __IM unsigned int : 1;
+      __IM unsigned int RESERVED1 : 1;
       __IM unsigned int AES_KEY_REQ : 1;  /*!< [5..5] Indicates that a key must be
                                           provided                              */
       __IM unsigned int AES_DATA_REQ : 1; /*!< [6..6] Indicates that data must be
                                           provided */
       __IM unsigned int AES_DATA_AV : 1;  /*!< [7..7] Indicates that data is available */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED2 : 24;
     } AES_SR_REG_b;
   };
   __IM unsigned int RESERVED1[7];
@@ -7542,7 +7542,7 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
 
     struct {
       __OM unsigned int IFB_ERROR : 1; /*!< [0..0] Clears the if_error bit */
-      __IM unsigned int : 31;
+      __IM unsigned int RESERVED0 : 31;
     } AES_IF_SR_C_REG_b;
   };
 
@@ -7552,7 +7552,7 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
     struct {
       __IM unsigned int IF_ERROR : 1; /*!< [0..0] Indicates that an interface error
                                       has occurred                     */
-      __IM unsigned int : 31;
+      __IM unsigned int RESERVED0 : 31;
     } AES_IF_SR_REG_b;
   };
 
@@ -7562,7 +7562,7 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
     struct {
       __IOM unsigned int AES_BIST_ENABLE : 1; /*!< [0..0] Isolates the iid_aes
                                               module and runs a BIST */
-      __IM unsigned int : 3;
+      __IM unsigned int RESERVED0 : 3;
       __IOM unsigned int AES_BIST_RUNNING : 1; /*!< [4..4] BIST is in progress or
                                                finishing up */
       __IOM unsigned int AES_BIST_ACTIVE : 1;  /*!< [5..5] Indicates that the BIST is
@@ -7570,7 +7570,7 @@ typedef struct { /*!< (@ 0x20480500) IID_AES Structure */
       __IOM unsigned int AES_BIST_OK : 1;      /*!< [6..6] Indicates that the BIST has passed */
       __IOM unsigned int AES_BIST_ERROR : 1;   /*!< [7..7] Indicates that the BIST has
                                              failed */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED1 : 24;
     } AES_TEST_REG_b;
   };
   __IM unsigned int RESERVED3[6];
@@ -7612,7 +7612,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
       __OM unsigned int QK_SET_UK : 1;  /*!< [4..4] Begin Set User Key operation */
       __OM unsigned int QK_SET_XK : 1;  /*!< [5..5] Begin Set External Key operation */
       __OM unsigned int QK_GET_KEY : 1; /*!< [6..6] Begin Get Key operation */
-      __IM unsigned int : 25;
+      __IM unsigned int RESERVED0 : 25;
     } QK_CR_REG_b;
   };
 
@@ -7622,7 +7622,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
 
     struct {
       __IOM unsigned int QK_KEY_INDEX : 4; /*!< [3..0] Key index for Set Key operations */
-      __IM unsigned int : 28;
+      __IM unsigned int RESERVED0 : 28;
     } QK_KIDX_REG_b;
   };
 
@@ -7631,7 +7631,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
 
     struct {
       __IOM unsigned int QK_KEY_SIZE : 6; /*!< [5..0] Key size for Set Key operations */
-      __IM unsigned int : 26;
+      __IM unsigned int RESERVED0 : 26;
     } QK_KSZ_REG_b;
   };
 
@@ -7640,7 +7640,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
 
     struct {
       __IOM unsigned int QK_KEY_TARGET : 1; /*!< [0..0] Target of reconstructed key */
-      __IM unsigned int : 31;
+      __IM unsigned int RESERVED0 : 31;
     } QK_KT_REG_b;
   };
   __IM unsigned int RESERVED[4];
@@ -7658,7 +7658,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
       __IM unsigned int QK_KO_AV : 1;  /*!< [5..5] Next part of key is available  */
       __IM unsigned int QK_CI_REQ : 1; /*!< [6..6] Request for next part of AC/KC */
       __IM unsigned int QK_CO_AV : 1;  /*!< [7..7] Next part of AC/KC is available */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED0 : 24;
     } QK_SR_REG_b;
   };
   __IM unsigned int RESERVED1;
@@ -7671,9 +7671,9 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
       __IM unsigned int QK_ALLOW_START : 1;   /*!< [1..1] Start operation is allowed */
       __IM unsigned int QK_ALLOW_SET_KEY : 1; /*!< [2..2] Set Key operations are allowed */
       __IM unsigned int QK_ALLOW_GET_KEY : 1; /*!< [3..3] Get Key operation is allowed */
-      __IM unsigned int : 3;
+      __IM unsigned int RESERVED0 : 3;
       __IM unsigned int QK_ALLOW_BIST : 1; /*!< [7..7] BIST is allowed to be started */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED1 : 24;
     } QK_AR_REG_b;
   };
   __IM unsigned int RESERVED2[5];
@@ -7718,7 +7718,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
     struct {
       __IM unsigned int qk_ko_index : 4; /*!< [3..0] Key index for the key that is currently
                                output via the Key Output register */
-      __IM unsigned int : 28;
+      __IM unsigned int RESERVED0 : 28;
     } QK_KO_IDX_REG_b;
   };
 
@@ -7737,7 +7737,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
 
     struct {
       __IM unsigned int IF_ERROR : 1; /*!< [0..0] Clears the if_error bit */
-      __IM unsigned int : 31;
+      __IM unsigned int RESERVED0 : 31;
     } QK_IF_SR_C_REG_b;
   };
 
@@ -7748,7 +7748,7 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
     struct {
       __IM unsigned int IF_ERROR : 1; /*!< [0..0] Indicates that an interface error
                                       has occurred                     */
-      __IM unsigned int : 31;
+      __IM unsigned int RESERVED0 : 31;
     } QK_IF_SR_REG_b;
   };
 
@@ -7758,14 +7758,14 @@ typedef struct { /*!< (@ 0x20480600) IID_QK Structure */
     struct {
       __IOM unsigned int QK_BIST_ENABLE : 1; /*!< [0..0] Isolates the iid_quiddikey
                                              module and runs a BIST */
-      __IM unsigned int : 3;
+      __IM unsigned int RESERVED0 : 3;
       __IOM unsigned int QK_BIST_RUNNING : 1; /*!< [4..4] BIST is in progress or
                                               finishing up */
       __IOM unsigned int QK_BIST_ACTIVE : 1;  /*!< [5..5] Indicates that the BIST is
                                               running  */
       __IOM unsigned int QK_BIST_OK : 1;      /*!< [6..6] Indicates that the BIST has passed */
       __IOM unsigned int QK_BIST_ERROR : 1;   /*!< [7..7] Indicates that the BIST has failed */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED1 : 24;
     } QK_TEST_REG_b;
   };
   __IM unsigned int RESERVED5[6];
@@ -7801,7 +7801,7 @@ typedef struct { /*!< (@ 0x20480400) IID_RPINE Structure */
       __IOM unsigned int QK_BIST_ENABLE : 1;  /*!< [0..0] none  */
       __IOM unsigned int AES_BIST_ENABLE : 1; /*!< [1..1] none */
       __IOM unsigned int KH_BIST_ENABLE : 1;  /*!< [2..2] none  */
-      __IM unsigned int : 29;
+      __IM unsigned int RESERVED0 : 29;
     } IID_BIST_CTRL_REG_b;
   };
 
@@ -7820,7 +7820,7 @@ typedef struct { /*!< (@ 0x20480400) IID_RPINE Structure */
       __IOM unsigned int AES_BIST_RUNNING : 1; /*!< [7..7] Indicates that the BIST
                                                is running */
       __IOM unsigned int KH_BIST_STATUS : 1;   /*!< [8..8] none   */
-      __IM unsigned int : 23;
+      __IM unsigned int RESERVED0 : 23;
     } IID_BIST_STATUS_REG_b;
   };
 
@@ -7840,7 +7840,7 @@ typedef struct { /*!< (@ 0x20480400) IID_RPINE Structure */
                                           This is used by KH */
       __IOM unsigned int KH_CLOCK_RATIO : 3;   /*!< [7..5] Indicates the division factor to be
                                   used for generating kh_clk. */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED0 : 24;
     } IID_CTRL_REG_b;
   };
 
@@ -7863,7 +7863,7 @@ typedef struct { /*!< (@ 0x20480400) IID_RPINE Structure */
                                             available from AES   */
       __IOM unsigned int KEY_CODE_DONE : 1; /*!< [5..5] This has to be set after
                                             reading key code */
-      __IM unsigned int : 26;
+      __IM unsigned int RESERVED0 : 26;
     } WKE_CTRL_REG_b;
   };
   __IM unsigned int RESERVED;
@@ -7886,7 +7886,7 @@ typedef struct { /*!< (@ 0x20480400) IID_RPINE Structure */
       __IOM unsigned int OTP_KEY_LOADING : 1;             /*!< [3..3] When set, WKE will compare
                                               the data from AES engine with the
                                               data provided by firmware */
-      __IM unsigned int : 28;
+      __IM unsigned int RESERVED0 : 28;
     } IID_AES_CTRL_REG_b;
   };
 
@@ -7897,7 +7897,7 @@ typedef struct { /*!< (@ 0x20480400) IID_RPINE Structure */
       __IM unsigned int DIN_FIFO_FULL : 1;   /*!< [0..0] Input data fifo full indication */
       __IM unsigned int DOUT_FIFO_EMPTY : 1; /*!< [1..1] Output data fifo empty
                                              indication */
-      __IM unsigned int : 30;
+      __IM unsigned int RESERVED0 : 30;
     } IID_AES_STS_REG_b;
   };
   __IM unsigned int RESERVED1;
@@ -7925,7 +7925,7 @@ typedef struct { /*!< (@ 0x20480400) IID_RPINE Structure */
                                                  when this bit is low */
       __IOM unsigned int WKE_COMPARE_FAIL : 1;         /*!< [7..7] This bit will be set when
                                     authentication data comparison fails */
-      __IM unsigned int : 24;
+      __IM unsigned int RESERVED0 : 24;
     } WKE_STATUS_REG_b;
   };
   __IM unsigned int RESERVED2;
@@ -11768,7 +11768,7 @@ typedef struct { /*!< (@ 0x2404821C) RTC Structure */
       struct {
         __IOM unsigned int PG_EN_CALENDER : 1;        /*!< [0..0] Legacy SDK spelling; alias of PG_EN_CALENDAR */
         __IOM unsigned int ENABLE_CALENDER_COMBI : 1; /*!< [1..1] Legacy SDK spelling; alias of ENABLE_CALENDAR_COMBI */
-        __IM unsigned int : 30;                       /*!< [31..2] Remaining bits; use first struct for named access */
+        __IM unsigned int RESERVED0 : 30;             /*!< [31..2] Remaining bits; use first struct for named access */
       };
     } MCU_CAL_POWERGATE_REG_b;
   };
@@ -15904,7 +15904,8 @@ typedef struct { /*!< (@ 0x24042400) SDC Structure                              
       __IOM unsigned int
         SDC_OPAMP_IN_P_SEL_CH4 : 1; /*!< [11..11] Configuration register for selecting P Input of OPAMP1
                                                       for Channel-4                                                             */
-      unsigned int : 3;
+      __IOM unsigned int
+        RESERVED0 : 3; /*!< [14..12] Reserved                                                         */
       __IOM unsigned int
         RESERVED1 : 17; /*!< [31..15] Reserved                                                         */
     } SDC_AUXOPAMP_CONFIG_2_b;

@@ -686,6 +686,7 @@ static sli_scan_info_t *sli_update_or_create_scan_info_element(const sli_scan_in
 {
   sli_scan_info_t **scan_db_head = sli_get_scan_info_database();
   sli_scan_info_t *element       = NULL;
+  sli_scan_info_t *prev          = NULL;
 
   element = *scan_db_head;
   while (NULL != element) {
@@ -696,8 +697,17 @@ static sli_scan_info_t *sli_update_or_create_scan_info_element(const sli_scan_in
       element->rssi          = info->rssi;
       element->network_type  = info->network_type;
       memcpy(element->ssid, info->ssid, 34);
-      break;
+
+      // Remove the element from its current position so it can be re-inserted in sorted order
+      if (NULL == prev) {
+        *scan_db_head = element->next;
+      } else {
+        prev->next = element->next;
+      }
+      element->next = NULL;
+      return element;
     }
+    prev    = element;
     element = element->next;
   }
 

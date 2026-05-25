@@ -11,6 +11,9 @@ component_root_path: ./components/at_commands_auto_gen
 provides:
   - name: wifi_at_commands
 
+source:
+  - path: wifi_at_commands_default_handlers.c
+
 include:
   - path: .
     file_list:

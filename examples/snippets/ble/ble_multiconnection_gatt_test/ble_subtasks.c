@@ -35,7 +35,7 @@
 #include "rsi_common_apis.h"
 #include "sl_si91x_status.h"
 #include <rsi_ble.h>
-#include "sl_log_helper.h"
+#include "sl_constants.h"
 
 /*=======================================================================*/
 //   ! MACROS

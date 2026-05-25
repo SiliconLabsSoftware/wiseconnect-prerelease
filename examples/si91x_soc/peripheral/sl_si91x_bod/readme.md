@@ -118,6 +118,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
     ![Figure: bod_result_console](resources/readme/bod_result_console.png)
 
+  >**Note**: Voltage will be displayed interms of milli volts i.e for example, 2.7V will be displayed as 2700mV
+
   - When an interrupt occurs, the following behavior can be observed based on the configured threshold value:
 
     - When Blackout is enabled:
