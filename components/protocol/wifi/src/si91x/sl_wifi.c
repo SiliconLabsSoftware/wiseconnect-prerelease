@@ -87,10 +87,6 @@ extern uint32_t sl_si91x_log_host_timesync_address;
 extern bool device_initialized;
 extern sl_wifi_advanced_scan_configuration_t advanced_scan_configuration;
 
-sl_status_t sl_wifi_get_associated_client_list(const void *client_list_buffer,
-                                               uint16_t buffer_length,
-                                               uint32_t timeout);
-
 sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
                          const sl_wifi_device_context_t *device_context,
                          sl_wifi_event_handler_t event_handler)
@@ -337,14 +333,6 @@ sl_status_t sl_wifi_get_pairwise_master_key(sl_wifi_interface_t interface,
                                             uint8_t *pairwise_master_key)
 {
   return sli_wifi_get_pairwise_master_key(interface, type, ssid, pre_shared_key, pairwise_master_key);
-}
-
-sl_status_t sl_wifi_get_associated_client_list(const void *client_list_buffer, uint16_t buffer_length, uint32_t timeout)
-{
-  UNUSED_PARAMETER(client_list_buffer);
-  UNUSED_PARAMETER(buffer_length);
-  UNUSED_PARAMETER(timeout);
-  return SL_STATUS_NOT_SUPPORTED;
 }
 
 sl_status_t sl_wifi_disconnect_ap_client(sl_wifi_interface_t interface,
@@ -784,6 +772,56 @@ sl_status_t sl_wifi_start_wps_v2(sl_wifi_interface_t interface,
                                  sl_wifi_wps_response_t *response)
 {
   return sli_wifi_start_wps_v2(interface, config, response);
+}
+
+sl_status_t sl_wifi_wps_get_remaining_credentials(sl_wifi_interface_t interface,
+                                                  sl_wifi_wps_response_t *credentials,
+                                                  uint8_t credential_count)
+{
+  SL_VERIFY_POINTER_OR_RETURN(credentials, SL_STATUS_INVALID_PARAMETER);
+
+  if ((credential_count == 0U) || (credential_count > (SLI_WIFI_MAX_WPS_CREDENTIALS - 1U))) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if ((interface & SL_WIFI_CLIENT_INTERFACE) == 0) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  if (!sli_wifi_is_interface_up(interface)) {
+    return SL_STATUS_WIFI_INTERFACE_NOT_UP;
+  }
+
+  sl_wifi_buffer_t *buffer              = NULL;
+  const sl_wifi_system_packet_t *packet = NULL;
+  sl_status_t status;
+  const size_t payload_size = (size_t)credential_count * sizeof(sl_wifi_wps_response_t);
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_WPS_EXTENDED_CREDENTIALS,
+                                 SLI_WIFI_WLAN_CMD,
+                                 NULL,
+                                 0,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_WPS_EXTENDED_CREDENTIALS_WAIT_TIME),
+                                 NULL,
+                                 (void **)&buffer);
+  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
+    sli_buffer_manager_free_buffer(buffer);
+  }
+  VERIFY_STATUS_AND_RETURN(status);
+
+  packet = (const sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
+  if ((packet == NULL) || (packet->length < payload_size)) {
+    sli_buffer_manager_free_buffer(buffer);
+    return SL_STATUS_FAIL;
+  }
+
+  memcpy(credentials, packet->data, payload_size);
+  sli_buffer_manager_free_buffer(buffer);
+  return SL_STATUS_OK;
 }
 
 sl_status_t sl_wifi_set_roam_configuration(sl_wifi_interface_t interface,

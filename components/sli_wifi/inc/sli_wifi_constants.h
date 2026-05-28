@@ -92,8 +92,12 @@
 
 #define SLI_WIFI_SET_WPS_METHOD_PIN   1
 #define SLI_WIFI_SET_WPS_GENERATE_PIN 1
-#define SLI_WIFI_TX_PENDING_FLAG(x)   (1 << (x))
-#define SLI_WIFI_RESPONSE_FLAG(x)     (1 << (SI91X_CMD_MAX + x))
+
+/// Maximum WPS credential records per JOIN response session (tri-band). Must match NWP / supplicant configuration.
+#define SLI_WIFI_MAX_WPS_CREDENTIALS 3
+
+#define SLI_WIFI_TX_PENDING_FLAG(x) (1 << (x))
+#define SLI_WIFI_RESPONSE_FLAG(x)   (1 << (SI91X_CMD_MAX + x))
 
 /// Flags for IP address availability used in sli_wifi_ip_address_info_t structure.
 #define SLI_WIFI_IPV4_AVAILABLE (1U << 0) ///< Bit 0: IPv4 address is available
@@ -259,6 +263,7 @@ typedef enum {
   SLI_WIFI_COMMON_REQ_FEATURE_FRAME         = 0xC8, ///< Feature Frame
   SLI_WIFI_REQ_FILTER_BCAST_PACKETS         = 0xC9, ///< Filter Broadcast Packets
   SLI_WIFI_REQ_WPS_METHOD                   = 0x72, ///< WPS Method
+  SLI_WIFI_REQ_WPS_EXTENDED_CREDENTIALS     = 0x95, ///< Fetch additional WPS credential records
   SLI_WIFI_REQ_GAIN_TABLE                   = 0x47, ///< Gain Table
   SLI_WIFI_REQ_TIMEOUT                      = 0xEA, ///< Timeout
   SLI_WIFI_REQ_SET_REGION_AP                = 0xBD, ///< Set Region AP
@@ -394,6 +399,7 @@ typedef enum {
   SLI_WIFI_RSP_MODULE_STATE                 = 0x70,
   SLI_WIFI_RSP_TWT_ASYNC                    = 0x71,
   SLI_WIFI_RSP_WPS_METHOD                   = 0x72, ///< WPS Method
+  SLI_WIFI_RSP_WPS_EXTENDED_CREDENTIALS     = 0x95, ///< Fetch additional WPS credential records
   SLI_WIFI_RSP_GAIN_TABLE                   = 0x47, ///< Gain Table
   SLI_WIFI_RSP_TIMEOUT                      = 0xEA, ///< Timeout
   SLI_WIFI_RSP_11AX_PARAMS                  = 0xFF, ///< 11AX Parameters
@@ -778,6 +784,9 @@ typedef enum {
   ((SLI_WIFI_MANAGEMENT_COMMANDS_BASE_VALUE * SL_WIFI_MANAGEMENT_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for WPS response command
 #define SLI_WIFI_RSP_WPS_METHOD_WAIT_TIME \
+  ((SLI_WIFI_MANAGEMENT_COMMANDS_BASE_VALUE * SL_WIFI_MANAGEMENT_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+/// Timeout value for WPS extended-credentials response (same scale as WPS method)
+#define SLI_WIFI_RSP_WPS_EXTENDED_CREDENTIALS_WAIT_TIME \
   ((SLI_WIFI_MANAGEMENT_COMMANDS_BASE_VALUE * SL_WIFI_MANAGEMENT_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for firmware upgrade response command
 #define SLI_WIFI_RSP_FWUP_WAIT_TIME \

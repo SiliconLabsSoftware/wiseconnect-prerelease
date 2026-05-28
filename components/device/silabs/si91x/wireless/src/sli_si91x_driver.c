@@ -496,21 +496,28 @@ static sl_status_t sli_si91x_check_thread_priority_order(void)
   // check the order of priorties of the Event engine, HAL and Command engine
   // order is Event engine > HAL > Command engine
   if (event_engine_thread_priority > hal_thread_priority && hal_thread_priority > command_engine_thread_priority) {
+    // clang-format off
     SL_DEBUG_LOG_V2(INFO,
-                    ("\r\nevent_engine_thread_priority: %" PRIu32 ", hal_thread_priority: %" PRIu32
-                     ", command_engine_thread_priority: %" PRIu32 "\r\nThread priority order is correct \r\n"),
+                    "\r\nevent_engine_thread_priority: %" PRIu32
+                    ", hal_thread_priority: %" PRIu32
+                    ", command_engine_thread_priority: %" PRIu32
+                    "\r\nThread priority order is correct \r\n",
                     (uint32_t)event_engine_thread_priority,
                     (uint32_t)hal_thread_priority,
                     (uint32_t)command_engine_thread_priority);
+    // clang-format on
     return SL_STATUS_OK;
   }
-  SL_DEBUG_LOG_V2(ERROR,
-                  ("\r\nevent_engine_thread_priority: %" PRIu32 ", hal_thread_priority: %" PRIu32
-                   ", command_engine_thread_priority: %" PRIu32 "\r\n"
-                   "Expected order is Event engine > HAL > Command engine\r\n"),
-                  (uint32_t)event_engine_thread_priority,
-                  (uint32_t)hal_thread_priority,
-                  (uint32_t)command_engine_thread_priority);
+  // clang-format off
+    SL_DEBUG_LOG_V2(INFO,
+                    "\r\nevent_engine_thread_priority: %" PRIu32
+                    ", hal_thread_priority: %" PRIu32
+                    ", command_engine_thread_priority: %" PRIu32
+                    "Expected order is Event engine > HAL > Command engine\r\n",
+                    (uint32_t)event_engine_thread_priority,
+                    (uint32_t)hal_thread_priority,
+                    (uint32_t)command_engine_thread_priority);
+  // clang-format on
 
   return SL_STATUS_INVALID_CONFIGURATION;
 }

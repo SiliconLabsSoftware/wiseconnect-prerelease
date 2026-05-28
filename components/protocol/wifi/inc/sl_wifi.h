@@ -911,45 +911,6 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
 
 /***************************************************************************/ /**
  * @brief
- *     Start the Wi-Fi 5 (802.11ac) transmit test.
- *
- * @details
- *     This function starts the transmit test for Wi-Fi 5 (802.11ac) using the provided
- *     common transmit test configuration, VHT-specific PER parameters, and an optional
- *     user-defined payload.
- *
- *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
- *
- * @pre Pre-conditions:
- * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
- * @param[in] tx_test_info
- *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
- * @param[in] per_params
- *     Pointer to @ref sl_wifi_11ac_per_params_t structure containing 802.11ac (VHT) specific PER parameters.
- * @param[in] payload
- *     Pointer to user-defined payload data. Optional argument, can be NULL.
- * @param[in] payload_length
- *     Length of the user-defined payload in bytes. This value must be less than or equal to
- *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
- *
- * @return
- *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
- *
- * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
- *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
- *             - Stop Continuous mode
- *             - Start Continuous Wave mode
- * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
- * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
- * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
- ******************************************************************************/
-sl_status_t sl_wifi_transmit_test_start_11ac(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                             const sl_wifi_11ac_per_params_t *per_params,
-                                             const uint8_t *payload,
-                                             uint16_t payload_length);
-
-/***************************************************************************/ /**
- * @brief
  *     Start the Wi-Fi 6/6E (802.11ax) transmit test.
  *
  * @details
@@ -984,45 +945,6 @@ sl_status_t sl_wifi_transmit_test_start_11ac(const sl_wifi_transmitter_test_base
  ******************************************************************************/
 sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
                                              const sl_wifi_11ax_per_params_t *per_params,
-                                             const uint8_t *payload,
-                                             uint16_t payload_length);
-
-/***************************************************************************/ /**
- * @brief
- *     Start the Wi-Fi 7 (802.11be) transmit test.
- *
- * @details
- *     This function starts the transmit test for Wi-Fi 7 (802.11be) using the provided
- *     common transmit test configuration, EHT-specific PER parameters, and an optional
- *     user-defined payload.
- *
- *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
- *
- * @pre Pre-conditions:
- * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
- * @param[in] tx_test_info
- *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
- * @param[in] per_params
- *     Pointer to @ref sl_wifi_11be_per_params_t structure containing 802.11be (EHT) specific PER parameters.
- * @param[in] payload
- *     Pointer to user-defined payload data. Optional argument, can be NULL.
- * @param[in] payload_length
- *     Length of the user-defined payload in bytes. This value must be less than or equal to
- *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
- *
- * @return
- *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
- *
- * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
- *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
- *             - Stop Continuous mode
- *             - Start Continuous Wave mode
- * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
- * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
- * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
- ******************************************************************************/
-sl_status_t sl_wifi_transmit_test_start_11be(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
-                                             const sl_wifi_11be_per_params_t *per_params,
                                              const uint8_t *payload,
                                              uint16_t payload_length);
 
@@ -1836,22 +1758,6 @@ sl_status_t sl_wifi_reconfigure_ap(sl_wifi_interface_t interface, sl_wifi_ap_rec
 
 /***************************************************************************/ /**
  * @brief
- *   Set the configuration of a running Wi-Fi AP.
- *   If the new configuration modifies vital settings such as SSID or security, the AP will be stopped and restarted automatically.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @param[in] configuration
- *   Wi-Fi AP configuration. See @ref sl_wifi_ap_configuration_t
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note
- *   This API is not yet implemented.
- ******************************************************************************/
-sl_status_t sl_wifi_set_ap_configuration(sl_wifi_interface_t interface,
-                                         const sl_wifi_ap_configuration_t *configuration);
-
-/***************************************************************************/ /**
- * @brief
  *   Get the configuration of a Wi-Fi AP interface.
  * @pre Pre-conditions:
  * - 
@@ -2082,67 +1988,6 @@ sl_status_t sl_wifi_get_performance_profile_v2(sl_wifi_performance_profile_v2_t 
 
 /** @} */
 
-// "Monitor Mode" functions
-
-/***************************************************************************/ /**
- * @brief
- *   Enable monitor (promiscuous) mode on the Wi-Fi device.
- *   In this mode, all types of Wi-Fi frames will be forwarded to the host.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note
- *   This API is not yet implemented.
- ******************************************************************************/
-sl_status_t sl_wifi_enable_monitor_mode(sl_wifi_interface_t interface);
-
-/***************************************************************************/ /**
- * @brief
- *   Disable monitor mode on the Wi-Fi interface.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note
- *   This API is not yet implemented.
- ******************************************************************************/
-sl_status_t sl_wifi_disable_monitor_mode(sl_wifi_interface_t interface);
-
-// P2P functions
-
-/***************************************************************************/ /**
- * @brief
- *   Start Wi-Fi direct discovery.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @param[in] configuration
- *   P2P configuration as identified by @ref sl_wifi_p2p_configuration_t
- * @param[in] credential_id
- *   Credential ID as identified by @ref sl_wifi_credential_id_t
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note
- *   This API is not yet implemented.
- ******************************************************************************/
-sl_status_t sl_wifi_start_p2p_discovery(sl_wifi_interface_t interface,
-                                        const sl_wifi_p2p_configuration_t *configuration,
-                                        sl_wifi_credential_id_t credential_id);
-
-/***************************************************************************/ /**
- * @brief
- *   Start Wi-Fi direct connection.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @param[in] configuration
- *   P2P configuration as identified by @ref sl_wifi_p2p_configuration_t
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note
- *   This API is not yet implemented.
- ******************************************************************************/
-sl_status_t sl_wifi_p2p_connect(sl_wifi_interface_t interface, const sl_wifi_p2p_configuration_t *configuration);
-
 /** \addtogroup WIFI_WPS_API Wi-Fi Protected Setup
   * \ingroup SL_WIFI_FUNCTIONS
   * @{ */
@@ -2198,6 +2043,9 @@ sl_status_t sl_wifi_start_wps(sl_wifi_interface_t interface,
  * @param[out] response
  *   WPS response object [sl_wifi_wps_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-wps-response-t)
  *   The status field in this structure will be updated with error codes defined in [sl_wifi_wps_resp_status_error_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl_wifi_wps_resp_status_error_code_t).
+ *   The remaining_credentials_count field is the number of additional WPS profiles for this exchange (not including the primary
+ *   credential in this structure). When remaining_credentials_count is greater than zero, call @ref sl_wifi_wps_get_remaining_credentials
+ *   on the same client interface with credential_count equal to remaining_credentials_count to retrieve those profiles.
  *
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
@@ -2210,6 +2058,33 @@ sl_status_t sl_wifi_start_wps(sl_wifi_interface_t interface,
 sl_status_t sl_wifi_start_wps_v2(sl_wifi_interface_t interface,
                                  sl_wifi_wps_config_t config,
                                  sl_wifi_wps_response_t *response);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Retrieves additional Wi-Fi Protected Setup (WPS) credential profiles from the NWP after
+ *   @ref sl_wifi_start_wps_v2 has returned the primary profile in its response argument.
+ *
+ * @pre Pre-conditions:
+ * - @ref sl_wifi_init should be called before this API.
+ * - @ref sl_wifi_start_wps_v2 should have completed successfully on the same client interface when additional
+ *   credentials are present (@ref sl_wifi_wps_response_t::remaining_credentials_count greater than zero).
+ *
+ * @param[in] interface
+ *   Client Wi-Fi interface; same as for @ref sl_wifi_start_wps_v2. See https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-interface-t
+ *
+ * @param[out] credentials
+ *   Caller array of @ref sl_wifi_wps_response_t; credential_count entries are written on success.
+ *
+ * @param[in] credential_count
+ *   Must match remaining_credentials_count from the primary @ref sl_wifi_wps_response_t from @ref sl_wifi_start_wps_v2. Non-zero;
+ *   at most two additional profiles per WPS session (tri-band cap minus the primary profile).
+ *
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sl_wifi_wps_get_remaining_credentials(sl_wifi_interface_t interface,
+                                                  sl_wifi_wps_response_t *credentials,
+                                                  uint8_t credential_count);
 
 /***************************************************************************/ /**
  * @brief
@@ -2293,18 +2168,6 @@ sl_status_t sl_wifi_start_statistic_report(sl_wifi_interface_t interface, sl_wif
 sl_status_t sl_wifi_stop_statistic_report(sl_wifi_interface_t interface);
 
 /** @} */
-
-/***************************************************************************/ /**
- * @brief
- *   Return the status of the Wi-Fi device.
- * @param[out] wifi_status
- *   @ref sl_wifi_status_t object that will contain the Wi-Fi status.
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note
- *   This API is not yet implemented.
- ******************************************************************************/
-sl_status_t sl_wifi_get_status(sl_wifi_status_t *wifi_status);
 
 /** \addtogroup WIFI_TRANSCEIVER_API Wi-Fi Transceiver
   * \ingroup SL_WIFI_FUNCTIONS
@@ -2577,151 +2440,6 @@ sl_status_t sl_wifi_send_transceiver_data(sl_wifi_interface_t interface,
                                           const uint8_t *payload,
                                           uint16_t payload_len);
 
-/**
- * @brief
- *   Start transmitting Continuous Wave (CW) tones on the specified Wi-Fi interface.
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
- * @param[in] cw_tone_config
- *   Pointer to @ref sl_wifi_cw_tone_config_t structure containing CW tone configuration.
- * @return
- *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
- *   The following status codes are returned by this API:
- *     - SL_STATUS_NOT_INITIALIZED
- *     - SL_STATUS_INVALID_PARAMETER
- *     - SL_STATUS_WIFI_INTERFACE_NOT_UP
- *     - SL_STATUS_INVALID_MODE
- * @note
- *   This API is supported only in PER mode.
- */
-sl_status_t sl_wifi_transmit_cw_tone_start(sl_wifi_interface_t interface, sl_wifi_cw_tone_config_t cw_tone_config);
-
-/***************************************************************************/ /**
- * @brief
- *   Stop transmitting Continuous Wave (CW) tones on the specified Wi-Fi interface.
- *
- * @details
- *   This function stops the ongoing CW tone transmission on the given Wi-Fi interface.
- *   It is typically used to terminate a CW tone test initiated using the @ref sl_wifi_transmit_cw_tone_start API.
- *
- * @pre Pre-conditions:
- *   - @ref sl_wifi_transmit_cw_tone_start should be called before this API.
- *
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
- * @return
- *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
- *   The following status codes are returned by this API:
- *     - SL_STATUS_NOT_INITIALIZED
- *     - SL_STATUS_INVALID_PARAMETER
- *     - SL_STATUS_WIFI_INTERFACE_NOT_UP
- *     - SL_STATUS_INVALID_MODE
- * @note
- *   This API is supported only in PER mode.
- ******************************************************************************/
-sl_status_t sl_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface);
-
-/**
- * @brief
- *   Set the transmit power for the Wi-Fi interface (test/PER mode).
- *
- * @details
- *   This function sets the transmit power for the specified Wi-Fi interface.
- *   The value is in decidBm (tenths of dBm), e.g. 210 = 21.0 dBm, -150 = -15.0 dBm.
- *
- * @param[in] txPower
- *   Transmit power in decidBm (tenths of dBm). Valid range is -150 to 210 decidBm
- *   (-15.0 dBm to 21.0 dBm).
- *
- * @return
- *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
- *   The following status codes are returned by this API:
- *   - SL_STATUS_NOT_INITIALIZED
- *   - SL_STATUS_INVALID_PARAMETER
- *   - SL_STATUS_WIFI_INTERFACE_NOT_UP
- *   - SL_STATUS_INVALID_MODE
- *  @note
- *    This API is supported only in PER mode.
- */
-sl_status_t sl_wifi_set_test_tx_power(int16_t txPower);
-
-/**
- * @brief
- *  Set the ctune configuration for the Wi-Fi interface.
- * 
- * @details
- *  This function sets the ctune configuration for the specified Wi-Fi interface.
- * 
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
- * @param[in] xo_ctune
- *   The ctune data to be read, as identified by @ref sl_wifi_response_get_ctune_data_t.
- * @param[in] ctune_data
- *   The ctune data to be set, as a 32-bit unsigned integer.
- * 
- * @return
- *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
- *   The following status codes are returned by this API: 
- *  - SL_STATUS_NOT_INITIALIZED
- *  - SL_STATUS_INVALID_PARAMETER
- *  - SL_STATUS_WIFI_INTERFACE_NOT_UP
- *  - SL_STATUS_INVALID_MODE
- * 
- * @note
- *   This API is supported only in PER mode.
- */
-sl_status_t sl_wifi_config_xo_ctune(sl_wifi_interface_t interface,
-                                    sl_wifi_response_get_ctune_data_t *xo_ctune,
-                                    uint32_t ctune_data);
-/**
- * @brief
- *  Read the ctune data from the Wi-Fi interface.
- * @details
- *  This function reads the ctune data from the specified Wi-Fi interface.
- * 
- * @param[in] interface
- *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
- * @param[in] get_xo_ctune
- *    The ctune data to be set, as identified by @ref sl_wifi_response_get_ctune_data_t.
- * @param[out] ctune_data
- *   Pointer to an array of two 32-bit unsigned integers where the ctune data will be stored.
- *  
- * @return
- *  sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
- *  The following status codes are returned by this API:
- *   - SL_STATUS_NOT_INITIALIZED
- *   - SL_STATUS_INVALID_PARAMETER
- *   - SL_STATUS_WIFI_INTERFACE_NOT_UP
- *   - SL_STATUS_INVALID_MODE
- * 
- * @note
- *   This API is supported only in PER mode.
- */
-sl_status_t sl_wifi_read_ctune(sl_wifi_interface_t interface,
-                               sl_wifi_response_get_ctune_data_t *get_xo_ctune,
-                               const uint32_t *ctune_data);
-/**
- * @brief
- *   Stop receiving frames on the specified Wi-Fi interface.
- * 
- * @details
- *   This function stops the reception of frames on the specified Wi-Fi interface.
- * @param[in] interface
- *  Wi-Fi interface as identified by @ref sl_wifi_interface_t.
- * 
- * @return
- *  sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
- *  The following status codes are returned by this API:
- *  - SL_STATUS_NOT_INITIALIZED
- *  - SL_STATUS_INVALID_PARAMETER
- *  - SL_STATUS_WIFI_INTERFACE_NOT_UP
- *  - SL_STATUS_INVALID_MODE
- * 
- * @note
- *   This API is supported only in PER mode.
- */
-sl_status_t sl_wifi_stop_rx(sl_wifi_interface_t interface);
-
 /***************************************************************************/ /**
  * @brief
  *   Add a vendor-specific IE to Wi-Fi management frames.
@@ -2823,3 +2541,329 @@ sl_status_t sl_wifi_set_join_configuration(sl_wifi_interface_t interface, uint8_
  *******************************************************************************/
 sl_status_t sl_wifi_get_join_configuration(sl_wifi_interface_t interface, uint8_t *join_feature_bitmap);
 /** @} */
+
+// "Monitor Mode" functions
+
+/***************************************************************************/ /**
+ * @brief
+ *   Enable monitor (promiscuous) mode on the Wi-Fi device.
+ *   In this mode, all types of Wi-Fi frames will be forwarded to the host.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is not yet implemented.
+ ******************************************************************************/
+sl_status_t sl_wifi_enable_monitor_mode(sl_wifi_interface_t interface);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Disable monitor mode on the Wi-Fi interface.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is not yet implemented.
+ ******************************************************************************/
+sl_status_t sl_wifi_disable_monitor_mode(sl_wifi_interface_t interface);
+
+// P2P functions
+
+/***************************************************************************/ /**
+ * @brief
+ *   Start Wi-Fi direct discovery.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] configuration
+ *   P2P configuration as identified by @ref sl_wifi_p2p_configuration_t
+ * @param[in] credential_id
+ *   Credential ID as identified by @ref sl_wifi_credential_id_t
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is not yet implemented.
+ ******************************************************************************/
+sl_status_t sl_wifi_start_p2p_discovery(sl_wifi_interface_t interface,
+                                        const sl_wifi_p2p_configuration_t *configuration,
+                                        sl_wifi_credential_id_t credential_id);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Start Wi-Fi direct connection.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] configuration
+ *   P2P configuration as identified by @ref sl_wifi_p2p_configuration_t
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is not yet implemented.
+ ******************************************************************************/
+sl_status_t sl_wifi_p2p_connect(sl_wifi_interface_t interface, const sl_wifi_p2p_configuration_t *configuration);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Return the status of the Wi-Fi device.
+ * @param[out] wifi_status
+ *   @ref sl_wifi_status_t object that will contain the Wi-Fi status.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is not yet implemented.
+ ******************************************************************************/
+sl_status_t sl_wifi_get_status(sl_wifi_status_t *wifi_status);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Set the configuration of a running Wi-Fi AP.
+ *   If the new configuration modifies vital settings such as SSID or security, the AP will be stopped and restarted automatically.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] configuration
+ *   Wi-Fi AP configuration. See @ref sl_wifi_ap_configuration_t
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is currently not supported in SiWx91x devices.
+ ******************************************************************************/
+sl_status_t sl_wifi_set_ap_configuration(sl_wifi_interface_t interface,
+                                         const sl_wifi_ap_configuration_t *configuration);
+
+/**
+ * @brief
+ *   Start transmitting Continuous Wave (CW) tones on the specified Wi-Fi interface.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ * @param[in] cw_tone_config
+ *   Pointer to @ref sl_wifi_cw_tone_config_t structure containing CW tone configuration.
+ * @return
+ *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
+ *   The following status codes are returned by this API:
+ *     - SL_STATUS_NOT_INITIALIZED
+ *     - SL_STATUS_INVALID_PARAMETER
+ *     - SL_STATUS_WIFI_INTERFACE_NOT_UP
+ *     - SL_STATUS_INVALID_MODE
+ * @note
+ *   This API is supported only in PER mode.
+ * @note
+ *   This API is currently not supported in SiWx91x devices.
+ */
+sl_status_t sl_wifi_transmit_cw_tone_start(sl_wifi_interface_t interface, sl_wifi_cw_tone_config_t cw_tone_config);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Stop transmitting Continuous Wave (CW) tones on the specified Wi-Fi interface.
+ *
+ * @details
+ *   This function stops the ongoing CW tone transmission on the given Wi-Fi interface.
+ *   It is typically used to terminate a CW tone test initiated using the @ref sl_wifi_transmit_cw_tone_start API.
+ *
+ * @pre Pre-conditions:
+ *   - @ref sl_wifi_transmit_cw_tone_start should be called before this API.
+ *
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ * @return
+ *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
+ *   The following status codes are returned by this API:
+ *     - SL_STATUS_NOT_INITIALIZED
+ *     - SL_STATUS_INVALID_PARAMETER
+ *     - SL_STATUS_WIFI_INTERFACE_NOT_UP
+ *     - SL_STATUS_INVALID_MODE
+ * @note
+ *   This API is supported only in PER mode.
+ * @note
+ *   This API is currently not supported in SiWx91x devices.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface);
+
+/**
+ * @brief
+ *   Set the transmit power for the Wi-Fi interface (test/PER mode).
+ *
+ * @details
+ *   This function sets the transmit power for the specified Wi-Fi interface.
+ *   The value is in decidBm (tenths of dBm), e.g. 210 = 21.0 dBm, -150 = -15.0 dBm.
+ *
+ * @param[in] txPower
+ *   Transmit power in decidBm (tenths of dBm). Valid range is -150 to 210 decidBm
+ *   (-15.0 dBm to 21.0 dBm).
+ *
+ * @return
+ *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
+ *   The following status codes are returned by this API:
+ *   - SL_STATUS_NOT_INITIALIZED
+ *   - SL_STATUS_INVALID_PARAMETER
+ *   - SL_STATUS_WIFI_INTERFACE_NOT_UP
+ *   - SL_STATUS_INVALID_MODE
+ *  @note
+ *    This API is supported only in PER mode.
+ *  @note
+ *    This API is currently not supported in SiWx91x devices.
+ */
+sl_status_t sl_wifi_set_test_tx_power(int16_t txPower);
+
+/**
+ * @brief
+ *  Set the ctune configuration for the Wi-Fi interface.
+ * 
+ * @details
+ *  This function sets the ctune configuration for the specified Wi-Fi interface.
+ * 
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ * @param[in] xo_ctune
+ *   The ctune data to be read, as identified by @ref sl_wifi_response_get_ctune_data_t.
+ * @param[in] ctune_data
+ *   The ctune data to be set, as a 32-bit unsigned integer.
+ * 
+ * @return
+ *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
+ *   The following status codes are returned by this API: 
+ *  - SL_STATUS_NOT_INITIALIZED
+ *  - SL_STATUS_INVALID_PARAMETER
+ *  - SL_STATUS_WIFI_INTERFACE_NOT_UP
+ *  - SL_STATUS_INVALID_MODE
+ * 
+ * @note
+ *   This API is supported only in PER mode.
+ * @note
+ *   This API is currently not supported in SiWx91x devices.
+ */
+sl_status_t sl_wifi_config_xo_ctune(sl_wifi_interface_t interface,
+                                    sl_wifi_response_get_ctune_data_t *xo_ctune,
+                                    uint32_t ctune_data);
+/**
+ * @brief
+ *  Read the ctune data from the Wi-Fi interface.
+ * @details
+ *  This function reads the ctune data from the specified Wi-Fi interface.
+ * 
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ * @param[in] get_xo_ctune
+ *    The ctune data to be set, as identified by @ref sl_wifi_response_get_ctune_data_t.
+ * @param[out] ctune_data
+ *   Pointer to an array of two 32-bit unsigned integers where the ctune data will be stored.
+ *  
+ * @return
+ *  sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
+ *  The following status codes are returned by this API:
+ *   - SL_STATUS_NOT_INITIALIZED
+ *   - SL_STATUS_INVALID_PARAMETER
+ *   - SL_STATUS_WIFI_INTERFACE_NOT_UP
+ *   - SL_STATUS_INVALID_MODE
+ * 
+ * @note
+ *   This API is supported only in PER mode.
+ * @note
+ *   This API is currently not supported in SiWx91x devices.
+ */
+sl_status_t sl_wifi_read_ctune(sl_wifi_interface_t interface,
+                               sl_wifi_response_get_ctune_data_t *get_xo_ctune,
+                               const uint32_t *ctune_data);
+/**
+ * @brief
+ *   Stop receiving frames on the specified Wi-Fi interface.
+ * 
+ * @details
+ *   This function stops the reception of frames on the specified Wi-Fi interface.
+ * @param[in] interface
+ *  Wi-Fi interface as identified by @ref sl_wifi_interface_t.
+ * 
+ * @return
+ *  sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).
+ *  The following status codes are returned by this API:
+ *  - SL_STATUS_NOT_INITIALIZED
+ *  - SL_STATUS_INVALID_PARAMETER
+ *  - SL_STATUS_WIFI_INTERFACE_NOT_UP
+ *  - SL_STATUS_INVALID_MODE
+ * 
+ * @note
+ *   This API is supported only in PER mode.
+ * @note
+ *   This API is currently not supported in SiWx91x devices.
+ */
+sl_status_t sl_wifi_stop_rx(sl_wifi_interface_t interface);
+
+/***************************************************************************/ /**
+ * @brief
+ *     Start the Wi-Fi 5 (802.11ac) transmit test.
+ *
+ * @details
+ *     This function starts the transmit test for Wi-Fi 5 (802.11ac) using the provided
+ *     common transmit test configuration, VHT-specific PER parameters, and an optional
+ *     user-defined payload.
+ *
+ *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
+ *
+ * @pre Pre-conditions:
+ * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
+ * @param[in] tx_test_info
+ *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
+ * @param[in] per_params
+ *     Pointer to @ref sl_wifi_11ac_per_params_t structure containing 802.11ac (VHT) specific PER parameters.
+ * @param[in] payload
+ *     Pointer to user-defined payload data. Optional argument, can be NULL.
+ * @param[in] payload_length
+ *     Length of the user-defined payload in bytes. This value must be less than or equal to
+ *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
+ *
+ * @return
+ *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ *
+ * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
+ *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+ *             - Stop Continuous mode
+ *             - Start Continuous Wave mode
+ * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
+ * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
+ * @note This API is currently not supported in SiWx91x devices.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_start_11ac(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
+                                             const sl_wifi_11ac_per_params_t *per_params,
+                                             const uint8_t *payload,
+                                             uint16_t payload_length);
+
+/***************************************************************************/ /**
+ * @brief
+ *     Start the Wi-Fi 7 (802.11be) transmit test.
+ *
+ * @details
+ *     This function starts the transmit test for Wi-Fi 7 (802.11be) using the provided
+ *     common transmit test configuration, EHT-specific PER parameters, and an optional
+ *     user-defined payload.
+ *
+ *     This is a blocking API and is only relevant in PER mode (@ref SL_WIFI_TRANSMIT_TEST_MODE).
+ *
+ * @pre Pre-conditions:
+ * - [sl_wifi_init](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init) should be called before this API.
+ * @param[in] tx_test_info
+ *     Pointer to @ref sl_wifi_transmitter_test_base_info_t structure containing the common transmit test configuration.
+ * @param[in] per_params
+ *     Pointer to @ref sl_wifi_11be_per_params_t structure containing 802.11be (EHT) specific PER parameters.
+ * @param[in] payload
+ *     Pointer to user-defined payload data. Optional argument, can be NULL.
+ * @param[in] payload_length
+ *     Length of the user-defined payload in bytes. This value must be less than or equal to
+ *     the length specified in `tx_test_info->length`. Ignored when payload is NULL.
+ *
+ * @return
+ *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ *
+ * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
+ *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+ *             - Stop Continuous mode
+ *             - Start Continuous Wave mode
+ * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.
+ * @note This API must only be called in SL_WIFI_TRANSMIT_TEST_MODE mode.
+ * @note On SiWx91x devices, user-defined payload is not supported for this API; use a NULL payload pointer and payload length zero.
+ * @note This API is currently not supported in SiWx91x devices.
+ ******************************************************************************/
+sl_status_t sl_wifi_transmit_test_start_11be(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
+                                             const sl_wifi_11be_per_params_t *per_params,
+                                             const uint8_t *payload,
+                                             uint16_t payload_length);

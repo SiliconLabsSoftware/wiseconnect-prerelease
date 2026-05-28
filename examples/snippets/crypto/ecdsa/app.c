@@ -265,8 +265,7 @@ sl_status_t ecdsa_verify_message(void)
   config.key_config.b0.key_size = 0;
   config.key_config.b0.key_slot = 0;
   config.key_config.b0.reserved = 0;
-
-  status = sl_si91x_ecdsa(&config, verify_output);
+  status                        = sl_si91x_ecdsa(&config, verify_output);
   if (status != SL_STATUS_OK || *verify_output != 1) {
     printf("\r\nECDSA signature verification failed, Error Code : 0x%X\r\n", (unsigned int)status);
     return status;

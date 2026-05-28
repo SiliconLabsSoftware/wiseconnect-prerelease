@@ -10,9 +10,13 @@ metadata:
   sbom:
     license: Zlib
 root_path: components/device/silabs/si91x/mcu/drivers/service/iostream
+config_file:
+  - path: "config/sl_si91x_iostream_debug_config.h"
 provides:
   - name: iostream_debug_si91x
   - name: iostream_transport
+    allow_multiple: true
+  - name: si91x_iostream_transport
     allow_multiple: true
 requires:
   - name: iostream

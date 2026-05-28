@@ -257,8 +257,8 @@ SECTIONS
 	{% endif %} 
 	__exidx_end = .;
 
-{%- if si91x_platform_core %}
-	.log_fmt :
+{%- if si91x_platform_core and si91x_log_formatted_output_enable %}
+  .log_fmt :
 	{
 		. = ALIGN(4);
 		__log_start__ = .;
@@ -304,17 +304,13 @@ SECTIONS
 		__zero_table_end__ = .;
 	} > rom :tables
 {%- else %}
-	.copy.table :
-	{
-		__copy_table_start__ = .;
-		__copy_table_end__ = .;
-	} > ram
-
-	.zero.table :
-	{
-		__zero_table_start__ = .;
-		__zero_table_end__ = .;
-	} > ram
+	/* No flash: no copy/zero tables. Define start==end symbols outside any output
+	   section so LLD doesn't complain about empty allocatable sections. Startup
+	   code's "if (end > start)" check skips the iteration. */
+	__copy_table_start__ = .;
+	__copy_table_end__ = .;
+	__zero_table_start__ = .;
+	__zero_table_end__ = .;
 {%- endif %}
 
 {%- if not flash_present %}
@@ -646,6 +642,19 @@ SECTIONS
  
 {%- endif %}  /* littlefs_enable */
 {%- endif %}  /* Flash Present */
+
+{%- if si91x_platform_core and not si91x_log_formatted_output_enable %}
+	/* Non-allocatable .log_fmt: placed at the very end of SECTIONS so it does
+	   not disrupt LLD's location counter / PHDR tracking for the allocatable
+	   sections above (notably .copy.table / .zero.table which only carry
+	   linker-generated LONG() content). Excluded from .bin via (INFO). */
+	.log_fmt (INFO) :
+	{
+		__log_start__ = .;
+		*(.log_fmt*)
+		__log_end__ = .;
+	}
+{%- endif %}
 
 	.debug_misc 0 : { *(.debug_*); *(.zdebug_*); }
 

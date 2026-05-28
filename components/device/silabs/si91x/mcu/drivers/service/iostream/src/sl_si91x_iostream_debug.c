@@ -30,6 +30,7 @@
 #include "sli_si91x_iostream_swo_itm_8.h"
 #include "sl_iostream.h"
 #include "sl_si91x_iostream_debug.h"
+#include "sl_si91x_iostream_debug_config.h"
 #include "sl_status.h"
 #include "sl_assert.h"
 #include "sl_si91x_debug_swo.h"
@@ -38,7 +39,10 @@
  ******************************  LOCAL VARIABLES   **********************************
  ******************************************************************************/
 
-static sl_si91x_iostream_swo_itm_8_msg_type_t debug_type = SI91X_DEBUG_PRINTF; //sets the debug type as debug printf
+// Default message type comes from the IO Stream Debug UC config
+// (SL_SI91X_IOSTREAM_DEBUG_MSG_TYPE). It can still be changed at runtime via
+// sl_si91x_iostream_set_debug_type().
+static sl_si91x_iostream_swo_itm_8_msg_type_t debug_type = SL_SI91X_IOSTREAM_DEBUG_MSG_TYPE;
 static uint8_t seq_number                                = 0;
 static sl_iostream_t sl_si91x_iostream_debug;
 sl_iostream_t *sl_si91x_iostream_debug_handle = &sl_si91x_iostream_debug;

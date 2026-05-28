@@ -1,44 +1,39 @@
 #!/usr/bin/env python3
 """
-UART Console - Real-time log parser for sl_log_event_t records.
+Log Console - lightweight real-time decoder for sl_log_event_t records.
 
-This console application receives ``sl_log_event_t`` binary records from a UART port
-and decodes them into human-readable messages (record size is set by ``--max-args``).
+Reads ``sl_log_event_t`` binary records from one of two transports and prints
+them as human-readable lines:
 
-Supports (sources are separate — core 0 never uses the descriptor; core 1 never uses .log_fmt):
-- Core 0: pass `--out` (or auto-search) for `.log_fmt` from the .out/.axf/.elf; MESSAGE column only (EVENT is `-`).
-- Core 1: pass `--descriptor` to a SystemView descriptor .txt. EVENT = debug_id; MESSAGE = rest of the row (no leading numeric id), printf args applied.
+  --source uart   serial port (default)
+  --source rtt    SEGGER J-Link RTT (via pylink-square)
 
-UART records match ``sl_log_event_t`` (``uint8_t`` ``arg_count``). Use ``--max-args N`` to match
-``SL_LOG_CONFIG_ARG`` in firmware (fixed packet size ``8 + 4*N + 4`` bytes). Use ``--variable-packet`` if
-the link sends the compact frame (length ``12 + 4*arg_count``).
+Decoding sources (kept separate by core_id in each record):
+  * core 0  -> format strings come from the ELF .log_fmt section (--out)
+  * core 1  -> format strings come from a SystemView descriptor .txt (--descriptor)
 
-Features:
-- Auto-detection of JLink CDC UART port
-- Auto-search for latest .out in C:\\Users\\surondla\\Logger\\ (recursive) by default
-- Optional flashing (reset -> flash .out -> continue)
-- Real-time log message decoding with timestamps
-- DELTA column: difference between consecutive timestamps (per-core)
-- Color-coded log levels (DEBUG, INFO, WARN, ERROR)
-- Overflow detection and reporting
-- Discard/resync logic to skip extra/misaligned bytes
+Packet layout (size is set at firmware compile time by SL_LOG_CONFIG_ARG):
+  fixed : 8 + 4*N + 4 bytes, where N = --max-args = SL_LOG_CONFIG_ARG.
 
-Usage examples:
-    python log_parser_core.py --out firmware.out --descriptor SYSVIEW_Si917nwp.txt
-    python log_parser_core.py --max-args 6 --out firmware.out --descriptor SYSVIEW_Si917nwp.txt
-    python log_parser_core.py --out firmware.out --descriptor SYSVIEW_Si917nwp.txt --port COM3
+Usage:
+  # UART
+  python Log_script.py --out firmware.out --descriptor SYSVIEW_Si917nwp.txt
+  python Log_script.py --out firmware.out --port COM7 --baud 115200
+
+  # RTT (pip install pylink-square)
+  python Log_script.py --source rtt --out firmware.out
+  python Log_script.py --source rtt --device SiWG917M111M --rtt-channel 0 --rtt-channel2 8 --out firmware.out
 """
 
 import argparse
+import os
+import re
 import struct
 import sys
 import time
-import subprocess
-import os
-import re
-from pathlib import Path
-from typing import Dict, Optional, List, Tuple, Any, Sequence
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 try:
     from elftools.elf.elffile import ELFFile
@@ -53,7 +48,13 @@ except ImportError:
     print("ERROR: pyserial is required. Install with: pip install pyserial")
     sys.exit(1)
 
-# Try to import colorama for colored output (optional)
+try:
+    import pylink  # type: ignore
+    PYLINK_AVAILABLE = True
+except ImportError:
+    pylink = None  # type: ignore
+    PYLINK_AVAILABLE = False
+
 try:
     from colorama import init, Fore, Style
     init(autoreset=True)
@@ -62,19 +63,10 @@ except ImportError:
     COLORS_AVAILABLE = False
 
 
-# Upper bound for --max-args (argparse); must match firmware SL_LOG_CONFIG_ARG
 SL_LOG_CONFIG_ARG_HARD_MAX = 32
-
-# Core 1: debug_id in EVENT; MESSAGE = descriptor row without leading numeric event_id
-EVENT_COLUMN_WIDTH = 48
-
-
-def record_size_fixed(max_args: int) -> int:
-    """Packed sl_log_event_t: II + max_args×I + BBBB (uint8 arg_count + core + flags + version)."""
-    return 8 + 4 * max_args + 4
+EVENT_COLUMN_WIDTH = 36
 
 LEVEL_MAP = {1: "DEBUG", 2: "INFO", 3: "WARN", 4: "ERROR"}
-
 LEVEL_COLORS = {
     "DEBUG": Fore.CYAN if COLORS_AVAILABLE else "",
     "INFO": Fore.GREEN if COLORS_AVAILABLE else "",
@@ -88,41 +80,39 @@ RESET_COLOR = Style.RESET_ALL if COLORS_AVAILABLE else ""
 # -------------------------------------------------------------------------
 # Console UI helpers
 # -------------------------------------------------------------------------
-def print_banner():
-    banner = """
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                         UART LOG CONSOLE                                     ║
-║                    Real-time Log Message Decoder                             ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-"""
-    print(banner)
+def print_banner() -> None:
+    print(
+        "\n+================================================================+\n"
+        "|                         LOG CONSOLE                            |\n"
+        "|              Real-time sl_log_event_t decoder                  |\n"
+        "+================================================================+\n"
+    )
 
 
 def print_config(
-    port: str,
-    baud: int,
+    source: str,
+    transport_desc: str,
     out_file: str,
     fmt_count: int,
     descriptor_path: Optional[str],
-    descriptor_id_base: int = 0,
-):
-    print("┌─ Configuration ─────────────────────────────────────────────────────────────┐")
-    print(f"│  Serial Port  : {port:<60} │")
-    print(f"│  Baud Rate    : {baud:<60} │")
-    print(f"│  OUT File     : {Path(out_file).name if out_file else 'None':<60} │")
-    print(f"│  Format Strs  : {fmt_count:<60} │")
-    print(f"│  Core1 descr. : {Path(descriptor_path).name if descriptor_path else 'None':<60} │")
-    print(f"│  Descr. ID base: {descriptor_id_base:<59} │")
-    print("└──────────────────────────────────────────────────────────────────────────────┘")
-    print()
-    print("Press Ctrl+C to stop the console.\n")
-    sep_w = 132
-    print("─" * sep_w)
+    descriptor_id_base: int,
+) -> None:
+    print("+- Configuration ------------------------------------------------+")
+    print(f"|  Source       : {source.upper():<46} |")
+    print(f"|  Transport    : {transport_desc:<46} |")
+    print(f"|  OUT File     : {(Path(out_file).name if out_file else 'None'):<46} |")
+    print(f"|  Format Strs  : {fmt_count:<46} |")
+    print(f"|  Core1 descr. : {(Path(descriptor_path).name if descriptor_path else 'None'):<46} |")
+    print(f"|  Descr. ID base: {descriptor_id_base:<45} |")
+    print("+----------------------------------------------------------------+\n")
+    print("Press Ctrl+C to stop.\n")
+    sep_w = 12 + 1 + 7 + 1 + 6 + 1 + 10 + 1 + 12 + 1 + EVENT_COLUMN_WIDTH + 1 + 30
+    print("-" * sep_w)
     print(
-        f"{'TIME':<12} {'LEVEL':<8} {'CORE':<6} {'TS':<12} {'DELTA':<12} "
+        f"{'TIME':<12} {'LEVEL':<7} {'CORE':<6} {'TS':>10} {'DELTA':>12} "
         f"{'EVENT':<{EVENT_COLUMN_WIDTH}} MESSAGE"
     )
-    print("─" * sep_w)
+    print("-" * sep_w)
 
 
 def get_current_time() -> str:
@@ -133,44 +123,15 @@ def get_current_time() -> str:
 def colorize(text: str, level: str) -> str:
     if not COLORS_AVAILABLE:
         return text
-    color = LEVEL_COLORS.get(level, "")
-    return f"{color}{text}{RESET_COLOR}"
+    return f"{LEVEL_COLORS.get(level, '')}{text}{RESET_COLOR}"
 
 
 def format_event_column(event: Optional[str], width: int = EVENT_COLUMN_WIDTH) -> str:
-    """EVENT column: core 1 symbolic name; '-' for core 0 / overflow."""
     if not event:
-        return f"{'-':<{width}}"
+        return "-"
     if len(event) > width:
         event = event[: width - 3] + "..."
     return f"{event:<{width}}"
-
-
-# -------------------------------------------------------------------------
-# Commander helpers
-# -------------------------------------------------------------------------
-def reset_device():
-    try:
-        print("Resetting device using commander...")
-        subprocess.run(["commander", "device", "reset"], check=True)
-        print("Device reset complete.")
-    except Exception as e:
-        print(f"ERROR: Failed to reset device: {e}")
-
-
-def flash_out_file(out_path: str):
-    """
-    Flash using Simplicity Commander.
-    Many setups accept: commander flash <file>
-    If your environment requires extra args (device, serialno, etc.), adjust here.
-    """
-    try:
-        print(f"Flashing firmware using commander: {out_path}")
-        subprocess.run(["commander", "flash", out_path], check=True)
-        print("Flash complete.")
-    except Exception as e:
-        print(f"ERROR: Failed to flash firmware: {e}")
-        raise
 
 
 # -------------------------------------------------------------------------
@@ -188,126 +149,89 @@ def _parse_max_args(value: str) -> int:
     return n
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="UART log decoder: core 0 from .out (.log_fmt), core 1 from SystemView descriptor .txt.",
+        description="Lightweight UART/RTT log decoder for sl_log_event_t records.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples (core 0: .out | core 1: descriptor .txt):
-  %(prog)s --out firmware.out --descriptor SYSVIEW_Si917nwp.txt
-  %(prog)s --out firmware.out --descriptor SYSVIEW_Si917nwp.txt --flash
-  %(prog)s --out firmware.out --descriptor SYSVIEW_Si917nwp.txt --port COM3 --baud 115200
-        """,
     )
 
-    p.add_argument("--port", help="Serial port name (override auto-detection).")
-    p.add_argument("--baud", type=int, default=115200, help="Baud rate (default: 115200).")
+    p.add_argument("--source", choices=("uart", "rtt"), default="uart",
+                   help="Transport: 'uart' (default) or 'rtt' (SEGGER J-Link RTT).")
 
-    p.add_argument(
-        "--out", "--axf",
-        dest="out_file",
-        help=(
-            "Path to .out/.axf/.elf for core 0 decode (.log_fmt section). If omitted, auto-search under --out-root."
-        ),
-    )
+    # UART
+    p.add_argument("--port", help="[uart] Serial port name (override auto-detection).")
+    p.add_argument("--baud", type=int, default=115200, help="[uart] Baud rate (default: 115200).")
 
-    p.add_argument(
-        "--out-root",
-        default=r"C:\Users\surondla\Logger",
-        help="Root directory to recursively search for the latest .out/.axf/.elf if --out is omitted.",
-    )
+    # RTT
+    p.add_argument("--device", default="SiWG917M111M",
+                   help="[rtt] J-Link target device name (default: SiWG917M111M). "
+                        "Must be a device known to your J-Link installation - run "
+                        "JLinkExe -CommandFile NUL and search for the part if unsure. "
+                        "Common Si91x choices: SiWG917M111M, SiWG917M110L, "
+                        "SiWG917M100M. Generic 'Cortex-M4' is rejected by some J-Link "
+                        "versions for Si91x and is not recommended.")
+    p.add_argument("--jlink-serial", dest="jlink_serial", default=None,
+                   help="[rtt] J-Link probe serial number (optional).")
+    p.add_argument("--rtt-channel", dest="rtt_channel", type=int, default=0,
+                   help="[rtt] Primary RTT up-buffer channel (default: 0).")
+    p.add_argument("--rtt-channel2", dest="rtt_channel2", type=int, default=None, metavar="N",
+                   help="[rtt] Optional second RTT up-buffer channel (e.g. 8 for TA/NWP).")
+    p.add_argument("--rtt-interface", dest="rtt_interface", choices=("swd", "jtag"),
+                   default="swd", help="[rtt] J-Link interface (default: swd).")
+    p.add_argument("--rtt-speed", dest="rtt_speed", default="1000",
+                   help="[rtt] J-Link speed in kHz, or 'auto' (default: 1000). "
+                        "Si91x debug ports can be unstable at the higher speeds "
+                        "that 'auto' negotiates, leading to 'Could not start CPU "
+                        "core' on connect; 1000 kHz is a safe baseline.")
+    p.add_argument("--rtt-block-address", dest="rtt_block_address",
+                   type=lambda v: int(v, 0), default=None,
+                   help="[rtt] Fixed RTT control block address (e.g. 0x20000000). "
+                        "If omitted, taken from --out (symbol _SEGGER_RTT or magic scan), "
+                        "else J-Link RAM auto-scan.")
+    p.add_argument("--rtt-reset", dest="rtt_reset", action="store_true",
+                   help="[rtt] Reset the target on connect. Default is to attach to the "
+                        "running firmware without resetting (Si91x debug ports can refuse "
+                        "the halt that reset performs, producing 'Could not start CPU core').")
+    p.add_argument("--rtt-no-reset", dest="rtt_no_reset", action="store_true",
+                   help="[rtt] Kept for backward compatibility. Has no effect - no-reset "
+                        "is now the default. Pass --rtt-reset to opt in to a reset.")
+    p.add_argument("--rtt-connect-timeout", dest="rtt_connect_timeout",
+                   type=float, default=18.0, metavar="SECS",
+                   help="[rtt] Seconds to wait for the RTT control block (default: 18.0). "
+                        "Firmware needs time to boot and call SEGGER_RTT_Init() before "
+                        "UP buffers appear; increase if your firmware takes longer.")
 
-    p.add_argument(
-        "--descriptor",
-        "--manifest",
-        dest="descriptor_path",
-        metavar="PATH",
-        help=(
-            "SystemView descriptor .txt for core 1 (TAB-separated: event_id, debug_id, format). "
-            "Example: SYSVIEW_Si917nwp.txt. Alias: --manifest."
-        ),
-    )
+    # Decode inputs
+    p.add_argument("--out", "--axf", dest="out_file",
+                   help="Path to .out/.axf/.elf for core 0 .log_fmt decoding "
+                        "(also used to locate _SEGGER_RTT and to resolve %%s pointers).")
+    p.add_argument("--descriptor", "--manifest", dest="descriptor_path", metavar="PATH",
+                   help="SystemView descriptor .txt for core 1 decoding.")
+    p.add_argument("--descriptor-id-base", type=int, default=0, metavar="N",
+                   help="Subtract N from each descriptor event_id (default: 0).")
 
-    p.add_argument(
-        "--descriptor-id-base",
-        type=int,
-        default=0,
-        metavar="N",
-        help=(
-            "Subtract N from each event_id in the descriptor file for UART lookup "
-            "(0 when file ids match the wire; use 500 for SystemView exports that start at 500)."
-        ),
-    )
+    # Packet shape (fixed sl_log_event_t; firmware always emits this layout)
+    p.add_argument("--max-args", type=_parse_max_args, default=10, metavar="N",
+                   help=f"Number of uint32 args slots per record. MUST match "
+                        f"SL_LOG_CONFIG_ARG in the firmware build, otherwise framing "
+                        f"will not align. Record size on the wire = 8 + 4*N + 4 bytes. "
+                        f"Range 1..{SL_LOG_CONFIG_ARG_HARD_MAX} (default 10).")
+    p.add_argument("--big-endian", action="store_true",
+                   help="Use big-endian (default: little-endian).")
 
-    p.add_argument(
-        "--big-endian",
-        action="store_true",
-        help="Use big-endian for records (default: little-endian).",
-    )
+    # Display / logging
+    p.add_argument("--no-arg-format", action="store_true",
+                   help="Skip applying %% args to format strings.")
+    p.add_argument("--no-color", action="store_true", help="Disable colored output.")
+    p.add_argument("--no-banner", action="store_true", help="Skip console banner.")
+    p.add_argument("--log-file", metavar="PATH",
+                   help="Also write decoded output to this file (plain text by default).")
+    p.add_argument("--log-file-color", action="store_true",
+                   help="Keep ANSI colour codes in --log-file output.")
 
-    p.add_argument(
-        "--no-arg-format",
-        action="store_true",
-        help="Skip applying arguments to format strings (faster).",
-    )
-
-    p.add_argument(
-        "--no-color",
-        action="store_true",
-        help="Disable colored output.",
-    )
-
-    p.add_argument(
-        "--no-banner",
-        action="store_true",
-        help="Skip printing the console banner.",
-    )
-
-    p.add_argument(
-        "--reset",
-        action="store_true",
-        help="Reset device using 'commander device reset' before starting.",
-    )
-
-    # Flashing option requested:
-    p.add_argument(
-        "--flash",
-        action="store_true",
-        help="Reset device, flash the selected .out file with commander, then continue.",
-    )
-
-    p.add_argument(
-        "--raw",
-        action="store_true",
-        help="Also show raw hex data for each record (debug mode).",
-    )
-
-    p.add_argument(
-        "--list-formats",
-        action="store_true",
-        help="List all format strings with their addresses from the .out file and exit.",
-    )
-
-    p.add_argument(
-        "--max-args",
-        type=_parse_max_args,
-        default=10,
-        metavar="N",
-        help=(
-            f"Number of uint32 slots in sl_log_event_t.args[] (must match SL_LOG_CONFIG_ARG in firmware). "
-            f"Fixed packet size = 8 + 4*N + 4 bytes. Range: 1..{SL_LOG_CONFIG_ARG_HARD_MAX} (default: 10)."
-        ),
-    )
-
-    p.add_argument(
-        "--variable-packet",
-        action="store_true",
-        help=(
-            "UART uses compact framing: timestamp, event_id, arg_count (u8), then arg_count uint32s, "
-            "then core_id/flags/version (packet length = 12 + 4*arg_count). "
-            "Otherwise the full packed struct is sent (length fixed from --max-args)."
-        ),
-    )
+    # Utility
+    p.add_argument("--list-formats", action="store_true",
+                   help="List all format strings (with addresses) from the --out file and exit.")
 
     return p.parse_args()
 
@@ -315,9 +239,12 @@ Examples (core 0: .out | core 1: descriptor .txt):
 # -------------------------------------------------------------------------
 # Record parsing
 # -------------------------------------------------------------------------
+def record_size_fixed(max_args: int) -> int:
+    return 8 + 4 * max_args + 4
+
+
 def mk_struct_fmt(max_args: int, big_endian: bool) -> str:
     endian = ">" if big_endian else "<"
-    # timestamp(4) + event_id(4) + args(max_args×4) + arg_count(1) + core(1) + flags(1) + version(1)
     return endian + ("II" + "I" * max_args + "BBBB")
 
 
@@ -328,15 +255,33 @@ def parse_record(chunk: bytes, fmt: str, max_args: int) -> Tuple[int, int, Tuple
     return ts, event_id, args, arg_count, core_id, flags, version
 
 
-def validate_log_fields(
-    ts: int,
-    event_id: int,
-    arg_count: int,
-    core_id: int,
-    flags: int,
-    version: int,
-    max_args: int,
-) -> bool:
+# Populated by main() once the .log_fmt section is loaded.  These bound the
+# valid address range for core-0 event_ids (each core-0 event_id is the flash
+# address of its format string in .log_fmt).  Used by validate_log_fields()
+# to reject misaligned frames whose "event_id" landed on the trailer of the
+# previous record.
+_FMT_ADDR_MIN: int = 0
+_FMT_ADDR_MAX: int = 0
+_MANIFEST_MAX_ID: int = 0
+
+
+def set_event_id_bounds(fmt_addr_min: int, fmt_addr_max: int,
+                        manifest_max_id: int) -> None:
+    """Configure the per-core event_id sanity-check ranges used by the validator."""
+    global _FMT_ADDR_MIN, _FMT_ADDR_MAX, _MANIFEST_MAX_ID
+    _FMT_ADDR_MIN = int(fmt_addr_min)
+    _FMT_ADDR_MAX = int(fmt_addr_max)
+    _MANIFEST_MAX_ID = int(manifest_max_id)
+
+
+def validate_log_fields(ts: int, event_id: int, arg_count: int,
+                        core_id: int, flags: int, version: int, max_args: int) -> bool:
+    """Heuristics that reject obvious junk so resync can find a real record.
+
+    Tightened to reduce false-positive matches when --max-args is small
+    (e.g. 3 -> only 24-byte records) and the RTT buffer is being attached
+    mid-stream so the first window of bytes is essentially random.
+    """
     if arg_count > max_args:
         return False
     if ts == 0:
@@ -346,35 +291,33 @@ def validate_log_fields(
     lvl_code = (flags >> 1) & 0x07
     if lvl_code == 0 or lvl_code > 4:
         return False
-    if version > 10:
+    # Si91x firmware uses sl_log_event_t version 1; allow 1..2 for forward
+    # compat but reject random byte values.
+    if version == 0 or version > 2:
         return False
-    if core_id > 10:
+    # Only core 0 (M4) and core 1 (NWP/TA) exist on Si91x.
+    if core_id > 1:
         return False
+    # Reserved high bits of flags (bit 4 and up) should be zero in current
+    # firmware - random bytes will frequently have them set.
+    if flags & 0xF0:
+        return False
+    # Event-id range sanity check (kills most resync false-positives).
+    #   * core 0: event_id is the flash address of the format string in
+    #             the ELF .log_fmt section. Anything outside [min..max] is
+    #             a misalignment match (the most common one: the BBBB
+    #             trailer of the previous record reinterpreted as event_id,
+    #             producing values like 0x01020003 with version=1, flags=2).
+    #   * core 1: event_id is a small integer descriptor key (or one of a
+    #             few special markers). If a descriptor is loaded we reject
+    #             event_ids that are too large to belong to it.
+    if core_id == 0:
+        if _FMT_ADDR_MAX and not (_FMT_ADDR_MIN <= event_id <= _FMT_ADDR_MAX):
+            return False
+    else:
+        if _MANIFEST_MAX_ID and event_id > _MANIFEST_MAX_ID + 16:
+            return False
     return True
-
-
-def try_parse_variable_record(
-    chunk: bytes, endian: str, max_args: int
-) -> Optional[Tuple[int, int, Tuple[int, ...], int, int, int, int, int]]:
-    """
-    Compact UART framing: IIB + (arg_count × uint32) + BBB  →  length = 12 + 4*arg_count
-    """
-    if len(chunk) < 12:
-        return None
-    ts, eid, ac = struct.unpack(endian + "IIB", chunk[:9])
-    if ac > max_args:
-        return None
-    need = 9 + 4 * ac + 3
-    if len(chunk) < need:
-        return None
-    args_raw = list(struct.unpack(endian + ("I" * ac), chunk[9 : 9 + 4 * ac]))
-    core_id, flags, version = struct.unpack("BBB", chunk[9 + 4 * ac : need])
-    padded = tuple((args_raw + [0] * max_args)[:max_args])
-    return ts, eid, padded, ac, core_id, flags, version, need
-
-
-def format_raw_hex(chunk: bytes) -> str:
-    return " ".join(f"{b:02X}" for b in chunk)
 
 
 def level_from_flags(flags: int) -> str:
@@ -382,20 +325,41 @@ def level_from_flags(flags: int) -> str:
     return LEVEL_MAP.get(lvl_code, f"LEVEL{lvl_code}")
 
 
+def is_valid_record(chunk: bytes, fmt: str, max_args: int, record_size: int) -> bool:
+    if len(chunk) != record_size:
+        return False
+    try:
+        ts, event_id, *rest = struct.unpack(fmt, chunk)
+        arg_count, core_id, flags, version = rest[max_args : max_args + 4]
+        return validate_log_fields(ts, event_id, arg_count, core_id, flags, version, max_args)
+    except Exception:
+        return False
+
+
+def find_record_sync(buffer: bytearray, fmt: str, max_args: int,
+                     record_size: int, max_search: int = 50) -> int:
+    if len(buffer) < record_size:
+        return 0
+    search_limit = min(max_search, len(buffer) - record_size + 1)
+    for offset in range(search_limit):
+        if is_valid_record(buffer[offset : offset + record_size], fmt, max_args, record_size):
+            return offset
+    return 1
+
+
 # -------------------------------------------------------------------------
-# OUT file format-string loading (core 0 typical path)
+# ELF helpers: .log_fmt, _SEGGER_RTT, %s string resolver
 # -------------------------------------------------------------------------
-def load_log_fmt_map(out_path: str) -> Dict[int, str]:
+def load_log_fmt_map(out_path: str) -> Tuple[Dict[int, str], int, int]:
+    """Returns (addr -> format string map, section_base, section_end_exclusive)."""
     try:
         with open(out_path, "rb") as f:
             elf = ELFFile(f)
             sec = elf.get_section_by_name(".log_fmt")
             if sec is None:
                 print("Warning: .log_fmt section not found in OUT file.")
-                print("         Core0 log messages may show as raw event IDs.")
-                return {}
-
-            base_addr = sec["sh_addr"]
+                return {}, 0, 0
+            base_addr = int(sec["sh_addr"])
             data = sec.data()
             n = len(data)
 
@@ -409,18 +373,16 @@ def load_log_fmt_map(out_path: str) -> Dict[int, str]:
             while i < n and data[i] != 0:
                 i += 1
             s = data[start:i].decode("utf-8", errors="replace")
-            addr = base_addr + start
-            fmt_map[addr] = s
+            fmt_map[base_addr + start] = s
             i += 1
-
-        return fmt_map
-
+        return fmt_map, base_addr, base_addr + n
     except Exception as e:
         print(f"ERROR: Failed to load format strings from {out_path}: {e}")
-        return {}
+        return {}, 0, 0
 
 
-def list_format_strings(fmt_map: Dict[int, str]):
+def list_format_strings(fmt_map: Dict[int, str]) -> None:
+    """Pretty-print the .log_fmt strings loaded from the OUT file."""
     if not fmt_map:
         print("No format strings found in the .out file.")
         return
@@ -434,25 +396,118 @@ def list_format_strings(fmt_map: Dict[int, str]):
 
     for addr in sorted(fmt_map.keys()):
         fmt_str = fmt_map[addr]
-        fmt_str_display = fmt_str.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
-        if len(fmt_str_display) > 70:
-            fmt_str_display = fmt_str_display[:67] + "..."
-        print(f"{addr:<12} 0x{addr:08X}    {fmt_str_display}")
+        display = fmt_str.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
+        if len(display) > 70:
+            display = display[:67] + "..."
+        print(f"{addr:<12} 0x{addr:08X}    {display}")
 
     print("-" * 100)
     print(f"\nTotal: {len(fmt_map)} format strings\n")
 
 
+def find_rtt_block_address(out_path: str) -> Optional[int]:
+    """Find SEGGER RTT control block in an ELF: _SEGGER_RTT symbol, then magic-string scan."""
+    if not out_path or not os.path.exists(out_path):
+        return None
+    try:
+        with open(out_path, "rb") as f:
+            elf = ELFFile(f)
+            for sec in elf.iter_sections():
+                iter_symbols = getattr(sec, "iter_symbols", None)
+                if not callable(iter_symbols):
+                    continue
+                try:
+                    for sym in iter_symbols():
+                        if sym.name == "_SEGGER_RTT":
+                            value = int(sym["st_value"])
+                            if value:
+                                return value & 0xFFFFFFFF
+                except Exception:
+                    continue
+
+            magic = b"SEGGER RTT\x00\x00\x00\x00\x00\x00"
+            for sec in elf.iter_sections():
+                try:
+                    sh_addr = int(sec["sh_addr"])
+                    sh_size = int(sec["sh_size"])
+                    sh_flags = int(sec["sh_flags"])
+                    sh_type = sec["sh_type"]
+                except Exception:
+                    continue
+                if not sh_addr or not sh_size:
+                    continue
+                if not (sh_flags & 0x2) or sh_type != "SHT_PROGBITS":
+                    continue
+                try:
+                    data = sec.data()
+                except Exception:
+                    continue
+                idx = data.find(magic)
+                if idx != -1:
+                    return (sh_addr + idx) & 0xFFFFFFFF
+    except Exception as e:
+        print(f"Warning: Could not scan {out_path} for RTT control block: {e}")
+    return None
+
+
+class ELFStringResolver:
+    """Read null-terminated strings from PROGBITS sections for %s pointer args."""
+
+    def __init__(self, out_path: str):
+        self._fp = None
+        self._elf = None
+        self._sections: list = []
+        self._cache: Dict[int, str] = {}
+        try:
+            self._fp = open(out_path, "rb")
+            self._elf = ELFFile(self._fp)
+            for sec in self._elf.iter_sections():
+                try:
+                    if (sec["sh_addr"] and sec["sh_size"]
+                            and (sec["sh_flags"] & 0x2)
+                            and sec["sh_type"] == "SHT_PROGBITS"):
+                        self._sections.append(sec)
+                except Exception:
+                    continue
+        except Exception:
+            self._elf = None
+
+    def close(self) -> None:
+        try:
+            if self._fp:
+                self._fp.close()
+        except Exception:
+            pass
+
+    def read_cstring(self, addr: int, max_len: int = 256) -> Optional[str]:
+        if addr in self._cache:
+            return self._cache[addr]
+        if not self._elf:
+            return None
+        for sec in self._sections:
+            sh_addr = sec["sh_addr"]
+            sh_size = sec["sh_size"]
+            if sh_addr <= addr < (sh_addr + sh_size):
+                try:
+                    data = sec.data()
+                    offset = addr - sh_addr
+                    raw = data[offset : min(len(data), offset + max_len)]
+                    z = raw.find(b"\x00")
+                    if z != -1:
+                        raw = raw[:z]
+                    s = raw.decode("utf-8", errors="replace")
+                    if s and any(ch.isprintable() for ch in s):
+                        self._cache[addr] = s
+                        return s
+                except Exception:
+                    continue
+        return None
+
+
 # -------------------------------------------------------------------------
-# SystemView descriptor (core 1 path)
+# SystemView descriptor (core 1)
 # -------------------------------------------------------------------------
 def _parse_systemview_descriptor_line(line: str) -> Optional[Tuple[int, str, str]]:
-    """
-    Parse one descriptor row. Supports:
-    - TAB form: <event_id> TAB <debug_id>  <format>  (two spaces between debug_id and format)
-    - Space form (e.g. SYSVIEW_CaptiveCore.txt): <event_id> <debug_id>  <format>
-    Returns (event_id, debug_id, format) or None to skip the line.
-    """
     stripped = line.strip()
     if not stripped or stripped.startswith("#"):
         return None
@@ -468,21 +523,14 @@ def _parse_systemview_descriptor_line(line: str) -> Optional[Tuple[int, str, str
         right = right.strip()
         if "  " in right:
             debug_id, fmt = right.split("  ", 1)
-            debug_id = debug_id.strip()
-            fmt = fmt.strip()
-        else:
-            debug_id = right
-            fmt = ""
-        return eid, debug_id, fmt
+            return eid, debug_id.strip(), fmt.strip()
+        return eid, right, ""
 
-    # Space-separated export: leading digits = event_id, then debug_id, then two spaces, then format
     if not stripped[0].isdigit():
         return None
     i = 0
     while i < len(stripped) and stripped[i].isdigit():
         i += 1
-    if i == 0:
-        return None
     try:
         eid = int(stripped[:i])
     except ValueError:
@@ -494,21 +542,7 @@ def _parse_systemview_descriptor_line(line: str) -> Optional[Tuple[int, str, str
     return eid, debug_id.strip(), fmt.strip()
 
 
-def load_systemview_descriptor(
-    descriptor_path: str, id_base: int = 0
-) -> Dict[int, Dict[str, Any]]:
-    """
-    Parse a SystemView-style descriptor text file (e.g. SYSVIEW_Si917nwp.txt).
-
-    Supported line shapes (after optional # comments; skip M=/V= headers):
-    - TAB-separated: <event_id> TAB <debug_id>  <format>  (two spaces between debug_id and format)
-    - Space-separated: <event_id> <debug_id>  <format>  (same two-space rule; e.g. SYSVIEW_CaptiveCore.txt)
-
-    id_base: subtract from each file event_id before storing (e.g. 500 maps file row 500 → key 0).
-
-    Returns mapping: event_id -> {debug_id, format, raw_line, component} (component always "").
-    raw_line is the full non-comment row from the file; MESSAGE uses this with args applied.
-    """
+def load_systemview_descriptor(descriptor_path: str, id_base: int = 0) -> Dict[int, Dict[str, Any]]:
     out: Dict[int, Dict[str, Any]] = {}
     skipped_negative = 0
     try:
@@ -523,18 +557,14 @@ def load_systemview_descriptor(
                 if key < 0:
                     skipped_negative += 1
                     continue
-                out[key] = {
-                    "debug_id": debug_id,
-                    "format": fmt,
-                    "raw_line": line,
-                    "component": "",
-                }
+                out[key] = {"debug_id": debug_id, "format": fmt, "raw_line": line}
         print(
-            f"Loaded {len(out)} entries from SystemView descriptor ({Path(descriptor_path).name})"
+            f"Loaded {len(out)} entries from SystemView descriptor "
+            f"({Path(descriptor_path).name})"
             f"{f' (id_base={id_base})' if id_base else ''}."
         )
         if skipped_negative:
-            print(f"Note: skipped {skipped_negative} descriptor rows with id < id_base ({id_base}).")
+            print(f"Note: skipped {skipped_negative} rows with id < id_base ({id_base}).")
         return out
     except Exception as e:
         print(f"ERROR: Failed to load SystemView descriptor {descriptor_path}: {e}")
@@ -542,157 +572,77 @@ def load_systemview_descriptor(
 
 
 # -------------------------------------------------------------------------
-# ELF string resolver (for %s pointers)
-# -------------------------------------------------------------------------
-class ELFStringResolver:
-    """
-    Best-effort: if firmware passes pointers for %s, try to read a null-terminated
-    string from an allocatable PROGBITS section containing that address.
-    """
-
-    def __init__(self, out_path: str):
-        self.out_path = out_path
-        self._elf = None
-        self._sections = []
-        self._cache: Dict[int, str] = {}
-
-        try:
-            self._fp = open(out_path, "rb")
-            self._elf = ELFFile(self._fp)
-            for sec in self._elf.iter_sections():
-                try:
-                    sh_addr = sec["sh_addr"]
-                    sh_size = sec["sh_size"]
-                    sh_flags = sec["sh_flags"]
-                    sh_type = sec["sh_type"]
-                    # Keep allocatable, PROGBITS-like sections
-                    if sh_addr and sh_size and (sh_flags & 0x2) and sh_type == "SHT_PROGBITS":
-                        self._sections.append(sec)
-                except Exception:
-                    continue
-        except Exception:
-            self._elf = None
-
-    def close(self):
-        try:
-            if getattr(self, "_fp", None):
-                self._fp.close()
-        except Exception:
-            pass
-
-    def read_cstring(self, addr: int, max_len: int = 256) -> Optional[str]:
-        if addr in self._cache:
-            return self._cache[addr]
-
-        if not self._elf:
-            return None
-
-        for sec in self._sections:
-            sh_addr = sec["sh_addr"]
-            sh_size = sec["sh_size"]
-            if sh_addr <= addr < (sh_addr + sh_size):
-                offset = addr - sh_addr
-                try:
-                    data = sec.data()
-                    end = min(len(data), offset + max_len)
-                    raw = data[offset:end]
-                    z = raw.find(b"\x00")
-                    if z != -1:
-                        raw = raw[:z]
-                    s = raw.decode("utf-8", errors="replace")
-                    # Heuristic: avoid returning junk
-                    if s and any(ch.isprintable() for ch in s):
-                        self._cache[addr] = s
-                        return s
-                except Exception:
-                    continue
-        return None
-
-
-# -------------------------------------------------------------------------
-# Argument formatting (improved printf-like handling)
+# printf-style arg substitution
 # -------------------------------------------------------------------------
 _PRINTF_SPEC_RE = re.compile(
-    r"%(%)|%("                      # %% OR start of real spec
-    r"(?:\d+\$)?"                   # positional (ignored)
-    r"[#0\- +]*"                    # flags
-    r"\d*"                          # width
-    r"(?:\.\d+)?"                   # precision
-    r"(?:hh|h|ll|l|z|t|j)?"         # length
-    r"([diuoxXpsc]))"               # type
+    r"%(%)|%("
+    r"(?:\d+\$)?"
+    r"[#0\- +]*"
+    r"\d*"
+    r"(?:\.\d+)?"
+    r"(?:hh|h|ll|l|z|t|j)?"
+    r"([diuoxXpsc]))"
 )
+
 
 def _to_signed32(x: int) -> int:
     x &= 0xFFFFFFFF
     return x - 0x100000000 if x & 0x80000000 else x
 
+
 def apply_args_to_format(fmt_str: str, args_list: List[int], arg_count: int,
                          resolver: Optional[ELFStringResolver] = None) -> str:
-    """
-    Best-effort C printf substitution supporting:
-      %d %i %u %x %X %p %s %c plus width/precision/flags/length (mostly ignored)
-    Also supports %%.
-    """
     if not fmt_str:
         return fmt_str
-
     max_args = min(arg_count, len(args_list))
     arg_idx = 0
 
     def repl(m: re.Match) -> str:
         nonlocal arg_idx
-        if m.group(1) == "%":   # %%
+        if m.group(1) == "%":
             return "%"
-
-        spec_type = m.group(3)  # one of diuoxXpsc
+        spec = m.group(3)
         if arg_idx >= max_args:
-            # Not enough args: leave the original token
             return m.group(0)
-
         val = args_list[arg_idx]
         arg_idx += 1
-
-        if spec_type in ("d", "i"):
+        if spec in ("d", "i"):
             return str(_to_signed32(val))
-        if spec_type == "u":
+        if spec == "u":
             return str(val & 0xFFFFFFFF)
-        if spec_type == "x":
+        if spec == "x":
             return f"{val & 0xFFFFFFFF:x}"
-        if spec_type == "X":
+        if spec == "X":
             return f"{val & 0xFFFFFFFF:X}"
-        if spec_type == "p":
+        if spec == "p":
             return f"0x{val & 0xFFFFFFFF:08x}"
-        if spec_type == "c":
+        if spec == "c":
             return chr(val & 0xFF)
-        if spec_type == "s":
-            # Try pointer->string if we have an ELF resolver
+        if spec == "s":
             if resolver:
                 s = resolver.read_cstring(val)
                 if s is not None:
                     return s
-            # Fallback: show pointer value
             return f"0x{val & 0xFFFFFFFF:08X}"
-
         return str(val)
 
-    # Replace all specs sequentially
     return _PRINTF_SPEC_RE.sub(repl, fmt_str)
 
 
 # -------------------------------------------------------------------------
-# Serial helpers
+# Transports: serial + RTT
 # -------------------------------------------------------------------------
 def find_jlink_port() -> Optional[str]:
-    desired_ports = ["JLink CDC Uart Port", "JLink CDC UART", "J-Link"]
+    desired = ("JLink CDC Uart Port", "JLink CDC UART", "J-Link")
     for p in list_ports.comports():
         desc = p.description or ""
-        for desired in desired_ports:
-            if desired.lower() in desc.lower():
+        for d in desired:
+            if d.lower() in desc.lower():
                 return p.device
     return None
 
 
-def list_available_ports():
+def list_available_ports() -> None:
     ports = list_ports.comports()
     if not ports:
         print("No serial ports found.")
@@ -703,140 +653,184 @@ def list_available_ports():
 
 
 def open_serial(port: str, baud: int) -> serial.Serial:
-    ser = serial.Serial(
-        port=port,
-        baudrate=baud,
-        bytesize=serial.EIGHTBITS,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        timeout=0.0,
-        write_timeout=0.0,
+    return serial.Serial(
+        port=port, baudrate=baud,
+        bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE, timeout=0.0, write_timeout=0.0,
     )
-    return ser
 
 
-# -------------------------------------------------------------------------
-# Latest .out finder (recursive)
-# -------------------------------------------------------------------------
-def find_latest_out_recursive(root_dir: Path) -> Optional[str]:
-    if not root_dir.exists():
-        return None
-    out_files = []
-    for ext in ("*.out", "*.axf", "*.elf"):
-        out_files.extend(root_dir.rglob(ext))
-    if not out_files:
-        return None
-    out_files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-    return str(out_files[0])
+class RttReader:
+    """Minimal non-blocking RTT reader with read(n)/close() like serial.Serial."""
 
+    def __init__(self, device: str, channel: int = 0,
+                 jlink_serial: Optional[str] = None, interface: str = "swd",
+                 speed: Any = "auto", block_address: Optional[int] = None,
+                 reset: bool = True, connect_timeout: float = 15.0):
+        if not PYLINK_AVAILABLE:
+            raise RuntimeError("pylink-square is required for --source rtt. "
+                               "Install with: pip install pylink-square")
+        if not device:
+            raise RuntimeError("--device is required for --source rtt.")
 
-def auto_find_out_file(out_root: str) -> Optional[str]:
-    root = Path(out_root)
-    chosen = find_latest_out_recursive(root)
-    if chosen:
-        print(f"Auto-detected latest OUT file under {root}: {chosen}")
-        return chosen
+        self._channel = int(channel)
+        self._extra_channels: List[int] = []
+        self._jlink = pylink.JLink()
 
-    # fallback: old behavior (cwd common dirs)
-    search_dirs = [
-        Path.cwd() / "GNU ARM v12.2.1 - Default",
-        Path.cwd() / "build",
-        Path.cwd() / "Debug",
-        Path.cwd() / "Release",
-        Path.cwd(),
-    ]
-    out_files = []
-    for base_dir in search_dirs:
-        if base_dir.exists():
-            out_files.extend(base_dir.rglob("*.out"))
-            out_files.extend(base_dir.rglob("*.axf"))
-            out_files.extend(base_dir.rglob("*.elf"))
-
-    if not out_files:
-        print("Warning: No .out/.axf/.elf files found.")
-        return None
-
-    out_files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-    chosen = out_files[0]
-    print(f"Auto-detected OUT file (fallback): {chosen}")
-    return str(chosen)
-
-
-# -------------------------------------------------------------------------
-# Discard/resync logic (kept)
-# -------------------------------------------------------------------------
-def is_valid_record(chunk: bytes, fmt: str, max_args: int, record_size: int) -> bool:
-    if len(chunk) != record_size:
-        return False
-
-    try:
-        ts, event_id, *rest = struct.unpack(fmt, chunk)
-        arg_count, core_id, flags, version = rest[max_args : max_args + 4]
-        return validate_log_fields(ts, event_id, arg_count, core_id, flags, version, max_args)
-    except Exception:
-        return False
-
-
-def find_record_sync(
-    buffer: bytearray, fmt: str, max_args: int, record_size: int, max_search: int = 50
-) -> int:
-    if len(buffer) < record_size:
-        return 0
-
-    search_limit = min(max_search, len(buffer) - record_size + 1)
-    for offset in range(search_limit):
-        chunk = buffer[offset : offset + record_size]
-        if is_valid_record(chunk, fmt, max_args, record_size):
-            return offset
-
-    return 1
-
-
-def find_record_sync_variable(
-    buffer: bytearray, endian: str, max_args: int, max_search: int = 120
-) -> int:
-    """Skip bytes to align to a valid compact record, or 0 if waiting for more data / aligned at 0."""
-    if len(buffer) < 12:
-        return 0
-
-    # Do not consume bytes if a record at offset 0 is only incomplete (need more UART data)
-    if len(buffer) >= 9:
         try:
-            _ts, _eid, ac = struct.unpack(endian + "IIB", bytes(buffer[:9]))
-            if ac <= max_args:
-                need = 9 + 4 * ac + 3
-                if len(buffer) < need:
-                    return 0
+            if jlink_serial:
+                try:
+                    self._jlink.open(serial_no=int(jlink_serial))
+                except ValueError:
+                    self._jlink.open(serial_no=jlink_serial)
+            else:
+                self._jlink.open()
+        except Exception as e:
+            raise RuntimeError(f"J-Link open failed: {e}") from e
+
+        iface = (pylink.enums.JLinkInterfaces.JTAG
+                 if str(interface).lower() == "jtag"
+                 else pylink.enums.JLinkInterfaces.SWD)
+        self._jlink.set_tif(iface)
+
+        try:
+            self._jlink.connect(device, speed=speed, verbose=False)
+        except Exception as e:
+            self._jlink.close()
+            hint = ""
+            if "unsupported device" in str(e).lower():
+                hint = (" Hint: pass an exact device name known to your J-Link "
+                        "installation via --device. For Si91x try SiWG917M111M, "
+                        "SiWG917M110L or SiWG917M100M; generic 'Cortex-M4' is "
+                        "rejected by recent J-Link versions for Si91x.")
+            raise RuntimeError(f"J-Link connect failed: {e}.{hint}") from e
+
+        if reset:
+            try:
+                self._jlink.reset(halt=False)
+            except Exception:
+                pass
+
+        try:
+            self._jlink.rtt_stop()
         except Exception:
             pass
+        try:
+            self._jlink.rtt_start(block_address)
+        except Exception as e:
+            self._jlink.close()
+            raise RuntimeError(f"RTT start failed: {e}") from e
 
-    search_limit = min(max_search, max(0, len(buffer) - 12))
-    for offset in range(search_limit + 1):
-        chunk = bytes(buffer[offset:])
-        p = try_parse_variable_record(chunk, endian, max_args)
-        if p is None:
-            continue
-        ts, eid, _, ac, core_id, flags, version, reclen = p
-        if len(buffer) < offset + reclen:
+        deadline = time.time() + connect_timeout
+        num_up = 0
+        while time.time() < deadline:
+            try:
+                num_up = self._jlink.rtt_get_num_up_buffers()
+                self._jlink.rtt_get_num_down_buffers()
+                if num_up > 0:
+                    break
+            except Exception:
+                pass
+            time.sleep(0.1)
+
+        if num_up == 0:
+            self._jlink.close()
+            raise RuntimeError(
+                "Timed out waiting for RTT control block. Increase --rtt-connect-timeout, "
+                "verify SEGGER_RTT is initialized in firmware, or pass --rtt-block-address."
+            )
+
+        if self._channel < 0 or self._channel >= num_up:
+            self._jlink.close()
+            raise RuntimeError(
+                f"RTT up-channel {self._channel} not available "
+                f"(target exposes {num_up} up-buffer(s))."
+            )
+
+        print(f"RTT connected: device={device}, iface={interface.upper()}, "
+              f"speed={speed}, up_buffers={num_up}, channel={self._channel}")
+
+        # Drain stale ring-buffer contents so parsing starts on a record
+        # boundary. Two-phase drain:
+        #   1. Hard ceiling so we never block forever if firmware is logging
+        #      continuously at line rate.
+        #   2. Quiescence detector: stop as soon as the buffer stays empty
+        #      for ~80 ms in a row - that's the cleanest possible start.
+        drained = self._drain_channel(self._channel, max_secs=1.5, quiet_ms=80)
+        if drained:
+            print(f"  Discarded {drained} stale RTT bytes from ch{self._channel} "
+                  f"to align on a record boundary.")
+
+    def add_channel(self, channel: int, num_up: int) -> None:
+        ch = int(channel)
+        if ch < 0 or ch >= num_up:
+            raise RuntimeError(
+                f"RTT up-channel {ch} not available (target exposes {num_up} up-buffer(s))."
+            )
+        if ch == self._channel or ch in self._extra_channels:
+            return
+        self._extra_channels.append(ch)
+        drained = self._drain_channel(ch, max_secs=1.5, quiet_ms=80)
+        if drained:
+            print(f"  Discarded {drained} stale RTT bytes from ch{ch} "
+                  f"to align on a record boundary.")
+
+    def _drain_channel(self, channel: int, max_secs: float = 1.5,
+                       quiet_ms: int = 80) -> int:
+        """Drain a channel until it stays empty for ``quiet_ms`` ms (or hits
+        the ``max_secs`` ceiling).  Returns the total byte count discarded.
+        """
+        drained = 0
+        deadline = time.time() + max_secs
+        quiet_until = time.time() + (quiet_ms / 1000.0)
+        while time.time() < deadline:
+            try:
+                chunk = self._jlink.rtt_read(channel, 4096)
+            except Exception:
+                break
+            if chunk:
+                drained += len(chunk)
+                quiet_until = time.time() + (quiet_ms / 1000.0)
+            else:
+                if time.time() >= quiet_until:
+                    break
+                time.sleep(0.01)
+        return drained
+
+    @property
+    def num_up_buffers(self) -> int:
+        try:
+            return self._jlink.rtt_get_num_up_buffers()
+        except Exception:
             return 0
-        if validate_log_fields(ts, eid, ac, core_id, flags, version, max_args):
-            return offset
 
-    # Truncated record starting at offset 0?
-    if len(buffer) >= 9:
+    @property
+    def all_channels(self) -> List[int]:
+        return [self._channel] + self._extra_channels
+
+    def read(self, size: int) -> bytes:
+        return self.read_channel(self._channel, size)
+
+    def read_channel(self, channel: int, size: int) -> bytes:
         try:
-            _ts, _eid, ac = struct.unpack(endian + "IIB", bytes(buffer[:9]))
-            if ac <= max_args and len(buffer) < 9 + 4 * ac + 3:
-                return 0
+            chunk = self._jlink.rtt_read(channel, size)
+        except Exception as e:
+            raise IOError(f"RTT read (ch{channel}) failed: {e}") from e
+        return bytes(chunk) if chunk else b""
+
+    def close(self) -> None:
+        try:
+            self._jlink.rtt_stop()
+        except Exception:
+            pass
+        try:
+            self._jlink.close()
         except Exception:
             pass
 
-    return 1
-
 
 # -------------------------------------------------------------------------
-# Decode logic: core 0 only from .out .log_fmt; core 1 only from descriptor .txt
-# Core 1: returns symbolic event name (debug_id) for EVENT column; MESSAGE = full descriptor row (args applied).
+# Decode
 # -------------------------------------------------------------------------
 def decode_message(event_id: int,
                    args_val: Sequence[int],
@@ -849,12 +843,6 @@ def decode_message(event_id: int,
                    version: int,
                    resolver: Optional[ELFStringResolver],
                    max_args_supported: int = 10) -> Tuple[str, str, Optional[str]]:
-    """
-    Returns (level_str, message, event_display).
-    event_display is the symbolic event name for core 1 (descriptor debug_id); None for core 0 / overflow.
-    For core 1, message is the descriptor line after the event_id column (no numeric id), printf args applied.
-    """
-    # Overflow
     if event_id == 0xFFFFFFFF:
         overflow_count = args_val[0] if arg_count > 0 else 0
         return "OVERFLOW", f"Buffer overflow detected! Count: {overflow_count}", None
@@ -862,55 +850,36 @@ def decode_message(event_id: int,
     level_str = level_from_flags(flags)
     arg_count = min(arg_count, max_args_supported)
 
-    # Core 1 (e.g. NWP): decode only from SystemView descriptor — never from .out fmt_map
     if core_id == 1:
         if not manifest_map:
-            return (
-                level_str,
-                "<Core1: no descriptor> Pass --descriptor <file.txt> (e.g. SYSVIEW_Si917nwp.txt); "
-                "core 0 uses --out. "
-                f"Args={list(args_val)[:arg_count]}",
-                None,
-            )
+            return (level_str,
+                    f"<Core1: no descriptor> Pass --descriptor <file.txt>. "
+                    f"Args={list(args_val)[:arg_count]}",
+                    None)
         entry = manifest_map.get(event_id)
         if entry:
             fmt_str = entry.get("format", "") or ""
             debug_id = (entry.get("debug_id", "") or "").strip()
-            # EVENT column: symbolic name from descriptor (not numeric event_id)
             event_display = debug_id if debug_id else "unknown"
-
-            # MESSAGE: descriptor row without leading numeric event_id; substitute % args on that text
             full_row = (entry.get("raw_line") or "").strip()
             if not full_row:
-                full_row = (
-                    f"{event_id}\t{debug_id}  {fmt_str.strip()}" if debug_id else str(event_id)
-                )
+                full_row = (f"{event_id}\t{debug_id}  {fmt_str.strip()}"
+                            if debug_id else str(event_id))
             tab_prefix = f"{event_id}\t"
             if full_row.startswith(tab_prefix):
-                body = full_row[len(tab_prefix) :]
+                body = full_row[len(tab_prefix):]
             else:
-                body = (
-                    f"{debug_id}  {fmt_str.strip()}".strip()
-                    if debug_id
-                    else fmt_str.strip()
-                )
+                body = (f"{debug_id}  {fmt_str.strip()}".strip()
+                        if debug_id else fmt_str.strip())
             if not body:
                 body = "(empty)"
             if (not no_arg_format) and arg_count > 0:
                 msg = apply_args_to_format(body, list(args_val), arg_count, resolver=resolver)
             else:
                 msg = body
-
             return level_str, msg, event_display
+        return (level_str, f"Not in descriptor. Args={list(args_val)[:arg_count]}", "unknown")
 
-        # Unknown id: EVENT = unknown (no numeric id in columns; use --raw for the record)
-        return (
-            level_str,
-            f"Not in descriptor. Args={list(args_val)[:arg_count]}",
-            "unknown",
-        )
-
-    # Core 0 (and any core_id != 1): decode only from .out .log_fmt — never from descriptor
     is_fmt = (flags & 1) == 0
     if is_fmt and fmt_map:
         base_msg = fmt_map.get(event_id)
@@ -922,60 +891,47 @@ def decode_message(event_id: int,
         else:
             msg = f"<Unknown Event 0x{event_id:08X}> Args={list(args_val)[:arg_count]}"
     else:
-        msg = f"Event=0x{event_id:08X} Core={core_id} Ver={version} Args={list(args_val)[:arg_count]}"
-
+        msg = (f"Event=0x{event_id:08X} Core={core_id} Ver={version} "
+               f"Args={list(args_val)[:arg_count]}")
     return level_str, msg, None
 
 
 # -------------------------------------------------------------------------
 # Main
 # -------------------------------------------------------------------------
-def main():
+def main() -> None:
     global COLORS_AVAILABLE
-
     args = parse_args()
 
     if args.no_color:
         COLORS_AVAILABLE = False
-
     if not args.no_banner:
         print_banner()
 
-    # Determine OUT file (needed for core0 format map, and also for %s pointer resolution)
-    out_path = None
+    # OUT file is optional but recommended (core 0 format strings, %s strings,
+    # and _SEGGER_RTT address for RTT auto-attach).
+    out_path: Optional[str] = None
     if args.out_file:
+        if not os.path.exists(args.out_file):
+            print(f"ERROR: OUT file not found: {args.out_file}")
+            sys.exit(1)
         out_path = args.out_file
-        if not os.path.exists(out_path):
-            print(f"ERROR: OUT file not found: {out_path}")
-            sys.exit(1)
-    else:
-        out_path = auto_find_out_file(args.out_root)
-        if not out_path:
-            print("ERROR: Could not find .out file automatically.")
-            print("       Use --out <path> or adjust --out-root.")
-            sys.exit(1)
 
-    # Optional reset/flash logic
-    # If --flash: do reset -> flash out -> continue.
-    # If only --reset: just reset.
-    if args.flash:
-        reset_device()
-        time.sleep(0.5)
-        flash_out_file(out_path)
-        time.sleep(0.5)
-    elif args.reset:
-        reset_device()
-        time.sleep(0.5)
-
-    # Load core0 format map
-    fmt_map = load_log_fmt_map(out_path) if out_path else {}
-    print(f"Loaded {len(fmt_map)} format strings from .log_fmt section")
+    fmt_map: Dict[int, str] = {}
+    fmt_sec_base = 0
+    fmt_sec_end = 0
+    if out_path:
+        fmt_map, fmt_sec_base, fmt_sec_end = load_log_fmt_map(out_path)
+        print(f"Loaded {len(fmt_map)} format strings from .log_fmt section "
+              f"[0x{fmt_sec_base:08X}..0x{fmt_sec_end:08X})")
 
     if args.list_formats:
+        if not out_path:
+            print("ERROR: --list-formats requires --out <path-to-elf>.")
+            sys.exit(1)
         list_format_strings(fmt_map)
         sys.exit(0)
 
-    # SystemView descriptor: required for decoding core 1 text (core 0 never reads this file)
     manifest_map: Dict[int, Dict[str, Any]] = {}
     if args.descriptor_path:
         if not os.path.exists(args.descriptor_path):
@@ -985,243 +941,324 @@ def main():
             args.descriptor_path, id_base=args.descriptor_id_base
         )
     else:
-        print(
-            "Note: No --descriptor; core 1 lines stay as placeholders until you pass the descriptor .txt."
-        )
+        print("Note: No --descriptor; core 1 lines will be placeholders.")
 
-    # String resolver (for %s pointers)
+    # Tell the record validator the valid event_id ranges so misaligned
+    # frames whose "event_id" lands outside .log_fmt (core 0) or far past
+    # the descriptor's max key (core 1) get rejected during resync. Use the
+    # actual section bounds from the ELF rather than just min/max of the
+    # parsed strings, so any address inside .log_fmt is accepted.
+    manifest_max_id = max(manifest_map.keys()) if manifest_map else 0
+    set_event_id_bounds(fmt_sec_base, max(0, fmt_sec_end - 1), manifest_max_id)
+
     resolver = ELFStringResolver(out_path) if out_path else None
-
-    # Serial port selection
-    if args.port:
-        port_name = args.port
-    else:
-        port_name = find_jlink_port()
-        if not port_name:
-            print("ERROR: JLink CDC UART port not found.")
-            list_available_ports()
-            print("\nUse --port <port> to specify the serial port manually.")
-            sys.exit(1)
-        print(f"Auto-detected serial port: {port_name}")
 
     max_args = args.max_args
     endian_chr = ">" if args.big_endian else "<"
     record_size = record_size_fixed(max_args)
     rec_fmt = mk_struct_fmt(max_args, args.big_endian)
 
-    if not args.variable_packet:
-        sz = struct.calcsize(rec_fmt)
-        if sz != record_size:
-            print(f"ERROR: Struct size mismatch (got {sz}, expected {record_size}).")
-            sys.exit(1)
-        print(
-            f"UART log record: fixed sl_log_event_t, max_args={max_args}, "
-            f"{record_size} bytes/event (uint8 arg_count)."
-        )
-    else:
-        print(
-            f"UART log record: variable compact frame, max_args={max_args}, "
-            f"length = 12 + 4*arg_count bytes."
-        )
-
-    try:
-        ser = open_serial(port_name, args.baud)
-    except Exception as e:
-        print(f"ERROR: Failed to open serial port {port_name}: {e}")
-        list_available_ports()
+    sz = struct.calcsize(rec_fmt)
+    if sz != record_size:
+        print(f"Struct size mismatch (got {sz}, expected {record_size}).")
         sys.exit(1)
+    print(f"Framing [{args.source}]: sl_log_event_t, max_args={max_args}, "
+          f"{record_size} bytes/event "
+          f"(must match firmware SL_LOG_CONFIG_ARG).")
+
+    # ---- Open transport ----
+    ser: Any
+    transport_desc: str
+    if args.source == "rtt":
+        if not PYLINK_AVAILABLE:
+            print("ERROR: --source rtt requires 'pylink-square'. "
+                  "Install with: pip install pylink-square")
+            sys.exit(1)
+
+        rtt_block_addr = args.rtt_block_address
+        block_source = "user"
+        if rtt_block_addr is None and out_path:
+            found = find_rtt_block_address(out_path)
+            if found is not None:
+                rtt_block_addr = found
+                block_source = f"ELF ({Path(out_path).name})"
+                print(f"RTT control block from {block_source}: 0x{rtt_block_addr:08X}")
+            else:
+                block_source = "J-Link auto-scan"
+        elif rtt_block_addr is None:
+            block_source = "J-Link auto-scan"
+
+        try:
+            ser = RttReader(
+                device=args.device,
+                channel=args.rtt_channel,
+                jlink_serial=args.jlink_serial,
+                interface=args.rtt_interface,
+                speed=args.rtt_speed,
+                block_address=rtt_block_addr,
+                reset=args.rtt_reset,
+                connect_timeout=args.rtt_connect_timeout,
+            )
+        except Exception as e:
+            print(f"ERROR: Failed to open RTT: {e}")
+            sys.exit(1)
+
+        if args.rtt_channel2 is not None:
+            try:
+                ser.add_channel(args.rtt_channel2, ser.num_up_buffers)
+                print(f"RTT channel {args.rtt_channel2} also enabled.")
+            except Exception as e:
+                print(f"WARNING: Could not add RTT channel {args.rtt_channel2}: {e}")
+
+        block_desc = (f"0x{rtt_block_addr:08X} [{block_source}]"
+                      if rtt_block_addr is not None else f"auto [{block_source}]")
+        ch_desc = (f"ch{args.rtt_channel}+ch{args.rtt_channel2}"
+                   if args.rtt_channel2 is not None else f"ch{args.rtt_channel}")
+        transport_desc = (f"RTT {ch_desc} via J-Link "
+                          f"({args.rtt_interface.upper()}, {args.device}, CB {block_desc})")
+    else:
+        port_name = args.port or find_jlink_port()
+        if not port_name:
+            print("ERROR: JLink CDC UART port not found.")
+            list_available_ports()
+            print("\nUse --port <port> to specify the serial port manually.")
+            sys.exit(1)
+        if not args.port:
+            print(f"Auto-detected serial port: {port_name}")
+        try:
+            ser = open_serial(port_name, args.baud)
+        except Exception as e:
+            print(f"ERROR: Failed to open serial port {port_name}: {e}")
+            list_available_ports()
+            sys.exit(1)
+        transport_desc = f"UART {port_name} @ {args.baud}"
 
     print()
-    print_config(
-        port_name,
-        args.baud,
-        out_path or "",
-        len(fmt_map),
-        args.descriptor_path,
-        descriptor_id_base=args.descriptor_id_base,
-    )
+    print_config(args.source, transport_desc, out_path or "",
+                 len(fmt_map), args.descriptor_path,
+                 descriptor_id_base=args.descriptor_id_base)
 
-    buffer = bytearray()
+    # ---- Decode loop ----
     read_size = 4096
     record_count = 0
-    error_count = 0
-
-    # Per-core last timestamp for DELTA column
+    # "Initial" = bytes/episodes discarded BEFORE the first valid record was
+    # decoded - these come from attaching mid-stream / stale ring-buffer
+    # contents and are not lost log messages.
+    # "Runtime" = bytes/episodes discarded AFTER decoding started - these
+    # usually indicate firmware overran the RTT up-buffer (the host wasn't
+    # draining fast enough), so log messages WERE lost.
+    bytes_initial = 0
+    bytes_runtime = 0
+    resync_initial = 0
+    resync_runtime = 0
     last_ts_by_core: Dict[int, Optional[int]] = {}
 
-    def handle_one_record(
-        ts: int,
-        event_id: int,
-        args_val: Tuple[int, ...],
-        arg_count: int,
-        core_id: int,
-        flags: int,
-        version: int,
-        raw_chunk: bytes,
-    ) -> None:
-        nonlocal record_count, last_ts_by_core
+    log_file = None
+    if args.log_file:
+        try:
+            log_file = open(args.log_file, "w", encoding="utf-8", buffering=1)
+            print(f"Saving decoded log to: {args.log_file}  "
+                  f"[{'with ANSI colours' if args.log_file_color else 'plain text'}]")
+        except Exception as e:
+            print(f"WARNING: Cannot open log file '{args.log_file}': {e}.")
+
+    _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
+
+    _is_rtt_multi = (args.source == "rtt" and args.rtt_channel2 is not None)
+    if _is_rtt_multi:
+        _channel_buffers: Dict[int, bytearray] = {
+            ch: bytearray() for ch in ser.all_channels  # type: ignore[union-attr]
+        }
+    else:
+        _channel_buffers = {0: bytearray()}
+
+    # ---- Pre-alignment: silently consume bytes until the first valid record
+    # boundary so the main parser starts cleanly. Whatever we discard here is
+    # the inevitable mid-record tail left over after the drain ended on a
+    # time-based quiet window rather than a frame boundary, and would
+    # otherwise show up as the "Bytes discarded (alignment)" overhead in the
+    # final summary. Not counted toward bytes_initial.
+    def _read_one(ch: int) -> bytes:
+        if args.source == "rtt":
+            try:
+                return ser.read_channel(ch, read_size)  # type: ignore[union-attr]
+            except Exception:
+                return b""
+        try:
+            return ser.read(read_size)
+        except Exception:
+            return b""
+
+    def _pre_align_channel(ch: int, buf: bytearray) -> int:
+        """Walk forward until a valid record sits at offset 0 of buf. Returns
+        the number of bytes silently consumed during alignment."""
+        consumed = 0
+        deadline = time.time() + 2.0
+        min_window = record_size * 2
+        while time.time() < deadline:
+            data = _read_one(ch)
+            if data:
+                buf.extend(data)
+            if len(buf) < min_window:
+                if not data:
+                    time.sleep(0.005)
+                continue
+            off = find_record_sync(buf, rec_fmt, max_args, record_size,
+                                   max_search=min(256, len(buf) - record_size))
+            if off == 0:
+                return consumed
+            if off > 0:
+                if off >= len(buf):
+                    consumed += off
+                    del buf[:off]
+                    continue
+                consumed += off
+                del buf[:off]
+                if is_valid_record(bytes(buf[:record_size]), rec_fmt,
+                                   max_args, record_size):
+                    return consumed
+            if not data:
+                time.sleep(0.005)
+        return consumed
+
+    # Only run pre-alignment for RTT - UART starts at byte 0 of the stream
+    # so it never has a mid-record tail to skip.  Runs silently so the
+    # decoded-log stream isn't preceded by noise lines while debugging.
+    if args.source == "rtt":
+        for _ch, _buf in _channel_buffers.items():
+            actual_ch = _ch if _is_rtt_multi else args.rtt_channel
+            _pre_align_channel(actual_ch, _buf)
+
+    def handle_one_record(ts: int, event_id: int, args_val: Tuple[int, ...],
+                          arg_count: int, core_id: int, flags: int,
+                          version: int) -> None:
+        nonlocal record_count
         record_count += 1
         last_ts = last_ts_by_core.get(core_id)
         delta = (ts - last_ts) if (last_ts is not None) else None
         last_ts_by_core[core_id] = ts
 
         level_str, msg, event_disp = decode_message(
-            event_id=event_id,
-            args_val=args_val,
-            arg_count=arg_count,
-            flags=flags,
-            fmt_map=fmt_map,
-            manifest_map=manifest_map,
+            event_id=event_id, args_val=args_val, arg_count=arg_count, flags=flags,
+            fmt_map=fmt_map, manifest_map=manifest_map,
             no_arg_format=args.no_arg_format,
-            core_id=core_id,
-            version=version,
-            resolver=resolver,
+            core_id=core_id, version=version, resolver=resolver,
             max_args_supported=max_args,
         )
         event_col = format_event_column(event_disp)
-
-        current_time = get_current_time()
         delta_str = f"{delta}" if delta is not None else "-"
-
-        if args.raw:
-            raw_hex = format_raw_hex(raw_chunk)
-            output = (
-                f"{current_time} [{colorize(level_str, level_str):>8}] "
-                f"{core_id:<6} {ts:>10} {delta_str:>12} {event_col} {msg}\n"
-                f"           RAW: {raw_hex}\n"
-            )
-        else:
-            output = (
-                f"{current_time} [{colorize(level_str, level_str):>8}] "
-                f"{core_id:<6} {ts:>10} {delta_str:>12} {event_col} {msg}\n"
-            )
-
+        level_field = f"[{colorize(f'{level_str:>5}', level_str)}]"
+        output = (f"{get_current_time()} {level_field} "
+                  f"{core_id:<6} {ts:>10} {delta_str:>12} {event_col} {msg}\n")
         sys.stdout.write(output)
         sys.stdout.flush()
+        if log_file:
+            log_file.write(output if args.log_file_color else _ANSI_RE.sub("", output))
+
+    def _account_discard(n: int, is_resync_episode: bool = False) -> None:
+        """Charge ``n`` discarded bytes to either the initial or runtime bucket.
+
+        Silent: counters are reported only in the final summary, not inline,
+        so the live decoded-log stream stays clean for debugging.
+        """
+        nonlocal bytes_initial, bytes_runtime, resync_initial, resync_runtime
+        if record_count == 0:
+            bytes_initial += n
+            if is_resync_episode:
+                resync_initial += 1
+        else:
+            bytes_runtime += n
+            if is_resync_episode:
+                resync_runtime += 1
+
+    def _parse_buffer(buf: bytearray) -> None:
+        while len(buf) >= record_size:
+            skip = find_record_sync(buf, rec_fmt, max_args, record_size)
+            if skip > 0:
+                if skip >= len(buf):
+                    break
+                del buf[:skip]
+                _account_discard(skip, is_resync_episode=True)
+                continue
+            if len(buf) < record_size:
+                break
+            chunk = bytes(buf[:record_size])
+            if not is_valid_record(chunk, rec_fmt, max_args, record_size):
+                buf.pop(0)
+                _account_discard(1)
+                continue
+            del buf[:record_size]
+            try:
+                ts, event_id, args_val, arg_count, core_id, flags, version = parse_record(
+                    chunk, rec_fmt, max_args
+                )
+            except Exception:
+                _account_discard(record_size)
+                continue
+            handle_one_record(ts, event_id, args_val, arg_count,
+                              core_id, flags, version)
+
+    _dead_channels: set = set()
 
     try:
         while True:
-            try:
-                data = ser.read(read_size)
-            except Exception as e:
-                sys.stdout.write(f"\n[ERROR] Serial read failed: {e}\n")
-                sys.stdout.flush()
-                break
-
-            if data:
-                buffer.extend(data)
-
-                if args.variable_packet:
-                    while len(buffer) >= 12:
-                        skip_bytes = find_record_sync_variable(buffer, endian_chr, max_args)
-                        if skip_bytes > 0:
-                            if skip_bytes >= len(buffer):
-                                break
-                            del buffer[:skip_bytes]
-                            error_count += skip_bytes
-                            continue
-
-                        p = try_parse_variable_record(bytes(buffer), endian_chr, max_args)
-                        if p is None:
-                            # Incomplete record (need more bytes) — do not drop a byte
-                            if len(buffer) >= 9:
-                                try:
-                                    _ts, _eid, ac = struct.unpack(
-                                        endian_chr + "IIB", bytes(buffer[:9])
-                                    )
-                                    if ac <= max_args and len(buffer) < 9 + 4 * ac + 3:
-                                        break
-                                except Exception:
-                                    pass
-                            buffer.pop(0)
-                            error_count += 1
-                            continue
-
-                        ts, event_id, args_val, arg_count, core_id, flags, version, reclen = p
-                        if len(buffer) < reclen:
-                            break
-                        if not validate_log_fields(
-                            ts, event_id, arg_count, core_id, flags, version, max_args
-                        ):
-                            buffer.pop(0)
-                            error_count += 1
-                            continue
-
-                        raw_chunk = bytes(buffer[:reclen])
-                        del buffer[:reclen]
-
-                        try:
-                            handle_one_record(
-                                ts,
-                                event_id,
-                                args_val,
-                                arg_count,
-                                core_id,
-                                flags,
-                                version,
-                                raw_chunk,
-                            )
-                        except Exception:
-                            error_count += 1
-                else:
-                    while len(buffer) >= record_size:
-                        skip_bytes = find_record_sync(buffer, rec_fmt, max_args, record_size)
-                        if skip_bytes > 0:
-                            if skip_bytes >= len(buffer):
-                                break
-                            del buffer[:skip_bytes]
-                            error_count += skip_bytes
-                            continue
-
-                        if len(buffer) < record_size:
-                            break
-
-                        chunk = bytes(buffer[:record_size])
-
-                        if not is_valid_record(chunk, rec_fmt, max_args, record_size):
-                            buffer.pop(0)
-                            error_count += 1
-                            continue
-
-                        del buffer[:record_size]
-
-                        try:
-                            ts, event_id, args_val, arg_count, core_id, flags, version = parse_record(
-                                chunk, rec_fmt, max_args
-                            )
-                        except Exception:
-                            error_count += 1
-                            continue
-
-                        handle_one_record(
-                            ts,
-                            event_id,
-                            args_val,
-                            arg_count,
-                            core_id,
-                            flags,
-                            version,
-                            chunk,
-                        )
-
+            got_any = False
+            if _is_rtt_multi:
+                primary_ch = args.rtt_channel
+                for ch, buf in list(_channel_buffers.items()):
+                    if ch in _dead_channels:
+                        continue
+                    try:
+                        data = ser.read_channel(ch, read_size)  # type: ignore[union-attr]
+                    except Exception as e:
+                        if ch == primary_ch:
+                            sys.stdout.write(f"\n[ERROR] RTT read (ch{ch}) failed: {e}\n")
+                            raise KeyboardInterrupt
+                        sys.stdout.write(f"\n[WARNING] RTT ch{ch} read failed: {e}. "
+                                         f"Skipping ch{ch}.\n")
+                        _dead_channels.add(ch)
+                        continue
+                    if data:
+                        buf.extend(data)
+                        got_any = True
+                    _parse_buffer(buf)
             else:
+                try:
+                    data = ser.read(read_size)
+                except Exception as e:
+                    sys.stdout.write(f"\n[ERROR] Read failed: {e}\n")
+                    break
+                buf = _channel_buffers[0]
+                if data:
+                    buf.extend(data)
+                    got_any = True
+                _parse_buffer(buf)
+
+            if not got_any:
                 time.sleep(0.001)
 
     except KeyboardInterrupt:
-        print("\n" + "─" * 80)
-        print(f"Console stopped. Records processed: {record_count}, Errors: {error_count}")
+        print("\n" + "-" * 64)
+        print()
+        print(f"Console stopped. Records decoded: {record_count}")
+        if log_file:
+            print(f"Log saved to: {args.log_file}")
     finally:
         try:
             ser.close()
         except Exception:
             pass
-        try:
-            if resolver:
+        if resolver:
+            try:
                 resolver.close()
-        except Exception:
-            pass
+            except Exception:
+                pass
+        if log_file:
+            try:
+                log_file.close()
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":
     main()
-

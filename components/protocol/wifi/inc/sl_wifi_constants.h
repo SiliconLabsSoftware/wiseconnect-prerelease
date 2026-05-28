@@ -863,34 +863,6 @@ typedef enum {
   }
 
 /**
-  * @enum sl_wifi_cw_tone_frequency_t
-  * @brief CW Tone Frequency.
-  *
-  * Frequency used for Continuous Wave (CW) Tone transmission in Wi-Fi test modes.
-  */
-typedef enum __attribute__((packed)) {
-  SL_WIFI_CW_TONE_FREQUENCY_312500HZ = 0,    ///< CW Tone Frequency 312500Hz
-  SL_WIFI_CW_TONE_FREQUENCY_612KHZ   = 1,    ///< CW Tone Frequency 612KHz
-  SL_WIFI_CW_TONE_FREQUENCY_1250KHZ  = 2,    ///< CW Tone Frequency 1250KHz
-  SL_WIFI_CW_TONE_FREQUENCY_2500KHZ  = 3,    ///< CW Tone Frequency 2500KHz
-  SL_WIFI_CW_TONE_FREQUENCY_5000KHZ  = 4,    ///< CW Tone Frequency 5000KHz
-  SL_WIFI_CW_TONE_FREQUENCY_INVALID  = 0xFF, ///< Invalid CW Tone Frequency
-} sl_wifi_cw_tone_frequency_t;
-
-/**
-  * @enum sl_wifi_dc_val_iq_t
-  * @brief DC value for I/Q signals.
-  *
-  * DC value for I/Q signals.
-  *
-  */
-typedef enum __attribute__((packed)) {
-  SL_WIFI_DC_VAL_IQ_NODATA  = 0x0,    ///< DC Value IQ No Data
-  SL_WIFI_DC_VAL_IQ_DEFAULT = 0x80,   ///< DC Value IQ Default
-  SL_WIFI_DC_VAL_IQ_INVALID = 0xFFFF, ///< Invalid DC Value IQ
-} sl_wifi_dc_val_iq_t;
-
-/**
   * @enum sl_wifi_cw_tone_amplitude_t
   * @brief CW Tone Amplitude.
   *
@@ -948,4 +920,33 @@ typedef enum __attribute__((packed)) {
   SL_WIFI_DCM_ENABLE_ENABLED  = 1, ///< DCM enabled
 } sl_wifi_dcm_enable_t;
 /**@} */
+
+/**
+  * @enum sl_wifi_cw_tone_frequency_t
+  * @brief CW Tone Frequency.
+  *
+  * Frequency used for Continuous Wave (CW) Tone transmission in Wi-Fi test modes.
+  */
+typedef enum __attribute__((packed)) {
+  SL_WIFI_CW_TONE_FREQUENCY_312500HZ = 0,    ///< CW Tone Frequency 312500Hz
+  SL_WIFI_CW_TONE_FREQUENCY_612KHZ   = 1,    ///< CW Tone Frequency 612KHz
+  SL_WIFI_CW_TONE_FREQUENCY_1250KHZ  = 2,    ///< CW Tone Frequency 1250KHz
+  SL_WIFI_CW_TONE_FREQUENCY_2500KHZ  = 3,    ///< CW Tone Frequency 2500KHz
+  SL_WIFI_CW_TONE_FREQUENCY_5000KHZ  = 4,    ///< CW Tone Frequency 5000KHz
+  SL_WIFI_CW_TONE_FREQUENCY_INVALID  = 0xFF, ///< Invalid CW Tone Frequency
+} sl_wifi_cw_tone_frequency_t;
+
+/**
+  * @enum sl_wifi_dc_val_iq_t
+  * @brief DC value for I/Q signals.
+  *
+  * DC value for I/Q signals.
+  *
+  */
+typedef enum __attribute__((packed)) {
+  SL_WIFI_DC_VAL_IQ_NODATA  = 0x0,    ///< DC Value IQ No Data
+  SL_WIFI_DC_VAL_IQ_DEFAULT = 0x80,   ///< DC Value IQ Default
+  SL_WIFI_DC_VAL_IQ_INVALID = 0xFFFF, ///< Invalid DC Value IQ
+} sl_wifi_dc_val_iq_t;
+
 #endif // _SL_WIFI_CONSTANTS_H_

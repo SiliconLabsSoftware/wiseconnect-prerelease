@@ -86,11 +86,21 @@ sl_status_t sl_si91x_iostream_swo_init(void)
   *******************************************************************************/
 sl_status_t sl_si91x_iostream_swo_deinit(void)
 {
+  sl_status_t ret = SL_STATUS_OK;
 
   // De-configure ITM
   // We cannot fully deconfigure the debug/trace system, since
   // it may be in use by others.
-  return sl_si91x_debug_swo_disable_itm(0U);
+  ret = sl_si91x_debug_swo_disable_itm(0U);
+  if (ret != SL_STATUS_OK) {
+    return ret;
+  }
+
+  ret = sl_si91x_debug_swo_deinit();
+  if (ret != SL_STATUS_OK && ret != SL_STATUS_NOT_INITIALIZED) {
+    return ret;
+  }
+  return SL_STATUS_OK;
 }
 
 /*******************************************************************************

@@ -85,13 +85,20 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Test the Application
 
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
+
 1. Compile and run the application.
 2. Logs are printed with success or failure status for PSRAM read & write events in auto mode, manual mode, and manual via DMA mode.
 3. Serial console output will be below.
 
     > ![Figure: outputConsole_PSRAM_DRIVER_Example](resources/readme/outputConsole_PSRAM_DRIVER_Example.png)
 
-
+> **Note:** PSRAM driver application is integrated with logger, where sl_si91x_log_backend_uart is used as the backend.
 
 > **Note:**
 >

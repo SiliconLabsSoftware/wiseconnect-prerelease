@@ -219,12 +219,8 @@ SECTIONS
 	{% endif %} 
 	__exidx_end = .;
 
-{%- if si91x_platform_core %}
-	{%- if si91x_log_formatted_output_enable %}
+{%- if si91x_platform_core and si91x_log_formatted_output_enable %}
 	.log_fmt :
-	{%- else %}
-	.log_fmt (NOLOAD) :
-	{%- endif %}
 	{
 		. = ALIGN(4);
 		__log_start__ = .;
@@ -233,10 +229,10 @@ SECTIONS
 		__log_end__ = .;
 	{%- if psram_present and text_segment_in_psram %}
 		_last_psram_location = .;
-	} > psram	
-	{%- elif flash_present %}			
-	} > rom 
-	{%- else %}			
+	} > psram
+	{%- elif flash_present %}
+	} > rom
+	{%- else %}
 	} > ram
 	{% endif %}
 {%- endif %}
@@ -678,6 +674,18 @@ SECTIONS
  
 {%- endif %}  /* littlefs_enable */
 {%- endif %}  /* Flash Present */
+
+{%- if si91x_platform_core and not si91x_log_formatted_output_enable %}
+	/* Non-allocatable .log_fmt: placed at the very end of SECTIONS so it does
+	   not disrupt LLD's location counter / PHDR tracking for the allocatable
+	   sections above. Excluded from .bin via (INFO). */
+	.log_fmt (INFO) :
+	{
+		__log_start__ = .;
+		*(.log_fmt*)
+		__log_end__ = .;
+	}
+{%- endif %}
 
 /*
  * Flash overflow guards.

@@ -66,7 +66,7 @@ extern sl_iostream_instance_info_t sl_si91x_iostream_instance_debug_info; ///< s
  * 
  * @return sl_status_t Status code indicating the result:
  *         - SL_STATUS_OK                 - Success.
- *         - SK_STATUS_FAIL               - fail
+ *         - SL_STATUS_FAIL               - fail
  *
  * For more information on status codes, see [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  ******************************************************************************/

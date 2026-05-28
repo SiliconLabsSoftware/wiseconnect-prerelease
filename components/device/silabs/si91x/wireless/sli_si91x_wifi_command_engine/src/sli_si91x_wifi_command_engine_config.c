@@ -294,6 +294,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_WIFI_RSP_TSF:
         case SLI_WIFI_RSP_AP_CONFIGURATION:
         case SLI_WIFI_RSP_WPS_METHOD:
+        case SLI_WIFI_RSP_WPS_EXTENDED_CREDENTIALS:
         case SLI_WIFI_RSP_QUERY_NETWORK_PARAMS:
         case SLI_WIFI_RSP_SET_MAC_ADDRESS:
         case SLI_WIFI_RSP_SET_REGION:

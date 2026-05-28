@@ -664,6 +664,7 @@ static sl_status_t sli_configure_channel_bitmap(sl_wifi_interface_t interface,
   }
   return SL_STATUS_OK;
 }
+
 sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_response_t *wps_response)
 {
   sl_status_t status;

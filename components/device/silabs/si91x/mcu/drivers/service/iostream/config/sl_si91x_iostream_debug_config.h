@@ -1,9 +1,9 @@
 /***************************************************************************/ /**
  * @file
- * @brief IO Stream Log configuration for SiWx91x.
+ * @brief IO Stream Debug configuration for SiWx91x.
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -27,24 +27,26 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-#ifndef SL_SI91X_IOSTREAM_LOG_CONFIG_H
-#define SL_SI91X_IOSTREAM_LOG_CONFIG_H
+#ifndef SL_SI91X_IOSTREAM_DEBUG_CONFIG_H
+#define SL_SI91X_IOSTREAM_DEBUG_CONFIG_H
+
+#include "sl_si91x_iostream_swo_itm_8.h"
 
 // <<< Use Configuration Wizard in Context Menu >>>
 
-// <h>LOG PRINTS settings
-// <q SL_SI91X_IOSTREAM_LOG_PRINTS_ENABLE> IOSTREAM LOG ENABLE
-// <i> Default: 1
-#define SL_SI91X_IOSTREAM_LOG_PRINTS_ENABLE 1
+// <h>IO Stream Debug settings
 
-// <o  IOSTREAM_LOG_TYPE> Stream type
-// <SL_SI91X_IOSTREAM_SWO_LOG=> SWO
-// <SL_SI91X_IOSTREAM_RTT_LOG=> RTT
-// <SL_SI91X_IOSTREAM_VUART_LOG=> VUART
-// <SL_SI91X_IOSTREAM_DEBUG_LOG=> DEBUG
-// <i> Default: RTT
-#define IOSTREAM_LOG_TYPE SL_SI91X_IOSTREAM_RTT_LOG
+// <o SL_SI91X_IOSTREAM_DEBUG_MSG_TYPE> Debug message type
+// <SI91X_DEBUG_PRINTF=> Debug printf
+// <SI91X_DEBUG_VIRTUAL_UART_TX=> Virtual UART TX
+// <SI91X_DEBUG_ML_PROFILER=> ML Profiler
+// <i> Selects the SWO ITM stimulus 8 message type used by the IO Stream Debug
+// <i> (DCH) transport. This value is applied automatically inside
+// <i> sl_si91x_iostream_debug_init().
+// <i> Default: SI91X_DEBUG_PRINTF
+#define SL_SI91X_IOSTREAM_DEBUG_MSG_TYPE SI91X_DEBUG_PRINTF
 
 // </h>
 // <<< end of configuration section >>>
-#endif
+
+#endif /* SL_SI91X_IOSTREAM_DEBUG_CONFIG_H */

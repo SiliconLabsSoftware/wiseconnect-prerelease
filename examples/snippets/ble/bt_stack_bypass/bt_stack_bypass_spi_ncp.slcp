@@ -1,7 +1,7 @@
 project_name: bt_stack_bypass_spi_ncp
 package: bluetooth_le_siwx91x_app
 quality: production
-label: bt_stack_bypass_spi_ncp
+label: BLE - NCP BT Stack Bypass
 category: Example|BLE
 description: 'BLE HCI raw (stack bypass) on NCP host MCU (EFR32 + Si91x module) over SPI.
 
@@ -13,12 +13,18 @@ description: 'BLE HCI raw (stack bypass) on NCP host MCU (EFR32 + Si91x module) 
 
   '
 filter:
-- name: Project Difficulty
-  value:
-  - Beginner
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - NCP
+- name: Project Difficulty
+  value:
+  - Beginner
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 - path: utils/command_parser.c

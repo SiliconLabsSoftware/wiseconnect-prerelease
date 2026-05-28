@@ -159,6 +159,9 @@ Open `app.c` file and configure the following parameters accordingly:
 >
 > 5. **Clean** the project and then **rebuild** it for the change to take effect.
 
+> [!NOTE]
+> Sideband is supported only with PSA APIs.
+
 ## Test the Application
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:

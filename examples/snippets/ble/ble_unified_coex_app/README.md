@@ -1,5 +1,7 @@
 # BLE Unified Coex Application
 
+> **Note:** This application is a **Proof of Concept (PoC)** and is intended for evaluation and demonstration purposes only. It is not recommended for production use.
+
 ## Overview
 
 This example demonstrates the use of the **BLE Unified Component Framework** on the Si917 SoC.

@@ -783,17 +783,6 @@ typedef struct {
 } sl_wifi_operational_statistics_t;
 
 /**
- * @struct sl_wifi_p2p_configuration_t
- * @brief Wi-Fi Direct (P2P) configuration structure.
- */
-typedef struct {
-  uint16_t group_owner_intent;                      ///< Group owner intent
-  const char *device_name;                          ///< Device name
-  sl_wifi_channel_t channel;                        ///< Wi-Fi channel. This is of type @ref sl_wifi_channel_t
-  char ssid_suffix[SL_WIFI_P2P_SSID_SUFFIX_LENGTH]; ///< SSID suffix
-} sl_wifi_p2p_configuration_t;
-
-/**
  * @union sl_wifi_event_data_t
  * @brief Wi-Fi event data.
  *
@@ -845,7 +834,9 @@ typedef struct {
   uint8_t security_type;                        ///< Security type
   uint8_t key[SL_WIFI_WPS_KEY_LENGTH];          ///< Network key
   uint8_t mac_addr[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< MAC address of the access point
-  uint32_t reserved;                            ///< Reserved for future use
+  uint8_t remaining_credentials_count;          ///< Additional WPS profiles
+  uint8_t reserved;                             ///< Reserved for future use
+  uint16_t reserved1;                           ///< Reserved for future use
 } sl_wifi_wps_response_t;
 #pragma pack()
 
@@ -1031,47 +1022,6 @@ typedef struct {
   uint16_t bss_multicast_pkts;                ///< BSSID matched multicast packets count
   uint16_t bss_filter_matched_multicast_pkts; ///< BSSID & multicast filter matched packets count
 } sl_wifi_async_stats_response_t;
-
-/**
- * @struct sl_wifi_cw_tone_config_t
- * @brief Structure representing the configuration for CW tone settings.
- *
- * This structure contains parameters to configure single-tone and two-tone modes, 
- * tone frequencies, amplitude scaling, and DC mode settings.
- * @note 
- *    - This structure is only supported on SiWx353 devices, not on SiWx91x devices.
- */
-typedef struct {
-  uint8_t freq_val_en; ///< Enable or disable frequency value. 1 to enable, 0 to disable.
-  uint8_t two_tone_en; ///< Enable or disable two-tone mode. 1 to enable, 0 to disable.
-  uint16_t
-    tone1_freq_val; ///< Frequency value for the first tone in KHz. Indicates the frequency of the 1st tone to be generated in TX test modes. Valid range of values is from 0 to 5000. This is ignored when @ref freq_val_en is 0.
-  sl_wifi_cw_tone_frequency_t
-    tone1_freq_sel; ///< Frequency selection for the first tone. Indicates the frequency of the 1st Tone to be generated in TX test modes. This is ignored when @ref freq_val_en is 1. Possible values are defined in @ref sl_wifi_cw_tone_frequency_t.
-  uint16_t
-    tone2_freq_val; ///< Frequency value for the second tone in KHz. Indicates the frequency of the 2nd Tone to be generated in TX test modes. Valid range of values is from 0 to 5000. This is ignored when @ref freq_val_en is 0 or @ref two_tone_en is 0.
-  sl_wifi_cw_tone_frequency_t
-    tone2_freq_sel; ///< Frequency selection for the second tone. Indicates the frequency of the 2nd Tone to be generated in TX test modes. This is ignored when @ref freq_val_en is 1 or @ref two_tone_en is 0. Possible values are defined in @ref sl_wifi_cw_tone_frequency_t.
-  sl_wifi_cw_tone_amplitude_t
-    tone_scale_val; ///< This is used to control the amplitude of the WAVE. Possible values are defined in @ref sl_wifi_cw_tone_amplitude_t.
-  uint8_t neg_tone_en; ///< Enable or disable negative tone. 1 to enable, 0 to disable.
-  uint8_t dc_mode_en;  ///< Enable or disable DC mode. 1 to enable, 0 to disable.
-  sl_wifi_dc_val_iq_t
-    dc_val_iq; ///< DC Value to be transmitted. Possible values are defined in @ref sl_wifi_dc_val_iq_t. This is ignored when dc_mode_en is 0.
-} sl_wifi_cw_tone_config_t;
-
-/**
- * @struct sl_wifi_response_get_ctune_data_t
- * @brief Structure representing the response for getting CTUNE data.
- * 
- * This structure contains the flags indicating the presence of CTUNE data and the actual CTUNE data values.
- * @note
- * This structure is only supported on SiWx353 devices, not on SiWx91x devices.
- */
-typedef struct {
-  uint32_t flags;                                ///< Flags indicating the presence of CTUNE data
-  uint32_t ctune_data[SL_WIFI_CTUNE_DATA_WORDS]; ///< CTUNE data values
-} sl_wifi_response_get_ctune_data_t;
 
 /**
  * @struct sl_wifi_rx_stats_request_t
@@ -1275,17 +1225,6 @@ typedef struct __attribute__((packed)) {
 } sl_wifi_11bgn_per_params_t;
 
 /**
- * @struct sl_wifi_11ac_per_params_t
- * @brief Structure representing Wi-Fi 5 (802.11ac) VHT-specific PER parameters.
- *
- * This structure contains the VHT (Very High Throughput) specific parameters for
- * configuring a Wi-Fi 5 (802.11ac) PER transmit test, such as short guard interval.
- */
-typedef struct __attribute__((packed)) {
-  uint8_t short_gi_enable; ///< Short guard interval. 0 - disable, 1 - enable
-} sl_wifi_11ac_per_params_t;
-
-/**
  * @struct sl_wifi_11ax_per_params_t
  * @brief Structure representing Wi-Fi 6/6E (802.11ax) HE-specific PER parameters.
  *
@@ -1316,28 +1255,6 @@ typedef struct __attribute__((packed)) {
   uint16_t user_sta_id;                ///< Station ID of the intended user. Range: 0-2047
   uint8_t sigb_compression;            ///< SIG-B compression field. 0 or 1
 } sl_wifi_11ax_per_params_t;
-
-/**
- * @struct sl_wifi_11be_per_params_t
- * @brief Structure representing Wi-Fi 7 (802.11be) EHT-specific PER parameters.
- *
- * This structure contains the EHT (Extremely High Throughput) specific parameters for
- * configuring a Wi-Fi 7 (802.11be) PER transmit test, such as coding type, PPDU type,
- * guard interval, and other EHT-specific fields.
- */
-typedef struct __attribute__((packed)) {
-  uint8_t coding_type;     ///< Coding type. 0 - BCC, 1 - LDPC
-  uint8_t nominal_pe;      ///< Nominal T-PE value. 0 - 0us, 1 - 8us, 2 - 16us
-  uint8_t ul_dl;           ///< UL/DL indication. 1 - UL (STA to AP), 0 - DL (AP to STA)
-  uint8_t be_ppdu_type;    ///< BE PPDU type
-  uint8_t bw;              ///< BW for PPDU
-  sl_wifi_gi_ltf_t gi_ltf; ///< HE GI and HE-LTF; values from @ref sl_wifi_gi_ltf_t
-  uint8_t spatial_reuse;   ///< Spatial reuse
-  uint8_t ru_allocation;   ///< RU allocation subfield
-  uint8_t n_heltf_tot;     ///< Number of HE-LTF to be transmitted
-  uint8_t eht_sig_mcs;     ///< MCS for EHT SIG symbols
-  uint8_t disregard;       ///< Disregard field
-} sl_wifi_11be_per_params_t;
 
 /**
  * @struct sl_wifi_11ax_config_params_t
@@ -1968,3 +1885,88 @@ typedef struct {
 } sl_wifi_groupcast_filter_config_t;
 
 /** @} */
+
+/**
+ * @struct sl_wifi_p2p_configuration_t
+ * @brief Wi-Fi Direct (P2P) configuration structure.
+ */
+typedef struct {
+  uint16_t group_owner_intent;                      ///< Group owner intent
+  const char *device_name;                          ///< Device name
+  sl_wifi_channel_t channel;                        ///< Wi-Fi channel. This is of type @ref sl_wifi_channel_t
+  char ssid_suffix[SL_WIFI_P2P_SSID_SUFFIX_LENGTH]; ///< SSID suffix
+} sl_wifi_p2p_configuration_t;
+
+/**
+ * @struct sl_wifi_cw_tone_config_t
+ * @brief Structure representing the configuration for CW tone settings.
+ *
+ * This structure contains parameters to configure single-tone and two-tone modes, 
+ * tone frequencies, amplitude scaling, and DC mode settings.
+ * @note 
+ *    - This structure is only supported on SiWx353 devices, not on SiWx91x devices.
+ */
+typedef struct {
+  uint8_t freq_val_en; ///< Enable or disable frequency value. 1 to enable, 0 to disable.
+  uint8_t two_tone_en; ///< Enable or disable two-tone mode. 1 to enable, 0 to disable.
+  uint16_t
+    tone1_freq_val; ///< Frequency value for the first tone in KHz. Indicates the frequency of the 1st tone to be generated in TX test modes. Valid range of values is from 0 to 5000. This is ignored when @ref freq_val_en is 0.
+  sl_wifi_cw_tone_frequency_t
+    tone1_freq_sel; ///< Frequency selection for the first tone. Indicates the frequency of the 1st Tone to be generated in TX test modes. This is ignored when @ref freq_val_en is 1. Possible values are defined in @ref sl_wifi_cw_tone_frequency_t.
+  uint16_t
+    tone2_freq_val; ///< Frequency value for the second tone in KHz. Indicates the frequency of the 2nd Tone to be generated in TX test modes. Valid range of values is from 0 to 5000. This is ignored when @ref freq_val_en is 0 or @ref two_tone_en is 0.
+  sl_wifi_cw_tone_frequency_t
+    tone2_freq_sel; ///< Frequency selection for the second tone. Indicates the frequency of the 2nd Tone to be generated in TX test modes. This is ignored when @ref freq_val_en is 1 or @ref two_tone_en is 0. Possible values are defined in @ref sl_wifi_cw_tone_frequency_t.
+  sl_wifi_cw_tone_amplitude_t
+    tone_scale_val; ///< This is used to control the amplitude of the WAVE. Possible values are defined in @ref sl_wifi_cw_tone_amplitude_t.
+  uint8_t neg_tone_en; ///< Enable or disable negative tone. 1 to enable, 0 to disable.
+  uint8_t dc_mode_en;  ///< Enable or disable DC mode. 1 to enable, 0 to disable.
+  sl_wifi_dc_val_iq_t
+    dc_val_iq; ///< DC Value to be transmitted. Possible values are defined in @ref sl_wifi_dc_val_iq_t. This is ignored when dc_mode_en is 0.
+} sl_wifi_cw_tone_config_t;
+
+/**
+ * @struct sl_wifi_response_get_ctune_data_t
+ * @brief Structure representing the response for getting CTUNE data.
+ * 
+ * This structure contains the flags indicating the presence of CTUNE data and the actual CTUNE data values.
+ * @note
+ * This structure is only supported on SiWx353 devices, not on SiWx91x devices.
+ */
+typedef struct {
+  uint32_t flags;                                ///< Flags indicating the presence of CTUNE data
+  uint32_t ctune_data[SL_WIFI_CTUNE_DATA_WORDS]; ///< CTUNE data values
+} sl_wifi_response_get_ctune_data_t;
+
+/**
+ * @struct sl_wifi_11ac_per_params_t
+ * @brief Structure representing Wi-Fi 5 (802.11ac) VHT-specific PER parameters.
+ *
+ * This structure contains the VHT (Very High Throughput) specific parameters for
+ * configuring a Wi-Fi 5 (802.11ac) PER transmit test, such as short guard interval.
+ */
+typedef struct __attribute__((packed)) {
+  uint8_t short_gi_enable; ///< Short guard interval. 0 - disable, 1 - enable
+} sl_wifi_11ac_per_params_t;
+
+/**
+ * @struct sl_wifi_11be_per_params_t
+ * @brief Structure representing Wi-Fi 7 (802.11be) EHT-specific PER parameters.
+ *
+ * This structure contains the EHT (Extremely High Throughput) specific parameters for
+ * configuring a Wi-Fi 7 (802.11be) PER transmit test, such as coding type, PPDU type,
+ * guard interval, and other EHT-specific fields.
+ */
+typedef struct __attribute__((packed)) {
+  uint8_t coding_type;     ///< Coding type. 0 - BCC, 1 - LDPC
+  uint8_t nominal_pe;      ///< Nominal T-PE value. 0 - 0us, 1 - 8us, 2 - 16us
+  uint8_t ul_dl;           ///< UL/DL indication. 1 - UL (STA to AP), 0 - DL (AP to STA)
+  uint8_t be_ppdu_type;    ///< BE PPDU type
+  uint8_t bw;              ///< BW for PPDU
+  sl_wifi_gi_ltf_t gi_ltf; ///< HE GI and HE-LTF; values from @ref sl_wifi_gi_ltf_t
+  uint8_t spatial_reuse;   ///< Spatial reuse
+  uint8_t ru_allocation;   ///< RU allocation subfield
+  uint8_t n_heltf_tot;     ///< Number of HE-LTF to be transmitted
+  uint8_t eht_sig_mcs;     ///< MCS for EHT SIG symbols
+  uint8_t disregard;       ///< Disregard field
+} sl_wifi_11be_per_params_t;

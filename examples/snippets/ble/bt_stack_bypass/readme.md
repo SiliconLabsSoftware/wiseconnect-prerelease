@@ -24,6 +24,8 @@ SiWx91x BLE BT stack bypass example: send raw HCI commands to the SiWx91x module
       - [BTDM debug logging (controller logs on RTT)](#btdm-debug-logging-controller-logs-on-rtt)
     - [Configuration and Setup](#configuration-and-setup)
     - [Steps for Execution](#steps-for-execution)
+      - [Attach HCI UART on the Linux host (Raspberry Pi / modern Linux)](#attach-hci-uart-on-the-linux-host-raspberry-pi--modern-linux)
+      - [Legacy Fedora (hciattach)](#legacy-fedora-hciattach)
     - [Pin configurations for UART cable (SoC mode)](#pin-configurations-for-uart-cable-soc-mode)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
@@ -197,53 +199,103 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 Follow the steps for successful execution of the program:
 
 1. After the program gets executed, Silicon Labs module will be in uart receive state.
-	
+
 	- Observe the prints in the Docklight
-	
+
 	![](resources/readme/consoleprints.png)
 
-2. Add the hciattach file from below path examples\snippets\ble\bt_stack_bypass\binaries in Fedora in any Folder.
+2. Wait until **Wi-Fi initialization completes** on the module before attaching HCI on the host (required for BLE HCI to respond).
 
-3. Change the permissions for the hciattach file added in Fedora by giving below command.
-    ```c
-	    chmod 777 hciattach
-    ```
-	
-4. Send the below command to make `Silicon labs module Up`.
-    ```c
-	    ./hciattach -s 115200  /dev/ttyUSBX  any , X - device interface
+3. Attach the UART HCI interface on the Linux host — see [Attach HCI UART on the Linux host](#attach-hci-uart-on-the-linux-host-raspberry-pi--modern-linux) (Raspberry Pi / modern Linux) or [Legacy Fedora (hciattach)](#legacy-fedora-hciattach).
+
+4. Send the below command to verify the device interface with `BD_ADDR` is up or not.
+
+    ```sh
+    hciconfig
     ```
 
-5. Send the below command to verify the device interface with `BD_ADDR` is up or not.
-    ```c
-	    hciconfig
-    ```
-	
-6. If the interface is `DOWN`. send below command to make interface `UP`. where  `X` indicates device interface.
-    ```c
-	    hciconfig -a hciX up 
+5. If the interface is `DOWN`, send below command to make interface `UP`, where `X` indicates device interface.
+
+    ```sh
+    hciconfig -a hciX up
     ```
 
-7. Send the below commands to verify the basic functionality.
-    - For Advertising, where  `X` indicates device interface.
+6. Send the below commands to verify the basic functionality.
+    - For Advertising, where `X` indicates device interface.
 
-    ```c
-	    hciconfig -a hciX leadv
+    ```sh
+    hciconfig -a hciX leadv
     ```
-    - For Scanning, where  `X` indicates device interface.
+    - For Scanning, where `X` indicates device interface.
 
-    ```c
-    	hcitool -i hciX lescan (for scanning), X - device interface
+    ```sh
+    hcitool -i hciX lescan
     ```
-8. After sending the above commands verify functionlaity in Remote Mobile App
 
-   - Open NRF connect app in remote Mobile device and scan for Silicon Labs Module with BD_ADDR seen in step no.5
-	
-9. Send the below command to remove the device.
-    ```c
-	    pkill hciattach
+7. After sending the above commands verify functionality in Remote Mobile App
+
+   - Open NRF connect app in remote Mobile device and scan for Silicon Labs Module with BD_ADDR seen in step no. 4
+
+8. To detach the HCI UART interface, stop `btattach` (modern Linux) or `hciattach` (legacy):
+
+    ```sh
+    pkill -f 'btattach.*ttyUSBX'
     ```
-10. If you want to re-run the application press reset on the EFR and follow the same steps.	
+    or
+    ```sh
+    pkill hciattach
+    ```
+
+9. If you want to re-run the application press reset on the board and follow the same steps.
+
+#### Attach HCI UART on the Linux host (Raspberry Pi / modern Linux)
+
+Use this flow on **Raspberry Pi OS**, **Debian Bookworm**, and other hosts with **kernel 5.10+** and **BlueZ 5.x**. The bundled script uses `btattach` (H4 protocol) instead of the deprecated `hciattach` tool.
+
+1. Install BlueZ user tools if `btattach` is not present:
+
+    ```sh
+    sudo apt install bluez
+    ```
+
+2. Copy `examples/snippets/ble/bt_stack_bypass/binaries/hci_uart_attach.sh` to the Pi and make it executable:
+
+    ```sh
+    chmod +x hci_uart_attach.sh
+    ```
+
+3. Attach the SiWx91x HCI UART (use `-d` for background mode — recommended on Pi so SSH disconnect does not remove `hciX`):
+
+    ```sh
+    sudo ./hci_uart_attach.sh -d /dev/ttyUSBX 115200
+    ```
+
+4. Bring the interface up:
+
+    ```sh
+    sudo hciconfig hciX up
+    ```
+
+The script stops **ModemManager** and the host **bluetooth** service (which can grab the serial port or conflict with the onboard controller), configures the UART line, and runs `btattach -P h4 -N`. **`btattach` must stay running** while `hci0` is in use.
+
+#### Legacy Fedora (hciattach)
+
+On older Fedora hosts that ship the bundled `hciattach` binary in `examples/snippets/ble/bt_stack_bypass/binaries/`:
+
+1. Copy the `hciattach` binary to a folder on the host.
+
+2. Change permissions:
+
+    ```sh
+    chmod 777 hciattach
+    ```
+
+3. Attach:
+
+    ```sh
+    ./hciattach -s 115200 /dev/ttyX any
+    ```
+
 	
 ### Pin configurations for UART cable (SoC mode)
 
@@ -251,7 +303,7 @@ The table below applies **only to SoC mode**, when you connect an **external USB
 
 **NCP mode (this SPI NCP example):** the EFR32 host board is typically connected to the PC with a **single USB cable** that supplies **power** and carries **USB/VCOM data** (HCI to the host and debug/flash as configured in Studio). You do **not** use the SoC UART pin wiring below for that link; follow your board’s **USB** connection and the project’s **stdio / iostream** setup instead.
 
-- Connect USB to UART cable to Fedora/Linux machine ([example cable](https://www.amazon.in/Serial-Converter-Cable-Terminated-Header/dp/B06ZYPLFNB)).
+- Connect USB to UART cable to a Linux host (e.g. Raspberry Pi or Fedora) ([example cable](https://www.amazon.in/Serial-Converter-Cable-Terminated-Header/dp/B06ZYPLFNB)).
 - Follow the pin configuration below to connect the USB-to-UART cable to the WSTK board (**SoC** testing only).
 
 | Pin description | Pin number on the WSTK board |
@@ -265,9 +317,13 @@ If you encounter issues while running the BT Stack Bypass example, check the fol
 
 - Ensure USART0 DMA channels (`RTE_USART0_CHNL_UDMA_TX_EN`, `RTE_USART0_CHNL_UDMA_RX_EN`) are enabled in `USART.c`.
 - Verify the USB-to-UART cable wiring matches the pin configuration (Tx on P35, Rx on P33).
-- Confirm the `hciattach` file has execute permissions (`chmod 777 hciattach`) on the Linux host.
+- On **Raspberry Pi / modern Linux**, use `hci_uart_attach.sh` with `btattach` — not legacy `hciattach` (see [Attach HCI UART on the Linux host](#attach-hci-uart-on-the-linux-host-raspberry-pi--modern-linux)).
+- Wait for **Wi-Fi initialization** on the module before running `hciconfig hciX up`.
+- If the serial port is busy, ensure **ModemManager** and the host **bluetooth** service are stopped (the script does this automatically).
+- On Pi, run `hci_uart_attach.sh -d` so `btattach` survives SSH session disconnect.
 - If `hciconfig` shows the interface as DOWN, bring it up with `hciconfig -a hciX up`.
-- Verify the serial baud rate (115200) and correct `/dev/ttyUSBX` device path when starting `hciattach`.
+- Verify the serial baud rate (115200) and correct `/dev/ttyUSBX` device path.
+- On legacy Fedora, confirm the `hciattach` binary has execute permissions (`chmod 777 hciattach`).
 
 ## Resources
 
