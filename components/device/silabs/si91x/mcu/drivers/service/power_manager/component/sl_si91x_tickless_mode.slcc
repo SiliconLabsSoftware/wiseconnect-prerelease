@@ -1,15 +1,13 @@
 id: si91x_tickless_mode
 label: Tick-Less Mode
 package: platform_siwx91x
-description: This Tick-Less Mode component enables FreeRTOS low-power tickless mode using the sleep timer. 
-category: Device|Si91x|MCU|Service
+description: This Tick-Less Mode component enables FreeRTOS low-power tickless mode using the sleep timer.
+category: Device|Si91x|MCU|Service|Power Manager
 quality: production
 metadata:
   sbom:
     license: MSLA
-component_root_path: "third_party/silicon_labs/freertos"
-source:
-  - path: "src/sl_si91x_low_power_tickless_mode.c"
+component_root_path: "components/device/silabs/si91x/mcu/drivers/service/power_manager"
 requires:
   - name: sleeptimer_si91x
   - name: sllib_m4_power_save

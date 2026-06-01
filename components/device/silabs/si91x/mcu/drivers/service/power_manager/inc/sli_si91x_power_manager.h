@@ -126,15 +126,16 @@ sl_status_t sli_si91x_power_manager_change_power_state(sl_power_state_t from,
 #else
 /***************************************************************************/
 /**
- * @brief To update the Power State as per the from and to parameters (with caller PRIMASK context).
+ * @brief To update the Power State as per the from and to parameters.
  *
  * @note FOR INTERNAL USE ONLY.
  *
  * @param[in] from Power State from which the transition takes place (of type \ref sl_power_state_t).
  * @param[in] to   Power State to which the transition takes place (of type \ref sl_power_state_t).
- * @param[in] critical_irq_state PRIMASK from SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() at the
- *             add/remove requirement boundary. For PS0/PS1 transitions, sli_si91x_power_manager_core_exitcritical()
- *             runs on this value before the transition handler.
+ * @param[in] critical_irq_state Return value of SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() at the add/remove
+ *             requirement boundary. It is the saved PRIMASK value (whether IRQs were masked before enter), not a
+ *             pointer to the PRIMASK register. For PS0/PS1 transitions, sli_si91x_power_manager_core_exitcritical()
+ *             uses this value before the transition handler.
  *
  * @return Status code of the operation.
  *         - SL_STATUS_OK  - Success.

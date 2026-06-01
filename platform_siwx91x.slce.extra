@@ -555,8 +555,6 @@ components:
 - sl_si91x_agents_md
 extra_files:
 - platform_siwx91x.slce
-- third_party/silicon_labs/freertos/src/sl_si91x_low_power_tickless_mode.c
-- third_party/silicon_labs/freertos/component/sl_si91x_tickless_mode.slcc
 - utilities/postbuild_profile/wiseconnect_soc.slpb
 - components/device/silabs/si91x/mcu/sl_si91x_mcu.slcc
 - components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c

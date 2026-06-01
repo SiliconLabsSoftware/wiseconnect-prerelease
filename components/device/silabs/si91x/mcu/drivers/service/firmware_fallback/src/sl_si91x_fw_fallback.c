@@ -332,8 +332,9 @@ static sl_status_t sli_si91x_validate_ab_info(uint32_t address, sl_si91x_fw_ab_s
 
   // **Validate Inputs: NULL Pointer & Zero Address**
   if (slot_info == NULL || address == 0) {
-    SL_PRINT_STRING_ERROR("[validate_ab_info] Error: %s. Aborting operation.",
-                          (slot_info == NULL) ? "Slot info pointer is NULL" : "Invalid address (0x00000000)");
+    SL_PRINT_STRING_ERROR(
+      "[validate_ab_info] Error: %s. Aborting operation.",
+      (slot_info == NULL) ? (uintptr_t) "Slot info pointer is NULL" : (uintptr_t) "Invalid address (0x00000000)");
     return (slot_info == NULL) ? SL_STATUS_NULL_POINTER : SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -692,8 +693,9 @@ sl_status_t sl_si91x_toggle_slot_info(bool toggle_m4_image, bool toggle_nwp_imag
                                   ? slot_info.m4_slot_info.m4_slot_B.image_size
                                   : slot_info.m4_slot_info.m4_slot_A.image_size;
 
-    SL_PRINT_STRING_ERROR("[toggle_ab_info] Switching M4 slot to %s",
-                          (slot_info.m4_slot_info.current_active_M4_slot == SLOT_A) ? "B" : "A");
+    SL_PRINT_STRING_ERROR(
+      "[toggle_ab_info] Switching M4 slot to %s",
+      (slot_info.m4_slot_info.current_active_M4_slot == SLOT_A) ? (uintptr_t) "B" : (uintptr_t) "A");
 
     status = sl_si91x_ab_upgrade_set_slot_info(new_image_offset, new_image_size, SL_SI91X_AB_OTA_IMAGE_TYPE_M4);
     if (status != SL_STATUS_OK) {
@@ -711,8 +713,9 @@ sl_status_t sl_si91x_toggle_slot_info(bool toggle_m4_image, bool toggle_nwp_imag
                                   ? slot_info.nwp_slot_info.nwp_slot_B.image_size
                                   : slot_info.nwp_slot_info.nwp_slot_A.image_size;
 
-    SL_PRINT_STRING_ERROR("[toggle_ab_info] Switching NWP slot to %s",
-                          (slot_info.nwp_slot_info.current_active_nwp_slot == SLOT_A) ? "B" : "A");
+    SL_PRINT_STRING_ERROR(
+      "[toggle_ab_info] Switching NWP slot to %s",
+      (slot_info.nwp_slot_info.current_active_nwp_slot == SLOT_A) ? (uintptr_t) "B" : (uintptr_t) "A");
 
     status = sl_si91x_ab_upgrade_set_slot_info(new_image_offset, new_image_size, SL_SI91X_AB_OTA_IMAGE_TYPE_NWP);
     if (status != SL_STATUS_OK) {

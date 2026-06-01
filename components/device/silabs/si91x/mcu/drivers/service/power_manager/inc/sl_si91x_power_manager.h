@@ -151,8 +151,10 @@ extern "C" {
 
 /** @cond DO_NOT_INCLUDE_WITH_DOXYGEN */
 // Deprecated: SL_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL and SL_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL.
-#define SL_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL            sl_si91x_power_manager_core_entercritical()
-#define SL_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL             sl_si91x_power_manager_core_exitcritical()
+#define SL_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL sl_si91x_power_manager_core_entercritical()
+#define SL_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL  sl_si91x_power_manager_core_exitcritical()
+// SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL starts a critical section; SLI_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL ends it (PRIMASK save/restore).
+// Use the return value of SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() as irq_state in SLI_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL(irq_state).
 #define SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL()         sli_si91x_power_manager_core_entercritical()
 #define SLI_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL(irq_state) sli_si91x_power_manager_core_exitcritical(irq_state)
 /** @endcond */
@@ -243,51 +245,47 @@ typedef struct {
 // -----------------------------------------------------------------------------
 // Internal API Prototypes
 #ifndef SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
-/*******************************************************************************
- * @brief To update the power state requirement, requirement table, and the current state variable.
- *
- * Deprecated: use \c sli_si91x_power_manager_update_ps_requirement_with_critical_irq instead.
- *
- * This function updates the power state requirement, requirement table, and the current state variable.
- *
- * @note FOR INTERNAL USE ONLY.
- *
- * @param[in] state Power state requirement that needs to be updated.
- * @param[in] add   Flag indicating if the requirement is added (true) or removed (false).
- *
- * @return Status code indicating the result:
- *         - SL_STATUS_OK  - Success.
- *         - SL_STATUS_NOT_INITIALIZED  - Power Manager is not initialized.
- *         - SL_STATUS_INVALID_PARAMETER  - Invalid state, invalid transition, or table bounds.
- *
- * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
- ******************************************************************************/
+// Update the power state requirement, requirement table, and the current state variable.
+//
+// Deprecated: use sli_si91x_power_manager_update_ps_requirement_with_critical_irq instead.
+//
+// This function updates the power state requirement, requirement table, and the current state variable.
+//
+// FOR INTERNAL USE ONLY.
+//
+// state: Power state requirement that needs to be updated.
+// add: Flag indicating if the requirement is added (true) or removed (false).
+//
+// Returns status code indicating the result:
+//   - SL_STATUS_OK - Success.
+//   - SL_STATUS_NOT_INITIALIZED - Power Manager is not initialized.
+//   - SL_STATUS_INVALID_PARAMETER - Invalid state, invalid transition, or table bounds.
+//
+// For more information on status codes, refer to https://docs.silabs.com/gecko-platform/latest/platform-common/status
 sl_status_t sli_si91x_power_manager_update_ps_requirement(sl_power_state_t state,
                                                           boolean_t add) SL_DEPRECATED_API_WISECONNECT_4_1;
 #else
-/*******************************************************************************
- * @brief To update the power state requirement, requirement table, and the current state variable,
- *        using the caller's IRQ (PRIMASK) context.
- *
- * @details Same behavior as the deprecated \c sli_si91x_power_manager_update_ps_requirement, but
- *          passes \a critical_irq_state into the PS transition path so PS0/PS1 handling can restore
- *          interrupt enablement consistently with nested critical sections (see
- *          \c sli_si91x_power_manager_change_power_state_with_critical_irq()).
- *
- * @note FOR INTERNAL USE ONLY. Callers should pass the value from
- *       \c SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() at the add/remove requirement boundary.
- *
- * @param[in] state Power state requirement that needs to be updated.
- * @param[in] add   Flag indicating if the requirement is added (true) or removed (false).
- * @param[in] critical_irq_state Saved PRIMASK from sli_si91x_power_manager_core_entercritical().
- *
- * @return Status code indicating the result:
- *         - SL_STATUS_OK  - Success.
- *         - SL_STATUS_NOT_INITIALIZED  - Power Manager is not initialized.
- *         - SL_STATUS_INVALID_PARAMETER  - Invalid state, invalid transition, or table bounds.
- *
- * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
- ******************************************************************************/
+// Update the power state requirement, requirement table, and the current state variable,
+// using the caller's IRQ (PRIMASK) context.
+//
+// Same behavior as the deprecated sli_si91x_power_manager_update_ps_requirement, but
+// passes critical_irq_state into the PS transition path so PS0/PS1 handling can restore
+// interrupt enablement consistently with nested critical sections (see
+// sli_si91x_power_manager_change_power_state_with_critical_irq()).
+//
+// FOR INTERNAL USE ONLY. Callers should pass the value from
+// SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() at the add/remove requirement boundary.
+//
+// state: Power state requirement that needs to be updated.
+// add: Flag indicating if the requirement is added (true) or removed (false).
+// critical_irq_state: Saved PRIMASK from sli_si91x_power_manager_core_entercritical().
+//
+// Returns status code indicating the result:
+//   - SL_STATUS_OK - Success.
+//   - SL_STATUS_NOT_INITIALIZED - Power Manager is not initialized.
+//   - SL_STATUS_INVALID_PARAMETER - Invalid state, invalid transition, or table bounds.
+//
+// For more information on status codes, refer to https://docs.silabs.com/gecko-platform/latest/platform-common/status
 sl_status_t sli_si91x_power_manager_update_ps_requirement_with_critical_irq(
   sl_power_state_t state,
   boolean_t add,
@@ -303,15 +301,11 @@ void sli_si91x_power_manager_debug_log_ps_requirement(sl_power_state_t ps, bool 
 #define sli_si91x_power_manager_debug_log_ps_requirement(em, add, name) /* no-op */
 #endif
 
-/***************************************************************************/
-/**
- * @brief Enter critical section: save PRIMASK and disable IRQs.
- *
- * @note FOR INTERNAL USE. Application code should use
- *       \c SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() and matching EXIT macro.
- *
- * @return Saved PRIMASK value for use with \c sli_si91x_power_manager_core_exitcritical().
- ******************************************************************************/
+// Enter critical section: save PRIMASK and disable IRQs.
+//
+// FOR INTERNAL USE ONLY.
+//
+// Returns saved PRIMASK value for use with sli_si91x_power_manager_core_exitcritical().
 __STATIC_INLINE sli_si91x_power_manager_irq_state_t sli_si91x_power_manager_core_entercritical(void)
 {
   sli_si91x_power_manager_irq_state_t irq_state = __get_PRIMASK();
@@ -319,25 +313,16 @@ __STATIC_INLINE sli_si91x_power_manager_irq_state_t sli_si91x_power_manager_core
   return irq_state;
 }
 
-/***************************************************************************/
-/**
- * @brief Exit critical section: restore PRIMASK from saved value.
- *
- * @note FOR INTERNAL USE. Re-enables IRQs only if they were enabled before enter
- *       (nested critical section support).
- *       For transitions to PS0 or PS1, \c sli_si91x_power_manager_change_power_state_with_critical_irq()
- *       calls this before the transition handler runs \c trigger_sleep. IRQs must be enabled before sleep
- *       so the SoC can wake from PS1 retention sleep.
- *       Pairing \c SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() / \c SLI_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL()
- *       for add/remove PS requirements is described on \ref sl_si91x_power_manager_add_ps_requirement;
- *       PS1 success does not call EXIT at the add wrapper because EXIT for that path is done inside
- *       \c sli_si91x_power_manager_change_power_state_with_critical_irq() as above.
- *       With \c SL_SI91X_TICKLESS_MODE set to 1, \c cpsie i (IRQ enable) is also applied from FreeRTOS
- *       \c vPortSuppressTicksAndSleep. With tickless off, PS2 to PS1 may still use \c cpsie i after retention
- *       wake when \c irq_state was \c 0 at the add/remove entry.
- *
- * @param[in] irq_state Value returned by \c sli_si91x_power_manager_core_entercritical().
- ******************************************************************************/
+// Exit critical section: restore PRIMASK from saved value.
+//
+// FOR INTERNAL USE ONLY. Re-enables IRQs only if they were enabled before enter
+// (nested critical section support).
+// Pairing SLI_SI91X_POWER_MANAGER_CORE_ENTER_CRITICAL() / SLI_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL()
+// for add/remove PS requirements is described on sl_si91x_power_manager_add_ps_requirement;
+// PS1 success does not call EXIT at the add wrapper because EXIT for that path is done inside
+// sli_si91x_power_manager_change_power_state_with_critical_irq().
+//
+// irq_state: Value returned by sli_si91x_power_manager_core_entercritical().
 __STATIC_INLINE void sli_si91x_power_manager_core_exitcritical(sli_si91x_power_manager_irq_state_t irq_state)
 {
   if (irq_state == 0U) {

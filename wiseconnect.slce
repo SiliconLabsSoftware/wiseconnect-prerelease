@@ -42,7 +42,6 @@ component_path:
  - path: components/device/silabs/si91x/mcu/hal/component
  - path: components/device/silabs/si91x/mcu/toolchain/component
  - path: components/device/silabs/si91x/sl_si91x_generative_ai/component
- - path: third_party/silicon_labs/freertos/component
  - path: components/at_commands_auto_gen
  - path: components/common
  - path: components/console
