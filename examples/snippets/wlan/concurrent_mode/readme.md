@@ -134,7 +134,7 @@ The application can be configured to suit your requirements and development envi
 
 > Note:
 >
-> 1. This application provides the facility to configure the access point’s IP Parameters. The IPv4 address for the Silicon Labs access point is 192.168.10.10.
+> 1. This application provides the facility to configure the access point’s IP Parameters. The default IPv4 address for the Silicon Labs access point is 192.168.10.10.
 > 2. In concurrent mode, the IP networks of Silicon Labs STA and Silicon Labs access point both should be different. Configure Wireless Access Point IP network (Ex: 192.168.0.1) other than Silicon Labs access point IP network.
 
 #### Open **sl_wifi_device.h** file. You can also refer to `sl_wifi_default_concurrent_configuration` and modify/create configurations as per your needs and requirements.

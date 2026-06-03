@@ -108,7 +108,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - 1: Enable - Activates velocity calculation.
   - Delta Time: Defines the time interval used for velocity calculations.
 
-- Configure the following macros in [`qei_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_qei/qei_example.h) file and update/modify following macros if required.
+- Configure the following macros in [`qei_example.h`](qei_example.h) file and update/modify following macros if required.
 
   - `BLINK_RATE`: Toggle rate (in ticks per second) used to generate the simulated encoder signals on the stimulus GPIOs. By default, it is set to 1000.
 

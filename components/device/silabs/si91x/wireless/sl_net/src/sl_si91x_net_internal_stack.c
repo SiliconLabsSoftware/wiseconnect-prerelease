@@ -155,7 +155,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
 
     // Free the buffer and return success status
     sli_buffer_manager_free_buffer(buffer);
-    SL_DEBUG_LOG_V2(INFO, "sli_net_configure_ip_address: IPv4 OK (vap_id=%u)", virtual_ap_id);
+    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv4 OK (vap_id=%u)", virtual_ap_id);
   }
 
   if (SL_IPV6 & ip_config->type) {
@@ -208,7 +208,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
 
     // Free the buffer and return success status
     sli_buffer_manager_free_buffer(buffer);
-    SL_DEBUG_LOG_V2(INFO, "sli_net_configure_ip_address: IPv6 OK (vap_id=%u)", virtual_ap_id);
+    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv6 OK (vap_id=%u)", virtual_ap_id);
   }
 
   // Send IP address information to firmware if it's a client interface.

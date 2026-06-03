@@ -15,7 +15,7 @@ component:
 - id: debug_ulp_component
 - id: pm_ps2_component
 - id: si91x_log
-- id: si91x_log_iostream_formatted
+- id: si91x_log_iostream_compact
 - id: iostream_si91x
 - id: iostream_uart_si91x
   instance:

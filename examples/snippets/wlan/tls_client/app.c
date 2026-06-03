@@ -380,7 +380,7 @@ sl_status_t set_tls_extensions(int client_socket)
                                    sizeof(sl_si91x_socket_type_length_value_t) + alpn_length);
 
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG("\r\nSet Socket option ALPN extension failed with bsd error: %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option ALPN extension failed with bsd error: %d", errno);
     free(alpn_value);
     return SL_STATUS_FAIL;
   }

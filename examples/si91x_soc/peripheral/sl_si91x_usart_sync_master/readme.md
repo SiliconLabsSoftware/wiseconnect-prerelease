@@ -41,7 +41,7 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 
 ## About Example Code
 
-- [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous master mode.
+- [`usart_sync_example.c`](usart_sync_example.c) – Demonstrates configuring the USART to send and receive data in synchronous master mode.
 - In this example, first USART gets initialized if it was not already initialized with the clock and DMA configurations if DMA is enabled using [`sl_si91x_usart_init`](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart#sl-si91x-usart-init).
 
 - If the UART/USART instance is already selected for debug output logs, initialization returns `SL_STATUS_NOT_AVAILABLE` (this is informational; the application continues using the existing instance).
@@ -52,14 +52,14 @@ This application demonstrates how to configure the Universal Synchronous/Asynchr
 
 ### Configuration Macros
 
-The header file [`usart_sync_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.h) exposes build-time macros:
+The header file [`usart_sync_example.h`](usart_sync_example.h) exposes build-time macros:
 
 | Macro | Purpose | Effect if Disabled | Error Returned? |
 |-------|---------|--------------------|-----------------|
 | `SL_USART_SYNCH_MODE` | Ensures the example validates synchronous mode operation. | Example runs but will not explicitly assert synchronous usage; configuration may fall back to default UC settings. | No – operation continues. |
 | `USE_SEND` | (Reserved for continuous send sequencing) Intended to enable repeated transmit cycles. | Currently unused in code; disabling has no effect. | No. |
 | `USE_RECEIVE` | (Reserved for continuous receive sequencing) Intended to enable repeated capture cycles. | Currently unused in code; disabling has no effect. | No. |
-| `NON_UC_DEFAULT_CONFIG` in [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) | Use hard-coded default configuration instead of UC component settings. | UC (Universal Configuration) values are used. | No – configuration API returns standard status. |
+| `NON_UC_DEFAULT_CONFIG` in [`usart_sync_example.c`](usart_sync_example.c) | Use hard-coded default configuration instead of UC component settings. | UC (Universal Configuration) values are used. | No – configuration API returns standard status. |
 
 These macros do not cause failures when disabled; they gate optional or illustrative behavior. If you require custom pin/baud/synchronous settings without UC, enable `NON_UC_DEFAULT_CONFIG` and adjust the structure values in `usart_sync_example.c`.
 
@@ -111,7 +111,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Connect master (this example) and a board flashed with the slave example: master clock pin (GPIO_8 or GPIO_25 depending on board) to slave clock pin, master TX (GPIO_30) to slave RX, master RX (GPIO_29) to slave TX.
 - The Application has been configured to run in Synchronous Master mode.
 
-- Configure the following macros in [`usart_sync_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_usart_sync_master/usart_sync_example.c) if required:
+- Configure the following macros in [`usart_sync_example.c`](usart_sync_example.c) if required:
 
 - `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
 

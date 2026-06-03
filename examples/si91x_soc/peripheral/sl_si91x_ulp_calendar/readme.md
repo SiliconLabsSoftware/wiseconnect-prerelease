@@ -127,7 +127,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define TIME_CONVERSION     1 ///< To enable time conversion trigger \n
   ```
 
-- Configure the following macros in the [`ulp_calendar_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_calendar/ulp_calendar_example.c) file and update/modify following macros, if required.
+- Configure the following macros in the [`ulp_calendar_example.c`](ulp_calendar_example.c) file and update/modify following macros, if required.
 
 - `MAX_SECOND`: Total number of seconds in one minute, used as a bound when iterating time values. By default, it is set to 60u.
 

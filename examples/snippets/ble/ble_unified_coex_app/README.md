@@ -143,6 +143,6 @@ Customize protocol initialization:
 
 ## References
 
-- [Si917 Component Framework Architecture](../../docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
-- [Component Refactoring Plan](../../docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
+- [Si917 Component Framework Architecture](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
+- [Component Refactoring Plan](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
 - WiSeConnect SDK Documentation

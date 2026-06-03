@@ -206,7 +206,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following parameters in [`gpio_group_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_group_example/gpio_group_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_group_example/) file and update/modify following macros if required.
+- Configure the following parameters in [`gpio_group_example.c`](gpio_group_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_group_example/) file and update/modify following macros if required.
 
 - `PIN_COUNT`: Specifies the number of interrupts needed for the group interrupt configuration. By default, it is set to 4.
 

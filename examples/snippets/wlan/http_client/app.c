@@ -436,14 +436,12 @@ sl_status_t http_put_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *put_response = (sl_http_client_response_t *)data;
   callback_status                         = put_response->status;
 
-  SL_DEBUG_LOG("\r\n===========HTTP PUT RESPONSE START===========\r\n");
-  SL_DEBUG_LOG(
-    "\r\n> Status: 0x%X\n> PUT response: %u\n> End of data: %lu\n> Data Length: %u\n> Request Context: %s\r\n",
-    put_response->status,
-    put_response->http_response_code,
-    put_response->end_of_data,
-    put_response->data_length,
-    (char *)request_context);
+  SL_DEBUG_LOG_V2(INFO, "===========HTTP PUT RESPONSE START===========");
+  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", put_response->status);
+  SL_DEBUG_LOG_V2(INFO, "> PUT response: %u", put_response->http_response_code);
+  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)put_response->end_of_data);
+  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u", put_response->data_length);
+  SL_DEBUG_LOG_V2(INFO, "> Request Context: %s", (uintptr_t)request_context);
 
   if (put_response->status != SL_STATUS_OK && put_response->status != SL_STATUS_IN_PROGRESS) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;
@@ -476,14 +474,12 @@ sl_status_t http_get_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *get_response = (sl_http_client_response_t *)data;
   callback_status                         = get_response->status;
 
-  SL_DEBUG_LOG("\r\n===========HTTP GET RESPONSE START===========\r\n");
-  SL_DEBUG_LOG(
-    "\r\n> Status: 0x%X\n> GET response: %u\n> End of data: %lu\n> Data Length: %u\n> Request Context: %s\r\n",
-    get_response->status,
-    get_response->http_response_code,
-    get_response->end_of_data,
-    get_response->data_length,
-    (char *)request_context);
+  SL_DEBUG_LOG_V2(INFO, "===========HTTP GET RESPONSE START===========");
+  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", get_response->status);
+  SL_DEBUG_LOG_V2(INFO, "> GET response: %u", get_response->http_response_code);
+  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)get_response->end_of_data);
+  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u", get_response->data_length);
+  SL_DEBUG_LOG_V2(INFO, "> Request Context: %s", (uintptr_t)request_context);
 
   if (get_response->status != SL_STATUS_OK && get_response->status != SL_STATUS_IN_PROGRESS) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;
@@ -511,7 +507,7 @@ sl_status_t http_get_response_callback_handler(const sl_http_client_t *client,
     http_rsp_received = HTTP_SUCCESS_RESPONSE;
   }
 
-  SL_DEBUG_LOG("\r\nGET Data response:\n%s \nOffset: %ld\r\n", app_buffer, app_buff_index);
+  SL_DEBUG_LOG_V2(INFO, "GET Data response: %s Offset: %ld", (uintptr_t)app_buffer, (long)app_buff_index);
   app_buff_index = 0;
 
   return SL_STATUS_OK;
@@ -528,14 +524,12 @@ sl_status_t http_post_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *post_response = (sl_http_client_response_t *)data;
   callback_status                          = post_response->status;
 
-  SL_DEBUG_LOG("\r\n===========HTTP POST RESPONSE START===========\r\n");
-  SL_DEBUG_LOG(
-    "\r\n> Status: 0x%X\n> POST response: %u\n> End of data: %lu\n> Data Length: %u\n> Request Context: %s\r\n",
-    post_response->status,
-    post_response->http_response_code,
-    post_response->end_of_data,
-    post_response->data_length,
-    (char *)request_context);
+  SL_DEBUG_LOG_V2(INFO, "===========HTTP POST RESPONSE START===========");
+  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", post_response->status);
+  SL_DEBUG_LOG_V2(INFO, "> POST response: %u", post_response->http_response_code);
+  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)post_response->end_of_data);
+  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u", post_response->data_length);
+  SL_DEBUG_LOG_V2(INFO, "> Request Context: %s", (uintptr_t)request_context);
 
   if (post_response->status != SL_STATUS_OK && post_response->status != SL_STATUS_IN_PROGRESS) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;

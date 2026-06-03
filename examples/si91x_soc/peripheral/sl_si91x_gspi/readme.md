@@ -159,7 +159,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   - **Note:** If your total transfer size exceeds `(number of descriptors) * 4095` bytes, increase the number of descriptors accordingly to accommodate the entire transfer.
 
-- Configure the following macros in [`gspi_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gspi/gspi_example.c) if required:
+- Configure the following macros in [`gspi_example.c`](gspi_example.c) if required:
 
 - `GSPI_BUFFER_SIZE`: Defines the size of the data buffer used for GSPI transfer. By default, it is set to 1024.
 
@@ -209,7 +209,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define RECEIVE_SYNC_TIME            500       // Delay to settle the slave after send
   ```
 
-- Configure the following macros in [`gspi_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gspi/gspi_example.h) to select the operating mode. Only one of these should be enabled at a time for a given phase; by default, only `SL_USE_TRANSFER` is enabled (full-duplex loopback-capable operation).
+- Configure the following macros in [`gspi_example.h`](gspi_example.h) to select the operating mode. Only one of these should be enabled at a time for a given phase; by default, only `SL_USE_TRANSFER` is enabled (full-duplex loopback-capable operation).
 
 - `SL_USE_TRANSFER`: When enabled, the application uses the GSPI transfer API to send and receive data simultaneously in full-duplex mode. By default, it is set to `ENABLE`.
 

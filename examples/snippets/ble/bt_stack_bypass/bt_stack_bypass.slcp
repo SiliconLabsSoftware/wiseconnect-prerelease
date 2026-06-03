@@ -41,6 +41,9 @@ component:
 - id: sl_usart
 - id: sl_clock_manager
 - id: log_none
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_rtt_si91x
 requires:
 - name: sl_main
 - name: network_manager
@@ -85,7 +88,13 @@ readme:
 - path: readme.md
 other_file:
 - path: resources/readme/blenewappsoc.png
-- path: resources/readme/consoleprints.png
+- path: resources/readme/LinuxLogs1.png
+- path: resources/readme/LinuxLogs2.png
+- path: resources/readme/LinuxLogs3.png
+- path: resources/readme/Mobile.png
+- path: resources/readme/NCPConsoleLogs.png
+- path: resources/readme/RTTLogs.png
+- path: resources/readme/SOCConsoleLogs.png
 ui_hints:
   highlight:
   - path: readme.md

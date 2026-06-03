@@ -27,26 +27,11 @@ filter:
   - Production
 source:
 - path: app.c
-- path: utils/command_parser.c
-- path: utils/event_loop.c
-- path: utils/rsi_common_utils.c
-- path: btdm_logging_framework/debug_logs_event_hdlr_auto_gen.c
-- path: btdm_logging_framework/debug_logs_task.c
-- path: btdm_logging_framework/debug_logs_user_event_hdlrs.c
 include:
 - path: .
   file_list:
   - path: app.h
   - path: ble_config.h
-  - path: app_rtt_logging.h
-- path: utils
-  file_list:
-  - path: generic_command_handling.h
-  - path: rsi_common_utils.h
-  - path: event_loop.h
-- path: btdm_logging_framework
-  file_list:
-  - path: debug_logs_event_hdlr_auto_gen.h
 define:
 - name: SLI_SI91X_MCU_INTR_BASED_RX_ON_UART
 component:
@@ -57,10 +42,29 @@ component:
 - id: spidrv
   instance:
   - exp
+- id: iostream_eusart
+  instance:
+  - vcom
+  condition:
+  - brd4186c
+- id: iostream_usart
+  instance:
+  - vcom
+  condition:
+  - brd4180a
+- id: iostream_usart
+  instance:
+  - vcom
+  condition:
+  - brd4180b
+- id: iostream_usart
+  instance:
+  - vcom
+  condition:
+  - brd4120a
 - id: iostream_retarget_stdio
 - id: iostream_recommended_stream
 - id: iostream_stdlib_config
-- id: segger_rtt
 - id: wiseconnect_common
 - id: wifi
 - id: sl_si91x_internal_stack
@@ -70,10 +74,10 @@ component:
 - id: basic_network_config_manager
 - id: ble
 - id: iot_socket
-- id: log_none
-- id: log_backend_iostream
+- id: log
 - id: log_backend_iostream_formatted
 - id: log_platform_specific
+- id: iostream_rtt
 toolchain_settings:
 - value: -Wall -Werror
   option: gcc_compiler_option
@@ -92,7 +96,13 @@ readme:
 - path: readme.md
 other_file:
 - path: resources/readme/blenewappsoc.png
-- path: resources/readme/consoleprints.png
+- path: resources/readme/LinuxLogs1.png
+- path: resources/readme/LinuxLogs2.png
+- path: resources/readme/LinuxLogs3.png
+- path: resources/readme/Mobile.png
+- path: resources/readme/NCPConsoleLogs.png
+- path: resources/readme/RTTLogs.png
+- path: resources/readme/SOCConsoleLogs.png
 ui_hints:
   highlight:
   - path: readme.md

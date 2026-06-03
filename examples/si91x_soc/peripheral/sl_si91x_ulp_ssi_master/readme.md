@@ -62,7 +62,7 @@ For half-duplex communication (that is, send and receive), a primary / secondary
 - After initialization [sl_si91x_ssi_configure_power_mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-configure-power-mode) is called to set the power mode [sl_ssi_power_state_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-ssi-power-state-t).
 - All the necessary parameters are configured using [sl_si91x_ssi_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-set-configuration) API. It expects a structure with required parameters [sl_ssi_control_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-ssi-control-config-t).
 - After configuration, a callback register API is called to register the callback at the time of events [sl_si91x_ssi_register_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-register-event-callback).
-- The State machine code is implemented for transfer, send and receive data, the current mode is determined by ssi_mode_enum_t which is declared in [`ulp_ssi_master_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_ssi_master/ulp_ssi_master_example.c) file.
+- The State machine code is implemented for transfer, send and receive data, the current mode is determined by ssi_mode_enum_t which is declared in [`ulp_ssi_master_example.c`](ulp_ssi_master_example.c) file.
 - According to the macro which is enabled, the example code executes the transfer of data:
 
 - If the **ULP_SSI_MASTER_TRANSFER** macro is enabled, it will transfer the data (send and receive data) in full-duplex mode.
@@ -146,7 +146,7 @@ Configure UC from the slcp component.
      - **Tx FIFO Threshold**: Transmit FIFO Threshold. Controls the level of entries (or below) at which the transmit FIFO controller triggers an interrupt. The configuration range from 0 to 15.
      - **Rx FIFO Threshold**: Receive FIFO Threshold. Controls the level of entries (or below) at which the receive FIFO controller triggers an interrupt. The configuration range from 0 to 15.
    - Configuration files are generated in **config folder**. If the values are not changed, the code will run on default UC values.
-- Configure the following macros in the [`ulp_ssi_master_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_ssi_master/ulp_ssi_master_example.h) file and update/modify following macros, if required.
+- Configure the following macros in the [`ulp_ssi_master_example.h`](ulp_ssi_master_example.h) file and update/modify following macros, if required.
 
     - `ULP_SSI_MASTER_TRANSFER`: Enables the full-duplex transfer API. When enabled, the ULP SSI master sends and receives data simultaneously. By default, it is set to ENABLE.
 
@@ -166,7 +166,7 @@ Configure UC from the slcp component.
       #define ULP_SSI_MASTER_RECEIVE  DISABLE   // To use the receive(Click Lock symbol to allow editing and add documentation here) API
       ```
 
-- By default, CS0 is selected in the pintool. To use a different chip select (CS), update the corresponding slave number in the [`ulp_ssi_master_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_ssi_master/ulp_ssi_master_example.c) file after configuring the desired CS in the pintool.
+- By default, CS0 is selected in the pintool. To use a different chip select (CS), update the corresponding slave number in the [`ulp_ssi_master_example.c`](ulp_ssi_master_example.c) file after configuring the desired CS in the pintool.
 
     ```c
     // For CS0
@@ -177,7 +177,7 @@ Configure UC from the slcp component.
     static uint32_t ulp_ssi_master_slave_number = SSI_SLAVE_2;
     ```
 
-- Configure the following macros in [`ulp_ssi_master_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_ssi_master/ulp_ssi_master_example.c) if required:
+- Configure the following macros in [`ulp_ssi_master_example.c`](ulp_ssi_master_example.c) if required:
 
 - `ULP_SSI_MASTER_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
 

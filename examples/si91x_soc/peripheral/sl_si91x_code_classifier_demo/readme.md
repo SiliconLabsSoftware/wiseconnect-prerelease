@@ -157,7 +157,7 @@ SL_SI91X_CODE_CLASSIFY(<segment>, <component>, <classifier_type>)
 
 ## Application Build Environment
 
-- Configure the following macros in [`code_classifier.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_code_classifier_demo/code_classifier.c) file and update/modify following macros, if required.
+- Configure the following macros in [`code_classifier.c`](code_classifier.c) file and update/modify following macros, if required.
 
   - `LED_INSTANCE`: Selects the LED instance toggled by the example to visually indicate application execution. By default, it is set to `led_led0`.
 

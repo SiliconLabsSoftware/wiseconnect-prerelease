@@ -57,7 +57,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Application Build Environment
 
 ### Application Configuration Parameters
-  - The threshold and slot values can be configured in [`bod_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_bod/bod_example.h). Alternatively, the slot value and blackout feature can be updated through the UC configuration.
+  - The threshold and slot values can be configured in [`bod_example.h`](bod_example.h). Alternatively, the slot value and blackout feature can be updated through the UC configuration.
 
 - `SL_BOD_DEFAULT_THRESHOLD`: Default BOD threshold voltage (in volts). A BOD interrupt is triggered when VMCU drops below this value. By default, it is set to `2.7f`.
 

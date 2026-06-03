@@ -132,13 +132,17 @@ void print_mac_address(const sl_mac_address_t *mac_address)
   if (mac_address == NULL) {
     return;
   }
-  printf("%2X:%2X:%2X:%2X:%2X:%2X",
-         mac_address->octet[0],
-         mac_address->octet[1],
-         mac_address->octet[2],
-         mac_address->octet[3],
-         mac_address->octet[4],
-         mac_address->octet[5]);
+  char sl_util_mac_log[24];
+  snprintf(sl_util_mac_log,
+           sizeof(sl_util_mac_log),
+           "%2X:%2X:%2X:%2X:%2X:%2X",
+           mac_address->octet[0],
+           mac_address->octet[1],
+           mac_address->octet[2],
+           mac_address->octet[3],
+           mac_address->octet[4],
+           mac_address->octet[5]);
+  printf("%s", sl_util_mac_log);
 }
 
 // Helper function to convert IPv6 bytes to words
@@ -241,7 +245,7 @@ char *sl_inet_ntop6(const unsigned char *input, char *dst, uint32_t size)
 
   // Check for overflow and copy result
   if ((uint32_t)(tp - tmp) > size) {
-    SL_DEBUG_LOG_V2(INFO, "\r\n Error \r\n");
+    printf("\r\n Error \r\n");
     return NULL;
   }
 

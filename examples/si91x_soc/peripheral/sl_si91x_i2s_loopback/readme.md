@@ -118,7 +118,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - **SL_I2S0_SAMPLING_RATE**: I2S0 sampling rates can be configured through this macro. Valid sampling rate values are 8kHz, 11.025kHz, 16kHz, 22.05kHz, 24kHz, 32kHz, 44.1kHz, 48kHz, 88.2kHz, 96kHz and 192kHz.
     - **SL_I2S0_CHANNEL**: I2S0 channel number (0-channel no 0, 1-channel no 1)
     - Configuration files are generated in **config folder**. If not changed, the code will run on default UC values.
-    - Configure the following macros in [`i2s_loopback_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2s_loopback/i2s_loopback_example.c) file and update/modify following macros if required.
+    - Configure the following macros in [`i2s_loopback_example.c`](i2s_loopback_example.c) file and update/modify following macros if required.
 
     - `I2S_BUFFER_SIZE`: Defines the size of the transmit and receive buffers used for the I2S loopback transfer. By default, it is set to 1024.
 

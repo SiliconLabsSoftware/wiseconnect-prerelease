@@ -48,7 +48,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Application Build Environment
 
-- Configure the following macros in [`rgb_led.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_rgb_led/rgb_led.c) file and update/modify following macros, if required.
+- Configure the following macros in [`rgb_led.c`](rgb_led.c) file and update/modify following macros, if required.
 
   - `RGB_LED`: Selects the RGB LED instance driven by the example. By default, it is set to `led_led0`.
 

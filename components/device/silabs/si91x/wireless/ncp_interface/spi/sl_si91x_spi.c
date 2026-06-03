@@ -431,7 +431,7 @@ sl_status_t sli_si91x_bus_read_frame(sl_wifi_buffer_t **buffer)
                                               (sli_buffer_t *)buffer);
   if (status != SL_STATUS_OK) {
     sl_si91x_host_spi_cs_deassert();
-    SL_DEBUG_LOG("\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -468,7 +468,7 @@ sl_status_t sli_si91x_bus_read_interrupt_status(uint16_t *interrupt_status)
   sl_status_t status = sli_si91x_req_wakeup();
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG("Failed to wake up SI91X device");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to wake up SI91X device");
     return status; // Skip processing if wakeup failed
   }
 

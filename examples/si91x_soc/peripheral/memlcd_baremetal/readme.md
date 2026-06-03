@@ -64,7 +64,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`memlcd_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/memlcd_baremetal/memlcd_app.c) file and update/modify following macros, if required.
+- Configure the following macros in [`memlcd_app.c`](memlcd_app.c) file and update/modify following macros, if required.
 
   - `SL_BOARD_ENABLE_DISPLAY_PIN`: GPIO pin number used to enable the MEMLCD display on the target board. By default, it is set to 0.
 

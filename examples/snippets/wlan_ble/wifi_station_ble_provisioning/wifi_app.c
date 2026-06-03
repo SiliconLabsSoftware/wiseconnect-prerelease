@@ -43,6 +43,7 @@
 
 #include "cmsis_os2.h"
 #include <string.h>
+#include <stdio.h>
 
 #include "wifi_config.h"
 #include "rsi_common_apis.h"
@@ -84,7 +85,7 @@ static uint32_t wlan_app_event_map;
 extern void wifi_app_send_to_ble(uint16_t msg_type, uint8_t *data, uint16_t data_len);
 static sl_status_t show_scan_results();
 void wifi_app_set_event(uint32_t event_num);
-extern uint8_t coex_ssid[50], pwd[34], sec_type;
+extern uint8_t coex_ssid[WIFI_STATION_BLE_COEX_SSID_BUFFER_LEN], pwd[WIFI_STATION_BLE_PWD_BUFFER_LEN], sec_type;
 uint8_t retry = 1;
 
 uint8_t conn_status;
@@ -188,8 +189,17 @@ static sl_status_t show_scan_results()
                       (uintptr_t)scan_result->scan_info[a].ssid,
                       scan_result->scan_info[a].security_mode,
                       scan_result->scan_info[a].network_type);
-      SL_DEBUG_LOG_V2(INFO, "  %02x:%02x:%02x:", bssid[0], bssid[1], bssid[2]);
-      SL_DEBUG_LOG_V2(INFO, "%02x:%02x:%02x, ", bssid[3], bssid[4], bssid[5]);
+      char sta_prov_scan_bssid_log[48];
+      snprintf(sta_prov_scan_bssid_log,
+               sizeof(sta_prov_scan_bssid_log),
+               "  %02x:%02x:%02x:%02x:%02x:%02x, ",
+               bssid[0],
+               bssid[1],
+               bssid[2],
+               bssid[3],
+               bssid[4],
+               bssid[5]);
+      SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)sta_prov_scan_bssid_log);
       SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }

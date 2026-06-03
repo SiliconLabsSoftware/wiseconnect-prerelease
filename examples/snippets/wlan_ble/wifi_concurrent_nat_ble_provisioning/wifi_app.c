@@ -308,8 +308,17 @@ static sl_status_t show_scan_results()
                       (uintptr_t)scan_result->scan_info[a].ssid,
                       scan_result->scan_info[a].security_mode,
                       scan_result->scan_info[a].network_type);
-      SL_DEBUG_LOG_V2(INFO, "  %02x:%02x:%02x:", bssid[0], bssid[1], bssid[2]);
-      SL_DEBUG_LOG_V2(INFO, "%02x:%02x:%02x, ", bssid[3], bssid[4], bssid[5]);
+      char nat_scan_bssid_log[48];
+      snprintf(nat_scan_bssid_log,
+               sizeof(nat_scan_bssid_log),
+               "  %02x:%02x:%02x:%02x:%02x:%02x, ",
+               bssid[0],
+               bssid[1],
+               bssid[2],
+               bssid[3],
+               bssid[4],
+               bssid[5]);
+      SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)nat_scan_bssid_log);
       SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }

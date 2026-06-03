@@ -105,7 +105,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Configuration files are generated in the **config** folder. If not changed, the code will run on default UC values.
 
-Configure the following macros in [`pcm_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_pcm_secondary/pcm_secondary_example.c) file and update/modify following macros if required.
+Configure the following macros in [`pcm_secondary_example.c`](pcm_secondary_example.c) file and update/modify following macros if required.
 
 - `PCM_SECONDARY_BUFFER_SIZE`: Size (in samples) of the buffers used to transmit and receive PCM data on the secondary side. By default, it is set to 1024.
 

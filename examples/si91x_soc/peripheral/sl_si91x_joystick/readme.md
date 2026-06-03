@@ -55,7 +55,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following macro in [`joystick_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_joystick/joystick_example.c) file and update/modify following macro, if required.
+- Configure the following macro in [`joystick_example.c`](joystick_example.c) file and update/modify following macro, if required.
 
   - `DELAY_MS1_PERIODIC`: Periodic sleeptimer timeout in milliseconds that sets how often the joystick position is sampled and printed. By default, it is set to 400 ms.
 

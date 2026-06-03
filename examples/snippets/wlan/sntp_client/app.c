@@ -30,6 +30,8 @@
 
 #include "sl_net.h"
 #include "sl_utility.h"
+#include <inttypes.h>
+#include <stdio.h>
 #include "cmsis_os2.h"
 #include "sl_constants.h"
 #include "sl_sntp.h"
@@ -130,20 +132,32 @@ static sl_status_t module_status_handler(sl_wifi_event_t event,
 
   sl_wifi_module_state_stats_response_t *notif = (sl_wifi_module_state_stats_response_t *)data;
 
-  SL_DEBUG_LOG("---> Module status handler event with length : %lu\r\n", data_length);
-  SL_DEBUG_LOG("  <> Timestamp : %lu, state_code : 0x%02X, reason_code : 0x%02X, channel : %u, rssi : %u.\n",
-               notif->timestamp,
-               notif->state_code,
-               notif->reason_code,
-               notif->channel,
-               notif->rssi);
-  SL_DEBUG_LOG("  <> BSSID : %x:%x:%x:%x:%x:%x.\n",
-               notif->bssid[0],
-               notif->bssid[1],
-               notif->bssid[2],
-               notif->bssid[3],
-               notif->bssid[4],
-               notif->bssid[5]);
+  SL_DEBUG_LOG_V2(DEBUG, "---> Module status handler event with length : %" PRIu32, data_length);
+  do {
+    char log_buf[128];
+    snprintf(log_buf,
+             sizeof(log_buf),
+             "  <> Timestamp : %" PRIu32 ", state_code : 0x%02X, reason_code : 0x%02X, channel : %u, rssi : %u.",
+             notif->timestamp,
+             notif->state_code,
+             notif->reason_code,
+             notif->channel,
+             notif->rssi);
+    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)log_buf);
+  } while (0);
+  do {
+    char log_buf[64];
+    snprintf(log_buf,
+             sizeof(log_buf),
+             "  <> BSSID : %02X:%02X:%02X:%02X:%02X:%02X.",
+             notif->bssid[0],
+             notif->bssid[1],
+             notif->bssid[2],
+             notif->bssid[3],
+             notif->bssid[4],
+             notif->bssid[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)log_buf);
+  } while (0);
   return SL_STATUS_OK;
 }
 

@@ -56,6 +56,8 @@ include:
 
      
 requires:
+- name: log_none
+  condition: ["device_si91x"]
 - name: sl_si91x_asynchronous_socket
   condition: ["sl_si91x_network_dual_stack"]
   

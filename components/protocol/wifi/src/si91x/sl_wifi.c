@@ -529,16 +529,16 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
                                               uint16_t payload_length)
 {
   if (test_base_info == NULL || per_params == NULL) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: null arg\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11bgn: null arg");
     return SL_STATUS_INVALID_PARAMETER;
   }
   if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: not initialized\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11bgn: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
   /* Si91x legacy PER path does not transport a host-provided payload; reject rather than silently drop it. */
   if (payload != NULL && payload_length > 0) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: payload not supported on Si91x\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11bgn: payload not supported on Si91x");
     return SL_STATUS_NOT_SUPPORTED;
   }
   switch (test_base_info->wifi_protocol) {
@@ -547,7 +547,9 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
     case SL_WIFI_RATE_PROTOCOL_N_ONLY:
       break;
     default:
-      SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: bad protocol %u\n", (unsigned)test_base_info->wifi_protocol);
+      SL_DEBUG_LOG_V2(ERROR,
+                      "sl_wifi_transmit_test_start_11bgn: bad protocol %u",
+                      (unsigned)test_base_info->wifi_protocol);
       return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -555,7 +557,7 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
   sli_wifi_transmitter_test_info_from_base_and_per(test_base_info, per_params, &tx_test_info);
 
   sl_status_t status = sli_wifi_transmit_test_start(SL_WIFI_CLIENT_INTERFACE, &tx_test_info);
-  SL_DEBUG_LOG("sl_wifi_transmit_test_start_11bgn: status=0x%lx\n", (unsigned long)status);
+  SL_DEBUG_LOG_V2(DEBUG, "sl_wifi_transmit_test_start_11bgn: status=0x%lx", (unsigned long)status);
   return status;
 }
 
@@ -577,20 +579,22 @@ sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base
                                              uint16_t payload_length)
 {
   if (test_base_info == NULL || per_params == NULL) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: null arg\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11ax: null arg");
     return SL_STATUS_INVALID_PARAMETER;
   }
   if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: not initialized\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11ax: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
   if (test_base_info->wifi_protocol != SL_WIFI_RATE_PROTOCOL_AX_ONLY) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: bad protocol %u\n", (unsigned)test_base_info->wifi_protocol);
+    SL_DEBUG_LOG_V2(ERROR,
+                    "sl_wifi_transmit_test_start_11ax: bad protocol %u",
+                    (unsigned)test_base_info->wifi_protocol);
     return SL_STATUS_INVALID_PARAMETER;
   }
   /* Si91x legacy PER path does not transport a host-provided payload; reject rather than silently drop it. */
   if (payload != NULL && payload_length > 0) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: payload not supported on Si91x\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11ax: payload not supported on Si91x");
     return SL_STATUS_NOT_SUPPORTED;
   }
 
@@ -598,7 +602,7 @@ sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base
   sli_wifi_transmitter_test_info_from_base_and_per(test_base_info, per_params, &tx_test_info);
 
   sl_status_t status = sli_wifi_transmit_test_start(SL_WIFI_CLIENT_INTERFACE, &tx_test_info);
-  SL_DEBUG_LOG("sl_wifi_transmit_test_start_11ax: status=0x%lx\n", (unsigned long)status);
+  SL_DEBUG_LOG_V2(DEBUG, "sl_wifi_transmit_test_start_11ax: status=0x%lx", (unsigned long)status);
   return status;
 }
 
@@ -618,22 +622,22 @@ sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
   if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_stop: not initialized\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_stop: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
   sl_status_t status = sli_wifi_transmit_test_stop();
-  SL_DEBUG_LOG("sl_wifi_transmit_test_stop: status=0x%lx\n", (unsigned long)status);
+  SL_DEBUG_LOG_V2(DEBUG, "sl_wifi_transmit_test_stop: status=0x%lx", (unsigned long)status);
   return status;
 }
 
 sl_status_t sl_wifi_transmit_test_stop_v2(void)
 {
   if (!device_initialized) {
-    SL_DEBUG_LOG("sl_wifi_transmit_test_stop_v2: not initialized\n");
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_stop_v2: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
   sl_status_t status = sli_wifi_transmit_test_stop();
-  SL_DEBUG_LOG("sl_wifi_transmit_test_stop_v2: status=0x%lx\n", (unsigned long)status);
+  SL_DEBUG_LOG_V2(DEBUG, "sl_wifi_transmit_test_stop_v2: status=0x%lx", (unsigned long)status);
   return status;
 }
 

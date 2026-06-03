@@ -49,7 +49,7 @@ Demonstrates basic file operations using the LittleFS library on a QSPI-based fl
 
 >**Note:**
 >- LittleFS service is supported on both stacked flash and external flash SiWx91x OPNs.
->- For detailed information about pinset configurations, refer to the **Flash and PSRAM Combinations** section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/release/v3.4.2/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+>- For detailed information about pinset configurations, refer to the **Flash and PSRAM Combinations** section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 ### Software Requirements
 
 - Simplicity Studio

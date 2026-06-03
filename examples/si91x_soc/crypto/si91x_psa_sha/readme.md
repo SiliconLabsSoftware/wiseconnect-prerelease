@@ -63,7 +63,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Each SHA mode runs two tests:
   1. **One-shot** — computes the hash in a single `psa_hash_compute` call.
   2. **Multipart** — streams the same message in 4-byte chunks via `psa_hash_setup` / `psa_hash_update` / `psa_hash_finish`, followed by `psa_hash_abort`.
-- Enable the desired SHA algorithm in [`psa_sha_app.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/crypto/si91x_psa_sha/psa_sha_app.h) by enabling the corresponding macro.
+- Enable the desired SHA algorithm in [`psa_sha_app.h`](psa_sha_app.h) by enabling the corresponding macro.
 - By default SHA-256 is enabled.
 
 * To use software fallback instead of hardware accelerators:

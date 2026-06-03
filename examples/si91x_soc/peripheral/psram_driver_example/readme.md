@@ -52,7 +52,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`main.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/psram_driver_example/main.c) file and update/modify following macros, if required.
+- Configure the following macros in [`main.c`](main.c) file and update/modify following macros, if required.
 
   - `READ_WRITE_LENGTH`: Number of bytes transferred in each PSRAM read/write test (auto mode, manual mode, and DMA mode). By default, it is set to 256.
 

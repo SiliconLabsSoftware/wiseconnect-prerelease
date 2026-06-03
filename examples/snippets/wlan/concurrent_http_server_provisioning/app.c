@@ -356,9 +356,9 @@ static void application_start(void *argument)
 
         parse_json_response();
 
-        SL_DEBUG_LOG("SSID stored:%s\r\n", WIFI_CLIENT_PROFILE_SSID);
-        SL_DEBUG_LOG("Password stored:%s\r\n", WIFI_CLIENT_CREDENTIAL);
-        SL_DEBUG_LOG("Security type stored:%s\r\n", WIFI_CLIENT_SECURITY_TYPE);
+        SL_DEBUG_LOG_V2(INFO, "SSID stored:%s", (uintptr_t)WIFI_CLIENT_PROFILE_SSID);
+        SL_DEBUG_LOG_V2(INFO, "Password stored:%s", (uintptr_t)WIFI_CLIENT_CREDENTIAL);
+        SL_DEBUG_LOG_V2(INFO, "Security type stored:%s", (uintptr_t)WIFI_CLIENT_SECURITY_TYPE);
 
         status = sl_http_server_stop(&server_handle);
         if (status != SL_STATUS_OK) {
@@ -430,7 +430,7 @@ static void application_start(void *argument)
         }
         SL_DEBUG_LOG_V2(INFO, "Wi-Fi set client profile v6 success");
 
-        SL_DEBUG_LOG("\r\nSTA credentials through http server");
+        SL_DEBUG_LOG_V2(INFO, "STA credentials through http server");
 
         sl_wifi_security_t sec_type = string_to_security_type(WIFI_CLIENT_SECURITY_TYPE);
         sl_wifi_credential_id_t id;
@@ -438,7 +438,7 @@ static void application_start(void *argument)
 
         if (sec_type == SL_WIFI_OPEN) {
           id = SL_NET_NO_CREDENTIAL_ID;
-          SL_DEBUG_LOG("Connecting to Open network - no credentials required\n");
+          SL_DEBUG_LOG_V2(INFO, "Connecting to Open network - no credentials required");
         } else {
           // Handle PSK-based security (WPA, WPA2, WPA3, etc.)
           id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
@@ -456,7 +456,7 @@ static void application_start(void *argument)
         }
 
         if (sec_type == SL_WIFI_OPEN || cred_status == SL_STATUS_OK) {
-          SL_DEBUG_LOG("Credentials set, id : %lu\n", id);
+          SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu", id);
           sl_wifi_client_configuration_t access_point = { 0 };
           access_point.ssid.length                    = strlen((char *)WIFI_CLIENT_PROFILE_SSID);
           memcpy(access_point.ssid.value, WIFI_CLIENT_PROFILE_SSID, access_point.ssid.length);
@@ -464,7 +464,7 @@ static void application_start(void *argument)
           access_point.encryption    = SL_WIFI_CCMP_ENCRYPTION;
           access_point.credential_id = id;
 
-          SL_DEBUG_LOG("SSID %s\n", access_point.ssid.value);
+          SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)access_point.ssid.value);
 
           sl_wifi_set_join_callback_v2(join_callback_handler, NULL);
           status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, 25000);
@@ -711,9 +711,9 @@ static void application_start(void *argument)
 
         parse_json_response();
 
-        SL_DEBUG_LOG("SSID stored:%s\r\n", WIFI_CLIENT_PROFILE_SSID);
-        SL_DEBUG_LOG("Password stored:%s\r\n", WIFI_CLIENT_CREDENTIAL);
-        SL_DEBUG_LOG("Security type stored:%s\r\n", WIFI_CLIENT_SECURITY_TYPE);
+        SL_DEBUG_LOG_V2(INFO, "SSID stored:%s", (uintptr_t)WIFI_CLIENT_PROFILE_SSID);
+        SL_DEBUG_LOG_V2(INFO, "Password stored:%s", (uintptr_t)WIFI_CLIENT_CREDENTIAL);
+        SL_DEBUG_LOG_V2(INFO, "Security type stored:%s", (uintptr_t)WIFI_CLIENT_SECURITY_TYPE);
 
 #endif
 #endif
@@ -935,36 +935,36 @@ void parse_json_response()
   for (i = 1; i < r; i++) {
     if (jsoneq(response, &t[i], "id") == 0) {
       /* We may use strndup() to fetch string value */
-      SL_DEBUG_LOG("- SSID: %.*s\n", t[i + 1].end - t[i + 1].start, response + t[i + 1].start);
       snprintf(WIFI_CLIENT_PROFILE_SSID,
                sizeof(WIFI_CLIENT_PROFILE_SSID),
                "%.*s",
                t[i + 1].end - t[i + 1].start,
                response + t[i + 1].start);
+      SL_DEBUG_LOG_V2(INFO, "- SSID: %s", (uintptr_t)WIFI_CLIENT_PROFILE_SSID);
       i++;
     } else if (jsoneq(response, &t[i], "password") == 0) {
       /* Only store password if it's not empty (not Open security) */
       if (t[i + 1].end - t[i + 1].start > 0) {
-        SL_DEBUG_LOG("- Password: %.*s\n", t[i + 1].end - t[i + 1].start, response + t[i + 1].start);
         snprintf(WIFI_CLIENT_CREDENTIAL,
                  sizeof(WIFI_CLIENT_CREDENTIAL),
                  "%.*s",
                  t[i + 1].end - t[i + 1].start,
                  response + t[i + 1].start);
+        SL_DEBUG_LOG_V2(INFO, "- Password: %s", (uintptr_t)WIFI_CLIENT_CREDENTIAL);
       } else {
         /* For Open networks, set empty password */
         WIFI_CLIENT_CREDENTIAL[0] = '\0';
-        SL_DEBUG_LOG("- Password: (empty for Open network)\n");
+        SL_DEBUG_LOG_V2(INFO, "- Password: (empty for Open network)");
       }
       i++;
     } else if (jsoneq(response, &t[i], "securityType") == 0) {
       /* We may want to do strtol() here to get numeric value */
-      SL_DEBUG_LOG("- Security Type: %.*s\n", t[i + 1].end - t[i + 1].start, response + t[i + 1].start);
       snprintf(WIFI_CLIENT_SECURITY_TYPE,
                sizeof(WIFI_CLIENT_SECURITY_TYPE),
                "%.*s",
                t[i + 1].end - t[i + 1].start,
                response + t[i + 1].start);
+      SL_DEBUG_LOG_V2(INFO, "- Security Type: %s", (uintptr_t)WIFI_CLIENT_SECURITY_TYPE);
       i++;
     } else {
       SL_DEBUG_LOG_V2(WARN, "Unexpected key: %.*s", t[i].end - t[i].start, (uintptr_t)(response + t[i].start));

@@ -260,11 +260,25 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 
 void print_char_buffer(char *buffer, uint32_t buffer_length)
 {
-  for (uint32_t index = 0; index < buffer_length; index++) {
-    SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[index]);
+  if (buffer == NULL || buffer_length == 0) {
+    SL_DEBUG_LOG_V2(ERROR, "Buffer is NULL or buffer_length is 0");
+    return;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "");
+  if (buffer_length > SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE) {
+    buffer_length = SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE;
+  }
+
+  char *line = (char *)malloc(buffer_length + 1);
+  if (line == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "print_char_buffer: malloc failed");
+    return;
+  }
+
+  memcpy(line, buffer, buffer_length);
+  line[buffer_length] = '\0';
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)line);
+  free(line);
 }
 
 void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)

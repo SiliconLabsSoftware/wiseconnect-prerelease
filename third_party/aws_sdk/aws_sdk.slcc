@@ -72,6 +72,8 @@ include:
       condition: ["sl_si91x_lwip_stack"]
 
 requires:
+- name: log_none
+  condition: ["device_si91x"]
 - name: bsd_socket
   condition: ["sl_si91x_internal_stack"]
 - name: mbedtls_random

@@ -40,6 +40,7 @@
 #include "sl_wifi_region_db_config.h"
 #include "sli_wifi_utility.h"
 #include "sli_buffer_manager.h"
+#include <stdio.h>
 #include <string.h>
 #ifndef SL_NCP_DEFAULT_COMMAND_WAIT_TIME
 #define SL_NCP_DEFAULT_COMMAND_WAIT_TIME 3000
@@ -2848,12 +2849,17 @@ sl_status_t sli_wifi_transceiver_up(sl_wifi_interface_t interface, sl_wifi_trans
   // Get DUT MAC address to use as Addr2/Transmitter Address
   status = sli_wifi_get_mac_address(interface, &config->dut_mac);
   if (status == SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(INFO,
-                    "\r\nDevice MAC address: %x:%x:%x:",
-                    config->dut_mac.octet[0],
-                    config->dut_mac.octet[1],
-                    config->dut_mac.octet[2]);
-    SL_DEBUG_LOG_V2(INFO, "%x:%x:%x\r\n", config->dut_mac.octet[3], config->dut_mac.octet[4], config->dut_mac.octet[5]);
+    char sli_wifi_dut_mac_log_buf[80];
+    snprintf(sli_wifi_dut_mac_log_buf,
+             sizeof(sli_wifi_dut_mac_log_buf),
+             "\r\nDevice MAC address: %x:%x:%x:%x:%x:%x\r\n",
+             config->dut_mac.octet[0],
+             config->dut_mac.octet[1],
+             config->dut_mac.octet[2],
+             config->dut_mac.octet[3],
+             config->dut_mac.octet[4],
+             config->dut_mac.octet[5]);
+    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)sli_wifi_dut_mac_log_buf);
   } else {
     SL_DEBUG_LOG_V2(ERROR, "\r\nFailed to get mac address: 0x%lX\r\n", status);
     return SL_STATUS_FAIL;

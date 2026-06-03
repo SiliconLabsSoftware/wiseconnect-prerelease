@@ -33,5 +33,7 @@ define:
 requires:
 - name: wifi_driver
 - name: sli_wifi
+- name: log_none
+  condition: ["device_si91x"]
 - name: sli_siwx3xx_wifi
   condition: ["sl_siwx3xx_wireless"]

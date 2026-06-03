@@ -58,7 +58,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   ![Figure: hspi_secondary_uc](resources/uc_screen/hspi_secondary_uc.png)
 
-- Configure the following macros in [`hspi_secondary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_hspi_secondary/hspi_secondary_example.c) file and update/modify following macros, if required.
+- Configure the following macros in [`hspi_secondary_example.c`](hspi_secondary_example.c) file and update/modify following macros, if required.
 
   - `TEST_MEMORY_READ_WRITES`: When enabled, runs additional memory read/write tests from the SPI primary against the HSPI secondary memory. By default, it is set to 0.
 

@@ -102,7 +102,7 @@ Configure UC from the slcp component:
 
     ![SDC Channel Configuration](resources/uc_screen/sl_sdc_channel_uc_screen.png)
 
-- Configure the following macros in [`sdc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sdc/sdc_example.c) file and update/modify following macros, if required.
+- Configure the following macros in [`sdc_example.c`](sdc_example.c) file and update/modify following macros, if required.
 
   - `SDC_VREF`: Reference voltage (in volts) supplied to the SDC/AUX-ADC. Used by the application to convert raw ADC codes to voltages. By default, it is set to 3.3.
 

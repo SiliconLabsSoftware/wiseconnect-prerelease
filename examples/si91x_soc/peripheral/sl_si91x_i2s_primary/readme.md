@@ -109,7 +109,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - SL_I2S0_CHANNEL: I2S0 channel number (0-channel no 0, 1-channel no 1)
 - Configuration files are generated in **config folder**, if not changed then the code will run on default UC values.
 
-- Configure the following macros in [`i2s_primary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_i2s_primary/i2s_primary_example.c) file and update/modify following macros if required.
+- Configure the following macros in [`i2s_primary_example.c`](i2s_primary_example.c) file and update/modify following macros if required.
 
 - `I2S_PRIMARY_BUFFER_SIZE`: Defines the size of the transmit and receive buffers used by the I2S primary. By default, it is set to 1024.
 

@@ -398,21 +398,21 @@ sl_status_t set_power_manager_sleep_handler(console_args_t *arguments)
   sl_status_t status = sl_si91x_power_manager_sleep();
   if (status != SL_STATUS_OK) {
     // If status is not OK, display the error info.
-    SL_DEBUG_LOG("sl_si91x_power_manager_sleep failed, Error Code: 0x%lX \n", status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_si91x_power_manager_sleep failed, Error Code: 0x%lX", status);
     return status;
   }
 #else
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    SL_DEBUG_LOG("Failed to create semaphore\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
     return SL_STATUS_FAIL;
   }
 
-  SL_DEBUG_LOG("\r\nM4 in sleep\r\n");
+  SL_DEBUG_LOG_V2(INFO, "M4 in sleep");
   // Waiting for time_ms using semaphore to put M4 to sleep in tick less mode
   osSemaphoreAcquire(wait_semaphore, time_ms);
-  SL_DEBUG_LOG("\r\nM4 wake up\r\n");
+  SL_DEBUG_LOG_V2(INFO, "M4 wake up");
 #endif
   PRINT_AT_CMD_SUCCESS;
   return SL_STATUS_OK;

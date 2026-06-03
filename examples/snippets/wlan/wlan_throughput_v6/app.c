@@ -38,6 +38,7 @@
 #include "sl_si91x_socket_support.h"
 #include "sl_si91x_socket_utility.h"
 #include <string.h>
+#include <stdio.h>
 #include "sl_si91x_core_utilities.h"
 
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -279,8 +280,17 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to get mac address: 0x%lx", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Device MAC address: %x:%x:%x:", mac_addr.octet[0], mac_addr.octet[1], mac_addr.octet[2]);
-  SL_DEBUG_LOG_V2(INFO, "%x:%x:%x", mac_addr.octet[3], mac_addr.octet[4], mac_addr.octet[5]);
+  char wlan_tp_v6_mac_log[80];
+  snprintf(wlan_tp_v6_mac_log,
+           sizeof(wlan_tp_v6_mac_log),
+           "Device MAC address: %x:%x:%x:%x:%x:%x",
+           mac_addr.octet[0],
+           mac_addr.octet[1],
+           mac_addr.octet[2],
+           mac_addr.octet[3],
+           mac_addr.octet[4],
+           mac_addr.octet[5]);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)wlan_tp_v6_mac_log);
 
   status = sl_wifi_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {

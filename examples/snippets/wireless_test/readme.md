@@ -608,7 +608,7 @@ wifi_update_gain_table 1 0
 
 **Note:** To update the gain table, configure the gain_table_payload[] of sl_wifi_update_gain_table_command_handler in wifi_command.c file.
 
-**Note:** For changing the UART instance of the wireless_test example, see the VCOM section of the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v3.3.1/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+**Note:** For changing the UART instance of the wireless_test example, see the VCOM section of the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 The changes needs to be configured in rsi_debug.c file and RTE_Device_917.h file. 
 
 

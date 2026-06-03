@@ -82,7 +82,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macro in [`hrng_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_hrng/hrng_example.c) file and update/modify following macro, if required.
+- Configure the following macro in [`hrng_example.c`](hrng_example.c) file and update/modify following macro, if required.
 
 - `HRNG_TRANSFER_SIZE`: Number of 32-bit random values read from the HRNG per transfer and validated for duplicates. By default, it is set to 10.
 

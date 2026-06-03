@@ -87,6 +87,17 @@ Configure the following macros in `ps1_state.c` if required:
 Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) for the following tasks:
 
 1. Compile and run the application.
+
+   > **Note:** Use `Log_script.py` from the [SiWx91x Platform Logger example](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_logger/) (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+   >
+   > ```bash
+   > python Log_script.py --out firmware.out --port COM5 --max-args 3
+   > ```
+   >
+   > Replace `COM5` with the serial port your board uses on the host PC.
+   >
+   > Refer to the instructions [here](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_logger/readme.md#test-the-application) to build, flash, and decode logger output.
+
 2. By default, application turns off the NWP, enters the PS2 state, then switches to PS1, returns to PS2, and finally goes to PS2 sleep.
 3. After successful program execution, the prints in the serial console look as shown below.
   ![Figure: PS1 State](resources/readme/ps1_state.png)

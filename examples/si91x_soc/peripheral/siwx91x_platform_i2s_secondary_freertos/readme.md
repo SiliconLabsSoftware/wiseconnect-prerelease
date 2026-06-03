@@ -81,7 +81,7 @@ If any API call fails, the task prints an error via `DEBUGOUT` and calls **`osTh
   - **transfer_type** — Transmit, receive, or abort variants.
 - Transfers with 16-bit resolution must use a `uint16_t` buffer and pass `SL_I2S_DATA_SIZE16` to the `data_size` field in `sl_i2s_xfer_config_t` while configuring the transfer.
 - Transfers with 24-bit and 32-bit resolutions must use a `uint32_t` buffer and pass `SL_I2S_DATA_SIZE32`.
-- Because 8-bit resolution is not supported, use a `uint8_t` buffer with 16-bit resolution, pass `SL_I2S_DATA_SIZE8`, cast the buffer to `(uint16_t *)`, and set the transfer size to half the 8-bit buffer length. (Refer to the **[I2S loopback FreeRTOS](../siwx91x_platform_i2s_loopback_freertos/readme.md)** example.) For 8-bit transfers, the transfer size in bytes must be a multiple of four (for example, 8, 12, 16, or 20).
+- Because 8-bit resolution is not supported, use a `uint8_t` buffer with 16-bit resolution, pass `SL_I2S_DATA_SIZE8`, cast the buffer to `(uint16_t *)`, and set the transfer size to half the 8-bit buffer length. (Refer to the **[I2S loopback FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_loopback_freertos/readme.md)** example.) For 8-bit transfers, the transfer size in bytes must be a multiple of four (for example, 8, 12, 16, or 20).
 - For 16-bit or 32-bit resolution, the transfer size must be an **even** value (8, 10, 12, 14…). For 24-bit resolution, it must be a **multiple of four** (8, 12, 16, 20…).
 - SCK frequency is calculated as **SCK = 2 × bit_width × sampling_rate**. By default, I2S0 uses `I2S_PLL_CLK` as the clock source. This can generate any frequency range described in section 6.11.7 of the SiWx91x HRM.
 - By default, ULP_I2S/I2S1 uses `ULP_MHZ_RC_CLK` for low-power operation, which limits the maximum supported sampling frequency of ULP_I2S to **48 kHz** (32 MHz RC trims to 20 MHz in sleep).
@@ -134,7 +134,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Configuration files are generated in the **config folder**. If the configurations are not changed, the code will run on default UC values.
 
-- Configure the following macros in [`i2s_secondary_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_secondary_freertos/i2s_secondary_freertos.c) if required:
+- Configure the following macros in [`i2s_secondary_freertos.c`](i2s_secondary_freertos.c) if required:
 
 - `I2S_SECONDARY_BUFFER_SIZE`: Defines the size of the transmit and receive buffers used by the I2S secondary. By default, it is set to 1024.
 
@@ -148,7 +148,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define I2S_INSTANCE               0    // I2S instance
   ```
 
-> **Note:** Use the **same** `SL_I2S0_*` UC settings on the **primary** board. **I2S Primary (Master) Setup:** For the companion application and pins, refer to [I2S Primary FreeRTOS](../siwx91x_platform_i2s_primary_freertos/readme.md).
+> **Note:** Use the **same** `SL_I2S0_*` UC settings on the **primary** board. **I2S Primary (Master) Setup:** For the companion application and pins, refer to [I2S Primary FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_primary_freertos/readme.md).
 
 ### Pin Configuration
 
@@ -193,7 +193,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-1. Build and flash this **secondary** application on one board and **[I2S Primary FreeRTOS](../siwx91x_platform_i2s_primary_freertos/readme.md)** on the other.
+1. Build and flash this **secondary** application on one board and **[I2S Primary FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_primary_freertos/readme.md)** on the other.
 2. Connect I2S **SCK**, **WS**, crossed **DOUT/DIN**, and **GND** between the boards as per the pin connection tables above.
 3. Open a serial console on each board. This task starts with **transmit**; the **primary (master)** must supply SCK/WS during that phase, so do not reset or start only this board while the primary is still stopped.
 4. **Reset the secondary board first, then reset the primary board within a short time** so this board’s **transmit** lines up with the primary **receive** phase.

@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <string.h>
+#include <stdio.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_m4_ps.h"
@@ -154,7 +155,7 @@ static void application_start(void *argument)
   //! Initialize the Wi-Fi client interface
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi client init success");
@@ -162,7 +163,7 @@ static void application_start(void *argument)
   //! Bring up the Wi-Fi client interface
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
@@ -174,20 +175,20 @@ static void application_start(void *argument)
 
   status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_groupcast_filter_config failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_groupcast_filter_config failed, Error Code : 0x%" PRIx32, (uint32_t)status);
     return;
   }
 
   status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_beacon_drop_threshold failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_beacon_drop_threshold failed, Error Code : 0x%" PRIx32, (uint32_t)status);
     return;
   }
 
   //! set performance profile
   status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Power save configuration success");
@@ -205,9 +206,7 @@ static void application_start(void *argument)
 
   status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR,
-                    "sl_wifi_set_advanced_scan_configuration failed with status 0x%" PRIx32 "",
-                    (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_advanced_scan_configuration failed with status 0x%" PRIx32, (uint32_t)status);
     return;
   }
 
@@ -225,7 +224,7 @@ static void application_start(void *argument)
 
   status = sl_wifi_set_roam_configuration(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &roam_configuration);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Roam failed with status 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Roam failed with status 0x%" PRIx32, (uint32_t)status);
     return;
   } else {
     SL_DEBUG_LOG_V2(INFO, "Roaming configuration set successfully");
@@ -245,7 +244,7 @@ static void application_start(void *argument)
   }
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "scan failed with status 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "scan failed with status 0x%" PRIx32, (uint32_t)status);
     return;
   }
 
@@ -279,15 +278,24 @@ static sl_status_t module_status_handler(sl_wifi_event_t event,
 
   sl_wifi_module_state_stats_response_t *notif = (sl_wifi_module_state_stats_response_t *)data;
 
-  SL_DEBUG_LOG_V2(DEBUG, "---> Module status handler event with length : %lu", data_length);
+  SL_DEBUG_LOG_V2(DEBUG, "---> Module status handler event with length : %" PRIu32, data_length);
   SL_DEBUG_LOG_V2(DEBUG,
-                  "  <> Timestamp : %lu, state_code : 0x%02X, reason_code : 0x%02X.",
+                  "  <> Timestamp : %" PRIu32 ", state_code : 0x%02X, reason_code : 0x%02X.",
                   notif->timestamp,
                   notif->state_code,
                   notif->reason_code);
   SL_DEBUG_LOG_V2(DEBUG, "  <> channel : %u, rssi : -%u.", notif->channel, notif->rssi);
-  SL_DEBUG_LOG_V2(DEBUG, "  <> BSSID : %x:%x:%x:", notif->bssid[0], notif->bssid[1], notif->bssid[2]);
-  SL_DEBUG_LOG_V2(DEBUG, "%x:%x:%x.", notif->bssid[3], notif->bssid[4], notif->bssid[5]);
+  char roam_bssid_notif_log[64];
+  snprintf(roam_bssid_notif_log,
+           sizeof(roam_bssid_notif_log),
+           "  <> BSSID : %x:%x:%x:%x:%x:%x.",
+           notif->bssid[0],
+           notif->bssid[1],
+           notif->bssid[2],
+           notif->bssid[3],
+           notif->bssid[4],
+           notif->bssid[5]);
+  SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)roam_bssid_notif_log);
 
   //! Display the status information
   print_status_info(notif->state_code, notif->reason_code);
@@ -311,8 +319,17 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
                     (uintptr_t)scan_result->scan_info[a].ssid,
                     scan_result->scan_info[a].security_mode,
                     scan_result->scan_info[a].network_type);
-    SL_DEBUG_LOG_V2(INFO, "  %02x:%02x:%02x:", bssid[0], bssid[1], bssid[2]);
-    SL_DEBUG_LOG_V2(INFO, "%02x:%02x:%02x, ", bssid[3], bssid[4], bssid[5]);
+    char roam_scan_bssid_log[48];
+    snprintf(roam_scan_bssid_log,
+             sizeof(roam_scan_bssid_log),
+             "  %02x:%02x:%02x:%02x:%02x:%02x, ",
+             bssid[0],
+             bssid[1],
+             bssid[2],
+             bssid[3],
+             bssid[4],
+             bssid[5]);
+    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)roam_scan_bssid_log);
     SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
   }
 

@@ -428,7 +428,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
     }
     default: {
       // frame_type doesn't match any known cases
-      SL_DEBUG_LOG_V2(DEBUG, "Unknown Queue type: %u\n", queue_id);
+      SL_DEBUG_LOG_V2(DEBUG, "Unknown Queue type: %x\n", queue_id);
       status = SL_STATUS_INVALID_INDEX;
       break;
     }
@@ -882,7 +882,7 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "flush_all_socket_queues err=0x%X\n", (unsigned int)error_status);
+  SL_DEBUG_LOG_V2(DEBUG, "flush_all_socket_queues err=0x%X\n", (unsigned int)error_status);
   sl_status_t status                              = SL_STATUS_OK;
   sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
 

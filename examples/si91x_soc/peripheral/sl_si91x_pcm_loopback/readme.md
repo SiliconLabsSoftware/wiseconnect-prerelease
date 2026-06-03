@@ -93,7 +93,7 @@ Using the configuration wizard, configure parameters as follows:
 
 Configuration files are generated in the **config** folder. If not changed, the code will run on default UC values.
 
-Configure the following macros in [`pcm_loopback.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_pcm_loopback/pcm_loopback.c) file and update/modify them if required.
+Configure the following macros in [`pcm_loopback.c`](pcm_loopback.c) file and update/modify them if required.
 
 - `PCM_BUFFER_SIZE`: Size (in samples) of the buffers used to transmit and receive PCM data in loopback mode. By default, it is set to 1024.
 

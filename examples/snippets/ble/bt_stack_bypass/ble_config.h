@@ -39,11 +39,6 @@
 #define HCI_EVENT_PKT   0x04
 #define HCI_VENDOR_PKT  0xff
 
-// BTDM Debug Logging Configuration (enable 1 only when testing; logs on Segger RTT)
-#define BTDM_DEBUG_LOGGING  0
-#define MAX_FILE_SIZE       (10000 * 1024) // Configurable maximum file size in bytes
-#define FILE_SIZE_TOLERANCE 240            // Tolerance in bytes to avoid data loss
-
 #ifdef SLI_SI91X_MCU_INTERFACE
 #define RSI_BLE_MAX_NBR_ATT_REC 20
 /* Number of BLE notifications */

@@ -131,7 +131,7 @@ static void sli_event_handler_thread(void *args)
   sl_status_t status       = SL_STATUS_FAIL;
   void *data               = NULL;
 
-  SL_DEBUG_LOG_V2(INFO, "Event Engine thread Started\n");
+  SL_DEBUG_LOG_V2(DEBUG, "Event Engine thread Started\n");
 
   while (1) {
     SL_DEBUG_LOG_V2(DEBUG, "Event Engine thread waiting for events\n");

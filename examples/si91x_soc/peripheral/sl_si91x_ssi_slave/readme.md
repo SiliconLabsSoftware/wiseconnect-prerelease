@@ -62,7 +62,7 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 - All the necessary parameters are configured using [sl_si91x_ssi_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-set-configuration) API. It expects a structure with required parameters
   [sl_ssi_control_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sl-ssi-control-config-t).
 - After configuration, a callback register API is called to register the callback at the time of events [sl_si91x_ssi_register_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-register-event-callback).
-- The State machine code is implemented for transfer, send and receive data, and the current mode is determined by ssi_mode_enum_t which is declared in [`ssi_slave_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/ssi_slave_example.c) file.
+- The State machine code is implemented for transfer, send and receive data, and the current mode is determined by ssi_mode_enum_t which is declared in [`ssi_slave_example.c`](ssi_slave_example.c) file.
 - According to the macro which is enabled, the example code executes the transfer of data:
 
 - If the **SSI_SLAVE_TRANSFER** macro is enabled, it will transfer the data (that is, send and receive data) in full-duplex mode.
@@ -139,7 +139,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - Rx FIFO Threshold: Receive FIFO Threshold. Controls the level of entries (or below) at which the receive FIFO controller triggers an interrupt. The configuration range from 0 to 15.
 - Configuration files are generated in the **config folder**. If the configurations are not changed, the code will run on default UC values.
 
-- Configure the following macros in the [`ssi_slave_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/ssi_slave_example.h) file and update/modify following macros, if required.
+- Configure the following macros in the [`ssi_slave_example.h`](ssi_slave_example.h) file and update/modify following macros, if required.
 
 - `SSI_SLAVE_TRANSFER`: This macro is enabled by default. It sends and receives data in full duplex.
 
@@ -165,7 +165,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   static uint16_t ssi_slave_rx_buffer[SSI_SLAVE_BUFFER_SIZE] = { '\0' };
   ```
 
-- Configure the following macros in [`ssi_slave_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/ssi_slave_example.c) if required:
+- Configure the following macros in [`ssi_slave_example.c`](ssi_slave_example.c) if required:
 
 - `SSI_SLAVE_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
 
@@ -211,7 +211,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 >
 > Where F<sub>sclk_in</sub> is the incoming clock from the master. The SSI Secondary (Slave) peripheral clock (F<sub>ssi_clk</sub>) must satisfy this condition. If the master is configured for a specific frequency, ensure that the slave's clock is properly configured. Failure to properly configure the clock may result in communication errors or unreliable data transfer.
 >
-> Configure the following macro in the [`ssi_slave_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/ssi_slave_example.c) file to set the SSI baud rate for the slave:
+> Configure the following macro in the [`ssi_slave_example.c`](ssi_slave_example.c) file to set the SSI baud rate for the slave:
 >
 > ```c
 > #define SSI_SLAVE_BAUDRATE 2000000  // SSI baudrate

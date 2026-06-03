@@ -30,7 +30,7 @@ When flashed with this example the boot count get updated in the "boot_count" fi
 
 ## About Example Code
 
-- The example code in [`file_system_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_littlefs/file_system_example.c) shows how to set up QSPI to access flash memory for a file system using the LittleFS library.
+- The example code in [`file_system_example.c`](file_system_example.c) shows how to set up QSPI to access flash memory for a file system using the LittleFS library.
 - Initialize QSPI for LittleFS using `sl_si91x_littlefs_qspi_init()`.
 - To use the file system, call `lfs_mount()`.
 - Open a file and read the current boot count  `lfs_file_read()`.
@@ -46,7 +46,7 @@ When flashed with this example the boot count get updated in the "boot_count" fi
 
 >**Note:**
 >- LittleFS service is not supported on stacked flash boards. However, if the board supports external flash, users can connect external flash to access the LittleFS service.
->- For detailed information about pinset configurations, refer to the **Flash and PSRAM Combinations** section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/release/v3.4.2/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+>- For detailed information about pinset configurations, refer to the **Flash and PSRAM Combinations** section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 
 ### Software Requirements
 

@@ -58,7 +58,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`blinky.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_mutex/src/blinky.c) file, update/modify following macros if required.
+- Configure the following macros in [`blinky.c`](src/blinky.c) file, update/modify following macros if required.
 
 - `LED_INSTANCE`: Selects the on-board LED instance controlled by the two threads for toggling. By default, it is set to `led_led0`.
 

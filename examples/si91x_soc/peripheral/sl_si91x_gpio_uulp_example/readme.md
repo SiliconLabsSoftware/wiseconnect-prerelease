@@ -148,7 +148,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following parameters in [`gpio_uulp_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_uulp_example/gpio_uulp_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_uulp_example/) file and update/modify following macros if required.
+- Configure the following parameters in [`gpio_uulp_example.c`](gpio_uulp_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_uulp_example/) file and update/modify following macros if required.
 
 - `UULP_GPIO_INTR_2`: Specifies the UULP (Ultra Ultra Low Power) GPIO pin interrupt number used by the example. By default, it is set to 2.
 

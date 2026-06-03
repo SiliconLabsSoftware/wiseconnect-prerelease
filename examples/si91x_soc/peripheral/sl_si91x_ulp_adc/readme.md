@@ -122,7 +122,7 @@ Configure UC from the slcp component.
 - Apply the different voltages (1.8V to Vref) to ADC input and observe console outputs as per input.
 - Provided input voltage and console output data should match.
 
-- Configure the following macros in [`sl_ulp_adc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_adc/sl_ulp_adc_example.c) file, if required:
+- Configure the following macros in [`sl_ulp_adc_example.c`](sl_ulp_adc_example.c) file, if required:
 
 - `CHANNEL_SAMPLE_LENGTH`: Number of ADC samples collected per channel for one operation. By default, it is set to 1023.
 
@@ -237,7 +237,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 >
 >- The user can configure the input selection GPIO in the example application if the default GPIO is work around.
 >- ADC input selection rather than GPIO (like OP-AMP, DAC and Temperature sensor) user can create their own instances and configure them as per other input selection.
->- In the [`sl_ulp_adc_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_adc/sl_ulp_adc_example.c) file, update the [sl_adc_channel_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-adc-channel-config-t) channel parameter to reflect the installed channel number.
+>- In the [`sl_ulp_adc_example.c`](sl_ulp_adc_example.c) file, update the [sl_adc_channel_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-adc-channel-config-t) channel parameter to reflect the installed channel number.
 >
  >Use the following formula to find equivalent input voltage of ADC:
 >

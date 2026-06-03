@@ -54,7 +54,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Application Build Environment
 
-- Configure the following macros in [`veml6035_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_veml6035/veml6035_example.c) file. .Update or  modify the following macros, if required.
+- Configure the following macros in [`veml6035_example.c`](veml6035_example.c) file. .Update or  modify the following macros, if required.
 
  
   - `DELAY_PERIODIC_MS1`: Periodic sleeptimer timeout in milliseconds used to pace sensor readings. By default, it is set to 2000 ms (2 seconds).

@@ -51,7 +51,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`button_baremetal.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_button_baremetal/button_baremetal.c) file and update/modify following macros, if required.
+- Configure the following macros in [`button_baremetal.c`](button_baremetal.c) file and update/modify following macros, if required.
 
   - `BUTTON_INSTANCE`: Selects the button instance whose press events toggle the LED. By default, it is set to `button_btn0`.
 
@@ -90,7 +90,7 @@ The project uses BTN0 by default. To change the button to BTN1, follow the below
 
    ![Figure: Adding Button Instance](resources/readme/image600d.png)
 
-2. Change the definition of macro BUTTON_INSTANCE_0 in the [`button_baremetal.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_button_baremetal/button_baremetal.c) file to button_btn1.
+2. Change the definition of macro BUTTON_INSTANCE_0 in the [`button_baremetal.c`](button_baremetal.c) file to button_btn1.
 
 3. Build and test the output.
 

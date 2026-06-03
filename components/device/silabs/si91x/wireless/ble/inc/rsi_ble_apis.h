@@ -3955,11 +3955,6 @@ int32_t rsi_ble_notify_value(const uint8_t *dev_addr, uint16_t handle, uint16_t 
  * @note       Refer to the Status Codes section for the above error codes at [wiseconnect-status-codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) 
  */
 int32_t rsi_ble_indicate_value(const uint8_t *dev_addr, uint16_t handle, uint16_t data_len, const uint8_t *p_data);
-/** @} */
-
-/** @addtogroup BT-LOW-ENERGY4
- * @{
- */
 
 /*==============================================*/
 /**
@@ -3984,6 +3979,11 @@ int32_t rsi_ble_indicate_value(const uint8_t *dev_addr, uint16_t handle, uint16_
  * @note       Refer to the Status Codes section for the above error codes at [wiseconnect-status-codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) 
  */
 int32_t rsi_ble_indicate_value_sync(const uint8_t *dev_addr, uint16_t handle, uint16_t data_len, const uint8_t *p_data);
+/** @} */
+
+/** @addtogroup BT-LOW-ENERGY4
+ * @{
+ */
 
 /*==============================================*/
 /**

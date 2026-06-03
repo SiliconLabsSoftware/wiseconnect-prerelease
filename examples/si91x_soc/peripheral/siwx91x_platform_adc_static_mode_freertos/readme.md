@@ -138,7 +138,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Apply the different voltages (1.8V to Vref) to ADC input and observe console outputs as per input.
 - Provided input voltage and console output data should match.
 
-- Configure the following macros in [`adc_static_mode_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_adc_static_mode_freertos/adc_static_mode_freertos.c) if required:
+- Configure the following macros in [`adc_static_mode_freertos.c`](adc_static_mode_freertos.c) if required:
 
 - `ADC_MAX_OP_VALUE`: Maximum raw 12-bit value that can be read from the ADC data register. By default, it is set to 4095.
 

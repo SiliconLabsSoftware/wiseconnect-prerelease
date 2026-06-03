@@ -108,7 +108,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`app.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/app.h) if required.
+- Configure the following macros in [`app.h`](app.h) if required.
 
 - `BUFFER_SIZE`: Specifies the size (in bytes) of the data buffers shared by the I2C and USART threads for send and receive operations. This value must match the buffer size used by the leader application. By default, it is set to 15.
 
@@ -122,7 +122,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define MSGQUEUE_OBJECTS 1   // number of Message Queue Objects
   ```
 
-- Configure the following macros in [`usart_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/src/usart_app.c) if required.
+- Configure the following macros in [`usart_app.c`](src/usart_app.c) if required.
 
 - `USART_BAUDRATE`: Specifies the USART communication baud rate for asynchronous data transfer. Supported range is 9600-7372800. By default, it is set to 115200.
 
@@ -130,7 +130,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
   ```
 
-- Configure the following macro in [`i2c_follower_app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/src/i2c_follower_app.c) if required.
+- Configure the following macro in [`i2c_follower_app.c`](src/i2c_follower_app.c) if required.
 
 - `OWN_I2C_ADDR`: Specifies the 7-bit I2C follower address assigned to this device. The leader application must target this same address when communicating. By default, it is set to `0x50`.
 

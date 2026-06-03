@@ -31,6 +31,7 @@
 
 #if RSI_ENABLE_WLAN_TEST
 #include "stdlib.h"
+#include <stdio.h>
 #include "wifi_app_config.h"
 
 //! SL Wi-Fi SDK includes
@@ -176,8 +177,17 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
                       (uintptr_t)scan_result->scan_info[a].ssid,
                       scan_result->scan_info[a].security_mode,
                       scan_result->scan_info[a].network_type);
-      SL_DEBUG_LOG_V2(INFO, "  %02x:%02x:%02x:", bssid[0], bssid[1], bssid[2]);
-      SL_DEBUG_LOG_V2(INFO, "%02x:%02x:%02x, ", bssid[3], bssid[4], bssid[5]);
+      char tp_ble_scan_bssid_log[48];
+      snprintf(tp_ble_scan_bssid_log,
+               sizeof(tp_ble_scan_bssid_log),
+               "  %02x:%02x:%02x:%02x:%02x:%02x, ",
+               bssid[0],
+               bssid[1],
+               bssid[2],
+               bssid[3],
+               bssid[4],
+               bssid[5]);
+      SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)tp_ble_scan_bssid_log);
       SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }

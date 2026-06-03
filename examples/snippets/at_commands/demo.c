@@ -151,7 +151,7 @@ void application_start(const void *unused)
   iostream_usart_init();
 #endif
 
-  SL_DEBUG_LOG("app start\n");
+  SL_DEBUG_LOG_V2(INFO, "app start");
 
   AT_PRINTF("Ready\r\n");
   console_line_ready = 0;
@@ -177,7 +177,7 @@ void application_start(const void *unused)
     sl_status_t result = console_process_at_command_buffer(&console_command_database, &args, &command);
 
     if (result == SL_STATUS_OK) {
-      SL_DEBUG_LOG("Processing command\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Processing command");
       if (command->handler) {
         result = command->handler(&args);
         print_status(result);

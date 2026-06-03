@@ -72,7 +72,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following macros in the [`sl_ulp_dac_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ulp_dac/sl_ulp_dac_example.c) file and update/modify following macros, if required.
+- Configure the following macros in the [`sl_ulp_dac_example.c`](sl_ulp_dac_example.c) file and update/modify following macros, if required.
 
 - `STATIC_MODE`: Selects the DAC operation mode. Set to 1 for Static mode (constant output voltage) or 0 for FIFO mode (continuous waveform output). By default, it is set to 1.
 

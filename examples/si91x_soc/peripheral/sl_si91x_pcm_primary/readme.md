@@ -99,7 +99,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     8kHz, 11.025kHz, 16kHz, 22.05kHz and 24kHz.
 - Configuration files are generated in **config folder**, if not changed then the code will run on default UC values.
 
-Configure the following macros in [`pcm_primary_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_pcm_primary/pcm_primary_example.c) file and update/modify the following macros if required.
+Configure the following macros in [`pcm_primary_example.c`](pcm_primary_example.c) file and update/modify the following macros if required.
 
 - `PCM_PRIMARY_BUFFER_SIZE`: Size (in samples) of the buffers used to transmit and receive PCM data between the primary and secondary. By default, it is set to 1024.
 

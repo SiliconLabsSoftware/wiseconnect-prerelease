@@ -66,7 +66,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in the [`si70xx_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_si70xx/si70xx_example.c) file and update/modify following macros, if required.
+- Configure the following macros in the [`si70xx_example.c`](si70xx_example.c) file and update/modify following macros, if required.
 
   - `I2C`: Specifies the I2C instance used for Si70xx communication; by default, it is set to `SI70XX_I2C_INSTANCE`.
 

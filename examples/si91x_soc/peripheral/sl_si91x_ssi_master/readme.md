@@ -61,8 +61,8 @@ This example demonstrates SSI transfer (full-duplex communication) and SSI send/
 - SSI instance must be passed in init function to get the instance handle [sl_ssi_instance_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-ssi-instance-t), which is used in other APIs.
 - All the necessary parameters are configured using [sl_si91x_ssi_set_configuration](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-set-configuration) API. It expects a structure with required parameters [sl_ssi_control_config_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sl-ssi-control-config-t).
 - After configuration, a callback register API is called to register the callback at the time of events [sl_si91x_ssi_register_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-register-event-callback).
-- The State machine code is implemented for transfer, send and receive data, the current mode is determined by ssi_mode_enum_t which is declared in [`ssi_master_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_master/ssi_master_example.c) file.
-- Four serial slaves can be connected using this SSI master. For validation, you should change the slave number range from 0 to 3 in [ssi_master_example.c](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_master/ssi_master_example.c) file and should enable the respective macro (for example, M4_SSI_CS0 for slave 0) in the `RTE_Device_917.h` file. (path: /$project/config/RTE_Device_917.h)
+- The State machine code is implemented for transfer, send and receive data, the current mode is determined by ssi_mode_enum_t which is declared in [`ssi_master_example.c`](ssi_master_example.c) file.
+- Four serial slaves can be connected using this SSI master. For validation, you should change the slave number range from 0 to 3 in [ssi_master_example.c](ssi_master_example.c) file and should enable the respective macro (for example, M4_SSI_CS0 for slave 0) in the `RTE_Device_917.h` file. (path: /$project/config/RTE_Device_917.h)
 
 >**Note:** The frequency of the SSI master bit-rate clock is one-half the frequency of SSI master input clock.
 
@@ -140,7 +140,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - Rx FIFO Threshold: Receive FIFO Threshold. It controls the level of entries (or below) at which the receive FIFO controller triggers an interrupt. The configuration range from 0 to 15.
 - Configuration files are generated in **config folder**. If the values are not changed, the code will run on default UC values.
 
-- Configure the following macros in the [`ssi_master_example.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_master/ssi_master_example.h) file and update/modify following macros, if required.
+- Configure the following macros in the [`ssi_master_example.h`](ssi_master_example.h) file and update/modify following macros, if required.
 
 - `SSI_MASTER_TRANSFER`: This macro is enabled default. It sends and receives data in full-duplex.
 
@@ -166,7 +166,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   static uint16_t ssi_master_rx_buffer[SSI_MASTER_BUFFER_SIZE] = { '\0' };
   ```
 
-- By default, CS0 is selected in the pintool. To use a different chip select (CS), update the corresponding slave number in the [`ssi_master_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_master/ssi_master_example.c) file after configuring the desired CS in the pintool.
+- By default, CS0 is selected in the pintool. To use a different chip select (CS), update the corresponding slave number in the [`ssi_master_example.c`](ssi_master_example.c) file after configuring the desired CS in the pintool.
 
   ```c
   // For CS2_
@@ -180,7 +180,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   static uint32_t ssi_slave_number = SSI_SLAVE_3;
   ```
 
-- Configure the following macros in [`ssi_master_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_master/ssi_master_example.c) if required:
+- Configure the following macros in [`ssi_master_example.c`](ssi_master_example.c) if required:
 
 - `SSI_MASTER_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
 

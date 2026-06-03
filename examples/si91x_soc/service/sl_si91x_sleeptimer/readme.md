@@ -59,7 +59,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - On si91x devices, sleeptimer uses only the SYSRTC peripheral, and there is no UC for this component.
 
-- Configure the following macros in [`sleeptimer.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_sleeptimer/sleeptimer.c) file, update/modify following macros if required
+- Configure the following macros in [`sleeptimer.c`](sleeptimer.c) file, update/modify following macros if required
 
 - `TOOGLE_DELAY_MS1_ONESHOT`: Specifies the one-shot timer delay (in milliseconds) after which the LED toggle is triggered once. By default, it is configured for 5000 ms.
 

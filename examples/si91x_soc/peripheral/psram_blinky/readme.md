@@ -50,7 +50,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following parameter in [`app.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/psram_blinky/app.c) file, update/modify following macro if required
+- Configure the following parameter in [`app.c`](app.c) file, update/modify following macro if required
 
   - `LED_INSTANCE`: Selects the LED instance used by the blinky example. By default, it is set to `led_led0`.
 

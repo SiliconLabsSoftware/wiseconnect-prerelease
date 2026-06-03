@@ -447,6 +447,255 @@ The following table describes the front-end switch selection for the SiWx917.
 
 ![ Standby State Sequence](./resources/Standby_Sequence.png)
 
+## SL Debug Logger
+The **Silicon Labs Debug Logger** (`sl_log`) is a platform-level service that gives an
+application a **single, unified logging API** with **selectable backends** (UART /
+IO Stream, RTT, SEGGER SystemView, no-op) and **compile-time + runtime level
+filtering**. It is the recommended replacement for ad-hoc `printf` /
+`DEBUGOUT` paths used today.
+
+SL Log provides:
+
+- **Printf-style string logging** with explicit levels: `SL_PRINT_STRING_DEBUG`,
+  `SL_PRINT_STRING_INFO`, `SL_PRINT_STRING_WARN`, `SL_PRINT_STRING_ERROR`.
+- **Event-style numeric logging**: `SL_PRINT_EVENT_INFO`, `SL_PRINT_EVENT_DEBUG`,
+  `SL_PRINT_EVENT_WARN`, `SL_PRINT_EVENT_ERROR` for trace IDs, dictionaries, and
+  machine-parsed logs.
+- **Compile-time level filtering** (`SL_LOG_CONFIG_LEVEL_COMPILE_TIME`) that
+  removes lower-priority calls from the binary.
+- **Runtime level control** through `sl_log_set_loglevel()` /
+  `sl_log_get_loglevel()`.
+- **Configurable max argument count per log call** (`SL_LOG_CONFIG_ARG`, 3–10)
+  and **configurable ring-buffer depth** (`SL_LOG_NUMBER_OF_EVENTS`, 1–255).
+- **Multiple backends** selected at the component level:
+  - **IO Stream** (`log_backend_iostream`) over **UART (VCOM)** or **RTT** —
+    in either *formatted* (human-readable text) or *compact* (binary
+    `sl_log_event_t`) mode.
+  - **SEGGER SystemView** (`log_backend_systemview`) for trace/timeline
+    correlation.
+  - **`log_none`** that keeps logger calls compilable when no real backend
+    is installed.
+
+  > **Only one backend may be installed at a time.** Adding a second backend
+  > component triggers a Simplicity Studio conflict dialog that offers
+  > **Replace** or **Keep**.
+- **Multi-core timestamp synchronization** (`sl_log_sync_timestamp`) for
+  correlating Host MCU and Captive Core (e.g. NWP / Wi-Fi / BLE) logs on
+  SiWx91x.
+- **Power-aware integration** (`sl_log_pre_sleep_process`,
+  `sl_log_post_sleep_process`) so logs survive normal low-power transitions.
+
+### Architecture
+
+![SL Log common service architecture: shared logger layers, board-specific platform adapters, and captive-core log ingress to the host MCU.](resources/sl_log_common_architecture.png)
+
+SL Log is delivered as a **common service**. Application code uses the same
+logging API regardless of the host MCU family; board-specific behavior
+(timestamp source, power hooks, captive-core ingress, backend transport) is
+isolated in a platform adapter. Logs from the host core and any captive core
+funnel into the same ring buffer, level filter, and selected backend.
+
+| Component `id:`                   | Provides (`provides:`)                          | Visible in UC | Role                                                                                       |
+|-----------------------------------|-------------------------------------------------|---------------|--------------------------------------------------------------------------------------------|
+| `log`                             | `log`                                            | hidden        | SL Log core (ring buffer, level filtering, public APIs).                                    |
+| `log_none`                        | `log_none`                                       | hidden        | Headers + weak no-op stubs; keeps callers buildable when no real backend is installed.      |
+| `log_platform_specific`           | `log_platform_core`                              | hidden        | Timer / sleep / wake hooks for the host platform; provides the `log_platform_core` capability. |
+| `log_backend_iostream`            | `log_backend_iostream`                           | visible       | I/O Stream **transport shim** (UART (VCOM) / RTT). Requires one output-format implementation. |
+| `log_backend_iostream_compact`    | `log_backend`, `log_backend_iostream_impl`       | visible       | Output-format impl: raw `sl_log_event_t` records for offline host-side decoding.            |
+| `log_backend_iostream_formatted`  | `log_backend`, `log_backend_iostream_impl`       | visible       | Output-format impl: human-readable text lines (printf-style format expansion on target).    |
+| `log_backend_systemview`          | `log_backend`, `log_backend_systemview`          | visible       | SEGGER SystemView trace backend.                                                            |
+
+> **IO Stream backend pair.** Selecting the IO Stream path means installing
+> the **transport shim** (`log_backend_iostream`) **plus exactly one
+> output-format implementation** (`log_backend_iostream_compact` *or*
+> `log_backend_iostream_formatted`). The shim defaults to the compact
+> implementation (`recommends`), but the choice is exposed in the UC.
+>
+> All seven components currently ship with `quality: evaluation`; enable the
+> **Evaluation** entry in the Software Components **Quality** filter in Simplicity Studio
+
+Public headers, configuration files, readme documents, API header documentation and example code live under
+`platform/service/sl_log/` (see `inc/sl_log.h`, `inc/sl_log_helper.h`, and
+`config/sl_log_common_config.h`).
+
+### Migration Guidelines
+
+Most existing customer code emits diagnostics through `printf`, the
+WiSeConnect `DEBUGOUT(...)` macro, or a third-party library’s own logger.
+A “big-bang” switch to SL Log is rarely practical on a real product. SL Log is
+designed to support a **staged migration** so that legacy and new logging
+**coexist** during the transition and become a **single unified stream** once
+migration is complete.
+
+The recommended path has three stages.
+
+#### Stage 1 – Coexistence (no source changes to legacy code)
+
+**Goal:** Keep the customer’s existing log path exactly as it is, and capture
+**SL Log output on a separate backend**. Drivers and services that already
+emit through `SL_PRINT_STRING_*` start producing usable output without
+disturbing legacy `printf` / `DEBUGOUT` traffic.
+
+Setup:
+
+1. Leave existing `printf` / `DEBUGOUT` over UART **untouched**. Existing
+   board UART, baud rate, and host capture continue to work as before.
+2. Install **one** SL Log backend stack on a transport that does not
+   collide with the legacy path. The SL Log core (`log`) and the platform
+   integration (`log_platform_specific`) are pulled in transitively.
+   - **`log_backend_systemview`** — if RTT/J-Link is available, this is
+     the cleanest separation: no UART contention.
+   - **`log_backend_iostream` + `log_backend_iostream_compact`** over
+     **RTT** — also fully separate from legacy UART; smallest on-wire
+     footprint, decoded host-side by `Log_script.py`.
+   - **`log_backend_iostream` + `log_backend_iostream_formatted`** over
+     **RTT** — same as above when no host decoder is desired.
+   - **`log_backend_iostream` (compact or formatted)** over
+     **UART (VCOM)** is acceptable only if a second UART is available;
+     sharing one UART between `printf` and SL Log is not recommended at
+     this stage.
+3. Build and flash. Two streams are now visible:
+   - Legacy `printf` / `DEBUGOUT` lines on UART, as before.
+   - SL Log output (from drivers/services that already use SL Log) on the
+     chosen secondary backend.
+
+What is achieved:
+
+- No changes to any application file that uses `printf` or `DEBUGOUT`.
+- SL Log–native subsystems begin producing structured, level-filtered output.
+- The customer can evaluate viewers (RTT, SystemView), level filtering, and
+  backend behavior in production-like conditions before touching legacy code.
+
+#### Stage 2 – Bridge legacy macros to SL Log (no call-site changes)
+
+**Goal:** Stop emitting two parallel streams. Redirect existing
+`printf` / `DEBUGOUT` calls into SL Log so that **the SL Log backend becomes
+the single sink**. Call sites stay unchanged.
+
+Two equivalent mechanisms are provided:
+
+#### Macro redirect (recommended for simple cases)
+
+In a central header included before the legacy log header (or by gating the
+existing one), redefine the legacy macro to an SL Log macro:
+
+```c
+#if defined(SL_CATALOG_LOGGER_COMPONENT_PRESENT)
+  #include "sl_log.h"
+  #include "sl_log_helper.h"
+  #define DEBUGOUT(...)  SL_PRINT_STRING_INFO(__VA_ARGS__)
+  #define DEBUGINIT()    do { } while (0)   /* sl_log_init() handled by sl_main / sl_system_init */
+#endif
+```
+
+Notes and constraints:
+
+- `SL_PRINT_STRING_*` macros accept up to `SL_LOG_CONFIG_ARG` arguments
+  (default `3`). A small number of legacy call sites with more than 3
+  arguments must be split or simplified.
+- All redirected calls land at one chosen level (typically `INFO`), this is not the intent of SL Logger. Promote
+  to `WARN` / `ERROR` selectively in code that matters.
+- Use `sl_log_set_loglevel()` at runtime to throttle verbosity in the
+  field without a rebuild.
+
+For supported logger backends (IO Stream over RTT or UART, compact vs formatted, and SystemView), use the **SL SI91x Logger Backend Example** (`examples/si91x_soc/service/sl_si91x_logger_backend_example/readme.md`).
+
+What is achieved:
+
+- One log stream. All legacy and SL Log output goes through SL Log’s
+  ring buffer, level filtering, and the chosen backend.
+- Existing source tree is largely untouched.
+- The customer’s log viewer, log levels, and tooling are now the long-term
+  ones.
+
+#### Stage 3 – Direct SL Log API at call sites (long-term form)
+
+**Goal:** Use SL Log natively. New code is written directly with
+`SL_PRINT_STRING_*` and `SL_PRINT_EVENT_*`; legacy macro redirects and the
+adapter layer can be retired over time.
+
+Typical actions:
+
+- Replace `DEBUGOUT("Error: 0x%lX", status);` with
+  `SL_PRINT_STRING_ERROR("Error: 0x%lX", (uint32_t)status);`.
+- Pick the right level per call site (`DEBUG`, `INFO`, `WARN`, `ERROR`).
+- For high-volume numeric trace, prefer `SL_PRINT_EVENT_*` with a
+  module-scoped event-ID range.
+- Drop the redirection header / adapter component once no caller uses it.
+
+What is achieved:
+
+- Full benefit of SL Log: explicit levels, compile-time stripping, runtime
+  filtering, multi-backend choice, captive-core correlation, and assert
+  logging.
+- Unified logging across Application and silicon labs components.
+
+#### Migration checklist
+
+| Step | Action                                                                                                                                  |
+|------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| 1    | Confirm existing `printf` / `DEBUGOUT` works as a baseline before adding SL Log.                                                         |
+| 2    | Install one backend stack (`log_backend_iostream` + `_compact`/`_formatted`, or `log_backend_systemview`) on a transport separate from the legacy UART (Stage 1). |
+| 3    | Verify SL Log–native subsystems produce output on the new backend.                                                                       |
+| 4    | Choose a redirect mechanism (macro redirect or adapter) and unify streams (Stage 2).                                                     |
+| 5    | Audit call sites with more than `SL_LOG_CONFIG_ARG` arguments; split or simplify them.                                                   |
+| 6    | Re-tune `LOG_LEVEL`, `CONFIG_MAX_ARGS`, `No of Logs`, `SL_LOG_CONFIG_TIMER_INSTANCE`, and any backend-specific UC values for production. |
+| 7    | Replace remaining legacy macros with `SL_PRINT_STRING_*` / `SL_PRINT_EVENT_*` (Stage 3).                                                 |
+| 8    | Pick the production backend pair: `_compact` (smallest, needs `Log_script.py`) vs `_formatted` (plain text), or `log_backend_systemview`.|
+| 9    | If logger is intentionally disabled in a build, install `log_none` (or `si91x_log_none`) or set `LOG_LEVEL=NONE`.                        |
+
+### M4 and TA logs visibility with backend
+
+![M4 and TA logs visibility with backend](./resources/M4_TA_logs_visibility_with_backend.png)
+
+#### Captive core (NWP) logging enablement
+
+TA log paths in the table above require the wireless stack to forward **NWP (captive core) logs** to the host-side logger. In `sl_wifi_device_configuration_t` (`sl_wifi_device.h`), OR **`SL_SI91X_ENABLE_NWP_LOGGING`** into `config_feature_bit_map` together with your other feature bits **before** wireless initialization—for example:
+
+```c
+.config_feature_bit_map = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_NWP_LOGGING,
+```
+
+### Format specifiers and argument-type requirements by backend
+
+| Backend | Allowed specifiers | Required cast | Mixing rules |
+|---------|-------------------|----------------|--------------|
+| IO Stream Formatted | `%d`, `%x`, `%p`, `%s` | `(uint32_t)` for non-pointer / non-string args; `(uintptr_t)` for `%p` and `%s` arguments. | May mix freely. |
+| IO Stream Compact | `%lu` | `(uint32_t)` for every argument; strings cannot be rendered (decode on the host with `Log_script.py`). | Numeric only. |
+| SEGGER SystemView | `%d`, `%u`, `%x` | None enforced by the macro. | None |
+
+### Decoding IO Stream compact log messages
+
+With **IO Stream compact**, the target sends encoded `sl_log_event_t` records (not plain text). On the host PC, run **`Log_script.py`** from the logger example tree (for example `examples/si91x_soc/service/sl_si91x_logger_backend_example/Log_script.py` or `examples/si91x_soc/service/sl_si91x_logger/Log_script.py`). Point **`--out`** at the built firmware image (`.out` / `.axf`) so the script reads format strings from the **`.log_fmt`** ELF section. Pass **`--descriptor SYSVIEW_Si917nwp.txt`** so captive-core (TA / NWP) events decode with readable names (use the descriptor file supplied with your SDK or project).
+
+**UART (VCOM)** — decode from the board virtual COM port. Add **`--port`** (for example `COM5`) and **`--baud`** if the script does not auto-detect the port; use **921600** when TA logging is enabled on UART:
+
+```text
+python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --max-args 3
+```
+
+**RTT** — decode from the J-Link RTT stream while the target runs:
+
+```text
+python Log_script.py --source rtt --device SiWG917M111M --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --max-args 3
+```
+
+**List format strings** stored in the firmware **`.log_fmt`** section (no device connection):
+
+```text
+python Log_script.py --out firmware.out --list-formats
+```
+
+For backend setup, UC settings, and proprietary compact-UART configuration, see `examples/si91x_soc/service/sl_si91x_logger_backend_example/readme.md`. Additional `Log_script.py` flags (`--flash`, `--reset`, `--max-args`, `--variable-packet`) are documented in the script’s `--help` text in the same example folder.
+
+### Limitations
+
+1. Buffer overflow is reported, not blocked. When the ring buffer fills, new events are dropped and an `event_id = 0xFFFFFFFF` overflow marker (with the dropped count) is delivered the next time `sl_log_flush()` runs. Increase **Number of Logs** in UC, or call `sl_log_flush()` more often, if you see overflows.
+
+2. Lowest allowable power state is **PS3** for RTT and SystemView backends when a debugger is connected. When using an RTT-based IO Stream backend or the SEGGER SystemView backend, the logger prevents the device from entering sleep or active power states below PS3 while an active debugger connection is detected, so debug and log capture sessions can remain connected.
+
+3. For `UART I/O Stream + BLE with TA logging and INFO/DEBUG` it is recommended to use `I/O Stream – compact binary output` and `IOStream Si91x UART at 921600 baud`; lower baud rates cannot carry M4 + TA traffic and `most logs will be dropped`. If needed, reduce log level, flush more often, or use RTT / SystemView.
+
 ## Chip/Module Programming
 
 ### ISP Mode

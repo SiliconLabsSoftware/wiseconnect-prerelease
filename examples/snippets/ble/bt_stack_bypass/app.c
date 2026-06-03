@@ -42,7 +42,6 @@
 #include "sl_iostream.h"
 #include "sl_iostream_handles.h"
 #include "em_device.h"
-#include "app_rtt_logging.h"
 #endif
 
 #define UART_READING_HCI_PKT_TYPE    0
@@ -127,22 +126,13 @@ static ARM_DRIVER_USART *USARTdrv = &Driver_USART0;
 ARM_USART_CAPABILITIES drv_capabilities;
 #endif
 
-#if BTDM_DEBUG_LOGGING
-#include "SEGGER_RTT.h"
-osSemaphoreId_t bt_debug_logs_sem;
-static uint8_t si91x_application_debug_buffer[1024] = { 0 };
-extern void rsi_task_bt_debug_logs(void);
-#endif
-#ifndef SLI_SI91X_MCU_INTERFACE
-// RTT Console buffer for Channel 2 (application console logs)
-static uint8_t rtt_console_buffer[1024] = { 0 };
-#endif
-
 sl_status_t status;
 
 static uint32_t ble_app_event_map;
 static uint32_t ble_app_event_map1;
+#ifdef SLI_SI91X_MCU_INTERFACE
 static uint8_t uart_rx_in_progress;
+#endif
 osSemaphoreId_t ble_main_task_sem;
 
 volatile uint32_t read_tx_cnt = 0;
@@ -241,9 +231,6 @@ static const sl_wifi_device_configuration_t config = {
 #if RSI_BLE_AE_MAX_ADV_SETS
                       | SL_SI91X_BLE_AE_MAX_ADV_SETS(RSI_BLE_AE_MAX_ADV_SETS)
 #endif
-#if BTDM_DEBUG_LOGGING
-                      | BIT(25)
-#endif
                       | SL_SI91X_BT_BLE_STACK_BYPASS_ENABLE),
                    .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
                                               | RSI_CONFIG_FEATURE_BITMAP) }
@@ -259,19 +246,6 @@ const osThreadAttr_t thread_attributes = {
   .priority   = 0,
   .tz_module  = 0,
 };
-
-#if BTDM_DEBUG_LOGGING
-const osThreadAttr_t bt_debug_logs_thread_attributes = {
-  .name       = "bt_debug_logs_thread",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
-  .stack_size = 3072,
-  .priority   = osPriorityNormal,
-  .tz_module  = 0,
-};
-#endif
 
 #ifndef SLI_SI91X_MCU_INTERFACE
 static const osThreadAttr_t hci_iostream_rx_thread_attributes = {
@@ -291,24 +265,28 @@ static void hci_iostream_rx_thread(void *argument);
 #ifndef SLI_SI91X_MCU_INTERFACE
 static sl_status_t iostream_rx(uint8_t *buf, size_t len)
 {
-  for (size_t i = 0; i < len; i++) {
-    char c;
-    sl_status_t s = sl_iostream_getchar(SL_IOSTREAM_STDIN, &c);
-    if (s != SL_STATUS_OK) {
-      return s;
+  // Read HCI bytes ONLY from the vcom UART, not from the "default" / "recommended
+  // console" stream. This decouples the HCI pipe from the log pipe so we can
+  // route SL_DEBUG_LOG_V2 output to RTT without corrupting HCI on vcom.
+  size_t total = 0;
+  while (total < len) {
+    size_t got         = 0;
+    sl_status_t retval = sl_iostream_read(sl_iostream_vcom_handle, &buf[total], len - total, &got);
+    if (retval == SL_STATUS_OK) {
+      total += got;
+    } else if (retval != SL_STATUS_EMPTY) {
+      return retval;
     }
-    buf[i] = (uint8_t)c;
+    // SL_STATUS_EMPTY or got == 0: spin until the EUSART has more bytes
   }
   return SL_STATUS_OK;
 }
 
 static sl_status_t iostream_tx(const uint8_t *buf, size_t len)
 {
-  sl_iostream_t *out = sl_iostream_recommended_console_stream;
-  if (out == NULL) {
-    return SL_STATUS_FAIL;
-  }
-  return sl_iostream_write(out, buf, len);
+  // HCI replies must go back to the host over the vcom UART, NEVER to the
+  // log/console stream (which app_init() redirects to RTT).
+  return sl_iostream_write(sl_iostream_vcom_handle, buf, len);
 }
 
 static void iostream_usart_init(void)
@@ -733,16 +711,6 @@ void rsi_ble_hci_raw_task(void *argument)
 #endif
 #else
   iostream_usart_init();
-
-  // Configure RTT Channel 2 for console logging (NCP mode)
-  // Channel 0: Default RTT Terminal
-  // Channel 1: BTDM controller logs
-  // Channel 2: Application console logs
-  SEGGER_RTT_ConfigUpBuffer(2,
-                            "Console_Logs",
-                            rtt_console_buffer,
-                            sizeof(rtt_console_buffer),
-                            SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 #endif
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
@@ -752,15 +720,6 @@ void rsi_ble_hci_raw_task(void *argument)
   } else {
     SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
   }
-
-#if BTDM_DEBUG_LOGGING
-  SEGGER_RTT_ConfigUpBuffer(1,
-                            "Si91x_ApplicationDebugBuffer",
-                            si91x_application_debug_buffer,
-                            sizeof(si91x_application_debug_buffer),
-                            SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
-  SL_DEBUG_LOG_V2(INFO, "RTT config is successful");
-#endif
 
 #if RSI_SET_REGION_SUPPORT && !SL_SI91X_ACX_MODULE
   status = sl_si91x_set_device_region(0, 0, 4);
@@ -776,19 +735,6 @@ void rsi_ble_hci_raw_task(void *argument)
 
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
-
-#if BTDM_DEBUG_LOGGING
-  bt_debug_logs_sem = osSemaphoreNew(1, 0, NULL);
-  //! Create task for btdm debug logs
-  osThreadId_t bt_debug_logs_thread_id =
-    osThreadNew((osThreadFunc_t)rsi_task_bt_debug_logs, NULL, &bt_debug_logs_thread_attributes);
-  if (bt_debug_logs_thread_id == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "bt_debug_logs_thread failed to create");
-    return;
-  }
-  SL_DEBUG_LOG_V2(DEBUG, "bt_debug_logs_thread created and started");
-  osSemaphoreRelease(bt_debug_logs_sem);
-#endif
 
   //! initialize the event map
   rsi_ble_app_init_events();
@@ -859,8 +805,9 @@ void rsi_ble_hci_raw_task(void *argument)
         __enable_irq();
 #else
         {
+          rsi_ble_app_clear_event(RSI_APP_EVENT_RCP);
           rx_uart_queue_t *rx_queue = &g_uart_rx_queue;
-          if ((rx_queue->pkt_cnt) && (uart_rx_in_progress == 0)) {
+          if (rx_queue->pkt_cnt > 0) {
             rx_uart_pkt_t *rx_pkt = rx_queue->head;
             if (rx_pkt != NULL) {
               status = iostream_tx(rx_pkt->tx_buf, (size_t)(rx_pkt->cmd_len + 1));
@@ -871,12 +818,12 @@ void rsi_ble_hci_raw_task(void *argument)
               }
               rx_pkt->pkt_in_use = 0;
               DEL_FROM_LIST(rx_queue);
-              if (g_uart_rx_queue.pkt_cnt) {
+              // Re-trigger event if more packets remain in queue
+              if (g_uart_rx_queue.pkt_cnt > 0) {
                 rsi_ble_app_set_event(RSI_APP_EVENT_RCP);
               }
             }
           }
-          rsi_ble_app_clear_event(RSI_APP_EVENT_RCP);
         }
 #endif
       } break;
@@ -899,9 +846,14 @@ void rsi_ble_hci_raw_task(void *argument)
  ******************************************************************************/
 void app_init(void)
 {
-#if BTDM_DEBUG_LOGGING || !defined(SLI_SI91X_MCU_INTERFACE)
-  // Initialize RTT for BTDM logging or NCP console logging
-  SEGGER_RTT_Init();
+#ifndef SLI_SI91X_MCU_INTERFACE
+  // Force the log backend (log_backend_iostream_formatted) to write to RTT
+  // instead of vcom. sl_iostream_set_console_instance() picks UART over RTT by
+  // priority; without this override, SL_DEBUG_LOG_V2 output would land on vcom
+  // and corrupt the HCI byte stream.
+  extern sl_iostream_t *sl_iostream_recommended_console_stream;
+  extern sl_iostream_t *sl_iostream_rtt_handle;
+  sl_iostream_recommended_console_stream = sl_iostream_rtt_handle;
 #endif
 
 #ifdef SLI_SI91X_MCU_INTERFACE

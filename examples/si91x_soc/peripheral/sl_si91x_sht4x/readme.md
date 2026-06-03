@@ -57,7 +57,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`sht4x_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_sht4x/sht4x_example.c) file and update/modify following macros, if required.
+- Configure the following macros in [`sht4x_example.c`](sht4x_example.c) file and update/modify following macros, if required.
 
   
 

@@ -50,7 +50,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-Configure the following parameter in [`blinky.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_blinky/blinky.c) file. Update or modify following macro if required.
+Configure the following parameter in [`blinky.c`](blinky.c) file. Update or modify following macro if required.
 
 - `LED_INSTANCE`: Selects the LED instance that is toggled by the example. By default, it is set to `led_led0`.
 

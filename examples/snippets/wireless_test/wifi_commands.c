@@ -634,8 +634,17 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
                     (uintptr_t)scan_result->scan_info[a].ssid,
                     (uintptr_t)scan_result->scan_info[a].security_mode,
                     (uintptr_t)scan_result->scan_info[a].network_type);
-    SL_DEBUG_LOG_V2(INFO, "  %02x:%02x:%02x:", bssid[0], bssid[1], bssid[2]);
-    SL_DEBUG_LOG_V2(INFO, "%02x:%02x:%02x, ", bssid[3], bssid[4], bssid[5]);
+    char wifi_cmd_scan_bssid_log[48];
+    snprintf(wifi_cmd_scan_bssid_log,
+             sizeof(wifi_cmd_scan_bssid_log),
+             "  %02x:%02x:%02x:%02x:%02x:%02x, ",
+             bssid[0],
+             bssid[1],
+             bssid[2],
+             bssid[3],
+             bssid[4],
+             bssid[5]);
+    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)wifi_cmd_scan_bssid_log);
     SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
   }
   SL_DEBUG_LOG_V2(INFO, "End");
@@ -855,11 +864,11 @@ sl_status_t wifi_connect_command_handler(console_args_t *arguments)
   sl_wifi_interface_t interface =
     GET_OPTIONAL_COMMAND_ARG(arguments, 10, SL_WIFI_CLIENT_2_4GHZ_INTERFACE, sl_wifi_interface_t);
 
-  SL_DEBUG_LOG("ssid=%s\n", ssid);
-  SL_DEBUG_LOG("secType=%u\n", security_type);
-  SL_DEBUG_LOG("encType=%u\n", encryption_type);
-  SL_DEBUG_LOG("userName=%s\n", user_name);
-  SL_DEBUG_LOG("pwd=%s\n", password);
+  SL_DEBUG_LOG_V2(DEBUG, "ssid=%s", (uintptr_t)ssid);
+  SL_DEBUG_LOG_V2(DEBUG, "secType=%u", security_type);
+  SL_DEBUG_LOG_V2(DEBUG, "encType=%u", encryption_type);
+  SL_DEBUG_LOG_V2(DEBUG, "userName=%s", (uintptr_t)user_name);
+  SL_DEBUG_LOG_V2(DEBUG, "pwd=%s", (uintptr_t)password);
 
   if (timeout_ms == 0) {
     sl_wifi_set_join_callback_v2(join_callback_handler, NULL);
@@ -876,7 +885,7 @@ sl_status_t wifi_connect_command_handler(console_args_t *arguments)
         sl_net_set_credential(SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID, SL_NET_CERTIFICATE, wifiuser, sizeof(wifiuser) - 1);
       VERIFY_STATUS_AND_RETURN(status);
 
-      SL_DEBUG_LOG("Certificate set\n");
+      SL_DEBUG_LOG_V2(INFO, "Certificate set");
     }
 
     wifi_client_enterprise_eap_credential.data.certificate_id = id;
@@ -891,7 +900,7 @@ sl_status_t wifi_connect_command_handler(console_args_t *arguments)
     if (security_type != SL_WIFI_OPEN) {
       status = sl_net_set_credential(id, SL_NET_WIFI_PSK, password, strlen(password));
       VERIFY_STATUS_AND_RETURN(status);
-      SL_DEBUG_LOG("Credentials set\n");
+      SL_DEBUG_LOG_V2(INFO, "Credentials set");
     }
   }
 
@@ -900,7 +909,7 @@ sl_status_t wifi_connect_command_handler(console_args_t *arguments)
   ap.encryption    = encryption_type;
   ap.credential_id = id;
 
-  SL_DEBUG_LOG("Connecting\n");
+  SL_DEBUG_LOG_V2(INFO, "Connecting");
   status = sl_wifi_connect(interface, &ap, timeout_ms);
   if (status == SL_STATUS_IN_PROGRESS) {
     callback_status = SL_STATUS_IN_PROGRESS;
@@ -1064,8 +1073,17 @@ sl_status_t wifi_get_mac_address_command_handler(console_args_t *arguments)
   status = sl_wifi_get_mac_address(interface, &mac_addr);
   VERIFY_STATUS_AND_RETURN(status);
 
-  SL_DEBUG_LOG_V2(INFO, "%x:%x:%x:", mac_addr.octet[0], mac_addr.octet[1], mac_addr.octet[2]);
-  SL_DEBUG_LOG_V2(INFO, "%x:%x:%x", mac_addr.octet[3], mac_addr.octet[4], mac_addr.octet[5]);
+  char wifi_cmd_mac_log[48];
+  snprintf(wifi_cmd_mac_log,
+           sizeof(wifi_cmd_mac_log),
+           "%x:%x:%x:%x:%x:%x",
+           mac_addr.octet[0],
+           mac_addr.octet[1],
+           mac_addr.octet[2],
+           mac_addr.octet[3],
+           mac_addr.octet[4],
+           mac_addr.octet[5]);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)wifi_cmd_mac_log);
   return status;
 }
 
@@ -1137,17 +1155,18 @@ sl_status_t wifi_get_ap_client_info_command_handler(console_args_t *argument)
 
   for (uint16_t station_info_index = 0; station_info_index < client_info.client_count; station_info_index++) {
     sl_wifi_client_info_t *station_info = &client_info.client_info[station_info_index];
-    SL_DEBUG_LOG_V2(INFO, "%d) MAC Address is ", station_info_index + 1);
-    SL_DEBUG_LOG_V2(INFO,
-                    "%x:%x:%x:",
-                    station_info->mac_adddress.octet[0],
-                    station_info->mac_adddress.octet[1],
-                    station_info->mac_adddress.octet[2]);
-    SL_DEBUG_LOG_V2(INFO,
-                    "%x:%x:%x",
-                    station_info->mac_adddress.octet[3],
-                    station_info->mac_adddress.octet[4],
-                    station_info->mac_adddress.octet[5]);
+    char wifi_cmd_ap_client_mac_log[80];
+    snprintf(wifi_cmd_ap_client_mac_log,
+             sizeof(wifi_cmd_ap_client_mac_log),
+             "%u) MAC Address is %x:%x:%x:%x:%x:%x",
+             (unsigned)(station_info_index + 1),
+             station_info->mac_adddress.octet[0],
+             station_info->mac_adddress.octet[1],
+             station_info->mac_adddress.octet[2],
+             station_info->mac_adddress.octet[3],
+             station_info->mac_adddress.octet[4],
+             station_info->mac_adddress.octet[5]);
+    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)wifi_cmd_ap_client_mac_log);
 
     print_sl_ip_address(&station_info->ip_address);
   }
@@ -1289,7 +1308,7 @@ sl_status_t wifi_load_certificate_handler(console_args_t *arguments)
 
 exit:
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate Failed, Error Code : 0x%" PRIx32, (uint32_t)status);
   }
   return status;
 }
@@ -1392,17 +1411,18 @@ sl_status_t wifi_get_ap_client_list_command_handler(console_args_t *arguments)
 
   SL_DEBUG_LOG_V2(INFO, "Mac address list of clients connected to AP:");
   for (uint16_t index = 0; client_list[index].octet[0] != 0; index++) {
-    SL_DEBUG_LOG_V2(INFO, " %d -> ", index);
-    SL_DEBUG_LOG_V2(INFO,
-                    "%x:%x:%x:",
-                    client_list[index].octet[0],
-                    client_list[index].octet[1],
-                    client_list[index].octet[2]);
-    SL_DEBUG_LOG_V2(INFO,
-                    "%x:%x:%x",
-                    client_list[index].octet[3],
-                    client_list[index].octet[4],
-                    client_list[index].octet[5]);
+    char wifi_cmd_ap_list_mac_log[80];
+    snprintf(wifi_cmd_ap_list_mac_log,
+             sizeof(wifi_cmd_ap_list_mac_log),
+             " %u -> %x:%x:%x:%x:%x:%x",
+             (unsigned)index,
+             client_list[index].octet[0],
+             client_list[index].octet[1],
+             client_list[index].octet[2],
+             client_list[index].octet[3],
+             client_list[index].octet[4],
+             client_list[index].octet[5]);
+    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)wifi_cmd_ap_list_mac_log);
   }
 
   return status;

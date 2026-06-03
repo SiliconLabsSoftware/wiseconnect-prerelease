@@ -145,7 +145,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-Configure the following parameters in [`gpio_detailed_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_gpio_detailed_example/gpio_detailed_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_detailed_example/) file and update/modify following macros if required.
+Configure the following parameters in [`gpio_detailed_example.c`](gpio_detailed_example.c) (examples/si91x_soc/peripheral/sl_si91x_gpio_detailed_example/) file and update/modify following macros if required.
 
 - `DELAY`: Delay (in milliseconds) between consecutive GPIO toggles. By default, it is set to 1000 (1 second).
 

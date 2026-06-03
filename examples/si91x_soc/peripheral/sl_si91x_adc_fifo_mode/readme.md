@@ -149,7 +149,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Apply the different voltages(1.8V to Vref) to ADC input and observe console outputs as per input.
 - Provided input voltage and console output data should match.
 
-- Configure the following macros in [`adc_fifo_mode_example.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_adc_fifo_mode/adc_fifo_mode_example.c) file, if required:
+- Configure the following macros in [`adc_fifo_mode_example.c`](adc_fifo_mode_example.c) file, if required:
 
 - `CHANNEL_SAMPLE_LENGTH`: Number of ADC samples collected per channel for one operation. By default, it is set to 1023.
 

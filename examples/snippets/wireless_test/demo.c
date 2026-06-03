@@ -125,7 +125,7 @@ void application_start(const void *unused)
   iostream_usart_init();
 #endif
 
-  SL_DEBUG_LOG("app start\n");
+  SL_DEBUG_LOG_V2(INFO, "app start");
 
   SL_DEBUG_LOG_V2(INFO, "Ready");
 
@@ -147,7 +147,7 @@ void application_start(const void *unused)
     sl_status_t result = console_process_buffer(&console_command_database, &args, &command);
 
     if (result == SL_STATUS_OK) {
-      SL_DEBUG_LOG("Processing command\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Processing command");
       if (command->handler) {
         SL_DEBUG_LOG_V2(INFO, "");
         uint32_t start_time = osKernelGetTickCount();

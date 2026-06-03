@@ -28,6 +28,7 @@
  *
  ******************************************************************************/
 #include <string.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include "errno.h"
@@ -238,7 +239,7 @@ void application_start()
   sl_si91x_set_timeout(&timeout_configuration);
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &twt_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done");
@@ -247,7 +248,7 @@ void application_start()
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
@@ -255,7 +256,7 @@ void application_start()
 
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32, (uint32_t)status);
     return;
   } else {
     print_firmware_version(&version);
@@ -263,22 +264,31 @@ void application_start()
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
 
   status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get MAC address: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get MAC address: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "MAC Address: %x:%x:%x:", mac_addr.octet[0], mac_addr.octet[1], mac_addr.octet[2]);
-  SL_DEBUG_LOG_V2(INFO, "%x:%x:%x", mac_addr.octet[3], mac_addr.octet[4], mac_addr.octet[5]);
+  char twt_mac_log[80];
+  snprintf(twt_mac_log,
+           sizeof(twt_mac_log),
+           "MAC Address: %x:%x:%x:%x:%x:%x",
+           mac_addr.octet[0],
+           mac_addr.octet[1],
+           mac_addr.octet[2],
+           mac_addr.octet[3],
+           mac_addr.octet[4],
+           mac_addr.octet[5]);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)twt_mac_log);
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get firmware version: 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get firmware version: 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
@@ -338,7 +348,7 @@ void application_start()
   performance_profile.profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
   status                      = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%" PRIx32, (uint32_t)status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
@@ -380,7 +390,7 @@ sl_status_t send_udp_data(void)
     if (status < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Failed to send data to UDP Server, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to send data to UDP Server, Error Code : 0x%" PRIx32, (uint32_t)status);
       close(udp_client_socket);
     }
     packet_count++;
@@ -537,7 +547,7 @@ sl_status_t receive_and_send_data(void)
           if (status < 0) {
             if (errno == ENOBUFS)
               continue;
-            SL_DEBUG_LOG_V2(ERROR, "Failed to send data to UDP Server, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to send data to UDP Server, Error Code : 0x%" PRIx32, (uint32_t)status);
             close(udp_client_socket);
           }
           packet_count++;
@@ -549,7 +559,7 @@ sl_status_t receive_and_send_data(void)
           if (status < 0) {
             if (errno == ENOBUFS)
               continue;
-            SL_DEBUG_LOG_V2(ERROR, "Failed to send data to TCP Server, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to send data to TCP Server, Error Code : 0x%" PRIx32, (uint32_t)status);
             close(tcp_client_socket);
           }
           packet_count++;

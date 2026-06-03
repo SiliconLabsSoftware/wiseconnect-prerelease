@@ -52,7 +52,7 @@ On each boot, the application mounts LittleFS, reads a stored counter from the f
 - Silicon Labs SiWx91x Evaluation Kit
 
 **Note:**
->- For detailed information about pinset configurations, refer to the Flash and PSRAM Combinations section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/release/v3.5.2/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+>- For detailed information about pinset configurations, refer to the Flash and PSRAM Combinations section in the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 
 ### Software Requirements
 

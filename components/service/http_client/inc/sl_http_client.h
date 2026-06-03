@@ -97,7 +97,7 @@
  *   End-of-data code for the final HTTP PUT server response segment on Si91x.
  * 
  * @details
- *   This macro is defined as 9. On Si91x, after the HTTP PUT request body is sent, the Network Processor delivers the server's HTTP response in one or more application callbacks. When @ref sl_http_client_response_t::end_of_data equals this macro, the current callback holds the last part of that server response and the server-response phase for this PUT is complete. Check that @ref sl_http_client_response_t::end_of_data equals this macro before you release PUT context or finish cleanup.
+ *   On Si91x, after the HTTP PUT request body is sent, the Network Processor delivers the server's HTTP response in one or more application callbacks. When @ref sl_http_client_response_t::end_of_data equals this macro, the current callback holds the last part of that server response and the server-response phase for this PUT is complete. Check that @ref sl_http_client_response_t::end_of_data equals this macro before you release PUT context or finish cleanup.
  */
 #define SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_END_OF_DATA 9
 

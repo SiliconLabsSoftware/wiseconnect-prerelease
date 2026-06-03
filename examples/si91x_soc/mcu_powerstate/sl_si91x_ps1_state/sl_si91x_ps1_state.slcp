@@ -18,7 +18,7 @@ component:
 - id: calendar_ulp_component
 - id: timer_ulp_component
 - id: si91x_log
-- id: si91x_log_iostream_formatted
+- id: si91x_log_iostream_compact
 - id: iostream_si91x
 - id: iostream_uart_si91x
   instance:

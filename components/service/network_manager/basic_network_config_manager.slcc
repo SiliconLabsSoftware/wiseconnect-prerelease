@@ -22,5 +22,7 @@ source:
 requires:
 - name: network_manager
 - name: basic_credential_manager
+- name: log_none
+  condition: ["device_si91x"]
 conflicts:
 - name: nvm3_network_config_manager
