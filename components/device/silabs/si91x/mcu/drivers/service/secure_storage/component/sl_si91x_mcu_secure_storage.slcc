@@ -3,8 +3,8 @@ label: MCU Secure Storage
 package: platform_siwx91x
 description: >
   Secure Storage is a Si91x MCU peripheral that provides non-volatile storage
-  for sensitive data (keys, credentials). It supports write protection via a write key.
-  Configurable parameters (via app config component):
+  for sensitive data (keys, credentials). It supports write protection through a write key.
+  Configurable parameters (through app config component):
     - Write key enable/disable
   Use with config/sl_si91x_secure_storage_config.h for UC screen and config header.
 category: Device|Si91x|MCU|Service

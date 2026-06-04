@@ -132,7 +132,7 @@ sl_status_t sl_si91x_secure_storage_enable_protection_and_lock(void);
  * - **Per-register access:** @ref sl_si91x_secure_storage_write_register and @ref sl_si91x_secure_storage_read_register operate on one register at a time.
  * - **Key handling in software:** Each @ref sl_si91x_secure_storage_write_register call unlocks then re-locks @c MCU_STORAGE_WRITE_KEY;
  *   hardware only requires that for REG0–REG3; REG4–REG7 use the same sequence for one implementation path.
- * - **NWP protection:** @ref sl_si91x_secure_storage_enable_protection_and_lock requests write protection via the NWP when enabled in configuration.
+ * - **NWP protection:** @ref sl_si91x_secure_storage_enable_protection_and_lock requests write protection through the NWP when enabled in configuration.
  * - **Hardware sharing:** The same peripheral block is shared with MCU temperature (MCU_TEMP); coordinate use at the application level.
  *
  * @section Mcu_Secure_Storage_Usage Usage

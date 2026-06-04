@@ -156,7 +156,7 @@ static void sli_si91x_secure_storage_write_disable(void)
 
 /*******************************************************************************
  * sl_si91x_secure_storage_enable_protection_and_lock: When ENABLE_SECURE_PROTECTION
- * (UC configuration) is 1: enable MCU secure storage write protection via NWP
+ * (UC configuration) is 1: enable MCU secure storage write protection through NWP
  * handshake. When ENABLE_SECURE_PROTECTION is 0:
  * return SL_STATUS_NOT_AVAILABLE (UC configuration not enabled). Returns
  * SL_STATUS_OK on success, SL_STATUS_NOT_AVAILABLE if config disabled, or

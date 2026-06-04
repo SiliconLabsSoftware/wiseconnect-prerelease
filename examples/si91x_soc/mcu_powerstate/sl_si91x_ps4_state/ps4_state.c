@@ -65,7 +65,7 @@ void ps4_state_init(void)
 #endif
   SL_PRINT_STRING_ERROR("PS%d Sleep State\n", sl_si91x_power_manager_get_current_state());
   // Call the sleep function, it goes to PS4 sleep as current state is PS4.
-  sl_si91x_power_manager_sleep();
+  sli_si91x_power_manager_sleep();
 }
 
 /******************************************************************************

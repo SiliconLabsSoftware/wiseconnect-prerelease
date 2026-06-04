@@ -204,10 +204,10 @@ static void application_thread(void *argument)
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
+ * intentionally emitted through SL_PRINT_STRING_ERROR so that they remain visible
  * on the console at the default log level. This is a demonstration choice, not
  * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
+ * actual failures, with successful operations logged through SL_PRINT_STRING_INFO
  * (or SL_PRINT_STRING_DEBUG for verbose trace). */
     SL_PRINT_STRING_ERROR("\r\nFailed to start Wi-Fi Client interface: 0x%lx\r\n", status);
     app_exit();

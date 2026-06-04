@@ -620,7 +620,7 @@ void test_power_manager_sleep(void)
   UnityPrintf("Testing Power Manager move into sleep mode \n");
   sl_status_t status;
 
-  status = sl_si91x_power_manager_sleep();
+  status = sli_si91x_power_manager_sleep();
   TEST_ASSERT_EQUAL_HEX(SL_STATUS_OK, status);
   UnityPrintf("Power Manager move into sleep mode successfully \n");
   // Calendar clock is stopped as it is not needed.
@@ -641,7 +641,7 @@ void test_power_manager_standby(void)
   UnityPrintf("\n");
   UnityPrintf("Testing Power Manager move into standby mode \n");
 
-  sl_si91x_power_manager_standby();
+  sli_si91x_power_manager_standby();
   UnityPrintf("Power Manager move into standby mode successfully \n");
 
   UnityPrintf("Power Manager move into standby mode test completed \n");

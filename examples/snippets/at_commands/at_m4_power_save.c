@@ -94,7 +94,7 @@ sl_status_t m4_powersave_command_handler(void)
 
 #if (defined(SLI_SI91X_MCU_INTERFACE) && (SL_SI91X_TICKLESS_MODE == 0))
   SL_DEBUG_LOG_V2(INFO, "M4 in sleep");
-  sl_si91x_power_manager_sleep();
+  sli_si91x_power_manager_sleep();
   SL_DEBUG_LOG_V2(INFO, "M4 wake up");
 #endif
 
@@ -395,10 +395,10 @@ sl_status_t set_power_manager_sleep_handler(console_args_t *arguments)
 
 #if (defined(SLI_SI91X_MCU_INTERFACE) && (SL_SI91X_TICKLESS_MODE == 0))
   // Call the sleep function.
-  sl_status_t status = sl_si91x_power_manager_sleep();
+  sl_status_t status = sli_si91x_power_manager_sleep();
   if (status != SL_STATUS_OK) {
     // If status is not OK, display the error info.
-    SL_DEBUG_LOG_V2(ERROR, "sl_si91x_power_manager_sleep failed, Error Code: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "sli_si91x_power_manager_sleep failed, Error Code: 0x%lX", status);
     return status;
   }
 #else
@@ -425,7 +425,7 @@ sl_status_t set_power_manager_standby_handler(console_args_t *arguments)
 
 #if (defined(SLI_SI91X_MCU_INTERFACE) && (SL_SI91X_TICKLESS_MODE == 0))
   // Call the standby function
-  sl_si91x_power_manager_standby();
+  sli_si91x_power_manager_standby();
 #endif
 
   PRINT_AT_CMD_SUCCESS;

@@ -40,6 +40,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "sl_mdns.h"
+#include "sl_net_default_values.h"
 
 /******************************************************
  *                    Constants
@@ -223,6 +224,18 @@ static void application_start(void *argument)
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Success ");
+
+  profile = DEFAULT_WIFI_CLIENT_PROFILE;
+#if MDNSV6_ENABLE
+  profile.ip.type = SL_IPV6;
+#else
+  profile.ip.type = SL_IPV4;
+#endif
+  status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set client profile: 0x%lx", status);
+    return;
+  }
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {

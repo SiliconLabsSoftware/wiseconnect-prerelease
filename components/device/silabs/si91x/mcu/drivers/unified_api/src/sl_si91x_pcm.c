@@ -62,14 +62,22 @@ sl_status_t sl_si91x_pcm_deinit(sl_i2s_handle_t *pcm_handle)
   sl_status_t status = SL_STATUS_OK;
 
   do {
+    if (pcm_handle == NULL) {
+      status = SL_STATUS_NULL_POINTER;
+      SL_PRINT_STRING_ERROR("sl_si91x_pcm_deinit: NULL handle pointer,line no : %d\r\n", (int)__LINE__);
+      break;
+    }
+
     /* Deinitialize I2S handle and clear the driver handle */
-    status = sl_si91x_i2s_deinit(pcm_handle);
+    status = sl_si91x_i2s_deinit_v2(*pcm_handle);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_pcm_deinit: i2s_deinit failed st=0x%04lX,line no : %d\r\n",
+      SL_PRINT_STRING_ERROR("sl_si91x_pcm_deinit: i2s_deinit_v2 failed st=0x%04lX,line no : %d\r\n",
                             (unsigned long)status,
                             (int)__LINE__);
       break;
     }
+
+    *pcm_handle = NULL;
 
   } while (false);
 

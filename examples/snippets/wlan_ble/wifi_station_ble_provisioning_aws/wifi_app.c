@@ -1221,7 +1221,7 @@ void wifi_app_mqtt_task(void)
         if (select_given == 1 && (check_for_recv_data != 1)) {
           SL_DEBUG_LOG_V2(INFO, "M4 in sleep");
 #if (SL_SI91X_TICKLESS_MODE == 0)
-          sl_si91x_power_manager_sleep();
+          sli_si91x_power_manager_sleep();
 #else
           if (osSemaphoreAcquire(data_received_semaphore, PUBLISH_PERIODICITY) == osOK) {
           }

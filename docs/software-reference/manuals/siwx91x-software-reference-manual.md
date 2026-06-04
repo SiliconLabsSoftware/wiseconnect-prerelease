@@ -696,6 +696,8 @@ For backend setup, UC settings, and proprietary compact-UART configuration, see 
 
 3. For `UART I/O Stream + BLE with TA logging and INFO/DEBUG` it is recommended to use `I/O Stream – compact binary output` and `IOStream Si91x UART at 921600 baud`; lower baud rates cannot carry M4 + TA traffic and `most logs will be dropped`. If needed, reduce log level, flush more often, or use RTT / SystemView.
 
+4. NWP (Captive Core) logging is not recommended for applications using the **BLE Advertising Extension (AE)** feature. Do not enable **`SL_SI91X_ENABLE_NWP_LOGGING`** in the `config_feature_bit_map` field of `sl_wifi_device_configuration_t` when BLE AE is enabled.
+
 ## Chip/Module Programming
 
 ### ISP Mode

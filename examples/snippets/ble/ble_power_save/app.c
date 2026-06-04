@@ -530,7 +530,7 @@ void ble_app_task(void *argument)
       if ((!(P2P_STATUS_REG & TA_wakeup_M4)) && (ble_app_event_map == 0) && (ble_app_event_map1 == 0)) {
         P2P_STATUS_REG &= ~M4_wakeup_TA;
         SL_DEBUG_LOG_V2(INFO, "triggering M4 sleep");
-        sl_si91x_power_manager_sleep();
+        sli_si91x_power_manager_sleep();
       }
 #else
       osSemaphoreAcquire(ble_main_task_sem, osWaitForever);

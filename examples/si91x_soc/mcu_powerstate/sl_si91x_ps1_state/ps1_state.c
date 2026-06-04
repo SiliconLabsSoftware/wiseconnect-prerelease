@@ -83,7 +83,7 @@ void ps1_state_init(void)
   clear_ulp_timer_wakeup_source();
   SL_PRINT_STRING_ERROR("PS%d Sleep State\n", sl_si91x_power_manager_get_current_state());
   // Call the sleep function.
-  sl_si91x_power_manager_sleep();
+  sli_si91x_power_manager_sleep();
 }
 /*******************************************************************************
  * Configure and initialize the ulp timer wakeup source.

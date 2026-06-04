@@ -175,7 +175,7 @@ void ulp_i2s_example_process_action(void)
         i2s_lowpower_send_complete    = 0;
         i2s_lowpower_receive_complete = 0;
         //  de initializing the i2s
-        if (!(sl_si91x_i2s_deinit((sl_i2s_handle_t *)i2s_driver_handle))) {
+        if (sl_si91x_i2s_deinit_v2(i2s_driver_handle) == SL_STATUS_OK) {
           SL_PRINT_STRING_ERROR("DEINIT SUCCESS\n");
         }
         // current mode being updated with power state transition to change the

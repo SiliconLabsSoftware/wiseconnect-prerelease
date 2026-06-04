@@ -19,23 +19,23 @@
 
 ## Purpose/Scope
 
-This application demonstrates MCU Secure Storage on Si91x: write predefined values to REG0–REG7, enable protection and lock, then read back and verify in a single run. The app uses per-register driver APIs via batch helpers and ends by halting (interrupts disabled) until the watchdog resets the system.
+This application demonstrates MCU Secure Storage on Si91x: write predefined values to REG0–REG7, enable protection and lock, then read back and verify in a single run. The app uses per-register driver APIs through batch helpers and ends by halting (interrupts disabled) until the watchdog resets the system.
 
 After that reset, **firmware starts again from the beginning**, so **each boot** runs the same flow (init, write or skip-write, protect, read, verify, then halt for WDT again). That is how you repeatedly exercise read/verify over reset without depending on RAM-only application state. The **watchdog is only the demo’s way to end one run**; it is not part of the secure storage feature itself.
 
 ## Overview
 
-- **Secure Storage:** Read and write of 8 MCU secure storage registers (REG0–REG7) via the driver APIs. The app writes distinct 32-bit values to each register, then reads them back and verifies.
+- **Secure Storage:** Read and write of 8 MCU secure storage registers (REG0–REG7) through the driver APIs. The app writes distinct 32-bit values to each register, then reads them back and verifies.
 - **Write key protection:** REG0–REG3 are write-protected by hardware; the driver enables the write key internally before each write and locks it after. REG4–REG7 do not use the write key. The app uses batch helpers that call the driver’s per-register APIs.
 - **Optional skip-write:** Before writing, the app reads current values; if they already match the desired values, it skips writing.
-- **Protection and lock:** After writing, the app optionally calls to enable MCU secure storage write protection via NWP handshake and lock REG0–REG3 (when ENABLE_SECURE_PROTECTION is 1).
+- **Protection and lock:** After writing, the app optionally calls to enable MCU secure storage write protection through NWP handshake and lock REG0–REG3 (when ENABLE_SECURE_PROTECTION is 1).
 - **Single verify then halt:** The app reads all 8 registers once, verifies them against the expected values, then disables interrupts and spins so the watchdog eventually resets the system. There is no sleep/wakeup loop.
 - **Repeat on every boot:** Secure storage **retains** its contents across reset. On the **next** boot after a watchdog (or power) reset, the example runs the full sequence again, including **another** read/verify. The write step may print **“skipping write”** if registers still hold the expected values from the previous run.
-- **WiFi and power save:** WiFi client and network stack initialization; deep sleep with RAM retention is configured (for reference; the demo does not enter a sleep/wake loop).
+- **Wi-Fi and power save:** Wi-Fi client and network stack initialization; deep sleep with RAM retention is configured (for reference; the demo does not enter a sleep/wake loop).
 
 ## About Example Code
 
-- [`app.c`](app.c) – Application that initializes WiFi and the network stack, writes predefined values to REG0–REG7 (write key for REG0–REG3 is handled inside the driver), optionally enables secure protection and lock, sets power profile to deep sleep with RAM retention, then reads all registers, verifies them against the expected values, disables interrupts, and spins until the watchdog resets the system. Before writing, the app may skip the write if current register values already match the desired values.
+- [`app.c`](app.c) – Application that initializes Wi-Fi and the network stack, writes predefined values to REG0–REG7 (write key for REG0–REG3 is handled inside the driver), optionally enables secure protection and lock, sets power profile to deep sleep with RAM retention, then reads all registers, verifies them against the expected values, disables interrupts, and spins until the watchdog resets the system. Before writing, the app may skip the write if current register values already match the desired values.
 
 **Note:** Secure storage registers retain values across power cycles and typical resets. REG0–REG3 are protected by the write key (handled inside the driver); REG4–REG7 have no write key. The intentional WDT reset at the end of each run causes a normal reboot so you can observe that **read/verify runs again** on the next boot; the WDT path is **not** required for real products using secure storage.
 
@@ -85,12 +85,21 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Test the Application
 
 1. Build and run the application.
-2. Open the serial console. You should see WiFi init, firmware version, secure storage write (or “skipping write” if values already match—for example on a **second** boot after registers were programmed), optional “MCU secure storage protection enabled, secure storage write disabled”, power save config, then a single read/verify. “All register values matched” or mismatch messages appear. Finally, the app reports that interrupts are disabled and the WDT will reset the system, then the device resets when the watchdog fires. **After reset, the same log sequence can appear again** for another full pass.
-3. If `APP_SECURE_STORAGE_DEBUG_PRINT_VALUES` is 1, written and read values are printed for each register.
+2. Open the serial console (see [Software Requirements](#software-requirements) for console setup).
+3. Confirm **Wi-Fi and network initialization**: the client interface starts and the firmware version is printed (for example, `Firmware version is: ...`).
+4. Observe the **secure storage write** phase:
+   - **First boot** (or after registers were cleared): `Register Read and write values differ, writing registers.`
+   - **Later boot** when values already match: `Register Read and before write values matched, skipping write.`
+5. Observe **protection and lock** (when `ENABLE_SECURE_PROTECTION` is 1 in config): `MCU secure storage protection enabled, secure storage write disabled`. If protection is disabled in config, the app prints `Secure protection disabled in config` and exits.
+6. **Power save** is configured for deep sleep with RAM retention (no message on success; a failure prints an error and the app exits).
+7. Confirm **read and verify**: the console shows `All register values matched.` or per-register mismatch messages.
+8. Confirm **halt and watchdog reset**: the app prints `disabled interrupts so WDT is no longer kicked; WDT will reset the system.` and the device resets when the watchdog fires.
+9. **After reset**, the application runs the full sequence again from step 3. On a subsequent boot you may see skip-write (step 4) and another successful verify (step 7).
+10. If `APP_SECURE_STORAGE_DEBUG_PRINT_VALUES` is 1, written and read values are printed for each register during steps 4 and 7.
 
 ## Expected Results
 
-- **WiFi and network:** WiFi client interface and network stack initialize successfully; firmware version is printed.
+- **Wi-Fi and network:** Wi-Fi client interface and network stack initialize successfully; firmware version is printed.
 - **Power save:** Deep sleep with RAM retention is configured.
 - **Secure storage write:** All 8 registers (REG0–REG7) are written (or write is skipped if current values already match); the driver handles write-enable for REG0–REG3 internally.
 - **Protection and lock:** When ENABLE_SECURE_PROTECTION is 1, MCU secure storage protection is enabled and secure storage write is disabled; otherwise a message indicates protection is disabled in config.

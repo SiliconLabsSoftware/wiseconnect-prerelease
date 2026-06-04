@@ -61,7 +61,7 @@ void ps3_state_init(void)
   SL_PRINT_STRING_ERROR("PS%d Sleep State\n", sl_si91x_power_manager_get_current_state());
 
   // Call the sleep function, it goes to PS3 sleep as current state is PS3.
-  sl_si91x_power_manager_sleep();
+  sli_si91x_power_manager_sleep();
 }
 
 /******************************************************************************

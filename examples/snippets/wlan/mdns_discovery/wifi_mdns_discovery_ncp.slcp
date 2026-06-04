@@ -21,6 +21,7 @@ include:
   - path: app.h
 define:
 - name: SL_SI91X_PRINT_DBG_LOG
+- name: SLI_SI91X_ENABLE_IPV6
 component:
 - id: sl_main
 - id: freertos

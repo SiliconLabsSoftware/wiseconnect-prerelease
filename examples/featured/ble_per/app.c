@@ -581,7 +581,7 @@ void ble_per(void *unused)
     if (!(P2P_STATUS_REG & TA_wakeup_M4)) {
       P2P_STATUS_REG &= ~M4_wakeup_TA;
       SL_DEBUG_LOG_V2(INFO, "M4 sleep");
-      sl_si91x_power_manager_sleep();
+      sli_si91x_power_manager_sleep();
     }
 #else
     //To get tx_done logs properly and to avoid application hang issue due to continuous stats added 1sec delay.
