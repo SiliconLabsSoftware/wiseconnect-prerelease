@@ -172,10 +172,10 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &transmit_test_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done ");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done \r\n");
 
 #if RECEIVE_STATS
   // Register WLAN receive stats call back handler
@@ -184,30 +184,30 @@ static void application_start(void *argument)
 
   status = sl_wifi_set_antenna(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, SL_WIFI_ANTENNA_INTERNAL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start set Antenna: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start set Antenna: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Antenna Command Frame Success ");
+  SL_DEBUG_LOG_V2(INFO, "Antenna Command Frame Success \r\n");
 
   if ((mode == SL_WIFI_TEST_CONTINOUS_WAVE_MODE) || (mode == SL_WIFI_TEST_CONTINOUS_WAVE_MODE_OFF_CENTER_LOW)
       || (mode == SL_WIFI_TEST_CONTINOUS_WAVE_MODE_OFF_CENTER_HIGH)) {
     tx_test_info.mode = SL_WIFI_TEST_CONTINOUS_MODE;
     status            = sl_si91x_transmit_test_start(&tx_test_info);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Transmit test start Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Transmit test start Failed, Error Code : 0x%lX\r\n", status);
       return;
     }
-    SL_DEBUG_LOG_V2(INFO, "Transmit test start Success");
+    SL_DEBUG_LOG_V2(INFO, "Transmit test start Success\r\n");
 
     // Add delay here to see the TX packets on AIR
     osDelay(1000);
 
     status = sl_si91x_transmit_test_stop();
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Transmit test stop Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Transmit test stop Failed, Error Code : 0x%lX\r\n", status);
       return;
     }
-    SL_DEBUG_LOG_V2(INFO, "Transmit test stop Success");
+    SL_DEBUG_LOG_V2(INFO, "Transmit test stop Success\r\n");
 
     osDelay(1000);
   }
@@ -215,20 +215,20 @@ static void application_start(void *argument)
   tx_test_info.mode = mode;
   status            = sl_si91x_transmit_test_start(&tx_test_info);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Transmit test start Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit test start Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Transmit test start Success");
+  SL_DEBUG_LOG_V2(INFO, "Transmit test start Success\r\n");
 
   // Add delay here to see the TX packets on AIR
   osDelay(1000);
 
   status = sl_si91x_transmit_test_stop();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Transmit test stop Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit test stop Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Transmit test stop Success");
+  SL_DEBUG_LOG_V2(INFO, "Transmit test stop Success\r\n");
 
 #if RECEIVE_STATS
   ////////////////////////////////////////
@@ -241,20 +241,20 @@ static void application_start(void *argument)
   status                    = sl_wifi_start_statistic_report(SL_WIFI_CLIENT_INTERFACE, channel);
   if (SL_STATUS_IN_PROGRESS == status) {
     callback_status = SL_STATUS_IN_PROGRESS;
-    SL_DEBUG_LOG_V2(INFO, "Receive Statistics...");
+    SL_DEBUG_LOG_V2(INFO, "Receive Statistics...\r\n");
     while (stats_count <= MAX_RECEIVE_STATS_COUNT) {
       osThreadYield();
       if (stats_count == MAX_RECEIVE_STATS_COUNT && callback_status != SL_STATUS_IN_PROGRESS) {
-        SL_DEBUG_LOG_V2(INFO, "%s: Stop Statistics Report", (uintptr_t) __func__);
+        SL_DEBUG_LOG_V2(INFO, "%s: Stop Statistics Report\r\n", (uintptr_t) __func__);
         sl_wifi_stop_statistic_report(SL_WIFI_CLIENT_INTERFACE);
-        SL_DEBUG_LOG_V2(INFO, "Start Statistic Report Success");
+        SL_DEBUG_LOG_V2(INFO, "Start Statistic Report Success\r\n");
         return;
       }
     }
     status = callback_status;
   }
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Start Statistic Report Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Start Statistic Report Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
 #endif
@@ -277,7 +277,7 @@ sl_status_t wifi_stats_receive_handler(sl_wifi_event_t event,
   if (event == SL_WIFI_STATS_ASYNC_EVENT) {
     sl_wifi_async_stats_response_t *result = (sl_wifi_async_stats_response_t *)reponse;
 
-    SL_DEBUG_LOG_V2(DEBUG, "%s: WIFI STATS Received packet# %d", (uintptr_t) __func__, stats_count);
+    SL_DEBUG_LOG_V2(DEBUG, "%s: WIFI STATS Received packet# %d\r\n", (uintptr_t) __func__, stats_count);
     SL_DEBUG_LOG_V2(DEBUG,
                     "stats : crc_pass %d, crc_fail %d, cal_rssi :%d",
                     result->crc_pass,

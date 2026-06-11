@@ -150,33 +150,33 @@ void application(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Wi-Fi initialization is successful");
+  SL_DEBUG_LOG_V2(INFO, " Wi-Fi initialization is successful\r\n");
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
 
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (wlan_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem\r\n");
     return;
   }
 
   ble_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem\r\n");
     return;
   }
 
   if (osThreadNew((osThreadFunc_t)rsi_ble_configurator_task, NULL, &ble_thread_attributes) == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create BLE thread");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create BLE thread\r\n");
   }
 
   // BLE initialization

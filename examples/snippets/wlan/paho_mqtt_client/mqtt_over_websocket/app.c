@@ -203,33 +203,33 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_mqtt_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success\r\n");
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   // Load SSL CA certificate
   if (enable_ssl) {
     status =
       sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
       return;
     }
-    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success", 0);
+    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success\r\n", 0);
   }
 
   if (profile.ip.type == SL_IPV4) {
@@ -259,9 +259,9 @@ static void application_start(void *argument)
 
   int result = paho_mqtt_over_websocket_demo();
   if (result == 0) {
-    SL_DEBUG_LOG_V2(INFO, "Paho MQTT over WebSocket demo executed successfully.");
+    SL_DEBUG_LOG_V2(INFO, "Paho MQTT over WebSocket demo executed successfully.\r\n");
   } else {
-    SL_DEBUG_LOG_V2(ERROR, "Paho MQTT over WebSocket demo failed with error code: %d", result);
+    SL_DEBUG_LOG_V2(ERROR, "Paho MQTT over WebSocket demo failed with error code: %d\r\n", result);
   }
 }
 
@@ -315,19 +315,19 @@ int paho_mqtt_over_websocket_demo()
                           enable_ssl);
 
   if (status == NETWORK_ERROR_NULL_STRUCTURE) {
-    SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.");
+    SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.\r\n");
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.");
+    SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.\r\n");
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   } else if (status == NETWORK_ERROR_INVALID_TYPE) {
-    SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.");
+    SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.\r\n");
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   } else if (status != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "WebSocket Connection Failed: %d", status);
+    SL_DEBUG_LOG_V2(ERROR, "WebSocket Connection Failed: %d\r\n", status);
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
@@ -345,22 +345,22 @@ int paho_mqtt_over_websocket_demo()
   // Connect to MQTT broker
   status = MQTTConnect(&mqtt_client->client, &connectData);
   if (status != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "MQTT Connection Failed: %d", status);
+    SL_DEBUG_LOG_V2(ERROR, "MQTT Connection Failed: %d\r\n", status);
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
   mqtt_connected = true;
-  SL_DEBUG_LOG_V2(INFO, "MQTT Connected Successfully!");
+  SL_DEBUG_LOG_V2(INFO, "MQTT Connected Successfully!\r\n");
 
   // Subscribe to topic
   status = MQTTSubscribe(&mqtt_client->client, (char *)TOPIC_TO_BE_SUBSCRIBED, (enum QoS)QOS, message_arrived);
   if (status != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Subscription Failed: %d", status);
+    SL_DEBUG_LOG_V2(ERROR, "Subscription Failed: %d\r\n", status);
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
   topic_subscribed = true;
-  SL_DEBUG_LOG_V2(INFO, "Subscribed to topic: %s", (uintptr_t)TOPIC_TO_BE_SUBSCRIBED);
+  SL_DEBUG_LOG_V2(INFO, "Subscribed to topic: %s\r\n", (uintptr_t)TOPIC_TO_BE_SUBSCRIBED);
 
   // Prepare publish message
   publish_msg.dup = 0;
@@ -378,21 +378,21 @@ int paho_mqtt_over_websocket_demo()
   // Publish message
   status = MQTTPublish(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED, &publish_msg);
   if (status != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "MQTT Publish Failed: %d", status);
+    SL_DEBUG_LOG_V2(ERROR, "MQTT Publish Failed: %d\r\n", status);
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
   }
-  SL_DEBUG_LOG_V2(INFO, "Published to Topic successfully");
+  SL_DEBUG_LOG_V2(INFO, "Published to Topic successfully\r\n");
 
   // Main message loop
   while (!halt) {
     status = MQTTYield(&mqtt_client->client, 60000);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Receive Data Failed, Error Code: 0x%X", status);
+      SL_DEBUG_LOG_V2(ERROR, "Receive Data Failed, Error Code: 0x%X\r\n", status);
       app_status = status;
       return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
     } else {
-      SL_DEBUG_LOG_V2(DEBUG, "Receive Data Success");
+      SL_DEBUG_LOG_V2(DEBUG, "Receive Data Success\r\n");
     }
   }
   return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);

@@ -130,7 +130,7 @@ sl_status_t wifi_bsd_socket_accept_handler(console_args_t *arguments)
   int32_t status = accept(socket_fd, ((struct sockaddr *)&remote_socket_address), &socket_length);
   VERIFY_BSD_STATUS(status);
 
-  SL_DEBUG_LOG_V2(INFO, " Socket ID: %ld", status);
+  SL_DEBUG_LOG_V2(INFO, " Socket ID: %ld\r\n", status);
   if (socket_length == sizeof(struct sockaddr_in)) {
     const uint8_t *ip_address = (const uint8_t *)&remote_socket_address.sin_addr.s_addr;
     SL_DEBUG_LOG_V2(INFO, "%u.%u.", ip_address[0], ip_address[1]);

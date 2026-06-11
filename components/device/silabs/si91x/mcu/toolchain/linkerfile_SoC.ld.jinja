@@ -656,7 +656,63 @@ SECTIONS
 	}
 {%- endif %}
 
-	.debug_misc 0 : { *(.debug_*); *(.zdebug_*); }
+  /* Stabs debugging sections. */
+  .stab          0 : { *(.stab) }
+  .stabstr       0 : { *(.stabstr) }
+  .stab.excl     0 : { *(.stab.excl) }
+  .stab.exclstr  0 : { *(.stab.exclstr) }
+  .stab.index    0 : { *(.stab.index) }
+  .stab.indexstr 0 : { *(.stab.indexstr) }
+
+  /* DWARF debug sections.
+   * Each DWARF section must be kept in its own uniquely-named output section
+   * so that debuggers (GDB, LLDB) and tools can locate them by their
+   * canonical names. Merging them into a single catch-all section makes the
+   * DWARF info unreadable. */
+  .debug              0 : { *(.debug) }
+  .line               0 : { *(.line) }
+  .debug_srcinfo      0 : { *(.debug_srcinfo) }
+  .debug_sfnames      0 : { *(.debug_sfnames) }
+  .debug_aranges      0 : { *(.debug_aranges) }
+  .debug_pubnames     0 : { *(.debug_pubnames) }
+  .debug_info         0 : { *(.debug_info .gnu.linkonce.wi.*) }
+  .debug_abbrev       0 : { *(.debug_abbrev) }
+  .debug_line         0 : { *(.debug_line .debug_line.* .debug_line_end) }
+  .debug_frame        0 : { *(.debug_frame) }
+  .debug_str          0 : { *(.debug_str) }
+  .debug_loc          0 : { *(.debug_loc) }
+  .debug_macinfo      0 : { *(.debug_macinfo) }
+  .debug_weaknames    0 : { *(.debug_weaknames) }
+  .debug_funcnames    0 : { *(.debug_funcnames) }
+  .debug_typenames    0 : { *(.debug_typenames) }
+  .debug_varnames     0 : { *(.debug_varnames) }
+  .debug_pubtypes     0 : { *(.debug_pubtypes) }
+  .debug_ranges       0 : { *(.debug_ranges) }
+  .debug_macro        0 : { *(.debug_macro) }
+  .debug_addr         0 : { *(.debug_addr) }
+  .debug_line_str     0 : { *(.debug_line_str) }
+  .debug_loclists     0 : { *(.debug_loclists) }
+  .debug_rnglists     0 : { *(.debug_rnglists) }
+  .debug_str_offsets  0 : { *(.debug_str_offsets) }
+  .debug_names        0 : { *(.debug_names) }
+  .zdebug_info        0 : { *(.zdebug_info) }
+  .zdebug_abbrev      0 : { *(.zdebug_abbrev) }
+  .zdebug_line        0 : { *(.zdebug_line) }
+  .zdebug_frame       0 : { *(.zdebug_frame) }
+  .zdebug_str         0 : { *(.zdebug_str) }
+  .zdebug_loc         0 : { *(.zdebug_loc) }
+  .zdebug_macinfo     0 : { *(.zdebug_macinfo) }
+  .zdebug_macro       0 : { *(.zdebug_macro) }
+  .zdebug_pubnames    0 : { *(.zdebug_pubnames) }
+  .zdebug_pubtypes    0 : { *(.zdebug_pubtypes) }
+  .zdebug_aranges     0 : { *(.zdebug_aranges) }
+  .zdebug_ranges      0 : { *(.zdebug_ranges) }
+  .zdebug_addr        0 : { *(.zdebug_addr) }
+  .zdebug_line_str    0 : { *(.zdebug_line_str) }
+  .zdebug_loclists    0 : { *(.zdebug_loclists) }
+  .zdebug_rnglists    0 : { *(.zdebug_rnglists) }
+  .zdebug_str_offsets 0 : { *(.zdebug_str_offsets) }
+  .zdebug_names       0 : { *(.zdebug_names) }
 
 /*
  * Flash overflow guard.

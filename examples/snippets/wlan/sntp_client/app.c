@@ -171,22 +171,22 @@ static void application_start(void *argument)
   UNUSED_PARAMETER(argument);
   sl_status_t status;
 
-  SL_DEBUG_LOG_V2(INFO, "SNTP client execution Started ");
+  SL_DEBUG_LOG_V2(INFO, "SNTP client execution Started \r\n");
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sntp_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
   sl_wifi_set_callback_v2(SL_WIFI_STATS_RESPONSE_EVENTS, module_status_handler, NULL);
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   embedded_sntp_client();
 
@@ -202,13 +202,15 @@ static void application_start(void *argument)
 
 static void print_char_buffer(char *buffer, uint32_t buffer_length)
 {
-  uint32_t i = 0;
+  char log_buf[DATA_BUFFER_LENGTH];
 
-  for (i = 0; i < buffer_length; i++) {
-    SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[i]);
+  if (buffer_length >= sizeof(log_buf)) {
+    buffer_length = sizeof(log_buf) - 1;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "");
+  memcpy(log_buf, buffer, buffer_length);
+  log_buf[buffer_length] = '\0';
+  SL_DEBUG_LOG_V2(INFO, "%s\r\n", (uintptr_t)log_buf);
   return;
 }
 
@@ -246,11 +248,12 @@ sl_status_t embedded_sntp_client(void)
 {
   uint32_t start = 0;
   sl_status_t status;
-  sl_ip_address_t address          = { 0 };
-  sl_sntp_client_config_t config   = { 0 };
-  uint8_t data[DATA_BUFFER_LENGTH] = { 0 };
-  sl_sntp_server_info_t serverInfo = { 0 };
-  int32_t dns_retry_count          = MAX_DNS_RETRY_COUNT;
+  sl_ip_address_t address                                = { 0 };
+  sl_sntp_client_config_t config                         = { 0 };
+  uint8_t data[DATA_BUFFER_LENGTH]                       = { 0 };
+  sl_sntp_server_info_t serverInfo                       = { 0 };
+  int32_t dns_retry_count                                = MAX_DNS_RETRY_COUNT;
+  char ip_address_str[SL_IPV6_ADDRESS_STRING_MAX_LENGTH] = { 0 };
 
   // Convert DNS server IP addresses to sl_ip_address_t structures
   sl_ip_address_t primary_dns_server   = { 0 };
@@ -277,8 +280,13 @@ sl_status_t embedded_sntp_client(void)
     dns_retry_count--;
   } while ((dns_retry_count != 0) && (status != SL_STATUS_OK));
 
-  SL_DEBUG_LOG_V2(INFO, "Ip Address : %u.%u.", address.ip.v4.bytes[0], address.ip.v4.bytes[1]);
-  SL_DEBUG_LOG_V2(INFO, "%u.%u", address.ip.v4.bytes[2], address.ip.v4.bytes[3]);
+  sprintf(ip_address_str,
+          "%u.%u.%u.%u",
+          address.ip.v4.bytes[0],
+          address.ip.v4.bytes[1],
+          address.ip.v4.bytes[2],
+          address.ip.v4.bytes[3]);
+  SL_DEBUG_LOG_V2(INFO, "Ip Address : %s\r\n", (uintptr_t)ip_address_str);
 
   config.server_host_name = address.ip.v4.bytes;
   config.sntp_method      = SNTP_METHOD;
@@ -296,14 +304,14 @@ sl_status_t embedded_sntp_client(void)
     }
 
     if (cb_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to start Async SNTP client: 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to start Async SNTP client: 0x%lx\r\n", status);
       return cb_status;
     }
   } else {
     if (status == SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(INFO, "SNTP Client started successfully");
+      SL_DEBUG_LOG_V2(INFO, "SNTP Client started successfully\r\n");
     } else {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to start SNTP client: 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to start SNTP client: 0x%lx\r\n", status);
       return status;
     }
   }
@@ -318,14 +326,14 @@ sl_status_t embedded_sntp_client(void)
     }
 
     if (cb_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to get async time from ntp server : 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to get async time from ntp server : 0x%lx\r\n", status);
       return cb_status;
     }
   } else {
     if (status == SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(INFO, "SNTP Client got TIME successfully");
+      SL_DEBUG_LOG_V2(INFO, "SNTP Client got TIME successfully\r\n");
     } else {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to get time from ntp server : 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to get time from ntp server : 0x%lx\r\n", status);
       return status;
     }
   }
@@ -341,14 +349,14 @@ sl_status_t embedded_sntp_client(void)
     }
 
     if (cb_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to get Async date and time from ntp server : 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to get Async date and time from ntp server : 0x%lx\r\n", status);
       return cb_status;
     }
   } else {
     if (status == SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(INFO, "SNTP Client got TIME and DATE successfully");
+      SL_DEBUG_LOG_V2(INFO, "SNTP Client got TIME and DATE successfully\r\n");
     } else {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to get date and time from ntp server : 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to get date and time from ntp server : 0x%lx\r\n", status);
       return status;
     }
   }
@@ -365,36 +373,34 @@ sl_status_t embedded_sntp_client(void)
     }
 
     if (cb_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to get async ntp server info : 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to get async ntp server info : 0x%lx\r\n", status);
       return cb_status;
     }
   } else {
     if (status == SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(INFO, "SNTP Client got server info successfully");
+      SL_DEBUG_LOG_V2(INFO, "SNTP Client got server info successfully\r\n");
     } else {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to get ntp server info : 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to get ntp server info : 0x%lx\r\n", status);
       return status;
     }
   }
-  SL_DEBUG_LOG_V2(INFO, "Got Server IP version as : %u", serverInfo.ip_version);
+  SL_DEBUG_LOG_V2(INFO, "Got Server IP version as : %u\r\n", serverInfo.ip_version);
   if (4 == serverInfo.ip_version) {
-    SL_DEBUG_LOG_V2(INFO,
-                    "IPv4 Address is : %u.%u.",
-                    serverInfo.server_ip_address.ipv4_address[0],
-                    serverInfo.server_ip_address.ipv4_address[1]);
-    SL_DEBUG_LOG_V2(INFO,
-                    "%u.%u",
-                    serverInfo.server_ip_address.ipv4_address[2],
-                    serverInfo.server_ip_address.ipv4_address[3]);
+    sprintf(ip_address_str,
+            "%u.%u.%u.%u",
+            serverInfo.server_ip_address.ipv4_address[0],
+            serverInfo.server_ip_address.ipv4_address[1],
+            serverInfo.server_ip_address.ipv4_address[2],
+            serverInfo.server_ip_address.ipv4_address[3]);
+    SL_DEBUG_LOG_V2(INFO, "IPv4 Address is : %s\r\n", (uintptr_t)ip_address_str);
   } else {
-    SL_DEBUG_LOG_V2(INFO,
-                    "IPv6 Address is : %lx:%lx:",
-                    serverInfo.server_ip_address.ipv6_address[0],
-                    serverInfo.server_ip_address.ipv6_address[1]);
-    SL_DEBUG_LOG_V2(INFO,
-                    "%lx:%lx",
-                    serverInfo.server_ip_address.ipv6_address[2],
-                    serverInfo.server_ip_address.ipv6_address[3]);
+    sprintf(ip_address_str,
+            "%lx:%lx:%lx:%lx",
+            serverInfo.server_ip_address.ipv6_address[0],
+            serverInfo.server_ip_address.ipv6_address[1],
+            serverInfo.server_ip_address.ipv6_address[2],
+            serverInfo.server_ip_address.ipv6_address[3]);
+    SL_DEBUG_LOG_V2(INFO, "IPv6 Address is : %s\r\n", (uintptr_t)ip_address_str);
   }
   SL_DEBUG_LOG_V2(INFO, "SNTP Server Method : %u", serverInfo.sntp_method);
 
@@ -408,27 +414,27 @@ sl_status_t embedded_sntp_client(void)
     }
 
     if (cb_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to stop Async SNTP client: 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to stop Async SNTP client: 0x%lx\r\n", status);
       return cb_status;
     }
   } else {
     if (status == SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(INFO, "SNTP Client stopped successfully");
+      SL_DEBUG_LOG_V2(INFO, "SNTP Client stopped successfully\r\n");
     } else {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to stop SNTP client: 0x%lx", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to stop SNTP client: 0x%lx\r\n", status);
       return status;
     }
 
     exec_status = 1;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Done");
+  SL_DEBUG_LOG_V2(INFO, "Done\r\n");
 
   while (0 == exec_status) {
     osThreadYield();
   }
 
-  SL_DEBUG_LOG_V2(INFO, "SNTP client execution completed ");
+  SL_DEBUG_LOG_V2(INFO, "SNTP client execution completed \r\n");
 
   return SL_STATUS_OK;
 }

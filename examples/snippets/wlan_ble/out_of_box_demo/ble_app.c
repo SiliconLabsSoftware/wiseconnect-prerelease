@@ -691,14 +691,14 @@ void rsi_ble_configurator_init(void)
 
   // set device in advertising mode.
   rsi_ble_start_advertising();
-  SL_DEBUG_LOG_V2(INFO, "BLE Advertising Started ...");
+  SL_DEBUG_LOG_V2(INFO, "BLE Advertising Started ...\r\n");
   SL_DEBUG_LOG_V2(INFO, "Device advertising as: ");
   SL_DEBUG_LOG_V2(INFO, RSI_BLE_APP_DEVICE_NAME);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
   status = sl_wifi_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version query failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version query failed, Error Code : 0x%lX\r\n", status);
   } else {
     GLIB_drawStringOnLine(&glibContext, " ", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
     GLIB_drawStringOnLine(&glibContext, "BLE advertising", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
@@ -746,7 +746,7 @@ void rsi_ble_configurator_task(void *argument)
 
   scanresult = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scanresult == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan results");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan results\r\n");
     return;
   }
   memset(scanresult, 0, scanbuf_size);
@@ -794,10 +794,10 @@ void rsi_ble_configurator_task(void *argument)
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Start advertising command failed, Error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start advertising command failed, Error code = %lx \r\n", status);
           goto adv;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "BLE Advertising started");
+          SL_DEBUG_LOG_V2(INFO, "BLE Advertising started\r\n");
         }
       } break;
 
@@ -814,7 +814,7 @@ adv:
           memcpy(&data[2], &firmware_version, sizeof(sl_wifi_firmware_version_t));
           rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, data);
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "Firmware version query failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Firmware version query failed, Error Code : 0x%lX\r\n", status);
         }
       } break;
 
@@ -894,7 +894,7 @@ adv:
           osDelay(10);
         }
 
-        SL_DEBUG_LOG_V2(INFO, "Displayed scan list in Silabs app");
+        SL_DEBUG_LOG_V2(INFO, "Displayed scan list in Silabs app\r\n");
       } break;
 
       // WLAN connection response status (response to '2' command)
@@ -995,7 +995,7 @@ adv:
 
           // WLAN disconnect request
           case '4': {
-            SL_DEBUG_LOG_V2(INFO, "WLAN disconnect request received");
+            SL_DEBUG_LOG_V2(INFO, "WLAN disconnect request received\r\n");
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_DISCONN_NOTIFY_STATE);
           } break;
@@ -1007,14 +1007,14 @@ adv:
           } break;
 
           default:
-            SL_DEBUG_LOG_V2(INFO, "Default command case");
+            SL_DEBUG_LOG_V2(INFO, "Default command case\r\n");
             break;
         }
 
         //! Send GATT write response to client with success status
         status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to send GATT write response, status: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to send GATT write response, status: 0x%lx\r\n", status);
         }
       } break;
 

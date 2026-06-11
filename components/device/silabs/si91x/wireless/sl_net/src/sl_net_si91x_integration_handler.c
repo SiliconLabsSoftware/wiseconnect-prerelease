@@ -242,7 +242,7 @@ void sl_net_si91x_event_dispatch_handler(sli_command_engine_response_t *response
 
   status = sli_convert_si91x_event_to_sl_net_event(&packet->command, &service_event, packet);
   if (status == SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(DEBUG, "><<<< Got net event : %u\n", service_event);
+    SL_DEBUG_LOG_V2(DEBUG, "><<<< Got net event : %u\r\n", service_event);
     sl_si91x_default_handler(service_event, buffer);
   }
 #ifdef SLI_SI91X_INTERNAL_HTTP_CLIENT

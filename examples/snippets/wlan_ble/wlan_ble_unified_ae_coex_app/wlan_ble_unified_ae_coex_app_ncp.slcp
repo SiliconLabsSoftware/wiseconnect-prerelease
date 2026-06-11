@@ -72,6 +72,10 @@ component:
 - id: sl_si91x_asynchronous_socket
 - id: bsd_socket
 toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 - option: gcc_linker_option
   value: -u _printf_float
 configuration:
@@ -83,6 +87,8 @@ configuration:
   value: '55'
 - name: configUSE_POSIX_ERRNO
   value: '1'
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 readme:
 - path: readme.md
 other_file:

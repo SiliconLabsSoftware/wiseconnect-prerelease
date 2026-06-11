@@ -278,7 +278,7 @@ sl_status_t bsd_socket_accept_handler(console_args_t *arguments)
   VERIFY_BSD_STATUS(status);
 
   PRINT_AT_CMD_SUCCESS;
-  SL_DEBUG_LOG_V2(INFO, "Socket ID: %lu", status);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID: %lu\r\n", status);
   if ((ip_version == SL_IPV4_VERSION) && (socket_length == sizeof(struct sockaddr_in))) {
     const uint8_t *ip_address = (const uint8_t *)&remote_socket_address.sin_addr.s_addr;
     SL_DEBUG_LOG_V2(INFO, "%u.%u.", ip_address[0], ip_address[1]);

@@ -84,7 +84,7 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, NULL, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx\r\n", status);
     return;
   }
 
@@ -95,10 +95,10 @@ static void application_start(void *argument)
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP interface init Success");
   status = sl_net_up(SL_NET_WIFI_AP_INTERFACE, SL_NET_DEFAULT_WIFI_AP_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi AP interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi AP interface up: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "AP started");
+  SL_DEBUG_LOG_V2(INFO, "AP started\r\n");
 
   while (1) {
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
@@ -125,7 +125,7 @@ static sl_status_t ap_connected_event_handler(sl_wifi_event_t event,
 
   SL_DEBUG_LOG_V2(INFO, "Remote Client connected: ");
   print_mac_address((sl_mac_address_t *)data);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
   return SL_STATUS_OK;
 }
@@ -145,7 +145,7 @@ static sl_status_t ap_disconnected_event_handler(sl_wifi_event_t event,
 
   SL_DEBUG_LOG_V2(INFO, "Remote Client disconnected: ");
   print_mac_address((sl_mac_address_t *)data);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
   return SL_STATUS_OK;
 }
@@ -160,12 +160,12 @@ static sl_status_t wifi_command_engine_status_handler(sl_wifi_event_t event,
   UNUSED_PARAMETER(optional_arg);
   UNUSED_PARAMETER(data);
 
-  SL_DEBUG_LOG_V2(DEBUG, "Event: 0x%llx", event);
+  SL_DEBUG_LOG_V2(DEBUG, "Event: 0x%llx\r\n", event);
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(ERROR, "Command engine status: FAILURE 0x%lx", status_code);
+    SL_DEBUG_LOG_V2(ERROR, "Command engine status: FAILURE 0x%lx\r\n", status_code);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Command engine status: SUCCESS 0x%lx", status_code);
+    SL_DEBUG_LOG_V2(INFO, "Command engine status: SUCCESS 0x%lx\r\n", status_code);
   }
 
   return SL_STATUS_OK;

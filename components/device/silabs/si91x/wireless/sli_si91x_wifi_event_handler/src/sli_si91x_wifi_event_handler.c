@@ -130,7 +130,7 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
     uint32_t event_result =
       osEventFlagsSet(*packet_type_info.sync_response_event_id, packet_type_info.sync_response_event);
     if ((event_result & osFlagsError) != 0) {
-      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for CARDREADY response\n");
+      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for CARDREADY response\r\n");
     }
   }
   sli_buffer_manager_free_buffer(buffer);
@@ -166,7 +166,7 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
     return;
   }
   frame_status = sli_wifi_get_wifi_frame_status(packet);
-  SL_DEBUG_LOG_V2(DEBUG, "WE-> C: 0x%X, S: 0x%X.\n", packet->command, frame_status);
+  SL_DEBUG_LOG_V2(DEBUG, "WE-> C: 0x%X, S: 0x%X.\r\n", packet->command, frame_status);
 
   wifi_event = sli_wifi_convert_event_to_sl_wifi_event(packet->command, frame_status);
 

@@ -234,7 +234,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
                                     uint8_t char_prop)
 {
   if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE) { //! Check for max data length for the characteristic value
-    SL_DEBUG_LOG_V2(INFO, "no data memory for att rec values ");
+    SL_DEBUG_LOG_V2(INFO, "no data memory for att rec values \r\n");
     return;
   }
 
@@ -1237,11 +1237,12 @@ int8_t rsi_ble_initialize_conn_buffer(rsi_ble_conn_config_t *ble_conn_spec_conf)
     /* Check the Total Number of Buffers allocated.*/
     if ((DLE_BUFFER_COUNT_P1 + DLE_BUFFER_COUNT_P2 + DLE_BUFFER_COUNT_P3 + DLE_BUFFER_COUNT_C1 + DLE_BUFFER_COUNT_C2)
         > RSI_BLE_NUM_CONN_EVENTS) {
-      SL_DEBUG_LOG_V2(INFO, "Total number of per connection buffer count is more than the total number alllocated ");
+      SL_DEBUG_LOG_V2(INFO,
+                      "Total number of per connection buffer count is more than the total number alllocated \r\n");
       status = RSI_FAILURE;
     }
   } else {
-    SL_DEBUG_LOG_V2(ERROR, "Invalid buffer passed ");
+    SL_DEBUG_LOG_V2(ERROR, "Invalid buffer passed \r\n");
     status = RSI_FAILURE;
   }
   return status;
@@ -1257,7 +1258,7 @@ int8_t rsi_fill_ble_user_config()
   //! copy ble connection specific configurations
 
   if ((RSI_BLE_MAX_NBR_CENTRALS > 2) || (RSI_BLE_MAX_NBR_PERIPHERALS > 3)) {
-    SL_DEBUG_LOG_V2(ERROR, "number of BLE CENTRALS or BLE PERIPHERALS Given wrong declaration");
+    SL_DEBUG_LOG_V2(ERROR, "number of BLE CENTRALS or BLE PERIPHERALS Given wrong declaration\r\n");
     return RSI_FAILURE;
   }
 
@@ -1283,7 +1284,7 @@ extern osSemaphoreId_t ui_task_sem;
 int32_t ble_init_hook(void);
 void ble_private_default_init(void)
 {
-  SL_DEBUG_LOG_V2(INFO, "private default init");
+  SL_DEBUG_LOG_V2(INFO, "private default init\r\n");
   // for loop
 
   uint8_t iter;
@@ -1369,21 +1370,21 @@ void rsi_ble_main_app_task(void)
   sl_wifi_firmware_version_t version = { 0 };
   status                             = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success\r\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "BLE Main Task Invoked");
+  SL_DEBUG_LOG_V2(INFO, "BLE Main Task Invoked\r\n");
 
   ble_private_default_init();
   ble_generic_cb.init_hook            = ble_init_hook;
@@ -1395,34 +1396,34 @@ void rsi_ble_main_app_task(void)
 
   status = rsi_fill_ble_user_config();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "failed to fill the configurations in local buffer ");
+    SL_DEBUG_LOG_V2(ERROR, "failed to fill the configurations in local buffer \r\n");
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "FILL USER config successful ");
+    SL_DEBUG_LOG_V2(INFO, "FILL USER config successful \r\n");
   }
 
 #if ENABLE_NWP_POWER_SAVE
-  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
 
   status = rsi_app_common_event_loop(&ble_generic_cb);
 
-  SL_DEBUG_LOG_V2(ERROR, "BLE task excution fails with error status 0X%lx ", status);
+  SL_DEBUG_LOG_V2(ERROR, "BLE task excution fails with error status 0X%lx \r\n", status);
   while (1)
     ;
 }
@@ -1446,7 +1447,7 @@ int32_t ble_init_hook(void)
   //! BLE dual role Initialization
   status = rsi_ble_dual_role();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "BLE DUAL role init failed ");
+    SL_DEBUG_LOG_V2(ERROR, "BLE DUAL role init failed \r\n");
   }
 #ifdef M4_UART
   osSemaphoreRelease(ui_task_sem);
@@ -1507,7 +1508,7 @@ int32_t rsi_ble_dual_role(void)
   //! get the local device address(MAC address).
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "rsi_bt_get_local_device_address failed with 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "rsi_bt_get_local_device_address failed with 0x%lX \r\n", status);
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
     SL_DEBUG_LOG_V2(INFO, "Local device address = %s", (uintptr_t)(local_dev_addr));
@@ -1515,10 +1516,10 @@ int32_t rsi_ble_dual_role(void)
 
   //! Set local IRK Value
   //! This value should be fixed on every reset
-  SL_DEBUG_LOG_V2(INFO, "Setting the Local IRK Value");
+  SL_DEBUG_LOG_V2(INFO, "Setting the Local IRK Value\r\n");
   status = rsi_ble_set_local_irk_value(local_irk);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Setting the Local IRK Value Failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Setting the Local IRK Value Failed = %lx\r\n", status);
     return status;
   }
 
@@ -1553,24 +1554,24 @@ int32_t rsi_ble_dual_role(void)
   status = rsi_ble_get_max_adv_data_len((uint8_t *)&rsi_app_resp_max_adv_data_len);
 
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "get max adv data length failed with 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "get max adv data length failed with 0x%lX \r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Max supported Adv Data length is %d ", (uint8_t)rsi_app_resp_max_adv_data_len);
+    SL_DEBUG_LOG_V2(INFO, "Max supported Adv Data length is %d \r\n", (uint8_t)rsi_app_resp_max_adv_data_len);
   }
 
   //! get the Max no.of supported adv sets
   status = rsi_ble_get_max_no_of_supp_adv_sets((uint8_t *)&rsi_app_resp_max_no_of_supp_adv_sets);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "get max supported adv sets failed with 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "get max supported adv sets failed with 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Max number of supported Adv sets are %ld  ", rsi_app_resp_max_no_of_supp_adv_sets);
+    SL_DEBUG_LOG_V2(INFO, "Max number of supported Adv sets are %ld  \r\n", rsi_app_resp_max_no_of_supp_adv_sets);
   }
 
 #if ADV_ENABLED_DEFAULT
 
   status = ble_ae_set_1_parameters();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae params failed with 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae params failed with 0x%lX \r\n", status);
   } else {
     SL_DEBUG_LOG_V2(INFO,
                     "Setting AE params of set 1 successful and selected TX Power is %d dbm ",
@@ -1596,7 +1597,7 @@ int32_t rsi_ble_dual_role(void)
 #if ADV_SET2
   status = ble_ae_set_2_parameters();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae params failed with 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae params failed with 0x%lX \r\n", status);
   } else {
     SL_DEBUG_LOG_V2(INFO,
                     "Setting AE params of set 2 successful and selected TX Power is %d dbm ",
@@ -1608,24 +1609,24 @@ int32_t rsi_ble_dual_role(void)
 #if PERIODIC_ADV_EN
   status = ble_ae_set_periodic_data();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae adv enable failed with status 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae adv enable failed with status 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set ae adv enable success ");
+    SL_DEBUG_LOG_V2(INFO, "set ae adv enable success \r\n");
   }
 #else
 
   status = ble_ae_set_1_adv_data();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae adv data for set 1 failed with status 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae adv data for set 1 failed with status 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set ae adv data for set 1 success ");
+    SL_DEBUG_LOG_V2(INFO, "set ae adv data for set 1 success \r\n");
   }
 
   status = ble_ae_set_1_scan_resp_data();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae scan resp data for set 1 failed with 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae scan resp data for set 1 failed with 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set ae scan resp data for set 1 success ");
+    SL_DEBUG_LOG_V2(INFO, "set ae scan resp data for set 1 success \r\n");
   }
 
 #endif
@@ -1633,16 +1634,16 @@ int32_t rsi_ble_dual_role(void)
 
   status = ble_ae_set_2_adv_data();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae adv data for set 2 failed with status 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae adv data for set 2 failed with status 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set ae adv data for set 2 success ");
+    SL_DEBUG_LOG_V2(INFO, "set ae adv data for set 2 success \r\n");
   }
 
   status = ble_ae_set_2_scan_resp_data();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae scan resp data for set 2 failed with 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae scan resp data for set 2 failed with 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set ae scan resp data for set 2 success ");
+    SL_DEBUG_LOG_V2(INFO, "set ae scan resp data for set 2 success \r\n");
   }
 
 #endif
@@ -1650,25 +1651,25 @@ int32_t rsi_ble_dual_role(void)
   //! set AE set random address
   status = rsi_ble_set_ae_set_random_address(BLE_AE_ADV_HNDL_SET_1, rand_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set ae set random address failed with 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae set random address failed with 0x%lX \r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set ae set random address successful ");
+    SL_DEBUG_LOG_V2(INFO, "set ae set random address successful \r\n");
   }
 
   status = ble_ae_set_1_advertising_enable();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set 1 ae adv enable failed with status 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "set 1 ae adv enable failed with status 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set 1 ae adv enable success ");
+    SL_DEBUG_LOG_V2(INFO, "set 1 ae adv enable success \r\n");
   }
 
 #if ADV_SET2
 
   status = ble_ae_set_2_advertising_enable();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "set 2 ae adv enable failed with status 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "set 2 ae adv enable failed with status 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "set 2 ae adv enable success ");
+    SL_DEBUG_LOG_V2(INFO, "set 2 ae adv enable success \r\n");
   }
 
 #endif
@@ -1680,17 +1681,17 @@ int32_t rsi_ble_dual_role(void)
 
   status = ble_ext_scan_params();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "\n set ae scan params failed with status 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n set ae scan params failed with status 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "\n set ae scan params success ");
+    SL_DEBUG_LOG_V2(INFO, "\n set ae scan params success \r\n");
   }
 
   status = ble_ext_scan_enable();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "\n set ae scan enable failed with 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "\n set ae scan enable failed with 0x%lX \r\n", status);
   } else {
     scan_state_dut = connectable_scan;
-    SL_DEBUG_LOG_V2(INFO, "\n set ae scan enable success ");
+    SL_DEBUG_LOG_V2(INFO, "\n set ae scan enable success \r\n");
   }
 
 #if WLAN_TRANSIENT_CASE

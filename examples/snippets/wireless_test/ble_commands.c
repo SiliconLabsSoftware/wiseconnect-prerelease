@@ -795,7 +795,7 @@ sl_status_t rsi_bt_get_local_name_command_handler(console_args_t *arguments)
   status             = rsi_bt_get_local_name(&rsi_app_resp_get_local_name);
   VERIFY_STATUS_AND_RETURN(status);
 
-  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)rsi_app_resp_get_local_name.name);
+  SL_DEBUG_LOG_V2(INFO, "%s\r\n", (uintptr_t)rsi_app_resp_get_local_name.name);
   return status;
 }
 
@@ -807,7 +807,7 @@ sl_status_t rsi_bt_get_local_device_address_command_handler(console_args_t *argu
   VERIFY_STATUS_AND_RETURN(status);
 
   rsi_6byte_dev_address_to_ascii(local_dev_addr, (uint8_t *)rsi_app_resp_get_dev_addr);
-  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)local_dev_addr);
+  SL_DEBUG_LOG_V2(INFO, "%s\r\n", (uintptr_t)local_dev_addr);
   return status;
 }
 
@@ -831,7 +831,7 @@ void rsi_ble_simple_peripheral_on_conn_status_event(rsi_ble_event_conn_status_t 
   static uint8_t str_remote_address[18]                       = { '\0' };
   memcpy(&rsi_app_connected_device, resp_conn, sizeof(rsi_ble_event_conn_status_t));
   rsi_6byte_dev_address_to_ascii(str_remote_address, rsi_app_connected_device.dev_addr);
-  SL_DEBUG_LOG_V2(INFO, " Module connected to address : %s ", (uintptr_t)str_remote_address);
+  SL_DEBUG_LOG_V2(INFO, " Module connected to address : %s \r\n", (uintptr_t)str_remote_address);
 }
 
 void rsi_ble_simple_peripheral_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconnect, uint16_t reason)
@@ -841,7 +841,7 @@ void rsi_ble_simple_peripheral_on_disconnect_event(rsi_ble_event_disconnect_t *r
   static uint8_t str_remote_address[18]                         = { '\0' };
   memcpy(&rsi_app_disconnected_device, resp_disconnect, sizeof(rsi_ble_event_disconnect_t));
   rsi_6byte_dev_address_to_ascii(str_remote_address, rsi_app_disconnected_device.dev_addr);
-  SL_DEBUG_LOG_V2(INFO, " Module disconnected to address : %s ", (uintptr_t)str_remote_address);
+  SL_DEBUG_LOG_V2(INFO, " Module disconnected to address : %s \r\n", (uintptr_t)str_remote_address);
 }
 void rsi_ble_simple_peripheral_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *resp_enh_conn)
 {
@@ -849,7 +849,7 @@ void rsi_ble_simple_peripheral_on_enhance_conn_status_event(rsi_ble_event_enhanc
   static uint8_t str_remote_address[18] = { '\0' };
   memcpy(&rsi_app_connected_device, resp_enh_conn, sizeof(rsi_ble_event_enhance_conn_status_t));
   rsi_6byte_dev_address_to_ascii(str_remote_address, rsi_app_connected_device.dev_addr);
-  SL_DEBUG_LOG_V2(INFO, " Module connected to address : %s ", (uintptr_t)str_remote_address);
+  SL_DEBUG_LOG_V2(INFO, " Module connected to address : %s \r\n", (uintptr_t)str_remote_address);
 }
 sl_status_t rsi_ble_start_advertising_command_handler(console_args_t *arguments)
 {
@@ -886,6 +886,6 @@ sl_status_t ble_end_test_command_handler(console_args_t *arguments)
   sl_status_t status = SL_STATUS_OK;
   status             = rsi_ble_end_test_mode(&testmodes_num_of_packets);
   VERIFY_STATUS_AND_RETURN(status);
-  SL_DEBUG_LOG_V2(INFO, "Num of packets:%d", testmodes_num_of_packets);
+  SL_DEBUG_LOG_V2(INFO, "Num of packets:%d\r\n", testmodes_num_of_packets);
   return SL_STATUS_OK;
 }

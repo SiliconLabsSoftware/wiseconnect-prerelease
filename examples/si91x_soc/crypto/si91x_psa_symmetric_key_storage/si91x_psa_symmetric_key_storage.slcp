@@ -36,8 +36,12 @@ include:
 define:
 - name: SL_SI91X_PRINT_DBG_LOG
 toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 - option: nano_c_libs
   value: enabled
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 other_file:
 - path: resources/readme/image508a.png
 - path: resources/readme/output.png

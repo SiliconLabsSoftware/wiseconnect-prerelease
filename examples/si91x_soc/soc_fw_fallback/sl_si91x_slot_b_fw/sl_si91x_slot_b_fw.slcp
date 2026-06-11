@@ -41,7 +41,9 @@ template_contribution:
   priority: -100
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 other_file:
 - path: resources/readme/output_remote_server.png
 - path: resources/readme/output_soc.png

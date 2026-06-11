@@ -40,7 +40,9 @@ readme:
 - path: readme.md
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 post_build:
   profile: wiseconnect_soc
 filter:

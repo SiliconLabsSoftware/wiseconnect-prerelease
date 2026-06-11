@@ -604,7 +604,7 @@ static void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t
     //! GATT write responses must be sent from task context (not interrupt context) to ensure proper delivery
     ble_app_set_event(RSI_BLE_GATT_CLIENT_WRITE_EVENT); //! Set event to trigger task processing
   } else {
-    SL_DEBUG_LOG_V2(ERROR, "[BLE]: Unknown Handle Write Event Received");
+    SL_DEBUG_LOG_V2(ERROR, "[BLE]: Unknown Handle Write Event Received\r\n");
   }
 }
 
@@ -678,7 +678,7 @@ void ble_configurator_init(void)
 
   // set device in advertising mode.
   rsi_ble_start_advertising();
-  SL_DEBUG_LOG_V2(INFO, "[BLE]: Advertising Started...");
+  SL_DEBUG_LOG_V2(INFO, "[BLE]: Advertising Started...\r\n");
 }
 
 /*==============================================*/
@@ -703,7 +703,7 @@ void ble_configurator_task(void *argument)
 
   scanresult = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scanresult == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "[BLE]: Failed to allocate memory for scan result");
+    SL_DEBUG_LOG_V2(ERROR, "[BLE]: Failed to allocate memory for scan result\r\n");
     return;
   }
   memset(scanresult, 0, scanbuf_size);
@@ -738,7 +738,7 @@ void ble_configurator_task(void *argument)
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT_DEFAULT);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[BLE]: rsi_ble_conn_params_update command failed : %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[BLE]: rsi_ble_conn_params_update command failed : %lx\r\n", status);
         }
       } break;
 
@@ -755,10 +755,10 @@ adv:
         if (Is_ble_disconnected_by_wifi == 0 && connected == 0) {
           status = rsi_ble_start_advertising();
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "[BLE]: start advertising cmd failed with error code = %lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "[BLE]: start advertising cmd failed with error code = %lx\r\n", status);
             goto adv;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: Started Advertising");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: Started Advertising\r\n");
             break;
           }
         }
@@ -859,7 +859,7 @@ adv:
           osDelay(10);
         }
 
-        SL_DEBUG_LOG_V2(INFO, "[BLE]: Displayed scan list in Silabs app");
+        SL_DEBUG_LOG_V2(INFO, "[BLE]: Displayed scan list in Silabs app\r\n");
       } break;
 
       // WLAN connection response status (response to '2' command)
@@ -898,7 +898,7 @@ adv:
         rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl,
                                     RSI_BLE_MAX_DATA_LEN,
                                     data); // set the local attribute value.
-        SL_DEBUG_LOG_V2(INFO, "[BLE]: STA joined successfully");
+        SL_DEBUG_LOG_V2(INFO, "[BLE]: STA joined successfully\r\n");
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
                                             CONN_INTERVAL_MIN,
                                             CONN_INTERVAL_MAX,
@@ -923,7 +923,7 @@ adv:
         switch (cmdid) {
           // Scan command request
           case '3': {
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: Received scan request");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: Received scan request\r\n");
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_SCAN_STATE);
           } break;
@@ -938,7 +938,7 @@ adv:
           // Sending Security type
           case '5': {
             sec_type = ((app_ble_write_event.att_value[3]) - '0');
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: In Security Request");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: In Security Request\r\n");
             ble_app_set_event(RSI_SECTYPE);
           } break;
 
@@ -946,13 +946,13 @@ adv:
           case '6': {
             memset(data, 0, sizeof(data));
             strcpy((char *)pwd, (const char *)&app_ble_write_event.att_value[3]);
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: PWD from ble app");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: PWD from ble app\r\n");
             wifi_app_set_event(WIFI_APP_JOIN_STATE);
           } break;
 
           // WLAN Status Request
           case '7': {
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: WLAN status request received");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: WLAN status request received\r\n");
             memset(data, 0, sizeof(data));
             if (connected) {
               ble_app_set_event(WLAN_ALREADY);
@@ -963,7 +963,7 @@ adv:
 
           // WLAN disconnect request
           case '4': {
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: WLAN disconnect request received");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: WLAN disconnect request received\r\n");
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_DISCONN_NOTIFY_STATE);
           } break;
@@ -972,18 +972,18 @@ adv:
           case '8': {
             memset(data, 0, sizeof(data));
             ble_app_set_event(APP_FW_VERSION);
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: FW version request");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: FW version request\r\n");
           } break;
 
           default:
-            SL_DEBUG_LOG_V2(INFO, "[BLE]: Default command case");
+            SL_DEBUG_LOG_V2(INFO, "[BLE]: Default command case\r\n");
             break;
         }
 
         //! Send GATT write response to client with success status
         status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "[BLE]: Failed to send GATT write response, status: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[BLE]: Failed to send GATT write response, status: 0x%lx\r\n", status);
         }
       } break;
 
@@ -1021,19 +1021,19 @@ adv:
 adv1:
         status = rsi_ble_start_advertising();
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[BLE]: start advertising cmd failed with error code = %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[BLE]: start advertising cmd failed with error code = %lx\r\n", status);
           goto adv1;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "[BLE]: Started Advertising");
+          SL_DEBUG_LOG_V2(INFO, "[BLE]: Started Advertising\r\n");
         }
       } break;
       case STOP_BLE_ADVERTISING: {
         ble_app_clear_event(STOP_BLE_ADVERTISING);
         status = rsi_ble_stop_advertising();
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[BLE]: stop advertising cmd failed with error code = %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[BLE]: stop advertising cmd failed with error code = %lx\r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "[BLE]: Advertising Stopped");
+          SL_DEBUG_LOG_V2(INFO, "[BLE]: Advertising Stopped\r\n");
         }
       } break;
       case INITIATE_BLE_DISCONNECT: {
@@ -1042,7 +1042,7 @@ adv1:
         rsi_ascii_dev_address_to_6bytes_rev(rsi_connected_dev_addr_l, (int8_t *)remote_dev_addr);
         status = rsi_ble_disconnect((int8_t *)rsi_connected_dev_addr_l);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[BLE]: rsi_ble_disconnect : error status 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[BLE]: rsi_ble_disconnect : error status 0x%lx\r\n", status);
         } else {
           Is_ble_disconnected_by_wifi = 1;
         }

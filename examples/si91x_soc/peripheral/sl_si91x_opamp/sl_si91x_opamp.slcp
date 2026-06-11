@@ -43,7 +43,9 @@ include:
   - path: opamp_example.h
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 define:
 - name: SLI_SI91X_MCU_COMMON_FLASH_MODE
 - name: SL_SI91X_OPAMP

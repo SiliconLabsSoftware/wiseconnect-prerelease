@@ -133,10 +133,10 @@ sl_status_t large_response_handler(sl_http_server_t *handle, sl_http_server_requ
 
     sl_http_server_read_request_data(handle, &recvData);
     response[recvData.received_data_length] = 0;
-    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s", (uintptr_t)response);
+    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s\r\n", (uintptr_t)response);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Got request query parameter count : %u", req->uri.query_parameter_count);
+  SL_DEBUG_LOG_V2(INFO, "Got request query parameter count : %u\r\n", req->uri.query_parameter_count);
   if (req->uri.query_parameter_count > 0) {
     for (int i = 0; i < req->uri.query_parameter_count; i++) {
       SL_DEBUG_LOG_V2(INFO,
@@ -192,10 +192,10 @@ sl_status_t chunked_large_response_handler(sl_http_server_t *handle, sl_http_ser
 
     sl_http_server_read_request_data(handle, &recvData);
     response[recvData.received_data_length] = 0;
-    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s", (uintptr_t)response);
+    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s\r\n", (uintptr_t)response);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Got request query parameter count : %u", req->uri.query_parameter_count);
+  SL_DEBUG_LOG_V2(INFO, "Got request query parameter count : %u\r\n", req->uri.query_parameter_count);
   if (req->uri.query_parameter_count > 0) {
     for (int i = 0; i < req->uri.query_parameter_count; i++) {
       SL_DEBUG_LOG_V2(INFO,
@@ -260,10 +260,10 @@ sl_status_t buffered_request_handler(sl_http_server_t *handle, sl_http_server_re
 
     sl_http_server_read_request_data(handle, &recvData);
     response[recvData.received_data_length] = 0;
-    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s", (uintptr_t)response);
+    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s\r\n", (uintptr_t)response);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Got request query parameter count : %u", req->uri.query_parameter_count);
+  SL_DEBUG_LOG_V2(INFO, "Got request query parameter count : %u\r\n", req->uri.query_parameter_count);
   if (req->uri.query_parameter_count > 0) {
     for (int i = 0; i < req->uri.query_parameter_count; i++) {
       SL_DEBUG_LOG_V2(INFO,
@@ -322,7 +322,7 @@ sl_status_t large_data_handler(sl_http_server_t *handle, sl_http_server_request_
         return SL_STATUS_FAIL;
       }
       data_length -= recvData.received_data_length;
-      SL_DEBUG_LOG_V2(INFO, "Read %lu bytes, remaining %lu bytes", recvData.received_data_length, data_length);
+      SL_DEBUG_LOG_V2(INFO, "Read %lu bytes, remaining %lu bytes\r\n", recvData.received_data_length, data_length);
     }
   }
 
@@ -359,24 +359,24 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &http_server_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success\r\n");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -390,17 +390,17 @@ static void application_start(void *argument)
 
   status = sl_http_server_init(&server_handle, &server_config);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "HTTP server init failed:%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "HTTP server init failed:%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Http Init done");
+  SL_DEBUG_LOG_V2(INFO, " Http Init done\r\n");
 
   status = sl_http_server_start(&server_handle);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Server start fail:%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Server start fail:%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Server start done");
+  SL_DEBUG_LOG_V2(INFO, " Server start done\r\n");
 
   is_server_running = true;
   while (is_server_running) {
@@ -409,15 +409,15 @@ static void application_start(void *argument)
 
   status = sl_http_server_stop(&server_handle);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Server stop fail:%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Server stop fail:%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Server stop done");
+  SL_DEBUG_LOG_V2(INFO, " Server stop done\r\n");
 
   status = sl_http_server_deinit(&server_handle);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Server deinit fail:%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Server deinit fail:%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Server deinit done");
+  SL_DEBUG_LOG_V2(INFO, " Server deinit done\r\n");
 }

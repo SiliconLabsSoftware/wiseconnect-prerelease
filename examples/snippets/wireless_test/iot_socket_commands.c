@@ -79,7 +79,7 @@ sl_status_t wifi_iot_socket_create_handler(console_args_t *arguments)
   int32_t sock_fd = iotSocketCreate(domain, type, protocol);
   VERIFY_IOT_STATUS(sock_fd);
 
-  SL_DEBUG_LOG_V2(INFO, "%ld", sock_fd);
+  SL_DEBUG_LOG_V2(INFO, "%ld\r\n", sock_fd);
 
   return SL_STATUS_OK;
 }
@@ -129,7 +129,7 @@ sl_status_t wifi_iot_socket_accept_handler(console_args_t *arguments)
   VERIFY_IOT_STATUS(iot_socket_status);
 
   // print client socket fd
-  SL_DEBUG_LOG_V2(INFO, "%ld", iot_socket_status);
+  SL_DEBUG_LOG_V2(INFO, "%ld\r\n", iot_socket_status);
 
   return SL_STATUS_OK;
 }

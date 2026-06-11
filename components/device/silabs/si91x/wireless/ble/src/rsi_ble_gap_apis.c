@@ -713,6 +713,7 @@ int32_t rsi_ble_set_local_irk_value(const uint8_t *l_irk)
  * @param[in]  status 			- accept or reject the connection parameters update request \n
  *                    			0 - ACCEPT, \n
 					1 - REJECT \n
+ * @note       If the central device receives a Connection Parameter Update Request with parameters that match the existing connection parameters, the central shall reject the request since no parameter change is necessary.
  * @return     0 - Success \n
  *             Non-Zero Value - Failure
  *             0x4E0C - Command disallowed \n
@@ -1345,6 +1346,7 @@ int32_t rsi_ble_setphy(const int8_t *remote_dev_address, uint8_t tx_phy, uint8_t
  * @note       min_int and max_int values ranges from 6 to 3200 (Time = N * 1.25 ms, Time Range: 7.5 ms to 4 s)\n
 		latency : If latency value is greater than 32 ,Limiting the peripheral latency value to 32\n
 		Max supported peripheral latency is 32 when Device is in Peripheral Role.
+ * @note       The host should refrain from sending the same connection parameters as an update request when they match the current connection parameters.
  *
  */
 int32_t rsi_ble_conn_params_update(const uint8_t *remote_dev_address,
@@ -1805,7 +1807,13 @@ int32_t rsi_ble_start_encryption(uint8_t *remote_dev_address, uint16_t ediv, con
  *                     127  	    BLE HP Mode, Max power supported. \n
  *              #define RSI_BLE_PWR_INX_DBM  1  indicate tx_power in dBm \n
  *              tx_power in dBm (-8 dBm to 18 dBm) \n
- * @note: This API currently supports controlling the tx power in the configured chain during wireless initialization. However, changing the chain from LP to HP or vice versa is not supported.  
+ * @note This API currently supports controlling the tx power in the configured chain during wireless initialization. However, changing the chain from LP to HP or vice versa is not supported.
+ *       For SiW917Y1GA and SiW917Y1GN module boards, region configuration is not supported.
+ *       These boards always use the world_safe region.
+ *       Hence, the maximum TX power is limited by the world_safe regulatory limits.
+ *       When the DUT is connected in AP mode, the output power is the minimum of the host
+ *              transmit power and the maximum power allowed for the country region.
+ *       When it is not connected to an AP, the maximum output power is world_safe.
  * @return      0 - Success \n
  *              Non-Zero Value - Failure \n
  *              0x4E02 	Unknown Connection Identifier \n 
@@ -2215,10 +2223,16 @@ int32_t rsi_ble_extended_connect_with_params(void *ble_extended_conn_params)
  *            !0  = failure \n
  * @section description
  * This function is used to read minimum and maximum transmit powers supported by the controller based on the country region.
- * Limitation for ACx Boards:
+ * @note For SiW917Y1GA and SiW917Y1GN boards:
  * This API must be invoked only after BLE on-air activity has started (e.g. advertising or scanning).
  * For dynamic TX power Control, first initiate BLE on-air activity, then call this API.
- * After that, stop the ongoing on-air activity, update the TX power and finally restart the BLE on-air activity to apply the changes.
+ * After that, stop the ongoing on-air activity, update the TX power and finally restart the BLE on-air activity to apply the change.
+ * When the DUT is connected in AP mode, the output power is the minimum of the host
+ * transmit power and the maximum power allowed for the country region.
+ * When it is not connected to an AP, the maximum output power is world_safe.
+ *
+ * The controller returns the minimum and maximum TX power allowed for the current country region.
+ * When WLAN is active, the returned values follow the WLAN country region limits.
  */
 
 int32_t rsi_ble_read_transmit_power(void *resp)

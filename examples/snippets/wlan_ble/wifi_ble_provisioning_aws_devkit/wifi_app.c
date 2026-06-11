@@ -353,7 +353,7 @@ static void iot_subscribe_callback_handler(AWS_IoT_Client *pClient,
     jsmn_parse(&parser, (char *)pParams->payload, pParams->payloadLen, tokens, sizeof(tokens) / sizeof(tokens[0]));
 
   if (token_count < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to parse JSON: %d", token_count);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to parse JSON: %d\r\n", token_count);
     return;
   }
 
@@ -383,7 +383,7 @@ static void iot_subscribe_callback_handler(AWS_IoT_Client *pClient,
 
   // Check if more than one light is requested to be on
   if ((red && green) || (red && blue) || (green && blue)) {
-    SL_DEBUG_LOG_V2(WARN, "Error: Only one light can be on at a time.");
+    SL_DEBUG_LOG_V2(WARN, "Error: Only one light can be on at a time.\r\n");
   } else {
     // Invoke the rgb_led_set_state() function with the extracted values
     rgb_led_init_instances();
@@ -400,20 +400,20 @@ static void iot_subscribe_callback_handler(AWS_IoT_Client *pClient,
 static void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)
 {
   IoT_Error_t rc = FAILURE;
-  SL_DEBUG_LOG_V2(INFO, "MQTT Disconnect");
+  SL_DEBUG_LOG_V2(INFO, "MQTT Disconnect\r\n");
   if (NULL == pClient) {
     return;
   }
   IOT_UNUSED(data);
   if (aws_iot_is_autoreconnect_enabled(pClient)) {
-    SL_DEBUG_LOG_V2(INFO, "Auto Reconnect is enabled, Reconnecting attempt will start now");
+    SL_DEBUG_LOG_V2(INFO, "Auto Reconnect is enabled, Reconnecting attempt will start now\r\n");
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Auto Reconnect not enabled. Starting manual reconnect...");
+    SL_DEBUG_LOG_V2(INFO, "Auto Reconnect not enabled. Starting manual reconnect...\r\n");
     rc = aws_iot_mqtt_attempt_reconnect(pClient);
     if (NETWORK_RECONNECTED == rc) {
-      SL_DEBUG_LOG_V2(INFO, "Manual Reconnect Successful");
+      SL_DEBUG_LOG_V2(INFO, "Manual Reconnect Successful\r\n");
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Manual Reconnect ");
+      SL_DEBUG_LOG_V2(INFO, "Manual Reconnect \r\n");
     }
   }
 }
@@ -428,10 +428,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_starfield_ca,
                                  sizeof(aws_starfield_ca) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successfull", 0);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successfull\r\n", 0);
 
   // Load SSL Client certificate
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(0),
@@ -439,10 +439,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_client_certificate,
                                  sizeof(aws_client_certificate) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successfull", 0);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successfull\r\n", 0);
 
   // Load SSL Client private key
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(0),
@@ -450,10 +450,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_client_private_key,
                                  sizeof(aws_client_private_key) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successfull", 0);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successfull\r\n", 0);
 
   return SL_STATUS_OK;
 }
@@ -464,7 +464,7 @@ int32_t rsi_wlan_mqtt_certs_init(void)
 
   status = load_certificates_in_flash();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificates: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificates: 0x%lx\r\n", status);
     return status;
   }
 
@@ -477,11 +477,11 @@ static sl_status_t show_scan_results()
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
-  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:", scan_result->scan_count);
+  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:\r\n", scan_result->scan_count);
 
   if (scan_result->scan_count) {
     SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
-    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
+    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s\r\n", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
 
     for (int a = 0; a < (int)scan_result->scan_count; ++a) {
       bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
@@ -501,7 +501,7 @@ static sl_status_t show_scan_results()
                bssid[4],
                bssid[5]);
       SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)aws_devkit_scan_bssid_log);
-      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
+      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u\r\n", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }
 
@@ -546,7 +546,7 @@ void wifi_app_task(void)
   // Allocate memory for scan buffer
   scan_result = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scan_result == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result\r\n");
     return;
   }
   memset(scan_result, 0, scanbuf_size);
@@ -599,7 +599,7 @@ void wifi_app_task(void)
           status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
         }
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan Wait Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan Wait Failed, Error Code : 0x%lX\r\n", status);
           wifi_app_set_event(WIFI_APP_SCAN_STATE);
           osDelay(1000);
         }
@@ -618,10 +618,10 @@ void wifi_app_task(void)
         if (sec_type != SL_WIFI_OPEN) {
           status = sl_net_set_credential(id, SL_NET_WIFI_PSK, pwd, strlen((char *)pwd));
           if (SL_STATUS_OK == status) {
-            SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu", id);
+            SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu\r\n", id);
           }
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Credentials set failed, id : %lu", id);
+            SL_DEBUG_LOG_V2(ERROR, "Credentials set failed, id : %lu\r\n", id);
             continue;
           }
         }
@@ -631,19 +631,19 @@ void wifi_app_task(void)
         access_point.encryption    = SL_WIFI_DEFAULT_ENCRYPTION;
         access_point.credential_id = id;
 
-        SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)access_point.ssid.value);
+        SL_DEBUG_LOG_V2(INFO, "SSID %s\r\n", (uintptr_t)access_point.ssid.value);
         status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
 
         if (status != RSI_SUCCESS) {
           timeout = 1;
           wifi_app_send_to_ble(WIFI_APP_TIMEOUT_NOTIFY, (uint8_t *)&timeout, 1);
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX\r\n", status);
 
           // update wlan application state
           disconnected = 1;
           connected    = 0;
         } else {
-          SL_DEBUG_LOG_V2(INFO, " WLAN Connection Success");
+          SL_DEBUG_LOG_V2(INFO, " WLAN Connection Success\r\n");
           // update wlan application state
           wifi_app_set_event(WIFI_APP_CONNECTED_STATE);
         }
@@ -655,7 +655,7 @@ void wifi_app_task(void)
         if (retry) {
           status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX", status);
+            SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX\r\n", status);
             break;
           } else {
             wifi_app_set_event(WIFI_APP_CONNECTED_STATE);
@@ -685,7 +685,7 @@ void wifi_app_task(void)
               wifi_app_set_event(WIFI_APP_ERROR_STATE);
             }
           }
-          SL_DEBUG_LOG_V2(ERROR, "IP Config Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "IP Config Failed, Error Code : 0x%lX\r\n", status);
           break;
         } else {
           a             = 0;
@@ -712,7 +712,7 @@ void wifi_app_task(void)
         wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
         wifi_app_mqtt_task();
 
-        SL_DEBUG_LOG_V2(INFO, "WIFI App IPCONFIG Done State");
+        SL_DEBUG_LOG_V2(INFO, "WIFI App IPCONFIG Done State\r\n");
       } break;
 
       case WIFI_APP_ERROR_STATE: {
@@ -725,7 +725,7 @@ void wifi_app_task(void)
         wifi_app_send_to_ble(WIFI_APP_DISCONNECTION_STATUS, (uint8_t *)&disconnected, 1);
         wifi_app_set_event(WIFI_APP_FLASH_STATE);
 
-        SL_DEBUG_LOG_V2(INFO, "WIFI App Disconnected State");
+        SL_DEBUG_LOG_V2(INFO, "WIFI App Disconnected State\r\n");
       } break;
 
       case WIFI_APP_DISCONN_NOTIFY_STATE: {
@@ -736,7 +736,7 @@ void wifi_app_task(void)
 #if RSI_WISE_MCU_ENABLE
           rsi_flash_erase((uint32_t)FLASH_ADDR_TO_STORE_AP_DETAILS);
 #endif
-          SL_DEBUG_LOG_V2(INFO, "WLAN Disconnected");
+          SL_DEBUG_LOG_V2(INFO, "WLAN Disconnected\r\n");
           disassosiated   = 1;
           connected       = 0;
           yield           = 0;
@@ -746,7 +746,7 @@ void wifi_app_task(void)
           wifi_app_send_to_ble(WIFI_APP_DISCONNECTION_NOTIFY, (uint8_t *)&disassosiated, 1);
           wifi_app_set_event(WIFI_APP_UNCONNECTED_STATE);
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "WIFI Disconnect Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "WIFI Disconnect Failed, Error Code : 0x%lX\r\n", status);
         }
       } break;
       default:
@@ -782,9 +782,9 @@ void wifi_app_mqtt_task(void)
           mac_addr.octet[3],
           mac_addr.octet[4],
           mac_addr.octet[5]);
-  SL_DEBUG_LOG_V2(INFO, "MAC ID: %s ", (uintptr_t)mac_id);
+  SL_DEBUG_LOG_V2(INFO, "MAC ID: %s \r\n", (uintptr_t)mac_id);
   sprintf(client_id, "silabs_%s", mac_id);
-  SL_DEBUG_LOG_V2(INFO, "Client ID: %s", (uintptr_t)client_id);
+  SL_DEBUG_LOG_V2(INFO, "Client ID: %s\r\n", (uintptr_t)client_id);
 
   mqttInitParams.enableAutoReconnect       = false;
   mqttInitParams.pHostURL                  = AWS_IOT_MQTT_HOST;
@@ -818,12 +818,12 @@ void wifi_app_mqtt_task(void)
     osSemaphoreAcquire(rsi_mqtt_sem, osWaitForever);
 
     if (wifi_app_get_event() == WIFI_APP_DISCONN_NOTIFY_STATE) {
-      SL_DEBUG_LOG_V2(INFO, "WLAN disconnect initiated");
+      SL_DEBUG_LOG_V2(INFO, "WLAN disconnect initiated\r\n");
       rc = aws_iot_mqtt_disconnect(&mqtt_client);
       if (SUCCESS != rc) {
-        SL_DEBUG_LOG_V2(ERROR, "MQTT Disconnection error : %d", rc);
+        SL_DEBUG_LOG_V2(ERROR, "MQTT Disconnection error : %d\r\n", rc);
       } else {
-        SL_DEBUG_LOG_V2(INFO, "MQTT Disconnection Successful");
+        SL_DEBUG_LOG_V2(INFO, "MQTT Disconnection Successful\r\n");
       }
       return;
     }
@@ -834,7 +834,7 @@ void wifi_app_mqtt_task(void)
         rc = aws_iot_mqtt_init(&mqtt_client, &mqttInitParams);
         if (SUCCESS != rc) {
           wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
-          SL_DEBUG_LOG_V2(ERROR, "Mqtt Init failed with error: %d", rc);
+          SL_DEBUG_LOG_V2(ERROR, "Mqtt Init failed with error: %d\r\n", rc);
         } else {
           wlan_app_cb.state = WIFI_APP_MQTT_CONNECT_STATE;
         }
@@ -843,14 +843,14 @@ void wifi_app_mqtt_task(void)
       } break;
 
       case WIFI_APP_MQTT_CONNECT_STATE: {
-        SL_DEBUG_LOG_V2(INFO, "AWS IOT MQTT Connecting...");
+        SL_DEBUG_LOG_V2(INFO, "AWS IOT MQTT Connecting...\r\n");
         rc = aws_iot_mqtt_connect(&mqtt_client, &connectParams);
         if (SUCCESS != rc) {
           if (rc == NETWORK_ALREADY_CONNECTED_ERROR) {
-            SL_DEBUG_LOG_V2(INFO, "Network is already connected");
+            SL_DEBUG_LOG_V2(INFO, "Network is already connected\r\n");
             //wlan_app_cb.state = WIFI_APP_MQTT_PUBLISH_STATE;
           } else {
-            SL_DEBUG_LOG_V2(ERROR, "Mqtt Connect failed with error: %d", rc);
+            SL_DEBUG_LOG_V2(ERROR, "Mqtt Connect failed with error: %d\r\n", rc);
             wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
           }
         } else {
@@ -863,7 +863,7 @@ void wifi_app_mqtt_task(void)
         rc = aws_iot_mqtt_autoreconnect_set_status(&mqtt_client, false);
         if (SUCCESS != rc) {
           if (NETWORK_DISCONNECTED_ERROR == rc) {
-            SL_DEBUG_LOG_V2(ERROR, "MQTT auto reconnect error : %d", rc);
+            SL_DEBUG_LOG_V2(ERROR, "MQTT auto reconnect error : %d\r\n", rc);
             wlan_app_cb.state = WIFI_APP_MQTT_CONNECT_STATE;
           } else if (NETWORK_ATTEMPTING_RECONNECT == rc) {
             // If the client is attempting to reconnect we will skip the rest of the loop.
@@ -878,7 +878,7 @@ void wifi_app_mqtt_task(void)
       } break;
 
       case WIFI_APP_MQTT_SUBSCRIBE_STATE: {
-        SL_DEBUG_LOG_V2(INFO, "AWS IOT MQTT Subscribe...");
+        SL_DEBUG_LOG_V2(INFO, "AWS IOT MQTT Subscribe...\r\n");
         rc = aws_iot_mqtt_subscribe(&mqtt_client,
                                     MQTT_TOPIC1,
                                     strlen(MQTT_TOPIC1),
@@ -888,7 +888,7 @@ void wifi_app_mqtt_task(void)
 
         if (SUCCESS != rc) {
           if (NETWORK_DISCONNECTED_ERROR == rc) {
-            SL_DEBUG_LOG_V2(ERROR, "Subscribe error : %d", rc);
+            SL_DEBUG_LOG_V2(ERROR, "Subscribe error : %d\r\n", rc);
             wlan_app_cb.state = WIFI_APP_MQTT_CONNECT_STATE;
           } else if (NETWORK_ATTEMPTING_RECONNECT == rc) {
             // If the client is attempting to reconnect we will skip the rest of the loop.
@@ -900,7 +900,7 @@ void wifi_app_mqtt_task(void)
 #if ENABLE_NWP_POWER_SAVE
         //! initiating power save in BLE mode
         if (rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE) != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode ");
+          SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode \r\n");
         }
 
         sl_wifi_performance_profile_v2_t performance_profile = { .profile         = ASSOCIATED_POWER_SAVE_LOW_LATENCY,
@@ -908,9 +908,9 @@ void wifi_app_mqtt_task(void)
 
         sl_status_t status = sl_wifi_set_performance_profile_v2(&performance_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX\r\n", status);
         }
-        SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
+        SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled\r\n");
 #endif
 
         osSemaphoreRelease(rsi_mqtt_sem);
@@ -924,7 +924,7 @@ void wifi_app_mqtt_task(void)
             memset(&read_fds, 0, sizeof(fd_set));
 
             FD_SET(mqtt_client.networkStack.socket_id, &read_fds);
-            SL_DEBUG_LOG_V2(INFO, " Socket ID: %d", mqtt_client.networkStack.socket_id);
+            SL_DEBUG_LOG_V2(INFO, " Socket ID: %d\r\n", mqtt_client.networkStack.socket_id);
 
             status1 =
               sl_si91x_select(mqtt_client.networkStack.socket_id + 1, &read_fds, NULL, NULL, NULL, async_socket_select);
@@ -977,20 +977,20 @@ void wifi_app_mqtt_task(void)
           publish_QOS0.payload    = temp_string;
           publish_QOS0.payloadLen = strlen(temp_string);
 #endif
-          SL_DEBUG_LOG_V2(INFO, "Data to be published: %s", (uintptr_t)response_data_buffer);
+          SL_DEBUG_LOG_V2(INFO, "Data to be published: %s\r\n", (uintptr_t)response_data_buffer);
           // mqtt publish with QOS0
           rc = aws_iot_mqtt_publish(&mqtt_client, MQTT_TOPIC2, strlen(MQTT_TOPIC2), &publish_QOS0);
 
           if (rc != SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "Mqtt Publish for QOS0 failed with error: %d", rc);
+            SL_DEBUG_LOG_V2(ERROR, "Mqtt Publish for QOS0 failed with error: %d\r\n", rc);
             wlan_app_cb.state = WIFI_APP_MQTT_DISCONNECT;
             break;
           }
 
           if (rc == MQTT_REQUEST_TIMEOUT_ERROR) {
-            SL_DEBUG_LOG_V2(INFO, "QOS0 publish ack not received.");
+            SL_DEBUG_LOG_V2(INFO, "QOS0 publish ack not received.\r\n");
           }
-          SL_DEBUG_LOG_V2(INFO, "MQTT Publish Successful");
+          SL_DEBUG_LOG_V2(INFO, "MQTT Publish Successful\r\n");
 #if !(defined(SLI_SI91X_MCU_INTERFACE) && ENABLE_NWP_POWER_SAVE)
           publish_msg = 0;
           if (!publish_timer_start) {
@@ -1024,14 +1024,14 @@ void wifi_app_mqtt_task(void)
 #ifdef SLI_SI91X_MCU_INTERFACE
 
         if (select_given == 1 && (check_for_recv_data != 1)) {
-          SL_DEBUG_LOG_V2(INFO, "M4 in sleep");
+          SL_DEBUG_LOG_V2(INFO, "M4 in sleep\r\n");
 #if (SL_SI91X_TICKLESS_MODE == 0)
           sli_si91x_power_manager_sleep();
 #else
           if (osSemaphoreAcquire(data_received_semaphore, PUBLISH_PERIODICITY) == osOK) {
           }
 #endif
-          SL_DEBUG_LOG_V2(INFO, "M4 Wake up");
+          SL_DEBUG_LOG_V2(INFO, "M4 Wake up\r\n");
         }
 
 #endif
@@ -1045,10 +1045,10 @@ void wifi_app_mqtt_task(void)
       case WIFI_APP_MQTT_DISCONNECT: {
         rc = aws_iot_mqtt_disconnect(&mqtt_client);
         if (SUCCESS != rc) {
-          SL_DEBUG_LOG_V2(ERROR, "MQTT Disconnection error : %d", rc);
+          SL_DEBUG_LOG_V2(ERROR, "MQTT Disconnection error : %d\r\n", rc);
           wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "MQTT Disconnection Successful");
+          SL_DEBUG_LOG_V2(INFO, "MQTT Disconnection Successful\r\n");
           wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
         }
         osSemaphoreRelease(rsi_mqtt_sem);

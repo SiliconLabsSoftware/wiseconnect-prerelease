@@ -127,7 +127,7 @@ void wifi_ble_send_data(void)
     //! send packet to wifi
     status = send(client_socket, data, sizeof(data), 0);
     if (status < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Send failed with BSD error:%d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Send failed with BSD error:%d\r\n", errno);
       close(client_socket);
       wifi_app_cb.state = WIFI_APP_IPCONFIG_DONE_STATE;
     }
@@ -146,10 +146,10 @@ void wifi_client_send_data(void)
   int32_t status = RSI_SUCCESS;
 
   if (wifi_app_cb.event_map & RSI_SEND_EVENT) {
-    SL_DEBUG_LOG_V2(INFO, "Data from BLE to Wi-Fi: %s", (uintptr_t)wifi_app_cb.buffer);
+    SL_DEBUG_LOG_V2(INFO, "Data from BLE to Wi-Fi: %s\r\n", (uintptr_t)wifi_app_cb.buffer);
     status = send(client_socket, wifi_app_cb.buffer, wifi_app_cb.length, 0);
     if (status < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Send failed with BSD error:%d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Send failed with BSD error:%d\r\n", errno);
       close(client_socket);
       wifi_app_cb.state = WIFI_APP_IPCONFIG_DONE_STATE;
     } else {
@@ -188,7 +188,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
   UNUSED_PARAMETER(arg);
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload", result_length);
+    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload\r\n", result_length);
     if (client_socket) {
       close(client_socket);
     }
@@ -250,7 +250,7 @@ void rsi_wlan_app_task(void)
           SL_DEBUG_LOG_V2(ERROR, "Get Pairwise Master Key Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Get Pairwise Master Key Success");
+        SL_DEBUG_LOG_V2(INFO, "Get Pairwise Master Key Success\r\n");
 #endif
         //! update wlan application state
         wifi_app_cb.state = WIFI_APP_UNCONNECTED_STATE;
@@ -270,7 +270,7 @@ void rsi_wlan_app_task(void)
       status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
 #endif
       if (status == SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu", id);
+        SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu\r\n", id);
 
         access_point.ssid.length = strlen((char *)SSID);
         memcpy(access_point.ssid.value, SSID, access_point.ssid.length);
@@ -284,16 +284,16 @@ void rsi_wlan_app_task(void)
           return;
         }
 
-        SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)access_point.ssid.value);
+        SL_DEBUG_LOG_V2(INFO, "SSID %s\r\n", (uintptr_t)access_point.ssid.value);
         status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
         if (status != RSI_SUCCESS) {
           SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, " WLAN connection is successful");
+          SL_DEBUG_LOG_V2(INFO, " WLAN connection is successful\r\n");
           wifi_app_cb.state = WIFI_APP_CONNECTED_STATE;
         }
       } else {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials; status: %lu", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials; status: %lu\r\n", status);
       }
     } break;
     case WIFI_APP_CONNECTED_STATE: {
@@ -305,15 +305,15 @@ void rsi_wlan_app_task(void)
       status = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
       if (status == RSI_SUCCESS) {
         //! update wlan application state
-        SL_DEBUG_LOG_V2(INFO, "Configured IP");
+        SL_DEBUG_LOG_V2(INFO, "Configured IP\r\n");
         wifi_app_cb.state = WIFI_APP_IPCONFIG_DONE_STATE;
       }
 #if ENABLE_NWP_POWER_SAVE
 
-      SL_DEBUG_LOG_V2(INFO, "Initiating PowerSave");
+      SL_DEBUG_LOG_V2(INFO, "Initiating PowerSave\r\n");
       status = rsi_initiate_power_save();
       if (status != RSI_SUCCESS) {
-        SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode ");
+        SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode \r\n");
         return;
       }
 
@@ -353,15 +353,15 @@ void rsi_wlan_app_task(void)
       //!Create socket
       client_socket = sl_si91x_socket_async(AF_INET, SOCK_STREAM, IPPROTO_TCP, &data_callback);
       if (client_socket < 0) {
-        SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
         return;
       }
-      SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+      SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
 #if SSL_CLIENT
       status = setsockopt(client_socket, SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
       if (status < 0) {
-        SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
         close(client_socket);
         return;
       }
@@ -370,12 +370,12 @@ void rsi_wlan_app_task(void)
       //! Socket connect
       return_value = connect(client_socket, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in));
       if (return_value < 0) {
-        SL_DEBUG_LOG_V2(ERROR, "Socket connect failed with BSD error: %d, return value %d", errno, return_value);
+        SL_DEBUG_LOG_V2(ERROR, "Socket connect failed with BSD error: %d, return value %d\r\n", errno, return_value);
         close(client_socket);
         return;
       } else {
         wifi_app_cb.state = WIFI_APP_SOCKET_CONNECTED_STATE;
-        SL_DEBUG_LOG_V2(INFO, "TCP Socket Connect Success");
+        SL_DEBUG_LOG_V2(INFO, "TCP Socket Connect Success\r\n");
         wlan_socket_connection_done = 1;
       }
 

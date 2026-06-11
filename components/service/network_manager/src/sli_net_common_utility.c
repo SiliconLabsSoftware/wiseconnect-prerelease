@@ -106,14 +106,14 @@ static void sli_network_manager_cleanup_init_failure(void)
 {
   if (sli_network_manager_request_queue != NULL) {
     if (osMessageQueueDelete(sli_network_manager_request_queue) != osOK) {
-      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to cleanup request queue during init failure\n");
+      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to cleanup request queue during init failure\r\n");
     }
     sli_network_manager_request_queue = NULL;
   }
 
   if (sli_network_manager_response_flags != NULL) {
     if (osEventFlagsDelete(sli_network_manager_response_flags) != osOK) {
-      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to cleanup response flags during init failure\n");
+      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to cleanup response flags during init failure\r\n");
     }
     sli_network_manager_response_flags = NULL;
   }
@@ -208,7 +208,7 @@ sl_status_t sli_net_validate_sl_net_profile(const sl_net_profile_t *profile, sl_
            && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id != SL_WIFI_NO_CREDENTIAL_ID))
           || ((((const sl_net_wifi_client_profile_t *)profile)->config.security != SL_WIFI_OPEN)
               && (((const sl_net_wifi_client_profile_t *)profile)->config.credential_id == SL_WIFI_NO_CREDENTIAL_ID))) {
-        SL_DEBUG_LOG_V2(ERROR, "Mismatch between security and credential_id\n");
+        SL_DEBUG_LOG_V2(ERROR, "Mismatch between security and credential_id\r\n");
         return SL_STATUS_INVALID_CONFIGURATION;
       }
       return SL_STATUS_OK;
@@ -226,7 +226,7 @@ sl_status_t sli_net_validate_sl_net_profile(const sl_net_profile_t *profile, sl_
            && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id != SL_WIFI_NO_CREDENTIAL_ID))
           || ((((const sl_net_wifi_ap_profile_t *)profile)->config.security != SL_WIFI_OPEN)
               && (((const sl_net_wifi_ap_profile_t *)profile)->config.credential_id == SL_WIFI_NO_CREDENTIAL_ID))) {
-        SL_DEBUG_LOG_V2(ERROR, "Mismatch between security and credential_id\n");
+        SL_DEBUG_LOG_V2(ERROR, "Mismatch between security and credential_id\r\n");
         return SL_STATUS_INVALID_CONFIGURATION;
       }
       return SL_STATUS_OK;
@@ -313,7 +313,7 @@ sl_status_t sli_network_manager_init(void)
                                                           sizeof(sli_network_manager_message_t),
                                                           &sli_network_manager_req_queue_attributes);
     if (sli_network_manager_request_queue == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create network manager request queue.\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create network manager request queue.\r\n");
       return SL_STATUS_FAIL;
     }
   }
@@ -321,7 +321,7 @@ sl_status_t sli_network_manager_init(void)
   if (sli_network_manager_response_flags == NULL) {
     sli_network_manager_response_flags = osEventFlagsNew(&sli_network_manager_rsp_flags_attributes);
     if (sli_network_manager_response_flags == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create network manager response flags.\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create network manager response flags.\r\n");
       sli_network_manager_cleanup_init_failure();
       return SL_STATUS_FAIL;
     }
@@ -330,7 +330,7 @@ sl_status_t sli_network_manager_init(void)
   if (sli_auto_join_retry_timer_id == NULL) {
     sli_auto_join_retry_timer_id = osTimerNew((osTimerFunc_t)sli_auto_join_retry_timer_cb, osTimerOnce, NULL, NULL);
     if (sli_auto_join_retry_timer_id == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create auto-join retry timer.\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create auto-join retry timer.\r\n");
       sli_network_manager_cleanup_init_failure();
       return SL_STATUS_FAIL;
     }
@@ -340,7 +340,7 @@ sl_status_t sli_network_manager_init(void)
     sli_network_manager_id =
       osThreadNew((osThreadFunc_t)sli_network_manager_event_handler, NULL, &sli_network_manager_attributes);
     if (sli_network_manager_id == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create network manager thread.\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create network manager thread.\r\n");
       sli_network_manager_cleanup_init_failure();
       return SL_STATUS_FAIL;
     }
@@ -370,7 +370,7 @@ sl_status_t sli_network_manager_deinit(void)
     // Send termination request to network manager thread
     osStatus_t queue_status = osMessageQueuePut(sli_network_manager_request_queue, &message, SLI_NET_MSG_PRIO_HIGH, 0);
     if (queue_status != osOK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to send thread terminate event to network manager: %d\n", queue_status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to send thread terminate event to network manager: %d\r\n", queue_status);
       return SL_STATUS_FAIL;
     }
 
@@ -380,11 +380,11 @@ sl_status_t sli_network_manager_deinit(void)
                                           osFlagsWaitAny,
                                           osWaitForever);
     if ((ack_flags & (uint32_t)osFlagsError) != 0u) {
-      SL_DEBUG_LOG_V2(ERROR, "osEventFlagsWait failed during network manager deinit\n");
+      SL_DEBUG_LOG_V2(ERROR, "osEventFlagsWait failed during network manager deinit\r\n");
       return SL_STATUS_FAIL;
     }
     if ((ack_flags & SLI_NET_RSP_FLAG_THREAD_TERMINATE_ACK) == 0u) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to receive thread terminate acknowledgment\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to receive thread terminate acknowledgment\r\n");
       return SL_STATUS_FAIL;
     }
 
@@ -394,7 +394,7 @@ sl_status_t sli_network_manager_deinit(void)
 
     // Terminate network manager thread
     if (osThreadTerminate(sli_network_manager_id) != osOK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to terminate network manager thread\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to terminate network manager thread\r\n");
       return SL_STATUS_FAIL;
     }
     sli_network_manager_id = NULL;
@@ -403,7 +403,7 @@ sl_status_t sli_network_manager_deinit(void)
   // Cleanup request queue if it exists
   if (sli_network_manager_request_queue != NULL) {
     if (osMessageQueueDelete(sli_network_manager_request_queue) != osOK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to delete network manager request queue\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to delete network manager request queue\r\n");
       return SL_STATUS_FAIL;
     }
     sli_network_manager_request_queue = NULL;
@@ -412,7 +412,7 @@ sl_status_t sli_network_manager_deinit(void)
   // Cleanup response flags if it exists
   if (sli_network_manager_response_flags != NULL) {
     if (osEventFlagsDelete(sli_network_manager_response_flags) != osOK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to delete network manager response flags\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to delete network manager response flags\r\n");
       return SL_STATUS_FAIL;
     }
     sli_network_manager_response_flags = NULL;
@@ -422,7 +422,7 @@ sl_status_t sli_network_manager_deinit(void)
   if (sli_auto_join_retry_timer_id != NULL) {
     (void)osTimerStop(sli_auto_join_retry_timer_id);
     if (osTimerDelete(sli_auto_join_retry_timer_id) != osOK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to delete auto-join retry timer\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to delete auto-join retry timer\r\n");
       return SL_STATUS_FAIL;
     }
     sli_auto_join_retry_timer_id = NULL;
@@ -511,7 +511,7 @@ static void sli_auto_join_retry_timer_cb(const void *argument)
   message.event_flags                   = SLI_NET_AUTO_JOIN_RETRY_Q_EVENT;
 
   if (osMessageQueuePut(sli_network_manager_request_queue, &message, SLI_NET_MSG_PRIO_NORMAL, 0) != osOK) {
-    SL_DEBUG_LOG_V2(DEBUG, "Failed to enqueue auto-join retry event\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Failed to enqueue auto-join retry event\r\n");
   }
   return;
 }
@@ -618,7 +618,7 @@ static bool sli_connect_to_sorted_wifi_profiles(const uint8_t sorted_profile_ids
     sli_auto_join_retry_ctx.interface          = interface;
 
     if (osTimerStart(sli_auto_join_retry_timer_id, SLI_SYSTEM_MS_TO_TICKS(SLI_NET_AUTO_JOIN_RETRY_DELAY_MS)) != osOK) {
-      SL_DEBUG_LOG_V2(DEBUG, "Failed to start auto-join retry timer\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Failed to start auto-join retry timer\r\n");
       sli_reset_auto_join_retry_ctx();
     }
   }
@@ -687,7 +687,7 @@ static void sli_handle_auto_join_retry_event(void)
     if (sli_sync_auto_join_waiting
         && osEventFlagsSet(sli_network_manager_response_flags, SLI_NET_RSP_FLAG_AUTO_JOIN_SUCCESS)
              == (uint32_t)osFlagsError) {
-      SL_DEBUG_LOG_V2(DEBUG, "Failed to signal auto-join success ACK\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Failed to signal auto-join success ACK\r\n");
     }
     if (net_event_handler) {
       sl_net_auto_join_status_t join_status = SL_NET_AUTO_JOIN_CONNECTED;
@@ -709,7 +709,7 @@ static void sli_handle_auto_join_retry_event(void)
     if (sli_sync_auto_join_waiting
         && osEventFlagsSet(sli_network_manager_response_flags, SLI_NET_RSP_FLAG_AUTO_JOIN_FAILURE)
              == (uint32_t)osFlagsError) {
-      SL_DEBUG_LOG_V2(DEBUG, "Failed to signal auto-join failure ACK\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Failed to signal auto-join failure ACK\r\n");
     }
     if (net_event_handler) {
       sl_net_auto_join_status_t join_status = SL_NET_AUTO_JOIN_FAILED;
@@ -721,7 +721,7 @@ static void sli_handle_auto_join_retry_event(void)
 
   sli_auto_join_retry_ctx.remaining_attempts--;
   if (osTimerStart(sli_auto_join_retry_timer_id, SLI_SYSTEM_MS_TO_TICKS(SLI_NET_AUTO_JOIN_RETRY_DELAY_MS)) != osOK) {
-    SL_DEBUG_LOG_V2(DEBUG, "Failed to restart auto-join retry timer\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Failed to restart auto-join retry timer\r\n");
     if (sli_sync_auto_join_waiting) {
       (void)osEventFlagsSet(sli_network_manager_response_flags, SLI_NET_RSP_FLAG_AUTO_JOIN_FAILURE);
     }
@@ -743,7 +743,7 @@ static void sli_handle_connect_event(const sli_network_manager_message_t *messag
 
   // Validate interface bounds to prevent buffer overflow
   if (message->interface >= SL_NET_INTERFACE_MAX) {
-    SL_DEBUG_LOG_V2(DEBUG, "Invalid interface index: %d\n", message->interface);
+    SL_DEBUG_LOG_V2(DEBUG, "Invalid interface index: %d\r\n", message->interface);
     return;
   }
 
@@ -766,10 +766,10 @@ static void sli_handle_connect_event(const sli_network_manager_message_t *messag
 
   // Handle IP configuration failure - disconnect WiFi and notify
   if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "IP configuration failed: 0x%lx, disconnecting WiFi\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "IP configuration failed: 0x%lx, disconnecting WiFi\r\n", status);
     sl_status_t disconnect_status = sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
     if (disconnect_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "WiFi disconnect failed: 0x%lx\n", disconnect_status);
+      SL_DEBUG_LOG_V2(ERROR, "WiFi disconnect failed: 0x%lx\r\n", disconnect_status);
     }
     sli_async_state[message->interface].state = SLI_NET_ASYNC_IDLE;
     if (net_event_handler) {
@@ -789,7 +789,7 @@ static void sli_handle_connect_event(const sli_network_manager_message_t *messag
 
   // DHCP started, will complete asynchronously
   sli_async_state[message->interface].state = SLI_NET_ASYNC_IP_CONFIG;
-  SL_DEBUG_LOG_V2(INFO, "DHCP configuration in progress\n");
+  SL_DEBUG_LOG_V2(INFO, "DHCP configuration in progress\r\n");
 #else
   // For offload stack - IP configuration need to be handled.
 #endif
@@ -805,7 +805,7 @@ static void sli_handle_disconnect_or_connect_failure_event(const sli_network_man
 
   // Validate interface bounds to prevent buffer overflow
   if (message->interface >= SL_NET_INTERFACE_MAX) {
-    SL_DEBUG_LOG_V2(DEBUG, "Invalid interface index: %d\n", message->interface);
+    SL_DEBUG_LOG_V2(DEBUG, "Invalid interface index: %d\r\n", message->interface);
     return;
   }
 
@@ -905,12 +905,12 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
 
   status = sl_net_get_profile(message->interface, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get default Wi-Fi client profile.\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get default Wi-Fi client profile.\r\n");
     sli_sync_client_state.state = SLI_NET_STATE_DISCONNECTED;
     if (sli_sync_auto_join_waiting
         && osEventFlagsSet(sli_network_manager_response_flags, SLI_NET_RSP_FLAG_AUTO_JOIN_FAILURE)
              == (uint32_t)osFlagsError) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to signal auto-join failure ACK\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to signal auto-join failure ACK\r\n");
     }
     return;
   }
@@ -923,7 +923,7 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
 
   status = sl_wifi_connect(client_interface, &profile.config, SLI_WIFI_CONNECT_TIMEOUT);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate Wi-Fi connection: 0x%lx\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate Wi-Fi connection: 0x%lx\r\n", status);
     sli_network_manager_message_t retry_message = { 0 };
     retry_message.interface                     = message->interface;
     retry_message.event_flags                   = SLI_NET_CONNECT_FAILURE_Q_EVENT; // Set event flag for retry logic
@@ -956,7 +956,7 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
     if (sli_sync_auto_join_waiting
         && osEventFlagsSet(sli_network_manager_response_flags, SLI_NET_RSP_FLAG_AUTO_JOIN_FAILURE)
              == (uint32_t)osFlagsError) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to signal auto-join failure ACK\n");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to signal auto-join failure ACK\r\n");
     }
     return;
   }
@@ -964,10 +964,10 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
 
   status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to set Wi-Fi client profile.\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set Wi-Fi client profile.\r\n");
     sli_sync_client_state.state = SLI_NET_STATE_DISCONNECTED;
   } else {
-    SL_DEBUG_LOG_V2(DEBUG, "Successfully set Wi-Fi client profile.\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Successfully set Wi-Fi client profile.\r\n");
     sli_sync_client_state.state = SLI_NET_STATE_CONNECTED;
   }
 
@@ -975,7 +975,7 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
     uint32_t ack_flag = (status == SL_STATUS_OK) ? SLI_NET_RSP_FLAG_AUTO_JOIN_SUCCESS
                                                  : SLI_NET_RSP_FLAG_AUTO_JOIN_FAILURE;
     if (osEventFlagsSet(sli_network_manager_response_flags, ack_flag) == (uint32_t)osFlagsError) {
-      SL_DEBUG_LOG_V2(DEBUG, "Failed to signal final sync WiFi client ACK\n");
+      SL_DEBUG_LOG_V2(DEBUG, "Failed to signal final sync WiFi client ACK\r\n");
     }
   }
   return;
@@ -988,7 +988,7 @@ static void sli_handle_thread_terminate(const sli_network_manager_message_t *mes
   SL_DEBUG_LOG_V2(INFO, "\r\n Terminating network manager thread\r\n");
   if (osEventFlagsSet(sli_network_manager_response_flags, SLI_NET_RSP_FLAG_THREAD_TERMINATE_ACK)
       == (uint32_t)osFlagsError) {
-    SL_DEBUG_LOG_V2(DEBUG, "Failed to signal thread terminate ACK\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Failed to signal thread terminate ACK\r\n");
     // Continue anyway - thread must terminate
   }
   osThreadSuspend(sli_network_manager_id);
@@ -1000,7 +1000,7 @@ static void sli_handle_async_wifi_client_up(const sli_network_manager_message_t 
 {
   // Validate interface bounds to prevent buffer overflow
   if (message->interface >= SL_NET_INTERFACE_MAX) {
-    SL_DEBUG_LOG_V2(ERROR, "Invalid interface index: %d\n", message->interface);
+    SL_DEBUG_LOG_V2(ERROR, "Invalid interface index: %d\r\n", message->interface);
     return;
   }
 
@@ -1011,7 +1011,7 @@ static void sli_handle_async_wifi_client_up(const sli_network_manager_message_t 
   // Get the client profile
   status = sl_net_get_profile(message->interface, message->profile_id, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get Wi-Fi client profile: 0x%lx\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get Wi-Fi client profile: 0x%lx\r\n", status);
     sli_async_state[message->interface].state = SLI_NET_ASYNC_IDLE;
     if (net_event_handler) {
       // Send CONNECT_EVENT with failure status
@@ -1025,12 +1025,12 @@ static void sli_handle_async_wifi_client_up(const sli_network_manager_message_t 
 
   if (status == SL_STATUS_IN_PROGRESS) {
     // WiFi connection initiated successfully (async)
-    SL_DEBUG_LOG_V2(DEBUG, "WiFi connection initiated asynchronously\n");
+    SL_DEBUG_LOG_V2(DEBUG, "WiFi connection initiated asynchronously\r\n");
     sli_async_state[message->interface].state = SLI_NET_ASYNC_CONNECTING;
 
   } else {
     // Failed to initiate WiFi connection
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate Wi-Fi connection: 0x%lx\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate Wi-Fi connection: 0x%lx\r\n", status);
     sli_async_state[message->interface].state = SLI_NET_ASYNC_IDLE;
     if (net_event_handler) {
       // Send CONNECT_EVENT with failure status
@@ -1060,7 +1060,7 @@ static void sli_handle_async_up_event(const sli_network_manager_message_t *messa
       break;
 
     default:
-      SL_DEBUG_LOG_V2(INFO, "Unsupported interface for async up: %d\n", message->interface);
+      SL_DEBUG_LOG_V2(INFO, "Unsupported interface for async up: %d\r\n", message->interface);
       break;
   }
   return;
@@ -1099,7 +1099,7 @@ void sli_network_manager_event_handler(const void *arg)
           sli_handle_thread_terminate(&message);
           break;
         default:
-          SL_DEBUG_LOG_V2(INFO, "Unknown event flag received at NW Manager: 0x%lx\n", flags);
+          SL_DEBUG_LOG_V2(INFO, "Unknown event flag received at NW Manager: 0x%lx\r\n", flags);
           break;
       }
     }
@@ -1132,16 +1132,16 @@ sl_status_t sli_network_manager_auto_join_request(sl_net_interface_t interface, 
                                         osFlagsWaitAny,
                                         osWaitForever);
   if ((ack_flags & (uint32_t)osFlagsError) != 0u) {
-    SL_DEBUG_LOG_V2(DEBUG, "Auto-join wait aborted (e.g. network manager deinitialized)\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Auto-join wait aborted (e.g. network manager deinitialized)\r\n");
     sli_sync_auto_join_waiting = false;
     return SL_STATUS_ABORT;
   }
   if ((ack_flags & SLI_NET_RSP_FLAG_AUTO_JOIN_SUCCESS) != 0u) {
-    SL_DEBUG_LOG_V2(DEBUG, "Auto-join process completed.\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Auto-join process completed.\r\n");
     sli_sync_auto_join_waiting = false;
     return SL_STATUS_OK;
   } else if ((ack_flags & SLI_NET_RSP_FLAG_AUTO_JOIN_FAILURE) != 0u) {
-    SL_DEBUG_LOG_V2(DEBUG, "Auto-join process failed.\n");
+    SL_DEBUG_LOG_V2(DEBUG, "Auto-join process failed.\r\n");
     sli_sync_auto_join_waiting = false;
     return SL_STATUS_FAIL;
   }
@@ -1190,6 +1190,6 @@ sl_status_t sli_net_up_async_start(sl_net_interface_t interface, sl_net_profile_
     return SL_STATUS_FAIL;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "Async up request posted for interface %d, profile %d\n", interface, profile_id);
+  SL_DEBUG_LOG_V2(DEBUG, "Async up request posted for interface %d, profile %d\r\n", interface, profile_id);
   return SL_STATUS_IN_PROGRESS;
 }

@@ -143,7 +143,7 @@ void data_callback(uint32_t sock_no,
   } else if (opcode == SL_WEBSOCKET_OPCODE_CLOSE) {
     // Validate the length
     if (length < 2) {
-      SL_DEBUG_LOG_V2(WARN, "Close frame received with insufficient length. No status code or reason available.");
+      SL_DEBUG_LOG_V2(WARN, "Close frame received with insufficient length. No status code or reason available.\r\n");
       return;
     }
 
@@ -152,21 +152,21 @@ void data_callback(uint32_t sock_no,
 
     // Check if there is a reason text
     if (length == 2) {
-      SL_DEBUG_LOG_V2(INFO, "Close frame received. Status code: %d, No reason available.", status_code);
+      SL_DEBUG_LOG_V2(INFO, "Close frame received. Status code: %d, No reason available.\r\n", status_code);
       return;
     }
 
     // Extract reason from the buffer
     char *reason = (char *)malloc(length - 2 + 1); // +1 for null-terminator
     if (reason == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for reason text.");
+      SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for reason text.\r\n");
       return;
     }
     memcpy(reason, buffer + 2, length - 2);
     reason[length - 2] = '\0';
 
     // Print the status code and reason
-    SL_DEBUG_LOG_V2(INFO, "Close frame received. Status code: %d, Reason: %s", status_code, (uintptr_t)reason);
+    SL_DEBUG_LOG_V2(INFO, "Close frame received. Status code: %d, Reason: %s\r\n", status_code, (uintptr_t)reason);
 
     // Free the allocated memory
     free(reason);
@@ -178,7 +178,7 @@ void data_callback(uint32_t sock_no,
   for (uint32_t i = 0; i < length; i++) {
     SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[i]);
   }
-  SL_DEBUG_LOG_V2(DEBUG, "");
+  SL_DEBUG_LOG_V2(DEBUG, "\r\n");
 }
 
 void remote_terminate_callback(int socket_id, uint16_t port_number, uint32_t bytes_sent)
@@ -199,24 +199,24 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &websocket_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success\r\n");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   if (profile.ip.type == SL_IPV4) {
     ip_address.type = SL_IPV4;
@@ -244,10 +244,10 @@ static void application_start(void *argument)
 
   sl_websocket_error_t ws_error = create_and_send_websocket_data();
   if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "create_and_send_websocket_data failed with error:%d", ws_error);
+    SL_DEBUG_LOG_V2(ERROR, "create_and_send_websocket_data failed with error:%d\r\n", ws_error);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed");
+  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed\r\n");
 }
 
 sl_websocket_error_t create_and_send_websocket_data(void)
@@ -274,10 +274,10 @@ sl_websocket_error_t create_and_send_websocket_data(void)
                                                cacert,
                                                sizeof(cacert) - 1);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate into FLASH Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate into FLASH Failed, Error Code : 0x%lX\r\n", status);
       return SL_WEBSOCKET_ERR_SSL_SETSOCKOPT;
     }
-    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success", CERTIFICATE_INDEX);
+    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success\r\n", CERTIFICATE_INDEX);
   }
 
   sl_websocket_error_t ws_error = sl_websocket_init(&ws_handle, &ws_config);

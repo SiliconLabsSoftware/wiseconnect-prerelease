@@ -1044,12 +1044,6 @@ typedef struct {
  * This structure contains various parameters for configuring a Wi-Fi TX test,
  * such as enabling the test, setting the power, rate, length, mode, and other
  * related settings.
- *
- * @note Moving forward, this structure will be deprecated. Instead, use the
- * [sl_wifi_transmitter_test_base_info_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-transmitter-test-base-info-t)
- * structure together with PHY-specific PER-parameter structures (@ref sl_wifi_11bgn_per_params_t,
- * @ref sl_wifi_11ac_per_params_t, @ref sl_wifi_11ax_per_params_t, @ref sl_wifi_11be_per_params_t).
- * This is retained for backward compatibility.
  */
 typedef struct {
   uint16_t enable; ///< Enable/disable TX test mode

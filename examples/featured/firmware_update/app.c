@@ -125,31 +125,31 @@ static void application_start(void *argument)
   UNUSED_PARAMETER(argument); // Avoid compiler warnings when parameter is not used
   sl_status_t status;
 
-  SL_DEBUG_LOG_V2(INFO, "Application Started");
+  SL_DEBUG_LOG_V2(INFO, "Application Started\r\n");
   // Initialize the Wi-Fi client interface with the configuration specified by firmware_update_configuration
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &firmware_update_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Success\r\n");
 
   // Bring up the Wi-Fi client interface
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected\r\n");
 
   // Update device firmware by downloading firmware file from remote TCP server
   status = update_firmware();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Update Firmware failed with status 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Update Firmware failed with status 0x%lx\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Firmware Upgrade Completed");
+  SL_DEBUG_LOG_V2(INFO, "Firmware Upgrade Completed\r\n");
 }
 
 sl_status_t update_firmware()
@@ -182,27 +182,27 @@ sl_status_t update_firmware()
 
   // Create TCP client socket
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  SL_DEBUG_LOG_V2(INFO, "client_socket : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "client_socket : %d\r\n", client_socket);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
 
   // Connect to the TCP server
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "Connect to TCP Server Success");
+  SL_DEBUG_LOG_V2(INFO, "Connect to TCP Server Success\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "Firmware update start");
+  SL_DEBUG_LOG_V2(INFO, "Firmware update start\r\n");
   start = osKernelGetTickCount();
   while (1) {
 
     if (chunk > (chunk_max_count + 1)) {
-      SL_DEBUG_LOG_V2(ERROR, " chunk : %d > chunk_max_count %d. Firmware update failed.", chunk, chunk_max_count);
+      SL_DEBUG_LOG_V2(ERROR, " chunk : %d > chunk_max_count %d. Firmware update failed.\r\n", chunk, chunk_max_count);
       finish = osKernelGetTickCount();
       close(client_socket);
       return SL_STATUS_FAIL;
@@ -223,7 +223,7 @@ sl_status_t update_firmware()
     if (data_length < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Failed to Send data, Error Code : 0x%X", data_length);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to Send data, Error Code : 0x%X\r\n", data_length);
       finish = osKernelGetTickCount();
       sl_si91x_fwup_abort();
       close(client_socket);
@@ -234,7 +234,7 @@ sl_status_t update_firmware()
     recv_size   = 3;
     data_length = recv(client_socket, recv_buffer, recv_size, 0);
     if (data_length < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to Receive data, Error Code : 0x%d", data_length);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to Receive data, Error Code : 0x%d\r\n", data_length);
       finish = osKernelGetTickCount();
       sl_si91x_fwup_abort();
       close(client_socket);
@@ -252,7 +252,7 @@ sl_status_t update_firmware()
     if (recv_size > 0) {
       data_length = recv(client_socket, recv_buffer, recv_size, 0);
       if (data_length < 0) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to Receive data from remote peer, Error Code : 0x%d", data_length);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to Receive data from remote peer, Error Code : 0x%d\r\n", data_length);
         finish = osKernelGetTickCount();
         sl_si91x_fwup_abort();
         close(client_socket);
@@ -264,11 +264,11 @@ sl_status_t update_firmware()
         //! Send the first chunk to extract OTA image size
         status = sl_wifi_get_firmware_size((void *)recv_buffer, &fw_image_size);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Unable to fetch firmware size. Status: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Unable to fetch firmware size. Status: 0x%lx\r\n", status);
           close(client_socket);
           return SL_STATUS_FAIL;
         }
-        SL_DEBUG_LOG_V2(INFO, " Image size = 0x%lx", fw_image_size);
+        SL_DEBUG_LOG_V2(INFO, " Image size = 0x%lx\r\n", fw_image_size);
         chunk_max_count += ((fw_image_size - FW_HEADER_SIZE) / CHUNK_SIZE) + 1;
         // Send RPS header which is received as first chunk
         status = sl_si91x_fwup_start(recv_buffer);
@@ -284,31 +284,31 @@ sl_status_t update_firmware()
         // Close the socket
         close(client_socket);
         osDelay(3000);
-        SL_DEBUG_LOG_V2(INFO, "Firmware update complete");
-        SL_DEBUG_LOG_V2(INFO, "FW update duration : %ld", finish - start);
+        SL_DEBUG_LOG_V2(INFO, "Firmware update complete\r\n");
+        SL_DEBUG_LOG_V2(INFO, "FW update duration : %ld\r\n", finish - start);
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 //! Perform SOC soft reset for combined Image
 #if COMBINED_IMAGE
-        SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!");
+        SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!\r\n");
         sl_si91x_soc_nvic_reset();
 #endif
 #endif
 
         // De-initialize the client network interface
         status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
-        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit status : %lx", status);
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit status : %lx\r\n", status);
         VERIFY_STATUS_AND_RETURN(status);
 
 #ifdef SL_NCP_UART_INTERFACE
-        SL_DEBUG_LOG_V2(INFO, "Waiting for firmware upgrade to complete");
+        SL_DEBUG_LOG_V2(INFO, "Waiting for firmware upgrade to complete\r\n");
         osDelay(40000);
-        SL_DEBUG_LOG_V2(INFO, "Waiting Done");
+        SL_DEBUG_LOG_V2(INFO, "Waiting Done\r\n");
 #endif
 
         // Initialize the client interface again to check if firmware update is done properly
         status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &firmware_update_configuration, NULL, NULL);
-        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init status : %lx", status);
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init status : %lx\r\n", status);
         VERIFY_STATUS_AND_RETURN(status);
 
         status = sl_wifi_get_firmware_version(&version);
@@ -317,10 +317,10 @@ sl_status_t update_firmware()
 
         return SL_STATUS_OK;
       } else {
-        SL_DEBUG_LOG_V2(ERROR, "Firmware update failed : %lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "Firmware update failed : %lx\r\n", status);
         finish = osKernelGetTickCount();
         close(client_socket);
-        SL_DEBUG_LOG_V2(INFO, "FW update duration : %ld", finish - start);
+        SL_DEBUG_LOG_V2(INFO, "FW update duration : %ld\r\n", finish - start);
         return SL_STATUS_FAIL;
       }
     }

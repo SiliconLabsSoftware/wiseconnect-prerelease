@@ -168,7 +168,7 @@ void fw_up_configurator_task(void *argument)
   update_semaphore = osSemaphoreNew(1, 0, NULL);
   if (update_semaphore == NULL) {
     // Error handling if semaphore creation fails
-    SL_DEBUG_LOG_V2(ERROR, "Error: Failed to create semaphore for firmware update and handshake.");
+    SL_DEBUG_LOG_V2(ERROR, "Error: Failed to create semaphore for firmware update and handshake.\r\n");
     return;
   }
 
@@ -180,10 +180,10 @@ void fw_up_configurator_task(void *argument)
         serial_com_handshake();
         // Wait for handshake completion
         if (osSemaphoreAcquire(update_semaphore, osWaitForever) == osOK) {
-          SL_DEBUG_LOG_V2(INFO, " Host MCU is ready for Firmware update process ");
+          SL_DEBUG_LOG_V2(INFO, " Host MCU is ready for Firmware update process \r\n");
           current_state = STATE_UPDATE_FIRMWARE;
         } else {
-          SL_DEBUG_LOG_V2(ERROR, " Handshake failed");
+          SL_DEBUG_LOG_V2(ERROR, " Handshake failed\r\n");
           current_state = STATE_ERROR;
         }
         break;
@@ -191,10 +191,10 @@ void fw_up_configurator_task(void *argument)
       case STATE_UPDATE_FIRMWARE:
         status = update_firmware();
         if (status == SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(INFO, " Firmware Upgrade Completed");
+          SL_DEBUG_LOG_V2(INFO, " Firmware Upgrade Completed\r\n");
           current_state = STATE_COMPLETED;
         } else {
-          SL_DEBUG_LOG_V2(ERROR, " Firmware update failed with status %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, " Firmware update failed with status %lx\r\n", status);
           current_state = STATE_ERROR;
         }
         break;
@@ -204,20 +204,20 @@ void fw_up_configurator_task(void *argument)
 
         status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX ", status);
+          SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX \r\n", status);
           return;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful");
+          SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful\r\n");
         }
         status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_v6_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface init");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface init\r\n");
         status = sl_wifi_get_firmware_version(&firmware_version);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
           return;
         } else {
           SL_DEBUG_LOG_V2(INFO,
@@ -273,12 +273,12 @@ sl_status_t send_1k_chunks(uint8_t *buffer, size_t total_length)
 
     // SL_STATUS_SI91X_FW_UPDATE_DONE is a valid status code for completion
     if (result == SL_STATUS_SI91X_FW_UPDATE_DONE) {
-      SL_DEBUG_LOG_V2(INFO, "Firmware update successful !!!: %lx", result);
+      SL_DEBUG_LOG_V2(INFO, "Firmware update successful !!!: %lx\r\n", result);
       return result;
     }
 
     if (result != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Firmware update failed !!! : %lx", result);
+      SL_DEBUG_LOG_V2(ERROR, "Firmware update failed !!! : %lx\r\n", result);
       return result;
     }
 
@@ -344,7 +344,7 @@ void serial_com_handshake()
   memset(recv_data, 0, sizeof(recv_data));
   static const char pythoncmd[] = "Python Ready for firmware update process";
 
-  SL_DEBUG_LOG_V2(INFO, "Waiting for Handshake to Perform...");
+  SL_DEBUG_LOG_V2(INFO, "Waiting for Handshake to Perform...\r\n");
 
   while (!handshake_complete) {
     com_port_receive((uint8_t *)recv_data, strlen(pythoncmd));
@@ -381,7 +381,7 @@ sl_status_t update_firmware()
   uint32_t fw_image_size             = 0;
   uint8_t recv_buffer[RECV_BUFFER_SIZE];
 
-  SL_DEBUG_LOG_V2(INFO, "Firmware update start");
+  SL_DEBUG_LOG_V2(INFO, "Firmware update start\r\n");
   start = osKernelGetTickCount();
 
   while (1) {
@@ -398,14 +398,14 @@ sl_status_t update_firmware()
       // Check if the received header contains the magic word
       if (*((uint32_t *)(recv_buffer + 4)) != MAGIC_WORD) {
         // Magic word not found, re-send the header request
-        SL_DEBUG_LOG_V2(WARN, "Magic word not found in header, resending...");
+        SL_DEBUG_LOG_V2(WARN, "Magic word not found in header, resending...\r\n");
         continue; // Go back to the beginning of the loop to re-send the header request
       }
 
       //! Send the first chunk to extract header
       status = sl_wifi_get_firmware_size((char *)recv_buffer, &fw_image_size);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Unable to fetch firmware size. Status: 0x%lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "Unable to fetch firmware size. Status: 0x%lx\r\n", status);
         continue; // Go back to the beginning of the loop to re-send the header request
       }
       total_chunks              = (fw_image_size / CHUNK_SIZE);

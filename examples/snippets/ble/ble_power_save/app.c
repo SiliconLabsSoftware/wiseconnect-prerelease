@@ -371,22 +371,22 @@ int32_t rsi_initiate_power_save(void)
 {
   int32_t status = RSI_SUCCESS;
 
-  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
     return status;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
     return status;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
   return status;
 }
 #endif
@@ -415,16 +415,16 @@ void ble_app_task(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success\r\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -449,27 +449,27 @@ void ble_app_task(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble get local device address cmd failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble get local device address cmd failed with reason code : %lX \r\n", status);
     return;
   }
   rsi_6byte_dev_address_to_ascii(local_dev_addr, (uint8_t *)rsi_app_resp_get_dev_addr);
-  SL_DEBUG_LOG_V2(INFO, "Get local device address: %s ", (uintptr_t)(local_dev_addr));
+  SL_DEBUG_LOG_V2(INFO, "Get local device address: %s \r\n", (uintptr_t)(local_dev_addr));
 
   //! set the local device name
   status = rsi_bt_set_local_name((uint8_t *)RSI_BLE_LOCAL_NAME);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble set local name cmd failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble set local name cmd failed with reason code : %lX \r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s", (uintptr_t)(RSI_BLE_LOCAL_NAME));
+  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s\r\n", (uintptr_t)(RSI_BLE_LOCAL_NAME));
 
   //! get the local device name
   status = rsi_bt_get_local_name(&rsi_app_resp_get_local_name);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble get local name cmd failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble get local name cmd failed with reason code : %lX \r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Get local name: %s", (uintptr_t)(rsi_app_resp_get_local_name.name));
+  SL_DEBUG_LOG_V2(INFO, "Get local name: %s\r\n", (uintptr_t)(rsi_app_resp_get_local_name.name));
 
   ble_peripheral_conn_sem = osSemaphoreNew(1, 0, NULL);
 
@@ -483,10 +483,10 @@ void ble_app_task(void *argument)
   rsi_ble_set_advertise_data(adv, strlen(RSI_BLE_LOCAL_NAME) + 5);
 
   //! start the advertising
-  SL_DEBUG_LOG_V2(INFO, "Start advertising ");
+  SL_DEBUG_LOG_V2(INFO, "Start advertising \r\n");
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble start advertising failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble start advertising failed with reason code : %lX \r\n", status);
     return;
   }
   SET_BIT1(rsi_ble_states_bitmap, RSI_ADV_STATE);
@@ -494,20 +494,20 @@ void ble_app_task(void *argument)
 
 #if ((BLE_ROLE == CENTRAL_ROLE) || (BLE_ROLE == DUAL_ROLE))
   //! start scanning
-  SL_DEBUG_LOG_V2(INFO, "Start scanning ");
+  SL_DEBUG_LOG_V2(INFO, "Start scanning \r\n");
   status = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble start scanning failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble start scanning failed with reason code : %lX \r\n", status);
     return;
   }
   SET_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE);
 #endif
 #if ENABLE_NWP_POWER_SAVE
   if (!powersave_cmd_given) {
-    SL_DEBUG_LOG_V2(INFO, "Initiating PowerSave");
+    SL_DEBUG_LOG_V2(INFO, "Initiating PowerSave\r\n");
     status = rsi_initiate_power_save();
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
       return;
     }
     powersave_cmd_given = 1;
@@ -529,8 +529,8 @@ void ble_app_task(void *argument)
 
       if ((!(P2P_STATUS_REG & TA_wakeup_M4)) && (ble_app_event_map == 0) && (ble_app_event_map1 == 0)) {
         P2P_STATUS_REG &= ~M4_wakeup_TA;
-        SL_DEBUG_LOG_V2(INFO, "triggering M4 sleep");
-        sli_si91x_power_manager_sleep();
+        SL_DEBUG_LOG_V2(INFO, "triggering M4 sleep\r\n");
+        sl_si91x_power_manager_sleep();
       }
 #else
       osSemaphoreAcquire(ble_main_task_sem, osWaitForever);
@@ -547,14 +547,14 @@ void ble_app_task(void *argument)
         //! initiate stop scanning command.
         status = rsi_ble_stop_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "ble stop scanning failed with reason code : %lX ", status);
+          SL_DEBUG_LOG_V2(ERROR, "ble stop scanning failed with reason code : %lX \r\n", status);
           return;
         }
 
         //! initiating the connection with remote BLE device
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "ble connect command failed with reason code : %lX ", status);
+          SL_DEBUG_LOG_V2(ERROR, "ble connect command failed with reason code : %lX \r\n", status);
           return;
         }
 
@@ -567,10 +567,10 @@ void ble_app_task(void *argument)
         temp_event_map1 = rsi_ble_app_get_event();
 
         if ((temp_event_map1 == -1) || (!(temp_event_map1 & RSI_APP_EVENT_CONNECTED))) {
-          SL_DEBUG_LOG_V2(INFO, "Initiating connect cancel command ");
+          SL_DEBUG_LOG_V2(INFO, "Initiating connect cancel command \r\n");
           status = rsi_ble_connect_cancel((int8_t *)remote_dev_bd_addr);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(INFO, "ble connect cancel cmd status = %lX ", status);
+            SL_DEBUG_LOG_V2(INFO, "ble connect cancel cmd status = %lX \r\n", status);
           } else {
             CLR_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE);
             rsi_ble_app_set_event(RSI_APP_EVENT_DISCONNECTED);
@@ -580,7 +580,7 @@ void ble_app_task(void *argument)
       } break;
       case RSI_APP_EVENT_CONNECTED: {
         //! remote device connected event
-        SL_DEBUG_LOG_V2(INFO, "Connection is success .............");
+        SL_DEBUG_LOG_V2(INFO, "Connection is success .............\r\n");
         //! clear the connected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_CONNECTED);
 
@@ -591,13 +591,13 @@ void ble_app_task(void *argument)
         //! clear the disconnected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_DISCONNECTED);
 
-        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state ");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state \r\n");
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state ");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state \r\n");
         //! initiating Active mode in BT mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode \r\n");
           return;
         }
 
@@ -605,18 +605,18 @@ void ble_app_task(void *argument)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode \r\n");
           return;
         }
 #endif
         if (((BLE_ROLE == PERIPHERAL_ROLE) || (BLE_ROLE == DUAL_ROLE))
             && (!(CHK_BIT1(rsi_ble_states_bitmap, RSI_ADV_STATE)))) {
           //! set device in advertising mode.
-          SL_DEBUG_LOG_V2(INFO, "Start advertising ");
+          SL_DEBUG_LOG_V2(INFO, "Start advertising \r\n");
 adv:
           status = rsi_ble_start_advertising();
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "ble start advertising failed with reason code : %lX ", status);
+            SL_DEBUG_LOG_V2(ERROR, "ble start advertising failed with reason code : %lX \r\n", status);
             goto adv;
           }
           SET_BIT1(rsi_ble_states_bitmap, RSI_ADV_STATE);
@@ -625,17 +625,17 @@ adv:
             && (!(CHK_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE)))) {
           device_found = false;
           //! set device in scanning mode.
-          SL_DEBUG_LOG_V2(INFO, "Start scanning ");
+          SL_DEBUG_LOG_V2(INFO, "Start scanning \r\n");
 scan:
           status = rsi_ble_start_scanning();
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "ble start scanning failed with reason code : %lX ", status);
+            SL_DEBUG_LOG_V2(ERROR, "ble start scanning failed with reason code : %lX \r\n", status);
             goto scan;
           }
           SET_BIT1(rsi_ble_states_bitmap, RSI_SCAN_STATE);
         }
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "Keep module in to power save ");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to power save \r\n");
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
           return;
@@ -645,10 +645,10 @@ scan:
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save \r\n");
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
       } break;
     }

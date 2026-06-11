@@ -158,7 +158,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client init success\r\n");
 
   //! Bring up the Wi-Fi client interface
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
@@ -166,7 +166,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
   groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
@@ -227,13 +227,13 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Roam failed with status 0x%" PRIx32, (uint32_t)status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Roaming configuration set successfully");
+    SL_DEBUG_LOG_V2(INFO, "Roaming configuration set successfully\r\n");
   }
 
   //! Start the scan
   status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
   if (SL_STATUS_IN_PROGRESS == status) {
-    SL_DEBUG_LOG_V2(INFO, "Scanning...");
+    SL_DEBUG_LOG_V2(INFO, "Scanning...\r\n");
     const uint32_t start = osKernelGetTickCount();
 
     while (!scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT) {
@@ -252,7 +252,7 @@ static void application_start(void *argument)
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore\r\n");
     return;
   }
   // Waiting forever using semaphore to put M4 to sleep in tick less mode
@@ -307,11 +307,11 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
-  SL_DEBUG_LOG_V2(INFO, "%ld scan results:", scan_result->scan_count);
+  SL_DEBUG_LOG_V2(INFO, "%ld scan results:\r\n", scan_result->scan_count);
   if (scan_result->scan_count) {
     SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
   }
-  SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
+  SL_DEBUG_LOG_V2(INFO, "%12s %12s %s\r\n", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
   for (uint32_t a = 0; a < scan_result->scan_count; ++a) {
     bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
     SL_DEBUG_LOG_V2(INFO,
@@ -330,7 +330,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
              bssid[4],
              bssid[5]);
     SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)roam_scan_bssid_log);
-    SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
+    SL_DEBUG_LOG_V2(INFO, "%4u,  -%u\r\n", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
   }
 
   return SL_STATUS_OK;
@@ -374,31 +374,31 @@ void print_status_info(uint8_t state_code, uint8_t reason_code)
    */
   switch (state_code & 0xF0) {
     case 0x00:
-      SL_DEBUG_LOG_V2(DEBUG, "State: Startup (Initial state or idle state)");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Startup (Initial state or idle state)\r\n");
       break;
     case 0x10:
-      SL_DEBUG_LOG_V2(DEBUG, "State: Beacon Loss");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Beacon Loss\r\n");
       break;
     case 0x20:
-      SL_DEBUG_LOG_V2(DEBUG, "State: De-authentication from AP");
+      SL_DEBUG_LOG_V2(DEBUG, "State: De-authentication from AP\r\n");
       break;
     case 0x50:
-      SL_DEBUG_LOG_V2(DEBUG, "State: Current AP is best");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Current AP is best\r\n");
       break;
     case 0x60:
-      SL_DEBUG_LOG_V2(DEBUG, "State: Better AP found while roaming");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Better AP found while roaming\r\n");
       break;
     case 0x70:
-      SL_DEBUG_LOG_V2(DEBUG, "State: No AP found");
+      SL_DEBUG_LOG_V2(DEBUG, "State: No AP found\r\n");
       break;
     case 0x80:
-      SL_DEBUG_LOG_V2(DEBUG, "State: Associated or joined to an Access point");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Associated or joined to an Access point\r\n");
       break;
     case 0x90:
-      SL_DEBUG_LOG_V2(DEBUG, "State: Unassociated (Disconnected from host or join failure)");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Unassociated (Disconnected from host or join failure)\r\n");
       break;
     default:
-      SL_DEBUG_LOG_V2(DEBUG, "State: Unknown state code");
+      SL_DEBUG_LOG_V2(DEBUG, "State: Unknown state code\r\n");
       break;
   }
 
@@ -458,157 +458,157 @@ void print_status_info(uint8_t state_code, uint8_t reason_code)
    */
   switch (reason_code) {
     case 0x00:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Initial state or idle state");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Initial state or idle state\r\n");
       break;
     case 0x01:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: No response from AP for authentication request (Authentication denial)");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: No response from AP for authentication request (Authentication denial)\r\n");
       break;
     case 0x02:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Association denial (Association timeout or failure)");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Association denial (Association timeout or failure)\r\n");
       break;
     case 0x03:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: User-configured AP is not present");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: User-configured AP is not present\r\n");
       break;
     case 0x05:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Four-way Handshake failure");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Four-way Handshake failure\r\n");
       break;
     case 0x06:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Deauthentication from user");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Deauthentication from user\r\n");
       break;
     case 0x07:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: PSK not configured");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: PSK not configured\r\n");
       break;
     case 0x08:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Key-handshake failure during rejoin/roaming/after connection");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Key-handshake failure during rejoin/roaming/after connection\r\n");
       break;
     case 0x09:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Roaming not enabled");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Roaming not enabled\r\n");
       break;
     case 0x10:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Beacon Loss (failover Roam)");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Beacon Loss (failover Roam)\r\n");
       break;
     case 0x20:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: De-authentication from AP");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: De-authentication from AP\r\n");
       break;
     case 0x28:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS CA Cert not present");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS CA Cert not present\r\n");
       break;
     case 0x29:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS PRIVATE key not present");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS PRIVATE key not present\r\n");
       break;
     case 0x2A:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS Client Cert not present");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS Client Cert not present\r\n");
       break;
     case 0x2B:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS no Cert present");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: TLS no Cert present\r\n");
       break;
     case 0x2C:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: PEAP CA Cert not present");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: PEAP CA Cert not present\r\n");
       break;
     case 0x2D:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Invalid Key Type");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Invalid Key Type\r\n");
       break;
     case 0x2E:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA Invalid Key Type");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA Invalid Key Type\r\n");
       break;
     case 0x2F:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Invalid Key Type");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Invalid Key Type\r\n");
       break;
     case 0x30:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Invalid Key Type");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Invalid Key Type\r\n");
       break;
     case 0x31:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Invalid Key Type");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Invalid Key Type\r\n");
       break;
     case 0x37:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert 4096-bit length support is not enabled");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert 4096-bit length support is not enabled\r\n");
       break;
     case 0x38:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA 4096-bit length support is not enabled");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA 4096-bit length support is not enabled\r\n");
       break;
     case 0x39:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA 4096-bit length support is not enabled");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA 4096-bit length support is not enabled\r\n");
       break;
     case 0x3A:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert 4096-bit length support is not enabled");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert 4096-bit length support is not enabled\r\n");
       break;
     case 0x3B:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA 4096-bit length support is not enabled");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA 4096-bit length support is not enabled\r\n");
       break;
     case 0x3C:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Invalid Sign Alg");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Invalid Sign Alg\r\n");
       break;
     case 0x3D:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA Invalid Sign Alg");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA Invalid Sign Alg\r\n");
       break;
     case 0x3E:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Invalid Sign Length");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Invalid Sign Length\r\n");
       break;
     case 0x3F:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Invalid Sign Alg");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Invalid Sign Alg\r\n");
       break;
     case 0x40:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Invalid Sign Length");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Invalid Sign Length\r\n");
       break;
     case 0x41:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA not Present");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate CA not Present\r\n");
       break;
     case 0x42:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Parse Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Parse Error\r\n");
       break;
     case 0x43:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate Root CA Parse Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate Root CA Parse Error\r\n");
       break;
     case 0x44:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Parse Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Parse Error\r\n");
       break;
     case 0x45:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Parse Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Parse Error\r\n");
       break;
     case 0x46:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Incorrect Private Key Password");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Incorrect Private Key Password\r\n");
       break;
     case 0x47:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: EAP Failure Received");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: EAP Failure Received\r\n");
       break;
     case 0x48:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Bad Date Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Cert Bad Date Error\r\n");
       break;
     case 0x49:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Bad Date Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Cert Bad Date Error\r\n");
       break;
     case 0x4A:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Bad Date Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Root CA Bad Date Error\r\n");
       break;
     case 0x4B:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Bad Date Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Root CA Bad Date Error\r\n");
       break;
     case 0x4C:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate Root CA Bad Date Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Server Intermediate Root CA Bad Date Error\r\n");
       break;
     case 0x4D:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Header Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Header Error\r\n");
       break;
     case 0x4E:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Footer Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Footer Error\r\n");
       break;
     case 0x4F:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA Invalid Sign Length");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA Invalid Sign Length\r\n");
       break;
     case 0x50:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA Invalid Length");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA Invalid Length\r\n");
       break;
     case 0x52:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA invalid Key Type");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Client Intermediate CA invalid Key Type\r\n");
       break;
     case 0x53:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Error");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pem Error\r\n");
       break;
     case 0x54:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pathlen certificate is Invalid");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Pathlen certificate is Invalid\r\n");
       break;
     default:
-      SL_DEBUG_LOG_V2(DEBUG, "Reason: Unknown reason code");
+      SL_DEBUG_LOG_V2(DEBUG, "Reason: Unknown reason code\r\n");
       break;
   }
 }

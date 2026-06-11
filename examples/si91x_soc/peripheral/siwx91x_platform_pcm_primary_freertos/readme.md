@@ -150,13 +150,16 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 2. On the first board, compile and run the PCM secondary device application.
 3. On the other board, compile and run the PCM primary application.
 4. When the primary application starts, it shows the message:
-   "Reset Secondary and Press Button 0 on Primary to sync."
+   "Reset Secondary" and " Press Button 0 on Primary to sync."
 5. Reset the secondary board. After reset, the secondary console prints:
    "Waiting for primary button 0 press to sync with primary."
 6. Press Button 0 on the primary board to complete the synchronization.
-7. After sync, the primary receives data from the secondary device, compares it, and then sends data back to the secondary device.
-8. When the primary sends data back, the secondary device receives it and performs loopback comparison to validate the data.
-9. After successful execution, the serial console will show the expected output logs.
+7. After sync, the primary receives data from the secondary device, compares it.
+8. After Data comparision at primary side, primary device shows the meassage:
+   "Press Button 0 on Primary to sync".
+9.  Again press button 0 on Primary device then primary sends data back to the secondary device.
+10. The secondary device receives it and performs loopback comparison to validate the data.
+11. After successful execution, the serial console will show the expected output logs.
 
     >![Figure: output](resources/readme/output.png)
 

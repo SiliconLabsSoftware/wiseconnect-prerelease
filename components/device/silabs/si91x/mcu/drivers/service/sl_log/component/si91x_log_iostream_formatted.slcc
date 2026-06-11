@@ -40,11 +40,11 @@ provides:
   - name: si91x_log_iostream
   - name: iostream_recommended_console 
     condition: [device_si91x] 
-  - name: log_backend
 requires:
   - name: si91x_iostream_transport
   - name: log
   - name: log_platform_core
+  - name: log_backend_iostream_formatted
 recommends:
   - id: si91x_log 
   - id: iostream_rtt_si91x
@@ -54,7 +54,6 @@ include:
       - path: sl_log_iostream_recommends.h  
 source:
   - path: src/sl_log_iostream_recommends.c   
-  - path: src/sl_si91x_log_backend_iostream_formatted.c
 config_file:
   - path: config/sl_log_common_config.h  
 template_contribution:

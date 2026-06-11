@@ -61,7 +61,9 @@ template_contribution:
   value: main.*
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 requires:
 - name: device_needs_ram_execution
 configuration:

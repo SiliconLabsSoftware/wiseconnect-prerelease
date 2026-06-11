@@ -141,7 +141,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char *result, uint32_t 
   UNUSED_PARAMETER(arg);
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(INFO, "F: Join Event received with %lu bytes payload", result_length);
+    SL_DEBUG_LOG_V2(INFO, "F: Join Event received with %lu bytes payload\r\n", result_length);
     wlan_app_cb.state = WLAN_UNCONNECTED_STATE;
     if (osThreadGetState(wifi_app_thread_id) == osThreadBlocked) {
       osThreadResume(wifi_app_thread_id);
@@ -175,10 +175,10 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 0);
+  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", 0);
 
   return status;
 }
@@ -188,11 +188,11 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
-  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:", scan_result->scan_count);
+  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:\r\n", scan_result->scan_count);
 
   if (scan_result->scan_count) {
     SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
-    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
+    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s\r\n", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
 
     for (int a = 0; a < (int)scan_result->scan_count; ++a) {
       bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
@@ -212,7 +212,7 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
                bssid[4],
                bssid[5]);
       SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)ucoex_tcp_scan_bssid_log);
-      SL_DEBUG_LOG_V2(INFO, " %4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
+      SL_DEBUG_LOG_V2(INFO, " %4u,  -%u\r\n", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }
   return SL_STATUS_OK;
@@ -263,13 +263,13 @@ void wlan_app_thread(void *unused)
         sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
         wifi_scan_configuration                              = default_wifi_scan_configuration;
 
-        SL_DEBUG_LOG_V2(INFO, "WLAN scan started ");
+        SL_DEBUG_LOG_V2(INFO, "WLAN scan started \r\n");
         sl_wifi_set_scan_callback(wlan_app_scan_callback_handler, NULL);
         scan_complete   = false;
         callback_status = SL_STATUS_FAIL;
         status          = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
         if (SL_STATUS_IN_PROGRESS == status) {
-          SL_DEBUG_LOG_V2(INFO, "Scanning...");
+          SL_DEBUG_LOG_V2(INFO, "Scanning...\r\n");
           const uint32_t start = osKernelGetTickCount();
 
           while (!scan_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT) {
@@ -278,13 +278,13 @@ void wlan_app_thread(void *unused)
           status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
         }
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan failed %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan failed %lx\r\n", status);
           break;
         } else {
 #if !WIFI_CONTINUOUS_SCAN_MODE_ONLY
           wlan_app_cb.state = WLAN_SCAN_DONE_STATE; //! update WLAN application state to connected state
 #endif
-          SL_DEBUG_LOG_V2(INFO, "Scan done state ");
+          SL_DEBUG_LOG_V2(INFO, "Scan done state \r\n");
         }
 
       } break;
@@ -297,7 +297,7 @@ void wlan_app_thread(void *unused)
 
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
         if (SL_STATUS_OK == status) {
-          SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu", id);
+          SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu\r\n", id);
 
           access_point.ssid.length = strlen((char *)SSID);
           memcpy(access_point.ssid.value, SSID, access_point.ssid.length);
@@ -305,15 +305,15 @@ void wlan_app_thread(void *unused)
           access_point.encryption    = SL_WIFI_DEFAULT_ENCRYPTION;
           access_point.credential_id = id;
 
-          SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)access_point.ssid.value);
+          SL_DEBUG_LOG_V2(INFO, "SSID %s\r\n", (uintptr_t)access_point.ssid.value);
           status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
         }
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN connection failed %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN connection failed %lx\r\n", status);
           break;
         } else {
           wlan_app_cb.state = WLAN_CONNECTED_STATE; //! update WLAN application state to connected state
-          SL_DEBUG_LOG_V2(INFO, "WLAN connected state ");
+          SL_DEBUG_LOG_V2(INFO, "WLAN connected state \r\n");
         }
       } break;
       case WLAN_CONNECTED_STATE: {
@@ -325,31 +325,31 @@ void wlan_app_thread(void *unused)
         // Configure IP
         status = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "IP Config failed %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "IP Config failed %lx\r\n", status);
           break;
         } else {
           wlan_app_cb.state = WLAN_IPCONFIG_DONE_STATE;
-          SL_DEBUG_LOG_V2(INFO, "WLAN ipconfig done state ");
+          SL_DEBUG_LOG_V2(INFO, "WLAN ipconfig done state \r\n");
           sl_ip_address_t ip = { 0 };
           ip.type            = ip_address.type;
           ip.ip.v4.value     = ip_address.ip.v4.ip_address.value;
           print_sl_ip_address(&ip);
-          SL_DEBUG_LOG_V2(INFO, "");
+          SL_DEBUG_LOG_V2(INFO, "\r\n");
         }
 #if ENABLE_NWP_POWER_SAVE
         osMutexAcquire(power_cmd_mutex, 0xFFFFFFFFUL);
         if (!powersave_cmd_given) {
           //! initiating power save in wlan mode
-          sl_wifi_performance_profile_t wifi_profile = { .profile = ASSOCIATED_POWER_SAVE };
-          status                                     = sl_wifi_set_performance_profile(&wifi_profile);
+          sl_wifi_performance_profile_v2_t wifi_profile = { .profile = ASSOCIATED_POWER_SAVE };
+          status                                        = sl_wifi_set_performance_profile_v2(&wifi_profile);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in Wi-Fi mode :%ld", status);
+            SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
           }
 
           powersave_cmd_given = true;
         }
         osMutexRelease(power_cmd_mutex);
-        SL_DEBUG_LOG_V2(INFO, "Module is in standby ");
+        SL_DEBUG_LOG_V2(INFO, "Module is in standby \r\n");
 #endif
 #if WIFI_CONNECTION_ONLY
         osThreadSuspend(osThreadGetId());
@@ -378,10 +378,10 @@ void wlan_throughput_task()
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success", 0);
+  SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success\r\n", 0);
 #endif
 
   for (size_t i = 0; i < sizeof(data_buffer); i++)
@@ -416,7 +416,7 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
   float duration = ((test_timeout) / 1000);                    // ms to sec
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully", result, duration);
+  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
 }
 
 void data_callback(uint32_t sock_no,
@@ -429,16 +429,16 @@ void data_callback(uint32_t sock_no,
 
   if (first_data_frame) {
     start = osKernelGetTickCount();
-    SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %ld", sock_no);
+    SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %ld\r\n", sock_no);
     switch (THROUGHPUT_TYPE) {
       case UDP_RX:
-        SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test start");
+        SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test start\r\n");
         break;
       case TCP_RX:
-        SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test start");
+        SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test start\r\n");
         break;
       case TLS_RX:
-        SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test start");
+        SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test start\r\n");
         break;
     }
     first_data_frame = 0;
@@ -468,10 +468,10 @@ void send_data_to_tcp_server(void)
 
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   status = sl_si91x_setsockopt(client_socket,
                                SOL_TCP,
@@ -494,13 +494,13 @@ void send_data_to_tcp_server(void)
 
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test start\r\n");
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
     sent_bytes = send(client_socket, data_buffer, TCP_BUFFER_SIZE, 0);
@@ -508,19 +508,19 @@ void send_data_to_tcp_server(void)
     if (sent_bytes < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d\r\n", errno);
       close(client_socket);
       break;
     }
     total_bytes_sent = total_bytes_sent + sent_bytes;
 
     if ((now - start) > TEST_TIMEOUT) {
-      SL_DEBUG_LOG_V2(INFO, "Time Out: %ld", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Time Out: %ld\r\n", (now - start));
       break;
     }
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %ld", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %ld\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 
@@ -538,17 +538,17 @@ void receive_data_from_tcp_client(void)
 
   sl_status_t status = sl_si91x_config_socket(socket_config);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld\r\n", status);
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket config Done");
+  SL_DEBUG_LOG_V2(INFO, "Socket config Done\r\n");
 
 #if SOCKET_ASYNC_FEATURE
   server_socket = sl_si91x_socket_async(AF_INET, SOCK_STREAM, IPPROTO_TCP, &data_callback);
   if (server_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d\r\n", server_socket);
 
   socket_return_value = sl_si91x_setsockopt(server_socket,
                                             SOL_SOCKET,
@@ -556,7 +556,7 @@ void receive_data_from_tcp_client(void)
                                             &high_performance_socket,
                                             sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
@@ -565,22 +565,22 @@ void receive_data_from_tcp_client(void)
 
   socket_return_value = sl_si91x_bind(server_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     close(server_socket);
     return;
   }
 
   socket_return_value = sl_si91x_listen(server_socket, BACK_LOG);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d\r\n", errno);
     close(server_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port : %d", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port : %d\r\n", LISTENING_PORT);
 
   client_socket = sl_si91x_accept(server_socket, NULL, 0);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d\r\n", errno);
     close(server_socket);
     return;
   }
@@ -591,8 +591,8 @@ void receive_data_from_tcp_client(void)
 
   now = osKernelGetTickCount();
 
-  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld", bytes_read);
+  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", bytes_read);
 
   sl_si91x_shutdown(server_socket, 0);
   sl_si91x_shutdown(client_socket, 0);
@@ -603,10 +603,10 @@ void receive_data_from_tcp_client(void)
   uint32_t total_bytes_received = 0;
   server_socket                 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (server_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d\r\n", server_socket);
 
   socket_return_value = setsockopt(server_socket,
                                    SOL_SOCKET,
@@ -614,7 +614,7 @@ void receive_data_from_tcp_client(void)
                                    &high_performance_socket,
                                    sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
@@ -623,28 +623,28 @@ void receive_data_from_tcp_client(void)
 
   socket_return_value = bind(server_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     close(server_socket);
     return;
   }
 
   socket_return_value = listen(server_socket, BACK_LOG);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d\r\n", errno);
     close(server_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port : %d", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port : %d\r\n", LISTENING_PORT);
 
   client_socket = accept(server_socket, NULL, NULL);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d\r\n", errno);
     close(server_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %d\r\n", client_socket);
 
-  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test start\r\n");
   start = osKernelGetTickCount();
   while (1) {
     read_bytes = recv(client_socket, data_buffer, sizeof(data_buffer), 0);
@@ -655,10 +655,10 @@ void receive_data_from_tcp_client(void)
         if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
           continue;
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx", errno, status);
+          SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
         }
       } else {
-        SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d\r\n", errno);
       }
       break;
     }
@@ -666,12 +666,12 @@ void receive_data_from_tcp_client(void)
     now                  = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
-      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms\r\n", (now - start));
       break;
     }
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld", total_bytes_received);
+  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", total_bytes_received);
 
   measure_and_print_throughput(total_bytes_received, (now - start));
 
@@ -694,32 +694,32 @@ void send_data_to_udp_server(void)
 
   client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
-  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test start\r\n");
   start = osKernelGetTickCount();
   while (total_bytes_sent < BYTES_TO_SEND) {
     sent_bytes =
       sendto(client_socket, data_buffer, UDP_BUFFER_SIZE, 0, (struct sockaddr *)&server_address, socket_length);
     now = osKernelGetTickCount();
     if ((now - start) > TEST_TIMEOUT) {
-      SL_DEBUG_LOG_V2(INFO, "Time Out: %ld", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Time Out: %ld\r\n", (now - start));
       break;
     }
     if (sent_bytes < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d\r\n", errno);
       close(client_socket);
       break;
     }
     total_bytes_sent = total_bytes_sent + sent_bytes;
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %ld", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %ld\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 
@@ -739,10 +739,10 @@ void receive_data_from_udp_client(void)
 #if SOCKET_ASYNC_FEATURE
   client_socket = sl_si91x_socket_async(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &data_callback);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   server_address.sin_family = AF_INET;
   server_address.sin_port   = LISTENING_PORT;
@@ -750,18 +750,18 @@ void receive_data_from_udp_client(void)
   socket_return_value = sl_si91x_bind(client_socket, (struct sockaddr *)&server_address, socket_length);
 
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port %d", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port %d\r\n", LISTENING_PORT);
 
   while (!has_data_received) {
     osThreadYield();
   }
   now = osKernelGetTickCount();
-  SL_DEBUG_LOG_V2(INFO, "UDP_RX Async Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld", bytes_read);
+  SL_DEBUG_LOG_V2(INFO, "UDP_RX Async Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", bytes_read);
 
   measure_and_print_throughput(bytes_read, (now - start));
 
@@ -771,23 +771,23 @@ void receive_data_from_udp_client(void)
   uint32_t total_bytes_received = 0;
   client_socket                 = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   server_address.sin_family = AF_INET;
   server_address.sin_port   = LISTENING_PORT;
 
   socket_return_value = bind(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port %d", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port %d\r\n", LISTENING_PORT);
 
-  SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test start\r\n");
   start = osKernelGetTickCount();
   while (total_bytes_received < BYTES_TO_RECEIVE) {
     read_bytes = recvfrom(client_socket, data_buffer, sizeof(data_buffer), 0, NULL, NULL);
@@ -798,22 +798,22 @@ void receive_data_from_udp_client(void)
         if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
           continue;
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx", errno, status);
+          SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
         }
       } else {
-        SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d\r\n", errno);
       }
       break;
     }
     total_bytes_received = total_bytes_received + read_bytes;
     now                  = osKernelGetTickCount();
     if ((now - start) > TEST_TIMEOUT) {
-      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms\r\n", (now - start));
       break;
     }
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld", total_bytes_received);
+  SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", total_bytes_received);
 
   measure_and_print_throughput(total_bytes_received, (now - start));
 
@@ -832,24 +832,24 @@ void receive_data_from_tls_server(void)
 
   sl_status_t status = sl_si91x_config_socket(socket_config);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld\r\n", status);
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket config Done");
+  SL_DEBUG_LOG_V2(INFO, "Socket config Done\r\n");
 
 #if SOCKET_ASYNC_FEATURE
   uint32_t enable_tls = SL_SI91X_ENABLE_TLS;
 
   client_socket = sl_si91x_socket_async(AF_INET, SOCK_STREAM, IPPROTO_TCP, &data_callback);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   socket_return_value =
     sl_si91x_setsockopt(client_socket, SOL_SOCKET, SL_SI91X_SO_SSL_ENABLE, &enable_tls, sizeof(enable_tls));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     sl_si91x_shutdown(client_socket, 0);
     return;
   }
@@ -860,7 +860,7 @@ void receive_data_from_tls_server(void)
                                             &high_performance_socket,
                                             sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     sl_si91x_shutdown(client_socket, 0);
     return;
   }
@@ -871,11 +871,11 @@ void receive_data_from_tls_server(void)
 
   socket_return_value = sl_si91x_connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     sl_si91x_shutdown(client_socket, 0);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connected to TLS server");
+  SL_DEBUG_LOG_V2(INFO, "Socket connected to TLS server\r\n");
 
   while (!has_data_received) {
     osThreadYield();
@@ -883,8 +883,8 @@ void receive_data_from_tls_server(void)
 
   now = osKernelGetTickCount();
 
-  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld", bytes_read);
+  SL_DEBUG_LOG_V2(INFO, "TCP_RX Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", bytes_read);
 
   sl_si91x_shutdown(client_socket, 0);
   measure_and_print_throughput(bytes_read, (now - start));
@@ -892,14 +892,14 @@ void receive_data_from_tls_server(void)
   uint32_t total_bytes_received = 0;
   client_socket                 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   socket_return_value = setsockopt(client_socket, SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
@@ -910,7 +910,7 @@ void receive_data_from_tls_server(void)
                                    &high_performance_socket,
                                    sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
@@ -921,13 +921,13 @@ void receive_data_from_tls_server(void)
 
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connected to TLS server");
+  SL_DEBUG_LOG_V2(INFO, "Socket connected to TLS server\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test start\r\n");
   start          = osKernelGetTickCount();
   now            = start;
   int read_bytes = 1;
@@ -940,10 +940,10 @@ void receive_data_from_tls_server(void)
         if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
           continue;
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx", errno, status);
+          SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
         }
       } else {
-        SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d\r\n", errno);
       }
       break;
 
@@ -951,12 +951,12 @@ void receive_data_from_tls_server(void)
       now                  = osKernelGetTickCount();
 
       if ((now - start) > TEST_TIMEOUT) {
-        SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms", (now - start));
+        SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms\r\n", (now - start));
         break;
       }
     }
-    SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test finished");
-    SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld", total_bytes_received);
+    SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test finished\r\n");
+    SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", total_bytes_received);
 
     measure_and_print_throughput(total_bytes_received, (now - start));
 
@@ -974,14 +974,14 @@ void send_data_to_tls_server(void)
 
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   socket_return_value = setsockopt(client_socket, SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
@@ -992,13 +992,13 @@ void send_data_to_tls_server(void)
 
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connected to TLS server");
+  SL_DEBUG_LOG_V2(INFO, "Socket connected to TLS server\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "TLS_TX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "TLS_TX Throughput test start\r\n");
   start          = osKernelGetTickCount();
   now            = start;
   int sent_bytes = 0;
@@ -1008,19 +1008,19 @@ void send_data_to_tls_server(void)
     if (sent_bytes < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d\r\n", errno);
       close(client_socket);
       break;
     }
     total_bytes_sent = total_bytes_sent + sent_bytes;
 
     if ((now - start) > TEST_TIMEOUT) {
-      SL_DEBUG_LOG_V2(INFO, "Time Out: %ld", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Time Out: %ld\r\n", (now - start));
       break;
     }
   }
-  SL_DEBUG_LOG_V2(INFO, "TLS_TX Throughput test finished");
-  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %ld", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "TLS_TX Throughput test finished\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %ld\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 

@@ -147,7 +147,7 @@ sl_status_t sli_http_client_default_event_handler(sl_http_client_event_t event,
     return SL_STATUS_FAIL;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, ">>> %s : %x <<<", (uintptr_t) __func__, status);
+  SL_DEBUG_LOG_V2(DEBUG, ">>> %s : %x <<<\r\n", (uintptr_t) __func__, status);
 
   // Handle different HTTP client response types based on the packet's command
   switch (packet->command) {

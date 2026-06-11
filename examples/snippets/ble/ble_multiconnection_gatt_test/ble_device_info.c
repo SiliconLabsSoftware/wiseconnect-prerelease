@@ -148,7 +148,7 @@ uint8_t rsi_add_ble_conn_id(uint8_t *remote_dev_addr, uint8_t *remote_name, uint
   }
 
   if (conn_id == 0xff) {
-    SL_DEBUG_LOG_V2(INFO, "Dailed to add dev to connection buffer");
+    SL_DEBUG_LOG_V2(INFO, "Dailed to add dev to connection buffer\r\n");
   }
 
   return conn_id;

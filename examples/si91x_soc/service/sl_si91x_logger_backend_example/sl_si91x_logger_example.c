@@ -91,32 +91,32 @@ void vApplicationIdleHook(void)
 // Main application thread that cycles through power/profile combinations
 static void application_start(void *argument)
 {
-  SL_PRINT_STRING_DEBUG("ENTER: application_start");
+  SL_PRINT_STRING_DEBUG("ENTER: application_start\r\n");
   (void)argument;
 
 #ifdef SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_PRESENT
 #ifdef SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_COMPACT_PRESENT
 #ifdef SL_CATALOG_SEGGER_RTT_PRESENT
-  SL_PRINT_STRING_INFO("Log Backend: iostream compact logging with RTT");
+  SL_PRINT_STRING_INFO("Log Backend: iostream compact logging with RTT\r\n");
 #endif
 #ifdef SL_CATALOG_IOSTREAM_SWO_SI91X_PRESENT
-  SL_PRINT_STRING_INFO("Log Backend: iostream compact logging with SWO");
+  SL_PRINT_STRING_INFO("Log Backend: iostream compact logging with SWO\r\n");
 #else
-  SL_PRINT_STRING_INFO("Log Backend: iostream compact logging with UART");
+  SL_PRINT_STRING_INFO("Log Backend: iostream compact logging with UART\r\n");
 #endif
 #endif
 #ifdef SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_FORMATTED_PRESENT
 #ifdef SL_CATALOG_SEGGER_RTT_PRESENT
-  SL_PRINT_STRING_INFO("Log Backend: iostream formatted logging with RTT");
+  SL_PRINT_STRING_INFO("Log Backend: iostream formatted logging with RTT\r\n");
 #elif defined(SL_CATALOG_IOSTREAM_SWO_SI91X_PRESENT)
-  SL_PRINT_STRING_INFO("Log Backend: iostream formatted logging with SWO");
+  SL_PRINT_STRING_INFO("Log Backend: iostream formatted logging with SWO\r\n");
 #else
-  SL_PRINT_STRING_INFO("Log Backend: iostream formatted logging with UART");
+  SL_PRINT_STRING_INFO("Log Backend: iostream formatted logging with UART\r\n");
 #endif
 #endif
 #endif
 #ifdef SL_CATALOG_SI91X_LOG_BACKEND_SEGGER_SYSVIEW_PRESENT
-  SL_PRINT_STRING_INFO("Log Backend: SystemView logging");
+  SL_PRINT_STRING_INFO("Log Backend: SystemView logging\r\n");
 #endif
 
   // Sample values used across all backend demonstrations below.
@@ -138,38 +138,38 @@ static void application_start(void *argument)
     // SystemView backend: Allowed only ONE type of argument (all string or all number, not mix)
     // Demonstrate SystemView backend: log current log level and which log levels are visible
     const char *curr_level_str = (log_level <= SL_LOG_CONFIG_LEVEL_NONE) ? level_names[log_level] : "UNKNOWN";
-    SL_PRINT_STRING_INFO("SystemView: Current log level: %d (%s)", (uint32_t)log_level, (uintptr_t)curr_level_str);
+    SL_PRINT_STRING_INFO("SystemView: Current log level: %d (%s)\r\n", (uint32_t)log_level, (uintptr_t)curr_level_str);
 
     // Print logs at different levels, using only supported format specifiers
     // (%d, %x, %p, %s, %%). Char args are not supported by the backend.
 
     switch (log_level) {
       case SL_LOG_CONFIG_LEVEL_DEBUG:
-        SL_PRINT_STRING_INFO("All log prints will be visible: DEBUG, INFO, WARN, ERROR.");
-        SL_PRINT_STRING_DEBUG("DEBUG log values: %d %d %d", test_number, another_number, i_value);
-        SL_PRINT_STRING_INFO("INFO log values: %d %d", test_number + 1, i_value + 1);
-        SL_PRINT_STRING_WARN("WARN log values: %d %d %d", 100, 200, 300);
-        SL_PRINT_STRING_DEBUG("DEBUG log strings: %s %s", (uintptr_t)test_str1, (uintptr_t)test_str2);
-        SL_PRINT_STRING_WARN("WARN log strings: %s", (uintptr_t)test_str2);
+        SL_PRINT_STRING_INFO("All log prints will be visible: DEBUG, INFO, WARN, ERROR.\r\n");
+        SL_PRINT_STRING_DEBUG("DEBUG log values: %d %d %d\r\n", test_number, another_number, i_value);
+        SL_PRINT_STRING_INFO("INFO log values: %d %d\r\n", test_number + 1, i_value + 1);
+        SL_PRINT_STRING_WARN("WARN log values: %d %d %d\r\n", 100, 200, 300);
+        SL_PRINT_STRING_DEBUG("DEBUG log strings: %s %s\r\n", (uintptr_t)test_str1, (uintptr_t)test_str2);
+        SL_PRINT_STRING_WARN("WARN log strings: %s\r\n", (uintptr_t)test_str2);
         break;
       case SL_LOG_CONFIG_LEVEL_INFO:
-        SL_PRINT_STRING_INFO("Visible prints: INFO, WARN, ERROR. DEBUG will be filtered out.");
-        SL_PRINT_STRING_INFO("INFO log values: %d %d", i_value + 2, i_value + 3);
-        SL_PRINT_STRING_WARN("WARN log values: %d %d", another_number, test_number);
-        SL_PRINT_STRING_WARN("WARN log strings: %s %s", (uintptr_t)test_str1, (uintptr_t)test_str2);
+        SL_PRINT_STRING_INFO("Visible prints: INFO, WARN, ERROR. DEBUG will be filtered out.\r\n");
+        SL_PRINT_STRING_INFO("INFO log values: %d %d\r\n", i_value + 2, i_value + 3);
+        SL_PRINT_STRING_WARN("WARN log values: %d %d\r\n", another_number, test_number);
+        SL_PRINT_STRING_WARN("WARN log strings: %s %s\r\n", (uintptr_t)test_str1, (uintptr_t)test_str2);
         break;
       case SL_LOG_CONFIG_LEVEL_WARN:
-        SL_PRINT_STRING_WARN("Visible prints: WARN and ERROR. DEBUG/INFO will be filtered out.");
-        SL_PRINT_STRING_WARN("WARN log values: %d %d", test_number, another_number);
-        SL_PRINT_STRING_WARN("WARN log strings: %s", (uintptr_t)test_str2);
+        SL_PRINT_STRING_WARN("Visible prints: WARN and ERROR. DEBUG/INFO will be filtered out.\r\n");
+        SL_PRINT_STRING_WARN("WARN log values: %d %d\r\n", test_number, another_number);
+        SL_PRINT_STRING_WARN("WARN log strings: %s\r\n", (uintptr_t)test_str2);
         break;
       case SL_LOG_CONFIG_LEVEL_ERROR:
-        SL_PRINT_STRING_ERROR("Visible prints: ERROR only. DEBUG/INFO/WARN will be filtered out.");
-        SL_PRINT_STRING_ERROR("ERROR log values: %d", i_value + 5);
-        SL_PRINT_STRING_ERROR("ERROR log strings: %s", (uintptr_t)test_str1);
+        SL_PRINT_STRING_ERROR("Visible prints: ERROR only. DEBUG/INFO/WARN will be filtered out.\r\n");
+        SL_PRINT_STRING_ERROR("ERROR log values: %d\r\n", i_value + 5);
+        SL_PRINT_STRING_ERROR("ERROR log strings: %s\r\n", (uintptr_t)test_str1);
         break;
       default:
-        SL_PRINT_STRING_INFO("Unknown log level. No log prints will be visible.");
+        SL_PRINT_STRING_INFO("Unknown log level. No log prints will be visible.\r\n");
         break;
     }
 
@@ -191,33 +191,36 @@ static void application_start(void *argument)
     }
 
     const char *curr_level_str = (log_level <= SL_LOG_CONFIG_LEVEL_NONE) ? level_names[log_level] : "UNKNOWN";
-    SL_PRINT_STRING_INFO("Formatted: Current log level: %d (%s)", (uint32_t)log_level, (uintptr_t)curr_level_str);
+    SL_PRINT_STRING_INFO("Formatted: Current log level: %d (%s)\r\n", (uint32_t)log_level, (uintptr_t)curr_level_str);
 
     switch (log_level) {
       case SL_LOG_CONFIG_LEVEL_DEBUG:
-        SL_PRINT_STRING_DEBUG("All log prints will be visible: DEBUG, INFO, WARN, ERROR.");
-        SL_PRINT_STRING_DEBUG("DEBUG mix: int=%d, str=%s, int=%d", test_number, (uintptr_t)test_str1, another_number);
-        SL_PRINT_STRING_INFO("INFO : str=%s, int=%d", (uintptr_t)test_str2, i_value);
-        SL_PRINT_STRING_WARN("WARN : int=%d, str=%s", 100, (uintptr_t)test_str1);
-        SL_PRINT_STRING_ERROR("ERROR : str=%s, int=%d", (uintptr_t)test_str2, 999);
+        SL_PRINT_STRING_DEBUG("All log prints will be visible: DEBUG, INFO, WARN, ERROR.\r\n");
+        SL_PRINT_STRING_DEBUG("DEBUG mix: int=%d, str=%s, int=%d\r\n",
+                              test_number,
+                              (uintptr_t)test_str1,
+                              another_number);
+        SL_PRINT_STRING_INFO("INFO : str=%s, int=%d\r\n", (uintptr_t)test_str2, i_value);
+        SL_PRINT_STRING_WARN("WARN : int=%d, str=%s\r\n", 100, (uintptr_t)test_str1);
+        SL_PRINT_STRING_ERROR("ERROR : str=%s, int=%d\r\n", (uintptr_t)test_str2, 999);
         break;
       case SL_LOG_CONFIG_LEVEL_INFO:
-        SL_PRINT_STRING_INFO("Visible prints: INFO, WARN, ERROR. DEBUG will be filtered out.");
-        SL_PRINT_STRING_INFO("INFO : int=%d, str=%s", i_value + 1, (uintptr_t)test_str1);
-        SL_PRINT_STRING_WARN("WARN : str=%s, int=%d", (uintptr_t)test_str2, another_number);
-        SL_PRINT_STRING_ERROR("ERROR : int=%d, str=%s", 500, (uintptr_t)test_str1);
+        SL_PRINT_STRING_INFO("Visible prints: INFO, WARN, ERROR. DEBUG will be filtered out.\r\n");
+        SL_PRINT_STRING_INFO("INFO : int=%d, str=%s\r\n", i_value + 1, (uintptr_t)test_str1);
+        SL_PRINT_STRING_WARN("WARN : str=%s, int=%d\r\n", (uintptr_t)test_str2, another_number);
+        SL_PRINT_STRING_ERROR("ERROR : int=%d, str=%s\r\n", 500, (uintptr_t)test_str1);
         break;
       case SL_LOG_CONFIG_LEVEL_WARN:
-        SL_PRINT_STRING_WARN("Visible prints: WARN and ERROR. DEBUG/INFO will be filtered out.");
-        SL_PRINT_STRING_WARN("WARN : int=%d, str=%s, int=%d", test_number, (uintptr_t)test_str1, another_number);
-        SL_PRINT_STRING_ERROR("ERROR : str=%s, int=%d", (uintptr_t)test_str2, i_value);
+        SL_PRINT_STRING_WARN("Visible prints: WARN and ERROR. DEBUG/INFO will be filtered out.\r\n");
+        SL_PRINT_STRING_WARN("WARN : int=%d, str=%s, int=%d\r\n", test_number, (uintptr_t)test_str1, another_number);
+        SL_PRINT_STRING_ERROR("ERROR : str=%s, int=%d\r\n", (uintptr_t)test_str2, i_value);
         break;
       case SL_LOG_CONFIG_LEVEL_ERROR:
-        SL_PRINT_STRING_ERROR("Visible prints: ERROR only. DEBUG/INFO/WARN will be filtered out.");
-        SL_PRINT_STRING_ERROR("ERROR : int=%d, str=%s, int=%d", test_number, (uintptr_t)test_str1, i_value);
+        SL_PRINT_STRING_ERROR("Visible prints: ERROR only. DEBUG/INFO/WARN will be filtered out.\r\n");
+        SL_PRINT_STRING_ERROR("ERROR : int=%d, str=%s, int=%d\r\n", test_number, (uintptr_t)test_str1, i_value);
         break;
       default:
-        SL_PRINT_STRING_INFO("Unknown log level. No log prints will be visible.");
+        SL_PRINT_STRING_INFO("Unknown log level. No log prints will be visible.\r\n");
         break;
     }
 
@@ -225,30 +228,30 @@ static void application_start(void *argument)
     // Compact iostream backend (default): only %lu is supported. Args are
     // emitted as raw uint32_t values; strings cannot be rendered here.
     // Multiple %lu args per call are fine (up to SL_LOG_CONFIG_ARG).
-    SL_PRINT_STRING_INFO("Compact: Current log level: %lu", (uint32_t)log_level);
+    SL_PRINT_STRING_INFO("Compact: Current log level: %lu\r\n", (uint32_t)log_level);
 
     switch (log_level) {
       case SL_LOG_CONFIG_LEVEL_DEBUG:
-        SL_PRINT_STRING_INFO("All log prints will be visible: DEBUG, INFO, WARN, ERROR.");
-        SL_PRINT_STRING_DEBUG("DEBUG : %lu %lu %lu", test_number, another_number, i_value);
-        SL_PRINT_STRING_INFO("INFO : %lu %lu", (uint32_t)(test_number + 1), (uint32_t)(i_value + 1));
-        SL_PRINT_STRING_WARN("WARN : %lu %lu %lu", (uint32_t)100, (uint32_t)200, (uint32_t)300);
-        SL_PRINT_STRING_ERROR("ERROR : %lu", (uint32_t)(i_value + 5));
+        SL_PRINT_STRING_INFO("All log prints will be visible: DEBUG, INFO, WARN, ERROR.\r\n");
+        SL_PRINT_STRING_DEBUG("DEBUG : %lu %lu %lu\r\n", test_number, another_number, i_value);
+        SL_PRINT_STRING_INFO("INFO : %lu %lu\r\n", (uint32_t)(test_number + 1), (uint32_t)(i_value + 1));
+        SL_PRINT_STRING_WARN("WARN : %lu %lu %lu\r\n", (uint32_t)100, (uint32_t)200, (uint32_t)300);
+        SL_PRINT_STRING_ERROR("ERROR : %lu\r\n", (uint32_t)(i_value + 5));
         break;
       case SL_LOG_CONFIG_LEVEL_INFO:
-        SL_PRINT_STRING_INFO("Visible prints: INFO, WARN, ERROR. DEBUG will be filtered out.");
-        SL_PRINT_STRING_INFO("INFO : %lu %lu", (uint32_t)(i_value + 2), (uint32_t)(i_value + 3));
-        SL_PRINT_STRING_WARN("WARN : %lu %lu", another_number, test_number);
-        SL_PRINT_STRING_ERROR("ERROR : %lu %lu", (uint32_t)500, i_value);
+        SL_PRINT_STRING_INFO("Visible prints: INFO, WARN, ERROR. DEBUG will be filtered out.\r\n");
+        SL_PRINT_STRING_INFO("INFO : %lu %lu\r\n", (uint32_t)(i_value + 2), (uint32_t)(i_value + 3));
+        SL_PRINT_STRING_WARN("WARN : %lu %lu\r\n", another_number, test_number);
+        SL_PRINT_STRING_ERROR("ERROR : %lu %lu\r\n", (uint32_t)500, i_value);
         break;
       case SL_LOG_CONFIG_LEVEL_WARN:
-        SL_PRINT_STRING_WARN("Visible prints: WARN and ERROR. DEBUG/INFO will be filtered out.");
-        SL_PRINT_STRING_WARN("WARN : %lu %lu", test_number, another_number);
-        SL_PRINT_STRING_ERROR("ERROR : %lu", i_value);
+        SL_PRINT_STRING_WARN("Visible prints: WARN and ERROR. DEBUG/INFO will be filtered out.\r\n");
+        SL_PRINT_STRING_WARN("WARN : %lu %lu\r\n", test_number, another_number);
+        SL_PRINT_STRING_ERROR("ERROR : %lu\r\n", i_value);
         break;
       case SL_LOG_CONFIG_LEVEL_ERROR:
-        SL_PRINT_STRING_ERROR("Visible prints: ERROR only. DEBUG/INFO/WARN will be filtered out.");
-        SL_PRINT_STRING_ERROR("ERROR : %lu %lu %lu", test_number, another_number, i_value);
+        SL_PRINT_STRING_ERROR("Visible prints: ERROR only. DEBUG/INFO/WARN will be filtered out.\r\n");
+        SL_PRINT_STRING_ERROR("ERROR : %lu %lu %lu\r\n", test_number, another_number, i_value);
         break;
       default:
         break;
@@ -286,57 +289,57 @@ static void sl_log_run_format_specifier_check(void)
    *    Expected header letters: D, I, W, E.                          *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_DEBUG("LEVEL DEBUG line"); /* [D|S|...] LEVEL DEBUG line */
+    SL_PRINT_STRING_DEBUG("LEVEL DEBUG line\r\n"); /* [D|S|...] LEVEL DEBUG line */
   }
   {
-    SL_PRINT_STRING_INFO("LEVEL INFO  line"); /* [I|S|...] LEVEL INFO  line */
+    SL_PRINT_STRING_INFO("LEVEL INFO  line\r\n"); /* [I|S|...] LEVEL INFO  line */
   }
   {
-    SL_PRINT_STRING_WARN("LEVEL WARN  line"); /* [W|S|...] LEVEL WARN  line */
+    SL_PRINT_STRING_WARN("LEVEL WARN  line\r\n"); /* [W|S|...] LEVEL WARN  line */
   }
   {
-    SL_PRINT_STRING_ERROR("LEVEL ERROR line"); /* [E|S|...] LEVEL ERROR line */
+    SL_PRINT_STRING_ERROR("LEVEL ERROR line\r\n"); /* [E|S|...] LEVEL ERROR line */
   }
 
   /* ---------------------------------------------------------------- *
    * 2. Signed decimal: %d, %i, with width and zero-pad.              *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("d  pos = %d", (uint32_t)42); /* d  pos = 42              */
+    SL_PRINT_STRING_INFO("d  pos = %d\r\n", (uint32_t)42); /* d  pos = 42              */
   }
   {
-    SL_PRINT_STRING_INFO("d  neg = %d", (uint32_t)-42); /* d  neg = -42             */
+    SL_PRINT_STRING_INFO("d  neg = %d\r\n", (uint32_t)-42); /* d  neg = -42             */
   }
   {
-    SL_PRINT_STRING_INFO("i  alias = %i", (uint32_t)-1); /* i  alias = -1            */
+    SL_PRINT_STRING_INFO("i  alias = %i\r\n", (uint32_t)-1); /* i  alias = -1            */
   }
   {
-    SL_PRINT_STRING_INFO("d  INT_MIN = %d", (uint32_t)0x80000000); /* d  INT_MIN = -2147483648 */
+    SL_PRINT_STRING_INFO("d  INT_MIN = %d\r\n", (uint32_t)0x80000000); /* d  INT_MIN = -2147483648 */
   }
   {
-    SL_PRINT_STRING_INFO("d  width  [%6d]", (uint32_t)42); /* d  width  [    42]       */
+    SL_PRINT_STRING_INFO("d  width  [%6d]\r\n", (uint32_t)42); /* d  width  [    42]       */
   }
   {
-    SL_PRINT_STRING_INFO("d  zero   [%06d]", (uint32_t)42); /* d  zero   [000042]       */
+    SL_PRINT_STRING_INFO("d  zero   [%06d]\r\n", (uint32_t)42); /* d  zero   [000042]       */
   }
   {
-    SL_PRINT_STRING_INFO("d  neg-w  [%06d]", (uint32_t)-7); /* d  neg-w  [-00007]       */
+    SL_PRINT_STRING_INFO("d  neg-w  [%06d]\r\n", (uint32_t)-7); /* d  neg-w  [-00007]       */
   }
 
   /* ---------------------------------------------------------------- *
    * 3. Unsigned decimal: %u, with width and zero-pad.                *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("u  small = %u", (uint32_t)42); /* u  small = 42         */
+    SL_PRINT_STRING_INFO("u  small = %u\r\n", (uint32_t)42); /* u  small = 42         */
   }
   {
-    SL_PRINT_STRING_INFO("u  max   = %u", (uint32_t)0xFFFFFFFFu); /* u  max   = 4294967295 */
+    SL_PRINT_STRING_INFO("u  max   = %u\r\n", (uint32_t)0xFFFFFFFFu); /* u  max   = 4294967295 */
   }
   {
-    SL_PRINT_STRING_INFO("u  width [%8u]", (uint32_t)42); /* u  width [      42]   */
+    SL_PRINT_STRING_INFO("u  width [%8u]\r\n", (uint32_t)42); /* u  width [      42]   */
   }
   {
-    SL_PRINT_STRING_INFO("u  zero  [%08u]", (uint32_t)42); /* u  zero  [00000042]   */
+    SL_PRINT_STRING_INFO("u  zero  [%08u]\r\n", (uint32_t)42); /* u  zero  [00000042]   */
   }
 
   /* ---------------------------------------------------------------- *
@@ -344,29 +347,29 @@ static void sl_log_run_format_specifier_check(void)
    *    is 8-digit zero-padded for backwards compatibility.           *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("x  default [%x]", (uint32_t)0xABCDu); /* x  default [0000abcd] */
+    SL_PRINT_STRING_INFO("x  default [%x]\r\n", (uint32_t)0xABCDu); /* x  default [0000abcd] */
   }
   {
-    SL_PRINT_STRING_INFO("X  default [%X]", (uint32_t)0xABCDu); /* X  default [0000ABCD] */
+    SL_PRINT_STRING_INFO("X  default [%X]\r\n", (uint32_t)0xABCDu); /* X  default [0000ABCD] */
   }
   {
-    SL_PRINT_STRING_INFO("x  width   [%4x]", (uint32_t)0xAu); /* x  width   [   a]     */
+    SL_PRINT_STRING_INFO("x  width   [%4x]\r\n", (uint32_t)0xAu); /* x  width   [   a]     */
   }
   {
-    SL_PRINT_STRING_INFO("x  zero    [%04x]", (uint32_t)0xAu); /* x  zero    [000a]     */
+    SL_PRINT_STRING_INFO("x  zero    [%04x]\r\n", (uint32_t)0xAu); /* x  zero    [000a]     */
   }
   {
-    SL_PRINT_STRING_INFO("X  zero    [%04X]", (uint32_t)0xAu); /* X  zero    [000A]     */
+    SL_PRINT_STRING_INFO("X  zero    [%04X]\r\n", (uint32_t)0xAu); /* X  zero    [000A]     */
   }
 
   /* ---------------------------------------------------------------- *
    * 5. Octal: %o.                                                    *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("o  small = %o", (uint32_t)8); /* o  small = 10     */
+    SL_PRINT_STRING_INFO("o  small = %o\r\n", (uint32_t)8); /* o  small = 10     */
   }
   {
-    SL_PRINT_STRING_INFO("o  width [%6o]", (uint32_t)8); /* o  width [    10] */
+    SL_PRINT_STRING_INFO("o  width [%6o]\r\n", (uint32_t)8); /* o  width [    10] */
   }
 
   /* ---------------------------------------------------------------- *
@@ -374,20 +377,20 @@ static void sl_log_run_format_specifier_check(void)
    * ---------------------------------------------------------------- */
   {
     static const int marker = 0;
-    SL_PRINT_STRING_INFO("p  &marker = %p", (uintptr_t)&marker); /* p  &marker = 0xXXXXXXXX */
+    SL_PRINT_STRING_INFO("p  &marker = %p\r\n", (uintptr_t)&marker); /* p  &marker = 0xXXXXXXXX */
   }
   {
-    SL_PRINT_STRING_INFO("p  null   = %p", (uintptr_t)NULL); /* p  null   = 0x00000000 */
+    SL_PRINT_STRING_INFO("p  null   = %p\r\n", (uintptr_t)NULL); /* p  null   = 0x00000000 */
   }
 
   /* ---------------------------------------------------------------- *
    * 7. Character: %c.                                                *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("c  letter = [%c]", (uint32_t)'Z'); /* c  letter = [Z] */
+    SL_PRINT_STRING_INFO("c  letter = [%c]\r\n", (uint32_t)'Z'); /* c  letter = [Z] */
   }
   {
-    SL_PRINT_STRING_INFO("c  digit  = [%c]", (uint32_t)'7'); /* c  digit  = [7] */
+    SL_PRINT_STRING_INFO("c  digit  = [%c]\r\n", (uint32_t)'7'); /* c  digit  = [7] */
   }
 
   /* ---------------------------------------------------------------- *
@@ -395,10 +398,10 @@ static void sl_log_run_format_specifier_check(void)
    * ---------------------------------------------------------------- */
   {
     static const char *hello = "hello, world";
-    SL_PRINT_STRING_INFO("s  msg = '%s'", (uintptr_t)hello); /* s  msg = 'hello, world' */
+    SL_PRINT_STRING_INFO("s  msg = '%s'\r\n", (uintptr_t)hello); /* s  msg = 'hello, world' */
   }
   {
-    SL_PRINT_STRING_INFO("s  null = '%s'", (uintptr_t)NULL); /* s  null = '' */
+    SL_PRINT_STRING_INFO("s  null = '%s'\r\n", (uintptr_t)NULL); /* s  null = '' */
   }
 
   /* ---------------------------------------------------------------- *
@@ -406,29 +409,29 @@ static void sl_log_run_format_specifier_check(void)
    *    Default precision is 6, max 9.                                *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("f  default     = %f", SL_LOG_FLOAT_BITS(3.14159265f)); /* 3.141592    */
+    SL_PRINT_STRING_INFO("f  default     = %f\r\n", SL_LOG_FLOAT_BITS(3.14159265f)); /* 3.141592    */
   }
   {
-    SL_PRINT_STRING_INFO("f  prec 0      = %.0f", SL_LOG_FLOAT_BITS(3.7f)); /* 3           */
+    SL_PRINT_STRING_INFO("f  prec 0      = %.0f\r\n", SL_LOG_FLOAT_BITS(3.7f)); /* 3           */
   }
   {
-    SL_PRINT_STRING_INFO("f  prec 2      = %.2f", SL_LOG_FLOAT_BITS(2.718f)); /* 2.71        */
+    SL_PRINT_STRING_INFO("f  prec 2      = %.2f\r\n", SL_LOG_FLOAT_BITS(2.718f)); /* 2.71        */
   }
   {
-    SL_PRINT_STRING_INFO("f  prec 9 max  = %.9f", SL_LOG_FLOAT_BITS(0.123456789f)); /* 0.123456789 */
+    SL_PRINT_STRING_INFO("f  prec 9 max  = %.9f\r\n", SL_LOG_FLOAT_BITS(0.123456789f)); /* 0.123456789 */
   }
   {
-    SL_PRINT_STRING_INFO("f  negative    = %.2f", SL_LOG_FLOAT_BITS(-12.5f)); /* -12.50      */
+    SL_PRINT_STRING_INFO("f  negative    = %.2f\r\n", SL_LOG_FLOAT_BITS(-12.5f)); /* -12.50      */
   }
   {
-    SL_PRINT_STRING_INFO("F  uppercase   = %.2F", SL_LOG_FLOAT_BITS(1.25f)); /* 1.25        */
+    SL_PRINT_STRING_INFO("F  uppercase   = %.2F\r\n", SL_LOG_FLOAT_BITS(1.25f)); /* 1.25        */
   }
 
   /* Float salvage path: pass a raw float (not bit-cast). The backend
    * detects the resulting denormal bit pattern and recovers the integer
    * part instead of printing 0.000000. */
   {
-    SL_PRINT_STRING_INFO("f  salvage     = %.2f", (uint32_t)2); /* 2.00 */
+    SL_PRINT_STRING_INFO("f  salvage     = %.2f\r\n", (uint32_t)2); /* 2.00 */
   }
 
   /* Float specials. */
@@ -445,20 +448,20 @@ static void sl_log_run_format_specifier_check(void)
       float f;
       uint32_t u;
     } nan_v = { .u = 0x7FC00000u };
-    SL_PRINT_STRING_INFO("f  +inf = %f", posinf.u); /* inf  */
-    SL_PRINT_STRING_INFO("f  -inf = %f", neginf.u); /* -inf */
-    SL_PRINT_STRING_INFO("f  nan  = %f", nan_v.u);  /* nan  */
+    SL_PRINT_STRING_INFO("f  +inf = %f\r\n", posinf.u); /* inf  */
+    SL_PRINT_STRING_INFO("f  -inf = %f\r\n", neginf.u); /* -inf */
+    SL_PRINT_STRING_INFO("f  nan  = %f\r\n", nan_v.u);  /* nan  */
   }
   /* Out-of-uint32-range value: prints "ovf". */
   {
-    SL_PRINT_STRING_INFO("f  ovf  = %f", SL_LOG_FLOAT_BITS(5e9f)); /* ovf */
+    SL_PRINT_STRING_INFO("f  ovf  = %f\r\n", SL_LOG_FLOAT_BITS(5e9f)); /* ovf */
   }
 
   /* ---------------------------------------------------------------- *
    * 10. Literal '%%'.                                                *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("literal percent: 100%%"); /* literal percent: 100% */
+    SL_PRINT_STRING_INFO("literal percent: 100%%\r\n"); /* literal percent: 100% */
   }
 
   /* ---------------------------------------------------------------- *
@@ -466,16 +469,16 @@ static void sl_log_run_format_specifier_check(void)
    *     ignored; arg is still uint32_t.                              *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_INFO("len  ld   = %ld", (uint32_t)-1); /* -1       */
+    SL_PRINT_STRING_INFO("len  ld   = %ld\r\n", (uint32_t)-1); /* -1       */
   }
   {
-    SL_PRINT_STRING_INFO("len  lld  = %lld", (uint32_t)123); /* 123      */
+    SL_PRINT_STRING_INFO("len  lld  = %lld\r\n", (uint32_t)123); /* 123      */
   }
   {
-    SL_PRINT_STRING_INFO("len  hhx  = %hhx", (uint32_t)0xFFu); /* 000000ff */
+    SL_PRINT_STRING_INFO("len  hhx  = %hhx\r\n", (uint32_t)0xFFu); /* 000000ff */
   }
   {
-    SL_PRINT_STRING_INFO("len  zu   = %zu", (uint32_t)4096); /* 4096     */
+    SL_PRINT_STRING_INFO("len  zu   = %zu\r\n", (uint32_t)4096); /* 4096     */
   }
 
   /* ---------------------------------------------------------------- *
@@ -483,7 +486,7 @@ static void sl_log_run_format_specifier_check(void)
    * ---------------------------------------------------------------- */
   {
     static const char *tag = "ADC";
-    SL_PRINT_STRING_INFO("[%s] count=%d addr=%p st=0x%04X t=%.2f",
+    SL_PRINT_STRING_INFO("[%s] count=%d addr=%p st=0x%04X t=%.2f\r\n",
                          (uintptr_t)tag,
                          (uint32_t)-1,
                          (uintptr_t)&tag,
@@ -500,11 +503,11 @@ static void sl_log_run_format_specifier_check(void)
    *     - Unknown specifier -> echoed literally.                     *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_WARN("diag  too-few-args: a=%d b=%d c=%d", (uint32_t)1, (uint32_t)2);
+    SL_PRINT_STRING_WARN("diag  too-few-args: a=%d b=%d c=%d\r\n", (uint32_t)1, (uint32_t)2);
     /* a=1 b=2 c=<%d?> */
   }
   {
-    SL_PRINT_STRING_WARN("diag  unknown spec: %q done", (uint32_t)0); /* unknown spec: %q done */
+    SL_PRINT_STRING_WARN("diag  unknown spec: %q done\r\n", (uint32_t)0); /* unknown spec: %q done */
   }
 
   /* ---------------------------------------------------------------- *
@@ -512,7 +515,7 @@ static void sl_log_run_format_specifier_check(void)
    *     "%260d" used to wrap to width=4; now clamps to 99 cleanly.   *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_DEBUG("wide [%260d]", (uint32_t)1);
+    SL_PRINT_STRING_DEBUG("wide [%260d]\r\n", (uint32_t)1);
     /* Expected: a single line with "1" preceded by ~99 spaces, no overflow. */
   }
 

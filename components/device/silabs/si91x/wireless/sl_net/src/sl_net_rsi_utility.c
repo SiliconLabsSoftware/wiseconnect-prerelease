@@ -198,6 +198,7 @@ sl_status_t sli_convert_si91x_mdns_response(sl_mdns_response_t *mdns_result, con
     }
   }
 
+  mdns_result->addr.addr = NULL;
   if (mdns_result->addr.addr_count > 0) {
     mdns_result->addr.addr = malloc(mdns_result->addr.addr_count * sizeof(sl_ip_address_t));
     if (mdns_result->addr.addr == NULL) {

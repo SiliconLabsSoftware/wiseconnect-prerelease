@@ -178,7 +178,7 @@ sl_mqtt_client_configuration_t mqtt_client_configuration = { .is_clean_session =
                                                              .client_id_length = strlen(CLIENT_ID),
                                                              .client_port      = CLIENT_PORT };
 
-sl_mqtt_broker_t mqtt_broker_configuration = {
+sl_mqtt_broker_v2_t mqtt_broker_configuration = {
   .ip                      = SL_IPV4_ADDRESS(192, 168, 1, 13),
   .port                    = MQTT_BROKER_PORT,
   .is_connection_encrypted = ENCRYPT_CONNECTION,
@@ -239,21 +239,21 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Start Wi-Fi client interface Success ");
+  SL_DEBUG_LOG_V2(INFO, "Start Wi-Fi client interface Success \r\n");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -265,7 +265,7 @@ static void application_start(void *argument)
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore\r\n");
     return;
   }
   // Waiting forever using semaphore to put M4 to sleep in tick less mode
@@ -336,17 +336,17 @@ sl_status_t twt_callback_handler(sl_wifi_event_t event,
     SL_DEBUG_LOG_V2(DEBUG, " wake duration : 0x%X", result->wake_duration);
     SL_DEBUG_LOG_V2(DEBUG, " wake_duration_unit: 0x%X", result->wake_duration_unit);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_exp : 0x%X", result->wake_int_exp);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_mantissa : 0x%X", result->wake_int_mantissa);
     SL_DEBUG_LOG_V2(DEBUG, " implicit_twt : 0x%X", result->implicit_twt);
     SL_DEBUG_LOG_V2(DEBUG, " un_announced_twt : 0x%X", result->un_announced_twt);
     SL_DEBUG_LOG_V2(DEBUG, " triggered_twt : 0x%X", result->triggered_twt);
     SL_DEBUG_LOG_V2(DEBUG, " twt_channel : 0x%X", result->twt_channel);
     SL_DEBUG_LOG_V2(DEBUG, " twt_protection : 0x%X", result->twt_protection);
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
   } else if (event < SL_WIFI_TWT_EVENTS_END) {
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
   }
   return SL_STATUS_OK;
 }
@@ -387,7 +387,7 @@ void print_char_buffer(char *buffer, uint32_t buffer_length)
     SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[index]);
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "");
+  SL_DEBUG_LOG_V2(DEBUG, "\r\n");
 }
 
 void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)
@@ -396,7 +396,7 @@ void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t
 
   switch (*error) {
     case SL_MQTT_CLIENT_RECEIVE_FAILED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.");
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.\r\n");
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE:
@@ -429,7 +429,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
 
   switch (event) {
     case SL_MQTT_CLIENT_CONNECTED_EVENT: {
-      SL_DEBUG_LOG_V2(INFO, "MQTT client connection success");
+      SL_DEBUG_LOG_V2(INFO, "MQTT client connection success\r\n");
 #if ENABLE_MQTT_SUBSCRIBE_PUBLISH
       sl_status_t status;
       status = sl_mqtt_client_subscribe(client,
@@ -471,7 +471,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     case SL_MQTT_CLIENT_SUBSCRIBED_EVENT: {
       char *subscribed_topic = (char *)context;
 
-      SL_DEBUG_LOG_V2(INFO, "Subscribed to Topic: %s", (uintptr_t)subscribed_topic);
+      SL_DEBUG_LOG_V2(INFO, "Subscribed to Topic: %s\r\n", (uintptr_t)subscribed_topic);
       break;
     }
 
@@ -479,7 +479,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
       char *unsubscribed_topic = (char *)context;
       sl_status_t status;
 
-      SL_DEBUG_LOG_V2(INFO, "Unsubscribed from topic: %s", (uintptr_t)unsubscribed_topic);
+      SL_DEBUG_LOG_V2(INFO, "Unsubscribed from topic: %s\r\n", (uintptr_t)unsubscribed_topic);
 
       status = sl_mqtt_client_disconnect(client, 0);
       if (status != SL_STATUS_IN_PROGRESS) {
@@ -493,7 +493,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
 #endif
 
     case SL_MQTT_CLIENT_DISCONNECTED_EVENT: {
-      SL_DEBUG_LOG_V2(INFO, "Disconnected from MQTT broker");
+      SL_DEBUG_LOG_V2(INFO, "Disconnected from MQTT broker\r\n");
 
       mqtt_client_cleanup();
       break;
@@ -525,7 +525,7 @@ sl_status_t mqtt_example()
   VERIFY_STATUS_AND_RETURN(status);
   status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
   VERIFY_STATUS_AND_RETURN(status);
-  SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
+  SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter\r\n");
 
   if (ENCRYPT_CONNECTION) {
     // Load SSL CA certificate
@@ -580,10 +580,10 @@ sl_status_t mqtt_example()
     mqtt_client_cleanup();
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "MQTT Client Init Done");
+  SL_DEBUG_LOG_V2(INFO, "MQTT Client Init Done\r\n");
 
   status =
-    sl_mqtt_client_connect(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
+    sl_mqtt_client_connect_v2(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
   if (status != SL_STATUS_IN_PROGRESS) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to connect to mqtt broker: 0x%" PRIx32 "", (uint32_t)status);
 
@@ -614,9 +614,9 @@ sl_status_t mqtt_example()
     SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
+  SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "Example execution completed ");
+  SL_DEBUG_LOG_V2(INFO, "Example execution completed \r\n");
 
   return SL_STATUS_OK;
 }

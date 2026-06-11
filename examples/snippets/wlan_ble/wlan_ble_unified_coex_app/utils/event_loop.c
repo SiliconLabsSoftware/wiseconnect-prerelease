@@ -54,19 +54,19 @@ int32_t rsi_app_common_event_loop(generic_task_cb_t *generic_task_cb)
 
   generic_task_cb->event_mutex = osMutexNew(NULL);
   if (generic_task_cb->event_mutex == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "failed to create event mutex object, error = %lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "failed to create event mutex object, error = %lx \r\n", status);
     return status;
   }
   generic_task_cb->cmd_mutex = osMutexNew(NULL);
   if (generic_task_cb->cmd_mutex == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "failed to create cmd mutex object, error = %lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "failed to create cmd mutex object, error = %lx \r\n", status);
     return status;
   }
 
   //! creating module specific semaphore
   generic_task_cb->semaphore = osSemaphoreNew(1, 0, NULL);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " failed to create semaphore object, error = %lx  ", status);
+    SL_DEBUG_LOG_V2(ERROR, " failed to create semaphore object, error = %lx  \r\n", status);
     return status;
   }
 
@@ -75,7 +75,7 @@ int32_t rsi_app_common_event_loop(generic_task_cb_t *generic_task_cb)
     //! Initialize the specifi module
     status = generic_task_cb->init_hook();
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, " Module init hook fails with error status = 0X%lx  ", status);
+      SL_DEBUG_LOG_V2(ERROR, " Module init hook fails with error status = 0X%lx  \r\n", status);
       return status;
     }
   }

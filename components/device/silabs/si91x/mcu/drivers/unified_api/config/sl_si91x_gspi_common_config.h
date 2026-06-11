@@ -50,22 +50,6 @@ extern "C" {
 // <i> Default: 5
 #define SL_GSPI_AEMPTY_THRESHOLD 5
 
-// <e SL_SI91X_GSPI_GPDMA_ENABLE> Enable GPDMA
-// <i> Use the GPDMA controller (instead of UDMA) for GSPI transfers.
-// <i> Must be enabled to use the advanced GPDMA TX/RX options below.
-// <i> Default: 0
-#define SL_SI91X_GSPI_GPDMA_ENABLE 0
-
-// <o GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_TX> GPDMA Max Number of Descriptors TX <1-256>
-// <i> Default: 32
-#define GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_TX 32
-
-// <o GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_RX> GPDMA Max Number of Descriptors RX <1-256>
-// <i> Default: 32
-#define GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_RX 32
-
-// </e>
-
 // </e>
 
 // </h>

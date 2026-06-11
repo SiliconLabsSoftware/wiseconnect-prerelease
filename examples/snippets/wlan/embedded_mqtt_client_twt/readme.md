@@ -436,7 +436,7 @@ You can get asynchronous TWT session updates if *twt_response_handler* is define
 5. For iTWT, GTK Interval should be kept at maximum possible value or zero. If GTK interval is not configurable, the recommended TWT interval (in case of sl_wifi_enable_target_wake_time) / RX Latency (in case of sl_wifi_target_wake_time_auto_selection_v2 API) is less than 4 sec.
 6. When sl_wifi_enable_target_wake_time API is used, configuring TWT Wake interval beyond 1 min might lead to disconnections from the AP. Recommended to use TWT wakeup interval less than or equal to 1 min.
 7. WLAN Keep Alive timeout should **not** be disabled when sl_wifi_target_wake_time_auto_selection_v2 API is used or when unannounced TWT session is set up using sl_wifi_enable_target_wake_time API. It is recommended to use WLAN Keep Alive timeout of 30 sec which is the default timeout even if not configured specifically by the user.
-8. Set keep_alive_retries to 4 in the sl_mqtt_broker_t structure and tcp_max_retransmission_cap_for_emb_mqtt to 128 in the si91x_mqtt_client_init_request_t structure when using the sl_mqtt_client_connect API to establish a stable MQTT connection. This adjustment is necessary in higher congestion environments and does not affect other cases.
+8. Set keep_alive_retries to 4 in the sl_mqtt_broker_v2_t structure and tcp_max_retransmission_cap_for_emb_mqtt to 128 in the si91x_mqtt_client_init_request_t structure when using the sl_mqtt_client_connect API to establish a stable MQTT connection. This adjustment is necessary in higher congestion environments and does not affect other cases.
 9. If OFDMA/MIMO is not needed, enable SLI_ENABLE_BEAMFORMEE_SUPPORT in sl_wifi.c. This action will reduce power consumption.
 
 ## Soc Mode:

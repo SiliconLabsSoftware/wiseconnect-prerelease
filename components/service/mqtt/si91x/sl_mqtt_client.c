@@ -229,7 +229,7 @@ static void sli_si91x_get_subscription(const sl_mqtt_client_t *client,
 static void sli_si91x_remove_and_free_all_subscriptions(sl_mqtt_client_t *client)
 {
   if (client == NULL) {
-    SL_DEBUG_LOG_V2(INFO, "MQTT client instance not initialized yet\n");
+    SL_DEBUG_LOG_V2(INFO, "MQTT client instance not initialized yet\r\n");
     return;
   }
   // Free subscription list.
@@ -1391,7 +1391,7 @@ static void sli_si91x_handle_disconnected_event(sl_status_t status,
 void sli_mqtt_client_cleanup()
 {
   if (mqtt_client == NULL) {
-    SL_DEBUG_LOG_V2(DEBUG, "MQTT client instance not initialized yet\n");
+    SL_DEBUG_LOG_V2(DEBUG, "MQTT client instance not initialized yet\r\n");
     return;
   }
 

@@ -1192,8 +1192,17 @@ int sli_si91x_shutdown(int socket, int how)
   // Verify the socket's existence
   SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket == NULL, EBADF);
 
-  // The firmware maps server socket and first client socket connected to the server would be assigned same firmware socket ID.
-  // Therefore, if Dev attempts to close either first client or server, close request type needs to be set to SHUTDOWN_BY_PORT.
+  // SHUTDOWN_BY_PORT is not supported for UDP sockets.
+  SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket->type == SOCK_DGRAM && how == SHUTDOWN_BY_PORT, EINVAL);
+
+  // SHUTDOWN_BY_PORT is valid only for listening(server) sockets.
+  SLI_SET_ERRNO_AND_RETURN_IF_TRUE(si91x_socket->state != LISTEN && how == SHUTDOWN_BY_PORT, EINVAL);
+
+  //The firmware uses socket_id to close client sockets and port_id to close server sockets.
+  //Closing a client socket:
+  //Set how to SHUTDOWN_BY_ID. In the request structure, specify the target socket by setting socket_id to the desired value and set the port field to 0.
+  //Closing a server socket:
+  //Set how to SHUTDOWN_BY_PORT. In this case, set socket_id to 0 and provide the server's source port number in the port field.
   int close_request_type = (si91x_socket->state == LISTEN) ? SHUTDOWN_BY_PORT : how;
 
   // Check the state of the socket and perform cleanup if necessary

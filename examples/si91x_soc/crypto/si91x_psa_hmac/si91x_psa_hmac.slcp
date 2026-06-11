@@ -41,7 +41,9 @@ other_file:
 - path: resources/readme/output.png
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 ui_hints:
   highlight:
   - path: readme.md

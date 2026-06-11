@@ -142,3 +142,7 @@ define:
   - name: MBEDTLS_ENTROPY_MIN_HARDWARE
     value: '128'
     condition: ["sl_si91x_lwip_stack"]
+
+toolchain_settings:
+  - option: llvm_compiler_option
+    value: -Wno-format -Wno-varargs    

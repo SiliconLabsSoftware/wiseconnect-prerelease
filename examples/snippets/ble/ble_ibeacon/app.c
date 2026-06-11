@@ -321,15 +321,15 @@ void ble_ibeacon(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi coex mode initialization is successful");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi coex mode initialization is successful\r\n");
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -348,7 +348,7 @@ void ble_ibeacon(void *argument)
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore\r\n");
   }
   //! initialize the event map
   rsi_ble_app_init_events();
@@ -356,27 +356,27 @@ void ble_ibeacon(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s \r\n", (uintptr_t)(local_dev_addr));
   }
 
   //! set the local device name
   status = rsi_bt_set_local_name((uint8_t *)RSI_BLE_LOCAL_NAME);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble set local name cmd failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble set local name cmd failed with reason code : %lX \r\n", status);
     return;
   }
 
   //! get the local device name
   status = rsi_bt_get_local_name(&rsi_app_resp_get_local_name);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble get local name cmd failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble get local name cmd failed with reason code : %lX \r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s", (uintptr_t)(rsi_app_resp_get_local_name.name));
+  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s\r\n", (uintptr_t)(rsi_app_resp_get_local_name.name));
 
   //! memcpy the uuid value
   memcpy(&adv[9], uuid, 16);
@@ -387,51 +387,51 @@ void ble_ibeacon(void *argument)
   //! memcpy the minor_number value
   adv[9 + 16 + 2 + 2] = tx_power;
 
-  SL_DEBUG_LOG_V2(INFO, "Start advertising ...");
+  SL_DEBUG_LOG_V2(INFO, "Start advertising ...\r\n");
   //! set advertise data
   rsi_ble_set_advertise_data(adv, 30);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Advertise Data Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Set Advertise Data Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Set Advertise Data Success");
+    SL_DEBUG_LOG_V2(INFO, "Set Advertise Data Success\r\n");
   }
   scan_data[3] = strlen(RSI_BLE_LOCAL_NAME) + 1;
   scan_data[4] = 9;
   strcpy((char *)&scan_data[5], RSI_BLE_LOCAL_NAME);
   status = rsi_ble_set_scan_response_data(scan_data, 31);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Scan Response Data Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Set Scan Response Data Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Set Scan Response Data Success");
+    SL_DEBUG_LOG_V2(INFO, "Set Scan Response Data Success\r\n");
   }
 
   //! start the advertising
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Start Advertising Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Start Advertising Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Start Advertising Success");
+    SL_DEBUG_LOG_V2(INFO, "Start Advertising Success\r\n");
   }
 #if ENABLE_NWP_POWER_SAVE
-  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
   while (1) {
     //! checking for received events
@@ -450,7 +450,7 @@ void ble_ibeacon(void *argument)
         //! clear the connected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_CONNECTED);
         rsi_6byte_dev_address_to_ascii(str_remote_address, rsi_app_connected_device.dev_addr);
-        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s \r\n", (uintptr_t)(str_remote_address));
         //! get the RSSI value with connected remote device
         status = rsi_bt_get_rssi((uint8_t *)rsi_app_connected_device.dev_addr, &rsi_app_resp_rssi);
         if (status != RSI_SUCCESS) {
@@ -469,18 +469,18 @@ void ble_ibeacon(void *argument)
 
         //! clear the disconnected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_DISCONNECTED);
-        SL_DEBUG_LOG_V2(INFO, "Module got disconnected");
+        SL_DEBUG_LOG_V2(INFO, "Module got disconnected\r\n");
         //! get the local device state.
         status = rsi_ble_get_device_state(&rsi_app_resp_device_state);
         if (status != RSI_SUCCESS) {
           return;
         }
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "keep module in to active state ");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to active state \r\n");
         //! initiating Active mode in BT mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode \r\n");
           return;
         }
 
@@ -488,7 +488,7 @@ void ble_ibeacon(void *argument)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode \r\n");
           return;
         }
 #endif
@@ -496,12 +496,12 @@ void ble_ibeacon(void *argument)
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to start advertising, error code : %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start advertising, error code : %lx\r\n", status);
           goto adv;
         }
-        SL_DEBUG_LOG_V2(INFO, "Start advertising ...");
+        SL_DEBUG_LOG_V2(INFO, "Start advertising ...\r\n");
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
           return;
@@ -511,10 +511,10 @@ adv:
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save \r\n");
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
       } break;
       default: {

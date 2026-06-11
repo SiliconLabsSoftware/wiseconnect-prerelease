@@ -180,14 +180,14 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done\r\n");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected\r\n");
 
   sl_net_inet_addr(SERVER_IP, (uint32_t *)&ip);
 
@@ -197,16 +197,16 @@ void application_start()
 
   //! Create socket
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  SL_DEBUG_LOG_V2(INFO, " Client Socket: %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, " Client Socket: %d\r\n", client_socket);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d\r\n", errno);
     return;
   }
 
   //! Configure TCP keep alive timeout
   return_value = setsockopt(client_socket, SOL_SOCKET, SO_KEEPALIVE, &tcp_keepalive_time, sizeof(tcp_keepalive_time));
   if (return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "setsockopt tcp_keepalive_time failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "setsockopt tcp_keepalive_time failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
@@ -214,18 +214,18 @@ void application_start()
   //! Socket connect
   return_value = connect(client_socket, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in));
   if (return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Socket Connected");
+  SL_DEBUG_LOG_V2(INFO, " Socket Connected\r\n");
 
   status = set_twt();
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Error while configuring TWT parameters: 0x%" PRIx32 " ", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "TWT Config Done");
+  SL_DEBUG_LOG_V2(INFO, "TWT Config Done\r\n");
 
 #if SEND_TCP_DATA
   status = send_data();
@@ -233,14 +233,14 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Error while sending data: 0x%" PRIx32 " ", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Data Sent");
+  SL_DEBUG_LOG_V2(INFO, "Data Sent\r\n");
 #endif
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore\r\n");
     return;
   }
   // Waiting forever using semaphore to put M4 to sleep in tick less mode
@@ -275,7 +275,7 @@ sl_status_t set_twt(void)
   VERIFY_STATUS_AND_RETURN(status);
   status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
   VERIFY_STATUS_AND_RETURN(status);
-  SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
+  SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter\r\n");
 
   //! Apply power save profile
   performance_profile.profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
@@ -284,7 +284,7 @@ sl_status_t set_twt(void)
     SL_DEBUG_LOG_V2(ERROR, "Powersave Configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
+  SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled\r\n");
   return SL_STATUS_OK;
 }
 
@@ -305,7 +305,7 @@ sl_status_t send_data(void)
     }
     packet_count++;
   }
-  SL_DEBUG_LOG_V2(INFO, " Data sent successfully");
+  SL_DEBUG_LOG_V2(INFO, " Data sent successfully\r\n");
 
   return SL_STATUS_OK;
 }
@@ -374,17 +374,17 @@ static sl_status_t twt_callback_handler(sl_wifi_event_t event,
     SL_DEBUG_LOG_V2(DEBUG, " wake duration : 0x%X", result->wake_duration);
     SL_DEBUG_LOG_V2(DEBUG, " wake_duration_unit: 0x%X", result->wake_duration_unit);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_exp : 0x%X", result->wake_int_exp);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_mantissa : 0x%X", result->wake_int_mantissa);
     SL_DEBUG_LOG_V2(DEBUG, " implicit_twt : 0x%X", result->implicit_twt);
     SL_DEBUG_LOG_V2(DEBUG, " un_announced_twt : 0x%X", result->un_announced_twt);
     SL_DEBUG_LOG_V2(DEBUG, " triggered_twt : 0x%X", result->triggered_twt);
     SL_DEBUG_LOG_V2(DEBUG, " twt_channel : 0x%X", result->twt_channel);
     SL_DEBUG_LOG_V2(DEBUG, " twt_protection : 0x%X", result->twt_protection);
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
   } else if (event < SL_WIFI_TWT_EVENTS_END) {
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
   }
   return SL_STATUS_OK;
 }

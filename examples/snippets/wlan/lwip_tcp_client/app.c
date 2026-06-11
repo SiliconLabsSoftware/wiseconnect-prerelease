@@ -144,7 +144,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface success\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
@@ -153,7 +153,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success\r\n");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
@@ -161,7 +161,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
   groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
@@ -198,7 +198,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Performance profile set");
+  SL_DEBUG_LOG_V2(INFO, "Performance profile set\r\n");
 
   send_data_to_tcp_server();
 
@@ -206,7 +206,7 @@ static void application_start(void *argument)
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create semaphore\r\n");
     return;
   }
   // Waiting forever using semaphore to put M4 to sleep in tick less mode
@@ -234,19 +234,19 @@ void send_data_to_tcp_server()
   //!Create socket
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Socket Create Success");
+  SL_DEBUG_LOG_V2(INFO, "TCP Socket Create Success\r\n");
 
   //! Socket connect
   return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Socket Connect Success");
+  SL_DEBUG_LOG_V2(INFO, "TCP Socket Connect Success\r\n");
 
   //! send data
   while (packet_count < NUMBER_OF_PACKETS) {

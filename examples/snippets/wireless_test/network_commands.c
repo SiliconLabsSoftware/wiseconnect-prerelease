@@ -103,7 +103,7 @@ sl_status_t net_init_command_handler(console_args_t *arguments)
       break;
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface");
+      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
 
@@ -128,7 +128,7 @@ sl_status_t net_deinit_command_handler(console_args_t *arguments)
       break;
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface");
+      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
   return status;
@@ -148,10 +148,10 @@ sl_status_t net_up_command_handler(console_args_t *arguments)
       // Fetch the profile and print some information about it
       status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, profile_id, &profile);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to load profile with id: %u", profile_id);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to load profile with id: %u\r\n", profile_id);
         return status;
       }
-      SL_DEBUG_LOG_V2(INFO, "Connecting to '%s'", (uintptr_t)profile.config.ssid.value);
+      SL_DEBUG_LOG_V2(INFO, "Connecting to '%s'\r\n", (uintptr_t)profile.config.ssid.value);
       status = sl_net_wifi_client_up(interface, profile_id);
       VERIFY_STATUS_AND_RETURN(status);
     } break;
@@ -162,16 +162,16 @@ sl_status_t net_up_command_handler(console_args_t *arguments)
       // Fetch the profile and print some information about it
       status = sl_net_get_profile(SL_NET_WIFI_AP_INTERFACE, profile_id, &profile);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to load profile with id: %u", profile_id);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to load profile with id: %u\r\n", profile_id);
         return status;
       }
-      SL_DEBUG_LOG_V2(INFO, "Starting AP with SSID '%s'", (uintptr_t)profile.config.ssid.value);
+      SL_DEBUG_LOG_V2(INFO, "Starting AP with SSID '%s'\r\n", (uintptr_t)profile.config.ssid.value);
       status = sl_net_wifi_ap_up(interface, profile_id);
       VERIFY_STATUS_AND_RETURN(status);
     } break;
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface");
+      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
   return status;
@@ -196,7 +196,7 @@ sl_status_t net_down_command_handler(console_args_t *arguments)
 #endif
 
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface");
+      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
 
@@ -302,7 +302,7 @@ sl_status_t set_nvm_profile_command_handler(console_args_t *arguments)
 #endif
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface");
+      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
 
@@ -345,7 +345,7 @@ sl_status_t ping_response_callback_handler(sl_net_event_t event, sl_status_t sta
 
   if (SL_NET_PING_RESPONSE_EVENT == event) {
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, " Ping request failed! ");
+      SL_DEBUG_LOG_V2(ERROR, " Ping request failed! \r\n");
       return status;
     } else {
       SL_DEBUG_LOG_V2(INFO,

@@ -443,6 +443,7 @@ typedef struct rsi_ble_event_conn_update_s {
 
 /**
  * @brief The structure represents the parameters of a remote connection parameter request event.
+ * @note  The host shall not receive a Connection Update notification when the requested connection interval is the same as the current connection interval.
  */
 typedef struct rsi_ble_event_remote_conn_param_req_s {
   /** Device address of the remote device */
@@ -2453,6 +2454,7 @@ int32_t rsi_ble_set_local_irk_value(const uint8_t *l_irk);
  * @param[in]  status 			- accept or reject the connection parameters update request 
  *                          -	0 - ACCEPT, 
  *                          - 1 - REJECT 
+ * @note       If the central device receives a Connection Parameter Update Request with parameters that match the existing connection parameters, the central shall reject the request since no parameter change is necessary.
  * @return The following values are returned:
  * - 0 - Success 
  * - Non-Zero Value - Failure
@@ -2866,6 +2868,7 @@ int32_t rsi_ble_setphy(const int8_t *remote_dev_address, uint8_t tx_phy, uint8_t
  * @note       min_int and max_int values ranges from 6 to 3200 (Time = N * 1.25 ms, Time Range: 7.5 ms to 4 s)
 		latency : If latency value is greater than 32 ,Limiting the peripheral latency value to 32
 		Max supported peripheral latency is 32 when Device is in peripheral Role.
+ * @note       The host should refrain from sending the same connection parameters as an update request when they match the current connection parameters.
  *
  */
 int32_t rsi_ble_conn_params_update(const uint8_t *remote_dev_address,
@@ -3134,13 +3137,19 @@ int32_t rsi_ble_start_encryption(uint8_t *remote_dev_address, uint16_t ediv, con
  *                - 0x4046 - Invalid arguments
  *                - 0x4D04	- BLE not connected 
  *                - 0x4D14	- BLE parameter out of mandatory range
- * @note        This is a Blocking API. 
- * @note        Refer to the Status Codes section for the above error codes at 
+ *         This is a Blocking API. 
+ *         Refer to the Status Codes section for the above error codes at 
  *              [wiseconnect-status-codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes).
  * @note        The higher power will be backed off based on country region.
- * @note        This API currently supports controlling the TX power in the configured chain during wireless initialization. However, changing the chain from LP to HP or vice versa is not supported.
- * @note        Use the following setting to indicate tx_power as an index: 
- *              `#define RSI_BLE_PWR_INX 30`
+ *         For SiW917Y1GA and SiW917Y1GN module boards, region configuration is not supported.
+ *         These boards always use the world_safe region.
+ *         Hence, the maximum TX power is limited by the world_safe regulatory limits.
+ *        When the DUT is connected in AP mode, the output power is the minimum of the host
+ *              transmit power and the maximum power allowed for the country region.
+ *       When it is not connected to an AP, the maximum output power is world_safe.
+ *         This API currently supports controlling the TX power in the configured chain during wireless initialization. However, changing the chain from LP to HP or vice versa is not supported.
+ *        Use the following setting to indicate tx_power as an index: 
+ *             `#define RSI_BLE_PWR_INX 30`
  *              Default value for power index is 31. 
  *              Valid values for power index range from 1 to 31 and 33 to 127:
  *                - 1 to 31  : BLE - 0 dBm mode.  
@@ -4461,10 +4470,16 @@ int32_t rsi_ble_extended_connect_with_params(void *ext_create_conn);
  *     !0 = failure
  * @note
  * This function requests the controller to return the minimum and maximum supported transmit power based on the country region.
- * Limitation for ACx Boards:
+ * For SiW917Y1GA and SiW917Y1GN boards:
  * Call this API only after Bluetooth Low Energy (BLE) on-air activity has started (for example, advertising or scanning).
  * For dynamic TX power control, first initiate BLE on-air activity, and then call this API.
- * After calling this API, stop the ongoing on-air activity, update the TX power, and then restart BLE on-air activity to apply the changes.
+ * After calling this API, stop the ongoing on-air activity, update the TX power, and then restart BLE on-air activity to apply the change
+ * When the DUT is connected in AP mode, the output power is the minimum of the host
+ * transmit power and the maximum power allowed for the country region.
+ * When it is not connected to an AP, the output power is world_safe.
+ *
+ * The controller returns the minimum and maximum TX power allowed for the current country region.
+ * When WLAN is active, the returned values follow the WLAN country region limits.
  */
 int32_t rsi_ble_read_transmit_power(void *resp);
 
@@ -5142,6 +5157,8 @@ typedef void (*rsi_ble_on_le_ping_payload_timeout_t)(
  * It has to be registered using the `rsi_ble_gap_register_callbacks` API.
  * @param[out] resp_status contains the response status (Success or Error code)
  * @param[out] rsi_ble_event_remote_conn_param contains the remote device connection parameters. Refer to \ref rsi_ble_event_remote_conn_param_req_s for more details.
+ * @note       The host shall not receive a Connection Update notification when the requested connection interval is the same as the current connection interval.
+ * @note       If the central device receives a Connection Parameter Update Request with parameters that match the existing connection parameters, the central shall reject the request since no parameter change is necessary.
  * @return The following values are returned:
  *      void
  * 

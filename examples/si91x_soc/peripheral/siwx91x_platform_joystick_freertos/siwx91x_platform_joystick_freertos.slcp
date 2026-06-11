@@ -34,7 +34,9 @@ include:
   - path: joystick_freertos.h
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 define:
 - name: GAIN_OFFSET_CAL_EN
 other_file:

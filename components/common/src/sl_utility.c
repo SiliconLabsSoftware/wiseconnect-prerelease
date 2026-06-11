@@ -118,6 +118,7 @@ void print_sl_ip_address(const sl_ip_address_t *sl_ip_address)
 void print_sl_ipv4_address(const sl_ipv4_address_t *ip_address)
 {
   printf("%d.%d.%d.%d", ip_address->bytes[0], ip_address->bytes[1], ip_address->bytes[2], ip_address->bytes[3]);
+  fflush(stdout);
 }
 
 void print_sl_ipv6_address(const sl_ipv6_address_t *ip_address)
@@ -142,7 +143,7 @@ void print_mac_address(const sl_mac_address_t *mac_address)
            mac_address->octet[3],
            mac_address->octet[4],
            mac_address->octet[5]);
-  printf("%s", sl_util_mac_log);
+  SL_DEBUG_LOG_V2(INFO, "%s\r\n", (uintptr_t)sl_util_mac_log);
 }
 
 // Helper function to convert IPv6 bytes to words
@@ -469,7 +470,10 @@ void sli_reverse_digits(unsigned char *xx, int no_digits)
 
 __WEAK void sl_debug_log(const char *format, ...)
 {
-  UNUSED_PARAMETER(format);
+  va_list args;
+  va_start(args, format);
+  vprintf(format, args); // NOSONAR: format from trusted SL_DEBUG_LOG_V2 string literals only
+  va_end(args);
 }
 
 void sl_redirect_log(const char *format, ...)

@@ -66,7 +66,7 @@ static sl_status_t pcm_primary_driver_init(void);
 static void pcm_primary_task(void *argument);
 static void compare_loop_back_data(void);
 static void remove_pcm_frame_offset(pcm_data_size_t data_buffer[PCM_PRIMARY_BUFFER_SIZE + FRAME_OFFSET]);
-static sl_status_t primary_sync_wait(void);
+static sl_status_t primary_sync_wait(bool first_sync);
 
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
@@ -136,8 +136,9 @@ static void pcm_primary_task(void *argument)
     SL_PRINT_STRING_ERROR("PCM driver init failed: 0x%lx, exiting task\r\n", status);
     osThreadExit();
   }
+  SL_PRINT_STRING_ERROR("Reset Secondary\r\n");
 
-  status = primary_sync_wait();
+  status = primary_sync_wait(true);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("Primary device synchronization failed with error code: 0x%lx\r\n", status);
     osThreadExit();
@@ -164,7 +165,11 @@ static void pcm_primary_task(void *argument)
   compare_loop_back_data();
 
   (void)osEventFlagsClear(pcm_event_flags, PCM_PRIMARY_EVENT_SEND_COMPLETE);
-
+  status = primary_sync_wait(false);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Primary device synchronization failed with error code: 0x%lx\r\n", status);
+    osThreadExit();
+  }
   status = sl_si91x_pcm_transmit_data(pcm_handle, pcm_primary_data_out, PCM_PRIMARY_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("PCM transmit start fail\r\n");
@@ -232,41 +237,47 @@ static void remove_pcm_frame_offset(pcm_data_size_t data_buffer[PCM_PRIMARY_BUFF
   }
 }
 
-static sl_status_t primary_sync_wait(void)
+static sl_status_t primary_sync_wait(bool first_sync)
 {
   uint8_t pin_value  = 0;
   sl_status_t status = SL_STATUS_OK;
+  if (first_sync) {
+    status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
 
-  status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
-  if (status != SL_STATUS_OK) {
-    return status;
+    status = sl_si91x_gpio_driver_select_uulp_npss_receiver(PRIMARY_SECONDARY_SYNC_PIN, GPIO_RECEIVER_EN);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(PRIMARY_SECONDARY_SYNC_PIN, NPSS_GPIO_PIN_MUX_MODE0);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    status =
+      sl_si91x_gpio_driver_set_uulp_npss_direction(PRIMARY_SECONDARY_SYNC_PIN, (sl_si91x_gpio_direction_t)GPIO_INPUT);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
   }
-
-  status = sl_si91x_gpio_driver_select_uulp_npss_receiver(PRIMARY_SECONDARY_SYNC_PIN, GPIO_RECEIVER_EN);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(PRIMARY_SECONDARY_SYNC_PIN, NPSS_GPIO_PIN_MUX_MODE0);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  status =
-    sl_si91x_gpio_driver_set_uulp_npss_direction(PRIMARY_SECONDARY_SYNC_PIN, (sl_si91x_gpio_direction_t)GPIO_INPUT);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  SL_PRINT_STRING_ERROR("Reset Secondary and Press button 0 on primary to sync.\r\n");
+  SL_PRINT_STRING_ERROR("Press button 0 on primary to sync.\r\n");
   for (;;) {
     pin_value = sl_si91x_gpio_driver_get_uulp_npss_pin(PRIMARY_SECONDARY_SYNC_PIN);
 
     if (pin_value == 0) {
       SL_PRINT_STRING_ERROR("Button press detected, synchronization completed\r\n");
+      sl_si91x_delay_ms(10);
       break;
     }
 
+    sl_si91x_delay_ms(10);
+  }
+
+  while (pin_value == 0) {
+    pin_value = sl_si91x_gpio_driver_get_uulp_npss_pin(PRIMARY_SECONDARY_SYNC_PIN);
     sl_si91x_delay_ms(10);
   }
 

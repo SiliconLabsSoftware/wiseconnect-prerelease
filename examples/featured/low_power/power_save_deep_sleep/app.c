@@ -114,25 +114,25 @@ static void application_start(void *argument)
   // Initialize the Wi-Fi client interface
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
   // Establish a secure handshake between the M4 core and the NWP
   status = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success\r\n");
 #endif
 
   // Enabling low-power standby mode
   enable_standby();
-  SL_DEBUG_LOG_V2(INFO, "NWP is in power save mode");
+  SL_DEBUG_LOG_V2(INFO, "NWP is in power save mode\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   taskENTER_CRITICAL();
@@ -140,7 +140,7 @@ static void application_start(void *argument)
   status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS0);
   if (status != SL_STATUS_OK) {
     // If status is not OK, return with the error code.
-    SL_DEBUG_LOG_V2(ERROR, "sl_si91x_power_manager_add_ps_requirement failed, Error Code: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "sl_si91x_power_manager_add_ps_requirement failed, Error Code: 0x%lX\r\n", status);
   } else {
     SL_DEBUG_LOG_V2(INFO, "M4 Deep Sleep wake up");
   }
@@ -153,27 +153,27 @@ static void application_start(void *argument)
 
     // Brings the NWP out of power save mode
     enable_high_performance();
-    SL_DEBUG_LOG_V2(INFO, "NWP comes out of power save mode");
+    SL_DEBUG_LOG_V2(INFO, "NWP comes out of power save mode\r\n");
 
   } else if (POWER_SAVE_PROFILE == DEEP_SLEEP_WITHOUT_RAM_RETENTION) {
     // Deinitialize the Wi-Fi client interface
     status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX ", status);
+      SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX \r\n", status);
       return;
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Wi-Fi client Deinit success");
+      SL_DEBUG_LOG_V2(INFO, "Wi-Fi client Deinit success\r\n");
     }
     // Initialize the Wi-Fi client interface
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
       return;
     }
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success\r\n");
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed");
+  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed\r\n");
 
 #endif
 }
@@ -184,10 +184,10 @@ static void enable_standby(void)
 
   sl_status_t status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Power save profile with deep sleep Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Power save profile with deep sleep Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Power save profile with deep sleep Success ");
+  SL_DEBUG_LOG_V2(INFO, "Power save profile with deep sleep Success \r\n");
 }
 
 #ifndef SLI_SI91X_MCU_INTERFACE
@@ -197,9 +197,9 @@ static void enable_high_performance(void)
 
   sl_status_t status = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Module is in HIGH_PERFORMANCE mode");
+  SL_DEBUG_LOG_V2(INFO, "Module is in HIGH_PERFORMANCE mode\r\n");
 }
 #endif

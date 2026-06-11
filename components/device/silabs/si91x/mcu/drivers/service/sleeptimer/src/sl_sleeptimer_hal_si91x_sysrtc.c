@@ -360,4 +360,6 @@ uint32_t sleeptimer_hal_get_capture(void)
  ******************************************************************************/
 void sleeptimer_hal_reset_prs_signal(void)
 {
+  // Intentionally empty: Si91x sleeptimer is backed by SYSRTC and does not use the
+  // Peripheral Reflex System (PRS) to route timer compare/capture signals.
 }

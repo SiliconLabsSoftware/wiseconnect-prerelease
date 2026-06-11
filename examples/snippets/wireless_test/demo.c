@@ -125,14 +125,14 @@ void application_start(const void *unused)
   iostream_usart_init();
 #endif
 
-  SL_DEBUG_LOG_V2(INFO, "app start");
+  SL_DEBUG_LOG_V2(INFO, "app start\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "Ready");
+  SL_DEBUG_LOG_V2(INFO, "Ready\r\n");
 
   console_line_ready = 0;
 
   while (1) {
-    SL_DEBUG_LOG_V2(INFO, "> ");
+    SL_DEBUG_LOG_V2(INFO, "> \r\n");
 #ifndef SLI_SI91X_MCU_INTERFACE
     while (!end_of_cmd) {
       iostream_rx();
@@ -147,9 +147,9 @@ void application_start(const void *unused)
     sl_status_t result = console_process_buffer(&console_command_database, &args, &command);
 
     if (result == SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(DEBUG, "Processing command");
+      SL_DEBUG_LOG_V2(DEBUG, "Processing command\r\n");
       if (command->handler) {
-        SL_DEBUG_LOG_V2(INFO, "");
+        SL_DEBUG_LOG_V2(INFO, "\r\n");
         uint32_t start_time = osKernelGetTickCount();
         result              = command->handler(&args);
         uint32_t duration   = osKernelGetTickCount() - start_time;
@@ -160,7 +160,7 @@ void application_start(const void *unused)
       print_command_args(command);
       print_status(SL_STATUS_INVALID_PARAMETER, 0);
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Not supported");
+      SL_DEBUG_LOG_V2(INFO, "Not supported\r\n");
     }
     console_line_ready = 0;
   }
@@ -179,7 +179,7 @@ sl_status_t help_command_handler(console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
   for (uint8_t a = 0; a < console_command_database.length; ++a) {
-    SL_DEBUG_LOG_V2(INFO, "");
+    SL_DEBUG_LOG_V2(INFO, "\r\n");
     SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)console_command_database.entries[a].key);
     SL_DEBUG_LOG_V2(INFO, "  ");
     print_command_args((console_descriptive_command_t *)console_command_database.entries[a].value);

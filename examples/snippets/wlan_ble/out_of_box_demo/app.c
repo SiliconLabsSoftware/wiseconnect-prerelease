@@ -189,13 +189,13 @@ void rsi_wlan_ble_app_init(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, NULL, network_event_handler);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    SL_DEBUG_LOG_V2(ERROR, "Wireless Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wireless Initialization Failed, Error Code : 0x%lX\r\n", status);
     GLIB_drawStringOnLine(&glibContext, "Wireless Initialization Failed", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
     DMD_updateDisplay();
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Si917 OOB Demo " OOB_APP_VERSION "");
-  SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success");
+  SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success\r\n");
   currentLine = 0;
   GLIB_clear(&glibContext);
   GLIB_drawBitmap(&glibContext,
@@ -216,13 +216,13 @@ void rsi_wlan_ble_app_init(void *argument)
 
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (wlan_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem\r\n");
     return;
   }
 
   ble_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem\r\n");
     return;
   }
 
@@ -230,13 +230,13 @@ void rsi_wlan_ble_app_init(void *argument)
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
     return;
   }
 #endif
 
   if (osThreadNew((osThreadFunc_t)rsi_ble_configurator_task, NULL, &ble_thread_attributes) == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create BLE thread");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create BLE thread\r\n");
   }
 
   // BLE initialization

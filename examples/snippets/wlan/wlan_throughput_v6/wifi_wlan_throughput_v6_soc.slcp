@@ -48,10 +48,12 @@ requires:
   condition:
   - si91x_common_flash
 toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 - option: gcc_linker_option
   value: -u _printf_float
-- option: gcc_compiler_option
-  value: -Wall -Werror
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'

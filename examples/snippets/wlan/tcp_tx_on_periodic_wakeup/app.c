@@ -172,34 +172,34 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_throughput_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success\r\n");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to AP: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to AP: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -228,29 +228,29 @@ void send_data_to_tcp_server(void)
 
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test start\r\n");
 
   sl_wifi_performance_profile_v2_t performance_profile = { .profile         = ASSOCIATED_POWER_SAVE_LOW_LATENCY,
                                                            .listen_interval = 1000 };
 #if ENABLE_NWP_POWER_SAVE
   rc = sl_wifi_set_performance_profile_v2(&performance_profile);
   if (rc != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", rc);
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX\r\n", rc);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
+    SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled\r\n");
   }
 #endif
 
@@ -261,13 +261,13 @@ void send_data_to_tcp_server(void)
       if (sent_bytes < 0) {
         if (errno == ENOBUFS)
           continue;
-        SL_DEBUG_LOG_V2(ERROR, "TCP send failed with BSD error = %d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "TCP send failed with BSD error = %d\r\n", errno);
         break;
       }
       total_bytes_sent = total_bytes_sent + sent_bytes;
 
       if ((osKernelGetTickCount() - start) > TEST_TIMEOUT) {
-        SL_DEBUG_LOG_V2(INFO, "Data transfer has completed");
+        SL_DEBUG_LOG_V2(INFO, "Data transfer has completed\r\n");
         break;
       }
     }
@@ -277,14 +277,14 @@ void send_data_to_tcp_server(void)
 #ifdef SLI_SI91X_MCU_INTERFACE
     osStatus_t semaphore_status = osSemaphoreAcquire(button_semaphore, ALARM_TIMEOUT);
     if (semaphore_status == osOK) {
-      SL_DEBUG_LOG_V2(INFO, "M4 wake up button pressed");
+      SL_DEBUG_LOG_V2(INFO, "M4 wake up button pressed\r\n");
     } else if (semaphore_status == osErrorTimeout) {
-      SL_DEBUG_LOG_V2(INFO, "M4 alarm based wakeup");
+      SL_DEBUG_LOG_V2(INFO, "M4 alarm based wakeup\r\n");
     }
 #endif
 #endif
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP_TX test finished");
+  SL_DEBUG_LOG_V2(INFO, "TCP_TX test finished\r\n");
 
   close(client_socket);
 }

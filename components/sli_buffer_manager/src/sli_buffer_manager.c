@@ -142,7 +142,7 @@ static bool sli_buffer_manager_are_all_pools_deallocated()
 {
   CORE_irqState_t state = CORE_EnterAtomic();
 
-  SL_DEBUG_LOG_V2(DEBUG, "Buffer Manager Pools Status:");
+  SL_DEBUG_LOG_V2(DEBUG, "Buffer Manager Pools Status:\r\n");
 
   // Dedicated pools
   for (uint8_t i = 0; i < SLI_MAX_MEMPOOL_HANDLERS_COUNT; i++) {
@@ -158,7 +158,7 @@ static bool sli_buffer_manager_are_all_pools_deallocated()
     }
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "Common Pools (Queue Size: %u):", common_mempool_queue.size);
+  SL_DEBUG_LOG_V2(DEBUG, "Common Pools (Queue Size: %u):\r\n", common_mempool_queue.size);
 
   // There shall be atleast one common pool, no need to check for null in first iteration.
   sli_buffer_manager_mempool_handler_t *current = common_mempool_queue.head;

@@ -210,30 +210,30 @@ static void application_start(void *argument)
 {
   UNUSED_PARAMETER(argument);
   sl_status_t status;
-  SL_DEBUG_LOG_V2(INFO, " initializing usart ");
+  SL_DEBUG_LOG_V2(INFO, " initializing usart \r\n");
   iostream_usart_init();
-  SL_DEBUG_LOG_V2(INFO, " initialised usart ");
+  SL_DEBUG_LOG_V2(INFO, " initialised usart \r\n");
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &calibration_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization successful");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization successful\r\n");
   }
 
   status = sl_si91x_transmit_test_start(&tx_test_info);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Transmit test start failed: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit test start failed: 0x%lx\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Transmit test started");
+    SL_DEBUG_LOG_V2(INFO, "Transmit test started\r\n");
   }
 
   status = calibration_app();
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Calibration test failed with status 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Calibration test failed with status 0x%lx\r\n", status);
     return;
   }
 }
@@ -261,7 +261,7 @@ void iostream_rx()
 
 void display_calib_cmd_usage()
 {
-  SL_DEBUG_LOG_V2(INFO, "Calibration commands usage:");
+  SL_DEBUG_LOG_V2(INFO, "Calibration commands usage:\r\n");
   SL_DEBUG_LOG_V2(
     INFO,
     "*************************************************************************************************************"
@@ -385,14 +385,14 @@ sl_status_t calibration_app()
   while (1) {
     display_calib_cmd_usage();
 
-    SL_DEBUG_LOG_V2(INFO, "Enter the calibration command:");
+    SL_DEBUG_LOG_V2(INFO, "Enter the calibration command:\r\n");
 
     while (!end_of_cmd) {
       iostream_rx();
     }
     end_of_cmd = false;
 
-    SL_DEBUG_LOG_V2(INFO, "Command read complete");
+    SL_DEBUG_LOG_V2(INFO, "Command read complete\r\n");
 
     cmd_len = validate_and_set_cmd_index();
     offset  = cmd_len;
@@ -403,10 +403,10 @@ sl_status_t calibration_app()
           freq_calib_pkt.frequency_offset_in_khz = temp4B;
           status                                 = sl_si91x_frequency_offset(&freq_calib_pkt);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Frequency offset correction failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "Frequency offset correction failed: 0x%lx\r\n", status);
             //return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "Frequency offset correction successful");
+            SL_DEBUG_LOG_V2(INFO, "Frequency offset correction successful\r\n");
           }
           offset = 0;
           temp4B = 0;
@@ -442,18 +442,18 @@ sl_status_t calibration_app()
           }
           status = sl_si91x_calibration_write(calib_pkt);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Calibration data write failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "Calibration data write failed: 0x%lx\r\n", status);
             return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "Calibration data write successful");
+            SL_DEBUG_LOG_V2(INFO, "Calibration data write successful\r\n");
           }
           target.target = calib_pkt.target;
           status        = sl_si91x_calibration_read(target, &calib_read_pkt);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Calibration data read failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "Calibration data read failed: 0x%lx\r\n", status);
             return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "Calibration data read successful");
+            SL_DEBUG_LOG_V2(INFO, "Calibration data read successful\r\n");
             SL_DEBUG_LOG_V2(DEBUG,
                             "target %d, gain_offset_low:%d, gain_offset_2:%d",
                             calib_read_pkt.target,
@@ -472,10 +472,10 @@ sl_status_t calibration_app()
         case EVM_OFFSET:
           status = sl_si91x_transmit_test_stop();
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Transmit test stop failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "Transmit test stop failed: 0x%lx\r\n", status);
             return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "Transmit test stopped");
+            SL_DEBUG_LOG_V2(INFO, "Transmit test stopped\r\n");
           }
           if (buffer[offset] != '\0') {
             offset += parse_cmd(&temp1B, PARSE_1_BYTE, (uint8_t *)&buffer[offset]);
@@ -487,19 +487,19 @@ sl_status_t calibration_app()
           }
           status = sl_si91x_evm_offset(&evm_offset_pkt);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "EVM offset correction failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "EVM offset correction failed: 0x%lx\r\n", status);
             return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "EVM offset correction successful");
+            SL_DEBUG_LOG_V2(INFO, "EVM offset correction successful\r\n");
           }
           offset = 0;
           temp1B = 0;
           status = sl_si91x_transmit_test_start(&tx_test_info);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Transmit test start failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "Transmit test start failed: 0x%lx\r\n", status);
             return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "Transmit test started");
+            SL_DEBUG_LOG_V2(INFO, "Transmit test started\r\n");
           }
           break;
         case EVM_WRITE:
@@ -533,27 +533,27 @@ sl_status_t calibration_app()
           }
           status = sl_si91x_evm_write(&evm_write_pkt);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "EVM offset correction failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "EVM offset correction failed: 0x%lx\r\n", status);
             return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "EVM offset correction successful");
+            SL_DEBUG_LOG_V2(INFO, "EVM offset correction successful\r\n");
           }
           break;
         case DPD_CALIB_WRITE:
           status = sl_process_dpd_calibration(&dpd_calib_pkt);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "DPD calibration failed: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "DPD calibration failed: 0x%lx\r\n", status);
             return status;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "DPD claibration successful");
+            SL_DEBUG_LOG_V2(INFO, "DPD claibration successful\r\n");
           }
           break;
         default:
-          SL_DEBUG_LOG_V2(WARN, "Invalid command");
+          SL_DEBUG_LOG_V2(WARN, "Invalid command\r\n");
           break;
       }
     } else {
-      SL_DEBUG_LOG_V2(WARN, "Invalid command");
+      SL_DEBUG_LOG_V2(WARN, "Invalid command\r\n");
     }
 
     memset(buffer, 0, sizeof(buffer));
@@ -570,10 +570,10 @@ sl_status_t sl_process_dpd_calibration(sl_si91x_get_dpd_calib_data_t *dpd_power_
   calib_pkt.flags                        = 256;
   status                                 = sl_si91x_transmit_test_stop();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Transmit failed to stop %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit failed to stop %lx\r\n", status);
     return status;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Transmit command stopped");
+    SL_DEBUG_LOG_V2(INFO, "Transmit command stopped\r\n");
   }
 
   for (i = 0; i < MAX_DPD_TRAINING_CHANNELS; i++) {
@@ -583,45 +583,45 @@ sl_status_t sl_process_dpd_calibration(sl_si91x_get_dpd_calib_data_t *dpd_power_
       tx_test_info.channel = channel_sel[i];
       status               = sl_si91x_transmit_test_start(&tx_test_info);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Transmit failed with channel num %lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "Transmit failed with channel num %lx\r\n", status);
         return status;
       } else {
-        SL_DEBUG_LOG_V2(INFO, "Transmit command started with channel num %x", channel_sel[i]);
+        SL_DEBUG_LOG_V2(INFO, "Transmit command started with channel num %x\r\n", channel_sel[i]);
       }
       osDelay(1000);
 
       status = sl_si91x_transmit_test_stop();
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Transmit failed to stop %lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "Transmit failed to stop %lx\r\n", status);
         return status;
       } else {
-        SL_DEBUG_LOG_V2(INFO, "Transmit command stopped");
+        SL_DEBUG_LOG_V2(INFO, "Transmit command stopped\r\n");
       }
       osDelay(1000);
     }
     if (i == MAX_DPD_TRAINING_CHANNELS - 1) {
       status = sl_si91x_dpd_calibration(dpd_power_inx);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "rsi_calibration_dpd_failed %lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_calibration_dpd_failed %lx\r\n", status);
         return status;
       } else {
-        SL_DEBUG_LOG_V2(INFO, "calib-val coellecting");
+        SL_DEBUG_LOG_V2(INFO, "calib-val coellecting\r\n");
       }
       osDelay(1000);
       status = sl_si91x_calibration_write(calib_pkt);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "rsi_calib_write failed with error %lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_calib_write failed with error %lx\r\n", status);
         return status;
       } else {
-        SL_DEBUG_LOG_V2(INFO, "calib-write pass");
+        SL_DEBUG_LOG_V2(INFO, "calib-write pass\r\n");
       }
     } else {
       status = sl_si91x_dpd_calibration(dpd_power_inx);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "rsi_calibration_dpd_failed %lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "rsi_calibration_dpd_failed %lx\r\n", status);
         return status;
       } else {
-        SL_DEBUG_LOG_V2(INFO, "calib val collect");
+        SL_DEBUG_LOG_V2(INFO, "calib val collect\r\n");
       }
     }
     osDelay(1000);

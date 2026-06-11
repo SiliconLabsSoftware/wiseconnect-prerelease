@@ -308,9 +308,9 @@ void throughput_calculation(uint32_t start_timer, uint32_t stop_timer, uint32_t 
 
   timing     = (((float)(stop_timer - start_timer)) / 1000);
   throughput = (((float)(packet_count * RSI_BLE_MAX_DATA_LEN * 8)) / timing);
-  SL_DEBUG_LOG_V2(INFO, "Throughput : %.07f bps", (float)throughput);
-  SL_DEBUG_LOG_V2(INFO, "Throughput : %.07f kbps", (float)(throughput / 1000));
-  SL_DEBUG_LOG_V2(INFO, "Time duration in sec:%0.2f ", timing);
+  SL_DEBUG_LOG_V2(INFO, "Throughput : %.07f bps\r\n", (float)throughput);
+  SL_DEBUG_LOG_V2(INFO, "Throughput : %.07f kbps\r\n", (float)(throughput / 1000));
+  SL_DEBUG_LOG_V2(INFO, "Time duration in sec:%0.2f \r\n", timing);
 }
 
 /*==============================================*/
@@ -459,7 +459,7 @@ void rsi_ble_on_sc_passkey(rsi_bt_event_sc_passkey_t *sc_passkey)
  */
 static void rsi_ble_on_le_ltk_req_event(rsi_bt_event_le_ltk_request_t *le_ltk_req)
 {
-  SL_DEBUG_LOG_V2(INFO, "\r\n rsi_ble_on_le_ltk_req_event ");
+  SL_DEBUG_LOG_V2(INFO, "\r\n rsi_ble_on_le_ltk_req_event \r\n");
   memcpy(&ble_ltk_req, le_ltk_req, sizeof(rsi_bt_event_le_ltk_request_t));
   rsi_ble_app_set_event(RSI_BLE_LTK_REQ_EVENT);
 }
@@ -476,7 +476,7 @@ static void rsi_ble_on_le_ltk_req_event(rsi_bt_event_le_ltk_request_t *le_ltk_re
 void rsi_ble_on_le_security_keys(rsi_bt_event_le_security_keys_t *rsi_ble_event_le_security_keys)
 {
   memcpy(&app_ble_sec_keys, rsi_ble_event_le_security_keys, sizeof(rsi_bt_event_le_security_keys_t));
-  //SL_DEBUG_LOG_V2(INFO, "remote_ediv: 0x%x", app_ble_sec_keys.remote_ediv);
+  //SL_DEBUG_LOG_V2(INFO, "remote_ediv: 0x%x\r\n", app_ble_sec_keys.remote_ediv);
 }
 
 /*==============================================*/
@@ -871,15 +871,15 @@ void ble_throughput_test_app(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success");
+  SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success\r\n");
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -887,11 +887,11 @@ void ble_throughput_test_app(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s \r\n", (uintptr_t)(local_dev_addr));
   }
 
   //! registering the GAP callback functions
@@ -949,7 +949,7 @@ void ble_throughput_test_app(void *argument)
 #endif
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem\r\n");
     return;
   }
 
@@ -974,18 +974,18 @@ void ble_throughput_test_app(void *argument)
   //! start advertising
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "start advertising cmd failed with error code = %lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "start advertising cmd failed with error code = %lx \r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Started advertising, local name : %s", (uintptr_t)((char *)RSI_BLE_DEVICE_NAME));
+    SL_DEBUG_LOG_V2(INFO, "Started advertising, local name : %s\r\n", (uintptr_t)((char *)RSI_BLE_DEVICE_NAME));
   }
 
 #elif (CONNECTION_ROLE == CENTERAL_ROLE)
 
   status = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "start scanning cmd failed with error code = %lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "start scanning cmd failed with error code = %lx \r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Started scanning ");
+    SL_DEBUG_LOG_V2(INFO, "Started scanning \r\n");
   }
 #endif
 
@@ -1004,17 +1004,17 @@ void ble_throughput_test_app(void *argument)
 #if (CONNECTION_ROLE == CENTERAL_ROLE)
       case RSI_BLE_ADV_REPORT_EVENT: {
 
-        SL_DEBUG_LOG_V2(INFO, "Advertise report received ");
+        SL_DEBUG_LOG_V2(INFO, "Advertise report received \r\n");
 
-        SL_DEBUG_LOG_V2(INFO, "Device found. Stop scanning ");
+        SL_DEBUG_LOG_V2(INFO, "Device found. Stop scanning \r\n");
         status = rsi_ble_stop_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Scan stop cmd failed = %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Scan stop cmd failed = %lx\r\n", status);
         }
-        SL_DEBUG_LOG_V2(INFO, "Connect command ");
+        SL_DEBUG_LOG_V2(INFO, "Connect command \r\n");
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "BLE connect cmd failed = %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "BLE connect cmd failed = %lx\r\n", status);
         }
 
         //! clear the advertise report event.
@@ -1024,7 +1024,7 @@ void ble_throughput_test_app(void *argument)
 
       case RSI_BLE_CONN_EVENT: {
         //! event invokes when connection was completed
-        SL_DEBUG_LOG_V2(INFO, "Connected, str_remote_address : %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Connected, str_remote_address : %s\r\n", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
@@ -1033,7 +1033,7 @@ void ble_throughput_test_app(void *argument)
         status = rsi_ble_mtu_exchange_event(remote_dev_address, MAX_MTU_SIZE);
         if (status != RSI_SUCCESS) {
 
-          SL_DEBUG_LOG_V2(ERROR, "MTU request cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "MTU request cmd failed with error code = %lx \r\n", status);
         }
 
         //! initiating the SMP pairing process
@@ -1042,7 +1042,7 @@ void ble_throughput_test_app(void *argument)
 
       case RSI_BLE_DISCONN_EVENT: {
         //! event invokes when disconnection was completed
-        SL_DEBUG_LOG_V2(INFO, "Disconnected, str_remote_address : %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Disconnected, str_remote_address : %s\r\n", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
@@ -1057,24 +1057,24 @@ void ble_throughput_test_app(void *argument)
         //! start advertising
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx \r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Started Advertising ");
+          SL_DEBUG_LOG_V2(INFO, "Started Advertising \r\n");
         }
 #elif (CONNECTION_ROLE == CENTERAL_ROLE)
 
         status = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Start scanning cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start scanning cmd failed with error code = %lx \r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Started scanning ");
+          SL_DEBUG_LOG_V2(INFO, "Started scanning \r\n");
         }
 #endif
       } break;
 #if SMP_ENABLE
       case RSI_BLE_SMP_REQ_EVENT: {
         //! initiate SMP protocol as a Central
-        SL_DEBUG_LOG_V2(INFO, "smp_req, str_remote_address : %s", (uintptr_t)((char *)str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "smp_req, str_remote_address : %s\r\n", (uintptr_t)((char *)str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_REQ_EVENT);
@@ -1082,13 +1082,13 @@ void ble_throughput_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_pair_request(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx \r\n", status);
         }
       } break;
 
       case RSI_BLE_SMP_RESP_EVENT: {
         //! initiate SMP protocol as a Central
-        SL_DEBUG_LOG_V2(INFO, "smp_resp, str_remote_address : %s", (uintptr_t)((char *)str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "smp_resp, str_remote_address : %s\r\n", (uintptr_t)((char *)str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_RESP_EVENT);
@@ -1096,13 +1096,13 @@ void ble_throughput_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_pair_response(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp pair response cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp pair response cmd failed with error code = %lx \r\n", status);
         }
       } break;
 
       case RSI_BLE_SMP_PASSKEY_EVENT: {
         //! initiate SMP protocol as a Central
-        SL_DEBUG_LOG_V2(INFO, "smp_passkeystr, _remote_address : %s", (uintptr_t)((char *)str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "smp_passkeystr, _remote_address : %s\r\n", (uintptr_t)((char *)str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_PASSKEY_EVENT);
@@ -1110,7 +1110,7 @@ void ble_throughput_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_passkey(remote_dev_address, RSI_BLE_SMP_PASSKEY);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp passkey cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp passkey cmd failed with error code = %lx \r\n", status);
         }
       } break;
       case RSI_BLE_SMP_PASSKEY_DISPLAY_EVENT: {
@@ -1136,13 +1136,13 @@ void ble_throughput_test_app(void *argument)
         rsi_ble_app_clear_event(RSI_BLE_LTK_REQ_EVENT);
         status = rsi_ble_ltk_req_reply(remote_dev_address, 0, NULL);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Ltk req reply cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "Ltk req reply cmd failed with error code = %lx \r\n", status);
         }
       } break;
 
       case RSI_BLE_SMP_FAILED_EVENT: {
         //! initiate SMP protocol as a Central
-        SL_DEBUG_LOG_V2(ERROR, "smp_failed, str_remote_address: %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(ERROR, "smp_failed, str_remote_address: %s\r\n", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_SMP_FAILED_EVENT);
@@ -1158,14 +1158,14 @@ void ble_throughput_test_app(void *argument)
 #endif
       case RSI_BLE_RECEIVE_REMOTE_FEATURES: {
         //! clear the served event
-        SL_DEBUG_LOG_V2(INFO, "Feature received is %x ", *(uint8_t *)remote_dev_feature.remote_features);
+        SL_DEBUG_LOG_V2(INFO, "Feature received is %x \r\n", *(uint8_t *)remote_dev_feature.remote_features);
 
         rsi_ble_app_clear_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
 
         if (remote_dev_feature.remote_features[0] & 0x20) {
           status = rsi_ble_set_data_len(remote_dev_address, TX_LEN, TX_TIME);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "Set data length cmd failed with error code = %lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "Set data length cmd failed with error code = %lx \r\n", status);
             rsi_ble_app_set_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
             //return;
           }
@@ -1177,7 +1177,7 @@ void ble_throughput_test_app(void *argument)
               //retry the same command
               rsi_ble_app_set_event(RSI_APP_EVENT_DATA_LENGTH_CHANGE);
             } else {
-              SL_DEBUG_LOG_V2(ERROR, "Set phy cmd failed with error code = %lx ", status);
+              SL_DEBUG_LOG_V2(ERROR, "Set phy cmd failed with error code = %lx \r\n", status);
             }
           }
         } else {
@@ -1185,7 +1185,7 @@ void ble_throughput_test_app(void *argument)
           //! initiating the SMP pairing process
           status = rsi_ble_smp_pair_request(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx \r\n", status);
           }
 #endif
         }
@@ -1194,10 +1194,10 @@ void ble_throughput_test_app(void *argument)
 
       case RSI_APP_EVENT_DATA_LENGTH_CHANGE: {
 
-        SL_DEBUG_LOG_V2(INFO, "Max_tx_octets: %d ", data_length_update.MaxTxOctets);
-        SL_DEBUG_LOG_V2(INFO, "Max_tx_time: %d ", data_length_update.MaxTxTime);
-        SL_DEBUG_LOG_V2(INFO, "Max_rx_octets: %d ", data_length_update.MaxRxOctets);
-        SL_DEBUG_LOG_V2(INFO, "Max_rx_time: %d ", data_length_update.MaxRxTime);
+        SL_DEBUG_LOG_V2(INFO, "Max_tx_octets: %d \r\n", data_length_update.MaxTxOctets);
+        SL_DEBUG_LOG_V2(INFO, "Max_tx_time: %d \r\n", data_length_update.MaxTxTime);
+        SL_DEBUG_LOG_V2(INFO, "Max_rx_octets: %d \r\n", data_length_update.MaxRxOctets);
+        SL_DEBUG_LOG_V2(INFO, "Max_rx_time: %d \r\n", data_length_update.MaxRxTime);
 
         //! clear the disconnected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_DATA_LENGTH_CHANGE);
@@ -1210,7 +1210,7 @@ void ble_throughput_test_app(void *argument)
               //retry the same command
               rsi_ble_app_set_event(RSI_APP_EVENT_DATA_LENGTH_CHANGE);
             } else {
-              SL_DEBUG_LOG_V2(ERROR, "Set phy cmd failed with error code = %lx ", status);
+              SL_DEBUG_LOG_V2(ERROR, "Set phy cmd failed with error code = %lx \r\n", status);
             }
           }
         } else {
@@ -1218,7 +1218,7 @@ void ble_throughput_test_app(void *argument)
           //! initiating the SMP pairing process
           status = rsi_ble_smp_pair_request(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx \r\n", status);
           }
 #endif
         }
@@ -1236,7 +1236,7 @@ void ble_throughput_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_pair_request(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp pair request cmd failed with error code = %lx \r\n", status);
         }
 #endif
       } break;
@@ -1274,21 +1274,21 @@ void ble_throughput_test_app(void *argument)
       case RSI_BLE_GATT_WRITE_EVENT: {
 
         //! event invokes when write/notification events receive
-        SL_DEBUG_LOG_V2(INFO, "Received packet type = %u", app_ble_write_event.pkt_type);
+        SL_DEBUG_LOG_V2(INFO, "Received packet type = %u\r\n", app_ble_write_event.pkt_type);
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
-        //SL_DEBUG_LOG_V2(INFO, "GWE");
+        //SL_DEBUG_LOG_V2(INFO, "GWE\r\n");
         if ((*(uint16_t *)app_ble_write_event.handle - 1) == rsi_ble_att2_val_hndl) {
           if (app_ble_write_event.att_value[0] == NOTIFY_ENABLE) {
-            SL_DEBUG_LOG_V2(INFO, "Remote device enabled the notification ");
+            SL_DEBUG_LOG_V2(INFO, "Remote device enabled the notification \r\n");
             //! set the data transfer event
             notifies_enabled = 0x01;
             tx_pkt_cnt       = 0;
             tx_start_timer   = osKernelGetTickCount();
             rsi_ble_app_set_event(RSI_DATA_TRANSMIT_EVENT);
           } else if (app_ble_write_event.att_value[0] == NOTIFY_DISABLE) {
-            SL_DEBUG_LOG_V2(INFO, "Remote device disabled the notification ");
+            SL_DEBUG_LOG_V2(INFO, "Remote device disabled the notification \r\n");
             //! clear the data transfer event
             notifies_enabled = 0x00;
             tx_stop_timer    = osKernelGetTickCount();
@@ -1309,7 +1309,7 @@ void ble_throughput_test_app(void *argument)
                                               CONN_LATENCY,
                                               SUPERVISION_TIMEOUT);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "conn params update cmd failed with status = %lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "conn params update cmd failed with status = %lx \r\n", status);
           } else {
             conn_params_updated = 1;
           }
@@ -1321,12 +1321,12 @@ void ble_throughput_test_app(void *argument)
           status = rsi_ble_notify_value(remote_dev_address, rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, send_buf);
           if (status != RSI_SUCCESS) {
             if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
-              //SL_DEBUG_LOG_V2(ERROR, "write with response failed with buffer error = %d ", status);
+              //SL_DEBUG_LOG_V2(ERROR, "write with response failed with buffer error = %d \r\n", status);
               //! wait for the more data request received from the device
               rsi_ble_app_clear_event(RSI_DATA_TRANSMIT_EVENT);
               break;
             } else {
-              SL_DEBUG_LOG_V2(ERROR, "Write with response failed with status = %lx ", status);
+              SL_DEBUG_LOG_V2(ERROR, "Write with response failed with status = %lx \r\n", status);
               //! clear the served event
               rsi_ble_app_clear_event(RSI_DATA_TRANSMIT_EVENT);
             }

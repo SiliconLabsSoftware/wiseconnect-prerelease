@@ -45,11 +45,11 @@
 /******************************************************
  *                      Macros
  ******************************************************/
-#define VERFIY_SOCKET_CREATE(expression)                                            \
-  {                                                                                 \
-    if (expression) {                                                               \
-      SL_DEBUG_LOG_V2(ERROR, "SSL Socket Create failed with bsd error: %d", errno); \
-    }                                                                               \
+#define VERFIY_SOCKET_CREATE(expression)                                                \
+  {                                                                                     \
+    if (expression) {                                                                   \
+      SL_DEBUG_LOG_V2(ERROR, "SSL Socket Create failed with bsd error: %d\r\n", errno); \
+    }                                                                                   \
   };
 
 /******************************************************
@@ -151,32 +151,32 @@ static void application_start(void *argument)
   sl_status_t status;
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success\r\n");
 
 #if LOAD_CERTIFICATE
   status = clear_and_load_certificates_in_flash();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lX\r\n", status);
     return;
   }
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = create_three_ssl_client_sockets();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while creating SSL sockets: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while creating SSL sockets: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed");
+  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed\r\n");
 }
 
 sl_status_t clear_and_load_certificates_in_flash(void)
@@ -187,19 +187,19 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 0);
+  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", 0);
 
   // Load SSL CA certificate
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(1), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 1);
+  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", 1);
 
   // Load SSL CA certificate
   status = sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(2),
@@ -207,10 +207,10 @@ sl_status_t clear_and_load_certificates_in_flash(void)
                                  aws_starfield_ca,
                                  sizeof(aws_starfield_ca) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successfull", 2);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successfull\r\n", 2);
 
   // Load SSL Client certificate
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(2),
@@ -218,10 +218,10 @@ sl_status_t clear_and_load_certificates_in_flash(void)
                                  aws_client_certificate,
                                  sizeof(aws_client_certificate) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successfull", 2);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successfull\r\n", 2);
 
   // Load SSL Client private key
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(2),
@@ -229,10 +229,10 @@ sl_status_t clear_and_load_certificates_in_flash(void)
                                  aws_client_private_key,
                                  sizeof(aws_client_private_key) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successfull", 2);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successfull\r\n", 2);
 
   return SL_STATUS_OK;
 }
@@ -264,7 +264,7 @@ sl_status_t create_three_ssl_client_sockets(void)
   } while ((dns_retry_count < MAX_DNS_RETRY_COUNT) && (status != SL_STATUS_OK));
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while while resolving dns, Error 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while while resolving dns, Error 0x%lX\r\n", status);
     return status;
   }
 
@@ -272,13 +272,13 @@ sl_status_t create_three_ssl_client_sockets(void)
   for (sock_id = 0; sock_id < MAX_SOCKET; sock_id++) {
     client_socket[sock_id] = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     VERFIY_SOCKET_CREATE(client_socket[sock_id] < 0);
-    SL_DEBUG_LOG_V2(INFO, "%d SSL Socket Create Success", sock_id + 1);
+    SL_DEBUG_LOG_V2(INFO, "%d SSL Socket Create Success\r\n", sock_id + 1);
   }
 
   //! Setting SSL socket option
   socket_status = setsockopt(client_socket[0], SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
   if (socket_status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "1st SSL Set socket failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "1st SSL Set socket failed with bsd error: %d\r\n", errno);
     close(client_socket[0]);
     return SL_STATUS_FAIL;
   }
@@ -288,7 +288,7 @@ sl_status_t create_three_ssl_client_sockets(void)
   socket_status =
     setsockopt(client_socket[0], SOL_SOCKET, SL_SO_CERT_INDEX, &ssl_certificate_index, sizeof(ssl_certificate_index));
   if (socket_status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, " 1st SSL set certificate index failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, " 1st SSL set certificate index failed with bsd error: %d\r\n", errno);
     close(client_socket[0]);
     return SL_STATUS_FAIL;
   }
@@ -296,7 +296,7 @@ sl_status_t create_three_ssl_client_sockets(void)
   //! Setting SSL socket option
   socket_status = setsockopt(client_socket[1], SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
   if (socket_status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, " 2nd SSL set socket failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, " 2nd SSL set socket failed with bsd error: %d\r\n", errno);
     close(client_socket[1]);
     return SL_STATUS_FAIL;
   }
@@ -306,7 +306,7 @@ sl_status_t create_three_ssl_client_sockets(void)
   socket_status =
     setsockopt(client_socket[1], SOL_SOCKET, SL_SO_CERT_INDEX, &ssl_certificate_index, sizeof(ssl_certificate_index));
   if (socket_status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, " 2nd SSL Set certificate index failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, " 2nd SSL Set certificate index failed with bsd error: %d\r\n", errno);
     close(client_socket[1]);
     return SL_STATUS_FAIL;
   }
@@ -314,7 +314,7 @@ sl_status_t create_three_ssl_client_sockets(void)
   //! Setting SSL socket option
   socket_status = setsockopt(client_socket[2], SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
   if (socket_status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "3rd SSL set socket failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "3rd SSL set socket failed with bsd error: %d\r\n", errno);
     close(client_socket[2]);
     return SL_STATUS_FAIL;
   }
@@ -324,7 +324,7 @@ sl_status_t create_three_ssl_client_sockets(void)
   socket_status =
     setsockopt(client_socket[2], SOL_SOCKET, SL_SO_CERT_INDEX, &ssl_certificate_index, sizeof(ssl_certificate_index));
   if (socket_status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "3rd SSL set certificate index failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "3rd SSL set certificate index failed with bsd error: %d\r\n", errno);
     close(client_socket[2]);
     return SL_STATUS_FAIL;
   }
@@ -353,11 +353,11 @@ sl_status_t create_three_ssl_client_sockets(void)
     socket_status =
       connect(client_socket[sock_id], (struct sockaddr *)&server_addr[sock_id], sizeof(server_addr[sock_id]));
     if (socket_status < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "%d SSL Socket Connect failed with bsd error: %d", sock_id, errno);
+      SL_DEBUG_LOG_V2(ERROR, "%d SSL Socket Connect failed with bsd error: %d\r\n", sock_id, errno);
       close(client_socket[sock_id]);
       return SL_STATUS_FAIL;
     }
-    SL_DEBUG_LOG_V2(INFO, "%d Socket Connect Success", sock_id + 1);
+    SL_DEBUG_LOG_V2(INFO, "%d Socket Connect Success\r\n", sock_id + 1);
   }
 
   // Fill send buffer
@@ -372,18 +372,18 @@ sl_status_t create_three_ssl_client_sockets(void)
         sock_id--;
         continue;
       }
-      SL_DEBUG_LOG_V2(ERROR, "Send failed on client_socket %d with bsd error : %d", sock_id, errno);
+      SL_DEBUG_LOG_V2(ERROR, "Send failed on client_socket %d with bsd error : %d\r\n", sock_id, errno);
       return SL_STATUS_FAIL;
     }
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Data transfer on 3 sockets is completed");
+  SL_DEBUG_LOG_V2(INFO, "Data transfer on 3 sockets is completed\r\n");
 
   for (sock_id = 0; sock_id < MAX_SOCKET; sock_id++) {
     close(client_socket[sock_id]);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Socket Close Success");
+  SL_DEBUG_LOG_V2(INFO, "Socket Close Success\r\n");
 
   return SL_STATUS_OK;
 }

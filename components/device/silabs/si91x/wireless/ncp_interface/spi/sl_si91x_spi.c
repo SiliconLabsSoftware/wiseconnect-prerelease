@@ -431,7 +431,7 @@ sl_status_t sli_si91x_bus_read_frame(sl_wifi_buffer_t **buffer)
                                               (sli_buffer_t *)buffer);
   if (status != SL_STATUS_OK) {
     sl_si91x_host_spi_cs_deassert();
-    SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION");
+    SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 

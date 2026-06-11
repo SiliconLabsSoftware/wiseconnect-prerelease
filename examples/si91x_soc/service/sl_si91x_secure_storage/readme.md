@@ -35,9 +35,15 @@ After that reset, **firmware starts again from the beginning**, so **each boot**
 
 ## About Example Code
 
-- [`app.c`](app.c) – Application that initializes Wi-Fi and the network stack, writes predefined values to REG0–REG7 (write key for REG0–REG3 is handled inside the driver), optionally enables secure protection and lock, sets power profile to deep sleep with RAM retention, then reads all registers, verifies them against the expected values, disables interrupts, and spins until the watchdog resets the system. Before writing, the app may skip the write if current register values already match the desired values.
+- [`app.c`](app.c)
+  - Initializes Wi-Fi and the network stack
+  - Writes predefined values to REG0–REG7 (write key for REG0–REG3 is handled inside the driver)
+  - Optionally enables secure protection and lock
+  - Sets power profile to deep sleep with RAM retention
+  - Reads all registers and verifies them against the expected values
+  - Disables interrupts and spins until the watchdog resets the system
 
-**Note:** Secure storage registers retain values across power cycles and typical resets. REG0–REG3 are protected by the write key (handled inside the driver); REG4–REG7 have no write key. The intentional WDT reset at the end of each run causes a normal reboot so you can observe that **read/verify runs again** on the next boot; the WDT path is **not** required for real products using secure storage.
+> **Note:** The application may skip writing if current register values match the desired values. Secure storage registers retain values across power cycles and typical resets. REG0–REG3 are protected by the write key (handled inside the driver); REG4–REG7 have no write key. The intentional WDT reset at the end of each run causes a normal reboot, so you can observe read/verify runs again on the next boot. The WDT path is not required for real products using secure storage.
 
 ## Prerequisites/Setup Requirements
 

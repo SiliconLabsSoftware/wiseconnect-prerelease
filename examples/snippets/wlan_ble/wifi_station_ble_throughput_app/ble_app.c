@@ -568,9 +568,9 @@ void rsi_ble_app_init(void)
   //! start advertising
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx \r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Started advertising, local device name: %s", (uintptr_t)(char *)RSI_BLE_DEVICE_NAME);
+    SL_DEBUG_LOG_V2(INFO, "Started advertising, local device name: %s\r\n", (uintptr_t)(char *)RSI_BLE_DEVICE_NAME);
   }
 }
 
@@ -601,7 +601,7 @@ void rsi_ble_app_task(void)
     switch (event_id) {
       case RSI_BLE_CONN_EVENT: {
         //! event invokes when connection was completed
-        SL_DEBUG_LOG_V2(INFO, "Connected to remote address : %s", (uintptr_t)str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "Connected to remote address : %s\r\n", (uintptr_t)str_remote_address);
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
@@ -612,7 +612,7 @@ void rsi_ble_app_task(void)
 
       case RSI_BLE_DISCONN_EVENT: {
         //! event invokes when disconnection was completed
-        SL_DEBUG_LOG_V2(INFO, "Disconnected from remote address : %s", (uintptr_t)str_remote_address);
+        SL_DEBUG_LOG_V2(INFO, "Disconnected from remote address : %s\r\n", (uintptr_t)str_remote_address);
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
@@ -635,9 +635,11 @@ void rsi_ble_app_task(void)
         //! start advertising
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx \r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Started advertising, local device name: %s", (uintptr_t)(char *)RSI_BLE_DEVICE_NAME);
+          SL_DEBUG_LOG_V2(INFO,
+                          "Started advertising, local device name: %s\r\n",
+                          (uintptr_t)(char *)RSI_BLE_DEVICE_NAME);
         }
       } break;
 
@@ -660,12 +662,12 @@ void rsi_ble_app_task(void)
 
         if ((*(uint16_t *)app_ble_write_event.handle - 1) == rsi_ble_att2_val_hndl) {
           if (app_ble_write_event.att_value[0] == NOTIFY_ENABLE) {
-            SL_DEBUG_LOG_V2(INFO, "Remote device enabled the notification ");
+            SL_DEBUG_LOG_V2(INFO, "Remote device enabled the notification \r\n");
             //! set the data transfer event
             notifies_enabled = 0x01;
             rsi_ble_app_set_event(RSI_DATA_TRANSMIT_EVENT);
           } else if (app_ble_write_event.att_value[0] == NOTIFY_DISABLE) {
-            SL_DEBUG_LOG_V2(INFO, "Remote device disabled the notification ");
+            SL_DEBUG_LOG_V2(INFO, "Remote device disabled the notification \r\n");
             //! clear the data transfer event
             notifies_enabled = 0x00;
             rsi_ble_app_clear_event(RSI_DATA_TRANSMIT_EVENT);

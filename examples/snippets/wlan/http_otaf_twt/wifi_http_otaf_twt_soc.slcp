@@ -49,7 +49,11 @@ requires:
 - name: device_needs_ram_execution
   condition:
   - si91x_common_flash
-toolchain_settings: []
+toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'

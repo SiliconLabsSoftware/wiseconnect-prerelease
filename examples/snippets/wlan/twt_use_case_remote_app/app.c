@@ -156,7 +156,7 @@ void data_callback(uint32_t sock_no,
   num_bytes += length;
   num_pkts++;
   memcpy((void *)rxBuff, buffer, length);
-  SL_DEBUG_LOG_V2(INFO, "Received %ld bytes", length);
+  SL_DEBUG_LOG_V2(INFO, "Received %ld bytes\r\n", length);
   SL_DEBUG_LOG_V2(DEBUG, "\"");
   for (i = 0; i < length; i++) {
     SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[i]);
@@ -164,7 +164,7 @@ void data_callback(uint32_t sock_no,
   SL_DEBUG_LOG_V2(DEBUG, "\"");
   if (data_recvd == 0) {
     end_rtt = osKernelGetTickCount();
-    SL_DEBUG_LOG_V2(INFO, "Overall RTT : 0x%lX", (end_rtt - start_rtt));
+    SL_DEBUG_LOG_V2(INFO, "Overall RTT : 0x%lX\r\n", (end_rtt - start_rtt));
     data_recvd = 1;
   }
 }
@@ -180,24 +180,24 @@ void application_start()
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &twt_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done\r\n");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -205,23 +205,23 @@ void application_start()
 
   status = create_tcp_server();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while creating TCP server: 0x%lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while creating TCP server: 0x%lx \r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Server is running");
+  SL_DEBUG_LOG_V2(INFO, "TCP Server is running\r\n");
 
 #if !TCP_RECEIVE
   status = create_udp_server();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while creating UDP server: 0x%lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while creating UDP server: 0x%lx \r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP Server is running");
+  SL_DEBUG_LOG_V2(INFO, "UDP Server is running\r\n");
 #endif
 
   status = send_and_receive_data();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Send and Receive Data fail: 0x%lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Send and Receive Data fail: 0x%lx \r\n", status);
     return;
   }
 }
@@ -237,19 +237,19 @@ sl_status_t create_tcp_server(void)
 
   tcp_server_socket = sl_si91x_socket_async(AF_INET, SOCK_STREAM, IPPROTO_TCP, &data_callback);
   if (tcp_server_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "TCP Socket creation failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "TCP Socket creation failed with BSD error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Server Socket ID : %d", tcp_server_socket);
+  SL_DEBUG_LOG_V2(INFO, "TCP Server Socket ID : %d\r\n", tcp_server_socket);
 
   socket_return_value =
     sl_si91x_setsockopt(tcp_server_socket, SOL_SOCKET, SL_SI91X_SO_MAXRETRY, &max_tcp_retry, sizeof(max_tcp_retry));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "TCP Set Socket option failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "TCP Set Socket option failed with BSD error: %d\r\n", errno);
     close(tcp_server_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Set Sock Option: Max retry set : %d", max_tcp_retry);
+  SL_DEBUG_LOG_V2(INFO, "TCP Set Sock Option: Max retry set : %d\r\n", max_tcp_retry);
 
   server_address.sin_family = AF_INET;
   server_address.sin_port   = TCP_LISTENING_PORT;
@@ -257,28 +257,28 @@ sl_status_t create_tcp_server(void)
   socket_return_value =
     sl_si91x_bind(tcp_server_socket, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "TCP Socket bind failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "TCP Socket bind failed with BSD error: %d\r\n", errno);
     close(tcp_server_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Bind Success");
+  SL_DEBUG_LOG_V2(INFO, "TCP Bind Success\r\n");
 
   socket_return_value = sl_si91x_listen(tcp_server_socket, BACK_LOG);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "TCP Socket listen failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "TCP Socket listen failed with BSD error: %d\r\n", errno);
     close(tcp_server_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Listening on Local Port : %d", TCP_LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "TCP Listening on Local Port : %d\r\n", TCP_LISTENING_PORT);
 
   tcp_client_socket = sl_si91x_accept(tcp_server_socket, NULL, 0);
   if (tcp_client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with BSD error: %d\r\n", errno);
     close(tcp_server_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Socket Accept Success");
-  SL_DEBUG_LOG_V2(INFO, "TCP Client Socket ID : %d", tcp_client_socket);
+  SL_DEBUG_LOG_V2(INFO, "TCP Socket Accept Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "TCP Client Socket ID : %d\r\n", tcp_client_socket);
   return SL_STATUS_OK;
 }
 
@@ -289,10 +289,10 @@ sl_status_t create_udp_server(void)
 
   udp_server_socket = sl_si91x_socket_async(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &data_callback);
   if (udp_server_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "UDP Socket creation failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "UDP Socket creation failed with BSD error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP Server Socket ID : %d", udp_server_socket);
+  SL_DEBUG_LOG_V2(INFO, "UDP Server Socket ID : %d\r\n", udp_server_socket);
 
   server_address.sin_family = AF_INET;
   server_address.sin_port   = UDP_LISTENING_PORT;
@@ -300,11 +300,11 @@ sl_status_t create_udp_server(void)
   socket_return_value =
     sl_si91x_bind(udp_server_socket, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "UDP Socket bind failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "UDP Socket bind failed with BSD error: %d\r\n", errno);
     close(udp_server_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP Bind Success");
+  SL_DEBUG_LOG_V2(INFO, "UDP Bind Success\r\n");
 
   return SL_STATUS_OK;
 }
@@ -318,29 +318,29 @@ sl_status_t send_and_receive_data(void)
       data_sent  = 1;
       data_recvd = 0;
       status     = sl_si91x_send(tcp_client_socket, (uint8_t *)"Stream Data", (sizeof("Stream Data") - 1), 0);
-      SL_DEBUG_LOG_V2(INFO, "Sending Command");
+      SL_DEBUG_LOG_V2(INFO, "Sending Command\r\n");
       if (status < 0) {
         data_sent = 0;
         sl_si91x_shutdown(tcp_client_socket, SHUTDOWN_BY_ID);
-        SL_DEBUG_LOG_V2(ERROR, "Failed to Send data to TCP Server, Error Code : 0x%x", (unsigned int)status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to Send data to TCP Server, Error Code : 0x%x\r\n", (unsigned int)status);
         return SL_STATUS_FAIL;
       }
     }
 
-    SL_DEBUG_LOG_V2(INFO, "Command Sent. Listening for data");
+    SL_DEBUG_LOG_V2(INFO, "Command Sent. Listening for data\r\n");
     start_rx = osKernelGetTickCount();
-    SL_DEBUG_LOG_V2(DEBUG, "Start time TX: 0x%lX", start_rx);
+    SL_DEBUG_LOG_V2(DEBUG, "Start time TX: 0x%lX\r\n", start_rx);
 
     do {
       osThreadYield();
     } while (((osKernelGetTickCount() - start_rx) < RECEIVE_DATA_TIMEOUT) && !(is_remote_terminated));
 
     start_rtt = 0;
-    SL_DEBUG_LOG_V2(INFO, "Number of packets received : 0x%lX", num_pkts);
-    SL_DEBUG_LOG_V2(INFO, "Number of bytes received : 0x%lx", (long)num_bytes);
+    SL_DEBUG_LOG_V2(INFO, "Number of packets received : 0x%lX\r\n", num_pkts);
+    SL_DEBUG_LOG_V2(INFO, "Number of bytes received : 0x%lx\r\n", (long)num_bytes);
     num_bytes = 0;
     num_pkts  = 0;
-    SL_DEBUG_LOG_V2(INFO, "Data Reception Completed");
+    SL_DEBUG_LOG_V2(INFO, "Data Reception Completed\r\n");
     data_sent = 0;
   }
   return SL_STATUS_OK;

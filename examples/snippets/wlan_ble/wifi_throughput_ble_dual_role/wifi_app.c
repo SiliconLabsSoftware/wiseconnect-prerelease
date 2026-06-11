@@ -121,7 +121,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
   UNUSED_PARAMETER(arg);
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload", result_length);
+    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload\r\n", result_length);
     rsi_wlan_app_cb.state = RSI_WLAN_UNCONNECTED_STATE;
     return status_code;
   }
@@ -151,10 +151,10 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 0);
+  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", 0);
 
   return status;
 }
@@ -164,11 +164,11 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
-  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:", scan_result->scan_count);
+  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:\r\n", scan_result->scan_count);
 
   if (scan_result->scan_count) {
     SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
-    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
+    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s\r\n", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
 
     for (int a = 0; a < (int)scan_result->scan_count; ++a) {
       bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
@@ -188,7 +188,7 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
                bssid[4],
                bssid[5]);
       SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)tp_ble_scan_bssid_log);
-      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
+      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u\r\n", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }
   return SL_STATUS_OK;
@@ -243,20 +243,20 @@ void rsi_wlan_app_thread(void *unused)
           uint8_t xtal_enable = 1;
           status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
             return;
           }
-          SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
+          SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success\r\n");
 #endif
           status = rsi_initiate_power_save();
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save");
+            SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save\r\n");
             return;
           }
           powersave_cmd_given = true;
         }
         osMutexRelease(power_cmd_mutex);
-        SL_DEBUG_LOG_V2(INFO, "Module is in deep sleep");
+        SL_DEBUG_LOG_V2(INFO, "Module is in deep sleep\r\n");
 #endif
       } break;
       case RSI_WLAN_UNCONNECTED_STATE: {
@@ -265,11 +265,11 @@ void rsi_wlan_app_thread(void *unused)
         scan_complete                                        = false;
         callback_status                                      = SL_STATUS_FAIL;
 
-        SL_DEBUG_LOG_V2(INFO, "WLAN scan started ");
+        SL_DEBUG_LOG_V2(INFO, "WLAN scan started \r\n");
         sl_wifi_set_scan_callback_v2(wlan_app_scan_callback_handler, NULL);
         status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
         if (SL_STATUS_IN_PROGRESS == status) {
-          SL_DEBUG_LOG_V2(INFO, "Scanning...");
+          SL_DEBUG_LOG_V2(INFO, "Scanning...\r\n");
           const uint32_t start = osKernelGetTickCount();
 
           while (!scan_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT) {
@@ -278,14 +278,14 @@ void rsi_wlan_app_thread(void *unused)
           status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
         }
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan failed %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan failed %lx\r\n", status);
           break;
         } else {
           rsi_wlan_app_cb.state = RSI_WLAN_SCAN_DONE_STATE; //! update WLAN application state to connected state
 #if ENABLE_NWP_POWER_SAVE
-          SL_DEBUG_LOG_V2(INFO, "Module is in standby ");
+          SL_DEBUG_LOG_V2(INFO, "Module is in standby \r\n");
 #endif
-          SL_DEBUG_LOG_V2(INFO, "Scan done state ");
+          SL_DEBUG_LOG_V2(INFO, "Scan done state \r\n");
         }
 
         //! while running BLE throughput test, go to idle state if WLAN_SCAN_ONLY is configured
@@ -314,7 +314,7 @@ void rsi_wlan_app_thread(void *unused)
 
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
         if (SL_STATUS_OK == status) {
-          SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu", id);
+          SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu\r\n", id);
 
           access_point.ssid.length = strlen((char *)SSID);
           memcpy(access_point.ssid.value, SSID, access_point.ssid.length);
@@ -322,15 +322,15 @@ void rsi_wlan_app_thread(void *unused)
           access_point.encryption    = SL_WIFI_DEFAULT_ENCRYPTION;
           access_point.credential_id = id;
 
-          SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)access_point.ssid.value);
+          SL_DEBUG_LOG_V2(INFO, "SSID %s\r\n", (uintptr_t)access_point.ssid.value);
           status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
         }
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN connection failed %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN connection failed %lx\r\n", status);
           break;
         } else {
           rsi_wlan_app_cb.state = RSI_WLAN_CONNECTED_STATE; //! update WLAN application state to connected state
-          SL_DEBUG_LOG_V2(INFO, "WLAN connected state ");
+          SL_DEBUG_LOG_V2(INFO, "WLAN connected state \r\n");
         }
       } break;
       case RSI_WLAN_CONNECTED_STATE: {
@@ -342,11 +342,11 @@ void rsi_wlan_app_thread(void *unused)
         // Configure IP
         status = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "IP Config failed %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "IP Config failed %lx\r\n", status);
           break;
         } else {
           rsi_wlan_app_cb.state = RSI_WLAN_IPCONFIG_DONE_STATE;
-          SL_DEBUG_LOG_V2(INFO, "WLAN ipconfig done state ");
+          SL_DEBUG_LOG_V2(INFO, "WLAN ipconfig done state \r\n");
           sl_ip_address_t ip = { 0 };
           ip.type            = ip_address.type;
           ip.ip.v4.value     = ip_address.ip.v4.ip_address.value;
@@ -363,7 +363,7 @@ void rsi_wlan_app_thread(void *unused)
 #endif
 
 #if (RSI_ENABLE_BLE_TEST && WLAN_THROUGHPUT_TEST && WLAN_SYNC_REQ)
-        SL_DEBUG_LOG_V2(INFO, " WLAN thread waiting for BLE activity to complete...");
+        SL_DEBUG_LOG_V2(INFO, " WLAN thread waiting for BLE activity to complete...\r\n");
         osSemaphoreAcquire(ble_wlan_throughput_sync_sem, osWaitForever);
 #endif
 

@@ -84,10 +84,10 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, NULL, NULL, network_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up success\r\n");
 
 #if CONNECT_WITH_PMK
   uint8_t pairwise_master_key[32] = { 0 };
@@ -102,43 +102,43 @@ static void application_start(void *argument)
                                            DEFAULT_WIFI_CLIENT_CREDENTIAL,
                                            pairwise_master_key);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Get Pairwise Master Key Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get Pairwise Master Key Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Get Pairwise Master Key Success");
+  SL_DEBUG_LOG_V2(INFO, "Get Pairwise Master Key Success\r\n");
 
   status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE,
                               SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID,
                               &DEFAULT_WIFI_CLIENT_PROFILE);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to set client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi set client profile success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi set client profile success\r\n");
 
   status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
                                  SL_NET_WIFI_PMK,
                                  pairwise_master_key,
                                  sizeof(pairwise_master_key));
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed sl_net_set_credential: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed sl_net_set_credential: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "PMK Credentials are set successfully");
+  SL_DEBUG_LOG_V2(INFO, "PMK Credentials are set successfully\r\n");
 #endif
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Client profile is fetched successfully");
+  SL_DEBUG_LOG_V2(INFO, "Client profile is fetched successfully\r\n");
 
   sl_ip_address_t link_local_address = { 0 };
   memcpy(&link_local_address.ip.v6, &profile.ip.ip.v6.link_local_address, SL_IPV6_ADDRESS_LENGTH);
@@ -165,7 +165,7 @@ static void application_start(void *argument)
                          address_buffer,
                          (unsigned int *)remote_ip_address.ip.v6.value);
   if (status != 0x1) {
-    SL_DEBUG_LOG_V2(ERROR, "IPv6 conversion failed.");
+    SL_DEBUG_LOG_V2(ERROR, "IPv6 conversion failed.\r\n");
     return;
   }
   remote_ip_address.type = SL_IPV6;
@@ -174,7 +174,7 @@ static void application_start(void *argument)
     // Send ping
     status = sl_si91x_send_ping(remote_ip_address, PING_PACKET_SIZE);
     if (status != SL_STATUS_IN_PROGRESS) {
-      SL_DEBUG_LOG_V2(ERROR, "Ping request failed with status 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Ping request failed with status 0x%lX\r\n", status);
       return;
     }
 
@@ -190,7 +190,7 @@ static sl_status_t network_event_handler(sl_net_event_t event, sl_status_t statu
       sl_ip_address_t remote_ip_address = { 0 };
       sl_net_ping_response_t *response  = (sl_net_ping_response_t *)data;
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Ping request failed with status 0x%lX", status);
+        SL_DEBUG_LOG_V2(ERROR, "Ping request failed with status 0x%lX\r\n", status);
         return status;
       }
       if (response->ip_version == SL_IPV4_VERSION) {
@@ -209,14 +209,14 @@ static sl_status_t network_event_handler(sl_net_event_t event, sl_status_t statu
       break;
     }
     case SL_NET_DHCP_NOTIFICATION_EVENT: {
-      SL_DEBUG_LOG_V2(INFO, "Received DHCP Notification event with status : 0x%lX", status);
+      SL_DEBUG_LOG_V2(INFO, "Received DHCP Notification event with status : 0x%lX\r\n", status);
       break;
     }
     case SL_NET_IP_ADDRESS_CHANGE_EVENT: {
       sl_net_ip_configuration_t *ip_config = (sl_net_ip_configuration_t *)data;
 
       if (ip_config->type == SL_IPV4) {
-        SL_DEBUG_LOG_V2(INFO, "Received Ip Address Change Notification event with status : 0x%lX", status);
+        SL_DEBUG_LOG_V2(INFO, "Received Ip Address Change Notification event with status : 0x%lX\r\n", status);
         SL_DEBUG_LOG_V2(INFO,
                         "\t Ip Address : %u.%u.",
                         ip_config->ip.v4.ip_address.bytes[0],

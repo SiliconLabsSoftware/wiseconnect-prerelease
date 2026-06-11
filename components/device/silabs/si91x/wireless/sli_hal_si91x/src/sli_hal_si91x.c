@@ -311,7 +311,7 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
   rx_buffer->length                     = (uint16_t)(packet->length & 0x0FFF);
 
   SL_DEBUG_LOG_V2(DEBUG, "H RX-> Q: %u, C: 0x%X, L: %lu,", firmware_queue_id, packet->command, rx_buffer->length);
-  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\n", frame_status);
+  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\r\n", frame_status);
 
   if (SLI_HAL_SI91X_IS_FLASH_COMMAND(packet->command)) {
     sli_si91x_update_flash_command_status(false);
@@ -475,7 +475,7 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
     sli_si91x_config_m4_dma_desc_on_reset();
   }
 #endif
-  SL_DEBUG_LOG_V2(DEBUG, "H TX-> Q: %u, C: 0x%X, L: %u.\n", queue_id, frame_type, packet_length);
+  SL_DEBUG_LOG_V2(DEBUG, "H TX-> Q: %u, C: 0x%X, L: %u.\r\n", queue_id, frame_type, packet_length);
 
   if ((status == SL_STATUS_OK) && SLI_HAL_SI91X_IS_FLASH_COMMAND(buffer->command)) {
     sli_si91x_update_flash_command_status(true);

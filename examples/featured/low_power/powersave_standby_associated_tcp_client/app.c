@@ -174,7 +174,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, " Failed to bring Wi-Fi client interface up: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, " Wi-Fi client connected\r\n");
 
   sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
   groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
@@ -234,7 +234,7 @@ sl_status_t send_data_to_tcp_server(void)
     SL_DEBUG_LOG_V2(ERROR, " Failed to get client profile: 0x%" PRIx32, (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, " Client profile is fetched successfully");
+  SL_DEBUG_LOG_V2(INFO, " Client profile is fetched successfully\r\n");
 
   if (profile.ip.type == SL_IPV4) { /*IPv4*/
     ip_address.type = SL_IPV4;
@@ -244,7 +244,7 @@ sl_status_t send_data_to_tcp_server(void)
     struct sockaddr_in server_address = { 0 };
     status                            = sl_net_inet_addr(SERVER_IP_ADDRESS, (uint32_t *)&ip_address);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, " IPv4 conversion failed.");
+      SL_DEBUG_LOG_V2(ERROR, " IPv4 conversion failed.\r\n");
       return SL_STATUS_FAIL;
     }
 
@@ -254,26 +254,26 @@ sl_status_t send_data_to_tcp_server(void)
 
     //!Create socket
     client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    SL_DEBUG_LOG_V2(INFO, " Client Socket: %d", client_socket);
+    SL_DEBUG_LOG_V2(INFO, " Client Socket: %d\r\n", client_socket);
     if (client_socket < 0) {
-      SL_DEBUG_LOG_V2(ERROR, " Socket Create failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, " Socket Create failed with bsd error: %d\r\n", errno);
       return SL_STATUS_FAIL;
     }
     //!Keep Alive
     return_value = setsockopt(client_socket, SOL_SOCKET, SO_KEEPALIVE, &tcp_keep_alive, sizeof(tcp_keep_alive));
-    SL_DEBUG_LOG_V2(INFO, " Client Socket: %d", client_socket);
+    SL_DEBUG_LOG_V2(INFO, " Client Socket: %d\r\n", client_socket);
     if (return_value < 0) {
-      SL_DEBUG_LOG_V2(ERROR, " TCP Keep Alive configuration failed: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, " TCP Keep Alive configuration failed: %d\r\n", errno);
       return SL_STATUS_FAIL;
     }
     //! Socket connect
     return_value = connect(client_socket, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in));
     if (return_value < 0) {
-      SL_DEBUG_LOG_V2(ERROR, " Socket Connect failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, " Socket Connect failed with bsd error: %d\r\n", errno);
       close(client_socket);
       return SL_STATUS_FAIL;
     }
-    SL_DEBUG_LOG_V2(INFO, " Socket Connected");
+    SL_DEBUG_LOG_V2(INFO, " Socket Connected\r\n");
 
   } else if (profile.ip.type == SL_IPV6) { /*IPv6*/
     sl_ip_address_t link_local_address = { 0 };
@@ -302,7 +302,7 @@ sl_status_t send_data_to_tcp_server(void)
                            address_buffer,
                            (unsigned int *)server_address6.sin6_addr.__u6_addr.__u6_addr32);
     if (status != 0x1) {
-      SL_DEBUG_LOG_V2(ERROR, " IPv6 conversion failed.");
+      SL_DEBUG_LOG_V2(ERROR, " IPv6 conversion failed.\r\n");
       return SL_STATUS_FAIL;
     }
 
@@ -312,24 +312,24 @@ sl_status_t send_data_to_tcp_server(void)
     //!Create socket
     client_socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
     if (client_socket < 0) {
-      SL_DEBUG_LOG_V2(ERROR, " Socket Create failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, " Socket Create failed with bsd error: %d\r\n", errno);
       return SL_STATUS_FAIL;
     }
     //!Keep alive
     return_value = setsockopt(client_socket, SOL_SOCKET, SO_KEEPALIVE, &tcp_keep_alive, sizeof(tcp_keep_alive));
-    SL_DEBUG_LOG_V2(INFO, " Client Socket: %d", client_socket);
+    SL_DEBUG_LOG_V2(INFO, " Client Socket: %d\r\n", client_socket);
     if (return_value < 0) {
-      SL_DEBUG_LOG_V2(ERROR, " TCP KA configuration failed: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, " TCP KA configuration failed: %d\r\n", errno);
       return SL_STATUS_FAIL;
     }
     //! Socket connect
     return_value = connect(client_socket, (struct sockaddr *)&server_address6, sizeof(struct sockaddr_in6));
     if (return_value < 0) {
-      SL_DEBUG_LOG_V2(ERROR, " Socket Connect failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, " Socket Connect failed with bsd error: %d\r\n", errno);
       close(client_socket);
       return SL_STATUS_FAIL;
     }
-    SL_DEBUG_LOG_V2(INFO, " Socket Connected");
+    SL_DEBUG_LOG_V2(INFO, " Socket Connected\r\n");
   }
 
   //! send data
@@ -347,7 +347,7 @@ sl_status_t send_data_to_tcp_server(void)
     }
     packet_count++;
   }
-  SL_DEBUG_LOG_V2(INFO, " Data sent successfully");
+  SL_DEBUG_LOG_V2(INFO, " Data sent successfully\r\n");
 #endif
 
   return SL_STATUS_OK;

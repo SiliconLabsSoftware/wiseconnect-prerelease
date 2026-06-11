@@ -259,9 +259,9 @@ sl_status_t clear_and_load_certificates_in_flash(void)
                                  cert,
                                  cert_length);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", CERTIFICATE_INDEX);
+    SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", CERTIFICATE_INDEX);
   }
 
   return status;
@@ -279,10 +279,10 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
 
   app_state = WLAN_UNCONNECTED_STATE;
 
-  SL_DEBUG_LOG_V2(INFO, "In Join CB");
+  SL_DEBUG_LOG_V2(INFO, "In Join CB\r\n");
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(WARN, "F: Initiating rejoin %lu bytes payload", result_length);
+    SL_DEBUG_LOG_V2(WARN, "F: Initiating rejoin %lu bytes payload\r\n", result_length);
     return status_code;
   }
   return SL_STATUS_OK;
@@ -316,17 +316,17 @@ void application_start(const void *unused)
         //! Client initialization
         status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Client initialization failed , Error Code: 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Client initialization failed , Error Code: 0x%lX\r\n", status);
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client initialization success");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client initialization success\r\n");
 
         //! Load certificate
 #if LOAD_CERTIFICATE
         if (FLAGS & HTTPS_SUPPORT) {
           status = clear_and_load_certificates_in_flash();
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lX", status);
+            SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lX\r\n", status);
             return;
           }
         }
@@ -338,11 +338,11 @@ void application_start(const void *unused)
         //! Bring up client interface
         status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
         if (status != SL_STATUS_OK && status != SL_STATUS_SI91X_SCAN_ISSUED_IN_ASSOCIATED_STATE) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
           app_state = WLAN_UNCONNECTED_STATE;
           break;
         }
-        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface up");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface up\r\n");
         app_state = WLAN_FIRMWARE_UPDATE;
 
       } break;
@@ -368,10 +368,10 @@ void application_start(const void *unused)
         } while ((dns_retry_count != 0) && (status != SL_STATUS_OK));
 
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%lX\r\n", status);
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Resolving dns Success");
+        SL_DEBUG_LOG_V2(INFO, "Resolving dns Success\r\n");
 
         server_address = dns_query_rsp.ip.v4.value;
         sprintf((char *)server_ip,
@@ -382,16 +382,16 @@ void application_start(const void *unused)
                 (unsigned int)((server_address & 0xff000000) >> 24));
 
 #ifdef AWS_ENABLE
-        SL_DEBUG_LOG_V2(INFO, "Resolved AWS S3 Bucket IP address = %s", (uintptr_t)server_ip);
+        SL_DEBUG_LOG_V2(INFO, "Resolved AWS S3 Bucket IP address = %s\r\n", (uintptr_t)server_ip);
 #elif AZURE_ENABLE
-        SL_DEBUG_LOG_V2(INFO, "Resolved AZURE Blob Storage IP address = %s", (uintptr_t)server_ip);
+        SL_DEBUG_LOG_V2(INFO, "Resolved AZURE Blob Storage IP address = %s\r\n", (uintptr_t)server_ip);
 #endif
 
 #else
         strcpy(server_ip, HTTP_SERVER_IP_ADDRESS);
-        SL_DEBUG_LOG_V2(INFO, "%s IP Address : %s", (uintptr_t)SERVER_NAME, (uintptr_t)HTTP_HOSTNAME);
+        SL_DEBUG_LOG_V2(INFO, "%s IP Address : %s\r\n", (uintptr_t)SERVER_NAME, (uintptr_t)HTTP_HOSTNAME);
 #endif
-        SL_DEBUG_LOG_V2(INFO, "Firmware download from %s is in progress...", (uintptr_t)SERVER_NAME);
+        SL_DEBUG_LOG_V2(INFO, "Firmware download from %s is in progress...\r\n", (uintptr_t)SERVER_NAME);
 
         sl_si91x_http_otaf_params_t http_params = { 0 };
 
@@ -408,12 +408,12 @@ void application_start(const void *unused)
         status = sl_si91x_http_otaf_v2(&http_params);
 
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, " Firmware update status = 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, " Firmware update status = 0x%lX\r\n", status);
           app_state = WLAN_UNCONNECTED_STATE;
           break;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Completed firmware download using %s", (uintptr_t)SERVER_NAME);
-          SL_DEBUG_LOG_V2(INFO, "Updating the firmware...");
+          SL_DEBUG_LOG_V2(INFO, "Completed firmware download using %s\r\n", (uintptr_t)SERVER_NAME);
+          SL_DEBUG_LOG_V2(INFO, "Updating the firmware...\r\n");
         }
         app_state = WLAN_NET_DOWN_STATE;
       } break;
@@ -422,29 +422,29 @@ void application_start(const void *unused)
         //! Client deinitialization
         status = sl_net_deinit(SL_NET_WIFI_CLIENT_INTERFACE);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX ", status);
+          SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%lX \r\n", status);
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful\r\n");
 
 #if SL_NCP_UART_INTERFACE
-        SL_DEBUG_LOG_V2(INFO, "Waiting for firmware upgrade to complete");
+        SL_DEBUG_LOG_V2(INFO, "Waiting for firmware upgrade to complete\r\n");
         osDelay(40000);
-        SL_DEBUG_LOG_V2(INFO, "Waiting Done");
+        SL_DEBUG_LOG_V2(INFO, "Waiting Done\r\n");
 #endif
         //! Client initialization
         status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lX\r\n", status);
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init success");
+        SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init success\r\n");
 
         //! Check firmware version
         status = sl_wifi_get_firmware_version(&version);
         print_firmware_version(&version);
 #else
-        SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!");
+        SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!\r\n");
         sl_si91x_soc_nvic_reset();
 #endif
         app_state = WLAN_OTA_UPDATE_DONE;

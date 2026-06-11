@@ -111,7 +111,7 @@ static void low_level_init(struct netif *netif)
   // Request MAC address
   status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " MAC address failed ");
+    SL_DEBUG_LOG_V2(ERROR, " MAC address failed \r\n");
     return;
   }
 
@@ -390,7 +390,7 @@ static sl_status_t set_sta_link_up(sl_net_wifi_client_profile_t *profile)
 static void set_sta_link_down(void)
 {
 #if LWIP_IPV4 && LWIP_DHCP
-  SL_DEBUG_LOG_V2(DEBUG, "DHCP Link down");
+  SL_DEBUG_LOG_V2(DEBUG, "DHCP Link down\r\n");
   dhcp_stop(&(wifi_client_context->netif));
 #endif /* LWIP_IPV4 && LWIP_DHCP */
   netifapi_netif_set_link_down(&(wifi_client_context->netif));
@@ -543,7 +543,7 @@ static void configure_static_ip(const sl_net_wifi_client_profile_t *profile)
 static sl_status_t set_sta_link_up_async(sl_net_wifi_client_profile_t *profile)
 {
   if (wifi_client_context == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "WiFi client context is NULL");
+    SL_DEBUG_LOG_V2(ERROR, "WiFi client context is NULL\r\n");
     return SL_STATUS_FAIL;
   }
 
@@ -566,10 +566,10 @@ static sl_status_t set_sta_link_up_async(sl_net_wifi_client_profile_t *profile)
       ip_addr_set_zero_ip4(&(wifi_client_context->netif.netmask));
       ip_addr_set_zero_ip4(&(wifi_client_context->netif.gw));
       dhcp_start(&(wifi_client_context->netif));
-      SL_DEBUG_LOG_V2(INFO, "DHCP started asynchronously");
+      SL_DEBUG_LOG_V2(INFO, "DHCP started asynchronously\r\n");
       async_started = true;
 #else
-      SL_DEBUG_LOG_V2(DEBUG, "IPv4 DHCP requested but not supported (LWIP_IPV4 and LWIP_DHCP not enabled)");
+      SL_DEBUG_LOG_V2(DEBUG, "IPv4 DHCP requested but not supported (LWIP_IPV4 and LWIP_DHCP not enabled)\r\n");
       return SL_STATUS_NOT_SUPPORTED;
 #endif /* LWIP_IPV4 && LWIP_DHCP */
     }
@@ -621,17 +621,17 @@ static sl_status_t set_sta_link_up_async(sl_net_wifi_client_profile_t *profile)
 static void sli_handle_dhcp_completion(sl_net_interface_t interface)
 {
   if (wifi_client_context == NULL) {
-    SL_DEBUG_LOG_V2(DEBUG, "WiFi client context is NULL");
+    SL_DEBUG_LOG_V2(DEBUG, "WiFi client context is NULL\r\n");
     return;
   }
 
   // Validate interface index
   if (interface >= SL_NET_INTERFACE_MAX) {
-    SL_DEBUG_LOG_V2(DEBUG, "Invalid interface index: %d", interface);
+    SL_DEBUG_LOG_V2(DEBUG, "Invalid interface index: %d\r\n", interface);
     return;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "DHCP completed successfully for interface %d", interface);
+  SL_DEBUG_LOG_V2(DEBUG, "DHCP completed successfully for interface %d\r\n", interface);
 
   // Get the profile and update it with the DHCP-assigned IP
   sl_net_wifi_client_profile_t profile = { 0 };
@@ -646,7 +646,7 @@ static void sli_handle_dhcp_completion(sl_net_interface_t interface)
 
     sl_status_t ip_info_status = sli_send_ip_info_to_firmware();
     if (ip_info_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(DEBUG, "Failed to send IP address info to firmware: 0x%lx", ip_info_status);
+      SL_DEBUG_LOG_V2(DEBUG, "Failed to send IP address info to firmware: 0x%lx\r\n", ip_info_status);
     }
   }
 
@@ -814,12 +814,12 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
 {
   // Validate interface bounds to prevent buffer overflow
   if (interface >= SL_NET_INTERFACE_MAX) {
-    SL_DEBUG_LOG_V2(ERROR, "Invalid interface index: %d", interface);
+    SL_DEBUG_LOG_V2(ERROR, "Invalid interface index: %d\r\n", interface);
     return SL_STATUS_INVALID_PARAMETER;
   }
 
   if (wifi_client_context == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "WiFi client context is NULL");
+    SL_DEBUG_LOG_V2(ERROR, "WiFi client context is NULL\r\n");
     return SL_STATUS_FAIL;
   }
 
@@ -827,7 +827,7 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
   sl_net_wifi_client_profile_t profile = { 0 };
   sl_status_t status                   = sl_net_get_profile(interface, profile_id, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get profile: 0x%lx\r\n", status);
     return status;
   }
 
@@ -843,7 +843,7 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
 
     sl_status_t ip_info_status = sli_send_ip_info_to_firmware();
     if (ip_info_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(DEBUG, "Failed to send IP address info to firmware: 0x%lx", ip_info_status);
+      SL_DEBUG_LOG_V2(DEBUG, "Failed to send IP address info to firmware: 0x%lx\r\n", ip_info_status);
     }
 
     return SL_STATUS_OK;
@@ -862,7 +862,7 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
 #if LWIP_NETIF_STATUS_CALLBACK
     // Event-driven: Register netif status callback
     netif_set_status_callback(&(wifi_client_context->netif), sli_netif_status_callback);
-    SL_DEBUG_LOG_V2(INFO, "DHCP monitoring started (event-driven) for interface %d", interface);
+    SL_DEBUG_LOG_V2(INFO, "DHCP monitoring started (event-driven) for interface %d\r\n", interface);
 #else
     // Fallback: Create periodic check timer
     const osTimerAttr_t timer_attr = { .name = "dhcp_check" };
@@ -870,7 +870,7 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
     dhcp_monitor_state[interface].check_timer =
       osTimerNew(sli_dhcp_check_callback, osTimerPeriodic, (void *)(uintptr_t)interface, &timer_attr);
     if (dhcp_monitor_state[interface].check_timer == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create DHCP check timer for interface %d", interface);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create DHCP check timer for interface %d\r\n", interface);
       // Cleanup: Stop DHCP since we can't monitor it
 #if LWIP_IPV4 && LWIP_DHCP
       dhcp_stop(&(wifi_client_context->netif));
@@ -886,7 +886,7 @@ sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profi
     }
     osStatus_t timer_status = osTimerStart(dhcp_monitor_state[interface].check_timer, DHCP_CHECK_INTERVAL_MS);
     if (timer_status != osOK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to start DHCP check timer: %d", timer_status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to start DHCP check timer: %d\r\n", timer_status);
       osTimerDelete(dhcp_monitor_state[interface].check_timer);
       dhcp_monitor_state[interface].check_timer = NULL;
 #if LWIP_IPV4 && LWIP_DHCP
@@ -974,7 +974,7 @@ sl_status_t sl_net_wifi_client_init(sl_net_interface_t interface,
   if (dhcp_monitor_mutex == NULL) {
     dhcp_monitor_mutex = osMutexNew(NULL);
     if (dhcp_monitor_mutex == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create DHCP monitor mutex");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create DHCP monitor mutex\r\n");
       return SL_STATUS_FAIL;
     }
   }
@@ -1034,7 +1034,7 @@ sl_status_t sl_net_wifi_client_deinit(sl_net_interface_t interface)
   if (!any_interface_active && dhcp_monitor_mutex != NULL) {
     osStatus_t status = osMutexDelete(dhcp_monitor_mutex);
     if (status != osOK) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to delete DHCP monitor mutex: %d", status);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to delete DHCP monitor mutex: %d\r\n", status);
     }
     dhcp_monitor_mutex = NULL;
   }
@@ -1072,7 +1072,7 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
     // Disconnect WiFi on IP configuration failure
     sl_status_t disconnect_status = sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
     if (disconnect_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(DEBUG, "WiFi disconnect failed: 0x%lx", disconnect_status);
+      SL_DEBUG_LOG_V2(DEBUG, "WiFi disconnect failed: 0x%lx\r\n", disconnect_status);
     }
     return status;
   }
@@ -1086,7 +1086,7 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   sl_status_t ip_info_status = sli_send_ip_info_to_firmware();
   if (ip_info_status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(DEBUG, "Failed to send IP address info to firmware: 0x%lx", ip_info_status);
+    SL_DEBUG_LOG_V2(DEBUG, "Failed to send IP address info to firmware: 0x%lx\r\n", ip_info_status);
   }
 
   return SL_STATUS_OK;
@@ -1105,7 +1105,7 @@ sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_w
   struct netif *ifp;
   sl_wifi_system_packet_t *packet;
   packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-  SL_DEBUG_LOG_V2(DEBUG, "RX len : %d", packet->length);
+  SL_DEBUG_LOG_V2(DEBUG, "RX len : %d\r\n", packet->length);
 
   /* get the network interface for STATION interface,
    * and forward the received frame buffer to LWIP

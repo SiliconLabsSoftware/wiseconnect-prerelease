@@ -169,10 +169,10 @@ void rsi_wlan_ble_app_init(void)
   //! WiSeConnect initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful\r\n");
 
 #if ENABLE_TLS && LOAD_CERTIFICATE
   clear_and_load_certificates_in_flash();
@@ -192,14 +192,14 @@ void rsi_wlan_ble_app_init(void)
   //! Thread created for WIFI task
   wifi_app_thread_id = osThreadNew((osThreadFunc_t)rsi_wlan_app_task, NULL, &wifi_thread_attributes);
   if (wifi_app_thread_id == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create");
+    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create\r\n");
     return;
   }
 
   //! Thread created for BLE task
   ble_app_thread_id = osThreadNew((osThreadFunc_t)rsi_ble_app_task, NULL, &ble_thread_attributes);
   if (ble_app_thread_id == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create");
+    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create\r\n");
     return;
   }
 

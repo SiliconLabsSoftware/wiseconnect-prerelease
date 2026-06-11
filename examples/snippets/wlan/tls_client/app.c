@@ -132,31 +132,31 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface init success\r\n");
 
 #if LOAD_CERTIFICATE
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading certificate Success");
+  SL_DEBUG_LOG_V2(INFO, "Loading certificate Success\r\n");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success\r\n");
 
   status = send_data_from_tls_socket();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while sending data: 0x%lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while sending data: 0x%lx \r\n", status);
     return;
   }
 }
@@ -182,14 +182,14 @@ sl_status_t send_data_from_tls_socket()
 
   client_socket1 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket1 < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket1 creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket1 creation failed with bsd error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket1 ID: %d", client_socket1);
+  SL_DEBUG_LOG_V2(INFO, "Socket1 ID: %d\r\n", client_socket1);
 
   return_value = setsockopt(client_socket1, SOL_TCP, TCP_ULP, TLS_1_0, sizeof(TLS_1_0));
   if (return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set socket1 option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set socket1 option failed with bsd error: %d\r\n", errno);
     close(client_socket1);
     return SL_STATUS_FAIL;
   }
@@ -292,7 +292,7 @@ sl_status_t send_data_from_tls_socket()
       if (return_value < 0) {
         if (errno == ENOBUFS)
           continue;
-        SL_DEBUG_LOG_V2(ERROR, "Socket2 send failed with bsd error: %d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "Socket2 send failed with bsd error: %d\r\n", errno);
         close(client_socket1);
         close(client_socket2);
         return SL_STATUS_FAIL;
@@ -302,12 +302,12 @@ sl_status_t send_data_from_tls_socket()
     packet_count++;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Data sent successfully");
+  SL_DEBUG_LOG_V2(INFO, "Data sent successfully\r\n");
 
   close(client_socket1);
   close(client_socket2);
 
-  SL_DEBUG_LOG_V2(INFO, "Sockets closed successfully");
+  SL_DEBUG_LOG_V2(INFO, "Sockets closed successfully\r\n");
 
   return status;
 }
@@ -325,7 +325,7 @@ sl_status_t set_tls_extensions(int client_socket)
     (sl_si91x_socket_type_length_value_t *)malloc(sizeof(sl_si91x_socket_type_length_value_t) + sni_length);
 
   if (sni_value == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for SNI value");
+    SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for SNI value\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -345,7 +345,7 @@ sl_status_t set_tls_extensions(int client_socket)
                                    sizeof(sl_si91x_socket_type_length_value_t) + sni_length);
 
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option SNI extension failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option SNI extension failed with bsd error: %d\r\n", errno);
     free(sni_value);
     return SL_STATUS_FAIL;
   }
@@ -360,7 +360,7 @@ sl_status_t set_tls_extensions(int client_socket)
     (sl_si91x_socket_type_length_value_t *)malloc(sizeof(sl_si91x_socket_type_length_value_t) + alpn_length);
 
   if (alpn_value == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for ALPN value");
+    SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for ALPN value\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -380,7 +380,7 @@ sl_status_t set_tls_extensions(int client_socket)
                                    sizeof(sl_si91x_socket_type_length_value_t) + alpn_length);
 
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option ALPN extension failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option ALPN extension failed with bsd error: %d\r\n", errno);
     free(alpn_value);
     return SL_STATUS_FAIL;
   }

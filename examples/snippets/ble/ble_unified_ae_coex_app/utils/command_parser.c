@@ -38,7 +38,7 @@ void command_parser(uint8_t argc, uint8_t **argv)
     if (cmd_lut_entry != NULL) {
       //! check command handler
       if (cmd_lut_entry->handler == NULL) {
-        SL_DEBUG_LOG_V2(INFO, "call generic command handler");
+        SL_DEBUG_LOG_V2(INFO, "call generic command handler\r\n");
         break;
       } else {
         cmd_lut_entry->handler((argc - (max_no_of_args + 1)), &argv[current_cmd_index + 1]);
@@ -77,7 +77,7 @@ void command_parser(uint8_t argc, uint8_t **argv)
             //! call display sub_module function
             display_submodule(&argv[current_cmd_index], current_module_lut);
           } else {
-            SL_DEBUG_LOG_V2(INFO, "sub_modules LUT not present");
+            SL_DEBUG_LOG_V2(INFO, "sub_modules LUT not present\r\n");
             break;
           }
           //! check if modules_lut_entry->commands != NULL then update the current_command_lut and call display function
@@ -86,20 +86,20 @@ void command_parser(uint8_t argc, uint8_t **argv)
             //! call display command function
             display_command(&argv[current_cmd_index], current_command_lut);
           } else {
-            SL_DEBUG_LOG_V2(INFO, "commands LUT not present");
+            SL_DEBUG_LOG_V2(INFO, "commands LUT not present\r\n");
             break;
           }
           break;
         }
       } else {
-        SL_DEBUG_LOG_V2(INFO, "call current_module_lut custom_handler");
+        SL_DEBUG_LOG_V2(INFO, "call current_module_lut custom_handler\r\n");
         break;
       }
     } else { //! if user input wrong sub_module and commands then call display function
-      SL_DEBUG_LOG_V2(INFO, "Command parser: Enter correct module_name ");
+      SL_DEBUG_LOG_V2(INFO, "Command parser: Enter correct module_name \r\n");
       //! call display sub_module function
       display_submodule(&argv[current_cmd_index], current_module_lut);
-      SL_DEBUG_LOG_V2(INFO, "Command parser: Enter correct command_name ");
+      SL_DEBUG_LOG_V2(INFO, "Command parser: Enter correct command_name \r\n");
       //! call display command function
       display_command(&argv[current_cmd_index], current_command_lut);
       break;

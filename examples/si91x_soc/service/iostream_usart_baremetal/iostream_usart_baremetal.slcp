@@ -34,7 +34,9 @@ define:
 - name: USART_CONFIG
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 other_file:
 - path: resources/readme/image501b.png
 - path: resources/readme/image501d.png

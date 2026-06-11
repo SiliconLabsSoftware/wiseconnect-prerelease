@@ -281,7 +281,7 @@ void application_start(const void *unused)
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init is successful");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init is successful\r\n");
 
 #if LOAD_CERTIFICATE
   if (FLAGS & HTTPS_SUPPORT) {
@@ -298,14 +298,14 @@ void application_start(const void *unused)
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Connected to Wi-Fi");
+  SL_DEBUG_LOG_V2(INFO, "Connected to Wi-Fi\r\n");
 
   status = http_otaf_app();
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Firmware update failed: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Firmware update is successful");
+  SL_DEBUG_LOG_V2(INFO, "Firmware update is successful\r\n");
 }
 
 #if LOAD_CERTIFICATE
@@ -376,7 +376,7 @@ sl_status_t http_otaf_app()
     SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Resolving dns Success");
+  SL_DEBUG_LOG_V2(INFO, "Resolving dns Success\r\n");
 
   server_address = dns_query_rsp.ip.v4.value;
   sprintf((char *)server_ip,
@@ -387,23 +387,23 @@ sl_status_t http_otaf_app()
           (unsigned int)((server_address & 0xff000000) >> 24));
 
 #ifdef AWS_ENABLE
-  SL_DEBUG_LOG_V2(INFO, "Resolved AWS S3 Bucket IP address = %s", (uintptr_t)server_ip);
-  SL_DEBUG_LOG_V2(INFO, "Firmware download from AWS S3 Bucket is in progress...");
+  SL_DEBUG_LOG_V2(INFO, "Resolved AWS S3 Bucket IP address = %s\r\n", (uintptr_t)server_ip);
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AWS S3 Bucket is in progress...\r\n");
 #elif AZURE_ENABLE
-  SL_DEBUG_LOG_V2(INFO, "Resolved AZURE Blob Storage IP address = %s", (uintptr_t)server_ip);
-  SL_DEBUG_LOG_V2(INFO, "Firmware download from AZURE Blob Storage is in progress...");
+  SL_DEBUG_LOG_V2(INFO, "Resolved AZURE Blob Storage IP address = %s\r\n", (uintptr_t)server_ip);
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AZURE Blob Storage is in progress...\r\n");
 #endif
 
 #else
   strcpy(server_ip, HTTP_SERVER_IP_ADDRESS);
-  SL_DEBUG_LOG_V2(INFO, "Local Apache Server IP Address: %s", (uintptr_t)HTTP_HOSTNAME);
+  SL_DEBUG_LOG_V2(INFO, "Local Apache Server IP Address: %s\r\n", (uintptr_t)HTTP_HOSTNAME);
 #endif
   status = set_twt();
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Error while configuring TWT parameters: 0x%" PRIx32 " ", (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "TWT Config Done");
+  SL_DEBUG_LOG_V2(INFO, "TWT Config Done\r\n");
 
   if (twt_active_session == 1) {
     status = sl_wifi_reschedule_twt(twt_response.twt_flow_id, SL_WIFI_SUSPEND_INDEFINITELY, 0);
@@ -412,7 +412,7 @@ sl_status_t http_otaf_app()
       return status;
     } else {
       twt_active_session = 0;
-      SL_DEBUG_LOG_V2(INFO, "Suspend TWT Done");
+      SL_DEBUG_LOG_V2(INFO, "Suspend TWT Done\r\n");
     }
   }
 
@@ -424,16 +424,16 @@ sl_status_t http_otaf_app()
       return status;
     } else {
       power_save_enabled = 0;
-      SL_DEBUG_LOG_V2(INFO, "Power Save Disabled");
+      SL_DEBUG_LOG_V2(INFO, "Power Save Disabled\r\n");
     }
   }
 
 #ifdef AWS_ENABLE
-  SL_DEBUG_LOG_V2(INFO, "Firmware download from AWS S3 Bucket is in progress...");
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AWS S3 Bucket is in progress...\r\n");
 #elif AZURE_ENABLE
-  SL_DEBUG_LOG_V2(INFO, "Firmware download from AZURE Blob Storage is in progress...");
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from AZURE Blob Storage is in progress...\r\n");
 #else
-  SL_DEBUG_LOG_V2(INFO, "Firmware download from Local Apache Server is in progress...");
+  SL_DEBUG_LOG_V2(INFO, "Firmware download from Local Apache Server is in progress...\r\n");
 #endif
   sl_si91x_http_otaf_params_t http_params = { 0 };
 
@@ -464,13 +464,13 @@ sl_status_t http_otaf_app()
     return status;
   } else {
 #ifdef AWS_ENABLE
-    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using AWS");
+    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using AWS\r\n");
 #elif AZURE_ENABLE
-    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using AZURE");
+    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using AZURE\r\n");
 #else
-    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using Local Apache Server");
+    SL_DEBUG_LOG_V2(INFO, "Completed firmware download using Local Apache Server\r\n");
 #endif
-    SL_DEBUG_LOG_V2(INFO, "Updating the firmware...");
+    SL_DEBUG_LOG_V2(INFO, "Updating the firmware...\r\n");
   }
 
 #if (FW_UPDATE_TYPE == TA_FW_UPDATE)
@@ -479,20 +479,20 @@ sl_status_t http_otaf_app()
     SL_DEBUG_LOG_V2(ERROR, "Error while wifi deinit: 0x%" PRIx32 " ", (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful\r\n");
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32 "", (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init success\r\n");
 
   status = sl_wifi_get_firmware_version(&version);
   VERIFY_STATUS_AND_RETURN(status);
   print_firmware_version(&version);
 #else
-  SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!");
+  SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!\r\n");
   sl_si91x_soc_nvic_reset();
 #endif
 
@@ -526,7 +526,7 @@ sl_status_t set_twt(void)
   VERIFY_STATUS_AND_RETURN(status);
   status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
   VERIFY_STATUS_AND_RETURN(status);
-  SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
+  SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter\r\n");
 
   //! Apply power save profile
   performance_profile.profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
@@ -536,7 +536,7 @@ sl_status_t set_twt(void)
     return status;
   } else {
     power_save_enabled = 1;
-    SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled");
+    SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled\r\n");
   }
   return SL_STATUS_OK;
 }
@@ -608,17 +608,17 @@ static sl_status_t twt_callback_handler(sl_wifi_event_t event,
     SL_DEBUG_LOG_V2(DEBUG, " wake duration : 0x%X", result->wake_duration);
     SL_DEBUG_LOG_V2(DEBUG, " wake_duration_unit: 0x%X", result->wake_duration_unit);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_exp : 0x%X", result->wake_int_exp);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_mantissa : 0x%X", result->wake_int_mantissa);
     SL_DEBUG_LOG_V2(DEBUG, " implicit_twt : 0x%X", result->implicit_twt);
     SL_DEBUG_LOG_V2(DEBUG, " un_announced_twt : 0x%X", result->un_announced_twt);
     SL_DEBUG_LOG_V2(DEBUG, " triggered_twt : 0x%X", result->triggered_twt);
     SL_DEBUG_LOG_V2(DEBUG, " twt_channel : 0x%X", result->twt_channel);
     SL_DEBUG_LOG_V2(DEBUG, " twt_protection : 0x%X", result->twt_protection);
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
   } else if (event < SL_WIFI_TWT_EVENTS_END) {
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
   }
   return SL_STATUS_OK;
 }

@@ -40,7 +40,9 @@ include:
   - path: ulp_gpio_transition_freertos.h
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 define:
 - name: SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION
 - name: SL_SI91X_ULP_STATE_ENABLE

@@ -227,9 +227,9 @@ int32_t rsi_ble_driver_deinit(void)
 
 /*==============================================*/
 /**
- * @brief      Enable BLE at runtime. Sends common command with enable sub-command and waits for response.
- * @return     0 on success, non-zero on failure
- *             RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE - BLE is already enabled
+ * @brief      Enable BLE at runtime. See @ref rsi_ble_enable() in rsi_common_apis.h for
+ *             pre-conditions, application queue usage, and full return-code list.
+ * @return     RSI_SUCCESS on success; otherwise see rsi_ble_enable() documentation.
  */
 int32_t rsi_ble_enable(void)
 {
@@ -261,10 +261,10 @@ int32_t rsi_ble_enable(void)
 
 /*==============================================*/
 /**
- * @brief      Disable BLE at runtime. Sends common command with disable sub-command and waits for response.
- * @return     0 on success, non-zero on failure
- *             RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE - BLE is already disabled
- *             RSI_ERROR_BLE_ACTIVITY_PENDING - BLE devices are still connected
+ * @brief      Disable BLE at runtime. See @ref rsi_ble_disable() in rsi_common_apis.h for
+ *             quiesce requirements (stop adv/scan, disconnect all links), application queue
+ *             usage, and full return-code list.
+ * @return     RSI_SUCCESS on success; otherwise see rsi_ble_disable() documentation.
  */
 int32_t rsi_ble_disable(void)
 {

@@ -635,7 +635,7 @@ sl_status_t ping_response_callback_handler(sl_net_event_t event, sl_status_t sta
 
   if (SL_NET_PING_RESPONSE_EVENT == event) {
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, " Ping request failed! ");
+      SL_DEBUG_LOG_V2(ERROR, " Ping request failed! \r\n");
       return status;
     } else {
       SL_DEBUG_LOG_V2(INFO,

@@ -274,7 +274,7 @@ uint8_t rsi_check_dev_list(uint8_t *remote_dev_name, uint8_t *adv_dev_addr)
         if (!(strcmp((const char *)rsi_ble_conn_info[i].rsi_remote_name, (const char *)remote_dev_name))) {
           peripheral_device_found = DEV_CONNECTED;
 #if RSI_DEBUG_EN
-          SL_DEBUG_LOG_V2(INFO, "Device %s already connected!!!", (uintptr_t)adv_dev_addr);
+          SL_DEBUG_LOG_V2(INFO, "Device %s already connected!!!\r\n", (uintptr_t)adv_dev_addr);
 #endif
           break;
         }
@@ -294,7 +294,7 @@ uint8_t rsi_check_dev_list(uint8_t *remote_dev_name, uint8_t *adv_dev_addr)
       if (!memcmp(rsi_ble_conn_info[i].remote_dev_addr, adv_dev_addr, RSI_REM_DEV_ADDR_LEN)) {
         peripheral_device_found = DEV_CONNECTED;
 #if RSI_DEBUG_EN
-        SL_DEBUG_LOG_V2(INFO, "Device %s already connected!!!", (uintptr_t)adv_dev_addr);
+        SL_DEBUG_LOG_V2(INFO, "Device %s already connected!!!\r\n", (uintptr_t)adv_dev_addr);
 #endif
         break;
       }
@@ -374,7 +374,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
                                     uint8_t char_prop)
 {
   if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE) { //! Check for max data length for the characteristic value
-    SL_DEBUG_LOG_V2(ERROR, " no data memory for att rec values ");
+    SL_DEBUG_LOG_V2(ERROR, " no data memory for att rec values \r\n");
     return;
   }
 
@@ -740,7 +740,7 @@ void rsi_ble_simple_central_on_adv_report_event(rsi_ble_event_adv_report_t *adv_
       rsi_ble_app_set_event(RSI_APP_EVENT_ADV_REPORT);
     } else {
       //! wrong state
-      SL_DEBUG_LOG_V2(ERROR, "Connection identifier is wrong");
+      SL_DEBUG_LOG_V2(ERROR, "Connection identifier is wrong\r\n");
       while (1)
         ;
     }
@@ -761,7 +761,7 @@ static void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t *resp_conn)
 {
   uint8_t central_dev_found = NO_DEV_FOUND;
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "In on conn cb");
+  SL_DEBUG_LOG_V2(INFO, "In on conn cb\r\n");
 #endif
   //! convert to ascii
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, resp_conn->dev_addr);
@@ -808,15 +808,15 @@ static void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t *resp_conn)
         rsi_ble_app_set_event(RSI_BLE_CONN_EVENT);
       } else {
         //! wrong state
-        SL_DEBUG_LOG_V2(ERROR, "Connection identifier is wrong");
+        SL_DEBUG_LOG_V2(ERROR, "Connection identifier is wrong\r\n");
         while (1)
           ;
       }
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Device already connected ");
+      SL_DEBUG_LOG_V2(INFO, "Device already connected \r\n");
     }
   } else {
-    SL_DEBUG_LOG_V2(ERROR, "CHECK WHY THIS STATE OCCURS IN CONNECTION ");
+    SL_DEBUG_LOG_V2(ERROR, "CHECK WHY THIS STATE OCCURS IN CONNECTION \r\n");
     while (1)
       ;
   }
@@ -835,7 +835,7 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
 {
   uint8_t central_dev_found = NO_DEV_FOUND;
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "In on_enhance_conn cb");
+  SL_DEBUG_LOG_V2(INFO, "In on_enhance_conn cb\r\n");
 #endif
   //! convert to ascii
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, resp_enh_conn->dev_addr);
@@ -844,7 +844,7 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
   remote_device_role = rsi_get_remote_device_role(remote_dev_addr_conn);
 
   if (resp_enh_conn->status != 0 && resp_enh_conn->status != 63) {
-    SL_DEBUG_LOG_V2(INFO, "On enhanced connect event");
+    SL_DEBUG_LOG_V2(INFO, "On enhanced connect event\r\n");
     if (remote_device_role == PERIPHERAL_ROLE) {
       peripheral_connection_in_prgs = 0;
     }
@@ -884,15 +884,15 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
         rsi_ble_app_set_event(RSI_BLE_ENHC_CONN_EVENT);
       } else {
         //! wrong state
-        SL_DEBUG_LOG_V2(ERROR, "Connection identifier is wrong ");
+        SL_DEBUG_LOG_V2(ERROR, "Connection identifier is wrong \r\n");
         while (1)
           ;
       }
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Device already connected");
+      SL_DEBUG_LOG_V2(INFO, "Device already connected\r\n");
     }
   } else {
-    SL_DEBUG_LOG_V2(ERROR, "CHECK WHY THIS STATE OCCURS IN CONNECTION ");
+    SL_DEBUG_LOG_V2(ERROR, "CHECK WHY THIS STATE OCCURS IN CONNECTION \r\n");
     while (1)
       ;
   }
@@ -909,10 +909,10 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
 static void ble_on_conn_update_complete_event(rsi_ble_event_conn_update_t *resp_conn_update, uint16_t resp_status)
 {
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "In conn update cb");
+  SL_DEBUG_LOG_V2(INFO, "In conn update cb\r\n");
 #endif
   if (resp_status != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_CONN_UPDATE_EVENT FAILED");
+    SL_DEBUG_LOG_V2(ERROR, "RSI_BLE_CONN_UPDATE_EVENT FAILED\r\n");
     return;
   } else {
     //! convert to ascii
@@ -996,7 +996,7 @@ static void rsi_ble_on_event_write_resp(uint16_t event_status, rsi_ble_set_att_r
 {
   //! convert to ascii
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "In write resp event");
+  SL_DEBUG_LOG_V2(INFO, "In write resp event\r\n");
 #endif
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, rsi_ble_event_set_att_rs->dev_addr);
 
@@ -1009,7 +1009,7 @@ static void rsi_ble_on_event_write_resp(uint16_t event_status, rsi_ble_set_att_r
          sizeof(rsi_ble_set_att_resp_t));
 
   if (event_status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " write event response failed");
+    SL_DEBUG_LOG_V2(ERROR, " write event response failed\r\n");
   } else {
     //! set conn specific event
     rsi_ble_app_set_task_event(ble_conn_id, RSI_BLE_WRITE_EVENT_RESP);
@@ -1053,7 +1053,7 @@ static void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t
 {
   UNUSED_PARAMETER(event_id);
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "In write event ");
+  SL_DEBUG_LOG_V2(INFO, "In write event \r\n");
 #endif
   //! convert to ascii
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, rsi_ble_write->dev_addr);
@@ -1083,7 +1083,7 @@ static void rsi_ble_on_gatt_prepare_write_event(uint16_t event_id,
 {
   UNUSED_PARAMETER(event_id); //This statement is added only to resolve compilation warning, value is unchanged
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "In rsi_ble_on_gatt_prepare_write_event ");
+  SL_DEBUG_LOG_V2(INFO, "In rsi_ble_on_gatt_prepare_write_event \r\n");
 #endif
   //! convert to ascii
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, rsi_app_ble_prepared_write_event->dev_addr);
@@ -1114,7 +1114,7 @@ static void rsi_ble_on_execute_write_event(uint16_t event_id, rsi_ble_execute_wr
 {
   UNUSED_PARAMETER(event_id); //This statement is added only to resolve compilation warning, value is unchanged
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "In rsi_ble_on_execute_write_event ");
+  SL_DEBUG_LOG_V2(INFO, "In rsi_ble_on_execute_write_event \r\n");
 #endif
   //! convert to ascii
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, rsi_app_ble_execute_write_event->dev_addr);
@@ -1292,7 +1292,7 @@ static void rsi_ble_on_read_resp_event(uint16_t event_status, rsi_ble_event_att_
 {
   UNUSED_PARAMETER(event_status); //This statement is added only to resolve compilation warning, value is unchanged
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, " In GATT descriptor response event");
+  SL_DEBUG_LOG_V2(INFO, " In GATT descriptor response event\r\n");
 #endif
 
   //! convert to ascii
@@ -1601,7 +1601,7 @@ static void rsi_ble_gatt_error_event(uint16_t resp_status, rsi_ble_event_error_r
 static void rsi_ble_more_data_req_event(rsi_ble_event_le_dev_buf_ind_t *rsi_ble_more_data_evt)
 {
 #if RSI_DEBUG_EN
-  SL_DEBUG_LOG_V2(INFO, "Received more data event in main task");
+  SL_DEBUG_LOG_V2(INFO, "Received more data event in main task\r\n");
 #endif
   //! convert to ascii
   rsi_6byte_dev_address_to_ascii(remote_dev_addr_conn, rsi_ble_more_data_evt->remote_dev_bd_addr);
@@ -1631,7 +1631,8 @@ static void rsi_ble_more_data_req_event(rsi_ble_event_le_dev_buf_ind_t *rsi_ble_
 void rsi_ble_on_sc_method(rsi_bt_event_sc_method_t *scmethod)
 {
   if (scmethod->sc_method == RSI_BT_LE_SC_JUST_WORKS) {
-    SL_DEBUG_LOG_V2(INFO, "Our Security method is Just works, hence compare the 6 digit numeric value on both devices");
+    SL_DEBUG_LOG_V2(INFO,
+                    "Our Security method is Just works, hence compare the 6 digit numeric value on both devices\r\n");
   } else if (scmethod->sc_method == RSI_BT_LE_SC_PASSKEY) {
     SL_DEBUG_LOG_V2(
       INFO,
@@ -1733,10 +1734,10 @@ static int32_t rsi_ble_dual_role(void)
 
   //! Set local IRK Value
   //! This value should be fixed on every reset
-  SL_DEBUG_LOG_V2(INFO, "Setting the Local IRK Value");
+  SL_DEBUG_LOG_V2(INFO, "Setting the Local IRK Value\r\n");
   status = rsi_ble_set_local_irk_value(local_irk);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Setting the Local IRK Value Failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Setting the Local IRK Value Failed = %lx\r\n", status);
     return status;
   }
 
@@ -1790,9 +1791,9 @@ static int32_t rsi_ble_dual_role(void)
     //! set device in advertising mode.
     status = rsi_ble_start_advertising();
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "Advertising failed");
+      SL_DEBUG_LOG_V2(ERROR, "Advertising failed\r\n");
     }
-    SL_DEBUG_LOG_V2(INFO, "Advertising started, local device name : %s", (uintptr_t)(char *)RSI_BLE_APP_GATT_TEST);
+    SL_DEBUG_LOG_V2(INFO, "Advertising started, local device name : %s\r\n", (uintptr_t)(char *)RSI_BLE_APP_GATT_TEST);
   }
 
   //! Module scans if peripheral connections are configured
@@ -1802,7 +1803,7 @@ static int32_t rsi_ble_dual_role(void)
     if (status != RSI_SUCCESS) {
       return status;
     }
-    SL_DEBUG_LOG_V2(INFO, "Scanning started");
+    SL_DEBUG_LOG_V2(INFO, "Scanning started\r\n");
   }
 
   // update the new scan and advertise parameters
@@ -1833,7 +1834,7 @@ static int32_t rsi_ble_dual_role(void)
   if (!powersave_cmd_given) {
     status = rsi_initiate_power_save();
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save\r\n");
       return status;
     }
     powersave_cmd_given = true;
@@ -1853,16 +1854,16 @@ void rsi_ble_main_app_task()
   //! FIXME: Workaround
   osDelay(50);
   if (rsi_wlan_running) {
-    SL_DEBUG_LOG_V2(INFO, "Waiting BLE, WLAN to unblock ");
+    SL_DEBUG_LOG_V2(INFO, "Waiting BLE, WLAN to unblock \r\n");
     osSemaphoreAcquire(sync_coex_ble_sem, osWaitForever);
   }
 #endif
 
   //! BLE dual role Initialization
-  SL_DEBUG_LOG_V2(INFO, "Initiating BLE ");
+  SL_DEBUG_LOG_V2(INFO, "Initiating BLE \r\n");
   status = rsi_ble_dual_role();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "BLE DUAL role init failed ");
+    SL_DEBUG_LOG_V2(ERROR, "BLE DUAL role init failed \r\n");
   }
 
   while (1) {
@@ -1901,7 +1902,7 @@ void rsi_ble_main_app_task()
                           (void *)&rsi_parsed_conf.rsi_ble_config.rsi_ble_conn_config[peripheral_task_instances],
                           &ble_peripheral_attr);
             if (ble_app_task_handle[peripheral_task_instances] == NULL) {
-              SL_DEBUG_LOG_V2(ERROR, "task%d failed to create, reason = %ld", peripheral_conn_id, status);
+              SL_DEBUG_LOG_V2(ERROR, "task%d failed to create, reason = %ld\r\n", peripheral_conn_id, status);
               peripheral_con_req_pending = 0;
               rsi_remove_ble_conn_id(rsi_ble_conn_info[peripheral_conn_id].remote_dev_addr);
               memset(&rsi_ble_conn_info[ble_conn_id].rsi_app_adv_reports_to_app, 0, sizeof(rsi_ble_event_adv_report_t));
@@ -1909,18 +1910,18 @@ void rsi_ble_main_app_task()
             }
             peripheral_task_instances++;
           } else {
-            SL_DEBUG_LOG_V2(ERROR, "In wrong state ");
+            SL_DEBUG_LOG_V2(ERROR, "In wrong state \r\n");
             while (1)
               ;
           }
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "Maximum peripheral connections reached");
+          SL_DEBUG_LOG_V2(ERROR, "Maximum peripheral connections reached\r\n");
         }
       } break;
       case RSI_BLE_CONN_EVENT: {
         //! event invokes when connection was completed
 #if RSI_DEBUG_EN
-        SL_DEBUG_LOG_V2(INFO, "In on comm-conn evt");
+        SL_DEBUG_LOG_V2(INFO, "In on comm-conn evt\r\n");
 #endif
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
@@ -1949,7 +1950,7 @@ void rsi_ble_main_app_task()
                               .rsi_ble_conn_config[RSI_BLE_MAX_NBR_PERIPHERALS + central_task_instances],
                             &ble_central_attr);
               if (ble_app_task_handle[central_conn_id] == NULL) {
-                SL_DEBUG_LOG_V2(ERROR, "task%d failed to create", central_conn_id);
+                SL_DEBUG_LOG_V2(ERROR, "task%d failed to create\r\n", central_conn_id);
                 //! remove device from local list
                 rsi_remove_ble_conn_id(rsi_ble_conn_info[central_conn_id].remote_dev_addr);
                 memset(&rsi_ble_conn_info[ble_conn_id].conn_event_to_app, 0, sizeof(rsi_ble_event_conn_status_t));
@@ -1961,22 +1962,22 @@ void rsi_ble_main_app_task()
               central_task_instances++;
             } else {
               //! unexpected state
-              SL_DEBUG_LOG_V2(ERROR, "Invalid conn identifier ");
+              SL_DEBUG_LOG_V2(ERROR, "Invalid conn identifier \r\n");
               while (1)
                 ;
             }
           } else {
-            SL_DEBUG_LOG_V2(ERROR, "Max central connections reached");
+            SL_DEBUG_LOG_V2(ERROR, "Max central connections reached\r\n");
           }
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "Check why this state occurred?");
+          SL_DEBUG_LOG_V2(ERROR, "Check why this state occurred?\r\n");
           while (1)
             ;
         }
       } break;
       case RSI_BLE_ENHC_CONN_EVENT: {
 #if RSI_DEBUG_EN
-        SL_DEBUG_LOG_V2(INFO, "In on_enhance_conn evt");
+        SL_DEBUG_LOG_V2(INFO, "In on_enhance_conn evt\r\n");
 #endif
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_ENHC_CONN_EVENT);
@@ -2006,7 +2007,7 @@ void rsi_ble_main_app_task()
                               .rsi_ble_conn_config[RSI_BLE_MAX_NBR_PERIPHERALS + central_task_instances],
                             &ble_central_attr);
               if (ble_app_task_handle[central_conn_id] == NULL) {
-                SL_DEBUG_LOG_V2(ERROR, "task%d failed to create", central_conn_id);
+                SL_DEBUG_LOG_V2(ERROR, "task%d failed to create\r\n", central_conn_id);
                 //! remove device from local list
                 rsi_remove_ble_conn_id(rsi_ble_conn_info[central_conn_id].remote_dev_addr);
                 memset(&rsi_ble_conn_info[ble_conn_id].rsi_enhc_conn_status,
@@ -2020,15 +2021,15 @@ void rsi_ble_main_app_task()
               central_task_instances++;
             } else {
               //! unexpected state
-              SL_DEBUG_LOG_V2(ERROR, "Invalid conn identifier");
+              SL_DEBUG_LOG_V2(ERROR, "Invalid conn identifier\r\n");
               while (1)
                 ;
             }
           } else {
-            SL_DEBUG_LOG_V2(ERROR, "Max central connections reached");
+            SL_DEBUG_LOG_V2(ERROR, "Max central connections reached\r\n");
           }
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "Check why this state occurred?");
+          SL_DEBUG_LOG_V2(ERROR, "Check why this state occurred?\r\n");
           while (1)
             ;
         }
@@ -2036,7 +2037,7 @@ void rsi_ble_main_app_task()
       case RSI_BLE_GATT_PROFILES: {
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_GATT_PROFILES);
-        SL_DEBUG_LOG_V2(INFO, "In GATT test:rsi_ble_gatt_profiles ");
+        SL_DEBUG_LOG_V2(INFO, "In GATT test:rsi_ble_gatt_profiles \r\n");
       } break;
 
       case RSI_BLE_GATT_PROFILE: {
@@ -2059,14 +2060,14 @@ void rsi_ble_main_app_task()
       } break;
       case RSI_BLE_CONN_UPDATE_COMPLETE_EVENT: {
 #if RSI_DEBUG_EN
-        SL_DEBUG_LOG_V2(INFO, "In conn update evt");
+        SL_DEBUG_LOG_V2(INFO, "In conn update evt\r\n");
 #endif
 
         rsi_ble_app_clear_event(RSI_BLE_CONN_UPDATE_COMPLETE_EVENT);
       } break;
       case RSI_BLE_DISCONN_EVENT: {
 
-        SL_DEBUG_LOG_V2(INFO, "In dis-conn evt");
+        SL_DEBUG_LOG_V2(INFO, "In dis-conn evt\r\n");
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
       } break;
@@ -2079,7 +2080,7 @@ void rsi_ble_main_app_task()
       case RSI_BLE_READ_REQ_EVENT: {
 #if RSI_DEBUG_EN
         //! event invokes when read event received
-        SL_DEBUG_LOG_V2(INFO, "In on GATT rd evt");
+        SL_DEBUG_LOG_V2(INFO, "In on GATT rd evt\r\n");
 #endif
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_READ_REQ_EVENT);
@@ -2087,7 +2088,7 @@ void rsi_ble_main_app_task()
       case RSI_BLE_MTU_EVENT: {
 #if RSI_DEBUG_EN
         //! event invokes when MTU event received
-        SL_DEBUG_LOG_V2(INFO, "In on mtu evt");
+        SL_DEBUG_LOG_V2(INFO, "In on mtu evt\r\n");
 #endif
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
@@ -2098,29 +2099,29 @@ void rsi_ble_main_app_task()
 
         status = rsi_ble_stop_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Scanning stop cmd status = %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Scanning stop cmd status = %lx\r\n", status);
           //return status;	//! TODO
         } else {
           rsi_scan_in_progress = 0;
         }
-        SL_DEBUG_LOG_V2(INFO, "Restarting scanning");
+        SL_DEBUG_LOG_V2(INFO, "Restarting scanning\r\n");
 
         status = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, " scanning start cmd status = %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, " scanning start cmd status = %lx\r\n", status);
           //return status;	//! TODO
         } else {
           rsi_scan_in_progress = 1;
         }
 
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(INFO, "Restart_scanning");
+          SL_DEBUG_LOG_V2(INFO, "Restart_scanning\r\n");
           rsi_ble_app_set_event(RSI_BLE_SCAN_RESTART_EVENT);
         }
       } break;
       case RSI_APP_EVENT_REMOTE_CONN_PARAM_REQ: {
 #if RSI_DEBUG_EN
-        SL_DEBUG_LOG_V2(INFO, "In conn params req evt");
+        SL_DEBUG_LOG_V2(INFO, "In conn params req evt\r\n");
 #endif
         //! remote device conn params request
         //! clear the conn params request event.

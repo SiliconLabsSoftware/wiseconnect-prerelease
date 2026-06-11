@@ -128,10 +128,10 @@ static sl_status_t sli_si91x_uart_command_handler(uint8_t *cmd,
 
   response = (uint8_t *)sli_wifi_host_get_buffer_data(resp_buffer, 0, &temp);
 
-  SL_DEBUG_LOG_V2(DEBUG, "Command : { %c }", *((char *)(cmd)));
+  SL_DEBUG_LOG_V2(DEBUG, "Command : { %c }\r\n", *((char *)(cmd)));
   sl_si91x_host_uart_transfer((const void *)cmd, NULL, cmd_length);
   sl_si91x_host_uart_transfer(NULL, (void *)response, expected_data_count);
-  SL_DEBUG_LOG_V2(DEBUG, "Response(%lu bytes) %s", expected_data_count, (uintptr_t)response);
+  SL_DEBUG_LOG_V2(DEBUG, "Response(%lu bytes) %s\r\n", expected_data_count, (uintptr_t)response);
   if (NULL == strstr((const char *)response, expected_response)) {
     return SL_STATUS_FAIL;
   }
@@ -150,7 +150,7 @@ sl_status_t sl_si91x_bus_init(void)
   sl_status_t status;
   uint16_t temp;
   static uint32_t i = 0;
-  SL_DEBUG_LOG_V2(DEBUG, "Bus Init startup");
+  SL_DEBUG_LOG_V2(DEBUG, "Bus Init startup\r\n");
 
   // Initialize the RX queue
   status = sli_queue_manager_init(&sli_uart_bus_rx_queue, SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
@@ -162,7 +162,7 @@ sl_status_t sl_si91x_bus_init(void)
                                               10000,
                                               (sli_buffer_t *)&resp_buffer);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION");
+    SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -186,7 +186,7 @@ sl_status_t sl_si91x_bus_init(void)
 
   sl_si91x_host_enable_high_speed_bus();
   sl_si91x_host_uart_transfer(NULL, (void *)response, 1);
-  SL_DEBUG_LOG_V2(DEBUG, "Response(%u bytes) %s", 1, (uintptr_t)response);
+  SL_DEBUG_LOG_V2(DEBUG, "Response(%u bytes) %s\r\n", 1, (uintptr_t)response);
   if (NULL == strstr((const char *)response, "U")) {
     return SL_STATUS_FAIL;
   }
@@ -195,7 +195,7 @@ sl_status_t sl_si91x_bus_init(void)
   VERIFY_STATUS_AND_RETURN(status);
 #endif
 
-  SL_DEBUG_LOG_V2(DEBUG, "Bus Init Done");
+  SL_DEBUG_LOG_V2(DEBUG, "Bus Init Done\r\n");
 
   return SL_STATUS_OK;
 }
@@ -288,7 +288,7 @@ sl_status_t sli_si91x_bootup_firmware(const uint8_t select_option, uint8_t image
 
   response = (uint8_t *)sli_wifi_host_get_buffer_data(resp_buffer, 0, &temp);
 #endif
-  SL_DEBUG_LOG_V2(DEBUG, "Bootup startup");
+  SL_DEBUG_LOG_V2(DEBUG, "Bootup startup\r\n");
 
   status = sli_si91x_uart_command_handler(load_binary, 1, "Enter Next Command", 47);
   VERIFY_STATUS_AND_RETURN(status);
@@ -312,7 +312,7 @@ sl_status_t sli_si91x_bootup_firmware(const uint8_t select_option, uint8_t image
 #endif
   sli_wifi_set_event(SL_WIFI_HOST_COMMON_RESPONSE_EVENT);
 
-  SL_DEBUG_LOG_V2(DEBUG, "Bootup Done");
+  SL_DEBUG_LOG_V2(DEBUG, "Bootup Done\r\n");
   return SL_STATUS_OK;
 }
 
@@ -332,7 +332,7 @@ sl_status_t sli_si91x_bus_rx_irq_handler(void)
   // Read the first 4 bytes to determine the frame size
   status = sl_si91x_host_uart_transfer(NULL, (void *)data_desc, 4);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Data descriptor read failed");
+    SL_DEBUG_LOG_V2(ERROR, "Data descriptor read failed\r\n");
     return SL_STATUS_FAIL;
   }
 
@@ -344,7 +344,7 @@ sl_status_t sli_si91x_bus_rx_irq_handler(void)
     resp_status = SL_STATUS_IN_PROGRESS;
     return status;
   } else if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Data frame read failed");
+    SL_DEBUG_LOG_V2(ERROR, "Data frame read failed\r\n");
     return SL_STATUS_FAIL;
   }
 
@@ -362,7 +362,7 @@ sl_status_t sli_si91x_bus_rx_irq_handler(void)
                                               10000,
                                               (sli_buffer_t *)&resp_buffer);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION");
+    SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -386,7 +386,7 @@ void sli_si91x_bus_rx_done_handler(void)
                                                 10000,
                                                 (sli_buffer_t *)&resp_buffer);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION");
+      SL_DEBUG_LOG_V2(ERROR, "HEAP EXHAUSTED DURING ALLOCATION\r\n");
       return;
     }
 

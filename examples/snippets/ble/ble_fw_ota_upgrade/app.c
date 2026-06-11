@@ -727,7 +727,7 @@ static void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconn
   UNUSED_PARAMETER(reason);
   memcpy(&disconn_event_to_app, resp_disconnect, sizeof(rsi_ble_event_disconnect_t));
   rsi_ble_app_set_event(RSI_BLE_DISCONN_EVENT);
-  SL_DEBUG_LOG_V2(INFO, "Reason for disconnection: %x ", reason);
+  SL_DEBUG_LOG_V2(INFO, "Reason for disconnection: %x \r\n", reason);
 }
 
 /*==============================================*/
@@ -926,10 +926,10 @@ void rsi_ble_ota_fwup_gatt_server(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful\r\n");
   }
 
   status = update_firmware();
@@ -946,18 +946,18 @@ sl_status_t update_firmware()
   status = rsi_bt_get_local_device_address(str_local_dev_address_6byte);
 
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Could not get BD Address of the module, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Could not get BD Address of the module, Error Code : 0x%lX\r\n", status);
     return status;
   }
 
   else {
     rsi_6byte_dev_address_to_ascii(str_local_dev_address, str_local_dev_address_6byte);
-    SL_DEBUG_LOG_V2(INFO, "BD Address of the module : %s", (uintptr_t)(str_local_dev_address));
+    SL_DEBUG_LOG_V2(INFO, "BD Address of the module : %s\r\n", (uintptr_t)(str_local_dev_address));
   }
 
   status = sl_wifi_get_firmware_version(&version);
   VERIFY_STATUS_AND_RETURN(status);
-  SL_DEBUG_LOG_V2(INFO, "Firmware version before update:");
+  SL_DEBUG_LOG_V2(INFO, "Firmware version before update:\r\n");
   print_firmware_version(&version);
 
   //! registering the GAP callback functions
@@ -1024,7 +1024,7 @@ sl_status_t update_firmware()
   if (status != RSI_SUCCESS) {
     return status;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Advertising started");
+    SL_DEBUG_LOG_V2(INFO, "Advertising started\r\n");
   }
   //! waiting for events from controller.
   while (1)
@@ -1046,11 +1046,11 @@ sl_status_t update_firmware()
         rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
         //! Converting the 6 byte address to ASCII.
         rsi_6byte_dev_address_to_ascii(str_remote_address, conn_event_to_app.dev_addr);
-        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s \r\n", (uintptr_t)(str_remote_address));
 
         status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, RSI_BLE_MAX_DATA_LEN);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "MTU request failed with status = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "MTU request failed with status = %lx \r\n", status);
         }
       } break; //! end of RSI_BLE_CONN_EVENT case
 
@@ -1061,9 +1061,9 @@ sl_status_t update_firmware()
         if (mtu_size > RSI_BLE_MAX_DATA_LEN) {
           status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, RSI_BLE_MAX_DATA_LEN);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "MTU request failed with status = %lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "MTU request failed with status = %lx \r\n", status);
           } else {
-            SL_DEBUG_LOG_V2(INFO, "MTU Requested");
+            SL_DEBUG_LOG_V2(INFO, "MTU Requested\r\n");
           }
         }
       } break; //! end of RSI_BLE_MTU_EX_EVENT case
@@ -1153,15 +1153,15 @@ sl_status_t update_firmware()
       case RSI_BLE_DISCONN_EVENT: {
 
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-        SL_DEBUG_LOG_V2(INFO, "Module got Disconnected");
+        SL_DEBUG_LOG_V2(INFO, "Module got Disconnected\r\n");
         //! set device in advertising mode.
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "advertising failed %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "advertising failed %lx\r\n", status);
           goto adv;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "module advertising ");
+          SL_DEBUG_LOG_V2(INFO, "module advertising \r\n");
         }
 
       } break;
@@ -1201,13 +1201,13 @@ adv:
               fw_size += FW_HEADER_SIZE;
 
 #endif
-              SL_DEBUG_LOG_V2(INFO, "Firmware size: %ld bytes", fw_size);
+              SL_DEBUG_LOG_V2(INFO, "Firmware size: %ld bytes\r\n", fw_size);
               total_number_of_chunks = (fw_size % app_ble_write_event.length)
                                          ? ((fw_size / app_ble_write_event.length) + 1)
                                          : (fw_size / app_ble_write_event.length);
-              SL_DEBUG_LOG_V2(DEBUG, "no of payload chunks :%d", total_number_of_chunks);
+              SL_DEBUG_LOG_V2(DEBUG, "no of payload chunks :%d\r\n", total_number_of_chunks);
               status = sl_si91x_fwup_start(firmware_header_data);
-              SL_DEBUG_LOG_V2(INFO, "Firmware transfer in progress. Please wait...  ");
+              SL_DEBUG_LOG_V2(INFO, "Firmware transfer in progress. Please wait...  \r\n");
               start_timer = osKernelGetTickCount();
               chunk_number++;
               status = sl_si91x_fwup_load(firmware_chunk_fw_payload, app_ble_write_event.length);
@@ -1217,9 +1217,9 @@ adv:
               //! received and loaded successfully
               if (status == SL_STATUS_SI91X_FW_UPDATE_DONE) {
                 stop_timer = osKernelGetTickCount();
-                SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld", (stop_timer - start_timer) / 1000);
-                SL_DEBUG_LOG_V2(INFO, "TA Firmware transfer complete!");
-                SL_DEBUG_LOG_V2(INFO, "Safe upgrade in Progress. Please wait....");
+                SL_DEBUG_LOG_V2(INFO, "Time in sec:%ld\r\n", (stop_timer - start_timer) / 1000);
+                SL_DEBUG_LOG_V2(INFO, "TA Firmware transfer complete!\r\n");
+                SL_DEBUG_LOG_V2(INFO, "Safe upgrade in Progress. Please wait....\r\n");
 #ifdef SLI_SI91X_MCU_INTERFACE
                 sl_si91x_soc_nvic_reset();
 #endif

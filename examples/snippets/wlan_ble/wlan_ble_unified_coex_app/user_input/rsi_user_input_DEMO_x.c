@@ -67,7 +67,7 @@ void display(uint8_t *disp)
   while (*(rx_ptr) != '\r') {
     SL_DEBUG_LOG_V2(INFO, "%c", *(rx_ptr++));
   }
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 }
 
 void ARM_USART_SignalEvent(uint32_t event)
@@ -129,35 +129,35 @@ void configure_m4_uart(void)
   stats = USARTdrv->Initialize(ARM_USART_SignalEvent);
 
   if (stats != ARM_DRIVER_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " UART Initialization Failed, Error Code : %d", stats);
+    SL_DEBUG_LOG_V2(ERROR, " UART Initialization Failed, Error Code : %d\r\n", stats);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " UART Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, " UART Initialization Success\r\n");
   }
 
   // Power up the UART peripheral
   stats = USARTdrv->PowerControl(ARM_POWER_FULL);
   if (stats != ARM_DRIVER_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to Set Power to UART, Error Code : %d", stats);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to Set Power to UART, Error Code : %d\r\n", stats);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " Configured Power to UART ");
+    SL_DEBUG_LOG_V2(INFO, " Configured Power to UART \r\n");
   }
   // Enable Receiver and Transmitter lines
   stats = USARTdrv->Control(ARM_USART_CONTROL_TX, 1);
   if (stats != ARM_DRIVER_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to Set  Transmitter lines to UART, Error Code : %d", stats);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to Set  Transmitter lines to UART, Error Code : %d\r\n", stats);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " Set  Transmitter lines to UART is success ");
+    SL_DEBUG_LOG_V2(INFO, " Set  Transmitter lines to UART is success \r\n");
   }
 
   stats = USARTdrv->Control(ARM_USART_CONTROL_RX, 1);
   if (stats != ARM_DRIVER_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to Set  Receiver lines to UART, Error Code : %d ", stats);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to Set  Receiver lines to UART, Error Code : %d \r\n", stats);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " Set  Receiver lines to UART");
+    SL_DEBUG_LOG_V2(INFO, " Set  Receiver lines to UART\r\n");
   }
 
   // Configure the UART to 9600 Bits/sec
@@ -165,10 +165,10 @@ void configure_m4_uart(void)
                               | ARM_USART_STOP_BITS_1 | ARM_USART_FLOW_CONTROL_NONE,
                             BAUD_VALUE);
   if (stats != ARM_DRIVER_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to set  UART control Configuration , Error Code : %d ", stats);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to set  UART control Configuration , Error Code : %d \r\n", stats);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " Successfully Configured UART control  ");
+    SL_DEBUG_LOG_V2(INFO, " Successfully Configured UART control  \r\n");
   }
 }
 #endif
@@ -206,7 +206,7 @@ void rsi_ui_app_task(void)
     rx_ptr = rx_buffer;
     stats  = USARTdrv->Receive(rx_ptr, BYTES_TO_BE_READ);
     if (stats != ARM_DRIVER_OK) {
-      SL_DEBUG_LOG_V2(ERROR, " Failed to Receive data , Error Code : %d ", stats);
+      SL_DEBUG_LOG_V2(ERROR, " Failed to Receive data , Error Code : %d \r\n", stats);
       return;
     } else {
       //DEBUGOUT("\r\n Receives data success  \r\n");
@@ -223,7 +223,7 @@ void rsi_ui_app_task(void)
     // Receives command based on the length
     stats = USARTdrv->Receive(rx_ptr, length);
     if (stats != ARM_DRIVER_OK) {
-      SL_DEBUG_LOG_V2(ERROR, " Failed to Receive data , Error Code : %d ", stats);
+      SL_DEBUG_LOG_V2(ERROR, " Failed to Receive data , Error Code : %d \r\n", stats);
       return;
     } else {
       //DEBUGOUT("\r\n Receives data success  \r\n");

@@ -1102,9 +1102,12 @@ int sl_si91x_recvfrom(int socket,
  *
  * @param[in] how
  *   Determines the scope of the shutdown operation: (@ref SI91X_SOCKET_SHUTDOWN_OPTION)
- *   - 0: Close the specified socket.
- *   - 1: Close all sockets open on the specified socket's source port number.
- *
+ *   TCP/TLS:
+*      - @c 0: Close the specified client socket.
+*      - @c 1: Close the server socket and the associated client sockets on the specified source port number.
+ *   UDP:
+*      - @c 0: Close the specified UDP socket.
+*      - @c 1: Not supported for UDP sockets; returns @c -1 with @c errno set to @c EINVAL.
  * @return 
  *   Returns 0 on success, or -1 on failure with @c errno set.
  *

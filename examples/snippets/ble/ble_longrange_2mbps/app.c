@@ -383,16 +383,16 @@ void ble_central(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success\r\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -400,11 +400,11 @@ void ble_central(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s \r\n", (uintptr_t)(local_dev_addr));
   }
 
   //! BLE register GAP callbacks
@@ -421,7 +421,7 @@ void ble_central(void *argument)
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore\r\n");
   }
 
   //! initialize the event map
@@ -430,29 +430,29 @@ void ble_central(void *argument)
   //! start scanning
   status = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(INFO, "Start_scanning status: 0x%lX", status);
+    SL_DEBUG_LOG_V2(INFO, "Start_scanning status: 0x%lX\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Scanning started ");
+  SL_DEBUG_LOG_V2(INFO, "Scanning started \r\n");
 
 #if ENABLE_NWP_POWER_SAVE
-  SL_DEBUG_LOG_V2(INFO, "Keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "Keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
 
   while (1) {
@@ -468,12 +468,12 @@ void ble_central(void *argument)
     switch (temp_event_map) {
       case RSI_APP_EVENT_ADV_REPORT: {
         //! advertise report event.
-        SL_DEBUG_LOG_V2(INFO, "In Advertising Event");
+        SL_DEBUG_LOG_V2(INFO, "In Advertising Event\r\n");
         //! clear the advertise report event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_ADV_REPORT);
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(INFO, "Connect status: 0x%lX", status);
+          SL_DEBUG_LOG_V2(INFO, "Connect status: 0x%lX\r\n", status);
         }
       } break;
 
@@ -483,7 +483,7 @@ void ble_central(void *argument)
         //! clear the connected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_CONNECTED);
         rsi_6byte_dev_address_to_ascii(str_remote_address, rsi_app_connected_device.dev_addr);
-        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s\r\n", (uintptr_t)(str_remote_address));
 
         status = rsi_ble_readphy((int8_t *)rsi_app_connected_device.dev_addr, &read_phy_resp);
         if (status != RSI_SUCCESS) {
@@ -502,14 +502,14 @@ void ble_central(void *argument)
 
         //! clear the disconnected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_DISCONNECTED);
-        SL_DEBUG_LOG_V2(INFO, "Module got disconnected");
+        SL_DEBUG_LOG_V2(INFO, "Module got disconnected\r\n");
 
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state ");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to active state \r\n");
         //! initiating Active mode in BT mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode \r\n");
           return;
         }
 
@@ -517,7 +517,7 @@ void ble_central(void *argument)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode \r\n");
           return;
         }
 #endif
@@ -525,12 +525,12 @@ void ble_central(void *argument)
         //! start scanning
         status = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(INFO, "Start_scanning status: 0x%lX", status);
+          SL_DEBUG_LOG_V2(INFO, "Start_scanning status: 0x%lX\r\n", status);
         }
 
-        SL_DEBUG_LOG_V2(INFO, "Scanning started ");
+        SL_DEBUG_LOG_V2(INFO, "Scanning started \r\n");
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "Keep module in to power save ");
+        SL_DEBUG_LOG_V2(INFO, "Keep module in to power save \r\n");
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
           return;
@@ -540,29 +540,29 @@ void ble_central(void *argument)
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save \r\n");
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
 
       } break;
 
       case RSI_APP_EVENT_PHY_UPDATE_COMPLETE: {
         //! phy update complete event
-        SL_DEBUG_LOG_V2(INFO, "Phy rate update complete event");
+        SL_DEBUG_LOG_V2(INFO, "Phy rate update complete event\r\n");
 
         if ((rsi_app_phy_update_complete.TxPhy != BLE_2MBPS) && (rsi_app_phy_update_complete.RxPhy != BLE_2MBPS)) {
           if (coded_phy_rate == BLE_500_KBPS) {
-            SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 500kbps");
+            SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 500kbps\r\n");
           } else if (coded_phy_rate == BLE_125_KBPS) {
-            SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 125kbps PHY data rate ");
+            SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 125kbps PHY data rate \r\n");
           }
         } else if ((rsi_app_phy_update_complete.TxPhy == BLE_1MBPS)
                    && (rsi_app_phy_update_complete.RxPhy == BLE_1MBPS)) {
-          SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 1Mbps PHY data rate ");
+          SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 1Mbps PHY data rate \r\n");
         } else {
-          SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 2Mbps PHY data rate ");
+          SL_DEBUG_LOG_V2(INFO, "PHY data rate is updated to 2Mbps PHY data rate \r\n");
         }
 
         //! clear the phy update complete event.

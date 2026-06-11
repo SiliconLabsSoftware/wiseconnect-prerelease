@@ -204,18 +204,18 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_mqtt_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success\r\n");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   mqtt_example();
 
@@ -251,7 +251,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
                                       0,
                                       TOPIC_TO_BE_SUBSCRIBED);
   if (status != SL_STATUS_IN_PROGRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to unsubscribe : 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to unsubscribe : 0x%lx\r\n", status);
 
     mqtt_client_cleanup();
     return;
@@ -287,7 +287,7 @@ void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t
 
   switch (*error) {
     case SL_MQTT_CLIENT_RECEIVE_FAILED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.");
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.\r\n");
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE:
@@ -326,7 +326,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
                                         mqtt_client_message_handler,
                                         TOPIC_TO_BE_SUBSCRIBED);
       if (status != SL_STATUS_IN_PROGRESS) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to subscribe : 0x%lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to subscribe : 0x%lx\r\n", status);
 
         mqtt_client_cleanup();
         return;
@@ -334,7 +334,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
 
       status = sl_mqtt_client_publish(client, &message_to_be_published, 0, &message_to_be_published);
       if (status != SL_STATUS_IN_PROGRESS) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to publish message: 0x%lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to publish message: 0x%lx\r\n", status);
 
         mqtt_client_cleanup();
         return;
@@ -354,21 +354,21 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     case SL_MQTT_CLIENT_SUBSCRIBED_EVENT: {
       char *subscribed_topic = (char *)context;
 
-      SL_DEBUG_LOG_V2(INFO, "Subscribed to Topic: %s", (uintptr_t)subscribed_topic);
+      SL_DEBUG_LOG_V2(INFO, "Subscribed to Topic: %s\r\n", (uintptr_t)subscribed_topic);
       break;
     }
 
     case SL_MQTT_CLIENT_UNSUBSCRIBED_EVENT: {
       char *unsubscribed_topic = (char *)context;
 
-      SL_DEBUG_LOG_V2(INFO, "Unsubscribed from topic: %s", (uintptr_t)unsubscribed_topic);
+      SL_DEBUG_LOG_V2(INFO, "Unsubscribed from topic: %s\r\n", (uintptr_t)unsubscribed_topic);
 
       sl_mqtt_client_disconnect(client, 0);
       break;
     }
 
     case SL_MQTT_CLIENT_DISCONNECTED_EVENT: {
-      SL_DEBUG_LOG_V2(INFO, "Disconnected from MQTT broker");
+      SL_DEBUG_LOG_V2(INFO, "Disconnected from MQTT broker\r\n");
 
       mqtt_client_cleanup();
       break;
@@ -394,10 +394,10 @@ sl_status_t mqtt_example()
                                    cacert,
                                    sizeof(cacert) - 1);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
       return status;
     }
-    SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", CERTIFICATE_INDEX);
+    SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", CERTIFICATE_INDEX);
   }
 
   if (SEND_CREDENTIALS) {
@@ -437,12 +437,12 @@ sl_status_t mqtt_example()
 
   status = sl_mqtt_client_init(&client, mqtt_client_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to init mqtt client: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to init mqtt client: 0x%lx\r\n", status);
 
     mqtt_client_cleanup();
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Init mqtt client Success ");
+  SL_DEBUG_LOG_V2(INFO, "Init mqtt client Success \r\n");
 
   sl_mqtt_client_tcp_tls_advanced_options_t mqtt_tcp_tls_opts = {
     .tcp_keepalive_initial_time_sec   = 180,
@@ -466,7 +466,7 @@ sl_status_t mqtt_example()
                          hex_addr,
                          (unsigned int *)mqtt_broker_configuration.ip.ip.v6.value);
   if (status != 0x1) {
-    SL_DEBUG_LOG_V2(ERROR, "IPv6 conversion failed.");
+    SL_DEBUG_LOG_V2(ERROR, "IPv6 conversion failed.\r\n");
     mqtt_client_cleanup();
     return status;
   }
@@ -474,7 +474,7 @@ sl_status_t mqtt_example()
 #else
   status = sl_net_inet_addr(MQTT_BROKER_IP, &mqtt_broker_configuration.ip.ip.v4.value);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to convert IP address ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to convert IP address \r\n");
 
     mqtt_client_cleanup();
     return status;
@@ -485,18 +485,18 @@ sl_status_t mqtt_example()
   status =
     sl_mqtt_client_connect_v2(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
   if (status != SL_STATUS_IN_PROGRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to mqtt broker: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to mqtt broker: 0x%lx\r\n", status);
 
     mqtt_client_cleanup();
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Connect to mqtt broker Success ");
+  SL_DEBUG_LOG_V2(INFO, "Connect to mqtt broker Success \r\n");
 
   while (!is_execution_completed) {
     osThreadYield();
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Example execution completed ");
+  SL_DEBUG_LOG_V2(INFO, "Example execution completed \r\n");
 
   return SL_STATUS_OK;
 }

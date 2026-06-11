@@ -532,7 +532,7 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *r
  */
 static void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t *resp_conn)
 {
-  SL_DEBUG_LOG_V2(INFO, "conn ");
+  SL_DEBUG_LOG_V2(INFO, "conn \r\n");
   memcpy(&conn_event_to_app, resp_conn, sizeof(rsi_ble_event_conn_status_t));
   rsi_ble_app_set_event(RSI_BLE_EVENT_CONN);
 }
@@ -567,7 +567,7 @@ static void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconn
 static void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t *rsi_ble_write)
 {
   UNUSED_PARAMETER(event_id); //This statement is added only to resolve compilation warning, value is unchanged
-  SL_DEBUG_LOG_V2(INFO, "gatt wr ");
+  SL_DEBUG_LOG_V2(INFO, "gatt wr \r\n");
   memcpy(&app_ble_write_event, rsi_ble_write, sizeof(rsi_ble_event_write_t));
 #if (GATT_ROLE == SERVER)
   rsi_ble_hid_srv_gatt_wr_cb();
@@ -588,7 +588,7 @@ static void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t
 static void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t *rsi_ble_read_req)
 {
   UNUSED_PARAMETER(event_id); //This statement is added only to resolve compilation warning, value is unchanged
-  SL_DEBUG_LOG_V2(INFO, "gatt rd ");
+  SL_DEBUG_LOG_V2(INFO, "gatt rd \r\n");
   memcpy(&app_ble_read_event, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
   rsi_ble_app_set_event(RSI_BLE_EVENT_GATT_RD);
 }
@@ -656,7 +656,7 @@ static void ble_on_att_desc_event(uint16_t resp_status, rsi_ble_event_gatt_desc_
 static void rsi_ble_on_smp_request(rsi_bt_event_smp_req_t *remote_dev_address)
 {
   memcpy(remote_dev_bd_addr, remote_dev_address->dev_addr, 6);
-  SL_DEBUG_LOG_V2(INFO, "smp req");
+  SL_DEBUG_LOG_V2(INFO, "smp req\r\n");
   rsi_ble_app_set_event(RSI_BLE_EVENT_SMP_REQ);
 }
 
@@ -673,7 +673,7 @@ static void rsi_ble_on_smp_request(rsi_bt_event_smp_req_t *remote_dev_address)
 static void rsi_ble_on_smp_response(rsi_bt_event_smp_resp_t *remote_dev_address)
 {
   memcpy(remote_dev_bd_addr, remote_dev_address->dev_addr, 6);
-  SL_DEBUG_LOG_V2(INFO, "smp resp");
+  SL_DEBUG_LOG_V2(INFO, "smp resp\r\n");
   rsi_ble_app_set_event(RSI_BLE_EVENT_SMP_RESP);
 }
 
@@ -690,7 +690,7 @@ static void rsi_ble_on_smp_response(rsi_bt_event_smp_resp_t *remote_dev_address)
 static void rsi_ble_on_smp_passkey(rsi_bt_event_smp_passkey_t *remote_dev_address)
 {
   memcpy(remote_dev_bd_addr, remote_dev_address->dev_addr, 6);
-  SL_DEBUG_LOG_V2(INFO, "smp passkey");
+  SL_DEBUG_LOG_V2(INFO, "smp passkey\r\n");
   rsi_ble_app_set_event(RSI_BLE_EVENT_SMP_PASSKEY);
 }
 
@@ -756,7 +756,7 @@ static void rsi_ble_on_encrypt_started(uint16_t resp_status, rsi_bt_event_encryp
  */
 static void rsi_ble_on_le_ltk_req_event(rsi_bt_event_le_ltk_request_t *le_ltk_req)
 {
-  SL_DEBUG_LOG_V2(INFO, "smp ltk req");
+  SL_DEBUG_LOG_V2(INFO, "smp ltk req\r\n");
   memcpy(&temp_le_ltk_req, le_ltk_req, sizeof(rsi_bt_event_le_ltk_request_t));
   rsi_ble_app_set_event(RSI_BLE_EVENT_LTK_REQ);
 }
@@ -797,7 +797,7 @@ static void rsi_gatt_add_att_to_list(rsi_ble_hid_info_t *p_hid_info,
                                      uint8_t *data,
                                      uint32_t uuid)
 {
-  SL_DEBUG_LOG_V2(INFO, "gatt add att to list");
+  SL_DEBUG_LOG_V2(INFO, "gatt add att to list\r\n");
   if ((p_hid_info->data_ix + data_len) >= BLE_ATT_REC_SIZE) {
     SL_DEBUG_LOG_V2(INFO, "no data memory for att rec values");
     return;
@@ -895,13 +895,13 @@ static int32_t rsi_ble_add_char_val_att(rsi_ble_hid_info_t *p_hid_info,
   //! add attribute to the service
   status = rsi_ble_add_attribute(&new_att);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "add attribute failed = %lx ", status);
+    SL_DEBUG_LOG_V2(ERROR, "add attribute failed = %lx \r\n", status);
     return status;
   }
 
   if (((config_bitmap & BIT(0)) == 1) || (data_len > 20)) {
     if (!p_hid_info) {
-      SL_DEBUG_LOG_V2(INFO, "HID INFO is not available ");
+      SL_DEBUG_LOG_V2(INFO, "HID INFO is not available \r\n");
       return RSI_FAILURE;
     }
     rsi_gatt_add_att_to_list(p_hid_info, handle, data_len, data, att_type_uuid.val.val32);
@@ -1281,9 +1281,9 @@ static uint32_t rsi_ble_add_hid_serv(rsi_ble_hid_info_t *p_hid_info)
  */
 void rsi_ble_hid_srv_gatt_wr_cb(void)
 {
-  SL_DEBUG_LOG_V2(INFO, "wr handle");
-  SL_DEBUG_LOG_V2(INFO, "report handle is:%d", rsi_ble_hid_in_report_val_hndl);
-  SL_DEBUG_LOG_V2(INFO, "app event handle is:%d", *app_ble_write_event.handle);
+  SL_DEBUG_LOG_V2(INFO, "wr handle\r\n");
+  SL_DEBUG_LOG_V2(INFO, "report handle is:%d\r\n", rsi_ble_hid_in_report_val_hndl);
+  SL_DEBUG_LOG_V2(INFO, "app event handle is:%d\r\n", *app_ble_write_event.handle);
   if ((rsi_ble_hid_in_report_val_hndl + 1) == *((uint16_t *)app_ble_write_event.handle)) {
     //! 0x01 for notification
     if (app_ble_write_event.att_value[0] == 0x01) {
@@ -1295,7 +1295,7 @@ void rsi_ble_hid_srv_gatt_wr_cb(void)
       app_state &= ~BIT(REPORT_IN_NOTIFY_ENABLE);
       rsi_ble_app_clear_event(RSI_BLE_GATT_SEND_DATA);
     }
-    SL_DEBUG_LOG_V2(INFO, "Input report notify val: %lu", app_state & BIT(REPORT_IN_NOTIFY_ENABLE));
+    SL_DEBUG_LOG_V2(INFO, "Input report notify val: %lu\r\n", app_state & BIT(REPORT_IN_NOTIFY_ENABLE));
   }
 }
 #endif
@@ -1375,15 +1375,15 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success\r\n");
   }
 
   status = sl_wifi_get_firmware_version(&fw_version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&fw_version);
   }
@@ -1445,7 +1445,7 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore\r\n");
     return;
   }
 
@@ -1458,11 +1458,11 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s \r\n", (uintptr_t)(local_dev_addr));
   }
 
 #if (GATT_ROLE == SERVER)
@@ -1483,7 +1483,7 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Start advertising ...");
+  SL_DEBUG_LOG_V2(INFO, "Start advertising ...\r\n");
   //! set device in advertising mode.
   rsi_ble_start_advertising();
 
@@ -1494,29 +1494,29 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
   //! start scanning
   status = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Start scanning failed, error status: %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Start scanning failed, error status: %lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Start scanning ...");
+  SL_DEBUG_LOG_V2(INFO, "Start scanning ...\r\n");
 #endif
 
 #if ENABLE_NWP_POWER_SAVE
-  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
 
   //! waiting for events from controller.
@@ -1534,11 +1534,11 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
         //! advertise report event.
 
         //! clear the advertise report event.
-        SL_DEBUG_LOG_V2(INFO, "In Advertising Event");
+        SL_DEBUG_LOG_V2(INFO, "In Advertising Event\r\n");
         rsi_ble_app_clear_event(RSI_APP_EVENT_ADV_REPORT);
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(INFO, "connect status: 0x%lX", status);
+          SL_DEBUG_LOG_V2(INFO, "connect status: 0x%lX\r\n", status);
         }
 
       } break;
@@ -1549,7 +1549,7 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_EVENT_CONN);
         rsi_6byte_dev_address_to_ascii(str_remote_address, conn_event_to_app.dev_addr);
-        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s \r\n", (uintptr_t)(str_remote_address));
         app_state |= BIT(CONNECTED);
 #if (GATT_ROLE == CLIENT)
         rsi_ble_smp_pair_request(conn_event_to_app.dev_addr, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
@@ -1564,13 +1564,13 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
         if (app_state & BIT(REPORT_IN_NOTIFY_ENABLE)) {
           rsi_ble_app_clear_event(RSI_BLE_GATT_SEND_DATA);
         }
-        SL_DEBUG_LOG_V2(INFO, "Module got disconnected");
+        SL_DEBUG_LOG_V2(INFO, "Module got disconnected\r\n");
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
         //! initiating power save in BLE mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
           return;
         }
 
@@ -1578,21 +1578,21 @@ void ble_hids_gatt_application(rsi_ble_hid_info_t *p_hid_info)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx\r\n", status);
           return;
         }
 
-        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
         app_state = 0;
         app_state |= BIT(ADVERTISE);
         //! set device in advertising mode.
 #if (GATT_ROLE == SERVER)
-        SL_DEBUG_LOG_V2(INFO, "Start advertising ...");
+        SL_DEBUG_LOG_V2(INFO, "Start advertising ...\r\n");
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Start advertising failed, error status: %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start advertising failed, error status: %lx\r\n", status);
           goto adv;
         }
 #elif (GATT_ROLE == CLIENT)
@@ -1601,17 +1601,17 @@ scan:
         device_found = 0;
         status = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Start scanning failed, error status: %lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start scanning failed, error status: %lx\r\n", status);
           goto scan;
         }
-        SL_DEBUG_LOG_V2(INFO, "Start scanning");
+        SL_DEBUG_LOG_V2(INFO, "Start scanning\r\n");
 #endif
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
         //! initiating power save in BLE mode
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
           return;
         }
 
@@ -1619,11 +1619,11 @@ scan:
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%lx\r\n", status);
           return;
         }
 
-        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
       } break;
 
@@ -1647,7 +1647,7 @@ scan:
         for (i = 0; i < p_hid_info->att_rec_list_count; i++) {
           if (p_hid_info->att_rec_list[i].handle == app_ble_read_event.handle) {
             if (app_ble_read_event.type == 0) {
-              SL_DEBUG_LOG_V2(INFO, "read resp ");
+              SL_DEBUG_LOG_V2(INFO, "read resp \r\n");
               rsi_ble_gatt_read_response(app_ble_read_event.dev_addr,
                                          GATT_READ_RESP,
                                          app_ble_read_event.handle,
@@ -1655,7 +1655,7 @@ scan:
                                          p_hid_info->att_rec_list[i].len,
                                          p_hid_info->att_rec_list[i].value);
             } else {
-              SL_DEBUG_LOG_V2(INFO, "read blob resp");
+              SL_DEBUG_LOG_V2(INFO, "read blob resp\r\n");
               rsi_ble_gatt_read_response(app_ble_read_event.dev_addr,
                                          GATT_READ_BLOB_RESP,
                                          app_ble_read_event.handle,
@@ -1669,7 +1669,7 @@ scan:
 
       case RSI_BLE_EVENT_MTU: {
         //! event invokes when MTU event is received
-        SL_DEBUG_LOG_V2(INFO, "Received MTU event");
+        SL_DEBUG_LOG_V2(INFO, "Received MTU event\r\n");
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_EVENT_MTU);
@@ -1712,13 +1712,13 @@ scan:
 
       case RSI_BLE_EVENT_SMP_PASSKEY_DISPLAY: {
         //! clear the served event
-        SL_DEBUG_LOG_V2(INFO, "smp passkey disp : %s ", (uintptr_t)(passkey));
+        SL_DEBUG_LOG_V2(INFO, "smp passkey disp : %s \r\n", (uintptr_t)(passkey));
         rsi_ble_app_clear_event(RSI_BLE_EVENT_SMP_PASSKEY_DISPLAY);
       } break;
 
       case RSI_BLE_EVENT_SMP_FAILED: {
         //! initiate SMP protocol as a Central
-        SL_DEBUG_LOG_V2(ERROR, "smp failed");
+        SL_DEBUG_LOG_V2(ERROR, "smp failed\r\n");
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_EVENT_SMP_FAILED);
@@ -1734,7 +1734,7 @@ scan:
 #if (ROLE == PERIPHERAL_ROLE)
         if ((temp_le_ltk_req.localediv == glbl_enc_enabled.localediv)
             && !((memcmp(temp_le_ltk_req.localrand, glbl_enc_enabled.localrand, 8)))) {
-          SL_DEBUG_LOG_V2(INFO, "Positive reply");
+          SL_DEBUG_LOG_V2(INFO, "Positive reply\r\n");
           SL_DEBUG_LOG_V2(INFO,
                           "EDIV match check status : %d ",
                           (temp_le_ltk_req.localediv == glbl_enc_enabled.localediv));
@@ -1787,9 +1787,9 @@ scan:
         service_uuid.val.val16 = RSI_BLE_HID_SERVICE_UUID;
         status                 = rsi_ble_get_profile_async(glbl_enc_enabled.dev_addr, service_uuid, NULL);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_profile_async : error status 0x%lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_profile_async : error status 0x%lx \r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_profile_async : successful ");
+          SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_profile_async : successful \r\n");
         }
 #endif
       } break;
@@ -1810,9 +1810,9 @@ scan:
                                                    *(uint16_t *)ble_servs.end_handle,
                                                    NULL);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_char_services_async : error status 0x%lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_char_services_async : error status 0x%lx \r\n", status);
           } else {
-            SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_char_services_async : successful ");
+            SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_char_services_async : successful \r\n");
           }
         }
       } break;
@@ -1845,9 +1845,9 @@ scan:
                                                      *(uint16_t *)ble_servs.end_handle,
                                                      NULL);
             if (status != RSI_SUCCESS) {
-              SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_char_services_async : error status 0x%lx ", status);
+              SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_char_services_async : error status 0x%lx \r\n", status);
             } else {
-              SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_char_services_async : successful ");
+              SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_char_services_async : successful \r\n");
             }
           } else {
             //if all characteristic has been discovered, discover the descriptors one by one from the desc hanlde list.
@@ -1857,9 +1857,9 @@ scan:
                                                          desc_range[desc_handle_index_1],
                                                          NULL);
               if (status != RSI_SUCCESS) {
-                SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_att_descriptors_async : error status 0x%lx ", status);
+                SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_att_descriptors_async : error status 0x%lx \r\n", status);
               } else {
-                SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_att_descriptors_async : successful ");
+                SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_att_descriptors_async : successful \r\n");
               }
               desc_handle_index_1 += 1;
             } else {
@@ -1875,9 +1875,9 @@ scan:
                                                        desc_range[desc_handle_index_1],
                                                        NULL);
             if (status != RSI_SUCCESS) {
-              SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_att_descriptors_async : error status 0x%lx ", status);
+              SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_att_descriptors_async : error status 0x%lx \r\n", status);
             } else {
-              SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_att_descriptors_async : successful ");
+              SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_att_descriptors_async : successful \r\n");
             }
             desc_handle_index_1 += 1;
           } else {
@@ -1906,11 +1906,11 @@ scan:
                                                  2,
                                                  (uint8_t *)data);
               if (status != RSI_SUCCESS) {
-                SL_DEBUG_LOG_V2(ERROR, "rsi_ble_set_att_cmd_async : error status 0x%lx ", status);
+                SL_DEBUG_LOG_V2(ERROR, "rsi_ble_set_att_cmd_async : error status 0x%lx \r\n", status);
               } else {
-                SL_DEBUG_LOG_V2(INFO, "rsi_ble_set_att_cmd_async : successful ");
+                SL_DEBUG_LOG_V2(INFO, "rsi_ble_set_att_cmd_async : successful \r\n");
               }
-              SL_DEBUG_LOG_V2(INFO, "Notification enabled ");
+              SL_DEBUG_LOG_V2(INFO, "Notification enabled \r\n");
             }
           }
           memset(&att_desc, 0, sizeof(rsi_ble_event_gatt_desc_t));
@@ -1921,9 +1921,9 @@ scan:
                                                        desc_range[desc_handle_index_1],
                                                        NULL);
             if (status != RSI_SUCCESS) {
-              SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_att_descriptors_async : error status 0x%lx ", status);
+              SL_DEBUG_LOG_V2(ERROR, "rsi_ble_get_att_descriptors_async : error status 0x%lx \r\n", status);
             } else {
-              SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_att_descriptors_async : successful ");
+              SL_DEBUG_LOG_V2(INFO, "rsi_ble_get_att_descriptors_async : successful \r\n");
             }
             desc_handle_index_1 += 1;
           } else {
@@ -1957,7 +1957,7 @@ scan:
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_conn_params_update Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_conn_params_update Failed, Error Code : 0x%lX\r\n", status);
           return;
         }
         if (app_state & BIT(CONNECTED)) {

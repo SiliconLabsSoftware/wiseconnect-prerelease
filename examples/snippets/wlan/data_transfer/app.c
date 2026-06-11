@@ -194,18 +194,18 @@ sl_status_t initialize_wifi_client_interface()
   //! Initialize Wi-Fi client interface
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Client initialization failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Client initialization failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client initialization success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client initialization success\r\n");
 
   //! Set Wi-Fi client profile
   status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_1, &wifi_client_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to store the Wi-Fi client network profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to store the Wi-Fi client network profile: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Successfully stored the Wi-Fi client network profile");
+  SL_DEBUG_LOG_V2(INFO, "Successfully stored the Wi-Fi client network profile\r\n");
 
   //! Set network credentials
   status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
@@ -213,33 +213,33 @@ sl_status_t initialize_wifi_client_interface()
                                  &wifi_client_credential.data,
                                  wifi_client_credential.data_length);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to configure Wi-Fi client credentials: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to configure Wi-Fi client credentials: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Configuring Wi-Fi client credentials is successful");
+  SL_DEBUG_LOG_V2(INFO, "Configuring Wi-Fi client credentials is successful\r\n");
 
   //! Bring up Wi-Fi client interface
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring up Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring up Wi-Fi client interface up: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up\r\n");
 
   //! Get profile
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_PROFILE_ID_1, &client_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Get client profile is successful");
+  SL_DEBUG_LOG_V2(INFO, "Get client profile is successful\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &client_profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
 
   SL_DEBUG_LOG_V2(INFO, "IP Address of client:");
   print_sl_ip_address(&ip_address);
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   return status;
 }
@@ -252,28 +252,28 @@ sl_status_t initialize_wifi_ap_interface()
   //! Initialize Wi-Fi Access Point interface
   status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi AP initialization failed, Error code: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi AP initialization failed, Error code: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP initialization success.");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP initialization success.\r\n");
 
   //! Get channel
   status = sl_wifi_get_channel(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &client_channel);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client channel: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client channel: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client channel.");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client channel.\r\n");
 
   wifi_ap_profile.config.channel.channel = client_channel.channel;
 
   //! Set profile
   status = sl_net_set_profile(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_1, &wifi_ap_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to store the Wi-Fi client network profile.: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to store the Wi-Fi client network profile.: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Successfully stored the Wi-Fi client network profile.");
+  SL_DEBUG_LOG_V2(INFO, "Successfully stored the Wi-Fi client network profile.\r\n");
 
   //! Set credential
   status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
@@ -281,26 +281,26 @@ sl_status_t initialize_wifi_ap_interface()
                                  &wifi_ap_credential.data,
                                  wifi_ap_credential.data_length);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to configure Wi-Fi AP credentials: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to configure Wi-Fi AP credentials: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Configured Wi-Fi AP credentials Successful");
+  SL_DEBUG_LOG_V2(INFO, "Configured Wi-Fi AP credentials Successful\r\n");
 
   //! Bring up AP interface
   status = sl_net_up(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi AP interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi AP interface up: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "AP started");
+  SL_DEBUG_LOG_V2(INFO, "AP started\r\n");
 
   //! Get AP profile
   status = sl_net_get_profile(SL_NET_WIFI_AP_INTERFACE, SL_NET_PROFILE_ID_1, &ap_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get AP profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get AP profile: 0x%lx\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to AP profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to AP profile\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &ap_profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -353,10 +353,10 @@ void data_transfer_through_client_and_ap_interface()
   //! Create server socket to listen for client connection from remote device
   server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (server_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket create failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket create failed with BSD error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Server socket creation is successful, socket id: %d", server_socket);
+  SL_DEBUG_LOG_V2(INFO, "Server socket creation is successful, socket id: %d\r\n", server_socket);
 
   //! Set socket
   socket_return_value = setsockopt(server_socket,
@@ -365,7 +365,7 @@ void data_transfer_through_client_and_ap_interface()
                                    &high_performance_socket,
                                    sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with BSD error: %d\r\n", errno);
     close(server_socket);
     return;
   }
@@ -375,7 +375,7 @@ void data_transfer_through_client_and_ap_interface()
   //! Bind Socket
   socket_return_value = bind(server_socket, (struct sockaddr *)&server_address1, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with BSD error: %d\r\n", errno);
     close(server_socket);
     return;
   }
@@ -383,30 +383,30 @@ void data_transfer_through_client_and_ap_interface()
   //! Listen on socket for client connection
   socket_return_value = listen(server_socket, BACK_LOG);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with BSD error: %d\r\n", errno);
     close(server_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port : %d", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "Listening on Local Port : %d\r\n", LISTENING_PORT);
 
   //! Accept socket to receive data from remote device
   client_socket1 = accept(server_socket, NULL, NULL);
   if (client_socket1 < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with BSD error: %d\r\n", errno);
     close(server_socket);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %d", client_socket1);
+  SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %d\r\n", client_socket1);
 
   //! Create client socket
   client_socket2 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket2 < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket create failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket create failed with BSD error: %d\r\n", errno);
     close(server_socket);
     close(client_socket1);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Client socket creation is succesful, socket id: %d", client_socket2);
+  SL_DEBUG_LOG_V2(INFO, "Client socket creation is succesful, socket id: %d\r\n", client_socket2);
 
   server_address2.sin_family = AF_INET;
   server_address2.sin_port   = SERVER_PORT;
@@ -415,13 +415,13 @@ void data_transfer_through_client_and_ap_interface()
   //! Connect client socket
   socket_return_value = connect(client_socket2, (struct sockaddr *)&server_address2, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with BSD error: %d\r\n", errno);
     close(client_socket2);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "Start data transfer to remote device");
+  SL_DEBUG_LOG_V2(INFO, "Start data transfer to remote device\r\n");
   while (1) {
     memset(data_buffer, 0, sizeof(data_buffer));
 
@@ -429,15 +429,15 @@ void data_transfer_through_client_and_ap_interface()
     read_bytes = recv(client_socket1, data_buffer, sizeof(data_buffer), 0);
     if (read_bytes < 0) {
       if (!(is_remote_terminated)) {
-        SL_DEBUG_LOG_V2(ERROR, "Receive failed with BSD error:%d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "Receive failed with BSD error:%d\r\n", errno);
       }
       break;
     }
 
-    SL_DEBUG_LOG_V2(INFO, "Data received from remote device on WiFi client interface: %s", (uintptr_t)data_buffer);
-    SL_DEBUG_LOG_V2(INFO, "Bytes received : %d", read_bytes);
+    SL_DEBUG_LOG_V2(INFO, "Data received from remote device on WiFi client interface: %s\r\n", (uintptr_t)data_buffer);
+    SL_DEBUG_LOG_V2(INFO, "Bytes received : %d\r\n", read_bytes);
 
-    SL_DEBUG_LOG_V2(INFO, "Send data to the connected third party station from AP interface");
+    SL_DEBUG_LOG_V2(INFO, "Send data to the connected third party station from AP interface\r\n");
 
     //! Send received data to remote device
     while (1) {
@@ -445,15 +445,15 @@ void data_transfer_through_client_and_ap_interface()
       if (sent_bytes < 0) {
         if (errno == ENOBUFS)
           continue;
-        SL_DEBUG_LOG_V2(ERROR, "Send failed with BSD error:%d", errno);
+        SL_DEBUG_LOG_V2(ERROR, "Send failed with BSD error:%d\r\n", errno);
         break;
       }
-      SL_DEBUG_LOG_V2(INFO, "Data sent: %s", (uintptr_t)data_buffer);
+      SL_DEBUG_LOG_V2(INFO, "Data sent: %s\r\n", (uintptr_t)data_buffer);
       break;
     }
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed");
+  SL_DEBUG_LOG_V2(INFO, "Example Demonstration Completed\r\n");
 
   is_remote_terminated = 0;
 

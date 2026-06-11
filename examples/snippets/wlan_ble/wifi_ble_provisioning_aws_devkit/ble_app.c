@@ -663,7 +663,7 @@ void rsi_ble_configurator_init(void)
 
   // set device in advertising mode.
   rsi_ble_start_advertising();
-  SL_DEBUG_LOG_V2(INFO, "BLE Advertising Started...");
+  SL_DEBUG_LOG_V2(INFO, "BLE Advertising Started...\r\n");
 }
 
 /*==============================================*/
@@ -687,7 +687,7 @@ void rsi_ble_configurator_task(void *argument)
 
   scanresult = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scanresult == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result\r\n");
     return;
   }
   memset(scanresult, 0, scanbuf_size);
@@ -753,7 +753,7 @@ adv:
         switch (cmdid) {
           // Scan command request
           case '3': {
-            SL_DEBUG_LOG_V2(INFO, "Received scan request");
+            SL_DEBUG_LOG_V2(INFO, "Received scan request\r\n");
             retry = 0;
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_SCAN_STATE);
@@ -769,7 +769,7 @@ adv:
           // Sending Security type
           case '5': {
             sec_type = ((app_ble_write_event.att_value[3]) - '0');
-            SL_DEBUG_LOG_V2(INFO, "In Security Request");
+            SL_DEBUG_LOG_V2(INFO, "In Security Request\r\n");
             rsi_ble_app_set_event(RSI_SECTYPE);
           } break;
 
@@ -777,7 +777,7 @@ adv:
           case '6': {
             memset(data, 0, sizeof(data));
             strcpy((char *)pwd, (const char *)&app_ble_write_event.att_value[3]);
-            SL_DEBUG_LOG_V2(INFO, "PWD from ble app");
+            SL_DEBUG_LOG_V2(INFO, "PWD from ble app\r\n");
             wifi_app_set_event(WIFI_APP_JOIN_STATE);
           } break;
 
@@ -795,7 +795,7 @@ adv:
           // FW version request
           case '8': {
             rsi_ble_app_set_event(RSI_APP_FW_VERSION);
-            SL_DEBUG_LOG_V2(INFO, "FW version request");
+            SL_DEBUG_LOG_V2(INFO, "FW version request\r\n");
           } break;
 
           default:
@@ -805,7 +805,7 @@ adv:
         // Send write response AFTER processing (ATT_REC_MAINTAIN_IN_HOST requirement)
         int32_t status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "ERROR: gatt write response failed for cmd '%c', error: 0x%lX", cmdid, status);
+          SL_DEBUG_LOG_V2(ERROR, "ERROR: gatt write response failed for cmd '%c', error: 0x%lX\r\n", cmdid, status);
         }
       } break;
 
@@ -902,7 +902,7 @@ adv:
           osDelay(10);
         }
 
-        SL_DEBUG_LOG_V2(INFO, "Displayed scan list in Silabs app");
+        SL_DEBUG_LOG_V2(INFO, "Displayed scan list in Silabs app\r\n");
       } break;
 
       // WLAN connection response status (response to '2' command)
@@ -941,7 +941,7 @@ adv:
         rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl,
                                     RSI_BLE_MAX_DATA_LEN,
                                     data); // set the local attribute value.
-        SL_DEBUG_LOG_V2(INFO, "AP joined successfully");
+        SL_DEBUG_LOG_V2(INFO, "AP joined successfully\r\n");
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
                                             CONN_INTERVAL_MIN,
                                             CONN_INTERVAL_MAX,

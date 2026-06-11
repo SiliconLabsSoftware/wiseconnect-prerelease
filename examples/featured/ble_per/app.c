@@ -372,33 +372,33 @@ void ble_per(void *unused)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wireless Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wireless Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success");
+  SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success\r\n");
 
 #ifndef SL_SI91X_ACX_MODULE
   //! set region support
   status = sl_si91x_set_device_region(config.boot_config.oper_mode, config.band, config.region_code);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Region Failed, Error Code : %ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Set Region Failed, Error Code : %ld\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Set Region Success");
+    SL_DEBUG_LOG_V2(INFO, "Set Region Success\r\n");
   }
 #endif
 
   //!  WLAN radio deinit
   status = sl_si91x_disable_radio();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to disable WLAN radio, Error Code : %ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to disable WLAN radio, Error Code : %ld\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Disable WLAN radio success");
+    SL_DEBUG_LOG_V2(INFO, "Disable WLAN radio success\r\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -406,7 +406,7 @@ void ble_per(void *unused)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
@@ -416,15 +416,15 @@ void ble_per(void *unused)
   //! set the local device name
   status = rsi_bt_set_local_name(RSI_BLE_LOCAL_NAME);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Local Name Failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Set Local Name Failed = %lx\r\n", status);
   }
 
   //! get the local device name
   status = rsi_bt_get_local_name(&rsi_app_resp_get_local_name);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get Local Name Failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get Local Name Failed = %lx\r\n", status);
   }
-  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s", (uintptr_t)(rsi_app_resp_get_local_name.name));
+  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s\r\n", (uintptr_t)(rsi_app_resp_get_local_name.name));
 
 #if GAIN_TABLE_AND_MAX_POWER_UPDATE_ENABLE
 
@@ -434,9 +434,9 @@ void ble_per(void *unused)
                                                           Si917_BLE_REGION_BASED_MAXPOWER_XX,
                                                           BLE_GAIN_TABLE_MAXPOWER_UPDATE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table for max power with status = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table for max power with status = %lx\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Updation of gain table max tx power command is successful ");
+    SL_DEBUG_LOG_V2(INFO, "Updation of gain table max tx power command is successful \r\n");
   }
 
   //! structure update for the MAXPOWER OFFSET
@@ -445,9 +445,9 @@ void ble_per(void *unused)
                                                           Si917_BLE_REGION_BASED_MAXPOWER_VS_OFFSET_XX,
                                                           BLE_GAIN_TABLE_OFFSET_UPDATE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table offset with status = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table offset with status = %lx\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Updation of gain table offset command is successful ");
+    SL_DEBUG_LOG_V2(INFO, "Updation of gain table offset command is successful \r\n");
   }
 
   //! structure update for the LP_CHAIN 0dBm OFFSET
@@ -456,9 +456,9 @@ void ble_per(void *unused)
                                                           Si917_BLE_REGION_BASED_LP_CHAIN_0DBM_OFFSET_XX,
                                                           BLE_GAIN_TABLE_LP_CHAIN_0DBM_OFFSET_UPDATE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table LP-Chain 0dBm offset with status = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table LP-Chain 0dBm offset with status = %lx\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Updation of gain table LP-Chain 0dBm offset command is successful ");
+    SL_DEBUG_LOG_V2(INFO, "Updation of gain table LP-Chain 0dBm offset command is successful \r\n");
   }
 
   //! structure update for the LP_CHAIN 10dBm OFFSET
@@ -467,9 +467,9 @@ void ble_per(void *unused)
                                                           Si917_BLE_REGION_BASED_LP_CHAIN_10DBM_OFFSET_XX,
                                                           BLE_GAIN_TABLE_LP_CHAIN_10DBM_OFFSET_UPDATE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table LP-Chain 10dBm offset with status = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table LP-Chain 10dBm offset with status = %lx\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Updation of gain table LP-Chain 10dBm offset command is successful ");
+    SL_DEBUG_LOG_V2(INFO, "Updation of gain table LP-Chain 10dBm offset command is successful \r\n");
   }
 
 #endif
@@ -499,10 +499,10 @@ void ble_per(void *unused)
     //! start the Transmit PER functionality
     status = rsi_ble_per_transmit(&rsi_ble_per_tx);
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "per transmit cmd failed : 0x%lX ", status);
+      SL_DEBUG_LOG_V2(ERROR, "per transmit cmd failed : 0x%lX \r\n", status);
       return;
     } else {
-      SL_DEBUG_LOG_V2(DEBUG, "RSI_BLE_PER_TRANSMIT_MODE ");
+      SL_DEBUG_LOG_V2(DEBUG, "RSI_BLE_PER_TRANSMIT_MODE \r\n");
       SL_DEBUG_LOG_V2(DEBUG, "cmd id: 0x%X ", rsi_ble_per_tx.cmd_ix);
       SL_DEBUG_LOG_V2(DEBUG, "enable: %d ", rsi_ble_per_tx.transmit_enable);
       SL_DEBUG_LOG_V2(DEBUG, "access_addr: 0x%lX ", *(uint32_t *)&rsi_ble_per_tx.access_addr[0]);
@@ -542,10 +542,10 @@ void ble_per(void *unused)
     //! start the Receive PER functionality
     status = rsi_ble_per_receive(&rsi_ble_per_rx);
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "per receive cmd failed : %lx ", status);
+      SL_DEBUG_LOG_V2(ERROR, "per receive cmd failed : %lx \r\n", status);
       return;
     } else {
-      SL_DEBUG_LOG_V2(INFO, "RSI_BLE_PER_RECEIVE_MODE ");
+      SL_DEBUG_LOG_V2(INFO, "RSI_BLE_PER_RECEIVE_MODE \r\n");
       SL_DEBUG_LOG_V2(INFO, "cmd id: 0x%X ", rsi_ble_per_rx.cmd_ix);
       SL_DEBUG_LOG_V2(INFO, "enable: %d ", rsi_ble_per_rx.receive_enable);
       SL_DEBUG_LOG_V2(INFO, "access_addr: 0x%lX ", *(uint32_t *)&rsi_ble_per_rx.access_addr[0]);

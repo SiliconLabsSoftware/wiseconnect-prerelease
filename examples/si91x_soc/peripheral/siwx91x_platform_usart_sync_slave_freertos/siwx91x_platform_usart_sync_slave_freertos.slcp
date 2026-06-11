@@ -31,7 +31,9 @@ define:
 - name: SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
 toolchain_settings:
 - option: gcc_compiler_option
-  value: -Wall -Werror
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 other_file:
 - path: resources/readme/setupdiagram.png
 - path: resources/readme/image513d.png

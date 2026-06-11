@@ -199,7 +199,7 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
              scan_result->scan_info[a].ssid,
              scan_result->scan_info[a].security_mode,
              scan_result->scan_info[a].network_type);
-      printf("  %02x:%02x:%02x:%02x:%02x:%02x, %4u,  -%u\n",
+      printf("  %02x:%02x:%02x:%02x:%02x:%02x, %4u,  -%u\r\n",
              bssid[0],
              bssid[1],
              bssid[2],

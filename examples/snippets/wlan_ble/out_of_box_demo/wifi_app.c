@@ -136,7 +136,7 @@ sl_mqtt_client_credentials_t *client_credentails         = NULL;
 sl_mqtt_client_configuration_t mqtt_client_configuration = { .is_clean_session = IS_CLEAN_SESSION,
                                                              .client_port      = CLIENT_PORT };
 
-sl_mqtt_broker_t mqtt_broker_configuration = {
+sl_mqtt_broker_v2_t mqtt_broker_configuration = {
   .port                    = MQTT_BROKER_PORT,
   .is_connection_encrypted = ENCRYPT_CONNECTION,
   .connect_timeout         = MQTT_CONNECT_TIMEOUT,
@@ -386,11 +386,11 @@ void rsi_wlan_app_callbacks_init(void)
 
 static sl_status_t show_scan_results()
 {
-  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:", scan_result->scan_count);
+  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:\r\n", scan_result->scan_count);
 
   if (scan_result->scan_count) {
     SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
-    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
+    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s\r\n", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
 
     for (int a = 0; a < (int)scan_result->scan_count; ++a) {
       uint8_t *bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
@@ -410,7 +410,7 @@ static sl_status_t show_scan_results()
                bssid[4],
                bssid[5]);
       SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)oob_scan_bssid_log);
-      SL_DEBUG_LOG_V2(INFO, " %4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
+      SL_DEBUG_LOG_V2(INFO, " %4u,  -%u\r\n", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }
 
@@ -454,10 +454,10 @@ sl_status_t network_event_handler(sl_net_event_t event, sl_status_t status, void
       sl_net_ping_response_t *response = (sl_net_ping_response_t *)data;
       UNUSED_VARIABLE(response);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(WARN, "Ping request unsuccessful");
+        SL_DEBUG_LOG_V2(WARN, "Ping request unsuccessful\r\n");
         return status;
       }
-      SL_DEBUG_LOG_V2(INFO, "Ping response from www.silabs.com ");
+      SL_DEBUG_LOG_V2(INFO, "Ping response from www.silabs.com \r\n");
       break;
     }
     default:
@@ -494,7 +494,7 @@ void ping_silabs()
   } while ((dns_retry_count != 0) && (status != SL_STATUS_OK));
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving dns, Error 0x%lX\r\n", status);
     return;
   }
 
@@ -506,14 +506,14 @@ void ping_silabs()
           (server_address & 0x00ff0000) >> 16,
           (server_address & 0xff000000) >> 24);
 
-  SL_DEBUG_LOG_V2(INFO, "Resolved DNS - www.silabs.com IP address = %s", (uintptr_t)server_ip);
+  SL_DEBUG_LOG_V2(INFO, "Resolved DNS - www.silabs.com IP address = %s\r\n", (uintptr_t)server_ip);
   SL_DEBUG_LOG_V2(INFO, "Pinging www.silabs.com");
 
   while (i < NO_OF_PINGS) {
     // Send ping
     status = sl_si91x_send_ping(dns_query_rsp, PING_PACKET_SIZE);
     if (status != SL_STATUS_IN_PROGRESS) {
-      SL_DEBUG_LOG_V2(ERROR, "Ping request failed with status 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Ping request failed with status 0x%lX\r\n", status);
       return;
     }
 
@@ -535,9 +535,9 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
   UNUSED_PARAMETER(client);
   SL_DEBUG_LOG_V2(INFO, "Message Received on Topic: ");
   print_char_buffer((char *)message->topic, message->topic_length);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
   print_char_buffer((char *)message->content, message->content_length);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
   strncpy(msg, (char *)message->content, message->content_length);
   msg[message->content_length] = '\0';
   GLIB_clear(&glibContext);
@@ -573,7 +573,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 
 void print_char_buffer(char *buffer, uint32_t buffer_length)
 {
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
   for (uint32_t index = 0; index < buffer_length; index++) {
     SL_DEBUG_LOG_V2(INFO, "%c", buffer[index]);
@@ -586,7 +586,7 @@ void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t
 
   switch (*error) {
     case SL_MQTT_CLIENT_RECEIVE_FAILED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.");
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.\r\n");
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE:
@@ -615,7 +615,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
 {
   switch (event) {
     case SL_MQTT_CLIENT_CONNECTED_EVENT: {
-      SL_DEBUG_LOG_V2(INFO, "MQTT connection established");
+      SL_DEBUG_LOG_V2(INFO, "MQTT connection established\r\n");
 
       sl_status_t status;
 
@@ -627,7 +627,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
                                         mqtt_client_message_handler,
                                         TOPIC_TO_BE_SUBSCRIBED);
       if (status != SL_STATUS_IN_PROGRESS) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to subscribe : 0x%lx", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to subscribe : 0x%lx\r\n", status);
 
         mqtt_client_cleanup();
         return;
@@ -641,7 +641,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
       SL_DEBUG_LOG_V2(INFO, "Published message successfully on topic: ");
       print_char_buffer((char *)published_message->topic, published_message->topic_length);
       print_char_buffer((char *)published_message->content, published_message->content_length);
-      SL_DEBUG_LOG_V2(INFO, "");
+      SL_DEBUG_LOG_V2(INFO, "\r\n");
       GLIB_clear(&glibContext);
       GLIB_drawBitmap(&glibContext,
                       SILABS_LOGO_POSITION_X,
@@ -684,7 +684,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     case SL_MQTT_CLIENT_SUBSCRIBED_EVENT: {
       char *subscribed_topic = (char *)context;
 
-      SL_DEBUG_LOG_V2(INFO, "Subscribed to Topic: %s", (uintptr_t)subscribed_topic);
+      SL_DEBUG_LOG_V2(INFO, "Subscribed to Topic: %s\r\n", (uintptr_t)subscribed_topic);
       mqtt_connected = 1;
       break;
     }
@@ -692,14 +692,14 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     case SL_MQTT_CLIENT_UNSUBSCRIBED_EVENT: {
       char *unsubscribed_topic = (char *)context;
 
-      SL_DEBUG_LOG_V2(INFO, "Unsubscribed from topic: %s", (uintptr_t)unsubscribed_topic);
+      SL_DEBUG_LOG_V2(INFO, "Unsubscribed from topic: %s\r\n", (uintptr_t)unsubscribed_topic);
 
       sl_mqtt_client_disconnect(client, 0);
       break;
     }
 
     case SL_MQTT_CLIENT_DISCONNECTED_EVENT: {
-      SL_DEBUG_LOG_V2(INFO, "Disconnected from MQTT broker");
+      SL_DEBUG_LOG_V2(INFO, "Disconnected from MQTT broker\r\n");
       mqtt_disconnect_flag = 1;
       mqtt_client_cleanup();
       break;
@@ -719,7 +719,7 @@ void test_mosquitto_org_pub()
   sl_status_t status = 0;
   status             = sl_mqtt_client_publish(&client, &message_to_be_published, 0, &message_to_be_published);
   if (status != SL_STATUS_IN_PROGRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to publish message: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to publish message: 0x%lx\r\n", status);
     mqtt_client_cleanup();
     return;
   }
@@ -731,12 +731,12 @@ sl_status_t mqtt_example()
 
   status = sl_mqtt_client_init(&client, mqtt_client_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initialize MQTT client: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initialize MQTT client: 0x%lx\r\n", status);
 
     mqtt_client_cleanup();
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "MQTT client initialization successful");
+  SL_DEBUG_LOG_V2(INFO, "MQTT client initialization successful\r\n");
 
   sl_ip_address_t remote_ip_address = { 0 };
 
@@ -760,7 +760,7 @@ sl_status_t mqtt_example()
   } while ((dns_retry_count != 0) && (status != SL_STATUS_OK));
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving DNS, Error 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while resolving DNS, Error 0x%lX\r\n", status);
   }
 
   server_address = dns_query_rsp.ip.v4.value;
@@ -771,7 +771,7 @@ sl_status_t mqtt_example()
           (server_address & 0x00ff0000) >> 16,
           (server_address & 0xff000000) >> 24);
 
-  SL_DEBUG_LOG_V2(INFO, "Resolved test.mosquitto.org's IP address = %s", (uintptr_t)server_ip);
+  SL_DEBUG_LOG_V2(INFO, "Resolved test.mosquitto.org's IP address = %s\r\n", (uintptr_t)server_ip);
 
   mqtt_broker_configuration.ip.type        = SL_IPV4;
   mqtt_broker_configuration.ip.ip.v4.value = dns_query_rsp.ip.v4.value;
@@ -793,9 +793,9 @@ sl_status_t mqtt_example()
   mqtt_client_configuration.client_id_length = strlen((char *)mqtt_client_configuration.client_id);
 
   status =
-    sl_mqtt_client_connect(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
+    sl_mqtt_client_connect_v2(&client, &mqtt_broker_configuration, &last_will_message, &mqtt_client_configuration, 0);
   if (status != SL_STATUS_IN_PROGRESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to MQTT broker: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to connect to MQTT broker: 0x%lx\r\n", status);
 
     mqtt_client_cleanup();
     return status;
@@ -814,7 +814,7 @@ void wifi_app_task(void)
   // Allocate memory for scan buffer
   scan_result = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scan_result == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result\r\n");
     return;
   }
   memset(scan_result, 0, scanbuf_size);
@@ -866,7 +866,7 @@ void wifi_app_task(void)
           status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
         }
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan Wait Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Scan Wait Failed, Error Code : 0x%lX\r\n", status);
           GLIB_drawStringOnLine(&glibContext, "WLAN Scan Failed", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
           DMD_updateDisplay();
           osDelay(1000);
@@ -892,7 +892,7 @@ void wifi_app_task(void)
           status =
             sl_net_set_credential(wifi_client_profile.config.credential_id, SL_NET_WIFI_PSK, pwd, strlen((char *)pwd));
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Failed to set client credentials: 0x%lx", status);
+            SL_DEBUG_LOG_V2(ERROR, "Failed to set client credentials: 0x%lx\r\n", status);
             continue;
           }
         } else {
@@ -913,20 +913,20 @@ void wifi_app_task(void)
               SL_WIFI_CLIENT_2_4GHZ_INTERFACE,
               SL_WIFI_JOIN_FEAT_MFP_CAPABLE_REQUIRED | SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG_V2(ERROR, " join configuration settings for WPA3 failed");
+              SL_DEBUG_LOG_V2(ERROR, " join configuration settings for WPA3 failed\r\n");
             }
           } else if (wifi_client_profile.config.security == SL_WIFI_WPA3_TRANSITION) {
             status = sl_wifi_set_join_configuration(
               SL_WIFI_CLIENT_2_4GHZ_INTERFACE,
               SL_WIFI_JOIN_FEAT_MFP_CAPABLE_ONLY | SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG_V2(ERROR, " Join configuration settings for WPA3 failed");
+              SL_DEBUG_LOG_V2(ERROR, " Join configuration settings for WPA3 failed\r\n");
             }
           } else {
             status =
               sl_wifi_set_join_configuration(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID);
             if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG_V2(ERROR, " Join configuration settings for WPA3 failed");
+              SL_DEBUG_LOG_V2(ERROR, " Join configuration settings for WPA3 failed\r\n");
             }
           }
 
@@ -944,7 +944,7 @@ void wifi_app_task(void)
         if (status != RSI_SUCCESS) {
           timeout = 1;
           wifi_app_send_to_ble(WIFI_APP_TIMEOUT_NOTIFY, (uint8_t *)&timeout, 1);
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX\r\n", status);
 
           GLIB_drawStringOnLine(&glibContext, "WLAN Connect Failed", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
           DMD_updateDisplay();
@@ -955,7 +955,7 @@ void wifi_app_task(void)
           connected    = 0;
         } else {
 
-          SL_DEBUG_LOG_V2(INFO, "WLAN connection successful");
+          SL_DEBUG_LOG_V2(INFO, "WLAN connection successful\r\n");
 
           // Update WLAN application state
           wifi_app_set_event(WIFI_APP_CONNECTED_STATE);
@@ -969,7 +969,7 @@ void wifi_app_task(void)
         if (retry) {
           status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "WLAN connection failed, Error Code : 0x%lX", status);
+            SL_DEBUG_LOG_V2(ERROR, "WLAN connection failed, Error Code : 0x%lX\r\n", status);
             break;
           } else {
             wifi_app_set_event(WIFI_APP_CONNECTED_STATE);
@@ -997,7 +997,7 @@ void wifi_app_task(void)
               wifi_app_set_event(WIFI_APP_IDLE_STATE);
             }
           }
-          SL_DEBUG_LOG_V2(ERROR, "IP configuration failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "IP configuration failed, Error Code : 0x%lX\r\n", status);
           break;
         } else {
           a             = 0;
@@ -1013,7 +1013,7 @@ void wifi_app_task(void)
                   fetch_ip->bytes[1],
                   fetch_ip->bytes[2],
                   fetch_ip->bytes[3]);
-          SL_DEBUG_LOG_V2(INFO, "IP Address:%s ", (uintptr_t)ip_add);
+          SL_DEBUG_LOG_V2(INFO, "IP Address:%s \r\n", (uintptr_t)ip_add);
           GLIB_clear(&glibContext);
           GLIB_drawBitmap(&glibContext,
                           SILABS_LOGO_POSITION_X,
@@ -1059,7 +1059,7 @@ void wifi_app_task(void)
                 mac_addr.octet[3],
                 mac_addr.octet[4],
                 mac_addr.octet[5]);
-        SL_DEBUG_LOG_V2(INFO, "MAC Address:%s ", (uintptr_t)mac_id);
+        SL_DEBUG_LOG_V2(INFO, "MAC Address:%s \r\n", (uintptr_t)mac_id);
 
         GLIB_drawStringOnLine(&glibContext, "", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
 
@@ -1112,7 +1112,7 @@ void wifi_app_task(void)
         //! initiating power save in BLE mode
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode\r\n");
         }
         uint32_t rc                                          = SL_STATUS_FAIL;
         sl_wifi_performance_profile_v2_t performance_profile = { .profile         = ASSOCIATED_POWER_SAVE_LOW_LATENCY,
@@ -1120,9 +1120,9 @@ void wifi_app_task(void)
 
         rc = sl_wifi_set_performance_profile_v2(&performance_profile);
         if (rc != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX", rc);
+          SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX\r\n", rc);
         }
-        SL_DEBUG_LOG_V2(INFO, "Associated power save enabled");
+        SL_DEBUG_LOG_V2(INFO, "Associated power save enabled\r\n");
         GLIB_drawStringOnLine(&glibContext, "", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
         GLIB_drawStringOnLine(&glibContext, "NWP Lowpower enabled", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
         DMD_updateDisplay();
@@ -1163,7 +1163,7 @@ void wifi_app_task(void)
 #if RSI_WISE_MCU_ENABLE
           rsi_flash_erase((uint32_t)FLASH_ADDR_TO_STORE_AP_DETAILS);
 #endif
-          SL_DEBUG_LOG_V2(INFO, "WLAN disconnected");
+          SL_DEBUG_LOG_V2(INFO, "WLAN disconnected\r\n");
           disassociated   = 1;
           connected       = 0;
           yield           = 0;
@@ -1172,7 +1172,7 @@ void wifi_app_task(void)
           wifi_app_send_to_ble(WIFI_APP_DISCONNECTION_NOTIFY, (uint8_t *)&disassociated, 1);
           wifi_app_set_event(WIFI_APP_UNCONNECTED_STATE);
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "Wi-Fi disconnect failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "Wi-Fi disconnect failed, Error Code : 0x%lX\r\n", status);
         }
       } break;
       default:

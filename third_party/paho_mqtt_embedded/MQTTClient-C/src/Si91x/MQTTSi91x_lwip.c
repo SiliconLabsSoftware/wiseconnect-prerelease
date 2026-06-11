@@ -220,7 +220,7 @@ static int mqtt_tls_init(mqtt_tls_context_t *tls_ctx, int socket_fd, const char 
                                    MBEDTLS_ENTROPY_MAX_GATHER,
                                    MBEDTLS_ENTROPY_SOURCE_STRONG);
   if (ret != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "mbedtls_entropy_add_source failed: -0x%04x", (unsigned int)(-ret));
+    SL_DEBUG_LOG_V2(ERROR, "mbedtls_entropy_add_source failed: -0x%04x\r\n", (unsigned int)(-ret));
     return ret;
   }
 
@@ -231,7 +231,7 @@ static int mqtt_tls_init(mqtt_tls_context_t *tls_ctx, int socket_fd, const char 
                               (const unsigned char *)pers,
                               strlen(pers));
   if (ret != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ctr_drbg_seed failed: -0x%04x", (unsigned int)(-ret));
+    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ctr_drbg_seed failed: -0x%04x\r\n", (unsigned int)(-ret));
     return ret;
   }
 
@@ -241,7 +241,7 @@ static int mqtt_tls_init(mqtt_tls_context_t *tls_ctx, int socket_fd, const char 
                                     MBEDTLS_SSL_TRANSPORT_STREAM,
                                     MBEDTLS_SSL_PRESET_DEFAULT);
   if (ret != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_config_defaults failed: -0x%04x", (unsigned int)(-ret));
+    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_config_defaults failed: -0x%04x\r\n", (unsigned int)(-ret));
     return ret;
   }
 
@@ -279,31 +279,31 @@ static int mqtt_tls_init(mqtt_tls_context_t *tls_ctx, int socket_fd, const char 
 
   ret = mbedtls_ssl_setup(&tls_ctx->ssl, &tls_ctx->conf);
   if (ret != 0) {
-    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_setup failed: -0x%04x", (unsigned int)(-ret));
+    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_setup failed: -0x%04x\r\n", (unsigned int)(-ret));
     if (ret == MBEDTLS_ERR_SSL_ALLOC_FAILED) {
-      SL_DEBUG_LOG_V2(ERROR, "SSL setup failed due to memory allocation failure");
+      SL_DEBUG_LOG_V2(ERROR, "SSL setup failed due to memory allocation failure\r\n");
     }
     return ret;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "SSL setup completed successfully!");
+  SL_DEBUG_LOG_V2(INFO, "SSL setup completed successfully!\r\n");
 
   if (hostname) {
     ret = mbedtls_ssl_set_hostname(&tls_ctx->ssl, hostname);
     if (ret != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_set_hostname failed: -0x%04x", (unsigned int)(-ret));
+      SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_set_hostname failed: -0x%04x\r\n", (unsigned int)(-ret));
       return ret;
     }
-    SL_DEBUG_LOG_V2(DEBUG, "Hostname set successfully");
+    SL_DEBUG_LOG_V2(DEBUG, "Hostname set successfully\r\n");
   } else {
-    SL_DEBUG_LOG_V2(DEBUG, "No hostname to set");
+    SL_DEBUG_LOG_V2(DEBUG, "No hostname to set\r\n");
   }
 
   // Set BIO callbacks
   mbedtls_ssl_set_bio(&tls_ctx->ssl, &tls_ctx->socket_fd, mqtt_ssl_send, mqtt_ssl_recv, mqtt_ssl_recv_timeout);
 
   tls_ctx->initialized = true;
-  SL_DEBUG_LOG_V2(INFO, "TLS initialization completed successfully");
+  SL_DEBUG_LOG_V2(INFO, "TLS initialization completed successfully\r\n");
   return 0;
 }
 
@@ -332,7 +332,7 @@ static int mqtt_tls_handshake(mqtt_tls_context_t *tls_ctx)
 static void mqtt_tls_cleanup(mqtt_tls_context_t *tls_ctx)
 {
   if (tls_ctx && tls_ctx->initialized) {
-    SL_DEBUG_LOG_V2(DEBUG, "Cleaning up TLS context...");
+    SL_DEBUG_LOG_V2(DEBUG, "Cleaning up TLS context...\r\n");
 
     mbedtls_ssl_free(&tls_ctx->ssl);
     mbedtls_ssl_config_free(&tls_ctx->conf);
@@ -363,7 +363,7 @@ static int mqtt_tls_read(Network *n, unsigned char *buffer, int len, int timeout
     return 0;
   }
   if (ret < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_read failed: -0x%04x", (unsigned int)(-ret));
+    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_read failed: -0x%04x\r\n", (unsigned int)(-ret));
     return -1;
   }
 
@@ -387,7 +387,7 @@ static int mqtt_tls_write(Network *n, unsigned char *buffer, int len, int timeou
     return 0;
   }
   if (ret < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_write failed: -0x%04x", (unsigned int)(-ret));
+    SL_DEBUG_LOG_V2(ERROR, "mbedtls_ssl_write failed: -0x%04x\r\n", (unsigned int)(-ret));
     return -1;
   }
 
@@ -424,7 +424,7 @@ static int mqtt_tcp_read(Network *n, unsigned char *buffer, int len, int timeout
   }
   if (rc < 0) {
     // Select error
-    SL_DEBUG_LOG_V2(ERROR, "select() error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "select() error: %d\r\n", errno);
     return -1;
   }
 
@@ -440,7 +440,7 @@ static int mqtt_tcp_read(Network *n, unsigned char *buffer, int len, int timeout
           break;
         }
         if (err != ENOTCONN && err != ECONNRESET) {
-          SL_DEBUG_LOG_V2(ERROR, "recv() error: %d", err);
+          SL_DEBUG_LOG_V2(ERROR, "recv() error: %d\r\n", err);
           total_bytes_read = -1;
         }
         break;
@@ -487,7 +487,7 @@ static void mqtt_tcp_disconnect(Network *n)
     n->socket = -1;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "MQTT connection closed");
+  SL_DEBUG_LOG_V2(DEBUG, "MQTT connection closed\r\n");
 }
 
 static int mqtt_tcpconnection_handler(Network *n,
@@ -518,7 +518,7 @@ static int mqtt_tcpconnection_handler(Network *n,
 
   n->socket = socket(AF_INET6, type, IPPROTO_TCP);
   if (n->socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return -1;
   }
 
@@ -527,13 +527,13 @@ static int mqtt_tcpconnection_handler(Network *n,
   server_address.sin_family = AF_INET;
   //! Set local port number
   server_address.sin_port = htons(dst_port);
-  SL_DEBUG_LOG_V2(DEBUG, "Connecting to MQTT broker on port %ld", dst_port);
+  SL_DEBUG_LOG_V2(DEBUG, "Connecting to MQTT broker on port %ld\r\n", dst_port);
 
   memcpy(&server_address.sin_addr.s_addr, addr, sizeof(server_address.sin_addr.s_addr));
 
   n->socket = socket(AF_INET, type, IPPROTO_TCP);
   if (n->socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return -1;
   }
 #endif
@@ -544,12 +544,12 @@ static int mqtt_tcpconnection_handler(Network *n,
   rc = connect(n->socket, (struct sockaddr *)&server_address, socket_length);
 #endif
   if (rc == -1) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(n->socket);
     n->socket = -1;
     return rc;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connection success");
+  SL_DEBUG_LOG_V2(INFO, "Socket connection success\r\n");
 
   // Handle TLS if requested
   if (ssl) {

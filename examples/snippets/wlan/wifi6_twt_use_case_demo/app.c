@@ -212,13 +212,13 @@ void data_callback(uint32_t sock_no,
   UNUSED_PARAMETER(sock_no);
   uint32_t i;
 
-  SL_DEBUG_LOG_V2(DEBUG, "Command length : %ld", length);
-  SL_DEBUG_LOG_V2(DEBUG, "Command Received from remote app is:");
-  SL_DEBUG_LOG_V2(DEBUG, "\"");
+  SL_DEBUG_LOG_V2(DEBUG, "Command length : %ld\r\n", length);
+  SL_DEBUG_LOG_V2(DEBUG, "Command Received from remote app is:\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "\"\r\n");
   for (i = 0; i < length; i++) {
     SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[i]);
   }
-  SL_DEBUG_LOG_V2(DEBUG, "\"");
+  SL_DEBUG_LOG_V2(DEBUG, "\"\r\n");
   data_received_flag = true;
   osSemaphoreRelease(data_semaphore);
 }
@@ -242,7 +242,7 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
@@ -251,7 +251,7 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success");
+  SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success\r\n");
 #endif
 
   status = sl_wifi_get_firmware_version(&version);
@@ -267,7 +267,7 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected\r\n");
 
   status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   if (status != SL_STATUS_OK) {
@@ -291,7 +291,7 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Failed to get firmware version: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -303,7 +303,7 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Error while doing UDP TX: 0x%" PRIx32 " ", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP TX complete");
+  SL_DEBUG_LOG_V2(INFO, "UDP TX complete\r\n");
 #endif
 
   status = create_tcp_socket();
@@ -311,7 +311,7 @@ void application_start()
     SL_DEBUG_LOG_V2(ERROR, "Error while creating TCP Socket: 0x%" PRIx32 " ", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Socket Creation done");
+  SL_DEBUG_LOG_V2(INFO, "TCP Socket Creation done\r\n");
 
   sl_wifi_set_twt_config_callback_v2(twt_callback_handler, NULL);
   if (TWT_AUTO_CONFIG == 1) {
@@ -374,12 +374,12 @@ sl_status_t send_udp_data(void)
 
   udp_client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (udp_client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with BSD error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", udp_client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", udp_client_socket);
 
-  SL_DEBUG_LOG_V2(INFO, "Sending a UDP packet");
+  SL_DEBUG_LOG_V2(INFO, "Sending a UDP packet\r\n");
   while (packet_count < NUMBER_OF_PACKETS) {
     status = sendto(udp_client_socket,
                     (int8_t *)"Hello from UDP client!!!",
@@ -408,10 +408,10 @@ sl_status_t create_tcp_socket(void)
 
   tcp_client_socket = sl_si91x_socket_async(AF_INET, SOCK_STREAM, IPPROTO_TCP, &data_callback);
   if (tcp_client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "TCP Socket creation failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "TCP Socket creation failed with BSD error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP Client Socket ID : %d", tcp_client_socket);
+  SL_DEBUG_LOG_V2(INFO, "TCP Client Socket ID : %d\r\n", tcp_client_socket);
 
   socket_return_value = sl_si91x_setsockopt(tcp_client_socket,
                                             SOL_SOCKET,
@@ -419,11 +419,11 @@ sl_status_t create_tcp_socket(void)
                                             &high_performance_socket,
                                             sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "TCP Set Socket option failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "TCP Set Socket option failed with BSD error: %d\r\n", errno);
     close(tcp_client_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "Set Socket Option Success");
+  SL_DEBUG_LOG_V2(INFO, "Set Socket Option Success\r\n");
 
   server_address.sin_family = AF_INET;
   server_address.sin_port   = TCP_SERVER_PORT;
@@ -431,11 +431,11 @@ sl_status_t create_tcp_socket(void)
 
   socket_return_value = connect(tcp_client_socket, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with BSD error: %d\r\n", errno);
     close(tcp_client_socket);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server");
+  SL_DEBUG_LOG_V2(INFO, "Socket connected to TCP server\r\n");
 
   return SL_STATUS_OK;
 }
@@ -503,17 +503,17 @@ static sl_status_t twt_callback_handler(sl_wifi_event_t event,
     SL_DEBUG_LOG_V2(DEBUG, " wake duration : 0x%X", result->wake_duration);
     SL_DEBUG_LOG_V2(DEBUG, " wake_duration_unit: 0x%X", result->wake_duration_unit);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_exp : 0x%X", result->wake_int_exp);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
     SL_DEBUG_LOG_V2(DEBUG, " wake_int_mantissa : 0x%X", result->wake_int_mantissa);
     SL_DEBUG_LOG_V2(DEBUG, " implicit_twt : 0x%X", result->implicit_twt);
     SL_DEBUG_LOG_V2(DEBUG, " un_announced_twt : 0x%X", result->un_announced_twt);
     SL_DEBUG_LOG_V2(DEBUG, " triggered_twt : 0x%X", result->triggered_twt);
     SL_DEBUG_LOG_V2(DEBUG, " twt_channel : 0x%X", result->twt_channel);
     SL_DEBUG_LOG_V2(DEBUG, " twt_protection : 0x%X", result->twt_protection);
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
   } else if (event < SL_WIFI_TWT_EVENTS_END) {
-    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X", result->twt_flow_id);
-    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X", result->negotiation_type);
+    SL_DEBUG_LOG_V2(DEBUG, " twt_flow_id : 0x%X\r\n", result->twt_flow_id);
+    SL_DEBUG_LOG_V2(DEBUG, " negotiation_type : 0x%X\r\n", result->negotiation_type);
   }
   return SL_STATUS_OK;
 }
@@ -525,7 +525,7 @@ sl_status_t receive_and_send_data(void)
   for (uint16_t i = 0; i < BUF_SIZE; i++) {
     send_buf[i] = i;
   }
-  SL_DEBUG_LOG_V2(INFO, "Listening for command");
+  SL_DEBUG_LOG_V2(INFO, "Listening for command\r\n");
   while (1) {
     if (osSemaphoreAcquire(data_semaphore, osWaitForever) == osOK) {
       if (data_received_flag) {
@@ -535,7 +535,7 @@ sl_status_t receive_and_send_data(void)
         server_address.sin_port           = UDP_SERVER_PORT;
         sl_net_inet_addr(SERVER_IP_UDP, &server_address.sin_addr.s_addr);
         packet_count = 0;
-        SL_DEBUG_LOG_V2(INFO, "Sending UDP Data");
+        SL_DEBUG_LOG_V2(INFO, "Sending UDP Data\r\n");
 
         while (packet_count < NUMBER_OF_PACKETS) {
           status = sendto(udp_client_socket,
@@ -564,7 +564,7 @@ sl_status_t receive_and_send_data(void)
           }
           packet_count++;
         }
-        SL_DEBUG_LOG_V2(INFO, "TCP TX completed ");
+        SL_DEBUG_LOG_V2(INFO, "TCP TX completed \r\n");
 #endif
         data_received_flag = false;
       }

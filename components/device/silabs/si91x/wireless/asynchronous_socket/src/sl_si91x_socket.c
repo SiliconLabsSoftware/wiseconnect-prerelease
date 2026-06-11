@@ -363,7 +363,7 @@ int sl_si91x_send_large_data(int socket, const uint8_t *buffer, size_t buffer_le
     // Send chunk of data and return the total data sent in successful case
     bsd_ret_code = sl_si91x_send_async(socket, buffer + offset, chunk_size, flags, NULL);
     if (bsd_ret_code < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "\n Send failed with error code 0x%X \n", errno);
+      SL_DEBUG_LOG_V2(ERROR, "\n Send failed with error code 0x%X \r\n", errno);
       break;
     } else {
       offset += bsd_ret_code;

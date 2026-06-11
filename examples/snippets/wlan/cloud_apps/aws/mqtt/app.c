@@ -253,7 +253,7 @@ void disconnect_notify_handler(AWS_IoT_Client *pClient, void *data)
 {
   UNUSED_PARAMETER(pClient);
   UNUSED_PARAMETER(data);
-  SL_DEBUG_LOG_V2(WARN, "MQTT disconnected abruptly and pClient state is: %d", pClient->clientStatus.clientState);
+  SL_DEBUG_LOG_V2(WARN, "MQTT disconnected abruptly and pClient state is: %d\r\n", pClient->clientStatus.clientState);
 }
 
 void subscribe_handler(struct _Client *pClient,
@@ -322,34 +322,34 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while initializing Wi-Fi: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while initializing Wi-Fi: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi is Initialized");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi is Initialized\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "M4-NWP secure handshake is successful");
+  SL_DEBUG_LOG_V2(INFO, "M4-NWP secure handshake is successful\r\n");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while connecting to Access point: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while connecting to Access point: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Connected to Access point");
+  SL_DEBUG_LOG_V2(INFO, "Connected to Access point\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Getting client profile is successful");
+  SL_DEBUG_LOG_V2(INFO, "Getting client profile is successful\r\n");
 
 #ifdef SLI_SI91X_ENABLE_IPV6
   ip_address.type = SL_IPV6;
@@ -364,25 +364,25 @@ static void application_start(void *argument)
   memcpy(&ip_address.ip.v6.bytes, &profile.ip.ip.v6.gateway, sizeof(sl_ipv6_address_t));
   SL_DEBUG_LOG_V2(INFO, "Gateway Address: ");
   print_sl_ip_address(&ip_address);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 #else
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
   SL_DEBUG_LOG_V2(INFO, "IP address is ");
   print_sl_ip_address(&ip_address);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 #endif
 
   status = load_certificates_in_flash();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while loading certificates: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while loading certificates: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loaded certificates");
+  SL_DEBUG_LOG_V2(INFO, "Loaded certificates\r\n");
 
   status = start_aws_mqtt();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error occurred in AWS connection: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error occurred in AWS connection: 0x%lx\r\n", status);
     return;
   }
 }
@@ -397,10 +397,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_starfield_ca,
                                  sizeof(aws_starfield_ca) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successful", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
 
   // Load SSL Client certificate
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX),
@@ -408,10 +408,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_client_certificate,
                                  sizeof(aws_client_certificate) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate in to FLASH failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate in to FLASH failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successful", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
 
 #if WRAP_PRIVATE_KEY
   wrap_config.key_type     = SL_SI91X_TRANSPARENT_KEY;
@@ -432,11 +432,11 @@ sl_status_t load_certificates_in_flash(void)
 
   status = sl_si91x_wrap(&wrap_config, wrapped_private_key);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wrapping private key failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wrapping private key failed, Error Code : 0x%lX\r\n", status);
     free(wrapped_private_key);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wrapping private key is successful");
+  SL_DEBUG_LOG_V2(INFO, "Wrapping private key is successful\r\n");
 
   sl_net_credential_type_t credential_type = ((wrap_config.wrap_iv_mode == SL_SI91X_WRAP_IV_ECB_MODE)
                                                 ? SL_NET_TLS_PRIVATE_KEY_ECB_WRAP
@@ -448,11 +448,11 @@ sl_status_t load_certificates_in_flash(void)
                                        wrapped_private_key_length,
                                        ((wrap_config.wrap_iv_mode == SL_SI91X_WRAP_IV_ECB_MODE) ? NULL : iv));
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client wrapped private key in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client wrapped private key in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     free(wrapped_private_key);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client wrapped private key at index %d Successful", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client wrapped private key at index %d Successful\r\n", CERTIFICATE_INDEX);
 
   free(wrapped_private_key);
 #else
@@ -462,10 +462,10 @@ sl_status_t load_certificates_in_flash(void)
                                  aws_client_private_key,
                                  sizeof(aws_client_private_key) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successful", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successful\r\n", CERTIFICATE_INDEX);
 #endif
 
   return SL_STATUS_OK;
@@ -495,14 +495,14 @@ sl_status_t start_aws_mqtt(void)
           mac_addr.octet[3],
           mac_addr.octet[4],
           mac_addr.octet[5]);
-  SL_DEBUG_LOG_V2(INFO, "MAC ID: %s ", (uintptr_t)mac_id);
+  SL_DEBUG_LOG_V2(INFO, "MAC ID: %s \r\n", (uintptr_t)mac_id);
   sprintf(client_id, "silabs_%s", mac_id);
-  SL_DEBUG_LOG_V2(INFO, "Client ID: %s", (uintptr_t)client_id);
+  SL_DEBUG_LOG_V2(INFO, "Client ID: %s\r\n", (uintptr_t)client_id);
 
   sl_wifi_firmware_version_t fw_version = { 0 };
   status                                = sl_wifi_get_firmware_version(&fw_version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&fw_version);
   }
@@ -540,7 +540,7 @@ sl_status_t start_aws_mqtt(void)
         rc = aws_iot_mqtt_init(&mqtt_client, &mqtt_init_params);
         if (SUCCESS != rc) {
           application_state = AWS_MQTT_INIT_STATE;
-          SL_DEBUG_LOG_V2(ERROR, "MQTT Initialization failed with error: %d", rc);
+          SL_DEBUG_LOG_V2(ERROR, "MQTT Initialization failed with error: %d\r\n", rc);
         } else {
           application_state = AWS_MQTT_CONNECT_STATE;
         }
@@ -550,14 +550,14 @@ sl_status_t start_aws_mqtt(void)
         rc = aws_iot_mqtt_connect(&mqtt_client, &mqtt_connect_params);
         if (SUCCESS != rc) {
           if (rc == NETWORK_ALREADY_CONNECTED_ERROR) {
-            SL_DEBUG_LOG_V2(INFO, "Network is already connected");
+            SL_DEBUG_LOG_V2(INFO, "Network is already connected\r\n");
             application_state = AWS_MQTT_SUBSCRIBE_STATE;
           } else {
-            SL_DEBUG_LOG_V2(ERROR, "MQTT connect failed with error: %d", rc);
+            SL_DEBUG_LOG_V2(ERROR, "MQTT connect failed with error: %d\r\n", rc);
             application_state = AWS_MQTT_INIT_STATE;
           }
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Connected to AWS IoT Cloud");
+          SL_DEBUG_LOG_V2(INFO, "Connected to AWS IoT Cloud\r\n");
           application_state = AWS_MQTT_SUBSCRIBE_STATE;
         }
 
@@ -572,7 +572,7 @@ sl_status_t start_aws_mqtt(void)
 
         if (SUCCESS != rc) {
           if (NETWORK_DISCONNECTED_ERROR == rc) {
-            SL_DEBUG_LOG_V2(ERROR, "Subscription failed with error: %d", rc);
+            SL_DEBUG_LOG_V2(ERROR, "Subscription failed with error: %d\r\n", rc);
             application_state = AWS_MQTT_CONNECT_STATE;
           } else if (NETWORK_ATTEMPTING_RECONNECT == rc) {
             // If the client is attempting to reconnect skip the rest of the loop
@@ -581,7 +581,7 @@ sl_status_t start_aws_mqtt(void)
             application_state = AWS_MQTT_SUBSCRIBE_STATE;
           }
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Subscribed to the specified topic with QoS%d", SUBSCRIBE_QOS);
+          SL_DEBUG_LOG_V2(INFO, "Subscribed to the specified topic with QoS%d\r\n", SUBSCRIBE_QOS);
           application_state = AWS_MQTT_SELECT_STATE;
         }
 
@@ -594,12 +594,12 @@ sl_status_t start_aws_mqtt(void)
             memset(&read_fds, 0, sizeof(fd_set));
 
             FD_SET(mqtt_client.networkStack.socket_id, &read_fds);
-            SL_DEBUG_LOG_V2(DEBUG, "Socket ID: %d", mqtt_client.networkStack.socket_id);
+            SL_DEBUG_LOG_V2(DEBUG, "Socket ID: %d\r\n", mqtt_client.networkStack.socket_id);
 
             status =
               sl_si91x_select(mqtt_client.networkStack.socket_id + 1, &read_fds, NULL, NULL, NULL, async_socket_select);
 
-            SL_DEBUG_LOG_V2(DEBUG, "Select status: 0x%lX", status);
+            SL_DEBUG_LOG_V2(DEBUG, "Select status: 0x%lX\r\n", status);
           }
 
           if (check_for_recv_data) {
@@ -627,7 +627,7 @@ sl_status_t start_aws_mqtt(void)
       case AWS_MQTT_RECEIVE_STATE: {
         rc = aws_iot_shadow_yield(&mqtt_client, 1);
         if (SUCCESS == rc) {
-          SL_DEBUG_LOG_V2(DEBUG, "Yield is successful");
+          SL_DEBUG_LOG_V2(DEBUG, "Yield is successful\r\n");
 #if !(defined(SLI_SI91X_MCU_INTERFACE) && ENABLE_NWP_POWER_SAVE)
           publish_msg = 1;
 #endif
@@ -654,20 +654,20 @@ sl_status_t start_aws_mqtt(void)
           if (SUBSCRIBE_QOS == QOS1 || PUBLISH_QOS == QOS1) {
             pub_state = 1;
           }
-          SL_DEBUG_LOG_V2(INFO, "Data to be published: %s", (uintptr_t)MQTT_PUBLISH_PAYLOAD);
+          SL_DEBUG_LOG_V2(INFO, "Data to be published: %s\r\n", (uintptr_t)MQTT_PUBLISH_PAYLOAD);
           rc = aws_iot_mqtt_publish(&mqtt_client, PUBLISH_ON_TOPIC, strlen(PUBLISH_ON_TOPIC), &publish_iot_msg);
 
           if (rc != SUCCESS) {
             if (rc == MQTT_REQUEST_TIMEOUT_ERROR) {
-              SL_DEBUG_LOG_V2(WARN, "ACK not received for QoS%d publish", PUBLISH_QOS);
+              SL_DEBUG_LOG_V2(WARN, "ACK not received for QoS%d publish\r\n", PUBLISH_QOS);
             } else {
-              SL_DEBUG_LOG_V2(ERROR, "MQTT Publish with QoS%d failed with error: %d", PUBLISH_QOS, rc);
+              SL_DEBUG_LOG_V2(ERROR, "MQTT Publish with QoS%d failed with error: %d\r\n", PUBLISH_QOS, rc);
             }
             osSemaphoreRelease(select_sem);
             application_state = AWS_MQTT_DISCONNECT;
             break;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "QoS%d publish is successful", PUBLISH_QOS);
+            SL_DEBUG_LOG_V2(INFO, "QoS%d publish is successful\r\n", PUBLISH_QOS);
           }
 
 #if !(defined(SLI_SI91X_MCU_INTERFACE) && ENABLE_NWP_POWER_SAVE)
@@ -694,9 +694,9 @@ sl_status_t start_aws_mqtt(void)
         if (!powersave_given) {
           rc = sl_wifi_set_performance_profile_v2(&performance_profile);
           if (rc != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : %d", rc);
+            SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : %d\r\n", rc);
           }
-          SL_DEBUG_LOG_V2(INFO, "Associated Power Save is enabled");
+          SL_DEBUG_LOG_V2(INFO, "Associated Power Save is enabled\r\n");
           powersave_given = 1;
         }
         if (SUBSCRIBE_QOS == QOS1 || PUBLISH_QOS == QOS1) {
@@ -714,10 +714,10 @@ sl_status_t start_aws_mqtt(void)
         if (select_given == 1 && (check_for_recv_data != 1)) {
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-          SL_DEBUG_LOG_V2(INFO, "M4 going to power save state..");
-          SL_DEBUG_LOG_V2(INFO, "select_given before sleep: %d", select_given);
+          SL_DEBUG_LOG_V2(INFO, "M4 going to power save state..\r\n");
+          SL_DEBUG_LOG_V2(INFO, "select_given before sleep: %d\r\n", select_given);
           if (osSemaphoreAcquire(data_received_semaphore, PUBLISH_PERIODICITY) == osOK) {
-            SL_DEBUG_LOG_V2(INFO, "M4 woke up from power save state..");
+            SL_DEBUG_LOG_V2(INFO, "M4 woke up from power save state..\r\n");
           }
 #endif
         }
@@ -728,7 +728,7 @@ sl_status_t start_aws_mqtt(void)
       case AWS_MQTT_DISCONNECT: {
         rc = aws_iot_mqtt_disconnect(&mqtt_client);
         if (SUCCESS != rc) {
-          SL_DEBUG_LOG_V2(ERROR, "MQTT disconnection error");
+          SL_DEBUG_LOG_V2(ERROR, "MQTT disconnection error\r\n");
         }
         application_state = AWS_MQTT_INIT_STATE;
 

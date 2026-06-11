@@ -844,8 +844,8 @@ static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli
   const sli_wifi_cipher_suite_t *akms = (const sli_wifi_cipher_suite_t *)(akmslc + SLI_WIFI_LE16_FIELD_OCTETS);
   uint8_t wlan_gcs_oui[3]             = { 0x00, 0x0F, 0xAC };
 
-  SL_DEBUG_LOG_V2(DEBUG, "RSN OUI %02x:%02x:%02x.\n", rsn->gcs.cs_oui[0], rsn->gcs.cs_oui[1], rsn->gcs.cs_oui[2]);
-  SL_DEBUG_LOG_V2(DEBUG, "Pairwise cipher suite count: %u.\n", pcsc);
+  SL_DEBUG_LOG_V2(DEBUG, "RSN OUI %02x:%02x:%02x.\r\n", rsn->gcs.cs_oui[0], rsn->gcs.cs_oui[1], rsn->gcs.cs_oui[2]);
+  SL_DEBUG_LOG_V2(DEBUG, "Pairwise cipher suite count: %u.\r\n", pcsc);
 
   if (!memcmp(rsn->gcs.cs_oui, wlan_gcs_oui, 3)) {
     // If WPA vendor IE was also present, report WPA/WPA2 mixed (PSK); enterprise stays WPA2_ENTERPRISE

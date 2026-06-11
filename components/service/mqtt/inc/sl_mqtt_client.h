@@ -118,6 +118,7 @@ sl_status_t sl_mqtt_client_deinit(sl_mqtt_client_t *client);
  *   The topic length of the last_will_message must be less than SI91X_MQTT_CLIENT_WILL_TOPIC_MAXIMUM_LENGTH.
  *   The client ID length should be less than SI91X_MQTT_CLIENT_CLIENT_ID_MAXIMUM_LENGTH.
  *   The username and password length must be less than SI91X_MQTT_CLIENT_USERNAME_MAXIMUM_LENGTH and SI91X_MQTT_CLIENT_PASSWORD_MAXIMUM_LENGTH, respectively.
+ *   MQTT 3.1.1 version is supported.
  *
  * @note
  *   This function uses a user-configurable timeout parameter that is not affected
@@ -175,6 +176,7 @@ sl_status_t sl_mqtt_client_connect(sl_mqtt_client_t *client,
  *   The topic length of the last_will message must be less than SI91X_MQTT_CLIENT_WILL_TOPIC_MAXIMUM_LENGTH.
  *   The client ID length should be less than SI91X_MQTT_CLIENT_CLIENT_ID_MAXIMUM_LENGTH.
  *   The username and password length must be less than SI91X_MQTT_CLIENT_USERNAME_MAXIMUM_LENGTH and SI91X_MQTT_CLIENT_PASSWORD_MAXIMUM_LENGTH, respectively.
+ *   MQTT 3.1.1 version is supported.
  *
  * @note
  *   This function uses a user-configurable timeout parameter that is not affected

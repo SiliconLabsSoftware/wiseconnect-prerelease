@@ -416,7 +416,7 @@ void rsi_ble_on_sc_passkey(rsi_bt_event_sc_passkey_t *sc_passkey)
  */
 static void rsi_ble_on_le_ltk_req_event(rsi_bt_event_le_ltk_request_t *le_ltk_req)
 {
-  SL_DEBUG_LOG_V2(INFO, "\r\n rsi_ble_on_le_ltk_req_event ");
+  SL_DEBUG_LOG_V2(INFO, "\r\n rsi_ble_on_le_ltk_req_event \r\n");
   memcpy(&ble_ltk_req, le_ltk_req, sizeof(rsi_bt_event_le_ltk_request_t));
   rsi_ble_app_set_event(RSI_BLE_LTK_REQ_EVENT);
 }
@@ -433,7 +433,7 @@ static void rsi_ble_on_le_ltk_req_event(rsi_bt_event_le_ltk_request_t *le_ltk_re
 void rsi_ble_on_le_security_keys(rsi_bt_event_le_security_keys_t *rsi_ble_event_le_security_keys)
 {
   memcpy(&app_ble_sec_keys, rsi_ble_event_le_security_keys, sizeof(rsi_bt_event_le_security_keys_t));
-  SL_DEBUG_LOG_V2(INFO, "security keys event remote_ediv: 0x%x", app_ble_sec_keys.remote_ediv);
+  SL_DEBUG_LOG_V2(INFO, "security keys event remote_ediv: 0x%x\r\n", app_ble_sec_keys.remote_ediv);
 }
 
 /*==============================================*/
@@ -466,7 +466,7 @@ void rsi_ble_on_smp_failed(uint16_t status, rsi_bt_event_smp_failed_t *event_smp
  */
 void rsi_ble_on_encrypt_started(uint16_t status, rsi_bt_event_encryption_enabled_t *enc_enabled)
 {
-  SL_DEBUG_LOG_V2(INFO, "start encrypt status: %d ", status);
+  SL_DEBUG_LOG_V2(INFO, "start encrypt status: %d \r\n", status);
   memcpy(&encrypt_keys, enc_enabled, sizeof(rsi_bt_event_encryption_enabled_t));
   rsi_ble_app_set_event(RSI_BLE_ENCRYPT_STARTED_EVENT);
 }
@@ -495,16 +495,16 @@ void ble_smp_test_app(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful\r\n");
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -512,11 +512,11 @@ void ble_smp_test_app(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s \r\n", (uintptr_t)(local_dev_addr));
   }
 
   //! registering the GAP callback functions
@@ -546,7 +546,7 @@ void ble_smp_test_app(void *argument)
   //! create ble main task if ble protocol is selected
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_main_task_sem semaphore\r\n");
   }
 
   //!  initializing the application events map
@@ -555,10 +555,10 @@ void ble_smp_test_app(void *argument)
   //! Set local name
   status = rsi_bt_set_local_name((uint8_t *)RSI_BLE_DEVICE_NAME);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "ble set local name cmd failed with reason code : %lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, "ble set local name cmd failed with reason code : %lX \r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s", (uintptr_t)(RSI_BLE_DEVICE_NAME));
+  SL_DEBUG_LOG_V2(INFO, "Local name set to: %s\r\n", (uintptr_t)(RSI_BLE_DEVICE_NAME));
 
   //! prepare advertise data //local/device name
   adv[3] = strlen(RSI_BLE_DEVICE_NAME) + 1;
@@ -571,28 +571,28 @@ void ble_smp_test_app(void *argument)
   //! start advertising
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Start Advertising Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Start Advertising Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Start Advertising Success");
+  SL_DEBUG_LOG_V2(INFO, "Start Advertising Success\r\n");
 
 #if ENABLE_NWP_POWER_SAVE
-  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
     return;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
 
   //! waiting for events from controller.
@@ -608,12 +608,12 @@ void ble_smp_test_app(void *argument)
     switch (event_id) {
       case RSI_BLE_CONN_EVENT: {
         //! event invokes when connection was completed
-        SL_DEBUG_LOG_V2(INFO, "Enhance connected, str_remote_address : %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Enhance connected, str_remote_address : %s\r\n", (uintptr_t)(str_remote_address));
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
         rsi_6byte_dev_address_to_ascii(str_remote_address, remote_dev_address);
-        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s \r\n", (uintptr_t)(str_remote_address));
 
 #ifdef RSI_BLE_PING
         //! get ping time out
@@ -629,7 +629,7 @@ void ble_smp_test_app(void *argument)
           //! initiating the SMP pairing process
           status = rsi_ble_smp_pair_request(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "smp pair req failed with reason = %lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "smp pair req failed with reason = %lx \r\n", status);
           }
         }
       } break;
@@ -639,14 +639,14 @@ void ble_smp_test_app(void *argument)
 
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-        SL_DEBUG_LOG_V2(INFO, "Module got disconnected");
+        SL_DEBUG_LOG_V2(INFO, "Module got disconnected\r\n");
 
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "keep module in to active state ");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to active state \r\n");
         //! initiating Active mode in BT mode
         status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode \r\n");
           return;
         }
 
@@ -654,20 +654,20 @@ void ble_smp_test_app(void *argument)
         wifi_profile.profile = HIGH_PERFORMANCE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode \r\n");
           return;
         }
 #endif
         //! start addvertising
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "start adv cmd failed with reason = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "start adv cmd failed with reason = %lx \r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Start advertising ...");
+          SL_DEBUG_LOG_V2(INFO, "Start advertising ...\r\n");
         }
 
 #if ENABLE_NWP_POWER_SAVE
-        SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+        SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
         status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
         if (status != RSI_SUCCESS) {
           return;
@@ -677,15 +677,15 @@ void ble_smp_test_app(void *argument)
         wifi_profile.profile = ASSOCIATED_POWER_SAVE;
         status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save \r\n");
           return;
         }
-        SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+        SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
       } break;
 
       case RSI_BLE_SMP_REQ_EVENT: {
-        SL_DEBUG_LOG_V2(INFO, "smp_req - str_remote_address : %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "smp_req - str_remote_address : %s\r\n", (uintptr_t)(str_remote_address));
 
         //! initiate SMP protocol as a Central
 
@@ -697,12 +697,12 @@ void ble_smp_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_pair_request(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp pair req failed with reason = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp pair req failed with reason = %lx \r\n", status);
         }
       } break;
 
       case RSI_BLE_SMP_RESP_EVENT: {
-        SL_DEBUG_LOG_V2(INFO, "smp_resp - str_remote_address : %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "smp_resp - str_remote_address : %s\r\n", (uintptr_t)(str_remote_address));
 
         //! initiate SMP protocol as a Central
 
@@ -714,12 +714,12 @@ void ble_smp_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_pair_response(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp pair resp failed with reason = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp pair resp failed with reason = %lx \r\n", status);
         }
       } break;
 
       case RSI_BLE_SMP_PASSKEY_EVENT: {
-        SL_DEBUG_LOG_V2(INFO, "smp_passkey event, str_remote_address : %s", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "smp_passkey event, str_remote_address : %s\r\n", (uintptr_t)(str_remote_address));
         //! initiate SMP protocol as a Central
 
         //! clear the served event
@@ -728,11 +728,11 @@ void ble_smp_test_app(void *argument)
         //! initiating the SMP pairing process
         status = rsi_ble_smp_passkey(remote_dev_address, RSI_BLE_SMP_PASSKEY);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp passkey cmd failed with reason = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp passkey cmd failed with reason = %lx \r\n", status);
         }
       } break;
       case RSI_BLE_SMP_PASSKEY_DISPLAY_EVENT: {
-        SL_DEBUG_LOG_V2(INFO, "In SMP passkey display event");
+        SL_DEBUG_LOG_V2(INFO, "In SMP passkey display event\r\n");
         uint8_t passkey[BLE_PASSKEY_SIZE];
 
         memset(passkey, 0, BLE_PASSKEY_SIZE);
@@ -751,7 +751,7 @@ void ble_smp_test_app(void *argument)
         rsi_ble_app_clear_event(RSI_BLE_SC_PASSKEY_EVENT);
         status = rsi_ble_smp_passkey(remote_dev_address, numeric_value);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "smp passkey cmd failed with reason = %lx ", status);
+          SL_DEBUG_LOG_V2(ERROR, "smp passkey cmd failed with reason = %lx \r\n", status);
         }
       } break;
 
@@ -774,7 +774,7 @@ void ble_smp_test_app(void *argument)
           /* restarting the SMP */
           status = rsi_ble_smp_pair_request(remote_dev_address, RSI_BLE_SMP_IO_CAPABILITY, MITM_REQ);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "smp pair req failed with reason = %lx ", status);
+            SL_DEBUG_LOG_V2(ERROR, "smp pair req failed with reason = %lx \r\n", status);
           } else {
             pairing_info_available = 0;
           }
@@ -782,7 +782,7 @@ void ble_smp_test_app(void *argument)
       } break;
 
       case RSI_BLE_SMP_FAILED_EVENT: {
-        SL_DEBUG_LOG_V2(ERROR, "In SMP failed event");
+        SL_DEBUG_LOG_V2(ERROR, "In SMP failed event\r\n");
         //! initiate SMP protocol as a Central
 
         pairing_info_available = 0;
@@ -791,7 +791,7 @@ void ble_smp_test_app(void *argument)
       } break;
 
       case RSI_BLE_ENCRYPT_STARTED_EVENT: {
-        SL_DEBUG_LOG_V2(INFO, "In encrypt started event");
+        SL_DEBUG_LOG_V2(INFO, "In encrypt started event\r\n");
         //! start the encrypt event
 
         pairing_info_available = 1;

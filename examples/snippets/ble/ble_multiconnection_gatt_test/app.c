@@ -175,7 +175,7 @@ int32_t rsi_initiate_power_save(void)
 {
   int32_t status = RSI_SUCCESS;
 
-  SL_DEBUG_LOG_V2(INFO, "keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to power save \r\n");
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
     return status;
@@ -185,10 +185,10 @@ int32_t rsi_initiate_power_save(void)
   wifi_profile.profile = ASSOCIATED_POWER_SAVE;
   status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in power save \r\n");
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
   return status;
 }
 
@@ -205,11 +205,11 @@ int32_t rsi_initiate_power_save(void)
 int32_t rsi_initiate_power_awake(void)
 {
   int32_t status = RSI_SUCCESS;
-  SL_DEBUG_LOG_V2(INFO, "keep module in to active state ");
+  SL_DEBUG_LOG_V2(INFO, "keep module in to active state \r\n");
   //! initiating Active mode in BT mode
   status = rsi_bt_power_save_profile(RSI_ACTIVE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to keep Module in ACTIVE mode \r\n");
     return status;
   }
 
@@ -217,10 +217,10 @@ int32_t rsi_initiate_power_awake(void)
   wifi_profile.profile = HIGH_PERFORMANCE;
   status               = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode ");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to keep module in HIGH_PERFORMANCE mode \r\n");
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Module is in power awake ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power awake \r\n");
   return status;
 }
 #endif // #if ENABLE_NWP_POWER_SAVE
@@ -344,7 +344,7 @@ int8_t rsi_ble_initialize_conn_buffer(rsi_ble_conn_config_t *ble_conn_spec_conf)
       ble_conn_spec_conf[CENTRAL2].buff_mode_sel.max_data_length    = RSI_BLE_MAX_DATA_LEN_C2;
     }
   } else {
-    SL_DEBUG_LOG_V2(ERROR, "Invalid buffer passed ");
+    SL_DEBUG_LOG_V2(ERROR, "Invalid buffer passed \r\n");
     status = RSI_FAILURE;
   }
   return status;
@@ -392,16 +392,16 @@ void rsi_common_app_task(void)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success\r\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -409,17 +409,17 @@ void rsi_common_app_task(void)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s \r\n", (uintptr_t)(local_dev_addr));
   }
 
   //! fill the configurations in local structure based on compilation macros
   status = rsi_fill_user_config();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "failed to fill the configurations in local buffer ");
+    SL_DEBUG_LOG_V2(ERROR, "failed to fill the configurations in local buffer \r\n");
     return;
   }
 

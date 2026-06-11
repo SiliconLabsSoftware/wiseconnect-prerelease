@@ -57,7 +57,7 @@ static uint16_t mode;
 static void callback_event(uint32_t event);
 static void compare_loop_back_data(void);
 static void remove_pcm_frame_offset(pcm_data_size_t data_buffer[PCM_PRIMARY_BUFFER_SIZE + FRAME_OFFSET]);
-static sl_status_t primary_sync_wait();
+static sl_status_t primary_sync_wait(bool first_sync);
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
@@ -111,7 +111,8 @@ void pcm_primary_example_init(void)
 
   // Synchronize primary device with secondary device using button press
   // This ensures both devices start PCM operations at the same time
-  status = primary_sync_wait();
+  SL_PRINT_STRING_ERROR("Reset Secondary\r\n");
+  status = primary_sync_wait(true);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("Primary device synchronization failed with error code: 0x%lx\r\n", status);
   } else {
@@ -123,11 +124,17 @@ void pcm_primary_example_init(void)
  ******************************************************************************/
 void pcm_primary_example_process_action(void)
 {
+  sl_status_t status;
   static transfer_state_t state = RECEIVE_DATA;
   switch (state) {
     case SEND_DATA:
       do {
         //Configure PCM transmit DMA channel
+        status = primary_sync_wait(false);
+        if (status != SL_STATUS_OK) {
+          SL_PRINT_STRING_ERROR("Primary device synchronization failed with error code: 0x%lx\r\n", status);
+        }
+
         if (sl_si91x_pcm_transmit_data(pcm_handle,
                                        pcm_primary_data_out,
                                        (PCM_PRIMARY_BUFFER_SIZE + FRAME_SIZE_ALIGNMENT))) {
@@ -254,38 +261,38 @@ static void remove_pcm_frame_offset(pcm_data_size_t data_buffer[PCM_PRIMARY_BUFF
  *         - SL_STATUS_OK: Synchronization completed successfully
  *         - Error code: GPIO configuration or operation failed
  ******************************************************************************/
-static sl_status_t primary_sync_wait()
+static sl_status_t primary_sync_wait(bool first_sync)
 {
   uint8_t pin_value  = 0;
   sl_status_t status = SL_STATUS_OK;
+  if (first_sync) {
+    // Enable GPIO ULP clock for UULP NPSS GPIO operation
+    status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
 
-  // Enable GPIO ULP clock for UULP NPSS GPIO operation
-  status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
-  if (status != SL_STATUS_OK) {
-    return status;
+    // Enable receiver for UULP NPSS GPIO pin to read input state
+    status = sl_si91x_gpio_driver_select_uulp_npss_receiver(PRIMARY_SECONDARY_SYNC_PIN, GPIO_RECEIVER_EN);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    // Configure pin mux mode for UULP NPSS GPIO functionality
+    status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(PRIMARY_SECONDARY_SYNC_PIN, NPSS_GPIO_PIN_MUX_MODE0);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    // Set GPIO pin direction as input to detect button press
+    status =
+      sl_si91x_gpio_driver_set_uulp_npss_direction(PRIMARY_SECONDARY_SYNC_PIN, (sl_si91x_gpio_direction_t)GPIO_INPUT);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
   }
-
-  // Enable receiver for UULP NPSS GPIO pin to read input state
-  status = sl_si91x_gpio_driver_select_uulp_npss_receiver(PRIMARY_SECONDARY_SYNC_PIN, GPIO_RECEIVER_EN);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  // Configure pin mux mode for UULP NPSS GPIO functionality
-  status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(PRIMARY_SECONDARY_SYNC_PIN, NPSS_GPIO_PIN_MUX_MODE0);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  // Set GPIO pin direction as input to detect button press
-  status =
-    sl_si91x_gpio_driver_set_uulp_npss_direction(PRIMARY_SECONDARY_SYNC_PIN, (sl_si91x_gpio_direction_t)GPIO_INPUT);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
   // Wait for button 0 press to synchronize primary and secondary devices
-  SL_PRINT_STRING_ERROR("Reset Secondary and Press button 0 on primary to sync.\r\n");
+  SL_PRINT_STRING_ERROR("Press button 0 on primary to sync.\r\n");
   while (1) {
     // Read the GPIO pin state
     pin_value = sl_si91x_gpio_driver_get_uulp_npss_pin(PRIMARY_SECONDARY_SYNC_PIN);
@@ -293,13 +300,18 @@ static sl_status_t primary_sync_wait()
     // Check if button is pressed (active low)
     if (pin_value == 0) {
       SL_PRINT_STRING_ERROR("Button press detected, synchronization completed\r\n");
+      sl_si91x_delay_ms(10);
       break;
     }
 
     // Small delay to avoid excessive GPIO polling
     sl_si91x_delay_ms(10);
   }
-
+  while (pin_value == 0) {
+    pin_value = sl_si91x_gpio_driver_get_uulp_npss_pin(PRIMARY_SECONDARY_SYNC_PIN);
+    sl_si91x_delay_ms(10);
+    ;
+  }
   // Additional delay to allow secondary device to start sending data first
   sl_si91x_delay_ms(50);
   return status;

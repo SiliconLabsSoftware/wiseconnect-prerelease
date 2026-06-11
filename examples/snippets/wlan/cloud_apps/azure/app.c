@@ -277,63 +277,63 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while initializing Wi-Fi: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while initializing Wi-Fi: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi is Initialized");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi is Initialized\r\n");
 
 #ifdef SLI_SI91X_MCU_INTERFACE
   uint8_t xtal_enable = 1;
   status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "M4-NWP secure handshake is successful");
+  SL_DEBUG_LOG_V2(INFO, "M4-NWP secure handshake is successful\r\n");
 #endif
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Error while connecting to Access point: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Error while connecting to Access point: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Connected to Access point");
+  SL_DEBUG_LOG_V2(INFO, "Connected to Access point\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Getting client profile is successful");
+  SL_DEBUG_LOG_V2(INFO, "Getting client profile is successful\r\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
   SL_DEBUG_LOG_V2(INFO, "IP address is ");
   print_sl_ip_address(&ip_address);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
 #if LOAD_CERTIFICATE
   status = load_certificates_in_flash();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Error while loading certificates: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Error while loading certificates: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loaded certificates");
+  SL_DEBUG_LOG_V2(INFO, "Loaded certificates\r\n");
 #endif
 
   status = create_tls_client();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Error while creating TLS client: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Error while creating TLS client: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "TLS client created ");
+  SL_DEBUG_LOG_V2(INFO, "TLS client created \r\n");
 
   azure_iot_mqtt_demo();
 
   if (client_socket >= 0)
     close(client_socket);
 
-  SL_DEBUG_LOG_V2(INFO, "Demo is completed");
+  SL_DEBUG_LOG_V2(INFO, "Demo is completed\r\n");
 }
 
 #if LOAD_CERTIFICATE
@@ -347,27 +347,27 @@ sl_status_t load_certificates_in_flash(void)
                                  silabs_dgcert_ca,
                                  sizeof(silabs_dgcert_ca) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successful", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS CA certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
 
 #ifdef democonfigDEVICE_SYMMETRIC_KEY
   // Clear TLS Client certificate
   status = sl_net_delete_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX), SL_NET_CERTIFICATE);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "TLS client certificate location not cleared, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "TLS client certificate location not cleared, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "TLS Client certificate at index %d cleared successfully", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "TLS Client certificate at index %d cleared successfully\r\n", CERTIFICATE_INDEX);
 
   // Clear TLS Client private key
   status = sl_net_delete_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX), SL_NET_PRIVATE_KEY);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "TLS Client private key location not cleared, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "TLS Client private key location not cleared, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "TLS Client private key at index %d cleared successfully", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "TLS Client private key at index %d cleared successfully\r\n", CERTIFICATE_INDEX);
 #else
   // Load SSL Client certificate
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX),
@@ -375,10 +375,10 @@ sl_status_t load_certificates_in_flash(void)
                                  mydevkitcertificate,
                                  sizeof(mydevkitcertificate) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate in to FLASH failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS certificate in to FLASH failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successful", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client certificate at index %d Successful\r\n", CERTIFICATE_INDEX);
 
   // Load SSL Client private key
   status = sl_net_set_credential(SL_NET_TLS_CLIENT_CREDENTIAL_ID(CERTIFICATE_INDEX),
@@ -386,10 +386,10 @@ sl_status_t load_certificates_in_flash(void)
                                  mydevkitkey,
                                  sizeof(mydevkitkey) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS Client private key in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successful", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Loading TLS Client private key at index %d Successful\r\n", CERTIFICATE_INDEX);
 #endif
   return SL_STATUS_OK;
 }
@@ -429,20 +429,20 @@ sl_status_t create_tls_client(void)
   print_sl_ip_address(&dns_query_rsp);
 
   if (client_socket != -1) {
-    SL_DEBUG_LOG_V2(INFO, "Close previous client_socket : %d", client_socket);
+    SL_DEBUG_LOG_V2(INFO, "Close previous client_socket : %d\r\n", client_socket);
     close(client_socket);
   }
 
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   socket_return_value = setsockopt(client_socket, SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return SL_STATUS_FAIL;
   }
@@ -451,7 +451,7 @@ sl_status_t create_tls_client(void)
   timeout.tv_usec             = sampleazureiotTRANSPORT_SEND_RECV_TIMEOUT_MS * 1000;
   socket_return_value         = setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return SL_STATUS_FAIL;
   }
@@ -462,11 +462,11 @@ sl_status_t create_tls_client(void)
 
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
     close(client_socket);
     return SL_STATUS_FAIL;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Socket : %d connected to TLS server ", client_socket);
+    SL_DEBUG_LOG_V2(INFO, "Socket : %d connected to TLS server \r\n", client_socket);
 #if ENABLE_NWP_POWER_SAVE
     sl_wifi_performance_profile_v2_t performance_profile = { .profile         = ASSOCIATED_POWER_SAVE_LOW_LATENCY,
                                                              .listen_interval = 1000 };
@@ -474,9 +474,9 @@ sl_status_t create_tls_client(void)
     sl_status_t status = SL_STATUS_OK;
     status             = sl_wifi_set_performance_profile_v2(&performance_profile);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%ld", status);
+      SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%ld\r\n", status);
     }
-    SL_DEBUG_LOG_V2(INFO, "Associated Power Save is enabled");
+    SL_DEBUG_LOG_V2(INFO, "Associated Power Save is enabled\r\n");
 #endif
   }
   return SL_STATUS_OK;
@@ -506,12 +506,12 @@ uint32_t Crypto_HMAC(const uint8_t *pucKey,
   config.key_config.B0.key      = (uint8_t *)pucKey;
   sl_status_t status            = sl_si91x_hmac(&config, pucOutput);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "HMAC failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "HMAC failed, Error Code : 0x%lX\r\n", status);
     return 1;
   }
   *pulBytesCopied = 32;
-  SL_DEBUG_LOG_V2(DEBUG, "ulOutputLength : %ld, pulBytesCopied : %ld", ulOutputLength, *pulBytesCopied);
-  SL_DEBUG_LOG_V2(INFO, "HMAC success");
+  SL_DEBUG_LOG_V2(DEBUG, "ulOutputLength : %ld, pulBytesCopied : %ld\r\n", ulOutputLength, *pulBytesCopied);
+  SL_DEBUG_LOG_V2(INFO, "HMAC success\r\n");
   return 0;
 }
 /*-----------------------------------------------------------*/
@@ -608,7 +608,7 @@ int32_t TLS_Socket_Recv(NetworkContext_t *pNetworkContext, void *pBuffer, size_t
       return 0;
     }
   }
-  SL_DEBUG_LOG_V2(DEBUG, " %s: bytes recv : %ld", (uintptr_t) __func__, recv_bytes);
+  SL_DEBUG_LOG_V2(DEBUG, " %s: bytes recv : %ld\r\n", (uintptr_t) __func__, recv_bytes);
   return recv_bytes;
 }
 
@@ -616,7 +616,7 @@ int32_t TLS_Socket_Send(NetworkContext_t *pNetworkContext, const void *pBuffer, 
 {
   (void)pNetworkContext;
   int32_t sent_bytes = send(client_socket, pBuffer, bytesToSend, 0);
-  SL_DEBUG_LOG_V2(DEBUG, " %s: bytes sent : %ld", (uintptr_t) __func__, sent_bytes);
+  SL_DEBUG_LOG_V2(DEBUG, " %s: bytes sent : %ld\r\n", (uintptr_t) __func__, sent_bytes);
   return sent_bytes;
 }
 /**
@@ -650,7 +650,7 @@ static void azure_iot_mqtt_demo()
 
   /* Init IoT Hub option */
   xResult = AzureIoTHubClient_OptionsInit(&xHubOptions);
-  SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_OptionsInit: %x", xResult);
+  SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_OptionsInit: %x\r\n", xResult);
   assert(xResult == eAzureIoTSuccess);
 
   xHubOptions.pucModuleID      = (const uint8_t *)democonfigMODULE_ID;
@@ -679,7 +679,7 @@ static void azure_iot_mqtt_demo()
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif // __GNUC__
-        SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_Init: %x", xResult);
+        SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_Init: %x\r\n", xResult);
         assert(xResult == eAzureIoTSuccess);
 
 #ifdef democonfigDEVICE_SYMMETRIC_KEY
@@ -687,13 +687,13 @@ static void azure_iot_mqtt_demo()
                                                     (const uint8_t *)democonfigDEVICE_SYMMETRIC_KEY,
                                                     sizeof(democonfigDEVICE_SYMMETRIC_KEY) - 1,
                                                     Crypto_HMAC);
-        SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_SetSymmetricKey: %x", xResult);
+        SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_SetSymmetricKey: %x\r\n", xResult);
         assert(xResult == eAzureIoTSuccess);
 #endif /* democonfigDEVICE_SYMMETRIC_KEY */
 
         /* Sends an MQTT Connect packet over the already established TLS connection,
              * and waits for connection acknowledgment (CONNACK) packet. */
-        SL_DEBUG_LOG_V2(INFO, "Creating an MQTT connection to %s.", (uintptr_t)pucIotHubHostname);
+        SL_DEBUG_LOG_V2(INFO, "Creating an MQTT connection to %s.\r\n", (uintptr_t)pucIotHubHostname);
 
         xResult = AzureIoTHubClient_Connect(&xAzureIoTHubClient,
                                             false,
@@ -760,7 +760,7 @@ static void azure_iot_mqtt_demo()
         /* Publish messages with QoS1, send and process Keep alive messages. */
         while (true) {
           lPublishCount++;
-          SL_DEBUG_LOG_V2(INFO, "Attempt to receive publish message from Cloud to IoT Hub.");
+          SL_DEBUG_LOG_V2(INFO, "Attempt to receive publish message from Cloud to IoT Hub.\r\n");
           xResult = AzureIoTHubClient_ProcessLoop(&xAzureIoTHubClient, sampleazureiotPROCESS_LOOP_TIMEOUT_MS);
           if (xResult != eAzureIoTSuccess) {
             // check if socket is closed and Retry socket connection.
@@ -782,7 +782,7 @@ static void azure_iot_mqtt_demo()
             break;
           }
 
-          SL_DEBUG_LOG_V2(INFO, "Attempt to send publish message : %s, from IoT Hub.", (uintptr_t)ucScratchBuffer);
+          SL_DEBUG_LOG_V2(INFO, "Attempt to send publish message : %s, from IoT Hub.\r\n", (uintptr_t)ucScratchBuffer);
 
           if (lPublishCount % 2 == 0) {
             /* Send reported property every other cycle */
@@ -796,7 +796,7 @@ static void azure_iot_mqtt_demo()
           }
 
           /* Leave Connection Idle for some time. */
-          SL_DEBUG_LOG_V2(INFO, "Keeping Connection Idle..., lPublishCount : %d", lPublishCount);
+          SL_DEBUG_LOG_V2(INFO, "Keeping Connection Idle..., lPublishCount : %d\r\n", lPublishCount);
 
           osDelay(sampleazureiotDELAY_BETWEEN_PUBLISHES_TICKS);
         }
@@ -806,7 +806,7 @@ static void azure_iot_mqtt_demo()
         // if TLS or MQTT connection is closed, retry connection.
         sl_status_t status = create_tls_client();
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, " Error while creating TLS client: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, " Error while creating TLS client: 0x%lx\r\n", status);
         }
         application_state = AZURE_MQTT_INIT_STATE;
       } break;
@@ -833,10 +833,10 @@ static void azure_iot_mqtt_demo()
 
         /* Wait for some time between two iterations to ensure that we do not
              * bombard the IoT Hub. */
-        SL_DEBUG_LOG_V2(INFO, "Demo completed successfully.");
+        SL_DEBUG_LOG_V2(INFO, "Demo completed successfully.\r\n");
       } break;
       default: {
-        SL_DEBUG_LOG_V2(ERROR, "Invalid application state. %d", application_state);
+        SL_DEBUG_LOG_V2(ERROR, "Invalid application state. %d\r\n", application_state);
       } break;
     }
   }

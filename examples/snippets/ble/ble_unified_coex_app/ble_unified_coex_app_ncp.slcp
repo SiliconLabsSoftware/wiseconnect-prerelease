@@ -50,6 +50,10 @@ component:
 - id: gatt_server
 - id: gatt_client
 toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 - option: gcc_linker_option
   value: -u _printf_float
 configuration:

@@ -123,7 +123,7 @@ static void low_level_init(struct netif *netif)
   // Request MAC address
   status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " MAC address failed ");
+    SL_DEBUG_LOG_V2(ERROR, " MAC address failed \r\n");
     return;
   }
 
@@ -656,7 +656,7 @@ static sl_status_t sli_set_sta_link_up_by_profile_mode(sl_net_wifi_client_profil
 
   // SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE mode: Dual Network Stack
   if (dual_mode_enabled) {
-    SL_DEBUG_LOG_V2(DEBUG, "Dual mode - Dual Network Stack (NWP + LwIP)");
+    SL_DEBUG_LOG_V2(DEBUG, "Dual mode - Dual Network Stack (NWP + LwIP)\r\n");
 
     if (ip_mode == SL_IP_MANAGEMENT_DHCP_IPV4_LINK_LOCAL_IPV6) {
       // DHCPv4 + IPv6 link-local mode: Configure based on requested IP type(s)
@@ -717,7 +717,7 @@ static sl_status_t sli_set_sta_link_up_by_profile_mode(sl_net_wifi_client_profil
     }
   } else {
     // Offload only mode: NWP-only IP management
-    SL_DEBUG_LOG_V2(DEBUG, "Offload mode - NWP only IP management");
+    SL_DEBUG_LOG_V2(DEBUG, "Offload mode - NWP only IP management\r\n");
     status = sl_si91x_configure_ip_address(&profile->ip, SL_SI91X_WIFI_CLIENT_VAP_ID);
   }
 
@@ -727,7 +727,7 @@ static sl_status_t sli_set_sta_link_up_by_profile_mode(sl_net_wifi_client_profil
 static void set_sta_link_down(void)
 {
 #if LWIP_IPV4 && LWIP_DHCP
-  SL_DEBUG_LOG_V2(DEBUG, "DHCP Link down");
+  SL_DEBUG_LOG_V2(DEBUG, "DHCP Link down\r\n");
   dhcp_stop(&(wifi_client_context->netif));
 #endif /* LWIP_IPV4 && LWIP_DHCP */
 
@@ -1385,7 +1385,7 @@ sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_w
   sl_wifi_system_packet_t *rsi_pkt;
   packet  = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
   rsi_pkt = (sl_wifi_system_packet_t *)packet;
-  SL_DEBUG_LOG_V2(DEBUG, "RX len : %d", rsi_pkt->length);
+  SL_DEBUG_LOG_V2(DEBUG, "RX len : %d\r\n", rsi_pkt->length);
 
   /* The event handler (sli_si91x_wifi_data_packet_handler) hardcodes
    * SL_WIFI_CLIENT_INTERFACE for all received data frames regardless of

@@ -28,6 +28,7 @@
 *
 ******************************************************************************/
 
+#include "stddef.h"
 #include "rsi_sysrtc.h"
 #include "sl_sysrtc_board.h"
 #include "sli_code_classification.h"
@@ -70,8 +71,6 @@ STATIC INLINE void RSI_NPSSGPIO_SetDir(uint8_t pin, boolean_t dir)
   MCU_RET->NPSS_GPIO_CNTRL[pin].NPSS_GPIO_CTRLS_b.NPSS_GPIO_OEN = dir;
 }
 
-#include "stddef.h"
-
 /***************************************************************************/ /**
  * @addtogroup sysrtc SYSRTC - System Real Time Counter
  * @brief System Real Time Counter (SYSRTC) Peripheral API
@@ -112,6 +111,7 @@ void rsi_sysrtc_clk_set(rsi_sysrtc_clk_inp_t sysrtc_clk, uint32_t div)
   MCU_AON->MCUAON_KHZ_CLK_SEL_POR_RESET_STATUS_b.AON_KHZ_CLK_SEL_SYSRTC = sysrtc_clk;
 
   while (MCU_AON->MCUAON_KHZ_CLK_SEL_POR_RESET_STATUS_b.AON_KHZ_CLK_SEL_CLOCK_SWITCHED_SYSRTC != 1) {
+    // Intentionally empty: busy-wait until the SYSRTC clock source switch is acknowledged by hardware.
   }
 }
 
@@ -201,7 +201,8 @@ void rsi_sysrtc_set_compare_gpio(const uint32_t group, const uint32_t chan)
  ******************************************************************************/
 uint32_t rsi_sysrtc_get_compare_bit(const uint32_t group, const uint32_t channel)
 {
-  uint32_t shift, val;
+  uint32_t shift;
+  uint32_t val;
   switch (group) {
     case 0:
       shift = SYSRTC_GRP0_CMP_SHIFT;
@@ -253,7 +254,7 @@ void rsi_sysrtc_disable(void)
   // Disable module
   SYSRTC0->EN_CLR = SYSRTC_EN_EN;
 
-  // Need to reset timer - for disable sync to be set TODO: Design change maybe?
+  // Need to reset timer - for disable sync to be set
   SYSRTC0->SWRST = SYSRTC_SWRST_SWRST;
 
   rsi_sysrtc_wait_ready();

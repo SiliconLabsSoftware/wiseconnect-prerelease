@@ -120,13 +120,13 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
   int32_t status = 0;
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload", result_length);
+    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload\r\n", result_length);
     if (client_socket) {
       status = close(client_socket);
       if (status != 0) {
-        SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d", status, errno);
+        SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d\r\n", status, errno);
       } else {
-        SL_DEBUG_LOG_V2(INFO, "socket close success");
+        SL_DEBUG_LOG_V2(INFO, "socket close success\r\n");
       }
     }
     rsi_wlan_app_cb.state = RSI_WLAN_UNCONNECTED_STATE;
@@ -159,10 +159,10 @@ sl_status_t clear_and_load_certificates_in_flash(void)
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", 0);
+  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", 0);
 
   return status;
 }
@@ -172,10 +172,10 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
-  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:", scan_result->scan_count);
+  SL_DEBUG_LOG_V2(INFO, "%lu Scan results:\r\n", scan_result->scan_count);
   if (scan_result->scan_count) {
     SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
-    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
+    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s\r\n", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
 
     for (int a = 0; a < (int)scan_result->scan_count; ++a) {
       bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
@@ -195,7 +195,7 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
                bssid[4],
                bssid[5]);
       SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)https_scan_bssid_log);
-      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
+      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u\r\n", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }
 
@@ -244,10 +244,10 @@ int32_t rsi_app_wlan_socket_create()
   //!Create socket
   client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with BSD error: %d\r\n", errno);
     return client_socket;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket create success : %ld", client_socket);
+  SL_DEBUG_LOG_V2(INFO, "Socket create success : %ld\r\n", client_socket);
 
   server_address.sin_family = AF_INET;
   server_address.sin_port   = SERVER_PORT;
@@ -257,12 +257,12 @@ int32_t rsi_app_wlan_socket_create()
   //! Setting SSL socket option
   status = setsockopt(client_socket, SOL_TCP, TCP_ULP, TLS, sizeof(TLS));
   if (status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set socket failed with BSD error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set socket failed with BSD error: %d\r\n", errno);
     status = close(client_socket);
     if (status != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d", status, errno);
+      SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d\r\n", status, errno);
     } else {
-      SL_DEBUG_LOG_V2(INFO, "socket close success");
+      SL_DEBUG_LOG_V2(INFO, "socket close success\r\n");
     }
     return status;
   }
@@ -275,12 +275,12 @@ int32_t rsi_app_wlan_socket_create()
                       &high_performance_socket,
                       sizeof(high_performance_socket));
   if (status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     status = close(client_socket);
     if (status != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = 0x%lX and BSD error: %d", status, errno);
+      SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = 0x%lX and BSD error: %d\r\n", status, errno);
     } else {
-      SL_DEBUG_LOG_V2(INFO, "socket close success");
+      SL_DEBUG_LOG_V2(INFO, "socket close success\r\n");
     }
     return status;
   }
@@ -289,17 +289,17 @@ int32_t rsi_app_wlan_socket_create()
   //! Connect to server socket
   status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in));
   if (status < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket connect failed with BSD error: %d, return value %ld", errno, status);
+    SL_DEBUG_LOG_V2(ERROR, "Socket connect failed with BSD error: %d, return value %ld\r\n", errno, status);
     status = close(client_socket);
     if (status != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d", status, errno);
+      SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d\r\n", status, errno);
     } else {
-      SL_DEBUG_LOG_V2(INFO, "socket close success");
+      SL_DEBUG_LOG_V2(INFO, "socket close success\r\n");
     }
     return status;
   } else {
     rsi_wlan_app_cb.state = RSI_WLAN_SOCKET_CONNECTED_STATE;
-    SL_DEBUG_LOG_V2(INFO, "TCP Socket Connect Success");
+    SL_DEBUG_LOG_V2(INFO, "TCP Socket Connect Success\r\n");
   }
   return status;
 }
@@ -339,20 +339,20 @@ int32_t rsi_wlan_app_task(void)
         if (!powersave_cmd_given) {
           status = rsi_initiate_power_save();
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, " failed to keep module in power save ");
+            SL_DEBUG_LOG_V2(ERROR, " failed to keep module in power save \r\n");
             return status;
           }
           powersave_cmd_given = true;
         }
         osMutexRelease(power_cmd_mutex);
-        SL_DEBUG_LOG_V2(INFO, " Module is in deep sleep ");
+        SL_DEBUG_LOG_V2(INFO, " Module is in deep sleep \r\n");
 #endif
       } break;
       case RSI_WLAN_UNCONNECTED_STATE: {
         //! do nothing
       } break;
       case RSI_WLAN_SCAN_STATE: {
-        SL_DEBUG_LOG_V2(INFO, " WLAN scan started ");
+        SL_DEBUG_LOG_V2(INFO, " WLAN scan started \r\n");
 #if (WLAN_SCAN_ONLY && WLAN_SYNC_REQ)
         static int8_t wlan_scan_only_check = 1;
         //! unblock other protocol activities
@@ -374,7 +374,7 @@ int32_t rsi_wlan_app_task(void)
 
         status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
         if (SL_STATUS_IN_PROGRESS == status) {
-          SL_DEBUG_LOG_V2(INFO, "Scanning...");
+          SL_DEBUG_LOG_V2(INFO, "Scanning...\r\n");
           if (osSemaphoreAcquire(scan_complete_sem, WIFI_SCAN_TIMEOUT) == osOK) {
             status = callback_status;
           } else {
@@ -382,14 +382,14 @@ int32_t rsi_wlan_app_task(void)
           }
         }
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, " scan failed ");
+          SL_DEBUG_LOG_V2(ERROR, " scan failed \r\n");
           break;
         } else {
           rsi_wlan_app_cb.state = RSI_WLAN_JOIN_STATE; //! update WLAN application state to connected state
 #if ENABLE_NWP_POWER_SAVE
-          SL_DEBUG_LOG_V2(INFO, " Module is in standby ");
+          SL_DEBUG_LOG_V2(INFO, " Module is in standby \r\n");
 #endif
-          SL_DEBUG_LOG_V2(INFO, " wlan scan done ");
+          SL_DEBUG_LOG_V2(INFO, " wlan scan done \r\n");
         }
 #if WLAN_SCAN_ONLY
         rsi_wlan_app_cb.state = RSI_WLAN_SCAN_STATE;
@@ -405,7 +405,7 @@ int32_t rsi_wlan_app_task(void)
 
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
         if (SL_STATUS_OK == status) {
-          SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu", id);
+          SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu\r\n", id);
 
           access_point.ssid.length = strlen((char *)SSID);
           memcpy(access_point.ssid.value, SSID, access_point.ssid.length);
@@ -413,15 +413,15 @@ int32_t rsi_wlan_app_task(void)
           access_point.encryption    = SL_WIFI_DEFAULT_ENCRYPTION;
           access_point.credential_id = id;
 
-          SL_DEBUG_LOG_V2(INFO, "SSID %s", (uintptr_t)access_point.ssid.value);
+          SL_DEBUG_LOG_V2(INFO, "SSID %s\r\n", (uintptr_t)access_point.ssid.value);
           status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
         }
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%lX\r\n", status);
           break;
         } else {
           rsi_wlan_app_cb.state = RSI_WLAN_CONNECTED_STATE; //! update WLAN application state to connected state
-          SL_DEBUG_LOG_V2(INFO, "WLAN connected state ");
+          SL_DEBUG_LOG_V2(INFO, "WLAN connected state \r\n");
         }
       } break;
       case RSI_WLAN_CONNECTED_STATE: {
@@ -432,7 +432,7 @@ int32_t rsi_wlan_app_task(void)
 
         status = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "IP Config failed ");
+          SL_DEBUG_LOG_V2(ERROR, "IP Config failed \r\n");
           break;
         } else {
           rsi_wlan_app_cb.state = RSI_WLAN_IPCONFIG_DONE_STATE;
@@ -471,9 +471,9 @@ int32_t rsi_wlan_app_task(void)
           //! Clear data receive flag
           data_recvd = 0;
 #if HTTPS_DOWNLOAD
-          SL_DEBUG_LOG_V2(INFO, "HTTPS download completed, total received bytes: %lu", total_read_bytes);
+          SL_DEBUG_LOG_V2(INFO, "HTTPS download completed, total received bytes: %lu\r\n", total_read_bytes);
 #elif !HTTPS_DOWNLOAD
-          SL_DEBUG_LOG_V2(INFO, "HTTP download completed, total received bytes: %lu", total_read_bytes);
+          SL_DEBUG_LOG_V2(INFO, "HTTP download completed, total received bytes: %lu\r\n", total_read_bytes);
 #endif
 #if !CONTINUOUS_HTTP_DOWNLOAD
           stop_download = 1;
@@ -501,12 +501,12 @@ int32_t rsi_wlan_app_task(void)
           if (status < 0) {
             if (errno == ENOBUFS)
               continue;
-            SL_DEBUG_LOG_V2(ERROR, " send failed");
+            SL_DEBUG_LOG_V2(ERROR, " send failed\r\n");
             status = close(client_socket);
             if (status != 0) {
-              SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d", status, errno);
+              SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d\r\n", status, errno);
             } else {
-              SL_DEBUG_LOG_V2(INFO, "socket close success");
+              SL_DEBUG_LOG_V2(INFO, "socket close success\r\n");
             }
             rsi_wlan_app_cb.state = RSI_WLAN_IPCONFIG_DONE_STATE;
             break;
@@ -525,12 +525,12 @@ int32_t rsi_wlan_app_task(void)
           if (status < 0) {
             if (errno == ENOBUFS)
               continue;
-            SL_DEBUG_LOG_V2(ERROR, " send failed");
+            SL_DEBUG_LOG_V2(ERROR, " send failed\r\n");
             status = close(client_socket);
             if (status != 0) {
-              SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = 0x%lX and BSD error: %d", status, errno);
+              SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = 0x%lX and BSD error: %d\r\n", status, errno);
             } else {
-              SL_DEBUG_LOG_V2(INFO, "socket close success");
+              SL_DEBUG_LOG_V2(INFO, "socket close success\r\n");
             }
             rsi_wlan_app_cb.state = RSI_WLAN_IPCONFIG_DONE_STATE;
             break;
@@ -540,9 +540,9 @@ int32_t rsi_wlan_app_task(void)
 #endif
         rsi_wlan_app_cb.state = RSI_WLAN_DATA_RECEIVE_STATE;
 #if HTTPS_DOWNLOAD
-        SL_DEBUG_LOG_V2(INFO, " HTTPS download started ");
+        SL_DEBUG_LOG_V2(INFO, " HTTPS download started \r\n");
 #elif !HTTPS_DOWNLOAD
-        SL_DEBUG_LOG_V2(INFO, " HTTP download started ");
+        SL_DEBUG_LOG_V2(INFO, " HTTP download started \r\n");
 #endif
         break;
       }
@@ -557,13 +557,13 @@ int32_t rsi_wlan_app_task(void)
             if (status == SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE) {
               continue;
             } else {
-              SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx", errno, status);
+              SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d and status = 0x%lx\r\n", errno, status);
             }
           } else if ((errno == ENOTCONN) && (download_inprogress)) {
             data_recvd          = 1;
             download_inprogress = 0;
           } else {
-            SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d", errno);
+            SL_DEBUG_LOG_V2(ERROR, "recv failed with BSD error = %d\r\n", errno);
           }
           rsi_wlan_app_cb.state = RSI_WLAN_IPCONFIG_DONE_STATE;
           status                = close(client_socket);
@@ -571,12 +571,12 @@ int32_t rsi_wlan_app_task(void)
             if (errno == 0) {
               // get the error code returned by the firmware
               status = sl_wifi_get_saved_firmware_status();
-              SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d", status, errno);
+              SL_DEBUG_LOG_V2(ERROR, "socket close failed with status = %ld and BSD error: %d\r\n", status, errno);
             } else {
-              SL_DEBUG_LOG_V2(ERROR, "socket close failed with BSD error: %d", errno);
+              SL_DEBUG_LOG_V2(ERROR, "socket close failed with BSD error: %d\r\n", errno);
             }
           } else {
-            SL_DEBUG_LOG_V2(INFO, "socket close success");
+            SL_DEBUG_LOG_V2(INFO, "socket close success\r\n");
           }
           break;
         }

@@ -619,7 +619,7 @@ void rsi_app_init_queue(rsi_app_queue_t *queue)
 }
 void _assert(uint8_t *msg, uint16_t line_number)
 {
-  SL_DEBUG_LOG_V2(INFO, " %s %u ", (uintptr_t)msg, line_number);
+  SL_DEBUG_LOG_V2(INFO, " %s %u \r\n", (uintptr_t)msg, line_number);
   while (1)
     ;
 }

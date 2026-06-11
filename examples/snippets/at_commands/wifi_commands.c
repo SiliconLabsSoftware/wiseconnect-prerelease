@@ -686,12 +686,12 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
 {
   UNUSED_PARAMETER(arg);
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(INFO, "F: Join Event received with %lu bytes payload", result_length);
+    SL_DEBUG_LOG_V2(INFO, "F: Join Event received with %lu bytes payload\r\n", result_length);
     callback_status = status_code;
     return status_code;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "%c: Join Event received with %lu bytes payload", *result, result_length);
+  SL_DEBUG_LOG_V2(INFO, "%c: Join Event received with %lu bytes payload\r\n", *result, result_length);
 
   callback_status = SL_STATUS_OK;
   return SL_STATUS_OK;

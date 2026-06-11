@@ -258,10 +258,37 @@ extern void sl_redirect_log(const char *format, ...);
     SL_PRINT_STRING_##level(fmt, ##__VA_ARGS__); \
   } while (0)
 #else
-#define SL_DEBUG_LOG_V2(level, fmt, ...)                                                  \
-  do {                                                                                    \
-    sl_redirect_log("%s:%s:%d:" fmt "\r\n", __FILE__, __func__, __LINE__, ##__VA_ARGS__); \
+
+// This section of code is applicable for Non-Silabs host boards only as an alternative to the SL_PRINT_STRING_* macros.
+extern void sl_debug_log(const char *format, ...);
+
+#ifndef SLI_HOST_DBGLOG_LVL_DEBUG
+#define SLI_HOST_DBGLOG_LVL_DEBUG 0
+#endif
+
+#ifndef SLI_HOST_DBGLOG_LVL_INFO
+#define SLI_HOST_DBGLOG_LVL_INFO 1
+#endif
+
+#ifndef SLI_HOST_DBGLOG_LVL_WARN
+#define SLI_HOST_DBGLOG_LVL_WARN 2
+#endif
+
+#ifndef SLI_HOST_DBGLOG_LVL_ERROR
+#define SLI_HOST_DBGLOG_LVL_ERROR 3
+#endif
+
+#ifndef SLI_HOST_CURRENT_DBGLOG_LEVEL
+#define SLI_HOST_CURRENT_DBGLOG_LEVEL SLI_HOST_DBGLOG_LVL_INFO
+#endif
+
+#define SL_DEBUG_LOG_V2(level, fmt, ...)                                \
+  do {                                                                  \
+    if (SLI_HOST_DBGLOG_LVL_##level >= SLI_HOST_CURRENT_DBGLOG_LEVEL) { \
+      sl_debug_log("[" #level "] " fmt, ##__VA_ARGS__);                 \
+    }                                                                   \
   } while (0)
+
 #endif
 
 typedef uint32_t sl_duration_t;

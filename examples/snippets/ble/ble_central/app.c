@@ -359,7 +359,7 @@ void rsi_ble_simple_central_on_conn_status_event(rsi_ble_event_conn_status_t *re
 void rsi_ble_simple_central_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconnect, uint16_t reason)
 {
   memcpy(&rsi_app_disconnected_device, resp_disconnect, sizeof(rsi_ble_event_disconnect_t));
-  SL_DEBUG_LOG_V2(INFO, "Disconnected reason:0x%x ", reason);
+  SL_DEBUG_LOG_V2(INFO, "Disconnected reason:0x%x \r\n", reason);
   rsi_ble_app_set_event(RSI_APP_EVENT_DISCONNECTED);
 }
 
@@ -389,16 +389,16 @@ void ble_central(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Success\r\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -406,11 +406,11 @@ void ble_central(void *argument)
   //! get the local device MAC address.
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Get local device address failed = %lx\r\n", status);
     return;
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    SL_DEBUG_LOG_V2(INFO, "Local device address %s ", (uintptr_t)(local_dev_addr));
+    SL_DEBUG_LOG_V2(INFO, "Local device address %s \r\n", (uintptr_t)(local_dev_addr));
   }
 
   //! BLE register GAP callbacks
@@ -427,7 +427,7 @@ void ble_central(void *argument)
 
   ble_main_task_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_main_task_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to cread ble_main_task_sem semaphore");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to cread ble_main_task_sem semaphore\r\n");
     return;
   }
 
@@ -445,21 +445,21 @@ void ble_central(void *argument)
                                               RSI_BLE_ADV_PAYLOAD_LENGTH_FROM_INDEX_TO_COMPARE,
                                               compare);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(INFO, "status: 0x%x", status);
+    SL_DEBUG_LOG_V2(INFO, "status: 0x%x\r\n", status);
     return;
   }
 #endif
   ble_peripheral_conn_sem = osSemaphoreNew(1, 0, NULL);
 
 #if ENABLE_NWP_POWER_SAVE
-  SL_DEBUG_LOG_V2(INFO, "Keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, "Keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
     if (status == RSI_FEATURE_NOT_SUPPORTED) {
-      SL_DEBUG_LOG_V2(ERROR, "Configured power save profile not supported in BLE mode ");
+      SL_DEBUG_LOG_V2(ERROR, "Configured power save profile not supported in BLE mode \r\n");
     } else {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode ");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode \r\n");
     }
     return;
   }
@@ -467,19 +467,19 @@ void ble_central(void *argument)
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
     return;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save \r\n");
 #endif
   //! start scanning
   status = rsi_ble_start_scanning();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX", status);
+    SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Started scanning");
+  SL_DEBUG_LOG_V2(INFO, "Started scanning\r\n");
 
   while (1) {
     //! Application main loop
@@ -496,7 +496,7 @@ void ble_central(void *argument)
 
         //! clear the advertise report event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_ADV_REPORT);
-        SL_DEBUG_LOG_V2(INFO, "In Advertising Event");
+        SL_DEBUG_LOG_V2(INFO, "In Advertising Event\r\n");
 
         //! initiate stop scanning command.
         status = rsi_ble_stop_scanning();
@@ -506,7 +506,7 @@ void ble_central(void *argument)
 
         status = rsi_ble_connect(remote_addr_type, (int8_t *)remote_dev_bd_addr);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(INFO, "Connect status: 0x%lX", status);
+          SL_DEBUG_LOG_V2(INFO, "Connect status: 0x%lX\r\n", status);
         }
         if (ble_peripheral_conn_sem) {
           osSemaphoreAcquire(ble_peripheral_conn_sem, 10000);
@@ -514,10 +514,10 @@ void ble_central(void *argument)
         temp_event_map1 = rsi_ble_app_get_event();
 
         if ((temp_event_map1 == -1) || (!(temp_event_map1 & RSI_APP_EVENT_CONNECTED))) {
-          SL_DEBUG_LOG_V2(INFO, "Initiating connect cancel command ");
+          SL_DEBUG_LOG_V2(INFO, "Initiating connect cancel command \r\n");
           status = rsi_ble_connect_cancel((int8_t *)remote_dev_bd_addr);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(INFO, "BLE connect cancel cmd status = %lx ", status);
+            SL_DEBUG_LOG_V2(INFO, "BLE connect cancel cmd status = %lx \r\n", status);
           } else {
             rsi_ble_app_set_event(RSI_APP_EVENT_DISCONNECTED);
           }
@@ -530,7 +530,7 @@ void ble_central(void *argument)
         //! clear the connected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_CONNECTED);
         rsi_6byte_dev_address_to_ascii(str_remote_address, rsi_app_connected_device.dev_addr);
-        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s ", (uintptr_t)(str_remote_address));
+        SL_DEBUG_LOG_V2(INFO, "Module connected to address : %s \r\n", (uintptr_t)(str_remote_address));
       } break;
 
       case RSI_APP_EVENT_DISCONNECTED: {
@@ -538,13 +538,13 @@ void ble_central(void *argument)
 
         //! clear the disconnected event.
         rsi_ble_app_clear_event(RSI_APP_EVENT_DISCONNECTED);
-        SL_DEBUG_LOG_V2(INFO, "Module got disconnected");
+        SL_DEBUG_LOG_V2(INFO, "Module got disconnected\r\n");
         device_found = 0;
-        SL_DEBUG_LOG_V2(INFO, "Restarted Scanning");
+        SL_DEBUG_LOG_V2(INFO, "Restarted Scanning\r\n");
         //! start scanning
         status = rsi_ble_start_scanning();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX", status);
+          SL_DEBUG_LOG_V2(INFO, "start_scanning status: 0x%lX\r\n", status);
         }
 
       } break;

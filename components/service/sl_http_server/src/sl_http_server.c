@@ -135,7 +135,7 @@ static sl_status_t sli_parse_http_headers(sl_http_server_t *handle, int length)
       headers[i]     = 0;
       headers[i + 1] = 0;
 
-      SL_DEBUG_LOG_V2(DEBUG, "Got request method : %s", (uintptr_t)sol);
+      SL_DEBUG_LOG_V2(DEBUG, "Got request method : %s\r\n", (uintptr_t)sol);
 
       char *sep_pos = strchr(sol, ' '); // Find the space position
       sep_pos[0]    = 0;
@@ -254,13 +254,13 @@ static void sli_process_request(sl_http_server_t *handle, int client_socket)
   while (rem_length > 0) {
     int length = sl_si91x_recv(client_socket, (uint8_t *)recv_buffer, rem_length, 0);
     if (length < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Socket receive failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket receive failed with bsd error: %d\r\n", errno);
       sl_si91x_shutdown(client_socket, SHUTDOWN_BY_ID);
       return;
     }
     if (length == 0) {
       // Connection closed by peer (e.g. browser tab closed) before full request received
-      SL_DEBUG_LOG_V2(DEBUG, "Connection closed by peer before headers complete");
+      SL_DEBUG_LOG_V2(DEBUG, "Connection closed by peer before headers complete\r\n");
       close(client_socket);
       return;
     }
@@ -283,20 +283,20 @@ static void sli_process_request(sl_http_server_t *handle, int client_socket)
       if (SL_STATUS_OK != sli_parse_http_headers(handle, length)) {
         break;
       }
-      SL_DEBUG_LOG_V2(DEBUG, "Got expected data length : %lu", handle->request.request_data_length);
+      SL_DEBUG_LOG_V2(DEBUG, "Got expected data length : %lu\r\n", handle->request.request_data_length);
 
       if (handle->request.request_data_length > 0) {
         int header_length = (int)(sep_pos - handle->request_buffer);
         recv_buffer       = (char *)handle->req_data;
         handle->rem_len   = handle->request.request_data_length;
 
-        SL_DEBUG_LOG_V2(DEBUG, "Got header length : %u", header_length);
+        SL_DEBUG_LOG_V2(DEBUG, "Got header length : %u\r\n", header_length);
 
         // Check if we recived data along with header
         if (recv_length > (header_length + 4)) {
           length              = recv_length - (header_length + 4);
           handle->data_length = length;
-          SL_DEBUG_LOG_V2(DEBUG, "Got remaining data length : %lu", handle->data_length);
+          SL_DEBUG_LOG_V2(DEBUG, "Got remaining data length : %lu\r\n", handle->data_length);
           handle->req_data = (uint8_t *)(handle->request_buffer + header_length + 4);
         }
         recv_length = 0;
@@ -325,7 +325,7 @@ static void client_accept_callback(int32_t sock_id, struct sockaddr *addr, uint8
 {
   UNUSED_PARAMETER(addr);
   UNUSED_PARAMETER(ip_version);
-  SL_DEBUG_LOG_V2(DEBUG, "Accepted socket ID : %ld", sock_id);
+  SL_DEBUG_LOG_V2(DEBUG, "Accepted socket ID : %ld\r\n", sock_id);
   client_socket = sock_id;
   osEventFlagsSet(server_handle->http_server_id, HTTP_SERVER_CONNECT_SUCCESS);
 }
@@ -341,12 +341,12 @@ static void sli_http_server(const void *arg)
 
   server_socket = sl_si91x_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (server_socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     // Set flag HTTP_SERVER_START_FAILED if socket call fails
     osEventFlagsSet(server_handle->http_server_id, HTTP_SERVER_START_FAILED);
     osThreadExit(); // Exit thread on failure
   }
-  SL_DEBUG_LOG_V2(DEBUG, "Server Socket ID : %d", server_socket);
+  SL_DEBUG_LOG_V2(DEBUG, "Server Socket ID : %d\r\n", server_socket);
 
   socket_return_value = sl_si91x_setsockopt(server_socket,
                                             SOL_SOCKET,
@@ -354,7 +354,7 @@ static void sli_http_server(const void *arg)
                                             &high_performance_socket,
                                             sizeof(high_performance_socket));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     sl_si91x_shutdown(server_socket, SHUTDOWN_BY_ID);
     // Set flag HTTP_SERVER_START_FAILED if setsockopt call fails
     osEventFlagsSet(server_handle->http_server_id, HTTP_SERVER_START_FAILED);
@@ -364,7 +364,7 @@ static void sli_http_server(const void *arg)
   socket_return_value =
     sl_si91x_setsockopt(server_socket, SOL_SOCKET, SL_SI91X_SO_SOCK_VAP_ID, &vap_id, sizeof(vap_id));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
     sl_si91x_shutdown(server_socket, SHUTDOWN_BY_ID);
     // Set flag HTTP_SERVER_START_FAILED if setsockopt call fails
     osEventFlagsSet(server_handle->http_server_id, HTTP_SERVER_START_FAILED);
@@ -376,7 +376,7 @@ static void sli_http_server(const void *arg)
 
   socket_return_value = sl_si91x_bind(server_socket, (struct sockaddr *)&server_address, socket_length);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     sl_si91x_shutdown(server_socket, SHUTDOWN_BY_ID);
     // Set flag HTTP_SERVER_START_FAILED if bind call fails
     osEventFlagsSet(server_handle->http_server_id, HTTP_SERVER_START_FAILED);
@@ -385,13 +385,13 @@ static void sli_http_server(const void *arg)
 
   socket_return_value = sl_si91x_listen(server_socket, BACK_LOG);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d\r\n", errno);
     sl_si91x_shutdown(server_socket, SHUTDOWN_BY_ID);
     // Set flag HTTP_SERVER_START_FAILED if listen call fails
     osEventFlagsSet(server_handle->http_server_id, HTTP_SERVER_START_FAILED);
     osThreadExit(); // Exit thread on failure
   }
-  SL_DEBUG_LOG_V2(DEBUG, "Listening on Local Port : %d", server_address.sin_port);
+  SL_DEBUG_LOG_V2(DEBUG, "Listening on Local Port : %d\r\n", server_address.sin_port);
 
   sl_si91x_time_value timeout = { 0 };
   timeout.tv_sec              = server_handle->config.client_idle_time;
@@ -402,7 +402,7 @@ static void sli_http_server(const void *arg)
   while (1) {
     socket_return_value = sl_si91x_accept_async(server_socket, client_accept_callback);
     if (socket_return_value != SLI_SI91X_NO_ERROR) {
-      SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d\r\n", errno);
     }
 
     // Wait for small amount of time to check if HTTP server stop is called
@@ -414,7 +414,7 @@ static void sli_http_server(const void *arg)
       if (result & HTTP_SERVER_STOP_CMD) {
         // HTTP_SERVER_STOP_CMD flag is set
         server_handle->server_socket = -1;
-        SL_DEBUG_LOG_V2(INFO, "In http server thread: Got Stop Command");
+        SL_DEBUG_LOG_V2(INFO, "In http server thread: Got Stop Command\r\n");
         sl_si91x_shutdown(server_socket, SHUTDOWN_BY_ID);
         osEventFlagsSet(server_handle->http_server_id, HTTP_SERVER_EXIT);
         break;
@@ -430,11 +430,11 @@ static void sli_http_server(const void *arg)
           socket_return_value =
             sl_si91x_setsockopt(client_socket, SOL_SOCKET, SL_SI91X_SO_RCVTIME, &timeout, sizeof(timeout));
           if (socket_return_value) {
-            SL_DEBUG_LOG_V2(ERROR, " setsockopt fail");
+            SL_DEBUG_LOG_V2(ERROR, " setsockopt fail\r\n");
             sl_si91x_shutdown(client_socket, SHUTDOWN_BY_ID);
             continue;
           } else {
-            SL_DEBUG_LOG_V2(DEBUG, " setsockopt done");
+            SL_DEBUG_LOG_V2(DEBUG, " setsockopt done\r\n");
           }
         }
 
@@ -479,7 +479,7 @@ static int sli_send_response_buffer(sl_http_server_t *server, sl_http_server_res
 
   // Check if memory allocation was successful
   if (response_buffer == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for response buffer");
+    SL_DEBUG_LOG_V2(ERROR, "Memory allocation failed for response buffer\r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -541,7 +541,7 @@ static int sli_send_response_buffer(sl_http_server_t *server, sl_http_server_res
   // Send headers first
   if (sli_process_socket_buffered_data(server->client_socket, (char *)response_buffer, buffer_length, window_size)
       != 0) {
-    SL_DEBUG_LOG_V2(DEBUG, "Response header send failed.");
+    SL_DEBUG_LOG_V2(DEBUG, "Response header send failed.\r\n");
     free(response_buffer);
     return -1;
   }
@@ -556,7 +556,7 @@ static int sli_send_response_buffer(sl_http_server_t *server, sl_http_server_res
                                          response->current_data_length,
                                          window_size)
         != 0) {
-      SL_DEBUG_LOG_V2(DEBUG, "Response data send failed.");
+      SL_DEBUG_LOG_V2(DEBUG, "Response data send failed.\r\n");
       return -1;
     }
   }
@@ -676,9 +676,9 @@ sl_status_t sl_http_server_stop(sl_http_server_t *handle)
   osThreadTerminate(http_server_id);
   osThreadState_t state = osThreadGetState(http_server_id);
   if (state == osThreadTerminated) {
-    SL_DEBUG_LOG_V2(INFO, " Server Thread Terminated ");
+    SL_DEBUG_LOG_V2(INFO, " Server Thread Terminated \r\n");
   }
-  SL_DEBUG_LOG_V2(INFO, "In http server stop: Done");
+  SL_DEBUG_LOG_V2(INFO, "In http server stop: Done\r\n");
   return SL_STATUS_OK;
 }
 
@@ -812,13 +812,13 @@ sl_status_t sl_http_server_read_request_data(sl_http_server_t *handle, sl_http_r
   while (0 != rem_len) {
     int receive_length = recv(handle->client_socket, &(recvData->buffer[offset]), rem_len, 0);
     if (receive_length < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Socket receive failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket receive failed with bsd error: %d\r\n", errno);
       close(handle->client_socket);
       return SL_STATUS_FAIL;
     }
     if (receive_length == 0) {
       // Connection closed by peer before full request body received
-      SL_DEBUG_LOG_V2(ERROR, "Connection closed by peer during request body read");
+      SL_DEBUG_LOG_V2(ERROR, "Connection closed by peer during request body read\r\n");
       close(handle->client_socket);
       return SL_STATUS_FAIL;
     }

@@ -32,6 +32,11 @@ readme:
 - path: readme.md
 ui_hints:
   highlight: readme.md
+toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs

@@ -209,17 +209,17 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &http_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Success\r\n");
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client Connected\r\n");
 
 #if HTTPS_ENABLE && LOAD_CERTIFICATE
   // Load SSL CA certificate
@@ -228,18 +228,18 @@ static void application_start(void *argument)
                                  cacert,
                                  sizeof(cacert) - 1);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success", CERTIFICATE_INDEX);
+  SL_DEBUG_LOG_V2(INFO, "Load TLS CA certificate at index %d Success\r\n", CERTIFICATE_INDEX);
 #endif
 
   status = http_client_application();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while HTTP client operation: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while HTTP client operation: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Application Demonstration Completed Successfully!");
+  SL_DEBUG_LOG_V2(INFO, "Application Demonstration Completed Successfully!\r\n");
 }
 
 sl_status_t http_client_application(void)
@@ -295,7 +295,7 @@ sl_status_t http_client_application(void)
 
   status = sl_http_client_init(&client_configuration, &client_handle);
   VERIFY_STATUS_AND_RETURN(status);
-  SL_DEBUG_LOG_V2(INFO, "HTTP Client init success");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Client init success\r\n");
 
   sl_http_client_tcp_tls_advanced_options_t tcp_tls_opts = {
     .tcp_keepalive_initial_time_sec   = 120,
@@ -331,7 +331,7 @@ sl_status_t http_client_application(void)
   //! Initialize callback method for HTTP PUT request
   status = sl_http_client_request_init(&client_request, http_put_response_callback_handler, "This is HTTP client");
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  SL_DEBUG_LOG_V2(INFO, "HTTP PUT request init success");
+  SL_DEBUG_LOG_V2(INFO, "HTTP PUT request init success\r\n");
 
   //! Send HTTP PUT request
   status = sl_http_client_send_request(&client_handle, &client_request);
@@ -369,7 +369,7 @@ sl_status_t http_client_application(void)
     }
   }
 
-  SL_DEBUG_LOG_V2(INFO, "HTTP PUT request Success!");
+  SL_DEBUG_LOG_V2(INFO, "HTTP PUT request Success!\r\n");
   reset_http_handles();
 
   //! Configure HTTP GET request
@@ -378,7 +378,7 @@ sl_status_t http_client_application(void)
   //! Initialize callback method for HTTP GET request
   status = sl_http_client_request_init(&client_request, http_get_response_callback_handler, "This is HTTP client");
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  SL_DEBUG_LOG_V2(INFO, "HTTP Get request init success");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Get request init success\r\n");
 
   //! Send HTTP GET request
   status = sl_http_client_send_request(&client_handle, &client_request);
@@ -388,7 +388,7 @@ sl_status_t http_client_application(void)
     CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "HTTP GET request Success");
+  SL_DEBUG_LOG_V2(INFO, "HTTP GET request Success\r\n");
   reset_http_handles();
 
   //! Configure HTTP POST request
@@ -399,7 +399,7 @@ sl_status_t http_client_application(void)
   //! Initialize callback method for HTTP POST request
   status = sl_http_client_request_init(&client_request, http_post_response_callback_handler, "This is HTTP client");
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  SL_DEBUG_LOG_V2(INFO, "HTTP Post request init success");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Post request init success\r\n");
 
   //! Send HTTP POST request
   status = sl_http_client_send_request(&client_handle, &client_request);
@@ -409,7 +409,7 @@ sl_status_t http_client_application(void)
     CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "HTTP POST request Success");
+  SL_DEBUG_LOG_V2(INFO, "HTTP POST request Success\r\n");
   reset_http_handles();
 
 #if EXTENDED_HEADER_ENABLE
@@ -419,7 +419,7 @@ sl_status_t http_client_application(void)
 
   status = sl_http_client_deinit(&client_handle);
   VERIFY_STATUS_AND_RETURN(status);
-  SL_DEBUG_LOG_V2(INFO, "HTTP Client deinit success");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Client deinit success\r\n");
   free(client_credentials);
 
   return status;
@@ -436,7 +436,7 @@ sl_status_t http_put_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *put_response = (sl_http_client_response_t *)data;
   callback_status                         = put_response->status;
 
-  SL_DEBUG_LOG_V2(INFO, "===========HTTP PUT RESPONSE START===========");
+  SL_DEBUG_LOG_V2(INFO, "===========HTTP PUT RESPONSE START===========\r\n");
   SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", put_response->status);
   SL_DEBUG_LOG_V2(INFO, "> PUT response: %u", put_response->http_response_code);
   SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)put_response->end_of_data);
@@ -474,7 +474,7 @@ sl_status_t http_get_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *get_response = (sl_http_client_response_t *)data;
   callback_status                         = get_response->status;
 
-  SL_DEBUG_LOG_V2(INFO, "===========HTTP GET RESPONSE START===========");
+  SL_DEBUG_LOG_V2(INFO, "===========HTTP GET RESPONSE START===========\r\n");
   SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", get_response->status);
   SL_DEBUG_LOG_V2(INFO, "> GET response: %u", get_response->http_response_code);
   SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)get_response->end_of_data);
@@ -524,7 +524,7 @@ sl_status_t http_post_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *post_response = (sl_http_client_response_t *)data;
   callback_status                          = post_response->status;
 
-  SL_DEBUG_LOG_V2(INFO, "===========HTTP POST RESPONSE START===========");
+  SL_DEBUG_LOG_V2(INFO, "===========HTTP POST RESPONSE START===========\r\n");
   SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", post_response->status);
   SL_DEBUG_LOG_V2(INFO, "> POST response: %u", post_response->http_response_code);
   SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)post_response->end_of_data);

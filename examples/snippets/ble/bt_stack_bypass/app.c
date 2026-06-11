@@ -652,26 +652,26 @@ int32_t rsi_ble_app_init_uart(void)
     // Initialize the UART
     status = sl_si91x_usart_init(USART_0, &uart_handle);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_initialize: Error Code : %lu ", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_initialize: Error Code : %lu \r\n", status);
       break;
     }
-    SL_DEBUG_LOG_V2(DEBUG, "UART initialization is successful ");
+    SL_DEBUG_LOG_V2(DEBUG, "UART initialization is successful \r\n");
     // Configure the UART configurations
     status = sl_si91x_usart_set_configuration(uart_handle, &uart_config);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_set_configuration: Error Code : %lu ", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_set_configuration: Error Code : %lu \r\n", status);
       break;
     }
-    SL_DEBUG_LOG_V2(DEBUG, "UART configuration is successful ");
+    SL_DEBUG_LOG_V2(DEBUG, "UART configuration is successful \r\n");
     // Register user callback function
     status = sl_si91x_usart_multiple_instance_register_event_callback(USART_0, uart_callback_event);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_register_event_callback: Error Code : %lu ", status);
+      SL_DEBUG_LOG_V2(DEBUG, "sl_si91x_usart_register_event_callback: Error Code : %lu \r\n", status);
       break;
     }
-    SL_DEBUG_LOG_V2(DEBUG, "UART user event callback registered successfully ");
+    SL_DEBUG_LOG_V2(DEBUG, "UART user event callback registered successfully \r\n");
     sl_si91x_usart_get_configurations(USART_0, &get_config);
-    SL_DEBUG_LOG_V2(DEBUG, "Baud Rate = %ld ", get_config.baudrate);
+    SL_DEBUG_LOG_V2(DEBUG, "Baud Rate = %ld \r\n", get_config.baudrate);
   } while (false);
   return status;
 }
@@ -715,19 +715,19 @@ void rsi_ble_hci_raw_task(void *argument)
 
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful");
+    SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful\r\n");
   }
 
 #if RSI_SET_REGION_SUPPORT && !SL_SI91X_ACX_MODULE
   status = sl_si91x_set_device_region(0, 0, 4);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Set Region Failed, Error Code : %ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Set Region Failed, Error Code : %ld\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Set Region Success");
+    SL_DEBUG_LOG_V2(INFO, "Set Region Success\r\n");
   }
 #endif
 

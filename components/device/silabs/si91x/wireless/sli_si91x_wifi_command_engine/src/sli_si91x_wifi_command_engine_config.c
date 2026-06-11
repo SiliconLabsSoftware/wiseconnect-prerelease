@@ -241,7 +241,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
   metadata->packet_status              = frame_status;
 
   SL_DEBUG_LOG_V2(DEBUG, "RX-> Q: %u, C: 0x%X, L: %u,", queue_id, frame_type, metadata->tx_info.data_packet_length);
-  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\n", frame_status);
+  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\r\n", frame_status);
 
   switch (queue_id) {
     case SLI_WLAN_MGMT_Q: {
@@ -411,7 +411,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         }
         default: {
           // frame_type doesn't match any known cases
-          SL_DEBUG_LOG_V2(DEBUG, "Unknown frame type: %u\n", frame_type);
+          SL_DEBUG_LOG_V2(DEBUG, "Unknown frame type: %u\r\n", frame_type);
           status = SL_STATUS_INVALID_INDEX;
           break;
         }
@@ -428,7 +428,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
     }
     default: {
       // frame_type doesn't match any known cases
-      SL_DEBUG_LOG_V2(DEBUG, "Unknown Queue type: %x\n", queue_id);
+      SL_DEBUG_LOG_V2(DEBUG, "Unknown Queue type: %x\r\n", queue_id);
       status = SL_STATUS_INVALID_INDEX;
       break;
     }
@@ -502,14 +502,14 @@ static void sli_si91x_process_flush_one_metadata(sli_command_engine_metadata_t *
       uint32_t thread_flags_result =
         osThreadFlagsSet(tx_metadata->sync_resp_thread_id, packet_config->sync_response_event);
       if ((thread_flags_result & osFlagsError) != 0) {
-        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set thread flags for sync response\n");
+        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set thread flags for sync response\r\n");
       }
     } else if (packet_config->sync_response_event_id != NULL && packet_config->sync_response_event != 0) {
       // Fallback to event flags if thread ID is not available
       uint32_t event_flags_result =
         osEventFlagsSet(*packet_config->sync_response_event_id, packet_config->sync_response_event);
       if ((event_flags_result & osFlagsError) != 0) {
-        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for sync response\n");
+        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for sync response\r\n");
       }
     }
   } else {
@@ -866,7 +866,7 @@ static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint1
     uint32_t event_result = osEventFlagsSet(*socket->socket_packet_type_configuration.sync_response_event_id,
                                             socket->socket_packet_type_configuration.sync_response_event);
     if ((event_result & osFlagsError) != 0) {
-      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for socket flush response\n");
+      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for socket flush response\r\n");
     }
   }
 
@@ -882,7 +882,7 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "flush_all_socket_queues err=0x%X\n", (unsigned int)error_status);
+  SL_DEBUG_LOG_V2(DEBUG, "flush_all_socket_queues err=0x%X\r\n", (unsigned int)error_status);
   sl_status_t status                              = SL_STATUS_OK;
   sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
 
@@ -919,7 +919,7 @@ static void sli_post_disconnect_event_to_network_manager(sl_net_interface_t inte
   message.interface                     = interface;
   message.event_flags                   = SLI_NET_DISCONNECT_Q_EVENT;
   if (osMessageQueuePut(sli_network_manager_request_queue, &message, SLI_NET_MSG_PRIO_NORMAL, 0) != osOK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue disconnect event for auto-join retry\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue disconnect event for auto-join retry\r\n");
   }
 }
 
@@ -995,6 +995,13 @@ sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t
   sl_status_t http_status = sli_wifi_convert_and_save_firmware_status(sli_wifi_get_wifi_frame_status(http_packet));
 
   if (http_status != SL_STATUS_OK) {
+    // For chunked HTTP GET/POST requests, firmware sends an interim ACK with
+    // frame status HTTP_GET_CMD_IN_PROGRESS and zero payload length after each
+    // chunk. Treat those ACKs as complete so command-engine can free one
+    // in-flight slot and schedule the next chunk immediately.
+    if ((http_status == SL_STATUS_SI91X_HTTP_GET_CMD_IN_PROGRESS) && (http_packet->length == 0U)) {
+      return SL_STATUS_OK;
+    }
     return http_status == SL_STATUS_SI91X_HTTP_GET_CMD_IN_PROGRESS ? SL_STATUS_IN_PROGRESS : SL_STATUS_OK;
   }
 

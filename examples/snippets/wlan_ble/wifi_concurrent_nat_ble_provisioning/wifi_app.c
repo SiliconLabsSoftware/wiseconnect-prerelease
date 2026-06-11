@@ -295,11 +295,11 @@ static sl_status_t show_scan_results()
 {
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid;
-  SL_DEBUG_LOG_V2(INFO, "%lu WLAN scan results:", scan_result->scan_count);
+  SL_DEBUG_LOG_V2(INFO, "%lu WLAN scan results:\r\n", scan_result->scan_count);
 
   if (scan_result->scan_count) {
     SL_DEBUG_LOG_V2(INFO, "   %s %24s %s", (uintptr_t) "SSID", (uintptr_t) "SECURITY", (uintptr_t) "NETWORK");
-    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
+    SL_DEBUG_LOG_V2(INFO, "%12s %12s %s\r\n", (uintptr_t) "BSSID", (uintptr_t) "CHANNEL", (uintptr_t) "RSSI");
 
     for (int a = 0; a < (int)scan_result->scan_count; ++a) {
       bssid = (uint8_t *)&scan_result->scan_info[a].bssid;
@@ -319,7 +319,7 @@ static sl_status_t show_scan_results()
                bssid[4],
                bssid[5]);
       SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)nat_scan_bssid_log);
-      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
+      SL_DEBUG_LOG_V2(INFO, "%4u,  -%u\r\n", scan_result->scan_info[a].rf_channel, scan_result->scan_info[a].rssi_val);
     }
   }
 
@@ -361,7 +361,7 @@ static void measure_and_print_throughput(size_t total_num_of_bytes, uint32_t tes
   float duration = (test_timeout / 1000);                      // ms to sec
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully", result, duration);
+  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
 }
 #endif
 
@@ -373,7 +373,7 @@ void wifi_app_task(void)
   // Allocate memory for scan buffer
   scan_result = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scan_result == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: Failed to allocate memory for scan result");
+    SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: Failed to allocate memory for scan result\r\n");
     return;
   }
   wlan_app_callbacks_init();
@@ -426,7 +426,7 @@ void wifi_app_task(void)
           status = scan_complete ? callback_status : SL_STATUS_TIMEOUT;
         }
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: WLAN Scan Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: WLAN Scan Failed, Error Code : 0x%lX\r\n", status);
           wifi_app_set_event(WIFI_APP_SCAN_STATE);
           osDelay(1000);
         }
@@ -445,10 +445,10 @@ void wifi_app_task(void)
         if (sec_type != SL_WIFI_OPEN) {
           status = sl_net_set_credential(id, SL_NET_WIFI_PSK, pwd, strlen((char *)pwd));
           if (SL_STATUS_OK == status) {
-            SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: Credentials set, id : %lu", id);
+            SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: Credentials set, id : %lu\r\n", id);
           }
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: Failed to set credentials, id : %lu", id);
+            SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: Failed to set credentials, id : %lu\r\n", id);
             continue;
           }
         }
@@ -458,19 +458,19 @@ void wifi_app_task(void)
         access_point.encryption    = SL_WIFI_DEFAULT_ENCRYPTION;
         access_point.credential_id = id;
 
-        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: SSID %s", (uintptr_t)access_point.ssid.value);
+        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: SSID %s\r\n", (uintptr_t)access_point.ssid.value);
         status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
 
         if (status != SL_STATUS_OK) {
           timeout = 1;
           wifi_app_send_to_ble(WIFI_APP_TIMEOUT_NOTIFY, (uint8_t *)&timeout, 1);
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: WLAN Connect Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: WLAN Connect Failed, Error Code : 0x%lX\r\n", status);
 
           // update wlan application state
           disconnected = 1;
           connected    = 0;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: WLAN Connection Success");
+          SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: WLAN Connection Success\r\n");
           // update wlan application state
           wifi_app_set_event(WIFI_APP_CONNECTED_STATE);
         }
@@ -498,7 +498,7 @@ void wifi_app_task(void)
               wifi_app_set_event(WIFI_AP_INIT_STATE);
             }
           }
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: IP Config Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: IP Config Failed, Error Code : 0x%lX\r\n", status);
           break;
         } else {
           a                  = 0;
@@ -510,7 +510,7 @@ void wifi_app_task(void)
           ip.ip.v4.value     = ip_address.ip.v4.ip_address.value;
           SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: STA IPv4 : ");
           print_sl_ip_address(&ip);
-          SL_DEBUG_LOG_V2(INFO, "");
+          SL_DEBUG_LOG_V2(INFO, "\r\n");
 
           // update wlan application state
           wifi_app_set_event(WIFI_APP_IPCONFIG_DONE_STATE);
@@ -520,14 +520,14 @@ void wifi_app_task(void)
 
       case WIFI_APP_IPCONFIG_DONE_STATE: {
         wifi_app_clear_event(WIFI_APP_IPCONFIG_DONE_STATE);
-        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: Wi-Fi App IPCONFIG Done State");
+        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: Wi-Fi App IPCONFIG Done State\r\n");
         wifi_app_send_to_ble(WIFI_APP_REQ_BLE_DISCONNECT, NULL, 0);
       } break;
 
       case WIFI_APP_DISCONNECTED_STATE: {
         disconnected = 1;
         wifi_app_clear_event(WIFI_APP_DISCONNECTED_STATE);
-        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: Wi-Fi App Disconnected State");
+        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: Wi-Fi App Disconnected State\r\n");
 #if !AP_ONLY_MODE
         wifi_app_set_event(WIFI_DISABLE_NAT);
 #endif
@@ -540,11 +540,11 @@ void wifi_app_task(void)
         if (status == SL_STATUS_OK) {
           disassosiated = 1;
           connected     = 0;
-          SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: WLAN Disconnected");
+          SL_DEBUG_LOG_V2(INFO, "[Wi-Fi STA]: WLAN Disconnected\r\n");
           wifi_app_send_to_ble(WIFI_APP_DISCONNECTION_NOTIFY, (uint8_t *)&disassosiated, 1);
           wifi_app_set_event(WIFI_APP_UNCONNECTED_STATE);
         } else {
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: WIFI Disconnect Failed, Error Code : 0x%lX", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi STA]: WIFI Disconnect Failed, Error Code : 0x%lX\r\n", status);
         }
       } break;
 
@@ -555,7 +555,7 @@ void wifi_app_task(void)
         sl_wifi_channel_t client_channel = { 0 };
         status                           = sl_wifi_get_channel(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &client_channel);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to get client channel: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to get client channel: 0x%lx\r\n", status);
           break;
         }
 
@@ -566,14 +566,14 @@ void wifi_app_task(void)
         if (wifi_ap_profile.security != SL_WIFI_OPEN) {
           status = sl_net_set_credential(id, SL_NET_WIFI_PSK, WIFI_AP_CREDENTIAL, strlen((char *)WIFI_AP_CREDENTIAL));
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to set credentials, id : %lu", id);
+            SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to set credentials, id : %lu\r\n", id);
             continue;
           }
         }
 
         status = sl_si91x_configure_ip_address(&ip_add, SL_SI91X_WIFI_AP_VAP_ID);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to configure IPv4 address : 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to configure IPv4 address : 0x%lx\r\n", status);
           break;
         }
 
@@ -583,29 +583,29 @@ void wifi_app_task(void)
           SL_DEBUG_LOG_V2(INFO, "[Wi-Fi AP]: AP's default gateway: ");
           memcpy(&ip_address.ip.v4.bytes, &ip_add.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
           print_sl_ip_address(&ip_address);
-          SL_DEBUG_LOG_V2(INFO, "");
+          SL_DEBUG_LOG_V2(INFO, "\r\n");
         }
 
         status = sl_net_set_profile(SL_NET_WIFI_AP_INTERFACE, SL_NET_DEFAULT_WIFI_AP_PROFILE_ID, &wifi_ap_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to set profile: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to set profile: 0x%lx\r\n", status);
           break;
         }
 
         status = sl_wifi_start_ap(SL_WIFI_AP_2_4GHZ_INTERFACE, &wifi_ap_profile);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to bring Wi-Fi AP interface up: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: Failed to bring Wi-Fi AP interface up: 0x%lx\r\n", status);
           break;
         }
-        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi AP]: AP started");
+        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi AP]: AP started\r\n");
 
 #if (THROUGHPUT_TYPE == TCP_TX)
         if (osThreadNew((osThreadFunc_t)create_tcp_server, NULL, &server_thread_attr) == NULL) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to create TCP server thread");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to create TCP server thread\r\n");
         }
 #elif (THROUGHPUT_TYPE == UDP_TX)
         if (osThreadNew((osThreadFunc_t)create_udp_server, NULL, &server_thread_attr) == NULL) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to create UDP server thread");
+          SL_DEBUG_LOG_V2(ERROR, "Failed to create UDP server thread\r\n");
         }
 #endif
 
@@ -618,10 +618,10 @@ void wifi_app_task(void)
         wifi_app_clear_event(WIFI_AP_BRING_DOWN_STATE);
         status = sl_wifi_stop_ap(SL_WIFI_AP_2_4GHZ_INTERFACE);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: AP stop failed: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "[Wi-Fi AP]: AP stop failed: 0x%lx\r\n", status);
           break;
         }
-        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi AP]: AP Stop Success");
+        SL_DEBUG_LOG_V2(INFO, "[Wi-Fi AP]: AP Stop Success\r\n");
         wifi_app_send_to_ble(WIFI_APP_REQ_BLE_START_ADVERTISING, NULL, 0);
       } break;
 
@@ -629,9 +629,9 @@ void wifi_app_task(void)
         wifi_app_clear_event(WIFI_ENABLE_NAT);
         status = sl_net_nat_enable(&nat_config);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Enabling the NAT failed with error code: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Enabling the NAT failed with error code: 0x%lx\r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Enabled NAT");
+          SL_DEBUG_LOG_V2(INFO, "Enabled NAT\r\n");
         }
       } break;
 
@@ -639,9 +639,9 @@ void wifi_app_task(void)
         wifi_app_clear_event(WIFI_DISABLE_NAT);
         status = sl_net_nat_disable(nat_config.interface);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Disabling the NAT failed with error code: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "Disabling the NAT failed with error code: 0x%lx\r\n", status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Disabled NAT");
+          SL_DEBUG_LOG_V2(INFO, "Disabled NAT\r\n");
         }
         wifi_app_set_event(WIFI_AP_BRING_DOWN_STATE);
       } break;
@@ -671,7 +671,7 @@ static sl_status_t ap_connected_event_handler(sl_wifi_event_t event,
 
   SL_DEBUG_LOG_V2(INFO, "Remote Client connected: ");
   print_mac_address((sl_mac_address_t *)data);
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
   return SL_STATUS_OK;
 }
@@ -692,7 +692,7 @@ static sl_status_t ap_disconnected_event_handler(sl_wifi_event_t event,
   SL_DEBUG_LOG_V2(INFO, "Remote Client disconnected: ");
   print_mac_address((sl_mac_address_t *)data);
 
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
   return SL_STATUS_OK;
 }
@@ -705,8 +705,8 @@ void tcp_client_handler(void *arg)
   ssize_t sent_bytes      = 0;
   size_t total_bytes_sent = 0;
 
-  SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %d", client_sock);
-  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %d\r\n", client_sock);
+  SL_DEBUG_LOG_V2(INFO, "TCP_TX Throughput test start\r\n");
   uint32_t start = osKernelGetTickCount();
   uint32_t now   = start;
 
@@ -715,25 +715,25 @@ void tcp_client_handler(void *arg)
     if (sent_bytes < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket send failed with bsd error: %d\r\n", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     now = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
-      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms\r\n", (now - start));
       break;
     }
   }
 
-  SL_DEBUG_LOG_V2(INFO, "TCP data transfer completed on: socket %d", client_sock);
-  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %d", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "TCP data transfer completed on: socket %d\r\n", client_sock);
+  SL_DEBUG_LOG_V2(INFO, "Total bytes sent : %d\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 
   close(client_sock);
-  SL_DEBUG_LOG_V2(INFO, "Exiting from client handler");
+  SL_DEBUG_LOG_V2(INFO, "Exiting from client handler\r\n");
   osThreadTerminate(osThreadGetId());
 }
 
@@ -745,25 +745,25 @@ void create_tcp_server(void)
   int ap_vap                     = 1;
   sl_status_t status             = sl_si91x_config_socket(socket_config);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld", status);
+    SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld\r\n", status);
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Socket config Done");
+    SL_DEBUG_LOG_V2(INFO, "Socket config Done\r\n");
   }
 
   server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (server_sock < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d", server_sock);
+  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d\r\n", server_sock);
 
   socket_return_value = sl_si91x_setsockopt(server_sock, SOL_SOCKET, SL_SI91X_SO_SOCK_VAP_ID, &ap_vap, sizeof(ap_vap));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket set sock opt failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket set sock opt failed with bsd error: %d\r\n", errno);
     close(server_sock);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, "Server socket bound to Wi-Fi AP VAP");
+    SL_DEBUG_LOG_V2(INFO, "Server socket bound to Wi-Fi AP VAP\r\n");
   }
 
   memset(&server_addr, 0, sizeof(server_addr));
@@ -772,27 +772,27 @@ void create_tcp_server(void)
 
   socket_return_value = bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     close(server_sock);
     return;
   }
 
   socket_return_value = listen(server_sock, BACK_LOG);
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket listen failed with bsd error: %d\r\n", errno);
     close(server_sock);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "TCP server listening on port : %d", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "TCP server listening on port : %d\r\n", LISTENING_PORT);
 
   while (1) {
-    SL_DEBUG_LOG_V2(INFO, "waiting for connections..");
+    SL_DEBUG_LOG_V2(INFO, "waiting for connections..\r\n");
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
     memset(&client_addr, 0, sizeof(client_addr));
     int client_sock = accept(server_sock, (struct sockaddr *)&client_addr, &client_addr_len);
     if (client_sock < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket accept failed with bsd error: %d\r\n", errno);
       continue;
     }
 
@@ -801,7 +801,7 @@ void create_tcp_server(void)
     attr.priority       = osPriorityLow;
     osThreadId_t tid    = osThreadNew(tcp_client_handler, (void *)(intptr_t)client_sock, &attr);
     if (tid == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create thread for client socket %d", client_sock);
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create thread for client socket %d\r\n", client_sock);
       close(client_sock);
     }
   }
@@ -815,7 +815,7 @@ void udp_client_handler(void *arg)
   char buffer[BUFFER_SIZE];
   ssize_t sent_bytes = 0;
   size_t total_bytes_sent = 0;
-  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test start");
+  SL_DEBUG_LOG_V2(INFO, "UDP_TX Throughput test start\r\n");
   uint32_t start = osKernelGetTickCount();
   uint32_t now = start;
 
@@ -830,24 +830,24 @@ void udp_client_handler(void *arg)
     if (sent_bytes < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Socket operation failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket operation failed with bsd error: %d\r\n", errno);
       break;
     }
     total_bytes_sent += sent_bytes;
     now = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
-      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms", (now - start));
+      SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms\r\n", (now - start));
       break;
     }
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Total bytes transferred: %d", total_bytes_sent);
+  SL_DEBUG_LOG_V2(INFO, "Total bytes transferred: %d\r\n", total_bytes_sent);
 
   measure_and_print_throughput(total_bytes_sent, (now - start));
 
   free(client_data);
-  SL_DEBUG_LOG_V2(INFO, "Exiting from client handler");
+  SL_DEBUG_LOG_V2(INFO, "Exiting from client handler\r\n");
   osThreadTerminate(osThreadGetId());
 }
 
@@ -860,26 +860,26 @@ void create_udp_server(void)
   server_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
   if (server_sock < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d", server_sock);
+  SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d\r\n", server_sock);
 
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(LISTENING_PORT);
 
   socket_return_value = bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
   if (socket_return_value < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     close(server_sock);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP server listening on port : %d", LISTENING_PORT);
+  SL_DEBUG_LOG_V2(INFO, "UDP server listening on port : %d\r\n", LISTENING_PORT);
 
   while (1) {
     client_data_t *client_data = malloc(sizeof(client_data_t));
     if (!client_data) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for client data");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for client data\r\n");
       continue;
     }
 
@@ -895,7 +895,7 @@ void create_udp_server(void)
                                       (struct sockaddr *)&client_data->client_addr,
                                       &client_data->client_addr_len);
     if (received_bytes < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Socket receive failed with error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Socket receive failed with error: %d\r\n", errno);
       free(client_data);
       continue;
     }
@@ -905,7 +905,7 @@ void create_udp_server(void)
     attr.priority = osPriorityLow;
     osThreadId_t tid = osThreadNew(udp_client_handler, (void *)client_data, &attr);
     if (tid == NULL) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to create thread for client");
+      SL_DEBUG_LOG_V2(ERROR, "Failed to create thread for client\r\n");
     }
   }
   close(server_sock);

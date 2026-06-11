@@ -139,7 +139,7 @@ sl_status_t send_data(void);
  ******************************************************/
 static inline void print_errno(void)
 {
-  SL_DEBUG_LOG_V2(DEBUG, "errno: %d", errno);
+  SL_DEBUG_LOG_V2(DEBUG, "errno: %d\r\n", errno);
 }
 
 /******************************************************
@@ -207,7 +207,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%" PRIx32, (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   sl_wifi_groupcast_filter_config_t groupcast_filter_config = { 0 };
   groupcast_filter_config.enable_bcast_filter               = (uint8_t)BCAST_FILTER_ENABLE;
@@ -265,10 +265,10 @@ sl_status_t send_data(void)
   //create UDP socket
   int32_t socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (socket_fd < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d", errno);
+    SL_DEBUG_LOG_V2(ERROR, "Socket Create failed with bsd error: %d\r\n", errno);
     return SL_STATUS_FAIL;
   }
-  SL_DEBUG_LOG_V2(INFO, "UDP Client Socket Creation Success");
+  SL_DEBUG_LOG_V2(INFO, "UDP Client Socket Creation Success\r\n");
 
   sl_net_inet_addr((char *)SERVER_IP_ADDRESS, (uint32_t *)&server_ip);
 
@@ -282,7 +282,7 @@ sl_status_t send_data(void)
     if (bytes_sent < 0) {
       if (errno == ENOBUFS)
         continue;
-      SL_DEBUG_LOG_V2(ERROR, "Send failed with bsd error: %d", errno);
+      SL_DEBUG_LOG_V2(ERROR, "Send failed with bsd error: %d\r\n", errno);
       close(socket_fd);
       return SL_STATUS_FAIL;
     }
@@ -290,7 +290,7 @@ sl_status_t send_data(void)
     packet_count++;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "Total number of bytes sent: %ld", total_num_of_bytes);
+  SL_DEBUG_LOG_V2(INFO, "Total number of bytes sent: %ld\r\n", total_num_of_bytes);
   close(socket_fd);
 
   return SL_STATUS_OK;

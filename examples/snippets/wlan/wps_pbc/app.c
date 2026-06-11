@@ -115,7 +115,7 @@ void app_init(void)
 static void print_wps_response(const sl_wifi_wps_response_t *response)
 {
   if (response == NULL) {
-    SL_DEBUG_LOG_V2(WARN, "WPS Response: NULL");
+    SL_DEBUG_LOG_V2(WARN, "WPS Response: NULL\r\n");
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "SSID: ");
@@ -126,16 +126,16 @@ static void print_wps_response(const sl_wifi_wps_response_t *response)
   } else {
     SL_DEBUG_LOG_V2(INFO, "(empty)");
   }
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "SSID Length: %u bytes", response->ssid_len);
-  SL_DEBUG_LOG_V2(INFO, "Security Type: 0x%02X", response->security_type);
-  SL_DEBUG_LOG_V2(INFO, "Status: 0x%08lX", response->status);
+  SL_DEBUG_LOG_V2(INFO, "SSID Length: %u bytes\r\n", response->ssid_len);
+  SL_DEBUG_LOG_V2(INFO, "Security Type: 0x%02X\r\n", response->security_type);
+  SL_DEBUG_LOG_V2(INFO, "Status: 0x%08lX\r\n", response->status);
   SL_DEBUG_LOG_V2(INFO, "Key: ");
   for (int i = 0; i < (int)SL_WIFI_WPS_KEY_LENGTH; i++) {
     SL_DEBUG_LOG_V2(DEBUG, "%02X", response->key[i]);
   }
-  SL_DEBUG_LOG_V2(INFO, "");
+  SL_DEBUG_LOG_V2(INFO, "\r\n");
   SL_DEBUG_LOG_V2(INFO, "remaining_credentials_count: %u", response->remaining_credentials_count);
 }
 
@@ -219,16 +219,16 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wps_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up success\r\n");
   status = wps_pbc();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "WPS connection failed: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "WPS connection failed: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "WPS connection successful");
+  SL_DEBUG_LOG_V2(INFO, "WPS connection successful\r\n");
 
   while (1) {
     osDelay(2000);
@@ -240,7 +240,7 @@ static sl_status_t wps_pbc(void)
   sl_wifi_wps_config_t wps_config     = { 0 };
   sl_wifi_wps_response_t wps_response = { 0 };
   sl_status_t status;
-  SL_DEBUG_LOG_V2(INFO, "Starting WPS PBC procedure...");
+  SL_DEBUG_LOG_V2(INFO, "Starting WPS PBC procedure...\r\n");
   // Configure WPS settings
   wps_config.role         = SL_WIFI_WPS_ENROLLEE_ROLE;
   wps_config.mode         = SL_WIFI_WPS_PUSH_BUTTON_MODE;
@@ -249,10 +249,10 @@ static sl_status_t wps_pbc(void)
   memset(wps_config.optional_pin, 0, sizeof(wps_config.optional_pin));
   status = sl_wifi_start_wps_v2(SL_WIFI_CLIENT_INTERFACE, wps_config, &wps_response);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start WPS PBC: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start WPS PBC: 0x%lX\r\n", status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, "WPS procedure completed successfully!");
+  SL_DEBUG_LOG_V2(INFO, "WPS procedure completed successfully!\r\n");
   print_wps_response(&wps_response);
 
   /* When the AP sends multiple WPS profiles, fetch the rest after the primary response (needed for host join retries). */

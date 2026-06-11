@@ -155,10 +155,10 @@ void app_init(void)
 void message_arrived(MessageData *md)
 {
   if (md == NULL || md->message == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Received NULL message!");
+    SL_DEBUG_LOG_V2(ERROR, "Received NULL message!\r\n");
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Message: %.*s", md->message->payloadlen, (uintptr_t)(char *)md->message->payload);
+  SL_DEBUG_LOG_V2(INFO, "Message: %.*s\r\n", md->message->payloadlen, (uintptr_t)(char *)md->message->payload);
   //! process the received data
   halt = 1;
   return;
@@ -172,33 +172,33 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_mqtt_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success\r\n");
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\r\n");
 
   // Load SSL CA certificate
   if (enable_ssl) {
     status =
       sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX", status);
+      SL_DEBUG_LOG_V2(ERROR, "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%lX\r\n", status);
       return;
     }
-    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success", 0);
+    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success\r\n", 0);
   }
 
   if (profile.ip.type == SL_IPV4) {
@@ -228,9 +228,9 @@ static void application_start(void *argument)
 
   int result = paho_mqtt_demo();
   if (result == 0) {
-    SL_DEBUG_LOG_V2(INFO, "Paho MQTT over TCP demo executed successfully.");
+    SL_DEBUG_LOG_V2(INFO, "Paho MQTT over TCP demo executed successfully.\r\n");
   } else {
-    SL_DEBUG_LOG_V2(ERROR, "Paho MQTT over TCP demo failed with error code: %d", result);
+    SL_DEBUG_LOG_V2(ERROR, "Paho MQTT over TCP demo failed with error code: %d\r\n", result);
   }
 }
 
@@ -290,16 +290,16 @@ int paho_mqtt_demo()
 
   do {
     if (status == NETWORK_ERROR_NULL_STRUCTURE) {
-      SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.");
+      SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.\r\n");
       break;
     } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
-      SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.");
+      SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.\r\n");
       break;
     } else if (status == NETWORK_ERROR_INVALID_TYPE) {
-      SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.");
+      SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.\r\n");
       break;
     } else if (status != 0) {
-      SL_DEBUG_LOG_V2(ERROR, " TCP Connection Failed: %d", status);
+      SL_DEBUG_LOG_V2(ERROR, " TCP Connection Failed: %d\r\n", status);
       break;
     }
 
@@ -321,18 +321,18 @@ int paho_mqtt_demo()
     // Connect to MQTT broker
     status = MQTTConnect(&mqtt_client->client, &connectData);
     if (status != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Connection Failed: %d", status);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Connection Failed: %d\r\n", status);
       break;
     }
-    SL_DEBUG_LOG_V2(INFO, "MQTT Connected Successfully!");
+    SL_DEBUG_LOG_V2(INFO, "MQTT Connected Successfully!\r\n");
 
     // Subscribe to the topic given
     status = MQTTSubscribe(&mqtt_client->client, (char *)TOPIC_TO_BE_SUBSCRIBED, (enum QoS)QOS, message_arrived);
     if (status != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Subscription Failed: %d", status);
+      SL_DEBUG_LOG_V2(ERROR, "Subscription Failed: %d\r\n", status);
       break;
     }
-    SL_DEBUG_LOG_V2(INFO, "Subscribed to topic: %s", (uintptr_t)TOPIC_TO_BE_SUBSCRIBED);
+    SL_DEBUG_LOG_V2(INFO, "Subscribed to topic: %s\r\n", (uintptr_t)TOPIC_TO_BE_SUBSCRIBED);
 
     publish_msg.dup = 0;
     if (QOS == QOS0) {
@@ -349,10 +349,10 @@ int paho_mqtt_demo()
     // Publish message on the topic
     status = MQTTPublish(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED, &publish_msg);
     if (status != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Publish Failed: %d", status);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Publish Failed: %d\r\n", status);
       break;
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Publishes to Topic successfully");
+      SL_DEBUG_LOG_V2(INFO, "Publishes to Topic successfully\r\n");
     }
 
     while (!halt) {
@@ -360,11 +360,11 @@ int paho_mqtt_demo()
       status = MQTTYield(&mqtt_client->client, 60000);
       if (status != SL_STATUS_OK) {
         //! Error in receiving
-        SL_DEBUG_LOG_V2(ERROR, "Receive Data Failed, Error Code : 0x%X", status);
+        SL_DEBUG_LOG_V2(ERROR, "Receive Data Failed, Error Code : 0x%X\r\n", status);
         recv_failed = 1;
         break;
       } else {
-        SL_DEBUG_LOG_V2(DEBUG, "Receive Data Success");
+        SL_DEBUG_LOG_V2(DEBUG, "Receive Data Success\r\n");
       }
     }
     if (recv_failed)
@@ -373,22 +373,22 @@ int paho_mqtt_demo()
     // UnSubscribe to the topic given
     status = MQTTUnsubscribe(&mqtt_client->client, (const char *)TOPIC_TO_BE_SUBSCRIBED);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Unsubscription to Topic Failed, Error Code : 0x%X", status);
+      SL_DEBUG_LOG_V2(ERROR, "Unsubscription to Topic Failed, Error Code : 0x%X\r\n", status);
       break;
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Unsubscription to Topic Success");
+      SL_DEBUG_LOG_V2(INFO, "Unsubscription to Topic Success\r\n");
     }
 
     // Disconnect to the MQTT broker
     status = MQTTDisconnect(&mqtt_client->client);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Disconnect to the MQTT broker Failed, Error Code : 0x%X", status);
+      SL_DEBUG_LOG_V2(ERROR, "Disconnect to the MQTT broker Failed, Error Code : 0x%X\r\n", status);
       break;
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Disconnect to the MQTT broker Success");
+      SL_DEBUG_LOG_V2(INFO, "Disconnect to the MQTT broker Success\r\n");
     }
 
-    SL_DEBUG_LOG_V2(INFO, "Execution completed!");
+    SL_DEBUG_LOG_V2(INFO, "Execution completed!\r\n");
 
   } while (0);
 

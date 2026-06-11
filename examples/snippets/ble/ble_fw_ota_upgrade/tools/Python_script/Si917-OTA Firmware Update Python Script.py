@@ -1,4 +1,4 @@
-import time,os,sys,asyncio,platform
+import time,os,sys,asyncio,platform,threading,queue
 from tkinter import *
 from tkinter import filedialog
 from bleak import BleakScanner,BleakClient
@@ -7,8 +7,10 @@ from PIL import Image, ImageTk
 def resource_path(relative_path):
    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
    return os.path.join(base_path, relative_path)
-global update_status
+update_status = 0
+connection_status = False
 fwv = ""
+bd_address = ""
 
 counter =0
 selected_counter =0
@@ -37,6 +39,58 @@ bd_address_uuid = "4B4A2368-8CCA-451E-BFFF-CF0E2EE23E9F"    #BD address is read 
 prelim_info_uuid= "F7BF3564-FB6D-4E53-88A4-5E37E0326063"    #info about number of chunks and Last chunk size is written on this UUID
 fw_chunks_uuid  = "984227F3-34FC-4045-A5D0-2C581F81A153"    #firmware chunks are written on this UUID
 chunk_size = 224  # size of each firmware chunk to be transferred
+BLE_POST_CONNECT_PAUSE_S = 0.5  # settle time before GATT (service discovery / WinRT)
+BLE_RECONNECT_DELAY_MS = 2000  # backoff when link drops or connect fails
+# Firmware may register FW-version / BD UUIDs with ATT_REC_MAINTAIN_IN_HOST but no GATT read
+# callback; centrals that read those attributes can see "Unreachable" and a dropped link on WinRT.
+# OTA still works over the write characteristics — set True to skip those reads (recommended for that layout).
+OTA_SKIP_FW_VERSION_AND_BD_READS = True
+
+# Bleak WinRT backend must run off the Tk GUI thread — use one dedicated asyncio loop.
+_ble_loop_holder = []
+_ble_loop_ready = threading.Event()
+_ble_gui_queue = queue.Queue()
+
+
+def _poll_ble_gui_queue():
+    try:
+        while True:
+            on_finish, exc, result = _ble_gui_queue.get_nowait()
+            on_finish(exc, result)
+    except queue.Empty:
+        pass
+    root.after(50, _poll_ble_gui_queue)
+
+
+def _ble_async_worker():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    _ble_loop_holder.append(loop)
+    _ble_loop_ready.set()
+    loop.run_forever()
+
+
+def _get_ble_loop():
+    if not _ble_loop_holder:
+        threading.Thread(target=_ble_async_worker, daemon=True, name="bleak-asyncio").start()
+        _ble_loop_ready.wait(timeout=30.0)
+    return _ble_loop_holder[0]
+
+
+def _schedule_on_ble_loop(coro, on_finish):
+    """Run awaitable coro on Bleak thread; on_finish(exc, result) runs on Tk main thread."""
+    loop = _get_ble_loop()
+
+    def _done(fut):
+        try:
+            result = fut.result()
+            _ble_gui_queue.put((on_finish, None, result))
+        except BaseException as e:
+            _ble_gui_queue.put((on_finish, e, None))
+
+    fut = asyncio.run_coroutine_threadsafe(coro, loop)
+    fut.add_done_callback(_done)
+
 
 def convert_bytearray_to_string(byte_array):
     result_string = ".".join(map(lambda x: str(x), byte_array[2:10]))
@@ -93,25 +147,24 @@ def start_scan():
   root.after(100, scan)
 #Bleak functions
 def scan():
-  global k
-  global dev_add
-  global dev_name
-  k = 0
-  async def run():
-      scanner = BleakScanner()
-      global devices
-      # await scanner.start()
-      # await asyncio.sleep(2.0)
-      # devices.clear()
-      print("Scanning for BLE_OTA_FWUP...")
-      devices = await scanner.discover()
-  loop = asyncio.get_event_loop()
-  loop.run_until_complete(run())
+  global k, dev_add, dev_name
 
-  if len(devices) == 0:
-      print("No devices found")
-      # keep a button for scan again
-  else:
+  k = 0
+
+  async def run():
+      print("Scanning for BLE_OTA_FWUP...")
+      return await BleakScanner.discover()
+
+  def finish(exc, devices):
+      global k, dev_add, dev_name
+      if exc:
+          print(exc)
+          return
+      if devices is None:
+          return
+      if len(devices) == 0:
+          print("No devices found")
+          return
       for d in devices:
           if d.name == "BLE_OTA_FWUP":
               print("BLE_OTA_FWUP found!")
@@ -120,13 +173,15 @@ def scan():
               dev_name = d.name
               print(dev_add)
               print("Initiating connection... ")
-              root.after(400,found_im)
+              root.after(400, found_im)
               break
           k += 1
           if k == len(devices):
               print("BLE_OTA_FWUP not found!!")
               print("Scanning Again")
               scan()
+
+  _schedule_on_ble_loop(run(), finish)
 def found_im():
   global connected_image_label
   global found_text_label
@@ -145,9 +200,10 @@ def found_im():
   root.after(100,con)
 def con():
   print("Connecting. Please wait..")
-  async def run():
-      global client
-      global connection_status
+
+  async def connect_and_read():
+      global client, connection_status, fwv, bd_address
+      connection_status = False
       client = BleakClient(dev_add)
       try:
           await client.connect()
@@ -156,50 +212,78 @@ def con():
       except Exception as e:
           connection_status = False
           print(e)
-  loop = asyncio.get_event_loop()
-  loop.run_until_complete(run())
+          return
 
-  # Disc_button = Button(root, image=start_button_image, command=start, borderwidth=0)
-  # Disc_button.place(x=310, y=520)
-  if connection_status==1:
-      getfw()
-      getbd()
-      root.after(100,cond)
-  else:
-      con()
-def getfw():
-  async def run():
+      fwv = ""
+      bd_address = ""
+
+      await asyncio.sleep(BLE_POST_CONNECT_PAUSE_S)
+
+      if OTA_SKIP_FW_VERSION_AND_BD_READS:
+          bd_address = str(dev_add).upper().replace("-", ":")
+          fwv = "(not read)"
+          print(
+              "Skipping GATT reads for FW version / BD address; using scan address:",
+              bd_address,
+          )
+      else:
+          try:
+              m = await client.read_gatt_char(fw_version_uuid)
+              byte_array = bytearray(m)
+              converted_string = convert_bytearray_to_string(byte_array)
+              first_converted_string = convert_firstbytearray_to_string(byte_array)
+              print("converted_string:", hex(first_converted_string))
+              hex_string = format(first_converted_string, "x")
+              fv = f"{hex_string}.{converted_string}"
+              fwv = fv
+              print("Current FW version is:  ", fv)
+          except Exception as e:
+              print(e)
+          try:
+              raw_bd = await client.read_gatt_char(bd_address_uuid)
+              if isinstance(raw_bd, (bytes, bytearray)):
+                  null = raw_bd.find(b"\x00")
+                  bd_s = raw_bd[: null if null != -1 else len(raw_bd)].decode(
+                      "utf-8", errors="replace"
+                  )
+                  bd_address = bd_s.strip() or str(dev_add).upper().replace("-", ":")
+              else:
+                  bd_s = str(raw_bd)
+                  if len(bd_s) >= 29:
+                      bd_address = bd_s[12:29]
+                  else:
+                      bd_address = bd_s
+              print("BD address of the module is:  ", bd_address)
+          except Exception as e:
+              print(e)
+      if not client.is_connected:
+          connection_status = False
+          print("Device disconnected after GATT access; try connecting again.")
+
+  async def connect_session():
       try:
-          global fwv
-          m = await client.read_gatt_char(fw_version_uuid)
-          # await asyncio.sleep(0.5)
-          #print("m:", m)
-          byte_array = bytearray(m)
-          #print("byte_array:", byte_array)
-          converted_string = convert_bytearray_to_string(byte_array)
-          first_converted_string = convert_firstbytearray_to_string(byte_array)
-          print("converted_string:",hex(first_converted_string))
-          hex_string = format(first_converted_string, 'x')
-          fv= f"{hex_string}.{converted_string}"
-          #converted_string
-          print("fv", fv)
-          fwv = fv
-          print("Current FW version is:  ", fv)
-      except Exception as e:
-          print(e)
-  loop = asyncio.get_event_loop()
-  loop.run_until_complete(run())
-def getbd():
-  async def run():
-      try:
-          global bd_address
-          bd_address = str(await client.read_gatt_char(bd_address_uuid))
-          bd_address = bd_address[12:29]
-          print("BD address of the module is:  ", bd_address)
-      except Exception as e:
-          print(e)
-  loop = asyncio.get_event_loop()
-  loop.run_until_complete(run())
+          await connect_and_read()
+      finally:
+          if not connection_status:
+              try:
+                  if client is not None and getattr(client, "is_connected", False):
+                      await client.disconnect()
+              except Exception:
+                  pass
+              await asyncio.sleep(0.25)
+
+  def finish(exc, _ignored):
+      global connection_status
+      if exc:
+          connection_status = False
+          print(exc)
+      if connection_status:
+          root.after(100, cond)
+      else:
+          print(f"Reconnecting in {BLE_RECONNECT_DELAY_MS // 1000}s...")
+          root.after(BLE_RECONNECT_DELAY_MS, con)
+
+  _schedule_on_ble_loop(connect_session(), finish)
 def cond():
     global back_image_label,device_name_label,bd_address_label ,bt_logo_label
     global line_1a
@@ -218,7 +302,7 @@ def cond():
     back_image_label.place(relx=0.47, rely=0.47, anchor=CENTER)
     device_name_label = Label(root, text=dev_name, borderwidth=0, bg="White", fg="#0f62fe", font=("Arial Bold", 20))
     device_name_label.place(x=260, y=140)
-    bd_address_label = Label(root, text=bd_address, borderwidth=0, bg="White", fg="Grey", font=("Arial ", 15), height=1)
+    bd_address_label = Label(root, text=bd_address or "(unavailable)", borderwidth=0, bg="White", fg="Grey", font=("Arial ", 15), height=1)
     bd_address_label .place(x=260, y=185)
     bt_logo_label = Label(root, image=conn_bt_image, borderwidth=0, bg="White")
     bt_logo_label.place(x=185, y=149)
@@ -393,11 +477,15 @@ def start_fw_transfer():
               exit()
           chunk_number+=1
 
-  loop = asyncio.get_event_loop()
-  loop.run_until_complete(run())
-  update_status = 1
-  print("Total time =", time.time() - start_time)
-  root.after(500,done)
+  def finish(exc, _ignored):
+      global update_status
+      if exc:
+          print(exc)
+      update_status = 1
+      print("Total time =", time.time() - start_time)
+      root.after(500, done)
+
+  _schedule_on_ble_loop(run(), finish)
 def done():
   global safeup_prog_label
   previous_labels = [curfw_text_label, sel_fw_text_label, in_progress_text_label]
@@ -428,6 +516,7 @@ root.resizable(0,0)
 root.title("  Firmware update over BLE")
 root.call('wm', 'iconphoto', root._w, PhotoImage(file = icon_path))    # title icon
 root.configure(background="#f0f0f0")
+root.after(0, _poll_ble_gui_queue)
 
 
 

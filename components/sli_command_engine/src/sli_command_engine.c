@@ -577,7 +577,7 @@ static sl_status_t sli_command_engine_handle_packet_tx(
       metadata->tx_info.data_packet_length = 0;
     }
 
-    SL_DEBUG_LOG_V2(DEBUG, "Adding meta data : 0x%X", (unsigned int)metadata);
+    SL_DEBUG_LOG_V2(DEBUG, "Adding meta data : 0x%X\r\n", (unsigned int)metadata);
 
     // Move metadata to in-flight queue for response correlation
     status = sli_queue_manager_enqueue(&(queue_info->inflight_packet_queue), (void *)metadata);
@@ -680,7 +680,7 @@ static void sli_command_engine_thread(void *args)
   void *data                                                                = NULL; // Generic packet pointer
   osThreadId_t resp_thread_id;                                                      // Waiting thread for sync response
 
-  SL_DEBUG_LOG_V2(DEBUG, "%s task started", (uintptr_t)instance->config.name);
+  SL_DEBUG_LOG_V2(DEBUG, "%s task started\r\n", (uintptr_t)instance->config.name);
 
   while (1) {
     uint32_t wait_time = (events_received == 0) ? osWaitForever : 0;
@@ -705,7 +705,7 @@ static void sli_command_engine_thread(void *args)
 
     // ---------------- Dynamic packet type configuration requests ----------------
     if (events_received & SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT) {
-      SL_DEBUG_LOG_V2(DEBUG, "Handling : SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT.");
+      SL_DEBUG_LOG_V2(DEBUG, "Handling : SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT.\r\n");
       events_received &= ~SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT;
 
       // Drain all control requests (register/unregister)
@@ -768,7 +768,7 @@ static void sli_command_engine_thread(void *args)
 
     // ---------------- TX completion (ACK) handling ----------------
     if (events_received & SLI_COMMAND_ENGINE_PACKET_TX_ACK_EVENT) {
-      SL_DEBUG_LOG_V2(DEBUG, "Got TX ACK Event");
+      SL_DEBUG_LOG_V2(DEBUG, "Got TX ACK Event\r\n");
       while (!SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&instance->tx_status_packet_queue)) {
         status = sli_queue_manager_dequeue(&(instance->tx_status_packet_queue), (void **)&metadata);
         if (SL_STATUS_OK != status) {
@@ -808,13 +808,13 @@ static void sli_command_engine_thread(void *args)
         events_received &= ~(SLI_COMMAND_ENGINE_PACKET_RX_EVENT);
       }
 
-      SL_DEBUG_LOG_V2(DEBUG, "Got RX Packet");
+      SL_DEBUG_LOG_V2(DEBUG, "Got RX Packet\r\n");
 
       // Fill temporary RX metadata using user callback
       rx_metadata.tx_info.data_packet = data;
       status                          = instance->config.get_packet_metadata(instance, data, &rx_metadata);
       if (SL_STATUS_OK != status) {
-        SL_DEBUG_LOG_V2(WARN, "Unidentified Packet");
+        SL_DEBUG_LOG_V2(WARN, "Unidentified Packet\r\n");
         // If metadata extraction fails, free the data buffer and continue
         sli_buffer_manager_free_buffer(data);
         continue;
@@ -826,12 +826,12 @@ static void sli_command_engine_thread(void *args)
         sli_command_engine_get_dynamic_packet_info(instance, packet_type, &queue_info, &packet_type_configuration);
       if ((SL_STATUS_OK != status) || (NULL == queue_info) || (NULL == packet_type_configuration)) {
         // If not found, free the data buffer and continue
-        SL_DEBUG_LOG_V2(ERROR, "Unidentified Packet info");
+        SL_DEBUG_LOG_V2(ERROR, "Unidentified Packet info\r\n");
         sli_buffer_manager_free_buffer(data);
         continue;
       }
 
-      SL_DEBUG_LOG_V2(DEBUG, "Got Packet info");
+      SL_DEBUG_LOG_V2(DEBUG, "Got Packet info\r\n");
       sl_status_t rx_handler_status = SL_STATUS_OK;
 
       // Call RX event handler if configured (e.g., for parsing/classification)
@@ -844,20 +844,20 @@ static void sli_command_engine_thread(void *args)
             break;
           }
           sli_buffer_manager_free_buffer(data);
-          SL_DEBUG_LOG_V2(ERROR, "RX packet handler error");
+          SL_DEBUG_LOG_V2(ERROR, "RX packet handler error\r\n");
           continue;
         }
       }
 
       sli_command_engine_response_t *response = NULL;
-      SL_DEBUG_LOG_V2(DEBUG, "Searching Packet metadata");
+      SL_DEBUG_LOG_V2(DEBUG, "Searching Packet metadata\r\n");
 
       // Try to locate matching in-flight metadata for synchronous response
       status = sli_queue_manager_remove_node_from_queue(&(queue_info->inflight_packet_queue),
                                                         rx_packet_identity_handler,
                                                         (const void *)&rx_metadata,
                                                         (void **)&metadata);
-      SL_DEBUG_LOG_V2(DEBUG, "Search Packet metadata status : %lu", status);
+      SL_DEBUG_LOG_V2(DEBUG, "Search Packet metadata status : %lu\r\n", status);
 
       if ((SL_STATUS_NOT_FOUND == status) || (SL_STATUS_EMPTY == status)) {
         // If not found, treat as async response: enqueue to async queue and signal event
@@ -920,7 +920,7 @@ static void sli_command_engine_thread(void *args)
         if ((time_elapsed > metadata->tx_info.timeout) && (metadata->tx_info.timeout > 0)) {
           sli_command_engine_decrement_in_flight_and_set_tx_event(instance, queue_info);
           // Drop timed out response data and metadata
-          SL_DEBUG_LOG_V2(WARN, "Packet timedout after : %lu", metadata->tx_info.timeout);
+          SL_DEBUG_LOG_V2(WARN, "Packet timedout after : %lu\r\n", metadata->tx_info.timeout);
           sli_buffer_manager_free_buffer(data);
           sli_buffer_manager_free_buffer(metadata);
           continue;
@@ -977,7 +977,7 @@ static void sli_command_engine_thread(void *args)
         }
 
         // Sync response: Complete metadata and enqueue for waiting thread
-        SL_DEBUG_LOG_V2(DEBUG, "Found meta data : 0x%X", (unsigned int)metadata);
+        SL_DEBUG_LOG_V2(DEBUG, "Found meta data : 0x%X\r\n", (unsigned int)metadata);
         metadata->tx_info.data_packet        = data;
         metadata->tx_info.data_packet_length = rx_metadata.tx_info.data_packet_length;
 

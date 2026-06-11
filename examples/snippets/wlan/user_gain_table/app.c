@@ -163,17 +163,17 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_transmit_test_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done ");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init Done \r\n");
 
   status = sl_wifi_set_antenna(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, SL_WIFI_ANTENNA_INTERNAL);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start set Antenna, Error Code: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start set Antenna, Error Code: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Antenna Command Frame Success ");
+  SL_DEBUG_LOG_V2(INFO, "Antenna Command Frame Success \r\n");
 
   status = sl_wifi_update_su_gain_table(BAND_VALUE,
                                         BANDWIDTH,
@@ -182,28 +182,28 @@ static void application_start(void *argument)
                                         X_BUMP_UP_OFFSET_52_TONE_RU,
                                         Y_BUMP_UP_OFFSET_106_TONE_RU);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table, Error Code: 0x%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to update gain table, Error Code: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Update gain table Success ");
+  SL_DEBUG_LOG_V2(INFO, "Update gain table Success \r\n");
 
   status = sl_si91x_transmit_test_start(&tx_test_info);
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Transmit test start Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit test start Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Transmit test start Success");
+  SL_DEBUG_LOG_V2(INFO, "Transmit test start Success\r\n");
 
   // Add delay here to see the TX packets on AIR
   osDelay(1000);
 
   status = sl_si91x_transmit_test_stop();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Transmit test stop Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Transmit test stop Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Transmit test stop Success");
+  SL_DEBUG_LOG_V2(INFO, "Transmit test stop Success\r\n");
 
   return;
 }

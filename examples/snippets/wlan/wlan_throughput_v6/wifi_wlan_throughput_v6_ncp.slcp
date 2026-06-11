@@ -47,10 +47,12 @@ component:
 - id: log_backend_iostream_formatted
 - id: log_platform_specific
 toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
 - option: gcc_linker_option
   value: -u _printf_float
-- option: gcc_compiler_option
-  value: -Wall -Werror
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
@@ -60,6 +62,8 @@ configuration:
   value: '51200'
 - name: configTIMER_TASK_PRIORITY
   value: '55'
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 readme:
 - path: readme.md
 other_file:

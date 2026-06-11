@@ -284,7 +284,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
                                     uint8_t char_prop)
 {
   if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE) { //! Check for max data length for the characteristic value
-    SL_DEBUG_LOG_V2(ERROR, " no data memory for att rec values ");
+    SL_DEBUG_LOG_V2(ERROR, " no data memory for att rec values \r\n");
     return;
   }
 
@@ -1053,11 +1053,12 @@ int8_t rsi_ble_initialize_conn_buffer(rsi_ble_conn_config_t *ble_conn_spec_conf)
     if ((DLE_BUFFER_COUNT_P1 + DLE_BUFFER_COUNT_P2 + DLE_BUFFER_COUNT_P3 + DLE_BUFFER_COUNT_P4 + DLE_BUFFER_COUNT_P5
          + DLE_BUFFER_COUNT_P6 + DLE_BUFFER_COUNT_P7 + DLE_BUFFER_COUNT_P8 + DLE_BUFFER_COUNT_C1 + DLE_BUFFER_COUNT_C2)
         > RSI_BLE_NUM_CONN_EVENTS) {
-      SL_DEBUG_LOG_V2(ERROR, " Total number of per connection buffer count is more than the total number alllocated ");
+      SL_DEBUG_LOG_V2(ERROR,
+                      " Total number of per connection buffer count is more than the total number alllocated \r\n");
       status = RSI_FAILURE;
     }
   } else {
-    SL_DEBUG_LOG_V2(ERROR, " Invalid buffer passed ");
+    SL_DEBUG_LOG_V2(ERROR, " Invalid buffer passed \r\n");
     status = RSI_FAILURE;
   }
   return status;
@@ -1073,7 +1074,7 @@ int8_t rsi_fill_ble_user_config()
   //! copy ble connection specific configurations
 
   if ((RSI_BLE_MAX_NBR_CENTRALS > 2) || (RSI_BLE_MAX_NBR_PERIPHERALS > 8)) {
-    SL_DEBUG_LOG_V2(ERROR, " number of BLE CENTRALS or BLE PERIPHERALS Given wrong declaration");
+    SL_DEBUG_LOG_V2(ERROR, " number of BLE CENTRALS or BLE PERIPHERALS Given wrong declaration\r\n");
     return RSI_FAILURE;
   }
 
@@ -1099,7 +1100,7 @@ extern osSemaphoreId_t ui_task_sem;
 int32_t ble_init_hook(void);
 void ble_private_default_init(void)
 {
-  SL_DEBUG_LOG_V2(DEBUG, " private default init");
+  SL_DEBUG_LOG_V2(DEBUG, " private default init\r\n");
   // for loop
 
   uint8_t iter;
@@ -1186,21 +1187,21 @@ void rsi_ble_main_app_task(void)
   sl_wifi_firmware_version_t version = { 0 };
   status                             = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " Wi-Fi Initialization Success");
+    SL_DEBUG_LOG_V2(INFO, " Wi-Fi Initialization Success\r\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
 #endif
-  SL_DEBUG_LOG_V2(INFO, " BLE Main Task Invoked");
+  SL_DEBUG_LOG_V2(INFO, " BLE Main Task Invoked\r\n");
 
   ble_private_default_init();
   ble_generic_cb.init_hook            = ble_init_hook;
@@ -1212,20 +1213,20 @@ void rsi_ble_main_app_task(void)
 
   status = rsi_fill_ble_user_config();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " failed to fill the configurations in local buffer ");
+    SL_DEBUG_LOG_V2(ERROR, " failed to fill the configurations in local buffer \r\n");
     return;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " FILL USER config successful ");
+    SL_DEBUG_LOG_V2(INFO, " FILL USER config successful \r\n");
   }
 
 #if ENABLE_NWP_POWER_SAVE
 
-  SL_DEBUG_LOG_V2(INFO, " keep module in to power save ");
+  SL_DEBUG_LOG_V2(INFO, " keep module in to power save \r\n");
 
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate BLE power save ");
+    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate BLE power save \r\n");
     return;
   }
 #if !WLAN_TASK_ENABLE
@@ -1233,16 +1234,16 @@ void rsi_ble_main_app_task(void)
   //! initiating power save in BLE only mode, for coex mode, wifi power save is called in wifiapp.c
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate Wi-Fi power save  :%lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate Wi-Fi power save  :%lx\r\n", status);
     return;
   }
 #endif
-  SL_DEBUG_LOG_V2(INFO, " Module is in power save ");
+  SL_DEBUG_LOG_V2(INFO, " Module is in power save \r\n");
 #endif
 
   status = rsi_app_common_event_loop(&ble_generic_cb);
 
-  SL_DEBUG_LOG_V2(ERROR, " BLE task excution fails with error status 0X%lx ", status);
+  SL_DEBUG_LOG_V2(ERROR, " BLE task excution fails with error status 0X%lx \r\n", status);
   while (1)
     ;
 }
@@ -1265,7 +1266,7 @@ int32_t ble_init_hook(void)
   //! BLE dual role Initialization
   status = rsi_ble_dual_role();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "BLE DUAL role init failed ");
+    SL_DEBUG_LOG_V2(ERROR, "BLE DUAL role init failed \r\n");
   }
 #ifdef M4_UART
   osSemaphoreRelease(ui_task_sem);
@@ -1329,7 +1330,7 @@ int32_t rsi_ble_dual_role(void)
   //! get the local device address(MAC address).
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " rsi_bt_get_local_device_address failed with 0x%lX ", status);
+    SL_DEBUG_LOG_V2(ERROR, " rsi_bt_get_local_device_address failed with 0x%lX \r\n", status);
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
     SL_DEBUG_LOG_V2(INFO, " Local device address = %s", (uintptr_t)local_dev_addr);
@@ -1337,10 +1338,10 @@ int32_t rsi_ble_dual_role(void)
 
   //! Set local IRK Value
   //! This value should be fixed on every reset
-  SL_DEBUG_LOG_V2(INFO, " Setting the Local IRK Value");
+  SL_DEBUG_LOG_V2(INFO, " Setting the Local IRK Value\r\n");
   status = rsi_ble_set_local_irk_value(local_irk);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " Setting the Local IRK Value Failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Setting the Local IRK Value Failed = %lx\r\n", status);
     return status;
   }
   uint8_t role_priority_payload[21] = {
@@ -1351,10 +1352,10 @@ int32_t rsi_ble_dual_role(void)
   };
   status = rsi_ble_set_coex_roles_priority(role_priority_payload);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " Setting the coex roles priority Failed = %lx", status);
+    SL_DEBUG_LOG_V2(ERROR, " Setting the coex roles priority Failed = %lx\r\n", status);
     return status;
   } else {
-    SL_DEBUG_LOG_V2(INFO, " Setting the coex roles priority Successful = %lx", status);
+    SL_DEBUG_LOG_V2(INFO, " Setting the coex roles priority Successful = %lx\r\n", status);
   }
   smp_capabilities.io_capability = RSI_BLE_SMP_IO_CAPABILITY;
   smp_capabilities.oob_data_flag = LOCAL_OOB_DATA_FLAG_NOT_PRESENT;
@@ -1385,9 +1386,9 @@ int32_t rsi_ble_dual_role(void)
     //! set device in advertising mode.
     status = rsi_ble_start_advertising();
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, " Advertising failed ");
+      SL_DEBUG_LOG_V2(ERROR, " Advertising failed \r\n");
     }
-    SL_DEBUG_LOG_V2(INFO, " Advertising started, local device name : %s", (uintptr_t)(char *)RSI_BLE_APP_GATT_TEST);
+    SL_DEBUG_LOG_V2(INFO, " Advertising started, local device name : %s\r\n", (uintptr_t)(char *)RSI_BLE_APP_GATT_TEST);
   }
 #endif
 #if SCAN_ENABLED_DEFAULT
@@ -1396,10 +1397,10 @@ int32_t rsi_ble_dual_role(void)
     //! start scanning
     status = rsi_ble_start_scanning();
     if (status != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, " Start scanning failed");
+      SL_DEBUG_LOG_V2(ERROR, " Start scanning failed\r\n");
       return status;
     }
-    SL_DEBUG_LOG_V2(INFO, " Scanning started ");
+    SL_DEBUG_LOG_V2(INFO, " Scanning started \r\n");
   }
 #endif
   rsi_change_ble_adv_and_scan_params();
@@ -1413,22 +1414,22 @@ void rsi_wlan_ble_app_init(void)
   //! WiSeConnect initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful\r\n");
 #if BTDM_DEBUG_LOGGING
   SEGGER_RTT_ConfigUpBuffer(1,
                             "Si91x_ApplicationDebugBuffer",
                             si91x_application_debug_buffer,
                             sizeof(si91x_application_debug_buffer),
                             SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
-  SL_DEBUG_LOG_V2(INFO, "rtt config is successful");
+  SL_DEBUG_LOG_V2(INFO, "rtt config is successful\r\n");
 #endif
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
     print_firmware_version(&version);
   }
@@ -1436,7 +1437,7 @@ void rsi_wlan_ble_app_init(void)
   // Create power_cmd_mutex mutex
   power_cmd_mutex = osMutexNew(NULL);
   if (power_cmd_mutex == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "power_cmd_mutex creation failed");
+    SL_DEBUG_LOG_V2(ERROR, "power_cmd_mutex creation failed\r\n");
     return;
   }
 
@@ -1446,13 +1447,13 @@ void rsi_wlan_ble_app_init(void)
                                        NULL,
                                        connect_timeout_handler);
   if (connect_timeout_timer == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to create connection timeout timer!");
+    SL_DEBUG_LOG_V2(ERROR, " Failed to create connection timeout timer!\r\n");
   }
 
   //! Thread created for BLE task
   ble_app_thread_id = osThreadNew((osThreadFunc_t)rsi_ble_main_app_task, NULL, &ble_thread_attributes);
   if (ble_app_thread_id == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create");
+    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create\r\n");
     return;
   }
   //! Thread created for WIFI task
@@ -1460,14 +1461,14 @@ void rsi_wlan_ble_app_init(void)
 #if (WIFI_APP == MQTT_APP)
   wifi_app_thread_id = osThreadNew((osThreadFunc_t)wifi_app_task, NULL, &wifi_thread_attributes);
   if (wifi_app_thread_id == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create");
+    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create\r\n");
     return;
   }
 #endif
 #if (WIFI_APP == TCP_APP)
   wifi_app_thread_id = osThreadNew((osThreadFunc_t)wlan_app_thread, NULL, &wifi_thread_attributes);
   if (wifi_app_thread_id == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create");
+    SL_DEBUG_LOG_V2(ERROR, "wifi_app_thread failed to create\r\n");
     return;
   }
 #endif
@@ -1478,7 +1479,7 @@ void rsi_wlan_ble_app_init(void)
   osThreadId_t bt_debug_logs_thread_id =
     osThreadNew((osThreadFunc_t)rsi_task_bt_debug_logs, NULL, &bt_debug_logs_thread_attributes);
   if (bt_debug_logs_thread_id == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "bt_debug_logs_thread failed to create");
+    SL_DEBUG_LOG_V2(ERROR, "bt_debug_logs_thread failed to create\r\n");
     return;
   }
 #endif
@@ -1493,7 +1494,7 @@ void app_init(void)
 #if BTDM_DEBUG_LOGGING
   // Initialize RTT before any other operations
   SEGGER_RTT_Init();
-  SL_DEBUG_LOG_V2(INFO, " RTT Initialization completed");
+  SL_DEBUG_LOG_V2(INFO, " RTT Initialization completed\r\n");
 #endif
   osThreadNew((osThreadFunc_t)rsi_wlan_ble_app_init, NULL, &thread_attributes);
 }

@@ -97,19 +97,19 @@ void motion_sensor_init(void)
   // Initialize the SSI driver
   sl_status = sl_si91x_ssi_init(ssi_master_config.device_mode, &ssi_driver_handle);
   if (sl_status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "SSI Initialization Failed, Error Code : %lu ", sl_status);
+    SL_DEBUG_LOG_V2(ERROR, "SSI Initialization Failed, Error Code : %lu \r\n", sl_status);
     return;
   }
   // Configure the SSI to Master, 16-bit mode @10000 kBits/sec
   sl_status = sl_si91x_ssi_set_configuration(ssi_driver_handle, &ssi_master_config, ssi_slave_number);
   if (sl_status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to Set Configuration Parameters to SSI, Error Code : %lu ", sl_status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to Set Configuration Parameters to SSI, Error Code : %lu \r\n", sl_status);
     return;
   }
   // Register the user callback
   sl_status = sl_si91x_ssi_register_event_callback(ssi_driver_handle, ssi_master_callback_event_handler);
   if (sl_status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "SSI register event callback Failed, Error Code : %lu ", sl_status);
+    SL_DEBUG_LOG_V2(ERROR, "SSI register event callback Failed, Error Code : %lu \r\n", sl_status);
     return;
   }
   // Set the slave number
@@ -118,7 +118,7 @@ void motion_sensor_init(void)
   // reset the sensor
   sl_status = sl_si91x_icm40627_software_reset(ssi_driver_handle);
   if (sl_status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Sensor Software reset un-successful, Error Code: 0x%ld ", sl_status);
+    SL_DEBUG_LOG_V2(ERROR, "Sensor Software reset un-successful, Error Code: 0x%ld \r\n", sl_status);
     return;
   }
   /* Read Who am I register, should get ICM40627_DEVICE_ID */
@@ -127,11 +127,11 @@ void motion_sensor_init(void)
     // Initializes sensor and reads electronic ID 1st byte
     sl_status = sl_si91x_icm40627_init(ssi_driver_handle);
     if (sl_status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Sensor initialization un-successful, Error Code: 0x%ld ", sl_status);
+      SL_DEBUG_LOG_V2(ERROR, "Sensor initialization un-successful, Error Code: 0x%ld \r\n", sl_status);
       return;
     }
   }
-  SL_DEBUG_LOG_V2(INFO, "Motion sensor initialized");
+  SL_DEBUG_LOG_V2(INFO, "Motion sensor initialized\r\n");
 }
 
 sl_status_t accelerometer_read(float *x, float *y, float *z)
@@ -139,7 +139,7 @@ sl_status_t accelerometer_read(float *x, float *y, float *z)
   float sensor_data[3];
   sl_status_t status = sl_si91x_icm40627_get_accel_data(ssi_driver_handle, sensor_data);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Acceleration read failed, Error Code: 0x%ld ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Acceleration read failed, Error Code: 0x%ld \r\n", status);
   } else {
     *x = sensor_data[0];
     *y = sensor_data[1];
@@ -153,7 +153,7 @@ sl_status_t gyro_read(float *x, float *y, float *z)
   float sensor_data[3];
   sl_status_t status = sl_si91x_icm40627_get_gyro_data(ssi_driver_handle, sensor_data);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Gyro read failed, Error Code: 0x%ld ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Gyro read failed, Error Code: 0x%ld \r\n", status);
   } else {
     *x = sensor_data[0];
     *y = sensor_data[1];
@@ -194,8 +194,8 @@ void motion_sensor_deinit(void)
   sl_status_t status;
   status = sl_si91x_ssi_deinit(ssi_driver_handle);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Sensor initialization un-successful, Error Code: 0x%ld ", status);
+    SL_DEBUG_LOG_V2(ERROR, "Sensor initialization un-successful, Error Code: 0x%ld \r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Motion sensor de-initialized");
+  SL_DEBUG_LOG_V2(INFO, "Motion sensor de-initialized\r\n");
 }
