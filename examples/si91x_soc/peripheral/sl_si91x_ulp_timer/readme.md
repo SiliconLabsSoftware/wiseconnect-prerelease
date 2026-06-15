@@ -21,8 +21,8 @@
 
 ## Purpose/Scope
 
-- This ULP_Timer example demonstrates the ULP-TIMER with LED toggle functionality. The timer instance is configured to generate interrupts upon expiration, which toggles LED0. Timer-0 is set to expire at 1-second (1Hz) intervals. ULP Timer expiration depends on the TIMER_MATCH_VALUE, which is configurable.
-- When the timer count matches the TIMER_MATCH_VALUE, the interrupt occurs, and the LED0 toggle can be seen.
+- This ULP_Timer example demonstrates the ULP-TIMER with LED flash functionality. The timer instance is configured to generate interrupts upon expiration, which flashes LED0. Timer-0 is set to expire at 1-second (1Hz) intervals. ULP Timer expiration depends on the TIMER_MATCH_VALUE, which is configurable.
+- When the timer count matches the TIMER_MATCH_VALUE, the interrupt occurs, and the LED0 flash can be seen.
 
 ## Overview
 
@@ -34,18 +34,18 @@
 
 ## About Example Code
 
-- The [`ulp_timer_example.c`](ulp_timer_example.c) example file demonstrates how to use a ULP-timer instance to toggle the onboard LED at a 1-second periodic rate.
+- The [`ulp_timer_example.c`](ulp_timer_example.c) example file demonstrates how to use a ULP-timer instance to flash the onboard LED at a 1-second periodic rate.
 - In this example, first, timer is configured with default high-power configuration values from UC through the [sl_si91x_ulp_timer_init](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-init) and [sl_si91x_ulp_timer_set_configurations](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-set-configurations) APIs respectively.
 - Match value is fetched based on timer type and TIME_IN_MICROSECONDS(Time in microseconds for which the match value needs to be calculated) using [sl_si91x_ulp_timer_get_match_value](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-get-match-value) API respectively.
 - Then, a callback is registered for the timer instance through the [sl_si91x_ulp_timer_register_timeout_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-register-timeout-callback) API.
 - Next, the timer instance is started using the [sl_si91x_ulp_timer_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-start) API.
-- The onboard LED-0 is then toggled on every interrupt (timeout value 1 second), and after toggling the LED five times, the timer is stopped using the [sl_si91x_ulp_timer_stop](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-stop) API.
+- The onboard LED-0 is then flashed on every interrupt (timeout value 1 second), and after flashing the LED five times, the timer is stopped using the [sl_si91x_ulp_timer_stop](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-stop) API.
 - After that, the timer is configured with new parameters using the following APIs:
 - [sl_si91x_ulp_timer_set_type](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-set-type) to change the timer type to 256US type (time in microseconds/256)
 - [sl_si91x_ulp_timer_set_direction](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-set-direction) to change the timer direction to up-counting
 - [sl_si91x_ulp_timer_set_count](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-set-count) to change the match value equal to the number of ticks required for a 1-second timeout in 256US type
-- Then, the timer is started again, and after five interrupts, it will stop and switch to ultra-low-power state by calling the API [sl_si91x_power_manager_add_ps_requirement](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-power-manager-add-ps-requirement). As the interrupt is initialized with 5, it will configure the set type, direction, count, and toggle the LED-0 5 times.
-- Similarly, after toggling the LED-0 five times, it will stop the timer and switch back to high-power mode by calling [sl_si91x_power_manager_add_ps_requirement](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-power-manager-add-ps-requirement) and configure the set type, direction, count, and toggle the LED0 5 times before stopping the timer.
+- Then, the timer is started again, and after five interrupts, it will stop and switch to ultra-low-power state by calling the API [sl_si91x_power_manager_add_ps_requirement](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-power-manager-add-ps-requirement). As the interrupt is initialized with 5, it will configure the set type, direction, count, and flash the LED-0 5 times.
+- Similarly, after flashing the LED-0 five times, it will stop the timer and switch back to high-power mode by calling [sl_si91x_power_manager_add_ps_requirement](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-power-manager-add-ps-requirement) and configure the set type, direction, count, and flash the LED0 5 times before stopping the timer.
 - The callback is unregistered using the [sl_si91x_ulp_timer_stop](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-stop) API. Finally, the timer is deinitialized using the [sl_si91x_ulp_timer_deinit](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer#sl-si91x-ulp-timer-deinit) API.
 
 
@@ -104,10 +104,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - `TIME_IN_MICROSECONDS`: Timer timeout duration in microseconds for which the match value is calculated. By default, it is set to 1000000 (1 second).
 
   ```c
-    #define TIME_IN_MICROSECONDS  1000000 // timer timeout for 1 second in microseconds
+    #define TIME_IN_MICROSECONDS  1000000 // Timer timeout for 1 second in microseconds
   ```
 
-- `LED0`: Identifier for the on-board LED-0, which is toggled on every timer timeout interrupt. By default, it is set to 0.
+- `LED0`: Identifier for the on-board LED-0, which is flashed on every timer timeout interrupt. By default, it is set to 0.
 
   ```c
     #define LED0                  0       // For On-board LED-0
@@ -119,13 +119,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define ZERO_INTERRUPT_COUNT  0       // Count for zeroth timeout interrupt
   ```
 
-- `FIFTH_INTERRUPT_COUNT`: Number of interrupts after which the timer stops its first toggle cycle (LED toggled five times). By default, it is set to 5.
+- `FIFTH_INTERRUPT_COUNT`: Number of interrupts after which the timer stops its first toggle cycle (LED flashed five times). By default, it is set to 5.
 
   ```c
     #define FIFTH_INTERRUPT_COUNT 5       // Count for fifth timeout interrupt
   ```
 
-- `TENTH_INTERRUPT_COUNT`: Number of interrupts after which the timer completes its second toggle cycle (LED toggled ten times total). By default, it is set to 10.
+- `TENTH_INTERRUPT_COUNT`: Number of interrupts after which the timer completes its second toggle cycle (LED flashed ten times total). By default, it is set to 10.
 
   ```c
     #define TENTH_INTERRUPT_COUNT 10      // Count for tenth timeout interrupt
@@ -161,11 +161,11 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
   ![Figure: ISP Switch](resources/readme/image512f.png)
 
-- The evaluation kit board's LED0 will toggle five times at a 1-second periodic rate.
-- After toggling LED0 five times, the timer stops and is configured with new parameters, toggling LED0 five more times.
-- If the timer mode is 'one-shot' mode, LED0 will toggle only one time, and then the timer will stop.
-- After that, the timer is stopped and switches the power state from High power to Ultra-low power and is configured with new parameters, toggling the LED again five times.
-- Similarly, the timer is stopped and switches the power state from Ultra Low Power to High power and is configured with new parameters, toggling the LED again five times.
+- The evaluation kit board's LED0 will flash five times at a 1-second periodic rate.
+- After flashing LED0 five times, the timer stops and is configured with new parameters, flashing LED0 five more times.
+- If the timer mode is 'one-shot' mode, LED0 will flash only one time, and then the timer will stop.
+- After that, the timer is stopped and switches the power state from High power to Ultra-low power and is configured with new parameters, flashling the LED again five times.
+- Similarly, the timer is stopped and switches the power state from Ultra Low Power to High power and is configured with new parameters, flashing the LED again five times.
 - At the end of this example, the serial console prints "Unregistered timer timeout callback, on timer operation completion."
 - After successful program execution, the prints in the serial console look as shown below:
 

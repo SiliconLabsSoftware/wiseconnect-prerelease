@@ -174,7 +174,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - `DELAY_MS`: Delay (in milliseconds) inserted between send/receive mode transitions. By default, it is set to 30.
 
   ```c
-  #define DELAY_MS                   30     // 30ms delay added between transitions
+  #define DELAY_MS                   30     // 30 ms delay added between transitions
   ```
 
 - This example demonstrates RS485 multi-slave communication using three Simplicity Studio projects: one master (sending) and two slaves (receiving). Below are the necessary configurations and changes required in the application code.

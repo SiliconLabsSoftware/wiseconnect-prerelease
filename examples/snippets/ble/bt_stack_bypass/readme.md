@@ -19,7 +19,7 @@ This application demonstrates how to send raw HCI commands to the SiWx91x module
     - [Getting Started](#getting-started)
     - [Configuration and Setup](#configuration-and-setup)
       - [NCP mode (EFR32 + Si91x NCP module)](#ncp-mode-efr32--si91x-ncp-module)
-      - [HCI VCOM and debug logging](#hci-vcom-and-debug-logging)
+      - [HCI VCOM and Debug Logging](#hci-vcom-and-debug-logging)
       - [General Configuration](#general-configuration)
     - [Steps for Execution](#steps-for-execution)
       - [Steps to view Logs](#steps-to-view-logs)
@@ -32,13 +32,13 @@ This application demonstrates how to send raw HCI commands to the SiWx91x module
 
 ## Purpose / Scope
 
-This application demonstrates how to configure the Raw HCI commands through uart.
+This application demonstrates how to configure the Raw HCI commands through UART.
 
 This application can be used for controller-level BT-Sig validation.
 
 ## Prerequisites / Setup Requirements
 
-Before running the application, the user will need the following things to setup.
+Before running the application, ensure that you have the following.
 
 ### Hardware Requirements
 
@@ -71,11 +71,11 @@ Before running the application, the user will need the following things to setup
   - Interface and Host MCU Supported
     - SPI - EFR32 
 
-- Smart phone with [Simplicity Connect App](https://www.silabs.com/developers/simplicity-connect-mobile-app) (formerly EFR Connect App) for BLE testing (optional; users may use other BLE apps on Android/iOS).
+- Smartphone with [Simplicity Connect App](https://www.silabs.com/developers/simplicity-connect-mobile-app) (formerly EFR Connect App) for BLE testing (or other BLE apps on Android/iOS).
 
 ### Software Requirements
 
-- [WiSeConnect SDK](https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk/)
+- [WiSeConnect SDK](https://github.com/SiliconLabs/wiseconnect)
 
 - Embedded Development Environment
 
@@ -95,10 +95,9 @@ Before running the application, the user will need the following things to setup
 | SoC  | Application runs on SiWx91x.                                                          | `bt_stack_bypass.slcp`             |
 | NCP  | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `bt_stack_bypass_spi_ncp.slcp`     |
 
-
 > **Note:** The BT Stack Bypass example is provided only in **SoC** and **NCP** mode. PSRAM variants are not shipped for this example.
 
-To create a project, select the appropriate example (`bt_stack_bypass` for SoC or `bt_stack_bypass_spi_ncp` for NCP) from the **Examples and Demos** section in Simplicity Studio. For NCP mode setup, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode-with-efr32).
+To create a project, select the appropriate example (`bt_stack_bypass` for SoC or `bt_stack_bypass_spi_ncp` for NCP) from the **Examples and Demos** section in Simplicity Studio. For NCP mode setup, refer to [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode-with-efr32).
 
 ### Setup Diagram
 
@@ -110,11 +109,11 @@ To create a project, select the appropriate example (`bt_stack_bypass` for SoC o
 
 - Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-  - [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio)
-  - [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-extension)
-  - [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer)
-  - [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware)
-    > **Note:** Ensure the SiWx91x module is loaded with the latest connectivity firmware as described in [SiWx91x Firmware Update]
+  - [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio).
+  - [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-extension).
+  - [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer).
+  - [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware).
+    > **Note:** Ensure the SiWx91x module is loaded with the latest connectivity firmware as described in [SiWx91x Firmware Update].
   - [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project). Choose **BLE - BT_STACK_BYPASS** or **BLE - BT_STACK_BYPASS (NCP)** as appropriate for your board.
 - For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
@@ -125,14 +124,14 @@ To create a project, select the appropriate example (`bt_stack_bypass` for SoC o
 Use **NCP host** mode when the application runs on an **EFR32 host MCU** connected to a Si91x NCP module over the **SPI Bus** (same arrangement as `wireless_test_ncp`).
 
 1. In Simplicity Studio, create and generate a project using the example **`bt_stack_bypass_spi_ncp`** with your target EFR32 board. This configuration aligns with the **`wireless_test_ncp`** component set for the SPI interface and excludes the console CLI source files.
-2. **Do not** define `SLI_SI91X_MCU_INTERFACE` for the NCP host build. In this configuration (`app.c`), HCI communication uses the `sl_iostream` interface. Configure the stdio retarget to use the EUSART VCOM interface, similar to the `wireless_test_ncp` example project.
+2. Do not define `SLI_SI91X_MCU_INTERFACE` for the NCP host build. In this configuration (`app.c`), HCI communication uses the `sl_iostream` interface. Configure the stdio retarget to use the EUSART VCOM interface, similar to the `wireless_test_ncp` example project.
 3. HCI reset handling on NCP calls **`sl_wifi_deinit()`** and **`NVIC_SystemReset()`** instead of the SoC **`sl_si91x_soc_nvic_reset()`**.
 4. **`ble_config.h`** already selects NCP-appropriate BLE limits.
-5. For **NCP mode**, connect the EFR32 host board directly to the Linux PC using a **USB cable**. The HCI communication happens over the board's USB/VCOM interface. This application follows your board's **USB** connection and the project's **stdio / iostream** setup.
+5. For **NCP mode**, connect the EFR32 host board directly to the Linux PC using a USB cable. The HCI communication happens over the board's USB/VCOM interface. This application follows your board's USB connection and the project's **stdio / iostream** setup.
 
-> **Note:** You do **not** use the SoC UART pin wiring below for the NCP mode.
+> **Note:** Ensure that you do not use the SoC UART pin wiring below for the NCP mode.
 
-#### HCI VCOM and debug logging
+#### HCI VCOM and Debug Logging
 
 - The UART/VCOM interface used for HCI communication with the host PC must transmit only HCI packet data. Do not use `printf()` on the same interface, as debug text and ASCII characters can corrupt the HCI data stream and cause invalid packet type errors on the host side.
 
@@ -226,7 +225,7 @@ Follow the steps for successful execution of the program:
 
 9. If you want to re-run the application press reset on the board and follow the same steps.
 
-Refer below Linux logs for the command which will be same for both `SOC` and `NCP` mode.
+Refer to the following Linux logs for the command which will be same for both `SOC` and `NCP` modes.
 ![Linux terminal logs - dmesg](resources/readme/LinuxLogs1.png)
 
 ![Linux terminal logs - hciattach and hciconfig](resources/readme/LinuxLogs2.png)
@@ -301,9 +300,9 @@ On older Fedora hosts that ship the bundled `hciattach` binary in `examples/snip
     ```
 
 	
-### Pin configurations for UART cable (SoC mode)
+### Pin Configurations for UART Cable (SoC mode)
 
-The table below applies **only to SoC mode**, when you connect an **external USB-to-UART cable** from a Linux host (e.g. Fedora) to the WSTK for raw HCI on UART.
+The table below applies only to SoC mode, when you connect an external USB-to-UART cable from a Linux host (e.g., Fedora) to the WSTK for raw HCI on UART.
 
 - Connect USB to UART cable to a Linux host (e.g. Raspberry Pi or Fedora) ([example cable](https://www.amazon.in/Serial-Converter-Cable-Terminated-Header/dp/B06ZYPLFNB)).
 - Follow the pin configuration below to connect the USB-to-UART cable to the WSTK board (**SoC** testing only).

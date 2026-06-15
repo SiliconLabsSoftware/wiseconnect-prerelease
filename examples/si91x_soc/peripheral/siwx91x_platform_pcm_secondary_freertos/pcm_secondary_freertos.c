@@ -164,7 +164,7 @@ static void pcm_secondary_task(void *argument)
 
   status = secondary_sync_wait(false);
   if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("Secondary device synchronization failed with error code: 0x%lx", status);
+    SL_PRINT_STRING_ERROR("Secondary device synchronization failed with error code: 0x%lx\r\n", status);
     osThreadExit();
   }
   status =
@@ -200,9 +200,9 @@ static void compare_loop_back_data(void)
   }
 
   if (data_index == PCM_SECONDARY_BUFFER_SIZE) {
-    SL_PRINT_STRING_ERROR("Data comparison successful\n");
+    SL_PRINT_STRING_ERROR("Data comparison successful\r\n");
   } else {
-    SL_PRINT_STRING_ERROR("Data comparison failed\n");
+    SL_PRINT_STRING_ERROR("Data comparison failed\r\n");
   }
 }
 

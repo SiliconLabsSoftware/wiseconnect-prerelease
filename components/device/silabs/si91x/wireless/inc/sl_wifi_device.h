@@ -1836,8 +1836,8 @@
  * @def SL_SI91X_EXT_TCP_IP_FEAT_SSL_HEAP_SIZE
  * @brief Enable additional memory for SSL/TLS connections.
  * @details
- * This feature allocates additional memory for SSL/TLS connections,
- * typically required when experiencing memory-related issues with cloud server connections.
+ * This feature allocates additional memory for SSL/TLS connections.
+ * Additional memory allocation is required when you experience memory-related issues with cloud server connections.
  * 
  * @note Enable this bit to avoid 0xD2 errors related to insufficient memory during SSL/TLS operations.
  * @note Applicable ONLY to SiWx91x chipset

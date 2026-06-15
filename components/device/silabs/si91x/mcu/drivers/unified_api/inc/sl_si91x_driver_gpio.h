@@ -61,7 +61,7 @@ extern "C" {
  *         - SL_STATUS_OK   - Success. 
  *         - SL_STATUS_INVALID_PARAMETER  - The parameter is an invalid argument. 
  * 
- * @note  the pin state depends on the direction of pin.
+ * @note  The pin state depends on the direction of pin.
  *        In input mode, the pin state depends on external signals and any configured pull-up or pull-down resistors.
  *        In output mode, the pin state is driven by the value exists in Bit Load Register.
  *        To ensure a default high state when switching to output, set the pin value using sl_gpio_driver_set_pin()/sl_si91x_gpio_set_uulp_npss_pin_value() before changing the configuration,

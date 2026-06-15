@@ -170,7 +170,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define AVL_INTR_NO            0    // available interrupt number
   ```
 
-- `ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 1 in SOC peripheral mode and toggle HP GPIO 7. Set to **0** to disable this feature. By default, it is set to 0.
+- `ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE`: Set to 1 to enable ULP GPIO 1 in SOC peripheral mode and toggle HP GPIO 7. Set to 0 to disable this feature. By default, it is set to 0.
 
   ```c
     #define ENABLE_ULP_PERI_ON_SOC_PIN_TOGGLE 0  // Set to 1 to enable ULP peripheral on SOC GPIO 7 and toggle ULP GPIO 1

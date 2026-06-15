@@ -115,7 +115,7 @@ typedef bool (*sli_queue_manager_node_match_handler_t)(const sli_queue_t *handle
  *   Packet which is present in the queue that has to be freed.
  *
  * @param context
- *   User context from flush/deinit (read-only in the callback; may be NULL).
+ *   User context from flush/deinit (read-only in the callback, its value can be NULL).
  *
  * @return
  *   N/A

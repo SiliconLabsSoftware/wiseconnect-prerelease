@@ -29,7 +29,6 @@
 #include "sl_rsi_utility.h"
 #include "sli_wifi_utility.h"
 #include "sli_net_types.h"
-#include <stdio.h>
 
 // External reference to async state for DHCP completion
 extern sli_net_async_if_state_t sli_async_state[];
@@ -157,25 +156,11 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
 #if LWIP_IPV6
   if ((ip6_addr_istentative(netif_ip6_addr_state(netif, 0))) && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0)
       && (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0)) {
-    char sl_net_lwip_ipv6_drop_eth_log[256];
-    snprintf(sl_net_lwip_ipv6_drop_eth_log,
-             sizeof(sl_net_lwip_ipv6_drop_eth_log),
-             "!!! [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-             dst_mac[0],
-             dst_mac[1],
-             dst_mac[2],
-             dst_mac[3],
-             dst_mac[4],
-             dst_mac[5],
-             src_mac[0],
-             src_mac[1],
-             src_mac[2],
-             src_mac[3],
-             src_mac[4],
-             src_mac[5],
-             b[12],
-             b[13]);
-    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)sl_net_lwip_ipv6_drop_eth_log);
+    SL_DEBUG_LOG_V2(DEBUG, "!!! [%02x:%02x:%02x:", dst_mac[0], dst_mac[1], dst_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]<-", dst_mac[3], dst_mac[4], dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
     return;
   }
 #endif
@@ -188,27 +173,12 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
       memcpy((uint8_t *)q->payload, (uint8_t *)b + bufferoffset, q->len);
       bufferoffset += q->len;
     }
-
-    char sl_net_lwip_rx_eth_log[256];
-    snprintf(sl_net_lwip_rx_eth_log,
-             sizeof(sl_net_lwip_rx_eth_log),
-             "<<< (%03u): [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-             (unsigned)bufferoffset,
-             dst_mac[0],
-             dst_mac[1],
-             dst_mac[2],
-             dst_mac[3],
-             dst_mac[4],
-             dst_mac[5],
-             src_mac[0],
-             src_mac[1],
-             src_mac[2],
-             src_mac[3],
-             src_mac[4],
-             src_mac[5],
-             b[12],
-             b[13]);
-    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)sl_net_lwip_rx_eth_log);
+    SL_DEBUG_LOG_V2(DEBUG, "<<< (%03d): [%02x:%02x:", bufferoffset, dst_mac[0], dst_mac[1]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x:", dst_mac[2], dst_mac[3], dst_mac[4]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x]<-", dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
 
     if (netif->input(p, netif) != ERR_OK) {
       gOverrunCount++;
@@ -225,29 +195,17 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
   UNUSED_PARAMETER(netif);
   sl_status_t status;
-
   // Extract and print the destination MAC address
+#ifdef SLI_NET_LWIP_TX_FRAME_DEBUG
   const uint8_t *dst_mac = (uint8_t *)p->payload;
   const uint8_t *src_mac = (uint8_t *)p->payload + netif->hwaddr_len;
 
-  char sl_net_lwip_tx_eth_log[256];
-  snprintf(sl_net_lwip_tx_eth_log,
-           sizeof(sl_net_lwip_tx_eth_log),
-           ">>> (%03u): [%02x:%02x:%02x:%02x:%02x:%02x]->[%02x:%02x:%02x:%02x:%02x:%02x]",
-           (unsigned)p->len,
-           src_mac[0],
-           src_mac[1],
-           src_mac[2],
-           src_mac[3],
-           src_mac[4],
-           src_mac[5],
-           dst_mac[0],
-           dst_mac[1],
-           dst_mac[2],
-           dst_mac[3],
-           dst_mac[4],
-           dst_mac[5]);
-  SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)sl_net_lwip_tx_eth_log);
+  SL_DEBUG_LOG_V2(DEBUG, ">>> (%03d): [%02x:%02x:", p->len, src_mac[0], src_mac[1]);
+  SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x:", src_mac[2], src_mac[3], src_mac[4]);
+  SL_DEBUG_LOG_V2(DEBUG, "%02x]->", src_mac[5]);
+  SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", dst_mac[0], dst_mac[1], dst_mac[2]);
+  SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", dst_mac[3], dst_mac[4], dst_mac[5]);
+#endif
 
   status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *)p->payload, p->len);
   /* TX can be queued asynchronously under load; IN_PROGRESS is not a hard failure. */

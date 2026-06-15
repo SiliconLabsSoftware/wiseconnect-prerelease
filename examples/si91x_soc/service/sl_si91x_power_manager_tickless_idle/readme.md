@@ -39,7 +39,7 @@
 
 ## About Example Code
 
-- Power Manager service is initialized in PS3 state with 40MHz clock (Power Save) using sl_si91x_power_manager_init.
+- Power Manager service is initialized in PS3 state with 40 MHz clock (Power Save) using sl_si91x_power_manager_init.
 - At initialization, a thread is created and the application_start() function is called along the thread.
 - All the activities are handled in the application_start() function.
 - Firstly wifi is initialized, M4-NWP secure handshake is established to send commands to NWP, NWP is switched to STANDBY_WITH_RAM_RETENTION mode.
@@ -74,7 +74,7 @@ To enable transitions from the active state to sleep or standby state, configure
 - `ULP_TIMER_MATCH_VALUE`: Specifies the ULP timer match count used to schedule the periodic wakeup interval. By default, it is set to 10000000, which corresponds to approximately 500 ms with a 20 MHz down-counter reference.
 
     ```c
-    #define ULP_TIMER_MATCH_VALUE 10000000   // Timer match value for down-counter type with 20mhz clock for 500 ms
+    #define ULP_TIMER_MATCH_VALUE 10000000   // Timer match value for down-counter type with 20 MHz clock for 500 ms
     ```
 
 - `BUTTON_INSTANCE_0`: Selects the on-board button instance used as a wakeup source for the application. By default, it is set to `button_btn0`.

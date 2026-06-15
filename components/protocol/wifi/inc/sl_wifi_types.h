@@ -340,7 +340,7 @@ typedef struct {
  * @note To configure active_channel_time and passive_channel_time for active and passive scans, 
  *       use the sl_wifi_set_advanced_scan_configuration() API with @ref sl_wifi_advanced_scan_configuration_t.
  * @note Channel scanning behavior:
- *       - For active scans: Scans the channels specified in `channel_bitmap_2g4` and `channel_bitmap_5`. If set to 0, scans all available channels. Can be configured as a subset of channels.
+ *       - For active scans: Scans the channels specified in `channel_bitmap_2g4` and `channel_bitmap_5`. If set to 0, scans all available channels. This can be configured as a subset of channels.
  *       - For background scans (SL_WIFI_SCAN_TYPE_ADV_SCAN): Scans the channels that were originally specified in `channel_bitmap_2g4` and `channel_bitmap_5` during the first scan. The channel bitmap cannot be modified for background scans.
  * @note 5 GHz is not supported in SiWx91x devices.
  *

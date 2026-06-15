@@ -105,10 +105,10 @@ void led_on_process_action(void)
  * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
  * (or SL_PRINT_STRING_DEBUG for verbose trace). */
 
-      SL_PRINT_STRING_ERROR("led_on task failed to acquired mutex\n");
+      SL_PRINT_STRING_ERROR("led_on task failed to acquired mutex\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("led_on task acquired mutex\n");
+    SL_PRINT_STRING_ERROR("led_on task acquired mutex\r\n");
 
     while (!toggle_timeout)
       ;
@@ -116,11 +116,11 @@ void led_on_process_action(void)
 
     // turn on LED
     sl_si91x_led_set(LED_INSTANCE.pin);
-    SL_PRINT_STRING_ERROR("LED turned ON\n");
+    SL_PRINT_STRING_ERROR("LED turned ON\r\n");
 
     status = osMutexRelease(led_mutex_id);
     if (status != osOK) {
-      SL_PRINT_STRING_ERROR("led_on task failed to release mutex\n");
+      SL_PRINT_STRING_ERROR("led_on task failed to release mutex\r\n");
       break;
     }
 
@@ -137,10 +137,10 @@ void led_off_process_action(void)
   while (1) {
     status = osMutexAcquire(led_mutex_id, osWaitForever); // try to acquire mutex
     if (status != osOK) {
-      SL_PRINT_STRING_ERROR("led_off task failed to acquire mutex\n");
+      SL_PRINT_STRING_ERROR("led_off task failed to acquire mutex\r\n");
       break;
     }
-    SL_PRINT_STRING_ERROR("led_off task acquired mutex\n");
+    SL_PRINT_STRING_ERROR("led_off task acquired mutex\r\n");
 
     while (!toggle_timeout)
       ;
@@ -148,11 +148,11 @@ void led_off_process_action(void)
 
     // turn off LED
     sl_si91x_led_clear(LED_INSTANCE.pin);
-    SL_PRINT_STRING_ERROR("LED turned OFF\n");
+    SL_PRINT_STRING_ERROR("LED turned OFF\r\n");
 
     status = osMutexRelease(led_mutex_id);
     if (status != osOK) {
-      SL_PRINT_STRING_ERROR("led_off task failed to release mutex\n");
+      SL_PRINT_STRING_ERROR("led_off task failed to release mutex\r\n");
       break;
     }
 

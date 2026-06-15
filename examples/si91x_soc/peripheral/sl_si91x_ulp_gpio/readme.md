@@ -140,7 +140,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - `AVL_INTR_NO`: Specifies the available interrupt number used by the GPIO pin interrupt. By default, it is set to 0.
 
   ```c
-  #define AVL_INTR_NO       0      // available interrupt number
+  #define AVL_INTR_NO       0      // Available interrupt number
   ```
 
 - `POLARITY`: Polarity configuration for the GPIO pin interrupt. By default, it is set to 0.

@@ -47,7 +47,7 @@
 - Sets compare value for selected group's selected compare channel through [sl_si91x_sysrtc_set_compare_channel_value](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-set-compare-value), can change compare value by updating `COMPARE_VALUE` macro in [sysrtc_example.c](sysrtc_example.c) file.
 - Then registers sysrtc callback and enabled selected compare channel interrupt, through [sl_si91x_sysrtc_register_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-register-callback).
 - Starts counter through [sl_si91x_sysrtc_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-start)
-- When the counter matches the compare value, it triggers the corresponding channel compare interrupt and toggles the LED every second.
+- When the counter matches the compare value, it triggers the corresponding channel compare interrupt and flashes the LED every second.
 - After every interrupt, compare value is updated again through [sl_si91x_sysrtc_set_compare_channel_value](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-set-compare-value) with sum of current count (read through [sl_si91x_sysrtc_get_count](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-get-count)) and compare-value.
 - After 10 interrupts sysrtc is stopped through [sl_si91x_sysrtc_stop](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-stop)
 - Callbacks are unregistered and interrupts are disabled through [sl_si91x_sysrtc_unregister_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-unregister-callback)
@@ -60,7 +60,7 @@
 - Then registers sysrtc callback and enabled capture channel interrupt, through [sl_si91x_sysrtc_register_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-register-callback).
 - Starts counter through [sl_si91x_sysrtc_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-start)
 - After starting waits unless counter reaches compare value for 1-second and then sets SYSRTC register capture input high through [sl_si91x_sysrtc_sets_register_capture_input](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-sets-register-capture-input) API.
-- A capture interrupt is generated and toggles LED one time.
+- A capture interrupt is generated and flashes LED one time.
 - And SYSRTC is de-initialized through [sl_si91x_sysrtc_deinit](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-deinit)
 
 ### If no channels enabled through UC
@@ -70,7 +70,7 @@
 - Sets counter start value for counter through [sl_si91x_sysrtc_set_count](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-set-count), can change by updating `COUNTER_VALUE2` macro in [sysrtc_example.c](sysrtc_example.c) file.
 - Starts counter through [sl_si91x_sysrtc_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-start)
 - After starting waits unless counter reaches overflow value (0xffffffff).
-- Then a overflow interrupt is generated and toggles LED one time.
+- Then a overflow interrupt is generated and flashes LED one time.
 ### For PRS_IN / PRS_OUT GPIO Configuration
 If you are configuring PRS_IN or PRS_OUT through GPIOs:
 - GPIOs must be selected from the UC (Universal Configurator).
@@ -85,7 +85,7 @@ If you are configuring PRS_IN or PRS_OUT through GPIOs:
   - PRS output GPIO is configured using `sl_si91x_sysrtc_set_compare_output_prs_gpio`()
   - the SYSRTC callback is registered using [sl_si91x_sysrtc_register_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-register-callback), and interrupts are enabled.
   - the SYSRTC is started using sl_si91x_sysrtc_start.
-  - When counter reaches compare-value generates respective channel compare interrupt, toggles corresponding PRS_OUT GPIO pin and toggles LED on every second.
+  - When counter reaches compare-value generates respective channel compare interrupt, toggles corresponding PRS_OUT GPIO pin and flashes LED on every second.
   - After every interrupt, compare value is updated again through [sl_si91x_sysrtc_set_compare_value](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-set-compare-value) with sum of current count (read through [sl_si91x_sysrtc_get_count](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-get-count)) and compare-value.
   - After 10 interrupts sysrtc is stopped through [sl_si91x_sysrtc_stop](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-stop)
   - Callbacks are unregistered and interrupts are disabled through [sl_si91x_sysrtc_unregister_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-unregister-callback)
@@ -103,7 +103,7 @@ If you are configuring PRS_IN or PRS_OUT through GPIOs:
    - The SYSRTC is started using sl_si91x_sysrtc_start.
    - Starts counter through [sl_si91x_sysrtc_start](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-start)
    - ULP_GPIO_8 is set to high, which is supplied as input to PRS_IN. At the rise edge of PRS_IN,interrupt will be triggered
-   - when first capture interrupt is generated, LED  toggles one time.
+   - when first capture interrupt is generated, LED  flashes one time.
    - And SYSRTC is de-initialized through [sl_si91x_sysrtc_deinit](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc#sl-si91x-sysrtc-deinit)
 
 **NOTE**:
@@ -169,13 +169,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define COUNTER_VALUE2       0     // Counter register value for overflow interrupt
   ```
 
-- `TENTH_INTERRUPT`: Number of compare interrupts after which the SYSRTC is stopped (LED toggled ten times). By default, it is set to 10.
+- `TENTH_INTERRUPT`: Number of compare interrupts after which the SYSRTC is stopped (LED flashes ten times). By default, it is set to 10.
 
   ```c
     #define TENTH_INTERRUPT      10    // for tenth interrupt count
   ```
 
-- `LED1`: Identifier for the on-board LED toggled on every SYSRTC interrupt. By default, it is set to 1.
+- `LED1`: Identifier for the on-board LED flashed on every SYSRTC interrupt. By default, it is set to 1.
 
   ```c
     #define LED1                 1     // For On-board LED-0
@@ -196,7 +196,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1. Compile and run the application.
-2. When the application runs, LED0 (GPIO_10 for [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)) or LED1 (GPIO_10 for evaluation kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]) will be toggled ten times at a 1-second periodic rate.
+2. When the application runs, LED0 (GPIO_10 for [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)) or LED1 (GPIO_10 for evaluation kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]) will be flashed ten times at a 1-second periodic rate.
 3. After successful program execution the prints in serial console looks as shown below.
 
     ![Figure: Output](resources/readme/output.png)
@@ -214,9 +214,9 @@ If PRS_IN/PRS_OUT are configured through GPIO,for compare out observe the PRS_OU
 
 > **Note:**
 >
->- When Compare channels are enabled : Toggles LED for ten times every second and timer stops
->- When Capture channel is enabled : Toggles LED one time after one second
->- When no channels are enabled, the overflow interrupt is enabled: Toggles LED once when the counter reaches overflow.
+>- When Compare channels are enabled : Flashes LED for ten times every second and timer stops
+>- When Capture channel is enabled : Flashes LED one time after one second
+>- When no channels are enabled, the overflow interrupt is enabled: Flashes LED once when the counter reaches overflow.
 
   ![Figure: Onboard LED-1](resources/readme/image509d.png)
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.

@@ -55,12 +55,12 @@
 /*=======================================================================*/
 //   ! Structures
 /*=======================================================================*/
-//! generic packet structure.first element in packet buffer should always be pointer to next element
+//! Generic packet structure. First element in packet buffer should always be pointer to next element.
 typedef struct rsi_app_pkt_s {
   struct rsi_app_pkt_s *next; //! pointer to next element in the queue
   uint8_t pkt_data[0];        //! transparent data structure
 } rsi_app_pkt_t;
-//! generic queue structure. first element in packet buffer should always be pointer to next element to use this queue
+//! Generic queue structure. First element in packet buffer should always be pointer to next element to use this queue.
 typedef struct rsi_app_queue_s {
   rsi_app_pkt_t *head;     //! generic pointer to a packet buffer
   rsi_app_pkt_t *tail;     //! generic pointer to a packet buffer

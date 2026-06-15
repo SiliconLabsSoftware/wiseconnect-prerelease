@@ -135,55 +135,55 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Comparison-mode selection macros: Enable exactly one of the following macros in `analog_comparator_example.c` to choose which pair of inputs the selected comparator compares. The corresponding non-inverting and inverting inputs must also be selected from UC as noted in each macro's description. By default, only `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL` is enabled.
 
-  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL`: Compares two external pin inputs (both fed from GPIOs). In UC, select 'External input-1' as non-inverting input and an external input as inverting input. By default, it is set to `ENABLE`.
+  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL`: Compares two external pin inputs (both fed from GPIOs). In UC, select **External input-1** as non-inverting input and an external input as inverting input. By default, it is set to `ENABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL       ENABLE
     ```
 
-  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER`: Compares an external input to the internal reference scaler output. In UC, select 'External input-1' as non-inverting input and 'Reference scaler' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER`: Compares an external input to the internal reference scaler output. In UC, select **External input-1** as non-inverting input and **Reference scaler** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_REF_SCALER     DISABLE
     ```
 
-  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK`: Compares an external input to the internal resistor bank output. In UC, select 'External input-1' as non-inverting input and 'Resistor bank output' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK`: Compares an external input to the internal resistor bank output. In UC, select **External input-1** as non-inverting input and **Resistor bank output** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_RESISTOR_BANK  DISABLE
     ```
 
-  - `COMPARE_POS_INPUT_RESISTOR_BANK_NEG_INPUT_REF_SCALER`: Compares the resistor bank output to the reference scaler output. In UC, select 'Resistor bank output' as non-inverting input and 'Reference scaler output' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_RESISTOR_BANK_NEG_INPUT_REF_SCALER`: Compares the resistor bank output to the reference scaler output. In UC, select **Resistor bank output** as non-inverting input and **Reference scaler output** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_RESISTOR_BANK_NEG_INPUT_REF_SCALER DISABLE
     ```
 
-  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_EXTERNAL`: Compares the OPAMP1 output with an external voltage. In UC, select 'OPAMP1 output' as non-inverting input and 'External input-1' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_EXTERNAL`: Compares the OPAMP1 output with an external voltage. In UC, select **OPAMP1 output** as non-inverting input and **External input-1** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_EXTERNAL          DISABLE
     ```
 
-  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_REF_SCALER`: Compares the OPAMP1 output with the reference scaler voltage. In UC, select 'OPAMP1 output' as non-inverting input and 'Reference scaler output' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_REF_SCALER`: Compares the OPAMP1 output with the reference scaler voltage. In UC, select **OPAMP1 output** as non-inverting input and **Reference scaler output** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_REF_SCALER        DISABLE
     ```
 
-  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_RESISTOR_BANK`: Compares the OPAMP1 output with the internal resistor bank voltage. In UC, select 'OPAMP1 output' as non-inverting input and 'Resistor bank output' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_OPAMP_NEG_INPUT_RESISTOR_BANK`: Compares the OPAMP1 output with the internal resistor bank voltage. In UC, select **OPAMP1 output** as non-inverting input and **Resistor bank output** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_OPAMP_NEG_INPUT_RESISTOR_BANK     DISABLE
     ```
 
-  - `COMPARE_POS_INPUT_DAC_NEG_INPUT_EXTERNAL`: Compares the DAC output with an external voltage. In UC, select 'DAC output' as non-inverting input and 'External input-1' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_DAC_NEG_INPUT_EXTERNAL`: Compares the DAC output with an external voltage. In UC, select **DAC output** as non-inverting input and **External input-1** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_DAC_NEG_INPUT_EXTERNAL            DISABLE
     ```
 
-  - `COMPARE_POS_INPUT_DAC_NEG_INPUT_REF_SCALER`: Compares the DAC output with the reference scaler voltage. In UC, select 'DAC output' as non-inverting input and 'Reference scaler output' as inverting input. By default, it is set to `DISABLE`.
+  - `COMPARE_POS_INPUT_DAC_NEG_INPUT_REF_SCALER`: Compares the DAC output with the reference scaler voltage. In UC, select **DAC output** as non-inverting input and **Reference scaler output** as inverting input. By default, it is set to `DISABLE`.
 
     ```c
     #define COMPARE_POS_INPUT_DAC_NEG_INPUT_REF_SCALER          DISABLE
@@ -192,7 +192,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Note:
   1. Only one macro should be enabled from the above `COMPARE_POS_INPUT_*` macros at a time.
   2. Use Comparator-2 for 917 boards.
-  3. To compare external input to buffer output, enable `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL` and select 'External input-1' as non-inverting input and 'Reference buffer output' as inverting input from UC. The reference buffer produces a fixed output of 1.2 V only.
+  3. To compare external input to buffer output, enable `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL` and select **External input-1** as non-inverting input and **Reference buffer output** as inverting input from UC. The reference buffer produces a fixed output of 1.2 V only.
 
 - `THRESHOLD_VALUE`: Threshold value that selects the resistor bank output voltage. For possible values, see [sl_analog_comparator_threshold_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-threshold-values-t) in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h). By default, it is set to `SL_COMPARATOR_THRESHOLD_VALUE_FOR_2_15_VOLT`, which configures the resistor bank output to 2.15 V.
 

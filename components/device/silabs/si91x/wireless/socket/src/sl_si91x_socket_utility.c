@@ -1242,8 +1242,9 @@ int sli_si91x_shutdown(int socket, int how)
                                  NULL,
                                  (void **)&response_buffer);
 
-  /* If the socket is closed, free the socket and return success */
-  if (status == SL_STATUS_SI91X_SOCKET_CLOSED) {
+  // Treat SOCKET_CLOSED and COMMAND_GIVEN_IN_INVALID_STATE (0x21, returned by the NWP after a
+  // rejoin failure already tore the socket down) as logical close success: free the host slot.
+  if (status == SL_STATUS_SI91X_SOCKET_CLOSED || status == SL_STATUS_SI91X_COMMAND_GIVEN_IN_INVALID_STATE) {
     if (close_request_type == SHUTDOWN_BY_ID) {
       sli_si91x_free_socket(socket);
     } else {
@@ -2286,6 +2287,12 @@ void sl_si91x_set_extended_socket_cipherlist(uint32_t extended_cipher_list)
 
 sli_si91x_socket_t *get_socket_from_packet(sl_wifi_system_packet_t *socket_packet)
 {
+
+  const uint16_t payload_length = (socket_packet->length & 0x0FFF);
+  if (payload_length == 0) {
+    return NULL;
+  }
+
   int socket_id = sli_si91x_get_socket_id(socket_packet);
 
   if (socket_packet->command == SLI_WIFI_RSP_CONN_ESTABLISH) {

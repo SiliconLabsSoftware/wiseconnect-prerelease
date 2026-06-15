@@ -155,13 +155,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - `GSPI_SWAP_READ_DATA`: Enables byte-wise swapping of read data (only applicable when data width is 16). By default, it is set to 1 (enabled).
 
   ```c
-  #define GSPI_SWAP_READ_DATA          1         // true to enable and false to disable swap read
+  #define GSPI_SWAP_READ_DATA          1         // To enable swap read set to true and to disable set to false.
   ```
 
 - `GSPI_SWAP_WRITE_DATA`: Enables byte-wise swapping of write data (only applicable when data width is 16). By default, it is set to 0 (disabled).
 
   ```c
-  #define GSPI_SWAP_WRITE_DATA         0         // true to enable and false to disable swap write
+  #define GSPI_SWAP_WRITE_DATA         0         // To enable swap write set to true and to disable set to false.
   ```
 
 - `GSPI_BIT_WIDTH`: Defines the default GSPI data bit width used for each transfer frame. By default, it is set to 8.

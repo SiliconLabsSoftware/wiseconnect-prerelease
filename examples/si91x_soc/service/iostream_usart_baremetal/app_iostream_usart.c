@@ -70,7 +70,7 @@ void app_iostream_usart_init(void)
  * a recommendation: in production code, ERROR severity should be reserved for
  * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
  * (or SL_PRINT_STRING_DEBUG for verbose trace). */
-  SL_PRINT_STRING_ERROR("Printf uses the default stream, as long as iostream_retarget_stdio is included.\r\n> ");
+  SL_PRINT_STRING_ERROR("Printf uses the default stream, as long as iostream_retarget_stdio is included.\r\n> \r\n");
 }
 
 /***************************************************************************/ /**
@@ -86,7 +86,7 @@ void app_iostream_usart_process_action(void)
   if (c > 0) {
     if ((c == '\r') || (c == '\n')) {
       buffer[index] = '\0';
-      SL_PRINT_STRING_ERROR("\r\nYou wrote: %s\r\n> ", (uintptr_t)buffer);
+      SL_PRINT_STRING_ERROR("\r\nYou wrote: %s\r\n>", (uintptr_t)buffer);
       index = 0;
     } else {
       if (index < BUFFER_SIZE - 1) {

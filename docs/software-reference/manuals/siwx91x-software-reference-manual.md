@@ -483,6 +483,27 @@ SL Log provides:
 - Power-aware integration (`sl_log_pre_sleep_process`,
   `sl_log_post_sleep_process`) so logs survive normal low-power transitions.
 
+### SL_DEBUG_LOG_V2
+
+`SL_DEBUG_LOG_V2` is a convenience wrapper around the `SL_PRINT_STRING_*` macros. It is defined in `sl_constants.h`, and used by the SDK components and examples in level-tagged diagnostics.
+
+```c
+SL_DEBUG_LOG_V2(INFO,  "message\r\n");
+SL_DEBUG_LOG_V2(ERROR, "failed: 0x%lX", (unsigned long)status);
+```
+
+The `level` argument is one of `DEBUG`, `INFO`, `WARN`, or `ERROR`.
+
+**Platform support**
+
+| Platform | Behavior |
+|----------|----------|
+| Silicon Labs SoC (SiWx91x) | Expands to `SL_PRINT_STRING_<level>` → SL Log backend |
+| Silicon Labs NCP (EFR32 host boards only) | Same as SoC — expands to `SL_PRINT_STRING_<level>` → SL Log backend |
+| All other host boards | Expands to `printf`-style output via `sl_debug_log()` |
+
+For SoC and EFR NCP builds, include `sl_constants.h` only. For other hosts, output is displayed on the host console. If configured, log level filtering uses `SLI_HOST_CURRENT_DBGLOG_LEVEL`.
+
 ### Architecture
 
 ![SL Log common service architecture: shared logger layers, board-specific platform adapters, and captive-core log ingress to the host MCU.](resources/sl_log_common_architecture.png)

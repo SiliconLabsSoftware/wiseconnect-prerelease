@@ -34,6 +34,7 @@
     - [APIs and functions (implementation reference)](#apis-and-functions-implementation-reference)
     - [Runtime sequence when enabled](#runtime-sequence-when-enabled)
     - [Failure behavior and disconnected path](#failure-behavior-and-disconnected-path)
+    - [Example serial output (macro = 1)](#example-serial-output-macro--1)
   
 ## Purpose / Scope
 
@@ -324,7 +325,7 @@ Follow the steps below for successful execution of the application:
 
    ![](resources/readme/remote_screen4.png)
 
-10. This completes the BLE provisioning using Android application. The next step is the [MQTT Connection](#mqtt-connection). If **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **1** in **`wifi_config.h`**, expect additional serial activity (BLE disable, 16k TLS demo, reconnect) before MQTT; see [Optional: Dynamic BLE enable/disable and 16k SSL demo](#optional-dynamic-ble-enable-disable-and-16k-ssl-demo).
+10. This completes the BLE provisioning using Android application. The next step is the [MQTT Connection](#mqtt-connection). If **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **1** in **`wifi_config.h`**, expect additional serial activity (BLE disable, 16k TLS demo, reconnect) before MQTT; see [Runtime sequence when enabled](#runtime-sequence-when-enabled) and [Example serial output (macro = 1)](#example-serial-output-macro--1).
 
 11. To disconnect from the access point, click on connected AP and click on YES.
 
@@ -534,10 +535,14 @@ When you set the macro to **1**, edit **`SSL_16K_DEMO_SERVER_IP`**, **`SSL_16K_D
 
 ### Overview
 
+**Simplicity Connect mobile app:** Initial Wi‑Fi provisioning over BLE uses the **Simplicity Connect App** (formerly EFR Connect App) and the **Wi‑Fi Commissioning over BLE** demo, as described in [Test the Application](#test-the-application). That flow is unchanged when **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **0** or **1**. The optional dynamic segment runs **automatically in firmware after DHCP**; it is **not** triggered by MQTT data and does **not** require the mobile app during BLE disable, the 16k SSL lab demo, BLE enable, or Wi‑Fi reconnect.
+
+**16k SSL record demo:** A **lab-only** step that validates TLS using a **16 KB SSL record** size. When the macro is **1**, **`app.c`** ORs **`SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD`** into the boot **`ext_tcp_ip_feature_bit_map`** so the network stack can use 16k-record TLS. After BLE is disabled, **`wifi_app_ssl_16k_demo()`** opens **two** TLS 1.2 TCP clients to **`SSL_16K_DEMO_SERVER_IP`** on **`SSL_16K_DEMO_SERVER_PORT_1`** and **`SSL_16K_DEMO_SERVER_PORT_2`** (OpenSSL **`s_server`** listeners on a lab PC). This is separate from AWS MQTT TLS.
+
 | `SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO` | Behavior summary |
 |--------------------------------------|------------------|
 | **0** (default) | After DHCP, the Wi‑Fi task proceeds to **MQTT** immediately. **`rsi_wlan_mqtt_certs_init()`** calls **`load_certificates_in_flash()`** at boot. No FreeRTOS message queues for BLE disable/enable, no **`WIFI_APP_BLE_ENABLE_REQUEST`**, and **`SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD`** is not added to boot **`ext_tcp_ip_feature_bit_map`**. |
-| **1** | After first DHCP success, the firmware **quiesces BLE**, calls **`rsi_ble_disable()`**, runs **`wifi_app_ssl_16k_demo()`** (two TLS 1.2 TCP clients), **`sl_wifi_disconnect()`**, **`rsi_ble_enable()`**, **`wifi_app_init_and_reconnect()`** ( **`sl_net_set_credential`** for PSK, **`sl_wifi_connect`**, DHCP only — **no** **`sl_wifi_init()`** ), then **`load_certificates_in_flash()`** for AWS and starts **MQTT**. Failures in that block skip MQTT and use the disconnected / reprovision path. |
+| **1** | After first DHCP success, the firmware runs the [runtime sequence](#runtime-sequence-when-enabled) below (BLE quiesce → disable → 16k SSL demo → station disconnect → BLE enable → Wi‑Fi reconnect → AWS cert load), then starts **MQTT**. Failures skip MQTT and use the [disconnected path](#failure-behavior-and-disconnected-path). |
 
 ### Return codes for runtime BLE enable and disable (SDK)
 
@@ -627,16 +632,13 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 | 1 | **`WIFI_APP_IPCONFIG_DONE_STATE`** | Wi‑Fi | Dynamic path entered after DHCP. |
 | 2 | **`osMessageQueueGet(ble_disable_done_queue, ...)`** | Wi‑Fi | Blocks until BLE posts disable result. |
 | 3 | **`WIFI_APP_CONNECTION_STATUS`** | Wi‑Fi → BLE | Sent with join; BLE runs join → quiesce when macro **1**. |
-| 4 | **`RSI_BLE_WLAN_JOIN_STATUS`** | BLE | GATT “AP joined”; then stop advertising + disconnect when macro **1**. |
-| 5 | **`rsi_ble_stop_advertising()`** | BLE | Stop advertising before disable. This API **may return an error** if advertising is **not** active (already stopped); the example **logs and continues**—see **Note** below. |
-| 6 | **`rsi_ble_disconnect()`** | BLE | Drop BLE link; on sync error, post to **`ble_disable_done_queue`** and skip pending disable. |
-| 7 | **`RSI_BLE_DISCONN_EVENT`** | BLE | Disconnect complete. |
-| 8 | **`ble_disable_after_disconnect_pending`** | BLE | If set, run **`rsi_ble_disable`** after disconnect event. |
-| 9 | **`app_ble_disable()`** | BLE | Wrapper for **`rsi_ble_disable()`**. |
-| 10 | **`rsi_ble_disable()`** | BLE | Turn off BLE stack after link quiesced. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already disabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
-| 11 | **`osMessageQueuePut(ble_disable_done_queue, ...)`** | BLE | Posts **`RSI_SUCCESS`**, **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`**, **`SL_STATUS_NOT_INITIALIZED`**, or other error to Wi‑Fi. |
-
-**Note:** A non-success status from **`rsi_ble_stop_advertising()`** does **not** abort the disable path by itself. Typical case: **no advertising** is running when the call is made. **`ble_app.c`** prints **`rsi_ble_stop_advertising before BLE disable: 0x… (continuing)`** and proceeds to **`rsi_ble_disconnect()`** and **`rsi_ble_disable()`** as usual.
+| 4 | **`RSI_BLE_WLAN_JOIN_STATUS`** | BLE | GATT “AP joined”; then disconnect when macro **1**. |
+| 5 | **`rsi_ble_disconnect()`** | BLE | Drop BLE link; on sync error, post to **`ble_disable_done_queue`** and skip pending disable. |
+| 6 | **`RSI_BLE_DISCONN_EVENT`** | BLE | Disconnect complete. |
+| 7 | **`ble_disable_after_disconnect_pending`** | BLE | If set, run **`rsi_ble_disable`** after disconnect event. |
+| 8 | **`app_ble_disable()`** | BLE | Wrapper for **`rsi_ble_disable()`**. |
+| 9 | **`rsi_ble_disable()`** | BLE | Turn off BLE stack after link quiesced. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already disabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
+| 10 | **`osMessageQueuePut(ble_disable_done_queue, ...)`** | BLE | Posts **`RSI_SUCCESS`**, **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`**, **`SL_STATUS_NOT_INITIALIZED`**, or other error to Wi‑Fi. |
 
 **BLE enable chain (explicit; one row per step)**
 
@@ -645,7 +647,7 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 | 1 | **`wifi_app_send_to_ble(WIFI_APP_BLE_ENABLE_REQUEST, ...)`** | Wi‑Fi | Queues enable request to BLE task. |
 | 2 | **`RSI_BLE_ENABLE_REQUEST`** | BLE | Internal event **`0x1B`** in **`rsi_ble_configurator_task`**. |
 | 3 | **`app_ble_enable()`** | BLE | Wrapper for **`rsi_ble_enable()`**. |
-| 4 | **`rsi_ble_enable()`** | BLE | Turn BLE stack back on. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already enabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
+| 4 | **`rsi_ble_enable()`** | BLE | Enable the BLE stack. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already enabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
 | 5 | **`osMessageQueuePut(ble_enable_done_queue, ...)`** | BLE | Posts **`RSI_SUCCESS`**, **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`**, **`SL_STATUS_NOT_INITIALIZED`**, or other error to Wi‑Fi. |
 
 **Reconnect after demo (one row per API / symbol)**
@@ -664,7 +666,7 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 | Location | Symbol | Role |
 |----------|--------|------|
 | `ble_app.c` | `app_ble_disable`, `app_ble_enable` | Thin wrappers around **`rsi_ble_disable()`** / **`rsi_ble_enable()`**; used only when the macro is **1**. See [Return codes for runtime BLE enable and disable (SDK)](#return-codes-for-runtime-ble-enable-and-disable-sdk). |
-| `ble_app.c` | `rsi_ble_stop_advertising`, `rsi_ble_disconnect`, `rsi_ble_start_advertising` | Quiesce link before disable (**`rsi_ble_stop_advertising`** errors ignored when not advertising—log and continue); restart advertising on normal disconnect when not in disable-pending path. |
+| `ble_app.c` | `rsi_ble_disconnect`, `rsi_ble_start_advertising` | Disconnect before disable; restart advertising on normal disconnect when not in disable-pending path. |
 | `wifi_app.c` | `wifi_app_ssl_16k_demo` | **`socket`**, **`setsockopt(..., TCP_ULP, TLS_1_2, ...)`**, sequential **`connect()`** to **`SSL_16K_DEMO_SERVER_IP`** on **`PORT_1`** then **`PORT_2`**, **`send`** on each, **`close`**. Returns **0** or **-1**. |
 | `wifi_app.c` | `sl_wifi_disconnect` | Drops station association before BLE re-enable so TLS demo does not run while associated. |
 | `wifi_app.c` | `load_certificates_in_flash` | **`sl_net_set_credential`** for AWS CA, client certificate, and private key (indices **0**). |
@@ -674,19 +676,47 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 
 ### Runtime sequence when enabled
 
-1. User provisions Wi‑Fi over BLE (same as the main readme).
-2. DHCP success → **`WIFI_APP_IPCONFIG_DONE_STATE`** and **`wifi_app_send_to_ble(WIFI_APP_CONNECTION_STATUS, ...)`**.
-3. BLE: join status handling → GATT “AP joined” → **`rsi_ble_stop_advertising()`** (may error if not advertising; logged, flow continues) → disconnect → **`RSI_BLE_DISCONN_EVENT`** → **`rsi_ble_disable()`** → post to **`ble_disable_done_queue`**.
-4. Wi‑Fi: **`osMessageQueueGet(ble_disable_done_queue)`** → on success, load **`cacert`** for slot **0** → **`wifi_app_ssl_16k_demo()`** → **`sl_wifi_disconnect()`** → **`WIFI_APP_BLE_ENABLE_REQUEST`** → wait **`ble_enable_done_queue`**.
-5. **`wifi_app_init_and_reconnect()`** → **`load_certificates_in_flash()`** → MQTT state machine (**`wifi_app_mqtt_task()`**).
+Follow these steps in order when **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **1**:
+
+1. Provision Wi‑Fi over BLE using the **Simplicity Connect App** (same as the main readme).
+2. DHCP succeeds. The Wi‑Fi task enters **`WIFI_APP_IPCONFIG_DONE_STATE`** and notifies the BLE task using **`WIFI_APP_CONNECTION_STATUS`**.
+3. The BLE task handles **`RSI_BLE_WLAN_JOIN_STATUS`**: updates the GATT “AP joined” status, then quiesces BLE (**`rsi_ble_disconnect()`** → **`rsi_ble_disable()`** after disconnect). The Wi‑Fi task blocks on **`ble_disable_done_queue`**. **`rsi_ble_disconnect()`** failure is handled in **`ble_app.c`**: the error status is posted to **`ble_disable_done_queue`** immediately (the Wi‑Fi task does not wait for a disconnect event that will never arrive).
+4. On successful BLE disable, the Wi‑Fi task loads the lab **`cacert`** and runs **`wifi_app_ssl_16k_demo()`** — two TLS 1.2 clients to **`SSL_16K_DEMO_SERVER_IP`** on **two different ports** (**`SSL_16K_DEMO_SERVER_PORT_1`** and **`SSL_16K_DEMO_SERVER_PORT_2`**). Both sockets connect to the **same lab host**; run **two** OpenSSL **`s_server`** processes (one per port). The demo sends **`Hello from Socket 1`** / **`Hello from Socket 2`**, then closes both sockets.
+5. **After** **`wifi_app_ssl_16k_demo()`** completes (both TLS sessions finished and closed), the Wi‑Fi task calls **`sl_wifi_disconnect()`** to drop the station association.
+6. The Wi‑Fi task requests BLE re-enable: **`wifi_app_send_to_ble(WIFI_APP_BLE_ENABLE_REQUEST, ...)`**. The BLE task calls **`rsi_ble_enable()`** and posts to **`ble_enable_done_queue`**. This step **does not** call **`rsi_ble_start_advertising()`** and does not require a new phone connection — it only turns the BLE stack back on before Wi‑Fi reconnect.
+7. **`wifi_app_init_and_reconnect()`** rejoins the **same AP** commissioned in step 1. It uses the SSID, security type, and password stored during BLE provisioning (**`coex_ssid`**, **`sec_type`**, **`pwd`** in **`wifi_app.c`**). No new scan or different AP is selected.
+8. **`load_certificates_in_flash()`** for AWS MQTT TLS material.
+9. Start the MQTT state machine (**`wifi_app_mqtt_task()`**).
 
 ### Failure behavior and disconnected path
 
-If BLE disable fails, demo CA load fails, **`wifi_app_ssl_16k_demo()`** fails, **`sl_wifi_disconnect`** fails, BLE re-enable fails, **`wifi_app_init_and_reconnect()`** fails, or post-reconnect **`load_certificates_in_flash()`** fails, the code sets **`disconnected`** and enters **`WIFI_APP_DISCONNECTED_STATE`** without starting MQTT. Here “BLE disable fails” / “BLE re-enable fails” includes any **non-** **`RSI_SUCCESS`** status on **`ble_disable_done_queue`** / **`ble_enable_done_queue`**, including **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** when the stack was **already** disabled or **already** enabled (see [Return codes for runtime BLE enable and disable (SDK)](#return-codes-for-runtime-ble-enable-and-disable-sdk)); that code is a **no firmware command** outcome, not a radio fault, but this example still treats it as failure unless you change the application.
+**Any step in the [runtime sequence](#runtime-sequence-when-enabled) fails** (BLE disable, demo CA load, **`wifi_app_ssl_16k_demo()`**, **`sl_wifi_disconnect`**, BLE enable, **`wifi_app_init_and_reconnect()`**, or post-reconnect **`load_certificates_in_flash()`**):
 
-In **`WIFI_APP_DISCONNECTED_STATE`**, when the macro is **1**, the Wi‑Fi task sends **`WIFI_APP_BLE_ENABLE_REQUEST`** and waits on **`ble_enable_done_queue`** before **`WIFI_APP_DISCONNECTION_STATUS`** so GATT updates can run. If BLE re-enable fails here (including **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE was already on), **`retry`** is cleared so the state machine does not immediately loop **`FLASH_STATE`** / **`sl_wifi_connect`** while BLE is still unusable; recovery is via reprovision (e.g. phone-side flow that drives **`WIFI_APP_DISCONN_NOTIFY_STATE`** as implemented in **`ble_app.c`**).
+- The Wi‑Fi task sets **`disconnected`** and enters **`WIFI_APP_DISCONNECTED_STATE`**.
+- **MQTT does not start.**
 
-See below for example run.
+Non-**`RSI_SUCCESS`** on **`ble_disable_done_queue`** / **`ble_enable_done_queue`** counts as failure, including **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** when BLE was already in the target state (see [Return codes](#return-codes-for-runtime-ble-enable-and-disable-sdk)).
+
+**`WIFI_APP_DISCONNECTED_STATE`** (macro **1**):
+
+- Wi‑Fi sends **`WIFI_APP_BLE_ENABLE_REQUEST`** and waits on **`ble_enable_done_queue`** so BLE is on before **`WIFI_APP_DISCONNECTION_STATUS`** updates the GATT.
+- Advertising is **not** restarted automatically. Use the Simplicity Connect reprovision flow if the user must commission Wi‑Fi again.
+- If BLE enable fails here, **`retry`** is cleared to avoid looping **`sl_wifi_connect`** while BLE is unusable.
+
+**Boot configuration:** When the macro is **1**, **`app.c`** sets **`SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD`** in **`ext_tcp_ip_feature_bit_map`**. BLE disable requires quiescing the link first (**`rsi_ble_disconnect()`**). Wi‑Fi/BLE coordination uses **`WIFI_APP_CONNECTION_STATUS`**, **`WIFI_APP_BLE_ENABLE_REQUEST`**, and the **`ble_disable_done_queue`** / **`ble_enable_done_queue`** queues. The application does **not** call **`rsi_ble_start_advertising()`** in the dynamic demo path.
+
+### Example serial output (macro = 1)
+
+Typical UART sequence after BLE provisioning and DHCP:
+
+1. **`16k demo: Certificate loading successful`**
+2. **`16k SSL demo: 2 TLS connections up (sequential connects, same server)`** — two clients to the **same** lab IP on ports **4443** and **4444** (not two different server hosts).
+3. **`16k demo: wifi reconnect successful`** — after **`sl_wifi_disconnect`**, BLE re-enable, and **`wifi_app_init_and_reconnect()`** to the **same provisioned AP**.
+4. **`Certificate loading successful`** — AWS MQTT certs loaded before MQTT.
+
+On the OpenSSL PCs, expect **`Hello from Socket 1`** on port **4443** and **`Hello from Socket 2`** on port **4444**.
+
+See below for example screenshots.
 
 ![](resources/readme/ble_enable_disable_1.png)
 

@@ -159,7 +159,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define INT_CH                0  // GPIO Pin interrupt 0
   ```
 
-- `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE`: Set to **1** to enable ULP GPIO 2 mapped to HP GPIO 66 toggling. Set to **0** to disable this feature and only use HP GPIO pin 6 toggle with pin 11 interrupt. By default, it is set to 1.
+- `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE`: Set to 1 to enable ULP GPIO 2 mapped to HP GPIO 66 toggling. Set to **0** to disable this feature and only use HP GPIO pin 6 toggle with pin 11 interrupt. By default, it is set to 1.
 
   ```c
     #define ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE 1  // Set to 1 to enable HP GPIO 66 toggle via ULP GPIO 2
@@ -173,7 +173,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 1. Compile and run the application.
 2. Observe toggles on GPIO 6 (P19). Press BTN1 for triggering HP GPIO pin interrupt.
-3. When `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE` is set to **1**, also observe HP GPIO 66 toggle on the ULP GPIO 2 pad.
+3. When `ENABLE_SOC_PERI_ON_ULP_PIN_TOGGLE` is set to 1, also observe HP GPIO 66 toggle on the ULP GPIO 2 pad.
 4. After successful program execution the prints in serial console looks as shown below.
 
   ![Figure: output](resources/readme/output.png)

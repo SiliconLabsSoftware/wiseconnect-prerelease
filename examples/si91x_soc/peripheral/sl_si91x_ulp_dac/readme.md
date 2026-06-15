@@ -101,7 +101,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - `FIVE_SECOND_DELAY`: Delay, in milliseconds, used between PS4 and PS2 power-state transitions. By default, it is set to 5000.
 
   ```c
-    #define FIVE_SECOND_DELAY     5000      // giving the 5 second delay in between state changes
+    #define FIVE_SECOND_DELAY     5000      // 5 seconds delay between state changes
   ```
 
 - Configure UC from the slcp component.

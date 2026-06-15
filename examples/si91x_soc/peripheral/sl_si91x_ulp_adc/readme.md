@@ -112,7 +112,7 @@ Configure UC from the slcp component.
   - **ADC Channel Configuration**
 
     - Input Type: ADC input type can be configured to be either single ended or differential.
-    - Sampling rate: The ADC sampling rate is configurable per channel, in units of samples per second. The supported range depends on the operating mode: in FIFO mode, the range is **80 Hz to 2.5 Msps**; in static mode, the range is approximately **39.1 ksps to 2.5 Msps** (determined by the 40 MHz ADC clock and an effective divider range of 16 to 1023).
+    - Sampling rate: The ADC sampling rate is configurable per channel, which is measured in samples per second. The supported range depends on the operating mode. In FIFO mode, the range is **80 Hz to 2.5 Msps**; in static mode, the range is approximately **39.1 ksps to 2.5 Msps** (determined by the 40 MHz ADC clock and an effective divider range of 16 to 1023).
     - Sample length: Set the length of ADC samples (that is, the number of ADC samples collected for operation). It should be minimum value set to 1 and maximum of 1023.
 
       ![Figure: sl_adc_channel_uc_screen](resources/uc_screen/sl_adc_channel_uc_screen.png)
@@ -133,13 +133,13 @@ Configure UC from the slcp component.
 - `ADC_MAX_OP_VALUE`: Maximum 12-bit raw value that can be read from the ADC data register. By default, it is set to 4095.
 
   ```c
-    #define ADC_MAX_OP_VALUE      4095       // Maximum output value get from adc data register
+    #define ADC_MAX_OP_VALUE      4095       // Maximum output value get from ADC data register
   ```
 
 - `VREF_VALUE`: ADC reference voltage (in volts) used to compute the equivalent input voltage. By default, it is set to 3.3.
 
   ```c
-    #define VREF_VALUE            3.3        // reference voltage
+    #define VREF_VALUE            3.3        // Reference voltage
   ```
 
 - `MS_DELAY_COUNTER`: Loop delay count used to generate a short millisecond-level wait inside the example. By default, it is set to 4600.

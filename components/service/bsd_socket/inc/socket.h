@@ -275,7 +275,7 @@ struct sockaddr_storage {
  * 
  * @pre Pre-conditions:
  * - The Wi-Fi/Net stack must be initialized and a network profile (STA or AP) must be up.
- * - If socket resources are configured via @ref sl_si91x_config_socket(), that call must have been made before @ref socket().
+ * - If socket resources are configured using @ref sl_si91x_config_socket(), that call must have been made before @ref socket().
  *
  * @post Post-conditions:
  * - On success a new socket descriptor is allocated and can be passed to @ref bind(), @ref connect(),
@@ -419,7 +419,7 @@ int bind(int socket_id, const struct sockaddr *addr, socklen_t addr_len);
  *   This function applies only to sockets of type `SOCK_STREAM` or `SOCK_SEQPACKET`.
  * 
  * @pre Pre-conditions:
- * - @p socket_id must be a @ref SOCK_STREAM socket created via @ref socket() and bound via @ref bind().
+ * - @p socket_id must be a @ref SOCK_STREAM socket created using @ref socket() and bound using @ref bind().
  * - A willingness to accept incoming connections and a queue limit for incoming connections 
  *   must be specified with @ref listen(), and then the connections can be accepted with @ref accept().
  *
@@ -480,8 +480,8 @@ int listen(int socket_id, int backlog);
  *   used to accept more connections. The original socket (`socket_id`) remains open.
  *
  * @pre Pre-conditions:
- * - @p socket_id must be a @ref SOCK_STREAM socket created via @ref socket(), bound via @ref bind(),
- *   and placed in the listening state via @ref listen().
+ * - @p socket_id must be a @ref SOCK_STREAM socket created using @ref socket(), bound using @ref bind(),
+ *   and placed in the listening state using @ref listen().
  *
  * @post Post-conditions:
  * - On success a new, connected socket descriptor is returned for the peer connection; @p addr / @p addr_len are populated (if non-NULL).
@@ -513,7 +513,7 @@ int listen(int socket_id, int backlog);
  * @retval -1/EINVAL        The socket is not listening (no prior @ref listen()) or arguments are invalid.
  * @retval -1/EWOULDBLOCK   The socket is non-blocking and no pending connections are available.
  * @retval -1/EMFILE        No free socket descriptor to allocate for the accepted connection.
- * @retval -1/ECONNABORTED  A connection has been aborted before @ref accept() returned.
+ * @retval -1/ECONNABORTED  A connection is aborted before @ref accept() returned.
  *
  * @note Thread safety:
  * - Not thread-safe on the same listening descriptor; serialize concurrent @ref accept() calls.
@@ -560,8 +560,8 @@ int accept(int socket_id, struct sockaddr *addr, socklen_t *addr_len);
  *   @ref connect() multiple times to change their association.
  *
  * @pre Pre-conditions:
- * - @p socket_id must be a descriptor created via @ref socket().
- * - For TCP (@ref SOCK_STREAM) any TLS / socket options (e.g. @ref TCP_ULP, @ref SL_SO_TLS_SNI) must be set via @ref setsockopt() before calling @ref connect().
+ * - @p socket_id must be a descriptor created using @ref socket().
+ * - For TCP (@ref SOCK_STREAM) any TLS / socket options (e.g. @ref TCP_ULP, @ref SL_SO_TLS_SNI) must be set using @ref setsockopt() before calling @ref connect().
  * - The network profile must be up and the destination must be reachable.
  *
  * @post Post-conditions:
@@ -635,8 +635,8 @@ int connect(int socket_id, const struct sockaddr *addr, socklen_t addr_len);
  *   By default, @ref recv() is a blocking API. To use it in a non-blocking manner, you can set the socket to non-blocking mode using `setsockopt()`.
  *
  * @pre Pre-conditions:
- * - For TCP the socket must be connected via @ref connect() or obtained from @ref accept().
- * - For UDP the socket must be bound via @ref bind() or connected via @ref connect() to a peer.
+ * - For TCP the socket must be connected using @ref connect() or obtained from @ref accept().
+ * - For UDP the socket must be bound using @ref bind() or connected using @ref connect() to a peer.
  *
  * @post Post-conditions:
  * - On success @p buf contains the received bytes and the return value is the number of bytes read.
@@ -711,7 +711,7 @@ ssize_t recv(int socket_id, void *buf, size_t buf_len, int flags);
  *   the source address of the message is filled in.
  *
  * @pre Pre-conditions:
- * - For UDP the socket must be bound via @ref bind() (at least implicitly).
+ * - For UDP the socket must be bound using @ref bind() (at least implicitly).
  * - For TCP the socket must be connected or obtained from @ref accept().
  *
  * @post Post-conditions:
@@ -794,13 +794,13 @@ ssize_t recvfrom(int socket_id, void *buf, size_t buf_len, int flags, struct soc
  *   If the socket is connection-oriented, the protocol must support implied connect or the socket must be explicitly connected before use. 
  *   No indication of failure to deliver is implicit in a @ref send(). Locally detected errors are indicated by a return value of -1. 
  *   If no message space is available at the socket to hold the message to be transmitted, then @ref send() normally blocks, unless the socket 
- *   has been placed in non-blocking I/O mode.
+ *   is placed in non-blocking I/O mode.
  *
  * @pre Pre-conditions:
- * - @p socket_id must be connected (TCP) or have had a peer cached via @ref connect() (UDP).
+ * - @p socket_id must be connected (TCP) or have cached a peer through @ref connect() (UDP).
  *
  * @post Post-conditions:
- * - On success the data has been handed to the stack for transmission. Return value indicates bytes accepted.
+ * - On success the data is passed to the stack for transmission. Return value indicates bytes accepted.
  * - On failure no bytes are transmitted and @c errno is set.
  * 
  * @param[in] socket_id
@@ -869,11 +869,11 @@ ssize_t send(int socket_id, const void *buf, size_t buf_len, int flags);
  *   the error `EMSGSIZE` is returned, and the message is not transmitted.
  *
  * @pre Pre-conditions:
- * - For UDP the socket must have been created via @ref socket() (optionally bound via @ref bind()).
+ * - For UDP the socket must have been created using @ref socket() (optionally bound using @ref bind()).
  * - For a connected socket, @p to_addr is ignored.
  *
  * @post Post-conditions:
- * - On success the data has been handed to the stack for transmission.
+ * - On success the data is passed to the stack for transmission.
  * - On failure no bytes are transmitted and @c errno is set.
  * 
  * @param[in] socket_id
@@ -962,7 +962,7 @@ ssize_t sendto(int socket_id, const void *buf, size_t buf_len, int flags, const 
  *   @ref SL_SO_VERIFY_DOMAIN_NAME) must be set before @ref connect().
  *
  * @post Post-conditions:
- * - On success the option has been applied to the socket. Subsequent calls on the socket observe the new behavior.
+ * - On success the option is applied to the socket. Subsequent calls on the socket observe the new behavior.
  * - On failure the option is unchanged and @c errno is set.
  * 
  * @param[in] socket_id
@@ -1227,7 +1227,7 @@ int getpeername(int socket_id, struct sockaddr *name, socklen_t *name_len);
  *   pointed to by `name_len`. If the buffer provided is too small, the address is truncated.
  *
  * @pre Pre-conditions:
- * - @p socket_id must be a descriptor returned by @ref socket(). The socket should be bound (explicitly via @ref bind() or implicitly).
+ * - @p socket_id must be a descriptor returned by @ref socket(). The socket should be bound (explicitly using @ref bind() or implicitly).
  *
  * @post Post-conditions:
  * - On success @p name is populated with the local address/port and @p name_len is updated with the actual size.

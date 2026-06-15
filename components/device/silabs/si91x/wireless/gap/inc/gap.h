@@ -24,7 +24,7 @@
  * - Connection state management structures
  * - Advertising and scanning state definitions
  * - Connection configuration structures
- * - Multi-protocol connection info structure (GAP owns/defines this)
+ * - Multiprotocol connection info structure (GAP owns/defines this)
  * - GAP utility function declarations
  */
 
@@ -148,7 +148,7 @@ typedef struct rsi_ble_profile_list_by_conn_s {
 } rsi_ble_profile_list_by_conn_t;
 
 /*=======================================================================*/
-//! Multi-Protocol Connection Info Structure (GAP DEFINES/OWNS)
+//! Multiprotocol Connection Info Structure (GAP DEFINES/OWNS)
 //! EXTRACTED FROM: ble_private.h lines 101-216
 //! NOTE: This structure is used by GAP, SMP, and GATT
 //!       GAP component DEFINES it, others extern it
@@ -305,7 +305,7 @@ typedef struct rsi_parsed_conf_s {
 int32_t ble_gap_init(void);
 
 /*=======================================================================*/
-//! Multi-protocol Connection Management APIs (GAP provides for SMP, GATT)
+//! Multiprotocol Connection Management APIs (GAP provides for SMP, GATT)
 /*=======================================================================*/
 
 /**

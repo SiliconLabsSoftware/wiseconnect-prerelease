@@ -247,10 +247,10 @@ The application can be configured to suit your requirements and development envi
 
     > Note:
     >
-    > - TWT Wake duration depends on the wake duration unit. For example, for the above configuration, the wake duration value is  (0x60 * 256 = 24.5 msec).
-    > - TWT Wake interval is calculated as mantissa *2 ^ exp.  For example, for the above configuration, the wake interval value is (0x1D4C * 2^13  = 61.4 sec).
+    > - TWT Wake duration depends on the wake duration unit. For example, for the above configuration, the wake duration value is  (0x60 * 256 = 24.5 ms).
+    > - TWT Wake interval is calculated as mantissa *2 ^ exp.  For example, for the above configuration, the wake interval value is (0x1D4C * 2^13  = 61.4 seconds).
     > - Configuring the TWT Wake interval beyond 1 min might lead to disconnections from the AP.
-    > - There might be disconnections while using TWT with wake interval > 4 sec when connected to an AP with non-zero GTK key renewal time.
+    > - There might be disconnections while using TWT with wake interval > 4 seconds when connected to an AP with non-zero GTK key renewal time.
     > - Keep Alive timeout should be non-zero when negotiated TWT setup is **unannounced**, otherwise there might be disconnections.
 
 - iTWT Teardown Configuration
@@ -303,9 +303,9 @@ The user can get asynchronous TWT session updates if *twt_response_handler* is d
 2. iTWT setup is recommended after IP assignment/TCP connection/application connection.
 3. When using sl_wifi_target_wake_time_auto_selection_v2 API, Rx Latency should be less than TCP / ARP Timeouts at the remote side.
 4. When using sl_wifi_enable_target_wake_time API, TWT interval configured should be less than TCP / ARP Timeouts at the remote side.
-5. For iTWT, GTK Interval should be kept at the maximum possible value or zero. If GTK interval is not configurable, recommended TWT interval (in case of sl_wifi_enable_target_wake_time) / RX Latency (in case of sl_wifi_target_wake_time_auto_selection_v2 API) is less than 4 sec.
+5. For iTWT, GTK Interval should be kept at the maximum possible value or zero. If GTK interval is not configurable, recommended TWT interval (in case of sl_wifi_enable_target_wake_time) / RX Latency (in case of sl_wifi_target_wake_time_auto_selection_v2 API) is less than 4 seconds.
 6. When sl_wifi_enable_target_wake_time API is used, configuring TWT Wake interval beyond 1 min might lead to disconnections from the AP. We recommend using a TWT wakeup interval less than or equal to 1 min.
-7. WLAN Keep Alive timeout should **not** be disabled when sl_wifi_target_wake_time_auto_selection_v2 API is used or when unannounced TWT session is set up using sl_wifi_enable_target_wake_time API. We recommend using WLAN Keep Alive timeout of 30 sec, which is the default timeout even if not configured specifically by the user.
+7. WLAN Keep Alive timeout should **not** be disabled when sl_wifi_target_wake_time_auto_selection_v2 API is used or when unannounced TWT session is set up using sl_wifi_enable_target_wake_time API. We recommend using WLAN Keep Alive timeout of 30 seconds, which is the default timeout even if not configured specifically by the user.
 
 ## Soc Mode:
 

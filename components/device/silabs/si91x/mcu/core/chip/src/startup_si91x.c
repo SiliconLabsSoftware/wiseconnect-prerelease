@@ -39,6 +39,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
+
 /*---------------------------------------------------------------------------
   * To ignore -Wpedantic warnings
   *---------------------------------------------------------------------------*/
@@ -51,6 +55,18 @@
   *---------------------------------------------------------------------------*/
 extern uint32_t __StackTop;
 extern int main(void); /*!< The entry point for the application  */
+
+#if defined(__GNUC__) && defined(SL_CATALOG_SL_MAIN_PRESENT) && defined(SL_CATALOG_KERNEL_PRESENT)
+/*
+ * When LTO is enabled, GCC may resolve the main() call in the reset handler
+ * directly to the user's main() definition, bypassing the linker's --wrap=main
+ * redirection. This is a known GCC LTO limitation (GCC bugzilla #24415).
+ * To guarantee correct startup sequencing, call __wrap_main() explicitly.
+ * Guard on SL_CATALOG_SL_MAIN_PRESENT because sl_main is the component
+ * that provides both --wrap=main and __wrap_main().
+ */
+extern int *__wrap_main(void);
+#endif
 
 /*---------------------------------------------------------------------------
   * Symbols defined in linker script
@@ -377,7 +393,11 @@ __attribute__((section(".reset_handler")))
   __libc_init_array();
 #endif
   /* Call the application's entry point.*/
+#if defined(__GNUC__) && defined(SL_CATALOG_SL_MAIN_PRESENT) && defined(SL_CATALOG_KERNEL_PRESENT)
+  __wrap_main();
+#else
   main();
+#endif
 }
 
 /*----------------------------------------------------------------------------

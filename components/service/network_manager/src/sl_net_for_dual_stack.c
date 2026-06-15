@@ -43,7 +43,6 @@
 #include "sli_net_common_utility.h"
 #include <stdbool.h>
 #include <string.h>
-#include <stdio.h>
 #include "sl_wifi_callback_framework.h"
 #include "sl_net_dns.h"
 #include "sli_wifi_constants.h"
@@ -161,7 +160,6 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
   if (len < LWIP_FRAME_ALIGNMENT) { /* 60 : LWIP frame alignment */
     len = LWIP_FRAME_ALIGNMENT;
   }
-
   // Drop packets originated from the same interface and is not destined for the said interface
   const uint8_t *src_mac = b + netif->hwaddr_len;
   const uint8_t *dst_mac = b;
@@ -170,26 +168,13 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
   if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0)))
       && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0)
       && (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0)) {
-    char sl_net_ds_ipv6_drop_eth_log[256];
-    snprintf(sl_net_ds_ipv6_drop_eth_log,
-             sizeof(sl_net_ds_ipv6_drop_eth_log),
-             "%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-             __func__,
-             dst_mac[0],
-             dst_mac[1],
-             dst_mac[2],
-             dst_mac[3],
-             dst_mac[4],
-             dst_mac[5],
-             src_mac[0],
-             src_mac[1],
-             src_mac[2],
-             src_mac[3],
-             src_mac[4],
-             src_mac[5],
-             b[12],
-             b[13]);
-    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)sl_net_ds_ipv6_drop_eth_log);
+    SL_DEBUG_LOG_V2(DEBUG, "%s: DROP, [%02x:%02x:", (uintptr_t) __func__, dst_mac[0], dst_mac[1]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x:", dst_mac[2], dst_mac[3], dst_mac[4]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x]<-", dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
+
     return;
   }
 #endif
@@ -204,25 +189,13 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
     }
 
     SL_DEBUG_LOG_V2(DEBUG, "%s: ACCEPT %d,", (uintptr_t) __func__, bufferoffset);
-    char sl_net_ds_rx_eth_log[256];
-    snprintf(sl_net_ds_rx_eth_log,
-             sizeof(sl_net_ds_rx_eth_log),
-             " [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-             dst_mac[0],
-             dst_mac[1],
-             dst_mac[2],
-             dst_mac[3],
-             dst_mac[4],
-             dst_mac[5],
-             src_mac[0],
-             src_mac[1],
-             src_mac[2],
-             src_mac[3],
-             src_mac[4],
-             src_mac[5],
-             b[12],
-             b[13]);
-    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)sl_net_ds_rx_eth_log);
+#ifdef SLI_NET_LWIP_RX_FRAME_DEBUG
+    SL_DEBUG_LOG_V2(DEBUG, " [%02x:%02x:%02x:", dst_mac[0], dst_mac[1], dst_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]<-", dst_mac[3], dst_mac[4], dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
+#endif
 
     if (netif->input(p, netif) != ERR_OK) {
       gOverrunCount++;

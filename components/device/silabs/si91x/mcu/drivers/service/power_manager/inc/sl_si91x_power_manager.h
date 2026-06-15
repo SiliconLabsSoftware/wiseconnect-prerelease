@@ -413,9 +413,9 @@ __STATIC_INLINE void sl_si91x_power_manager_core_exitcritical(void)
  * @note Critical section pairing: on failure, \c SLI_SI91X_POWER_MANAGER_CORE_EXIT_CRITICAL() runs for every state except
  *       when adding PS1 (legacy behavior). On success, EXIT runs for all states except PS1; for PS1, EXIT happens inside
  *       \c sli_si91x_power_manager_change_power_state_with_critical_irq() before \c trigger_sleep so interrupts are enabled
- *       for wake from retention sleep (see \c sli_si91x_power_manager_core_exitcritical()).
- *       With \c SL_SI91X_TICKLESS_MODE 1, \c cpsie i is enabled from \c vPortSuppressTicksAndSleep; otherwise PS2 to PS1 may
- *       still issue \c cpsie i after wake when \c irq_state was \c 0 at entry.
+ *       for waking up from retention sleep (see \c sli_si91x_power_manager_core_exitcritical()).
+ *       With \c SL_SI91X_TICKLESS_MODE 1, \c cpsie i is enabled from \c vPortSuppressTicksAndSleep; otherwise, PS2 to PS1 may
+ *       still issue \c cpsie i after wake up when \c irq_state was \c 0 at entry.
  * 
  * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  ******************************************************************************/

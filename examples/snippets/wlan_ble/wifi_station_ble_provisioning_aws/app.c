@@ -176,20 +176,20 @@ void rsi_wlan_ble_app_init(void *argument)
   ble_disable_done_queue = osMessageQueueNew(1, sizeof(int32_t), NULL);
   ble_enable_done_queue  = osMessageQueueNew(1, sizeof(int32_t), NULL);
   if (ble_disable_done_queue == NULL || ble_enable_done_queue == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Queue creation failed.");
+    SL_DEBUG_LOG_V2(ERROR, "Queue creation failed.\r\n");
     return;
   }
 #endif
 
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (wlan_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem\r\n");
     return;
   }
 
   ble_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem\r\n");
     return;
   }
 

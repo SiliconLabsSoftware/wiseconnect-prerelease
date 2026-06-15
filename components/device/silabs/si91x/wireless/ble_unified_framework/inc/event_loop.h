@@ -21,9 +21,9 @@
  *
  *
  *
- *  @brief : This file contains structures and macros of event and command of a module
+ *  @brief : This file contains structures and macros of event and command of a module.
  *
- *  @section Description  This file contain structures and macros
+ *  @section Description  This file contains structures and macros.
  */
 
 #ifndef __EVENT_LOOP_H__

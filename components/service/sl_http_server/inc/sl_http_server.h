@@ -117,8 +117,8 @@ sl_status_t sl_http_server_deinit(sl_http_server_t *handle);
  *   - SL_STATUS_FAIL: Failed to create the server thread.
  *
  * @note
- *   The server accepts only one TCP connection at a time. Simultaneous connections (e.g. multiple browser tabs or browsers) are not supported; 
- *   further attempts may be refused or may time out until the current connection is closed.
+ *   The server accepts only one TCP connection at a time. Simultaneous connections (e.g., multiple browser tabs or browsers) are not supported. 
+ *   Further attempts might be refused or might time out until the current connection closes.
  */
 sl_status_t sl_http_server_start(sl_http_server_t *handle);
 

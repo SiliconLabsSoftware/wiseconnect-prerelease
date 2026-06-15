@@ -12,7 +12,16 @@
  *
  */
 #ifndef SLI_SI91X_MCU_INTERFACE
+#include "sl_component_catalog.h"
 #include "sl_iostream.h"
+#include "sl_iostream_handles.h"
+#if defined(SL_CATALOG_IOSTREAM_USART_PRESENT) || defined(SL_CATALOG_IOSTREAM_EUSART_PRESENT)
+#define SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT 1
+#elif defined(__has_include)
+#if __has_include("sl_iostream_init_usart_instances.h") || __has_include("sl_iostream_init_eusart_instances.h")
+#define SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT 1
+#endif
+#endif
 #endif
 #include "console.h"
 #include "sl_constants.h"
@@ -84,10 +93,19 @@ const osThreadAttr_t thread_attributes = {
 
 void app_init(void)
 {
+#ifndef SLI_SI91X_MCU_INTERFACE
+  // Force the log backend (log_backend_iostream_formatted) to write to RTT
+  // instead of vcom. sl_iostream_set_console_instance() picks UART over RTT by
+  // priority; without this override, SL_DEBUG_LOG_V2 output would land on vcom
+  // and corrupt the HCI byte stream.
+  extern sl_iostream_t *sl_iostream_recommended_console_stream;
+  extern sl_iostream_t *sl_iostream_rtt_handle;
+  sl_iostream_recommended_console_stream = sl_iostream_rtt_handle;
+#endif
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
 }
 
-#ifndef SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT)
 void iostream_usart_init()
 {
   /* Prevent buffering of output/input.*/
@@ -101,27 +119,40 @@ void iostream_rx()
 {
   char c               = 0;
   static uint8_t index = 0;
-  sl_iostream_getchar(SL_IOSTREAM_STDIN, &c);
-  if (c > 0) {
-    cache_uart_rx_data(c);
-    if ((c == '\n')) {
-      index      = 0;
-      end_of_cmd = true;
-    } else {
-      if (index < BUFFER_SIZE - 1) {
-        index++;
+  // Read HCI bytes ONLY from the vcom UART, not from the "default" / "recommended
+  // console" stream. This decouples the HCI pipe from the log pipe so we can
+  // route SL_DEBUG_LOG_V2 output to RTT without corrupting HCI on vcom.
+  size_t total = 0;
+  size_t len   = 1;
+  while (total < len) {
+    size_t got         = 0;
+    sl_status_t retval = sl_iostream_read(sl_iostream_vcom_handle, &c, len - total, &got);
+    if (retval == SL_STATUS_OK) {
+      total += got;
+    } else if (retval != SL_STATUS_EMPTY) {
+      return;
+    }
+    if (c > 0) {
+      cache_uart_rx_data(c);
+      if ((c == '\n')) {
+        index      = 0;
+        end_of_cmd = true;
+      } else {
+        if (index < BUFFER_SIZE - 1) {
+          index++;
+        }
       }
     }
   }
 }
-#endif
+#endif // SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT
 
 void application_start(const void *unused)
 {
   UNUSED_PARAMETER(unused);
   console_args_t args;
   const console_descriptive_command_t *command;
-#ifndef SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT)
   iostream_usart_init();
 #endif
 
@@ -133,7 +164,7 @@ void application_start(const void *unused)
 
   while (1) {
     SL_DEBUG_LOG_V2(INFO, "> \r\n");
-#ifndef SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT)
     while (!end_of_cmd) {
       iostream_rx();
     }

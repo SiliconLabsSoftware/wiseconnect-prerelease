@@ -118,7 +118,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - `UART_RS485_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive RS485 UART data. By default, it is set to 1024.
 
   ```c
-  #define UART_RS485_BUFFER_SIZE  1024   // Data send and receive length
+  #define UART_RS485_BUFFER_SIZE  1024   // Length of data to be sent or received
   ```
 
 - `UART_RS485_BAUDRATE`: Specifies the UART baud rate used for RS485 transmission and reception. By default, it is set to 115200.

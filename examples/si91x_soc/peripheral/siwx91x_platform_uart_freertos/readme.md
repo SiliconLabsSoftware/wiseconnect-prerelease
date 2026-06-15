@@ -110,7 +110,7 @@ Configuration of UART at UC (Universal Configuration):
 - `UART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive UART data. By default, it is set to 1024.
 
   ```c
-  #define UART_BUFFER_SIZE      1024   // Data send and receive length
+  #define UART_BUFFER_SIZE      1024   // Length of data to be sent or received
   ```
 
 - `UART_BAUDRATE`: Specifies the UART baud rate used for transmission and reception. Supported range is 9600-7372800. By default, it is set to 115200.

@@ -229,7 +229,7 @@ int sl_si91x_socket_async(int family, int type, int protocol, sl_si91x_socket_re
  * - Must be called before @ref sl_si91x_connect() / @ref sl_si91x_listen() (TCP) or before @ref sl_si91x_sendto() / @ref sl_si91x_recvfrom() / @ref sl_si91x_connect() (UDP).
  *
  * @post Post-conditions:
- * - On success the option has been applied to the socket.
+ * - On success the option is applied to the socket.
  *
  * @return 
  *   Returns 0 on success, or -1 on failure with @c errno set.
@@ -412,7 +412,7 @@ int sl_si91x_listen(int socket, int max_number_of_clients);
  * - The original listening descriptor remains open and usable for further @ref sl_si91x_accept() calls.
  *
  * @param[in] socket The socket ID or file descriptor for the specified socket.
- * @param[in] addr The address of type @ref sockaddr to which datagrams are to be sent. May be NULL.
+ * @param[in] addr The address of type @ref sockaddr to which datagrams are to be sent. Its value can be NULL.
  * @param[in] addr_len The length of the socket address of type @ref socklen_t in bytes.
  * @return 
  *   Returns a non-negative socket descriptor for the accepted connection on success, or -1 on failure with @c errno set.
@@ -462,7 +462,7 @@ int sl_si91x_accept(int socket, const struct sockaddr *addr, socklen_t addr_len)
  * - @p callback must be non-NULL.
  *
  * @post Post-conditions:
- * - On success the registration is complete and @p callback is invoked from the stack context whenever a new client connects.
+ * - On success, the registration is complete and @p callback is invoked from the stack context whenever a new client connects.
  * - The original descriptor remains open.
  * 
  * @param[in] socket 
@@ -603,7 +603,7 @@ int sl_si91x_connect(int socket, const struct sockaddr *addr, socklen_t addr_len
  * @retval -1/EINVAL             @p buffer is NULL or @p buffer_length out of range.
  * @retval -1/EMSGSIZE           Buffer exceeds the MSS limit for the protocol.
  * @retval -1/EPIPE              Peer has closed the connection.
- * @retval -1/ECONNRESET         Peer reset the connection.
+ * @retval -1/ECONNRESET         Peer resets the connection.
  * @retval -1/ENOBUFS            Not enough buffer space in the stack; try again later.
  *
  * @note Thread safety:
@@ -648,7 +648,7 @@ int sl_si91x_send(int socket, const uint8_t *buffer, size_t buffer_length, int32
  * - @p callback, if non-NULL, must remain valid until the TX-complete notification is delivered.
  *
  * @post Post-conditions:
- * - On success the request has been queued. @p callback is invoked from the stack context once the transmission completes.
+ * - On success, the request is queued. @p callback is invoked from the stack context once the transmission completes.
  * 
  * @param[in] socket 
  * The socket ID or file descriptor for the specified socket.
@@ -808,7 +808,7 @@ int sl_si91x_sendto(int socket,
  * - @p callback, if non-NULL, must remain valid until the TX-complete notification is delivered.
  *
  * @post Post-conditions:
- * - On success the request has been queued. @p callback is invoked from the stack context once the transmission completes.
+ * - On success, the request is queued. @p callback is invoked from the stack context once the transmission completes.
  * 
  * @param[in] socket 
  * The socket ID or file descriptor for the specified socket.
@@ -876,7 +876,7 @@ int sl_si91x_sendto_async(int socket,
  * - @p socket must be a connected TCP socket.
  *
  * @post Post-conditions:
- * - On success the requested number of bytes have been segmented and queued by the stack for transmission.
+ * - On success, the requested number of bytes are segmented and queued by the stack for transmission.
  *
  * @param[in] socket 
  *   The socket ID or file descriptor for the specified socket.
@@ -899,7 +899,7 @@ int sl_si91x_sendto_async(int socket,
  * @retval -1/ENOTCONN           Socket is not connected.
  * @retval -1/EINVAL             @p buffer is NULL or @p buffer_length is 0.
  * @retval -1/EPIPE              Peer has closed the connection.
- * @retval -1/ECONNRESET         Peer reset the connection.
+ * @retval -1/ECONNRESET         Peer resets the connection.
  * @retval -1/ENOBUFS            Not enough buffer space in the stack.
  *
  * @note Thread safety:
@@ -969,7 +969,7 @@ int sl_si91x_send_large_data(int socket, const uint8_t *buffer, size_t buffer_le
  * @retval -1/EINVAL             @p buffer is NULL or @p bufferLength is 0.
  * @retval -1/EWOULDBLOCK        Non-blocking socket has no data available.
  * @retval -1/ETIMEDOUT          @ref SL_SI91X_SO_RCVTIME elapsed before data was received.
- * @retval -1/ECONNRESET         Peer reset the connection.
+ * @retval -1/ECONNRESET         Peer resets the connection.
  *
  * @note Thread safety:
  * - Not thread-safe on the same descriptor; serialize concurrent access.
@@ -1044,7 +1044,7 @@ int sl_si91x_recv(int socket, uint8_t *buffer, size_t bufferLength, int32_t flag
  * @retval -1/EINVAL             @p buffer is NULL, @p buffersize is 0, or @p fromAddrLen invalid.
  * @retval -1/EWOULDBLOCK        Non-blocking socket has no data available.
  * @retval -1/ETIMEDOUT          @ref SL_SI91X_SO_RCVTIME elapsed before data was received.
- * @retval -1/ECONNRESET         Peer reset the connection.
+ * @retval -1/ECONNRESET         Peer resets the connection.
  *
  * @note Thread safety:
  * - Not thread-safe on the same descriptor; serialize concurrent access.

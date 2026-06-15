@@ -33,8 +33,8 @@ extern "C" {
  * @brief      Initialize Legacy Advertising component
  * @return     int32_t - SL_STATUS_OK on success, error code otherwise
  * 
- * @section description
- * This function initializes the Legacy Advertising component including:
+ * @section Description
+ * This function initializes the legacy advertising component including:
  * - Setting up advertising data with device name from configuration
  * - Starting legacy advertising (if ADV_ENABLED_DEFAULT and centrals configured)
  * - Starting scanning (if SCAN_ENABLED_DEFAULT and peripherals configured)

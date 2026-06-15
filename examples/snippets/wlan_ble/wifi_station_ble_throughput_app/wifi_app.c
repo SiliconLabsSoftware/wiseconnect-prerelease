@@ -113,6 +113,21 @@ uint32_t now              = 0;
 uint8_t first_call        = 1;
 uint8_t enable_callback   = 0;
 
+#if SOCKET_ASYNC_FEATURE
+static uint8_t tcp_async_socket_config_done = 0;
+#endif
+
+#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO && SOCKET_ASYNC_FEATURE
+static void reset_wlan_async_rx_state_between_passes(void)
+{
+  has_data_received = 0;
+  bytes_read        = 0;
+  first_call        = 1;
+  enable_callback   = 0;
+  start             = 0;
+  now               = 0;
+}
+#endif
 void data_callback(uint32_t sock_no,
                    uint8_t *buffer,
                    uint32_t length,
@@ -144,7 +159,7 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
   float duration = ((test_timeout) / 1000);                    // ms to sec
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully", result, duration);
+  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
   bytes_read = 0;
 }
 
@@ -206,7 +221,7 @@ static int32_t wifi_app_init_and_reconnect(void)
 
   status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: set credential failed: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: set credential failed: 0x%lX\r\n", status);
     return -1;
   }
 
@@ -218,7 +233,7 @@ static int32_t wifi_app_init_and_reconnect(void)
 
   status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: sl_wifi_connect failed: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: sl_wifi_connect failed: 0x%lX\r\n", status);
     return -1;
   }
 
@@ -227,7 +242,7 @@ static int32_t wifi_app_init_and_reconnect(void)
   ip_address.host_name = DHCP_HOST_NAME;
   status               = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: IP config failed: 0x%lX", status);
+    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: IP config failed: 0x%lX\r\n", status);
     return -1;
   }
 
@@ -309,33 +324,43 @@ int32_t rsi_wlan_app_task()
   {
     int32_t ble_result = RSI_FAILURE;
     if (rsi_ble_app_request_disable() != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "BLE disable request failed");
+      SL_DEBUG_LOG_V2(ERROR, "BLE disable request failed\r\n");
       return -1;
     }
     if (osMessageQueueGet(ble_disable_done_queue, &ble_result, NULL, osWaitForever) != osOK
         || ble_result != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "BLE disable failed: %ld", (long)ble_result);
+      SL_DEBUG_LOG_V2(ERROR, "BLE disable failed: %ld\r\n", (long)ble_result);
       return -1;
     }
+
+    SL_DEBUG_LOG_V2(INFO, "BLE disabled\r\n");
+#if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO && SOCKET_ASYNC_FEATURE
+    reset_wlan_async_rx_state_between_passes();
+#endif
+
     wlan_throughput_task();
     status = sl_wifi_disconnect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE);
     if (status != SL_STATUS_OK) {
-      LOG_PRINT("\r\nDynamic demo: sl_wifi_disconnect failed: 0x%lX\r\n", (unsigned long)status);
+      SL_DEBUG_LOG_V2(ERROR, "Dynamic demo: sl_wifi_disconnect failed: 0x%lX\r\n", (unsigned long)status);
       return -1;
     }
     rsi_ble_app_request_enable();
     if (osMessageQueueGet(ble_enable_done_queue, &ble_result, NULL, osWaitForever) != osOK
         || ble_result != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "BLE enable failed: %ld", (long)ble_result);
+      SL_DEBUG_LOG_V2(ERROR, "BLE enable failed: %ld\r\n", (long)ble_result);
       return -1;
     }
+
+    SL_DEBUG_LOG_V2(INFO, "BLE re-enabled\r\n");
+
     if (wifi_app_init_and_reconnect() != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Init+reconnect after BLE enable failed");
+      SL_DEBUG_LOG_V2(ERROR, "Init+reconnect after BLE enable failed\r\n");
       return -1;
     }
   }
 #endif
 
+  SL_DEBUG_LOG_V2(INFO, "WLAN throughput test finished\r\n");
   return 0;
 }
 
@@ -601,14 +626,14 @@ void receive_data_from_tcp_client(void)
   struct sockaddr_in server_address = { 0 };
   socklen_t socket_length           = sizeof(struct sockaddr_in);
   uint32_t high_performance_socket  = SL_HIGH_PERFORMANCE_SOCKET;
-  static uint8_t done_once          = 0;
 
-  if (!done_once) {
+  if (!tcp_async_socket_config_done) {
     sl_status_t status = sl_si91x_config_socket(socket_config);
     if (status != SL_STATUS_OK) {
       SL_DEBUG_LOG_V2(ERROR, "Socket config failed: %ld\r\n", status);
       return;
     }
+    tcp_async_socket_config_done = 1;
   }
   SL_DEBUG_LOG_V2(INFO, "Socket config Done\r\n");
 
@@ -619,18 +644,16 @@ void receive_data_from_tcp_client(void)
   }
   SL_DEBUG_LOG_V2(INFO, "Server Socket ID : %d\r\n", server_socket);
 
-  if (!done_once) {
-    socket_return_value = sl_si91x_setsockopt(server_socket,
-                                              SOL_SOCKET,
-                                              SL_SI91X_SO_HIGH_PERFORMANCE_SOCKET,
-                                              &high_performance_socket,
-                                              sizeof(high_performance_socket));
-    if (socket_return_value < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
-      close(server_socket);
-      return;
-    }
-    done_once = 1;
+  /* HP socket mode is per-socket; apply on every new async TCP socket */
+  socket_return_value = sl_si91x_setsockopt(server_socket,
+                                            SOL_SOCKET,
+                                            SL_SI91X_SO_HIGH_PERFORMANCE_SOCKET,
+                                            &high_performance_socket,
+                                            sizeof(high_performance_socket));
+  if (socket_return_value < 0) {
+    SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
+    close(server_socket);
+    return;
   }
   server_address.sin_family = AF_INET;
   server_address.sin_port   = DEVICE_PORT;

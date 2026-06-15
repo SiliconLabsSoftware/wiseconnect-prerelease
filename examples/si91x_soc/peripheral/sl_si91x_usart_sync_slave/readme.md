@@ -123,10 +123,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define USART_BAUDRATE        115200 // Baud rate <9600-7372800>
   ```
 
-- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default USART configurations in the non-UC (non Universal Configuration) case. By default, it is set to 0.
+- `NON_UC_DEFAULT_CONFIG`: When enabled (set to 1), applies the default USART configurations in the non-Universal Configuration (non-UC) case. By default, it is set to 0.
 
   ```c
-  #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non_uc case
+  #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non-UC case
   ```
 
 ### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board

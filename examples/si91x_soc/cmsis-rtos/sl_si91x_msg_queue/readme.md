@@ -21,9 +21,8 @@
 
 ## Purpose/Scope
 
-- The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts embedded with multiple peripherals. The following concepts are demonstrated:
-  - Message Queues
-- This application contains a comprehensive sample application which includes multiple peripherals listed below
+- The purpose of this application is to demonstrate the use of CMSIS-RTOS concepts embedded with multiple peripherals. In this sample application, the Message Queues concepts is demonstrated.
+- This is a comprehensive sample application which includes the following peripherals:
   - I2C (as a Follower)
   - USART
 - This example creates separate threads for each above mentioned peripheral.
@@ -113,13 +112,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - `BUFFER_SIZE`: Specifies the size (in bytes) of the data buffers shared by the I2C and USART threads for send and receive operations. This value must match the buffer size used by the leader application. By default, it is set to 15.
 
   ```c
-    #define BUFFER_SIZE      15  // Data send and receive length
+    #define BUFFER_SIZE      15  // Length of sent or received data.
   ```
 
 - `MSGQUEUE_OBJECTS`: Specifies the maximum number of messages each CMSIS-RTOS2 message queue can hold at any time. By default, it is set to 1.
 
   ```c
-    #define MSGQUEUE_OBJECTS 1   // number of Message Queue Objects
+    #define MSGQUEUE_OBJECTS 1   // Number of message queue objects.
   ```
 
 - Configure the following macros in [`usart_app.c`](src/usart_app.c) if required.

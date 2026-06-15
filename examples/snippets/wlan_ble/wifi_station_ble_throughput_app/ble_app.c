@@ -568,7 +568,7 @@ void rsi_ble_app_init(void)
   //! start advertising
   status = rsi_ble_start_advertising();
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx \r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx\r\n", status);
   } else {
     SL_DEBUG_LOG_V2(INFO, "Started advertising, local device name: %s\r\n", (uintptr_t)(char *)RSI_BLE_DEVICE_NAME);
   }
@@ -635,7 +635,7 @@ void rsi_ble_app_task(void)
         //! start advertising
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx \r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "Start advertising cmd failed with error code = %lx\r\n", status);
         } else {
           SL_DEBUG_LOG_V2(INFO,
                           "Started advertising, local device name: %s\r\n",
@@ -644,9 +644,9 @@ void rsi_ble_app_task(void)
       } break;
 
       case RSI_BLE_CONN_UPDATE_EVENT: {
-        SL_DEBUG_LOG_V2(INFO, "Connection parameters update completed ");
+        SL_DEBUG_LOG_V2(INFO, "Connection parameters update completed\r\n");
         SL_DEBUG_LOG_V2(INFO,
-                        "Connection interval = %d, Latency = %d, Supervision Timeout = %d ",
+                        "Connection interval = %d, Latency = %d, Supervision Timeout = %d\r\n",
                         conn_update_complete.conn_interval,
                         conn_update_complete.conn_latency,
                         conn_update_complete.timeout);
@@ -658,16 +658,16 @@ void rsi_ble_app_task(void)
         //! event invokes when write event received
         //! clear the served event
         rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
-        SL_DEBUG_LOG_V2(INFO, "Received packet type = %d", app_ble_write_event.pkt_type);
+        SL_DEBUG_LOG_V2(INFO, "Received packet type = %d\r\n", app_ble_write_event.pkt_type);
 
         if ((*(uint16_t *)app_ble_write_event.handle - 1) == rsi_ble_att2_val_hndl) {
           if (app_ble_write_event.att_value[0] == NOTIFY_ENABLE) {
-            SL_DEBUG_LOG_V2(INFO, "Remote device enabled the notification \r\n");
+            SL_DEBUG_LOG_V2(INFO, "Remote device enabled the notification\r\n");
             //! set the data transfer event
             notifies_enabled = 0x01;
             rsi_ble_app_set_event(RSI_DATA_TRANSMIT_EVENT);
           } else if (app_ble_write_event.att_value[0] == NOTIFY_DISABLE) {
-            SL_DEBUG_LOG_V2(INFO, "Remote device disabled the notification \r\n");
+            SL_DEBUG_LOG_V2(INFO, "Remote device disabled the notification\r\n");
             //! clear the data transfer event
             notifies_enabled = 0x00;
             rsi_ble_app_clear_event(RSI_DATA_TRANSMIT_EVENT);
@@ -677,15 +677,11 @@ void rsi_ble_app_task(void)
 #if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO
       case RSI_BLE_DISABLE_REQUEST: {
         rsi_ble_app_clear_event(RSI_BLE_DISABLE_REQUEST);
-        /* Quiesce before BLE disable: stop advertising, disconnect; app_ble_disable runs after RSI_BLE_DISCONN_EVENT. */
-        status = rsi_ble_stop_advertising();
-        if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_stop_advertising before BLE disable: 0x%lx (continuing)", status);
-        }
+        /* Quiesce before BLE disable: disconnect; app_ble_disable runs after RSI_BLE_DISCONN_EVENT. */
         ble_disable_after_disconnect_pending = 1;
         status                               = rsi_ble_disconnect((const int8_t *)remote_dev_address);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_disconnect before BLE disable failed: 0x%lx", status);
+          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_disconnect before BLE disable failed: 0x%lx\r\n", status);
           ble_disable_after_disconnect_pending = 0;
           osMessageQueuePut(ble_disable_done_queue, &status, 0, osWaitForever);
         }

@@ -64,7 +64,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Test the Application
 
-1. Activates the RGB LED on the board, cycling through various colors at 100ms intervals.
+1. Activates the RGB LED on the board, cycling through various colors at 100 ms intervals.
 
 
 > **Note:**
@@ -77,7 +77,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Troubleshooting
 
-- If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
+- If the project does not build, ensure that Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
 - If the device is not detected, reinstall the connectivity firmware and check USB drivers.
 
 ## Resources

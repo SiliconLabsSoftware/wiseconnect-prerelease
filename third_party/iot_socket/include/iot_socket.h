@@ -113,9 +113,9 @@ extern "C"
  *   @ref iotSocketRecv operate over TLS transparently.
  *
  * @par Call ordering
- *   This option MUST be set on a freshly created stream socket BEFORE
- *   @ref iotSocketConnect() is called. Setting it after connect has no
- *   effect because the TLS handshake is performed during connect.
+ *   This option must be set on a freshly created stream socket before calling 
+ *   @ref iotSocketConnect(). Setting it after connection has no
+ *   effect because the TLS handshake is performed during connection.
  *
  * @par Argument layout
  *   - @c opt_val : pointer to a NUL-terminated TLS-version string.
@@ -124,8 +124,8 @@ extern "C"
  *   - @c opt_len : @c strlen(opt_val) + 1 (must include the trailing NUL).
  *
  * @par Other TLS attributes (certificate index, SNI, ALPN, high-performance
- *      flag, ...) are NOT exposed via this opt_id. They must be configured
- *      via the underlying @c setsockopt() call directly on the same fd.
+ *      flag, ...) are NOT exposed through this opt_id. They must be configured
+ *      using the underlying @c setsockopt() call directly on the same fd.
  *
  * @par Example
  * @code{.c}
@@ -185,7 +185,7 @@ extern "C"
  *
  * @pre Pre-conditions:
  * - The Wi-Fi/Net stack must be initialized and a network profile must be up.
- * - If socket resources are configured via @ref sl_si91x_config_socket(), that call must be made before @ref iotSocketCreate().
+ * - If socket resources are configured using @ref sl_si91x_config_socket(), that call must be made before @ref iotSocketCreate().
  *
  * @post Post-conditions:
  * - On success a new IoT socket descriptor is allocated and can be passed to @ref iotSocketBind(),
@@ -310,7 +310,7 @@ extern int32_t iotSocketBind(int32_t socket, const uint8_t *ip, uint32_t ip_len,
  *   The `backlog` parameter defines the maximum length to which the queue of pending connections for `socket` may grow.
  *
  * @pre Pre-conditions:
- * - @p socket must be a TCP (@c IOT_SOCKET_SOCK_STREAM) socket created via @ref iotSocketCreate() and bound via @ref iotSocketBind().
+ * - @p socket must be a TCP (@c IOT_SOCKET_SOCK_STREAM) socket created using @ref iotSocketCreate() and bound using @ref iotSocketBind().
  *
  * @post Post-conditions:
  * - On success the socket transitions into the listening state and can be passed to @ref iotSocketAccept().
@@ -369,7 +369,7 @@ extern int32_t iotSocketListen(int32_t socket, int32_t backlog);
  *   to accept new connections.
  *
  * @pre Pre-conditions:
- * - @p socket must be a TCP socket placed in the listening state via @ref iotSocketListen().
+ * - @p socket must be a TCP socket placed in the listening state using @ref iotSocketListen().
  *
  * @post Post-conditions:
  * - On success a new connected socket descriptor is returned. If @p ip / @p port are non-NULL they are populated with the peer's address.
@@ -444,7 +444,7 @@ extern int32_t iotSocketAccept(int32_t socket, uint8_t *ip, uint32_t *ip_len, ui
  *   and optionally bound to a local address before calling this function.
  *
  * @pre Pre-conditions:
- * - @p socket must be a descriptor created via @ref iotSocketCreate().
+ * - @p socket must be a descriptor created using @ref iotSocketCreate().
  * - Network must be up and the destination must be reachable.
  *
  * @post Post-conditions:
@@ -519,7 +519,7 @@ extern int32_t iotSocketConnect(int32_t socket, const uint8_t *ip, uint32_t ip_l
  *   The received data is stored in the buffer pointed to by `buf`, which has a length of `len` bytes.
  *
  * @pre Pre-conditions:
- * - @p socket must be connected via @ref iotSocketConnect() (TCP) or have a cached peer (UDP).
+ * - @p socket must be connected using @ref iotSocketConnect() (TCP) or have a cached peer (UDP).
  *
  * @post Post-conditions:
  * - On success @p buf contains the received bytes and the return value is the number of bytes read.
@@ -591,7 +591,7 @@ extern int32_t iotSocketRecv(int32_t socket, void *buf, uint32_t len);
  *   of the received data.
  *
  * @pre Pre-conditions:
- * - @p socket must be bound via @ref iotSocketBind() (for UDP) or connected via @ref iotSocketConnect() (for TCP).
+ * - @p socket must be bound using @ref iotSocketBind() (for UDP) or connected using @ref iotSocketConnect() (for TCP).
  *
  * @post Post-conditions:
  * - On success @p buf contains the received bytes and @p ip / @p port (when non-NULL) are populated with the source address.
@@ -674,7 +674,7 @@ extern int32_t iotSocketRecvFrom(int32_t socket, void *buf, uint32_t len, uint8_
  *   If `len` is 0, the function checks if data can be sent on the socket without blocking.
  *
  * @pre Pre-conditions:
- * - @p socket must be connected (TCP) or have a cached peer (UDP via @ref iotSocketConnect()).
+ * - @p socket must be connected (TCP) or have a cached peer (UDP using @ref iotSocketConnect()).
  *
  * @post Post-conditions:
  * - On success the bytes have been handed to the stack for transmission.
@@ -750,7 +750,7 @@ extern int32_t iotSocketSend(int32_t socket, const void *buf, uint32_t len);
  *   without blocking.
  *
  * @pre Pre-conditions:
- * - @p socket must have been created via @ref iotSocketCreate().
+ * - @p socket must have been created using @ref iotSocketCreate().
  * - For a connected socket, @p ip / @p port are ignored.
  *
  * @post Post-conditions:

@@ -139,7 +139,7 @@ The example uses five log levels:
 | **WARN** | Non-fatal anomalies such as repeated requests for the same state. | `SL_PRINT_STRING_WARN` |
 | **ERROR** | Most severe among the macros used in this example. Failures that require attention (API failures, resource creation failures). | `SL_PRINT_STRING_ERROR` |
 
-The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the WiSeConnect API reference). UC **Debug Level** names map to `SL_LOG_CONFIG_LEVEL_*` in `config/sl_log_common_config.h`—the authoritative in-repo definitions for compile-time values (`SL_LOG_CONFIG_LEVEL_NONE`, and so on) and for levels not shown above (for example `SL_LOG_CONFIG_LEVEL_CRASH`).  
+The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the WiSeConnect API reference). UC **Debug Level** names map to `SL_LOG_CONFIG_LEVEL_*` in `config/sl_log_common_config.h`—the authoritative in-repo definitions for compile-time values (`SL_LOG_CONFIG_LEVEL_NONE`, and so on) and for levels not shown above (for example, `SL_LOG_CONFIG_LEVEL_CRASH`).  
 
 ## UC Config
 
@@ -161,7 +161,7 @@ The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the
 
 4. **Proprietary config mode**  
    Logger backend output path:
-   - `Buffer Mode` → Logs stored in an internal buffer;
+   - `Buffer Mode` → Logs stored in an internal buffer.
    - `Console Mode` → Logs sent directly to console/UART.
    - `Host Mode` → Logs sent to the host interface (required for this example). call `sl_log_flush()` to send them out.
 
@@ -271,12 +271,12 @@ Follow these steps to build and test the SiWx91x Logger example:
 ![Figure: Logger output after decoding](resources/readme/output1.png)
 
 > **Note:**
->    1. Actual values depend on timing and board profile.
->    2. Only `uint32_t` arguments are supported by logger.
->    3. Keep **Proprietary config mode** on Host Mode for this example (Buffer/Console are not supported here; see that UC item above).
->    4. SDK examples using NWP have a limitation where fewer than three arguments are not supported.
->    5. The default log level is set to Error, and users can modify this configuration
-        through the UC
+>    - Actual values depend on timing and board profile.
+>    - Only `uint32_t` arguments are supported by logger.
+>    - Keep **Proprietary config mode** on Host Mode for this example (Buffer/Console are not supported; see [UC Config](#uc-config)).
+>    - SDK examples using NWP have a limitation where fewer than three arguments are not supported.
+>    - The default log level is set to **Error**, and you can modify this configuration
+        using UC.
 
 For more examples and setup information, visit the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 

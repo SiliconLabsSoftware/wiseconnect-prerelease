@@ -17,18 +17,17 @@
     - [Pin Configuration for INPUT EVENT mode use case](#pin-configuration-for-input-event-mode-use-case)
     - [Macros for CT Configurations](#macros-for-ct-configurations)
   - [Test the Application](#test-the-application)
+    - [Run the application in INPUT EVENT mode](#run-the-application-in-input-event-mode)
+    - [Run the application in DMA mode](#run-the-application-in-dma-mode)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
   - [Report Bugs/Support](#report-bugssupport)
-    - [Run the application in DMA mode](#run-the-application-in-dma-mode)
-    - [Run the application in INPUT EVENT mode](#run-the-application-in-input-event-mode)
 
 ## Purpose/Scope
 
 - This Config Timer ICU OCU example demonstrates 2 use cases of a timer:
-  - First as a input capture event. Here it captures the input event on GPIO pin and store the captured value in
-  capture_value variable.
-  - Second as a CT DMA used to generate varied PWM waveform. counter-0 and counter-1 will generate PWM output with varied duty cycle.
+  - First as an input capture event (ICU). It captures input events on GPIO IN0 and stores the captured value. Use `CT_ICU_COUNTER_USED` in `config_timer_icu_ocu_example.h` to run capture on Counter-0 (default) or Counter-1.
+  - Second as a CT DMA used to generate varied PWM waveforms. Counter-0 and Counter-1 generate PWM output with varied duty cycle on CT Output-0 and Output-1.
 
 
 ## Overview
@@ -49,15 +48,16 @@
 ## About Example Code
 
 - This example demonstrates the Config Timer as a Input Capture and Output Compare. Output Compare Values are updated using DMA.
-- Configure the following macros in `config_timer_icu_ocu_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.h)]to change the application use case.Two macros are present: CT_COUNTER_INPUT_EVENT_USECASE and CT_COUNTER_DMA_MODE_USECASE. By default, the input capture use case is enabled.
+- Configure the following macros in `config_timer_icu_ocu_example.h` to change the application use case. Two use-case macros are present: `CT_COUNTER_INPUT_EVENT_USECASE` and `CT_COUNTER_DMA_MODE_USECASE`. By default, the input capture use case is enabled. For ICU mode, `CT_ICU_COUNTER_USED` selects Counter-0 or Counter-1.
 - Enable only one of the following use case macros at a time.
   - If **CT_COUNTER_INPUT_EVENT_USECASE** is enabled:
     - The Config Timer is initialized using [sl_si91x_config_timer_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-init) API.
     - Counter parameters are configured using [sl_si91x_config_timer_set_configuration()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-set-configuration) API.
-    - Action events are selected for start and capture using [sl_si91x_config_timer_select_action_event()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-select-action-event) API.
+    - **One** counter is selected for input capture using `CT_ICU_COUNTER_USED` (`CT_ICU_COUNTER_0` or `CT_ICU_COUNTER_1`). Only one counter runs in this mode at a time.
+    - Action events are selected for start, capture, and interrupt using [sl_si91x_config_timer_select_action_event()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-select-action-event) API.
     - Callback is registered for the capture event using [sl_si91x_config_timer_register_callback()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-register-callback) API.
     - Captured values are read using [sl_si91x_config_timer_read_capture()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-read-capture) API.
-    - The captured value is printed or processed as needed.
+    - The active counter is printed at init (for example, `ICU input capture using Counter-1`). Each capture prints `counter0 capture_value:` or `counter1 capture_value:`.
   - If **CT_COUNTER_DMA_MODE_USECASE** is enabled:
     - CT_COUNTER_DMA_MODE_USECASE is used to generate varied PWM waveform.
     - Both counter0 and counter1 compare value arrays are initialized with step increments.
@@ -106,28 +106,33 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in 'config_timer_icu_ocu_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.h)]file to change the application use case (enable exactly only one at a time).
+- Configure the following macros in `config_timer_icu_ocu_example.h` to change the application use case (enable exactly one use-case macro at a time).
 
-- `CT_COUNTER_INPUT_EVENT_USECASE`: When enabled (`SET`), runs the input capture / input event use case where the Config Timer captures the timing of input signal changes and the captured values are read and processed. Enable exactly one use-case macro at a time. By default, it is set to `SET` (enabled).
+- `CT_COUNTER_INPUT_EVENT_USECASE`: When enabled (`SET`), runs the input capture / input event use case where the Config Timer captures the timing of input signal changes and the captured values are read and processed. By default, it is set to `SET` (enabled).
 
   ```c
     #define CT_COUNTER_INPUT_EVENT_USECASE SET   //< To run input event mode
   ```
 
-- `CT_COUNTER_DMA_MODE_USECASE`: When enabled (`SET`), runs the DMA counter use case where DMA continuously updates the OCU compare values to generate varied PWM waveforms on CT Output-0 and CT Output-1. Enable exactly one use-case macro at a time. By default, it is set to `CLEAR` (disabled).
+- `CT_COUNTER_DMA_MODE_USECASE`: When enabled (`SET`), runs the DMA counter use case where DMA continuously updates the OCU compare values to generate varied PWM waveforms on CT Output-0 and CT Output-1. By default, it is set to `CLEAR` (disabled).
 
   ```c
     #define CT_COUNTER_DMA_MODE_USECASE    CLEAR //< To run DMA counter mode
   ```
 
-- Also enable the relevant CT (Config Timer) configuration settings required for the PWM DMA mode use case to ensure proper operation of the timer in DMA-driven PWM output mode.
-- In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value. Modify or update the following macros as necessary to allow flexible customization of the timer's period and compare value.
+- `CT_ICU_COUNTER_USED`: Selects which Config Timer counter is used for the **input event / ICU use case only**. Set to `CT_ICU_COUNTER_0` (default) or `CT_ICU_COUNTER_1`. This applies only when `CT_COUNTER_INPUT_EVENT_USECASE` is enabled. No `.c` file changes are needed when switching counters; event mapping, interrupt flag, and capture read are updated automatically in `config_timer_icu_ocu_example.c`.
+- **UC note:** With the default `CONFIG_TIMER_UC` setting (`1` in the Config Timer component), `sl_si91x_config_timer_set_configuration()` programs hardware from `ct_configuration`, not from the local `ct_config` in the example. The example copies ICU counter trigger settings into `ct_configuration` before that call so Counter-0/Counter-1 selection works without disabling UC. Alternatively, set `CONFIG_TIMER_UC` to `0` in the component and rely on runtime `ct_config` only.
 
-- `CT_COUNTER_USED`: Selects which Config Timer counter (SL_COUNTER_0 or SL_COUNTER_1) is used for the normal counter application. By default, it is set to SL_COUNTER_0.
+  > **Migration note:** If you previously used `CT_COUNTER_USED` in `config_timer_icu_ocu_example.c`, replace it with `CT_ICU_COUNTER_USED` in this header (`CT_ICU_COUNTER_0` replaces `SL_COUNTER_0`, `CT_ICU_COUNTER_1` replaces `SL_COUNTER_1`).
 
   ```c
-   #define CT_COUNTER_USED       SL_COUNTER_0          // Counter number used for normal counter application
+    #define CT_ICU_COUNTER_0     0
+    #define CT_ICU_COUNTER_1     1
+    #define CT_ICU_COUNTER_USED  CT_ICU_COUNTER_0   // or CT_ICU_COUNTER_1
   ```
+
+- Also enable the relevant CT (Config Timer) configuration settings required for the PWM DMA mode use case to ensure proper operation of the timer in DMA-driven PWM output mode.
+- In `config_timer_icu_ocu_example.c`, the following macros can be adjusted for timer period and DMA compare values:
 
 - `TIME_PERIOD_VALUE`: Time period (in microseconds) used to compute the match value of the counter. By default, it is set to 1000.
 
@@ -151,7 +156,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   > ![Figure: Pin configuration](resources/uc_screen/uc_screen.png)
 
    **Note:**
-  > The Config Timer supports only 16-bit counter mode, with a maximum match value of 65,535.
+  > The Config Timer supports only 16-bit counter mode, with a maximum match value of 65,535. Input event capture on Counter-0 and Counter-1 is supported in 16-bit dual-counter mode. OCU/DMA mode is unaffected by the ICU counter selection.
 
 ### Pin Configuration for OCU DMA mode use case
 
@@ -169,7 +174,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 |    input-0    | GPIO_25 |     P25       |
 
 ### Macros for CT Configurations
-In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_icu_ocu_with_dma/config_timer_icu_ocu_example.c)] file, these are the following macros.
+
+In the Simplicity Studio **Config Timer** software component (UC), configure the following generated macros in `config_timer_icu_ocu_example.c`:
 
 - \ref SL_CT_MODE_32BIT_ENABLE_MACRO,  for possible values refer \ref sl_config_timer_mode_t
 - \ref SL_COUNTER0_DIRECTION_MACRO,  for possible values refer \ref sl_counter0_direction_t
@@ -183,16 +189,34 @@ In the `config_timer_icu_ocu_example.c`[(https://github.com/SiliconLabs/wiseconn
 
 ### Run the application in INPUT EVENT mode
 
-- The Config Timer will capture external events (such as rising edge) on the configured input pin.
-- Each captured event's capture value will be read and printed to the console.
-- connect the IN0 pin to button0 pin (F12 which is input pin for button),press and release the button, you can see the capture value updating upon the event occurred.
-- Following prints will be observed on the console:
+- Set `CT_COUNTER_INPUT_EVENT_USECASE` to `SET` and `CT_COUNTER_DMA_MODE_USECASE` to `CLEAR` in `config_timer_icu_ocu_example.h`.
+- Set `CT_ICU_COUNTER_USED` to `CT_ICU_COUNTER_0` or `CT_ICU_COUNTER_1` to select the capture counter.
+- The Config Timer captures external events (rising edge on IN0) on GPIO_25.
+- Connect IN0 to button0 (F12 on the mainboard), then press and release the button. The capture value updates on each event.
+- Example console output (Counter-0):
+
+  ```
+  ICU input capture using Counter-0
+  ...
+  counter0 capture_value:34302
+  ```
+
+- Example console output (Counter-1):
+
+  ```
+  ICU input capture using Counter-1
+  ...
+  counter1 capture_value:10502
+  ```
+
+- Reference screenshot:
 
   > ![Figure: Result](resources/readme/OutputConsole_ICU.png)
 
 ### Run the application in DMA mode
 
-- Both CT Output-0 and CT Output-1 will generate waveforms using DMA, with compare values automatically updated from pre-defined arrays.
+- Set `CT_COUNTER_DMA_MODE_USECASE` to `SET` and `CT_COUNTER_INPUT_EVENT_USECASE` to `CLEAR` in `config_timer_icu_ocu_example.h`.
+- Both CT Output-0 and CT Output-1 generate waveforms using DMA, with compare values automatically updated from pre-defined arrays.
 - The outputs will continuously repeat their waveform patterns as the DMA cycles through the arrays.
 - CT Output-0 and Output-1 will produce a continuous varied PWM using DMA.
 - Connect a logic analyzer to the Evaluation Kit board's GPIO-29 & GPIO-30 for output-0 and output-1 respectively to observe the DMA-driven waveforms.
