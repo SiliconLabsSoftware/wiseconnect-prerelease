@@ -443,7 +443,7 @@ typedef struct rsi_ble_event_conn_update_s {
 
 /**
  * @brief The structure represents the parameters of a remote connection parameter request event.
- * @note  The host shall not receive a Connection Update notification when the requested connection interval is the same as the current connection interval.
+ * @note  The host does not receive a Connection Update callback event when the requested connection interval is the same as the current connection interval.
  */
 typedef struct rsi_ble_event_remote_conn_param_req_s {
   /** Device address of the remote device */
@@ -2454,7 +2454,7 @@ int32_t rsi_ble_set_local_irk_value(const uint8_t *l_irk);
  * @param[in]  status 			- accept or reject the connection parameters update request 
  *                          -	0 - ACCEPT, 
  *                          - 1 - REJECT 
- * @note       If the central device receives a Connection Parameter Update Request with parameters that match the existing connection parameters, the central shall reject the request since no parameter change is necessary.
+ * @note       If the central device receives a Connection Parameter Update Request with parameters that match the existing connection parameters, the central rejects the request since no parameter change is necessary.
  * @return The following values are returned:
  * - 0 - Success 
  * - Non-Zero Value - Failure
@@ -2868,7 +2868,7 @@ int32_t rsi_ble_setphy(const int8_t *remote_dev_address, uint8_t tx_phy, uint8_t
  * @note       min_int and max_int values ranges from 6 to 3200 (Time = N * 1.25 ms, Time Range: 7.5 ms to 4 s)
 		latency : If latency value is greater than 32 ,Limiting the peripheral latency value to 32
 		Max supported peripheral latency is 32 when Device is in peripheral Role.
- * @note       The host should refrain from sending the same connection parameters as an update request when they match the current connection parameters.
+ * @note       The host should not send the same connection parameters as an update request when they match the current connection parameters.
  *
  */
 int32_t rsi_ble_conn_params_update(const uint8_t *remote_dev_address,
@@ -5157,8 +5157,8 @@ typedef void (*rsi_ble_on_le_ping_payload_timeout_t)(
  * It has to be registered using the `rsi_ble_gap_register_callbacks` API.
  * @param[out] resp_status contains the response status (Success or Error code)
  * @param[out] rsi_ble_event_remote_conn_param contains the remote device connection parameters. Refer to \ref rsi_ble_event_remote_conn_param_req_s for more details.
- * @note       The host shall not receive a Connection Update notification when the requested connection interval is the same as the current connection interval.
- * @note       If the central device receives a Connection Parameter Update Request with parameters that match the existing connection parameters, the central shall reject the request since no parameter change is necessary.
+ * @note       The host does not receive a Connection Update notification when the requested connection interval is the same as the current connection interval.
+ * @note       If the central device receives a Connection Parameter Update Request with parameters that match the existing connection parameters, the central rejects the request since no parameter change is necessary.
  * @return The following values are returned:
  *      void
  * 

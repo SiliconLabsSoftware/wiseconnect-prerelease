@@ -135,14 +135,6 @@ static void application_start(void *argument);
 sl_status_t send_data(void);
 
 /******************************************************
- *               Static Inline Functions
- ******************************************************/
-static inline void print_errno(void)
-{
-  SL_DEBUG_LOG_V2(DEBUG, "errno: %d\r\n", errno);
-}
-
-/******************************************************
  *               Variable Definitions
  ******************************************************/
 

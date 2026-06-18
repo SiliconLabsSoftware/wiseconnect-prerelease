@@ -291,9 +291,7 @@ static sl_net_wifi_client_profile_t wifi_client_profile = {
     .ip = {
         .mode = SL_IP_MANAGEMENT_DHCP,
         .type = SL_IPV4,
-        .host_name = DHCP_HOST_NAME,
-        .ip = {{{0}}},
-
+        .host_name = DHCP_HOST_NAME
     }
 };
 

@@ -132,7 +132,7 @@ extern int32_t rsi_ble_driver_deinit(void);
  *             - Call after [sl_wifi_init()](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init)
  *               / driver init; the device must be initialized.
  *             - BLE re-enable does not overlap an active WLAN connection used for the
- *               post-provision segment i.e wifi disconnect has to be called before re-enable.
+ *               post-provision segment i.e., Wi-Fi disconnect has to be called before re-enable.
  *             - Invoke this API only from the BLE task context or another context that is
  *               permitted to issue BLE/common commands.
  *             - Wait for the BLE enable operation to complete and consume the result before
@@ -156,8 +156,8 @@ extern int32_t rsi_ble_enable(void);
  * @fn         int32_t rsi_ble_disable(void)
  * @brief      Disables the BLE stack at runtime. This is a blocking API and unblocks only when
  *             a response is received or the command times out. Disabling only stops the BLE
- *             stack; it does not stop advertising, scanning, or tear down connections — the
- *             application must quiesce BLE activity first.
+ *             stack without stopping advertising, scanning, or terminating connections. Before calling this API, the
+ *             application must stop all BLE activities.
  *
  * @pre        Pre-conditions (application responsibility):
  *             - Call after [sl_wifi_init()](../wiseconnect-api-reference-guide-wi-fi/wifi-common-api#sl-wifi-init)

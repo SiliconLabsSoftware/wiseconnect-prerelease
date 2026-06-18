@@ -94,7 +94,7 @@ For half-duplex communication (that is, send and receive), a primary / secondary
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 
 ### Software Requirements
 
@@ -246,7 +246,7 @@ Configure UC from the slcp component.
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 ## Required configuration for BRD4343C
 
-For the **BRD4343C** pin table above (CS1 on **ULP_GPIO_4** [P17]), apply the updates below in **`config/RTE_Device_917.h`** (path: `/$project/config/RTE_Device_917.h`) and in **`ulp_ssi_master_example.c`** where indicated.
+For the **BRD4343C** pin (CS1 on **ULP_GPIO_4** [P17]), apply the following updates in **`config/RTE_Device_917.h`** (path: `/$project/config/RTE_Device_917.h`) and in **`ulp_ssi_master_example.c`** where indicated.
 
 1. **Chip select 1 pin mux** — set CS1 to the ULP_GPIO_4 option
    ```c

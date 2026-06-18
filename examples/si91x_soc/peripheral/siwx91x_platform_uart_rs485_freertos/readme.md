@@ -68,7 +68,7 @@ This application demonstrates UART RS485 **multidrop** operation on the SiWx91x 
 ### Hardware Requirements
 
 - Windows PC
-- Three Silicon Labs SiWx917 Evaluation Kits [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)] (or equivalent supported radio board)
+- Silicon Labs SiWx917 Evaluation Kits [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)] (or equivalent supported radio board)
 - Three RS485 transceivers (as shown in the setup diagram)
 
 ### Software Requirements

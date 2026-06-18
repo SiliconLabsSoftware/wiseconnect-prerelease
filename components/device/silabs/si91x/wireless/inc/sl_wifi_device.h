@@ -2771,7 +2771,7 @@ typedef struct {
 /**
  * @struct sl_si91x_rsp_wireless_info_t
  * @brief si91x Specific Wireless information.
- * @note This structure is deprecated. Use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-interface-info-t) for new implementations.
+ * @note This structure is deprecated. Use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-interface-info-t) for new implementations.
  */
 typedef struct {
 

@@ -317,7 +317,7 @@ For example, for 2412 MHz, the output will be seen at 2417 MHz.
 >
 >    **channel**: Set the Channel number.
 
-- The Wi-Fi 6 parameter descriptions are mentioned in the [sl_si91x_protocol_types.h](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/sl-si91x-request-tx-test-info-t) file of the SDK.
+- The Wi-Fi 6 parameter descriptions are mentioned in the [sl_wifi_request_tx_test_info_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-request-tx-test-info-t) structure in the SDK.
 >
 >5. **wifi_transmit_test_stop** is used for stopping the Transmit test.
 

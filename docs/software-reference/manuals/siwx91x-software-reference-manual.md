@@ -171,14 +171,15 @@ The following table shows the possible combinations and the available options to
 
 The SiWx917 clock subsystem is designed to facilitate dynamic adjustments of the clock source and frequency for various functionalities, enabling fine-tuning of power usage and performance for specific applications. This subsystem supports the configuration of on-chip clocks, including ULP clock oscillators, high-frequency PLLs, and clocks for the processor and peripherals (including MCU HP, MCU ULP, and UULP Vbat).
 
-> **Note — `CLK_CONFIG_REG2` (M4CLK `0x46000000` + `0x01C`) field names:** The [SiWx917 family RM](https://www.silabs.com/documents/public/reference-manuals/siw917x-family-rm.pdf) and WiseConnect `si91x_device.h` use different labels for the same bits:
+> **Note**
+> **`CLK_CONFIG_REG2` (M4CLK `0x46000000` + `0x01C`) field names:** The [SiWx917 family RM](https://www.silabs.com/documents/public/reference-manuals/siw917x-family-rm.pdf) and WiseConnect `si91x_device.h` use different labels for the same bits:
 >
 > | Family RM (example names) | SDK (`CLK_CONFIG_REG2_b`) |
 > | ------------------------- | --------------------------- |
 > | `USART0_*`                | `USART1_*`                  |
 > | `UART1_*`                 | `USART2_*`                  |
 >
-> **`USART3_*`** appears only in the SDK for this register; if your RM omits it, ignore that field.
+> **`USART3_*`** appears only in the SDK for this register. If your RM omits it, ignore the field.
 
 **High-Frequency Clocks:**
   * 40MHZ_XTAL_CLK
@@ -465,7 +466,7 @@ SL Log provides:
   removes lower-priority calls from the binary.
 - Runtime level control through `sl_log_set_loglevel()` /
   `sl_log_get_loglevel()`.
-- Configurable max argument count per log call (`SL_LOG_CONFIG_ARG`, set in UC as **CONFIG_MAX_ARGS**, dropdown **0**–**10**, default **3**)
+- Configurable maximum argument count per log call (`SL_LOG_CONFIG_ARG`, set in UC as **CONFIG_MAX_ARGS**, dropdown **0**–**10**, default **3**)
   and configurable ring-buffer depth (`SL_LOG_NUMBER_OF_EVENTS`, set in UC as **No of Logs**, range 1–255, default **128**).
 - Multiple backends selected at the component level:
   - **Log Backend I/O Stream – Compact Binary Output** or **Log Backend I/O Stream – Formatted Output** (`log_backend_iostream` transport shim) over **IO Stream RTT** or UART (VCOM).
@@ -551,7 +552,7 @@ The recommended path has three stages.
 
 #### Stage 1 – Coexistence (no source changes to legacy code)
 
-Goal: Keep the customer’s existing log path exactly as it is, and capture
+Goal: Keep the customer’s existing log path unchanged, and capture
 SL Log output on a separate backend. Drivers and services that already
 emit through `SL_PRINT_STRING_*` start producing usable output without
 disturbing legacy `printf` / `DEBUGOUT` traffic.

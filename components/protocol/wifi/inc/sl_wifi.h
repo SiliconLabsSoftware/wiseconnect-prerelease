@@ -480,7 +480,7 @@ sl_status_t sl_wifi_get_transmit_rate(sl_wifi_interface_t interface,
  *   By default listen interval is set 1000 time units (TU), where 1 TU = 1024 microseconds. User can call this API to overwrite the value.
  * @note
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_set_listen_interval_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-radio-api#sl-wifi-set-listen-interval-v2) API. This is retained for backward compatibility.
- *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps()
+ *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps_v2()
  ******************************************************************************/
 sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface,
                                         sl_wifi_listen_interval_t listen_interval) SL_DEPRECATED_API_WISECONNECT_3_5;
@@ -497,7 +497,7 @@ sl_status_t sl_wifi_set_listen_interval(sl_wifi_interface_t interface,
  * @note
  *   By default listen interval is set 1000 time units (TU) and listen interval multiplier is set to 1, where 1 TU = 1024 microseconds. User can call this API to overwrite the values for listen interval and listen interval multiplier.
  *   Recommended max value for listen_interval_multiplier is 10. Higher value may cause interop issues. 
- *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps()
+ *   Si91X implementation allows this API ONLY to be called before calling @ref sl_wifi_connect(), @ref sl_wifi_start_ap(), @ref sl_wifi_start_wps_v2()
  ******************************************************************************/
 sl_status_t sl_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wifi_listen_interval_v2_t listen_interval);
 
@@ -578,7 +578,7 @@ sl_status_t sl_wifi_get_listen_interval_v2(sl_wifi_interface_t interface,
  *     This function is applicable in Transmit test mode (SL_WIFI_TRANSMIT_TEST_MODE) and end-to-end modes.
  *     Use this function only in devices for which you have completed FCC/CE (ETSI)/MIC (TELEC)/ KC (KCC) certification with your own antenna. Silicon Labs disclaims any liability for non-compliant use of this function that could breach those or any other regulatory certifications.
  *     To enforce regulatory transmit power limits (FCC, CE (ETSI), MIC (TELEC), KC (KCC)):
- *       - Load the region-specific maximum power values at every boot via this function/API- sl_wifi_update_gain_table().
+ *       - Load the region-specific maximum power values at every boot via [sl_wifi_update_su_gain_table](../wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/wifi-radio-api#sl-wifi-update-su-gain-table).
  *       - Since the firmware does not retain this information in flash memory, the application must invoke this API at every startup.
  *       - The provided region-based user gain table is copied into the firmware’s region-based table.
  *       - The device then uses this table to cap transmit power and ensure compliance with the allowed limits.
@@ -1981,7 +1981,7 @@ sl_status_t sl_wifi_wps_get_remaining_credentials(sl_wifi_interface_t interface,
  *   Stop current running Wi-Fi Protected Setup (WPS).
  * @pre Pre-conditions:
  * - 
- *   @ref sl_wifi_start_wps should be called before this API.
+ *   @ref sl_wifi_start_wps_v2 should be called before this API.
  * @param[in] interface
  *   Wi-Fi Access Point interface as identified by @ref sl_wifi_interface_t
  * @return
@@ -2397,7 +2397,7 @@ sl_status_t sl_wifi_remove_all_vendor_ie(void);
  *
  *   By default, the `SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID` bitmap is enabled.
  *
- *   Users can call this API before calling [sl_wifi_connect](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-connect), [sl_wifi_start_ap](../wiseconnect-api-reference-guide-wi-fi/wifi-ap-api#sl-wifi-start-ap), [sl_wifi_start_wps](../wiseconnect-api-reference-guide-wi-fi/wifi-wps-api#sl-wifi-start-wps) to overwrite the join feature bitmap.
+ *   Users can call this API before calling [sl_wifi_connect](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-connect), [sl_wifi_start_ap](../wiseconnect-api-reference-guide-wi-fi/wifi-ap-api#sl-wifi-start-ap), [sl_wifi_start_wps_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-wps-api#sl-wifi-start-wps-v2) to overwrite the join feature bitmap.
  *
  * @param[in] interface
  *   The selected Wi-Fi interface. Refer to [sl_wifi_interface_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-interface-t) for possible values.
@@ -2704,7 +2704,7 @@ sl_status_t sl_wifi_stop_rx(sl_wifi_interface_t interface);
  * @return
  *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
  *
- * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
+ * @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e., \n
  *             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
  *             - Stop Continuous mode
  *             - Start Continuous Wave mode
@@ -2743,8 +2743,8 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
 * @return
 *     sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
 *
-* @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e. \n
-*             - Start Continuous mode with intended power value and channel values - Pass any valid values for rate and length.
+* @note Before starting Continuous Wave mode, user must start Continuous mode with power and channel values that are intended to be used in Continuous Wave mode i.e., \n
+*             - Start Continuous mode with intended power value and channel values — Pass any valid values for rate and length.
 *             - Stop Continuous mode
 *             - Start Continuous Wave mode
 * @note If user wants to switch continuous wave mode, first need to stop the per mode and again need to give continuous wave mode which user wants to switch.

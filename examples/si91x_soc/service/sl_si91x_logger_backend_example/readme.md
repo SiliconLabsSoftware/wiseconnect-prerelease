@@ -132,7 +132,8 @@ Main files for this example:
 | **Ring-buffer depth** | UC: *Logger → Number of Logs* | `128` | Range 1–255. |
 | **Button instance** | `BUTTON_INSTANCE` macro | `button_btn0` | Override before include if you need a different button. |
 
-> **Note - In case of sleep-wakeup:** Call `button_init_instances()` after wakeup before using BTN0 to change the runtime log level. If the selected logger transport uses SWO or Debug SWO, call `sl_si91x_debug_swo_init()` after wakeup before resuming log output so the SWO path is restored.
+> **Note**
+> In case of sleep-wakeup, Call `button_init_instances()` after wakeup before using BTN0 to change the runtime log level. If the selected logger transport uses SWO or Debug SWO, call `sl_si91x_debug_swo_init()` after wakeup before resuming log output so the SWO path is restored.
 
 ### Logger Levels
 

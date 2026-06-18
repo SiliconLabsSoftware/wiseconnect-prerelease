@@ -46,7 +46,7 @@
  * @{
  */
 
-/** Max SSID size in an 802.11 SSID information element (32 bytes in the IE body, not counting IE header). */
+/** Maximum SSID size in an 802.11 SSID information element (32 bytes in the IE body, not counting IE header). */
 #define SL_WIFI_MAX_SSID_IE_OCTETS 32U
 
 /** Legacy alias for @ref SL_WIFI_MAX_SSID_LENGTH (NWP/host SSID buffers, often includes space for a null terminator). */
@@ -101,11 +101,11 @@
  * @{
  */
 
-/** Tell the firmware to use its default auth/association timeout. */
+/** Instruct firmware to use its default auth/association timeout. */
 #define SL_WIFI_DEFAULT_AUTH_ASSOCIATION_TIMEOUT 0xFFFF
-/** Tell the firmware to use its default dwell time on each channel during active scan. */
+/** Instruct firmware to use its default dwell time on each channel during active scan. */
 #define SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME 0xFFFF
-/** Tell the firmware to use its default keep-alive timeout. */
+/** Instruct firmware to use its default keep-alive timeout. */
 #define SL_WIFI_DEFAULT_KEEP_ALIVE_TIMEOUT 0xFFFF
 /** Passive scan: @c 0 means use the default passive scan dwell time. */
 #define SL_WIFI_DEFAULT_PASSIVE_CHANNEL_SCAN_TIME 0
@@ -462,12 +462,12 @@ typedef struct {
     options; ///< Optional flags for AP configuration. @note Dynamic configurability of hidden SSIDs is only available in APCONF when it is disabled in opermode.
   sl_wifi_credential_id_t credential_id; ///< ID of secure credentials
   uint8_t
-    keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-types#sl-si91x-ap-keepalive-type-t)
+    keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-ap-keepalive-type-t)
   uint16_t beacon_interval;     ///< Beacon interval of the access point in time units (1 TU = 1024 microseconds)
   uint32_t client_idle_timeout; ///< Period after which AP will disconnect the station
   uint16_t dtim_beacon_count;   ///< Number of beacons per DTIM
   uint8_t
-    maximum_clients; ///< The maximum number of associated clients must not exceed [SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap#sl-si91x-custom-feat-max-num-of-clients). If this bit is not set in device configuration, the default maximum is 8 clients in AP-only mode and 4 clients in concurrent mode.
+    maximum_clients; ///< The maximum number of associated clients must not exceed [SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap#sl-wifi-custom-feat-max-num-of-clients). If this bit is not set in device configuration, the default maximum is 8 clients in AP-only mode and 4 clients in concurrent mode.
   uint8_t beacon_stop; ///< Flag to stop beaconing when there are no associated clients
   sl_wifi_tdi_t
     tdi_flags; ///< Flags to enable Transition Disable Indication (TDI). One of the values from @ref sl_wifi_tdi_t
@@ -863,7 +863,7 @@ typedef struct {
 typedef struct {
   uint32_t listen_interval; ///< Wi-Fi Listen interval in time units (1 TU = 1024 microseconds)
   uint32_t
-    listen_interval_multiplier; ///< Multiplier for the listen interval, sent by the device in the association request to the AP. Default: 1. Max recommended: 10. Higher values may lead to interoperability issues.
+    listen_interval_multiplier; ///< Multiplier for the listen interval, sent by the device in the association request to the AP. Default: 1. Maximum recommended: 10. Higher values may lead to interoperability issues.
 } sl_wifi_listen_interval_v2_t;
 
 /**

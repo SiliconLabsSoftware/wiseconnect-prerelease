@@ -245,7 +245,7 @@ typedef struct {
  *
  * @retval SL_STATUS_OK                         Configuration applied successfully.
  * @retval SL_STATUS_NOT_INITIALIZED            Wi-Fi/Net stack is not initialized.
- * @retval SL_STATUS_INVALID_PARAMETER          One of the fields in @p socket_config is invalid (e.g., totals mismatch or exceed the maximum).
+ * @retval SL_STATUS_INVALID_PARAMETER          One of the fields in @p socket_config is invalid (e.g., the calculated totals do not match or exceed the maximum value).
  * @retval SL_STATUS_SI91X_INVALID_CONFIG       Firmware rejected the configuration (for example, MSS/buffer sizes out of range).
  * @retval SL_STATUS_BUSY                       A previous socket-configuration request is still in progress.
  *

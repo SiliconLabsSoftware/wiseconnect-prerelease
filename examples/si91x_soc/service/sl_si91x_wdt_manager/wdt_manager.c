@@ -28,7 +28,6 @@
 #include "rsi_debug.h"
 #include "sl_si91x_led.h"
 #include "wdt_manager.h"
-#include "cmsis_gcc.h"
 #include "sl_log_helper.h"
 /*******************************************************************************
  *******************************   DEFINES   ***********************************
@@ -134,7 +133,7 @@ void wdt_manager_process_action(void)
       sl_sleeptimer_stop_timer(&timer);
 
       // Disable interrupts to prevent WDT from being kicked
-      __disable_irq();
+      __asm volatile("cpsid i" : : : "memory");
 
       // Create infinite loop to hang the system
       // With interrupts disabled, WDT cannot be kicked and will reset the system

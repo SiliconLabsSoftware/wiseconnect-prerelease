@@ -320,9 +320,11 @@ static void application_start(void *argument)
     if (nwp_fw_addr != 0) {
       sl_status_t burn_status = sl_si91x_burn_nwp_security_version(nwp_fw_addr);
       if (burn_status != SL_STATUS_OK) {
-        DEBUGOUT("\r\nFailed to burn NWP security version: 0x%X at 0x%X\r\n", burn_status, nwp_fw_addr);
+        DEBUGOUT("\r\nFailed to burn NWP security version: 0x%X at 0x%X\r\n",
+                 (unsigned int)burn_status,
+                 (unsigned int)nwp_fw_addr);
       } else {
-        DEBUGOUT("\r\nBurned NWP security version at 0x%X\r\n", nwp_fw_addr);
+        DEBUGOUT("\r\nBurned NWP security version at 0x%X\r\n", (unsigned int)nwp_fw_addr);
       }
     } else {
       DEBUGOUT("\r\nSkipping NWP security version burn: invalid NWP address\r\n");
