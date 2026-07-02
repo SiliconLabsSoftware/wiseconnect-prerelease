@@ -569,9 +569,9 @@ void rsi_scan_restart_event()
 void rsi_ble_event_scan_restart(uint16_t __attribute__((unused)) status, void __attribute__((unused)) * event_data)
 {
   //! Add handling here
-  if (SCAN_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_PERIPHERALS) {
-    rsi_scan_restart_event();
-  }
+#if (SCAN_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_PERIPHERALS)
+  rsi_scan_restart_event();
+#endif
 }
 
 void rsi_adv_restart_event()
@@ -635,9 +635,9 @@ void rsi_adv_restart_event()
 void rsi_ble_event_advertisement_restart(uint16_t __attribute__((unused)) status,
                                          void __attribute__((unused)) * event_data)
 {
-  if (ADV_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_CENTRALS) {
-    rsi_adv_restart_event();
-  }
+#if (ADV_ENABLED_DEFAULT && RSI_BLE_MAX_NBR_CENTRALS)
+  rsi_adv_restart_event();
+#endif
 }
 
 /**
@@ -978,7 +978,7 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
 
         more_data_state_beta[ble_conn_id].data_transmit = 1;
         LOG_PRINT_D("\r\n more_data_state_beta  for conn %d\n", ble_conn_id);
-      } else if ((status == SL_STATUS_SI91X_ERROR_BLE_HW_BUF_OVERFLOW)) {
+      } else if (status == SL_STATUS_SI91X_ERROR_BLE_HW_BUF_OVERFLOW) {
         more_data_state_beta[ble_conn_id].data_transmit = 1;
         LOG_PRINT_D("\r\n BUFFER OVRFLW more_data_state_beta  for conn %d\n", ble_conn_id);
       } else if (status == RSI_ERROR_IN_BUFFER_ALLOCATION) //! TO-DO, add proper error code
@@ -1023,7 +1023,7 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
 #endif
           more_data_state_beta[ble_conn_id].data_transmit = 1;
           LOG_PRINT_D("\r\n more_data_state_beta  for conn %d\n", ble_conn_id);
-        } else if ((status == SL_STATUS_SI91X_ERROR_BLE_HW_BUF_OVERFLOW)) {
+        } else if (status == SL_STATUS_SI91X_ERROR_BLE_HW_BUF_OVERFLOW) {
           more_data_state_beta[ble_conn_id].data_transmit = 1;
 
           LOG_PRINT_D("\r\n BUFFER OVRFLW more_data_state_beta  for conn %d\n", ble_conn_id);
@@ -1082,7 +1082,7 @@ void rsi_ble_on_data_transmit(uint8_t ble_conn_id)
           LOG_PRINT_D("\r\n more_data_state_beta  for conn %d\n", ble_conn_id);
 
           return;
-        } else if ((status == SL_STATUS_SI91X_ERROR_BLE_HW_BUF_OVERFLOW)) {
+        } else if (status == SL_STATUS_SI91X_ERROR_BLE_HW_BUF_OVERFLOW) {
           more_data_state_beta[ble_conn_id].data_transmit = 1;
 
           LOG_PRINT_D("\r\n BUFFER OVRFLW more_data_state_beta  for conn %d\n", ble_conn_id);

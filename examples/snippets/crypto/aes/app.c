@@ -1,38 +1,38 @@
 /***************************************************************************/ /**
- * @file
- * @brief Crypto AES Application
- *******************************************************************************
- * # License
- * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * SPDX-License-Identifier: Zlib
- *
- * The licensor of this software is Silicon Laboratories Inc.
- *
- * This software is provided 'as-is', without any express or implied
- * warranty. In no event will the authors be held liable for any damages
- * arising from the use of this software.
- *
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *
- * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would be
- *    appreciated but is not required.
- * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.
- * 3. This notice may not be removed or altered from any source distribution.
- *
- ******************************************************************************/
-
-#include <string.h>
+* @file
+* @brief Crypto AES Application
+*******************************************************************************
+* # License
+* <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
+*******************************************************************************
+*
+* SPDX-License-Identifier: Zlib
+*
+* The licensor of this software is Silicon Laboratories Inc.
+*
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely, subject to the following restrictions:
+*
+* 1. The origin of this software must not be misrepresented; you must not
+*    claim that you wrote the original software. If you use this software
+*    in a product, an acknowledgment in the product documentation would be
+*    appreciated but is not required.
+* 2. Altered source versions must be plainly marked as such, and must not be
+*    misrepresented as being the original software.
+* 3. This notice may not be removed or altered from any source distribution.
+*
+******************************************************************************/
 #include "cmsis_os2.h"
 #include "sl_net.h"
-#include "sl_wifi.h"
 #include "sl_si91x_aes.h"
+#include "sl_wifi.h"
+#include <string.h>
+
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
 /*
  * Sideband multipart AES uses the init/update/final entry points declared
@@ -42,9 +42,9 @@
  */
 #include "sl_si91x_mp_aes.h"
 #endif
-#include "sl_si91x_wrap.h"
-#include "sl_si91x_crypto_utility.h"
 #include "rsi_debug.h"
+#include "sl_si91x_crypto_utility.h"
+#include "sl_si91x_wrap.h"
 
 /******************************************************
  *                    Constants
@@ -150,7 +150,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", (unsigned long)status);
     return;
   }
   DEBUGOUT("\r\nWi-Fi Init Success\r\n");
@@ -209,14 +209,14 @@ sl_status_t aes_multipart_encryption(void)
 
   status = sl_si91x_wrap(&wrap_config, wrapped_key);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nWrap failed, Error Code : 0x%lX\r\n", status);
+    DEBUGOUT("\r\nWrap failed, Error Code : 0x%lX\r\n", (unsigned long)status);
     return status;
   }
   DEBUGOUT("\r\nWrap success\r\n");
 
   config.key_config.b0.key_type = SL_SI91X_WRAPPED_KEY;
-  //for 128 bits key, wrap key size is 128 bits,
-  //for 192 and 256 bits keys, wrap key size is 256 bits
+  // for 128 bits key, wrap key size is 128 bits,
+  // for 192 and 256 bits keys, wrap key size is 256 bits
   if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_128) {
     memcpy(config.key_config.b0.key_buffer, &wrapped_key, SL_SI91X_AES_KEY_SIZE_128);
   } else if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_192
@@ -230,12 +230,9 @@ sl_status_t aes_multipart_encryption(void)
 
   uint32_t total_msg_length = config.msg_length;
   int chunk_len             = 0;
-  int chunk_sizes[]         = { 128,
-                                256,
-                                128,
-                                384,
-                                128 }; // Make sure that sum of the chunk sizes are equal to total message length.
-  int num_chunks            = sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
+  int chunk_sizes[]         = { 128, 256, 128, 384, 128 }; // Make sure that sum of the chunk sizes are equal
+                                                           // to total message length.
+  int num_chunks = sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
 
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
   /*
@@ -245,7 +242,7 @@ sl_status_t aes_multipart_encryption(void)
    */
   status = sl_si91x_mp_aes_init(&config);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nAES multipart init failed, Error Code : 0x%lX\r\n", status);
+    DEBUGOUT("\r\nAES multipart init failed, Error Code : 0x%lX\r\n", (unsigned long)status);
     return status;
   }
   (void)aes_flags;
@@ -274,7 +271,7 @@ sl_status_t aes_multipart_encryption(void)
       status = sl_si91x_aes_multipart(&config, chunk_len, aes_flags, encrypted_buffer + sent_data);
 #endif
       if (status != SL_STATUS_OK) {
-        DEBUGOUT("\r\nAES encryption failed, Error Code : 0x%lX\r\n", status);
+        DEBUGOUT("\r\nAES encryption failed, Error Code : 0x%lX\r\n", (unsigned long)status);
         return status;
       }
       DEBUGOUT("\r\nAES encryption success\r\n");
@@ -353,14 +350,14 @@ sl_status_t aes_encryption(void)
 
   status = sl_si91x_wrap(&wrap_config, wrapped_key);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nWrap failed, Error Code : 0x%lX\r\n", status);
+    DEBUGOUT("\r\nWrap failed, Error Code : 0x%lX\r\n", (unsigned long)status);
     return status;
   }
   DEBUGOUT("\r\nWrap success\r\n");
 
   config.key_config.b0.key_type = SL_SI91X_WRAPPED_KEY;
-  //for 128 bits key, wrap key size is 128 bits,
-  //for 192 and 256 bits keys, wrap key size is 256 bits
+  // for 128 bits key, wrap key size is 128 bits,
+  // for 192 and 256 bits keys, wrap key size is 256 bits
   if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_128) {
     memcpy(config.key_config.b0.key_buffer, &wrapped_key, SL_SI91X_AES_KEY_SIZE_128);
   } else if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_192
@@ -383,7 +380,7 @@ sl_status_t aes_encryption(void)
 
   status = sl_si91x_aes(&config, encrypted_buffer);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nAES encryption failed, Error Code : 0x%lX\r\n", status);
+    DEBUGOUT("\r\nAES encryption failed, Error Code : 0x%lX\r\n", (unsigned long)status);
     return status;
   }
   DEBUGOUT("\r\nAES encryption success\r\n");
@@ -426,8 +423,8 @@ sl_status_t aes_multipart_decryption(void)
 
 #if USE_WRAPPED_KEYS
   config.key_config.b0.key_type = SL_SI91X_WRAPPED_KEY;
-  //for 128 bits key, wrap key size is 128 bits,
-  //for 192 and 256 bits keys, wrap key size is 256 bits
+  // for 128 bits key, wrap key size is 128 bits,
+  // for 192 and 256 bits keys, wrap key size is 256 bits
   if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_128) {
     memcpy(config.key_config.b0.key_buffer, &wrapped_key, SL_SI91X_AES_KEY_SIZE_128);
   } else if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_192
@@ -457,7 +454,7 @@ sl_status_t aes_multipart_decryption(void)
    */
   status = sl_si91x_mp_aes_init(&config);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nAES multipart init failed, Error Code : 0x%lX\r\n", status);
+    DEBUGOUT("\r\nAES multipart init failed, Error Code : 0x%lX\r\n", (unsigned long)status);
     return status;
   }
   (void)aes_flags;
@@ -487,7 +484,7 @@ sl_status_t aes_multipart_decryption(void)
 #endif
 
       if (status != SL_STATUS_OK) {
-        DEBUGOUT("\r\nAES Multipart decryption failed, Error Code : 0x%lX\r\n", status);
+        DEBUGOUT("\r\nAES Multipart decryption failed, Error Code : 0x%lX\r\n", (unsigned long)status);
         return status;
       }
       DEBUGOUT("\r\nAES Multipart decryption success\r\n");
@@ -542,8 +539,8 @@ sl_status_t aes_decryption(void)
 
 #if USE_WRAPPED_KEYS
   config.key_config.b0.key_type = SL_SI91X_WRAPPED_KEY;
-  //for 128 bits key, wrap key size is 128 bits,
-  //for 192 and 256 bits keys, wrap key size is 256 bits
+  // for 128 bits key, wrap key size is 128 bits,
+  // for 192 and 256 bits keys, wrap key size is 256 bits
   if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_128) {
     memcpy(config.key_config.b0.key_buffer, &wrapped_key, SL_SI91X_AES_KEY_SIZE_128);
   } else if (config.key_config.b0.key_size == SL_SI91X_AES_KEY_SIZE_192
@@ -561,7 +558,7 @@ sl_status_t aes_decryption(void)
 
   status = sl_si91x_aes(&config, decrypted_buffer);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("\r\nAES decryption failed, Error Code : 0x%lX\r\n", status);
+    DEBUGOUT("\r\nAES decryption failed, Error Code : 0x%lX\r\n", (unsigned long)status);
     return status;
   }
   DEBUGOUT("\r\nAES decryption success\r\n");
@@ -710,7 +707,7 @@ static sl_status_t mp_run_session(sl_si91x_aes_config_t *cfg, const mp_demo_case
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
   status = sl_si91x_mp_aes_init(cfg);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("  [%s] init failed: 0x%lX\r\n", mp_dir_name(cfg->encrypt_decrypt), status);
+    DEBUGOUT("  [%s] init failed: 0x%lX\r\n", mp_dir_name(cfg->encrypt_decrypt), (unsigned long)status);
     return status;
   }
 
@@ -726,7 +723,7 @@ static sl_status_t mp_run_session(sl_si91x_aes_config_t *cfg, const mp_demo_case
                mp_dir_name(cfg->encrypt_decrypt),
                (unsigned)i,
                (unsigned)len,
-               status);
+               (unsigned long)status);
       cfg->msg = msg_base;
       return status;
     }
@@ -745,7 +742,7 @@ static sl_status_t mp_run_session(sl_si91x_aes_config_t *cfg, const mp_demo_case
                mp_dir_name(cfg->encrypt_decrypt),
                (unsigned)i,
                (unsigned)len,
-               status);
+               (unsigned long)status);
       cfg->msg = msg_base;
       return status;
     }

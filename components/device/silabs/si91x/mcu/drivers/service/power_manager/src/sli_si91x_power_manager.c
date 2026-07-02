@@ -59,6 +59,7 @@
 #ifdef SL_CATALOG_LOG_COMPONENT_PRESENT
 #include "sl_log_platform_specific.h"
 #endif
+#include "sl_code_classification.h"
 
 #if defined(SL_CATALOG_LOG_COMPONENT_PRESENT)
 /** Re-run log core configuration after power-state clock changes (e.g. ULP + debug logger). */
@@ -234,6 +235,7 @@ static const power_state_struct_t ps_transition[NO_OF_ACTIVE_STATES] = {
  * When the macro is defined, it implements sli_si91x_power_manager_change_power_state_with_critical_irq (PS0/PS1 uses
  * sli_si91x_power_manager_core_exitcritical(critical_irq_state)).
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 #ifndef SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
 sl_status_t sli_si91x_power_manager_change_power_state(sl_power_state_t from, sl_power_state_t to)
 #else
@@ -284,6 +286,7 @@ sl_status_t sli_si91x_power_manager_change_power_state_with_critical_irq(
  * board.
  * It switches off the components which are not required and goes to sleep with retention.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_si91x_power_manager_set_sleep_configuration(sl_power_state_t state)
 {
   sl_status_t status;
@@ -367,6 +370,7 @@ sl_status_t sli_si91x_power_manager_set_sleep_configuration(sl_power_state_t sta
  * equivalent rsi apis to power-on / power-off the peripherals/components as per
  * the value of add.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_power_manager_update_peripheral(sl_power_peripheral_t *peripheral, boolean_t add)
 {
   if (peripheral == NULL) {
@@ -429,6 +433,7 @@ sl_status_t sli_power_manager_update_peripheral(sl_power_peripheral_t *periphera
  * It verifies all the possible state transitions, if valid returns true otherwise
  * returns false.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 boolean_t sli_si91x_power_manager_is_valid_transition(sl_power_state_t from, sl_power_state_t to)
 {
   boolean_t status = false;
@@ -450,6 +455,7 @@ boolean_t sli_si91x_power_manager_is_valid_transition(sl_power_state_t from, sl_
  * As per the flag, wakeup sources are set or cleared.
  * The source is the ored value of wakeup sources from \ref sl_power_wakeup_sources_t enum.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_si91x_power_configure_wakeup_resource(uint32_t source, boolean_t add)
 {
   if (!(source & VALID_WAKEUP_SOURCES)) {
@@ -476,6 +482,7 @@ sl_status_t sli_si91x_power_configure_wakeup_resource(uint32_t source, boolean_t
  * If configure_ram_banks is disabled, user can enter the size of RAM to be retained.
  * It configures ram retention based on the selected ram banks.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_si91x_power_manager_set_ram_retention_configuration(sl_power_ram_retention_config_t *config)
 {
   sl_status_t status;
@@ -554,6 +561,7 @@ sl_status_t sli_si91x_power_manager_set_ram_retention_configuration(sl_power_ram
  * Sets the initial hardware configuration.
  * Configures the system core clock to current powersave mode.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 void sli_si91x_power_manager_init_hardware(void)
 {
   // Power-Down the deep-sleep timer
@@ -575,6 +583,7 @@ void sli_si91x_power_manager_init_hardware(void)
  * Configures the hardware for low power mode.
  * Disables the components and clocks which are not required.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 void sli_si91x_power_manager_low_power_hw_config(boolean_t is_sleep)
 {
   // Disable OTHER_CLK which is enabled at Start-up
@@ -617,6 +626,7 @@ void sli_si91x_power_manager_low_power_hw_config(boolean_t is_sleep)
  * Hardware is configured for low power mode.
  * LDO and other registers are taken care by RSI api.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps4_to_ps2_state_change(void)
 {
   // Low power hardware configuration to switch off the components which are not required.
@@ -657,6 +667,7 @@ static void ps4_to_ps2_state_change(void)
 /*******************************************************************************
  * State Change from PS4 to PS3.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps4_to_ps3_state_change(void)
 {
   sli_si91x_clock_manager_config_clks_on_ps_change(SL_SI91X_POWER_MANAGER_PS3,
@@ -670,6 +681,7 @@ static void ps4_to_ps3_state_change(void)
  * board.
  * It switches off the components which are not required and goes to sleep without retention.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps4_to_ps0_state_change(void)
 {
   sli_power_sleep_config_t config;
@@ -701,6 +713,7 @@ static void ps4_to_ps0_state_change(void)
 /*******************************************************************************
  * State Change from PS3 to PS4.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps3_to_ps4_state_change(void)
 {
   sli_si91x_clock_manager_config_clks_on_ps_change(SL_SI91X_POWER_MANAGER_PS4,
@@ -712,6 +725,7 @@ static void ps3_to_ps4_state_change(void)
  * Hardware is configured for low power mode.
  * LDO and other registers are taken care by RSI api.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps3_to_ps2_state_change(void)
 {
   // Low power hardware configuration to switch off the components which are not required.
@@ -756,6 +770,7 @@ static void ps3_to_ps2_state_change(void)
  * board.
  * It switches off the components which are not required and goes to sleep without retention.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps3_to_ps0_state_change(void)
 {
   sli_power_sleep_config_t config;
@@ -786,6 +801,7 @@ static void ps3_to_ps0_state_change(void)
  * State Change from PS2 to PS4.
  * LDO and other registers are taken care by RSI api.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps2_to_ps4_state_change(void)
 {
   ps_power_state_change_ps2_to_Ps4(PMU_WAIT_TIME, LDO_WAIT_TIME);
@@ -832,6 +848,7 @@ static void ps2_to_ps4_state_change(void)
  * State Change from PS2 to PS3.
  * LDO and other registers are taken care by RSI api.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps2_to_ps3_state_change(void)
 {
   ps_power_state_change_ps2_to_Ps4(PMU_WAIT_TIME, LDO_WAIT_TIME);
@@ -882,6 +899,7 @@ static void ps2_to_ps3_state_change(void)
  * It switches off the components which are not required and goes to sleep with retention.
  * If the wakeup sources are configured as ULPSS or SDCSS then only it will transit to PS1.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void ps2_to_ps1_state_change(void)
 {
   uint32_t get_wakeup_sources;
@@ -912,6 +930,7 @@ static void ps2_to_ps1_state_change(void)
  * RSI APIs handles the retention as per parameters and enters deep sleep mode.
  * If any error is encountered, error code is returned.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static sl_status_t trigger_sleep(sli_power_sleep_config_t *config, uint8_t sleep_type)
 {
   sl_status_t status;
@@ -955,6 +974,7 @@ static sl_status_t trigger_sleep(sli_power_sleep_config_t *config, uint8_t sleep
  * As per the memory passed, it sets the bits of RAM banks in m4ss and ulpss 
  * registers and updates it.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static sl_status_t configure_ram_memory(sl_power_ram_retention_config_t *config,
                                         uint32_t *m4ss_ram,
                                         uint32_t *ulpss_ram)
@@ -1018,6 +1038,7 @@ static sl_status_t configure_ram_memory(sl_power_ram_retention_config_t *config,
   return SL_STATUS_OK;
 }
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void initialize_flash(void)
 {
   RSI_PS_M4ssPeriPowerUp(M4SS_PWRGATE_ULP_QSPI_ICACHE | M4SS_PWRGATE_ULP_EFUSE_PERI);
@@ -1039,6 +1060,7 @@ static void initialize_flash(void)
 #endif
 }
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void get_ram_retention_mode(uint32_t m4ss_ram, uint32_t *m4ss_ram_retention)
 {
   if ((m4ss_ram & RAM_BANK_0) || (m4ss_ram & RAM_BANK_1) || (m4ss_ram & RAM_BANK_2) || (m4ss_ram & RAM_BANK_3)) {
@@ -1059,6 +1081,7 @@ static void get_ram_retention_mode(uint32_t m4ss_ram, uint32_t *m4ss_ram_retenti
  * after successful conversion it breaks the switch statement.
  * If the error code is not listed, by default is SL_STATUS_FAIL.
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static sl_status_t convert_rsi_to_sl_error_code(rsi_error_t error)
 {
   sl_status_t status;

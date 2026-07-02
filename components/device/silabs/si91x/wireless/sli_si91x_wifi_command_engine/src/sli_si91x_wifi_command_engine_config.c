@@ -1127,5 +1127,5 @@ static void sli_post_packet_to_event_engine(sl_wifi_buffer_t *rx_buffer)
   }
 
   /* Signal the event engine to process the queued packet */
-  osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
+  sli_wifi_event_engine_signal_async();
 }

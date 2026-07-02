@@ -2978,7 +2978,7 @@
                 </param>
                 <param name="version" type="uint32" enum="mqtt_client_mqtt_version">
                     <description>
-                        MQTT protocol version used by the client.
+                        MQTT protocol version used by the client. Only MQTT version 3.1.1 is supported by the Network Wireless Processor (NWP).
                     </description>
                 </param>
                 <param name="client_port" type="uint16">
@@ -3045,12 +3045,17 @@
         <enums name="mqtt_version" title="mqtt_version">
             <enum name="mqtt_version_v3" value="0x00">
                 <description>
-                    MQTT protocol version 3.0.
+                    MQTT protocol version 3.0 (currently not supported).
                 </description>
             </enum>
             <enum name="mqtt_version_v3_1" value="0x01">
                 <description>
-                    PMQTT protocol version 3.1.
+                    MQTT protocol version 3.1 (currently not supported).
+                </description>
+            </enum>
+            <enum name="mqtt_version_v3_1_1" value="0x02">
+                <description>
+                    MQTT protocol version 3.1.1.
                 </description>
             </enum>
         </enums>

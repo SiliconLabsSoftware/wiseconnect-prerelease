@@ -783,6 +783,11 @@ sl_status_t sli_si91x_socket_pre_tx_handler(sli_command_engine_t *instance, uint
 
 static bool sli_is_port_available(uint16_t port_number)
 {
+  // Port 0 requests auto-assigned local port; skip availability check.
+  if (port_number == 0) {
+    return true;
+  }
+
   // Check whether local port is already used or not
   for (uint8_t socket_index = 0; socket_index < SLI_NUMBER_OF_SOCKETS; socket_index++) {
     if (sli_si91x_sockets[socket_index] != NULL

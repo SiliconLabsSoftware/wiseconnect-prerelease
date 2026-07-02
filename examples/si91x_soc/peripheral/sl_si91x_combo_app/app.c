@@ -30,21 +30,24 @@ static osThreadId_t tid_thread_pwm;    // thread id for pwm thread
 static osThreadId_t tid_thread_i2c;    // thread id for i2c thread
 
 static const osThreadAttr_t button_thread_attributes = {
-  .name       = "button",
-  .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
-  .priority   = osPriorityLow,
+  .name = "button",
+  .stack_size =
+    1024, // using 1024 for all the threads, may use as low as possible based on the need of respective thread
+  .priority = osPriorityLow,
 };
 
 static const osThreadAttr_t pwm_thread_attributes = {
-  .name       = "pwm",
-  .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
-  .priority   = osPriorityLow1,
+  .name = "pwm",
+  .stack_size =
+    1024, // using 1024 for all the threads, may use as low as possible based on the need of respective thread
+  .priority = osPriorityLow1,
 };
 
 static const osThreadAttr_t i2c_thread_attributes = {
-  .name       = "i2c",
-  .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
-  .priority   = osPriorityLow1,
+  .name = "i2c",
+  .stack_size =
+    1024, // using 1024 for all the threads, may use as low as possible based on the need of respective thread
+  .priority = osPriorityLow1,
 };
 /*******************************************************************************
  * Initialize application.

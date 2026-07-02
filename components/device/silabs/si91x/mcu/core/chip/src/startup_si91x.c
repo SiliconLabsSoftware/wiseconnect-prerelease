@@ -78,12 +78,6 @@ extern unsigned long _edata;        /*!< End address for the .data section      
 extern unsigned long __bss_start__; /*!< Start address for the .bss section     */
 extern unsigned long __bss_end__;   /*!< End address for the .bss section         */
 
-#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(DATA_SEGMENT_IN_PSRAM)
-extern unsigned long _slpcode; /*!< LMA of .sleep_psram_driver (== __etext)          */
-extern unsigned long _scode;   /*!< VMA start of .sleep_psram_driver (RAM)           */
-extern unsigned long _ecode;   /*!< VMA end of .sleep_psram_driver (RAM)             */
-#endif
-
 #if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
   && defined(DATA_SEGMENT_IN_PSRAM)
 extern unsigned long _classified_text_;               /*!< Start address for the initialization
@@ -292,13 +286,6 @@ void Copy_Table(void)
     *(pulDest++) = *(pulSrc++);
   }
 #endif
-#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(DATA_SEGMENT_IN_PSRAM)
-  /* Copy .sleep_psram_driver from LMA in PSRAM to VMA in SRAM (UDMA, d_cache, ipmu data) */
-  pulSrc = &_slpcode;
-  for (volatile unsigned long *pulDest = &_scode; pulDest < &_ecode;) {
-    *(pulDest++) = *(pulSrc++);
-  }
-#endif
 #if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
   && defined(DATA_SEGMENT_IN_PSRAM)
   /* Copy the classified text segment to SRAM */
@@ -350,8 +337,8 @@ void Zero_Table(void)
 #if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
   && !defined(BSS_SEGMENT_IN_PSRAM)
   /* Classified BSS in PSRAM: no load image - zero-init only */
-  pulDest = (uint32_t *)&_classified_bss_section_start_;
-  for (; pulDest < (uint32_t *)&_classified_bss_section_end_;) {
+  pulDest = (unsigned long *)&_classified_bss_section_start_;
+  for (; pulDest < (unsigned long *)&_classified_bss_section_end_;) {
     *pulDest++ = 0UL;
   }
 #endif

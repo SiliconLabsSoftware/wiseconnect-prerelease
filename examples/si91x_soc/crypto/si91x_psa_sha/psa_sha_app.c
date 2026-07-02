@@ -62,7 +62,7 @@ void test_psa_sha_1()
 
   // Compare with the expected result
   if (ret != 0) {
-    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", ret);
+    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", (unsigned long)ret);
   } else if (ret == 0 && memcmp(hash_buf, expect_sha1_hash, sizeof(expect_sha1_hash)) == 0) {
     DEBUGOUT("    Result: PASS\r\n");
   } else {
@@ -79,9 +79,9 @@ void test_psa_sha_1()
   ret = psa_hash_setup(&hash_op, PSA_ALG_SHA_1);
   if (ret != PSA_SUCCESS) {
     if (ret == PSA_ERROR_NOT_SUPPORTED) {
-      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", (unsigned long)ret);
     } else {
-      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", (unsigned long)ret);
     }
   } else {
     msg_len = strlen(test_msg);
@@ -89,7 +89,7 @@ void test_psa_sha_1()
       size_t chunk_len = (msg_len - offset) >= 4 ? 4 : (msg_len - offset);
       ret              = psa_hash_update(&hash_op, (const unsigned char *)test_msg + offset, chunk_len);
       if (ret != PSA_SUCCESS) {
-        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", ret);
+        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", (unsigned long)ret);
         break;
       }
     }
@@ -97,7 +97,7 @@ void test_psa_sha_1()
       ret = psa_hash_finish(&hash_op, hash_buf, sizeof(hash_buf), &hash_len);
     }
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", (unsigned long)ret);
     } else if (memcmp(hash_buf, expect_sha1_hash, sizeof(expect_sha1_hash)) == 0) {
       DEBUGOUT("    Result: PASS\r\n");
     } else {
@@ -106,7 +106,7 @@ void test_psa_sha_1()
     }
     ret = psa_hash_abort(&hash_op);
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", (unsigned long)ret);
     } else {
       DEBUGOUT("    Result: PASS (abort)\r\n");
     }
@@ -146,7 +146,7 @@ void test_psa_sha_224()
 
   // Compare with the expected result
   if (ret != 0) {
-    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", ret);
+    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", (unsigned long)ret);
   } else if (ret == 0 && memcmp(hash_buf, expect_sha224_hash, sizeof(expect_sha224_hash)) == 0) {
     DEBUGOUT("    Result: PASS\r\n");
   } else {
@@ -163,9 +163,9 @@ void test_psa_sha_224()
   ret = psa_hash_setup(&hash_op, PSA_ALG_SHA_224);
   if (ret != PSA_SUCCESS) {
     if (ret == PSA_ERROR_NOT_SUPPORTED) {
-      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", (unsigned long)ret);
     } else {
-      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", (unsigned long)ret);
     }
   } else {
     msg_len = strlen(test_msg);
@@ -173,7 +173,7 @@ void test_psa_sha_224()
       size_t chunk_len = (msg_len - offset) >= 4 ? 4 : (msg_len - offset);
       ret              = psa_hash_update(&hash_op, (const unsigned char *)test_msg + offset, chunk_len);
       if (ret != PSA_SUCCESS) {
-        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", ret);
+        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", (unsigned long)ret);
         break;
       }
     }
@@ -181,7 +181,7 @@ void test_psa_sha_224()
       ret = psa_hash_finish(&hash_op, hash_buf, sizeof(hash_buf), &hash_len);
     }
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", (unsigned long)ret);
     } else if (memcmp(hash_buf, expect_sha224_hash, sizeof(expect_sha224_hash)) == 0) {
       DEBUGOUT("    Result: PASS\r\n");
     } else {
@@ -190,7 +190,7 @@ void test_psa_sha_224()
     }
     ret = psa_hash_abort(&hash_op);
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", (unsigned long)ret);
     } else {
       DEBUGOUT("    Result: PASS (abort)\r\n");
     }
@@ -231,7 +231,7 @@ void test_psa_sha_256()
 
   // Compare with the expected result
   if (ret != 0) {
-    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", ret);
+    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", (unsigned long)ret);
   } else if (ret == 0 && memcmp(hash_buf, expect_sha256_hash, sizeof(expect_sha256_hash)) == 0) {
     DEBUGOUT("    Result: PASS\r\n");
   } else {
@@ -248,9 +248,9 @@ void test_psa_sha_256()
   ret = psa_hash_setup(&hash_op, PSA_ALG_SHA_256);
   if (ret != PSA_SUCCESS) {
     if (ret == PSA_ERROR_NOT_SUPPORTED) {
-      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", (unsigned long)ret);
     } else {
-      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", (unsigned long)ret);
     }
   } else {
     msg_len = strlen(test_msg);
@@ -258,7 +258,7 @@ void test_psa_sha_256()
       size_t chunk_len = (msg_len - offset) >= 4 ? 4 : (msg_len - offset);
       ret              = psa_hash_update(&hash_op, (const unsigned char *)test_msg + offset, chunk_len);
       if (ret != PSA_SUCCESS) {
-        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", ret);
+        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", (unsigned long)ret);
         break;
       }
     }
@@ -266,7 +266,7 @@ void test_psa_sha_256()
       ret = psa_hash_finish(&hash_op, hash_buf, sizeof(hash_buf), &hash_len);
     }
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", (unsigned long)ret);
     } else if (memcmp(hash_buf, expect_sha256_hash, sizeof(expect_sha256_hash)) == 0) {
       DEBUGOUT("    Result: PASS\r\n");
     } else {
@@ -275,7 +275,7 @@ void test_psa_sha_256()
     }
     ret = psa_hash_abort(&hash_op);
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", (unsigned long)ret);
     } else {
       DEBUGOUT("    Result: PASS (abort)\r\n");
     }
@@ -317,7 +317,7 @@ void test_psa_sha_384()
 
   // Compare with the expected result
   if (ret != 0) {
-    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", ret);
+    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", (unsigned long)ret);
   } else if (ret == 0 && memcmp(hash_buf, expect_sha384_hash, sizeof(expect_sha384_hash)) == 0) {
     DEBUGOUT("    Result: PASS\r\n");
   } else {
@@ -334,9 +334,9 @@ void test_psa_sha_384()
   ret = psa_hash_setup(&hash_op, PSA_ALG_SHA_384);
   if (ret != PSA_SUCCESS) {
     if (ret == PSA_ERROR_NOT_SUPPORTED) {
-      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", (unsigned long)ret);
     } else {
-      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", (unsigned long)ret);
     }
   } else {
     msg_len = strlen(test_msg);
@@ -344,7 +344,7 @@ void test_psa_sha_384()
       size_t chunk_len = (msg_len - offset) >= 4 ? 4 : (msg_len - offset);
       ret              = psa_hash_update(&hash_op, (const unsigned char *)test_msg + offset, chunk_len);
       if (ret != PSA_SUCCESS) {
-        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", ret);
+        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", (unsigned long)ret);
         break;
       }
     }
@@ -352,7 +352,7 @@ void test_psa_sha_384()
       ret = psa_hash_finish(&hash_op, hash_buf, sizeof(hash_buf), &hash_len);
     }
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", (unsigned long)ret);
     } else if (memcmp(hash_buf, expect_sha384_hash, sizeof(expect_sha384_hash)) == 0) {
       DEBUGOUT("    Result: PASS\r\n");
     } else {
@@ -361,7 +361,7 @@ void test_psa_sha_384()
     }
     ret = psa_hash_abort(&hash_op);
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", (unsigned long)ret);
     } else {
       DEBUGOUT("    Result: PASS (abort)\r\n");
     }
@@ -404,7 +404,7 @@ void test_psa_sha_512()
 
   // Compare with the expected result
   if (ret != 0) {
-    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", ret);
+    DEBUGOUT("    Result: FAIL (status 0x%lx)\r\n", (unsigned long)ret);
   } else if (ret == 0 && memcmp(hash_buf, expect_sha512_hash, sizeof(expect_sha512_hash)) == 0) {
     DEBUGOUT("    Result: PASS\r\n");
   } else {
@@ -421,9 +421,9 @@ void test_psa_sha_512()
   ret = psa_hash_setup(&hash_op, PSA_ALG_SHA_512);
   if (ret != PSA_SUCCESS) {
     if (ret == PSA_ERROR_NOT_SUPPORTED) {
-      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (NOT SUPPORTED 0x%lx)\r\n", (unsigned long)ret);
     } else {
-      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (SETUP 0x%lx)\r\n", (unsigned long)ret);
     }
   } else {
     msg_len = strlen(test_msg);
@@ -431,7 +431,7 @@ void test_psa_sha_512()
       size_t chunk_len = (msg_len - offset) >= 4 ? 4 : (msg_len - offset);
       ret              = psa_hash_update(&hash_op, (const unsigned char *)test_msg + offset, chunk_len);
       if (ret != PSA_SUCCESS) {
-        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", ret);
+        DEBUGOUT("    Result: FAIL (HASH UPDATE 0x%lx)\r\n", (unsigned long)ret);
         break;
       }
     }
@@ -439,7 +439,7 @@ void test_psa_sha_512()
       ret = psa_hash_finish(&hash_op, hash_buf, sizeof(hash_buf), &hash_len);
     }
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (HASH FINISH 0x%lx)\r\n", (unsigned long)ret);
     } else if (memcmp(hash_buf, expect_sha512_hash, sizeof(expect_sha512_hash)) == 0) {
       DEBUGOUT("    Result: PASS\r\n");
     } else {
@@ -448,7 +448,7 @@ void test_psa_sha_512()
     }
     ret = psa_hash_abort(&hash_op);
     if (ret != PSA_SUCCESS) {
-      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", ret);
+      DEBUGOUT("    Result: FAIL (ABORT 0x%lx)\r\n", (unsigned long)ret);
     } else {
       DEBUGOUT("    Result: PASS (abort)\r\n");
     }
@@ -462,7 +462,7 @@ void psa_app_process_action()
   psa_status_t ret;
   ret = psa_crypto_init();
   if (ret != PSA_SUCCESS) {
-    DEBUGOUT("PSA Crypto Init failed with status : %ld\r\n", ret);
+    DEBUGOUT("PSA Crypto Init failed with status : %ld\r\n", (long)ret);
   } else {
     DEBUGOUT("PSA Crypto Init Success\r\n");
   }

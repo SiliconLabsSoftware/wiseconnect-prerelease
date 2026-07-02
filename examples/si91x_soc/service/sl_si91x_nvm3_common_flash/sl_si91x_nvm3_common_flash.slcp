@@ -15,6 +15,9 @@ component:
 - id: syscalls
 - id: wifi
 - id: network_manager
+- id: sl_si91x_freertos_heap_4_redirect
+  condition:
+  - toolchain_gcc
 - id: basic_network_config_manager
 - id: sl_si91x_internal_stack
 - id: si91x_memory_default_config
@@ -68,8 +71,8 @@ filter:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.1.0
+  version: 4.1.1
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2026.6.0
+  version: 2026.6.1

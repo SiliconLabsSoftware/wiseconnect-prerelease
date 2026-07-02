@@ -296,6 +296,13 @@ sl_status_t sli_event_engine_deinit(void)
     free(temp);                                    // Release node memory
   }
 
+  if (event_engine_Id != NULL) {
+    if (osEventFlagsDelete(event_engine_Id) != osOK) {
+      return SL_STATUS_FAIL;
+    }
+    event_engine_Id = NULL;
+  }
+
   return SL_STATUS_OK; // Deinitialization successful
 }
 

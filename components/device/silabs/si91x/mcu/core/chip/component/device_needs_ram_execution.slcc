@@ -14,7 +14,7 @@ provides:
   - name: device_needs_ram_execution
 requires:
   - name: code_classification
-    unless: [psram_core, text_segment_in_psram, data_segment_in_psram, sl_si91x_code_classifier, pm_ps2_component]
+    unless: [pm_ps2_component]
 define:
   - name: SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION 
 template_contribution:

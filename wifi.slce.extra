@@ -1030,7 +1030,6 @@ extra_files:
 - components/device/silabs/si91x/wireless/inc/sl_si91x_protocol_types.h
 - components/device/silabs/si91x/wireless/inc/sl_si91x_driver.h
 - components/device/silabs/si91x/wireless/inc/sli_si91x_driver.h
-- extensions/wiseconnect_internal_everest/components/device/silabs/siwx3xx/wireless/inc/sli_wifi_data_interface_packet.h
 - components/device/silabs/si91x/wireless/inc/http_client/inc/sl_si91x_http_client_callback_framework.h
 - components/device/silabs/si91x/wireless/inc/mqtt/inc/si91x_mqtt_client_utility.h
 - components/device/silabs/si91x/wireless/inc/mqtt/inc/si91x_mqtt_client_types.h
@@ -1099,12 +1098,10 @@ extra_files:
 - components/service/network_manager/nvm3_network_config_manager.slcc
 - components/service/network_manager/basic_network_config_manager.slcc
 - components/service/network_manager/src/sl_net.c
-- components/service/network_manager/src/siwx3xx/sl_net_credentials.c
 - components/service/network_manager/src/si91x/sl_net_credentials.c
 - components/service/network_manager/src/sli_net_credentials.c
 - components/service/network_manager/src/sl_net_nvm_profiles.c
 - components/service/network_manager/src/sl_net_for_lwip.c
-- components/service/network_manager/src/sl_net_for_siwx3xx_lwip.c
 - components/service/network_manager/src/sli_net_common_utility.c
 - components/service/network_manager/src/sl_net_for_dual_stack.c
 - components/service/network_manager/src/sl_net_basic_certificate_store.c
@@ -1199,14 +1196,13 @@ extra_files:
 - components/sli_wifi/inc/sli_wifi_power_profile.h
 - components/sli_wifi/inc/sli_wifi_utility.h
 - components/sli_wifi/inc/sli_wifi_types.h
-- components/sli_wifi/inc/sli_wifi_radio_priority_config.h
 - components/at_commands_auto_gen/fs_at_commands.slcc
 - components/at_commands_auto_gen/at_commands_auto_gen.slcc
 - components/at_commands_auto_gen/http_at_commands.slcc
 - components/at_commands_auto_gen/net_at_commands.slcc
 - components/at_commands_auto_gen/wifi_at_commands.slcc
 - components/at_commands_auto_gen/at_power_manager.slcc
-- components/at_commands_auto_gen/uart_at_commands_config.h
+- components/at_commands_auto_gen/config/uart_at_commands_config.h
 - components/at_commands_auto_gen/wifi_commands.h
 - components/at_commands_auto_gen/bsd_socket_at_commands.slcc
 - components/at_commands_auto_gen/mqtt_at_commands.slcc
@@ -1224,7 +1220,6 @@ extra_files:
 - components/device/silabs/si91x/wireless/sli_si91x_wifi_event_handler/inc/sli_si91x_wifi_event_handler.h
 - components/sli_wifi_per_mode/sli_wifi_per_mode.slcc
 - components/sli_wifi_per_mode/src/sli_wifi_per_mode.c
-- extensions/wiseconnect_internal_everest/components/device/silabs/siwx3xx/wireless/src/sli_wifi_data_routing_table.c
 - components/sli_wifi_per_mode/inc/sli_wifi_per_mode.h
 - resources/wifi_resources.slcc
 - resources/lwip_defaults/lwipopts.h
