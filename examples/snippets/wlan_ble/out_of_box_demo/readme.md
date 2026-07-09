@@ -26,7 +26,7 @@ The SiWG917 dev kit does not have an onboard display. All device activities for 
 
 SiWG917 establishes WLAN connectivity via BLE provisioning. SiWG917 then proceeds to ping [www.silabs.com](https://www.silabs.com) for 5 times, after which MQTT connectivity with a remote mosquitto broker [test.mosquitto.org](http://test.mosquitto.org) is established.
 Then Network processor of SiWG917 enters connected sleep state.
-If a message is published onto the topic from a MQTT client application [https://testclient-cloud.mqtt.cool/](https://testclient-cloud.mqtt.cool/) to which the module is subscribed (Si917_MQTT_RECEIVE), the NWP wakes up and displays the received data and goes back to sleep. If BTN0 on the WPK baseboard or dev kit board is pressed, SiWG917 publishes a message onto a MQTT topic named Si917_APP_STATUS. The status of application is updated on the TFT-LCD display on the WPK baseboard, the same can be observed on the serial terminal prints as well.
+If a message is published onto the topic from a MQTT client application to which the module is subscribed (Si917_MQTT_RECEIVE), the NWP wakes up and displays the received data and goes back to sleep. If BTN0 on the WPK baseboard or dev kit board is pressed, SiWG917 publishes a message onto a MQTT topic named Si917_APP_STATUS. The status of application is updated on the TFT-LCD display on the WPK baseboard, the same can be observed on the serial terminal prints as well.
 
 ## Prerequisites/Setup Requirements
 
@@ -59,7 +59,7 @@ If a message is published onto the topic from a MQTT client application [https:/
 
 ## Upgrade application binary
 
-- Download the latest out-of-box demo binary from [the WiseConnect SDK GitHub repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/demos).
+- Download the latest out-of-box demo binary from [the WiseConnect SDK GitHub repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/demos).
 
 - Follow the instructions on the [Developing for SiWx91x Host page](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio) to:
 
@@ -98,7 +98,7 @@ To view the application prints on the console, refer to [link name](https://docs
 
     To upgrade to latest application binary, refer [upgrade application binary](#upgrade-application-binary) section.
 
-    Also, upgrade the connectivity firmware (NWP firmware) to the latest version to avoid compatibility issues with application binary. Download the latest connectivity firmware from [Wiseconnect github repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/connectivity_firmware) and refer [Upgrade SiWx91x Connectivity Firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#upgrade-si-wx91x-connectivity-firmware)  to upgrade the connectivity firmware.
+    Also, upgrade the connectivity firmware (NWP firmware) to the latest version to avoid compatibility issues with application binary. Download the latest connectivity firmware from [Wiseconnect github repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/connectivity_firmware) and refer [Upgrade SiWx91x Connectivity Firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#upgrade-si-wx91x-connectivity-firmware)  to upgrade the connectivity firmware.
 
     If the messages being displayed on the LCD display on WPK or the serial terminal prints indicate versioning information (Si917 OOB Demo v2.0 - as show in the following image)
 
@@ -181,55 +181,13 @@ To view the application prints on the console, refer to [link name](https://docs
 
 - If you are using a different MQTT broker, replace "test.mosquitto.org" with the appropriate hostname.
 
-- To check if the MQTT broker is working, you can use the online MQTT client available at the below link.
-
-  >**NOTE :**
-  >
-  > If the default MQTT broker link is not working, you can try using other MQTT brokers listed on the webpage. For example, if "test.mosquitto.org" is not functioning, you can use "broker.mqtt.cool" as an alternative. Follow the steps mentioned above to update the MQTT hostname.
-
-- Go to the browser and open the [online mqtt client](https://testclient-cloud.mqtt.cool/).
-
-  ![MQTT test client image-1](resources/readme/MQTT_testclient1.png)
-
-- Click on the dropdown option and select 'tcp://test.mosquitto.org:1883'.
-
-  ![MQTT test client image-2](resources/readme/MQTT_testclient2.png)
-
-- Click on "connect" to connect to the mosquitto broker.
-
-  ![MQTT test client image-3](resources/readme/MQTT_testclient3.png)
-
-- Enter "Si917_MQTT_RECEIVE" in the Publish section.
-
-  ![MQTT test client image-4](resources/readme/MQTT_testclient4.png)
-
-- Enter the data to be sent to the SiWG917 (can be any random text) in the publish section and click on the publish button, the online client then publishes data on the "Si917_MQTT_RECEIVE" topic.
-
-  If the application binary version is older than v2.0, the MQTT data received by SiWG917 will be displayed in the application prints on the serial console.
-
-  If the application binary version is v2.0, the MQTT data received by SiWG917 will be displayed on the TFT-LCD display of the WPK board and the application prints on the serial console.
-
-  ![Here is the image of LCD with the status prints](resources/readme/status_lcd4.png)
-
-  ![Here is the image of serial terminal prints](resources/readme/status_print_message_received.png)
-
-- If the application binary version is v2.0, please proceed with the following steps, if not please refer [Measuring the current consumption using Simplicity Studio Energy Profiler](#measuring-the-current-consumption-using-simplicity-studio-energy-profiler) section for using the energy profiler tool to measure the current consumption of the SiWG917.
-
-- Enter "Si917_APP_STATUS" in the Subscriptions sections as shown in the following image and click on Subscribe.
-
-  ![MQTT test client image-5](resources/readme/MQTT_testclient5.png)
-
-  After clicking the subscribe button, Si917_APP_STATUS can be observed under the subscribed topics section.
-
-  ![MQTT test client image-6](resources/readme/MQTT_testclient6.png)
+- To check if the MQTT broker is working, you can use the online MQTT client.
 
 - Press BTN0 on the WPK baseboard or dev kit. When BTN0 is pressed, SiWG917 publishes a MQTT message saying "Button is pressed" onto the topic "Si917_APP_STATUS". The same can be observed in the LCD display of the baseboard and the MQTT client page.
 
   ![Here is the image of LCD with the published messages](resources/readme/status_lcd5.png)
 
   ![Here is the image of serial terminal prints](resources/readme/status_print_button_pressed.png)
-
-  ![MQTT test client image-7](resources/readme/MQTT_testclient7.png)
 
 - The current consumption of SiWG917 can observed using the energy profiler tool integrated within the Simplicity Studio. Refer the [Measuring the current consumption using Simplicity Studio Energy Profiler](#measuring-the-current-consumption-using-simplicity-studio-energy-profiler) section for using the energy profiler to measure the current consumption of the module.
 

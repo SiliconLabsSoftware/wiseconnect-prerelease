@@ -666,7 +666,9 @@ static sl_status_t sli_set_sta_link_up_by_profile_mode(sl_net_wifi_client_profil
       // Default dual mode: single ipconfig, then sync to LwIP
       SL_DEBUG_LOG_V2(DEBUG, "Dual: DHCP performed by NWP, synced to LwIP");
       status = sl_si91x_configure_ip_address(&profile->ip, SL_SI91X_WIFI_CLIENT_VAP_ID);
-      if (status == SL_STATUS_OK) {
+      // Bring the link up on full or partial IP configuration success. profile->ip.type now
+      // reflects only the families that configured successfully, so LwIP is synced accordingly.
+      if (sli_net_is_ip_config_success(status)) {
         set_sta_link_up(profile);
       }
     }
@@ -804,12 +806,16 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Configure IP based on the management type
   status = sli_set_sta_link_up_by_profile_mode(&profile);
-  if (status != SL_STATUS_OK) {
+  if (!sli_net_is_ip_config_success(status)) {
     SL_DEBUG_LOG_V2(ERROR, "IP/link config failed with error: 0x%lX", status);
-    // Disconnect WiFi on IP configuration failure
+    // Disconnect WiFi only when no IP family could be configured.
     sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
     return status;
   }
+
+  // Preserve the IP configuration status (which may be a partial-success code) so it can be
+  // propagated to the caller.
+  const sl_status_t ip_config_status = status;
 
   // Store the IP configuration for later retrieval
   stored_ip_config[SLI_SI91X_CLIENT] = profile.ip;
@@ -821,7 +827,7 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
   status = sli_send_ip_info_to_firmware_from_profile(&profile);
   VERIFY_STATUS_AND_RETURN(status);
 
-  return status;
+  return ip_config_status;
 }
 
 sl_status_t sl_net_wifi_client_down(sl_net_interface_t interface)

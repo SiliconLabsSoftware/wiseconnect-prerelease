@@ -1155,6 +1155,43 @@ sl_status_t sl_wifi_get_signal_strength(sl_wifi_interface_t interface, int32_t *
 
 /***************************************************************************/ /**
  * @brief
+ *   Get the per-family IP configuration status captured during the last IP configuration.
+ * @details
+ *   When (IPv4 + IPv6) is brought up and only one family configures
+ *   successfully, [sl_net_up](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-up) /
+ *   [sl_si91x_configure_ip_address](../wiseconnect-api-reference-guide-si91x-driver/si91-x-network-functions#sl-si91x-configure-ip-address)
+ *   returns a partial-success
+ *   code (`SL_STATUS_WIFI_IPV4_OK` or `SL_STATUS_WIFI_IPV6_OK`). This API lets the
+ *   application retrieve the underlying per-family result so it can decide how to handle the
+ *   partially configured link.
+ *
+ *   When a dual-stack request fails for both families, the return code from
+ *   [sl_net_up](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-up) or
+ *   [sl_si91x_configure_ip_address](../wiseconnect-api-reference-guide-si91x-driver/si91-x-network-functions#sl-si91x-configure-ip-address)
+ *   contains only the IPv4 failure. Use this API to obtain the IPv6 failure as well.
+ * @pre Pre-conditions:
+ * -
+ *   IP configuration (for example, via [sl_net_up](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-up)
+ *   or [sl_si91x_configure_ip_address](../wiseconnect-api-reference-guide-si91x-driver/si91-x-network-functions#sl-si91x-configure-ip-address))
+ *   should have been attempted before calling this API.
+ * @param[out] ipv4_status
+ *   Pointer that receives the IPv4 configuration result. May be NULL if not required.
+ *   - `SL_STATUS_OK` : IPv4 configured successfully
+ *   - firmware error code : IPv4 configuration failed
+ *   - `SL_STATUS_NOT_AVAILABLE` : IPv4 was not requested in the last attempt
+ * @param[out] ipv6_status
+ *   Pointer that receives the IPv6 configuration result. May be NULL if not required.
+ *   - `SL_STATUS_OK` : IPv6 configured successfully
+ *   - firmware error code : IPv6 configuration failed
+ *   - `SL_STATUS_NOT_AVAILABLE` : IPv6 was not requested in the last attempt
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *   Returns `SL_STATUS_NULL_POINTER` if both output pointers are NULL.
+ ******************************************************************************/
+sl_status_t sl_wifi_get_ip_config_failure_reason(sl_status_t *ipv4_status, sl_status_t *ipv6_status);
+
+/***************************************************************************/ /**
+ * @brief
  *   Get the station Timing Synchronization Function (TSF) time which is synchronised with connected AP beacon TSF. 
  * @pre
  *   Pre-condition: @ref sl_wifi_connect should be called before this API.

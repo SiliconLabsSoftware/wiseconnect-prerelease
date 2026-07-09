@@ -351,9 +351,9 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 
 1. After creating the project add **SH_AWS_ENABLE=1** macro in the preprocessor settings.
 2. Now refer to ***Wi-Fi - AWS IoT MQTT Client (SoC)*** example readme.
-3. Make the relevant changes according to the above example readme in [`sl_net_default_values.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/sl_net_default_values.h),  [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/aws_iot_config.h) present in *config* folder
+3. Make the relevant changes according to the above example readme in [`sl_net_default_values.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/resources/defaults/sl_net_default_values.h),  [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/resources/defaults/aws_iot_config.h) present in *config* folder
 4. Modify the relevant changes in [`sensorhub_aws_app.c`](sensorhub_aws_app.c) also.
-5. Increase the buffer size AWS_IOT_MQTT_TX_BUF_LEN to 1024 in [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/aws_iot_config.h)
+5. Increase the buffer size AWS_IOT_MQTT_TX_BUF_LEN to 1024 in [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/resources/defaults/aws_iot_config.h)
 
 ## Sensor Pins Setup
 

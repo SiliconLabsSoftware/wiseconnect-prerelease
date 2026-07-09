@@ -84,6 +84,16 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define RESOURCE_NAME  "/myresource"
     ```
 
+  - Optional WebSocket Origin header
+
+    ```c
+    // Optional: sets Origin header explicitly
+    ws_error = sl_websocket_set_origin(&ws_handle, "http://localhost");
+    ```
+
+    - `sl_websocket_set_origin()` is optional. If not called, the firmware uses its default Origin value (`"http://localhost"`).
+    - Maximum supported Origin length is `SL_SI91X_WEBSOCKET_MAX_ORIGIN_LENGTH - 1` characters (50 chars + null terminator).
+
 NOTE:
 > Procedure to run the example
 > 1. The application initializes the WebSocket client with the server IP, host name, and resource name.

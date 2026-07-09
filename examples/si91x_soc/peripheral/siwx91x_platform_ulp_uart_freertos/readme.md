@@ -38,9 +38,9 @@ This application demonstrates ULP UART operation under **FreeRTOS**, including:
   - 8 Bit data transfer
   - Stop bits 1
   - No Parity
-  - No Auto Flow control
+  - Auto Flow control
   - Baud Rates - 115200
-- HW flow control is currently not supported for ULP_UART.
+  - RS485 is not supported by ULP UART.
 
 ## About Example Code
 
@@ -163,7 +163,6 @@ Follow the steps below for successful execution of the application:
 >- In this application, the power state changes between PS4 and PS2.
 >- After a PS4↔PS2 transition, call `sl_si91x_usart_set_configuration()` again with settings appropriate to the new clock domain; this example does that from `ulp_uart_application_init()` in **`ulp_uart_freertos.c`**.
 >
->- CTS and RTS only work when not using the ROM UART driver.
 >
 > **Note:**
 >

@@ -27,6 +27,3 @@ requires:
   - name: systemlevel_time_period
   - name: systemlevel_rtc
   - name: log_none
-documentation:
-    docset: wiseconnect
-    document: wiseconnect-api-reference-guide-si91x-peripherals/calendar

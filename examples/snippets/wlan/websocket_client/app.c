@@ -287,6 +287,12 @@ sl_websocket_error_t create_and_send_websocket_data(void)
   }
   SL_DEBUG_LOG_V2(INFO, "WebSocket Init done");
 
+  ws_error = sl_websocket_set_origin(&ws_handle, "http://localhost");
+  if (ws_error != SL_WEBSOCKET_SUCCESS) {
+    SL_DEBUG_LOG_V2(ERROR, "Error setting WebSocket origin:%d", ws_error);
+    return ws_error;
+  }
+
   // Advanced TCP/TLS options - customize as needed
   // For ssl_ciphers_bitmap, use values from sl_si91x_socket_constants.h, e.g.:
   //   SL_SI91X_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 | SL_SI91X_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256

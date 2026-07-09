@@ -111,7 +111,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Connect master (this example) and a board flashed with the slave example: master clock pin (GPIO_8 or GPIO_25 depending on board) to slave clock pin, master TX (GPIO_30) to slave RX, master RX (GPIO_29) to slave TX.
 
-- Configure the following macros in [`usart_sync_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_master_freertos/usart_sync_master_freertos.c) if required:
+- Configure the following macros in [`usart_sync_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_master_freertos/usart_sync_master_freertos.c) if required:
 
 - `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
 

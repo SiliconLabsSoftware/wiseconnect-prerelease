@@ -62,7 +62,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - **Data width:** Specifies how many bits wide the input data is (e.g., 8-bit, 16-bit, 32-bit)
 - These parameters allow users to customize the CRC implementation for different standards and data types.
 
-- Configure the following macros in the [`sl_si91x_crc.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_crc.h) file. Update or modify the following macros, if required. The code illustrates the default configurations.
+- Configure the following macros in the [`sl_si91x_crc.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_crc.h) file. Update or modify the following macros, if required. The code illustrates the default configurations.
 
 - `SL_CRC_POLYNOMIAL`: Polynomial value used for CRC calculation. By default, it is set to `0x04C11DB7` (the standard CRC-32 polynomial).
 

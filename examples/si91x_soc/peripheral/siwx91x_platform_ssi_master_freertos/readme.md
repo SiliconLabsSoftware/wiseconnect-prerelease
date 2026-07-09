@@ -58,7 +58,7 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 This example demonstrates SSI transfer (full-duplex communication) and SSI send/SSI receive (half-duplex communication) running as a dedicated FreeRTOS task.
 
 - Various parameters like SSI clock mode, Bit-width, Manual cs pin, and SSI baud rate can be configured using the UC. Also, Master or Slave or ULP Master DMA can be configured using the UC.
-- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations, and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
+- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations, and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
 
 ### FreeRTOS Architecture
 
@@ -78,7 +78,7 @@ This example demonstrates SSI transfer (full-duplex communication) and SSI send/
 
 ### Task Flow (ssi_master_task)
 
-After initialization, the task uses `osDelay(SYNC_TIME)` (5 seconds) to synchronize with the slave board, then executes the transfer phases sequentially based on the macros enabled in `ssi_master_freertos.h`:
+After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and waits for a button press on the master-side sync line before starting the first active phase. If a later receive phase follows a transfer or send phase, the task waits for a second button press before starting that receive phase. The transfer phases then execute sequentially based on the macros enabled in `ssi_master_freertos.h`:
 
 >**Note:** The frequency of the SSI master bit-rate clock is one-half the frequency of SSI master input clock.
 
@@ -95,7 +95,7 @@ After initialization, the task uses `osDelay(SYNC_TIME)` (5 seconds) to synchron
 
 - If the **SSI_MASTER_RECEIVE** macro is enabled, it only receives the data from slave. SPI slave must be connected; it cannot be tested in loopback mode.
 
-  - An additional `osDelay(RECEIVE_SYNC_TIME)` (500 ms) is used to allow the slave to settle before receiving.
+  - If receive follows an earlier transfer or send phase, the task waits for another `BTN0` press before starting the receive phase.
   - Calls [sl_si91x_ssi_receive_data](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-receive-data) which expects data_in (empty buffer) and number of data bytes to be received.
   - The task blocks on `osSemaphoreAcquire()` until the receive completes, then compares the data.
 
@@ -195,7 +195,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   static uint32_t ssi_slave_number = SSI_SLAVE_3;  
   ```
 
-- Configure the following macros in [`ssi_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_master_freertos/ssi_master_freertos.c) if required:
+- Configure the following macros in [`ssi_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_master_freertos/ssi_master_freertos.c) if required:
 
 - `SSI_MASTER_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
 
@@ -227,16 +227,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define SSI_MASTER_RECEIVE_SAMPLE_DELAY 0      // RX sample delay (SSI clocks)
   ```
 
-- `SYNC_TIME`: Defines the delay (in milliseconds) used to synchronize master and slave before starting the transfer. By default, it is set to 5000.
+- `PRIMARY_SECONDARY_SYNC_PIN`: Defines the GPIO used for button-based master/slave synchronization. By default, it is `RTE_UULP_GPIO_2_PIN`.
 
   ```c
-  #define SYNC_TIME                       5000   // Delay to sync master and slave (ms)
-  ```
-
-- `RECEIVE_SYNC_TIME`: Defines the delay (in milliseconds) used to settle the slave after a send operation completes. By default, it is set to 500.
-
-  ```c
-  #define RECEIVE_SYNC_TIME               500    // Delay to settle the slave after send (ms)
+  #define PRIMARY_SECONDARY_SYNC_PIN      RTE_UULP_GPIO_2_PIN
   ```
 
 - To unregister a user event callback for a specific instance, use the API [sl_si91x_ssi_per_instance_unregister_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-per-instance-unregister-event-callback). Alternatively, to unregister callbacks for all instances simultaneously, use the API [sl_si91x_ssi_unregister_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-unregister-event-callback).
@@ -247,7 +241,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 >
 > Where F<sub>sclk_out</sub> is the bit rate output from the master. Make sure the SSI Primary (Master) peripheral clock (F<sub>ssi_clk</sub>) is set accordingly. Incorrect clock configuration may result in communication errors or unreliable data transfer.
 >
-> **SSI Secondary (Slave) Setup:** For instructions on configuring the SSI slave, refer to the [SSI slave](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/readme.md) to ensure correct setup and operation.
+> **SSI Secondary (Slave) Setup:** For instructions on configuring the SSI slave, refer to the [SSI slave](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/readme.md) to ensure correct setup and operation.
 
 ### Pin Configuration
 
@@ -259,6 +253,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | GPIO_28 [P31]              | GPIO_28 [CS]            | RTE_SSI_MASTER_CS0_PIN  |
 | GPIO_26 [P27]              | GPIO_26 [MOSI]          | RTE_SSI_MASTER_MOSI_PIN |
 | GPIO_27 [P29]              | GPIO_27 [MISO]          | RTE_SSI_MASTER_MISO_PIN |
+
+`UULP_VBAT_GPIO_2` which is `BTN0` on WPK is connected to `F12`. This example uses that signal as the synchronization source on the master side.
 
 ![Figure: Pin Configuration for SSI1](resources/readme/image510d.png)
 
@@ -272,17 +268,19 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | CS     | GPIO_28                 | P31             | GPIO_9                 | F09            | CS → CS                    |
 | MOSI   | GPIO_26                 | P27             | GPIO_27                | P29            | Master MOSI → Slave MOSI   |
 | MISO   | GPIO_27                 | P29             | GPIO_28                | P31            | Master MISO → Slave MISO   |
+| SYNC   | UULP_VBAT_GPIO_2        | F12             | UULP_VBAT_GPIO_2       | F12            | F12 → F12                  |
 | GND    | GND                     | GND             | GND                    | GND            | GND → GND                  |
 
 **If using Explorer Kit (BRD2708A) on both sides:**
 
-| Signal | Master Board GPIO | Slave Board GPIO | Wire                       |
-| ------ | ----------------- | ---------------- | -------------------------- |
-| SCK    | GPIO_25 [SCK]     | GPIO_25          | SCK → SCK                  |
-| CS     | GPIO_28 [CS]      | GPIO_28          | CS → CS                    |
-| MOSI   | GPIO_26 [MOSI]    | GPIO_27          | Master MOSI → Slave MOSI   |
-| MISO   | GPIO_27 [MISO]    | GPIO_26          | Master MISO → Slave MISO   |
-| GND    | GND               | GND              | GND → GND                  |
+| Signal | Master Board GPIO | Slave Board GPIO | Wire                     |
+| ------ | ----------------- | ---------------- | ------------------------ |
+| SCK    | GPIO_25 [SCK]     | GPIO_25          | SCK → SCK                |
+| CS     | GPIO_28 [CS]      | GPIO_28          | CS → CS                  |
+| MOSI   | GPIO_26 [MOSI]    | GPIO_27          | Master MOSI → Slave MOSI |
+| MISO   | GPIO_27 [MISO]    | GPIO_26          | Master MISO → Slave MISO |
+| SYNC   | UULP_VBAT_GPIO_2  | UULP_VBAT_GPIO_2 | SYNC → SYNC              |
+| GND    | GND               | GND              | GND → GND                |
 
 >**Note:** Make sure the following pin configurations are in the `RTE_Device_917.h` file:
 >
@@ -293,10 +291,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1. Compile and run the application.
-2. Connect master SSI pins to slave SSI pins on WPK board.
-3. First reset the slave board and then reset the master board. The time difference between these resets is expected up to 5 seconds.
-4. In the case of loopback mode, when the loopback jumper wire is removed and the test is run, the result should come as data comparison fail and test case fail.
-5. After successful program execution, the prints in serial console looks as shown below.
+2. Connect the master SSI pins to the slave SSI pins as listed above. On WPK hardware, also connect `F12` on the master board to `F12` on the slave board for synchronization.
+3. Reset the slave board and then run or reset the master board.
+4. When the master prints `Press button 0 on master to sync.`, press `BTN0` on the master board to start the first active phase.
+5. If the enabled flow later reaches a receive phase after a transfer or send phase, press `BTN0` on the master board again when prompted to start that receive phase.
+6. In the case of loopback mode, when the loopback jumper wire is removed and the test is run, the result should come as data comparison fail and test case fail.
+7. After successful program execution, the prints in serial console looks as shown below.
 
    ![Figure: output](resources/readme/output.png)
 

@@ -105,7 +105,7 @@ Configuration of UART at UC (Universal Configuration):
 
 - By default in UC, UART1 clock source will be configured to `ULP REF CLK`, select `INTF PLL CLK`.
 
-- Configure the following macros in [`uart_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_uart_freertos/uart_freertos.c) if required:
+- Configure the following macros in [`uart_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_uart_freertos/uart_freertos.c) if required:
 
 - `UART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive UART data. By default, it is set to 1024.
 

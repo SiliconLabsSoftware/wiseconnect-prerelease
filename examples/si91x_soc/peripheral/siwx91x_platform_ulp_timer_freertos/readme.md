@@ -93,7 +93,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   ![Figure: ulp_timer_uc_screen](resources/uc_screen/ulp_timer_uc_screen.png)
 
-- Configure timer using following macros, defined in [**sl_si91x_ulp_timer_inst_config.h**](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ulp_timer_inst_config.h) file and update/modify following macros if required:
+- Configure timer using following macros, defined in [**sl_si91x_ulp_timer_inst_config.h**](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ulp_timer_inst_config.h) file and update/modify following macros if required:
 
 ### Macros for Timer Configurations
 

@@ -54,6 +54,4 @@ template_contribution:
 config_file:
   - path: config/sl_si91x_psram_pin_config.h
     file_id: psram_pin_config
-documentation:
-    docset: wiseconnect
-    document: wiseconnect-api-reference-guide-si91x-peripherals/psram
+

@@ -42,7 +42,7 @@ This application runs on the **I2S primary (master)** device. It demonstrates bi
 This example demonstrates I2S **two-board** primary/secondary transfer as a dedicated FreeRTOS task.
 
 - Resolution, sampling rate, and channel can be configured using the **I2S** UC. Generated values appear as `SL_I2S0_*` macros in the **config folder**.
-- The [`sl_si91x_i2s_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_i2s_config/sl_si91x_i2s_config.h) file contains the UC-driven I2S instance configuration.
+- The [`sl_si91x_i2s_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_i2s_config/sl_si91x_i2s_config.h) file contains the UC-driven I2S instance configuration.
 
 ### FreeRTOS Architecture
 
@@ -81,7 +81,7 @@ If any API call fails, the task prints an error via `DEBUGOUT` and calls **`osTh
   - **transfer_type** — Transmit, receive, or abort variants.
 - Transfers with 16-bit resolution must use a `uint16_t` buffer and pass `SL_I2S_DATA_SIZE16` to the `data_size` field in `sl_i2s_xfer_config_t` while configuring the transfer.
 - Transfers with 24-bit and 32-bit resolutions must use a `uint32_t` buffer and pass `SL_I2S_DATA_SIZE32`.
-- Because 8-bit resolution is not supported, use a `uint8_t` buffer with 16-bit resolution, pass `SL_I2S_DATA_SIZE8`, cast the buffer to `(uint16_t *)`, and set the transfer size to half the 8-bit buffer length. (Refer to the **[I2S loopback FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_loopback_freertos/readme.md)** example.) For 8-bit transfers, the transfer size in bytes must be a multiple of four (for example, 8, 12, 16, or 20).
+- Because 8-bit resolution is not supported, use a `uint8_t` buffer with 16-bit resolution, pass `SL_I2S_DATA_SIZE8`, cast the buffer to `(uint16_t *)`, and set the transfer size to half the 8-bit buffer length. (Refer to the **[I2S loopback FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_loopback_freertos/readme.md)** example.) For 8-bit transfers, the transfer size in bytes must be a multiple of four (for example, 8, 12, 16, or 20).
 - For 16-bit or 32-bit resolution, the transfer size must be an **even** value (8, 10, 12, 14…). For 24-bit resolution, it must be a **multiple of four** (8, 12, 16, 20…).
 - SCK frequency is calculated as **SCK = 2 × bit_width × sampling_rate**. By default, I2S0 uses `I2S_PLL_CLK` as the clock source.
 - By default, ULP_I2S (I2S1) uses `ULP_MHZ_RC_CLK` for low-power operation, which limits the maximum supported sampling rate to **48 kHz** (32 MHz RC trims to 20 MHz in sleep mode).
@@ -148,7 +148,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define I2S_INSTANCE               0    // I2S instance
   ```
 
-> **Note:** Use the **same** `SL_I2S0_*` UC settings on the **secondary** board. **I2S Secondary (Slave) Setup:** For the companion application and pins, refer to [I2S Secondary FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_secondary_freertos/readme.md).
+> **Note:** Use the **same** `SL_I2S0_*` UC settings on the **secondary** board. **I2S Secondary (Slave) Setup:** For the companion application and pins, refer to [I2S Secondary FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_secondary_freertos/readme.md).
 
 ### Pin Configuration
 
@@ -193,7 +193,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-1. Build and flash **[I2S Secondary FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_secondary_freertos/readme.md)** on one board and this **primary** application on the other.
+1. Build and flash **[I2S Secondary FreeRTOS](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_i2s_secondary_freertos/readme.md)** on one board and this **primary** application on the other.
 2. Connect I2S **SCK**, **WS**, crossed **DOUT/DIN**, and **GND** between the boards as per the pin connection tables above.
 3. Open a serial console on each board. The secondary task starts with **transmit** and the primary task with **receive**; the **primary (master)** must be clocking the bus during the secondary **transmit** phase, so do not start the secondary alone before the primary is ready.
 4. **Reset the secondary board first, then reset the primary board within a short time** so the secondary **transmit** lines up with the primary **receive** phase.

@@ -37,6 +37,7 @@
  ******************************************************************************/
 static float vref_value = (float)VREF_VALUE;
 static int16_t adc_output[1]; // Last read value (used for sign handling)
+static uint8_t adc_static_channel_index = 0;
 /* Counting semaphore: one token per static-mode completion (see adc_init_function) */
 static osSemaphoreId_t adc_sample_sem;
 static sl_status_t adc_init_function(void);
@@ -145,7 +146,7 @@ static sl_status_t adc_init_function(void)
 /*******************************************************************************
  * @brief  ADC event callback: gives one counting-semaphore token per static-mode conversion
  *         completion (one per channel per scan round when multiple channels are enabled).
- * @param  event_channel  Channel index (unused in this example)
+ * @param  event_channel  Channel index (unused; RSI static-mode callback always reports channel 0)
  * @param  event          SL_ADC_STATIC_MODE_EVENT when static sample is ready
  * @return None
  ******************************************************************************/
@@ -178,41 +179,47 @@ static void adc_static_mode_task(void *argument)
   while (1) {
     sl_status_t status;
     uint16_t adc_value;
-    uint8_t channel_num;
     float vout = 0.0f;
 
-    /* Iterate all enabled channels; one semaphore wait per channel read */
-    for (channel_num = 0; channel_num < sl_adc_config.num_of_channel_enable; channel_num++) {
-      /* Wait for this channel's completion (callback releases semaphore) */
-      if (adc_sample_sem != NULL) {
-        (void)osSemaphoreAcquire(adc_sample_sem, osWaitForever);
-      }
-      status = sl_si91x_adc_read_data_static(sl_adc_channel_config, sl_adc_config, &adc_value);
-      if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("sl_si91x_adc_read_data_static: Error Code : %lu\r\n", status);
-        continue;
-      }
-      /* Apply sign handling for 12-bit static result */
-      adc_output[0] = (int16_t)adc_value;
-      if (adc_output[0] & SIGN_BIT) {
-        adc_output[0] = (int16_t)(adc_output[0] & (ADC_DATA_CLEAR));
-      } else {
-        adc_output[0] = adc_output[0] | SIGN_BIT;
-      }
-      /* Convert to voltage using Vref */
-      vout = (((float)adc_output[0] / (float)ADC_MAX_OP_VALUE) * vref_value);
-      /* Differential input: report relative to Vref/2 */
-      if (sl_adc_channel_config.input_type[channel_num]) {
+    if (adc_sample_sem != NULL) {
+      (void)osSemaphoreAcquire(adc_sample_sem, osWaitForever);
+    }
+    status = sl_si91x_adc_read_data_static(sl_adc_channel_config, sl_adc_config, &adc_value);
+    if (status != SL_STATUS_OK) {
+      SL_PRINT_STRING_ERROR("sl_si91x_adc_read_data_static: Error Code : %lu\r\n", status);
+      continue;
+    }
+    adc_output[0] = (int16_t)adc_value;
+    if (adc_output[0] & SIGN_BIT) {
+      adc_output[0] = (int16_t)(adc_output[0] & (ADC_DATA_CLEAR));
+    } else {
+      adc_output[0] = adc_output[0] | SIGN_BIT;
+    }
+    vout = (((float)adc_output[0] / (float)ADC_MAX_OP_VALUE) * vref_value);
+    if (sl_adc_config.num_of_channel_enable > 1) {
+      if (sl_adc_channel_config.input_type[adc_static_channel_index]) {
         vout = vout - (vref_value / 2);
         SL_PRINT_STRING_ERROR("Differential ended input  :%ldmV\r\n", (int32_t)(vout * 1000.0f));
       } else {
-        SL_PRINT_STRING_ERROR("ADC Channel[%d] Measured input :%ldmV\r\n", channel_num, (int32_t)(vout * 1000.0f));
+        SL_PRINT_STRING_ERROR("ADC Channel[%d] Measured input :%ldmV\r\n",
+                              adc_static_channel_index,
+                              (int32_t)(vout * 1000.0f));
       }
-      /* Extra newline after last channel in multi-channel mode */
-      if (sl_adc_config.num_of_channel_enable > 1) {
-        if (channel_num >= (sl_adc_config.num_of_channel_enable - 1)) {
-          SL_PRINT_STRING_ERROR("\r\n\r\n");
-        }
+      if (adc_static_channel_index >= (sl_adc_config.num_of_channel_enable - 1)) {
+        SL_PRINT_STRING_ERROR("\r\n\r\n");
+      }
+      adc_static_channel_index++;
+      if (adc_static_channel_index >= sl_adc_config.num_of_channel_enable) {
+        adc_static_channel_index = 0;
+      }
+    } else {
+      if (sl_adc_channel_config.input_type[sl_adc_channel_config.channel]) {
+        vout = vout - (vref_value / 2);
+        SL_PRINT_STRING_ERROR("Differential ended input  :%ldmV\r\n", (int32_t)(vout * 1000.0f));
+      } else {
+        SL_PRINT_STRING_ERROR("ADC Channel[%d] Measured input :%ldmV\r\n",
+                              sl_adc_channel_config.channel,
+                              (int32_t)(vout * 1000.0f));
       }
     }
   }

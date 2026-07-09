@@ -497,6 +497,15 @@ void sli_si91x_handle_websocket(sli_si91x_socket_create_request_t *socket_create
     socket_create_request->webs_subprotocol_name[si91x_bsd_socket->websocket_info->subprotocol_length] =
       '\0'; // Null-terminate
   }
+
+  // Copy origin
+  if (si91x_bsd_socket->websocket_info && si91x_bsd_socket->websocket_info->origin_length > 0) {
+    memcpy(socket_create_request->webs_origin,
+           si91x_bsd_socket->websocket_info->websocket_data + si91x_bsd_socket->websocket_info->host_length
+             + si91x_bsd_socket->websocket_info->resource_length + si91x_bsd_socket->websocket_info->subprotocol_length,
+           si91x_bsd_socket->websocket_info->origin_length);
+    socket_create_request->webs_origin[si91x_bsd_socket->websocket_info->origin_length] = '\0'; // Null-terminate
+  }
 }
 
 sl_status_t sl_si91x_config_socket(sl_si91x_socket_config_t socket_config)

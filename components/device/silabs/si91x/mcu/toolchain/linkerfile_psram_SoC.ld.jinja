@@ -376,26 +376,24 @@ SECTIONS
 	{% endif %} 
 	__exidx_end = .;
 
-{%- if si91x_platform_core %}
-	{%- if si91x_log_formatted_output_enable %}
-	.log_fmt :
-	{%- else %}
-	.log_fmt (NOLOAD) :
-	{%- endif %}
-	{
-		. = ALIGN(4);
-		__log_start__ = .;
-		*(.log_fmt*)
-		. = ALIGN(4);
-		__log_end__ = .;
-	{%- if psram_present and text_segment_in_psram %}
-		_last_psram_location = .;
-	} > psram :text
-	{%- elif flash_present %}			
-	} > rom :text
-	{%- else %}			
-	} > ram
-	{% endif %}
+{%- if si91x_platform_core and si91x_log_formatted_output_enable %}
+ /* Formatted on-device logging: format strings must be loaded into the image
+    so the firmware can dereference them at runtime. */
+ .log_fmt :
+ {
+  . = ALIGN(4);
+  __log_start__ = .;
+  *(.log_fmt*)
+  . = ALIGN(4);
+  __log_end__ = .;
+ {%- if psram_present and text_segment_in_psram %}
+  _last_psram_location = .;
+ } > psram :text
+ {%- elif flash_present %}   
+ } > rom :text
+ {%- else %}   
+ } > ram
+ {% endif %}
 {%- endif %}
 
 {%- if crash_manager_enable and crash_manager_backend_ram %}
@@ -785,6 +783,25 @@ SECTIONS
 {%- endif %}  /* littlefs_enable */
 {%- endif %}  /* Flash Present */
 
+{%- if si91x_platform_core and not si91x_log_formatted_output_enable %}
+ /* Compact/proprietary logging: the firmware transmits only pointer IDs, not the
+    format strings, so the strings do NOT need to be in the programmed image (.bin).
+    Emit them as a non-allocatable (INFO) section: the bytes stay in the ELF (.out)
+    for the host-side log decoder to read, but are excluded from the loadable image.
+    Placed at the very end of SECTIONS (with the other non-allocatable sections):
+    a non-alloc section positioned amid the allocatable flow makes LLD drop the
+    SHF_ALLOC flag on the following classified sections. No ">" memory region is
+    used because LLD warns and forces the address to 0 for a region-assigned
+    non-allocatable section; GNU ld and LLD both keep the data in the ELF regardless. */
+ .log_fmt (INFO) :
+ {
+  . = ALIGN(4);
+  __log_start__ = .;
+  KEEP(*(.log_fmt*))
+  . = ALIGN(4);
+  __log_end__ = .;
+ }
+{%- endif %}
 
   /* Stabs debugging sections. */
   .stab          0 : { *(.stab) }

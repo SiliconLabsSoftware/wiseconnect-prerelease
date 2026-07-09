@@ -73,11 +73,6 @@ component_path:
  - path: components/device/silabs/si91x/wireless/gatt
  - path: components/device/silabs/si91x/wireless/smp
   # Root-level BLE advertising/scan installer .slcc (extended, legacy, default)
- - path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
- - path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
- - path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
- - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
- - path: third_party/littlefs/component
  - path: components/board/silabs/component
  - path: components/device/silabs/si91x/mcu
  - path: components/device/silabs/si91x/mcu/core/chip/component
@@ -117,15 +112,20 @@ component_path:
  - path: components/device/silabs/si91x/mcu/hal/component
  - path: components/device/silabs/si91x/mcu/toolchain/component
  - path: components/device/silabs/si91x/sl_si91x_generative_ai/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
+ - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
+ - path: third_party/littlefs/component
  - path: netstack_silabs_lwip/component
 documentation:
  - docset: wifi
    version: 4.1.1
  - docset: bluetooth_le_siwx91x
    version: 4.1.1
- - docset: platform_nwp_siwx91x
-   version: 4.1.1
  - docset: platform_siwx91x
+   version: 4.1.1
+ - docset: platform_nwp_siwx91x
    version: 4.1.1
  - docset: unknown
    version: 0.0.0

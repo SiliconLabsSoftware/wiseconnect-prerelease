@@ -106,6 +106,9 @@ Refer [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-g
 
   ------------------------------------------------------------------------------
 
+> **Note:**
+>- On the 4342A PSRAM board, GPIO8 [F8] must not be used as the UART1 Receiver Enable (~RE) pin. Use another available GPIO pin instead.
+
 ## Steps for N-board setup
 
 - Create N applications for N boards.

@@ -48,6 +48,3 @@ requires:
   - name: log_none
 ui_hints:
   visibility: never
-documentation:
-    docset: wiseconnect
-    document: wiseconnect-api-reference-guide-si91x-peripherals/ssi

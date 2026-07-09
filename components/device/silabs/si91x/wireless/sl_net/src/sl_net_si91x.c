@@ -132,17 +132,25 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
     status                             = sl_si91x_configure_ip_address(&profile.ip, SL_WIFI_CLIENT_VAP_ID_1);
   }
 
-  // Disconnect WiFi on IP configuration failure
-  if (status != SL_STATUS_OK) {
+  // Keep the connection on full or partial IP configuration success; only tear down when no
+  // requested IP family could be configured. profile.ip.type now reflects the families that
+  // configured successfully.
+  if (!sli_net_is_ip_config_success(status)) {
     sl_wifi_disconnect(client_interface);
     return status;
   }
+
+  const sl_status_t ip_config_status = status;
 
   dhcp_type[SLI_SI91X_CLIENT] = profile.ip.mode;
 
   // Set the client profile
   status = sl_net_set_profile(interface, profile_id, &profile);
-  return status;
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  return ip_config_status;
 }
 
 sl_status_t sl_net_wifi_client_down(sl_net_interface_t interface)
@@ -500,6 +508,7 @@ sl_status_t sl_net_get_ip_address(sl_net_interface_t interface, sl_net_ip_addres
   if (SL_NET_WIFI_CLIENT_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {
     vap_id           = SL_WIFI_CLIENT_VAP_ID;
     ip_address->mode = dhcp_type[SLI_SI91X_CLIENT];
+
   } else if (SL_NET_WIFI_AP_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {
     ip_address->mode = dhcp_type[SLI_SI91X_AP];
     return SL_STATUS_OK;

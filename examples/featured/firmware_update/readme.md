@@ -218,7 +218,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 	  user@linux:~$ gcc firmware_update_tcp_server_9117.c -o ota_server.bin
 	  ```
 
-  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
+  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
 
       ```c
       user@linux:~$ ./ota_server.bin 5001 SiWG917-B.2.x.x.x.x.x.rps
@@ -232,7 +232,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
       ![Figure: cygwin server compilation](resources/readme/cygwin_server_compilation.png)
   
-  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
+  3. Run the application providing the TCP port number (specified in the SiWx91x app) together with the firmware file and path where [SiWG917-B.2.x.x.x.x.x.rps](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/connectivity_firmware) is the firmware image to be sent to SiWx91x.
 
       ```c
       ./ota_server 5001 SiWG917-B.2.x.x.x.x.x.rps

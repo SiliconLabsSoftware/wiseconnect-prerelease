@@ -174,7 +174,7 @@ To enable hardware flow control (RTS/CTS):
 3. Assign RTS and CTS pins either:
 
 - Through the UC pin assignment widget (preferred), OR
-- Manually by editing [`RTE_Device_917.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/core/chip/config/RTE_Device_917.h) and locating the USART0 RTS/CTS section.
+- Manually by editing [`RTE_Device_917.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/core/chip/config/RTE_Device_917.h) and locating the USART0 RTS/CTS section.
 
 4. Use the following default mapping if your Pin Tool is unavailable:
 
