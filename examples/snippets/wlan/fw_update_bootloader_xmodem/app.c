@@ -149,7 +149,10 @@ static const sl_wifi_device_configuration_t firmware_update_configuration = {
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 }
+                   .config_feature_bit_map     = 0 },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 extern uint8_t recv_buffer[];
@@ -160,14 +163,14 @@ volatile uint8_t xmodem_download            = 0;
 si91x_wlan_app_cb_t si91x_wlan_app_cb;
 
 uint32_t chunk_cnt = 0u, chunk_check = 0u, offset = 0u, fw_image_size = 0u;
-int32_t status                        = SL_STATUS_OK;
-uint8_t recv_buffer[SI91X_CHUNK_SIZE] = { 0 };
-sl_wifi_firmware_version_t fw_version = { 0 };
-uint8_t one_time                      = 1;
-volatile uint32_t offset_xmodem       = 0u;
-volatile uint32_t remaining_bytes     = 0u;
-uint32_t xmodem_chunk_cnt             = 0;
-uint32_t xmodem_chunk_rem             = 0;
+int32_t status                         = SL_STATUS_OK;
+uint8_t recv_buffer[SI91X_CHUNK_SIZE]  = { 0 };
+sl_si91x_firmware_version_t fw_version = { 0 };
+uint8_t one_time                       = 1;
+volatile uint32_t offset_xmodem        = 0u;
+volatile uint32_t remaining_bytes      = 0u;
+uint32_t xmodem_chunk_cnt              = 0;
+uint32_t xmodem_chunk_rem              = 0;
 
 uint32_t t_start   = 0;
 uint32_t t_end     = 0;
@@ -387,13 +390,21 @@ int32_t app_task_fw_update_via_xmodem(uint8_t *rx_data, uint32_t size)
         return status;
       }
 
-      status = sl_wifi_get_firmware_version(&fw_version);
+      status = sl_si91x_get_firmware_version(&fw_version);
       if (status != SL_STATUS_OK) {
         printf("reading fw version failed\n");
         break;
       }
       printf("fw version after upgrade is:");
-      print_firmware_version(&fw_version);
+      printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+             fw_version.chip_id,
+             fw_version.rom_id,
+             fw_version.major,
+             fw_version.minor,
+             fw_version.security_version,
+             fw_version.patch_num,
+             fw_version.customer_id,
+             fw_version.build_num);
       t_end     = osKernelGetTickCount();
       xfer_time = t_end - t_start;
       secs      = xfer_time / 1000;

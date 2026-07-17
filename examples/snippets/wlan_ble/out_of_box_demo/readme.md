@@ -1,11 +1,16 @@
 # Out of the box demo - SiWG917
 
+## High-Level Overview
+
+SiWG917 out-of-box demo: showcase WLAN, BLE, MCU peripherals, and NWP power save with minimal setup on the SiWG917 dev kit or wireless pro kit.
+
 This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.
 
 ## Table of Contents
 
 - [Out of the box demo - SiWG917](#out-of-the-box-demo---siwg917)
   - [Table of Contents](#table-of-contents)
+  - [High-Level Overview](#high-level-overview)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -18,6 +23,10 @@ This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (ne
     - [Run the application](#run-the-application)
     - [Update MQTT Hostname in wifi\_app.c](#update-mqtt-hostname-in-wifi_appc)
     - [Measuring the current consumption using Simplicity Studio Energy Profiler](#measuring-the-current-consumption-using-simplicity-studio-energy-profiler)
+
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs and Get Support](#report-bugs-and-get-support)
 
 ## Purpose/Scope
 
@@ -38,13 +47,16 @@ If a message is published onto the topic from a MQTT client application to which
 - A Wireless Access point with internet connectivity
 - **SoC Mode**:
   - Standalone
-    - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
+    - BRD4002A Wireless pro kit mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards
-      - BRD4338A [SiWx917-RB4338A]
-      - BRD4342A [SiWx917-RB4342A]
-      - BRD4343A [SiWx917-RB4343A]
+      - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+      - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+      - BRD4339B [SiWx917-RB4339B](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
+      - BRD4340A [SiWx917-RB4340A](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
+      - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+      - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
   - Kits
-    - SiWG917 Dev Kit [BRD2605A]
+    - SiWG917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
     - SiWx917 Pro Kit [Si917-PK6031A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-pro-kit?tab=overview)
 - Android Phone or iPhone with Simplicity Connect App (formerly EFR Connect App), which is available in Play Store and App Store (or) Windows PC with windows Silicon labs connect application.
 
@@ -232,3 +244,22 @@ To open the energy profiler:
   - Current consumption would be in the range of 8mA-9mA since M4 is in active state.
   - The above energy consumption plots are for reference and the power consumption number would vary based on the on air traffic, environment and the access point used.
 
+## Troubleshooting
+
+If you encounter issues while running this example, check the following:
+
+- Use the SiWG917 dev kit or WPK with the correct pre-built binary for your board.
+- Update the MQTT hostname in `wifi_app.c` as described in [Update MQTT Hostname in wifi_app.c](#update-mqtt-hostname-in-wifi_appc).
+- For Energy Profiler measurements, follow [Measuring the current consumption using Simplicity Studio Energy Profiler](#measuring-the-current-consumption-using-simplicity-studio-energy-profiler).
+
+## Resources
+
+- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
+- [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)

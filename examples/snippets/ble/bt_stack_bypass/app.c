@@ -239,7 +239,10 @@ static const sl_wifi_device_configuration_t config = {
 #endif
                       | SL_SI91X_BT_BLE_STACK_BYPASS_ENABLE),
                    .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
-                                              | RSI_CONFIG_FEATURE_BITMAP) }
+                                              | RSI_CONFIG_FEATURE_BITMAP) },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 const osThreadAttr_t thread_attributes = {

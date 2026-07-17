@@ -426,6 +426,7 @@ void data_callback(uint32_t sock_no,
   if (first_data_frame) {
     start = osKernelGetTickCount();
     printf("\r\nClient Socket ID : %" PRIu32 "\r\n", sock_no);
+#if ((THROUGHPUT_TYPE == UDP_RX) || (THROUGHPUT_TYPE == TCP_RX) || (THROUGHPUT_TYPE == TLS_RX))
     switch (THROUGHPUT_TYPE) {
       case UDP_RX:
         printf("\r\nUDP_RX Throughput test start\r\n");
@@ -437,6 +438,7 @@ void data_callback(uint32_t sock_no,
         printf("\r\nTLS_RX Throughput test start\r\n");
         break;
     }
+#endif
     first_data_frame = 0;
   }
 

@@ -123,7 +123,9 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
                                                                    &packet_type_info);
     if (SL_STATUS_OK != status) {
       sli_buffer_manager_free_buffer(buffer);
-      sli_buffer_manager_free_buffer(metadata);
+      if (metadata != NULL) {
+        sli_buffer_manager_free_buffer(metadata);
+      }
       sli_buffer_manager_free_buffer(response);
       return;
     }
@@ -135,7 +137,9 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
     }
   }
   sli_buffer_manager_free_buffer(buffer);
-  sli_buffer_manager_free_buffer(metadata);
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   sli_buffer_manager_free_buffer(response);
 
   return;
@@ -162,7 +166,9 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
   sl_wifi_system_packet_t *packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
   if (packet == NULL) {
     sli_buffer_manager_free_buffer(buffer);
-    sli_buffer_manager_free_buffer(metadata);
+    if (metadata != NULL) {
+      sli_buffer_manager_free_buffer(metadata);
+    }
     sli_buffer_manager_free_buffer(engine_response);
     return;
   }
@@ -180,7 +186,9 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
   }
 
   sli_buffer_manager_free_buffer(buffer);
-  sli_buffer_manager_free_buffer(metadata);
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   sli_buffer_manager_free_buffer(engine_response);
   return;
 }
@@ -214,7 +222,9 @@ static void sli_si91x_wifi_event_engine_network_event_handler(uint32_t event, vo
 
   sli_buffer_manager_free_buffer(buffer);
   sli_buffer_manager_free_buffer(response);
-  sli_buffer_manager_free_buffer(metadata);
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   return;
 }
 
@@ -232,7 +242,9 @@ static void sli_si91x_wifi_event_engine_socket_cmd_event_handler(uint32_t event,
 
   sli_buffer_manager_free_buffer(buffer);
   sli_buffer_manager_free_buffer(response);
-  sli_buffer_manager_free_buffer(metadata);
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   return;
 }
 

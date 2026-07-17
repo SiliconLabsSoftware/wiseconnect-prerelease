@@ -242,11 +242,11 @@ int sl_si91x_setsockopt(int32_t sockID, int level, int option_name, const void *
 
     case SL_SI91X_SO_TLS_SNI:
     case SL_SI91X_SO_TLS_ALPN: {
-      sl_status_t status = sli_si91x_add_tls_extension(&si91x_socket->tls_extensions,
-                                                       (const sl_si91x_socket_type_length_value_t *)option_value);
-
-      if (status != SL_STATUS_OK) {
-        SLI_SET_ERROR_AND_RETURN(ENOMEM);
+      const int result = sli_si91x_configure_tls_extension(&si91x_socket->tls_extensions,
+                                                           (const sl_si91x_socket_type_length_value_t *)option_value,
+                                                           option_len);
+      if (result != SLI_SI91X_NO_ERROR) {
+        return result;
       }
       break;
     }

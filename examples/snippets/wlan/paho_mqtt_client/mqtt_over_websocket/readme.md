@@ -1,10 +1,14 @@
-
 # Wi-Fi - Paho MQTT Client Over WebSocket
+
+## High-Level Overview
+
+SiWx91x Paho MQTT over WebSocket example: connect to Wi-Fi and an MQTT broker using Paho MQTT over WebSocket on SoC and NCP modes.
 
 ## Table of Contents
 
 - [Wi-Fi - Paho MQTT Client Over WebSocket](#wi-fi---paho-mqtt-client-over-websocket)
   - [Table of Contents](#table-of-contents)
+  - [High-Level Overview](#high-level-overview)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -15,7 +19,11 @@
   - [Test the Application](#test-the-application)
     - [Procedure for executing the application when enabled with SSL](#procedure-for-executing-the-application-when-enabled-with-ssl)
   - [Additional Information](#additional-information)
+    - [TLS ALPN and WebSocket transport](#tls-alpn-and-websocket-transport)
     - [Steps to set up MQTT server](#steps-to-set-up-mqtt-server)
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs and Get Support](#report-bugs-and-get-support)
 
 ## Purpose/Scope
 
@@ -31,10 +39,18 @@ SiWx91x device is configured as a Wi-Fi station and connects to an access point.
 - Windows PC1 (for running MQTT broker)
 - Windows PC2 (for running MQTT client utility - MQTT Explorer)
 - SoC Mode:
-  - Silicon Labs [BRD4338A, BRD4343A](https://www.silabs.com/)
+  - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+  - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+  - BRD4339B [SiWx917-RB4339B](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
+  - BRD4340A [SiWx917-RB4340A](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
+  - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+  - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
   - For Soc Mode, Simplicity Studio Energy Profiler can be used for the current consumption measurement - [Simplicity Studio Energy Profiler](#using-simplicity-studio-energy-profiler-for-current-measurement).
 - NCP Mode:
-  - Silicon Labs [BRD4180B](https://www.silabs.com/) 
+  - [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
+  - [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
+  - [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
+  - Silicon Labs [BRD4180B](https://www.silabs.com/development-tools/wireless/slwrb4180b-efr32xg21-wireless-gecko-radio-board?tab=overview) 
   - Host MCU Eval Kit. This example has been tested with:
     - Silicon Labs [WSTK + EFR32MG21](https://www.silabs.com/development-tools/wireless/efr32xg21-bluetooth-starter-kit)
    - Interface and Host MCU Supported
@@ -265,6 +281,12 @@ Follow the steps below for successful execution of the application:
 
 ## Additional Information
 
+### TLS ALPN and WebSocket transport
+
+The Paho Si91x SDK `MQTT_TLS_ALPN_ENABLED` integration applies to **MQTT over TCP/TLS** only. This WebSocket example uses the WebSocket transport path, which does not configure TLS ALPN through the Paho ALPN helpers. If you need MQTT with ALPN on port 443 (for example Mosquitto with `protocol mqtt`),use the **Wi-Fi - Paho MQTT Client Over TCP** example and follow the **Procedure for MQTT over TLS on port 443 with ALPN (Mosquitto)** section in that example's readme.
+
+Secure WebSocket (WSS) on port 443 typically negotiates `http/1.1` at the TLS layer rather than `mqtt`; that scenario is outside the scope of the MQTT ALPN SDK support added in WiseConnect.
+
 ### Steps to set up MQTT server
 
 1. To run MQTT broker on port 8080 in Windows PC1, open the command prompt and go to the MQTT installed folder (Ex: C:\Program Files\mosquitto) and run the following command:
@@ -308,3 +330,22 @@ Follow the steps below for successful execution of the application:
 >    - `-p 8080`: This is the same as the `-p` option for `mosquitto_sub`, specifying the network port of the MQTT broker.
 >    - `-t THERMOSTAT-DATA`: Specifies the topic that the client should publish the message to.
 >    - `-m "hello"`: Specifies the message to publish. In this case, the message is the string "hello".
+## Troubleshooting
+
+If you encounter issues while running this example, check the following:
+
+- Verify Wi-Fi credentials and WebSocket MQTT broker URL/port settings.
+- Ensure the broker supports MQTT over WebSocket and is reachable from the device.
+- Load valid TLS certificates if using secure WebSocket (wss).
+
+## Resources
+
+- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
+- [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)

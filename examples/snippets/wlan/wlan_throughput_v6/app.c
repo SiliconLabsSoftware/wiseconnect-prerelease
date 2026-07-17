@@ -34,6 +34,7 @@
 #include "sl_net_wifi_types.h"
 #include "sl_utility.h"
 #include "sl_wifi.h"
+#include "sl_si91x_driver.h"
 #include "socket.h"
 #include "sl_si91x_socket_support.h"
 #include "sl_si91x_socket_utility.h"
@@ -172,9 +173,11 @@ static const sl_wifi_device_configuration_t throughput_configuration = {
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
                    .config_feature_bit_map  = 0 },
-  .ta_pool = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
-               .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
-               .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO }
+  .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
+                           .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
+                           .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },
+  .efuse_data_type     = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 static sl_si91x_socket_config_t socket_config = {
@@ -236,6 +239,7 @@ void data_callback(uint32_t sock_no,
   if (first_data_frame) {
     start = osKernelGetTickCount();
     SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %ld\r\n", sock_no);
+#if ((THROUGHPUT_TYPE == UDP_RX) || (THROUGHPUT_TYPE == TCP_RX) || (THROUGHPUT_TYPE == TLS_RX))
     switch (THROUGHPUT_TYPE) {
       case UDP_RX:
         SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test start\r\n");
@@ -247,6 +251,7 @@ void data_callback(uint32_t sock_no,
         SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test start\r\n");
         break;
     }
+#endif
     first_data_frame = 0;
   }
 
@@ -262,8 +267,8 @@ static void application_start(void *argument)
   UNUSED_PARAMETER(argument);
   sl_status_t status;
 
-  sl_mac_address_t mac_addr                   = { 0 };
-  sl_wifi_firmware_version_t firmware_version = { 0 };
+  sl_mac_address_t mac_addr                    = { 0 };
+  sl_si91x_firmware_version_t firmware_version = { 0 };
 
   sl_ip_address_t ip_address           = { 0 };
   sl_net_wifi_client_profile_t profile = { 0 };
@@ -292,12 +297,20 @@ static void application_start(void *argument)
            mac_addr.octet[5]);
   SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)wlan_tp_v6_mac_log);
 
-  status = sl_wifi_get_firmware_version(&firmware_version);
+  status = sl_si91x_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
     return;
   } else {
-    print_firmware_version(&firmware_version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           firmware_version.chip_id,
+           firmware_version.rom_id,
+           firmware_version.major,
+           firmware_version.minor,
+           firmware_version.security_version,
+           firmware_version.patch_num,
+           firmware_version.customer_id,
+           firmware_version.build_num);
   }
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);

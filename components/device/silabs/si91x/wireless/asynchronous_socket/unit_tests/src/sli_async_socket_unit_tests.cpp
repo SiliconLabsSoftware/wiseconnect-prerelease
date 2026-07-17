@@ -29,12 +29,39 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <cstdint> // For u_int32_t
+#include <cstring>
+#include <cstdlib>
+#include <string>
 extern "C" {
 #include "sli_async_socket_fake_functions.h"
 #include "sl_si91x_socket_constants.h"
 #include "sl_si91x_socket.h"
+#include "sl_si91x_socket_utility.h"
 #include "sl_constants.h"
+#include <errno.h>
 #include <stdint.h>
+}
+
+static int sli_configure_tls_extension_enomem_fake(sli_si91x_tls_extensions_t *socket_tls_extensions,
+                                                   const sl_si91x_socket_type_length_value_t *tls_extension,
+                                                   socklen_t option_length)
+{
+  (void)socket_tls_extensions;
+  (void)tls_extension;
+  (void)option_length;
+  errno = ENOMEM;
+  return -1;
+}
+
+static int sli_configure_tls_extension_einval_fake(sli_si91x_tls_extensions_t *socket_tls_extensions,
+                                                   const sl_si91x_socket_type_length_value_t *tls_extension,
+                                                   socklen_t option_length)
+{
+  (void)socket_tls_extensions;
+  (void)tls_extension;
+  (void)option_length;
+  errno = EINVAL;
+  return -1;
 }
 
 #define IPADDR_LOOPBACK ((uint32_t)0x7f000001UL)
@@ -389,4 +416,101 @@ TEST(sli_async_socket_unit_tests, invalid_buffer_length)
 
   EXPECT_EQ(result, -1);
   EXPECT_EQ(errno, EMSGSIZE);
+}
+
+namespace {
+
+sl_si91x_socket_type_length_value_t *make_tls_alpn_tlv(socklen_t *option_length)
+{
+  const char *protocol      = "mqtt";
+  const size_t value_length = strlen(protocol);
+  const size_t total_size   = sizeof(sl_si91x_socket_type_length_value_t) + value_length;
+  auto *tlv                 = (sl_si91x_socket_type_length_value_t *)malloc(total_size);
+
+  tlv->type   = SL_SI91X_TLS_EXTENSION_ALPN_TYPE;
+  tlv->length = (uint16_t)value_length;
+  memcpy(tlv->value, protocol, value_length);
+  *option_length = (socklen_t)total_size;
+  return tlv;
+}
+
+} // namespace
+
+TEST(sli_async_socket_unit_tests, SetSockopt_TlsAlpn_Success)
+{
+  RESET_FAKE(sli_get_si91x_socket);
+  RESET_FAKE(sli_si91x_configure_tls_extension);
+
+  sli_si91x_socket_t mock_socket_instance           = { 0 };
+  sli_get_si91x_socket_fake.return_val              = &mock_socket_instance;
+  sli_si91x_configure_tls_extension_fake.return_val = SLI_SI91X_NO_ERROR;
+
+  socklen_t option_length                  = 0;
+  sl_si91x_socket_type_length_value_t *tlv = make_tls_alpn_tlv(&option_length);
+
+  const int result = sl_si91x_setsockopt(1, 0, SL_SI91X_SO_TLS_ALPN, tlv, option_length);
+
+  EXPECT_EQ(result, SLI_SI91X_NO_ERROR);
+  EXPECT_EQ(sli_si91x_configure_tls_extension_fake.call_count, 1u);
+  free(tlv);
+}
+
+TEST(sli_async_socket_unit_tests, SetSockopt_TlsAlpn_MemoryError)
+{
+  RESET_FAKE(sli_get_si91x_socket);
+  RESET_FAKE(sli_si91x_configure_tls_extension);
+
+  sli_si91x_socket_t mock_socket_instance            = { 0 };
+  sli_get_si91x_socket_fake.return_val               = &mock_socket_instance;
+  sli_si91x_configure_tls_extension_fake.custom_fake = sli_configure_tls_extension_enomem_fake;
+
+  socklen_t option_length                  = 0;
+  sl_si91x_socket_type_length_value_t *tlv = make_tls_alpn_tlv(&option_length);
+
+  const int result = sl_si91x_setsockopt(1, 0, SL_SI91X_SO_TLS_ALPN, tlv, option_length);
+
+  EXPECT_EQ(result, -1);
+  EXPECT_EQ(errno, ENOMEM);
+  EXPECT_EQ(sli_si91x_configure_tls_extension_fake.call_count, 1u);
+  free(tlv);
+}
+
+TEST(sli_async_socket_unit_tests, SetSockopt_TlsAlpn_InvalidParameter)
+{
+  RESET_FAKE(sli_get_si91x_socket);
+  RESET_FAKE(sli_si91x_configure_tls_extension);
+
+  sli_si91x_socket_t mock_socket_instance            = { 0 };
+  sli_get_si91x_socket_fake.return_val               = &mock_socket_instance;
+  sli_si91x_configure_tls_extension_fake.custom_fake = sli_configure_tls_extension_einval_fake;
+
+  socklen_t option_length                  = 0;
+  sl_si91x_socket_type_length_value_t *tlv = make_tls_alpn_tlv(&option_length);
+
+  const int result = sl_si91x_setsockopt(1, 0, SL_SI91X_SO_TLS_ALPN, tlv, option_length);
+
+  EXPECT_EQ(result, -1);
+  EXPECT_EQ(errno, EINVAL);
+  EXPECT_EQ(sli_si91x_configure_tls_extension_fake.call_count, 1u);
+  free(tlv);
+}
+
+TEST(sli_async_socket_unit_tests, SetSockopt_TlsAlpn_NullPointer)
+{
+  RESET_FAKE(sli_get_si91x_socket);
+  RESET_FAKE(sli_si91x_configure_tls_extension);
+
+  sli_si91x_socket_t mock_socket_instance            = { 0 };
+  sli_get_si91x_socket_fake.return_val               = &mock_socket_instance;
+  sli_si91x_configure_tls_extension_fake.custom_fake = sli_configure_tls_extension_einval_fake;
+
+  socklen_t option_length                  = 0;
+  sl_si91x_socket_type_length_value_t *tlv = make_tls_alpn_tlv(&option_length);
+
+  const int result = sl_si91x_setsockopt(1, 0, SL_SI91X_SO_TLS_ALPN, tlv, option_length);
+
+  EXPECT_EQ(result, -1);
+  EXPECT_EQ(errno, EINVAL);
+  EXPECT_EQ(sli_si91x_configure_tls_extension_fake.call_count, 1u);
+  free(tlv);
 }

@@ -1308,10 +1308,8 @@ sl_status_t sl_net_get_ip_address(sl_net_interface_t interface, sl_net_ip_addres
     return SL_STATUS_INVALID_CONFIGURATION;
   }
 
-  // For AP interface (always static IP), return the stored IP configuration
-  // directly. Calling sli_net_configure_ip_address() for AP would either
-  // attempt a DHCP client request (wrong) or reconfigure with zero IPs (destructive).
-  if (SL_NET_WIFI_AP_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {
+  // Return stored type and IP address for AP (only static) and STA (only static).
+  if (SL_NET_WIFI_AP_INTERFACE == SL_NET_INTERFACE_TYPE(interface) || stored->mode == SL_IP_MANAGEMENT_STATIC_IP) {
     ip_address->type = stored->type;
     if (stored->type & SL_IPV4) {
       memcpy(ip_address->v4.ip_address.bytes, stored->ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -1328,7 +1326,7 @@ sl_status_t sl_net_get_ip_address(sl_net_interface_t interface, sl_net_ip_addres
     return SL_STATUS_OK;
   }
 
-  // For STA interface, query firmware for the current IP (handles DHCP renewals)
+  // For STA Interface, query firmware for the current IP (handles DHCP renewals)
   ip_config.mode = stored->mode;
   ip_config.type = stored->type;
   status         = sli_net_configure_ip_address(&ip_config, vap_id, timeout);

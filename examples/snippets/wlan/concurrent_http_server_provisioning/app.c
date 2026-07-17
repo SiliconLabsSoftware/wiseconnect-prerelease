@@ -978,7 +978,11 @@ void parse_json_response()
       SL_DEBUG_LOG_V2(INFO, "- Security Type: %s", (uintptr_t)WIFI_CLIENT_SECURITY_TYPE);
       i++;
     } else {
-      SL_DEBUG_LOG_V2(WARN, "Unexpected key: %.*s\r\n", t[i].end - t[i].start, (uintptr_t)(response + t[i].start));
+      {
+        char key_log[64];
+        snprintf(key_log, sizeof(key_log), "%.*s", (int)(t[i].end - t[i].start), response + t[i].start);
+        SL_DEBUG_LOG_V2(WARN, "Unexpected key: %s\r\n", (uintptr_t)key_log);
+      }
     }
   }
 }

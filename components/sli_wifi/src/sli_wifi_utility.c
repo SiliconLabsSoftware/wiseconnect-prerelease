@@ -1136,7 +1136,8 @@ sl_status_t sli_wifi_send_command_packet(uint32_t command,
     if ((wait_period & SLI_WIFI_WAIT_FOR_EVER) == SLI_WIFI_WAIT_FOR_EVER) {
       tx_info.timeout = (uint32_t)osWaitForever;
     } else {
-      tx_info.timeout = (uint32_t)(wait_period & ~SLI_WIFI_WAIT_FOR_RESPONSE_BIT);
+      // Store timeout in kernel ticks so command-engine timeout comparisons remain unit-consistent.
+      tx_info.timeout = SLI_SYSTEM_MS_TO_TICKS((uint32_t)(wait_period & ~SLI_WIFI_WAIT_FOR_RESPONSE_BIT));
     }
   }
 
@@ -1179,8 +1180,11 @@ sl_status_t sli_wifi_receive_response_buffer(uint16_t command_packet_type,
   sli_command_engine_metadata_t *metadata_response = NULL;
 
   // Wait for a response packet and handle it
-  status =
-    sli_wifi_driver_wait_for_response_packet(command_packet_type, packet_id, wait_time, wait_type, &metadata_response);
+  status = sli_wifi_driver_wait_for_response_packet(command_packet_type,
+                                                    packet_id,
+                                                    (uint32_t)wait_time,
+                                                    wait_type,
+                                                    &metadata_response);
   VERIFY_STATUS_AND_RETURN(status);
 
   if (metadata_response == NULL) {
@@ -1280,7 +1284,7 @@ static bool rx_packet_identity_handler(const sli_queue_t *handle, const void *da
 
 sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_type,
                                                      uint16_t packet_id,
-                                                     sli_wifi_wait_period_t wait_period,
+                                                     uint32_t wait_period_ms,
                                                      uint8_t wait_type,
                                                      sli_command_engine_metadata_t **metadata_response)
 {
@@ -1298,43 +1302,56 @@ sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_typ
                                                                  &packet_type_info);
   VERIFY_STATUS_AND_RETURN(status);
 
+  uint32_t start_time_ticks     = osKernelGetTickCount();
+  uint32_t elapsed_time_ticks   = 0;
+  uint32_t remaining_time_ticks = 0;
+  uint32_t wait_period_ticks    = (wait_period_ms == osWaitForever) ? osWaitForever
+                                                                    : SLI_SYSTEM_MS_TO_TICKS(wait_period_ms);
   if (wait_type == SLI_WIFI_WAIT_ON_THREAD_ID) {
-    // Wait for thread event flags for the response
-    SL_DEBUG_LOG_V2(DEBUG,
-                    "Waiting on Thread Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
-                    packet_type_info.sync_response_event,
-                    (unsigned int)packet_type_info.sync_response_event_id,
-                    (unsigned int)packet_type_info.sync_response_queue);
-    events = osThreadFlagsWait(packet_type_info.sync_response_event, osFlagsWaitAny, (uint32_t)wait_period);
-    SL_DEBUG_LOG_V2(DEBUG,
-                    "Got Thread Events: 0x%lX for queue 0x%X\n",
-                    events,
-                    (unsigned int)packet_type_info.sync_response_queue);
-    if (events == (uint32_t)osErrorTimeout || events == (uint32_t)osErrorResource) {
-      // Timeout or resource error
-      return SL_STATUS_TIMEOUT;
-    } else if ((packet_type_info.sync_response_event & events) == packet_type_info.sync_response_event) {
-      // Remove the node with the matching packet_id from the queue
-      status = sli_queue_manager_remove_node_from_queue(packet_type_info.sync_response_queue,
-                                                        rx_packet_identity_handler,
-                                                        (const void *)&packet_id,
-                                                        (void **)metadata_response);
-      if ((SL_STATUS_EMPTY != status) || (SL_STATUS_NOT_FOUND != status)) {
-        VERIFY_STATUS_AND_RETURN(status);
+    // Wait for thread event flags and retry dequeue until matching response or timeout.
+    do {
+      remaining_time_ticks = (elapsed_time_ticks > wait_period_ticks) ? 0 : (wait_period_ticks - elapsed_time_ticks);
+      SL_DEBUG_LOG_V2(DEBUG,
+                      "Waiting on Thread Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
+                      packet_type_info.sync_response_event,
+                      (unsigned int)packet_type_info.sync_response_event_id,
+                      (unsigned int)packet_type_info.sync_response_queue);
+      events = osThreadFlagsWait(packet_type_info.sync_response_event, osFlagsWaitAny, remaining_time_ticks);
+      SL_DEBUG_LOG_V2(DEBUG,
+                      "Got Thread Events: 0x%lX for queue 0x%X\n",
+                      events,
+                      (unsigned int)packet_type_info.sync_response_queue);
+      if (events == (uint32_t)osErrorTimeout || events == (uint32_t)osErrorResource) {
+        // Timeout or resource error
+        return SL_STATUS_TIMEOUT;
+      } else if ((packet_type_info.sync_response_event & events) == packet_type_info.sync_response_event) {
+        // Remove the node with the matching packet_id from the queue
+        status = sli_queue_manager_remove_node_from_queue(packet_type_info.sync_response_queue,
+                                                          rx_packet_identity_handler,
+                                                          (const void *)&packet_id,
+                                                          (void **)metadata_response);
+        if (status == SL_STATUS_OK) {
+          return SL_STATUS_OK;
+        }
+        if ((status != SL_STATUS_EMPTY) && (status != SL_STATUS_NOT_FOUND)) {
+          VERIFY_STATUS_AND_RETURN(status);
+        }
+        if (wait_period_ms != osWaitForever) {
+          elapsed_time_ticks = sli_wifi_host_elapsed_time(start_time_ticks);
+        }
+      } else {
+        // Other error
+        return SL_STATUS_FAIL;
       }
-    } else {
-      // Other error
-      return SL_STATUS_FAIL;
-    }
+    } while (elapsed_time_ticks < wait_period_ticks);
   } else if (wait_type == SLI_WIFI_WAIT_ON_EVENT_ID) {
     // sync_response_event_id must be a pointer to the event flags handle (see sli_command_engine.h)
     if (packet_type_info.sync_response_event_id == NULL) {
       return SL_STATUS_INVALID_CONFIGURATION;
     }
-    // Wait for event flags for the response, with elapsed time tracking
-    uint32_t start_time   = osKernelGetTickCount();
-    uint32_t elapsed_time = 0;
+
     do {
+      remaining_time_ticks = (elapsed_time_ticks > wait_period_ticks) ? 0 : (wait_period_ticks - elapsed_time_ticks);
       SL_DEBUG_LOG_V2(DEBUG,
                       "Waiting on Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
                       packet_type_info.sync_response_event,
@@ -1344,7 +1361,7 @@ sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_typ
       events = osEventFlagsWait(*packet_type_info.sync_response_event_id,
                                 packet_type_info.sync_response_event,
                                 (osFlagsWaitAny | osFlagsNoClear),
-                                (wait_period - elapsed_time));
+                                remaining_time_ticks);
 
       if (events == (uint32_t)osErrorTimeout || events == (uint32_t)osErrorResource) {
         // Timeout or resource error
@@ -1384,14 +1401,16 @@ sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_typ
       }
 
       // Update elapsed time
-      elapsed_time = sli_wifi_host_elapsed_time(start_time);
-    } while (1); // Repeat until packet is found or timeout occurs
+      if (wait_period_ms != osWaitForever) {
+        elapsed_time_ticks = sli_wifi_host_elapsed_time(start_time_ticks);
+      }
+    } while (elapsed_time_ticks < wait_period_ticks);
 
   } else {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  return SL_STATUS_OK;
+  return SL_STATUS_TIMEOUT;
 }
 
 uint8_t sli_wifi_get_vap_id_from_operation_mode(const sl_wifi_system_packet_t *rx_packet)

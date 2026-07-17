@@ -138,7 +138,10 @@ static const sl_wifi_device_configuration_t station_init_configuration = {
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENTION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_ENHANCED_MAX_PSP) }
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_ENHANCED_MAX_PSP) },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 #else
 #include "sl_si91x_wc_device_configuration.h"
@@ -199,7 +202,7 @@ static void application_thread(void *argument)
   sl_status_t status = SL_STATUS_OK;
   uint32_t app_secure_storage_read_values[APP_SECURE_STORAGE_NUM_REGISTERS];
   sl_wifi_performance_profile_v2_t performance_profile = { .profile = DEEP_SLEEP_WITH_RAM_RETENTION };
-  sl_wifi_firmware_version_t version                   = { 0 };
+  sl_si91x_firmware_version_t version                  = { 0 };
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
@@ -213,11 +216,19 @@ static void application_thread(void *argument)
     app_exit();
   }
 
-  status = sl_wifi_get_firmware_version(&version);
+  status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("\r\n\r\nFailed to fetch firmware version: 0x%lx\r\n", status);
   } else {
-    print_firmware_version(&version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           version.chip_id,
+           version.rom_id,
+           version.major,
+           version.minor,
+           version.security_version,
+           version.patch_num,
+           version.customer_id,
+           version.build_num);
   }
 
   /* Write 8 registers (REG0..REG7); read/compare done in loop after wake. */

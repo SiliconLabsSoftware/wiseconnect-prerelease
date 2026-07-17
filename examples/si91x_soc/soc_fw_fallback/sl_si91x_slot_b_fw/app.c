@@ -250,7 +250,9 @@ static sl_wifi_device_configuration_t sl_wifi_firmware_update_configuration = {
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 }
+                   .config_feature_bit_map     = 0 },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
 };
 
 /******************************************************
@@ -264,12 +266,12 @@ void app_init(void)
 
 static void application_start(void *argument)
 {
-  sl_status_t status                 = SL_STATUS_FAIL;
-  struct sockaddr_in server_address  = { 0 }; // Server address structure
-  socklen_t socket_length            = sizeof(struct sockaddr_in);
-  int client_socket                  = -1;           // Client socket descriptor
-  int socket_return_value            = 0;            // Return value for socket operations
-  sl_wifi_firmware_version_t version = { 0 };        // Structure to store firmware version
+  sl_status_t status                  = SL_STATUS_FAIL;
+  struct sockaddr_in server_address   = { 0 }; // Server address structure
+  socklen_t socket_length             = sizeof(struct sockaddr_in);
+  int client_socket                   = -1;          // Client socket descriptor
+  int socket_return_value             = 0;           // Return value for socket operations
+  sl_si91x_firmware_version_t version = { 0 };       // Structure to store firmware version
   sl_si91x_fw_ab_slot_management_t app_ab_slot_info; // Structure to manage firmware slots
 
   UNUSED_PARAMETER(argument); // Avoids compiler warning for unused parameter
@@ -314,11 +316,19 @@ static void application_start(void *argument)
   sl_app_display_ab_slot_info(&app_ab_slot_info);
 
   // Retrieve the current firmware version
-  status = sl_wifi_get_firmware_version(&version);
+  status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     DEBUGOUT("\r\nFailed to fetch firmware version: 0x%x\r\n", (unsigned int)status);
   } else {
-    print_firmware_version(&version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           version.chip_id,
+           version.rom_id,
+           version.major,
+           version.minor,
+           version.security_version,
+           version.patch_num,
+           version.customer_id,
+           version.build_num);
   }
 
   // Bring up the Wi-Fi client interface

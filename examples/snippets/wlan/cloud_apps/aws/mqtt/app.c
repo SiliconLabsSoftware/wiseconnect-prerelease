@@ -215,7 +215,10 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
                    .config_feature_bit_map = 0
 #endif
 #endif
-  }
+  },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 /******************************************************
 *               Function Definitions
@@ -266,10 +269,8 @@ void subscribe_handler(struct _Client *pClient,
   UNUSED_PARAMETER(pTopicName);
   UNUSED_PARAMETER(topicNameLen);
   UNUSED_PARAMETER(data);
-  SL_DEBUG_LOG_V2(INFO,
-                  "Data received on the Subscribed Topic: %.*s ",
-                  pParams->payloadLen,
-                  (uintptr_t)(char *)pParams->payload);
+
+  printf("Data received on the Subscribed Topic: %.*s ", (int)pParams->payloadLen, (char *)pParams->payload);
 }
 
 #if WRAP_PRIVATE_KEY
@@ -499,12 +500,20 @@ sl_status_t start_aws_mqtt(void)
   sprintf(client_id, "silabs_%s", mac_id);
   SL_DEBUG_LOG_V2(INFO, "Client ID: %s\r\n", (uintptr_t)client_id);
 
-  sl_wifi_firmware_version_t fw_version = { 0 };
-  status                                = sl_wifi_get_firmware_version(&fw_version);
+  sl_si91x_firmware_version_t fw_version = { 0 };
+  status                                 = sl_si91x_get_firmware_version(&fw_version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
-    print_firmware_version(&fw_version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           fw_version.chip_id,
+           fw_version.rom_id,
+           fw_version.major,
+           fw_version.minor,
+           fw_version.security_version,
+           fw_version.patch_num,
+           fw_version.customer_id,
+           fw_version.build_num);
   }
 
   mqtt_init_params.enableAutoReconnect       = true;

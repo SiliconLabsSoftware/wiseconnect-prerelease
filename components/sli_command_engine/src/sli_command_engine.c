@@ -920,7 +920,9 @@ static void sli_command_engine_thread(void *args)
         if ((time_elapsed > metadata->tx_info.timeout) && (metadata->tx_info.timeout > 0)) {
           sli_command_engine_decrement_in_flight_and_set_tx_event(instance, queue_info);
           // Drop timed out response data and metadata
-          SL_DEBUG_LOG_V2(WARN, "Packet timedout after : %lu\r\n", metadata->tx_info.timeout);
+          SL_DEBUG_LOG_V2(WARN,
+                          "Packet timedout after : %lu ms\r\n",
+                          (unsigned long)SLI_SYSTEM_TICKS_TO_MS(metadata->tx_info.timeout));
           sli_buffer_manager_free_buffer(data);
           sli_buffer_manager_free_buffer(metadata);
           continue;

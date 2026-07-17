@@ -186,9 +186,11 @@ static const sl_wifi_device_configuration_t throughput_configuration = {
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
                    .config_feature_bit_map  = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
-  .ta_pool = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
-               .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
-               .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO }
+  .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
+                           .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
+                           .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },
+  .efuse_data_type     = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 uint8_t data_buffer[BUFFER_SIZE];
@@ -284,7 +286,7 @@ static void application_start(void *argument)
 {
   UNUSED_PARAMETER(argument);
   sl_status_t status;
-  sl_wifi_firmware_version_t firmware_version = { 0 };
+  sl_si91x_firmware_version_t firmware_version = { 0 };
 
   // AP initialization
   status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &throughput_configuration, NULL, NULL);
@@ -298,12 +300,20 @@ static void application_start(void *argument)
   sl_wifi_set_callback_v2(SL_WIFI_CLIENT_DISCONNECTED_EVENTS, ap_disconnected_event_handler, NULL);
 
   // Get firmware version
-  status = sl_wifi_get_firmware_version(&firmware_version);
+  status = sl_si91x_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
     return;
   } else {
-    print_firmware_version(&firmware_version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           firmware_version.chip_id,
+           firmware_version.rom_id,
+           firmware_version.major,
+           firmware_version.minor,
+           firmware_version.security_version,
+           firmware_version.patch_num,
+           firmware_version.customer_id,
+           firmware_version.build_num);
   }
 
   // Get AP profile

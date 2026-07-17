@@ -279,20 +279,76 @@ static sl_status_t sli_wifi_convert_client_info(sl_wifi_client_info_response_t *
     sl_wifi_client_info_t *sl_client_info            = &client_info_response->client_info[station_index];
     const sli_wifi_station_info_t *si91x_client_info = &sli_wifi_client_info_response->sta_info[station_index];
 
-    uint8_t ip_address_size = (uint8_t)(si91x_client_info->ip_version[0] | si91x_client_info->ip_version[1] << 8);
+    const uint8_t ip_version = si91x_client_info->ip_version[0];
 
-    si91x_ip_address = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? si91x_client_info->ip_address.ipv4_address
-                                                                 : si91x_client_info->ip_address.ipv6_address;
-    sl_ip_address    = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? sl_client_info->ip_address.ip.v4.bytes
-                                                                 : sl_client_info->ip_address.ip.v6.bytes;
-
-    sl_client_info->ip_address.type = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? SL_IPV4 : SL_IPV6;
+    if ((ip_version == SL_IPV4_VERSION) || (ip_version == SL_IPV4_ADDRESS_LENGTH)) {
+      si91x_ip_address                = si91x_client_info->ip_address.ipv4_address;
+      sl_ip_address                   = sl_client_info->ip_address.ip.v4.bytes;
+      sl_client_info->ip_address.type = SL_IPV4;
+      memcpy(sl_ip_address, si91x_ip_address, SL_IPV4_ADDRESS_LENGTH);
+    } else if ((ip_version == SL_IPV6_VERSION) || (ip_version == SL_IPV6_ADDRESS_LENGTH)) {
+      si91x_ip_address                = si91x_client_info->ip_address.ipv6_address;
+      sl_ip_address                   = sl_client_info->ip_address.ip.v6.bytes;
+      sl_client_info->ip_address.type = SL_IPV6;
+      memcpy(sl_ip_address, si91x_ip_address, SL_IPV6_ADDRESS_LENGTH);
+    } else {
+      sl_client_info->ip_address.type = SL_INVALID_IP;
+      memset(&sl_client_info->ip_address.ip, 0, sizeof(sl_client_info->ip_address.ip));
+    }
 
     memcpy(&sl_client_info->mac_adddress, si91x_client_info->mac, sizeof(sl_mac_address_t));
-    memcpy(sl_ip_address, si91x_ip_address, ip_address_size);
   }
 
   return SL_STATUS_OK;
+}
+
+static uint16_t sli_wifi_go_params_header_length(void)
+{
+  return (uint16_t)(sizeof(sli_wifi_client_info_response) - (SLI_WIFI_MAX_STATIONS * sizeof(sli_wifi_station_info_t)));
+}
+
+// Firmware returns a variable-length GO params payload; copy only the fields present in the packet.
+static sl_status_t sli_wifi_parse_go_params_response(const sl_wifi_system_packet_t *packet,
+                                                     sli_wifi_client_info_response *go_params_response)
+{
+  if (packet->length == 0) {
+    return SL_STATUS_OK;
+  }
+
+  const uint16_t go_params_header_length = sli_wifi_go_params_header_length();
+
+  if (packet->length < go_params_header_length) {
+    return SL_STATUS_FAIL;
+  }
+
+  const sli_wifi_client_info_response *response = (const sli_wifi_client_info_response *)packet->data;
+  const uint16_t go_params_fixed_fields_length =
+    go_params_header_length - (uint16_t)sizeof(go_params_response->sta_count);
+
+  memcpy(go_params_response, response, go_params_fixed_fields_length);
+
+  uint16_t station_count             = (uint16_t)(response->sta_count[0] | ((uint16_t)response->sta_count[1] << 8));
+  const bool station_count_truncated = (station_count > SLI_WIFI_MAX_STATIONS);
+  if (station_count_truncated) {
+    station_count = SLI_WIFI_MAX_STATIONS;
+  }
+
+  go_params_response->sta_count[0] = (uint8_t)(station_count & 0xFFU);
+  go_params_response->sta_count[1] = (uint8_t)(station_count >> 8);
+
+  const uint16_t required_length =
+    go_params_header_length + (station_count * (uint16_t)sizeof(sli_wifi_station_info_t));
+  if (packet->length < required_length) {
+    return SL_STATUS_FAIL;
+  }
+
+  for (uint16_t station_index = 0; station_index < station_count; station_index++) {
+    memcpy(&go_params_response->sta_info[station_index],
+           &response->sta_info[station_index],
+           sizeof(sli_wifi_station_info_t));
+  }
+
+  return station_count_truncated ? SL_STATUS_INVALID_COUNT : SL_STATUS_OK;
 }
 
 sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
@@ -1461,7 +1517,7 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
   sl_status_t status;
   sl_wifi_buffer_t *buffer = NULL;
   const sl_wifi_system_packet_t *packet;
-  sli_wifi_client_info_response sli_wifi_client_info_response = { 0 };
+  sli_wifi_client_info_response go_params_response = { 0 };
 
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
@@ -1481,7 +1537,7 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
                                  SLI_WIFI_WLAN_CMD,
                                  NULL,
                                  0,
-                                 SLI_WIFI_RSP_QUERY_GO_PARAMS_WAIT_TIME,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_QUERY_GO_PARAMS_WAIT_TIME),
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
@@ -1489,14 +1545,28 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
   }
   VERIFY_STATUS_AND_RETURN(status);
 
-  packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
+  if (buffer == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
 
-  memcpy(&sli_wifi_client_info_response, packet->data, sizeof(sli_wifi_client_info_response));
-  sli_wifi_convert_client_info(client_info, &sli_wifi_client_info_response);
+  packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
+  if (packet == NULL) {
+    sli_buffer_manager_free_buffer(buffer);
+    return SL_STATUS_FAIL;
+  }
+
+  status = sli_wifi_parse_go_params_response(packet, &go_params_response);
+  if (status == SL_STATUS_FAIL) {
+    sli_buffer_manager_free_buffer(buffer);
+    return status;
+  }
+
+  sli_wifi_convert_client_info(client_info, &go_params_response);
 
   sli_buffer_manager_free_buffer(buffer);
   return status;
 }
+
 sl_status_t sli_wifi_disconnect(sl_wifi_interface_t interface)
 {
   if (!device_initialized) {

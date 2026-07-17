@@ -1,9 +1,14 @@
 # Sensor Data Publishing and LED Control with AWS IoT MQTT for SiWG917 Dev Kit
 
+## High-Level Overview
+
+SiWG917 dev kit AWS example: provision Wi-Fi over BLE using the Si Connect app, connect to AWS IoT Core via MQTT, and publish sensor data on SoC mode.
+
 ## Table of Contents
 
 - [Sensor Data Publishing and LED Control with AWS IoT MQTT for SiWG917 Dev Kit](#sensor-data-publishing-and-led-control-with-aws-iot-mqtt-for-siwg917-dev-kit)
   - [Table of Contents](#table-of-contents)
+  - [High-Level Overview](#high-level-overview)
   - [Purpose / Scope](#purpose--scope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -20,6 +25,10 @@
     - [Setting up Security Certificates](#setting-up-security-certificates)
     - [Create an AWS Thing](#create-an-aws-thing)
   
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+
 ## Purpose / Scope
 
 In this application, the Bluetooth Low Energy (BLE) and Si Connect App (formerly Simplicity Connect / EFR Connect App) are used for provisioning the SiWx917 to a Wi-Fi Network. Once provisioned, SiWx917 acts as a Wi-Fi station and connects to the AWS cloud via MQTT.
@@ -38,7 +47,7 @@ The application also publishes the real-time sensor data (LUX, Temperature, Humi
 - Wireless Access Point
 - **SoC Mode**:
   - Kits
-    - BRD2605A/BRD2605B (SiWG917 Dev Kit Board)
+    - [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)/[BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) (SiWG917 Dev Kit Board)
 - Android Phone or iPhone with Si Connect App (formerly Simplicity Connect / EFR Connect App), which is available in Play Store and App Store (or) Windows PC with Windows Silicon Labs connect application.
 
 ### Software Requirements
@@ -353,3 +362,25 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 8. Click **Done**.
 
    The created thing should now be visible on the AWS console (**Manage > All devices > Things**).
+## Troubleshooting
+
+If you encounter issues while running this example, check the following:
+
+- Prepare AWS certificates and configure `aws_iot_config.h` before building the application.
+- Use the Si Connect mobile app for BLE provisioning and verify the target AP credentials.
+- See [Setting up Security Certificates](#setting-up-security-certificates) and [Create an AWS Thing](#create-an-aws-thing) for cloud setup.
+- Confirm MQTT connection status in [MQTT Connection](#mqtt-connection) serial prints.
+
+## Resources
+
+- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
+- [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+- [AWS IoT Core Documentation](https://docs.aws.amazon.com/iot/)
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)
+

@@ -338,10 +338,7 @@ static void iot_subscribe_callback_handler(AWS_IoT_Client *pClient,
   UNUSED_PARAMETER(topicNameLen);
   UNUSED_PARAMETER(pData);
 
-  SL_DEBUG_LOG_V2(INFO,
-                  "Data received on the Subscribed Topic: %.*s ",
-                  pParams->payloadLen,
-                  (uintptr_t)(char *)pParams->payload);
+  printf("Data received on the Subscribed Topic: %.*s ", (int)pParams->payloadLen, (char *)pParams->payload);
 
   // Initialize the JSON parser
   jsmn_parser parser;

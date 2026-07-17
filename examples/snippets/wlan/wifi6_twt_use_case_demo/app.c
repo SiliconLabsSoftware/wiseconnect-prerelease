@@ -120,7 +120,10 @@ static const sl_wifi_device_configuration_t twt_client_configuration = {
                      | (SL_SI91X_EXT_FEAT_HTTP_OTAF_SUPPORT | SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
+                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /******************************************************
@@ -232,7 +235,7 @@ void application_start()
 {
   sl_status_t status;
   sl_wifi_performance_profile_v2_t performance_profile = { 0 };
-  sl_wifi_firmware_version_t version                   = { 0 };
+  sl_si91x_firmware_version_t version                  = { 0 };
   sl_mac_address_t mac_addr                            = { 0 };
   data_semaphore                                       = osSemaphoreNew(1, 0, NULL);
 
@@ -254,12 +257,20 @@ void application_start()
   SL_DEBUG_LOG_V2(INFO, "m4_ta_secure_handshake Success\r\n");
 #endif
 
-  status = sl_wifi_get_firmware_version(&version);
+  status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring m4_ta_secure_handshake: 0x%" PRIx32, (uint32_t)status);
     return;
   } else {
-    print_firmware_version(&version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           version.chip_id,
+           version.rom_id,
+           version.major,
+           version.minor,
+           version.security_version,
+           version.patch_num,
+           version.customer_id,
+           version.build_num);
   }
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, 0);

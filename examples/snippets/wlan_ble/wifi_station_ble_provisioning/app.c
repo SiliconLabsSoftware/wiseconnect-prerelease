@@ -35,6 +35,7 @@
 //! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "sl_wifi.h"
+#include "sl_si91x_driver.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
 #include "sl_utility.h"
@@ -115,7 +116,10 @@ static const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_BLE_GATT_INIT
 #endif
                       ),
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP) }
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP) },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 const osThreadAttr_t thread_attributes = {
@@ -144,8 +148,8 @@ void application(void *argument)
 {
   UNUSED_PARAMETER(argument);
 
-  int32_t status                     = RSI_SUCCESS;
-  sl_wifi_firmware_version_t version = { 0 };
+  int32_t status                      = RSI_SUCCESS;
+  sl_si91x_firmware_version_t version = { 0 };
 
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
@@ -156,11 +160,19 @@ void application(void *argument)
   SL_DEBUG_LOG_V2(INFO, " Wi-Fi initialization is successful\r\n");
 
   //! Firmware version Prints
-  status = sl_wifi_get_firmware_version(&version);
+  status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
-    print_firmware_version(&version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           version.chip_id,
+           version.rom_id,
+           version.major,
+           version.minor,
+           version.security_version,
+           version.patch_num,
+           version.customer_id,
+           version.build_num);
   }
 
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);

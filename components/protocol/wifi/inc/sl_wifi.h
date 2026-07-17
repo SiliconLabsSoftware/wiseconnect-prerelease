@@ -1776,9 +1776,16 @@ sl_status_t sl_wifi_disconnect_ap_client(sl_wifi_interface_t interface,
  * @param[in] interface
  *   Wi-Fi Access Point interface as identified by @ref sl_wifi_interface_t
  * @param[out] client_info
- *   @ref sl_wifi_client_info_response_t object to store the client info.
+ *   @ref sl_wifi_client_info_response_t object to store the client info. Initialize to zero
+ *   before the call. Only @p client_info->client_info[0 .. client_count-1] are valid on success.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *   - `SL_STATUS_OK` : Client information retrieved successfully.
+ *   - `SL_STATUS_INVALID_COUNT` : The firmware reported more than @ref SL_WIFI_MAX_CLIENT_COUNT
+ *     associated clients. @p client_info is still populated with up to @ref SL_WIFI_MAX_CLIENT_COUNT
+ *     entries; check the return status before using @p client_info.
+ *   On other errors, @p client_info may be unchanged; do not use @p client_info unless the return
+ *   status is `SL_STATUS_OK` or `SL_STATUS_INVALID_COUNT`.
  * @note 
  *   This API is supported only in AP mode.
  ******************************************************************************/

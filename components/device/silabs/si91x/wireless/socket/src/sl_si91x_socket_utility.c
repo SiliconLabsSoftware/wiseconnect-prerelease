@@ -813,18 +813,44 @@ static bool sli_is_port_available(uint16_t port_number)
  * 
  * @param socket_tls_extensions pointer to TLS extension in socket structure
  * @param tls_extension pointer to the TLS information provided by application
- * @return sl_status_t possible return values are SL_STATUS_OK and SL_STATUS_SI91X_MEMORY_ERROR
+ * @param option_length length of the TLS extension buffer passed by the application
+ * @return sl_status_t possible return values are SL_STATUS_OK, SL_STATUS_NULL_POINTER,
+ *         SL_STATUS_INVALID_PARAMETER, and SL_STATUS_SI91X_MEMORY_ERROR
  */
 sl_status_t sli_si91x_add_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
-                                        const sl_si91x_socket_type_length_value_t *tls_extension)
+                                        const sl_si91x_socket_type_length_value_t *tls_extension,
+                                        socklen_t option_length)
 {
+  const size_t tls_extension_header_size = sizeof(sl_si91x_socket_type_length_value_t);
+
+  if (socket_tls_extensions == NULL || tls_extension == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
+  if (option_length < (socklen_t)tls_extension_header_size) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (tls_extension->length == 0) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if ((tls_extension->type != SL_SI91X_TLS_EXTENSION_SNI_TYPE)
+      && (tls_extension->type != SL_SI91X_TLS_EXTENSION_ALPN_TYPE)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (option_length != (socklen_t)(tls_extension_header_size + tls_extension->length)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
   // To check if memory available for new extension in buffer of socket, max 256 Bytes only
   if (SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA - socket_tls_extensions->current_size_of_extensions
-      < (int)(sizeof(sl_si91x_socket_type_length_value_t) + tls_extension->length)) {
+      < (int)(tls_extension_header_size + tls_extension->length)) {
     return SL_STATUS_SI91X_MEMORY_ERROR;
   }
 
-  uint8_t extension_size = (uint8_t)(sizeof(sl_si91x_socket_type_length_value_t) + tls_extension->length);
+  const uint16_t extension_size = (uint16_t)(tls_extension_header_size + tls_extension->length);
 
   // copies TLS extension provided by app into SDK socket struct
   memcpy(&socket_tls_extensions->buffer[socket_tls_extensions->current_size_of_extensions],
@@ -834,6 +860,22 @@ sl_status_t sli_si91x_add_tls_extension(sli_si91x_tls_extensions_t *socket_tls_e
   socket_tls_extensions->total_extensions++;
 
   return SL_STATUS_OK;
+}
+
+int sli_si91x_configure_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
+                                      const sl_si91x_socket_type_length_value_t *tls_extension,
+                                      socklen_t option_length)
+{
+  const sl_status_t status = sli_si91x_add_tls_extension(socket_tls_extensions, tls_extension, option_length);
+
+  if (status == SL_STATUS_SI91X_MEMORY_ERROR) {
+    SLI_SET_ERROR_AND_RETURN(ENOMEM);
+  }
+  if (status != SL_STATUS_OK) {
+    SLI_SET_ERROR_AND_RETURN(EINVAL);
+  }
+
+  return SLI_SI91X_NO_ERROR;
 }
 
 int32_t sli_get_socket_command_from_host_packet(sl_wifi_buffer_t *buffer)

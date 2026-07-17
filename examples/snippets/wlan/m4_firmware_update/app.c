@@ -100,7 +100,10 @@ static const sl_wifi_device_configuration_t sl_wifi_firmware_update_configuratio
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 }
+                   .config_feature_bit_map     = 0 },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 uint8_t recv_buffer[RECV_BUFFER_SIZE];
@@ -235,7 +238,7 @@ sl_status_t m4_firmware_update_app()
       // Call corresponding firmware upgrade API based on the chunk type
       if (fwup_chunk_type == SL_FWUP_RPS_HEADER) {
         //! Send the first chunk to extract OTA image size
-        status = sl_wifi_get_firmware_size((void *)recv_buffer, &fw_image_size);
+        status = sl_si91x_get_firmware_size((void *)recv_buffer, &fw_image_size);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Unable to fetch firmware size. Status: 0x%lx\r\n", status);
           close(client_socket);

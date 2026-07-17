@@ -880,9 +880,13 @@ typedef struct {
 /**
  * @struct sl_wifi_client_info_response_t
  * @brief Wi-Fi client information response structure.
+ *
+ * Returned by @ref sl_wifi_get_ap_client_info. Only @c client_info[0 .. client_count-1] contain
+ * valid data. Entries beyond @c client_count may be stale unless this structure was zero-initialized
+ * before the API call.
  */
 typedef struct {
-  uint8_t client_count; ///< Indicates the total count of Wi-Fi clients currently connected to the network
+  uint8_t client_count; ///< Number of valid entries in @c client_info (max @ref SL_WIFI_MAX_CLIENT_COUNT)
   sl_wifi_client_info_t client_info[SL_WIFI_MAX_CLIENT_COUNT]; ///< Array of client information
 } sl_wifi_client_info_response_t;
 
