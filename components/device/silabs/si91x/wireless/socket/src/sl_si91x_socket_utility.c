@@ -497,15 +497,6 @@ void sli_si91x_handle_websocket(sli_si91x_socket_create_request_t *socket_create
     socket_create_request->webs_subprotocol_name[si91x_bsd_socket->websocket_info->subprotocol_length] =
       '\0'; // Null-terminate
   }
-
-  // Copy origin
-  if (si91x_bsd_socket->websocket_info && si91x_bsd_socket->websocket_info->origin_length > 0) {
-    memcpy(socket_create_request->webs_origin,
-           si91x_bsd_socket->websocket_info->websocket_data + si91x_bsd_socket->websocket_info->host_length
-             + si91x_bsd_socket->websocket_info->resource_length + si91x_bsd_socket->websocket_info->subprotocol_length,
-           si91x_bsd_socket->websocket_info->origin_length);
-    socket_create_request->webs_origin[si91x_bsd_socket->websocket_info->origin_length] = '\0'; // Null-terminate
-  }
 }
 
 sl_status_t sl_si91x_config_socket(sl_si91x_socket_config_t socket_config)
@@ -792,11 +783,6 @@ sl_status_t sli_si91x_socket_pre_tx_handler(sli_command_engine_t *instance, uint
 
 static bool sli_is_port_available(uint16_t port_number)
 {
-  // Port 0 requests auto-assigned local port; skip availability check.
-  if (port_number == 0) {
-    return true;
-  }
-
   // Check whether local port is already used or not
   for (uint8_t socket_index = 0; socket_index < SLI_NUMBER_OF_SOCKETS; socket_index++) {
     if (sli_si91x_sockets[socket_index] != NULL
@@ -813,44 +799,18 @@ static bool sli_is_port_available(uint16_t port_number)
  * 
  * @param socket_tls_extensions pointer to TLS extension in socket structure
  * @param tls_extension pointer to the TLS information provided by application
- * @param option_length length of the TLS extension buffer passed by the application
- * @return sl_status_t possible return values are SL_STATUS_OK, SL_STATUS_NULL_POINTER,
- *         SL_STATUS_INVALID_PARAMETER, and SL_STATUS_SI91X_MEMORY_ERROR
+ * @return sl_status_t possible return values are SL_STATUS_OK and SL_STATUS_SI91X_MEMORY_ERROR
  */
 sl_status_t sli_si91x_add_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
-                                        const sl_si91x_socket_type_length_value_t *tls_extension,
-                                        socklen_t option_length)
+                                        const sl_si91x_socket_type_length_value_t *tls_extension)
 {
-  const size_t tls_extension_header_size = sizeof(sl_si91x_socket_type_length_value_t);
-
-  if (socket_tls_extensions == NULL || tls_extension == NULL) {
-    return SL_STATUS_NULL_POINTER;
-  }
-
-  if (option_length < (socklen_t)tls_extension_header_size) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  if (tls_extension->length == 0) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  if ((tls_extension->type != SL_SI91X_TLS_EXTENSION_SNI_TYPE)
-      && (tls_extension->type != SL_SI91X_TLS_EXTENSION_ALPN_TYPE)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  if (option_length != (socklen_t)(tls_extension_header_size + tls_extension->length)) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
   // To check if memory available for new extension in buffer of socket, max 256 Bytes only
   if (SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA - socket_tls_extensions->current_size_of_extensions
-      < (int)(tls_extension_header_size + tls_extension->length)) {
+      < (int)(sizeof(sl_si91x_socket_type_length_value_t) + tls_extension->length)) {
     return SL_STATUS_SI91X_MEMORY_ERROR;
   }
 
-  const uint16_t extension_size = (uint16_t)(tls_extension_header_size + tls_extension->length);
+  uint8_t extension_size = (uint8_t)(sizeof(sl_si91x_socket_type_length_value_t) + tls_extension->length);
 
   // copies TLS extension provided by app into SDK socket struct
   memcpy(&socket_tls_extensions->buffer[socket_tls_extensions->current_size_of_extensions],
@@ -860,22 +820,6 @@ sl_status_t sli_si91x_add_tls_extension(sli_si91x_tls_extensions_t *socket_tls_e
   socket_tls_extensions->total_extensions++;
 
   return SL_STATUS_OK;
-}
-
-int sli_si91x_configure_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
-                                      const sl_si91x_socket_type_length_value_t *tls_extension,
-                                      socklen_t option_length)
-{
-  const sl_status_t status = sli_si91x_add_tls_extension(socket_tls_extensions, tls_extension, option_length);
-
-  if (status == SL_STATUS_SI91X_MEMORY_ERROR) {
-    SLI_SET_ERROR_AND_RETURN(ENOMEM);
-  }
-  if (status != SL_STATUS_OK) {
-    SLI_SET_ERROR_AND_RETURN(EINVAL);
-  }
-
-  return SLI_SI91X_NO_ERROR;
 }
 
 int32_t sli_get_socket_command_from_host_packet(sl_wifi_buffer_t *buffer)
@@ -1298,9 +1242,8 @@ int sli_si91x_shutdown(int socket, int how)
                                  NULL,
                                  (void **)&response_buffer);
 
-  // Treat SOCKET_CLOSED and COMMAND_GIVEN_IN_INVALID_STATE (0x21, returned by the NWP after a
-  // rejoin failure already tore the socket down) as logical close success: free the host slot.
-  if (status == SL_STATUS_SI91X_SOCKET_CLOSED || status == SL_STATUS_SI91X_COMMAND_GIVEN_IN_INVALID_STATE) {
+  /* If the socket is closed, free the socket and return success */
+  if (status == SL_STATUS_SI91X_SOCKET_CLOSED) {
     if (close_request_type == SHUTDOWN_BY_ID) {
       sli_si91x_free_socket(socket);
     } else {
@@ -2343,12 +2286,6 @@ void sl_si91x_set_extended_socket_cipherlist(uint32_t extended_cipher_list)
 
 sli_si91x_socket_t *get_socket_from_packet(sl_wifi_system_packet_t *socket_packet)
 {
-
-  const uint16_t payload_length = (socket_packet->length & 0x0FFF);
-  if (payload_length == 0) {
-    return NULL;
-  }
-
   int socket_id = sli_si91x_get_socket_id(socket_packet);
 
   if (socket_packet->command == SLI_WIFI_RSP_CONN_ESTABLISH) {

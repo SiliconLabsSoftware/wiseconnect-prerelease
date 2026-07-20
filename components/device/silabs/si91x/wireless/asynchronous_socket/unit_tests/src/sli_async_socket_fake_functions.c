@@ -50,11 +50,10 @@ DEFINE_FAKE_VALUE_FUNC2(int, sli_si91x_shutdown, int, int);
 DEFINE_FAKE_VALUE_FUNC3(int, sli_si91x_connect, int, const struct sockaddr *, socklen_t);
 DEFINE_FAKE_VALUE_FUNC3(int, sli_si91x_bind, int, const struct sockaddr *, socklen_t);
 DEFINE_FAKE_VALUE_FUNC3(sl_status_t, sli_create_and_send_socket_request, int, int, const int *);
-DEFINE_FAKE_VALUE_FUNC3(int,
-                        sli_si91x_configure_tls_extension,
+DEFINE_FAKE_VALUE_FUNC2(sl_status_t,
+                        sli_si91x_add_tls_extension,
                         sli_si91x_tls_extensions_t *,
-                        const sl_si91x_socket_type_length_value_t *,
-                        socklen_t);
+                        const sl_si91x_socket_type_length_value_t *);
 DEFINE_FAKE_VALUE_FUNC4(int, sli_si91x_accept, int, struct sockaddr *, socklen_t *, sl_si91x_socket_accept_callback_t);
 DEFINE_FAKE_VALUE_FUNC4(int, sli_si91x_socket, int, int, int, sl_si91x_socket_receive_data_callback_t);
 DEFINE_FAKE_VALUE_FUNC3(sl_status_t,

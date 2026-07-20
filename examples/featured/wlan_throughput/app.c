@@ -186,11 +186,9 @@ static const sl_wifi_device_configuration_t throughput_configuration = {
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
                    .config_feature_bit_map  = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
-  .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
-                           .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
-                           .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },
-  .efuse_data_type     = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+  .ta_pool = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
+               .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
+               .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO }
 };
 
 static sl_si91x_socket_config_t socket_config = {
@@ -237,9 +235,9 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
 
 volatile uint8_t has_data_received = 0;
 volatile uint32_t bytes_read       = 0;
-volatile uint32_t start            = 0;
+uint32_t start                     = 0;
 uint32_t now                       = 0;
-volatile uint8_t first_data_frame  = 1;
+uint8_t first_data_frame           = 1;
 
 void data_callback(uint32_t sock_no,
                    uint8_t *buffer,
@@ -282,29 +280,12 @@ void data_callback(uint32_t sock_no,
   }
 }
 
-#if SOCKET_ASYNC_FEATURE
-static void wait_for_async_rx_complete(void)
-{
-  while (!has_data_received) {
-    if (!first_data_frame) {
-      now = osKernelGetTickCount();
-      if ((now - start) > TEST_TIMEOUT) {
-        SL_DEBUG_LOG_V2(INFO, "Time Out: %ld ms", (now - start));
-        has_data_received = 1;
-        break;
-      }
-    }
-    osThreadYield();
-  }
-}
-#endif
-
 static void application_start(void *argument)
 {
   UNUSED_PARAMETER(argument);
   sl_status_t status;
-  sl_mac_address_t mac_addr                    = { 0 };
-  sl_si91x_firmware_version_t firmware_version = { 0 };
+  sl_mac_address_t mac_addr                   = { 0 };
+  sl_wifi_firmware_version_t firmware_version = { 0 };
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &throughput_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
@@ -330,20 +311,12 @@ static void application_start(void *argument)
            mac_addr.octet[5]);
   SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)wlan_tp_mac_log);
 
-  status = sl_si91x_get_firmware_version(&firmware_version);
+  status = sl_wifi_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
     return;
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           firmware_version.chip_id,
-           firmware_version.rom_id,
-           firmware_version.major,
-           firmware_version.minor,
-           firmware_version.security_version,
-           firmware_version.patch_num,
-           firmware_version.customer_id,
-           firmware_version.build_num);
+    print_firmware_version(&firmware_version);
   }
 
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
@@ -514,7 +487,9 @@ void receive_data_from_tcp_client(void)
     return;
   }
 
-  wait_for_async_rx_complete();
+  while (!has_data_received) {
+    osThreadYield();
+  }
 
   now = osKernelGetTickCount();
 
@@ -681,8 +656,9 @@ void receive_data_from_udp_client(void)
   }
   SL_DEBUG_LOG_V2(INFO, "Listening on Local Port %d\r\n", LISTENING_PORT);
 
-  wait_for_async_rx_complete();
-
+  while (!has_data_received) {
+    osThreadYield();
+  }
   now = osKernelGetTickCount();
   SL_DEBUG_LOG_V2(INFO, "UDP_RX Async Throughput test finished\r\n");
   SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", bytes_read);

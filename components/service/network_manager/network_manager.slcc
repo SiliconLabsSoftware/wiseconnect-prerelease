@@ -20,6 +20,9 @@ source:
 - path: src/sl_net_for_lwip.c
   condition:
   - sl_si91x_lwip_stack
+- path: src/sl_net_for_siwx3xx_lwip.c
+  condition:
+  - sl_lwip_series3_for_fpga
 - path: src/sl_net_for_dual_stack.c
   condition:
   - sl_si91x_network_dual_stack

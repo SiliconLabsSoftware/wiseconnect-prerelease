@@ -72,6 +72,7 @@
 #define QOS                    0
 #define TOPIC_TO_BE_SUBSCRIBED "THERMOSTAT-DATA"
 
+#define TCP_MQTT_CLIENT_INIT_BUFF_LEN 3500
 // Rx buffer size
 #define TCP_MQTT_CLIENT_RX_BUFFER_SIZE 1500
 // Tx buffer size
@@ -95,6 +96,8 @@ volatile int halt = 0;
 bool enable_ssl           = false; // Enable SSL for TLS connection
 int8_t clientID[]         = "WISECONNECT_SDK_TOPIC";
 uint8_t publish_message[] = "THIS IS MQTT CLIENT DEMO FROM APPLICATION";
+
+int8_t tcp_mqtt_client_buffer[TCP_MQTT_CLIENT_INIT_BUFF_LEN];
 
 const osThreadAttr_t thread_attributes = {
   .name       = "app",
@@ -134,10 +137,7 @@ static const sl_wifi_device_configuration_t wifi_mqtt_client_configuration = {
                       | SL_SI91X_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS | SL_SI91X_EXT_TCP_IP_FEAT_SSL_MEMORY_CLOUD),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map  = 0 }
 };
 
 typedef struct mqtt_client_s {
@@ -157,11 +157,6 @@ typedef struct mqtt_client_s {
   int8_t *tcp_mqtt_rx_buffer;
 
 } mqtt_client_t;
-
-static mqtt_client_t tcp_mqtt_client_instance;
-static Network tcp_mqtt_network_instance;
-static int8_t tcp_mqtt_tx_buffer[TCP_MQTT_CLIENT_TX_BUFFER_SIZE];
-static int8_t tcp_mqtt_rx_buffer[TCP_MQTT_CLIENT_RX_BUFFER_SIZE];
 
 static sl_net_wifi_lwip_context_t wifi_client_context;
 
@@ -201,7 +196,7 @@ void message_arrived(MessageData *md)
     SL_DEBUG_LOG_V2(ERROR, "Received NULL message!\r\n");
     return;
   }
-  printf("Message: %.*s\r\n", (int)md->message->payloadlen, (char *)md->message->payload);
+  SL_DEBUG_LOG_V2(INFO, "Message: %.*s\r\n", md->message->payloadlen, (uintptr_t)(char *)md->message->payload);
   //! process the received data
   halt = 1;
   return;
@@ -288,9 +283,12 @@ int paho_mqtt_demo()
 #else
   sl_net_inet_addr((char *)MQTT_BROKER_IP, (uint32_t *)&server_address);
 #endif
-  int8_t *server_ip                = (int8_t *)&server_address;
-  mqtt_client                      = &tcp_mqtt_client_instance;
-  mqtt_client->client.ipstack      = &tcp_mqtt_network_instance;
+  int8_t *server_ip  = (int8_t *)&server_address;
+  int8_t *buffer_ptr = tcp_mqtt_client_buffer;
+  mqtt_client        = (mqtt_client_t *)buffer_ptr;
+  buffer_ptr += sizeof(mqtt_client_t);
+  mqtt_client->client.ipstack = (Network *)buffer_ptr;
+  buffer_ptr += sizeof(Network);
   mqtt_client->server_port         = enable_ssl ? MQTTS_BROKER_PORT : MQTT_BROKER_PORT;
   mqtt_client->client_port         = CLIENT_PORT;
   mqtt_client->keep_alive_interval = KEEP_ALIVE_PERIOD;
@@ -300,8 +298,10 @@ int paho_mqtt_demo()
   mqtt_client->server_ip.type = SL_IPV4;
   memcpy(&mqtt_client->server_ip.ip.v4, server_ip, 4);
 #endif
-  mqtt_client->tcp_mqtt_tx_buffer             = tcp_mqtt_tx_buffer;
-  mqtt_client->tcp_mqtt_rx_buffer             = tcp_mqtt_rx_buffer;
+  mqtt_client->tcp_mqtt_tx_buffer = buffer_ptr;
+  buffer_ptr += TCP_MQTT_CLIENT_TX_BUFFER_SIZE;
+  mqtt_client->tcp_mqtt_rx_buffer = buffer_ptr;
+  buffer_ptr += TCP_MQTT_CLIENT_RX_BUFFER_SIZE;
   mqtt_client->client.ipstack->transport_type = MQTT_TRANSPORT_TCP;
 
   NetworkInit(mqtt_client->client.ipstack);
@@ -314,7 +314,7 @@ int paho_mqtt_demo()
              (uint8_t *)mqtt_client->tcp_mqtt_rx_buffer,
              TCP_MQTT_CLIENT_RX_BUFFER_SIZE);
 
-  SL_DEBUG_LOG_V2(INFO, "\nConnecting to MQTT broker on port %ld\r\n", mqtt_client->server_port);
+  SL_DEBUG_LOG_V2(INFO, "Connecting to MQTT broker on port %ld\r\n", mqtt_client->server_port);
 #ifdef SLI_SI91X_ENABLE_IPV6
   SL_DEBUG_LOG_V2(INFO, "Server IP: ");
   print_sl_ip_address(&canonical_ipv6_address);
@@ -322,7 +322,7 @@ int paho_mqtt_demo()
   SL_DEBUG_LOG_V2(INFO, "Server IP: ");
   print_sl_ip_address(&mqtt_client->server_ip);
 #endif
-  SL_DEBUG_LOG_V2(INFO, "\nSSL enabled: %s\r\n", (uintptr_t)(enable_ssl ? "Yes" : "No"));
+  SL_DEBUG_LOG_V2(INFO, "SSL enabled: %s\r\n", (uintptr_t)(enable_ssl ? "Yes" : "No"));
   if (enable_ssl) {
     mqtt_client->client.ipstack->tls = malloc(sizeof(mqtt_tls_context_t));
     if (!mqtt_client->client.ipstack->tls) {

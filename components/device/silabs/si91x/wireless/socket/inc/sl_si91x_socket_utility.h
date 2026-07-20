@@ -192,7 +192,8 @@ typedef struct {
  * | @ref SL_SI91X_TLS_EXTENSION_ALPN_TYPE   | The application protocol name, provided as a string   | Length of the application protocol name string  |
  *
  * @note For `SNI`, provide the server name or hostname as a string (e.g., `"example.com"`).
- * @note For `ALPN`, provide the application protocol string (e.g., `"http/1.1"` or `"mqtt"`).
+ * @note For `ALPN`, provide the application protocol string (e.g., `"http/1.1"`).
+ * @note Currently, SL_SI91X_TLS_EXTENSION_ALPN_TYPE supports only the HTTP protocol.
  */
 typedef struct {
   uint16_t type;   ///< Specifies the TLS extension type.
@@ -244,7 +245,7 @@ typedef struct {
  *
  * @retval SL_STATUS_OK                         Configuration applied successfully.
  * @retval SL_STATUS_NOT_INITIALIZED            Wi-Fi/Net stack is not initialized.
- * @retval SL_STATUS_INVALID_PARAMETER          One of the fields in @p socket_config is invalid (e.g., the calculated totals do not match or exceed the maximum value).
+ * @retval SL_STATUS_INVALID_PARAMETER          One of the fields in @p socket_config is invalid (e.g., totals mismatch or exceed the maximum).
  * @retval SL_STATUS_SI91X_INVALID_CONFIG       Firmware rejected the configuration (for example, MSS/buffer sizes out of range).
  * @retval SL_STATUS_BUSY                       A previous socket-configuration request is still in progress.
  *
@@ -311,35 +312,8 @@ void sli_si91x_send_tx_packet_status_handler(uint16_t packet_type, sl_status_t s
  */
 sli_si91x_socket_t *sli_get_si91x_socket(int32_t socket_id);
 
-/**
- * @brief Copies a TLS extension TLV into the socket extension buffer.
- *
- * @param[in] socket_tls_extensions Pointer to TLS extensions in the socket structure.
- * @param[in] tls_extension Pointer to the TLS extension TLV provided by the application.
- * @param[in] option_length Length of the TLS extension buffer passed by the application.
- *
- * @return SL_STATUS_OK on success.
- * @return SL_STATUS_NULL_POINTER if @p socket_tls_extensions or @p tls_extension is NULL.
- * @return SL_STATUS_INVALID_PARAMETER if the TLV layout, type, or length is invalid.
- * @return SL_STATUS_SI91X_MEMORY_ERROR if the socket extension buffer is full.
- */
 sl_status_t sli_si91x_add_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
-                                        const sl_si91x_socket_type_length_value_t *tls_extension,
-                                        socklen_t option_length);
-
-/**
- * @brief Adds a TLS extension TLV and maps the result to BSD socket errno conventions.
- *
- * @param[in] socket_tls_extensions Pointer to TLS extensions in the socket structure.
- * @param[in] tls_extension Pointer to the TLS extension TLV provided by the application.
- * @param[in] option_length Length of the TLS extension buffer passed by the application.
- *
- * @return SLI_SI91X_NO_ERROR on success.
- * @return -1 on failure with @c errno set to @c ENOMEM or @c EINVAL.
- */
-int sli_si91x_configure_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
-                                      const sl_si91x_socket_type_length_value_t *tls_extension,
-                                      socklen_t option_length);
+                                        const sl_si91x_socket_type_length_value_t *tls_extension);
 
 sl_status_t sli_create_and_send_socket_request(int socketIdIndex, int type, const int *backlog);
 

@@ -19,7 +19,7 @@ This application demonstrates how to send raw HCI commands to the SiWx91x module
     - [Getting Started](#getting-started)
     - [Configuration and Setup](#configuration-and-setup)
       - [NCP mode (EFR32 + Si91x NCP module)](#ncp-mode-efr32--si91x-ncp-module)
-      - [HCI VCOM and Debug Logging](#hci-vcom-and-debug-logging)
+      - [HCI VCOM and debug logging](#hci-vcom-and-debug-logging)
       - [General Configuration](#general-configuration)
     - [Steps for Execution](#steps-for-execution)
       - [Steps to view Logs](#steps-to-view-logs)
@@ -48,22 +48,24 @@ Before running the application, ensure that you have the following.
 
 - **SoC Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - BRD4002A Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards
-      - [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) [SiWx917-RB4338A]
-      - [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343A]
-      - [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343C]
+      - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+      - BRD4339B [SiWx917-RB4339B]
+      - BRD4340A [SiWx917-RB4340A]
+      - BRD4343A [SiWx917-RB4343A]
   - Kits
     - SiWx917 Pro Kit [Si917-PK6031A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-pro-kit?tab=overview)
     - SiWx917 Pro Kit [Si917-PK6032A]
-    - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
+    - SiWx917 AC1 Module Explorer Kit (BRD2708A)
 
 - **NCP Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - BRD4002A Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
     - NCP Expansion Kit with NCP Radio Boards
-      - [[BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview) + [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) / [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) / [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview)]
+      - (BRD4346A + BRD8045A) [SiWx917-EB4346A]
+      - (BRD4357A + BRD8045A) [SiWx917-EB4357A]
   - Kits
     - EFR32xG24 Pro Kit +10 dBm [xG24-PK6009A](https://www.silabs.com/development-tools/wireless/efr32xg24-pro-kit-10-dbm?tab=overview)
   - Interface and Host MCU Supported
@@ -95,7 +97,7 @@ Before running the application, ensure that you have the following.
 
 > **Note:** The BT Stack Bypass example is provided only in **SoC** and **NCP** mode. PSRAM variants are not shipped for this example.
 
-To create a project, select the appropriate example (`bt_stack_bypass` for SoC or `bt_stack_bypass_spi_ncp` for NCP) from the **Examples and Demos** section in Simplicity Studio. For NCP mode setup, refer to [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode-with-efr32).
+To create a project, select the appropriate example (`bt_stack_bypass` for SoC or `bt_stack_bypass_spi_ncp` for NCP) from the **Examples and Demos** section in Simplicity Studio. For NCP mode setup, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode-with-efr32).
 
 ### Setup Diagram
 
@@ -107,11 +109,11 @@ To create a project, select the appropriate example (`bt_stack_bypass` for SoC o
 
 - Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-  - [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio).
-  - [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-extension).
-  - [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer).
-  - [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware).
-    > **Note:** Ensure the SiWx91x module is loaded with the latest connectivity firmware as described in [SiWx91x Firmware Update].
+  - [Install Simplicity Studio](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-simplicity-studio)
+  - [Install WiSeConnect extension](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#install-the-wiseconnect-extension)
+  - [Connect your device to the computer](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#connect-siwx91x-to-computer)
+  - [Upgrade your connectivity firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#update-siwx91x-connectivity-firmware)
+    > **Note:** Ensure the SiWx91x module is loaded with the latest connectivity firmware as described in [SiWx91x Firmware Update]
   - [Create a Studio project](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#create-a-project). Choose **BLE - BT_STACK_BYPASS** or **BLE - BT_STACK_BYPASS (NCP)** as appropriate for your board.
 - For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
@@ -122,14 +124,14 @@ To create a project, select the appropriate example (`bt_stack_bypass` for SoC o
 Use **NCP host** mode when the application runs on an **EFR32 host MCU** connected to a Si91x NCP module over the **SPI Bus** (same arrangement as `wireless_test_ncp`).
 
 1. In Simplicity Studio, create and generate a project using the example **`bt_stack_bypass_spi_ncp`** with your target EFR32 board. This configuration aligns with the **`wireless_test_ncp`** component set for the SPI interface and excludes the console CLI source files.
-2. Do not define `SLI_SI91X_MCU_INTERFACE` for the NCP host build. In this configuration (`app.c`), HCI communication uses the `sl_iostream` interface. Configure the stdio retarget to use the EUSART VCOM interface, similar to the `wireless_test_ncp` example project.
+2. **Do not** define `SLI_SI91X_MCU_INTERFACE` for the NCP host build. In this configuration (`app.c`), HCI communication uses the `sl_iostream` interface. Configure the stdio retarget to use the EUSART VCOM interface, similar to the `wireless_test_ncp` example project.
 3. HCI reset handling on NCP calls **`sl_wifi_deinit()`** and **`NVIC_SystemReset()`** instead of the SoC **`sl_si91x_soc_nvic_reset()`**.
 4. **`ble_config.h`** already selects NCP-appropriate BLE limits.
-5. For **NCP mode**, connect the EFR32 host board directly to the Linux PC using a USB cable. The HCI communication happens over the board's USB/VCOM interface. This application follows your board's USB connection and the project's **stdio / iostream** setup.
+5. For **NCP mode**, connect the EFR32 host board directly to the Linux PC using a **USB cable**. The HCI communication happens over the board's USB/VCOM interface. This application follows your board's **USB** connection and the project's **stdio / iostream** setup.
 
-> **Note:** Ensure that you do not use the SoC UART pin wiring below for the NCP mode.
+> **Note:** You do **not** use the SoC UART pin wiring below for the NCP mode.
 
-#### HCI VCOM and Debug Logging
+#### HCI VCOM and debug logging
 
 - The UART/VCOM interface used for HCI communication with the host PC must transmit only HCI packet data. Do not use `printf()` on the same interface, as debug text and ASCII characters can corrupt the HCI data stream and cause invalid packet type errors on the host side.
 
@@ -223,7 +225,7 @@ Follow the steps for successful execution of the program:
 
 9. If you want to re-run the application press reset on the board and follow the same steps.
 
-Refer to the following Linux logs for the command which will be same for both `SOC` and `NCP` modes.
+Refer below Linux logs for the command which will be same for both `SOC` and `NCP` mode.
 ![Linux terminal logs - dmesg](resources/readme/LinuxLogs1.png)
 
 ![Linux terminal logs - hciattach and hciconfig](resources/readme/LinuxLogs2.png)

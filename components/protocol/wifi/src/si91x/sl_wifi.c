@@ -701,7 +701,7 @@ sl_wifi_interface_t sl_wifi_get_default_interface(void)
 
 void sl_wifi_set_default_interface(sl_wifi_interface_t interface)
 {
-  sli_wifi_set_default_interface(interface);
+  return sli_wifi_set_default_interface(interface);
 }
 
 sl_status_t sl_wifi_deinit(void)
@@ -1210,6 +1210,22 @@ sl_status_t sl_wifi_get_timeout(sl_wifi_interface_t interface,
                                 uint16_t *timeout_value)
 {
   return sli_wifi_get_timeout(interface, timeout_type, timeout_value);
+}
+
+sl_status_t sl_wifi_get_rssi_stats(sl_wifi_interface_t interface, sl_wifi_rssi_stats_t *rssi_stats)
+{
+  UNUSED_PARAMETER(interface);
+  UNUSED_PARAMETER(rssi_stats);
+
+  return SL_STATUS_NOT_SUPPORTED;
+}
+
+sl_status_t sl_wifi_get_snr_stats(sl_wifi_interface_t interface, sl_wifi_snr_stats_t *snr_stats)
+{
+  UNUSED_PARAMETER(interface);
+  UNUSED_PARAMETER(snr_stats);
+
+  return SL_STATUS_NOT_SUPPORTED;
 }
 
 sl_status_t sl_wifi_set_groupcast_filter_config(const sl_wifi_groupcast_filter_config_t *config)

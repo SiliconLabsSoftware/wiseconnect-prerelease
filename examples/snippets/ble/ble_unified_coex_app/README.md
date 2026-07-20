@@ -1,6 +1,6 @@
 # BLE Unified Coex Application
 
-> **Note:** This application is a Proof of Concept (PoC) and intended for evaluation and demonstration purposes only. It is not recommended for production use.
+> **Note:** This application is a **Proof of Concept (PoC)** and is intended for evaluation and demonstration purposes only. It is not recommended for production use.
 
 ## Overview
 
@@ -143,6 +143,6 @@ Customize protocol initialization:
 
 ## References
 
-- [Si917 Component Framework Architecture](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
-- [Component Refactoring Plan](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
+- [Si917 Component Framework Architecture](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
+- [Component Refactoring Plan](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
 - WiSeConnect SDK Documentation

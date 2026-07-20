@@ -36,6 +36,8 @@
 #include <stdio.h>
 #if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
 #include "sl_log_helper.h"
+#elif defined(SLI_SIWX3XX)
+#include "sl_log_helper_siwx3xx.h"
 #endif
 
 /** @brief
@@ -252,7 +254,7 @@ extern void sl_redirect_log(const char *format, ...);
 #define SL_COMPILE_TIME_ASSERT(condition, comment) typedef char assertion_failed__##comment[2 * !!(condition)-1];
 
 // Expands to SL_PRINT_STRING_<level>(fmt, ...). Use level INFO, ERROR, DEBUG, or WARN (must match macro suffix).
-#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE))
+#if (defined(SLI_SI91X_MCU_INTERFACE) || defined(SLI_SI91X_NCP_INTERFACE) || defined(SLI_SIWX3XX))
 #define SL_DEBUG_LOG_V2(level, fmt, ...)         \
   do {                                           \
     SL_PRINT_STRING_##level(fmt, ##__VA_ARGS__); \

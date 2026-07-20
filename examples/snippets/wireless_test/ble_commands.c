@@ -194,10 +194,7 @@ const sl_wifi_device_configuration_t sl_wifi_ble_configuration_cli = {
                       | SL_SI91X_BLE_GATT_INIT
 #endif
                       ),
-                   .config_feature_bit_map = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map = 0 }
 };
 
 static rsi_ble_per_transmit_t rsi_ble_per_tx;

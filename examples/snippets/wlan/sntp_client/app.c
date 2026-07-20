@@ -97,10 +97,7 @@ static const sl_wifi_device_configuration_t sntp_client_configuration = {
                       | SL_SI91X_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS | SL_SI91X_EXT_TCP_IP_FEAT_SSL_MEMORY_CLOUD),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map  = 0 }
 };
 
 static uint8_t callback_event = 0;

@@ -537,15 +537,11 @@ static sl_status_t initialize_wireless(void)
                      .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                      .ble_feature_bit_map        = 0,
                      .ble_ext_feature_bit_map    = 0,
-                     .config_feature_bit_map =
-                       (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
-    .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-    .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-    .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                     .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
   };
   sl_status_t st;
-  sl_si91x_firmware_version_t version = { 0 };
-  sl_mac_address_t mac_addr           = { 0 };
+  sl_wifi_firmware_version_t version = { 0 };
+  sl_mac_address_t mac_addr          = { 0 };
 
   st = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
   if (st != SL_STATUS_OK) {
@@ -557,17 +553,9 @@ static sl_status_t initialize_wireless(void)
     SL_PRINT_STRING_ERROR("Device MAC address: %x:%x:%x:", mac_addr.octet[0], mac_addr.octet[1], mac_addr.octet[2]);
     SL_PRINT_STRING_ERROR("%x:%x:%x\r\n", mac_addr.octet[3], mac_addr.octet[4], mac_addr.octet[5]);
   }
-  st = sl_si91x_get_firmware_version(&version);
+  st = sl_wifi_get_firmware_version(&version);
   if (st == SL_STATUS_OK) {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           version.chip_id,
-           version.rom_id,
-           version.major,
-           version.minor,
-           version.security_version,
-           version.patch_num,
-           version.customer_id,
-           version.build_num);
+    print_firmware_version(&version);
   }
   wireless_sleep(true);
   return SL_STATUS_OK;

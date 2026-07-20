@@ -123,6 +123,7 @@
 #define SLI_11BE_MCS0         0x480u
 #define SLI_11AC_MCS0         0x180u
 #define SLI_11AX_MCS0         0x400u
+#define SLI_11N_MCS0          0x100u
 
 /*=========================================================================*/
 extern sli_wifi_performance_profile_t performance_profile;
@@ -279,76 +280,20 @@ static sl_status_t sli_wifi_convert_client_info(sl_wifi_client_info_response_t *
     sl_wifi_client_info_t *sl_client_info            = &client_info_response->client_info[station_index];
     const sli_wifi_station_info_t *si91x_client_info = &sli_wifi_client_info_response->sta_info[station_index];
 
-    const uint8_t ip_version = si91x_client_info->ip_version[0];
+    uint8_t ip_address_size = (uint8_t)(si91x_client_info->ip_version[0] | si91x_client_info->ip_version[1] << 8);
 
-    if ((ip_version == SL_IPV4_VERSION) || (ip_version == SL_IPV4_ADDRESS_LENGTH)) {
-      si91x_ip_address                = si91x_client_info->ip_address.ipv4_address;
-      sl_ip_address                   = sl_client_info->ip_address.ip.v4.bytes;
-      sl_client_info->ip_address.type = SL_IPV4;
-      memcpy(sl_ip_address, si91x_ip_address, SL_IPV4_ADDRESS_LENGTH);
-    } else if ((ip_version == SL_IPV6_VERSION) || (ip_version == SL_IPV6_ADDRESS_LENGTH)) {
-      si91x_ip_address                = si91x_client_info->ip_address.ipv6_address;
-      sl_ip_address                   = sl_client_info->ip_address.ip.v6.bytes;
-      sl_client_info->ip_address.type = SL_IPV6;
-      memcpy(sl_ip_address, si91x_ip_address, SL_IPV6_ADDRESS_LENGTH);
-    } else {
-      sl_client_info->ip_address.type = SL_INVALID_IP;
-      memset(&sl_client_info->ip_address.ip, 0, sizeof(sl_client_info->ip_address.ip));
-    }
+    si91x_ip_address = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? si91x_client_info->ip_address.ipv4_address
+                                                                 : si91x_client_info->ip_address.ipv6_address;
+    sl_ip_address    = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? sl_client_info->ip_address.ip.v4.bytes
+                                                                 : sl_client_info->ip_address.ip.v6.bytes;
+
+    sl_client_info->ip_address.type = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? SL_IPV4 : SL_IPV6;
 
     memcpy(&sl_client_info->mac_adddress, si91x_client_info->mac, sizeof(sl_mac_address_t));
+    memcpy(sl_ip_address, si91x_ip_address, ip_address_size);
   }
 
   return SL_STATUS_OK;
-}
-
-static uint16_t sli_wifi_go_params_header_length(void)
-{
-  return (uint16_t)(sizeof(sli_wifi_client_info_response) - (SLI_WIFI_MAX_STATIONS * sizeof(sli_wifi_station_info_t)));
-}
-
-// Firmware returns a variable-length GO params payload; copy only the fields present in the packet.
-static sl_status_t sli_wifi_parse_go_params_response(const sl_wifi_system_packet_t *packet,
-                                                     sli_wifi_client_info_response *go_params_response)
-{
-  if (packet->length == 0) {
-    return SL_STATUS_OK;
-  }
-
-  const uint16_t go_params_header_length = sli_wifi_go_params_header_length();
-
-  if (packet->length < go_params_header_length) {
-    return SL_STATUS_FAIL;
-  }
-
-  const sli_wifi_client_info_response *response = (const sli_wifi_client_info_response *)packet->data;
-  const uint16_t go_params_fixed_fields_length =
-    go_params_header_length - (uint16_t)sizeof(go_params_response->sta_count);
-
-  memcpy(go_params_response, response, go_params_fixed_fields_length);
-
-  uint16_t station_count             = (uint16_t)(response->sta_count[0] | ((uint16_t)response->sta_count[1] << 8));
-  const bool station_count_truncated = (station_count > SLI_WIFI_MAX_STATIONS);
-  if (station_count_truncated) {
-    station_count = SLI_WIFI_MAX_STATIONS;
-  }
-
-  go_params_response->sta_count[0] = (uint8_t)(station_count & 0xFFU);
-  go_params_response->sta_count[1] = (uint8_t)(station_count >> 8);
-
-  const uint16_t required_length =
-    go_params_header_length + (station_count * (uint16_t)sizeof(sli_wifi_station_info_t));
-  if (packet->length < required_length) {
-    return SL_STATUS_FAIL;
-  }
-
-  for (uint16_t station_index = 0; station_index < station_count; station_index++) {
-    memcpy(&go_params_response->sta_info[station_index],
-           &response->sta_info[station_index],
-           sizeof(sli_wifi_station_info_t));
-  }
-
-  return station_count_truncated ? SL_STATUS_INVALID_COUNT : SL_STATUS_OK;
 }
 
 sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
@@ -1401,11 +1346,8 @@ sl_status_t sli_wifi_start_ap(sl_wifi_interface_t interface, const sl_wifi_ap_co
   if (configuration->is_11n_enabled) {
     sli_wifi_request_ap_high_throughput_capability_t htcaps = { 0 };
     htcaps.mode_11n_enable                                  = true;
-    htcaps.ht_caps_bitmap = SL_WIFI_HT_CAPS_NUM_RX_STBC | SL_WIFI_HT_CAPS_SHORT_GI_20MHZ | SL_WIFI_HT_CAPS_GREENFIELD_EN
-#if !defined(SLI_SI917)
-                            | SL_WIFI_HT_CAPS_SUPPORT_CH_WIDTH
-#endif
-      ;
+    htcaps.ht_caps_bitmap =
+      (SL_WIFI_HT_CAPS_NUM_RX_STBC | SL_WIFI_HT_CAPS_SHORT_GI_20MHZ | SL_WIFI_HT_CAPS_GREENFIELD_EN);
     status = sli_wifi_set_high_throughput_capability(SL_WIFI_AP_INTERFACE, htcaps);
     VERIFY_STATUS_AND_RETURN(status);
   }
@@ -1517,7 +1459,7 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
   sl_status_t status;
   sl_wifi_buffer_t *buffer = NULL;
   const sl_wifi_system_packet_t *packet;
-  sli_wifi_client_info_response go_params_response = { 0 };
+  sli_wifi_client_info_response sli_wifi_client_info_response = { 0 };
 
   if (!device_initialized) {
     return SL_STATUS_NOT_INITIALIZED;
@@ -1537,7 +1479,7 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
                                  SLI_WIFI_WLAN_CMD,
                                  NULL,
                                  0,
-                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_QUERY_GO_PARAMS_WAIT_TIME),
+                                 SLI_WIFI_RSP_QUERY_GO_PARAMS_WAIT_TIME,
                                  NULL,
                                  (void **)&buffer);
   if ((status != SL_STATUS_OK) && (buffer != NULL)) {
@@ -1545,28 +1487,14 @@ sl_status_t sli_wifi_get_ap_client_info(sl_wifi_interface_t interface, sl_wifi_c
   }
   VERIFY_STATUS_AND_RETURN(status);
 
-  if (buffer == NULL) {
-    return SL_STATUS_NULL_POINTER;
-  }
-
   packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
-  if (packet == NULL) {
-    sli_buffer_manager_free_buffer(buffer);
-    return SL_STATUS_FAIL;
-  }
 
-  status = sli_wifi_parse_go_params_response(packet, &go_params_response);
-  if (status == SL_STATUS_FAIL) {
-    sli_buffer_manager_free_buffer(buffer);
-    return status;
-  }
-
-  sli_wifi_convert_client_info(client_info, &go_params_response);
+  memcpy(&sli_wifi_client_info_response, packet->data, sizeof(sli_wifi_client_info_response));
+  sli_wifi_convert_client_info(client_info, &sli_wifi_client_info_response);
 
   sli_buffer_manager_free_buffer(buffer);
   return status;
 }
-
 sl_status_t sli_wifi_disconnect(sl_wifi_interface_t interface)
 {
   if (!device_initialized) {
@@ -1813,22 +1741,132 @@ sl_status_t sli_wifi_transmit_test_start(sl_wifi_interface_t interface,
   return status;
 }
 
-static size_t sli_wifi_per_params_size_from_wifi_protocol(sl_wifi_rate_protocol_t wifi_protocol)
+static void sli_wifi_tx_test_base_info_to_wire(const sl_wifi_transmitter_test_base_info_t *tx_test_info,
+                                               sli_wifi_tx_test_base_info_wire_t *wire_info)
+{
+  memset(wire_info, 0, sizeof(*wire_info));
+  /* Serialize field-by-field so the NWP payload does not depend on host enum size/layout. */
+  wire_info->wifi_protocol = (uint16_t)tx_test_info->wifi_protocol;
+  wire_info->enable        = tx_test_info->enable;
+  wire_info->power         = tx_test_info->power;
+  wire_info->rate          = (uint32_t)tx_test_info->rate;
+  wire_info->length        = tx_test_info->length;
+  wire_info->mode          = tx_test_info->mode;
+  wire_info->channel       = tx_test_info->channel;
+  wire_info->no_of_pkts    = tx_test_info->no_of_pkts;
+  wire_info->delay         = tx_test_info->delay;
+  wire_info->channel_bw    = tx_test_info->channel_bw;
+  wire_info->aggr_enable   = tx_test_info->aggr_enable;
+  wire_info->aggr_count    = tx_test_info->aggr_count;
+}
+
+static void sli_wifi_11bgn_per_params_to_wire(const sl_wifi_11bgn_per_params_t *per_params,
+                                              sli_wifi_11bgn_per_params_wire_t *wire_params)
+{
+  memset(wire_params, 0, sizeof(*wire_params));
+  wire_params->short_gi_enable        = per_params->short_gi_enable;
+  wire_params->greenfield_mode_enable = per_params->greenfield_mode_enable;
+  wire_params->short_preamble_enable  = per_params->short_preamble_enable;
+}
+
+static void sli_wifi_11ac_per_params_to_wire(const sl_wifi_11ac_per_params_t *per_params,
+                                             sli_wifi_11ac_per_params_wire_t *wire_params)
+{
+  memset(wire_params, 0, sizeof(*wire_params));
+  wire_params->short_gi_enable = per_params->short_gi_enable;
+}
+
+static void sli_wifi_11ax_per_params_to_wire(const sl_wifi_11ax_per_params_t *per_params,
+                                             sli_wifi_11ax_per_params_wire_t *wire_params)
+{
+  memset(wire_params, 0, sizeof(*wire_params));
+  wire_params->coding_type       = per_params->coding_type;
+  wire_params->nominal_pe        = per_params->nominal_pe;
+  wire_params->ul_dl             = per_params->ul_dl;
+  wire_params->he_ppdu_type      = (uint8_t)per_params->he_ppdu_type;
+  wire_params->beam_change       = per_params->beam_change;
+  wire_params->bw                = per_params->bw;
+  wire_params->stbc              = per_params->stbc;
+  wire_params->tx_bf             = per_params->tx_bf;
+  wire_params->gi_ltf            = (uint8_t)per_params->gi_ltf;
+  wire_params->dcm               = (uint8_t)per_params->dcm;
+  wire_params->nsts_midamble     = per_params->nsts_midamble;
+  wire_params->spatial_reuse     = per_params->spatial_reuse;
+  wire_params->bss_color         = per_params->bss_color;
+  wire_params->ru_allocation     = per_params->ru_allocation;
+  wire_params->he_siga2_reserved = per_params->he_siga2_reserved;
+  wire_params->n_heltf_tot       = per_params->n_heltf_tot;
+  wire_params->sigb_dcm          = per_params->sigb_dcm;
+  wire_params->sigb_mcs          = per_params->sigb_mcs;
+  wire_params->user_idx          = per_params->user_idx;
+  wire_params->user_sta_id       = per_params->user_sta_id;
+  wire_params->sigb_compression  = per_params->sigb_compression;
+}
+
+static void sli_wifi_11be_per_params_to_wire(const sl_wifi_11be_per_params_t *per_params,
+                                             sli_wifi_11be_per_params_wire_t *wire_params)
+{
+  memset(wire_params, 0, sizeof(*wire_params));
+  wire_params->coding_type   = per_params->coding_type;
+  wire_params->nominal_pe    = per_params->nominal_pe;
+  wire_params->ul_dl         = per_params->ul_dl;
+  wire_params->be_ppdu_type  = per_params->be_ppdu_type;
+  wire_params->bw            = per_params->bw;
+  wire_params->gi_ltf        = (uint8_t)per_params->gi_ltf;
+  wire_params->spatial_reuse = per_params->spatial_reuse;
+  wire_params->ru_allocation = per_params->ru_allocation;
+  wire_params->n_heltf_tot   = per_params->n_heltf_tot;
+  wire_params->eht_sig_mcs   = per_params->eht_sig_mcs;
+  wire_params->disregard     = per_params->disregard;
+}
+
+static sl_status_t sli_wifi_per_params_wire_size(sl_wifi_rate_protocol_t wifi_protocol, size_t *wire_size)
 {
   switch (wifi_protocol) {
     case SL_WIFI_RATE_PROTOCOL_B_ONLY:
     case SL_WIFI_RATE_PROTOCOL_G_ONLY:
     case SL_WIFI_RATE_PROTOCOL_N_ONLY:
-      return sizeof(sl_wifi_11bgn_per_params_t);
+      *wire_size = sizeof(sl_wifi_11bgn_per_params_t);
+      return SL_STATUS_OK;
     case SL_WIFI_RATE_PROTOCOL_AC_ONLY:
-      return sizeof(sl_wifi_11ac_per_params_t);
+      *wire_size = sizeof(sli_wifi_11ac_per_params_wire_t);
+      return SL_STATUS_OK;
     case SL_WIFI_RATE_PROTOCOL_AX_ONLY:
-      return sizeof(sl_wifi_11ax_per_params_t);
+      *wire_size = sizeof(sli_wifi_11ax_per_params_wire_t);
+      return SL_STATUS_OK;
     case SL_WIFI_RATE_PROTOCOL_BE_ONLY:
-      return sizeof(sl_wifi_11be_per_params_t);
-    case SL_WIFI_RATE_PROTOCOL_AUTO:
+      *wire_size = sizeof(sli_wifi_11be_per_params_wire_t);
+      return SL_STATUS_OK;
     default:
-      return 0;
+      return SL_STATUS_INVALID_PARAMETER;
+  }
+}
+
+static sl_status_t sli_wifi_per_params_to_wire(sl_wifi_rate_protocol_t wifi_protocol,
+                                               const void *per_params,
+                                               void *per_params_wire_dst)
+{
+  switch (wifi_protocol) {
+    case SL_WIFI_RATE_PROTOCOL_B_ONLY:
+    case SL_WIFI_RATE_PROTOCOL_G_ONLY:
+    case SL_WIFI_RATE_PROTOCOL_N_ONLY:
+      sli_wifi_11bgn_per_params_to_wire((const sl_wifi_11bgn_per_params_t *)per_params,
+                                        (sli_wifi_11bgn_per_params_wire_t *)per_params_wire_dst);
+      return SL_STATUS_OK;
+    case SL_WIFI_RATE_PROTOCOL_AC_ONLY:
+      sli_wifi_11ac_per_params_to_wire((const sl_wifi_11ac_per_params_t *)per_params,
+                                       (sli_wifi_11ac_per_params_wire_t *)per_params_wire_dst);
+      return SL_STATUS_OK;
+    case SL_WIFI_RATE_PROTOCOL_AX_ONLY:
+      sli_wifi_11ax_per_params_to_wire((const sl_wifi_11ax_per_params_t *)per_params,
+                                       (sli_wifi_11ax_per_params_wire_t *)per_params_wire_dst);
+      return SL_STATUS_OK;
+    case SL_WIFI_RATE_PROTOCOL_BE_ONLY:
+      sli_wifi_11be_per_params_to_wire((const sl_wifi_11be_per_params_t *)per_params,
+                                       (sli_wifi_11be_per_params_wire_t *)per_params_wire_dst);
+      return SL_STATUS_OK;
+    default:
+      return SL_STATUS_INVALID_PARAMETER;
   }
 }
 
@@ -1843,25 +1881,36 @@ sl_status_t sli_wifi_transmit_test_start_v2(const sl_wifi_transmitter_test_base_
   SL_VERIFY_POINTER_OR_RETURN(tx_test_info, SL_STATUS_NULL_POINTER);
   SL_VERIFY_POINTER_OR_RETURN(per_params, SL_STATUS_NULL_POINTER);
 
-  const size_t per_params_size = sli_wifi_per_params_size_from_wifi_protocol(tx_test_info->wifi_protocol);
-  if (per_params_size == 0) {
+  size_t per_params_wire_size = 0;
+  sl_status_t status          = sli_wifi_per_params_wire_size(tx_test_info->wifi_protocol, &per_params_wire_size);
+  if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR,
-                    "tx test start v2: bad protocol %u (per_params_size=0)\n",
+                    "tx test start v2: bad protocol %u (per_params wire size lookup failed)\n",
                     (unsigned)tx_test_info->wifi_protocol);
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  /* NWP reserves 2 bytes after base_info before PER params, and 2 bytes after PER params. */
-  const size_t nwp_reserved_len = 2U;
-  const size_t total_len = sizeof(sl_wifi_transmitter_test_base_info_t) + (nwp_reserved_len * 2) + per_params_size;
+  /* NWP: 4 reserved bytes after base_info and after per_params (gaps in text_tx_cmd, not in wire structs). */
+  const size_t base_info_len = sizeof(sli_wifi_tx_test_base_info_wire_t);
+  const size_t total_len     = base_info_len + (SLI_WIFI_TX_TEST_NWP_RESERVED_LEN * 2U) + per_params_wire_size;
 
-  uint8_t text_tx_cmd[total_len];
-  memcpy(text_tx_cmd, tx_test_info, sizeof(sl_wifi_transmitter_test_base_info_t));
-  memset(text_tx_cmd + sizeof(sl_wifi_transmitter_test_base_info_t), 0, nwp_reserved_len);
-  memcpy(text_tx_cmd + sizeof(sl_wifi_transmitter_test_base_info_t) + nwp_reserved_len, per_params, per_params_size);
-  memset(text_tx_cmd + sizeof(sl_wifi_transmitter_test_base_info_t) + nwp_reserved_len + per_params_size,
-         0,
-         nwp_reserved_len);
+  /* Fixed-size buffer (not VLA): debuggers often show only text_tx_cmd[0] for VLAs. */
+  uint8_t text_tx_cmd[SLI_WIFI_TX_TEST_CMD_MAX_LEN];
+  sli_wifi_tx_test_base_info_wire_t wire_info;
+
+  memset(text_tx_cmd, 0, SLI_WIFI_TX_TEST_CMD_MAX_LEN);
+  sli_wifi_tx_test_base_info_to_wire(tx_test_info, &wire_info);
+  memcpy(text_tx_cmd, &wire_info, base_info_len);
+
+  status = sli_wifi_per_params_to_wire(tx_test_info->wifi_protocol,
+                                       per_params,
+                                       text_tx_cmd + base_info_len + SLI_WIFI_TX_TEST_NWP_RESERVED_LEN);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR,
+                    "tx test start v2: bad protocol %u (per_params wire convert failed)\n",
+                    (unsigned)tx_test_info->wifi_protocol);
+    return SL_STATUS_INVALID_PARAMETER;
+  }
 
   SL_DEBUG_LOG_V2(DEBUG,
                   "tx test start v2: protocol=%u total_len=%u enable=%u\n",
@@ -1870,8 +1919,7 @@ sl_status_t sli_wifi_transmit_test_start_v2(const sl_wifi_transmitter_test_base_
                   (unsigned)tx_test_info->enable);
   SL_DEBUG_LOG_V2(DEBUG, "tx test start v2: pwr=%d\r\n", (int)tx_test_info->power);
 
-  sl_status_t status = SL_STATUS_OK;
-  status             = sli_wifi_send_command(SLI_WIFI_REQ_TX_TEST_MODE,
+  status = sli_wifi_send_command(SLI_WIFI_REQ_TX_TEST_MODE,
                                  SLI_WIFI_WLAN_CMD,
                                  text_tx_cmd,
                                  total_len,
@@ -1894,13 +1942,16 @@ sl_status_t sli_wifi_transmit_test_stop(void)
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  /* Same NWP layout as start: base + reserved + PER + reserved; disable via enable == 0. */
-  const size_t nwp_reserved_len = 2U;
-  const size_t total_len        = sizeof(sl_wifi_transmitter_test_base_info_t) + nwp_reserved_len;
+  /* Same NWP layout as start: base + reserved gap; disable via enable == 0 (no PER section). */
+  const size_t total_len = sizeof(sli_wifi_tx_test_base_info_wire_t) + SLI_WIFI_TX_TEST_NWP_RESERVED_LEN;
   uint8_t tx_test_cmd[total_len];
   sl_wifi_transmitter_test_base_info_t tx_test_info;
+  sli_wifi_tx_test_base_info_wire_t wire_info;
+  memset(tx_test_cmd, 0, sizeof(tx_test_cmd));
   memset(&tx_test_info, 0, sizeof(tx_test_info));
   tx_test_info.enable = 0;
+  sli_wifi_tx_test_base_info_to_wire(&tx_test_info, &wire_info);
+  memcpy(tx_test_cmd, &wire_info, sizeof(wire_info));
 
   sl_status_t status = sli_wifi_send_command(SLI_WIFI_REQ_TX_TEST_MODE,
                                              SLI_WIFI_WLAN_CMD,
@@ -3631,31 +3682,31 @@ uint16_t sli_wifi_get_encoded_rate(sl_wifi_rate_protocol_t protocol, sl_wifi_mcs
       SL_DEBUG_LOG_V2(ERROR, "get_encoded_rate: invalid 11b rate %u\r\n", (unsigned)rate);
       return SL_STATUS_INVALID_PARAMETER;
     case SL_WIFI_RATE_PROTOCOL_G_ONLY:
-      if ((rate - 8u) <= 7u) {
+      if ((rate - SL_WIFI_RATE_MCS8) <= SL_WIFI_RATE_MCS7) {
         return (uint16_t)(SLI_PER_11G_RATE_BASE | rate);
       }
       SL_DEBUG_LOG_V2(ERROR, "get_encoded_rate: invalid 11g rate %u\r\n", (unsigned)rate);
       return SL_STATUS_INVALID_PARAMETER;
     case SL_WIFI_RATE_PROTOCOL_N_ONLY:
-      if (rate <= 7u) {
-        return (uint16_t)(SL_WIFI_RATE_MCS0 + rate);
+      if (rate <= SL_WIFI_RATE_MCS7) {
+        return (uint16_t)(SLI_11N_MCS0 + rate);
       }
       SL_DEBUG_LOG_V2(ERROR, "get_encoded_rate: invalid 11n mcs %u\r\n", (unsigned)rate);
       return SL_STATUS_INVALID_PARAMETER;
     case SL_WIFI_RATE_PROTOCOL_AC_ONLY:
-      if (rate <= 7u) {
+      if (rate <= SL_WIFI_RATE_MCS8) {
         return (uint16_t)(SLI_11AC_MCS0 + rate);
       }
       SL_DEBUG_LOG_V2(ERROR, "get_encoded_rate: invalid 11ac mcs %u\r\n", (unsigned)rate);
       return SL_STATUS_INVALID_PARAMETER;
     case SL_WIFI_RATE_PROTOCOL_AX_ONLY:
-      if (rate <= 9u) {
+      if (rate <= SL_WIFI_RATE_MCS9) {
         return (uint16_t)(SLI_11AX_MCS0 + rate);
       }
       SL_DEBUG_LOG_V2(ERROR, "get_encoded_rate: invalid 11ax mcs %u\r\n", (unsigned)rate);
       return SL_STATUS_INVALID_PARAMETER;
     case SL_WIFI_RATE_PROTOCOL_BE_ONLY:
-      if (rate <= 9u || rate == 0xFu) {
+      if (rate <= SL_WIFI_RATE_MCS9 || rate == SL_WIFI_RATE_MCSF) {
         return (uint16_t)(SLI_11BE_MCS0 + rate);
       }
       SL_DEBUG_LOG_V2(ERROR, "get_encoded_rate: invalid 11be mcs %u\r\n", (unsigned)rate);

@@ -28,7 +28,6 @@
  *
  ******************************************************************************/
 #include "sli_si91x_wifi_event_handler.h"
-#include "sli_event_engine.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
 #include "sl_si91x_protocol_types.h"
@@ -123,9 +122,7 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
                                                                    &packet_type_info);
     if (SL_STATUS_OK != status) {
       sli_buffer_manager_free_buffer(buffer);
-      if (metadata != NULL) {
-        sli_buffer_manager_free_buffer(metadata);
-      }
+      sli_buffer_manager_free_buffer(metadata);
       sli_buffer_manager_free_buffer(response);
       return;
     }
@@ -137,9 +134,7 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
     }
   }
   sli_buffer_manager_free_buffer(buffer);
-  if (metadata != NULL) {
-    sli_buffer_manager_free_buffer(metadata);
-  }
+  sli_buffer_manager_free_buffer(metadata);
   sli_buffer_manager_free_buffer(response);
 
   return;
@@ -166,9 +161,7 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
   sl_wifi_system_packet_t *packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
   if (packet == NULL) {
     sli_buffer_manager_free_buffer(buffer);
-    if (metadata != NULL) {
-      sli_buffer_manager_free_buffer(metadata);
-    }
+    sli_buffer_manager_free_buffer(metadata);
     sli_buffer_manager_free_buffer(engine_response);
     return;
   }
@@ -186,9 +179,7 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
   }
 
   sli_buffer_manager_free_buffer(buffer);
-  if (metadata != NULL) {
-    sli_buffer_manager_free_buffer(metadata);
-  }
+  sli_buffer_manager_free_buffer(metadata);
   sli_buffer_manager_free_buffer(engine_response);
   return;
 }
@@ -222,9 +213,7 @@ static void sli_si91x_wifi_event_engine_network_event_handler(uint32_t event, vo
 
   sli_buffer_manager_free_buffer(buffer);
   sli_buffer_manager_free_buffer(response);
-  if (metadata != NULL) {
-    sli_buffer_manager_free_buffer(metadata);
-  }
+  sli_buffer_manager_free_buffer(metadata);
   return;
 }
 
@@ -242,9 +231,7 @@ static void sli_si91x_wifi_event_engine_socket_cmd_event_handler(uint32_t event,
 
   sli_buffer_manager_free_buffer(buffer);
   sli_buffer_manager_free_buffer(response);
-  if (metadata != NULL) {
-    sli_buffer_manager_free_buffer(metadata);
-  }
+  sli_buffer_manager_free_buffer(metadata);
   return;
 }
 
@@ -341,13 +328,6 @@ __WEAK sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interfac
 /******************************************************
   *               Global Function Definitions
  ******************************************************/
-void sli_wifi_event_engine_signal_async(void)
-{
-  if (sli_wifi_event_engine_event_id != NULL) {
-    osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
-  }
-}
-
 sl_status_t sli_si91x_wifi_data_packet_handler(void *rx_buffer,
                                                uint32_t packet_size,
                                                sli_routing_utility_packet_status_handler_t packet_status_handler,
@@ -370,7 +350,8 @@ sl_status_t sli_si91x_wifi_data_packet_handler(void *rx_buffer,
     // Passes the asynchronous socket packet to the event engine for further processing.
     sli_queue_manager_enqueue(&event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_DATA_EVENT], rx_buffer);
 
-    sli_wifi_event_engine_signal_async();
+    // set event to the event engine
+    osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
 
 #elif defined(SLI_SI91X_NETWORK_DUAL_STACK)
 
@@ -381,7 +362,8 @@ sl_status_t sli_si91x_wifi_data_packet_handler(void *rx_buffer,
       // Passes the asynchronous socket packet to the event engine for further processing.
       sli_queue_manager_enqueue(&event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_DATA_EVENT], rx_buffer);
 
-      sli_wifi_event_engine_signal_async();
+      // set event to the event engine
+      osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
 
     } else {
       // If SLI_SI91X_OFFLOAD_NETWORK_STACK is defined and dual stack mode is enabled, process the raw data frame.
@@ -400,7 +382,8 @@ sl_status_t sli_si91x_wifi_data_packet_handler(void *rx_buffer,
   } else if (rx_packet->command == SLI_WIFI_RX_DOT11_DATA) {
     // Passes the asynchronous Wi-Fi packet to the event engine for further processing.
     sli_queue_manager_enqueue(&event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_WIFI_EVENT], rx_buffer);
-    sli_wifi_event_engine_signal_async();
+    // set event to the event engine
+    osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
   }
 
   return SL_STATUS_OK;
@@ -422,7 +405,8 @@ sl_status_t sli_si91x_wifi_ble_packet_handler(void *rx_buffer,
 
   // Pass the BLE packet to the event engine for further processing.
   sli_queue_manager_enqueue(&event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_BLE_EVENT], rx_buffer);
-  sli_wifi_event_engine_signal_async();
+  // set event to the event engine
+  osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
 
   return SL_STATUS_OK;
 }
@@ -443,7 +427,8 @@ sl_status_t sli_si91x_wifi_nwp_log_packet_handler(void *rx_buffer,
 
   // Pass the NWP log packet to the dedicated NWP log event handler
   sli_queue_manager_enqueue(&event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_NWP_LOG_EVENT], rx_buffer);
-  sli_wifi_event_engine_signal_async();
+  // set event to the event engine
+  osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
 
   return SL_STATUS_OK;
 }
@@ -467,7 +452,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            sli_si91x_wifi_event_engine_common_event_handler);
   if (SL_STATUS_OK != status) {
     // If registration fails, deinitialize the event engine and return the error status
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
     return status;
   }
 
@@ -477,7 +462,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            sli_si91x_wifi_event_engine_wifi_event_handler);
   if (SL_STATUS_OK != status) {
     // If registration fails, deinitialize the event engine and return the error status
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
     return status;
   }
 
@@ -487,7 +472,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            sli_si91x_wifi_event_engine_bt_event_handler);
   if (SL_STATUS_OK != status) {
     // If registration fails, deinitialize the event engine and return the error status
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
     return status;
   }
 
@@ -497,7 +482,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            sli_si91x_wifi_event_engine_network_event_handler);
   if (SL_STATUS_OK != status) {
     // If registration fails, deinitialize the event engine and return the error status
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
     return status;
   }
 
@@ -507,7 +492,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            sli_si91x_wifi_event_engine_socket_cmd_event_handler);
   if (SL_STATUS_OK != status) {
     // If registration fails, deinitialize the event engine and return the error status
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
     return status;
   }
 
@@ -517,7 +502,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            sli_si91x_wifi_event_engine_socket_data_event_handler);
   if (SL_STATUS_OK != status) {
     // If registration fails, deinitialize the event engine and return the error status
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
     return status;
   }
 
@@ -527,7 +512,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
                                            sli_si91x_wifi_event_engine_error_event_handler);
   if (SL_STATUS_OK != status) {
     // If registration fails, deinitialize the event engine
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
     return status;
   }
 
@@ -538,7 +523,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
   if (SL_STATUS_OK != status) {
     SL_DEBUG_LOG_V2(ERROR, "Register NWP_LOG failed 0x%lX", status);
     // If registration fails, deinitialize the event engine
-    sli_si91x_wifi_event_engine_deinit();
+    sli_event_engine_deinit();
   }
 
   return status;
@@ -548,8 +533,6 @@ sl_status_t sli_si91x_wifi_event_engine_deinit(void)
 {
   sl_status_t status = sli_event_engine_deinit();
   VERIFY_STATUS_AND_RETURN(status);
-
-  sli_wifi_event_engine_event_id = NULL;
 
   return SL_STATUS_OK;
 }

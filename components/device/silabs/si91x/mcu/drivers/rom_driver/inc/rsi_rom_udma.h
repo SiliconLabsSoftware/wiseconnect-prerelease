@@ -266,8 +266,7 @@ STATIC INLINE rsi_error_t RSI_UDMA_SetupChannel(RSI_UDMA_HANDLE_T pHandle, const
  * @param[in]   pCfg	  : Pointer to DMA channel configuration structure
  * @return 		  none
  */
-STATIC INLINE __attribute__((always_inline)) void RSI_UDMA_DeInit(RSI_UDMA_HANDLE_T pHandle,
-                                                                  const RSI_UDMA_CHA_CFG_T *pCfg)
+STATIC INLINE void RSI_UDMA_DeInit(RSI_UDMA_HANDLE_T pHandle, const RSI_UDMA_CHA_CFG_T *pCfg)
 {
 #if defined(UDMA_ROMDRIVER_PRESENT)
   ROMAPI_UDMA_API->udma_deInit(pHandle, pCfg);

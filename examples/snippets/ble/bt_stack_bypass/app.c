@@ -53,8 +53,6 @@
 #define RSI_APP_EVENT_UART 0
 #define RSI_APP_EVENT_RCP  1
 
-#define RSI_BLE_RCP_HCI_HDR_BEFORE_DATA 12U
-
 #define BUFFER_SIZE 1024
 
 #define BAUD_VALUE 115200
@@ -136,10 +134,6 @@ static uint32_t ble_app_event_map1;
 static uint8_t uart_rx_in_progress;
 #endif
 osSemaphoreId_t ble_main_task_sem;
-
-#ifndef SLI_SI91X_MCU_INTERFACE
-static osSemaphoreId_t hci_uart_rx_sem;
-#endif
 
 volatile uint32_t read_tx_cnt = 0;
 volatile uint32_t read_rx_cnt = 0;
@@ -239,10 +233,7 @@ static const sl_wifi_device_configuration_t config = {
 #endif
                       | SL_SI91X_BT_BLE_STACK_BYPASS_ENABLE),
                    .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
-                                              | RSI_CONFIG_FEATURE_BITMAP) },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                                              | RSI_CONFIG_FEATURE_BITMAP) }
 };
 
 const osThreadAttr_t thread_attributes = {
@@ -382,7 +373,6 @@ void rsi_ble_on_rcp_resp_rcvd(uint16_t status, rsi_ble_event_rcp_rcvd_info_t *re
   uint8_t ii;
   rx_uart_queue_t *rx_queue = &g_uart_rx_queue;
   rx_uart_pkt_t *rx_pkt     = NULL;
-  const uint8_t *rcp_hci    = (const uint8_t *)resp_buf - RSI_BLE_RCP_HCI_HDR_BEFORE_DATA;
 
   for (ii = 0; ii < MAX_UART_RX_QUEUE_SIZE; ii++) {
     rx_pkt = &g_uart_rx_pkt[ii];
@@ -390,7 +380,7 @@ void rsi_ble_on_rcp_resp_rcvd(uint16_t status, rsi_ble_event_rcp_rcvd_info_t *re
     if (rx_pkt != NULL) {
       if (rx_pkt->pkt_in_use == 0) {
         rx_pkt->pkt_in_use = 1;
-        rx_pkt->tx_buf[0]  = rcp_hci[0];
+        memcpy(rx_pkt->tx_buf, (resp_buf->data - 12), 1);
         switch (rx_pkt->tx_buf[0]) {
           case HCI_EVENT_PKT:
             rx_pkt->cmd_len = (uint16_t)resp_buf->data[1];
@@ -430,14 +420,6 @@ void get_pkt_length(void)
 }
 
 #ifndef SLI_SI91X_MCU_INTERFACE
-
-static void hci_uart_rx_sem_give(void)
-{
-  if (hci_uart_rx_sem != NULL) {
-    (void)osSemaphoreRelease(hci_uart_rx_sem);
-  }
-}
-
 /* NCP: synchronous UART � advance all HCI framing states in one call (SoC uses ISR per step). */
 static void read_user_packet_iostream_rx(void)
 {
@@ -448,7 +430,6 @@ static void read_user_packet_iostream_rx(void)
         status = iostream_rx(&rx_buffer[1], 2);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
-          hci_uart_rx_sem_give();
           return;
         }
         uart_rx_state = UART_READING_HCI_OPCODE;
@@ -459,7 +440,6 @@ static void read_user_packet_iostream_rx(void)
           status = iostream_rx((uint8_t *)&cmd_length, 1);
           if (status != SL_STATUS_OK) {
             SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
-            hci_uart_rx_sem_give();
             return;
           }
           uart_rx_state = UART_READING_HCI_LEN;
@@ -467,7 +447,6 @@ static void read_user_packet_iostream_rx(void)
           status = iostream_rx((uint8_t *)&cmd_length, 2);
           if (status != SL_STATUS_OK) {
             SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
-            hci_uart_rx_sem_give();
             return;
           }
           uart_rx_state = UART_READING_HCI_LEN;
@@ -492,7 +471,6 @@ static void read_user_packet_iostream_rx(void)
         status = iostream_rx(&rx_buffer[pkt_len], cmd_length);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "iostream_rx: Error Code : %lu ", (unsigned long)status);
-          hci_uart_rx_sem_give();
           return;
         }
         uart_rx_state = UART_RECEIVING_ACTUAL_PACKET;
@@ -504,7 +482,6 @@ static void read_user_packet_iostream_rx(void)
         return;
       }
       default:
-        hci_uart_rx_sem_give();
         return;
     }
   }
@@ -522,17 +499,13 @@ static void hci_iostream_rx_thread(void *argument)
   }
 
   for (;;) {
-    if (hci_uart_rx_sem != NULL) {
-      (void)osSemaphoreAcquire(hci_uart_rx_sem, osWaitForever);
+    status = iostream_rx(&rx_buffer[0], 1);
+    if (status != SL_STATUS_OK) {
+      SL_DEBUG_LOG_V2(ERROR, "iostream_rx first byte: Error Code : %lu ", (unsigned long)status);
+      continue;
     }
     uart_rx_state = UART_READING_HCI_PKT_TYPE;
     pkt_len       = 0;
-    status        = iostream_rx(&rx_buffer[0], 1);
-    if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "iostream_rx first byte: Error Code : %lu ", (unsigned long)status);
-      hci_uart_rx_sem_give();
-      continue;
-    }
     read_user_packet_iostream_rx();
   }
 }
@@ -774,11 +747,6 @@ void rsi_ble_hci_raw_task(void *argument)
     return;
   }
 #else
-  hci_uart_rx_sem = osSemaphoreNew(1, 1, NULL);
-  if (hci_uart_rx_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "hci_uart_rx_sem create failed");
-    return;
-  }
   (void)osThreadNew((osThreadFunc_t)hci_iostream_rx_thread, NULL, &hci_iostream_rx_thread_attributes);
 #endif
 
@@ -837,27 +805,25 @@ void rsi_ble_hci_raw_task(void *argument)
         __enable_irq();
 #else
         {
-
-          rx_uart_queue_t *rx_queue = &g_uart_rx_queue;
-
-          while ((rx_queue->pkt_cnt > 0)) {
-            rx_uart_pkt_t *rx_pkt = rx_queue->head;
-            if (rx_pkt == NULL) {
-              break;
-            }
-            status = iostream_tx(rx_pkt->tx_buf, (size_t)(rx_pkt->cmd_len + 1));
-            if (status != SL_STATUS_OK) {
-              SL_DEBUG_LOG_V2(DEBUG, "iostream_tx: Error Code : %lu ", status);
-              break;
-            }
-            rx_pkt->pkt_in_use = 0;
-            DEL_FROM_LIST(rx_queue);
-          }
-          if (g_uart_rx_queue.pkt_cnt > 0) {
-            rsi_ble_app_set_event(RSI_APP_EVENT_RCP);
-          }
-
           rsi_ble_app_clear_event(RSI_APP_EVENT_RCP);
+          rx_uart_queue_t *rx_queue = &g_uart_rx_queue;
+          if (rx_queue->pkt_cnt > 0) {
+            rx_uart_pkt_t *rx_pkt = rx_queue->head;
+            if (rx_pkt != NULL) {
+              status = iostream_tx(rx_pkt->tx_buf, (size_t)(rx_pkt->cmd_len + 1));
+              if (status != SL_STATUS_OK) {
+                SL_DEBUG_LOG_V2(DEBUG, "iostream_tx: Error Code : %lu ", status);
+              } else {
+                SL_DEBUG_LOG_V2(DEBUG, "iostream_tx success");
+              }
+              rx_pkt->pkt_in_use = 0;
+              DEL_FROM_LIST(rx_queue);
+              // Re-trigger event if more packets remain in queue
+              if (g_uart_rx_queue.pkt_cnt > 0) {
+                rsi_ble_app_set_event(RSI_APP_EVENT_RCP);
+              }
+            }
+          }
         }
 #endif
       } break;
@@ -870,8 +836,6 @@ void rsi_ble_hci_raw_task(void *argument)
       if (status != SL_STATUS_OK) {
         return;
       }
-#else
-      hci_uart_rx_sem_give();
 #endif
     }
   }
@@ -891,6 +855,7 @@ void app_init(void)
   extern sl_iostream_t *sl_iostream_rtt_handle;
   sl_iostream_recommended_console_stream = sl_iostream_rtt_handle;
 #endif
+
 #ifdef SLI_SI91X_MCU_INTERFACE
   rsi_ble_app_init_uart();
 #endif

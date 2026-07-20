@@ -26,7 +26,9 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
+#include <errno.h>
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -88,6 +90,8 @@ typedef enum {
 
 static no_token_action_t handle_no_more_tokens(console_argument_type_t type, int *arg_index, int *arg_count);
 
+static char *console_skip_at_command_prefix(char *command_line);
+
 sl_status_t console_tokenize(char *start,
                              const char *end,
                              char **token,
@@ -144,6 +148,15 @@ static no_token_action_t handle_no_more_tokens(console_argument_type_t type, int
   return NO_TOKEN_INVALID;
 }
 
+static char *console_skip_at_command_prefix(char *command_line)
+{
+  if (strncasecmp(command_line, "at+", 3) == 0) {
+    return command_line + 3;
+  }
+
+  return command_line;
+}
+
 sl_status_t console_parse_command(char *command_line,
                                   const console_database_t *db,
                                   console_args_t *args,
@@ -157,6 +170,8 @@ sl_status_t console_parse_command(char *command_line,
 
 #ifdef CONSOLE_SUB_COMMAND_SUPPORT
 #endif
+
+  command_line = console_skip_at_command_prefix(command_line);
 
   args->bitmap = 0;
 
@@ -188,7 +203,11 @@ sl_status_t console_parse_command(char *command_line,
       return SL_STATUS_OK;
     }
 
-    status = console_tokenize(command_line, command_line_end, &token, &command_line, SL_CONSOLE_TOKENIZE_ON_SPACE);
+    status = console_tokenize(command_line,
+                              command_line_end,
+                              &token,
+                              &command_line,
+                              SL_CONSOLE_TOKENIZE_ON_SPACE | SL_CONSOLE_TOKENIZE_ON_COMMA);
 
     // If no more tokens are available, verify there are only optional arguments left
     if (status != SL_STATUS_OK) {
@@ -379,8 +398,11 @@ sl_status_t console_find_command(char **string,
     *entry = NULL;
 
     // Find first token
-    status =
-      console_tokenize(iter, string_end, &token, &iter, SL_CONSOLE_TOKENIZE_ON_SPACE | SL_CONSOLE_TOKENIZE_ON_DOT);
+    status = console_tokenize(iter,
+                              string_end,
+                              &token,
+                              &iter,
+                              SL_CONSOLE_TOKENIZE_ON_SPACE | SL_CONSOLE_TOKENIZE_ON_DOT | SL_CONSOLE_TOKENIZE_ON_EQUAL);
     if (status != SL_STATUS_OK)
       return SL_STATUS_FAIL;
 
@@ -446,9 +468,21 @@ sl_status_t console_parse_arg(console_argument_type_t type, char *line, uint32_t
       *arg_result = strtoul(line, 0, 0);
       break;
 
-    case CONSOLE_ARG_INT:
-      *arg_result = strtoul(line, 0, 0);
+    case CONSOLE_ARG_INT: {
+      char *end = NULL;
+
+      errno      = 0;
+      long value = strtol(line, &end, 0);
+
+      if ((end == line) || (*end != '\0')) {
+        return SL_STATUS_COMMAND_IS_INVALID;
+      }
+      if ((value == LONG_MIN || value == LONG_MAX) && errno == ERANGE) {
+        return SL_STATUS_COMMAND_IS_INVALID;
+      }
+      *arg_result = (uint32_t)value;
       break;
+    }
 
     case CONSOLE_ARG_STRING:
       *arg_result = (uint32_t)line;
@@ -515,7 +549,7 @@ sl_status_t console_tokenize(char *start,
   char *i = start;
 
   // Ignore preceding space or null
-  while (*i == ' ' || *i == '\0') {
+  while (*i == ' ' || *i == '\0' || *i == ',' || *i == '.' || *i == '=') {
     ++i;
     if (i >= end) {
       return SL_STATUS_FAIL;
@@ -534,8 +568,8 @@ sl_status_t console_tokenize(char *start,
         // Token ignores " character
         *token = i + 1;
       }
-      // Verify that preceding character is space or end of string
-      if (i > start && (i[-1] != ' ' && i[-1] != '\0')) {
+      // Verify that preceding character is space/comma/dot/equal/end of string
+      if (i > start && (i[-1] != ' ' && i[-1] != ',' && i[-1] != '.' && i[-1] != '=' && i[-1] != '\0')) {
         return SL_STATUS_INVALID_PARAMETER;
       }
 
@@ -557,8 +591,8 @@ sl_status_t console_tokenize(char *start,
           return SL_STATUS_INVALID_PARAMETER;
         }
       }
-      // Verify that next character is space or end of string
-      if (i[1] != ' ' && i[1] != '\0' && &i[1] != end) {
+      // Verify that next character is space/comma/dot/equal/end of string
+      if (i[1] != ' ' && i[1] != ',' && i[1] != '.' && i[1] != '=' && i[1] != '\0' && &i[1] != end) {
         return SL_STATUS_INVALID_PARAMETER;
       }
       // Remove " from string end
@@ -580,8 +614,10 @@ sl_status_t console_tokenize(char *start,
 
       // Ordinary splitting
     } else if (((options & SL_CONSOLE_TOKENIZE_ON_SPACE) && *i == ' ')
-               || ((options & SL_CONSOLE_TOKENIZE_ON_DOT) && *i == '.')) {
-      // Turn space into '\0' to indicate end of string
+               || ((options & SL_CONSOLE_TOKENIZE_ON_DOT) && *i == '.')
+               || ((options & SL_CONSOLE_TOKENIZE_ON_EQUAL) && *i == '=')
+               || ((options & SL_CONSOLE_TOKENIZE_ON_COMMA) && *i == ',')) {
+      // Turn space/comma/dot/equal into '\0' to indicate end of string
       *i         = '\0';
       *token_end = i;
       return SL_STATUS_OK;

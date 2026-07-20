@@ -213,7 +213,7 @@ extern "C" {
 
 // <q SL_SI91X_WC_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA> Roaming Mode selection
 // <i> Selects between de-authentication or null data (with power management bit set) for roaming.
-// <i> If this bit is enabled then roam through DEAUTH, or roam through NULL.
+// <i> If this bit is enabled, the station roams using a null data frame (with the power management bit set). If disabled (default), it roams using a de-authentication frame.
 // <i> Enable or disable.
 // <i> Default: Disable
 #define SL_SI91X_WC_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA 0

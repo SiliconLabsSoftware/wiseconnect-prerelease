@@ -142,20 +142,8 @@
    * This feature, when enabled, permits the execution of socket commands even if the Wi-Fi connection has not been established.
    * 
    * @note If this feature is disabled, issuing socket commands before the device obtains an IP address will result in an invalid state error.
-   * @note Bit(16) is used internally by SDK. Bit(17) is reserved and must be set to 0.
    */
 #define SL_WIFI_FEAT_SOCKET_CMDS_ALLOW_BEFORE_WLAN_CONNECTION BIT(18)
-
-/**
-   * @def SL_WIFI_FEAT_CLEAR_SCAN_RESULTS_AFTER_USE
-   * @brief Flush cached scan/BSS entries after scan results are used.
-   * @details
-   * Enables automatic clearing of cached scan/BSS entries once scan results
-   * are consumed.
-   * 
-   * @note Bits 19-20 are reserved. Must be set to 0.
-   */
-#define SL_WIFI_FEAT_CLEAR_SCAN_RESULTS_AFTER_USE BIT(21)
 
 /**
  * @def SL_WIFI_FEAT_SECURE_ATTESTATION
@@ -163,8 +151,7 @@
  * @details
  * Enables secure attestation functionality.
  * 
- * @note Bits 22-29 and bit 31 are reserved.
- * @note Reserved bits must be set to 0.
+ * @note Bit(16) is used internally by SDK. Bits 17-29 and bit 31 are reserved.
  */
 #define SL_WIFI_FEAT_SECURE_ATTESTATION BIT(30)
 
@@ -241,11 +228,18 @@
 #define SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS(max_num_of_clients) (max_num_of_clients << 13)
 
 /**
-   * @def SL_WIFI_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA
+   * @def SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA
    * @brief Selects between de-authentication or null data (with power management bit set) for roaming.
-   * @details If this bit is enabled then roam through DEAUTH, or roam through NULL.
+   * @details If this bit is enabled, the station roams using a null data frame (with the power management bit set). If disabled (default), it roams using a de-authentication frame.
    */
-#define SL_WIFI_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA BIT(17)
+#define SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA BIT(17)
+
+/**
+ * @def SL_WIFI_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA
+ * @brief Alias for SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA
+ * @note The macro SL_WIFI_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA is being deprecated and will be removed in the future. Please use SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA instead.
+ */
+#define SL_WIFI_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA
 
 /**
    * @def SL_WIFI_CUSTOM_FEAT_TRIGGER_AUTO_CONFIG
@@ -1171,9 +1165,10 @@
 /**
  * @def SL_SI91X_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA
  * @brief Selects between de-authentication or null data (with power management bit set) for roaming.
- * @details If this bit is enabled then roam through DEAUTH, or roam through NULL.
+ * @details If this bit is enabled, the station roams using a null data frame (with the power management bit set). If disabled (default), it roams using a de-authentication frame.
+ * @note The macro SL_SI91X_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA is being deprecated and will be removed in the future. Please use SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA instead.
  */
-#define SL_SI91X_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA SL_WIFI_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA
+#define SL_SI91X_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA
 
 /**
  * @def SL_SI91X_CUSTOM_FEAT_TRIGGER_AUTO_CONFIG
@@ -1257,8 +1252,7 @@
 /**
  * @def SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID
  * @brief Alias for SL_SI91X_CUSTOM_FEAT_EXTENSION_VALID
- * @details Ensure smooth migration to SL_SI91X_CUSTOM_FEAT_EXTENSION_VALID the
- *          deprecation
+ * @details Ensure smooth migration to SL_SI91X_CUSTOM_FEAT_EXTENSION_VALID
  * @note The macro SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID is being deprecated and
  *       will be removed in the future. Please use
  *       SL_SI91X_CUSTOM_FEAT_EXTENSION_VALID instead.
@@ -1890,8 +1884,7 @@
 /**
  * @def SL_SI91X_CONFIG_FEAT_EXTENTION_VALID
  * @brief Alias for SL_SI91X_CONFIG_FEAT_EXTENSION_VALID
- * @details Ensure smooth migration to SL_SI91X_CONFIG_FEAT_EXTENSION_VALID the
- *          deprecation
+ * @details Ensure smooth migration to SL_SI91X_CONFIG_FEAT_EXTENSION_VALID
  * @note The macro SL_SI91X_CONFIG_FEAT_EXTENTION_VALID is being deprecated and
  *       will be removed in the future. Please use SL_SI91X_CONFIG_FEAT_EXTENSION_VALID
  *       instead.
@@ -2026,7 +2019,6 @@
  * @def SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENTION_VALID
  * @brief Alias for SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENSION_VALID
  * @details Ensure smooth migration to SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENSION_VALID
- *          the deprecation
  * @note The macro SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENTION_VALID is being
  *       deprecated and will be removed in the future. Please use
  *       SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENSION_VALID instead.
@@ -2784,7 +2776,7 @@ typedef struct {
 /**
  * @struct sl_si91x_rsp_wireless_info_t
  * @brief si91x Specific Wireless information.
- * @note This structure is deprecated. Use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-interface-info-t) for new implementations.
+ * @note This structure is deprecated. Use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-interface-info-t) for new implementations.
  */
 typedef struct {
 
@@ -2855,10 +2847,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_client_configuration
                       | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS)),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map  = 0 }
 };
 
 /// Default Wi-Fi enterprise client configuration
@@ -2885,10 +2874,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_enterprise_client_co
                       | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS)),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map  = 0 }
 };
 
 /// Default Wi-Fi ap configuration
@@ -2912,10 +2898,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_ap_configuration = {
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = 0 }
 };
 
 /// Default Wi-Fi concurrent (AP + STATION) configuration
@@ -2939,10 +2922,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_configura
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
 };
 
 /// Default Wi-Fi concurrent (AP + STATION) configuration
@@ -2969,10 +2949,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_v6_config
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
 };
 
 /// Default Wi-Fi transmit configuration
@@ -3001,10 +2978,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transmit_test_config
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
 };
 
 /// Default Wi-Fi transceiver mode configuration
@@ -3032,10 +3006,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transceiver_configur
                    .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = 0 }
 };
 
 /// The typedefs in the below header depends on the structs defination in this .h

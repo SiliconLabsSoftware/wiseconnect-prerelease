@@ -171,15 +171,14 @@ The following table shows the possible combinations and the available options to
 
 The SiWx917 clock subsystem is designed to facilitate dynamic adjustments of the clock source and frequency for various functionalities, enabling fine-tuning of power usage and performance for specific applications. This subsystem supports the configuration of on-chip clocks, including ULP clock oscillators, high-frequency PLLs, and clocks for the processor and peripherals (including MCU HP, MCU ULP, and UULP Vbat).
 
-> **Note**
-> **`CLK_CONFIG_REG2` (M4CLK `0x46000000` + `0x01C`) field names:** The [SiWx917 family RM](https://www.silabs.com/documents/public/reference-manuals/siw917x-family-rm.pdf) and WiseConnect `si91x_device.h` use different labels for the same bits:
+> **Note — `CLK_CONFIG_REG2` (M4CLK `0x46000000` + `0x01C`) field names:** The [SiWx917 family RM](https://www.silabs.com/documents/public/reference-manuals/siw917x-family-rm.pdf) and WiseConnect `si91x_device.h` use different labels for the same bits:
 >
 > | Family RM (example names) | SDK (`CLK_CONFIG_REG2_b`) |
 > | ------------------------- | --------------------------- |
 > | `USART0_*`                | `USART1_*`                  |
 > | `UART1_*`                 | `USART2_*`                  |
 >
-> **`USART3_*`** appears only in the SDK for this register. If your RM omits it, ignore the field.
+> **`USART3_*`** appears only in the SDK for this register; if your RM omits it, ignore that field.
 
 **High-Frequency Clocks:**
   * 40MHZ_XTAL_CLK
@@ -388,7 +387,7 @@ The wakeup mode defines the bootloader sequence the SiWx917 will undergo once it
 >**Note:**
 >* rsi_deepsleep_soc.c file should compiled to SRAM.
 >
->* Refer to the [Wi-Fi - TCP Tx on Periodic Wakeup (SoC)](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/examples/snippets/wlan/tcp_tx_on_periodic_wakeup) example for a detailed >example of M4 sleep wakeup.
+>* Refer to the [Wi-Fi - TCP Tx on Periodic Wakeup (SoC)](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/examples/snippets/wlan/tcp_tx_on_periodic_wakeup) example for a detailed >example of M4 sleep wakeup.
 >
 >* Enable SL_SI91X_ENABLE_LOWPWR_RET_LDO macro to optimize the deepsleep >power number. By default, it is disabled.
 >
@@ -466,7 +465,7 @@ SL Log provides:
   removes lower-priority calls from the binary.
 - Runtime level control through `sl_log_set_loglevel()` /
   `sl_log_get_loglevel()`.
-- Configurable maximum argument count per log call (`SL_LOG_CONFIG_ARG`, set in UC as **CONFIG_MAX_ARGS**, dropdown **0**–**10**, default **3**)
+- Configurable max argument count per log call (`SL_LOG_CONFIG_ARG`, set in UC as **CONFIG_MAX_ARGS**, dropdown **0**–**10**, default **3**)
   and configurable ring-buffer depth (`SL_LOG_NUMBER_OF_EVENTS`, set in UC as **No of Logs**, range 1–255, default **128**).
 - Multiple backends selected at the component level:
   - **Log Backend I/O Stream – Compact Binary Output** or **Log Backend I/O Stream – Formatted Output** (`log_backend_iostream` transport shim) over **IO Stream RTT** or UART (VCOM).
@@ -483,27 +482,6 @@ SL Log provides:
   SiWx91x.
 - Power-aware integration (`sl_log_pre_sleep_process`,
   `sl_log_post_sleep_process`) so logs survive normal low-power transitions.
-
-### SL_DEBUG_LOG_V2
-
-`SL_DEBUG_LOG_V2` is a convenience wrapper around the `SL_PRINT_STRING_*` macros. It is defined in `sl_constants.h`, and used by the SDK components and examples in level-tagged diagnostics.
-
-```c
-SL_DEBUG_LOG_V2(INFO,  "message\r\n");
-SL_DEBUG_LOG_V2(ERROR, "failed: 0x%lX", (unsigned long)status);
-```
-
-The `level` argument is one of `DEBUG`, `INFO`, `WARN`, or `ERROR`.
-
-**Platform support**
-
-| Platform | Behavior |
-|----------|----------|
-| Silicon Labs SoC (SiWx91x) | Expands to `SL_PRINT_STRING_<level>` → SL Log backend |
-| Silicon Labs NCP (EFR32 host boards only) | Same as SoC — expands to `SL_PRINT_STRING_<level>` → SL Log backend |
-| All other host boards | Expands to `printf`-style output via `sl_debug_log()` |
-
-For SoC and EFR NCP builds, include `sl_constants.h` only. For other hosts, output is displayed on the host console. If configured, log level filtering uses `SLI_HOST_CURRENT_DBGLOG_LEVEL`.
 
 ### Architecture
 
@@ -552,7 +530,7 @@ The recommended path has three stages.
 
 #### Stage 1 – Coexistence (no source changes to legacy code)
 
-Goal: Keep the customer’s existing log path unchanged, and capture
+Goal: Keep the customer’s existing log path exactly as it is, and capture
 SL Log output on a separate backend. Drivers and services that already
 emit through `SL_PRINT_STRING_*` start producing usable output without
 disturbing legacy `printf` / `DEBUGOUT` traffic.
@@ -1129,7 +1107,7 @@ The Lite configuration is used for 4 MB SoC OPN where 1.3 MB is allocated for th
 The `SLI_SI91X_MCU_4MB_LITE_IMAGE` macro will be enabled if the **lite_image_for_4mb** component is installed.
 
 For low-power M4 sleep states such as PS2, PS3, and PS4, certain files must be run from RAM memory. Refer to [Power manager integration guide](
-https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) for more details.
+https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) for more details.
 
 #### SL_SI91X_ENABLE_GCC_LTO
 
@@ -1274,5 +1252,5 @@ For further assistance and support, please contact:
 | Getting Started with WiSeConnect | [Getting Started](http://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) |
 | NVM3 - NVM Data Manager | [NVM3 Documentation](https://docs.silabs.com/gecko-platform/3.1/driver/api/group-nvm3) |
 | Third Generation NonVolatile Memory (NVM3) Data Storage | [NVM3 Application Note](https://www.silabs.com/documents/public/application-notes/an1135-using-third-generation-nonvolatile-memory.pdf) |
-| Power Manager Integration Guide | [Power Manager Integration Guide](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) |
+| Power Manager Integration Guide | [Power Manager Integration Guide](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) |
 | SiWx917 Reference Manual | Contact [Silicon Labs Sales](https://www.silabs.com/about-us/contact-sales) for access. |

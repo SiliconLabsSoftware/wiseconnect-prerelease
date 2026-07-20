@@ -757,8 +757,7 @@ int32_t rsi_ble_conn_param_resp(const uint8_t *remote_dev_address, uint8_t statu
  *                            0x00 - Display Only \n
  *                            0x01 - Display Yes/No \n
  *                            0x02 - Keyboard Only \n
- *                            0x03 - No Input No Output \n
- *                            0x04 - Keyboard Display \n
+ *                            0x03 - No Input No Output
  * @param[in]  mitm_req - MITM enable/disable \n
  *                       0 - Disable \n
  *                       1 - Enable
@@ -884,8 +883,7 @@ int32_t rsi_ble_ltk_req_reply(uint8_t *remote_dev_address, uint8_t reply_type, c
  *                            0x00 - Display Only \n
  *                            0x01 - Display Yes/No \n
  *                            0x02 - Keyboard Only \n
- *                            0x03 - No Input No Output \n
- *                            0x04 - Keyboard Display \n
+ *                            0x03 - No Input No Output
  * @param[in]  mitm_req -  MITM Request info \n
  *                        0 - Disable \n
  *                        1 - Enable

@@ -1,14 +1,9 @@
 # Wi-Fi - Multithread sockets
 
-## High-Level Overview
-
-SiWx91x multithreaded sockets example: run multiple concurrent TCP/UDP socket operations across RTOS threads after connecting to Wi-Fi on SoC and NCP modes.
-
 ## Table of Contents
 
 - [Wi-Fi - Multithread sockets](#wi-fi---Multithread sockets)
   - [Table of Contents](#table-of-contents)
-  - [High-Level Overview](#high-level-overview)
   - [Purpose/Scope](#purposescope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -27,11 +22,8 @@ SiWx91x multithreaded sockets example: run multiple concurrent TCP/UDP socket op
       - [TCP Tx Throughput](#tcp-tx-throughput)
       - [TCP Rx Throughput](#tcp-rx-throughput)
       - [TLS Tx Throughput](#tls-tx-throughput)
-      - [TLS Rx Throughput](#tls-rx-throughput)  
-  - [Troubleshooting](#troubleshooting)
-  - [Resources](#resources)
-  - [Report Bugs and Get Support](#report-bugs-and-get-support)
-
+      - [TLS Rx Throughput](#tls-rx-throughput)
+  
 ## Purpose/Scope
 
 This application demonstrates the procedure to measure WLAN UDP/TCP/TLS throughput by configuring the SiWx91x in client/server role. In this application, the SiWx91x connects to a Wi-Fi access point, obtains an IP address, and connects to an iPerf server/client or Python-based TLS scripts running on a remote PC. It then measures Tx/Rx throughput transmitted/received from the remote PC. Additionally, the application supports multithreaded operations, enabling simultaneous measurement of throughput across multiple connections or roles. This feature allows the SiWx91x to efficiently handle concurrent Tx and Rx streams or multiple client/server instances, thereby maximizing performance.
@@ -44,28 +36,23 @@ This application demonstrates the procedure to measure WLAN UDP/TCP/TLS throughp
 - Wireless Access Point
 - **SoC Mode**:
   - Standalone
-    - BRD4002A Wireless pro kit mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
     - Radio Boards
-      - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
-      - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
-      - BRD4339B [SiWx917-RB4339B](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
-      - BRD4340A [SiWx917-RB4340A](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
-      - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
-      - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+      - BRD4338A [SiWx917-RB4338A]
+      - BRD4342A [SiWx917-RB4342A]
+      - BRD4343A [SiWx917-RB4343A]
   - Kits
-    - SiWG917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
     - SiWx917 Pro Kit [Si917-PK6031A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-pro-kit?tab=overview)
     - SiWx917 Pro Kit [Si917-PK6032A]
-    - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit?tab=overview)
+    - SiWx917 AC1 Module Explorer Kit (BRD2708A)
 
 - **NCP Mode**:
   - Standalone
-    - BRD4002A Wireless pro kit mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
     - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
     - NCP Expansion Kit with NCP Radio boards
-      - [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
-      - [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
-      - [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
+      - (BRD4346A + BRD8045A) [SiWx917-EB4346A]
+      - (BRD4357A + BRD8045A) [SiWx917-EB4357A]
   - Kits
     - EFR32xG24 Pro Kit +10 dBm [xG24-PK6009A](https://www.silabs.com/development-tools/wireless/efr32xg24-pro-kit-10-dbm?tab=overview)
 
@@ -571,23 +558,4 @@ To measure TLS RX throughput, configure the SiWx91x as a TLS client and open a T
 
 > **Note:**
 > The captured reference images are measured in an isolated chamber. However, variations can be observed if Throughputs measured in dense environments that is, in a dense environment we can observe less throughput.
-## Troubleshooting
 
-If you encounter issues while running this example, check the following:
-
-- Verify Wi-Fi credentials and socket IP/port settings for each thread in `app.c`.
-- Ensure socket pool macros match the number of concurrent sockets opened.
-- Start remote servers before the DUT threads attempt to connect.
-- Review thread priorities and stack sizes if connections fail under load.
-
-## Resources
-
-- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
-- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
-- [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
-
-## Report Bugs and Get Support
-
-Report issues and get help from the Silicon Labs community:
-
-- [Silicon Labs Community](https://www.silabs.com/community)

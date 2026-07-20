@@ -2776,7 +2776,7 @@
         <command name="set_roam_configuration" index="0x02">
             <description>
                 Set the Wi-Fi roaming configuration.
-                Ensure that both SL_WIFI_CUSTOM_FEAT_ASYNC_CONNECTION_STATUS and SL_WIFI_CUSTOM_FEAT_ROAM_WITH_DEAUTH_OR_NULL_DATA
+                Ensure that both SL_WIFI_CUSTOM_FEAT_ASYNC_CONNECTION_STATUS and SL_WIFI_CUSTOM_FEAT_ROAM_WITH_NULL_DATA
                 are enabled in the custom feature bitmap by calling the sl_wifi_net_intf_set_si91x_boot_config() command. Additionally,
                 ensure that the sl_wifi_set_advanced_scan_configuration() command is called before invoking this command.
             </description>
@@ -2978,7 +2978,7 @@
                 </param>
                 <param name="version" type="uint32" enum="mqtt_client_mqtt_version">
                     <description>
-                        MQTT protocol version used by the client. Only MQTT version 3.1.1 is supported by the Network Wireless Processor (NWP).
+                        MQTT protocol version used by the client.
                     </description>
                 </param>
                 <param name="client_port" type="uint16">
@@ -3045,17 +3045,12 @@
         <enums name="mqtt_version" title="mqtt_version">
             <enum name="mqtt_version_v3" value="0x00">
                 <description>
-                    MQTT protocol version 3.0 (currently not supported).
+                    MQTT protocol version 3.0.
                 </description>
             </enum>
             <enum name="mqtt_version_v3_1" value="0x01">
                 <description>
-                    MQTT protocol version 3.1 (currently not supported).
-                </description>
-            </enum>
-            <enum name="mqtt_version_v3_1_1" value="0x02">
-                <description>
-                    MQTT protocol version 3.1.1.
+                    PMQTT protocol version 3.1.
                 </description>
             </enum>
         </enums>

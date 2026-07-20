@@ -153,7 +153,7 @@ uint32_t sl_log_hal_get_timestamp_timer_frequency(uint8_t core_id);
  * @param[in] args    Optional arguments (currently unused)
  * @return SL_STATUS_OK on success or an sl_status_t error code
  */
-sl_status_t sl_log_hal_timer_sync(void *args, uint8_t core_id);
+sl_status_t sl_log_hal_timer_sync(const void *args, uint8_t core_id);
 
 /**
  * @brief Prepare logging subsystem before entering sleep.
@@ -164,7 +164,7 @@ sl_status_t sl_log_hal_timer_sync(void *args, uint8_t core_id);
  * @param[in] config Pointer to logging configuration
  * @return SL_STATUS_OK on success or an sl_status_t error code
  */
-sl_status_t sl_log_hal_pre_sleep_process(void *config);
+sl_status_t sl_log_hal_pre_sleep_process(const void *config);
 
 /**
  * @brief Restore logging subsystem after wake-up from sleep.
@@ -174,7 +174,7 @@ sl_status_t sl_log_hal_pre_sleep_process(void *config);
  * @param[in] config Pointer to logging configuration
  * @return SL_STATUS_OK on success or an sl_status_t error code
  */
-sl_status_t sl_log_hal_post_sleep_process(void *config);
+sl_status_t sl_log_hal_post_sleep_process(const void *config);
 
 /**
  * @brief Get the platform-specific logging configuration.
@@ -192,7 +192,7 @@ sl_status_t sl_log_hal_get_configuration(void *args, uint8_t core_id);
  * @param[in] core_id Core identifier
  * @return SL_STATUS_OK currently always returned
  */
-sl_status_t sl_log_hal_set_configuration(void *args, uint8_t core_id);
+sl_status_t sl_log_hal_set_configuration(const void *args, uint8_t core_id);
 
 /***************************************************************************/ /**
  * @brief Write multiple log events into the ring buffer.
@@ -410,7 +410,7 @@ uint32_t sl_log_hal_get_timestamp_timer_frequency(uint8_t core_id)
  * @param config configuration pointer
  * @return sl_status_t  Status of the operation.
  */
-sl_status_t sl_log_hal_pre_sleep_process(void *config)
+sl_status_t sl_log_hal_pre_sleep_process(const void *config)
 {
   sl_status_t status = SL_STATUS_OK;
   (void)config;
@@ -436,7 +436,7 @@ sl_status_t sl_log_hal_pre_sleep_process(void *config)
  * @param config configuration pointer
  * @return sl_status_t  Status of the operation.
  */
-sl_status_t sl_log_hal_post_sleep_process(void *config)
+sl_status_t sl_log_hal_post_sleep_process(const void *config)
 {
   // Implementation for post-sleep process
   (void)config;
@@ -461,7 +461,7 @@ sl_status_t sl_log_hal_post_sleep_process(void *config)
  * @param args  Pointer to additional arguments if any
  * @return sl_status_t  Status of the operation.
  */
-sl_status_t sl_log_hal_timer_sync(void *args, uint8_t core_id)
+sl_status_t sl_log_hal_timer_sync(const void *args, uint8_t core_id)
 {
   (void)core_id;
   (void)args;
@@ -537,7 +537,7 @@ sl_status_t sl_log_hal_get_configuration(void *args, uint8_t core_id)
  * @param core_id  Core identifier
  * @return sl_status_t 
  */
-sl_status_t sl_log_hal_set_configuration(void *args, uint8_t core_id)
+sl_status_t sl_log_hal_set_configuration(const void *args, uint8_t core_id)
 {
   (void)args;
   (void)core_id;

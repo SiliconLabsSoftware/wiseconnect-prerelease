@@ -329,19 +329,19 @@ static int wifi_app_ssl_16k_demo(void)
   server_address.sin_port   = SSL_16K_DEMO_SERVER_PORT_1;
   status                    = sl_net_inet_addr(SSL_16K_DEMO_SERVER_IP, (uint32_t *)&server_address.sin_addr.s_addr);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: invalid server IP\r\n");
+    LOG_PRINT("\r\n16k SSL demo: invalid server IP\r\n");
     return -1;
   }
 
   /* Create first socket and set TLS 1.2 */
   client_socket_1 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket_1 < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 1 create failed, errno %d\r\n", errno);
+    LOG_PRINT("\r\n16k SSL demo: socket 1 create failed, errno %d\r\n", errno);
     return -1;
   }
   r = setsockopt(client_socket_1, SOL_TCP, TCP_ULP, TLS_1_2, sizeof(TLS_1_2));
   if (r < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 1 setsockopt TLS failed, errno %d\r\n", errno);
+    LOG_PRINT("\r\n16k SSL demo: socket 1 setsockopt TLS failed, errno %d\r\n", errno);
     close(client_socket_1);
     return -1;
   }
@@ -349,13 +349,13 @@ static int wifi_app_ssl_16k_demo(void)
   /* Create second socket and set TLS 1.2 */
   client_socket_2 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_socket_2 < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 2 create failed, errno %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 2 create failed, errno %d", errno);
     close(client_socket_1);
     return -1;
   }
   r = setsockopt(client_socket_2, SOL_TCP, TCP_ULP, TLS_1_2, sizeof(TLS_1_2));
   if (r < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 2 setsockopt TLS failed, errno %d\r\n", errno);
+    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 2 setsockopt TLS failed, errno %d", errno);
     close(client_socket_1);
     close(client_socket_2);
     return -1;
@@ -363,33 +363,33 @@ static int wifi_app_ssl_16k_demo(void)
 
   /* Connect each socket in sequence to the same server (two concurrent TLS sessions after both succeed). */
   if (connect(client_socket_1, (struct sockaddr *)&server_address, socket_length) < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 1 connect failed, errno %d\r\n", errno);
+    LOG_PRINT("\r\n16k SSL demo: socket 1 connect failed, errno %d\r\n", errno);
     close(client_socket_1);
     close(client_socket_2);
     return -1;
   }
   server_address.sin_port = SSL_16K_DEMO_SERVER_PORT_2;
   if (connect(client_socket_2, (struct sockaddr *)&server_address, socket_length) < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 2 connect failed, errno %d\r\n", errno);
+    LOG_PRINT("\r\n16k SSL demo: socket 2 connect failed, errno %d\r\n", errno);
     close(client_socket_1);
     close(client_socket_2);
     return -1;
   }
-  SL_DEBUG_LOG_V2(INFO, "16k SSL demo: 2 TLS connections up (sequential connects, same server)\r\n");
+  LOG_PRINT("\r\n16k SSL demo: 2 TLS connections up (sequential connects, same server)\r\n");
 
   /* Optional: send a short payload on each socket to prove the path */
   const char *buffer1 = "Hello from Socket 1";
   const char *buffer2 = "Hello from Socket 2";
   r                   = send(client_socket_1, buffer1, strlen(buffer1), 0);
   if (r < 0 && errno != ENOBUFS) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 1 send failed, errno %d\r\n", errno);
+    LOG_PRINT("\r\n16k SSL demo: socket 1 send failed, errno %d\r\n", errno);
     close(client_socket_1);
     close(client_socket_2);
     return -1;
   }
   r = send(client_socket_2, buffer2, strlen(buffer2), 0);
   if (r < 0 && errno != ENOBUFS) {
-    SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: socket 2 send failed, errno %d\r\n", errno);
+    LOG_PRINT("\r\n16k SSL demo: socket 2 send failed, errno %d\r\n", errno);
     close(client_socket_1);
     close(client_socket_2);
     return -1;
@@ -397,7 +397,7 @@ static int wifi_app_ssl_16k_demo(void)
 
   close(client_socket_1);
   close(client_socket_2);
-  SL_DEBUG_LOG_V2(INFO, "16k SSL demo: finished (2 TLS sessions)\r\n");
+  SL_DEBUG_LOG_V2(INFO, "16k SSL demo: finished (2 TLS sessions)");
   return 0;
 }
 
@@ -417,7 +417,7 @@ static int wifi_app_init_and_reconnect(void)
   if (sec_type != SL_WIFI_OPEN) {
     status = sl_net_set_credential(id, SL_NET_WIFI_PSK, pwd, strlen((char *)pwd));
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Reconnect: set credential failed: 0x%lX\r\n", status);
+      SL_DEBUG_LOG_V2(ERROR, "Reconnect: set credential failed: 0x%lX", status);
       disconnected = 1;
       return -1;
     }
@@ -434,7 +434,7 @@ static int wifi_app_init_and_reconnect(void)
 
   status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Reconnect: sl_wifi_connect failed: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Reconnect: sl_wifi_connect failed: 0x%lX", status);
     disconnected = 1;
     return -1;
   }
@@ -444,7 +444,7 @@ static int wifi_app_init_and_reconnect(void)
   ip_address.host_name = DHCP_HOST_NAME;
   status               = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Reconnect: IP config failed: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Reconnect: IP config failed: 0x%lX", status);
     disconnected = 1;
     return -1;
   }
@@ -563,7 +563,7 @@ int32_t rsi_wlan_mqtt_certs_init(void)
 #if (SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO == 0)
   status = load_certificates_in_flash();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificates: 0x%lx\r\n", status);
+    LOG_PRINT("\r\nUnexpected error while loading certificates: 0x%lx\r\n", status);
     return status;
   }
 #endif
@@ -818,10 +818,9 @@ void wifi_app_task(void)
         int32_t ble_result;
         osMessageQueueGet(ble_disable_done_queue, &ble_result, NULL, osWaitForever);
         if (ble_result != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "BLE disable failed (0x%lx), skipping 16k SSL demo.\r\n", (unsigned long)ble_result);
+          SL_DEBUG_LOG_V2(ERROR, "BLE disable failed (0x%lx), skipping 16k SSL demo.", (unsigned long)ble_result);
           disconnected = 1;
         }
-        SL_DEBUG_LOG_V2(INFO, "BLE disabled\r\n");
 
         if (!disconnected) {
           status = sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0),
@@ -829,10 +828,10 @@ void wifi_app_task(void)
                                          cacert,
                                          sizeof(cacert) - 1);
           if (status != SL_STATUS_OK) {
-            SL_DEBUG_LOG_V2(ERROR, "16k demo: Certificate loading failed: 0x%lx\r\n", status);
+            LOG_PRINT("\r\n16k demo: Certificate loading failed: 0x%lx\r\n", status);
             disconnected = 1;
           } else {
-            SL_DEBUG_LOG_V2(INFO, "16k demo: Certificate loading successful\r\n");
+            LOG_PRINT("\r\n16k demo: Certificate loading successful\r\n");
           }
         }
 
@@ -845,7 +844,7 @@ void wifi_app_task(void)
         }
         status = sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: sl_wifi_disconnect failed: 0x%lX\r\n", status);
+          SL_DEBUG_LOG_V2(ERROR, "16k SSL demo: sl_wifi_disconnect failed: 0x%lX", status);
           disconnected = 1;
           wifi_app_set_event(WIFI_APP_DISCONNECTED_STATE);
           break;
@@ -853,18 +852,16 @@ void wifi_app_task(void)
         wifi_app_send_to_ble(WIFI_APP_BLE_ENABLE_REQUEST, NULL, 0);
         osMessageQueueGet(ble_enable_done_queue, &ble_result, NULL, osWaitForever);
         if (ble_result != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "BLE re-enable failed (0x%lx), skipping MQTT.\r\n", (unsigned long)ble_result);
+          SL_DEBUG_LOG_V2(ERROR, "BLE re-enable failed (0x%lx), skipping MQTT.", (unsigned long)ble_result);
           disconnected = 1;
           wifi_app_set_event(WIFI_APP_DISCONNECTED_STATE);
           break;
         }
-        SL_DEBUG_LOG_V2(INFO, "BLE re-enabled\r\n");
-
         if (!disconnected) {
           if (wifi_app_init_and_reconnect() != 0) {
-            SL_DEBUG_LOG_V2(ERROR, "16k demo: wifi reconnect failed\r\n");
+            LOG_PRINT("\r\n16k demo: wifi reconnect failed\r\n");
           } else {
-            SL_DEBUG_LOG_V2(INFO, "16k demo: wifi reconnect successful\r\n");
+            LOG_PRINT("\r\n16k demo: wifi reconnect successful\r\n");
           }
         }
 
@@ -872,9 +869,9 @@ void wifi_app_task(void)
           status = load_certificates_in_flash();
           if (status != SL_STATUS_OK) {
             disconnected = 1;
-            SL_DEBUG_LOG_V2(ERROR, "Certificate loading failed: 0x%lx\r\n", status);
+            LOG_PRINT("\r\nCertificate loading failed: 0x%lx\r\n", status);
           } else {
-            SL_DEBUG_LOG_V2(INFO, "Certificate loading successful\r\n");
+            LOG_PRINT("\r\nCertificate loading successful\r\n");
           }
         }
 
@@ -889,7 +886,7 @@ void wifi_app_task(void)
 
         wifi_app_mqtt_task();
 
-        SL_DEBUG_LOG_V2(INFO, "WIFI App IPCONFIG Done State\r\n");
+        SL_DEBUG_LOG_V2(INFO, "WIFI App IPCONFIG Done State");
       } break;
 
       case WIFI_APP_ERROR_STATE: {
@@ -906,7 +903,7 @@ void wifi_app_task(void)
         int32_t ble_result;
         osMessageQueueGet(ble_enable_done_queue, &ble_result, NULL, osWaitForever);
         if (ble_result != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "BLE re-enable failed (0x%lx) in disconnect path\r\n", (unsigned long)ble_result);
+          LOG_PRINT("\r\nBLE re-enable failed (0x%lx) in disconnect path.\r\n", (unsigned long)ble_result);
           retry = 0;
         }
 #endif
@@ -914,7 +911,7 @@ void wifi_app_task(void)
         wifi_app_send_to_ble(WIFI_APP_DISCONNECTION_STATUS, (uint8_t *)&disconnected, 1);
         wifi_app_set_event(WIFI_APP_FLASH_STATE);
 
-        SL_DEBUG_LOG_V2(INFO, "WIFI App Disconnected State\r\n");
+        LOG_PRINT("WIFI App Disconnected State\r\n");
       } break;
 
       case WIFI_APP_DISCONN_NOTIFY_STATE: {
@@ -1060,7 +1057,7 @@ void wifi_app_mqtt_task(void)
             // If the client is attempting to reconnect we will skip the rest of the loop.
             continue;
           }
-          SL_DEBUG_LOG_V2(ERROR, "Unable to set Auto Reconnect to true \r\n");
+          SL_DEBUG_LOG_V2(ERROR, "Unable to set Auto Reconnect to true ");
           wlan_app_cb.state = WIFI_APP_MQTT_AUTO_RECONNECT_SET_STATE;
         } else {
           wlan_app_cb.state = WIFI_APP_MQTT_SUBSCRIBE_STATE;

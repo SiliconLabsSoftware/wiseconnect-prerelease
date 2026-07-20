@@ -40,25 +40,25 @@
 #include "sl_si91x_sha3.h"
 
 /******************************************************
-  *                    Constants
-  ******************************************************/
+ *                    Constants
+ ******************************************************/
 // NIST SHA3 short test vector (length = 56 bytes)
 char message[] = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
 
 /*
-  * SHA3 multi-rate padding (pad10*1) with the SHA3 domain separator 0x06.
-  *
-  * The si91x firmware does NOT apply SHA3 padding internally, so the
-  * message must be pre-padded by the application before calling
-  * sl_si91x_sha() with a SHA3 mode. Without this padding the resulting
-  * digest will not match the standard NIST SHA3 vectors.
-  *
-  * Rate (in bytes) per mode (rate = (1600 - 2 * digest_bits) / 8):
-  *   SHA3-224 -> 144
-  *   SHA3-256 -> 136
-  *   SHA3-384 -> 104
-  *   SHA3-512 ->  72
-  */
+ * SHA3 multi-rate padding (pad10*1) with the SHA3 domain separator 0x06.
+ *
+ * The si91x firmware does NOT apply SHA3 padding internally, so the
+ * message must be pre-padded by the application before calling
+ * sl_si91x_sha() with a SHA3 mode. Without this padding the resulting
+ * digest will not match the standard NIST SHA3 vectors.
+ *
+ * Rate (in bytes) per mode (rate = (1600 - 2 * digest_bits) / 8):
+ *   SHA3-224 -> 144
+ *   SHA3-256 -> 136
+ *   SHA3-384 -> 104
+ *   SHA3-512 ->  72
+ */
 #define SHA3_PAD_DOMAIN 0x06
 
 #define SHA3_224_RATE 144
@@ -70,8 +70,8 @@ char message[] = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
 #define SHA3_PAD_BUF_SIZE 256
 
 /******************************************************
-  *               Variable Definitions
-  ******************************************************/
+ *               Variable Definitions
+ ******************************************************/
 const osThreadAttr_t thread_attributes = {
   .name       = "app",
   .attr_bits  = 0,
@@ -106,10 +106,7 @@ static const sl_wifi_device_configuration_t client_configuration = {
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = 0 }
 };
 
 // Buffer to store response (sized for the largest SHA3 digest)
@@ -124,8 +121,8 @@ uint8_t digest_out[SL_SI91X_SHA3_512_DIGEST_LEN] = { 0x04, 0xa3, 0x71, 0xe8, 0x4
                                                      0x99, 0xa2, 0x7d, 0xaf, 0x11, 0x39, 0xd6, 0xe7, 0x5e };
 
 /******************************************************
-  *               Function Declarations
-  ******************************************************/
+ *               Function Declarations
+ ******************************************************/
 static void application_start(void *argument);
 static sl_status_t sha3_process(void);
 static int sha3_pad(const uint8_t *msg,
@@ -136,8 +133,8 @@ static int sha3_pad(const uint8_t *msg,
                     size_t *out_padded_len);
 
 /******************************************************
-  *               Function Definitions
-  ******************************************************/
+ *               Function Definitions
+ ******************************************************/
 void app_init(void)
 {
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
@@ -149,7 +146,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", (unsigned long)status);
+    printf("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
   printf("\r\nWi-Fi Init Success\r\n");
@@ -225,7 +222,7 @@ static sl_status_t sha3_process(void)
   status = sl_si91x_sha(SL_SI91X_SHA3_512, padded_msg, (uint16_t)padded_len, digest);
 #endif
   if (status != SL_STATUS_OK) {
-    printf("\r\n SHA3 Failed, Error Code : 0x%lX\r\n", (unsigned long)status);
+    printf("\r\n SHA3 Failed, Error Code : 0x%lX\r\n", status);
     return status;
   }
   printf("\r\nSHA3 success\r\n");

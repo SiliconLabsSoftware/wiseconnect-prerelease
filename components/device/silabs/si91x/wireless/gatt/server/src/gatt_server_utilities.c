@@ -35,10 +35,12 @@
 extern rsi_parsed_conf_t rsi_parsed_conf;
 
 /* GATT Server-owned variables */
-rsi_ble_t att_list                      = { 0 };
-volatile uint16_t rsi_ble_att1_val_hndl = 0;
-volatile uint16_t rsi_ble_att2_val_hndl = 0;
-volatile uint16_t rsi_ble_att3_val_hndl = 0;
+rsi_ble_t att_list                                        = { 0 };
+rsi_ble_t ta_att_list                                     = { 0 };
+volatile uint16_t write_attribute_handle                  = 0;
+volatile uint16_t notify_attribute_handle                 = 0;
+volatile uint16_t write_without_response_attribute_handle = 0;
+volatile uint16_t indicate_attribute_handle               = 0;
 
 /*=======================================================================*/
 //! Category 1: Connection State Initialization
@@ -149,12 +151,12 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
   p_val->DATA_ix += data_len;
 }
 
-static void rsi_ble_add_char_serv_att(void *serv_handler,
-                                      uint16_t handle,
-                                      uint8_t val_prop,
-                                      uint16_t att_val_handle,
-                                      uuid_t att_val_uuid,
-                                      uint16_t auth_read)
+void rsi_ble_add_char_serv_att(void *serv_handler,
+                               uint16_t handle,
+                               uint8_t val_prop,
+                               uint16_t att_val_handle,
+                               uuid_t att_val_uuid,
+                               uint16_t auth_read)
 {
   rsi_ble_req_add_att_t new_att = { 0 };
 
@@ -178,13 +180,13 @@ static void rsi_ble_add_char_serv_att(void *serv_handler,
   rsi_ble_add_attribute(&new_att);
 }
 
-static void rsi_ble_add_char_val_att(void *serv_handler,
-                                     uint16_t handle,
-                                     uuid_t att_type_uuid,
-                                     uint8_t val_prop,
-                                     uint8_t *data,
-                                     uint8_t data_len,
-                                     uint8_t auth_read)
+void rsi_ble_add_char_val_att(void *serv_handler,
+                              uint16_t handle,
+                              uuid_t att_type_uuid,
+                              uint8_t val_prop,
+                              uint8_t *data,
+                              uint8_t data_len,
+                              uint8_t auth_read)
 {
   rsi_ble_req_add_att_t new_att = { 0 };
 
@@ -200,9 +202,11 @@ static void rsi_ble_add_char_val_att(void *serv_handler,
   new_att.data_len = data_len;
   rsi_ble_add_attribute(&new_att);
 
-  if ((auth_read == ATT_REC_MAINTAIN_IN_HOST) || (data_len > 20)) {
-    if (data != NULL) {
+  if (data != NULL) {
+    if ((auth_read == ATT_REC_MAINTAIN_IN_HOST) || (data_len > 20)) {
       rsi_gatt_add_attribute_to_list(&att_list, handle, data_len, data, att_type_uuid, val_prop);
+    } else {
+      rsi_gatt_add_attribute_to_list(&ta_att_list, handle, data_len, data, att_type_uuid, val_prop);
     }
   }
 
@@ -237,9 +241,9 @@ uint32_t rsi_ble_add_simple_chat_serv(void)
                             new_uuid,
                             0);
 
-  rsi_ble_att1_val_hndl = new_serv_resp.start_handle + 2;
-  new_uuid.size         = 2;
-  new_uuid.val.val16    = RSI_BLE_ATTRIBUTE_1_UUID;
+  write_attribute_handle = notify_attribute_handle = new_serv_resp.start_handle + 2;
+  new_uuid.size                                    = 2;
+  new_uuid.val.val16                               = RSI_BLE_ATTRIBUTE_1_UUID;
   rsi_ble_add_char_val_att(new_serv_resp.serv_handler,
                            new_serv_resp.start_handle + 2,
                            new_uuid,
@@ -280,7 +284,7 @@ uint32_t rsi_ble_add_simple_chat_serv2(void)
                             custom_characteristic,
                             0);
 
-  rsi_ble_att2_val_hndl = new_serv_resp.start_handle + 2;
+  write_without_response_attribute_handle = new_serv_resp.start_handle + 2;
   rsi_ble_add_char_val_att(new_serv_resp.serv_handler,
                            new_serv_resp.start_handle + 2,
                            custom_characteristic,
@@ -320,9 +324,9 @@ uint32_t rsi_ble_add_custom_service_serv(void)
                             new_uuid,
                             SEC_MODE_1_LEVEL_1);
 
-  rsi_ble_att3_val_hndl = new_serv_resp.start_handle + 2;
-  new_uuid.size         = 2;
-  new_uuid.val.val16    = RSI_BLE_CUSTOM_LEVEL_UUID;
+  indicate_attribute_handle = new_serv_resp.start_handle + 2;
+  new_uuid.size             = 2;
+  new_uuid.val.val16        = RSI_BLE_CUSTOM_LEVEL_UUID;
   rsi_ble_add_char_val_att(new_serv_resp.serv_handler,
                            new_serv_resp.start_handle + 2,
                            new_uuid,
@@ -342,4 +346,26 @@ uint32_t rsi_ble_add_custom_service_serv(void)
                            1);
 
   return 0;
+}
+
+__attribute__((weak)) int32_t sl_gatt_server_register_services_hook(void)
+{
+  int32_t status;
+
+  status = rsi_ble_add_simple_chat_serv();
+  if (status != RSI_SUCCESS) {
+    return status;
+  }
+
+  status = rsi_ble_add_simple_chat_serv2();
+  if (status != RSI_SUCCESS) {
+    return status;
+  }
+
+  status = rsi_ble_add_custom_service_serv();
+  if (status != RSI_SUCCESS) {
+    return status;
+  }
+
+  return RSI_SUCCESS;
 }

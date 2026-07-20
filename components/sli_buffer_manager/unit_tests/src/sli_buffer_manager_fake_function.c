@@ -29,6 +29,7 @@
  ******************************************************************************/
 
 #include "sli_buffer_manager_fake_function.h"
+#include <stdint.h>
 
 DEFINE_FFF_GLOBALS
 
@@ -41,3 +42,41 @@ DEFINE_FAKE_VOID_FUNC_VARARG(sl_redirect_log, const char *, ...);
 DEFINE_FAKE_VOID_FUNC5(sli_mem_pool_create, sli_mem_pool_handle_t *, uint32_t, uint32_t, void *, uint32_t);
 DEFINE_FAKE_VALUE_FUNC1(void *, sli_mem_pool_alloc, sli_mem_pool_handle_t *);
 DEFINE_FAKE_VOID_FUNC2(sli_mem_pool_free, sli_mem_pool_handle_t *, void *);
+
+/*
+ * PC unit tests link production sli_buffer_manager.c without CMSIS-RTOS2.
+ * Minimal implementations so init / allocate-with-wait paths resolve.
+ */
+osThreadId_t osThreadGetId(void)
+{
+  return (osThreadId_t)(uintptr_t)1;
+}
+
+osEventFlagsId_t osEventFlagsNew(const osEventFlagsAttr_t *attr)
+{
+  (void)attr;
+  return (osEventFlagsId_t)(uintptr_t)1;
+}
+
+osStatus_t osEventFlagsDelete(osEventFlagsId_t ef_id)
+{
+  (void)ef_id;
+  return osOK;
+}
+
+uint32_t osEventFlagsSet(osEventFlagsId_t ef_id, uint32_t flags)
+{
+  (void)ef_id;
+  return flags;
+}
+
+uint32_t osEventFlagsWait(osEventFlagsId_t ef_id, uint32_t flags, uint32_t options, uint32_t timeout)
+{
+  (void)ef_id;
+  (void)flags;
+  (void)options;
+  (void)timeout;
+  /* No RTOS in PC tests: a successful immediate return keeps allocate wait loops spinning when the tick
+   * fake repeats values (elapsed time never reaches wait_duration_ms). Timeout breaks the loop. */
+  return osFlagsErrorTimeout;
+}

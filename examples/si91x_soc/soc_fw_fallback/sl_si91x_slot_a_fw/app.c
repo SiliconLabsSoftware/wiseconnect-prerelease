@@ -126,39 +126,8 @@ uint8_t ota_fw_upgrade_type = 0;
 uint32_t flash_offset_for_updater_image = 0;
 
 #if SL_APP_COMBINED_IMAGE_SUPPORT
-//! Number of images processed so far in the current combined-image update session (expected: 2).
+//! Count of combined images processed.
 uint8_t combined_image_count = 0;
-
-/*
- * Deferred slot-information storage for combined-image updates.
- *
- * In a combined update both images (M4 and NWP) are downloaded back-to-back over a
- * single socket. We must NOT commit the slot information of the first image as soon as
- * it is verified, because the second image could still fail to download/verify. Instead,
- * each image's slot details (flash address + size) are captured into these "pending"
- * variables as it is verified, and the actual slot update for ALL images is performed
- * together only after the final (second) image has been successfully verified.
- *
- * These variables are intentionally NOT cleared by sl_app_reset_state_for_next_image(),
- * so the first image's captured details survive while the second image is downloaded.
- *
- * The *_valid flag indicates whether a slot was actually captured for that core, so we
- * only commit slots that were part of this update session.
- *
- * These variables are only used when slot-info updates are enabled, so they are guarded
- * by SL_APP_UPDATE_FIRMWARE_SLOT as well to avoid unused-variable warnings under -Werror.
- */
-#if SL_APP_UPDATE_FIRMWARE_SLOT
-//! Captured slot info for the M4 image (address, size) and whether it is valid/captured.
-static uint32_t pending_m4_slot_address = 0;
-static uint32_t pending_m4_slot_size    = 0;
-static uint8_t pending_m4_slot_valid    = 0;
-
-//! Captured slot info for the NWP image (address, size) and whether it is valid/captured.
-static uint32_t pending_nwp_slot_address = 0;
-static uint32_t pending_nwp_slot_size    = 0;
-static uint8_t pending_nwp_slot_valid    = 0;
-#endif
 #endif
 
 // Global variable to store slot information for firmware fallback operations
@@ -250,9 +219,7 @@ static sl_wifi_device_configuration_t sl_wifi_firmware_update_configuration = {
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+                   .config_feature_bit_map     = 0 }
 };
 
 /******************************************************
@@ -266,12 +233,12 @@ void app_init(void)
 
 static void application_start(void *argument)
 {
-  sl_status_t status                  = SL_STATUS_FAIL;
-  struct sockaddr_in server_address   = { 0 }; // Server address structure
-  socklen_t socket_length             = sizeof(struct sockaddr_in);
-  int client_socket                   = -1;          // Client socket descriptor
-  int socket_return_value             = 0;           // Return value for socket operations
-  sl_si91x_firmware_version_t version = { 0 };       // Structure to store firmware version
+  sl_status_t status                 = SL_STATUS_FAIL;
+  struct sockaddr_in server_address  = { 0 }; // Server address structure
+  socklen_t socket_length            = sizeof(struct sockaddr_in);
+  int client_socket                  = -1;           // Client socket descriptor
+  int socket_return_value            = 0;            // Return value for socket operations
+  sl_wifi_firmware_version_t version = { 0 };        // Structure to store firmware version
   sl_si91x_fw_ab_slot_management_t app_ab_slot_info; // Structure to manage firmware slots
 
   UNUSED_PARAMETER(argument); // Avoids compiler warning for unused parameter
@@ -316,19 +283,11 @@ static void application_start(void *argument)
   sl_app_display_ab_slot_info(&app_ab_slot_info);
 
   // Retrieve the current firmware version
-  status = sl_si91x_get_firmware_version(&version);
+  status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     DEBUGOUT("\r\nFailed to fetch firmware version: 0x%x\r\n", (unsigned int)status);
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           version.chip_id,
-           version.rom_id,
-           version.major,
-           version.minor,
-           version.security_version,
-           version.patch_num,
-           version.customer_id,
-           version.build_num);
+    print_firmware_version(&version);
   }
 
   // Bring up the Wi-Fi client interface
@@ -361,11 +320,9 @@ static void application_start(void *argument)
     if (nwp_fw_addr != 0) {
       sl_status_t burn_status = sl_si91x_burn_nwp_security_version(nwp_fw_addr);
       if (burn_status != SL_STATUS_OK) {
-        DEBUGOUT("\r\nFailed to burn NWP security version: 0x%X at 0x%X\r\n",
-                 (unsigned int)burn_status,
-                 (unsigned int)nwp_fw_addr);
+        DEBUGOUT("\r\nFailed to burn NWP security version: 0x%X at 0x%X\r\n", burn_status, nwp_fw_addr);
       } else {
-        DEBUGOUT("\r\nBurned NWP security version at 0x%X\r\n", (unsigned int)nwp_fw_addr);
+        DEBUGOUT("\r\nBurned NWP security version at 0x%X\r\n", nwp_fw_addr);
       }
     } else {
       DEBUGOUT("\r\nSkipping NWP security version burn: invalid NWP address\r\n");
@@ -464,35 +421,13 @@ static sl_status_t firmware_update_process(int client_socket)
                    (unsigned int)status,
                    (unsigned int)ota_image_start_address);
 
-          // Handle slot information once the image has passed verification.
-          // Only application images (ota_fw_upgrade_type == 0) update A/B slot info here;
-          // updater images (type == 1) are handled separately via the updater flash offset.
+          // Update slot information after image verification
 #if SL_APP_UPDATE_FIRMWARE_SLOT
           if (ota_fw_upgrade_type == 0) {
-#if SL_APP_COMBINED_IMAGE_SUPPORT
-            // COMBINED-IMAGE MODE: do NOT commit the slot info for this image yet.
-            // Both images are downloaded over the same connection, so the slot update must
-            // be deferred until the LAST image is verified. Capturing here (instead of
-            // writing) guarantees that if the second image fails, no slot is ever updated.
-            // The captured values survive sl_app_reset_state_for_next_image() below.
+            // Updating M4 firmware slot
             if (m4_ota_image) {
-              pending_m4_slot_address = ota_image_start_address;
-              pending_m4_slot_size    = ota_image_size;
-              pending_m4_slot_valid   = 1;
-              DEBUGOUT("\r\n Captured M4 slot info (deferred until all combined images are received) \r\n");
-            }
-            if (ta_ota_image) {
-              pending_nwp_slot_address = ota_image_start_address;
-              pending_nwp_slot_size    = ota_image_size;
-              pending_nwp_slot_valid   = 1;
-              DEBUGOUT("\r\n Captured NWP slot info (deferred until all combined images are received) \r\n");
-            }
-#else
-            // SINGLE-IMAGE MODE: only one image is downloaded per session, so the slot info
-            // can be committed immediately after this image is verified.
 
-            // Update the M4 core's A/B slot info with the newly downloaded image.
-            if (m4_ota_image) {
+              // This API updates the slot information for the M4 core with the new firmware image.
               status = sl_si91x_ab_upgrade_set_slot_info(ota_image_start_address,
                                                          ota_image_size,
                                                          SL_SI91X_AB_OTA_IMAGE_TYPE_M4);
@@ -503,8 +438,10 @@ static sl_status_t firmware_update_process(int client_socket)
               }
             }
 
-            // Update the NWP core's A/B slot info with the newly downloaded image.
+            // Updating NWP firmware slot
             if (ta_ota_image) {
+              // Set the slot information for the NWP core
+              // This API updates the slot information for the NWP core with the new firmware image.
               status = sl_si91x_ab_upgrade_set_slot_info(ota_image_start_address,
                                                          ota_image_size,
                                                          SL_SI91X_AB_OTA_IMAGE_TYPE_NWP);
@@ -514,14 +451,11 @@ static sl_status_t firmware_update_process(int client_socket)
                 DEBUGOUT("\r\n Successfully updated NWP slot information \r\n");
               }
             }
-#endif
           }
 #endif
 
+          // After updating slot info, check if we need to process the next image
 #if SL_APP_COMBINED_IMAGE_SUPPORT
-          // First image done: reset the per-image state machine/counters (but keep the
-          // captured slot info above) so the same socket can be reused to fetch the
-          // second image. On the second image this branch is skipped.
           if (!combined_image_count) {
             DEBUGOUT("\r\n Ready for the Second Image \r\n");
             sl_app_reset_state_for_next_image(&data_chunk,
@@ -537,41 +471,10 @@ static sl_status_t firmware_update_process(int client_socket)
 
 #if SL_APP_COMBINED_IMAGE_SUPPORT
         if (combined_image_count == 2) {
-          // FINAL STAGE: both combined images have now been downloaded and verified.
-          // It is safe to commit the slot information that was deferred/captured earlier.
-          // Each slot is committed only if it was actually captured during this session
-          // (indicated by its *_valid flag).
-#if SL_APP_UPDATE_FIRMWARE_SLOT
-          // Commit the M4 image's slot info (captured after the M4 image was verified).
-          if (pending_m4_slot_valid) {
-            status = sl_si91x_ab_upgrade_set_slot_info(pending_m4_slot_address,
-                                                       pending_m4_slot_size,
-                                                       SL_SI91X_AB_OTA_IMAGE_TYPE_M4);
-            if (status != SL_STATUS_OK) {
-              DEBUGOUT("Failed to update M4 slot, error: %u\n", (unsigned int)status);
-            } else {
-              DEBUGOUT("\r\n Successfully updated M4 slot information \r\n");
-            }
-          }
-
-          // Commit the NWP image's slot info (captured after the NWP image was verified).
-          if (pending_nwp_slot_valid) {
-            status = sl_si91x_ab_upgrade_set_slot_info(pending_nwp_slot_address,
-                                                       pending_nwp_slot_size,
-                                                       SL_SI91X_AB_OTA_IMAGE_TYPE_NWP);
-            if (status != SL_STATUS_OK) {
-              DEBUGOUT("Failed to update NWP slot, error: %u\n", (unsigned int)status);
-            } else {
-              DEBUGOUT("\r\n Successfully updated NWP slot information \r\n");
-            }
-          }
-#endif
-          // All images processed and slots committed: close the socket and finish.
+          // Close the client socket after all images are processed
           close(client_socket);
           return SL_STATUS_OK;
         } else {
-          // Not all images received yet: stay in the loop (socket stays open) and go
-          // back to request/download the next image.
           break;
         }
 #else

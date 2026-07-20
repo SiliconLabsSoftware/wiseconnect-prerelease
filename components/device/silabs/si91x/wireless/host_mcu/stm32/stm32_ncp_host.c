@@ -28,7 +28,15 @@
 #include "stm32f4xx_hal.h"
 #include "sli_wifi_utility.h"
 
+// SPI DMA staging buffer for NULL tx/rx in sl_si91x_host_spi_transfer(). Must be >= max SPI frame
+// length; follow SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE when large transceiver packets are enabled.
+#ifndef SLI_SPI_BUFFER_LENGTH
+#if (SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE)
+#define SLI_SPI_BUFFER_LENGTH SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE
+#else
 #define SLI_SPI_BUFFER_LENGTH 2300
+#endif
+#endif
 #define SLI_DMA_ENABLED
 
 static void sli_mx_gpio_init(void);

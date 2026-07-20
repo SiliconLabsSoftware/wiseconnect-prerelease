@@ -161,8 +161,8 @@ void sl_debug_log(const char *format, ...)
 void fw_up_configurator_task(void *argument)
 {
   UNUSED_PARAMETER(argument);
-  sl_status_t status                           = SL_STATUS_OK;
-  sl_si91x_firmware_version_t firmware_version = { 0 };
+  sl_status_t status                          = SL_STATUS_OK;
+  sl_wifi_firmware_version_t firmware_version = { 0 };
 
   // Create semaphore for firmware update and handshake completion
   update_semaphore = osSemaphoreNew(1, 0, NULL);
@@ -215,7 +215,7 @@ void fw_up_configurator_task(void *argument)
           return;
         }
         SL_DEBUG_LOG_V2(INFO, "Wi-Fi Client interface init\r\n");
-        status = sl_si91x_get_firmware_version(&firmware_version);
+        status = sl_wifi_get_firmware_version(&firmware_version);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
           return;
@@ -403,7 +403,7 @@ sl_status_t update_firmware()
       }
 
       //! Send the first chunk to extract header
-      status = sl_si91x_get_firmware_size((char *)recv_buffer, &fw_image_size);
+      status = sl_wifi_get_firmware_size((char *)recv_buffer, &fw_image_size);
       if (status != SL_STATUS_OK) {
         SL_DEBUG_LOG_V2(ERROR, "Unable to fetch firmware size. Status: 0x%lx\r\n", status);
         continue; // Go back to the beginning of the loop to re-send the header request

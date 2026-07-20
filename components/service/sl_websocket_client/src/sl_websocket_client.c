@@ -28,7 +28,6 @@
  ******************************************************************************/
 #include "sl_websocket_client.h"
 #include "sl_websocket_client_types.h"
-#include "sli_websocket_client_sync.h"
 #include "sl_constants.h"
 #include "sl_slist.h"
 #include "sl_net.h"
@@ -135,11 +134,6 @@ sl_websocket_error_t sl_websocket_set_tcp_tls_advanced_configuration(
   handle->tcp_options_configured = true;
 
   return SL_WEBSOCKET_SUCCESS;
-}
-
-sl_websocket_error_t sl_websocket_set_origin(sl_websocket_client_t *handle, const char *origin)
-{
-  return sli_websocket_set_origin(handle, origin);
 }
 
 sl_websocket_error_t sl_websocket_connect(sl_websocket_client_t *handle)
@@ -269,14 +263,13 @@ sl_websocket_error_t sl_websocket_connect(sl_websocket_client_t *handle)
     }
   }
 
-  // Copy the host name, resource name and origin from handle to si91x_socket->websocket_info
+  // Copy the host name and resource name from handle to si91x_socket->websocket_info
   size_t host_length     = strlen(handle->host);
   size_t resource_length = strlen(handle->resource);
-  size_t origin_length   = strlen(handle->origin);
 
   // Allocate memory for websocket_info
-  si91x_socket->websocket_info = (sli_si91x_websocket_info_t *)malloc(sizeof(sli_si91x_websocket_info_t) + host_length
-                                                                      + resource_length + origin_length);
+  si91x_socket->websocket_info =
+    (sli_si91x_websocket_info_t *)malloc(sizeof(sli_si91x_websocket_info_t) + host_length + resource_length);
 
   // Check if memory allocation was successful
   if (si91x_socket->websocket_info == NULL) {
@@ -287,19 +280,15 @@ sl_websocket_error_t sl_websocket_connect(sl_websocket_client_t *handle)
   }
 
   // Clear the websocket_info structure to ensure all fields are initialized to zero
-  memset(si91x_socket->websocket_info,
-         0,
-         sizeof(sli_si91x_websocket_info_t) + host_length + resource_length + origin_length);
+  memset(si91x_socket->websocket_info, 0, sizeof(sli_si91x_websocket_info_t) + host_length + resource_length);
 
   // Set the lengths
   si91x_socket->websocket_info->host_length     = host_length;
   si91x_socket->websocket_info->resource_length = resource_length;
-  si91x_socket->websocket_info->origin_length   = origin_length;
 
-  // Copy the host, resource and origin names to websocket_info
+  // Copy the host and resource names to websocket_info
   memcpy(si91x_socket->websocket_info->websocket_data, handle->host, host_length);
   memcpy(si91x_socket->websocket_info->websocket_data + host_length, handle->resource, resource_length);
-  memcpy(si91x_socket->websocket_info->websocket_data + host_length + resource_length, handle->origin, origin_length);
 
   socket_return_value = connect(client_socket, (struct sockaddr *)&server_address, socket_length);
 

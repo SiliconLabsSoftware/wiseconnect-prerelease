@@ -32,7 +32,6 @@
 #include "rsi_ccp_user_config.h"
 #include <math.h>
 #include "rsi_rom_clks.h"
-#include "sl_code_classification.h"
 #ifndef PLL_ROMDRIVER_PRESENT
 /** @addtogroup SOC3
 * @{
@@ -46,7 +45,6 @@
  *			   Disable on failure
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 boolean_t clk_check_pll_lock(PLL_TYPE_T pllType)
 {
   uint16_t lock = 0;
@@ -73,7 +71,6 @@ boolean_t clk_check_pll_lock(PLL_TYPE_T pllType)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_clk_enable(boolean_t clkEnable)
 {
   if (clkEnable == Enable) {
@@ -96,7 +93,6 @@ rsi_error_t clk_soc_pll_clk_enable(boolean_t clkEnable)
  * @return      RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_set_soc_pll_freq(const M4CLK_Type *pCLK, uint32_t socPllFreq, uint32_t pllRefClk)
 {
   uint16_t shiftFac     = 0;
@@ -295,7 +291,6 @@ rsi_error_t clk_set_soc_pll_freq(const M4CLK_Type *pCLK, uint32_t socPllFreq, ui
  * @return      RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_set_freq_div(const M4CLK_Type *pCLK,
                                      boolean_t clk_en,
                                      uint16_t divFactor,
@@ -390,7 +385,6 @@ rsi_error_t clk_soc_pll_set_freq_div(const M4CLK_Type *pCLK,
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_clk_set(const M4CLK_Type *pCLK)
 {
   SPI_MEM_MAP_PLL(SOC_PLL_500_CTRL_REG11) = 0xFFFF;
@@ -408,7 +402,6 @@ rsi_error_t clk_soc_pll_clk_set(const M4CLK_Type *pCLK)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_clk_bypass_enable(boolean_t clkEnable)
 {
   if (clkEnable == Enable) {
@@ -428,7 +421,6 @@ rsi_error_t clk_soc_pll_clk_bypass_enable(boolean_t clkEnable)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_clk_reset(void)
 {
   SPI_MEM_MAP_PLL(SOC_PLL_500_CTRL_REG11) = 0x01FF;
@@ -443,7 +435,6 @@ rsi_error_t clk_soc_pll_clk_reset(void)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_pd_enable(boolean_t en)
 {
   if (en == Enable) {
@@ -463,7 +454,6 @@ rsi_error_t clk_soc_pll_pd_enable(boolean_t en)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_turn_off(void)
 {
   uint16_t socreg1 = 0x31c9;
@@ -481,7 +471,6 @@ rsi_error_t clk_soc_pll_turn_off(void)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_soc_pll_turn_on(void)
 {
   uint16_t socreg1 = 0x31c9;
@@ -500,7 +489,6 @@ rsi_error_t clk_soc_pll_turn_on(void)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_clk_enable(boolean_t clkEnable)
 {
   if (clkEnable == Enable) {
@@ -521,7 +509,6 @@ rsi_error_t clk_i2s_pll_clk_enable(boolean_t clkEnable)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_clk_bypass_enable(boolean_t clkEnable)
 {
   if (clkEnable == Enable) {
@@ -542,7 +529,6 @@ rsi_error_t clk_i2s_pll_clk_bypass_enable(boolean_t clkEnable)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_pd_enable(boolean_t en)
 {
   if (en == Enable) {
@@ -562,7 +548,6 @@ rsi_error_t clk_i2s_pll_pd_enable(boolean_t en)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_turn_off(void)
 {
   uint16_t i2sreg1 = 0x1244;
@@ -580,7 +565,6 @@ rsi_error_t clk_i2s_pll_turn_off(void)
  * @return   RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_turn_on(void)
 {
   uint16_t i2sreg1 = 0x1244;
@@ -600,7 +584,6 @@ rsi_error_t clk_i2s_pll_turn_on(void)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_set_i2s_pll_freq(const M4CLK_Type *pCLK, uint32_t i2sPllFreq, uint32_t fXtal)
 {
   uint16_t p_div         = 0;
@@ -701,7 +684,6 @@ rsi_error_t clk_set_i2s_pll_freq(const M4CLK_Type *pCLK, uint32_t i2sPllFreq, ui
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_set_freq_div(const M4CLK_Type *pCLK,
                                      uint16_t u16DivFactor1,
                                      uint16_t u16DivFactor2,
@@ -744,7 +726,6 @@ rsi_error_t clk_i2s_pll_set_freq_div(const M4CLK_Type *pCLK,
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_clk_set(const M4CLK_Type *pCLK)
 {
   if (pCLK == NULL) {
@@ -763,7 +744,6 @@ rsi_error_t clk_i2s_pll_clk_set(const M4CLK_Type *pCLK)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_pll_clk_reset(void)
 {
   SPI_MEM_MAP_PLL(I2S_PLL_CTRL_REG11) = 0x01FF;
@@ -778,7 +758,6 @@ rsi_error_t clk_i2s_pll_clk_reset(void)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_clk_enable(boolean_t clkEnable)
 {
   if (clkEnable == Enable) {
@@ -799,7 +778,6 @@ rsi_error_t clk_intf_pll_clk_enable(boolean_t clkEnable)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_pd_enable(boolean_t en)
 {
   if (en == Enable) {
@@ -819,7 +797,6 @@ rsi_error_t clk_intf_pll_pd_enable(boolean_t en)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_turn_off(void)
 {
   uint16_t intfreg1 = 0x31c9;
@@ -841,7 +818,6 @@ rsi_error_t clk_intf_pll_turn_off(void)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_set_intf_pll_freq(const M4CLK_Type *pCLK, uint32_t intfPllFreq, uint32_t pllRefClk)
 {
   uint16_t shiftFac      = 0;
@@ -1041,7 +1017,6 @@ rsi_error_t clk_set_intf_pll_freq(const M4CLK_Type *pCLK, uint32_t intfPllFreq, 
  * @return      RSI_OK on success  
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_set_freq_div(const M4CLK_Type *pCLK,
                                       boolean_t clk_en,
                                       uint16_t divFactor,
@@ -1135,7 +1110,6 @@ rsi_error_t clk_intf_pll_set_freq_div(const M4CLK_Type *pCLK,
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_clk_bypass_enable(boolean_t clkEnable)
 {
   if (clkEnable == Enable) {
@@ -1155,7 +1129,6 @@ rsi_error_t clk_intf_pll_clk_bypass_enable(boolean_t clkEnable)
  * @return   RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_turn_on()
 {
   uint16_t intfreg1 = 0x31c9;
@@ -1174,7 +1147,6 @@ rsi_error_t clk_intf_pll_turn_on()
  * @return   RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_clk_reset(void)
 {
   SPI_MEM_MAP_PLL(INTF_PLL_500_CTRL_REG11) = 0x01FF;
@@ -1189,7 +1161,6 @@ rsi_error_t clk_intf_pll_clk_reset(void)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_intf_pll_clk_set(const M4CLK_Type *pCLK)
 {
   if (pCLK == NULL) {
@@ -1210,7 +1181,6 @@ rsi_error_t clk_intf_pll_clk_set(const M4CLK_Type *pCLK)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_enable1(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1229,7 +1199,6 @@ rsi_error_t clk_peripheral_clk_enable1(M4CLK_Type *pCLK, uint32_t flags)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_disable1(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1248,7 +1217,6 @@ rsi_error_t clk_peripheral_clk_disable1(M4CLK_Type *pCLK, uint32_t flags)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_enable2(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1267,7 +1235,6 @@ rsi_error_t clk_peripheral_clk_enable2(M4CLK_Type *pCLK, uint32_t flags)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_disable2(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1286,7 +1253,6 @@ rsi_error_t clk_peripheral_clk_disable2(M4CLK_Type *pCLK, uint32_t flags)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_enable3(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1305,7 +1271,6 @@ rsi_error_t clk_peripheral_clk_enable3(M4CLK_Type *pCLK, uint32_t flags)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_disable3(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1324,7 +1289,6 @@ rsi_error_t clk_peripheral_clk_disable3(M4CLK_Type *pCLK, uint32_t flags)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_dynamic_clk_gate_disable(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1343,7 +1307,6 @@ rsi_error_t clk_dynamic_clk_gate_disable(M4CLK_Type *pCLK, uint32_t flags)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_dynamic_clk_gate_disable2(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1362,7 +1325,6 @@ rsi_error_t clk_dynamic_clk_gate_disable2(M4CLK_Type *pCLK, uint32_t flags)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_dynamic_clk_gate_enable(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1381,7 +1343,6 @@ rsi_error_t clk_dynamic_clk_gate_enable(M4CLK_Type *pCLK, uint32_t flags)
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_dynamic_clk_gate_enable2(M4CLK_Type *pCLK, uint32_t flags)
 {
   if (pCLK == NULL) {
@@ -1407,7 +1368,6 @@ rsi_error_t clk_dynamic_clk_gate_enable2(M4CLK_Type *pCLK, uint32_t flags)
  * @return    clock spi on success           
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_qspi_clk_config(M4CLK_Type *pCLK,
                                 QSPI_CLK_SRC_SEL_T clkSource,
                                 boolean_t swalloEn,
@@ -1498,7 +1458,6 @@ rsi_error_t clk_qspi_clk_config(M4CLK_Type *pCLK,
  * @return    clock spi on success           
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_qspi_2_clk_config(M4CLK_Type *pCLK,
                                   QSPI_CLK_SRC_SEL_T clkSource,
                                   boolean_t swalloEn,
@@ -1596,7 +1555,6 @@ rsi_error_t clk_qspi_2_clk_config(M4CLK_Type *pCLK,
 * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_ssi_mst_clk_config(M4CLK_Type *pCLK,
                                    CLK_ENABLE_T clkType,
                                    SSI_MST_CLK_SRC_SEL_T clkSource,
@@ -1676,7 +1634,6 @@ rsi_error_t clk_ssi_mst_clk_config(M4CLK_Type *pCLK,
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_sd_mem_clk_config(M4CLK_Type *pCLK,
                                   boolean_t swalloEn,
                                   SDMEM_CLK_SRC_SEL_T clkSource,
@@ -1747,7 +1704,6 @@ rsi_error_t clk_sd_mem_clk_config(M4CLK_Type *pCLK,
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_cci_clk_config(M4CLK_Type *pCLK, CCI_CLK_SRC_SEL_T clkSource, uint32_t divFactor, CLK_ENABLE_T clkType)
 {
   /* Parameter validation */
@@ -1796,7 +1752,6 @@ rsi_error_t clk_cci_clk_config(M4CLK_Type *pCLK, CCI_CLK_SRC_SEL_T clkSource, ui
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_can_clk_config(M4CLK_Type *pCLK, uint32_t divFactor, CLK_ENABLE_T clkType)
 {
   if ((pCLK == NULL) || (divFactor > CAN_MAX_CLK_DIVISION_FACTOR)) {
@@ -1829,7 +1784,6 @@ rsi_error_t clk_can_clk_config(M4CLK_Type *pCLK, uint32_t divFactor, CLK_ENABLE_
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_ethernet_clk_config(M4CLK_Type *pCLK,
                                     boolean_t swalloEn,
                                     ETHERNET_CLK_SRC_SEL_T clkSource,
@@ -1876,7 +1830,6 @@ rsi_error_t clk_ethernet_clk_config(M4CLK_Type *pCLK,
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_cci_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -1896,7 +1849,6 @@ rsi_error_t clk_cci_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_sd_mem_clk_div(M4CLK_Type *pCLK, boolean_t u8SwallowEn, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -1924,7 +1876,6 @@ rsi_error_t clk_sd_mem_clk_div(M4CLK_Type *pCLK, boolean_t u8SwallowEn, uint32_t
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_usb_clk_config(M4CLK_Type *pCLK, USB_CLK_SRC_SEL_T clkSource, uint16_t divFactor)
 {
   /* Parameter validation */
@@ -1976,7 +1927,6 @@ rsi_error_t clk_usb_clk_config(M4CLK_Type *pCLK, USB_CLK_SRC_SEL_T clkSource, ui
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_ct_clk_config(M4CLK_Type *pCLK, CT_CLK_SRC_SEL_T clkSource, uint32_t divFactor, CLK_ENABLE_T clkType)
 {
   /* Parameter validation */
@@ -2032,7 +1982,6 @@ rsi_error_t clk_ct_clk_config(M4CLK_Type *pCLK, CT_CLK_SRC_SEL_T clkSource, uint
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_clk_config(M4CLK_Type *pCLK, I2S_CLK_SRC_SEL_T clkSource, uint32_t divFactor)
 {
   /* Parameter validation */
@@ -2073,7 +2022,6 @@ rsi_error_t clk_i2s_clk_config(M4CLK_Type *pCLK, I2S_CLK_SRC_SEL_T clkSource, ui
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_mcu_clk_cut_config(M4CLK_Type *pCLK, MCU_CLKOUT_SRC_SEL_T clkSource, uint32_t divFactor)
 {
   /* Parameter validation */
@@ -2184,7 +2132,6 @@ rsi_error_t clk_mcu_clk_cut_config(M4CLK_Type *pCLK, MCU_CLKOUT_SRC_SEL_T clkSou
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_m4_soc_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -2205,7 +2152,6 @@ rsi_error_t clk_m4_soc_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_qspi_clk_div(M4CLK_Type *pCLK, boolean_t u8SwallowEn, boolean_t u8OddDivEn, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -2234,7 +2180,6 @@ rsi_error_t clk_qspi_clk_div(M4CLK_Type *pCLK, boolean_t u8SwallowEn, boolean_t 
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_ct_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -2253,7 +2198,6 @@ rsi_error_t clk_ct_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_ssi_mst_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -2272,7 +2216,6 @@ rsi_error_t clk_ssi_mst_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2s_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -2293,7 +2236,6 @@ rsi_error_t clk_i2s_clk_div(M4CLK_Type *pCLK, uint32_t divFactor)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_usart_clk_div(M4CLK_Type *pCLK, EN_USART_T enUsart, boolean_t u8FracDivEn, uint32_t divFactor)
 {
   if (pCLK == NULL) {
@@ -2326,7 +2268,6 @@ rsi_error_t clk_usart_clk_div(M4CLK_Type *pCLK, EN_USART_T enUsart, boolean_t u8
  * @return     RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_xtal_clk_config(uint8_t xtalPin)
 {
   if (xtalPin > 4) {
@@ -2373,7 +2314,6 @@ rsi_error_t clk_xtal_clk_config(uint8_t xtalPin)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_slp_clk_config(M4CLK_Type *pCLK, SLEEP_CLK_SRC_SEL_T clkSrc)
 {
   /* Parameter validation */
@@ -2422,7 +2362,6 @@ rsi_error_t clk_slp_clk_config(M4CLK_Type *pCLK, SLEEP_CLK_SRC_SEL_T clkSrc)
  * @return     pCLK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 uint32_t clk_slp_clk_calib_config(M4CLK_Type *pCLK, uint8_t clkCycles)
 {
   if (pCLK == NULL || clkCycles > MAX_SLP_CYCLES) {
@@ -2447,7 +2386,6 @@ uint32_t clk_slp_clk_calib_config(M4CLK_Type *pCLK, uint8_t clkCycles)
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_gspi_clk_config(M4CLK_Type *pCLK, GSPI_CLK_SRC_SEL_T clkSel)
 {
   if (pCLK == NULL) {
@@ -2509,7 +2447,6 @@ rsi_error_t clk_gspi_clk_config(M4CLK_Type *pCLK, GSPI_CLK_SRC_SEL_T clkSel)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_i2c_clk_config(M4CLK_Type *pCLK, boolean_t clkEnable, EN_I2C_T enI2C)
 {
   if (pCLK == NULL) {
@@ -2553,7 +2490,6 @@ rsi_error_t clk_i2c_clk_config(M4CLK_Type *pCLK, boolean_t clkEnable, EN_I2C_T e
  * @return    RSI_OK on success 
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_enable(M4CLK_Type *pCLK, PERIPHERALS_CLK_T module, CLK_ENABLE_T clkType)
 {
   /* valid parameter check */
@@ -2691,7 +2627,6 @@ rsi_error_t clk_peripheral_clk_enable(M4CLK_Type *pCLK, PERIPHERALS_CLK_T module
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_peripheral_clk_disable(M4CLK_Type *pCLK, PERIPHERALS_CLK_T module)
 {
   /* valid parameter check */
@@ -2786,7 +2721,6 @@ rsi_error_t clk_peripheral_clk_disable(M4CLK_Type *pCLK, PERIPHERALS_CLK_T modul
  * @return       none
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 void clk_config_pll_ref_clk(uint8_t ref_clk_src)
 {
   uint32_t reg_read = 0;
@@ -2809,7 +2743,6 @@ void clk_config_pll_ref_clk(uint8_t ref_clk_src)
  * @return      none
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 void clk_config_pll_lock(boolean_t manual_lock, boolean_t bypass_manual_lock, uint8_t mm_count_limit)
 {
   uint32_t reg_read = 0;
@@ -2831,7 +2764,6 @@ void clk_config_pll_lock(boolean_t manual_lock, boolean_t bypass_manual_lock, ui
  *                 ERROR_CLOCK_NOT_ENABLED
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 uint32_t RSI_CLK_CheckPresent(const M4CLK_Type *pCLK, CLK_PRESENT_T clkPresent)
 {
   uint32_t errorReturn = 0;
@@ -2877,7 +2809,6 @@ uint32_t RSI_CLK_CheckPresent(const M4CLK_Type *pCLK, CLK_PRESENT_T clkPresent)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_m4ss_ref_clk_config(const M4CLK_Type *pCLK, M4SS_REF_CLK_SEL_T clkSource)
 {
   if (pCLK == NULL) {
@@ -2937,7 +2868,6 @@ rsi_error_t clk_m4ss_ref_clk_config(const M4CLK_Type *pCLK, M4SS_REF_CLK_SEL_T c
  * @return    RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t ulpss_disable_ref_clks(REF_CLK_ENABLE_T clk_type)
 {
   /* Select clock source */
@@ -2985,7 +2915,6 @@ rsi_error_t ulpss_disable_ref_clks(REF_CLK_ENABLE_T clk_type)
  * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_m4_soc_clk_config(M4CLK_Type *pCLK, M4_SOC_CLK_SRC_SEL_T clkSource, uint32_t divFactor)
 {
   /* check valid parameters */
@@ -3082,7 +3011,6 @@ rsi_error_t clk_m4_soc_clk_config(M4CLK_Type *pCLK, M4_SOC_CLK_SRC_SEL_T clkSour
  * @return        RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t clk_usart_clk_config(M4CLK_Type *pCLK,
                                  CLK_ENABLE_T clkType,
                                  boolean_t FracDivEn,
@@ -3302,7 +3230,6 @@ rsi_error_t clk_usart_clk_config(M4CLK_Type *pCLK,
 * @return     RSI_OK on success
  */
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SYSTEMLEVEL_PLL, SL_CODE_CLASS_TIME_CRITICAL)
 rsi_error_t ulpss_enable_ref_clks(REF_CLK_ENABLE_T enable, SRC_TYPE_T srcType, cdDelay delayFn)
 {
   /* Select clock source */

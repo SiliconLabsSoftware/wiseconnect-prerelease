@@ -66,6 +66,10 @@ typedef uint32_t sl_si91x_host_timestamp_t;
 /* Indicates the current performance profile */
 extern sl_wifi_system_performance_profile_t current_performance_profile;
 
+/* Function converts NWP client info to SDK client info */
+sl_status_t sli_convert_si91x_wifi_client_info(sl_wifi_client_info_response_t *client_info_response,
+                                               const sli_wifi_client_info_response *sli_wifi_client_info_response);
+
 /* Function used to set whether tcp auto close is enabled or disabled */
 void sli_save_tcp_auto_close_choice(bool is_tcp_auto_close_enabled);
 

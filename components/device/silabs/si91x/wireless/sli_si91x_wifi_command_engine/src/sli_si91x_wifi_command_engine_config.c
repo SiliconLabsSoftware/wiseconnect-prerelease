@@ -622,6 +622,7 @@ static sl_status_t sli_flush_queue_for_packet_type(sli_command_engine_t *instanc
     // Decrement in_flight_command_count for all entries removed from inflight queue
     if (queue_info->in_flight_command_count > 0) {
       queue_info->in_flight_command_count--;
+      sli_si91x_try_rearm_command_engine_dynamic_tx(instance, queue_info, packet_config);
     }
 
     if (tx_metadata->tx_status == SLI_COMMAND_ENGINE_PACKET_TX_INPROGRESS) {
@@ -1127,5 +1128,5 @@ static void sli_post_packet_to_event_engine(sl_wifi_buffer_t *rx_buffer)
   }
 
   /* Signal the event engine to process the queued packet */
-  sli_wifi_event_engine_signal_async();
+  osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
 }

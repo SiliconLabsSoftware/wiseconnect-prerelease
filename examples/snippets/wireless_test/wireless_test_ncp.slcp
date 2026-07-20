@@ -50,27 +50,6 @@ component:
   - exp
 - id: iostream_retarget_stdio
 - id: iostream_recommended_stream
-- id: iostream_rtt
-- id: iostream_eusart
-  instance:
-  - vcom
-  condition:
-  - brd4186c
-- id: iostream_usart
-  instance:
-  - vcom
-  condition:
-  - brd4180a
-- id: iostream_usart
-  instance:
-  - vcom
-  condition:
-  - brd4180b
-- id: iostream_usart
-  instance:
-  - vcom
-  condition:
-  - brd4120a
 - id: iostream_stdlib_config
 - id: wiseconnect_common
 - id: wifi
@@ -83,7 +62,8 @@ component:
 - id: console
 - id: console_variables
 - id: iot_socket
-- id: log
+- id: log_none
+- id: log_backend_iostream
 - id: log_backend_iostream_formatted
 - id: log_platform_specific
 toolchain_settings:
@@ -183,8 +163,8 @@ ui_hints:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.1.1
+  version: 4.2.0
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2026.6.1
+  version: 2026.12.0

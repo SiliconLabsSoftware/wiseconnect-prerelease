@@ -74,7 +74,6 @@
  ******************************************************************************/
 static sl_adc_callback_t user_callback = NULL;
 static uint8_t num_of_channels_enabled;
-static uint8_t adc_static_read_channel  = 0;
 static uint8_t ping_pong_memory_read[4] = { ADC_PING_ENABLE, ADC_PING_ENABLE, ADC_PING_ENABLE, ADC_PING_ENABLE };
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************
@@ -616,57 +615,46 @@ sl_status_t sl_si91x_adc_read_data_static(sl_adc_channel_config_t adc_channel_co
 {
   sl_status_t status;
   rsi_error_t error_status;
-  uint8_t channel_num                 = adc_channel_config.channel;
-  uint8_t data_process                = 1;
-  uint8_t next_channel_num            = 0;
-  int16_t read_static_data            = 0;
-  sl_adc_channel_config_t next_config = adc_channel_config;
-
-  if (adc_value == NULL) {
-    SL_PRINT_STRING_ERROR("sl_si91x_adc_read_data_static:ADC value pointer is null,line no : %d\r\n", (int)__LINE__);
-    return SL_STATUS_NULL_POINTER;
-  }
-  if (adc_config.num_of_channel_enable > MINIMUM_NUMBER_OF_CHANNEL) {
-    channel_num = adc_static_read_channel;
-  } else if (channel_num >= MAXIMUM_CHANNEL_ID) {
-    SL_PRINT_STRING_ERROR("sl_si91x_adc_read_data_static:ADC channel number is invalid,line no : %d\r\n",
-                          (int)__LINE__);
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-  status = validate_adc_channel_parameters(&adc_channel_config);
-  if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("sl_si91x_adc_read_data_static:ADC parameters are invalid, status=0x%04lX,line no : %d\r\n",
-                          (unsigned long)status,
-                          (int)__LINE__);
-    return status;
-  }
-  read_static_data = RSI_ADC_ReadDataStatic(AUX_ADC_DAC_COMP, data_process, adc_channel_config.input_type[channel_num]);
-  *adc_value       = (uint16_t)read_static_data;
-  if (adc_config.num_of_channel_enable == 1) {
-    status = sl_si91x_adc_channel_interrupt_clear(adc_config, channel_num);
+  uint8_t data_process     = 1;
+  static uint8_t chnl_num  = 0;
+  int16_t read_static_data = 0;
+  do {
+    // Validate ADC parameters, if the parameters are incorrect
+    // If the status is not equal to SL_STATUS_OK, returns error code.
+    status = validate_adc_channel_parameters(&adc_channel_config);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR(
-        "sl_si91x_adc_read_data_static:ADC read static data clear failed status=0x%04lX,line no : %d\r\n",
-        (unsigned long)status,
-        (int)__LINE__);
+      SL_PRINT_STRING_ERROR("sl_si91x_adc_read_data_static:ADC parameters are invalid, status=0x%04lX,line no : %d\r\n",
+                            (unsigned long)status,
+                            (int)__LINE__);
+      break;
     }
-    return status;
-  }
-  next_channel_num = channel_num + 1;
-  if (next_channel_num >= adc_config.num_of_channel_enable) {
-    next_channel_num = 0;
-  }
-  next_config.channel = next_channel_num;
-  error_status        = ADC_Per_ChannelConfig(next_config, adc_config);
-  status              = convert_rsi_to_sl_error_code(error_status);
-  if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR(
-      "sl_si91x_adc_read_data_static:ADC read static data configuration failed status=0x%04lX,line no : %d\r\n",
-      (unsigned long)status,
-      (int)__LINE__);
-    return status;
-  }
-  adc_static_read_channel = next_channel_num;
+    // Enable the gain and calculation on output samples.
+    read_static_data = RSI_ADC_ReadDataStatic(AUX_ADC_DAC_COMP, data_process, adc_channel_config.input_type[chnl_num]);
+    *adc_value       = (uint16_t)read_static_data;
+    if (adc_config.num_of_channel_enable == 1) {
+      // If adc using only one channel then it will clear the interrupt to sample the next data.
+      status = sl_si91x_adc_channel_interrupt_clear(adc_config, chnl_num);
+      if (status != SL_STATUS_OK) {
+        SL_PRINT_STRING_ERROR(
+          "sl_si91x_adc_read_data_static:ADC read static data clear failed status=0x%04lX,line no : %d\r\n",
+          (unsigned long)status,
+          (int)__LINE__);
+      }
+    } else { // If number of channel more than one it will reconfig the next channel and it will sample the data in a sequential order.
+      if (++chnl_num >= adc_config.num_of_channel_enable) {
+        chnl_num = 0;
+      }
+      adc_channel_config.channel = chnl_num;
+      error_status               = ADC_Per_ChannelConfig(adc_channel_config, adc_config);
+      status                     = convert_rsi_to_sl_error_code(error_status);
+      if (status != SL_STATUS_OK) {
+        SL_PRINT_STRING_ERROR(
+          "sl_si91x_adc_read_data_static:ADC read static data configuration failed status=0x%04lX,line no : %d\r\n",
+          (unsigned long)status,
+          (int)__LINE__);
+      }
+    }
+  } while (false);
   return status;
 }
 
@@ -822,9 +810,8 @@ sl_status_t sl_si91x_adc_start(sl_adc_config_t adc_config)
   // If the status is not equal to SL_STATUS_OK, returns error code.
   status = validate_adc_parameters(&adc_config);
   if (status == SL_STATUS_OK) {
-    adc_static_read_channel = 0;
-    error_status            = ADC_Start(adc_config);
-    status                  = convert_rsi_to_sl_error_code(error_status);
+    error_status = ADC_Start(adc_config);
+    status       = convert_rsi_to_sl_error_code(error_status);
     if (status != SL_STATUS_OK) {
       SL_PRINT_STRING_ERROR("sl_si91x_adc_start:ADC start failed status=0x%04lX,line no : %d\r\n",
                             (unsigned long)status,

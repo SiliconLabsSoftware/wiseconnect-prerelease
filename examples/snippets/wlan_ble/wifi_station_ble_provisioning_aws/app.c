@@ -134,10 +134,7 @@ static const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_BLE_GATT_INIT
 #endif
                       ),
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
 };
 
 const osThreadAttr_t thread_attributes = {
@@ -179,20 +176,20 @@ void rsi_wlan_ble_app_init(void *argument)
   ble_disable_done_queue = osMessageQueueNew(1, sizeof(int32_t), NULL);
   ble_enable_done_queue  = osMessageQueueNew(1, sizeof(int32_t), NULL);
   if (ble_disable_done_queue == NULL || ble_enable_done_queue == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Queue creation failed.\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Queue creation failed.");
     return;
   }
 #endif
 
   wlan_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (wlan_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create wlan_thread_sem");
     return;
   }
 
   ble_thread_sem = osSemaphoreNew(1, 0, NULL);
   if (ble_thread_sem == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to create ble_thread_sem");
     return;
   }
 

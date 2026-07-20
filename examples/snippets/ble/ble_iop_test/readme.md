@@ -44,12 +44,8 @@ This document outlines the requirements, setup process, test execution, and data
 	
 - Test Hardware:
 	- SiWG917 SoC Family Development Kits:
-    - Standalone
-      - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
-    - Radio Boards 
-  	  - [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) [SiWx917-RB4338A]
-      - [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343A]
-      - [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343C]
+		-   SOC Expansion Kits with SOC Radio Boards:
+			- (BRD4338A + BRD4002A)
 	- BLE Smartphone
 			
 ### Software Requirements

@@ -146,7 +146,7 @@ upgrade:
   - sdk:
       id: wiseconnect3_sdk
       vendor: silabs
-      version: "4.1.1"
+      version: "4.1.0"
     component:
       - trigger: psram_aps6404l_sqh
         description: >

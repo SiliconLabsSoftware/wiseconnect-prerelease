@@ -61,7 +61,9 @@
 #include <gatt_server_config.h> // GATT Server config - MUST be included after common config
                                 // Provides: LOCAL_MTU_SIZE, TX_NOTIFICATIONS_TO_*, TX_INDICATIONS_TO_*
 #include "gatt_server.h"        // GATT Server types, structures, and API declarations
-                                // att_list, rsi_ble_att*_val_hndl, rsi_gatt_get_attribute_from_list() (14 uses)
+                                // att_list, write_attribute_handle/notify_attribute_handle,
+                                // write_without_response_attribute_handle/indicate_attribute_handle,
+                                // rsi_gatt_get_attribute_from_list() (14 uses)
 #include "gatt_common.h"        // Common GATT constants shared between server/client
 // NOTIFY_ENABLE/DISABLE, INDICATION_ENABLE/DISABLE, RSI_ERROR_IN_BUFFER_ALLOCATION (5 uses)
 
@@ -90,11 +92,21 @@
 // Debug and Utility Functions
 #include "rsi_utils.h" // LOG_PRINT_D() macro, PEER_DEVICE_INITATED_MTU_EXCHANGE constant (18 uses)
 
+__attribute__((weak)) void sl_gatt_server_profile_refresh_notify_payload(uint8_t ble_conn_id)
+{
+  UNUSED_PARAMETER(ble_conn_id);
+}
+
 // GAP-owned variables (defined in gap_user_event_hdlrs.c)
 extern rsi_ble_conn_info_t rsi_ble_conn_info[TOTAL_CONNECTIONS];
 extern uint8_t remote_dev_addr_conn[RSI_REM_DEV_ADDR_LEN];
 extern ble_confg_info_t ble_confgs;
 extern more_data_state_beta_t more_data_state_beta[TOTAL_CONNECTIONS];
+
+volatile sl_gatt_server_notify_payload_policy_t sl_gatt_server_notify_payload_policy =
+  SL_GATT_SERVER_NOTIFY_PAYLOAD_DEFAULT;
+
+volatile uint16_t sl_gatt_server_profile_notify_payload_len = 0;
 
 /*==============================================*/
 /**
@@ -111,21 +123,44 @@ extern more_data_state_beta_t more_data_state_beta[TOTAL_CONNECTIONS];
 void rsi_ble_gatt_server_data_transmit(uint8_t ble_conn_id)
 {
   int32_t status;
+  rsi_ble_att_list_t *indicate_attr_in_host = NULL;
+  rsi_ble_att_list_t *indicate_attr_in_ta   = NULL;
+  rsi_ble_att_list_t *notify_attr_in_host   = NULL;
+  rsi_ble_att_list_t *notify_attr_in_ta     = NULL;
   LOG_PRINT_D("\r\n GATT Server data transmit -conn%d \n", ble_conn_id);
 
   //! indicate to remote device continuously
   if (ble_confgs.ble_conn_configuration[ble_conn_id].tx_indications) {
 
     if (rsi_ble_conn_info[ble_conn_id].indication_enabled == true) {
+      uint16_t cfg_max = ble_confgs.ble_conn_configuration[ble_conn_id].buff_mode_sel.max_data_length;
+
+      indicate_attr_in_host = rsi_gatt_get_attribute_from_list(&att_list, indicate_attribute_handle);
+      indicate_attr_in_ta   = rsi_gatt_get_attribute_from_list(&ta_att_list, indicate_attribute_handle);
       //! prepare the data to set as local attribute value.
-      rsi_ble_conn_info[ble_conn_id].read_data1[0] = rsi_ble_conn_info[ble_conn_id].indication_cnt;
-      rsi_ble_conn_info[ble_conn_id].read_data1[1] = rsi_ble_conn_info[ble_conn_id].indication_cnt >> 8;
-      rsi_ble_conn_info[ble_conn_id].max_data_length =
-        ble_confgs.ble_conn_configuration[ble_conn_id].buff_mode_sel.max_data_length;
-      status = rsi_ble_indicate_value(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
-                                      rsi_ble_att3_val_hndl,
-                                      rsi_ble_conn_info[ble_conn_id].max_data_length,
-                                      (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
+      if (sl_gatt_server_notify_payload_policy == SL_GATT_SERVER_NOTIFY_PAYLOAD_DEFAULT) {
+        rsi_ble_conn_info[ble_conn_id].read_data1[0] = rsi_ble_conn_info[ble_conn_id].indication_cnt;
+        rsi_ble_conn_info[ble_conn_id].read_data1[1] = rsi_ble_conn_info[ble_conn_id].indication_cnt >> 8;
+      }
+      /* PROFILE: read_data1 and payload length are prepared in the event_data_transmit_server hook. */
+      if ((sl_gatt_server_notify_payload_policy == SL_GATT_SERVER_NOTIFY_PAYLOAD_PROFILE)
+          && (sl_gatt_server_profile_notify_payload_len != 0U)) {
+        rsi_ble_conn_info[ble_conn_id].max_data_length =
+          (uint16_t)MIN((uint32_t)cfg_max, (uint32_t)sl_gatt_server_profile_notify_payload_len);
+      } else {
+        rsi_ble_conn_info[ble_conn_id].max_data_length = cfg_max;
+      }
+
+      if (indicate_attr_in_ta != NULL && indicate_attr_in_host == NULL) {
+        status = rsi_ble_set_local_att_value(indicate_attribute_handle,
+                                             rsi_ble_conn_info[ble_conn_id].max_data_length,
+                                             (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
+      } else {
+        status = rsi_ble_indicate_value(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
+                                        indicate_attribute_handle,
+                                        rsi_ble_conn_info[ble_conn_id].max_data_length,
+                                        (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
+      }
       if (status != RSI_SUCCESS) {
         if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
 #if RSI_DEBUG_EN
@@ -160,20 +195,37 @@ void rsi_ble_gatt_server_data_transmit(uint8_t ble_conn_id)
   if (ble_confgs.ble_conn_configuration[ble_conn_id].tx_notifications) {
 
     if (rsi_ble_conn_info[ble_conn_id].notify_enabled == true) {
-      //! prepare the data to set as local attribute value.
-      rsi_ble_conn_info[ble_conn_id].read_data1[0] = rsi_ble_conn_info[ble_conn_id].notfy_cnt;
-      rsi_ble_conn_info[ble_conn_id].read_data1[1] = rsi_ble_conn_info[ble_conn_id].notfy_cnt >> 8;
+      uint16_t cfg_max = ble_confgs.ble_conn_configuration[ble_conn_id].buff_mode_sel.max_data_length;
 
+      notify_attr_in_host = rsi_gatt_get_attribute_from_list(&att_list, notify_attribute_handle);
+      notify_attr_in_ta   = rsi_gatt_get_attribute_from_list(&ta_att_list, notify_attribute_handle);
+      //! prepare the data to set as local attribute value.
+      if (sl_gatt_server_notify_payload_policy == SL_GATT_SERVER_NOTIFY_PAYLOAD_DEFAULT) {
+        rsi_ble_conn_info[ble_conn_id].read_data1[0] = rsi_ble_conn_info[ble_conn_id].notfy_cnt;
+        rsi_ble_conn_info[ble_conn_id].read_data1[1] = rsi_ble_conn_info[ble_conn_id].notfy_cnt >> 8;
+      }
 #if RSI_DEBUG_EN
       printf("\r\n sending notify :%d\n", rsi_ble_conn_info[ble_conn_id].notfy_cnt);
 #endif
-      //! set the local attribute value.
-      rsi_ble_conn_info[ble_conn_id].max_data_length =
-        ble_confgs.ble_conn_configuration[ble_conn_id].buff_mode_sel.max_data_length;
-      status = rsi_ble_notify_value(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
-                                    rsi_ble_att1_val_hndl,
-                                    rsi_ble_conn_info[ble_conn_id].max_data_length,
-                                    (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
+      /* PROFILE: read_data1 and payload length are prepared in the event_data_transmit_server hook. */
+      if ((sl_gatt_server_notify_payload_policy == SL_GATT_SERVER_NOTIFY_PAYLOAD_PROFILE)
+          && (sl_gatt_server_profile_notify_payload_len != 0U)) {
+        rsi_ble_conn_info[ble_conn_id].max_data_length =
+          (uint16_t)MIN((uint32_t)cfg_max, (uint32_t)sl_gatt_server_profile_notify_payload_len);
+      } else {
+        rsi_ble_conn_info[ble_conn_id].max_data_length = cfg_max;
+      }
+
+      if (notify_attr_in_ta != NULL && notify_attr_in_host == NULL) {
+        status = rsi_ble_set_local_att_value(notify_attribute_handle,
+                                             rsi_ble_conn_info[ble_conn_id].max_data_length,
+                                             (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
+      } else {
+        status = rsi_ble_notify_value(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
+                                      notify_attribute_handle,
+                                      rsi_ble_conn_info[ble_conn_id].max_data_length,
+                                      (uint8_t *)rsi_ble_conn_info[ble_conn_id].read_data1);
+      }
 
       if (status != RSI_SUCCESS) {
         if (status == RSI_ERROR_BLE_DEV_BUF_FULL) {
@@ -396,6 +448,11 @@ void rsi_ble_read_req(uint16_t status, void *event_data)
     printf("\r\n response to read request initiated by remote device was successfull -conn%d \n", ble_conn_id);
   }
 }
+
+static uint8_t rsi_ble_is_ta_maintained_attribute(uint16_t handle)
+{
+  return (rsi_gatt_get_attribute_from_list(&ta_att_list, handle) != NULL);
+}
 /*==============================================*/
 /**
  * @fn          void rsi_ble_on_gatt_write_event(uint16_t status, void *event_data)
@@ -444,106 +501,110 @@ void rsi_ble_server_handle_gatt_write(uint16_t status, void *event_data)
 
   //! copy to conn specific buffer
   memcpy(&rsi_ble_conn_info[ble_conn_id].app_ble_write_event, rsi_ble_write, sizeof(rsi_ble_event_write_t));
+  uint16_t write_handle     = *(uint16_t *)(rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle);
+  uint8_t attr_in_ta_handle = rsi_ble_is_ta_maintained_attribute(write_handle);
 
-  //=======================================================================
-  // SERVER OPERATION 1: Write Request with Response to local attribute
-  //=======================================================================
+  // TA-maintained handles are owned by TA for ATT write procedure completion.
+  // Host-side handling below is only for host-maintained attributes.
+  if (!attr_in_ta_handle) {
+    //=======================================================================
+    // SERVER OPERATION 1: Write Request with Response to local attribute
+    //=======================================================================
 
-  //! process the received 'write response' data packet
-  if ((*(uint16_t *)(rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle)) == rsi_ble_att1_val_hndl) {
-    rsi_ble_att_list_t *attribute = NULL;
-    uint8_t opcode = 0x12, err = 0x00;
-    attribute =
-      rsi_gatt_get_attribute_from_list(&att_list,
-                                       (*(uint16_t *)(rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle)));
+    //! process the received 'write response' data packet
+    if (write_handle == write_attribute_handle) {
+      rsi_ble_att_list_t *attribute = NULL;
+      uint8_t opcode = 0x12, err = 0x00;
+      attribute = rsi_gatt_get_attribute_from_list(&att_list, write_handle);
 
-    //! Check if value has write properties
-    if ((attribute != NULL) && (attribute->value != NULL)) {
-      if (!(attribute->char_val_prop & 0x08)) //! If no write property, send error response
-      {
-        err = 0x03; //! Error - Write not permitted
+      //! Check if value has write properties
+      if ((attribute != NULL) && (attribute->value != NULL)) {
+        if (!(attribute->char_val_prop & 0x08)) //! If no write property, send error response
+        {
+          err = 0x03; //! Error - Write not permitted
+        }
+      } else {
+        //! Error = No such handle exists
+        err = 0x01;
       }
-    } else {
-      //! Error = No such handle exists
-      err = 0x01;
-    }
 
-    //! Update the value based6 on the offset and length of the value
-    if ((err == 0) && ((rsi_ble_conn_info[ble_conn_id].app_ble_write_event.length) <= attribute->max_value_len)) {
-      memset(attribute->value, 0, attribute->max_value_len);
+      //! Update the value based on the offset and length of the value
+      if ((err == 0) && ((rsi_ble_conn_info[ble_conn_id].app_ble_write_event.length) <= attribute->max_value_len)) {
+        memset(attribute->value, 0, attribute->max_value_len);
 
-      //! Check if value exists for the handle. If so, maximum length of the value.
-      memcpy(attribute->value,
-             rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value,
-             rsi_ble_conn_info[ble_conn_id].app_ble_write_event.length);
+        //! Check if value exists for the handle. If so, maximum length of the value.
+        memcpy(attribute->value,
+               rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value,
+               rsi_ble_conn_info[ble_conn_id].app_ble_write_event.length);
 
-      //! Update value length
-      attribute->value_len = rsi_ble_conn_info[ble_conn_id].app_ble_write_event.length;
+        //! Update value length
+        attribute->value_len = rsi_ble_conn_info[ble_conn_id].app_ble_write_event.length;
 
-      printf("\r\n received data from remote device: %s \n", (uint8_t *)attribute->value);
+        printf("\r\n received data from remote device: %s \n", (uint8_t *)attribute->value);
 
-      //! Send gatt write response
-      rsi_ble_gatt_write_response(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr, 0);
-    } else {
-      //! Error : 0x07 - Invalid request,  0x0D - Invalid attribute value length
-      err = 0x07;
-    }
+        //! Send gatt write response
+        rsi_ble_gatt_write_response(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr, 0);
+      } else {
+        //! Error : 0x07 - Invalid request,  0x0D - Invalid attribute value length
+        err = 0x07;
+      }
 
-    if (err) {
-      //! Send error response
-      rsi_ble_att_error_response(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
-                                 *(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle,
-                                 opcode,
-                                 err);
-    }
-  }
-
-  //=======================================================================
-  // SERVER OPERATION 2: Write Without Response to local attribute
-  //=======================================================================
-  //! print the received 'write no response' data packet
-  if ((*(uint16_t *)(rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle)) == rsi_ble_att2_val_hndl) {
-    printf("\r\n received data from remote device: %s \n",
-           rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value);
-  }
-
-  //=======================================================================
-  // SERVER OPERATION 3: CCCD Write - Enable/Disable TX Notifications
-  //=======================================================================
-  //! when remote device enabled the notifications
-  if (((*(uint16_t *)(rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle) - 1) == rsi_ble_att1_val_hndl)) {
-    if (ble_confgs.ble_conn_configuration[ble_conn_id].tx_notifications) {
-      // check for valid notifications
-      if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == NOTIFY_ENABLE) {
-        printf("\r\n Remote device enabled the notification -conn%d\n", ble_conn_id);
-        rsi_ble_conn_info[ble_conn_id].rsi_tx_to_rem_dev = true;
-        rsi_ble_conn_info[ble_conn_id].transmit          = true;
-        rsi_ble_conn_info[ble_conn_id].notify_enabled    = true;
-        //! configure the buffer configuration mode
-        rsi_ble_event_set_buffer_config_server_driver_callback(&ble_conn_id);
-      } else if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == NOTIFY_DISABLE) {
-        printf("\r\n Remote device disabled the notification -conn%d\n", ble_conn_id);
-        rsi_ble_conn_info[ble_conn_id].transmit       = false;
-        rsi_ble_conn_info[ble_conn_id].notify_enabled = false;
+      if (err) {
+        //! Send error response
+        rsi_ble_att_error_response(rsi_ble_conn_info[ble_conn_id].rsi_connected_dev_addr,
+                                   *(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle,
+                                   opcode,
+                                   err);
       }
     }
-  }
 
-  //=======================================================================
-  // SERVER OPERATION 4: CCCD Write - Enable/Disable TX Indications
-  //=======================================================================
-  else if (((*(uint16_t *)(rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle) - 1) == rsi_ble_att3_val_hndl)) {
-    if (ble_confgs.ble_conn_configuration[ble_conn_id].tx_indications) {
-      // check for valid indications
-      if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == INDICATION_ENABLE) {
-        printf("\r\n Remote device enabled the indications -conn%d\n", ble_conn_id);
-        rsi_ble_conn_info[ble_conn_id].rsi_tx_to_rem_dev  = true;
-        rsi_ble_conn_info[ble_conn_id].indication_enabled = true;
-        //! configure the buffer configuration mode
-        rsi_ble_event_set_buffer_config_server_driver_callback(&ble_conn_id);
-      } else if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == INDICATION_DISABLE) {
-        rsi_ble_conn_info[ble_conn_id].indication_enabled = false;
-        printf("\r\n Remote device disabled the indications -conn%d\n", ble_conn_id);
+    //=======================================================================
+    // SERVER OPERATION 2: Write Without Response to local attribute
+    //=======================================================================
+    //! print the received 'write no response' data packet
+    if (write_handle == write_without_response_attribute_handle) {
+      printf("\r\n received data from remote device: %s \n",
+             rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value);
+    }
+
+    //=======================================================================
+    // SERVER OPERATION 3: CCCD Write - Enable/Disable TX Notifications
+    //=======================================================================
+    //! when remote device enabled the notifications
+    if ((write_handle - 1) == notify_attribute_handle) {
+      if (ble_confgs.ble_conn_configuration[ble_conn_id].tx_notifications) {
+        // check for valid notifications
+        if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == NOTIFY_ENABLE) {
+          printf("\r\n Remote device enabled the notification -conn%d\n", ble_conn_id);
+          rsi_ble_conn_info[ble_conn_id].rsi_tx_to_rem_dev = true;
+          rsi_ble_conn_info[ble_conn_id].transmit          = true;
+          rsi_ble_conn_info[ble_conn_id].notify_enabled    = true;
+          //! configure the buffer configuration mode
+          rsi_ble_event_set_buffer_config_server_driver_callback(&ble_conn_id);
+        } else if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == NOTIFY_DISABLE) {
+          printf("\r\n Remote device disabled the notification -conn%d\n", ble_conn_id);
+          rsi_ble_conn_info[ble_conn_id].transmit       = false;
+          rsi_ble_conn_info[ble_conn_id].notify_enabled = false;
+        }
+      }
+    }
+
+    //=======================================================================
+    // SERVER OPERATION 4: CCCD Write - Enable/Disable TX Indications
+    //=======================================================================
+    else if ((write_handle - 1) == indicate_attribute_handle) {
+      if (ble_confgs.ble_conn_configuration[ble_conn_id].tx_indications) {
+        // check for valid indications
+        if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == INDICATION_ENABLE) {
+          printf("\r\n Remote device enabled the indications -conn%d\n", ble_conn_id);
+          rsi_ble_conn_info[ble_conn_id].rsi_tx_to_rem_dev  = true;
+          rsi_ble_conn_info[ble_conn_id].indication_enabled = true;
+          //! configure the buffer configuration mode
+          rsi_ble_event_set_buffer_config_server_driver_callback(&ble_conn_id);
+        } else if (rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value[0] == INDICATION_DISABLE) {
+          rsi_ble_conn_info[ble_conn_id].indication_enabled = false;
+          printf("\r\n Remote device disabled the indications -conn%d\n", ble_conn_id);
+        }
       }
     }
   }
@@ -586,14 +647,13 @@ void rsi_ble_event_prepare_write(uint16_t status, void *event_data)
          sizeof(rsi_ble_event_prepare_write_t));
 
   printf("\nPWE\n");
-  uint8_t err = 0;
-  //! clear the served event
-  if (*(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_prepared_write_event.handle == rsi_ble_att1_val_hndl) {
+  uint16_t prepare_write_handle = *(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_prepared_write_event.handle;
+  uint8_t err                   = 0;
+  // For TA-maintained handles, host does not send prepare-write/error responses.
+  if (!rsi_ble_is_ta_maintained_attribute(prepare_write_handle) && (prepare_write_handle == write_attribute_handle)) {
     rsi_ble_att_list_t *attribute = NULL;
     uint8_t opcode                = 0x16;
-    attribute =
-      rsi_gatt_get_attribute_from_list(&att_list,
-                                       *(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_prepared_write_event.handle);
+    attribute                     = rsi_gatt_get_attribute_from_list(&att_list, prepare_write_handle);
 
     //! Check if value has write properties
     if ((attribute != NULL) && (attribute->value != NULL)) {
@@ -614,7 +674,7 @@ void rsi_ble_event_prepare_write(uint16_t status, void *event_data)
                                  err);
     }
 
-    //! Update the value based6 on the offset and length of the value
+    //! Update the value based on the offset and length of the value
     if ((err == 0)
         && ((*(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_prepared_write_event.offset)
             <= attribute->max_value_len)) {
@@ -675,12 +735,12 @@ void rsi_ble_event_execute_write(uint16_t status, void *event_data)
          sizeof(rsi_ble_execute_write_t));
 
   printf("\nEWE\n");
-  if (*(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_prepared_write_event.handle == rsi_ble_att1_val_hndl) {
+  uint16_t execute_write_handle = *(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_prepared_write_event.handle;
+  // For TA-maintained handles, host does not send execute-write/error responses.
+  if (!rsi_ble_is_ta_maintained_attribute(execute_write_handle) && (execute_write_handle == write_attribute_handle)) {
     rsi_ble_att_list_t *attribute = NULL;
     uint8_t opcode = 0x18, err = 0x00;
-    attribute =
-      rsi_gatt_get_attribute_from_list(&att_list,
-                                       *(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_prepared_write_event.handle);
+    attribute = rsi_gatt_get_attribute_from_list(&att_list, execute_write_handle);
 
     //! Check if value has write properties
     if ((attribute != NULL) && (attribute->value != NULL)) {
@@ -778,10 +838,9 @@ void rsi_ble_event_indication_confirmation(uint16_t __attribute__((unused)) stat
  *
  */
 void rsi_ble_event_data_transmit_server(uint16_t __attribute__((unused)) status, void *event_data)
-
 {
-
   uint8_t conn_id = *(uint8_t *)event_data;
+
   LOG_PRINT_D("\r\n in transmit  -conn%d \r\n", conn_id);
   rsi_ble_gatt_server_data_transmit(conn_id);
 }

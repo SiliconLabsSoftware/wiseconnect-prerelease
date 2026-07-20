@@ -1,9 +1,8 @@
-/***************************************************************************/ /**
- * @file sli_mqtt_tls_alpn.h
- * @brief Shared MQTT TLS ALPN configuration and helpers for Si91x Paho ports.
+/*******************************************************************************
+ * @file  sl_net_credentials.c
  *******************************************************************************
  * # License
- * <b>Copyright 2025 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -27,27 +26,26 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-#ifndef SLI_MQTT_TLS_ALPN_H
-#define SLI_MQTT_TLS_ALPN_H
 
-// MQTT TLS ALPN Configuration (for non-AWS MQTT brokers on port 443)
-#ifndef MQTT_TLS_ALPN_ENABLED
-#define MQTT_TLS_ALPN_ENABLED 0 // Set to 1 to enable ALPN during TLS handshake
-#endif
+#include "sli_net_credentials.h"
 
-#ifndef MQTT_TLS_ALPN_PROTOCOL
-#define MQTT_TLS_ALPN_PROTOCOL "mqtt" // ALPN protocol name (e.g. "mqtt" for Mosquitto on port 443)
-#endif
+sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
+                                  sl_net_credential_type_t type,
+                                  const void *credential,
+                                  uint32_t credential_length)
+{
+  return sli_net_set_credential(id, type, credential, credential_length);
+}
 
-#define SLI_MQTT_TLS_ALPN_PROTOCOL_MAX_LEN 64
-#define SLI_MQTT_TLS_ALPN_PROTOCOL_LEN     (sizeof(MQTT_TLS_ALPN_PROTOCOL) - 1U)
+sl_status_t sl_net_get_credential(sl_net_credential_id_t id,
+                                  sl_net_credential_type_t *type,
+                                  void *credential,
+                                  uint32_t *credential_length)
+{
+  return sli_net_get_credential(id, type, credential, credential_length);
+}
 
-#if MQTT_TLS_ALPN_ENABLED && defined(SLI_MQTT_TLS_ALPN_USE_BSD)
-int sli_mqtt_tls_alpn_set_bsd(int socket_fd);
-#endif
-
-#if MQTT_TLS_ALPN_ENABLED && defined(SLI_MQTT_TLS_ALPN_USE_ASYNC)
-int sli_mqtt_tls_alpn_set_async(int socket_fd);
-#endif
-
-#endif // SLI_MQTT_TLS_ALPN_H
+sl_status_t sl_net_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type)
+{
+  return sli_net_delete_credential(id, type);
+}

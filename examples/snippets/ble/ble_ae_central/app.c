@@ -32,7 +32,6 @@
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
 #include "sl_wifi.h"
-#include "sl_si91x_driver.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
 
@@ -185,10 +184,7 @@ static const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_BLE_AE_MAX_ADV_SETS(RSI_BLE_AE_MAX_ADV_SETS)
 #endif
                         ),
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
 };
 
 const osThreadAttr_t thread_attributes = {
@@ -512,7 +508,7 @@ void ble_ae_central(void)
   int32_t status                                             = 0;
   int32_t temp_event_map                                     = 0;
   int32_t temp_event_map1                                    = 0;
-  sl_si91x_firmware_version_t version                        = { 0 };
+  sl_wifi_firmware_version_t version                         = { 0 };
   static uint8_t rsi_app_resp_get_dev_addr[RSI_DEV_ADDR_LEN] = { 0 };
   uint8_t local_dev_addr[LOCAL_DEV_ADDR_LEN]                 = { 0 };
 
@@ -525,19 +521,11 @@ void ble_ae_central(void)
   }
 
   //! Firmware version Prints
-  status = sl_si91x_get_firmware_version(&version);
+  status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           version.chip_id,
-           version.rom_id,
-           version.major,
-           version.minor,
-           version.security_version,
-           version.patch_num,
-           version.customer_id,
-           version.build_num);
+    print_firmware_version(&version);
   }
 
   //! get the local device MAC address.

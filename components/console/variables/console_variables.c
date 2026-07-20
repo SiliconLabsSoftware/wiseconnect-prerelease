@@ -19,9 +19,9 @@
 
 #include "console.h"
 #include "sl_ip_types.h"
-#include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <inttypes.h>
 #include <string.h>
 #include "sl_constants.h"
 

@@ -38,9 +38,9 @@ This application demonstrates ULP UART operation under **FreeRTOS**, including:
   - 8 Bit data transfer
   - Stop bits 1
   - No Parity
-  - Auto Flow control
+  - No Auto Flow control
   - Baud Rates - 115200
-  - RS485 is not supported by ULP UART.
+- HW flow control is currently not supported for ULP_UART.
 
 ## About Example Code
 
@@ -67,7 +67,7 @@ This application demonstrates ULP UART operation under **FreeRTOS**, including:
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs SiWx917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -163,6 +163,7 @@ Follow the steps below for successful execution of the application:
 >- In this application, the power state changes between PS4 and PS2.
 >- After a PS4↔PS2 transition, call `sl_si91x_usart_set_configuration()` again with settings appropriate to the new clock domain; this example does that from `ulp_uart_application_init()` in **`ulp_uart_freertos.c`**.
 >
+>- CTS and RTS only work when not using the ROM UART driver.
 >
 > **Note:**
 >

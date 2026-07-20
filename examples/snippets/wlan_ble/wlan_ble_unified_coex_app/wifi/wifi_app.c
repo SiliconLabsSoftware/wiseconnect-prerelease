@@ -410,20 +410,12 @@ sl_status_t start_aws_mqtt(void)
   sprintf(client_id, "silabs_%s", mac_id);
   SL_DEBUG_LOG_V2(INFO, "Client ID: %s\r\n", (uintptr_t)client_id);
 
-  sl_si91x_firmware_version_t fw_version = { 0 };
-  status                                 = sl_si91x_get_firmware_version(&fw_version);
+  sl_wifi_firmware_version_t fw_version = { 0 };
+  status                                = sl_wifi_get_firmware_version(&fw_version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           fw_version.chip_id,
-           fw_version.rom_id,
-           fw_version.major,
-           fw_version.minor,
-           fw_version.security_version,
-           fw_version.patch_num,
-           fw_version.customer_id,
-           fw_version.build_num);
+    print_firmware_version(&fw_version);
   }
 
   mqtt_init_params.enableAutoReconnect       = true;
@@ -739,7 +731,10 @@ void subscribe_handler(struct _Client *pClient,
   UNUSED_PARAMETER(pTopicName);
   UNUSED_PARAMETER(topicNameLen);
   UNUSED_PARAMETER(data);
-  printf("Data received on the Subscribed Topic: %.*s ", (int)pParams->payloadLen, (char *)pParams->payload);
+  SL_DEBUG_LOG_V2(INFO,
+                  "Data received on the Subscribed Topic: %.*s ",
+                  pParams->payloadLen,
+                  (uintptr_t)(char *)pParams->payload);
 }
 #endif
 #endif

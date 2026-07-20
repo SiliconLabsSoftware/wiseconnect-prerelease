@@ -46,7 +46,7 @@
  * @{
  */
 
-/** Maximum SSID size in an 802.11 SSID information element (32 bytes in the IE body, not counting IE header). */
+/** Max SSID size in an 802.11 SSID information element (32 bytes in the IE body, not counting IE header). */
 #define SL_WIFI_MAX_SSID_IE_OCTETS 32U
 
 /** Legacy alias for @ref SL_WIFI_MAX_SSID_LENGTH (NWP/host SSID buffers, often includes space for a null terminator). */
@@ -101,11 +101,11 @@
  * @{
  */
 
-/** Instruct firmware to use its default auth/association timeout. */
+/** Tell the firmware to use its default auth/association timeout. */
 #define SL_WIFI_DEFAULT_AUTH_ASSOCIATION_TIMEOUT 0xFFFF
-/** Instruct firmware to use its default dwell time on each channel during active scan. */
+/** Tell the firmware to use its default dwell time on each channel during active scan. */
 #define SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME 0xFFFF
-/** Instruct firmware to use its default keep-alive timeout. */
+/** Tell the firmware to use its default keep-alive timeout. */
 #define SL_WIFI_DEFAULT_KEEP_ALIVE_TIMEOUT 0xFFFF
 /** Passive scan: @c 0 means use the default passive scan dwell time. */
 #define SL_WIFI_DEFAULT_PASSIVE_CHANNEL_SCAN_TIME 0
@@ -462,12 +462,12 @@ typedef struct {
     options; ///< Optional flags for AP configuration. @note Dynamic configurability of hidden SSIDs is only available in APCONF when it is disabled in opermode.
   sl_wifi_credential_id_t credential_id; ///< ID of secure credentials
   uint8_t
-    keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-ap-keepalive-type-t)
+    keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-types#sl-si91x-ap-keepalive-type-t)
   uint16_t beacon_interval;     ///< Beacon interval of the access point in time units (1 TU = 1024 microseconds)
   uint32_t client_idle_timeout; ///< Period after which AP will disconnect the station
   uint16_t dtim_beacon_count;   ///< Number of beacons per DTIM
   uint8_t
-    maximum_clients; ///< The maximum number of associated clients must not exceed [SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap#sl-wifi-custom-feat-max-num-of-clients). If this bit is not set in device configuration, the default maximum is 8 clients in AP-only mode and 4 clients in concurrent mode.
+    maximum_clients; ///< The maximum number of associated clients must not exceed [SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap#sl-si91x-custom-feat-max-num-of-clients). If this bit is not set in device configuration, the default maximum is 8 clients in AP-only mode and 4 clients in concurrent mode.
   uint8_t beacon_stop; ///< Flag to stop beaconing when there are no associated clients
   sl_wifi_tdi_t
     tdi_flags; ///< Flags to enable Transition Disable Indication (TDI). One of the values from @ref sl_wifi_tdi_t
@@ -863,7 +863,7 @@ typedef struct {
 typedef struct {
   uint32_t listen_interval; ///< Wi-Fi Listen interval in time units (1 TU = 1024 microseconds)
   uint32_t
-    listen_interval_multiplier; ///< Multiplier for the listen interval, sent by the device in the association request to the AP. Default: 1. Maximum recommended: 10. Higher values may lead to interoperability issues.
+    listen_interval_multiplier; ///< Multiplier for the listen interval, sent by the device in the association request to the AP. Default: 1. Max recommended: 10. Higher values may lead to interoperability issues.
 } sl_wifi_listen_interval_v2_t;
 
 /**
@@ -880,13 +880,9 @@ typedef struct {
 /**
  * @struct sl_wifi_client_info_response_t
  * @brief Wi-Fi client information response structure.
- *
- * Returned by @ref sl_wifi_get_ap_client_info. Only @c client_info[0 .. client_count-1] contain
- * valid data. Entries beyond @c client_count may be stale unless this structure was zero-initialized
- * before the API call.
  */
 typedef struct {
-  uint8_t client_count; ///< Number of valid entries in @c client_info (max @ref SL_WIFI_MAX_CLIENT_COUNT)
+  uint8_t client_count; ///< Indicates the total count of Wi-Fi clients currently connected to the network
   sl_wifi_client_info_t client_info[SL_WIFI_MAX_CLIENT_COUNT]; ///< Array of client information
 } sl_wifi_client_info_response_t;
 
@@ -1871,6 +1867,18 @@ typedef struct {
     wireless_mode; ///< Wireless mode used in connected AP (6 - AX, 4 - N, 3 - G, 1 - B) in station mode; not supported in AP mode.
   uint8_t mac_address[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< MAC address of the module.
 } sl_wifi_interface_info_t;
+
+/// SNR statistics structure
+typedef struct {
+  int16_t snr_last_deci_dbm; ///< Last SNR in deci-dbm
+  int16_t snr_avg_deci_dbm;  ///< Average SNR in deci-dbm
+} sl_wifi_snr_stats_t;
+
+/// RSSI statistics structure
+typedef struct {
+  int16_t rssi_last_deci_dbm; ///< Last RSSI in deci-dbm
+  int16_t rssi_avg_deci_dbm;  ///< Average RSSI in deci-dbm
+} sl_wifi_rssi_stats_t;
 
 /**
   * @struct sl_wifi_groupcast_filter_config_t

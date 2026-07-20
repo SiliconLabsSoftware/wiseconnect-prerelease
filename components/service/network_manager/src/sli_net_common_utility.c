@@ -36,7 +36,6 @@
 #include "sl_net_wifi_types.h"
 #if defined(SLI_SI917)
 #include "sl_net_si91x.h"
-#include "sli_net_utility.h"
 #endif
 #include "sl_wifi.h"
 #if defined(SLI_SI91X_OFFLOAD_NETWORK_STACK) || defined(SLI_SI91X_LWIP_HOSTED_NETWORK_STACK)
@@ -302,11 +301,6 @@ sl_status_t sli_net_get_vap_for_ip_version(uint8_t vap_id, sl_ip_address_type_t 
   return ((combined_ip_types & ip_type) != 0) ? SL_STATUS_OK : SL_STATUS_INVALID_CONFIGURATION;
 }
 #endif /* SLI_SI91X_OFFLOAD_NETWORK_STACK || SLI_SI91X_LWIP_HOSTED_NETWORK_STACK */
-
-bool sli_net_is_ip_config_success(sl_status_t status)
-{
-  return (status == SL_STATUS_OK) || (status == SL_STATUS_WIFI_IPV4_OK) || (status == SL_STATUS_WIFI_IPV6_OK);
-}
 
 sl_status_t sli_network_manager_init(void)
 {
@@ -953,9 +947,7 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
   uint8_t vap_id = (message->interface == SL_NET_WIFI_CLIENT_1_INTERFACE) ? SL_SI91X_WIFI_CLIENT_VAP_ID
                                                                           : SL_SI91X_WIFI_CLIENT_VAP_ID_1;
   status         = sl_si91x_configure_ip_address(&profile.ip, vap_id);
-  // Keep the connection on full or partial IP configuration success; only treat a total
-  // IP configuration failure as a disconnect.
-  if (!sli_net_is_ip_config_success(status)) {
+  if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR,
                     "Failed to configure IP address for Wi-Fi client interface: 0x%lx, VAP ID: %d\n",
                     message->interface,

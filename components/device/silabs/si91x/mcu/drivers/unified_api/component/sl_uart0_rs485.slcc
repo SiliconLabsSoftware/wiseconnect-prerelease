@@ -34,3 +34,6 @@ requires:
   - name: log_none
 conflicts:
   - name: sl_usart
+documentation:
+    docset: wiseconnect
+    document: wiseconnect-api-reference-guide-si91x-peripherals/usart

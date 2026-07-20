@@ -24,17 +24,15 @@ osThreadId_t tid_thread_led_on;  // thread id for LED ON thread
 osThreadId_t tid_thread_led_off; // thread id for LED OFF thread
 
 static const osThreadAttr_t led_on_thread_attributes = {
-  .name = "led_on",
-  .stack_size =
-    1024, // using 1024 for all the threads, may use as low as possible based on the need of respective thread
-  .priority = osPriorityLow,
+  .name       = "led_on",
+  .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
+  .priority   = osPriorityLow,
 };
 
 static const osThreadAttr_t led_off_thread_attributes = {
-  .name = "led_off",
-  .stack_size =
-    1024, // using 1024 for all the threads, may use as low as possible based on the need of respective thread
-  .priority = osPriorityLow,
+  .name       = "led_off",
+  .stack_size = 500, // using 500 for all the threads, may use as low as possible based on the need of respective thread
+  .priority   = osPriorityLow,
 };
 /*******************************************************************************
  * Initialize application.

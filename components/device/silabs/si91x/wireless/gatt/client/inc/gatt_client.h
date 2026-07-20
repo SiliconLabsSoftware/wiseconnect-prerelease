@@ -40,4 +40,20 @@ void rsi_ble_gatt_client_default_init(void);
 int8_t rsi_ble_gatt_client_initialize_conn_config(rsi_ble_conn_config_t *ble_conn_spec_conf);
 void rsi_assign_remote_data_serv_and_char(void);
 
+/*******************************************************************************
+ * @brief Optional hook for each RX GATT notification (client role).
+ *
+ * Invoked when `rx_notifications` is enabled and the ATT handle matches the
+ * connection's discovered notify handle (that handle comes from the UUID pair
+ * configured for RX notifications on that link).
+ *
+ * A profile (Heart Rate, HID, etc.) typically does two things, analogous to
+ * Heart Rate: (1) set `rx_notif_client_service_uuid` and `rx_notif_client_char_uuid`
+ * in the per-connection BLE config so discovery targets that profile's notify
+ * characteristic instead of the generic GATT client defaults, and (2) supply a
+ * non-weak `sl_ble_gatt_client_notification_received` implementation to decode
+ * that characteristic's payloads. The default definition is weak and empty.
+ ******************************************************************************/
+void sl_ble_gatt_client_notification_received(uint8_t ble_conn_id, const uint8_t *att_value, uint16_t length);
+
 #endif // GATT_CLIENT_H

@@ -35,14 +35,7 @@
 #include "sl_cmsis_utility.h"
 //#include <stdlib.h>
 //#include <stddef.h>
-
-#ifndef SLI_WIFI_BUFFER_BLOCK_SIZE
-#ifdef SPI_EXTENDED_TX_LEN_2K
-#define SLI_WIFI_BUFFER_BLOCK_SIZE 2300
-#else
-#define SLI_WIFI_BUFFER_BLOCK_SIZE 1616
-#endif
-#endif
+#include "sli_wifi_constants.h"
 
 #ifndef SLI_WIFI_BUFFER_SIZE
 #define SLI_WIFI_BUFFER_SIZE (8 * SLI_WIFI_BUFFER_BLOCK_SIZE)

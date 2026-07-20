@@ -270,9 +270,9 @@ typedef struct {
 #define SL_SI91X_GET_CHANNEL_TIMEOUT 30200
 
 /// Timeout used in get_interface_info API (milliseconds)
-#define SL_SI91X_GET_INTERFACE_INFO_TIMEOUT 15000
+#define SL_SI91X_GET_INTERFACE_INFO_TIMEOUT 1000
 
-/// Maximum wait time (in milliseconds) for the NCP wake indicator during host-requested NCP wakeup before returning SL_STATUS_TIMEOUT
+/// Maximum time (milliseconds) to wait for the NCP wake indicator during host-requested NCP wakeup before returning SL_STATUS_TIMEOUT
 #define SL_SI91X_NCP_REQ_WAKEUP_TIMEOUT_MS 5000
 
 //! @endcond

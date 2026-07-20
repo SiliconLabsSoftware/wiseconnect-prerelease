@@ -95,7 +95,7 @@ void test_psa_aes(psa_algorithm_t alg)
 
   for (int i = 0; i < NB_TESTS; i++) {
 
-    psa_key_id_t key_id = 0;
+    psa_key_id_t key_id;
     psa_key_attributes_t key_attr;
     size_t out_len   = 0;
     size_t out_total = 0;
@@ -111,7 +111,7 @@ void test_psa_aes(psa_algorithm_t alg)
       printf("\n\n Encryption/Decryption with %d size key for AES \n\n", (key_len_test_data[i] * 8));
       printf("\n Import a volatile plain %d size key for AES \n", (key_len_test_data[i] * 8));
       status = psa_import_key(&key_attr, aes_key_16, sizeof(aes_key_16), &key_id);
-    } else { // 256 key size
+    } else if (i == 1) { // 256 key size
       printf("\n\n Encryption/Decryption with %d size key for AES \n\n", (key_len_test_data[i] * 8));
       printf("\n Import a volatile plain %d size key for AES \n", (key_len_test_data[i] * 8));
       status = psa_import_key(&key_attr, aes_key_32, sizeof(aes_key_32), &key_id);

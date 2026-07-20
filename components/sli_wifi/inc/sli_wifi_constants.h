@@ -36,6 +36,24 @@
 #ifndef SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME
 #define SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000 // 1 second to wait for a command buffer
 #endif
+
+// Shared Wi-Fi buffer block size (default 1640). Override via SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE=2324 in project defines.
+#ifndef SLI_WIFI_BUFFER_BLOCK_SIZE
+#if (SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE)
+#define SLI_WIFI_BUFFER_BLOCK_SIZE SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE
+#else
+#define SLI_WIFI_BUFFER_BLOCK_SIZE 1640
+#endif
+#endif
+
+// Buffer block count for the buffer manager pools (default 10). Override via SLI_WIFI_BUFFER_CONFIG_BLOCK_COUNT=<n> in project config.
+
+#if (SLI_WIFI_BUFFER_CONFIG_BLOCK_COUNT)
+#define SLI_WIFI_BUFFER_BLOCK_COUNT SLI_WIFI_BUFFER_CONFIG_BLOCK_COUNT
+#else
+#define SLI_WIFI_BUFFER_BLOCK_COUNT 10
+#endif
+
 #define SLI_WLAN_MGMT_Q 4
 #define SLI_BT_Q        2
 
@@ -248,6 +266,7 @@ typedef enum {
   SLI_WIFI_REQ_BEACON_STOP                  = 0x63, ///< Stop Beacon
   SLI_WIFI_REQ_REJOIN_PARAMS                = 0x6F, ///< Rejoin Parameters
   SLI_WIFI_REQ_RSSI                         = 0x3A, ///< RSSI
+  SLI_WIFI_REQ_SIGNAL_QUALITY_STATS         = 0x3B, ///< Signal Quality Statistics
   SLI_WIFI_REQ_GET_TIMEOUT                  = 0x3C, ///< Get Timeout
   SLI_WIFI_REQ_SET_MAC_ADDRESS              = 0x17, ///< Set MAC Address
   SLI_WIFI_REQ_QUERY_GO_PARAMS              = 0x4E, ///< Query GO Parameters
@@ -385,6 +404,7 @@ typedef enum {
   SLI_WIFI_RSP_BEACON_STOP                  = 0x63, ///< Stop Beacon
   SLI_WIFI_RSP_REJOIN_PARAMS                = 0x6F, ///< Rejoin Parameters
   SLI_WIFI_RSP_RSSI                         = 0x3A, ///< RSSI
+  SLI_WIFI_RSP_SIGNAL_QUALITY_STATS         = 0x3B, ///< Signal Quality Statistics
   SLI_WIFI_RSP_GET_TIMEOUT                  = 0x3C, ///< Get Timeout
   SLI_WIFI_RSP_SET_MAC_ADDRESS              = 0x17, ///< Set MAC Address
   SLI_WIFI_RSP_QUERY_GO_PARAMS              = 0x4E, ///< Query GO Parameters

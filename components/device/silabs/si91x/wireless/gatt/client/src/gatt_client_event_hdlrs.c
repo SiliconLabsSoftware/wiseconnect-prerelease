@@ -1712,13 +1712,15 @@ void rsi_ble_client_handle_gatt_write(uint16_t status, void *event_data)
   //! code to handle remote device notifications
   else if (*(uint16_t *)rsi_ble_conn_info[ble_conn_id].app_ble_write_event.handle
            == (rsi_ble_conn_info[ble_conn_id].notify_handle)) {
-    if ((!rsi_ble_conn_info[ble_conn_id].notification_received)
-        && (ble_confgs.ble_conn_configuration[ble_conn_id].rx_notifications)) {
-      //! stop printing the logs after receiving first notification
-      rsi_ble_conn_info[ble_conn_id].notification_received = true;
-      printf("\r\n receiving notifications from remote device -conn%d\r\n", ble_conn_id);
-    } else {
-      //! do nothing as received notifications not required to print
+    if (ble_confgs.ble_conn_configuration[ble_conn_id].rx_notifications) {
+      if (!rsi_ble_conn_info[ble_conn_id].notification_received) {
+        //! print once when notifications begin, but still process first payload
+        rsi_ble_conn_info[ble_conn_id].notification_received = true;
+        printf("\r\n receiving notifications from remote device -conn%d\r\n", ble_conn_id);
+      }
+      sl_ble_gatt_client_notification_received(ble_conn_id,
+                                               rsi_ble_conn_info[ble_conn_id].app_ble_write_event.att_value,
+                                               (uint16_t)rsi_ble_conn_info[ble_conn_id].app_ble_write_event.length);
     }
   }
 }

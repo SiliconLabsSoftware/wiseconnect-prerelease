@@ -39,7 +39,6 @@
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
 #include "sl_wifi.h"
-#include "sl_si91x_driver.h"
 #include "sl_net_ip_types.h"
 #include "cmsis_os2.h"
 #include "sl_utility.h"
@@ -702,7 +701,7 @@ void rsi_ble_configurator_init(void)
 
   // set device in advertising mode.
   rsi_ble_start_advertising();
-  SL_DEBUG_LOG_V2(INFO, "BLE Advertising Started\r\n");
+  LOG_PRINT("\r\nBLE Advertising Started...\r\n");
 }
 
 /*==============================================*/
@@ -726,7 +725,7 @@ void rsi_ble_configurator_task(void *argument)
 
   scanresult = (sl_wifi_scan_result_t *)malloc(scanbuf_size);
   if (scanresult == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to allocate memory for scan result\r\n");
+    LOG_PRINT("Failed to allocate memory for scan result\r\n");
     return;
   }
   memset(scanresult, 0, scanbuf_size);
@@ -747,13 +746,13 @@ void rsi_ble_configurator_task(void *argument)
         rsi_ble_app_clear_event(RSI_BLE_ENH_CONN_EVENT);
 
         SL_DEBUG_LOG_V2(INFO,
-                        "Connected - remote_dev_addr : %s\r\n",
+                        "Connected - remote_dev_addr : %s",
                         (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, conn_event_to_app.dev_addr));
 
         //MTU exchange
         status = rsi_ble_mtu_exchange_event(conn_event_to_app.dev_addr, BLE_MTU_SIZE);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "MTU request failed with error code %lx\r\n", status);
+          LOG_PRINT("\n MTU request failed with error code %lx", status);
         }
         status = rsi_ble_conn_params_update(conn_event_to_app.dev_addr,
                                             CONN_INTERVAL_DEFAULT_MIN,
@@ -761,7 +760,7 @@ void rsi_ble_configurator_task(void *argument)
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT_DEFAULT);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "rsi_ble_conn_params_update command failed: %lx\r\n", status);
+          LOG_PRINT("\n rsi_ble_conn_params_update command failed : %lx", status);
         }
       } break;
 
@@ -771,7 +770,7 @@ void rsi_ble_configurator_task(void *argument)
         // clear the served event
         rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
         SL_DEBUG_LOG_V2(INFO,
-                        "Disconnected - remote_dev_addr : %s\r\n",
+                        "Disconnected - remote_dev_addr : %s",
                         (uintptr_t)rsi_6byte_dev_address_to_ascii(remote_dev_addr, disconn_event_to_app.dev_addr));
 #if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
         if (ble_disable_after_disconnect_pending != 0) {
@@ -787,35 +786,27 @@ void rsi_ble_configurator_task(void *argument)
 adv:
         status = rsi_ble_start_advertising();
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "start advertising cmd failed with error code = %lx\r\n", status);
+          LOG_PRINT("\r\nstart advertising cmd failed with error code = %lx \n", status);
           goto adv;
         } else {
-          SL_DEBUG_LOG_V2(INFO, "Started Advertising\r\n");
+          LOG_PRINT("\r\nStarted Advertising \n");
         }
       } break;
 
       case RSI_APP_FW_VERSION: {
-        sl_si91x_firmware_version_t firmware_version = { 0 };
+        sl_wifi_firmware_version_t firmware_version = { 0 };
 
         rsi_ble_app_clear_event(RSI_APP_FW_VERSION);
         memset(data, 0, RSI_BLE_MAX_DATA_LEN);
 
-        status = sl_si91x_get_firmware_version(&firmware_version);
+        status = sl_wifi_get_firmware_version(&firmware_version);
         if (status == SL_STATUS_OK) {
           data[0] = 0x08;
-          data[1] = sizeof(sl_si91x_firmware_version_t);
-          memcpy(&data[2], &firmware_version, sizeof(sl_si91x_firmware_version_t));
+          data[1] = sizeof(sl_wifi_firmware_version_t);
+          memcpy(&data[2], &firmware_version, sizeof(sl_wifi_firmware_version_t));
 
           rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, data);
-          printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-                 firmware_version.chip_id,
-                 firmware_version.rom_id,
-                 firmware_version.major,
-                 firmware_version.minor,
-                 firmware_version.security_version,
-                 firmware_version.patch_num,
-                 firmware_version.customer_id,
-                 firmware_version.build_num);
+          print_firmware_version(&firmware_version);
         }
       } break;
 
@@ -895,7 +886,7 @@ adv:
           osDelay(10);
         }
 
-        SL_DEBUG_LOG_V2(INFO, "Displayed scan list in Silabs app\r\n");
+        LOG_PRINT("Displayed scan list in Silabs app\r\n\n");
       } break;
 
       // WLAN connection response status (response to '2' command)
@@ -934,16 +925,20 @@ adv:
         rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl,
                                     RSI_BLE_MAX_DATA_LEN,
                                     data); // set the local attribute value.
-        SL_DEBUG_LOG_V2(INFO, "AP joined successfully\r\n");
+        LOG_PRINT("AP joined successfully\r\n\n");
 #if SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO
-        /* Quiesce BLE before calling BLE disable: disconnect; disable runs after RSI_BLE_DISCONN_EVENT.
-         * The BLE stack's disable API only stops BLE; link must be down first. */
+        /* Quiesce BLE before calling BLE disable: stop advertising, disconnect; disable runs after
+         * RSI_BLE_DISCONN_EVENT. The BLE stack's disable API only stops BLE; link must be down first. */
         {
           int32_t ret;
+          status = rsi_ble_stop_advertising();
+          if (status != RSI_SUCCESS) {
+            LOG_PRINT("\r\nrsi_ble_stop_advertising before BLE disable: 0x%lx (continuing)\r\n", status);
+          }
           ble_disable_after_disconnect_pending = 1;
           status                               = rsi_ble_disconnect((const int8_t *)conn_event_to_app.dev_addr);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "rsi_ble_disconnect before BLE disable failed: 0x%lx\r\n", status);
+            LOG_PRINT("\r\nrsi_ble_disconnect before BLE disable failed: 0x%lx\r\n", status);
             ble_disable_after_disconnect_pending = 0;
             ret                                  = status;
             osMessageQueuePut(ble_disable_done_queue, &ret, 0, osWaitForever);
@@ -956,7 +951,9 @@ adv:
                                             CONN_LATENCY,
                                             SUPERVISION_TIMEOUT);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "conn params update cmd failed with status = %lx\r\n", status);
+          LOG_PRINT("\r\nconn params update cmd failed with status "
+                    "= %lx \r\n",
+                    status);
         }
 #endif
         //   conn_params_updated = 1;
@@ -985,7 +982,9 @@ adv:
         if (remote_dev_feature.remote_features[0] & 0x20) {
           status = rsi_ble_set_data_len(conn_event_to_app.dev_addr, TX_LEN, TX_TIME);
           if (status != RSI_SUCCESS) {
-            SL_DEBUG_LOG_V2(ERROR, "set data length cmd failed with error code = %lx\r\n", status);
+            LOG_PRINT("\n set data length cmd failed with error code = "
+                      "%lx \n",
+                      status);
             rsi_ble_app_set_event(RSI_BLE_RECEIVE_REMOTE_FEATURES);
           }
         }
@@ -1005,7 +1004,7 @@ adv:
         // Process the command FIRST
         switch (cmdid) {
           case '3': { // Scan command
-            SL_DEBUG_LOG_V2(INFO, "Received scan request\r\n");
+            LOG_PRINT("Received scan request\r\n");
             retry = 0;
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_SCAN_STATE);
@@ -1014,25 +1013,25 @@ adv:
           case '2': { // SSID
             memset(coex_ssid, 0, sizeof(coex_ssid));
             strcpy((char *)coex_ssid, (const char *)&app_ble_write_event.att_value[3]);
-            SL_DEBUG_LOG_V2(INFO, "SSID set to: %s\r\n", (uintptr_t)coex_ssid);
+            SL_DEBUG_LOG_V2(INFO, "SSID set to: %s", (uintptr_t)coex_ssid);
             rsi_ble_app_set_event(RSI_SSID);
           } break;
 
           case '5': { // Security type
             sec_type = ((app_ble_write_event.att_value[3]) - '0');
-            SL_DEBUG_LOG_V2(INFO, "Security type set to: %d\r\n", sec_type);
+            LOG_PRINT("Security type set to: %d\r\n", sec_type);
             rsi_ble_app_set_event(RSI_SECTYPE);
           } break;
 
           case '6': { // Password
             memset(data, 0, sizeof(data));
             strcpy((char *)pwd, (const char *)&app_ble_write_event.att_value[3]);
-            SL_DEBUG_LOG_V2(INFO, "Password set, sec_type=%d, triggering WiFi join\r\n", sec_type);
+            LOG_PRINT("Password set, sec_type=%d, triggering WiFi join\r\n", sec_type);
             wifi_app_set_event(WIFI_APP_JOIN_STATE);
           } break;
 
           case '7': { // WLAN Status
-            SL_DEBUG_LOG_V2(INFO, "WLAN status request received\r\n");
+            LOG_PRINT("WLAN status request received\r\n");
             memset(data, 0, sizeof(data));
             if (connected) {
               rsi_ble_app_set_event(RSI_WLAN_ALREADY);
@@ -1042,7 +1041,7 @@ adv:
           } break;
 
           case '4': { // WLAN disconnect
-            SL_DEBUG_LOG_V2(INFO, "WLAN disconnect request received\r\n");
+            LOG_PRINT("WLAN disconnect request received\r\n");
             memset(data, 0, sizeof(data));
             wifi_app_set_event(WIFI_APP_DISCONN_NOTIFY_STATE);
           } break;
@@ -1050,18 +1049,18 @@ adv:
           case '8': { // FW version
             memset(data, 0, sizeof(data));
             rsi_ble_app_set_event(RSI_APP_FW_VERSION);
-            SL_DEBUG_LOG_V2(INFO, "FW version request\r\n");
+            LOG_PRINT("FW version request\r\n");
           } break;
 
           default:
-            SL_DEBUG_LOG_V2(WARN, "Default command case\r\n");
+            LOG_PRINT("Default command case\r\n");
             break;
         }
 
         // Send write response AFTER processing (ATT_REC_MAINTAIN_IN_HOST requirement)
         int32_t status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "gatt write response failed for cmd '%c', error: 0x%lX\r\n", cmdid, status);
+          LOG_PRINT("ERROR: gatt write response failed for cmd '%c', error: 0x%lX\r\n", cmdid, status);
         }
       } break;
 

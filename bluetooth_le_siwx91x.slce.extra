@@ -10,6 +10,7 @@ components:
   - gatt_common
   - gatt_client
   - gatt_server
+  - gatt_heart_rate_profile
   - smp
   - si91x_ble_extended_adv_scan_config
   - si91x_ble_legacy_adv_scan_config
@@ -86,6 +87,10 @@ extra_files:
   - components/device/silabs/si91x/wireless/gatt/server/src/gatt_server_event_hdlrs.c
   - components/device/silabs/si91x/wireless/gatt/server/src/gatt_server_init.c
   - components/device/silabs/si91x/wireless/gatt/server/src/gatt_server_utilities.c
+  - components/device/silabs/si91x/wireless/gatt/gatt_heart_rate_profile.slcc
+  - components/device/silabs/si91x/wireless/gatt/profiles/heart_rate/inc/gatt_heart_rate_server.h
+  - components/device/silabs/si91x/wireless/gatt/profiles/heart_rate/src/gatt_heart_rate_server.c
+  - components/device/silabs/si91x/wireless/gatt/profiles/heart_rate/src/gatt_heart_rate_client.c
   - components/device/silabs/si91x/wireless/smp/smp.slcc
   - components/device/silabs/si91x/wireless/smp/inc/smp.h
   - components/device/silabs/si91x/wireless/smp/inc/smp_config.h

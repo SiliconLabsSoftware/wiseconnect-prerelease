@@ -22,6 +22,38 @@
 #include "rsi_ble.h" // uuid_t
 #include "gap.h"     // For rsi_ble_conn_info_t, rsi_ble_conn_config_t definitions
 
+/**
+ * @brief Controls who prepares `rsi_ble_conn_info[].read_data1` for server TX paths.
+ *
+ * Default behavior (DEFAULT) matches the legacy demo: `rsi_ble_gatt_server_data_transmit()`
+ * overwrites the first bytes of `read_data1` with a running counter before notify/indicate.
+ *
+ * Profile subcomponents set PROFILE during service registration so the GATT server transmit
+ * path will not stomp profile-prepared payload bytes in `read_data1`.
+ */
+typedef enum {
+  SL_GATT_SERVER_NOTIFY_PAYLOAD_DEFAULT = 0,
+  SL_GATT_SERVER_NOTIFY_PAYLOAD_PROFILE = 1,
+} sl_gatt_server_notify_payload_policy_t;
+
+extern volatile sl_gatt_server_notify_payload_policy_t sl_gatt_server_notify_payload_policy;
+
+/**
+ * @brief Last prepared notify/indicate payload length when policy is PROFILE.
+ *
+ * Set together with `read_data1` in the `event_data_transmit_server` path (before
+ * `rsi_ble_gatt_server_data_transmit()`). Zero means fall back to configured max length.
+ */
+extern volatile uint16_t sl_gatt_server_profile_notify_payload_len;
+
+/**
+ * @brief PROFILE path: encode notify/indicate payload into `rsi_ble_conn_info[conn_id].read_data1`
+ *        and set `sl_gatt_server_profile_notify_payload_len`.
+ *
+ * Weak default in `gatt_server_event_hdlrs.c` is a no-op; profile subcomponents may override.
+ */
+void sl_gatt_server_profile_refresh_notify_payload(uint8_t ble_conn_id);
+
 /*=======================================================================*/
 //   GATT SERVER CONSTANTS AND UUIDS
 /*=======================================================================*/
@@ -73,9 +105,12 @@ typedef struct rsi_ble_s {
 
 // GATT Server-owned variables (attribute list and handles)
 extern rsi_ble_t att_list;
-extern volatile uint16_t rsi_ble_att1_val_hndl;
-extern volatile uint16_t rsi_ble_att2_val_hndl;
-extern volatile uint16_t rsi_ble_att3_val_hndl;
+extern rsi_ble_t ta_att_list;
+/* Property-based handle names */
+extern volatile uint16_t write_attribute_handle;
+extern volatile uint16_t notify_attribute_handle;
+extern volatile uint16_t write_without_response_attribute_handle;
+extern volatile uint16_t indicate_attribute_handle;
 
 // Multi-protocol variables (GAP owns - use extern)
 extern rsi_ble_conn_info_t rsi_ble_conn_info[];
@@ -90,6 +125,9 @@ rsi_ble_att_list_t *rsi_gatt_get_attribute_from_list(rsi_ble_t *p_val, uint16_t 
 /** Initialize GATT Server-specific fields in connection info array */
 void rsi_ble_gatt_server_default_init(void);
 
+/** Notify/indicate TX path (reads `read_data1` / `max_data_length` for this connection). */
+void rsi_ble_gatt_server_data_transmit(uint8_t ble_conn_id);
+
 /** Initialize GATT Server-specific connection buffer configuration */
 int8_t rsi_ble_gatt_server_initialize_conn_config(rsi_ble_conn_config_t *ble_conn_spec_conf);
 
@@ -101,6 +139,42 @@ uint32_t rsi_ble_add_simple_chat_serv2(void);
 
 /** Add custom service to GATT database */
 uint32_t rsi_ble_add_custom_service_serv(void);
+
+/**
+ * @brief Add characteristic declaration attribute to a GATT service.
+ */
+void rsi_ble_add_char_serv_att(void *serv_handler,
+                               uint16_t handle,
+                               uint8_t val_prop,
+                               uint16_t att_val_handle,
+                               uuid_t att_val_uuid,
+                               uint16_t auth_read);
+
+/**
+ * @brief Add characteristic value attribute to a GATT service.
+ */
+void rsi_ble_add_char_val_att(void *serv_handler,
+                              uint16_t handle,
+                              uuid_t att_type_uuid,
+                              uint8_t val_prop,
+                              uint8_t *data,
+                              uint8_t data_len,
+                              uint8_t auth_read);
+
+/**
+ * @brief Register GATT services for this build.
+ * @return int32_t - RSI_SUCCESS on success, error code otherwise
+ *
+ * Weak default implementation registers the current generic/default services.
+ * Profile/service subcomponents (or application code) can provide a strong
+ * implementation to replace this behavior.
+ *
+ * Runtime contract: assign the operation handles your service model uses
+ * (`write_attribute_handle`, `notify_attribute_handle`, optionally
+ * `write_without_response_attribute_handle`, `indicate_attribute_handle`).
+ * Handles for properties the profile does not expose may remain at their defaults (e.g. 0).
+ */
+int32_t sl_gatt_server_register_services_hook(void);
 
 /**
  * @brief Initialize GATT Server component

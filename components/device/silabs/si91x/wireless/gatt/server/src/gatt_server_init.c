@@ -47,22 +47,10 @@ int32_t ble_gatt_server_init(void)
     return status;
   }
 
-  // Step 4: Add GATT services (extracted from ble_unified_app.c)
-  status = rsi_ble_add_simple_chat_serv();
+  // Step 4: Register GATT services via hook (weak default or strong override)
+  status = sl_gatt_server_register_services_hook();
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to add simple chat service\r\n");
-    return status;
-  }
-
-  status = rsi_ble_add_simple_chat_serv2();
-  if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to add simple chat service 2\r\n");
-    return status;
-  }
-
-  status = rsi_ble_add_custom_service_serv();
-  if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to add custom service\r\n");
+    printf("\r\n Failed to register GATT services: 0x%lx\r\n", status);
     return status;
   }
 

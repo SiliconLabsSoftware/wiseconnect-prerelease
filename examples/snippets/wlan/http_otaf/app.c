@@ -33,7 +33,6 @@
 #include "sl_wifi_types.h"
 #include <string.h>
 #include "sl_wifi.h"
-#include "sl_si91x_driver.h"
 #include "sl_wifi_callback_framework.h"
 #include "firmware_upgradation.h"
 #include "sl_net_dns.h"
@@ -198,10 +197,7 @@ static const sl_wifi_device_configuration_t station_init_configuration = {
                       | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map  = 0 }
 };
 
 //! Enumeration for states in application
@@ -306,7 +302,7 @@ void application_start(const void *unused)
   }
 
 #if (FW_UPDATE_TYPE == TA_FW_UPDATE)
-  sl_si91x_firmware_version_t version = { 0 };
+  sl_wifi_firmware_version_t version = { 0 };
 #endif
 #if defined(AWS_ENABLE) || defined(AZURE_ENABLE)
   sl_ip_address_t dns_query_rsp = { 0 };
@@ -352,16 +348,8 @@ void application_start(const void *unused)
       } break;
       case WLAN_FIRMWARE_UPDATE: {
 #if (FW_UPDATE_TYPE == TA_FW_UPDATE)
-        status = sl_si91x_get_firmware_version(&version);
-        printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-               version.chip_id,
-               version.rom_id,
-               version.major,
-               version.minor,
-               version.security_version,
-               version.patch_num,
-               version.customer_id,
-               version.build_num);
+        status = sl_wifi_get_firmware_version(&version);
+        print_firmware_version(&version);
 #endif
 
         sl_wifi_set_callback_v2(SL_WIFI_HTTP_OTA_FW_UPDATE_EVENTS,
@@ -453,16 +441,8 @@ void application_start(const void *unused)
         SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init success\r\n");
 
         //! Check firmware version
-        status = sl_si91x_get_firmware_version(&version);
-        printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-               version.chip_id,
-               version.rom_id,
-               version.major,
-               version.minor,
-               version.security_version,
-               version.patch_num,
-               version.customer_id,
-               version.build_num);
+        status = sl_wifi_get_firmware_version(&version);
+        print_firmware_version(&version);
 #else
         SL_DEBUG_LOG_V2(INFO, "SoC Soft Reset initiated!\r\n");
         sl_si91x_soc_nvic_reset();

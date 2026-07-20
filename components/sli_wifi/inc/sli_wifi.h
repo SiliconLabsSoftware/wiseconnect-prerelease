@@ -39,15 +39,14 @@
 #include "sli_wifi_power_profile.h"
 #include "cmsis_os2.h"
 
-#define ENABLE_MAC_INFO            BIT(0)
-#define QOS_EN                     BIT(12)
-#define BROADCAST_IND              BIT(9)
-#define PER_CONT_MODE              1
-#define FRAME_DESC_SZ              16
-#define MIN_802_11_HDR_LEN         24
-#define SLI_WIFI_BUFFER_BLOCK_SIZE 1640
-#define SLI_SEND_MAC_FRAME         0x0
-#define SLI_11AX_BE_RATE_MASK      0x18f
+#define ENABLE_MAC_INFO       BIT(0)
+#define QOS_EN                BIT(12)
+#define BROADCAST_IND         BIT(9)
+#define PER_CONT_MODE         1
+#define FRAME_DESC_SZ         16
+#define MIN_802_11_HDR_LEN    24
+#define SLI_SEND_MAC_FRAME    0x0
+#define SLI_11AX_BE_RATE_MASK 0x18f
 /// Nominal preamble length offset
 #define RATE_OFFSET_NOMINAL_PE 5
 /// Guard interval and LTF offset
@@ -178,6 +177,8 @@ typedef struct {
   int16_t Txpower;
 } sli_wifi_request_tx_power_t;
 
+#define SLI_WIFI_TX_TEST_NWP_RESERVED_LEN 4U
+
 typedef struct {
   uint16_t frame_control; // Frame Control field
   uint16_t duration_id;   // Duration/ID field
@@ -186,6 +187,74 @@ typedef struct {
   uint8_t addr3[6];       // Address 3 (Destination Address - DA or Source Address - SA)
   uint16_t seq_ctrl;      // Sequence Control field
 } sli_ieee80211_hdr_t;
+
+typedef struct __attribute__((packed)) {
+  uint16_t wifi_protocol;
+  uint16_t enable;
+  int16_t power;
+  uint32_t rate;
+  uint16_t length;
+  uint16_t mode;
+  uint16_t channel;
+  uint16_t no_of_pkts;
+  uint32_t delay;
+  uint16_t channel_bw;
+  uint16_t aggr_enable;
+  uint16_t aggr_count;
+} sli_wifi_tx_test_base_info_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t short_gi_enable;
+  uint8_t greenfield_mode_enable;
+  uint8_t short_preamble_enable;
+} sli_wifi_11bgn_per_params_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t short_gi_enable;
+} sli_wifi_11ac_per_params_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t coding_type;
+  uint8_t nominal_pe;
+  uint8_t ul_dl;
+  uint8_t he_ppdu_type;
+  uint8_t beam_change;
+  uint8_t bw;
+  uint8_t stbc;
+  uint8_t tx_bf;
+  uint8_t gi_ltf;
+  uint8_t dcm;
+  uint8_t nsts_midamble;
+  uint8_t spatial_reuse;
+  uint8_t bss_color;
+  uint8_t ru_allocation;
+  uint16_t he_siga2_reserved;
+  uint8_t n_heltf_tot;
+  uint8_t sigb_dcm;
+  uint8_t sigb_mcs;
+  uint8_t user_idx;
+  uint16_t user_sta_id;
+  uint8_t sigb_compression;
+} sli_wifi_11ax_per_params_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t coding_type;
+  uint8_t nominal_pe;
+  uint8_t ul_dl;
+  uint8_t be_ppdu_type;
+  uint8_t bw;
+  uint8_t gi_ltf;
+  uint8_t spatial_reuse;
+  uint8_t ru_allocation;
+  uint8_t n_heltf_tot;
+  uint8_t eht_sig_mcs;
+  uint8_t disregard;
+} sli_wifi_11be_per_params_wire_t;
+
+/* Largest v2 PER command: base_info + 4 reserved + 11ax per + 4 reserved = 59 bytes. */
+#define SLI_WIFI_TX_TEST_CMD_MAX_LEN                                                    \
+  (sizeof(sli_wifi_tx_test_base_info_wire_t) + (SLI_WIFI_TX_TEST_NWP_RESERVED_LEN * 2U) \
+   + sizeof(sli_wifi_11ax_per_params_wire_t))
 
 sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
                                        sl_wifi_timeout_type_t timeout_type,

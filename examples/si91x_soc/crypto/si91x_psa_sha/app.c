@@ -39,8 +39,8 @@
 #include "sl_status.h"
 
 /******************************************************
-  *               Variable Definitions
-  ******************************************************/
+ *               Variable Definitions
+ ******************************************************/
 static const osThreadAttr_t thread_attributes = {
   .name       = "app",
   .stack_size = 3072,
@@ -75,20 +75,17 @@ static const sl_wifi_device_configuration_t client_configuration = {
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = 0 }
 };
 
 /******************************************************
-  *               Function Declarations
-  ******************************************************/
+ *               Function Declarations
+ ******************************************************/
 static void application_start(void *argument);
 
 /******************************************************
-  *               Function Definitions
-  ******************************************************/
+ *               Function Definitions
+ ******************************************************/
 void app_init(void)
 {
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
@@ -100,7 +97,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", (unsigned long)status);
+    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
   }
   DEBUGOUT("\r\nWi-Fi Init Success\r\n");
@@ -109,8 +106,8 @@ static void application_start(void *argument)
 }
 
 /***************************************************************************/ /**
-  * Application state machine, called infinitely.
-  ******************************************************************************/
+ * Application state machine, called infinitely.
+ ******************************************************************************/
 void app_process_action(void)
 {
   psa_app_process_action();

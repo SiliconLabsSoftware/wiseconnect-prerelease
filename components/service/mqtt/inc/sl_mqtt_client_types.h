@@ -110,12 +110,11 @@ typedef enum {
  * @brief MQTT Protocol versions.
  * 
  * @details
- *   This enumeration defines the supported versions of the MQTT protocol. The version determines the protocol features and behaviors used by the MQTT client. Only MQTT version 3.1.1 is supported by the Network Wireless Processor (NWP).
+ *   This enumeration defines the supported versions of the MQTT protocol. The version determines the protocol features and behaviors used by the MQTT client.
  */
 typedef enum {
-  SL_MQTT_VERSION_3,    ///< MQTT Version 3.0 (Currently not supported)
-  SL_MQTT_VERSION_3_1,  ///< MQTT Version 3.1 (Currently not supported)
-  SL_MQTT_VERSION_3_1_1 ///< MQTT Version 3.1.1
+  SL_MQTT_VERSION_3,  ///< MQTT Version 3.0
+  SL_MQTT_VERSION_3_1 ///< MQTT Version 3.1
 } sl_mqtt_version_t;
 
 /**
@@ -342,7 +341,7 @@ typedef struct {
   uint16_t minimum_back_off_time; ///< Minimum back-off time (in seconds) between two successive reconnect attempts.
   uint16_t maximum_back_off_time; ///< Maximum back-off time (in seconds) between two successive reconnect attempts.
   bool is_clean_session;          ///< Clean session flag to send to the broker in the connect request.
-  sl_mqtt_version_t mqt_version;  ///< This parameter is currently not supported.
+  sl_mqtt_version_t mqt_version;  ///< MQTT protocol version used by the client.
   uint16_t client_port;           ///< Port number used by the client for the connection.
   sl_net_credential_id_t
     credential_id;    ///< Credential ID for the username and password used in the MQTT connect request.

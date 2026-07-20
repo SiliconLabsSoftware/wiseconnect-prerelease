@@ -43,7 +43,6 @@
 #ifdef SL_CATALOG_LOG_COMPONENT_PRESENT
 #include "sl_log_platform_specific.h"
 #endif
-#include "sl_code_classification.h"
 /*******************************************************************************
  ***************************  DEFINES / MACROS   ********************************
  ******************************************************************************/
@@ -108,7 +107,6 @@ bool sli_si91x_ta_packet_initiated_to_m4(void);
  * It also initializes the hardware: Sets the system clock to 100 MHz and changes the 
  * state to PS4.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_init(void)
 {
   if (!is_initialized) {
@@ -138,7 +136,6 @@ sl_status_t sl_si91x_power_manager_init(void)
  * Calls the internal peripheral update function which validates the peripheral
  * and enables them.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_add_peripheral_requirement(sl_power_peripheral_t *peripheral)
 {
   sl_status_t status;
@@ -168,7 +165,6 @@ sl_status_t sl_si91x_power_manager_add_peripheral_requirement(sl_power_periphera
  * Calls the internal peripheral update function which validates the peripheral
  * and disables them.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_remove_peripheral_requirement(sl_power_peripheral_t *peripheral)
 {
   sl_status_t status;
@@ -197,7 +193,6 @@ sl_status_t sl_si91x_power_manager_remove_peripheral_requirement(sl_power_periph
  * Registers a callback to be called on given Power state transition(s).
  * New node is added to the linked list for handling the state transition callbacks.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_subscribe_ps_transition_event(
   sl_power_manager_ps_transition_event_handle_t *event_handle,
   const sl_power_manager_ps_transition_event_info_t *event_info)
@@ -232,7 +227,6 @@ sl_status_t sl_si91x_power_manager_subscribe_ps_transition_event(
  * Un-registers a callback to be called on given Power state transition(s).
  * Existing node is deleted from the linked list for handling the state transition callbacks.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_unsubscribe_ps_transition_event(
   sl_power_manager_ps_transition_event_handle_t *event_handle,
   const sl_power_manager_ps_transition_event_info_t *event_info)
@@ -268,7 +262,6 @@ sl_status_t sl_si91x_power_manager_unsubscribe_ps_transition_event(
  * If the sleep mode transition is not successful, then it returns error code.
  * Configuration of sleep parameters are handled in the internal function.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_si91x_power_manager_sleep(void)
 {
   sl_status_t status;
@@ -331,7 +324,6 @@ sl_status_t sli_si91x_power_manager_sleep(void)
 /*******************************************************************************
  * Internal alias for @ref sl_si91x_power_manager_sleep (same behavior).
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_sleep(void)
 {
   return sli_si91x_power_manager_sleep();
@@ -341,7 +333,6 @@ sl_status_t sl_si91x_power_manager_sleep(void)
  * Transit to standby state and will wait for the interrupt.
  * WFI instruction is called to move the soc power mode to standby mode.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 void sli_si91x_power_manager_standby(void)
 {
   if (sli_si91x_power_manager_is_valid_transition(current_state, SL_SI91X_POWER_MANAGER_STANDBY)) {
@@ -354,7 +345,6 @@ void sli_si91x_power_manager_standby(void)
 /*******************************************************************************
  * Internal alias for @ref sl_si91x_power_manager_standby (same behavior).
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 void sl_si91x_power_manager_standby(void)
 {
   sli_si91x_power_manager_standby();
@@ -364,7 +354,6 @@ void sl_si91x_power_manager_standby(void)
  * Configures the wakeup sources.
  * Configuration of wakeup source is handled in the internal function.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_set_wakeup_sources(uint32_t source, boolean_t add)
 {
   sl_status_t status;
@@ -385,7 +374,6 @@ sl_status_t sl_si91x_power_manager_set_wakeup_sources(uint32_t source, boolean_t
  * Retains the RAM in low power state either by using size or RAM bank as input parameter.
  * All the RAM retention configuration parameters are handled in the internal function
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_configure_ram_retention(sl_power_ram_retention_config_t *config)
 {
   sl_status_t status;
@@ -415,7 +403,6 @@ sl_status_t sl_si91x_power_manager_configure_ram_retention(sl_power_ram_retentio
  * Internal function handles the clock configuration as per the paramater passed
  * in it.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_set_clock_scaling(sl_clock_scaling_t mode)
 {
   sl_status_t status;
@@ -461,7 +448,6 @@ sl_status_t sl_si91x_power_manager_set_clock_scaling(sl_clock_scaling_t mode)
 /*******************************************************************************
  * Returns the current clock scaling mode of power state which is stored in static variable.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_clock_scaling_t sl_si91x_power_manager_get_clock_scaling(void)
 {
   return clock_scaling_mode;
@@ -469,7 +455,6 @@ sl_clock_scaling_t sl_si91x_power_manager_get_clock_scaling(void)
 /*******************************************************************************
  * Returns the current power state of SoC which is stored in static variable.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_power_state_t sl_si91x_power_manager_get_current_state(void)
 {
   return current_state;
@@ -478,7 +463,6 @@ sl_power_state_t sl_si91x_power_manager_get_current_state(void)
 /*******************************************************************************
  * Returns the pointer to the array of requirement table.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 uint8_t *sl_si91x_power_manager_get_requirement_table(void)
 {
   return requirement_ps_table;
@@ -488,7 +472,6 @@ uint8_t *sl_si91x_power_manager_get_requirement_table(void)
  * De-initialize the power manager service.
  * It clears the requirement table and the is_initialized flag.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 void sl_si91x_power_manager_deinit(void)
 {
   // Clears the requirement table and disable the initialization flag.
@@ -503,7 +486,6 @@ void sl_si91x_power_manager_deinit(void)
  * the deprecated \c sli_si91x_power_manager_update_ps_requirement API. When the macro is defined
  * (see \c sl_power_manager.slcc), it implements \c sli_si91x_power_manager_update_ps_requirement_with_critical_irq.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 #ifndef SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
 sl_status_t sli_si91x_power_manager_update_ps_requirement(sl_power_state_t state, boolean_t add)
 #else
@@ -628,7 +610,6 @@ sl_status_t sli_si91x_power_manager_update_ps_requirement_with_critical_irq(
  * It masks the transition variable with the subscribers event mask and if it matches,
  * the callback function is called.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 static void notify_power_state_transition(sl_power_state_t from, sl_power_state_t to)
 {
   sl_power_manager_ps_transition_event_handle_t *handle;
@@ -703,7 +684,6 @@ static void notify_power_state_transition(sl_power_state_t from, sl_power_state_
  * @note This is the fall back implementation of the callback, it can be
  *       overridden by the application or other components.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 boolean_t sl_si91x_power_manager_is_ok_to_sleep(void)
 {
   boolean_t is_sleep_ready = false;
@@ -736,7 +716,6 @@ boolean_t sl_si91x_power_manager_is_ok_to_sleep(void)
 * @return sl_power_state_t values are returned:
 * - none
 ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_power_state_t sl_si91x_get_lowest_ps(void)
 {
   uint8_t ps_counter;
@@ -763,7 +742,6 @@ sl_power_state_t sl_si91x_get_lowest_ps(void)
  * @note This is the fallback implementation of the callback, it can be
  *       overridden by the application or other components.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 __WEAK boolean_t sl_si91x_power_manager_sleep_on_isr_exit(void)
 {
   return false;
@@ -782,7 +760,6 @@ __WEAK boolean_t sl_si91x_power_manager_sleep_on_isr_exit(void)
  *          - SL_STATUS_NOT_INITIALIZED (0x0011) - Power manager service is not initialized.
  *          - SL_STATUS_INVALID_PARAMETER (0x0021) - Invalid parameter.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_request_ps1_state(void)
 {
   sl_status_t status = SL_STATUS_OK;
@@ -825,7 +802,6 @@ sl_status_t sl_si91x_power_manager_request_ps1_state(void)
  *          - SL_STATUS_NOT_INITIALIZED (0x0011) - Power manager service is not initialized.
  *          - SL_STATUS_INVALID_PARAMETER (0x0021) - Invalid parameter.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_remove_ps1_state_request(void)
 {
   sl_status_t status = SL_STATUS_OK;
@@ -859,7 +835,6 @@ sl_status_t sl_si91x_power_manager_remove_ps1_state_request(void)
  *          - true - PS1 state requirement is added.
  *          - false - PS1 state requirement is not added.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 bool sl_si91x_power_manager_get_ps1_state_status(void)
 {
   return sli_si91x_pm_ps1_state_active;
@@ -876,7 +851,6 @@ bool sl_si91x_power_manager_get_ps1_state_status(void)
  *          - SL_STATUS_OK (0x0000) - Standby state requirement successfully added.
  *          - SL_STATUS_INVALID_STATE (0x0002) - Invalid request to add standby state.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_request_standby_state(void)
 {
   if (sli_si91x_pm_ps1_state_active) {
@@ -901,7 +875,6 @@ sl_status_t sl_si91x_power_manager_request_standby_state(void)
  *          - SL_STATUS_OK (0x0000) : Standby state requirement successfully removed.
  *          - SL_STATUS_INVALID_STATE (0x0001) - Invalid request to remove standby state.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sl_si91x_power_manager_remove_standby_state_request(void)
 {
   if (!sli_si91x_pm_standby_state_active) {
@@ -926,7 +899,6 @@ sl_status_t sl_si91x_power_manager_remove_standby_state_request(void)
  *          - true : Standby state requirement is added.
  *          - false : Standby state requirement is not added.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 bool sl_si91x_power_manager_get_standby_state_status(void)
 {
   return sli_si91x_pm_standby_state_active;
@@ -949,7 +921,6 @@ bool sl_si91x_power_manager_get_standby_state_status(void)
  * @note    This function is useful for power management decisions and determining
  *          when the system is ready for sleep or other power state transitions.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 bool sl_si91x_power_manager_is_tx_command_in_progress(void)
 {
 #if SL_WIFI_COMPONENT_INCLUDED
@@ -972,7 +943,6 @@ bool sl_si91x_power_manager_is_tx_command_in_progress(void)
  *          - true - Safe to enter PS2 state (no pending packets).
  *          - false - Pending packets detected, PS2 transition should be blocked.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_POWER_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 bool sl_si91x_power_manager_ps2_pre_check(void)
 {
 #if defined(SLI_WIRELESS_COMPONENT_PRESENT) && (SLI_WIRELESS_COMPONENT_PRESENT == 1)

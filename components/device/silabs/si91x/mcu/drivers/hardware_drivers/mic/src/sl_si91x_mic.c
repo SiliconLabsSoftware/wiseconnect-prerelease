@@ -38,9 +38,9 @@
 /*******************************************************************************
  *************************** LOCAL VARIABLES   *******************************
  ******************************************************************************/
-static sl_i2s_handle_t i2s_mic_driver_handle     = NULL;
-static volatile bool mic_sample_receive_complete = false;
-static sl_i2s_xfer_config_t mic_xfer_config      = { 0 };
+static sl_i2s_handle_t i2s_mic_driver_handle = NULL;
+static uint8_t mic_sample_receive_complete   = false;
+static sl_i2s_xfer_config_t mic_xfer_config  = { 0 };
 typedef enum { RECEIVE_DATA, WAIT_STATE, INVALID_STATE } transfer_state_t;
 
 /* Flags to indicate the microphone and I2S states */

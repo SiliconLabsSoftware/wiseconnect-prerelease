@@ -1,25 +1,15 @@
 # Wireless Test
 
-## High-Level Overview
-
-SiWx91x Wireless Test CLI example: exercise Wi-Fi and BLE features through a command-line interface for RF testing, station/AP/concurrent modes, power save, and calibration on SoC and NCP modes using Simplicity Studio or a serial terminal.
-
 ## Table of Contents
 
-- [Wireless Test](#wireless-test)
-  - [High-Level Overview](#high-level-overview)
-  - [Table of Contents](#table-of-contents)
-  - [Purpose/Scope](#purposescope)
-  - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
-    - [Hardware Requirements](#hardware-requirements)
-    - [Software Requirements](#software-requirements)
-    - [Setup Diagram](#setup-diagram)
-  - [Getting Started](#getting-started)
-  - [Application Build Environment](#application-build-environment)
-  - [Test the Application](#test-the-application)
-  - [Troubleshooting](#troubleshooting)
-  - [Resources](#resources)
-  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+- [Purpose/Scope](#purposescope) 
+- [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
+  - [Hardware Requirements](#hardware-requirements)
+  - [Software Requirements](#software-requirements)
+  - [Setup Diagram](#setup-diagram)
+- [Getting Started](#getting-started)
+- [Application Build Environment](#application-build-environment)
+- [Test the Application](#test-the-application)
 
 ## Purpose/Scope
 
@@ -39,15 +29,12 @@ The Wireless Test application is a Command-Line Interface (CLI) application desi
     - BRD4002A Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards 
   	  - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
-  	  - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
-      - BRD4339B [SiWx917-RB4339B](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
-  	  - BRD4340A [SiWx917-RB4340A](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
-  	  - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
-  	  - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+      - BRD4339B [SiWx917-RB4339B]
+  	  - BRD4340A [SiWx917-RB4340A]
+  	  - BRD4343A [SiWx917-RB4343A]
   - Kits
-	- SiWG917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
   	- SiWx917 Pro Kit [Si917-PK6031A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-pro-kit?tab=overview)
-    - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit?tab=overview)
+  	
 - **NCP Mode**:
   - Standalone
     - BRD4002A Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
@@ -55,7 +42,6 @@ The Wireless Test application is a Command-Line Interface (CLI) application desi
     - NCP Expansion Kit with NCP Radio Boards
       - [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
       - [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
-      - [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
   - Kits
   	- EFR32xG24 Pro Kit +10 dBm [xG24-PK6009A](https://www.silabs.com/development-tools/wireless/efr32xg24-pro-kit-10-dbm?tab=overview)  
   - Interface and Host MCU Supported
@@ -331,7 +317,7 @@ For example, for 2412 MHz, the output will be seen at 2417 MHz.
 >
 >    **channel**: Set the Channel number.
 
-- The Wi-Fi 6 parameter descriptions are mentioned in the [sl_wifi_request_tx_test_info_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-request-tx-test-info-t) structure in the SDK.
+- The Wi-Fi 6 parameter descriptions are mentioned in the [sl_si91x_protocol_types.h](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/sl-si91x-request-tx-test-info-t) file of the SDK.
 >
 >5. **wifi_transmit_test_stop** is used for stopping the Transmit test.
 
@@ -622,7 +608,7 @@ wifi_update_gain_table 1 0
 
 **Note:** To update the gain table, configure the gain_table_payload[] of sl_wifi_update_gain_table_command_handler in wifi_command.c file.
 
-**Note:** For changing the UART instance of the wireless_test example, see the VCOM section of the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+**Note:** For changing the UART instance of the wireless_test example, see the VCOM section of the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 The changes needs to be configured in rsi_debug.c file and RTE_Device_917.h file. 
 
 
@@ -1191,31 +1177,3 @@ In the command handler, the arguments passed in the cli command are internally m
 
 
 **![cmdhandler](resources/readme/picture6.png)**
-
-## Troubleshooting
-
-If you encounter issues while running the Wireless Test application, check the following:
-
-- Use [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) or an equivalent serial terminal rather than the Simplicity Studio console for reliable CLI input and output.
-- Confirm the correct serial port and baud rate are selected and that the `Ready` prompt appears after flashing, as shown in [Test the Application](#test-the-application).
-- Verify default SSID and passphrase in `wifi_commands.c` (`SOFT_AP_SSID`, `SOFT_AP_PSK`) or update them to match your test network configuration.
-- For Wi-Fi PER and RF measurements, confirm the U.Fl to SMA cable, spectrum analyzer, or signal generator connections match the setup diagrams in [Setup Diagram](#setup-diagram).
-- When a CLI command fails with invalid arguments, check the corresponding string values in `console_commands/src/console_argument_types.c` (for example, data rate enums map to strings such as `1Mbps`).
-- If a command requires more than the default number of parameters, increase `SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT` in the project preprocessor settings as described in the Wi-Fi CLI Examples section.
-- Replace default cloud connectivity certificates before testing cloud-related commands; the included certificates are for reference only.
-- For NCP mode, verify the host interface (SPI or UART) matches the project variant and that connectivity firmware on the NCP is up to date.
-- Run `set_region_configuration` with the correct region code before RF transmit tests if region-specific limits apply.
-- Use the `reset` command to recover the CLI state if a prior command leaves the module in an unexpected configuration.
-
-## Resources
-
-- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
-- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
-- [WiSeConnect API Reference Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/)
-- [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
-
-## Report Bugs and Get Support
-
-Report issues and get help from the Silicon Labs community:
-
-- [Silicon Labs Community](https://www.silabs.com/community)

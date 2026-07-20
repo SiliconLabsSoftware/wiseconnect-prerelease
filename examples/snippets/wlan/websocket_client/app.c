@@ -100,10 +100,7 @@ static const sl_wifi_device_configuration_t websocket_client_configuration = {
                       | SL_SI91X_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS | SL_SI91X_EXT_TCP_IP_WAIT_FOR_SOCKET_CLOSE),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map  = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
 };
 
 /******************************************************
@@ -289,12 +286,6 @@ sl_websocket_error_t create_and_send_websocket_data(void)
     return ws_error;
   }
   SL_DEBUG_LOG_V2(INFO, "WebSocket Init done");
-
-  ws_error = sl_websocket_set_origin(&ws_handle, "http://localhost");
-  if (ws_error != SL_WEBSOCKET_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Error setting WebSocket origin:%d", ws_error);
-    return ws_error;
-  }
 
   // Advanced TCP/TLS options - customize as needed
   // For ssl_ciphers_bitmap, use values from sl_si91x_socket_constants.h, e.g.:

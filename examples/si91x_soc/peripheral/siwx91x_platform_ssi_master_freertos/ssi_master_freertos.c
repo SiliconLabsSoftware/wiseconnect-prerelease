@@ -1,6 +1,6 @@
 /***************************************************************************/ /**
 * @file  ssi_master_freertos.c
-* @brief SSI master FreeRTOS example with GPIO button synchronization.
+* @brief SSI Master example.
 *******************************************************************************
 * # License
 * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
@@ -16,13 +16,11 @@
 ******************************************************************************/
 // Include Files
 
-#include <stdbool.h>
 #include "sl_si91x_ssi.h"
 #include "rsi_debug.h"
 #include "rsi_rom_clks.h"
 #include "ssi_master_freertos.h"
 #include "sl_si91x_clock_manager.h"
-#include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_ssi_primary_config.h"
 #include "cmsis_os2.h"
 
@@ -35,9 +33,8 @@
 #define SSI_MASTER_BAUDRATE             10000000 // SSI baudrate
 #define SSI_MASTER_MAX_BIT_WIDTH        16       // Maximum Bit width
 #define SSI_MASTER_RECEIVE_SAMPLE_DELAY 0        // By default sample delay is 0
-#define SSI_MASTER_SYNC_POLL_DELAY_MS   10       // Polling delay for button-based sync
-#define SSI_MASTER_SYNC_SETTLE_DELAY_MS 50       // Settling delay after button release
-#define PRIMARY_SECONDARY_SYNC_PIN      RTE_UULP_GPIO_2_PIN
+#define SYNC_TIME                       5000     // Delay to sync master and slave (ms)
+#define RECEIVE_SYNC_TIME               500      // Delay to settle the slave after send (ms)
 /*******************************************************************************
  **********************  Local Function prototypes   ***************************
  ******************************************************************************/
@@ -45,7 +42,6 @@ static void ssi_master_callback_event_handler(uint32_t event);
 static sl_status_t ssi_app_compare_data(void);
 static sl_status_t ssi_master_init_function(void);
 static void ssi_master_task(void *argument);
-static sl_status_t master_sync_wait(bool first_sync);
 
 /*******************************************************************************
  **********************  Local variables   *************************************
@@ -186,13 +182,8 @@ static void ssi_master_task(void *argument)
     osThreadExit();
   }
 
-  SL_PRINT_STRING_ERROR("Reset Slave\r\n");
-  status = master_sync_wait(true);
-  if (status != SL_STATUS_OK) {
-    SL_PRINT_STRING_ERROR("SSI master synchronization failed, Error Code : %lu\r\n", status);
-    osThreadExit();
-  }
-  SL_PRINT_STRING_ERROR("SSI master synchronized successfully with slave\r\n");
+  // Sync delay: Allow master and slave to stabilize before transfer
+  osDelay(SYNC_TIME);
 
   /* Transfer phase (full-duplex): simultaneous TX and RX */
   if (SSI_MASTER_TRANSFER) {
@@ -227,15 +218,9 @@ static void ssi_master_task(void *argument)
     SL_PRINT_STRING_ERROR("SSI send completed\r\n");
   }
 
-  /* Receive phase (half-duplex): RX only, with optional button resync */
+  /* Receive phase (half-duplex): RX only, preceded by settle delay */
   if (SSI_MASTER_RECEIVE) {
-    if (SSI_MASTER_TRANSFER || SSI_MASTER_SEND) {
-      status = master_sync_wait(false);
-      if (status != SL_STATUS_OK) {
-        SL_PRINT_STRING_ERROR("SSI master synchronization failed, Error Code : %lu\r\n", status);
-        osThreadExit();
-      }
-    }
+    osDelay(RECEIVE_SYNC_TIME); // Delay to settle the slave after send phase
     sl_si91x_ssi_set_slave_number((uint8_t)ssi_slave_number);
     status =
       sl_si91x_ssi_receive_data(ssi_driver_handle, ssi_master_rx_buffer, sizeof(ssi_master_rx_buffer) / size_factor);
@@ -303,55 +288,4 @@ static void ssi_master_callback_event_handler(uint32_t event)
     default:
       break;
   }
-}
-
-static sl_status_t master_sync_wait(bool first_sync)
-{
-  uint8_t pin_value  = 0;
-  sl_status_t status = SL_STATUS_OK;
-
-  if (first_sync) {
-    status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
-    if (status != SL_STATUS_OK) {
-      return status;
-    }
-
-    status = sl_si91x_gpio_driver_select_uulp_npss_receiver(PRIMARY_SECONDARY_SYNC_PIN, GPIO_RECEIVER_EN);
-    if (status != SL_STATUS_OK) {
-      return status;
-    }
-
-    status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(PRIMARY_SECONDARY_SYNC_PIN, NPSS_GPIO_PIN_MUX_MODE0);
-    if (status != SL_STATUS_OK) {
-      return status;
-    }
-
-    status =
-      sl_si91x_gpio_driver_set_uulp_npss_direction(PRIMARY_SECONDARY_SYNC_PIN, (sl_si91x_gpio_direction_t)GPIO_INPUT);
-    if (status != SL_STATUS_OK) {
-      return status;
-    }
-  }
-
-  SL_PRINT_STRING_ERROR("Press button 0 on master to sync.\r\n");
-
-  for (;;) {
-    pin_value = sl_si91x_gpio_driver_get_uulp_npss_pin(PRIMARY_SECONDARY_SYNC_PIN);
-
-    if (pin_value == 0U) {
-      SL_PRINT_STRING_ERROR("Button press detected, synchronization completed\r\n");
-      sl_si91x_delay_ms(SSI_MASTER_SYNC_POLL_DELAY_MS);
-      break;
-    }
-
-    sl_si91x_delay_ms(SSI_MASTER_SYNC_POLL_DELAY_MS);
-  }
-
-  while (pin_value == 0U) {
-    pin_value = sl_si91x_gpio_driver_get_uulp_npss_pin(PRIMARY_SECONDARY_SYNC_PIN);
-    sl_si91x_delay_ms(SSI_MASTER_SYNC_POLL_DELAY_MS);
-  }
-
-  sl_si91x_delay_ms(SSI_MASTER_SYNC_SETTLE_DELAY_MS);
-  return status;
 }

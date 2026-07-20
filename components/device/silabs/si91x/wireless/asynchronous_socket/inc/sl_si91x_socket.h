@@ -1215,7 +1215,7 @@ int sl_si91x_shutdown(int socket, int how);
  *   - Supports a maximum of 10 sockets per call.
  *   - Supports read and write fd_sets only. It does not monitor the exceptfds set.
  *   - Operates only with connected sockets. Listening sockets are not supported.
- *   - The select API supports configuring multiple file descriptors in a single call. However, it returns only one read descriptor when an event is pending, and returns none if no events are pending.
+ *   - Multiple file descriptors are not supported for a single select.
  *
  * @par Example
  * Synchronous select: wait up to 2 seconds for data on two sockets, then

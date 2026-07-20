@@ -201,10 +201,7 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
                    .config_feature_bit_map = 0
 #endif
 #endif
-  },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+  }
 };
 /******************************************************
 *               Function Definitions
@@ -393,20 +390,12 @@ sl_status_t start_aws_mqtt(void)
           mac_addr.octet[5]);
   SL_PRINT_STRING_ERROR("\r\n client_id:%s \r\n", (uint32_t)(uintptr_t)mac_id);
 
-  sl_si91x_firmware_version_t fw_version = { 0 };
-  sh_aws_status                          = sl_si91x_get_firmware_version(&fw_version);
+  sl_wifi_firmware_version_t fw_version = { 0 };
+  sh_aws_status                         = sl_wifi_get_firmware_version(&fw_version);
   if (sh_aws_status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", sh_aws_status);
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           fw_version.chip_id,
-           fw_version.rom_id,
-           fw_version.major,
-           fw_version.minor,
-           fw_version.security_version,
-           fw_version.patch_num,
-           fw_version.customer_id,
-           fw_version.build_num);
+    print_firmware_version(&fw_version);
   }
 
   mqtt_init_params.enableAutoReconnect       = true;

@@ -26,7 +26,6 @@
 //For TLS
 #include "sl_si91x_socket_constants.h"
 #include "sl_si91x_constants.h"
-#include "sli_mqtt_tls_alpn.h"
 
 //For WebSocket functionality
 #include "sl_websocket_client_types.h"
@@ -134,7 +133,7 @@ static int mqtt_tcpconnection_handler(Network *n, uint8_t flags, char *addr, int
     n->socket = socket(AF_INET, type, IPPROTO_TCP);
 
   if (n->socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
+    printf("\r\nSocket creation failed with bsd error: %d\r\n", errno);
     return -1;
   }
 
@@ -155,7 +154,7 @@ static int mqtt_tcpconnection_handler(Network *n, uint8_t flags, char *addr, int
     n->socket = socket(AF_INET, type, IPPROTO_TCP);
 
   if (n->socket < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket creation failed with bsd error: %d\r\n", errno);
+    printf("\r\nSocket creation failed with bsd error: %d\r\n", errno);
     return -1;
   }
   client_address.sin_family = AF_INET;
@@ -167,17 +166,9 @@ static int mqtt_tcpconnection_handler(Network *n, uint8_t flags, char *addr, int
     int socket_return_value = 0;
     socket_return_value     = setsockopt(n->socket, SOL_SOCKET, TCP_ULP, TLS, sizeof(TLS));
     if (socket_return_value < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Set Socket option failed with bsd error: %d\r\n", errno);
+      printf("\r\nSet Socket option failed with bsd error: %d\r\n", errno);
       close(n->socket);
-      return -1;
     }
-
-#if MQTT_TLS_ALPN_ENABLED
-    if (sli_mqtt_tls_alpn_set_bsd(n->socket) < 0) {
-      close(n->socket);
-      return -1;
-    }
-#endif
   }
 
 #ifdef SLI_SI91X_ENABLE_IPV6
@@ -188,7 +179,7 @@ static int mqtt_tcpconnection_handler(Network *n, uint8_t flags, char *addr, int
 #endif
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
+    printf("\r\nSocket bind failed with bsd error: %d\r\n", errno);
     mqtt_tcp_disconnect(n);
     return status;
   }
@@ -199,11 +190,11 @@ static int mqtt_tcpconnection_handler(Network *n, uint8_t flags, char *addr, int
   rc     = connect(n->socket, (struct sockaddr *)&server_address, socket_length);
 #endif
   if (rc == -1) {
-    SL_DEBUG_LOG_V2(ERROR, "Socket Connect failed with bsd error: %d\r\n", errno);
+    printf("\r\nSocket Connect failed with bsd error: %d\r\n", errno);
     close(n->socket);
     return rc;
   }
-  SL_DEBUG_LOG_V2(INFO, "Socket connection success\r\n");
+  printf("\nSocket connection success \n");
   return status;
 }
 

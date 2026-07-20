@@ -117,13 +117,6 @@ extern osMutexId_t side_band_crypto_mutex;
 #define SLI_IS_IMMEDIATE_TRF(ctrl_flags) (ctrl_flags & SLI_IMMEDIATE_TRF_CTRL_FLAGS)
 #define SLI_EXT_DESC_SIZE_IF_EIA_PKT     5
 
-// Buffer size and count for the buffer manager pools for the SI91x driver
-#define SLI_WIFI_BUFFER_BLOCK_SIZE  1640
-#define SLI_WIFI_BUFFER_BLOCK_COUNT 10
-
-// Note: This is the extended block size for the transceiver APIs.
-#define SLI_WIFI_EXTENDED_BLOCK_SIZE 2324
-
 /*========================================================================*/
 // 11ax params
 /*========================================================================*/
@@ -377,61 +370,56 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   }
 #endif
 
+  // Dedicated buffer pools indexed by sli_buffer_manager_pool_types_t.
+  // Wi-Fi data pools use SLI_WIFI_BUFFER_BLOCK_SIZE (1640 default, or SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE when set).
+  // Pools with block_count = 0 have no dedicated blocks; HYBRID allocations fall back to the common pool.
   sli_buffer_manager_pool_info_t default_buffer_configuration[SLI_BUFFER_MANAGER_MAX_POOL] = {
+    // [0] SLI_BUFFER_MANAGER_CE_TX_POOL: Command Engine TX command buffers.
     {
-#ifdef SPI_EXTENDED_TX_LEN_2K
-      .block_size = SLI_WIFI_EXTENDED_BLOCK_SIZE,
-#else
-      .block_size = SLI_WIFI_BUFFER_BLOCK_SIZE,
-#endif
+      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 4,
     },
+    // [1] SLI_BUFFER_MANAGER_CE_RX_POOL: Command Engine RX command buffers.
     {
-#ifdef SPI_EXTENDED_TX_LEN_2K
-      .block_size = SLI_WIFI_EXTENDED_BLOCK_SIZE,
-#else
-      .block_size = SLI_WIFI_BUFFER_BLOCK_SIZE,
-#endif
+      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 4,
     },
-
+    // [2] SLI_BUFFER_MANAGER_CE_DATA_POOL: Command Engine data/command payload buffers.
     {
-#ifdef SPI_EXTENDED_TX_LEN_2K
-      .block_size = SLI_WIFI_EXTENDED_BLOCK_SIZE,
-#else
-      .block_size = SLI_WIFI_BUFFER_BLOCK_SIZE,
-#endif
+      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 4,
     },
-
+    // [3] SLI_BUFFER_MANAGER_CE_METADATA_POOL: Command Engine packet metadata (sli_command_engine_metadata_t).
     {
       .block_size  = sizeof(sli_command_engine_metadata_t),
       .block_count = SLI_WIFI_BUFFER_BLOCK_COUNT,
     },
-
+    // [4] SLI_BUFFER_MANAGER_HAL_METADATA_POOL: HAL packet metadata (sli_si91x_hal_packet_t).
     {
       .block_size  = sizeof(sli_command_engine_metadata_t),
       .block_count = SLI_WIFI_BUFFER_BLOCK_COUNT,
     },
-
+    // [5] SLI_BUFFER_MANAGER_CP_CMD_TX_POOL: UNUSED POOL in Si91x
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 0,
     },
-
+    // [6] SLI_BUFFER_MANAGER_CP_CMD_RX_POOL: Bus RX command buffers (SPI/UART/AHB).
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 10,
     },
-
+    // [7] SLI_BUFFER_MANAGER_CP_DATA_TX_POOL: UNUSED POOL in Si91x
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 0,
     },
+    // [8] SLI_BUFFER_MANAGER_CP_DATA_RX_POOL: UNUSED POOL in Si91x
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 0,
     },
+    // [9] SLI_BUFFER_MANAGER_QUEUE_NODE_POOL: Queue manager node buffers (sli_queue_node_t).
     {
       .block_size  = sizeof(sli_queue_node_t),
       .block_count = 20,
@@ -445,6 +433,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     config_buffer.pool_info[i] = &default_buffer_configuration[i];
   }
 
+  // Common pool: shared fallback for HYBRID allocations (same block size as CE TX pool, 4 blocks).
   config_buffer.common_pool_info.block_size  = default_buffer_configuration[0].block_size;
   config_buffer.common_pool_info.block_count = 4;
 

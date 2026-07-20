@@ -36,10 +36,9 @@
 #include "sl_wifi_host_interface.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_wifi_constants.h"
-#include <stdint.h>
 
-#define SLI_WIFI_WAIT_ON_THREAD_ID 0 ///< Wait on the calling thread's event flags (used by synchronous commands).
-#define SLI_WIFI_WAIT_ON_EVENT_ID  1 ///< Wait on the packet-type shared event flags (used by socket/select paths).
+#define SLI_WIFI_WAIT_ON_THREAD_ID 0
+#define SLI_WIFI_WAIT_ON_EVENT_ID  1
 
 #define SLI_WIFI_HEADER_SIZE               16
 #define SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE 4
@@ -262,55 +261,11 @@ sl_status_t sli_wifi_async_send_command(uint32_t command,
                                         uint32_t data_length,
                                         void *custom_desc);
 
-/***************************************************************************/ /**
- * @brief
- *   Block until a synchronous command-engine response is dequeued.
- *
- * @details
- *   Waits for an RX response on the sync-response queue registered for
- *   @p command_packet_type, then removes and returns the metadata node whose
- *   @c tx_info.packet_id matches @p packet_id. Spurious wakeups (event set but
- *   no matching node) are retried until @p wait_period_ms elapses.
- *
- *   Two wait mechanisms are supported via @p wait_type:
- *   - @ref SLI_WIFI_WAIT_ON_THREAD_ID: blocks on the calling thread's CMSIS
- *     thread flags. Used when the thread that sent the command waits for its
- *     own response.
- *   - @ref SLI_WIFI_WAIT_ON_EVENT_ID: blocks on the per-packet-type shared
- *     @c osEventFlags handle (@c sync_response_event_id). Used when the waiter
- *     may differ from the sender (for example socket read/select).
- *
- *   On success the caller owns @p metadata_response and must free it (and any
- *   attached @c tx_info.data_packet) when no longer needed. Higher-level callers
- *   typically use sli_wifi_receive_response_buffer() instead of calling this
- *   function directly.
- *
- * @param[in] command_packet_type
- *   Command-engine packet type used to look up the sync-response queue and events.
- * @param[in] packet_id
- *   TX packet identifier to match in the response queue. Use @c 0 when the
- *   response is not correlated by packet ID (for example async socket reads).
- * @param[in] wait_period_ms
- *   Maximum time to wait for a matching response, in milliseconds.
- * @param[in] wait_type
- *   Wait mechanism: @ref SLI_WIFI_WAIT_ON_THREAD_ID or @ref SLI_WIFI_WAIT_ON_EVENT_ID.
- * @param[out] metadata_response
- *   On @c SL_STATUS_OK, set to the dequeued command-engine metadata. Unchanged on error.
- *
- * @return
- *   @c SL_STATUS_OK on success.
- *   @c SL_STATUS_TIMEOUT if no matching response arrives within @p wait_period_ms.
- *   @c SL_STATUS_INVALID_PARAMETER if @p metadata_response is NULL or @p wait_type is invalid.
- *   @c SL_STATUS_INVALID_CONFIGURATION if @ref SLI_WIFI_WAIT_ON_EVENT_ID is requested but
- *   the packet type has no @c sync_response_event_id configured.
- *   @c SL_STATUS_FAIL on an unexpected RTOS wait error.
- *   Other queue-manager errors may be propagated on the thread-ID wait path.
- ******************************************************************************/
 sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_type,
                                                      uint16_t packet_id,
-                                                     uint32_t wait_period_ms,
+                                                     sli_wifi_wait_period_t wait_period,
                                                      uint8_t wait_type,
-                                                     sli_command_engine_metadata_t **metadata_response);
+                                                     sli_command_engine_metadata_t **packet_buffer);
 /**
  * @brief Internal function to send a command packet to Command Engine
  *

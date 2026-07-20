@@ -159,7 +159,7 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
   float duration = ((test_timeout) / 1000);                    // ms to sec
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
+  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully", result, duration);
   bytes_read = 0;
 }
 
@@ -221,7 +221,7 @@ static int32_t wifi_app_init_and_reconnect(void)
 
   status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: set credential failed: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: set credential failed: 0x%lX", status);
     return -1;
   }
 
@@ -233,7 +233,7 @@ static int32_t wifi_app_init_and_reconnect(void)
 
   status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: sl_wifi_connect failed: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: sl_wifi_connect failed: 0x%lX", status);
     return -1;
   }
 
@@ -242,7 +242,7 @@ static int32_t wifi_app_init_and_reconnect(void)
   ip_address.host_name = DHCP_HOST_NAME;
   status               = sl_si91x_configure_ip_address(&ip_address, SL_SI91X_WIFI_CLIENT_VAP_ID);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: IP config failed: 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Init+reconnect: IP config failed: 0x%lX", status);
     return -1;
   }
 
@@ -324,16 +324,14 @@ int32_t rsi_wlan_app_task()
   {
     int32_t ble_result = RSI_FAILURE;
     if (rsi_ble_app_request_disable() != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "BLE disable request failed\r\n");
+      SL_DEBUG_LOG_V2(ERROR, "BLE disable request failed");
       return -1;
     }
     if (osMessageQueueGet(ble_disable_done_queue, &ble_result, NULL, osWaitForever) != osOK
         || ble_result != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "BLE disable failed: %ld\r\n", (long)ble_result);
+      SL_DEBUG_LOG_V2(ERROR, "BLE disable failed: %ld", (long)ble_result);
       return -1;
     }
-
-    SL_DEBUG_LOG_V2(INFO, "BLE disabled\r\n");
 #if SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO && SOCKET_ASYNC_FEATURE
     reset_wlan_async_rx_state_between_passes();
 #endif
@@ -341,26 +339,22 @@ int32_t rsi_wlan_app_task()
     wlan_throughput_task();
     status = sl_wifi_disconnect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE);
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, "Dynamic demo: sl_wifi_disconnect failed: 0x%lX\r\n", (unsigned long)status);
+      LOG_PRINT("\r\nDynamic demo: sl_wifi_disconnect failed: 0x%lX\r\n", (unsigned long)status);
       return -1;
     }
     rsi_ble_app_request_enable();
     if (osMessageQueueGet(ble_enable_done_queue, &ble_result, NULL, osWaitForever) != osOK
         || ble_result != RSI_SUCCESS) {
-      SL_DEBUG_LOG_V2(ERROR, "BLE enable failed: %ld\r\n", (long)ble_result);
+      SL_DEBUG_LOG_V2(ERROR, "BLE enable failed: %ld", (long)ble_result);
       return -1;
     }
-
-    SL_DEBUG_LOG_V2(INFO, "BLE re-enabled\r\n");
-
     if (wifi_app_init_and_reconnect() != 0) {
-      SL_DEBUG_LOG_V2(ERROR, "Init+reconnect after BLE enable failed\r\n");
+      SL_DEBUG_LOG_V2(ERROR, "Init+reconnect after BLE enable failed");
       return -1;
     }
   }
 #endif
 
-  SL_DEBUG_LOG_V2(INFO, "WLAN throughput test finished\r\n");
   return 0;
 }
 

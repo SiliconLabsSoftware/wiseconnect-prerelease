@@ -48,14 +48,6 @@
 // Global variable indicating if the device is initialized
 extern bool device_initialized;
 
-// Per-family IP configuration status captured during the last IP configuration attempt.
-// Retrieved by the application via sl_wifi_get_ip_config_failure_reason().
-//  - SL_STATUS_OK             : that family configured successfully
-//  - firmware error code      : that family failed to configure
-//  - SL_STATUS_NOT_AVAILABLE  : that family was not requested
-static sl_status_t sli_ipv4_config_status = SL_STATUS_NOT_AVAILABLE;
-static sl_status_t sli_ipv6_config_status = SL_STATUS_NOT_AVAILABLE;
-
 static sl_status_t sli_send_client_ip_address_info_if_applicable(const sl_net_ip_configuration_t *ip_config,
                                                                  uint8_t virtual_ap_id)
 {
@@ -83,161 +75,16 @@ static sl_status_t sli_send_client_ip_address_info_if_applicable(const sl_net_ip
   return status;
 }
 
-static sl_status_t sli_configure_ipv4_address(sl_net_ip_configuration_t *ip_config,
-                                              uint8_t virtual_ap_id,
-                                              uint32_t wait_time)
-{
-  sli_si91x_req_ipv4_params_t ip_req = { 0 };
-  sl_wifi_buffer_t *buffer           = NULL;
-
-  memset(&ip_req, 0, sizeof(ip_req));
-  ip_req.vap_id = virtual_ap_id;
-
-  if (SL_IP_MANAGEMENT_STATIC_IP == ip_config->mode) {
-    ip_req.dhcp_mode = SLI_NET_STATIC_IP;
-    memcpy(ip_req.ipaddress, ip_config->ip.v4.ip_address.bytes, SL_IPV4_ADDRESS_LENGTH);
-    memcpy(ip_req.netmask, ip_config->ip.v4.netmask.bytes, SL_IPV4_ADDRESS_LENGTH);
-    memcpy(ip_req.gateway, ip_config->ip.v4.gateway.bytes, SL_IPV4_ADDRESS_LENGTH);
-  } else {
-    ip_req.dhcp_mode = (SLI_NET_DHCP | SL_SI91X_DHCP_UNICAST_OFFER);
-  }
-
-  if (NULL != ip_config->host_name) {
-    ip_req.dhcp_mode |= SLI_NET_DHCP_HOSTNAME;
-    memcpy(ip_req.hostname, ip_config->host_name, sizeof(ip_req.hostname));
-  }
-
-  ip_req.dhcp_discover_rtr_interval_min = ip_config->dhcp_config.min_discover_retry_interval;
-  ip_req.dhcp_request_rtr_interval_min  = ip_config->dhcp_config.min_request_retry_interval;
-  ip_req.dhcp_discover_rtr_interval_max = ip_config->dhcp_config.max_discover_retry_interval;
-  ip_req.dhcp_request_rtr_interval_max  = ip_config->dhcp_config.max_request_retry_interval;
-  ip_req.dhcp_discover_max_retries      = ip_config->dhcp_config.max_discover_retries;
-  ip_req.dhcp_request_max_retries       = ip_config->dhcp_config.max_request_retries;
-
-  sli_ipv4_config_status = sli_wifi_send_command(SLI_WIFI_REQ_IPCONFV4,
-                                                 SLI_SI91X_NETWORK_CMD,
-                                                 &ip_req,
-                                                 sizeof(sli_si91x_req_ipv4_params_t),
-                                                 wait_time,
-                                                 NULL,
-                                                 (void **)&buffer);
-
-  if (sli_ipv4_config_status == SL_STATUS_OK) {
-    sl_wifi_system_packet_t *packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-
-    if (SL_IP_MANAGEMENT_DHCP == ip_config->mode) {
-      const sli_si91x_rsp_ipv4_params_t *response_data = (sli_si91x_rsp_ipv4_params_t *)packet->data;
-      memcpy(ip_config->ip.v4.ip_address.bytes, (const uint8_t *)response_data->ipaddr, sizeof(sl_ipv4_address_t));
-      memcpy(ip_config->ip.v4.netmask.bytes, (const uint8_t *)response_data->netmask, sizeof(sl_ipv4_address_t));
-      memcpy(ip_config->ip.v4.gateway.bytes, (const uint8_t *)response_data->gateway, sizeof(sl_ipv4_address_t));
-    }
-
-    sli_buffer_manager_free_buffer(buffer);
-    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv4 OK (vap_id=%u)", virtual_ap_id);
-  } else {
-    if (buffer != NULL) {
-      sli_buffer_manager_free_buffer(buffer);
-    }
-    SL_DEBUG_LOG_V2(WARN,
-                    "sli_net_configure_ip_address: IPv4 failed (vap_id=%u, status=0x%lX)",
-                    virtual_ap_id,
-                    sli_ipv4_config_status);
-  }
-
-  return sli_ipv4_config_status;
-}
-
-static sl_status_t sli_configure_ipv6_address(sl_net_ip_configuration_t *ip_config,
-                                              uint8_t virtual_ap_id,
-                                              uint32_t wait_time)
-{
-  sli_si91x_req_ipv6_params_t ipv6_request = { 0 };
-  sl_wifi_buffer_t *buffer                 = NULL;
-  uint16_t prefix_length                   = 64;
-
-  memset(&ipv6_request, 0, sizeof(ipv6_request));
-  memcpy(&ipv6_request.prefixLength, &prefix_length, SLI_SI91X_2BYTE_FIELD_SIZE);
-  ipv6_request.vap_id = virtual_ap_id;
-
-  if (SL_IP_MANAGEMENT_STATIC_IP == ip_config->mode) {
-    memcpy(&ipv6_request.ipaddr6, ip_config->ip.v6.global_address.bytes, SL_IPV6_ADDRESS_LENGTH);
-    memcpy(&ipv6_request.gateway6, ip_config->ip.v6.gateway.bytes, SL_IPV6_ADDRESS_LENGTH);
-    ipv6_request.mode[0] = SLI_NET_STATIC_IP;
-  } else {
-    ipv6_request.mode[0] = (SLI_NET_DHCP | SL_SI91X_DHCP_UNICAST_OFFER);
-  }
-
-  sli_ipv6_config_status = sli_wifi_send_command(SLI_WIFI_REQ_IPCONFV6,
-                                                 SLI_SI91X_NETWORK_CMD,
-                                                 &ipv6_request,
-                                                 sizeof(sli_si91x_req_ipv6_params_t),
-                                                 wait_time,
-                                                 NULL,
-                                                 (void **)&buffer);
-
-  if (sli_ipv6_config_status == SL_STATUS_OK) {
-    sl_wifi_system_packet_t *packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-    const sli_si91x_rsp_ipv6_params_t *ipv6_response = (sli_si91x_rsp_ipv6_params_t *)packet->data;
-
-    memcpy(&ip_config->ip.v6.link_local_address,
-           (const uint8_t *)ipv6_response->link_local_address,
-           sizeof(ipv6_response->link_local_address));
-    memcpy(&ip_config->ip.v6.global_address,
-           (const uint8_t *)ipv6_response->global_address,
-           sizeof(ipv6_response->global_address));
-    memcpy(&ip_config->ip.v6.gateway,
-           (const uint8_t *)ipv6_response->gateway_address,
-           sizeof(ipv6_response->gateway_address));
-
-    sli_buffer_manager_free_buffer(buffer);
-    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv6 OK (vap_id=%u)", virtual_ap_id);
-  } else {
-    if (buffer != NULL) {
-      sli_buffer_manager_free_buffer(buffer);
-    }
-    SL_DEBUG_LOG_V2(WARN,
-                    "sli_net_configure_ip_address: IPv6 failed (vap_id=%u, status=0x%lX)",
-                    virtual_ap_id,
-                    sli_ipv6_config_status);
-  }
-
-  return sli_ipv6_config_status;
-}
-
-static sl_status_t sli_aggregate_ip_config_status(sl_ip_address_type_t requested_type,
-                                                  sl_ip_address_type_t configured_type)
-{
-  const bool ipv4_requested = (requested_type & SL_IPV4) == SL_IPV4;
-  const bool ipv6_requested = (requested_type & SL_IPV6) == SL_IPV6;
-
-  if (ipv4_requested && ipv6_requested) {
-    if ((configured_type & SL_IPV4) && (configured_type & SL_IPV6)) {
-      return SL_STATUS_OK;
-    }
-    if (configured_type & SL_IPV4) {
-      return SL_STATUS_WIFI_IPV4_OK;
-    }
-    if (configured_type & SL_IPV6) {
-      return SL_STATUS_WIFI_IPV6_OK;
-    }
-    // Dual-stack total failure: return IPv4 error; IPv6 error via sl_wifi_get_ip_config_failure_reason().
-    return sli_ipv4_config_status;
-  }
-  if (ipv4_requested) {
-    return (configured_type & SL_IPV4) ? SL_STATUS_OK : sli_ipv4_config_status;
-  }
-  if (ipv6_requested) {
-    return (configured_type & SL_IPV6) ? SL_STATUS_OK : sli_ipv6_config_status;
-  }
-  return SL_STATUS_OK;
-}
-
 sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
                                          uint8_t virtual_ap_id,
                                          const uint32_t timeout)
 {
-  sl_status_t status = SL_STATUS_OK;
-  uint32_t wait_time = (timeout ? SLI_WIFI_WAIT_FOR_RESPONSE(timeout) : SLI_WIFI_RETURN_IMMEDIATELY);
+  sl_status_t status                       = SL_STATUS_INVALID_PARAMETER;
+  sli_si91x_req_ipv4_params_t ip_req       = { 0 };
+  sli_si91x_req_ipv6_params_t ipv6_request = { 0 };
+  sl_wifi_system_packet_t *packet;
+  sl_wifi_buffer_t *buffer = NULL;
+  uint32_t wait_time       = (timeout ? SLI_WIFI_WAIT_FOR_RESPONSE(timeout) : SLI_WIFI_RETURN_IMMEDIATELY);
 
   // Check if the device is initialized
   if (!device_initialized) {
@@ -249,54 +96,129 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  const sl_ip_address_type_t requested_type = ip_config->type;
-  const bool ipv4_requested                 = (requested_type & SL_IPV4) == SL_IPV4;
-  const bool ipv6_requested                 = (requested_type & SL_IPV6) == SL_IPV6;
-  sl_ip_address_type_t configured_type      = 0;
+  if (SL_IPV4 & ip_config->type) {
+    // Initialize the IPv4 request structure and fill fields accordingly
+    memset(&ip_req, 0, sizeof(ip_req));
+    ip_req.vap_id = virtual_ap_id;
 
-  // Reset the per-family status for this configuration attempt. Families that were not
-  // requested are reported as SL_STATUS_NOT_AVAILABLE via sl_wifi_get_ip_config_failure_reason().
-  sli_ipv4_config_status = ipv4_requested ? SL_STATUS_FAIL : SL_STATUS_NOT_AVAILABLE;
-  sli_ipv6_config_status = ipv6_requested ? SL_STATUS_FAIL : SL_STATUS_NOT_AVAILABLE;
+    if (SL_IP_MANAGEMENT_STATIC_IP == ip_config->mode) {
+      ip_req.dhcp_mode = SLI_NET_STATIC_IP;
+      // Fill IP address
+      memcpy(ip_req.ipaddress, ip_config->ip.v4.ip_address.bytes, SL_IPV4_ADDRESS_LENGTH);
 
-  // Configure each requested family independently so a dual-stack profile can succeed partially.
-  if (ipv4_requested && (sli_configure_ipv4_address(ip_config, virtual_ap_id, wait_time) == SL_STATUS_OK)) {
-    configured_type |= SL_IPV4;
-  }
-  if (ipv6_requested && (sli_configure_ipv6_address(ip_config, virtual_ap_id, wait_time) == SL_STATUS_OK)) {
-    configured_type |= SL_IPV6;
-  }
+      // Fill network mask
+      memcpy(ip_req.netmask, ip_config->ip.v4.netmask.bytes, SL_IPV4_ADDRESS_LENGTH);
 
-  // Reflect only the families that configured successfully so downstream link-up,
-  // LwIP synchronization, and firmware IP-info use the real address families.
-  ip_config->type = configured_type;
+      // Fill gateway
+      memcpy(ip_req.gateway, ip_config->ip.v4.gateway.bytes, SL_IPV4_ADDRESS_LENGTH);
+    } else {
+      ip_req.dhcp_mode = (SLI_NET_DHCP | SL_SI91X_DHCP_UNICAST_OFFER);
+    }
 
-  // Send IP address information to firmware for the successfully configured families.
-  if (configured_type != 0) {
-    status = sli_send_client_ip_address_info_if_applicable(ip_config, virtual_ap_id);
+    if (NULL != ip_config->host_name) {
+      // Enable DHCP hostname option and copy the hostname
+      ip_req.dhcp_mode |= SLI_NET_DHCP_HOSTNAME;
+      memcpy(ip_req.hostname, ip_config->host_name, sizeof(ip_req.hostname));
+    }
+
+    ip_req.dhcp_discover_rtr_interval_min = ip_config->dhcp_config.min_discover_retry_interval;
+    ip_req.dhcp_request_rtr_interval_min  = ip_config->dhcp_config.min_request_retry_interval;
+    ip_req.dhcp_discover_rtr_interval_max = ip_config->dhcp_config.max_discover_retry_interval;
+    ip_req.dhcp_request_rtr_interval_max  = ip_config->dhcp_config.max_request_retry_interval;
+    ip_req.dhcp_discover_max_retries      = ip_config->dhcp_config.max_discover_retries;
+    ip_req.dhcp_request_max_retries       = ip_config->dhcp_config.max_request_retries;
+
+    status = sli_wifi_send_command(SLI_WIFI_REQ_IPCONFV4,
+                                   SLI_SI91X_NETWORK_CMD,
+                                   &ip_req,
+                                   sizeof(sli_si91x_req_ipv4_params_t),
+                                   wait_time,
+                                   NULL,
+                                   (void **)&buffer);
+
+    // Check if the command failed and free the buffer if it was allocated
+    if ((status != SL_STATUS_OK) && (buffer != NULL)) {
+      sli_buffer_manager_free_buffer(buffer);
+    }
+
+    // Verify the status and return it
     VERIFY_STATUS_AND_RETURN(status);
+    packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
+
+    if (SL_IP_MANAGEMENT_DHCP == ip_config->mode) {
+      // Extract DHCP response data if in DHCP mode
+      const sli_si91x_rsp_ipv4_params_t *response_data = (sli_si91x_rsp_ipv4_params_t *)packet->data;
+      memcpy(ip_config->ip.v4.ip_address.bytes, (const uint8_t *)response_data->ipaddr, sizeof(sl_ipv4_address_t));
+      memcpy(ip_config->ip.v4.netmask.bytes, (const uint8_t *)response_data->netmask, sizeof(sl_ipv4_address_t));
+      memcpy(ip_config->ip.v4.gateway.bytes, (const uint8_t *)response_data->gateway, sizeof(sl_ipv4_address_t));
+    }
+
+    // Free the buffer and return success status
+    sli_buffer_manager_free_buffer(buffer);
+    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv4 OK (vap_id=%u)", virtual_ap_id);
   }
 
-  return sli_aggregate_ip_config_status(requested_type, configured_type);
+  if (SL_IPV6 & ip_config->type) {
+    // Initialize the IPv6 request structure
+    memset(&ipv6_request, 0, sizeof(ipv6_request));
+    uint16_t prefix_length = 64;
+    memcpy(&ipv6_request.prefixLength, &prefix_length, SLI_SI91X_2BYTE_FIELD_SIZE);
+    ipv6_request.vap_id = virtual_ap_id;
+
+    if (SL_IP_MANAGEMENT_STATIC_IP == ip_config->mode) {
+      // Set IPv6 mode to static
+      memcpy(&ipv6_request.ipaddr6, ip_config->ip.v6.global_address.bytes, SL_IPV6_ADDRESS_LENGTH);
+      memcpy(&ipv6_request.gateway6, ip_config->ip.v6.gateway.bytes, SL_IPV6_ADDRESS_LENGTH);
+      ipv6_request.mode[0] = SLI_NET_STATIC_IP;
+    } else {
+      // Set IPv6 mode to dynamic
+      ipv6_request.mode[0] = (SLI_NET_DHCP | SL_SI91X_DHCP_UNICAST_OFFER);
+    }
+
+    // Send the IPv6 configuration request to SI91X driver
+    status = sli_wifi_send_command(SLI_WIFI_REQ_IPCONFV6,
+                                   SLI_SI91X_NETWORK_CMD,
+                                   &ipv6_request,
+                                   sizeof(sli_si91x_req_ipv6_params_t),
+                                   wait_time,
+                                   NULL,
+                                   (void **)&buffer);
+
+    // Check if the command failed and free the buffer if it was allocated
+    if ((status != SL_STATUS_OK) && (buffer != NULL)) {
+      sli_buffer_manager_free_buffer(buffer);
+    }
+
+    VERIFY_STATUS_AND_RETURN(status);
+
+    // Extract the IPv6 configuration response data
+    packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
+    const sli_si91x_rsp_ipv6_params_t *ipv6_response = (sli_si91x_rsp_ipv6_params_t *)packet->data;
+
+    // Copy the IPv6 addresses to the address structure
+    memcpy(&ip_config->ip.v6.link_local_address,
+           (const uint8_t *)ipv6_response->link_local_address,
+           sizeof(ipv6_response->link_local_address));
+    memcpy(&ip_config->ip.v6.global_address,
+           (const uint8_t *)ipv6_response->global_address,
+           sizeof(ipv6_response->global_address));
+    memcpy(&ip_config->ip.v6.gateway,
+           (const uint8_t *)ipv6_response->gateway_address,
+           sizeof(ipv6_response->gateway_address));
+
+    // Free the buffer and return success status
+    sli_buffer_manager_free_buffer(buffer);
+    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv6 OK (vap_id=%u)", virtual_ap_id);
+  }
+
+  // Send IP address information to firmware if it's a client interface.
+  status = sli_send_client_ip_address_info_if_applicable(ip_config, virtual_ap_id);
+  VERIFY_STATUS_AND_RETURN(status);
+
+  return status;
 }
 
 sl_status_t sl_si91x_configure_ip_address(sl_net_ip_configuration_t *address, uint8_t virtual_ap_id)
 {
   return sli_net_configure_ip_address(address, virtual_ap_id, SLI_WIFI_WAIT_FOR_EVER);
-}
-
-sl_status_t sl_wifi_get_ip_config_failure_reason(sl_status_t *ipv4_status, sl_status_t *ipv6_status)
-{
-  if ((NULL == ipv4_status) && (NULL == ipv6_status)) {
-    return SL_STATUS_NULL_POINTER;
-  }
-
-  if (NULL != ipv4_status) {
-    *ipv4_status = sli_ipv4_config_status;
-  }
-  if (NULL != ipv6_status) {
-    *ipv6_status = sli_ipv6_config_status;
-  }
-
-  return SL_STATUS_OK;
 }

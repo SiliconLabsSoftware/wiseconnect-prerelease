@@ -565,10 +565,10 @@ sl_status_t sli_si91x_wifi_platform_deinit(void)
 {
   sl_status_t status = SL_STATUS_OK;
 
-  status = sli_hal_si91x_deinit();
+  status = sli_si91x_wifi_command_engine_deinit();
   VERIFY_STATUS_AND_RETURN(status);
 
-  status = sli_si91x_wifi_command_engine_deinit();
+  status = sli_hal_si91x_deinit();
   VERIFY_STATUS_AND_RETURN(status);
 
   if (NULL != sli_wifi_events) {

@@ -1240,6 +1240,8 @@ sl_status_t sli_wifi_transmit_loopback(sl_wifi_interface_t interface,
     return SL_STATUS_INVALID_MODE;
   }
 
+  request->frame_body_type.sub_type = SLI_WIFI_SUBTYPE_TRANSMIT_LOOPBACK;
+
   status = sli_wifi_send_command(SLI_WIFI_REQ_WIFI_RAIL,
                                  SLI_WIFI_WLAN_CMD,
                                  request,

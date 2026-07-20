@@ -29,3 +29,6 @@ define:
 requires:
   - name: romdriver_timer
   - name: log_none
+documentation:
+    docset: wiseconnect
+    document: wiseconnect-api-reference-guide-si91x-peripherals/ulp-timer

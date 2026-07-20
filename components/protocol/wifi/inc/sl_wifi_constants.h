@@ -107,7 +107,7 @@
   * @brief Enumeration for Wi-Fi security types.
   *
   * @note WPA3 Transition security type is not currently supported while running as an Access Point (AP).
-  * @note To enable any WPA3 mode, the bit represented by the macro [SL_WIFI_EXT_FEAT_IEEE_80211W](../wiseconnect-api-reference-guide-si91x-driver/si91-x-extended-custom-feature-bitmap#sl-wifi-ext-feat-ieee-80211w) must be set in the [ext_custom_feature_bit_map](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-boot-configuration-t).
+  * @note To enable any WPA3 mode, the bit represented by the macro [SL_WIFI_EXT_FEAT_IEEE_80211W](../wiseconnect-api-reference-guide-si91x-driver/si91-x-extended-custom-feature-bitmap#sl-si91-x-ext-feat-ieee-80211-w) must be set in the [ext_custom_feature_bit_map](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-boot-configuration-t#ext-custom-feature-bit-map).
   */
 typedef enum {
   SL_WIFI_OPEN                       = 0,  ///< Wi-Fi Open security type
@@ -523,59 +523,59 @@ typedef enum {
   SL_WIFI_TWT_UNSOLICITED_SESSION_SUCCESS_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (1
-       << 16), ///< Event for TWT unsolicited session success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT unsolicited session success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_AP_REJECTED_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (4
-       << 16), ///< Event for TWT AP rejection. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT AP rejection. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_OUT_OF_TOLERANCE_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (5
-       << 16), ///< Event for TWT out of tolerance. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT out of tolerance. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_RESPONSE_NOT_MATCHED_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (6
-       << 16), ///<  Event for TWT response not matched. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///<  Event for TWT response not matched. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_UNSUPPORTED_RESPONSE_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (10
-       << 16), ///< Event for TWT unsupported response. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT unsupported response. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_TEARDOWN_SUCCESS_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (11
-       << 16), ///< Event for TWT teardown success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT teardown success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_AP_TEARDOWN_SUCCESS_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (12
-       << 16), ///< Event for TWT AP teardown success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT AP teardown success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_FAIL_MAX_RETRIES_REACHED_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (15
-       << 16), ///< Event for TWT maximum retries reached. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT maximum retries reached. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_INACTIVE_DUE_TO_ROAMING_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (16
-       << 16), ///< Event for TWT inactive due to roaming. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT inactive due to roaming. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_INACTIVE_DUE_TO_DISCONNECT_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (17
-       << 16), ///< Event for TWT inactive due to disconnect. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT inactive due to disconnect. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_INACTIVE_NO_AP_SUPPORT_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (18
-       << 16), ///< Event for TWT inactive due to no AP support. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT inactive due to no AP support. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_RESCHEDULE_TWT_SUCCESS_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (19
-       << 16), ///<  Event for TWT suspend resume success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///<  Event for TWT suspend resume success. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_INFO_FRAME_EXCHANGE_FAILED_EVENT =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (20
-       << 16), ///< Event for TWT info frame exchange failure. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT info frame exchange failure. Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
   SL_WIFI_TWT_EVENTS_END =
     SL_WIFI_TWT_RESPONSE_EVENTS
     | (21
-       << 16), ///< Event for TWT event end.  Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
+       << 16), ///< Event for TWT event end.  Data would be of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
 
   // Stats specific events
   SL_WIFI_STATS_EVENT = SL_WIFI_STATS_RESPONSE_EVENTS
@@ -583,18 +583,18 @@ typedef enum {
   SL_WIFI_STATS_ASYNC_EVENT =
     SL_WIFI_STATS_RESPONSE_EVENTS
     | (2
-       << 16), ///< Event for Wi-Fi asynchronous statistics. Data would be of type [sl_wifi_async_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-async-stats-response-t)
+       << 16), ///< Event for Wi-Fi asynchronous statistics. Data would be of type [sl_wifi_async_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-async-stats-response-t)
   SL_WIFI_STATS_ADVANCE_EVENT =
     SL_WIFI_STATS_RESPONSE_EVENTS
     | (3
-       << 16), ///< Event for Wi-Fi advance statistics. Data would be of type [sl_wifi_advanced_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-advanced-stats-response-t)
+       << 16), ///< Event for Wi-Fi advance statistics. Data would be of type [sl_wifi_advanced_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-advance-stats-response-t)
   SL_WIFI_STATS_TEST_MODE_EVENT =
     SL_WIFI_STATS_RESPONSE_EVENTS
     | (4 << 16), ///< Event for Wi-Fi test mode statistics. This feature is not supported in current release
   SL_WIFI_STATS_MODULE_STATE_EVENT =
     SL_WIFI_STATS_RESPONSE_EVENTS
     | (5
-       << 16), ///< Event for Wi-Fi module state statistics. Data would be of type [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-module-state-stats-response-t)
+       << 16), ///< Event for Wi-Fi module state statistics. Data would be of type [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-module-state-stats-response-t)
 
   SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB = SL_WIFI_TRANSCEIVER_EVENTS | (1 << 16),
   SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB  = SL_WIFI_TRANSCEIVER_EVENTS | (2 << 16),

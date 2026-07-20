@@ -22,15 +22,5 @@ provides:
   - name: rsilib_qspi
 requires:
   - name: romdriver_timer
-  - name: code_classification
-    condition: [psram_core]
 define: 
   - name: QSPI_ROMDRIVER_PRESENT
-  - name: SL_CODE_COMPONENT_RSILIB_QSPI
-    value: rsilib_qspi
-template_contribution:
-  - name: code_classification_components
-    value: rsilib_qspi
-    condition: [psram_core]
-  - name: psram_ram_data_files
-    value: rsi_qspi

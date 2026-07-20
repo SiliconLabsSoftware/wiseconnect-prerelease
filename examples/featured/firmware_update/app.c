@@ -100,10 +100,7 @@ static const sl_wifi_device_configuration_t firmware_update_configuration = {
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = 0 }
 };
 
 uint8_t recv_buffer[RECV_BUFFER_SIZE];
@@ -157,34 +154,27 @@ static void application_start(void *argument)
 
 sl_status_t update_firmware()
 {
-  sl_si91x_firmware_version_t version = { 0 };
-  sl_status_t status                  = SL_STATUS_FAIL;
-  struct sockaddr_in server_address   = { 0 };
-  socklen_t socket_length             = sizeof(struct sockaddr_in);
-  int client_socket                   = -1;
-  int socket_return_value             = 0;
-  uint32_t start                      = 0;
-  uint32_t finish                     = 0;
-  uint16_t chunk                      = 1;
-  uint16_t chunk_max_count            = 1; // for header
-  uint16_t fwup_chunk_length          = 0;
-  int16_t recv_size                   = 0;
-  uint8_t send_buffer[3]              = { 0 };
-  uint8_t fwup_chunk_type             = 0;
-  uint32_t fw_image_size              = 0;
+  sl_wifi_firmware_version_t version = { 0 };
+  sl_status_t status                 = SL_STATUS_FAIL;
+  struct sockaddr_in server_address  = { 0 };
+  socklen_t socket_length            = sizeof(struct sockaddr_in);
+  int client_socket                  = -1;
+  int socket_return_value            = 0;
+  uint32_t start                     = 0;
+  uint32_t finish                    = 0;
+  uint16_t chunk                     = 1;
+  uint16_t chunk_max_count           = 1; // for header
+  uint16_t fwup_chunk_length         = 0;
+  int16_t recv_size                  = 0;
+  uint8_t send_buffer[3]             = { 0 };
+  uint8_t fwup_chunk_type            = 0;
+  uint32_t fw_image_size             = 0;
 
   // Gets firmware version from device
-  status = sl_si91x_get_firmware_version(&version);
+  status = sl_wifi_get_firmware_version(&version);
   VERIFY_STATUS_AND_RETURN(status);
-  printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-         version.chip_id,
-         version.rom_id,
-         version.major,
-         version.minor,
-         version.security_version,
-         version.patch_num,
-         version.customer_id,
-         version.build_num);
+  print_firmware_version(&version);
+
   // Set up the server IP address and port number
   server_address.sin_family = AF_INET;
   server_address.sin_port   = SERVER_PORT;
@@ -272,7 +262,7 @@ sl_status_t update_firmware()
       // Call corresponding firmware upgrade API based on the chunk type
       if (fwup_chunk_type == SL_FWUP_RPS_HEADER) {
         //! Send the first chunk to extract OTA image size
-        status = sl_si91x_get_firmware_size((void *)recv_buffer, &fw_image_size);
+        status = sl_wifi_get_firmware_size((void *)recv_buffer, &fw_image_size);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Unable to fetch firmware size. Status: 0x%lx\r\n", status);
           close(client_socket);
@@ -321,17 +311,10 @@ sl_status_t update_firmware()
         SL_DEBUG_LOG_V2(INFO, "Wi-Fi Init status : %lx\r\n", status);
         VERIFY_STATUS_AND_RETURN(status);
 
-        status = sl_si91x_get_firmware_version(&version);
+        status = sl_wifi_get_firmware_version(&version);
         VERIFY_STATUS_AND_RETURN(status);
-        printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-               version.chip_id,
-               version.rom_id,
-               version.major,
-               version.minor,
-               version.security_version,
-               version.patch_num,
-               version.customer_id,
-               version.build_num);
+        print_firmware_version(&version);
+
         return SL_STATUS_OK;
       } else {
         SL_DEBUG_LOG_V2(ERROR, "Firmware update failed : %lx\r\n", status);

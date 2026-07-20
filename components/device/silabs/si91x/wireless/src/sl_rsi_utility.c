@@ -121,6 +121,39 @@ bool sli_is_tcp_auto_close_enabled()
   return tcp_auto_close_enabled;
 }
 
+sl_status_t sli_convert_si91x_wifi_client_info(sl_wifi_client_info_response_t *client_info_response,
+                                               const sli_wifi_client_info_response *sli_wifi_client_info_response)
+{
+
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(sli_wifi_client_info_response);
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(client_info_response);
+
+  client_info_response->client_count =
+    (uint8_t)(sli_wifi_client_info_response->sta_count[0] | sli_wifi_client_info_response->sta_count[1] << 8);
+
+  for (uint8_t station_index = 0; station_index < client_info_response->client_count; station_index++) {
+    const uint8_t *si91x_ip_address;
+    uint8_t *sl_ip_address;
+
+    sl_wifi_client_info_t *sl_client_info            = &client_info_response->client_info[station_index];
+    const sli_wifi_station_info_t *si91x_client_info = &sli_wifi_client_info_response->sta_info[station_index];
+
+    uint8_t ip_address_size = (uint8_t)(si91x_client_info->ip_version[0] | si91x_client_info->ip_version[1] << 8);
+
+    si91x_ip_address = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? si91x_client_info->ip_address.ipv4_address
+                                                                 : si91x_client_info->ip_address.ipv6_address;
+    sl_ip_address    = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? sl_client_info->ip_address.ip.v4.bytes
+                                                                 : sl_client_info->ip_address.ip.v6.bytes;
+
+    sl_client_info->ip_address.type = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? SL_IPV4 : SL_IPV6;
+
+    memcpy(&sl_client_info->mac_adddress, si91x_client_info->mac, sizeof(sl_mac_address_t));
+    memcpy(sl_ip_address, si91x_ip_address, ip_address_size);
+  }
+
+  return SL_STATUS_OK;
+}
+
 sl_si91x_host_timestamp_t sl_si91x_host_get_timestamp(void)
 {
   return osKernelGetTickCount();

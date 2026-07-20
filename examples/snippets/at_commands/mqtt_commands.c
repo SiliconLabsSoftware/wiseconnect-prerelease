@@ -456,7 +456,7 @@ sl_status_t mqtt_client_opt_command_handler(console_args_t *arguments)
   }
 
   uint8_t clean_session          = GET_OPTIONAL_COMMAND_ARG(arguments, 5, 1, uint8_t);
-  sl_mqtt_version_t mqtt_version = GET_OPTIONAL_COMMAND_ARG(arguments, 6, SL_MQTT_VERSION_3_1_1, sl_mqtt_version_t);
+  sl_mqtt_version_t mqtt_version = GET_OPTIONAL_COMMAND_ARG(arguments, 6, SL_MQTT_VERSION_3, sl_mqtt_version_t);
   uint16_t client_port           = GET_OPTIONAL_COMMAND_ARG(arguments, 7, MQTT_CLIENT_PORT, uint16_t);
   sl_net_credential_id_t credential_id =
     GET_OPTIONAL_COMMAND_ARG(arguments, 8, SL_NET_INVALID_CREDENTIAL_ID, sl_net_credential_id_t);

@@ -1224,7 +1224,7 @@ sl_status_t sl_si91x_dma_enable(uint32_t dma_number)
  * If transfer size is greater than DMA max transfer size, process_dma_irq
  * will initiate the transfer again until all the bytes are transferred
  * *****************************************************************************/
-void NO_OPTIMIZE DMA0_IRQ_HANDLER(void)
+void __attribute__((optimize("O0"))) DMA0_IRQ_HANDLER(void)
 {
   // Removed optimization to support large chunk of data transfer as a temporary solution, maybe removed in future
   uint32_t channel;

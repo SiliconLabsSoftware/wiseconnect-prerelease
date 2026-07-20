@@ -196,3 +196,12 @@ void rsi_assign_remote_data_serv_and_char(void)
     rsi_ble_conn_info[i].rsi_ble_profile_list_by_conn.profile_char_info = NULL;
   }
 }
+
+__attribute__((weak)) void sl_ble_gatt_client_notification_received(uint8_t ble_conn_id,
+                                                                    const uint8_t *att_value,
+                                                                    uint16_t length)
+{
+  (void)ble_conn_id;
+  (void)att_value;
+  (void)length;
+}

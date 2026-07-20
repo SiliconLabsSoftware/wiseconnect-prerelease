@@ -28,7 +28,6 @@
  *
  ******************************************************************************/
 
-#include <inttypes.h>
 #include "sl_net.h"
 #include "cmsis_os2.h"
 #include "sl_wifi_callback_framework.h"
@@ -149,10 +148,7 @@ static const sl_wifi_device_configuration_t firmware_update_configuration = {
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
-  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
-  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
-  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+                   .config_feature_bit_map     = 0 }
 };
 
 extern uint8_t recv_buffer[];
@@ -163,14 +159,14 @@ volatile uint8_t xmodem_download            = 0;
 si91x_wlan_app_cb_t si91x_wlan_app_cb;
 
 uint32_t chunk_cnt = 0u, chunk_check = 0u, offset = 0u, fw_image_size = 0u;
-int32_t status                         = SL_STATUS_OK;
-uint8_t recv_buffer[SI91X_CHUNK_SIZE]  = { 0 };
-sl_si91x_firmware_version_t fw_version = { 0 };
-uint8_t one_time                       = 1;
-volatile uint32_t offset_xmodem        = 0u;
-volatile uint32_t remaining_bytes      = 0u;
-uint32_t xmodem_chunk_cnt              = 0;
-uint32_t xmodem_chunk_rem              = 0;
+int32_t status                        = SL_STATUS_OK;
+uint8_t recv_buffer[SI91X_CHUNK_SIZE] = { 0 };
+sl_wifi_firmware_version_t fw_version = { 0 };
+uint8_t one_time                      = 1;
+volatile uint32_t offset_xmodem       = 0u;
+volatile uint32_t remaining_bytes     = 0u;
+uint32_t xmodem_chunk_cnt             = 0;
+uint32_t xmodem_chunk_rem             = 0;
 
 uint32_t t_start   = 0;
 uint32_t t_end     = 0;
@@ -204,7 +200,7 @@ static void application_start(void *argument)
   if (status == SL_STATUS_OK) {
     printf("Wi-Fi initialized successfully for firmware update.\n");
   } else {
-    printf("Wi-Fi init failed with error: 0x%" PRIX32 "\n", status);
+    printf("Wi-Fi init failed with error: 0x%lX\n", status);
     return;
   }
 
@@ -290,7 +286,7 @@ void xmodem_data(uint8_t *data, uint32_t size)
   //3: last pkt
   if (((((xmodem_cnt % 32) == 0) && (xmodem_cnt <= xmodem_chunk_cnt)) || (xmodem_cnt == xmodem_chunk_cnt))
       || (xmodem_cnt == FIRST_PKT_XMODEM_CNT)) {
-    if (xmodem_cnt == xmodem_chunk_cnt) {
+    if ((xmodem_cnt == xmodem_chunk_cnt)) {
       memset(&recv_buffer[remaining_bytes + FW_HEADER_SIZE], 0, (SI91X_CHUNK_SIZE - remaining_bytes - FW_HEADER_SIZE));
     }
 
@@ -342,19 +338,19 @@ int32_t app_task_fw_update_via_xmodem(uint8_t *rx_data, uint32_t size)
           break;
         }
         if (chunk_cnt != 0) {
-          printf("chunk_cnt: %" PRIu32 "\n", chunk_cnt);
+          printf("chunk_cnt: %lu\n", chunk_cnt);
         }
         if (chunk_cnt == 0) {
           printf("fw_upgrade Start\n");
           status = sl_si91x_bl_upgrade_firmware((uint8_t *)rx_data, SI91X_CHUNK_SIZE, SI91X_START_OF_FILE);
           if (status != SL_STATUS_OK) {
-            printf("ERROR: 0x%" PRIX32 "\n", status);
+            printf("ERROR: 0x%lx\n", status);
             break;
           }
         } else if (chunk_cnt == (chunk_check - 1)) {
           status = sl_si91x_bl_upgrade_firmware((uint8_t *)rx_data, SI91X_CHUNK_SIZE, SI91X_END_OF_FILE);
           if (status != SL_STATUS_OK) {
-            printf("ERROR: 0x%" PRIX32 "\n", status);
+            printf("ERROR: 0x%lx\n", status);
             break;
           }
           printf("\r\nfw_upgrade Success\n");
@@ -362,7 +358,7 @@ int32_t app_task_fw_update_via_xmodem(uint8_t *rx_data, uint32_t size)
         } else {
           status = sl_si91x_bl_upgrade_firmware((uint8_t *)rx_data, SI91X_CHUNK_SIZE, SI91X_IN_BETWEEN_FILE);
           if (status != SL_STATUS_OK) {
-            printf("ERROR: 0x%" PRIX32 "\n", status);
+            printf("ERROR: 0x%lx\n", status);
             break;
           }
         }
@@ -378,7 +374,7 @@ int32_t app_task_fw_update_via_xmodem(uint8_t *rx_data, uint32_t size)
       if (status == SL_STATUS_OK) {
         printf("Wi-Fi deinitialized successfully after firmware upgrade.\n");
       } else {
-        printf("Wi-Fi deinit failed with error: 0x%" PRIX32 "\n", status);
+        printf("Wi-Fi deinit failed with error: 0x%lX\n", status);
         return status;
       }
       //! WiSeConnect initialization
@@ -386,25 +382,17 @@ int32_t app_task_fw_update_via_xmodem(uint8_t *rx_data, uint32_t size)
       if (status == SL_STATUS_OK) {
         printf("Wi-Fi initialized successfully after firmware upgrade.\n");
       } else {
-        printf("Wi-Fi init failed with error: 0x%" PRIX32 "\n", status);
+        printf("Wi-Fi init failed with error: 0x%lX\n", status);
         return status;
       }
 
-      status = sl_si91x_get_firmware_version(&fw_version);
+      status = sl_wifi_get_firmware_version(&fw_version);
       if (status != SL_STATUS_OK) {
         printf("reading fw version failed\n");
         break;
       }
       printf("fw version after upgrade is:");
-      printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-             fw_version.chip_id,
-             fw_version.rom_id,
-             fw_version.major,
-             fw_version.minor,
-             fw_version.security_version,
-             fw_version.patch_num,
-             fw_version.customer_id,
-             fw_version.build_num);
+      print_firmware_version(&fw_version);
       t_end     = osKernelGetTickCount();
       xfer_time = t_end - t_start;
       secs      = xfer_time / 1000;

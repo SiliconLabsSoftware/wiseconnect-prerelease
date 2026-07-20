@@ -41,7 +41,7 @@
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
   - The Serial Console setup instructions are provided below:
 Refer to instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/using-the-simplicity-studio-ide#console-input-and-output).
 
@@ -94,7 +94,7 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
 
 1. Compile and run the application.
 
-   > **Note:** Use `Log_script.py` from the [SiWx91x Platform Logger example](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/examples/si91x_soc/service/sl_si91x_logger/) (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+   > **Note:** Use `Log_script.py` from the [SiWx91x Platform Logger example](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_logger/) (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
    >
    > ```bash
    > python Log_script.py --out firmware.out --port COM5 --max-args 3
@@ -102,7 +102,7 @@ Refer instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect
    >
    > Replace `COM5` with the serial port your board uses on the host PC.
    >
-   > Refer to the instructions [here](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/service/sl_si91x_logger/readme.md#test-the-application) to build, flash, and decode logger output.
+   > Refer to the instructions [here](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/service/sl_si91x_logger/readme.md#test-the-application) to build, flash, and decode logger output.
 
 2. By default it switches the NWP off, add the PS2 requirement and goes to sleep.
 3. After successful program execution, the prints in the serial console look as shown below.

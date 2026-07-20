@@ -24,3 +24,6 @@ requires:
   - name: rsilib_qei
   - name: sl_gpio
   - name: log_none
+documentation:
+    docset: wiseconnect
+    document: wiseconnect-api-reference-guide-si91x-peripherals/qei

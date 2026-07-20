@@ -48,6 +48,18 @@
 
 #define SLI_ZERO_TIMEOUT 0
 
+/**
+ * @brief Get the event flag bit for a specific pool type.
+ * Each pool uses one bit in the shared event flag.
+ */
+#define SLI_BUFFER_MANAGER_GET_POOL_FLAG(pool_type) ((uint32_t)(1U << (pool_type)))
+
+/**
+ * @brief Event flag bit for common pool.
+ * Uses a bit after all dedicated pool bits.
+ */
+#define SLI_BUFFER_MANAGER_COMMON_POOL_FLAG ((uint32_t)(1U << SLI_MAX_MEMPOOL_HANDLERS_COUNT))
+
 /***************************************************************************************************************** 
  * @brief Internal structures
 *********************************************************************************************************************/
@@ -83,20 +95,24 @@ typedef struct {
 static sli_buffer_manager_mempool_handler_t dedicated_mempool_handlers[SLI_MAX_MEMPOOL_HANDLERS_COUNT] = { 0 };
 static sli_buffer_manager_mempool_queue_t common_mempool_queue                                         = { 0 };
 static sli_buffer_manager_pool_info_t common_mempool_configuration                                     = { 0 };
+static osEventFlagsId_t buffer_pool_event_flags                                                        = NULL;
 /***************************************************************************************************************** 
  * Static functions
  * ****************************************************************************************************************/
 
 /**
- * @brief Function to check if the timeout has expired.
+ * @brief Gets the elapsed time in kernel ticks since a starting timestamp.
  *
- * @param start_time Start time.
- * @param wait_time Wait time.
- * @return true if the timeout has expired.
+ * @param[in] starting_timestamp The starting timestamp value (in kernel ticks) from which to calculate elapsed time.
+ *
+ * @return The elapsed time in kernel ticks since the starting_timestamp.
+ *
+ * @note This function relies on osKernelGetTickCount() to get the current kernel tick count.
+ *       The result may wrap around if the kernel tick counter overflows.
  */
-inline static bool sli_buffer_manager_has_timeout_expired(uint32_t start_time, uint32_t wait_time)
+inline static uint32_t sli_buffer_manager_get_host_elapsed_time(uint32_t starting_timestamp)
 {
-  return ((osKernelGetTickCount() - start_time) > wait_time);
+  return (osKernelGetTickCount() - starting_timestamp);
 }
 
 /**
@@ -110,11 +126,10 @@ static sl_status_t sli_buffer_manager_create_and_assign_mempool(sli_buffer_manag
                                                                 sli_buffer_manager_mempool_handler_t *mempool_handler,
                                                                 bool is_common_pool)
 {
-  CORE_irqState_t state = CORE_EnterAtomic();
-  size_t buffer_size    = (size_t)configuration->block_count * SLI_MEM_POOL_BLOCK_SIZE(configuration->block_size);
+
+  size_t buffer_size = (size_t)configuration->block_count * SLI_MEM_POOL_BLOCK_SIZE(configuration->block_size);
   mempool_handler->mempool_memory = malloc(buffer_size);
   if (mempool_handler->mempool_memory == NULL) {
-    CORE_ExitAtomic(state);
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -127,9 +142,6 @@ static sl_status_t sli_buffer_manager_create_and_assign_mempool(sli_buffer_manag
   mempool_handler->max_buffer_count       = configuration->block_count;
   mempool_handler->allocated_buffer_count = 0;
   mempool_handler->is_common_pool         = is_common_pool;
-
-  CORE_ExitAtomic(state);
-
   return SL_STATUS_OK;
 }
 
@@ -167,13 +179,13 @@ static bool sli_buffer_manager_are_all_pools_deallocated()
   do {
     SL_DEBUG_LOG_V2(DEBUG, "Common Pool %u: Max Buffers = %u", pool_idx, current->max_buffer_count);
     SL_DEBUG_LOG_V2(DEBUG, "Common Pool %u: Allocated = %u", pool_idx, current->allocated_buffer_count);
-    current = (sli_buffer_manager_mempool_handler_t *)current->next.node;
-    pool_idx++;
 
     if (current->allocated_buffer_count > 0) {
       CORE_ExitAtomic(state);
       return false;
     }
+    current = (sli_buffer_manager_mempool_handler_t *)current->next.node;
+    pool_idx++;
   } while (current != common_mempool_queue.head && current != NULL);
 
   CORE_ExitAtomic(state);
@@ -181,110 +193,347 @@ static bool sli_buffer_manager_are_all_pools_deallocated()
 }
 
 /**
+ * @brief Helper function to attempt buffer allocation from a mempool handler.
+ *
+ * @param buffer Pointer to buffer pointer (output).
+ * @param mempool_handler Memory pool handler.
+ * @return true if buffer was successfully allocated, false otherwise.
+ */
+static bool sli_buffer_manager_try_allocate_from_handler(sli_internal_buffer_t **buffer,
+                                                         sli_buffer_manager_mempool_handler_t *mempool_handler)
+{
+  CORE_irqState_t state = CORE_EnterAtomic();
+
+  if (mempool_handler->allocated_buffer_count >= mempool_handler->max_buffer_count) {
+    CORE_ExitAtomic(state);
+    return false;
+  }
+  *buffer = (sli_internal_buffer_t *)sli_mem_pool_alloc(&mempool_handler->mempool);
+  if (*buffer != NULL) {
+    (*buffer)->buffer_manager_mempool_handler = mempool_handler;
+    mempool_handler->allocated_buffer_count++;
+  }
+  CORE_ExitAtomic(state);
+  return (*buffer != NULL);
+}
+
+/**
+ * @brief Wake threads waiting on a dedicated pool if it still has free buffers.
+ */
+static void sli_buffer_manager_notify_dedicated_pool_waiters_if_available(
+  const sli_buffer_manager_mempool_handler_t *mempool_handler,
+  uint32_t pool_flag)
+{
+  if (buffer_pool_event_flags == NULL) {
+    return;
+  }
+
+  CORE_irqState_t state  = CORE_EnterAtomic();
+  bool buffers_available = (mempool_handler->allocated_buffer_count < mempool_handler->max_buffer_count);
+  CORE_ExitAtomic(state);
+
+  if (buffers_available) {
+    osEventFlagsSet(buffer_pool_event_flags, pool_flag);
+  }
+}
+
+/**
  * @brief Function to allocate a buffer from the dedicated pool.
  *
  * @param buffer Buffer.
  * @param pool_type Pool type.
- * @param start_time Start time.
+ * @param start_time_ticks Start time in kernel ticks.
  * @param wait_duration_ms Wait duration.
  * @return SL_STATUS_OK if the operation is successful.
  */
 static sl_status_t sli_buffer_manager_allocate_buffer_from_dedicated_pool(
   sli_internal_buffer_t **buffer,
   const sli_buffer_manager_pool_types_t pool_type,
-  uint32_t start_time,
+  uint32_t start_time_ticks,
   uint32_t wait_duration_ms)
 {
-  CORE_irqState_t state = CORE_EnterAtomic();
-
   sli_buffer_manager_mempool_handler_t *mempool_handler = &dedicated_mempool_handlers[pool_type];
-  // uint8_t delay                                         = 2;
-  // uint8_t new_delay                                     = 2;
-  if (mempool_handler->mempool_memory == NULL) {
-    CORE_ExitAtomic(state);
+  *buffer                                               = NULL;
+
+  // Fail-fast: if this dedicated pool was never configured, fail immediately (do not try or wait)
+  if ((mempool_handler->max_buffer_count == 0) || (mempool_handler->mempool_memory == NULL)) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  if (mempool_handler->max_buffer_count == 0) {
-    CORE_ExitAtomic(state);
+  // Try to allocate buffer first
+  if (sli_buffer_manager_try_allocate_from_handler(buffer, mempool_handler)) {
+    return SL_STATUS_OK;
+  }
+
+  // Check if event flag is initialized
+  if (buffer_pool_event_flags == NULL) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  // Get the bit flag for this specific pool
+  uint32_t pool_flag = SLI_BUFFER_MANAGER_GET_POOL_FLAG(pool_type);
+
+  // If wait duration is 0 or there is no current RTOS thread, return immediately
+  // Event flags cannot be waited on without a thread context, and zero wait means no blocking
+  if ((wait_duration_ms == 0) || (osThreadGetId() == NULL)) {
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
-  *buffer = NULL;
-  CORE_ExitAtomic(state);
+  // Calculate remaining time using the provided start_time_ticks
+  uint32_t elapsed_time_ms = SLI_SYSTEM_TICKS_TO_MS(sli_buffer_manager_get_host_elapsed_time(start_time_ticks));
 
-  do {
-    CORE_irqState_t state = CORE_EnterAtomic();
-    if (mempool_handler->allocated_buffer_count < mempool_handler->max_buffer_count) {
-      *buffer = (sli_internal_buffer_t *)sli_mem_pool_alloc(&mempool_handler->mempool);
-      if (*buffer != NULL) {
-        (*buffer)->buffer_manager_mempool_handler = mempool_handler;
-        mempool_handler->allocated_buffer_count++;
-        CORE_ExitAtomic(state);
-        break;
-      }
+  // If buffer is not available and we're in thread context, wait on event flag
+  // Event flags can be set from ISR, so this works for both contexts
+  // To handle multiple buffer frees: after waking up, check available buffer count
+  // and try to allocate immediately if buffers are still available (without waiting again)
+  while (elapsed_time_ms < wait_duration_ms) {
+
+    uint32_t flags_result = osEventFlagsWait(buffer_pool_event_flags,
+                                             pool_flag,
+                                             osFlagsWaitAny,
+                                             SLI_SYSTEM_MS_TO_TICKS(wait_duration_ms - elapsed_time_ms));
+
+    // Check if timeout occurred
+    if ((flags_result & osFlagsError) != 0) {
+      break;
     }
-    CORE_ExitAtomic(state);
-    osDelay(SLI_SYSTEM_MS_TO_TICKS(2));
-    /*new_delay = (new_delay < 50) ? new_delay * 2 : 50; // Exponential backoff for delay with a maximum cap at 50 ms
-    uint8_t remanning_time = wait_duration_ms - (osKernelGetTickCount() - start_time);
-    if (new_delay > remanning_time) {
-      delay = remanning_time - 1;
-    } else {
-      delay = new_delay;
-    }*/
-  } while ((osKernelGetTickCount() - start_time) <= wait_duration_ms);
+
+    // Flag is automatically cleared by osEventFlagsWait
+    // Try to allocate buffer - if multiple buffers were freed, we can allocate
+    // without waiting again by checking available count
+    if (sli_buffer_manager_try_allocate_from_handler(buffer, mempool_handler)) {
+      sli_buffer_manager_notify_dedicated_pool_waiters_if_available(mempool_handler, pool_flag);
+      return SL_STATUS_OK;
+    }
+
+    // Calculate remaining time using the provided start_time_ticks
+    elapsed_time_ms = SLI_SYSTEM_TICKS_TO_MS(sli_buffer_manager_get_host_elapsed_time(start_time_ticks));
+
+    // Allocation failed (race condition - another thread got the buffer)
+    // Continue loop to wait for next event flag
+    // If more buffers are available, the flag will be set again by the thread that successfully allocated
+    // Note: Timeout check at start of loop ensures we don't loop forever
+  }
 
   return (*buffer == NULL) ? SL_STATUS_ALLOCATION_FAILED : SL_STATUS_OK;
 }
 
 /**
- * @brief Function to allocate a buffer from the common pool.
+ * @brief Helper function to try allocating a buffer from common pools.
  *
- * @param buffer Buffer.
- * @param start_time Start time.
- * @param wait_duration_ms Wait duration.
- * @return SL_STATUS_OK if the operation is successful.
+ * @param buffer Pointer to buffer pointer (output).
+ * @return true if buffer was successfully allocated, false otherwise.
  */
-static sl_status_t sli_buffer_manager_allocate_buffer_from_common_pool(sli_internal_buffer_t **buffer,
-                                                                       uint32_t start_time,
-                                                                       const uint32_t wait_duration_ms)
+static bool sli_buffer_manager_try_allocate_from_common_pool(sli_internal_buffer_t **buffer)
 {
   CORE_irqState_t state = CORE_EnterAtomic();
 
   // If there are no common mempools in the queue, return.
   if (common_mempool_queue.size == 0) {
     CORE_ExitAtomic(state);
-    return SL_STATUS_FAIL;
+    return false;
   }
 
   sli_buffer_manager_mempool_handler_t *mempool_handler = common_mempool_queue.last_used_handler;
-  *buffer                                               = NULL;
+  sli_buffer_manager_mempool_handler_t *start_handler   = mempool_handler;
 
   do {
+    if (mempool_handler->allocated_buffer_count < mempool_handler->max_buffer_count) {
+      *buffer = (sli_internal_buffer_t *)sli_mem_pool_alloc(&mempool_handler->mempool);
+      if (*buffer != NULL) {
+        (*buffer)->buffer_manager_mempool_handler = mempool_handler;
+        mempool_handler->allocated_buffer_count++;
+        common_mempool_queue.last_used_handler = mempool_handler;
+        CORE_ExitAtomic(state);
+        return true;
+      }
+    }
+    // Move to the next mempool handler.
+    mempool_handler = (sli_buffer_manager_mempool_handler_t *)mempool_handler->next.node;
+  } while (mempool_handler != start_handler);
 
-    if (mempool_handler->allocated_buffer_count >= mempool_handler->max_buffer_count) {
-      mempool_handler = (sli_buffer_manager_mempool_handler_t *)mempool_handler->next.node;
-      continue;
+  CORE_ExitAtomic(state);
+  return false;
+}
+
+/**
+ * @brief Wake threads waiting on the common pool if any common mempool still has free buffers.
+ */
+static void sli_buffer_manager_notify_common_pool_waiters_if_available(void)
+{
+  if ((buffer_pool_event_flags == NULL) || (common_mempool_queue.size == 0)) {
+    return;
+  }
+
+  CORE_irqState_t state                         = CORE_EnterAtomic();
+  bool buffers_available                        = false;
+  sli_buffer_manager_mempool_handler_t *current = common_mempool_queue.head;
+  do {
+    if (current->allocated_buffer_count < current->max_buffer_count) {
+      buffers_available = true;
+      break;
+    }
+    current = (sli_buffer_manager_mempool_handler_t *)current->next.node;
+  } while (current != common_mempool_queue.head);
+  CORE_ExitAtomic(state);
+
+  if (buffers_available) {
+    osEventFlagsSet(buffer_pool_event_flags, SLI_BUFFER_MANAGER_COMMON_POOL_FLAG);
+  }
+}
+
+/**
+ * @brief Function to allocate a buffer from the common pool.
+ *
+ * @param buffer Buffer.
+ * @param start_time_ticks Start time in kernel ticks.
+ * @param wait_duration_ms Wait duration.
+ * @return SL_STATUS_OK if the operation is successful.
+ */
+static sl_status_t sli_buffer_manager_allocate_buffer_from_common_pool(sli_internal_buffer_t **buffer,
+                                                                       uint32_t start_time_ticks,
+                                                                       const uint32_t wait_duration_ms)
+{
+  *buffer = NULL;
+
+  // Check if common pool queue is initialized
+  if (common_mempool_queue.size == 0) {
+    return SL_STATUS_FAIL;
+  }
+
+  // Try to allocate buffer first
+  if (sli_buffer_manager_try_allocate_from_common_pool(buffer)) {
+    return SL_STATUS_OK;
+  }
+
+  // Check if event flag is initialized
+  if (buffer_pool_event_flags == NULL) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  // If wait duration is 0 or there is no current RTOS thread, return immediately
+  // Event flags cannot be waited on without a thread context, and zero wait means no blocking
+  if ((wait_duration_ms == 0) || (osThreadGetId() == NULL)) {
+    return SL_STATUS_ALLOCATION_FAILED;
+  }
+
+  // Calculate elapsed time using the utility function
+  uint32_t elapsed_time_ms = SLI_SYSTEM_TICKS_TO_MS(sli_buffer_manager_get_host_elapsed_time(start_time_ticks));
+
+  // If buffer is not available and we're in thread context, wait on event flag
+  while (elapsed_time_ms < wait_duration_ms) {
+
+    uint32_t flags_result = osEventFlagsWait(buffer_pool_event_flags,
+                                             SLI_BUFFER_MANAGER_COMMON_POOL_FLAG,
+                                             osFlagsWaitAny,
+                                             SLI_SYSTEM_MS_TO_TICKS(wait_duration_ms - elapsed_time_ms));
+
+    // Check if timeout occurred
+    if ((flags_result & osFlagsError) != 0) {
+      break;
     }
 
-    *buffer = (sli_internal_buffer_t *)sli_mem_pool_alloc(&mempool_handler->mempool);
-    if ((*buffer) != NULL) {
-      (*buffer)->buffer_manager_mempool_handler = mempool_handler;
-      mempool_handler->allocated_buffer_count++;
-      common_mempool_queue.last_used_handler = mempool_handler;
-      CORE_ExitAtomic(state);
+    // Flag is automatically cleared by osEventFlagsWait
+    // Try to allocate buffer from common pools
+    if (sli_buffer_manager_try_allocate_from_common_pool(buffer)) {
+      sli_buffer_manager_notify_common_pool_waiters_if_available();
       return SL_STATUS_OK;
     }
 
-    // If the buffer is not allocated, move to the next mempool handler.
-    mempool_handler = (sli_buffer_manager_mempool_handler_t *)mempool_handler->next.node;
+    // Calculate elapsed time using the utility function
+    elapsed_time_ms = SLI_SYSTEM_TICKS_TO_MS(sli_buffer_manager_get_host_elapsed_time(start_time_ticks));
+  }
 
-  } while (((osKernelGetTickCount() - start_time) < wait_duration_ms)
-           && (mempool_handler != common_mempool_queue.last_used_handler));
+  return (*buffer == NULL) ? SL_STATUS_ALLOCATION_FAILED : SL_STATUS_OK;
+}
 
-  CORE_ExitAtomic(state);
-  return SL_STATUS_ALLOCATION_FAILED;
+static sl_status_t sli_buffer_manager_wait_on_dedicated_and_common_pool(sli_internal_buffer_t **buffer,
+                                                                        uint32_t start_time_ticks,
+                                                                        const uint32_t wait_duration_ms,
+                                                                        uint32_t dedicated_pool_type)
+{
+  // Check if event flag is initialized
+  if (buffer_pool_event_flags == NULL) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  // If wait duration is 0 or there is no current RTOS thread, return immediately
+  // Event flags cannot be waited on without a thread context, and zero wait means no blocking
+  if ((wait_duration_ms == 0) || (osThreadGetId() == NULL)) {
+    return SL_STATUS_ALLOCATION_FAILED;
+  }
+
+  // Calculate elapsed time using the utility function
+  uint32_t elapsed_time_ms = SLI_SYSTEM_TICKS_TO_MS(sli_buffer_manager_get_host_elapsed_time(start_time_ticks));
+
+  // If buffer is not available and we're in thread context, wait on event flag
+  while (elapsed_time_ms < wait_duration_ms) {
+
+    uint32_t flags_result =
+      osEventFlagsWait(buffer_pool_event_flags,
+                       (SLI_BUFFER_MANAGER_GET_POOL_FLAG(dedicated_pool_type) | SLI_BUFFER_MANAGER_COMMON_POOL_FLAG),
+                       osFlagsWaitAny,
+                       SLI_SYSTEM_MS_TO_TICKS(wait_duration_ms - elapsed_time_ms));
+
+    // Check if timeout occurred
+    if ((flags_result & osFlagsError) != 0) {
+      break;
+    }
+
+    if (flags_result & SLI_BUFFER_MANAGER_COMMON_POOL_FLAG
+        && sli_buffer_manager_try_allocate_from_common_pool(buffer)) {
+      sli_buffer_manager_notify_common_pool_waiters_if_available();
+      if (flags_result & SLI_BUFFER_MANAGER_GET_POOL_FLAG(dedicated_pool_type)) {
+        sli_buffer_manager_notify_dedicated_pool_waiters_if_available(
+          &dedicated_mempool_handlers[dedicated_pool_type],
+          SLI_BUFFER_MANAGER_GET_POOL_FLAG(dedicated_pool_type));
+      }
+      return SL_STATUS_OK;
+    }
+
+    if (flags_result & SLI_BUFFER_MANAGER_GET_POOL_FLAG(dedicated_pool_type)
+        && sli_buffer_manager_try_allocate_from_handler(buffer, &dedicated_mempool_handlers[dedicated_pool_type])) {
+      sli_buffer_manager_notify_dedicated_pool_waiters_if_available(
+        &dedicated_mempool_handlers[dedicated_pool_type],
+        SLI_BUFFER_MANAGER_GET_POOL_FLAG(dedicated_pool_type));
+      return SL_STATUS_OK;
+    }
+
+    // Calculate elapsed time using the utility function
+    elapsed_time_ms = SLI_SYSTEM_TICKS_TO_MS(sli_buffer_manager_get_host_elapsed_time(start_time_ticks));
+  }
+
+  return (*buffer == NULL) ? SL_STATUS_ALLOCATION_FAILED : SL_STATUS_OK;
+}
+
+static sl_status_t sli_buffer_manager_allocate_buffer_from_hybrid_pool(sli_internal_buffer_t **buffer,
+                                                                       uint32_t start_time_ticks,
+                                                                       const uint32_t wait_duration_ms,
+                                                                       uint32_t dedicated_pool_type)
+{
+  *buffer = NULL;
+
+  // verify if the dedicated pool is valid
+  if (dedicated_pool_type >= SLI_BUFFER_MANAGER_MAX_POOL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  // verify if the common pool is initialized
+  if (common_mempool_queue.size == 0) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (sli_buffer_manager_try_allocate_from_common_pool(buffer)) {
+    return SL_STATUS_OK;
+  }
+  if (sli_buffer_manager_try_allocate_from_handler(buffer, &dedicated_mempool_handlers[dedicated_pool_type])) {
+    return SL_STATUS_OK;
+  }
+
+  return sli_buffer_manager_wait_on_dedicated_and_common_pool(buffer,
+                                                              start_time_ticks,
+                                                              wait_duration_ms,
+                                                              dedicated_pool_type);
 }
 
 /**
@@ -295,11 +544,9 @@ static sl_status_t sli_buffer_manager_allocate_buffer_from_common_pool(sli_inter
 static sl_status_t sli_buffer_manager_create_new_common_mempool(void)
 {
 
-  CORE_irqState_t state                                 = CORE_EnterAtomic();
   sli_buffer_manager_mempool_handler_t *mempool_handler = malloc(sizeof(sli_buffer_manager_mempool_handler_t));
 
   if (mempool_handler == NULL) {
-    CORE_ExitAtomic(state);
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -310,11 +557,9 @@ static sl_status_t sli_buffer_manager_create_new_common_mempool(void)
 
   if (status != SL_STATUS_OK) {
     free(mempool_handler);
-
-    CORE_ExitAtomic(state);
     return status;
   }
-
+  CORE_irqState_t state = CORE_EnterAtomic();
   if (common_mempool_queue.head == NULL && common_mempool_queue.tail == NULL) {
     common_mempool_queue.head = mempool_handler;
     common_mempool_queue.tail = mempool_handler;
@@ -332,6 +577,7 @@ static sl_status_t sli_buffer_manager_create_new_common_mempool(void)
 
   common_mempool_queue.size++;
   CORE_ExitAtomic(state);
+
   return SL_STATUS_OK;
 }
 
@@ -435,6 +681,17 @@ static sl_status_t sli_buffer_manager_free_all_common_mempools(void)
   return SL_STATUS_OK;
 }
 
+/**
+ * @brief Function to clean up the shared event flag for buffer pools.
+ */
+static void sli_buffer_manager_free_all_event_flags(void)
+{
+  if (buffer_pool_event_flags != NULL) {
+    osEventFlagsDelete(buffer_pool_event_flags);
+    buffer_pool_event_flags = NULL;
+  }
+}
+
 static sl_status_t sli_buffer_manager_free_all_mempools(void)
 {
   CORE_irqState_t state = CORE_EnterAtomic();
@@ -476,6 +733,13 @@ sl_status_t sli_buffer_manager_init(sli_buffer_manager_configuration_t *configur
     }
   }
 
+  // Create shared OS event flag for all dedicated pools (can be set from ISR)
+  // Each pool uses one bit in this shared event flag
+  buffer_pool_event_flags = osEventFlagsNew(NULL);
+  if (buffer_pool_event_flags == NULL) {
+    return SL_STATUS_ALLOCATION_FAILED;
+  }
+
   for (uint8_t index = 0; index < SLI_BUFFER_MANAGER_MAX_POOL; index++) {
     if (configuration->pool_info[index] == NULL || configuration->pool_info[index]->block_count == 0) {
       continue;
@@ -485,6 +749,7 @@ sl_status_t sli_buffer_manager_init(sli_buffer_manager_configuration_t *configur
                                                           &dedicated_mempool_handlers[index],
                                                           false);
     if (status != SL_STATUS_OK) {
+      sli_buffer_manager_free_all_event_flags();
       sli_buffer_manager_free_all_mempools();
       return SL_STATUS_NO_MORE_RESOURCE;
     }
@@ -494,6 +759,7 @@ sl_status_t sli_buffer_manager_init(sli_buffer_manager_configuration_t *configur
   status = sli_buffer_manager_create_new_common_mempool();
 
   if (status != SL_STATUS_OK) {
+    sli_buffer_manager_free_all_event_flags();
     sli_buffer_manager_free_all_mempools();
     return SL_STATUS_NO_MORE_RESOURCE;
   }
@@ -508,6 +774,9 @@ sl_status_t sli_buffer_manager_deinit(void)
   if (!are_deallocated) {
     return SL_STATUS_BUSY;
   }
+
+  // Clean up event flags for dedicated pools
+  sli_buffer_manager_free_all_event_flags();
 
   sli_buffer_manager_free_all_mempools();
   return SL_STATUS_OK;
@@ -529,29 +798,31 @@ sl_status_t sli_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_typ
 
     *buffer = internal_buffer->data;
     return SL_STATUS_OK;
-  }
+  } else if (allocation_type == SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID) {
 
-  sl_status_t status = sli_buffer_manager_allocate_buffer_from_common_pool(&internal_buffer, start, wait_duration_ms);
-  // If buffer is to be allocated from uninitialized common pool, return error.
-  if (status == SL_STATUS_FAIL) {
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-  // If the buffer is not allocated from the common pool, allocate from the dedicated pool.
-  if (status != SL_STATUS_OK && !sli_buffer_manager_has_timeout_expired(start, wait_duration_ms)) {
-    status =
-      sli_buffer_manager_allocate_buffer_from_dedicated_pool(&internal_buffer, pool_type, start, SLI_ZERO_TIMEOUT);
-  }
+    // reserve 1ms for creating the new common pool when buffer allocation fails so pass 1ms less than the wait duration
+    uint32_t wait_duration_ms_adjusted = wait_duration_ms > 1U ? wait_duration_ms - 1U : 0U;
+    sl_status_t status                 = sli_buffer_manager_allocate_buffer_from_hybrid_pool(&internal_buffer,
+                                                                             start,
+                                                                             wait_duration_ms_adjusted,
+                                                                             pool_type);
+    if ((status != SL_STATUS_OK) && (status != SL_STATUS_ALLOCATION_FAILED)) {
+      return status;
+    }
+    // If the buffer is not allocated from the dedicated pool, create a new common pool and allocate from it.
+    if (status == SL_STATUS_ALLOCATION_FAILED) {
+      status = sli_buffer_manager_create_new_common_mempool();
+      VERIFY_STATUS_AND_RETURN(status);
+      sli_buffer_manager_allocate_buffer_from_common_pool(&internal_buffer, start, SLI_ZERO_TIMEOUT);
+      sli_buffer_manager_notify_common_pool_waiters_if_available();
+    }
 
-  // If the buffer is not allocated from the dedicated pool, create a new common pool and allocate from it.
-  if (status != SL_STATUS_OK && !sli_buffer_manager_has_timeout_expired(start, wait_duration_ms)) {
-    status = sli_buffer_manager_create_new_common_mempool();
-    VERIFY_STATUS_AND_RETURN(status);
-    sli_buffer_manager_allocate_buffer_from_common_pool(&internal_buffer, start, wait_duration_ms);
-  }
-
-  // If the buffer is still not allocated, return error.
-  if (internal_buffer == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
+    // If the buffer is still not allocated, return error.
+    if (internal_buffer == NULL) {
+      return SL_STATUS_ALLOCATION_FAILED;
+    }
+  } else {
+    return SL_STATUS_INVALID_PARAMETER;
   }
 
   *buffer = internal_buffer->data;
@@ -562,7 +833,8 @@ sl_status_t sli_buffer_manager_free_buffer(sli_buffer_t buffer)
 {
   SL_VERIFY_POINTER_OR_RETURN(buffer, SL_STATUS_NULL_POINTER);
 
-  CORE_irqState_t state = CORE_EnterAtomic();
+  bool suppress_common_pool_event = false;
+  CORE_irqState_t state           = CORE_EnterAtomic();
 
   sli_internal_buffer_t *internal_buffer = NULL;
   uint8_t *temp                          = NULL;
@@ -573,14 +845,64 @@ sl_status_t sli_buffer_manager_free_buffer(sli_buffer_t buffer)
 
   sli_buffer_manager_mempool_handler_t *mempool_handler =
     (sli_buffer_manager_mempool_handler_t *)internal_buffer->buffer_manager_mempool_handler;
+
+  // Validate that the handler pointer points to a known pool (dedicated or common)
+  bool valid_handler     = false;
+  bool is_dedicated_pool = false;
+  int8_t pool_index      = -1;
+
+  // Check if handler is a known dedicated pool
+  for (uint8_t index = 0; index < SLI_MAX_MEMPOOL_HANDLERS_COUNT; index++) {
+    if (mempool_handler == &dedicated_mempool_handlers[index]) {
+      valid_handler     = true;
+      is_dedicated_pool = true;
+      pool_index        = (int8_t)index;
+      break;
+    }
+  }
+
+  // If not found in dedicated pools, check common pools
+  if (!valid_handler && common_mempool_queue.size > 0) {
+    sli_buffer_manager_mempool_handler_t *current = common_mempool_queue.head;
+    do {
+      if (mempool_handler == current) {
+        valid_handler = true;
+        break;
+      }
+      current = (sli_buffer_manager_mempool_handler_t *)current->next.node;
+    } while (current != common_mempool_queue.head);
+  }
+
+  if (!valid_handler) {
+    CORE_ExitAtomic(state);
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
   sli_mem_pool_free(&mempool_handler->mempool, internal_buffer);
   mempool_handler->allocated_buffer_count--;
 
   if ((mempool_handler->is_common_pool) && (mempool_handler->allocated_buffer_count == 0)
       && (common_mempool_queue.size > SLI_MINIUM_ELEMENTS_IN_COMMON_MEMPOOL_QUEUE)) {
-    sli_buffer_manager_free_a_common_mempool_from_queue(mempool_handler);
+    if (sli_buffer_manager_free_a_common_mempool_from_queue(mempool_handler) == SL_STATUS_OK) {
+      /* Pool removed and freed; no buffer returned to an existing common pool — avoid waking waiters. */
+      suppress_common_pool_event = true;
+    }
   }
 
   CORE_ExitAtomic(state);
+
+  // Set event flag outside atomic section to notify waiting threads
+  // Event flags can be set from ISR, so this works for both ISR and thread contexts
+  // Note: Event flags are binary, but the wait loop checks available buffer count
+  // after waking up, allowing one thread to consume multiple freed buffers efficiently
+  if (buffer_pool_event_flags != NULL) {
+    if (is_dedicated_pool && (pool_index >= 0) && (pool_index < SLI_MAX_MEMPOOL_HANDLERS_COUNT)) {
+      osEventFlagsSet(buffer_pool_event_flags, SLI_BUFFER_MANAGER_GET_POOL_FLAG(pool_index));
+    } else if (!is_dedicated_pool && !suppress_common_pool_event) {
+      // Set common pool event flag to wake up threads waiting for common pool buffers
+      osEventFlagsSet(buffer_pool_event_flags, SLI_BUFFER_MANAGER_COMMON_POOL_FLAG);
+    }
+  }
+
   return SL_STATUS_OK;
 }

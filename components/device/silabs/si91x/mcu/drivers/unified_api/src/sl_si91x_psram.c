@@ -37,7 +37,6 @@
 #include "rsi_rom_udma.h"
 #include "sl_si91x_psram_handle.h"
 #include "sl_si91x_psram.h"
-#include "sl_code_classification.h"
 
 /*******************************************************************************
  *******************************   DEFINES   ***********************************
@@ -365,7 +364,6 @@ static void qspi_qspiunload_key_ext(qspi_reg_t *qspi_reg);
  ******************************************************************************/
 
 /* Wait for QSPI to become idle */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 __STATIC_INLINE void wait_state_manual()
 {
   qspi_reg_t *qspi_reg = (qspi_reg_t *)M4_QSPI_2_BASE_ADDRESS;
@@ -375,7 +373,6 @@ __STATIC_INLINE void wait_state_manual()
 }
 
 /* UDMA controller transfer descriptor chain complete callback */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 static void udma_transfer_complete(uint32_t event, uint32_t ch)
 {
   if (event == UDMA_EVENT_XFER_DONE) {
@@ -448,7 +445,6 @@ static void udma_transfer_complete(uint32_t event, uint32_t ch)
 }
 
 /* This API used to enable auto mode in QSPI */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_auto_mode_en(qspi_reg_t *qspi_reg)
 {
   if (!(qspi_reg->QSPI_STATUS_REG & HW_CTRLD_QSPI_MODE_CTRL_SCLK)) {
@@ -460,7 +456,6 @@ void qspi_auto_mode_en(qspi_reg_t *qspi_reg)
 }
 
 /* Transmit data via QSPI interface */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_transmit(qspi_reg_t *qspi_reg,
                    uint8_t hSize,
                    void *data,
@@ -519,7 +514,6 @@ void qspi_transmit(qspi_reg_t *qspi_reg,
 }
 
 /* Receive data via QSPI interface */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_receive(qspi_reg_t *qspi_reg,
                   uint8_t hSize,
                   void *data,
@@ -598,14 +592,12 @@ void qspi_receive(qspi_reg_t *qspi_reg,
 }
 
 /* Deassert CS line */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_deassert_csn(qspi_reg_t *qspi_reg)
 {
   DEASSERT_CSN;
 }
 
 /* Initialize SRAM auto mode */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_sram_auto_init(qspi_reg_t *qspi_reg, spi_config_t *spi_config)
 {
   uint32_t *sram_ctrl_csn_ptr;
@@ -638,7 +630,6 @@ void qspi_sram_auto_init(qspi_reg_t *qspi_reg, spi_config_t *spi_config)
 
 #if (PSRAM_MODEL_WRAP == 1)
 /* Initialize SRAM Wrap mode */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_sram_wrap_init(qspi_reg_t *qspi_reg, spi_config_t *spi_config)
 {
   uint32_t offset;
@@ -668,7 +659,6 @@ void qspi_sram_wrap_init(qspi_reg_t *qspi_reg, spi_config_t *spi_config)
 #endif
 
 /* Set SWAP mode based on SPI config */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_set_swap_mode(qspi_reg_t *qspi_reg, spi_config_t *spi_config)
 {
   /*Set Swap for Manual transactions */
@@ -685,7 +675,6 @@ void qspi_set_swap_mode(qspi_reg_t *qspi_reg, spi_config_t *spi_config)
   }
 }
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_qspiload_key_ext(qspi_reg_t *qspi_reg, uint16_t key_size)
 {
   uint8_t segIndex;
@@ -723,7 +712,6 @@ void qspi_qspiload_key_ext(qspi_reg_t *qspi_reg, uint16_t key_size)
 }
 
 #ifdef SECURITY_KEY_CONFIG
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 void qspi_qspiunload_key_ext(qspi_reg_t *qspi_reg)
 {
 
@@ -738,7 +726,6 @@ void qspi_qspiunload_key_ext(qspi_reg_t *qspi_reg)
 #endif
 
 /* Enters QPI Mode, can only be called in SPI mode */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t psram_enter_qpi_mode(void)
 {
 
@@ -758,7 +745,6 @@ sl_psram_return_type_t psram_enter_qpi_mode(void)
 }
 
 /* Exits QPI interface Mode, can only be called in QPI mode */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t psram_exit_qpi_mode(void)
 {
 
@@ -778,7 +764,6 @@ sl_psram_return_type_t psram_exit_qpi_mode(void)
 }
 
 /* Enables Auto Read-Write mode */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t psram_enable_auto_readwrite(void)
 {
 
@@ -804,7 +789,6 @@ sl_psram_return_type_t psram_enable_auto_readwrite(void)
 }
 
 /* Disables Auto Read-Write mode */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t psram_disable_auto_readwrite(void)
 {
 
@@ -833,7 +817,6 @@ sl_psram_return_type_t psram_disable_auto_readwrite(void)
 }
 
 /* Reads Manufactoring ID, KGD (Known Good Die) & EID */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_id_type_t psram_read_id()
 {
   sl_psram_id_type_t psram_id;
@@ -870,7 +853,6 @@ sl_psram_id_type_t psram_read_id()
 
 /* Toggles the device’s burst length wrap between 
    PSRAM_DEFAULT_BURST_WRAP_SIZE and PSRAM_TOGGLE_BURST_WRAP_SIZE */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t psram_toggle_burst_length(void)
 {
 
@@ -903,7 +885,6 @@ sl_psram_return_type_t psram_toggle_burst_length(void)
 }
 
 /* Writes wrap length to Mode Register */
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t psram_set_wrap_size(sl_psram_burst_size_type_t PSRAMBurstSize)
 {
 
@@ -973,7 +954,6 @@ sl_psram_return_type_t psram_set_wrap_size(sl_psram_burst_size_type_t PSRAMBurst
 /***************************************************************************/ /**
  * @brief See @ref sli_si91x_psram_device_init in sl_si91x_psram.h.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sli_si91x_psram_device_init(void)
 {
   sl_psram_return_type_t PSRAM_Status = PSRAM_UNKNOWN;
@@ -1050,7 +1030,6 @@ sl_psram_return_type_t sli_si91x_psram_device_init(void)
   return PSRAM_SUCCESS;
 }
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_init()
 {
   sl_psram_return_type_t PSRAM_Status = PSRAM_UNKNOWN;
@@ -1105,7 +1084,6 @@ sl_psram_return_type_t sl_si91x_psram_init()
 /***************************************************************************/ /**
  * @brief See @ref sli_si91x_psram_device_uninit in sl_si91x_psram.h.
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sli_si91x_psram_device_uninit(void)
 {
   /*Exits PSRAM device from QPI mode*/
@@ -1127,7 +1105,6 @@ sl_psram_return_type_t sli_si91x_psram_device_uninit(void)
   return PSRAM_SUCCESS;
 }
 
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_uninit(void)
 {
   uint8_t pinIndex = 0;
@@ -1153,7 +1130,6 @@ sl_psram_return_type_t sl_si91x_psram_uninit(void)
 /***************************************************************************/ /**     
  * Write data to PSRAM in manual mode
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_manual_write_in_blocking_mode(uint32_t addr,
                                                                     void *SourceBuf,
                                                                     uint8_t hSize,
@@ -1320,7 +1296,6 @@ sl_psram_return_type_t sl_si91x_psram_manual_write_in_blocking_mode(uint32_t add
 /***************************************************************************/ /**
  * Read data from PSRAM in manual mode
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_manual_read_in_blocking_mode(uint32_t addr,
                                                                    void *DestBuf,
                                                                    uint8_t hSize,
@@ -1506,7 +1481,6 @@ sl_psram_return_type_t sl_si91x_psram_manual_read_in_blocking_mode(uint32_t addr
 /***************************************************************************/ /**
  * Write data to PSRAM in manual mode using DMA
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_manual_write_in_dma_mode(uint32_t addr,
                                                                void *SourceBuf,
                                                                uint8_t hSize,
@@ -1784,7 +1758,6 @@ sl_psram_return_type_t sl_si91x_psram_manual_write_in_dma_mode(uint32_t addr,
 /***************************************************************************/ /**
  * Read data from PSRAM in manual mode using DMA
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_manual_read_in_dma_mode(uint32_t addr,
                                                               void *DestBuf,
                                                               uint8_t hSize,
@@ -2076,7 +2049,6 @@ sl_psram_return_type_t sl_si91x_psram_manual_read_in_dma_mode(uint32_t addr,
 /***************************************************************************/ /**
  * Reset the PSRAM Device
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_reset(void)
 {
   uint8_t command;
@@ -2112,7 +2084,6 @@ sl_psram_return_type_t sl_si91x_psram_reset(void)
 /***************************************************************************/ /**
  * Put PSRAM Device in sleep 
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_sleep(void)
 {
   uint8_t command;
@@ -2141,7 +2112,6 @@ sl_psram_return_type_t sl_si91x_psram_sleep(void)
 /***************************************************************************/ /**
  * Exit PSRAM device from sleep
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_wakeup(void)
 {
 
@@ -2171,7 +2141,6 @@ sl_psram_return_type_t sl_si91x_psram_wakeup(void)
 /***************************************************************************/ /**
  * Enable CTR encryption-decryption on PSRAM
  ******************************************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_PSRAM_CORE, SL_CODE_CLASS_TIME_CRITICAL)
 sl_psram_return_type_t sl_si91x_psram_enable_encry_decry(uint16_t keySize)
 {
 

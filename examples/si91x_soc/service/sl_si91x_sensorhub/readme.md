@@ -78,7 +78,7 @@
 
 ### Hardware Requirements
 
-- Silicon Labs SiWx91x Pro Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Pro Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - BH1750 Light Sensor
 - LM75 Temperature Sensor
 - APDS9960 RGB-Gesture-Proximity Sensor
@@ -351,9 +351,9 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 
 1. After creating the project add **SH_AWS_ENABLE=1** macro in the preprocessor settings.
 2. Now refer to ***Wi-Fi - AWS IoT MQTT Client (SoC)*** example readme.
-3. Make the relevant changes according to the above example readme in [`sl_net_default_values.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/resources/defaults/sl_net_default_values.h),  [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/resources/defaults/aws_iot_config.h) present in *config* folder
+3. Make the relevant changes according to the above example readme in [`sl_net_default_values.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/sl_net_default_values.h),  [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/aws_iot_config.h) present in *config* folder
 4. Modify the relevant changes in [`sensorhub_aws_app.c`](sensorhub_aws_app.c) also.
-5. Increase the buffer size AWS_IOT_MQTT_TX_BUF_LEN to 1024 in [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/resources/defaults/aws_iot_config.h)
+5. Increase the buffer size AWS_IOT_MQTT_TX_BUF_LEN to 1024 in [`aws_iot_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/resources/defaults/aws_iot_config.h)
 
 ## Sensor Pins Setup
 

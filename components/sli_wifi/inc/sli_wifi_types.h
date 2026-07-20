@@ -659,6 +659,34 @@ typedef struct {
   uint8_t ipv6_address[16]; // IPv6 address
 } sli_wifi_ip_address_info_t;
 
+/**
+ * @brief Statistics type for @ref SLI_WIFI_REQ_SIGNAL_QUALITY_STATS.
+ */
+typedef enum {
+  SLI_WIFI_STATS_TYPE_SNR  = 0, ///< SNR statistics
+  SLI_WIFI_STATS_TYPE_RSSI = 1, ///< RSSI statistics
+} sli_wifi_stats_type_t;
+
+/**
+ * @brief Statistics request structure for @ref SLI_WIFI_REQ_SIGNAL_QUALITY_STATS.
+ */
+typedef struct {
+  sl_wifi_interface_t interface;    ///< Interface type
+  sli_wifi_stats_type_t stats_type; ///< Statistics type
+} sli_wifi_stats_request_t;
+
+/**
+ * @brief Statistics response structure for @ref SLI_WIFI_REQ_SIGNAL_QUALITY_STATS.
+ */
+typedef struct {
+  sli_wifi_stats_type_t stats_type; ///< Statistics type
+
+  union {
+    sl_wifi_snr_stats_t snr_stats;
+    sl_wifi_rssi_stats_t rssi_stats;
+  } stats; ///< Statistics data
+} sli_wifi_stats_response_t;
+
 /// Operation field for @ref SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST (command @c 0x5C).
 #define SLI_WIFI_MC_ALLOWLIST_OP_ADD        0
 #define SLI_WIFI_MC_ALLOWLIST_OP_REMOVE     1
