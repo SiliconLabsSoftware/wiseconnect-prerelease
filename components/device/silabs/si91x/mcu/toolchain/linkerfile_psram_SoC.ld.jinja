@@ -168,9 +168,6 @@ PHDRS
 }
 {%- endif %}
 
-{%- if (nvm3_enable and text_segment_in_psram) %}
-_last_rom_location = ORIGIN(rom);
-{%- endif %}
 {%- if psram_present and psram_linker_config_enabled %}
 _last_psram_location = ORIGIN(psram);
 _last_ram_location = ALIGN(ORIGIN(ram), 16);
@@ -456,9 +453,6 @@ SECTIONS
 
 	__etext = .;
 
-{%- if (nvm3_enable and text_segment_in_psram) %}
-	__nvm3text = _last_rom_location;
-{% endif %}	
 	
 {% if data_segment_in_psram %}
 	{% if psram_present and psram_linker_config_enabled %}
@@ -741,7 +735,12 @@ SECTIONS
   linker_storage_begin = linker_storage_end - SIZEOF(.internal_storage1);
   linker_storage_size = SIZEOF(.internal_storage1);
  {%- if text_segment_in_psram %}
-  ASSERT((linker_storage_begin >= (__nvm3text + SIZEOF(.data))), "FLASH memory overflowed !")
+  /* Program executes from PSRAM, so `rom` (internal flash) holds no program bytes.
+     NVM3 storage is laid out top-down from the top of flash; `linker_storage_begin`
+     is its LOWEST address. Overflow = storage grows past the flash floor, i.e. its
+     lowest address drops below ORIGIN(rom). `.data` is not counted (its LMA is in
+     PSRAM, not rom). */
+  ASSERT((linker_storage_begin >= ORIGIN(rom)), "FLASH memory overflowed: NVM3 storage does not fit in flash")
  {%- else %}
   ASSERT((linker_storage_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
  {%- endif %} 
@@ -775,7 +774,11 @@ SECTIONS
   linker_storage2_begin = linker_storage2_end - SIZEOF(.internal_storage2);
   linker_storage2_size = SIZEOF(.internal_storage2);
  {%- if text_segment_in_psram %}
-  ASSERT((linker_storage2_begin >= (__nvm3text + SIZEOF(.data))), "FLASH memory overflowed !")
+  /* Program executes from PSRAM, so `rom` (internal flash) holds no program bytes.
+     LittleFS storage is laid out top-down (below NVM3 when present); its LOWEST
+     address is `linker_storage2_begin`. Overflow = it drops below ORIGIN(rom).
+     `.data` is not counted (its LMA is in PSRAM, not rom). */
+  ASSERT((linker_storage2_begin >= ORIGIN(rom)), "FLASH memory overflowed: LittleFS storage does not fit in flash")
  {%- else %}
   ASSERT((linker_storage2_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
  {%- endif %}

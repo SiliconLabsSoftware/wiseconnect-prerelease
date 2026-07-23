@@ -25,10 +25,8 @@ provides:
   - name: memory_manager_redirect
 toolchain_settings:
   - option: gcc_linker_option
-    value: -Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=calloc -Wl,--wrap=realloc
+    value: -Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,-u,__wrap_malloc -Wl,-u,__wrap_free -Wl,-u,__wrap_calloc -Wl,-u,__wrap_realloc
   - option: gcc_linker_option
-    value: -Wl,--wrap=aligned_alloc -Wl,--wrap=memalign -Wl,--wrap=posix_memalign
+    value: -Wl,--wrap=aligned_alloc -Wl,--wrap=memalign -Wl,--wrap=posix_memalign -Wl,-u,__wrap_aligned_alloc -Wl,-u,__wrap_memalign -Wl,-u,__wrap_posix_memalign
   - option: gcc_linker_option
-    value: -Wl,-u,__wrap_aligned_alloc -Wl,-u,__wrap_memalign -Wl,-u,__wrap_posix_memalign
-  - option: gcc_linker_option
-    value: -Wl,--wrap=_free_r -Wl,--wrap=_malloc_r -Wl,--wrap=_calloc_r -Wl,--wrap=_realloc_r
+    value: -Wl,--wrap=_free_r -Wl,--wrap=_malloc_r -Wl,--wrap=_calloc_r -Wl,--wrap=_realloc_r -Wl,-u,__wrap__free_r -Wl,-u,__wrap__malloc_r -Wl,-u,__wrap__calloc_r -Wl,-u,__wrap__realloc_r

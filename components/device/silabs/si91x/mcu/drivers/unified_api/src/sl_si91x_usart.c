@@ -237,7 +237,7 @@ sl_status_t sl_si91x_usart_init(usart_peripheral_t usart_instance, sl_usart_hand
 
 #ifdef DEBUG_UART_UC
     // Check the USART instance is already used for Debug output
-    if (SL_DEBUG_INSTANCE == usart_instance) {
+    if (SL_DEBUG_INSTANCE == usart_instance && USART_GetInitState(usart_instance)) {
       status = SL_STATUS_NOT_AVAILABLE;
       SL_PRINT_STRING_ERROR("sl_si91x_usart_init: usart instance is already used for debug output,line no : %d\r\n",
                             (int)__LINE__);
@@ -245,14 +245,12 @@ sl_status_t sl_si91x_usart_init(usart_peripheral_t usart_instance, sl_usart_hand
     }
 #endif
 
-    // Get the USART Init state
     if (USART_GetInitState(usart_instance)) {
       status = SL_STATUS_BUSY;
       SL_PRINT_STRING_ERROR("sl_si91x_usart_init: usart instance is already initialized,line no : %d\r\n",
                             (int)__LINE__);
       break;
     }
-
     // To validate the structure pointer and usart handle, if the parameters is NULL, it
     // returns an error code
     if (*usart_handle != NULL) {
