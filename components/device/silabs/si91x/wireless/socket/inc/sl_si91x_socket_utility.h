@@ -68,7 +68,7 @@
   do {                                                                            \
     if (status != expected_status) {                                              \
       if (PRINT_ERROR_LOGS) {                                                     \
-        PRINT_ERROR_STATUS(ERROR_TAG, errno_value);                               \
+        PRINT_ERROR_STATUS(ERROR_TAG, status);                                    \
       }                                                                           \
       errno = errno_value;                                                        \
       return -1;                                                                  \

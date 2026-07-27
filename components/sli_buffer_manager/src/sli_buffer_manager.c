@@ -560,7 +560,9 @@ sl_status_t sli_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_typ
 
 sl_status_t sli_buffer_manager_free_buffer(sli_buffer_t buffer)
 {
-  SL_VERIFY_POINTER_OR_RETURN(buffer, SL_STATUS_NULL_POINTER);
+  if (buffer == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
 
   CORE_irqState_t state = CORE_EnterAtomic();
 
