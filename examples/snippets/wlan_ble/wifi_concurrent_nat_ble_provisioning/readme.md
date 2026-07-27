@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x concurrent NAT coex example: provision Wi-Fi over BLE, enable concurrent STA and soft AP, and provide internet access to AP clients via NAT on SoC and NCP modes.
+SiWx91x concurrent NAT coex example: Provision Wi-Fi over BLE, enable concurrent STA and soft AP, and provide internet access to AP clients via NAT in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -199,14 +199,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 
 > **Note** : The number of NAT entries is limited to 100.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Complete BLE provisioning before expecting STA and concurrent AP interfaces to come up.
+- Complete BLE provisioning before you expect STA and concurrent AP interfaces to come up.
 - Verify third-party AP credentials received during BLE provisioning are correct.
-- Ensure NAT client devices connect to the SiWx91x soft AP, not the upstream AP directly.
-- NAT entry limit is 100; reduce connected clients if NAT forwarding fails.
+- Ensure NAT client devices connect to the SiWx91x SoftAP, not the upstream AP directly.
+- The NAT entry limit is 100. If NAT forwarding fails, reduce the number of connected clients.
 
 ## Resources
 

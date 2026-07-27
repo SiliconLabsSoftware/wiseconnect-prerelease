@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x AP throughput example: configure the device as a soft access point and measure UDP, TCP, or TLS Tx/Rx throughput against iPerf or Python TLS scripts on a remote PC in SoC and NCP modes.
+SiWx91x AP throughput example: Configure the device as a soft access point and measure UDP, TCP, or TLS Tx/Rx throughput against iPerf or Python TLS scripts on a remote PC in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -295,14 +295,15 @@ To measure TLS RX throughput, configure the SiWx91x as a TLS client and open a T
 
 If you encounter issues while running the AP Throughput example, check the following:
 
-- Verify `DEFAULT_WIFI_AP_PROFILE_SSID` and `DEFAULT_WIFI_AP_CREDENTIAL` in `sl_net_default_values.h` match the soft AP configuration used by connecting clients.
-- Confirm `SERVER_IP_ADDRESS`, `SERVER_PORT`, and `LISTENING_PORT` in `app.c` match the iPerf or TLS server/client configuration on the remote PC.
-- Ensure `THROUGHPUT_TYPE` in `app.c` matches the server/client role setup on the PC (for example, use `TCP_TX` on the DUT when iPerf is running as a TCP server).
-- Start the iPerf server or Python TLS script on the remote PC **before** the SiWx91x device attempts to connect.
-- For TCP Rx and TLS Rx throughput, verify the TCP RX window size and division factor are set to 44 in the socket configuration as described in [Application Build Environment](#application-build-environment).
-- AP standalone mode does not support Tx aggregation; throughput may be lower than station-mode measurements, especially for non-UDP-Rx scenarios.
-- Ensure the remote PC is connected to the SiWx91x soft AP and can reach the configured IP addresses.
-- For TLS throughput, run the Python scripts from the `/resources/certificates/` directory using Python 2 or above (TLS 1.3 requires Python 3.6 or later).
+- Verify that `DEFAULT_WIFI_AP_PROFILE_SSID` and `DEFAULT_WIFI_AP_CREDENTIAL` in `sl_net_default_values.h` match the soft AP configuration used by connecting clients.
+- Confirm that `SERVER_IP_ADDRESS`, `SERVER_PORT`, and `LISTENING_PORT` in `app.c` match the iPerf or TLS server or client configuration on the remote PC.
+- Ensure that `THROUGHPUT_TYPE` in `app.c` matches the server or client role on the PC (for example, use `TCP_TX` on the DUT when iPerf runs as a TCP server).
+- Start the iPerf server or Python TLS script on the remote PC before the SiWx91x device attempts to connect.
+- For TCP Rx and TLS Rx throughput, verify that the TCP RX window size and division factor are set to 44 in the socket configuration as described in [Application Build Environment](#application-build-environment).
+- Ensure that the remote PC is connected to the SiWx91x soft AP and can reach the configured IP addresses.
+- For TLS throughput, run the Python scripts from the `resources/certificates/` directory. Use Python 2 or later; TLS 1.3 requires Python 3.6 or later.
+
+> **Note**: AP standalone mode does not support Tx aggregation. Throughput may be lower than station-mode measurements, especially for non-UDP-Rx scenarios.
 
 ## Resources
 

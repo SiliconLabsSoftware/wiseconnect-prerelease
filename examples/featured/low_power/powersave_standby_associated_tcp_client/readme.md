@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x associated power save TCP example: connect to Wi-Fi, send TCP data in low-power mode with NWP retention, and measure current consumption with Energy Profiler and iPerf on SoC and NCP modes.
+SiWx91x associated power save TCP example: Connect to Wi-Fi, send TCP data in low-power mode with NWP retention, and measure current consumption with Energy Profiler and iPerf in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -194,15 +194,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 If you encounter issues while running the Powersave Standby Associated TCP Client example, check the following:
 
-- Verify `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings.
-- Set `SEND_TCP_DATA` to `1` in `app.c` and confirm `SERVER_IP_ADDRESS`, `SERVER_PORT`, and `NUMBER_OF_PACKETS` match the remote iPerf TCP server configuration.
-- Start the iPerf TCP server on the remote PC **before** the SiWx91x device connects and sends data.
+- Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point (AP) settings.
+- Set `SEND_TCP_DATA` to `1` in `app.c`, and confirm that `SERVER_IP_ADDRESS`, `SERVER_PORT`, and `NUMBER_OF_PACKETS` match the remote iPerf TCP server configuration.
+- Start the iPerf TCP server on the remote PC before the SiWx91x device connects and sends data.
 - If iPerf reports "Access Denied", run the command prompt as administrator as described in [Run the iPerf Server](#run-the-iperf-server).
-- Review monitor interval and listen interval settings if power save behavior or wake timing is unexpected.
-- When using Energy Profiler, revert the target part and board name to default before flashing the application binary.
-- Current measurements may vary with access point type, DTIM interval, and TCP keep-alive settings.
-- To achieve lower connected-sleep current in SoC mode, configure `RAM_LEVEL` to `SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV` and do not configure `sl_si91x_configure_ram_retention` for M4.
-- A flash erase is required before flashing another application after running powersave examples.
+- If power save behavior or wake timing is unexpected, review the monitor interval and listen interval settings in the example configuration.
+- When you use Energy Profiler, revert the target part and board name to the defaults before you flash the application binary.
+- To achieve lower connected-sleep current in System on Chip (SoC) mode, set `RAM_LEVEL` to `SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV` and do not call `sl_si91x_configure_ram_retention` for the M4 host.
+- Erase flash before you flash another application after you run power save examples.
+
 
 ## Resources
 

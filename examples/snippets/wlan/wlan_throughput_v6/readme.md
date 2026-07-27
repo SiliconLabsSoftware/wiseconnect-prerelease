@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x IPv6 throughput example: connect to Wi-Fi, obtain an IPv6 address, and measure UDP/TCP/TLS Tx/Rx throughput with iPerf on SoC and NCP modes.
+SiWx91x IPv6 throughput example: Connect to Wi-Fi, obtain an IPv6 address, and measure UDP/TCP/TLS Tx/Rx throughput with iPerf in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -276,14 +276,15 @@ The following throughput values were measured for each test case:
 6. TLS Rx Throughput
 
     ![TLS_RX](resources/readme/TLS_RX.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials in `sl_net_default_values.h` and throughput settings in `app.c`.
-- Ensure the access point and network provide IPv6 connectivity to the remote iPerf host.
-- Install iPerf on the remote PC and allow traffic through the firewall on the configured port.
-- For TLS throughput, run the Python TLS scripts described in [Test the Application](#test-the-application) before starting the DUT.
+- Ensure that your access point and network provide IPv6 connectivity to the remote iPerf host.
+- Install iPerf on your remote PC and allow traffic through your firewall on the configured port.
+- For TLS throughput, run the Python TLS scripts described in [Test the Application](#test-the-application) before you start the DUT.
 
 ## Resources
 

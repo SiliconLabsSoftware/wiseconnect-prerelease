@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x WLAN throughput example: connect to a Wi-Fi access point and measure UDP, TCP, or TLS Tx/Rx throughput against iPerf or Python TLS scripts on a remote PC in SoC and NCP modes.
+SiWx91x WLAN throughput example: Connect to a Wi-Fi access point and measure UDP, TCP, or TLS Tx/Rx throughput against iPerf or Python TLS scripts on a remote PC in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -371,15 +371,16 @@ To measure TLS RX throughput, configure the SiWx91x as a TLS client and open a T
 
 If you encounter issues while running the WLAN Throughput example, check the following:
 
-- Verify `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings.
-- Confirm `SERVER_IP`, `SERVER_PORT`, and `LISTENING_PORT` in `app.c` match the iPerf or TLS server/client configuration on the remote PC.
-- Ensure `THROUGHPUT_TYPE` in `app.c` matches the server/client role setup on the PC (for example, use `TCP_TX` on the DUT when iPerf is running as a TCP server).
-- Start the iPerf server or Python TLS script on the PC **before** the SiWx91x device attempts to connect.
+- Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings.
+- Confirm that `SERVER_IP`, `SERVER_PORT`, and `LISTENING_PORT` in `app.c` match the iPerf or TLS server or client configuration on the remote PC.
+- Ensure that `THROUGHPUT_TYPE` in `app.c` matches the server or client role on the PC (for example, use `TCP_TX` on the DUT when iPerf runs as a TCP server).
+- Start the iPerf server or Python TLS script on the PC before the SiWx91x device attempts to connect.
 - Set `PLL_MODE` to `1` in `sl_si91x_protocol_types.h` as described in [Application Build Environment](#application-build-environment).
-- Ensure the PC and SiWx91x device are connected to the same Wi-Fi network and that no firewall is blocking the configured ports.
-- For TLS throughput, run the Python scripts from the `/resources/certificates/` directory and use Python 2 or above (TLS 1.3 requires Python 3.6 or later).
-- If throughput is lower than expected, test in a low-interference environment; dense RF environments can reduce measured throughput.
+- Ensure that the PC and SiWx91x device are on the same Wi-Fi network and that no firewall blocks the configured ports.
+- For TLS throughput, run the Python scripts from the `resources/certificates/` directory. Use Python 2 or later; TLS 1.3 requires Python 3.6 or later.
+- If throughput is lower than expected, test in a low-interference environment. Dense RF environments can reduce measured throughput.
 - For UART NCP mode, verify the handshake feature bit configuration if socket connections fail consistently.
+
 
 ## Resources
 

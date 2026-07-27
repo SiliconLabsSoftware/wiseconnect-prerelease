@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x low-power TCP example: maintain a TCP client socket in connected sleep and periodically wake to transmit data on SoC mode.
+SiWx91x low-power TCP example: Maintain a TCP client socket in connected sleep and periodically wake to transmit data in SoC mode.
 
 ## Table of Contents
 
@@ -161,14 +161,15 @@ To establish TCP Server on remote PC, open [iPerf Application](https://sourcefor
 The SiWx91x SoC, which is configured as a TCP client, connects to the iPerf server and the power save profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY. Upon successsful TCP connection, the Si917 NWP sends 512MB data to server. Once the configured ALARM_TIMEOUT expires or a button is pressed, M4 is triggered out of sleep, performs data transfer and goes back to sleep.
 
 ![Figure: Console logs](resources/readme/console_logs.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials and TCP server IP/port in `app.c`.
 - Start the remote TCP server before the SiWx91x client connects.
-- Review alarm and tickless wakeup settings if periodic transmission does not resume after sleep.
-- Ensure connected sleep mode is supported and enabled for your target configuration.
+- If periodic transmission does not resume after sleep, review alarm and tickless wakeup settings.
+- Ensure that connected sleep mode is supported and enabled for your target configuration.
 
 ## Resources
 

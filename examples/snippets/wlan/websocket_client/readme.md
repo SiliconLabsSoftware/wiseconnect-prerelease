@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x WebSocket client example: connect to Wi-Fi and establish a WebSocket session with a remote server on SoC and NCP modes.
+SiWx91x WebSocket client example: Connect to Wi-Fi and establish a WebSocket session with a remote server in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -111,7 +111,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     ```
 
     - `sl_websocket_set_origin()` is optional. If not called, the firmware uses its default Origin value (`"http://localhost"`).
-    - Maximum supported Origin length is `SL_SI91X_WEBSOCKET_MAX_ORIGIN_LENGTH - 1` characters (50 chars + null terminator).
+    - The maximum supported Origin length is `SL_SI91X_WEBSOCKET_MAX_ORIGIN_LENGTH - 1` characters (50 characters + null terminator).
 
 NOTE:
 > Procedure to run the example
@@ -183,6 +183,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - Flash, run and debug the application.
 
    ![Application prints](resources/readme/output_soc.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:

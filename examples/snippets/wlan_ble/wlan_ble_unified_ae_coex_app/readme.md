@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x WLAN BLE unified extended advertising coex example: run WLAN throughput with BLE extended advertising central and peripheral roles on SoC and NCP modes.
+SiWx91x WLAN BLE unified extended advertising coex example: Run WLAN throughput with BLE extended advertising central and peripheral roles in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -591,14 +591,16 @@ Follow the steps as mentioned for the successful execution of the application:
 - Bonding information needs to be removed from remote device before issuing reconnection.
 - WLAN/BLE throughputs will be less in coexistence cases due to BLE flow control missing in SDK.
 - The SL logging framework is not supported for AE feature.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and BLE extended advertising parameters in application configuration.
-- Review [Extended Advertising Configurations](#extended-advertising-configurations) and [Extended Scanning Configurations](#extended-scanning-configurations) before testing.
-- Install iPerf on the remote PC for WLAN throughput measurements.
-- See [Limitations](#limitations) for supported feature combinations.
+- Verify Wi-Fi credentials and BLE extended advertising parameters in your application configuration.
+- Review [Extended Advertising Configurations](#extended-advertising-configurations) and [Extended Scanning Configurations](#extended-scanning-configurations) before you start testing.
+- Install iPerf on your remote PC for WLAN throughput measurements.
+- Review [Limitations](#limitations) for supported feature combinations.
+
 
 ## Resources
 
@@ -606,6 +608,7 @@ If you encounter issues while running this example, check the following:
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
 - [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
 - [iPerf Tool](https://sourceforge.net/projects/iperf2/files/)
+
 ## Report Bugs and Get Support
 
 Report issues and get help from the Silicon Labs community:

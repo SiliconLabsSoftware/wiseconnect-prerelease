@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x HTTP server example: connect to Wi-Fi as a station and serve HTTP GET/POST requests from remote clients on SoC and NCP modes.
+SiWx91x HTTP server example: Connect to Wi-Fi as a station and serve HTTP GET/POST requests from remote clients in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -128,13 +128,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    ![Webpage](resources/readme/webpage.png)
 
    ![Application prints](resources/readme/output_soc.png)
+
+  
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials in `sl_net_default_values.h` and HTTP server port in `app.c`.
-- Ensure the remote client uses the correct SiWx91x IP address and port after the device obtains an IP from the AP.
-- If the server does not respond, confirm the firewall on the PC allows connections to the configured port.
+- Ensure your remote client uses the correct SiWx91x IP address and port after the device obtains an IP from the AP.
+- If the server does not respond, confirm your PC firewall allows incoming connections on the configured port.
 
 ## Resources
 

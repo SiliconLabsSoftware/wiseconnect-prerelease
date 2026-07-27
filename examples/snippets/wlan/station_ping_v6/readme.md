@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x station ping IPv6 example: connect to Wi-Fi and send ICMPv6 echo requests to a target IPv6 address on SoC and NCP modes.
+SiWx91x station ping IPv6 example: Connect to Wi-Fi and send ICMPv6 echo requests to a target IPv6 address in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -124,13 +124,14 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - Upon successfully connecting to the Access Point, the device initiates ping requests to the specified REMOTE_IP_ADDRESS with the configured PING_PACKET_SIZE to verify the availability of the target device.
 
   ![Station_Ping_Output](resources/readme/station_ping_output.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and IPv6 target address in application configuration.
-- Ensure the access point and network provide IPv6 connectivity to the target host.
-- Confirm the target host responds to ICMPv6 ping and is reachable from the SiWx91x subnet.
+- Verify Wi-Fi credentials and IPv6 target address in your application configuration.
+- Ensure that your access point and network provide IPv6 connectivity to the target host.
+- Confirm the target host responds to ICMPv6 ping and is reachable from the SiWx91x.
 
 ## Resources
 

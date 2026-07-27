@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x TLS client example: open TCP client sockets secured with TLS v1.0 and TLS v1.2, load CA and device certificates, and transmit data on SoC and NCP modes.
+SiWx91x TLS client example: Open TCP client sockets secured with TLS v1.0 and TLS v1.2, load CA and device certificates, and transmit data in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -196,14 +196,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - EVK connects to remote SSL server-2
   
   ![EVK connects to remote SSL server-2](resources/readme/server2.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials in `sl_net_default_values.h` and server IP/port in `app.c`.
-- Load CA and device certificates using [sl_net_set_credential()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-nwk-mgmt/net-credential-functions#sl-net-set-credential) before opening TLS sockets.
-- Replace default cloud connectivity certificates; included certificates are for reference only.
-- Ensure the remote TLS server is running and supports the configured TLS version.
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and TLS server IP/port in `app.c`.
+- Load the CA and device certificates using [sl_net_set_credential()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-nwk-mgmt/net-credential-functions#sl-net-set-credential) before opening TLS sockets.
+- Replace the default cloud connectivity certificates. The included certificates are for reference only.
+- Ensure that the remote TLS server is running and supports the configured TLS version.
 
 ## Resources
 

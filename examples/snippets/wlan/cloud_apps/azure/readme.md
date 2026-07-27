@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Azure IoT MQTT example: connect to a Wi-Fi access point and Azure IoT Hub, send device-to-cloud telemetry, receive cloud-to-device messages, and measure current with Energy Profiler on SoC and NCP modes.
+SiWx91x Azure IoT MQTT example: Connect to a Wi-Fi access point and Azure IoT Hub, send device-to-cloud telemetry, receive cloud-to-device messages, and measure current with Energy Profiler in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -467,13 +467,13 @@ The device is now successfully registered to IoT Hub with Symmetric key authenti
 
 If you encounter issues while running the Azure IoT MQTT Client example, check the following:
 
-- Verify `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings and that the AP has internet access.
-- Confirm `democonfigHOSTNAME`, `democonfigDEVICE_ID`, and authentication credentials in `demo_config.h` match your Azure IoT Hub and registered device settings.
+- Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings and that the AP has internet access.
+- Confirm that `democonfigHOSTNAME`, `democonfigDEVICE_ID`, and authentication credentials in `demo_config.h` match your Azure IoT Hub and registered device settings.
 - For symmetric key authentication, set `USE_SYMMETRIC_KEY` to `1` and configure `democonfigDEVICE_SYMMETRIC_KEY` from the IoT Hub primary connection string as described in [Register IoT Device with Symmetric Key Authentication in IoT Hub](#131-register-iot-device-with-symmetric-key-authentication-in-iot-hub).
 - For X.509 authentication, set `USE_SYMMETRIC_KEY` to `0`, generate and convert device certificates using `certificate_to_array.py`, and include the generated `.h` files as described in [Register IoT Device with X.509 Authenticated Device with IoT Hub](#132-register-iot-device-with-x509-authenticated-device-with-iot-hub).
-- Replace the default SDK cloud connectivity certificates with valid certificates; the included certificates are for reference only.
-- If telemetry or C2D messages are not visible, verify the device connected to IoT Hub successfully and use the Azure CLI commands in [Appendix-2](#appendix-2--steps-to-check-telemetry-message-on-azure-cloud) and [Appendix-3](#appendix-3--steps-to-send-c2d-message-from-the-cloud).
-- When using Energy Profiler, revert the target part and board name to default before flashing the application binary.
+- Replace the default cloud connectivity certificates in the WiseConnect SDK with valid certificates. The included certificates are for reference only.
+- If telemetry or C2D messages are not visible, verify that the device connected to IoT Hub successfully and use the Azure CLI commands in [Appendix-2](#appendix-2--steps-to-check-telemetry-message-on-azure-cloud) and [Appendix-3](#appendix-3--steps-to-send-c2d-message-from-the-cloud).
+- When you use Energy Profiler, revert the target part and board name to the defaults before you flash the application binary.
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Paho MQTT over TCP example: connect to Wi-Fi and an MQTT broker using the Paho MQTT library over TCP on SoC and NCP modes.
+SiWx91x Paho MQTT over TCP example: Connect to Wi-Fi and an MQTT broker using the Paho MQTT library over TCP in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -360,13 +360,14 @@ Use this when the MQTT broker listens on port 443 and requires ALPN negotiation 
 >    - `-p 1883`: This is the same as the `-p` option for `mosquitto_sub`, specifying the network port of the MQTT broker.
 >    - `-t THERMOSTAT-DATA`: Specifies the topic that the client should publish the message to.
 >    - `-m "hello"`: Specifies the message to publish. In this case, the message is the string "hello".
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials in `sl_net_default_values.h` and MQTT broker host/port in application config.
-- Ensure the MQTT broker is running and reachable before starting the application.
-- Replace default certificates if using TLS; default cloud certificates are for reference only.
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and MQTT broker host/port in your application configuration.
+- Ensure that the MQTT broker is running and reachable before you start the application.
+- If you use TLS, replace the default certificates. Default cloud certificates are for reference only. 
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x BLE provisioning with AWS example: provision Wi-Fi over BLE, connect to AWS IoT Core via MQTT, and support optional I2C sensor data on SoC mode.
+SiWx91x BLE provisioning with AWS example: Provision Wi-Fi over BLE, connect to AWS IoT Core via MQTT, and support optional I2C sensor data in SoC mode.
 
 ## Table of Contents
 
@@ -743,14 +743,17 @@ OpenSSL **`s_server`** on **`SSL_16K_DEMO_SERVER_PORT_1`** and **`SSL_16K_DEMO_S
 ![](resources/readme/ble_enable_disable_openssl_server_1.png)
 
 ![](resources/readme/ble_enable_disable_openssl_server_2.png)
+
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Configure AWS IoT endpoint and credentials in `aws_iot_config.h` before building.
-- Complete BLE provisioning with correct AP credentials before expecting MQTT connect.
-- See [Setting up Security Certificates](#setting-up-security-certificates) for AWS certificate setup.
-- If using I2C sensor data, verify [I2C](#i2c) pin configuration for your board.
+- Configure AWS IoT endpoint and credentials in `aws_iot_config.h` before you build the application.
+- Complete BLE provisioning with correct AP credentials before you expect an MQTT connection.
+- Review [Setting up Security Certificates](#setting-up-security-certificates) for AWS certificate setup.
+- If you use I2C sensor data, verify [I2C](#i2c) pin configuration for your board.
+
 
 ## Resources
 

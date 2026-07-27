@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x AWS Device Shadow example: connect to AWS IoT Core over MQTT/TLS, publish temperature and window state to a device shadow, and receive shadow delta updates using Simplicity Studio on SoC and NCP modes.
+SiWx91x AWS Device Shadow example: Connect to AWS IoT Core over MQTT/TLS, publish temperature and window state to a device shadow, and receive shadow delta updates using Simplicity Studio in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -325,14 +325,15 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 
 If you encounter issues while running the AWS Device Shadow example, check the following:
 
-- Verify `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings and that the AP has internet access.
-- Confirm `AWS_IOT_MQTT_HOST` matches the **Device data endpoint** from the AWS IoT console (**Settings** page).
-- Ensure `AWS_IOT_MQTT_CLIENT_ID` and `AWS_IOT_MY_THING_NAME` match the Thing name registered in AWS IoT Core.
-- Replace the default SDK certificates with the device certificate and private key downloaded when the AWS Thing was created. The default certificates included in the SDK are for reference only and will not connect to AWS.
-- After converting certificates with `certificate_to_array.py`, verify the generated `.h` files are included in `app.c` and loaded using [sl_net_set_credential()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-nwk-mgmt/net-credential-functions#sl-net-set-credential) before calling `aws_iot_mqtt_init()`.
-- Confirm the IoT policy attached to the Thing allows publish/subscribe on the required shadow MQTT topics (for example, `$aws/things/<thingName>/shadow/update` and related shadow topics).
-- If TLS authentication fails, verify the Starfield Root CA certificate is loaded on the device. For intermediate CA validation, define `SL_SI91X_AWS_IOT_ROOT_CA1` as described in [Setting up Security Certificates](#setting-up-security-certificates).
-- If shadow updates are not visible in the AWS console, confirm the application prints show a successful MQTT connection and that the Thing shadow name matches the configured `AWS_IOT_MY_THING_NAME`.
+- Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point (AP) settings, and that the AP has internet access.
+- Confirm that `AWS_IOT_MQTT_HOST` matches the **Device data endpoint** on the **Settings** page in the AWS IoT console.
+- Ensure that `AWS_IOT_MQTT_CLIENT_ID` and `AWS_IOT_MY_THING_NAME` match the Thing name registered in AWS IoT Core.
+- Replace the default certificates in the WiseConnect SDK with the device certificate and private key you downloaded when you created the AWS Thing. The default certificates are for reference only and will not connect to AWS.
+- After you convert certificates with `certificate_to_array.py`, verify that the generated `.h` files are included in `app.c` and loaded with [sl_net_set_credential()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-nwk-mgmt/net-credential-functions#sl-net-set-credential) before you call `aws_iot_mqtt_init()`.
+- Confirm that the IoT policy attached to the Thing allows publish and subscribe on the required Device Shadow MQTT topics (for example, `$aws/things/<thingName>/shadow/update` and related shadow topics).
+- If Transport Layer Security (TLS) authentication fails, verify that the Starfield Root CA certificate is loaded on the device. For intermediate CA validation, define `SL_SI91X_AWS_IOT_ROOT_CA1` as described in [Setting up Security Certificates](#setting-up-security-certificates).
+- If shadow updates are not visible in the AWS IoT console, confirm that application logs show a successful MQTT connection and that the shadow Thing name matches `AWS_IOT_MY_THING_NAME`.
+
 
 ## Resources
 

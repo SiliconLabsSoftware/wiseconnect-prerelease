@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x user gain table example: transmit Wi-Fi packets in burst mode with custom gain table values for regulatory packet error testing on SoC and NCP modes.
+SiWx91x user gain table example: Transmit Wi-Fi packets in burst mode with custom gain table values for regulatory packet error testing in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -261,6 +261,7 @@ The below result is for PER Mode with Channel '6' with 6 Mbps data rate and max 
 ## Application Output
 
   ![Figure: Application prints](resources/readme/application_prints_soc_ncp.PNG)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:

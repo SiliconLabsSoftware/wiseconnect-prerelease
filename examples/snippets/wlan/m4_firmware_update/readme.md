@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x M4 firmware update example: download and update the M4 application firmware over Wi-Fi from a remote TCP server on SoC mode.
+SiWx91x M4 firmware update example: Download and update the M4 application firmware over Wi-Fi from a remote TCP server in SoC mode.
 
 ## Table of Contents
 
@@ -147,6 +147,7 @@ To esstablish the TCP Server with firmware file on remote PC, follow the steps b
 
   > Note:
   > Image size displayed may vary depending on the firmware provided by the server.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
@@ -154,7 +155,7 @@ If you encounter issues while running this example, check the following:
 - Verify Wi-Fi credentials and TCP server IP/port match the host running the firmware server.
 - Start the TCP firmware server before the SiWx91x application connects.
 - Use an M4 firmware image compatible with the current NWP release.
-- Allow time after download for flash write and reboot to complete.
+- After the download completes, wait for flash write and reboot to complete.
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x dual network stack example: configure dual network stacks and send ICMP echo requests using raw data and offload APIs on SoC and NCP modes.
+SiWx91x dual network stack example: Configure dual network stacks and send ICMP echo requests using raw data and offload APIs in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -185,8 +185,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials in `sl_net_default_values.h` and target IP address in `app.c`.
-- Ensure dual network stack mode is enabled in project configuration.
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and ping target IP address in `app.c`.
+- Ensure dual network stack mode is enabled in your project configuration.
 - Confirm the target host responds to ICMP ping on the selected network stack.
 
 ## Resources

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x TWT TCP client example: establish an iTWT session with a Wi-Fi 6 access point, maintain a TCP connection in associated power save mode, and measure current consumption with Energy Profiler on SoC and NCP modes.
+SiWx91x TWT TCP client example: Establish an iTWT session with a Wi-Fi 6 access point, maintain a TCP connection in associated power save mode, and measure current consumption with Energy Profiler in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -384,16 +384,18 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 If you encounter issues while running the TWT TCP Client example, check the following:
 
-- Verify the access point supports Wi-Fi 6 (802.11ax) and TWT responder mode as described in [Prerequisites/Setup Requirements](#prerequisitessetup-requirements).
-- Confirm `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings.
-- Set `SEND_TCP_DATA` to `1` and verify `SERVER_IP` and `SERVER_PORT` in `app.c` match the iPerf TCP server on the remote PC.
-- Start the iPerf TCP server on the remote PC **before** the SiWx91x device connects.
-- Prefer `sl_wifi_target_wake_time_auto_selection_v2` with `TWT_AUTO_CONFIG` enabled; review [TWT Recommendations](#twt-recommendations) for latency and keep-alive settings.
-- Check `twt_response_handler` status codes in [iTWT Session Status Codes](#itwt-session-status-codes) if TWT setup fails or the session becomes inactive.
-- Ensure `rx_latency` is less than TCP and ARP timeouts on the remote side when using the auto-selection API.
-- Do not disable WLAN Keep Alive when using unannounced TWT or the auto-selection API; the default 30-second timeout is recommended.
-- TWT wake intervals beyond 1 minute or long `rx_latency` values may cause AP disconnections; reduce interval or latency if connection drops occur.
-- Current measurements may vary in open environments and with different access points.
+- Verify that the access point supports Wi-Fi 6 (802.11ax) and TWT responder mode as described in [Prerequisites/Setup Requirements](#prerequisites-setup-requirements).
+- Confirm that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings.
+- Set `SEND_TCP_DATA` to `1` in `app.c`, and verify that `SERVER_IP` and `SERVER_PORT` match the iPerf TCP server on the remote PC.
+- Start the iPerf TCP server on the remote PC before the SiWx91x device connects.
+- Prefer `sl_wifi_target_wake_time_auto_selection_v2` with `TWT_AUTO_CONFIG` enabled, and review [TWT Recommendations](#twt-recommendations) for latency and keep-alive settings.
+- If TWT setup fails or the session becomes inactive, check `twt_response_handler` status codes in [iTWT Session Status Codes](#itwt-session-status-codes).
+- When you use the auto-selection API, ensure that `rx_latency` is less than the TCP and Address Resolution Protocol (ARP) timeouts on the remote side.
+- Do not disable WLAN Keep Alive when you use unannounced TWT or the auto-selection API. The default 30-second timeout is recommended.
+- TWT wake intervals longer than 1 minute or high `rx_latency` values may cause access point disconnections. Reduce the interval or latency if connection drops occur.
+
+> **Note:** Current measurements may vary in open environments and with different access points.
+
 
 ## Resources
 

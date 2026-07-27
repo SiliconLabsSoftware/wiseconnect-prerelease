@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWG917 out-of-box demo: showcase WLAN, BLE, MCU peripherals, and NWP power save with minimal setup on the SiWG917 dev kit or wireless pro kit.
+SiWG917 out-of-box demo: Showcase WLAN, BLE, MCU peripherals, and NWP power save with minimal setup on the SiWG917 dev kit or wireless pro kit.
 
 This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.
 
@@ -35,7 +35,10 @@ The SiWG917 dev kit does not have an onboard display. All device activities for 
 
 SiWG917 establishes WLAN connectivity via BLE provisioning. SiWG917 then proceeds to ping [www.silabs.com](https://www.silabs.com) for 5 times, after which MQTT connectivity with a remote mosquitto broker [test.mosquitto.org](http://test.mosquitto.org) is established.
 Then Network processor of SiWG917 enters connected sleep state.
-If a message is published onto the topic from a MQTT client application to which the module is subscribed (Si917_MQTT_RECEIVE), the NWP wakes up and displays the received data and goes back to sleep. If BTN0 on the WPK baseboard or dev kit board is pressed, SiWG917 publishes a message onto a MQTT topic named Si917_APP_STATUS. The status of application is updated on the TFT-LCD display on the WPK baseboard, the same can be observed on the serial terminal prints as well.
+
+If an MQTT client publishes a message to a topic that the module subscribes to (Si917_MQTT_RECEIVE), the network processor (NWP) wakes up, displays the received data, and then returns to sleep.
+
+When BTN0 is pressed on the WPK baseboard or development kit, SiWG917 publishes a message to the Si917_APP_STATUS MQTT topic. The application status is updated on the TFT-LCD display on the WPK baseboard. You can also view the status in the serial terminal output.
 
 ## Prerequisites/Setup Requirements
 
@@ -250,7 +253,8 @@ If you encounter issues while running this example, check the following:
 
 - Use the SiWG917 dev kit or WPK with the correct pre-built binary for your board.
 - Update the MQTT hostname in `wifi_app.c` as described in [Update MQTT Hostname in wifi_app.c](#update-mqtt-hostname-in-wifi_appc).
-- For Energy Profiler measurements, follow [Measuring the current consumption using Simplicity Studio Energy Profiler](#measuring-the-current-consumption-using-simplicity-studio-energy-profiler).
+- For Energy Profiler measurements, follow the steps in [Measuring the current consumption using Simplicity Studio Energy Profiler](#measuring-the-current-consumption-using-simplicity-studio-energy-profiler).
+
 
 ## Resources
 

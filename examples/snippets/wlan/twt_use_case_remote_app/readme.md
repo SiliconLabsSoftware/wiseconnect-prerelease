@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x TWT remote trigger example: send periodic TCP triggers to the TWT Use Case Demo App and receive TCP or UDP test traffic for door-lock and camera scenarios on SoC and NCP modes.
+SiWx91x TWT remote trigger example: Send periodic TCP triggers to the TWT Use Case Demo App and receive TCP or UDP test traffic for door-lock and camera scenarios in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -153,14 +153,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - After successful connection, module will be brought up as a TCP server socket, listens for TCP client and sends configured NUMBER_OF_PACKETS to TCP or UDP client (SiWx91x module with TWT enabled).
 
     ![Application prints](resources/readme/remoteapplicationprintssoc.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Run this application together with [Wi-Fi - TWT Use Case Demo App](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/snippets/wlan/wifi6_twt_use_case_demo/readme.md) on a separate SiWx91x board.
-- Verify Wi-Fi credentials and the demo app IP address/port in application configuration.
+- Verify Wi-Fi credentials and the demo app IP address/port in your application configuration.
 - Use a Wi-Fi 6 access point with TWT responder mode enabled.
-- Ensure both devices are associated to the same AP before sending trigger packets.
+- Ensure that both devices are connected to the same AP before you send trigger packets.
 
 ## Resources
 

@@ -268,9 +268,9 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 2. Connect master SSI pins to slave SSI pins as per the pin connection tables above.
 3. On WPK hardware, connect the sync signal between the two boards by wiring `F12` on the master board to `F12` on the slave board.
 4. Reset the slave board and then run or reset the master board.
-5. When the slave prints `Waiting for master button 0 press to sync with master.`, press `BTN0` on the master board to start the active phase.
-6. If both the master and slave complete the transfer successfully, the slave prints the data comparison result and completion logs.
-7. After successful program execution, the prints in serial console looks as shown below.
+5. When the slave displays `Waiting for master button 0 press to sync with master.`, press `BTN0` on the master board to start the active phase.
+6. If both the master and slave complete the transfer successfully, the slave displays the data comparison result and completion logs.
+7. After the program runs successfully, the serial console displays output similar to the following.
 
     ![Figure: output](resources/readme/output.png)
 

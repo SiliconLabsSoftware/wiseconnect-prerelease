@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x concurrent HTTP provisioning example: provision STA credentials through a provisioning AP and HTTP server, then run concurrent STA and SoftAP with IPv4/IPv6 and multi-threaded UDP throughput on SoC and NCP modes.
+SiWx91x concurrent HTTP provisioning example: Provision STA credentials through a provisioning AP and HTTP server, then run concurrent STA and SoftAP with IPv4/IPv6 and multi-threaded UDP throughput in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -492,13 +492,13 @@ Use the **same** IP address in **`wifi_app.c`** as the PC’s address on the thi
 
 If you encounter issues while running the Concurrent HTTP Server Provisioning example, check the following:
 
-- Connect to the SiWx91x provisioning AP and complete the HTTP provisioning webpage before expecting STA and SoftAP concurrent mode to start.
-- Verify third-party AP credentials entered on the provisioning page are correct; the provisioning AP and HTTP server shut down after credentials are received.
-- If the STA disconnects, the application retries up to five times before restarting from the provisioning AP state; review console logs against the state machine diagram in [Purpose/Scope](#purposescope).
-- For UDP throughput testing, start iPerf UDP servers on ports **5002–5006** on the PC **before** the DUT connects, and match the server IP in `wifi_app.c` to the PC address on the third-party AP subnet.
-- Ensure socket pool macros in `app.h` (`TOTAL_SOCKETS`, `UDP_TX_ONLY_SOCKETS`, etc.) match the enabled throughput code in `wifi_app.c`.
-- If enabling commented TCP/TLS or SoftAP server variants in `wifi_app.c`, retune `app.h` socket configuration accordingly.
-- For NCP mode, verify the host interface matches the project variant.
+- Connect to the SiWx91x provisioning AP and complete the HTTP provisioning webpage before you expect STA and SoftAP concurrent mode to start.
+- Verify that the third-party AP credentials entered on the provisioning page are correct. The provisioning AP and HTTP server shut down after credentials are received.
+- If the STA disconnects, the application retries up to five times before it restarts from the provisioning AP state. Review console logs against the state machine diagram in [Purpose/Scope](#purposescope).
+- For UDP throughput testing, start iPerf UDP servers on ports 5002–5006 on the PC before the DUT connects, and match the server IP in `wifi_app.c` to the PC address on the third-party AP subnet.
+- Ensure that socket pool macros in `app.h` (`TOTAL_SOCKETS`, `UDP_TX_ONLY_SOCKETS`, etc.) match the enabled throughput code in `wifi_app.c`.
+- If you enable commented TCP/TLS or SoftAP server variants in `wifi_app.c`, retune the `app.h` socket configuration accordingly.
+- For NCP mode, verify that the host interface matches the project variant.
 
 ## Resources
 

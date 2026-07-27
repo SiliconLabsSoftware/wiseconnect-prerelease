@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Paho MQTT over WebSocket example: connect to Wi-Fi and an MQTT broker using Paho MQTT over WebSocket on SoC and NCP modes.
+SiWx91x Paho MQTT over WebSocket example: Connect to Wi-Fi and an MQTT broker using Paho MQTT over WebSocket in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -335,8 +335,8 @@ Secure WebSocket (WSS) on port 443 typically negotiates `http/1.1` at the TLS la
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials and WebSocket MQTT broker URL/port settings.
-- Ensure the broker supports MQTT over WebSocket and is reachable from the device.
-- Load valid TLS certificates if using secure WebSocket (wss).
+- Ensure that the broker supports MQTT over WebSocket and is reachable from the device.
+- If using secure WebSocket (wss), load valid TLS certificates.
 
 ## Resources
 

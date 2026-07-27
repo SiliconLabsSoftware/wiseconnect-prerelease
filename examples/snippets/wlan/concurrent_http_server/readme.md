@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x concurrent HTTP server example: run Wi-Fi station and soft AP together, serve a provisioning webpage on the AP instance, and connect the STA to a third-party access point using credentials entered on the webpage.
+SiWx91x concurrent HTTP server example: Run Wi-Fi station and soft AP together, serve a provisioning webpage on the AP instance, and connect the STA to a third-party access point using credentials entered on the webpage.
 
 ## Table of Contents
 
@@ -161,11 +161,11 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 If you encounter issues while running the Concurrent HTTP Server example, check the following:
 
 - Verify the default SSID (`MY_AP_SSID`) and passphrase (`MY_AP_PASSPHRASE`) in `sl_net_default_values.h`, or update them as described in [Application Build Environment](#application-build-environment).
-- Connect a client device to the SiWx91x soft AP and open the served webpage in a browser before entering third-party AP credentials.
-- Enter the correct SSID, password, and security type on the webpage; the server stops after the `/connect` POST request and the STA connects using those credentials.
-- If the STA fails to connect, confirm the third-party AP is reachable and credentials match the target network.
-- For custom webpages, verify new handlers are registered in `sl_http_server_handler_t` in `app.c` as described in [Steps to create webpage](#steps-to-create-webpage).
-- For NCP mode, verify the host interface (SPI or UART) matches the project variant.
+- Connect a client device to the SiWx91x soft AP and open the served webpage in a browser before you enter third-party AP credentials.
+- Enter the correct SSID, password, and security type on the webpage. The server stops after the `/connect` POST request, and the STA connects using those credentials.
+- If the STA fails to connect, confirm that the third-party AP is reachable and that the credentials match the target network.
+- For custom webpages, verify that new handlers are registered in `sl_http_server_handler_t` in `app.c` as described in [Steps to create webpage](#steps-to-create-webpage).
+- For NCP mode, verify that the host interface (SPI or UART) matches the project variant.
 
 ## Resources
 

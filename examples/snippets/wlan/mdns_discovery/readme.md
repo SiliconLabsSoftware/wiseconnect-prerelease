@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x mDNS discovery example: connect to Wi-Fi and advertise or discover services on the local network using mDNS on SoC and NCP modes.
+SiWx91x mDNS discovery example: Connect to Wi-Fi and advertise or discover services on the local network using mDNS in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -211,9 +211,10 @@ This returns all PTR records on the network, which can then initiate targeted qu
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials in `sl_net_default_values.h`.
-- Ensure the PC and SiWx91x are on the same LAN; mDNS does not work across routed subnets.
-- Disable conflicting mDNS services or use unique service names if discovery fails.
-- On Windows, allow mDNS/Bonjour traffic through the firewall if the peer is not discovered.
+- Ensure that your PC and the SiWx91x are on the same LAN. mDNS does not work across routed subnets.
+- If discovery fails, disable conflicting mDNS services or use unique service names.
+- For Windows, allow mDNS/Bonjour traffic through your firewall if the peer is not discovered.
+
 
 ## Resources
 

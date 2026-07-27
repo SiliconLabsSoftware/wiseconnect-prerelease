@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x BLE provisioning example: receive third-party AP credentials over BLE and connect as a Wi-Fi station on SoC and NCP modes.
+SiWx91x BLE provisioning example: Receive third-party AP credentials over BLE and connect as a Wi-Fi station in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -225,14 +225,16 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ![](resources/readme/output1.png)
 
 ![](resources/readme/output2.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Use a BLE provisioning client or mobile app to send AP SSID, passphrase, and security type.
-- Verify SiWx91x is advertising in BLE mode before starting provisioning.
-- Follow [Steps to verify the WLAN Station BLE Provisioning Example](#steps-to-verify-the-wlan-station-ble-provisioning-example) for the full flow.
-- Check serial prints if STA connection fails after provisioning completes.
+- Use a BLE provisioning client or mobile app to send the AP SSID, passphrase, and security type.
+- Verify the SiWx91x is advertising in BLE mode before you start provisioning.
+- Follow [Steps to verify the WLAN Station BLE Provisioning Example](#steps-to-verify-the-wlan-station-ble-provisioning-example) for the full provisioning flow.
+- If STA connection fails after provisioning completes, check the console output.
+
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x dual-stack NWP and M4 example: run simultaneous TCP/UDP traffic on the NWP offload stack and M4 host-side LwIP stack on SoC mode.
+SiWx91x dual-stack NWP and M4 example: Run simultaneous TCP/UDP traffic on the NWP offload stack and M4 host-side LwIP stack in SoC mode.
 
 ## Table of Contents
 
@@ -239,13 +239,14 @@ This will send TCP traffic to the SiWx91x module on both ports for simultaneous 
 - IPv6 is not supported in dual network stack mode.
 
 - Triggering DHCP process from external host is currently not supported.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and enable `SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE` in project configuration.
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and enable `SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE` in your project configuration.
 - Configure socket IP/port settings for both NWP and M4 LwIP paths in `app.c`.
-- Start remote servers before the DUT attempts connections on either stack.
+- Start remote servers before the DUT connects on either stack.
 - Review [Limitations](#limitations) for supported feature combinations.
 
 ## Resources

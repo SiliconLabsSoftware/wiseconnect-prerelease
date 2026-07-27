@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x WPS PBC example: connect to an access point using Wi-Fi Protected Setup Push Button Configuration without manually entering credentials on SoC and NCP modes.
+SiWx91x WPS PBC example: Connect to an access point using Wi-Fi Protected Setup Push Button Configuration without manually entering credentials in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -125,14 +125,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 
 WPS PBC does not support the Protected Management Frames (PMF) security feature.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Press the WPS button on the access point within the WPS time window after starting the application.
-- Ensure the access point supports WPS PBC enrollee mode.
-- Review serial prints for WPS response SSID, security type, and credentials if auto-connect fails.
-- See [Limitation](#limitation) for supported platforms and AP compatibility notes.
+- Press the WPS button on the access point within the WPS time window after you start the application.
+- Ensure that your access point supports WPS PBC enrollee mode.
+- If auto-connect fails, review the console output for WPS response SSID, security type, and credentials.
+- Review [Limitation](#limitation) for supported platforms and AP compatibility notes.
 
 ## Resources
 

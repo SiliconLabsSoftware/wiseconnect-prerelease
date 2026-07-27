@@ -68,6 +68,7 @@ component:
 - id: mqtt
 - id: http_at_commands
 - id: http_client
+- id: iostream_rtt_si91x
 - id: ble_at_commands
 - id: ble
 - id: fs_at_commands
@@ -75,13 +76,10 @@ component:
 - id: fwup_at_commands
 - id: uart_at_commands
 - id: sl_uart
+- id: iostream_rtt
 - id: log_none
 - id: si91x_log
 - id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror -Wno-error=deprecated-declarations

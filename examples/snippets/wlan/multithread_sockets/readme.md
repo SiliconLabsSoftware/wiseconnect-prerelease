@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x multithreaded sockets example: run multiple concurrent TCP/UDP socket operations across RTOS threads after connecting to Wi-Fi on SoC and NCP modes.
+SiWx91x multithreaded sockets example: Run multiple concurrent TCP/UDP socket operations across RTOS threads after connecting to Wi-Fi in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -575,10 +575,11 @@ To measure TLS RX throughput, configure the SiWx91x as a TLS client and open a T
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and socket IP/port settings for each thread in `app.c`.
-- Ensure socket pool macros match the number of concurrent sockets opened.
-- Start remote servers before the DUT threads attempt to connect.
-- Review thread priorities and stack sizes if connections fail under load.
+- Verify Wi-Fi credentials and socket IP/port settings in `app.c` for each thread.
+- Ensure that socket pool macros match the number of concurrent sockets you open.
+- Start remote servers before the DUT threads connect.
+- If connections fail under load, review thread priorities and stack sizes.
+
 
 ## Resources
 

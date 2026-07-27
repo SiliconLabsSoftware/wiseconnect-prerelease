@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x WLAN BLE unified coex example: run AWS MQTT over Wi-Fi with multiple BLE central and peripheral connections on SoC and NCP modes.
+SiWx91x WLAN BLE unified coex example: Run AWS MQTT over Wi-Fi with multiple BLE central and peripheral connections in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -525,14 +525,15 @@ Follow the steps below for the successful execution of the program:
 - The BLE scan window and scan interval should be in 1:3 ratio.
 - Supports only MQTT profile.
 - IPv6 is not supported.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Configure AWS IoT settings in `aws_iot_config.h` and Wi-Fi credentials in `sl_net_default_values.h`.
-- Load valid AWS certificates; see [Setting up Security Certificates](#setting-up-security-certificates).
-- Verify BLE central and peripheral connection limits match application configuration.
-- Ensure the access point provides internet access for AWS MQTT connectivity.
+- Load valid AWS certificates. See [Setting up Security Certificates](#setting-up-security-certificates).
+- Verify BLE central and peripheral connection limits match your application configuration.
+- Ensure that your access point provides internet access for AWS MQTT connectivity.
 
 ## Resources
 
@@ -540,6 +541,7 @@ If you encounter issues while running this example, check the following:
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
 - [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
 - [AWS IoT Core Documentation](https://docs.aws.amazon.com/iot/)
+
 ## Report Bugs and Get Support
 
 Report issues and get help from the Silicon Labs community:

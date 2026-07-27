@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x firmware update example: flash NWP firmware from a host MCU over UART using the XMODEM bootloader protocol on NCP mode.
+SiWx91x firmware update example: Flash NWP firmware from a host MCU over UART using the XMODEM bootloader protocol on NCP mode.
 
 ## Table of Contents
 
@@ -233,14 +233,15 @@ sl_net_init: 0x4
 
 - [Secure Zone](https://www.silabs.com/documents/public/data-sheets/siwg917-datasheet.pdf)
 - [Secure Zone bit](https://www.silabs.com/documents/public/user-guides/ug574-siwx917-soc-manufacturing-utility-user-guide.pdf)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify the correct COM port and baud rate for the UART connection to the host MCU.
-- Ensure the device is in bootloader mode before starting the XMODEM transfer.
+- Ensure the device is in bootloader mode before you start the XMODEM transfer.
 - Use a compatible `.rps` firmware image from the same release package as the connectivity SDK.
-- Review [Appendix](#appendix) and console prints if the transfer fails or times out.
+- If the transfer fails or times out, review [Appendix](#appendix) and the console output.
 
 ## Resources
 

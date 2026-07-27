@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x data transfer example: run concurrent STA and soft AP in bridge mode and forward TCP data between remote devices on both interfaces on SoC and NCP modes.
+SiWx91x data transfer example: Run concurrent STA and soft AP in bridge mode and forward TCP data between remote devices on both interfaces in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -208,7 +208,7 @@ The SiWx91x device, which is configured as a TCP server/client, connects to the 
 If you encounter issues while running this example, check the following:
 
 - Verify STA and AP credentials in `sl_net_default_values.h` and bridge/TCP socket settings in `app.c`.
-- Ensure remote devices are connected to the correct networks (third-party AP for STA-side clients, SiWx91x soft AP for AP-side clients).
+- Ensure remote devices are connected to the correct networks (third-party AP for STA-side clients, SiWx91x SoftAP for AP-side clients).
 - Start the TCP server on the STA-side remote device before the DUT accepts bridge traffic.
 - Confirm listening and remote port/IP settings match on both bridge paths described in [Test the Application](#test-the-application).
 

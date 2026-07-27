@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x concurrent mode example: run Wi-Fi station and soft AP together and measure UDP/TCP throughput on both interfaces using iPerf on SoC and NCP modes.
+SiWx91x concurrent mode example: Run Wi-Fi station and soft AP together and measure UDP/TCP throughput on both interfaces using iPerf in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -318,12 +318,12 @@ The iPerf command to start the TCP client is:
 
 If you encounter issues while running the Concurrent Mode example, check the following:
 
-- Verify STA and AP credentials in `sl_net_default_values.h` and concurrent configuration in `sl_wifi_device.h` using `sl_wifi_default_concurrent_configuration` as a reference.
-- Confirm `SERVER_IP`, `SERVER_PORT`, `LISTENING_PORT`, and `THROUGHPUT_TYPE` in `app.c` match the iPerf server/client setup on the remote PC.
-- Start the iPerf server or client on the PC **before** the SiWx91x device attempts to connect for throughput tests.
-- Ensure the remote PC and client devices are connected to the correct network (third-party AP for STA, SiWx91x soft AP for AP-side tests).
-- If vendor-specific IE features are enabled, verify IE buffer length and identifier settings in [Vendor Specific Information Element (IE) Support](#vendor-specific-information-element-ie-support).
-- For NCP mode, verify the host interface matches the project variant.
+- Verify that STA and AP credentials in `sl_net_default_values.h` and concurrent configuration in `sl_wifi_device.h` match your setup, using `sl_wifi_default_concurrent_configuration` as a reference.
+- Confirm that `SERVER_IP`, `SERVER_PORT`, `LISTENING_PORT`, and `THROUGHPUT_TYPE` in `app.c` match the iPerf server or client setup on the remote PC.
+- Start the iPerf server or client on the PC before the SiWx91x device attempts to connect for throughput tests.
+- Ensure that the remote PC and client devices are connected to the correct network (third-party AP for STA, SiWx91x soft AP for AP-side tests).
+- If vendor-specific IE features are enabled, verify that IE buffer length and identifier settings match [Vendor Specific Information Element (IE) Support](#vendor-specific-information-element-ie-support).
+- For NCP mode, verify that the host interface matches the project variant.
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x deep sleep example: configure standby power save in unassociated mode without RAM retention and measure current consumption using Energy Profiler on SoC and NCP modes.
+SiWx91x deep sleep example: Configure standby power save in unassociated mode without RAM retention and measure current consumption using Energy Profiler in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -194,14 +194,17 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 ## Troubleshooting
 
-If you encounter issues while running the Powersave Deep Sleep example, check the following:
+If you encounter issues while running the Firmware Update example, check the following:
 
-- Confirm `POWER_SAVE_PROFILE` is set to `DEEP_SLEEP_WITHOUT_RAM_RETENTION` in `app.c` as described in [Application Build Environment](#application-build-environment).
-- In SoC mode, verify the ALARM timer wakeup source is configured under **PM Wakeup Source Configuration** in the Universal Configurator if periodic M4 wakeup is required.
-- When using Energy Profiler, revert the target part and board name to default before flashing the application binary.
-- If measured current is higher than expected, configure both NWP and M4 to sleep without RAM retention and verify `RAM_LEVEL` settings in **Memory Configuration** as described in [Application Output](#application-output).
-- Current measurements may vary in open environments compared to the isolated chamber reference images.
-- A flash erase is required before flashing another application after running powersave examples; without it, the module may not accept new application images.
+- Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point (AP) settings.
+- Confirm that `SERVER_IP_ADDRESS` and `SERVER_PORT` in `app.c` match the IP address and port of the TCP server on your PC.
+- Start the TCP server on the PC before you flash and run the SiWx91x application so the firmware image is available when the device connects.
+- Ensure the firmware image path you pass to the TCP server is correct and that the image version is compatible with the target device.
+- Set `COMBINED_IMAGE` to `1` only when you use a combined network processor (NWP) and M4 host image from the same release package. Set it to `0` for NWP-only updates.
+- On devices with 4 MB flash, do not use a combined image. Update the NWP image first, then update the M4 image separately.
+- In Network Co-Processor (NCP) mode, update the NWP image first, then update the host image from the same release version.
+- On Windows, use Cygwin to build the TCP server as described in [Build and Run the TCP Server (Windows PC)](#build-and-run-the-tcp-server-windows-pc).
+- If the update become unresponsive after download, wait a few minutes while the device writes the new firmware to flash and reboots.
 
 ## Resources
 

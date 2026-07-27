@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="sl__si91x__sha3_8h" kind="file" language="C++">
+    <compoundname>sl_si91x_sha3.h</compoundname>
+    <includes refid="sl__si91x__crypto_8h" local="yes">sl_si91x_crypto.h</includes>
+    <includes local="yes">sl_status.h</includes>
+    <incdepgraph>
+      <node id="2">
+        <label>sl_si91x_crypto.h</label>
+        <link refid="sl__si91x__crypto_8h"/>
+      </node>
+      <node id="1">
+        <label>components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h</label>
+        <link refid="sl__si91x__sha3_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>sl_status.h</label>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="group__CRYPTO__SHA3__CONSTANTS_1ga4b972c8a1896db5fa8f936e258828fd4" prot="public" static="no">
+        <name>SL_SI91X_SHA3_LEN_INVALID</name>
+        <initializer>0</initializer>
+        <briefdescription>
+<para>SHA3 length is invalid. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h" line="43" column="9" bodyfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h" bodystart="43" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="enum">
+      <memberdef kind="enum" id="group__CRYPTO__SHA3__CONSTANTS_1gaa848d8dd7e0b85df23f3a402334be6b8" prot="public" static="no" strong="no">
+        <type></type>
+        <name>sl_si91x_crypto_sha3_mode_t</name>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a4041997e7ab096781c78eb716b8537be" prot="public">
+          <name>SL_SI91X_SHA3_512</name>
+          <initializer>= 9</initializer>
+          <briefdescription>
+<para>SHA3-512. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8af8452a83ca491d468207b027e272320d" prot="public">
+          <name>SL_SI91X_SHA3_384</name>
+          <initializer>= 13</initializer>
+          <briefdescription>
+<para>SHA3-384. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a70bc94c82224815007dbfef0716c57d7" prot="public">
+          <name>SL_SI91X_SHA3_256</name>
+          <initializer>= 17</initializer>
+          <briefdescription>
+<para>SHA3-256. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a1a57ca6f27cc195f45214399f04ea363" prot="public">
+          <name>SL_SI91X_SHA3_224</name>
+          <initializer>= 18</initializer>
+          <briefdescription>
+<para>SHA3-224. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+<para>SHA3 modes supported by the SI91X device (algorithm_sub_type for SHA3). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Values align with the SHA API mapping for digest width: 224, 256, 384, and 512-bit. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h" line="50" column="1" bodyfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h" bodystart="50" bodyend="55"/>
+      </memberdef>
+      <memberdef kind="enum" id="group__CRYPTO__SHA3__CONSTANTS_1ga411034c2503df573a40e73de4f2c5caf" prot="public" static="no" strong="no">
+        <type></type>
+        <name>sl_si91x_sha3_length_t</name>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa35a57fcce5d7971a96e7669003da3a0c" prot="public">
+          <name>SL_SI91X_SHA3_224_DIGEST_LEN</name>
+          <initializer>= 28</initializer>
+          <briefdescription>
+<para>SHA3-224. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa31cab399f13d9a9d16c930b88683e109" prot="public">
+          <name>SL_SI91X_SHA3_256_DIGEST_LEN</name>
+          <initializer>= 32</initializer>
+          <briefdescription>
+<para>SHA3-256. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa911c7b03f0a62bf5d01bc35e39b5ba27" prot="public">
+          <name>SL_SI91X_SHA3_384_DIGEST_LEN</name>
+          <initializer>= 48</initializer>
+          <briefdescription>
+<para>SHA3-384. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa9719c41b754f9b64809cf3b0eda340dc" prot="public">
+          <name>SL_SI91X_SHA3_512_DIGEST_LEN</name>
+          <initializer>= 64</initializer>
+          <briefdescription>
+<para>SHA3-512. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+<para>Digest lengths for SHA3 modes (bytes). </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h" line="60" column="1" bodyfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h" bodystart="60" bodyend="65"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">/*******************************************************************************</highlight></codeline>
+<codeline lineno="2"><highlight class="comment"><sp/>*<sp/>@file<sp/><sp/>sl_si91x_sha3.h</highlight></codeline>
+<codeline lineno="3"><highlight class="comment"><sp/>*<sp/>@brief<sp/>SHA3<sp/>(Keccak)<sp/>hash<sp/>API<sp/>for<sp/>Si91x</highlight></codeline>
+<codeline lineno="4"><highlight class="comment"><sp/>*******************************************************************************</highlight></codeline>
+<codeline lineno="5"><highlight class="comment"><sp/>*<sp/>#<sp/>License</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>&lt;b&gt;Copyright<sp/>2026<sp/>Silicon<sp/>Laboratories<sp/>Inc.<sp/>www.silabs.com&lt;/b&gt;</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*******************************************************************************</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*<sp/>SPDX-License-Identifier:<sp/>Zlib</highlight></codeline>
+<codeline lineno="10"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="11"><highlight class="comment"><sp/>*<sp/>The<sp/>licensor<sp/>of<sp/>this<sp/>software<sp/>is<sp/>Silicon<sp/>Laboratories<sp/>Inc.</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/>*<sp/>This<sp/>software<sp/>is<sp/>provided<sp/>&apos;as-is&apos;,<sp/>without<sp/>any<sp/>express<sp/>or<sp/>implied</highlight></codeline>
+<codeline lineno="14"><highlight class="comment"><sp/>*<sp/>warranty.<sp/>In<sp/>no<sp/>event<sp/>will<sp/>the<sp/>authors<sp/>be<sp/>held<sp/>liable<sp/>for<sp/>any<sp/>damages</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"><sp/>*<sp/>arising<sp/>from<sp/>the<sp/>use<sp/>of<sp/>this<sp/>software.</highlight></codeline>
+<codeline lineno="16"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="17"><highlight class="comment"><sp/>*<sp/>Permission<sp/>is<sp/>granted<sp/>to<sp/>anyone<sp/>to<sp/>use<sp/>this<sp/>software<sp/>for<sp/>any<sp/>purpose,</highlight></codeline>
+<codeline lineno="18"><highlight class="comment"><sp/>*<sp/>including<sp/>commercial<sp/>applications,<sp/>and<sp/>to<sp/>alter<sp/>it<sp/>and<sp/>redistribute<sp/>it</highlight></codeline>
+<codeline lineno="19"><highlight class="comment"><sp/>*<sp/>freely,<sp/>subject<sp/>to<sp/>the<sp/>following<sp/>restrictions:</highlight></codeline>
+<codeline lineno="20"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="21"><highlight class="comment"><sp/>*<sp/>1.<sp/>The<sp/>origin<sp/>of<sp/>this<sp/>software<sp/>must<sp/>not<sp/>be<sp/>misrepresented;<sp/>you<sp/>must<sp/>not</highlight></codeline>
+<codeline lineno="22"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>claim<sp/>that<sp/>you<sp/>wrote<sp/>the<sp/>original<sp/>software.<sp/>If<sp/>you<sp/>use<sp/>this<sp/>software</highlight></codeline>
+<codeline lineno="23"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>in<sp/>a<sp/>product,<sp/>an<sp/>acknowledgment<sp/>in<sp/>the<sp/>product<sp/>documentation<sp/>would<sp/>be</highlight></codeline>
+<codeline lineno="24"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>appreciated<sp/>but<sp/>is<sp/>not<sp/>required.</highlight></codeline>
+<codeline lineno="25"><highlight class="comment"><sp/>*<sp/>2.<sp/>Altered<sp/>source<sp/>versions<sp/>must<sp/>be<sp/>plainly<sp/>marked<sp/>as<sp/>such,<sp/>and<sp/>must<sp/>not<sp/>be</highlight></codeline>
+<codeline lineno="26"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>misrepresented<sp/>as<sp/>being<sp/>the<sp/>original<sp/>software.</highlight></codeline>
+<codeline lineno="27"><highlight class="comment"><sp/>*<sp/>3.<sp/>This<sp/>notice<sp/>may<sp/>not<sp/>be<sp/>removed<sp/>or<sp/>altered<sp/>from<sp/>any<sp/>source<sp/>distribution.</highlight></codeline>
+<codeline lineno="28"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="29"><highlight class="comment"><sp/>******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="sl__si91x__crypto_8h" kindref="compound">sl_si91x_crypto.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;sl_status.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="comment">/******************************************************</highlight></codeline>
+<codeline lineno="36"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Constants</highlight></codeline>
+<codeline lineno="37"><highlight class="comment"><sp/>******************************************************/</highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="38"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="39"><highlight class="comment"><sp/>*<sp/>@addtogroup<sp/>CRYPTO_SHA3_CONSTANTS</highlight></codeline>
+<codeline lineno="40"><highlight class="comment"><sp/>*<sp/>@{</highlight></codeline>
+<codeline lineno="41"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight></codeline>
+<codeline lineno="43" refid="group__CRYPTO__SHA3__CONSTANTS_1ga4b972c8a1896db5fa8f936e258828fd4" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>SL_SI91X_SHA3_LEN_INVALID<sp/>0<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3<sp/>length<sp/>is<sp/>invalid</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="45"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="46"><highlight class="comment"><sp/>*<sp/>@brief<sp/>SHA3<sp/>modes<sp/>supported<sp/>by<sp/>the<sp/>SI91X<sp/>device<sp/>(algorithm_sub_type<sp/>for<sp/>SHA3).</highlight></codeline>
+<codeline lineno="47"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="48"><highlight class="comment"><sp/>*<sp/>Values<sp/>align<sp/>with<sp/>the<sp/>SHA<sp/>API<sp/>mapping<sp/>for<sp/>digest<sp/>width:<sp/>224,<sp/>256,<sp/>384,<sp/>and<sp/>512-bit.</highlight></codeline>
+<codeline lineno="49"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="50" refid="group__CRYPTO__SHA3__CONSTANTS_1gaa848d8dd7e0b85df23f3a402334be6b8" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">enum</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="51" refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a4041997e7ab096781c78eb716b8537be" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a4041997e7ab096781c78eb716b8537be" kindref="member">SL_SI91X_SHA3_512</ref><sp/>=<sp/>9,<sp/><sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-512</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="52" refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8af8452a83ca491d468207b027e272320d" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8af8452a83ca491d468207b027e272320d" kindref="member">SL_SI91X_SHA3_384</ref><sp/>=<sp/>13,<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-384</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53" refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a70bc94c82224815007dbfef0716c57d7" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a70bc94c82224815007dbfef0716c57d7" kindref="member">SL_SI91X_SHA3_256</ref><sp/>=<sp/>17,<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-256</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54" refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a1a57ca6f27cc195f45214399f04ea363" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1ggaa848d8dd7e0b85df23f3a402334be6b8a1a57ca6f27cc195f45214399f04ea363" kindref="member">SL_SI91X_SHA3_224</ref><sp/>=<sp/>18,<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-224</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal">}<sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1gaa848d8dd7e0b85df23f3a402334be6b8" kindref="member">sl_si91x_crypto_sha3_mode_t</ref>;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="57"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="58"><highlight class="comment"><sp/>*<sp/>@brief<sp/>Digest<sp/>lengths<sp/>for<sp/>SHA3<sp/>modes<sp/>(bytes).</highlight></codeline>
+<codeline lineno="59"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="60" refid="group__CRYPTO__SHA3__CONSTANTS_1ga411034c2503df573a40e73de4f2c5caf" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">enum</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="61" refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa35a57fcce5d7971a96e7669003da3a0c" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa35a57fcce5d7971a96e7669003da3a0c" kindref="member">SL_SI91X_SHA3_224_DIGEST_LEN</ref><sp/>=<sp/>28,<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-224</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="62" refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa31cab399f13d9a9d16c930b88683e109" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa31cab399f13d9a9d16c930b88683e109" kindref="member">SL_SI91X_SHA3_256_DIGEST_LEN</ref><sp/>=<sp/>32,<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-256</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63" refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa911c7b03f0a62bf5d01bc35e39b5ba27" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa911c7b03f0a62bf5d01bc35e39b5ba27" kindref="member">SL_SI91X_SHA3_384_DIGEST_LEN</ref><sp/>=<sp/>48,<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-384</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64" refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa9719c41b754f9b64809cf3b0eda340dc" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1gga411034c2503df573a40e73de4f2c5cafa9719c41b754f9b64809cf3b0eda340dc" kindref="member">SL_SI91X_SHA3_512_DIGEST_LEN</ref><sp/>=<sp/>64,<sp/></highlight><highlight class="comment">///&lt;<sp/>SHA3-512</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="65"><highlight class="normal">}<sp/><ref refid="group__CRYPTO__SHA3__CONSTANTS_1ga411034c2503df573a40e73de4f2c5caf" kindref="member">sl_si91x_sha3_length_t</ref>;</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="67"><highlight class="comment">/**<sp/>@}<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_sha3.h"/>
+  </compounddef>
+</doxygen>

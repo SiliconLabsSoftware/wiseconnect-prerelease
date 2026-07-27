@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x LwIP Paho MQTT example: connect to Wi-Fi and an MQTT broker using Paho MQTT over TCP with the LwIP network stack on SoC and NCP modes.
+SiWx91x LwIP Paho MQTT example: Connect to Wi-Fi and an MQTT broker using Paho MQTT over TCP with the LwIP network stack in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -409,12 +409,13 @@ Use this when the MQTT broker listens on port 443 and requires ALPN negotiation 
 > 3. Generate server private key `openssl genrsa -out server.key 2048`
 > 4. Create server certificate signing request `openssl req -new -key server.key -out server.csr`
 > 5. Sign server certificate with CA `openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt`
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials and MQTT broker settings in project configuration files.
-- Ensure the MQTT broker is running on the configured IP and port.
+- Ensure that the MQTT broker is running on the configured IP and port.
 - Confirm LwIP network interface is up and has a valid IP before MQTT connect.
 
 ## Resources

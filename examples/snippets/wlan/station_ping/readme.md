@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x station ping example: connect to Wi-Fi as a station and send ICMP echo requests to a target IPv4 address on SoC and NCP modes.
+SiWx91x station ping example: Connect to Wi-Fi as a station and send ICMP echo requests to a target IPv4 address in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -133,13 +133,14 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - In the `app.c` file, when the ping response arrives from the remote node, the application identifies it from the `status` parameter of the callback function (`ping_callback_handler`) registered.
 
   ![Station_Ping_Output](resources/readme/station_ping_output.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials in `sl_net_default_values.h` and target IP address in `app.c`.
-- Ensure the target host is on the same network and responds to ICMP ping.
-- Check firewall settings on the target PC if ping requests time out.
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and ping target IP address in `app.c`.
+- Ensure that the target host is on the same network as the SiWx91x and responds to ICMP ping.
+- If ping requests time out, check firewall settings on the target PC.
 
 ## Resources
 

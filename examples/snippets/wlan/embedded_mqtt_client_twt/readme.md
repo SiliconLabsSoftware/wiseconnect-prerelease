@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x embedded MQTT with TWT example: connect to a Wi-Fi 6 AP, establish an iTWT session, and run embedded MQTT publish/subscribe in associated power save on SoC and NCP modes.
+SiWx91x embedded MQTT with TWT example: Connect to a Wi-Fi 6 AP, establish an iTWT session, and run embedded MQTT publish/subscribe in associated power save in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -587,9 +587,9 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 If you encounter issues while running this example, check the following:
 
 - Verify the access point supports Wi-Fi 6 and TWT responder mode.
-- Confirm Wi-Fi credentials and MQTT broker settings; review [TWT Recommendations](#twt-recommendations) for latency and keep-alive settings.
-- Check `twt_response_handler` status codes in [iTWT Session Status Codes](#itwt-session-status-codes) if TWT setup fails.
-- Do not disable WLAN Keep Alive when using TWT auto-selection API.
+- Confirm Wi-Fi credentials and MQTT broker settings. Review [TWT Recommendations](#twt-recommendations) for latency and keep-alive settings.
+- If TWT setup fails, check the `twt_response_handler` status codes in [iTWT Session Status Codes](#itwt-session-status-codes).
+- Do not disable WLAN Keep Alive when you use the TWT auto-selection API.
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Wi-Fi BLE power save example: run concurrent WLAN and BLE tasks with associated power save and tickless sleep on SoC and NCP modes.
+SiWx91x Wi-Fi BLE power save example: Run concurrent WLAN and BLE tasks with associated power save and tickless sleep in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -409,13 +409,14 @@ In Tickless Mode, the device enters sleep based on the idle time set by the sche
 13. The following are the serial prints:
 
     ![](resources/readme/serial_prints.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials in `sl_net_default_values.h` and BLE task configuration in application config files.
-- Review WLAN and BLE task priorities and stack sizes if either protocol fails to start.
-- For tickless mode, confirm wakeup sources are configured as described in [Tickless Mode](#tickless-mode).
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and BLE task configuration in your application configuration files.
+- If either protocol fails to start, review WLAN and BLE task priorities and stack sizes.
+- In tickless mode, confirm wakeup sources are configured as described in [Tickless Mode](#tickless-mode).
 - Use Energy Profiler to validate current consumption during associated power save.
 
 ## Resources

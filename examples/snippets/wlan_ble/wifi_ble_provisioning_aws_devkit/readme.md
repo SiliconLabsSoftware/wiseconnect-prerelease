@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWG917 dev kit AWS example: provision Wi-Fi over BLE using the Si Connect app, connect to AWS IoT Core via MQTT, and publish sensor data on SoC mode.
+SiWG917 dev kit AWS example: Provision Wi-Fi over BLE using the Si Connect app, connect to AWS IoT Core via MQTT, and publish sensor data in SoC mode.
 
 ## Table of Contents
 
@@ -362,14 +362,15 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 8. Click **Done**.
 
    The created thing should now be visible on the AWS console (**Manage > All devices > Things**).
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Prepare AWS certificates and configure `aws_iot_config.h` before building the application.
+- Prepare AWS certificates and configure `aws_iot_config.h` before you build the application.
 - Use the Si Connect mobile app for BLE provisioning and verify the target AP credentials.
-- See [Setting up Security Certificates](#setting-up-security-certificates) and [Create an AWS Thing](#create-an-aws-thing) for cloud setup.
-- Confirm MQTT connection status in [MQTT Connection](#mqtt-connection) serial prints.
+- Review [Setting up Security Certificates](#setting-up-security-certificates) and [Create an AWS Thing](#create-an-aws-thing) for cloud setup.
+- Confirm MQTT connection status in the [MQTT Connection](#mqtt-connection) console output.
 
 ## Resources
 

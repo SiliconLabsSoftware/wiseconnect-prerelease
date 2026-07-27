@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x HTTP OTAF example: download and apply NWP or combined firmware over HTTP/HTTPS from a remote server on SoC and NCP modes.
+SiWx91x HTTP OTAF example: Download and apply NWP or combined firmware over HTTP/HTTPS from a remote server in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -815,14 +815,15 @@ The HTTPs server configuration for Apache requires the Wamp server. If you have 
     > **Note:** Make sure to check your HTTPS server from other local machines present in the same network. It should be accessible.
 
     > **NOTE :** Support for the SNI extension has been added to the AWS SDK, ensuring it is set by the client when connecting to an AWS server using TLS 1.3. This is handled internally by the AWS SDK and does not affect compatibility with other TLS versions.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and HTTP/HTTPS URL settings in application configuration.
+- Verify Wi-Fi credentials and HTTP/HTTPS URL settings in your application configuration.
 - Ensure the firmware URL is accessible from the device and points to a valid `.bin` or `.rps` image.
-- For HTTPS OTAF, load valid server CA certificates; default certificates are for reference only.
-- Allow sufficient time after download for the device to write firmware to flash and reboot.
+- For HTTPS OTAF, load valid server CA certificates. Default certificates are for reference only.
+- After the download completes, allow sufficient time for the device to write the firmware to flash and reboot.
 
 ## Resources
 

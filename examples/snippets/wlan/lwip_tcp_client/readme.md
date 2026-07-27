@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x LwIP TCP client example: connect to Wi-Fi and establish a TCP client connection to a remote server using the LwIP network stack on SoC and NCP modes.
+SiWx91x LwIP TCP client example: Connect to Wi-Fi and establish a TCP client connection to a remote server using the LwIP network stack in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -177,13 +177,15 @@ The iPerf command to start the TCP server is:
 > `C:\> iperf.exe -s -p 5001 -i 1`
 
   **![LWIP_point_Output](resources/readme/lwip_output.png)**
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials in `sl_net_default_values.h` and server IP/port in `app.c`.
-- Start the remote TCP server before the SiWx91x client attempts to connect.
-- Ensure the PC and SiWx91x are on the same network subnet.
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and TCP server IP/port in `app.c`.
+- Start the remote TCP server before the SiWx91x client connects.
+- Ensure that your PC and the SiWx91x are on the same subnet.
+
 
 ## Resources
 

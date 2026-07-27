@@ -1,0 +1,683 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="sl__si91x__psa__sha_8h" kind="file" language="C++">
+    <compoundname>sl_si91x_psa_sha.h</compoundname>
+    <includes local="yes">psa/crypto.h</includes>
+    <incdepgraph>
+      <node id="1">
+        <label>components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h</label>
+        <link refid="sl__si91x__psa__sha_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>psa/crypto.h</label>
+      </node>
+    </incdepgraph>
+    <innerclass refid="structsli__si91x__crypto__sha__operation__t" prot="public">sli_si91x_crypto_sha_operation_t</innerclass>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="sl__si91x__psa__sha_8h_1ab41de85bb7345ff0516f203aa815f5ae" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>psa_status_t</type>
+        <definition>psa_status_t sli_si91x_crypto_hash_compute</definition>
+        <argsstring>(psa_algorithm_t alg, const uint8_t *input, size_t input_length, uint8_t *hash, size_t hash_size, size_t *hash_length)</argsstring>
+        <name>sli_si91x_crypto_hash_compute</name>
+        <param>
+          <type>psa_algorithm_t</type>
+          <declname>alg</declname>
+        </param>
+        <param>
+          <type>const uint8_t *</type>
+          <declname>input</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>input_length</declname>
+        </param>
+        <param>
+          <type>uint8_t *</type>
+          <declname>hash</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>hash_size</declname>
+        </param>
+        <param>
+          <type>size_t *</type>
+          <declname>hash_length</declname>
+        </param>
+        <briefdescription>
+<para>Process an Hashing operation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>The signature of this function is that of a PSA driver hash_compute entry point. This function behaves as an hash_compute entry point as defined in the PSA driver interface specification for transparent drivers.</para>
+</simplesect>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">alg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The SHA algorithm to compute. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input data. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input_length</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Size of given input. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">hash</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output buffer for the hash value. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">hash_size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Size of the ciphertext buffer in bytes. This must be appropriate for the selected algorithm </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">hash_length</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>On success, the size of the output in the ciphertext buffer.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>PSA_SUCCESS</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Success. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_NOT_SUPPORTED</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>alg</computeroutput> is not supported. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_INSUFFICIENT_MEMORY</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_BUFFER_TOO_SMALL</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>ciphertext_size is too small. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_CORRUPTION_DETECTED</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" line="99" column="14" declfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" declline="99" declcolumn="14"/>
+      </memberdef>
+      <memberdef kind="function" id="sl__si91x__psa__sha_8h_1a42a75a4ab6db4a006b576a8a5c84b95f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>psa_status_t</type>
+        <definition>psa_status_t sli_si91x_crypto_hash_setup</definition>
+        <argsstring>(sli_si91x_crypto_sha_operation_t *operation, psa_algorithm_t alg)</argsstring>
+        <name>sli_si91x_crypto_hash_setup</name>
+        <param>
+          <type><ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref> *</type>
+          <declname>operation</declname>
+        </param>
+        <param>
+          <type>psa_algorithm_t</type>
+          <declname>alg</declname>
+        </param>
+        <briefdescription>
+<para>Set up a multipart hash operation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>The signature of this function is that of a PSA driver hash_setup entry point as defined in the PSA driver interface specification for transparent drivers.</para>
+</simplesect>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">operation</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Operation object to initialise. Must be zero-initialized or previously aborted. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">alg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The SHA algorithm to use (<computeroutput>PSA_ALG_SHA_1</computeroutput>, <computeroutput>PSA_ALG_SHA_224</computeroutput>, etc.).</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>PSA_SUCCESS</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Operation set up successfully. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_INVALID_ARGUMENT</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>operation</computeroutput> is <computeroutput>NULL</computeroutput> or <computeroutput>alg</computeroutput> is not a hash algorithm. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_BAD_STATE</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>alg</computeroutput> is not a supported SHA variant. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_NOT_SUPPORTED</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>No SHA algorithm is enabled. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" line="124" column="14" declfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" declline="124" declcolumn="14"/>
+      </memberdef>
+      <memberdef kind="function" id="sl__si91x__psa__sha_8h_1ac58efdcf234daa9a1b2d51019346d841" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>psa_status_t</type>
+        <definition>psa_status_t sli_si91x_crypto_hash_update</definition>
+        <argsstring>(sli_si91x_crypto_sha_operation_t *operation, const uint8_t *input, size_t input_length)</argsstring>
+        <name>sli_si91x_crypto_hash_update</name>
+        <param>
+          <type><ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref> *</type>
+          <declname>operation</declname>
+        </param>
+        <param>
+          <type>const uint8_t *</type>
+          <declname>input</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>input_length</declname>
+        </param>
+        <briefdescription>
+<para>Feed input data into an ongoing multipart hash operation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>The signature of this function is that of a PSA driver hash_update entry point as defined in the PSA driver interface specification for transparent drivers.</para>
+</simplesect>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">operation</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active operation object returned by a successful <computeroutput>sli_si91x_crypto_hash_setup</computeroutput>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Buffer containing the input data. May be <computeroutput>NULL</computeroutput> if <computeroutput>input_length</computeroutput> is 0. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input_length</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Size of the <computeroutput>input</computeroutput> buffer in bytes. Must not exceed <computeroutput>UINT16_MAX</computeroutput>. A zero-length update is a valid no-op.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>PSA_SUCCESS</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data accepted successfully. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_INVALID_ARGUMENT</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>One or more arguments are invalid. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_BAD_STATE</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The operation is not active or has been invalidated by a prior failure. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_NOT_SUPPORTED</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>No SHA algorithm is enabled. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" line="147" column="14" declfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" declline="147" declcolumn="14"/>
+      </memberdef>
+      <memberdef kind="function" id="sl__si91x__psa__sha_8h_1af3b17b29a16034cbd47ee92319f67cef" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>psa_status_t</type>
+        <definition>psa_status_t sli_si91x_crypto_hash_finish</definition>
+        <argsstring>(sli_si91x_crypto_sha_operation_t *operation, uint8_t *hash, size_t hash_size, size_t *hash_length)</argsstring>
+        <name>sli_si91x_crypto_hash_finish</name>
+        <param>
+          <type><ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref> *</type>
+          <declname>operation</declname>
+        </param>
+        <param>
+          <type>uint8_t *</type>
+          <declname>hash</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>hash_size</declname>
+        </param>
+        <param>
+          <type>size_t *</type>
+          <declname>hash_length</declname>
+        </param>
+        <briefdescription>
+<para>Finish a multipart hash operation and produce the digest. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>The signature of this function is that of a PSA driver hash_finish entry point as defined in the PSA driver interface specification for transparent drivers.</para>
+</simplesect>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">operation</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active operation object to finalise. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">hash</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Buffer where the hash value will be written. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">hash_size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Size of the <computeroutput>hash</computeroutput> buffer in bytes. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">hash_length</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>On success, the number of bytes written to <computeroutput>hash</computeroutput>.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>PSA_SUCCESS</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Hash produced successfully. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_INVALID_ARGUMENT</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>One or more arguments are invalid. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_BUFFER_TOO_SMALL</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>hash_size</computeroutput> is smaller than the digest length for the active algorithm. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_BAD_STATE</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The operation is not active or has been invalidated by a prior failure. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_NOT_SUPPORTED</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>No SHA algorithm is enabled. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" line="172" column="14" declfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" declline="172" declcolumn="14"/>
+      </memberdef>
+      <memberdef kind="function" id="sl__si91x__psa__sha_8h_1abf1810c4ffeacaeb3b0506619d1cfa7f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>psa_status_t</type>
+        <definition>psa_status_t sli_si91x_crypto_hash_abort</definition>
+        <argsstring>(sli_si91x_crypto_sha_operation_t *operation)</argsstring>
+        <name>sli_si91x_crypto_hash_abort</name>
+        <param>
+          <type><ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref> *</type>
+          <declname>operation</declname>
+        </param>
+        <briefdescription>
+<para>Abort a multipart hash operation and release associated resources. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>The signature of this function is that of a PSA driver hash_abort entry point as defined in the PSA driver interface specification for transparent drivers.</para>
+</simplesect>
+This function is idempotent: calling it on a zero-initialized, already-finished, or previously-aborted operation succeeds with no effect. No firmware command is sent because the firmware resets its SHA context automatically on completion or failure.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">operation</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Operation object to abort. May be in any state, including zero-initialized.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>PSA_SUCCESS</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Operation aborted (or was already inactive). </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_INVALID_ARGUMENT</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>operation</computeroutput> is <computeroutput>NULL</computeroutput>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PSA_ERROR_NOT_SUPPORTED</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>No SHA algorithm is enabled. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" line="197" column="14" declfile="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h" declline="197" declcolumn="14"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">/*******************************************************************************</highlight></codeline>
+<codeline lineno="2"><highlight class="comment"><sp/>*<sp/>@file<sp/><sp/>sl_si91x_psa_sha.h</highlight></codeline>
+<codeline lineno="3"><highlight class="comment"><sp/>*<sp/>@brief</highlight></codeline>
+<codeline lineno="4"><highlight class="comment"><sp/>*******************************************************************************</highlight></codeline>
+<codeline lineno="5"><highlight class="comment"><sp/>*<sp/>#<sp/>License</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>&lt;b&gt;Copyright<sp/>2025<sp/>Silicon<sp/>Laboratories<sp/>Inc.<sp/>www.silabs.com&lt;/b&gt;</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*******************************************************************************</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*<sp/>SPDX-License-Identifier:<sp/>Zlib</highlight></codeline>
+<codeline lineno="10"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="11"><highlight class="comment"><sp/>*<sp/>The<sp/>licensor<sp/>of<sp/>this<sp/>software<sp/>is<sp/>Silicon<sp/>Laboratories<sp/>Inc.</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/>*<sp/>This<sp/>software<sp/>is<sp/>provided<sp/>&apos;as-is&apos;,<sp/>without<sp/>any<sp/>express<sp/>or<sp/>implied</highlight></codeline>
+<codeline lineno="14"><highlight class="comment"><sp/>*<sp/>warranty.<sp/>In<sp/>no<sp/>event<sp/>will<sp/>the<sp/>authors<sp/>be<sp/>held<sp/>liable<sp/>for<sp/>any<sp/>damages</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"><sp/>*<sp/>arising<sp/>from<sp/>the<sp/>use<sp/>of<sp/>this<sp/>software.</highlight></codeline>
+<codeline lineno="16"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="17"><highlight class="comment"><sp/>*<sp/>Permission<sp/>is<sp/>granted<sp/>to<sp/>anyone<sp/>to<sp/>use<sp/>this<sp/>software<sp/>for<sp/>any<sp/>purpose,</highlight></codeline>
+<codeline lineno="18"><highlight class="comment"><sp/>*<sp/>including<sp/>commercial<sp/>applications,<sp/>and<sp/>to<sp/>alter<sp/>it<sp/>and<sp/>redistribute<sp/>it</highlight></codeline>
+<codeline lineno="19"><highlight class="comment"><sp/>*<sp/>freely,<sp/>subject<sp/>to<sp/>the<sp/>following<sp/>restrictions:</highlight></codeline>
+<codeline lineno="20"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="21"><highlight class="comment"><sp/>*<sp/>1.<sp/>The<sp/>origin<sp/>of<sp/>this<sp/>software<sp/>must<sp/>not<sp/>be<sp/>misrepresented;<sp/>you<sp/>must<sp/>not</highlight></codeline>
+<codeline lineno="22"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>claim<sp/>that<sp/>you<sp/>wrote<sp/>the<sp/>original<sp/>software.<sp/>If<sp/>you<sp/>use<sp/>this<sp/>software</highlight></codeline>
+<codeline lineno="23"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>in<sp/>a<sp/>product,<sp/>an<sp/>acknowledgment<sp/>in<sp/>the<sp/>product<sp/>documentation<sp/>would<sp/>be</highlight></codeline>
+<codeline lineno="24"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>appreciated<sp/>but<sp/>is<sp/>not<sp/>required.</highlight></codeline>
+<codeline lineno="25"><highlight class="comment"><sp/>*<sp/>2.<sp/>Altered<sp/>source<sp/>versions<sp/>must<sp/>be<sp/>plainly<sp/>marked<sp/>as<sp/>such,<sp/>and<sp/>must<sp/>not<sp/>be</highlight></codeline>
+<codeline lineno="26"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/>misrepresented<sp/>as<sp/>being<sp/>the<sp/>original<sp/>software.</highlight></codeline>
+<codeline lineno="27"><highlight class="comment"><sp/>*<sp/>3.<sp/>This<sp/>notice<sp/>may<sp/>not<sp/>be<sp/>removed<sp/>or<sp/>altered<sp/>from<sp/>any<sp/>source<sp/>distribution.</highlight></codeline>
+<codeline lineno="28"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="29"><highlight class="comment"><sp/>******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>SL_SI91X_PSA_SHA_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>SL_SI91X_PSA_SHA_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;psa/crypto.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="comment">//<sp/>-----------------------------------------------------------------------------</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="comment">//<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Macros<sp/>and<sp/>Typedefs</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="comment">//<sp/>-----------------------------------------------------------------------------</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="40"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="41"><highlight class="comment"><sp/>*<sp/>Multipart<sp/>hash<sp/>operation<sp/>state<sp/>for<sp/>the<sp/>Si91x<sp/>PSA<sp/>SHA<sp/>driver.</highlight></codeline>
+<codeline lineno="42"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="43"><highlight class="comment"><sp/>*<sp/>The<sp/>standard<sp/>PSA<sp/>streaming<sp/>API<sp/>(\c<sp/>psa_hash_update,<sp/>\c<sp/>psa_hash_finish,<sp/>etc.)<sp/>does<sp/>not<sp/>pass</highlight></codeline>
+<codeline lineno="44"><highlight class="comment"><sp/>*<sp/>\c<sp/>psa_algorithm_t<sp/>on<sp/>each<sp/>call;<sp/>the<sp/>algorithm<sp/>is<sp/>fixed<sp/>at<sp/>\c<sp/>psa_hash_setup<sp/>and<sp/>carried<sp/>in</highlight></codeline>
+<codeline lineno="45"><highlight class="comment"><sp/>*<sp/>this<sp/>operation<sp/>object.</highlight></codeline>
+<codeline lineno="46"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="47"><highlight class="comment"><sp/>*<sp/>A<sp/>separate<sp/>\c<sp/>alg<sp/>(\c<sp/>psa_algorithm_t)<sp/>member<sp/>could<sp/>be<sp/>added,<sp/>but<sp/>it<sp/>would<sp/>add<sp/>little<sp/>value:</highlight></codeline>
+<codeline lineno="48"><highlight class="comment"><sp/>*<sp/>the<sp/>side-band<sp/>path<sp/>sends<sp/>commands<sp/>to<sp/>the<sp/>TA,<sp/>and<sp/>the<sp/>TA<sp/>firmware<sp/>holds<sp/>the<sp/>SHA<sp/>context.<sp/>The</highlight></codeline>
+<codeline lineno="49"><highlight class="comment"><sp/>*<sp/>host<sp/>still<sp/>needs<sp/>a<sp/>single<sp/>field<sp/>that<sp/>both<sp/>identifies<sp/>the<sp/>active<sp/>algorithm<sp/>for<sp/>follow-up<sp/>calls</highlight></codeline>
+<codeline lineno="50"><highlight class="comment"><sp/>*<sp/>and<sp/>can<sp/>be<sp/>forced<sp/>into<sp/>an<sp/>error<sp/>state<sp/>if<sp/>something<sp/>fails<sp/>mid-stream.<sp/>\p<sp/>digest_size<sp/>serves<sp/>that</highlight></codeline>
+<codeline lineno="51"><highlight class="comment"><sp/>*<sp/>role:<sp/>it<sp/>is<sp/>the<sp/>expected<sp/>digest<sp/>length<sp/>for<sp/>the<sp/>selected<sp/>SHA<sp/>mode,<sp/>and<sp/>on<sp/>any<sp/>intermediate</highlight></codeline>
+<codeline lineno="52"><highlight class="comment"><sp/>*<sp/>failure<sp/>the<sp/>implementation<sp/>sets<sp/>it<sp/>to<sp/>\c<sp/>SL_SI91X_SHA_LEN_INVALID.<sp/>The<sp/>next<sp/>\c<sp/>update<sp/>/</highlight></codeline>
+<codeline lineno="53"><highlight class="comment"><sp/>*<sp/>\c<sp/>finish<sp/>/<sp/>\c<sp/>abort<sp/>then<sp/>checks<sp/>\p<sp/>digest_size<sp/>first<sp/>and<sp/>returns<sp/>an<sp/>error<sp/>without<sp/>relying<sp/>on</highlight></codeline>
+<codeline lineno="54"><highlight class="comment"><sp/>*<sp/>a<sp/>stale<sp/>TA<sp/>session.<sp/>(Storing<sp/>\c<sp/>alg<sp/>in<sp/>addition<sp/>would<sp/>not<sp/>remove<sp/>that<sp/>invalidation<sp/>pattern.)</highlight></codeline>
+<codeline lineno="55"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="56"><highlight class="comment"><sp/>*<sp/>The<sp/>TA<sp/>must<sp/>still<sp/>be<sp/>given<sp/>a<sp/>concrete<sp/>SHA<sp/>mode<sp/>(\c<sp/>SL_SI91X_SHA_*)<sp/>on<sp/>\c<sp/>update<sp/>and<sp/>\c<sp/>finish.</highlight></codeline>
+<codeline lineno="57"><highlight class="comment"><sp/>*<sp/>That<sp/>value<sp/>can<sp/>be<sp/>derived<sp/>from<sp/>\p<sp/>digest_size<sp/>(unique<sp/>per<sp/>supported<sp/>SHA<sp/>variant<sp/>here);<sp/>the</highlight></codeline>
+<codeline lineno="58"><highlight class="comment"><sp/>*<sp/>\c<sp/>switch<sp/>in<sp/>the<sp/>\c<sp/>.c<sp/>file<sp/>maps<sp/>digest<sp/>length<sp/>→<sp/>\c<sp/>sha_mode.<sp/>Keeping<sp/>an<sp/>\c<sp/>alg<sp/>member<sp/>would<sp/>be</highlight></codeline>
+<codeline lineno="59"><highlight class="comment"><sp/>*<sp/>optional<sp/>and<sp/>redundant<sp/>for<sp/>that<sp/>mapping—the<sp/>\c<sp/>switch<sp/>would<sp/>remain—and<sp/>was<sp/>therefore<sp/>omitted.</highlight></codeline>
+<codeline lineno="60"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="61" refid="structsli__si91x__crypto__sha__operation__t" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63" refid="structsli__si91x__crypto__sha__operation__t_1a242e5ab2e8b7d947e94ddd3b2b5f27dc" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structsli__si91x__crypto__sha__operation__t_1a242e5ab2e8b7d947e94ddd3b2b5f27dc" kindref="member">digest_size</ref>;<sp/></highlight><highlight class="comment">///&lt;<sp/>Expected<sp/>digest<sp/>length<sp/>for<sp/>the<sp/>active<sp/>hash,<sp/>or<sp/>\c<sp/>SL_SI91X_SHA_LEN_INVALID<sp/>if<sp/>the<sp/>operation<sp/>is<sp/>invalid<sp/>/<sp/>failed</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal">}<sp/><ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref>;</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight><highlight class="comment">//<sp/>-----------------------------------------------------------------------------</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"></highlight><highlight class="comment">//<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Global<sp/>Variables</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight><highlight class="comment">//<sp/>-----------------------------------------------------------------------------</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"></highlight><highlight class="comment">//<sp/>-----------------------------------------------------------------------------</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight><highlight class="comment">//<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Public<sp/>Function<sp/>Declarations</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight><highlight class="comment">//<sp/>-----------------------------------------------------------------------------</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="73"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="74"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="75"><highlight class="comment"><sp/>*<sp/>\brief<sp/>Process<sp/>an<sp/>Hashing<sp/>operation.</highlight></codeline>
+<codeline lineno="76"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="77"><highlight class="comment"><sp/>*<sp/>\note<sp/>The<sp/>signature<sp/>of<sp/>this<sp/>function<sp/>is<sp/>that<sp/>of<sp/>a<sp/>PSA<sp/>driver</highlight></codeline>
+<codeline lineno="78"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>hash_compute<sp/>entry<sp/>point.<sp/>This<sp/>function<sp/>behaves<sp/>as<sp/>an<sp/>hash_compute</highlight></codeline>
+<codeline lineno="79"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>entry<sp/>point<sp/>as<sp/>defined<sp/>in<sp/>the<sp/>PSA<sp/>driver<sp/>interface<sp/>specification<sp/>for</highlight></codeline>
+<codeline lineno="80"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>transparent<sp/>drivers.</highlight></codeline>
+<codeline lineno="81"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="82"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/>alg<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>The<sp/>SHA<sp/>algorithm<sp/>to<sp/>compute.</highlight></codeline>
+<codeline lineno="83"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/>input<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Input<sp/>data.</highlight></codeline>
+<codeline lineno="84"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/>input_length<sp/><sp/><sp/><sp/><sp/><sp/><sp/>Size<sp/>of<sp/>given<sp/>input.</highlight></codeline>
+<codeline lineno="85"><highlight class="comment"><sp/>*<sp/>\param[out]<sp/>hash<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Output<sp/>buffer<sp/>for<sp/>the<sp/>hash<sp/>value.</highlight></codeline>
+<codeline lineno="86"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/>hash_size<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Size<sp/>of<sp/>the<sp/>ciphertext<sp/>buffer<sp/>in<sp/>bytes.<sp/>This</highlight></codeline>
+<codeline lineno="87"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>must<sp/>be<sp/>appropriate<sp/>for<sp/>the<sp/>selected<sp/>algorithm</highlight></codeline>
+<codeline lineno="88"><highlight class="comment"><sp/>*<sp/>\param[out]<sp/>hash_length<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>On<sp/>success,<sp/>the<sp/>size<sp/>of<sp/>the<sp/>output<sp/>in<sp/>the</highlight></codeline>
+<codeline lineno="89"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ciphertext<sp/>buffer.</highlight></codeline>
+<codeline lineno="90"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="91"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_SUCCESS<sp/>Success.</highlight></codeline>
+<codeline lineno="92"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_NOT_SUPPORTED</highlight></codeline>
+<codeline lineno="93"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\p<sp/>alg<sp/>is<sp/>not<sp/>supported.</highlight></codeline>
+<codeline lineno="94"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_INSUFFICIENT_MEMORY</highlight></codeline>
+<codeline lineno="95"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_BUFFER_TOO_SMALL</highlight></codeline>
+<codeline lineno="96"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ciphertext_size<sp/>is<sp/>too<sp/>small.</highlight></codeline>
+<codeline lineno="97"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_CORRUPTION_DETECTED</highlight></codeline>
+<codeline lineno="98"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="99"><highlight class="normal">psa_status_t<sp/>sli_si91x_crypto_hash_compute(psa_algorithm_t<sp/>alg,</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>*input,</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>input_length,</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/>*hash,</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>hash_size,</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>*hash_length);</highlight></codeline>
+<codeline lineno="105"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="106"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="107"><highlight class="comment"><sp/>*<sp/>\brief<sp/>Set<sp/>up<sp/>a<sp/>multipart<sp/>hash<sp/>operation.</highlight></codeline>
+<codeline lineno="108"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="109"><highlight class="comment"><sp/>*<sp/>\note<sp/>The<sp/>signature<sp/>of<sp/>this<sp/>function<sp/>is<sp/>that<sp/>of<sp/>a<sp/>PSA<sp/>driver</highlight></codeline>
+<codeline lineno="110"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>hash_setup<sp/>entry<sp/>point<sp/>as<sp/>defined<sp/>in<sp/>the<sp/>PSA<sp/>driver<sp/>interface</highlight></codeline>
+<codeline lineno="111"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>specification<sp/>for<sp/>transparent<sp/>drivers.</highlight></codeline>
+<codeline lineno="112"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="113"><highlight class="comment"><sp/>*<sp/>\param[in,out]<sp/>operation<sp/><sp/><sp/><sp/><sp/><sp/><sp/>Operation<sp/>object<sp/>to<sp/>initialise.<sp/>Must<sp/>be</highlight></codeline>
+<codeline lineno="114"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>zero-initialized<sp/>or<sp/>previously<sp/>aborted.</highlight></codeline>
+<codeline lineno="115"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/><sp/><sp/><sp/>alg<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>The<sp/>SHA<sp/>algorithm<sp/>to<sp/>use</highlight></codeline>
+<codeline lineno="116"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>(\c<sp/>PSA_ALG_SHA_1,<sp/>\c<sp/>PSA_ALG_SHA_224,<sp/>etc.).</highlight></codeline>
+<codeline lineno="117"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="118"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_SUCCESS<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Operation<sp/>set<sp/>up<sp/>successfully.</highlight></codeline>
+<codeline lineno="119"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_INVALID_ARGUMENT<sp/><sp/><sp/>\p<sp/>operation<sp/>is<sp/>\c<sp/>NULL<sp/>or<sp/>\p<sp/>alg<sp/>is</highlight></codeline>
+<codeline lineno="120"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>not<sp/>a<sp/>hash<sp/>algorithm.</highlight></codeline>
+<codeline lineno="121"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_BAD_STATE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\p<sp/>alg<sp/>is<sp/>not<sp/>a<sp/>supported<sp/>SHA<sp/>variant.</highlight></codeline>
+<codeline lineno="122"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_NOT_SUPPORTED<sp/><sp/><sp/><sp/><sp/><sp/>No<sp/>SHA<sp/>algorithm<sp/>is<sp/>enabled.</highlight></codeline>
+<codeline lineno="123"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="124"><highlight class="normal">psa_status_t<sp/>sli_si91x_crypto_hash_setup(<ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref><sp/>*operation,<sp/>psa_algorithm_t<sp/>alg);</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="126"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="127"><highlight class="comment"><sp/>*<sp/>\brief<sp/>Feed<sp/>input<sp/>data<sp/>into<sp/>an<sp/>ongoing<sp/>multipart<sp/>hash<sp/>operation.</highlight></codeline>
+<codeline lineno="128"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="129"><highlight class="comment"><sp/>*<sp/>\note<sp/>The<sp/>signature<sp/>of<sp/>this<sp/>function<sp/>is<sp/>that<sp/>of<sp/>a<sp/>PSA<sp/>driver</highlight></codeline>
+<codeline lineno="130"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>hash_update<sp/>entry<sp/>point<sp/>as<sp/>defined<sp/>in<sp/>the<sp/>PSA<sp/>driver<sp/>interface</highlight></codeline>
+<codeline lineno="131"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>specification<sp/>for<sp/>transparent<sp/>drivers.</highlight></codeline>
+<codeline lineno="132"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="133"><highlight class="comment"><sp/>*<sp/>\param[in,out]<sp/>operation<sp/><sp/><sp/><sp/><sp/><sp/><sp/>Active<sp/>operation<sp/>object<sp/>returned<sp/>by<sp/>a</highlight></codeline>
+<codeline lineno="134"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>successful<sp/>\c<sp/>sli_si91x_crypto_hash_setup.</highlight></codeline>
+<codeline lineno="135"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/><sp/><sp/><sp/>input<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Buffer<sp/>containing<sp/>the<sp/>input<sp/>data.</highlight></codeline>
+<codeline lineno="136"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>May<sp/>be<sp/>\c<sp/>NULL<sp/>if<sp/>\p<sp/>input_length<sp/>is<sp/>0.</highlight></codeline>
+<codeline lineno="137"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/><sp/><sp/><sp/>input_length<sp/><sp/><sp/><sp/>Size<sp/>of<sp/>the<sp/>\p<sp/>input<sp/>buffer<sp/>in<sp/>bytes.</highlight></codeline>
+<codeline lineno="138"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Must<sp/>not<sp/>exceed<sp/>\c<sp/>UINT16_MAX.</highlight></codeline>
+<codeline lineno="139"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>A<sp/>zero-length<sp/>update<sp/>is<sp/>a<sp/>valid<sp/>no-op.</highlight></codeline>
+<codeline lineno="140"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="141"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_SUCCESS<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Data<sp/>accepted<sp/>successfully.</highlight></codeline>
+<codeline lineno="142"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_INVALID_ARGUMENT<sp/><sp/><sp/>One<sp/>or<sp/>more<sp/>arguments<sp/>are<sp/>invalid.</highlight></codeline>
+<codeline lineno="143"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_BAD_STATE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>The<sp/>operation<sp/>is<sp/>not<sp/>active<sp/>or<sp/>has</highlight></codeline>
+<codeline lineno="144"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>been<sp/>invalidated<sp/>by<sp/>a<sp/>prior<sp/>failure.</highlight></codeline>
+<codeline lineno="145"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_NOT_SUPPORTED<sp/><sp/><sp/><sp/><sp/><sp/>No<sp/>SHA<sp/>algorithm<sp/>is<sp/>enabled.</highlight></codeline>
+<codeline lineno="146"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="147"><highlight class="normal">psa_status_t<sp/>sli_si91x_crypto_hash_update(<ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref><sp/>*operation,</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>*input,</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>input_length);</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="151"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="152"><highlight class="comment"><sp/>*<sp/>\brief<sp/>Finish<sp/>a<sp/>multipart<sp/>hash<sp/>operation<sp/>and<sp/>produce<sp/>the<sp/>digest.</highlight></codeline>
+<codeline lineno="153"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="154"><highlight class="comment"><sp/>*<sp/>\note<sp/>The<sp/>signature<sp/>of<sp/>this<sp/>function<sp/>is<sp/>that<sp/>of<sp/>a<sp/>PSA<sp/>driver</highlight></codeline>
+<codeline lineno="155"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>hash_finish<sp/>entry<sp/>point<sp/>as<sp/>defined<sp/>in<sp/>the<sp/>PSA<sp/>driver<sp/>interface</highlight></codeline>
+<codeline lineno="156"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>specification<sp/>for<sp/>transparent<sp/>drivers.</highlight></codeline>
+<codeline lineno="157"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="158"><highlight class="comment"><sp/>*<sp/>\param[in,out]<sp/>operation<sp/><sp/><sp/><sp/><sp/><sp/><sp/>Active<sp/>operation<sp/>object<sp/>to<sp/>finalise.</highlight></codeline>
+<codeline lineno="159"><highlight class="comment"><sp/>*<sp/>\param[out]<sp/><sp/><sp/><sp/>hash<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Buffer<sp/>where<sp/>the<sp/>hash<sp/>value<sp/>will<sp/>be<sp/>written.</highlight></codeline>
+<codeline lineno="160"><highlight class="comment"><sp/>*<sp/>\param[in]<sp/><sp/><sp/><sp/><sp/>hash_size<sp/><sp/><sp/><sp/><sp/><sp/><sp/>Size<sp/>of<sp/>the<sp/>\p<sp/>hash<sp/>buffer<sp/>in<sp/>bytes.</highlight></codeline>
+<codeline lineno="161"><highlight class="comment"><sp/>*<sp/>\param[out]<sp/><sp/><sp/><sp/>hash_length<sp/><sp/><sp/><sp/><sp/>On<sp/>success,<sp/>the<sp/>number<sp/>of<sp/>bytes<sp/>written</highlight></codeline>
+<codeline lineno="162"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>to<sp/>\p<sp/>hash.</highlight></codeline>
+<codeline lineno="163"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="164"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_SUCCESS<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Hash<sp/>produced<sp/>successfully.</highlight></codeline>
+<codeline lineno="165"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_INVALID_ARGUMENT<sp/><sp/><sp/>One<sp/>or<sp/>more<sp/>arguments<sp/>are<sp/>invalid.</highlight></codeline>
+<codeline lineno="166"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_BUFFER_TOO_SMALL<sp/><sp/><sp/>\p<sp/>hash_size<sp/>is<sp/>smaller<sp/>than<sp/>the</highlight></codeline>
+<codeline lineno="167"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>digest<sp/>length<sp/>for<sp/>the<sp/>active<sp/>algorithm.</highlight></codeline>
+<codeline lineno="168"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_BAD_STATE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>The<sp/>operation<sp/>is<sp/>not<sp/>active<sp/>or<sp/>has</highlight></codeline>
+<codeline lineno="169"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>been<sp/>invalidated<sp/>by<sp/>a<sp/>prior<sp/>failure.</highlight></codeline>
+<codeline lineno="170"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_NOT_SUPPORTED<sp/><sp/><sp/><sp/><sp/><sp/>No<sp/>SHA<sp/>algorithm<sp/>is<sp/>enabled.</highlight></codeline>
+<codeline lineno="171"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="172"><highlight class="normal">psa_status_t<sp/>sli_si91x_crypto_hash_finish(<ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref><sp/>*operation,</highlight></codeline>
+<codeline lineno="173"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/>*hash,</highlight></codeline>
+<codeline lineno="174"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>hash_size,</highlight></codeline>
+<codeline lineno="175"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>*hash_length);</highlight></codeline>
+<codeline lineno="176"><highlight class="normal"></highlight><highlight class="comment"></highlight></codeline>
+<codeline lineno="177"><highlight class="comment">/**</highlight></codeline>
+<codeline lineno="178"><highlight class="comment"><sp/>*<sp/>\brief<sp/>Abort<sp/>a<sp/>multipart<sp/>hash<sp/>operation<sp/>and<sp/>release<sp/>associated<sp/>resources.</highlight></codeline>
+<codeline lineno="179"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="180"><highlight class="comment"><sp/>*<sp/>\note<sp/>The<sp/>signature<sp/>of<sp/>this<sp/>function<sp/>is<sp/>that<sp/>of<sp/>a<sp/>PSA<sp/>driver</highlight></codeline>
+<codeline lineno="181"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>hash_abort<sp/>entry<sp/>point<sp/>as<sp/>defined<sp/>in<sp/>the<sp/>PSA<sp/>driver<sp/>interface</highlight></codeline>
+<codeline lineno="182"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/>specification<sp/>for<sp/>transparent<sp/>drivers.</highlight></codeline>
+<codeline lineno="183"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="184"><highlight class="comment"><sp/>*<sp/>This<sp/>function<sp/>is<sp/>idempotent:<sp/>calling<sp/>it<sp/>on<sp/>a<sp/>zero-initialized,</highlight></codeline>
+<codeline lineno="185"><highlight class="comment"><sp/>*<sp/>already-finished,<sp/>or<sp/>previously-aborted<sp/>operation<sp/>succeeds<sp/>with<sp/>no<sp/>effect.</highlight></codeline>
+<codeline lineno="186"><highlight class="comment"><sp/>*<sp/>No<sp/>firmware<sp/>command<sp/>is<sp/>sent<sp/>because<sp/>the<sp/>firmware<sp/>resets<sp/>its<sp/>SHA<sp/>context</highlight></codeline>
+<codeline lineno="187"><highlight class="comment"><sp/>*<sp/>automatically<sp/>on<sp/>completion<sp/>or<sp/>failure.</highlight></codeline>
+<codeline lineno="188"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="189"><highlight class="comment"><sp/>*<sp/>\param[in,out]<sp/>operation<sp/><sp/><sp/><sp/><sp/><sp/><sp/>Operation<sp/>object<sp/>to<sp/>abort.<sp/>May<sp/>be<sp/>in<sp/>any</highlight></codeline>
+<codeline lineno="190"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>state,<sp/>including<sp/>zero-initialized.</highlight></codeline>
+<codeline lineno="191"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="192"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_SUCCESS<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Operation<sp/>aborted<sp/>(or<sp/>was<sp/>already</highlight></codeline>
+<codeline lineno="193"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>inactive).</highlight></codeline>
+<codeline lineno="194"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_INVALID_ARGUMENT<sp/><sp/><sp/>\p<sp/>operation<sp/>is<sp/>\c<sp/>NULL.</highlight></codeline>
+<codeline lineno="195"><highlight class="comment"><sp/>*<sp/>\retval<sp/>PSA_ERROR_NOT_SUPPORTED<sp/><sp/><sp/><sp/><sp/><sp/>No<sp/>SHA<sp/>algorithm<sp/>is<sp/>enabled.</highlight></codeline>
+<codeline lineno="196"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="197"><highlight class="normal">psa_status_t<sp/>sli_si91x_crypto_hash_abort(<ref refid="structsli__si91x__crypto__sha__operation__t" kindref="compound">sli_si91x_crypto_sha_operation_t</ref><sp/>*operation);</highlight></codeline>
+<codeline lineno="198"><highlight class="normal"></highlight></codeline>
+<codeline lineno="199"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">/*<sp/>SL_SI91X_PSA_SHA_H<sp/>*/</highlight><highlight class="preprocessor"></highlight></codeline>
+    </programlisting>
+    <location file="components/device/silabs/si91x/wireless/crypto/sha/inc/sl_si91x_psa_sha.h"/>
+  </compounddef>
+</doxygen>

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x embedded MQTT example: connect to Wi-Fi and an MQTT broker, subscribe and publish on configured topics using the embedded MQTT client on SoC and NCP modes.
+SiWx91x embedded MQTT example: Connect to Wi-Fi and an MQTT broker and subscribe and publish on configured topics using the embedded MQTT client in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -388,14 +388,15 @@ Follow the steps below for successful execution of the application:
 >    - `-p 1883`: This is the same as the `-p` option for `mosquitto_sub`, specifying the network port of the MQTT broker.
 >    - `-t THERMOSTAT-DATA`: Specifies the topic that the client should publish the message to.
 >    - `-m "hello"`: Specifies the message to publish. In this case, the message is the string "hello".
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials in `sl_net_default_values.h` and MQTT broker IP/port in `app.c`.
-- Confirm the MQTT broker is running and reachable; see [Steps to set up MQTT server](#steps-to-set-up-mqtt-server).
-- If using SSL/TLS, load valid broker and device certificates; default certificates are for reference only.
-- Ensure subscribe and publish topic names match broker configuration.
+- Confirm the MQTT broker is running and reachable. See [Steps to set up MQTT server](#steps-to-set-up-mqtt-server).
+- If using SSL/TLS, load valid broker and device certificates. Default certificates are for reference only.
+- Ensure your subscribe and publish topic names match the broker configuration.
 
 ## Resources
 

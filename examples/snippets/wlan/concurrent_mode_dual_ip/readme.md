@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x concurrent dual-IP example: run STA and soft AP together with IPv4 and IPv6, send UDPv6 traffic on STA, and receive TCPv4 traffic on SoftAP using iPerf on SoC and NCP modes.
+SiWx91x concurrent dual-IP example: Run STA and soft AP together with IPv4 and IPv6, send UDPv6 traffic on STA, and receive TCPv4 traffic on SoftAP using iPerf in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -210,12 +210,12 @@ The SiWx91x STA, which is configured as a UDP IPv6 client, connects to the iPerf
 
 If you encounter issues while running the Concurrent Mode Dual IP example, check the following:
 
-- Verify STA and AP credentials and concurrent IPv4/IPv6 configuration in `sl_wifi_device.h` using `sl_wifi_default_concurrent_v6_configuration` as a reference.
-- Confirm IP addresses, ports, and throughput settings in `app.c` match the iPerf server/client configuration on the remote PC.
-- For UDPv6 Tx on STA, ensure the third-party AP and PC support IPv6 and the iPerf UDP server is started before the DUT connects.
-- For TCPv4 Rx on SoftAP, connect the remote PC to the SiWx91x soft AP and start the iPerf TCP client with the SoftAP interface IP address.
-- Ensure both subnets and interface roles (STA vs SoftAP) are configured correctly when running dual-stack concurrent traffic.
-- For NCP mode, verify the host interface matches the project variant.
+- Verify STA and AP credentials and concurrent IPv4/IPv6 configuration in sl_wifi_device.h. Use sl_wifi_default_concurrent_v6_configuration as a reference.
+- Confirm IP addresses, ports, and throughput settings in app.c match the iPerf server/client configuration on the remote PC.
+- Ensure both subnets and interface roles (STA vs SoftAP) are configured correctly for dual-stack concurrent traffic.
+- For UDPv6 Tx on STA, confirm the third-party AP and remote PC support IPv6. Start the iPerf UDP server before the DUT connects.
+- For TCPv4 Rx on SoftAP, connect the remote PC to the SiWx91x SoftAP. Start the iPerf TCP client with the SoftAP interface IP address.
+- For NCP mode, confirm the host interface matches the project variant configured for this example.
 
 ## Resources
 

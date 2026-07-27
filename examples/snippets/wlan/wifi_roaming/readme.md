@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Wi-Fi roaming example: configure advanced scan and roaming parameters to transition between access points when RSSI falls below threshold on SoC and NCP modes.
+SiWx91x Wi-Fi roaming example: Configure advanced scan and roaming parameters to transition between access points when RSSI falls below threshold in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -149,14 +149,16 @@ When the application runs successfully, you should see the following output:
 ![Figure: ApplicationOutput](resources/readme/output.png)
 
 > **Note:** The actual asynchronous statistics messages can vary depending on the signal strength and the specific conditions of the Wi-Fi environment.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Deploy multiple access points with the same SSID and credentials within range of the DUT.
-- Verify roaming threshold and scan parameters in application configuration.
-- Monitor serial prints for asynchronous statistics and roaming events during AP transitions.
-- Ensure candidate APs advertise stronger RSSI than the roaming threshold before expecting a roam.
+- Verify roaming threshold and scan parameters in your application configuration.
+- Monitor the console output for asynchronous statistics and roaming events during AP transitions.
+- Ensure that candidate APs advertise an RSSI stronger than the roaming threshold before you expect a roam.
+
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Wi-Fi BLE dual-role throughput example: measure WLAN and BLE throughput individually or concurrently on SoC and NCP modes.
+SiWx91x Wi-Fi BLE dual-role throughput example: Measure WLAN and BLE throughput individually or concurrently in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -552,14 +552,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 > **Note:**
 > Verify that all connections are stable and throughput is as expected.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and throughput type settings in application configuration.
-- Install iPerf on the remote PC for WLAN throughput tests.
+- Verify Wi-Fi credentials and throughput type settings in your application configuration.
+- Install iPerf on your remote PC for WLAN throughput tests.
 - Follow [WLAN throughputs: UDP/TCP/SSL unidirectional](#wlan-throughputs-udptcpssl-unidirectional) and [BLE throughput](#ble-throughput-1) setup steps.
-- Ensure BLE peer devices are connected before starting concurrent throughput tests.
+- Ensure that BLE peer devices are connected before you start concurrent throughput tests.
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x calibration example: calibrate carrier frequency offset and Tx gain offset using a spectrum analyzer and serial CLI commands, then store calibration data to flash or eFuse on SoC and NCP modes.
+SiWx91x calibration example: Calibrate carrier frequency offset and Tx gain offset using a spectrum analyzer and serial CLI commands, then store calibration data to flash or eFuse in SoC and NCP modes.
 
 ## Table of Contents
 

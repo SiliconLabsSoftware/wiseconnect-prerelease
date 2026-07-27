@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x enterprise client example: connect to a WPA2-Enterprise access point using EAP-TLS, EAP-TTLS, EAP-FAST, or PEAP with FreeRADIUS on SoC and NCP modes.
+SiWx91x enterprise client example: Connect to a WPA2-Enterprise access point using EAP-TLS, EAP-TTLS, EAP-FAST, or PEAP with FreeRADIUS in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -263,14 +263,15 @@ The configuration explained below is for Linux OS. A similar process may be foll
 > - The Radius Server has to run before the application is executed. You will observe some transactions when the module is trying to connect to the Radius Server. Restart the Radius Server when you execute the application every time.
 >
 > - Make sure that the Radius Server and module are on the same network.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Configure the enterprise AP and FreeRADIUS server as described in [Configure Access Point in WAP2-EAP](#configure-access-point-in-wap2-eap) and [FreeRADIUS Server Setup](#freeradius-server-setup).
-- Verify enterprise credentials, certificates, and EAP method settings in `sl_net_default_values.h` and application config.
+- Configure the enterprise AP and FreeRADIUS server as described in [Configure Access Point in WPA2-EAP](#configure-access-point-in-wap2-eap) and [FreeRADIUS Server Setup](#freeradius-server-setup).
+- Verify enterprise credentials, certificates, and EAP method settings in `sl_net_default_values.h` and the application configuration.
 - Ensure device and CA certificates match the RADIUS server configuration.
-- Confirm the AP advertises the same EAP method selected in the application.
+- Confirm the AP advertises the same EAP method you selected in the application.
 
 ## Resources
 

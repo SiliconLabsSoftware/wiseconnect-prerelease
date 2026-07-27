@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x soft access point example: configure the device as a Wi-Fi AP with WPA2 security, allow stations to connect, and display client connect/disconnect events on the console in SoC and NCP modes.
+SiWx91x soft access point example: Configure the device as a Wi-Fi AP with WPA2 security, allow stations to connect, and display client connect/disconnect events in the console in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -127,7 +127,7 @@ If you encounter issues while running the Access Point example, check the follow
 - Verify `DEFAULT_WIFI_AP_PROFILE_SSID` and `DEFAULT_WIFI_AP_CREDENTIAL` in `sl_net_default_values.h` match the SSID and passphrase you use to connect from the client device.
 - Confirm the client device supports the configured security mode (WPA2 by default).
 - If no clients connect, ensure the soft AP is advertising by checking application prints for the AP start message and connected client MAC addresses.
-- AP mode operates as 802.11n/ac and does not support 802.11ax (Wi-Fi 6); client devices expecting Wi-Fi 6 AP features may not connect as expected.
+- AP mode operates as 802.11n/ac and does not support 802.11ax (Wi-Fi 6). Client devices expecting Wi-Fi 6 AP features may not connect as expected.
 - For NCP mode, verify the host interface (SPI or UART) matches the project variant and connectivity firmware is up to date.
 
 ## Resources

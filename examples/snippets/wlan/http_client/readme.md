@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x HTTP client example: connect to Wi-Fi and perform HTTP PUT, GET, and POST operations with remote HTTP/HTTPS servers on SoC and NCP modes.
+SiWx91x HTTP client example: Connect to Wi-Fi and perform HTTP PUT, GET, and POST operations with remote HTTP/HTTPS servers in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -194,9 +194,10 @@ Navigate to **`/<SDK>/resources/scripts/`**. Run the **simple_https_server.py** 
 
 ## Troubleshooting
 
-- If any permission errors are observed while setting up the Python HTTP/HTTPS server:
-  - Try running the python HTTP/HTTPS server script with admin privileges (Open command prompt or terminal in admin mode)
-  - Try using a different port like 8080 for the HTTP/HTTPS connection
+If you see permission errors while setting up the Python HTTP/HTTPS server:
+
+  - Run the Python HTTP/HTTPS server script with administrator privileges. Open the command prompt or terminal in administrator mode.
+  - Use a different port, such as `8080`, for the HTTP/HTTPS server.
 
 ## Resources
 

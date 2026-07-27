@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Wi-Fi BLE throughput coex example: measure WLAN UDP/TCP/TLS throughput while a BLE central device is connected on SoC and NCP modes.
+SiWx91x Wi-Fi BLE throughput coex example: Measure WLAN UDP/TCP/TLS throughput while a BLE central device is connected in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -374,14 +374,15 @@ See below for reference.
    ![](resources/readme/BLE_enable_disable_1.png)
 
    ![](resources/readme/BLE_enable_disable_2.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and iPerf server/client settings in application configuration.
-- Install iPerf on the remote PC and allow traffic through the firewall.
-- Connect a BLE central device before starting WLAN throughput measurement.
-- For post-BLE-disable throughput, set `SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO` to 1 as described in [Optional: Dynamic BLE disable for WLAN throughput](#optional-dynamic-ble-disable-for-wlan-throughput).
+- Verify Wi-Fi credentials and iPerf server/client settings in your application configuration.
+- Install iPerf on your remote PC and allow traffic through your firewall.
+- Connect a BLE central device before you start WLAN throughput measurement.
+- For post-BLE-disable throughput, set `SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO` to `1` as described in [Optional: Dynamic BLE disable for WLAN throughput](#optional-dynamic-ble-disable-for-wlan-throughput).
 
 ## Resources
 
@@ -389,6 +390,7 @@ If you encounter issues while running this example, check the following:
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
 - [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
 - [iPerf Tool](https://sourceforge.net/projects/iperf2/files/)
+
 ## Report Bugs and Get Support
 
 Report issues and get help from the Silicon Labs community:

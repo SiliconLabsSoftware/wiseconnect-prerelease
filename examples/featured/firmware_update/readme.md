@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x firmware update example: connect to Wi-Fi as a TCP client, download NWP or combined NWP and M4 firmware from a remote TCP server, and apply the update over the air on SoC and NCP modes.
+SiWx91x firmware update example: Connect to Wi-Fi as a TCP client, download NWP or combined NWP and M4 firmware from a remote TCP server, and apply the update over the air in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -261,15 +261,15 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 If you encounter issues while running the Firmware Update example, check the following:
 
-- Verify `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings.
+- Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in the `sl_net_default_values.h` file match your access point settings.
 - Confirm `SERVER_IP_ADDRESS` and `SERVER_PORT` in `app.c` match the IP address and port of the TCP server running on the PC.
-- Start the TCP server on the PC **before** flashing and running the SiWx91x application so the firmware file is available when the device connects.
+- Start the TCP server on the PC before flash and run the SiWx91x application so the firmware file is available when the device connects.
 - Ensure the firmware file path passed to `ota_server` or `ota_server.bin` is correct and the image version is compatible with the target device.
-- Set `COMBINED_IMAGE` to `1` only when using a combined NWP and M4 image from the same release package; use `0` for NWP-only updates.
-- On devices with 4 MB flash, do not use a combined image; update the NWP image first, then update the M4 image separately.
+- Set `COMBINED_IMAGE` to `1` only when using a combined NWP and M4 image from the same release package. Set it to `0` for NWP-only updates.
+- On devices with 4 MB flash, do not use a combined image. Update the NWP image first, then update the M4 image separately.
 - In NCP mode, update the NWP image first, then update the host image from the same release version.
 - On Windows, use Cygwin to build the TCP server as described in [Build and Run the TCP Server (Windows PC)](#build-and-run-the-tcp-server-windows-pc).
-- If the update appears to hang after download, allow a few minutes for the device to write the new firmware to flash and reboot.
+- If the update become unresponsive after download, wait a few minutes while the device writes the new firmware to flash and reboots.
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x concurrent firmware update example: run WLAN Tx/Rx in concurrent mode while updating NWP firmware from a host PC over UART through an intermediary host MCU on NCP mode.
+SiWx91x concurrent firmware update example: Run WLAN Tx/Rx in concurrent mode while updating the NWP firmware from a host PC over UART through an intermediary host MCU in NCP mode.
 
 ## Table of Contents
 
@@ -197,14 +197,14 @@ Note: Python 3.9.0 version used to test this application.
 
 If you encounter issues while running the Concurrent Firmware Update from Host UART example, check the following:
 
-- Flash and start the SiWx91x application **before** running the Python firmware update script.
-- Verify the COM port and baud rate (default 115200) in `fw_update_from_host_uart.py` match the host MCU UART connection.
-- Install required Python libraries: `pip install pyserial` and `pip install print-color`.
-- Confirm the host MCU completes the handshake with the Python script before firmware chunks are sent.
-- Ensure the firmware file path passed to the script points to a valid `.rps` image compatible with the target device.
-- Verify concurrent mode Wi-Fi configuration in `sl_wifi_device.h` and throughput parameters in `app.c` if WLAN traffic fails during the update.
-- If the update appears to hang after download, allow a few minutes for the device to write firmware to flash and reboot.
-- Match any custom chunk size or UART settings between the Python script and host MCU firmware configuration.
+- Flash and start the SiWx91x application before you run the Python firmware update script.
+- Verify that the COM port and baud rate (default 115200) in `fw_update_from_host_uart.py` match the host MCU UART connection.
+- Install the required Python libraries: `pip install pyserial` and `pip install print-color`.
+- Confirm that the host MCU completes the handshake with the Python script before firmware chunks are sent.
+- Ensure that the firmware file path you pass to the script points to a valid `.rps` image compatible with the target device.
+- If WLAN traffic fails during the update, verify concurrent mode Wi-Fi configuration in `sl_wifi_device.h` and throughput parameters in `app.c`.
+- If the update appears to hang after download, wait a few minutes while the device writes firmware to flash and reboots.
+- Match any custom chunk size or UART settings between the Python script and the host MCU firmware configuration.
 
 ## Resources
 

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x provisioning example: configure the device as a provisioning access point and HTTP server to receive third-party AP credentials from a client browser on SoC and NCP modes.
+SiWx91x provisioning example: Configure the device as a provisioning access point and HTTP server to receive third-party AP credentials from a client browser in SoC and NCP modes.
 
 This example illustrates Wi-Fi provisioning using Access Point (AP) mode. It demonstrates how to display available Wi-Fi networks on an HTTP server and allows the device to connect to a third-party Access Point (AP) via the STA instance. Users can view and select networks from the HTTP interface, enabling straightforward connection to the chosen network.
 
@@ -148,9 +148,9 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 If you encounter issues while running this example, check the following:
 
-- Connect a client device to the SiWx91x provisioning AP and open the provisioning webpage in a browser.
-- Enter correct third-party AP SSID, passphrase, and security type on the provisioning page.
-- If STA connection fails after provisioning, verify credentials and that the target AP is in range.
+- Connect your client device to the SiWx91x provisioning AP and open the provisioning webpage in a browser.
+- Enter the correct third-party AP SSID, passphrase, and security type on the provisioning page.
+- If STA connection fails after provisioning, verify the credentials and confirm the target AP is in range.
 
 ## Resources
 

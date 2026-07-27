@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x HTTPS BLE dual-role coex example: download files over HTTPS while maintaining BLE central and peripheral connections on SoC and NCP modes.
+SiWx91x HTTPS BLE dual-role coex example: Download files over HTTPS while maintaining BLE central and peripheral connections in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -408,13 +408,14 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
     ![](resources/readme/output4_1.png)
 
    > **Note:** Steps 9 to 12 can be repeated for 2 peripheral connection and steps 13 to 15 can be repeated for 3 central connections based on the RSI_BLE_MAX_NBR_CENTRALS and RSI_BLE_MAX_NBR_PERIPHERALS. Verify that all connections are stable and simultaneous data transfer is happening from all the radios of SiWx917.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials and HTTPS server URL/port in application configuration.
-- Set up the HTTPS server before the SiWx91x client attempts download.
-- Load valid TLS certificates if using secure HTTPS connections.
+- Verify Wi-Fi credentials and HTTPS server URL/port in your application configuration.
+- Set up the HTTPS server before the SiWx91x client starts the download.
+- If you use secure HTTPS connections, load valid TLS certificates.
 - Confirm BLE central and peripheral roles are configured for simultaneous operation.
 
 ## Resources

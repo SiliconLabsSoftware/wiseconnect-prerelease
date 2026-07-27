@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x select app example: demonstrate Wi-Fi station mode with socket `select()` for monitoring multiple TCP/UDP sockets on SoC and NCP modes.
+SiWx91x select app example: Demonstrate Wi-Fi station mode with socket `select()` for monitoring multiple TCP/UDP sockets in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -158,13 +158,14 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - If data is to be received on the socket, then the receive function is called on the socket.
 
    ![Application prints](resources/readme/application_output.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials in `sl_net_default_values.h` and socket configuration in `app.c`.
-- Ensure remote peers are connected and sending data on the monitored sockets.
-- Review timeout values passed to `select()` if the application blocks indefinitely.
+- Ensure that remote peers are connected and sending data on the monitored sockets.
+- If the application blocks indefinitely, review timeout values passed to `select()`.
 
 ## Resources
 

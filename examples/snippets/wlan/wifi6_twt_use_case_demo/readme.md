@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x TWT use case demo: configure iTWT sessions and respond to remote TCP triggers with TCP or UDP traffic for door-lock and camera power-save scenarios on SoC mode.
+SiWx91x TWT use case demo: Configure iTWT sessions and respond to remote TCP triggers with TCP or UDP traffic for door-lock and camera power-save scenarios in SoC mode.
 
 ## Table of Contents
 
@@ -429,14 +429,17 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
   ![Figure: Energy Profiler Output](resources/readme/outputs_2.png)
 
 > **Note**: The average current consumption may vary based on the environment, the above image is for reference.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Run together with [Wi-Fi - TWT Use Case Remote app](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/snippets/wlan/twt_use_case_remote_app/readme.md) on a separate SiWx91x board.
+- Run this application together with [Wi-Fi - TWT Use Case Remote app](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/snippets/wlan/twt_use_case_remote_app/readme.md) on a separate SiWx91x board.
 - Use a Wi-Fi 6 access point with TWT responder mode enabled.
-- Review [iTWT Session Status Codes](#itwt-session-status-codes) if TWT setup fails.
+- If TWT setup fails, review [iTWT Session Status Codes](#itwt-session-status-codes).
 - Follow [Recommendations](#recommendations) for latency, keep-alive, and teardown settings.
+
+
 
 ## Resources
 

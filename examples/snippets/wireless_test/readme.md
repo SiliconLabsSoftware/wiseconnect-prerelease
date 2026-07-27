@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Wireless Test CLI example: exercise Wi-Fi and BLE features through a command-line interface for RF testing, station/AP/concurrent modes, power save, and calibration on SoC and NCP modes using Simplicity Studio or a serial terminal.
+SiWx91x Wireless Test CLI example: Exercise Wi-Fi and BLE features through a command-line interface for RF testing, station/AP/concurrent modes, power save, and calibration in SoC and NCP modes using Simplicity Studio or a serial terminal.
 
 ## Table of Contents
 
@@ -1196,14 +1196,14 @@ In the command handler, the arguments passed in the cli command are internally m
 
 If you encounter issues while running the Wireless Test application, check the following:
 
-- Use [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) or an equivalent serial terminal rather than the Simplicity Studio console for reliable CLI input and output.
-- Confirm the correct serial port and baud rate are selected and that the `Ready` prompt appears after flashing, as shown in [Test the Application](#test-the-application).
-- Verify default SSID and passphrase in `wifi_commands.c` (`SOFT_AP_SSID`, `SOFT_AP_PSK`) or update them to match your test network configuration.
-- For Wi-Fi PER and RF measurements, confirm the U.Fl to SMA cable, spectrum analyzer, or signal generator connections match the setup diagrams in [Setup Diagram](#setup-diagram).
+- Use [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) or an equivalent serial terminal instead of the Simplicity Studio console for reliable CLI input and output.
+- Confirm that the correct serial port and baud rate are selected and that the `Ready` prompt appears after flashing, as shown in [Test the Application](#test-the-application).
+- Verify the default SSID and passphrase in `wifi_commands.c` (`SOFT_AP_SSID`, `SOFT_AP_PSK`), or update them to match your test network configuration.
+- For Wi-Fi PER and RF measurements, confirm that the U.Fl to SMA cable, spectrum analyzer, or signal generator connections match the setup diagrams in [Setup Diagram](#setup-diagram).
 - When a CLI command fails with invalid arguments, check the corresponding string values in `console_commands/src/console_argument_types.c` (for example, data rate enums map to strings such as `1Mbps`).
 - If a command requires more than the default number of parameters, increase `SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT` in the project preprocessor settings as described in the Wi-Fi CLI Examples section.
-- Replace default cloud connectivity certificates before testing cloud-related commands; the included certificates are for reference only.
-- For NCP mode, verify the host interface (SPI or UART) matches the project variant and that connectivity firmware on the NCP is up to date.
+- Replace the default cloud connectivity certificates before you test cloud-related commands. The included certificates are for reference only.
+- For NCP mode, verify that the host interface (SPI or UART) matches the project variant and that the connectivity firmware on the NCP is up to date.
 - Run `set_region_configuration` with the correct region code before RF transmit tests if region-specific limits apply.
 - Use the `reset` command to recover the CLI state if a prior command leaves the module in an unexpected configuration.
 

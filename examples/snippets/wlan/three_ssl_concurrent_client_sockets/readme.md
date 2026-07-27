@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x concurrent TLS example: open three simultaneous SSL client sockets with separate certificate sets loaded into flash on SoC and NCP modes.
+SiWx91x concurrent TLS example: Open three simultaneous SSL client sockets with separate certificate sets loaded into flash in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -309,14 +309,15 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 - Click **Done**.
 
 - The created thing should now be visible on the AWS console (Manage > All devices > Things).
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials and AWS IoT endpoint settings in `aws_iot_config.h`.
-- Load valid CA and device certificates for each SSL connection; see [Setting up Security Certificates](#setting-up-security-certificates).
-- Ensure each AWS Thing and certificate pair matches the configured client identifiers.
-- Build and run the server as described in [Build and Run the Server](#build-and-run-the-server) before starting the DUT.
+- Load valid CA and device certificates for each SSL connection. See [Setting up Security Certificates](#setting-up-security-certificates).
+- Ensure that each AWS Thing and certificate pair matches its configured client identifier.
+- Build and run the server as described in [Build and Run the Server](#build-and-run-the-server) before you start the DUT.
 
 ## Resources
 

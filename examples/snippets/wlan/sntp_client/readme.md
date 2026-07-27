@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x SNTP client example: connect to Wi-Fi and synchronize date and time from an SNTP server on SoC and NCP modes.
+SiWx91x SNTP client example: Connect to Wi-Fi and synchronize date and time from an SNTP server in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -153,13 +153,14 @@ When the application starts running, the following will take place:
 - The SNTP server response containing the date and time can be seen in sniffer logs.
 
 ![output_prints](resources/readme/output.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify Wi-Fi credentials in `sl_net_default_values.h` and SNTP server address in application configuration.
-- Ensure the access point provides internet access so the SNTP server is reachable.
-- Confirm the configured SNTP server IP or hostname resolves and responds on port 123.
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and SNTP server address in your application configuration.
+- Ensure that your access point provides internet access so the SNTP server is reachable.
+- Confirm the configured SNTP server IP address or hostname resolves and responds on port `123`.
 
 ## Resources
 

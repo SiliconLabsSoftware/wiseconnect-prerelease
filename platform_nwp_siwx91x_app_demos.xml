@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.0' encoding='ASCII'?>
 <demos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.silabs.com/ss/Demo.ecore">
   <demo name="brd2605a.demo.siwx917_dev_kit" label="Wi-Fi - SiWx917 Dev Kit (BRD2605A/BRD2605B)">
     <description>Demonstrates the features of the SiWx917 Dev Kit Board. This can be tested with the Simplicity Connect mobile app.</description>

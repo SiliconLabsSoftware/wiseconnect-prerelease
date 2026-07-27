@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x RF test example: transmit Wi-Fi packets at configurable data rates and power levels for regulatory certification testing on SoC and NCP modes.
+SiWx91x RF test example: Transmit Wi-Fi packets at configurable data rates and power levels for regulatory certification testing in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -187,13 +187,14 @@ The below result is for PER Mode with Channel '6' with 6 Mbps data rate and max 
 The below is the result for PER Mode with Channel '1' with MCS index 0 transfer rate, in continuous mode.
 
 ![Figure: Spectrum Analyzer RF Test with wifi6](resources/readme/continuous_mode_spectrum_analyser_rf_test_wifi6.png)
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Connect spectrum analyzer and signal generator using the correct RF connectors for your board.
-- Verify transmit mode, data rate, and power level settings in application configuration.
-- Review [Transmit Spectrum Example](#transmit-spectrum-example) and [RF Test with wifi 6](#rf-test-with-wifi-6) for setup guidance.
+- Connect your spectrum analyzer and signal generator using the correct RF connectors for your board.
+- Verify transmit mode, data rate, and power level settings in your application configuration.
+- Review [Transmit Spectrum Example](#transmit-spectrum-example) and [RF Test with Wi-Fi 6](#rf-test-with-wifi-6) for setup guidance.
 - Use appropriate shielding and calibration for accurate RF measurements.
 
 ## Resources

@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x multithreading example: demonstrate multiple Wi-Fi application tasks running concurrently on CMSIS-RTOS after connecting to an access point on SoC and NCP modes.
+SiWx91x multithreading example: Demonstrate multiple Wi-Fi application tasks running concurrently on CMSIS-RTOS after connecting to an access point in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -461,13 +461,14 @@ The iPerf command to start the TCP client is:
 4. Connect to the MQTT broker by providing the IP address and port number of Windows PC1 in the HOST and PORT fields in MQTT Explorer, respectively. Click on **CONNECT** to connect to the MQTT broker. If you are running your MQTT broker on the same PC, then the following configuration is made as shown in the image below.
 
    **![MQTT broker Configuration](resources/readme/connect.png)**
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
 - Verify Wi-Fi credentials in `sl_net_default_values.h`.
-- Review RTOS thread attributes and stack sizes if tasks fail to start.
-- Check application prints for Wi-Fi connection status before expecting thread activity.
+- If tasks fail to start, review RTOS thread attributes and stack sizes.
+- Check the console output for Wi-Fi connection status before you expect thread activity.
 
 ## Resources
 

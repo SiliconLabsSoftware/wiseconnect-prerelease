@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x AWS IoT MQTT example: connect to Wi-Fi and AWS IoT Core over MQTT/TLS, subscribe and publish on configured topics, enter associated power save, and measure current with Energy Profiler on SoC and NCP modes.
+SiWx91x AWS IoT MQTT example: Connect to Wi-Fi and AWS IoT Core over MQTT/TLS, subscribe and publish on configured topics, enter associated power save, and measure current with Energy Profiler in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -389,15 +389,15 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 
 If you encounter issues while running the AWS IoT MQTT Client example, check the following:
 
-- Verify `DEFAULT_WIFI_CLIENT_PROFILE_SSID` and `DEFAULT_WIFI_CLIENT_CREDENTIAL` in `sl_net_default_values.h` match your access point settings and that the AP has internet access.
-- Confirm `AWS_IOT_MQTT_HOST` matches the **Device data endpoint** from the AWS IoT console (**Settings** page).
-- Ensure `AWS_IOT_MQTT_CLIENT_ID` and `AWS_IOT_MY_THING_NAME` match the Thing name registered in AWS IoT Core.
-- Replace the default SDK certificates with the device certificate and private key downloaded when the AWS Thing was created; the default certificates are for reference only.
-- After converting certificates with `certificate_to_array.py`, verify the generated `.h` files are included in `app.c` and loaded using [sl_net_set_credential()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-nwk-mgmt/net-credential-functions#sl-net-set-credential) before calling `aws_iot_mqtt_init()`.
-- Confirm the IoT policy attached to the Thing allows publish/subscribe on the configured `SUBSCRIBE_TO_TOPIC` and `PUBLISH_ON_TOPIC` topics.
-- If TLS authentication fails, verify the Starfield Root CA certificate is loaded on the device; define `SL_SI91X_AWS_IOT_ROOT_CA1` if using the intermediate Amazon Root CA 1 certificate.
-- If the MQTT connection drops during power save, ensure keep-alive packets are sent as noted in [Test the Application](#test-the-application).
-- For wrapped private key usage (`WRAP_PRIVATE_KEY`), ensure security is enabled on the device as described in the UG574 Manufacturing Utility User Guide.
+- Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID` and `DEFAULT_WIFI_CLIENT_CREDENTIAL` in `sl_net_default_values.h` match your access point settings and that the AP has internet access.
+- Confirm that `AWS_IOT_MQTT_HOST` matches the **Device data endpoint** on the **Settings** page in the AWS IoT console.
+- Ensure that `AWS_IOT_MQTT_CLIENT_ID` and `AWS_IOT_MY_THING_NAME` match the Thing name registered in AWS IoT Core.
+- Replace the default certificates in the WiseConnect SDK with the device certificate and private key you downloaded when you created the AWS Thing. The default certificates are for reference only.
+- After you convert certificates with `certificate_to_array.py`, verify that the generated `.h` files are included in `app.c` and loaded with [sl_net_set_credential()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-nwk-mgmt/net-credential-functions#sl-net-set-credential) before you call `aws_iot_mqtt_init()`.
+- Confirm that the IoT policy attached to the Thing allows publish and subscribe on the configured `SUBSCRIBE_TO_TOPIC` and `PUBLISH_ON_TOPIC` topics.
+- If TLS authentication fails, verify that the Starfield Root CA certificate is loaded on the device. Define `SL_SI91X_AWS_IOT_ROOT_CA1` if you use the intermediate Amazon Root CA 1 certificate.
+- If the MQTT connection drops during power save, ensure that keep-alive packets are sent as noted in [Test the Application](#test-the-application).
+- For wrapped private key usage (`WRAP_PRIVATE_KEY`), ensure that security is enabled on the device as described in the UG574 Manufacturing Utility User Guide.
 
 ## Resources
 

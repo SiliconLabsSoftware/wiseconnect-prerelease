@@ -78,7 +78,7 @@ This example demonstrates SSI transfer (full-duplex communication) and SSI send/
 
 ### Task Flow (ssi_master_task)
 
-After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and waits for a button press on the master-side sync line before starting the first active phase. If a later receive phase follows a transfer or send phase, the task waits for a second button press before starting that receive phase. The transfer phases then execute sequentially based on the macros enabled in `ssi_master_freertos.h`:
+After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and waits for a button press on the master sync line before it starts the first active phase. If a receive phase follows a transfer or send phase, the task waits for a second button press before it starts that receive phase. The task then runs the enabled transfer phases in sequence according to the macros in `ssi_master_freertos.h`:
 
 >**Note:** The frequency of the SSI master bit-rate clock is one-half the frequency of SSI master input clock.
 
@@ -95,7 +95,7 @@ After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and
 
 - If the **SSI_MASTER_RECEIVE** macro is enabled, it only receives the data from slave. SPI slave must be connected; it cannot be tested in loopback mode.
 
-  - If receive follows an earlier transfer or send phase, the task waits for another `BTN0` press before starting the receive phase.
+  - If receive follows an earlier transfer or send phase, the task waits for another `BTN0` press before it starts the receive phase.
   - Calls [sl_si91x_ssi_receive_data](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-receive-data) which expects data_in (empty buffer) and number of data bytes to be received.
   - The task blocks on `osSemaphoreAcquire()` until the receive completes, then compares the data.
 
@@ -288,15 +288,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Test the Application
 
-Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
+Refer to the instructions [Getting Started with the WiSeConnect SDK](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1. Compile and run the application.
-2. Connect the master SSI pins to the slave SSI pins as listed above. On WPK hardware, also connect `F12` on the master board to `F12` on the slave board for synchronization.
-3. Reset the slave board and then run or reset the master board.
-4. When the master prints `Press button 0 on master to sync.`, press `BTN0` on the master board to start the first active phase.
-5. If the enabled flow later reaches a receive phase after a transfer or send phase, press `BTN0` on the master board again when prompted to start that receive phase.
-6. In the case of loopback mode, when the loopback jumper wire is removed and the test is run, the result should come as data comparison fail and test case fail.
-7. After successful program execution, the prints in serial console looks as shown below.
+2. Connect the master SSI pins to the slave SSI pins as listed in [Pin Connections Between Master and Slave](#pin-connections-between-master-and-slave). On WPK hardware, connect `F12` on the master board to `F12` on the slave board for synchronization.
+3. Reset the slave board and run or reset the master board.
+4. When the master displays `Press button 0 on master to sync.`, press `BTN0` on the master board to start the first active phase.
+5. If the enabled flow later reaches a receive phase after a transfer or send phase, press **BTN0** on the master board again when prompted to start the receive phase.
+6. In loopback mode, remove the loopback jumper wire and run the test. Verify that the test reports data comparison fail and test case fail.
+7. After the program runs successfully, the serial console output looks similar to the following.
 
    ![Figure: output](resources/readme/output.png)
 

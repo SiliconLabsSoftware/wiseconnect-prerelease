@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x HTTP OTAF with TWT example: use Target Wake Time power save while downloading firmware over HTTP/HTTPS from a remote server on SoC and NCP modes.
+SiWx91x HTTP OTAF with TWT example: Use Target Wake Time power save while downloading firmware over HTTP/HTTPS from a remote server in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -900,14 +900,15 @@ HTTPs server configuration for Apache requires Wamp server. If you have not inst
    ![Access the page and resources in HTTPS](resources/readme/image419.png)
 
   > **Note:** Make sure to check your HTTPS server from other local machines present in the same network. It should be accessible.
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
 
-- Verify the access point supports Wi-Fi 6 and TWT; review TWT configuration in the application.
-- Confirm Wi-Fi credentials and OTAF URL settings before starting the download.
+- Verify the access point supports Wi-Fi 6 and TWT. Review TWT configuration in the application.
+- Confirm Wi-Fi credentials and OTAF URL settings before you start the download.
 - Ensure the firmware server is reachable and the image is compatible with the target device.
-- Do not disable WLAN Keep Alive when using TWT with OTAF.
+- Do not disable WLAN Keep Alive when you use TWT with OTAF.
 
 ## Resources
 
