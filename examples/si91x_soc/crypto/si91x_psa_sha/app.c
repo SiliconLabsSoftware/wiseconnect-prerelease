@@ -39,8 +39,8 @@
 #include "sl_status.h"
 
 /******************************************************
- *               Variable Definitions
- ******************************************************/
+  *               Variable Definitions
+  ******************************************************/
 static const osThreadAttr_t thread_attributes = {
   .name       = "app",
   .stack_size = 3072,
@@ -79,13 +79,13 @@ static const sl_wifi_device_configuration_t client_configuration = {
 };
 
 /******************************************************
- *               Function Declarations
- ******************************************************/
+  *               Function Declarations
+  ******************************************************/
 static void application_start(void *argument);
 
 /******************************************************
- *               Function Definitions
- ******************************************************/
+  *               Function Definitions
+  ******************************************************/
 void app_init(void)
 {
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
@@ -97,7 +97,7 @@ static void application_start(void *argument)
 
   sl_status_t status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
-    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    DEBUGOUT("Failed to start Wi-Fi client interface: 0x%lx\r\n", (unsigned long)status);
     return;
   }
   DEBUGOUT("\r\nWi-Fi Init Success\r\n");
@@ -106,8 +106,8 @@ static void application_start(void *argument)
 }
 
 /***************************************************************************/ /**
- * Application state machine, called infinitely.
- ******************************************************************************/
+  * Application state machine, called infinitely.
+  ******************************************************************************/
 void app_process_action(void)
 {
   psa_app_process_action();

@@ -88,6 +88,9 @@
 #define WILL_FLAG_ENABLE      0
 #define IPV6_PARSE_SUCCESS    1
 
+// Set to 1 to call sl_net_set_application_profile() in this example (Neutral-less Matter switch preset).
+#define ENABLE_APPLICATION_PROFILE 0
+
 /******************************************************
  *               Variable Definitions
  ******************************************************/
@@ -116,7 +119,11 @@ static const sl_wifi_device_configuration_t wifi_mqtt_client_configuration = {
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
   .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
-                   .feature_bit_map = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION),
+                   .feature_bit_map = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION
+#if ENABLE_APPLICATION_PROFILE
+                                       | SL_WIFI_FEAT_DISABLE_11AX_SUPPORT
+#endif
+                                       ),
                    .tcp_ip_feature_bit_map =
                      (SL_SI91X_TCP_IP_FEAT_BYPASS | SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT
                       | SL_SI91X_TCP_IP_FEAT_SSL | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID
@@ -210,10 +217,19 @@ static void application_start(void *argument)
 
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_mqtt_client_configuration, &wifi_client_context, NULL);
   if (status != SL_STATUS_OK && status != SL_STATUS_ALREADY_INITIALIZED) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initialize Wi-Fi client: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface up Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi client initialized successfully\r\n");
+#if ENABLE_APPLICATION_PROFILE
+  status =
+    sl_net_set_application_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set application profile: 0x%lx\r\n", status);
+    return;
+  }
+  SL_DEBUG_LOG_V2(INFO, "Application profile applied\r\n");
+#endif
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);

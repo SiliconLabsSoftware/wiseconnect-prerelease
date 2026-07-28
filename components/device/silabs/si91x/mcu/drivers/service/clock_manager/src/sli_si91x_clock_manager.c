@@ -49,6 +49,7 @@
 #endif
 
 #endif
+#include "sl_code_classification.h"
 /************************************************************************************
  *************************  DEFINES / MACROS  ***************************************
  ************************************************************************************/
@@ -101,6 +102,7 @@ STATIC INLINE sl_status_t config_sleep_clks(void);
  * 
  * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  **************************************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_CLOCK_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_si91x_clock_manager_config_clks_on_ps_change(sl_power_state_t power_state, boolean_t power_mode)
 {
   sl_status_t sli_status = SL_STATUS_OK;
@@ -286,6 +288,7 @@ sl_status_t sli_si91x_clock_manager_config_clks_on_ps_change(sl_power_state_t po
  * Switch Subsystems' Ref clocks to MHz RC
  * Set M4 SOC and QSPI2 clock to Ref clock
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_CLOCK_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 STATIC INLINE sl_status_t config_sleep_clks(void)
 {
   sl_status_t sli_status = SL_STATUS_OK;
@@ -324,6 +327,7 @@ STATIC INLINE sl_status_t config_sleep_clks(void)
 /*******************************************************************************
  * @brief This API Switch Subsystems' Ref clocks to MHz RC,Set M4 SOC and QSPI/QSPI2 clock to Ref clock
  ******************************************************************************/
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_CLOCK_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_si91x_config_clocks_to_mhz_rc(void)
 {
   sl_status_t sli_status = SL_STATUS_OK;

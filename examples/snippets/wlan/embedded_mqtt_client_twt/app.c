@@ -383,11 +383,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 
 void print_char_buffer(char *buffer, uint32_t buffer_length)
 {
-  for (uint32_t index = 0; index < buffer_length; index++) {
-    SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[index]);
-  }
-
-  SL_DEBUG_LOG_V2(DEBUG, "\r\n");
+  printf("%.*s\r\n", (int)buffer_length, buffer);
 }
 
 void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)

@@ -1,5 +1,5 @@
 id: json_parser
-package: wifi
+package: json_parser
 description: >
   JSON Parser for Embedded C
 label: JSON Parser
@@ -21,7 +21,5 @@ source:
 - path: src/jsmn.c
 include:
 - path: include
-- path: include
   file_list:
     - path: jsmn.h
-

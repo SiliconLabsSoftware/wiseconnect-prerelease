@@ -2025,11 +2025,11 @@ sl_status_t wifi_get_pairwise_master_key_command_handler(console_args_t *argumen
 
 sl_status_t wifi_configure_timeout_command_handler(console_args_t *arguments)
 {
-  sl_status_t status                         = SL_STATUS_OK;
-  const sl_si91x_timeout_type_t timeout_type = (sl_si91x_timeout_type_t)GET_COMMAND_ARG(arguments, 0);
-  const uint16_t timeout_value               = (uint16_t)GET_COMMAND_ARG(arguments, 1);
+  sl_status_t status                        = SL_STATUS_OK;
+  const sl_wifi_timeout_type_t timeout_type = (sl_wifi_timeout_type_t)GET_COMMAND_ARG(arguments, 0);
+  const uint16_t timeout_value              = (uint16_t)GET_COMMAND_ARG(arguments, 1);
 
-  status = sl_wifi_configure_timeout(SL_WIFI_CLIENT_INTERFACE, (sl_wifi_timeout_type_t)timeout_type, timeout_value);
+  status = sl_wifi_configure_timeout(SL_WIFI_CLIENT_INTERFACE, timeout_type, timeout_value);
   VERIFY_STATUS_AND_RETURN(status);
   return SL_STATUS_OK;
 }

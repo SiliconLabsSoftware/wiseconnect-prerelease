@@ -606,6 +606,9 @@ sl_status_t sli_si91x_usart_send_data_blocking(sl_usart_handle_t usart_handle, c
   // if uart_instance is  UART_1, send data to uart1
   else if (uart_instance == UART_1) {
     uart_reg = UART1;
+  } else {
+    SL_PRINT_STRING_ERROR("sli_si91x_usart_send_data_blocking: invalid uart instance,line no : %d\r\n", (int)__LINE__);
+    return SL_STATUS_INVALID_PARAMETER;
   }
   // Send data byte-by-byte
   for (uint32_t index = 0; index < data_length; index++) {

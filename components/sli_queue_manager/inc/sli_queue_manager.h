@@ -61,15 +61,61 @@ sl_status_t sli_queue_manager_init(sli_queue_t *handle, sli_buffer_manager_pool_
 sl_status_t sli_queue_manager_enqueue(sli_queue_t *handle, void *data);
 
 /**
- * @brief Enqueues a node into the specified queue.
+ * @brief Enqueues a pre-built node into the specified queue.
  *
  * This function adds the given node to the end of the queue managed by the provided handle.
+ * Unlike @ref sli_queue_manager_enqueue(), the caller is responsible for allocating both the
+ * queue node and its payload before calling this API.
+ *
+ * @par Memory contract
+ * - The queue node (@p node) must be allocated separately from its payload and obtained from
+ *   the Buffer Manager using the same pool that was passed to @ref sli_queue_manager_init().
+ *   Removal and flush paths release the node via @ref sli_buffer_manager_free_buffer().
+ * - The payload must be allocated in a separate buffer and referenced through @p node->data.
+ *   Do not embed @ref sli_queue_node_t as the first field of a larger struct and cast the
+ *   enclosing object to @ref sli_queue_node_t *.
+ * - This function only links @p node into the queue; it does not allocate memory or validate
+ *   @p node->data.
  *
  * @param[in,out] handle Pointer to the queue handle where the node will be enqueued.
- * @param[in] node Pointer to the queue node to be enqueued.
+ * @param[in] node Pointer to a Buffer Manager-backed queue node whose @c data member points
+ *                 to a separately allocated payload.
  * @return sl_status_t Status code indicating the result of the operation.
  *         - SL_STATUS_OK on success.
- *         - Appropriate error code on failure (e.g., invalid parameters, queue full).
+ *         - Appropriate error code on failure (e.g., invalid parameters).
+ *
+ * @par Example
+ * @code{.c}
+ * typedef struct {
+ *   uint32_t value;
+ * } my_payload_t;
+ *
+ * sl_status_t enqueue_payload(sli_queue_t *queue, uint32_t value)
+ * {
+ *   sl_status_t status;
+ *   sli_queue_node_t *node = NULL;
+ *   my_payload_t *payload = malloc(sizeof(my_payload_t));
+ *
+ *   if (payload == NULL) {
+ *     return SL_STATUS_ALLOCATION_FAILED;
+ *   }
+ *   payload->value = value;
+ *
+ *   status = sli_buffer_manager_allocate_buffer(queue->queue_node_pool,
+ *                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
+ *                                               1000,
+ *                                               (sli_buffer_t *)&node);
+ *   if (status != SL_STATUS_OK) {
+ *     free(payload);
+ *     return status;
+ *   }
+ *
+ *   node->next = NULL;
+ *   node->data = payload;
+ *
+ *   return sli_queue_manager_enqueue_node(queue, node);
+ * }
+ * @endcode
  */
 sl_status_t sli_queue_manager_enqueue_node(sli_queue_t *handle, sli_queue_node_t *node);
 

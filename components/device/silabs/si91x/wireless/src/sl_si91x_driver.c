@@ -157,7 +157,6 @@ bool device_initialized = false;
 bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX] = { false, false, false, false, false };
 bool bg_enabled                                   = false;
 uint32_t frontend_switch_control                  = 0;
-static uint32_t feature_bit_map                   = 0;
 //! Currently, initialized_opermode is used only to handle concurrent mode using sl_net_init()
 extern uint16_t initialized_opermode;
 
@@ -377,17 +376,17 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     // [0] SLI_BUFFER_MANAGER_CE_TX_POOL: Command Engine TX command buffers.
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 4,
+      .block_count = 5,
     },
     // [1] SLI_BUFFER_MANAGER_CE_RX_POOL: Command Engine RX command buffers.
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 4,
+      .block_count = 0,
     },
     // [2] SLI_BUFFER_MANAGER_CE_DATA_POOL: Command Engine data/command payload buffers.
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 4,
+      .block_count = 5,
     },
     // [3] SLI_BUFFER_MANAGER_CE_METADATA_POOL: Command Engine packet metadata (sli_command_engine_metadata_t).
     {
@@ -544,7 +543,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   VERIFY_STATUS_AND_RETURN(status);
 #endif
 
-  feature_bit_map = config->boot_config.feature_bit_map;
+  sli_si91x_set_feature_bit_map(config->boot_config.feature_bit_map);
   sli_si91x_set_config_feature_bit_map(config->boot_config.config_feature_bit_map);
 
 #ifdef SLI_SI91X_ENABLE_BLE
@@ -741,6 +740,7 @@ sl_status_t sl_si91x_driver_deinit(void)
 
   // Reset config feature bit map
   sli_si91x_set_config_feature_bit_map(0);
+  sli_si91x_set_feature_bit_map(0);
 
   // Reset all the interfaces
   memset(interface_is_up, 0, sizeof(interface_is_up));
@@ -1616,7 +1616,7 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
   }
 
   pkt_offset = packet->data + ext_desc_size;
-  status     = sli_encapsulate_tx_data_packet(control, pkt_offset, mac_hdr_len, feature_bit_map);
+  status     = sli_encapsulate_tx_data_packet(control, pkt_offset, mac_hdr_len, sli_si91x_get_feature_bit_map());
   if (status != SL_STATUS_OK) {
     sli_buffer_manager_free_buffer(packet);
     return status;

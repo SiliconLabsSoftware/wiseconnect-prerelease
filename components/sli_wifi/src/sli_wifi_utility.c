@@ -113,6 +113,7 @@ static sl_wifi_ap_configuration_t ap_configuration;
 static sli_scan_info_t *scan_info_database = NULL;
 extern uint8_t firmware_queue_id[SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES];
 extern uint8_t command_packet_type[SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES];
+static uint32_t sli_wifi_boot_feature_bit_map = 0;
 
 #ifndef __ZEPHYR__
 sl_status_t sli_fw_status_storage_index_init(void)
@@ -1487,4 +1488,22 @@ void *sli_wifi_host_get_buffer_data(void *buffer, uint16_t offset, uint16_t *dat
   }
 
   return (void *)&temp_buffer->data[offset];
+}
+
+void sli_wifi_save_boot_feature_bit_map(uint32_t feature_bit_map)
+{
+  sli_wifi_boot_feature_bit_map = feature_bit_map;
+}
+
+bool sli_wifi_is_11n_only_mode_enabled(void)
+{
+  if (!device_initialized) {
+    return false;
+  }
+
+#if defined(SL_WIFI_FEAT_DISABLE_11AX_SUPPORT)
+  return (sli_wifi_boot_feature_bit_map & SL_WIFI_FEAT_DISABLE_11AX_SUPPORT) != 0U;
+#else
+  return false;
+#endif
 }

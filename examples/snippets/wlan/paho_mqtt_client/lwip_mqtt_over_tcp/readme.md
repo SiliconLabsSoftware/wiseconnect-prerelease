@@ -11,6 +11,7 @@
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
+    - [Neutral-less Matter Switch Profile (optional)](#neutral-less-matter-switch-profile-optional)
   - [Test the Application](#test-the-application)
     - [Procedure for executing the application when enabled with SSL](#procedure-for-executing-the-application-when-enabled-with-ssl)
   - [Additional Information](#additional-information)
@@ -179,6 +180,44 @@ In the Project Explorer pane, expand the **config** folder and open the ``sl_net
       //! Global buffer or memory which is used for MQTT client initialization. This is used for the MQTT client information storage.
       uint8_t tcp_mqtt_client_buffer[TCP_MQTT_CLIENT_INIT_BUFF_LEN];
    ```
+
+### Neutral-less Matter Switch Profile (optional)
+
+This example can optionally call `sl_net_set_application_profile()` to select an SDK-defined Wi-Fi application profile. The API supports a default profile and a Neutral-less Matter switch profile; this example applies the Neutral-less Matter switch preset when the feature is enabled.
+
+In `app.c`, set `ENABLE_APPLICATION_PROFILE` to `1` to enable profile selection, or leave it at `0` (default) for standard Wi-Fi behavior without calling the API:
+
+```c
+#define ENABLE_APPLICATION_PROFILE 0
+```
+
+When set to `1`:
+
+- `SL_WIFI_FEAT_DISABLE_11AX_SUPPORT` is included in the Wi-Fi boot configuration (`feature_bit_map`) so that 802.11n-only mode is active before the Neutral-less Matter switch profile is applied.
+- `sl_net_set_application_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH)` is called after `sl_net_init()` and before `sl_net_up()`.
+
+When set to `0`, the example does not call `sl_net_set_application_profile()` and does not modify the boot feature bitmap for 11n-only mode.
+
+**Scan timeout ownership (when profile is enabled):**
+
+After `sl_net_set_application_profile()` succeeds (for any profile, including default), active and passive channel scan timeouts are owned by the profile preset. `sl_wifi_configure_timeout()` and `sl_si91x_configure_timeout()` return `SL_STATUS_OK` for `SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT` and `SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT` without changing the profile-managed values until Wi-Fi is deinitialized. To change those scan timeouts, call `sl_net_set_application_profile()` again with the desired profile rather than the generic timeout APIs.
+
+**Recovery after disconnect or join failure (production requirement):**
+
+Profile configuration (advanced-config and scan-timeout settings) is not retained across Wi-Fi disconnect or join failure. This example demonstrates **initial** profile application only. Matter and other production applications **must** re-call `sl_net_set_application_profile()` with the same interface and profile in the Wi-Fi disconnect or join-failure event handler, **before** the next connect or auto-join retry:
+
+```c
+// Wi-Fi disconnect or join-failure event (application callback)
+sl_net_set_application_profile(SL_NET_WIFI_CLIENT_INTERFACE,
+                               SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH);
+// then reconnect
+```
+
+The SDK does not automatically reapply the profile on these events.
+
+To compare behavior with and without the application profile on the same MQTT workload, build and run the application with `ENABLE_APPLICATION_PROFILE` set to `0` and then to `1`.
+
+Alternatively, the feature can be enabled or disabled at build time by defining `ENABLE_APPLICATION_PROFILE` to `1` or `0` in the compiler preprocessor settings (for example, `-DENABLE_APPLICATION_PROFILE=1`).
 
 > **Note**: For recommended settings, see the [Recommendations Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 

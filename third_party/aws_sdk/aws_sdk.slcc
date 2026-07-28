@@ -1,5 +1,5 @@
 id: aws_sdk
-package: wifi
+package: aws_sdk
 description: >
   AWS IoT Device SDK for Embedded C
 label: AWS IoT Device SDK

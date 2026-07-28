@@ -28,7 +28,7 @@ requires:
   - name: romdriver_romtable_headers
   - name: udma_linker_config
   - name: code_classification
-    unless: [psram_core, text_segment_in_psram, data_segment_in_psram, sl_si91x_code_classifier, pm_ps2_component]
+    unless: [pm_ps2_component]
 template_contribution:
   - name: code_classification_components
     value: cmsis_udma

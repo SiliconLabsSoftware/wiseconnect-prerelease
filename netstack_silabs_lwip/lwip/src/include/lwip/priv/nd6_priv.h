@@ -134,6 +134,10 @@ extern struct nd6_router_list_entry default_router_list[];
 extern u32_t reachable_time;
 extern u32_t retrans_timer;
 
+#if SL_LWIP_ND6_DYNAMIC_TIMER && LWIP_TESTMODE
+int nd6_timer_is_active(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

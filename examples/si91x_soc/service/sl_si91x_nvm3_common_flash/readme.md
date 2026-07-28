@@ -30,20 +30,20 @@ The NVM3 provides a means to write and read data objects (key/value pairs) store
 
 For more detailed information about NVM3, refer to [Third Generation NonVolatile Memory (NVM3) Data Storage](https://www.silabs.com/documents/public/application-notes/an1135-using-third-generation-nonvolatile-memory.pdf).
 
-### Initialization order (mandatory on SiWx91x SoC, common flash)
+### Initialization Order (mandatory on SiWx91x SoC, common flash)
 
-On SiWx91x SoC, NVM3 in common flash requires NWP-M4 communication for program and erase. Wireless initialization must therefore complete **before** any NVM3 API is called, including `nvm3_initDefault()`. Specifically:
-
-- Call `sl_net_init()` (or an equivalent wireless initialization that brings up NWP-M4 communication) first.
-- Call `nvm3_initDefault()` and other NVM3 APIs only after `sl_net_init()` has returned `SL_STATUS_OK`.
-- Calling NVM3 APIs earlier may return `SL_STATUS_NVM3_NO_VALID_PAGES` (0x5E) even when the NVM3 region is sized and linked correctly. On SiWx91x, that status can indicate missing wireless/NWP setup rather than a corrupt or mis-sized NVM3 region.
+On SiWx91x SoC, NVM3 in common flash requires NWP-M4 communication for program and erase. Wireless initialization must therefore complete before any NVM3 API is called, including `nvm3_initDefault()`.
+1. Call `sl_net_init()` (or an equivalent wireless initialization that brings up NWP-M4 communication).
+2. Call `nvm3_initDefault()` and other NVM3 APIs only after `sl_net_init()` returns `SL_STATUS_OK`.
+   
+Calling NVM3 APIs earlier may return `SL_STATUS_NVM3_NO_VALID_PAGES` (0x5E) even when the NVM3 region is sized and linked correctly. On SiWx91x, that status can indicate missing wireless/NWP setup rather than a corrupt or mis-sized NVM3 region.
 
 This ordering requirement is for **common flash** only; NVM3 in **dual flash** does not require wireless initialization (see the dual-flash NVM3 example).
 
 ## About Example Code
 
-- This example performs wireless initialization before using NVM3 APIs using `sl_net_init()`. This is required (not optional) on common flash because it sets up NWP-M4 communication.
-- After successful wireless init, NVM3 init is done using `nvm3_initDefault()` API.
+- This example performs wireless initialization before using NVM3 APIs using `sl_net_init()`. This is mandatory on common flash because it sets up NWP-M4 communication.
+- After successful wireless initialization, NVM3 init is done using `nvm3_initDefault()` API.
 - Two counter objects are initialized using nvm3_writeCounter() API. One is used to track the number of writes and another is used for
   tracking number of deleted objects.
 - Four NVM3 data objects are written with keys numbered from 1 to 4 using nvm3_writeData() APIs and each write is followed by nvm3_incrementCounter()
@@ -60,7 +60,7 @@ This ordering requirement is for **common flash** only; NVM3 in **dual flash** d
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit (BRD2708A)
 
 ### Software Requirements
@@ -127,9 +127,9 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
 - If the device is not detected, reinstall the connectivity firmware and check USB drivers.
 - If `nvm3_initDefault()` returns `SL_STATUS_NVM3_NO_VALID_PAGES` (0x5E):
-  - Verify that wireless initialization (`sl_net_init()` or equivalent) has completed successfully **before** the NVM3 call. On SiWx91x SoC common flash this status often reflects missing NWP-M4 communication rather than an invalid NVM3 region.
-  - Make sure NVM3 is not being initialized from `sl_platform_init()`, an early `app_init()` path, or any other code that runs before wireless init.
-  - If the application needs NVM3 before wireless is up, use NVM3 in dual flash instead of common flash; see the dual-flash NVM3 example.
+  - Verify that wireless initialization (`sl_net_init()` or equivalent) has completed successfully before the NVM3 call. On SiWx91x SoC common flash this status often reflects missing NWP-M4 communication rather than an invalid NVM3 region.
+  - Make sure NVM3 is not being initialized from `sl_platform_init()`, an early `app_init()` path, or any other code that runs before wireless initialization.
+  - If the application needs NVM3 before wireless is up, use NVM3 in dual flash instead of common flash. Refer to the dual-flash NVM3 example for more information.
 
 ## Resources
 

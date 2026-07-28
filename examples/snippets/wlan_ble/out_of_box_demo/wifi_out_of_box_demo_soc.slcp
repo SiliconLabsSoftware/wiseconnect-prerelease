@@ -117,13 +117,6 @@ other_file:
 - path: resources/readme/EFRConnect_done.png
 - path: resources/readme/EFRConnect_enterpsk.png
 - path: resources/readme/EFRConnect_wificommisioning.png
-- path: resources/readme/MQTT_testclient1.png
-- path: resources/readme/MQTT_testclient2.png
-- path: resources/readme/MQTT_testclient3.png
-- path: resources/readme/MQTT_testclient4.png
-- path: resources/readme/MQTT_testclient5.png
-- path: resources/readme/MQTT_testclient6.png
-- path: resources/readme/MQTT_testclient7.png
 - path: resources/readme/oobdemo_soc.png
 - path: resources/readme/oob_energy_profiler_quick_access.png
 - path: resources/readme/oob_energy_profiler_start.png
@@ -139,10 +132,8 @@ other_file:
 - path: resources/readme/status_lcd2.png
 - path: resources/readme/status_lcd2_v1_0.png
 - path: resources/readme/status_lcd3.png
-- path: resources/readme/status_lcd4.png
 - path: resources/readme/status_lcd5.png
 - path: resources/readme/status_print_button_pressed.png
-- path: resources/readme/status_print_message_received.png
 - path: resources/readme/status_print_mqtt_connected.png
 - path: resources/readme/status_print_startup.png
 ui_hints:

@@ -37,10 +37,16 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
-#ifdef SLI_SI91X_ENABLE_IPV6
+#if defined(SLI_SI91X_ENABLE_IPV6) || LWIP_IPV6
 #define REQUIRED_IP_TYPE SL_IPV6
 #else
 #define REQUIRED_IP_TYPE SL_IPV4
+#endif
+
+#if LWIP_IPV6
+#define DEFAULT_WIFI_CLIENT_IP_MODE SL_IP_MANAGEMENT_LINK_LOCAL
+#else
+#define DEFAULT_WIFI_CLIENT_IP_MODE SL_IP_MANAGEMENT_DHCP
 #endif
 
 #ifndef DEFAULT_WIFI_CLIENT_PROFILE_SSID
@@ -106,7 +112,7 @@
                          SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, \
     }, \
     .ip = { \
-        .mode = SL_IP_MANAGEMENT_DHCP, \
+        .mode = DEFAULT_WIFI_CLIENT_IP_MODE, \
         .type = REQUIRED_IP_TYPE, \
         .host_name = NULL, \
         .ip = { \

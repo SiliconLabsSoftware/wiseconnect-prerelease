@@ -266,10 +266,7 @@ void subscribe_handler(struct _Client *pClient,
   UNUSED_PARAMETER(pTopicName);
   UNUSED_PARAMETER(topicNameLen);
   UNUSED_PARAMETER(data);
-  SL_DEBUG_LOG_V2(INFO,
-                  "Data received on the Subscribed Topic: %.*s ",
-                  pParams->payloadLen,
-                  (uintptr_t)(char *)pParams->payload);
+  printf("Data received on the Subscribed Topic: %.*s \r\n", (int)pParams->payloadLen, (char *)pParams->payload);
 }
 
 #if WRAP_PRIVATE_KEY
@@ -654,7 +651,7 @@ sl_status_t start_aws_mqtt(void)
           if (SUBSCRIBE_QOS == QOS1 || PUBLISH_QOS == QOS1) {
             pub_state = 1;
           }
-          SL_DEBUG_LOG_V2(INFO, "Data to be published: %s\r\n", (uintptr_t)MQTT_PUBLISH_PAYLOAD);
+          printf("Data to be published: %s\r\n", MQTT_PUBLISH_PAYLOAD);
           rc = aws_iot_mqtt_publish(&mqtt_client, PUBLISH_ON_TOPIC, strlen(PUBLISH_ON_TOPIC), &publish_iot_msg);
 
           if (rc != SUCCESS) {

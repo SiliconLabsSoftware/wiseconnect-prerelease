@@ -75,7 +75,7 @@ void usart_example_init(void)
     // Initialize the USART
     status = sl_si91x_usart_init(USART_0, &usart_handle);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_usart_initialize: Error Code : %lu \n", status);
+      SL_PRINT_STRING_ERROR("sl_si91x_usart_initialize: Error Code : %" PRIu32 " \n", (uint32_t)status);
       break;
     }
 
@@ -89,22 +89,22 @@ void usart_example_init(void)
     // Configure the USART configurations
     status = sl_si91x_usart_set_configuration(usart_handle, &usart_config);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
+      SL_PRINT_STRING_ERROR("sl_si91x_usart_set_configuration: Error Code : %" PRIu32 " \n", (uint32_t)status);
       break;
     }
     SL_PRINT_STRING_ERROR("USART configuration is successful \n");
     // Register user callback function
     status = sl_si91x_usart_register_event_callback(callback_event);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
+      SL_PRINT_STRING_ERROR("sl_si91x_usart_register_event_callback: Error Code : %" PRIu32 " \n", (uint32_t)status);
       break;
     }
     SL_PRINT_STRING_ERROR("USART user event callback registered successfully \n");
     sl_si91x_usart_get_configurations(USART_0, &get_config);
 #if SL_USART_SYNCH_MODE
-    SL_PRINT_STRING_ERROR("Baud Rate = %ld \n", (get_config.baudrate << 3));
+    SL_PRINT_STRING_ERROR("Baud Rate = %" PRIu32 " \n", (get_config.baudrate << 3));
 #else
-    SL_PRINT_STRING_ERROR("Baud Rate = %ld \n", get_config.baudrate);
+    SL_PRINT_STRING_ERROR("Baud Rate = %" PRIu32 " \n", get_config.baudrate);
 #endif
 
     // create and initialize message queue object for USART Rx msgs
@@ -146,7 +146,7 @@ void usart_example_process_action(void)
           status = sl_si91x_usart_send_data(usart_handle, usart_data_out, sizeof(usart_data_out));
           if (status != SL_STATUS_OK) {
             // If it fails to execute the API, it will not execute rest of the things
-            SL_PRINT_STRING_ERROR("sl_si91x_usart_send_data: Error Code : %lu \n", status);
+            SL_PRINT_STRING_ERROR("sl_si91x_usart_send_data: Error Code : %" PRIu32 " \n", (uint32_t)status);
             current_mode = SL_TRANSMISSION_COMPLETED;
             break;
           }
@@ -176,7 +176,7 @@ void usart_example_process_action(void)
           status = sl_si91x_usart_receive_data(usart_handle, usart_data_in, sizeof(usart_data_in));
           if (status != SL_STATUS_OK) {
             // If it fails to execute the API, it will not execute rest of the things
-            SL_PRINT_STRING_ERROR("sl_si91x_usart_receive_data: Error Code : %lu \n", status);
+            SL_PRINT_STRING_ERROR("sl_si91x_usart_receive_data: Error Code : %" PRIu32 " \n", (uint32_t)status);
             current_mode = SL_TRANSMISSION_COMPLETED;
             break;
           }
@@ -224,7 +224,7 @@ void usart_example_process_action(void)
           status = sl_si91x_usart_transfer_data(usart_handle, usart_data_out, usart_data_in, sizeof(usart_data_out));
           if (status != SL_STATUS_OK) {
             // If it fails to execute the API, it will not execute rest of the things
-            SL_PRINT_STRING_ERROR("sl_si91x_usart_transfer_data: Error Code : %lu \n", status);
+            SL_PRINT_STRING_ERROR("sl_si91x_usart_transfer_data: Error Code : %" PRIu32 " \n", (uint32_t)status);
             current_mode = SL_TRANSMISSION_COMPLETED;
             break;
           }

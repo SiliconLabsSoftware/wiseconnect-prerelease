@@ -73,3 +73,13 @@ extern sl_net_wifi_lwip_interface_api_t wifi_client;
  *         - SL_STATUS_NOT_INITIALIZED: Network context not initialized
  */
 sl_status_t sli_start_async_ip_config(sl_net_interface_t interface, sl_net_profile_id_t profile_id);
+
+/**
+ * @brief Notify LwIP that WLAN has disconnected.
+ *
+ * @details
+ * Brings the STA netif down and stops LwIP timers (for example IPv6 timers).
+ * Called on unsolicited Wi-Fi disconnect or join failure when the LwIP hosted
+ * or dual-stack bypass path is active.
+ */
+void sli_si91x_lwip_notify_wifi_disconnect(void);

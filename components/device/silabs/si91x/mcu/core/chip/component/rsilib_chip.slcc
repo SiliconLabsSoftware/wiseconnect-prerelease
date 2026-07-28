@@ -16,8 +16,6 @@ define:
   - name: SLI_SI91X_MCU_ENABLE_IPMU_APIS
   - name: SL_CODE_COMPONENT_RSILIB_CHIP
     value: rsilib_chip
-  - name: SLI_CODE_CLASSIFICATION_DISABLE
-    condition: [psram_core]
 source:
   - path: "src/rsi_ps_ram_func.c"
   - path: "src/iPMU_prog/iPMU_dotc/rsi_system_config_917.c"
@@ -52,6 +50,8 @@ requires:
 template_contribution:
   - name: code_classification_components
     value: rsilib_chip
+  - name: psram_ram_data_files
+    value: rsi_deepsleep_soc
   - name: event_handler
     value:
       event: platform_init

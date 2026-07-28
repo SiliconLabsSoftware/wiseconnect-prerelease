@@ -74,9 +74,9 @@ To use this application, the following hardware, software, and project setup are
 ### Hardware Requirements
 
 - Host PC (Windows, macOS, or Linux). Simplicity Studio is cross-platform; the optional Python decoder script (`Log_script.py`) runs on any of the three.
-- Silicon Labs Si917 evaluation kit. Boards covered by this template (per `wifi_templates.xml`):
-  - WPK (BRD4002) plus one of: BRD4338A, BRD4339B, BRD4340B, BRD4342A, BRD4343A, BRD4343B, BRD4343C, BRD4343Q, BRD4343S.
-  - Standalone radio boards: BRD2605A, BRD2605B, BRD2708A, BRD2911A.
+- Silicon Labs SiWx91x evaluation kit. Boards covered by this template (per `wifi_templates.xml`):
+  - WPK ([BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)) plus one of: [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / BRD4339B / BRD4340B / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / BRD4343B / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / BRD4343Q / BRD4343S.
+  - Standalone radio boards: [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) / BRD2605B / [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit) / BRD2911A.
 
 ### Software Requirements
 
@@ -132,7 +132,8 @@ Main files for this example:
 | **Ring-buffer depth** | UC: *Logger → Number of Logs* | `128` | Range 1–255. |
 | **Button instance** | `BUTTON_INSTANCE` macro | `button_btn0` | Override before include if you need a different button. |
 
-> **Note - In case of sleep-wakeup:** Call `button_init_instances()` after wakeup before using BTN0 to change the runtime log level. If the selected logger transport uses SWO or Debug SWO, call `sl_si91x_debug_swo_init()` after wakeup before resuming log output so the SWO path is restored.
+> **Note**
+> In case of sleep-wakeup, Call `button_init_instances()` after wakeup before using BTN0 to change the runtime log level. If the selected logger transport uses SWO or Debug SWO, call `sl_si91x_debug_swo_init()` after wakeup before resuming log output so the SWO path is restored.
 
 ### Logger Levels
 

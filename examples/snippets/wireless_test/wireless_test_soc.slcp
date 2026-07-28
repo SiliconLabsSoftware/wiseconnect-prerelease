@@ -61,10 +61,7 @@ component:
 - id: log_none
 - id: si91x_log
 - id: si91x_log_iostream_formatted
-- id: iostream_si91x
-- id: iostream_uart_si91x
-  instance:
-  - vcom
+- id: iostream_rtt_si91x
 toolchain_settings:
 - option: gcc_compiler_option
   value: -Wall -Werror -Wno-error=deprecated-declarations

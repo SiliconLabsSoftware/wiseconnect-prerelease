@@ -25,6 +25,3 @@ requires:
   - name: rsilib_efuse
   - name: romdriver_efuse
   - name: log_none
-documentation:
-    docset: wiseconnect
-    document: wiseconnect-api-reference-guide-si91x-peripherals/efuse

@@ -91,6 +91,7 @@ static uint16_t sli_xtal_good_time_us = 0;
 static uint16_t sli_pmu_good_time_us  = 0;
 
 static uint32_t config_feature_bit_map        = 0;
+static uint32_t feature_bit_map               = 0;
 static sli_wifi_efuse_data_t si91x_efuse_data = { 0 };
 
 sli_queue_t cmd_queues[SI91X_CMD_MAX] = { 0 };
@@ -565,10 +566,10 @@ sl_status_t sli_si91x_wifi_platform_deinit(void)
 {
   sl_status_t status = SL_STATUS_OK;
 
-  status = sli_si91x_wifi_command_engine_deinit();
+  status = sli_hal_si91x_deinit();
   VERIFY_STATUS_AND_RETURN(status);
 
-  status = sli_hal_si91x_deinit();
+  status = sli_si91x_wifi_command_engine_deinit();
   VERIFY_STATUS_AND_RETURN(status);
 
   if (NULL != sli_wifi_events) {
@@ -650,4 +651,15 @@ sl_status_t sli_wifi_send_data_packet(const void *data, uint16_t length, const v
                                                         context);
 
   return (SL_STATUS_IN_PROGRESS == status) ? SL_STATUS_OK : status;
+}
+
+void sli_si91x_set_feature_bit_map(uint32_t feature_bit_map_val)
+{
+  feature_bit_map = feature_bit_map_val;
+  sli_wifi_save_boot_feature_bit_map(feature_bit_map_val);
+}
+
+uint32_t sli_si91x_get_feature_bit_map(void)
+{
+  return feature_bit_map;
 }

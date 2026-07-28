@@ -142,8 +142,20 @@
    * This feature, when enabled, permits the execution of socket commands even if the Wi-Fi connection has not been established.
    * 
    * @note If this feature is disabled, issuing socket commands before the device obtains an IP address will result in an invalid state error.
+   * @note Bit(16) is used internally by SDK. Bit(17) is reserved and must be set to 0.
    */
 #define SL_WIFI_FEAT_SOCKET_CMDS_ALLOW_BEFORE_WLAN_CONNECTION BIT(18)
+
+/**
+   * @def SL_WIFI_FEAT_CLEAR_SCAN_RESULTS_AFTER_USE
+   * @brief Flush cached scan/BSS entries after scan results are used.
+   * @details
+   * Enables automatic clearing of cached scan/BSS entries once scan results
+   * are consumed.
+   * 
+   * @note Bits 19-20 are reserved. Must be set to 0.
+   */
+#define SL_WIFI_FEAT_CLEAR_SCAN_RESULTS_AFTER_USE BIT(21)
 
 /**
  * @def SL_WIFI_FEAT_SECURE_ATTESTATION
@@ -151,7 +163,8 @@
  * @details
  * Enables secure attestation functionality.
  * 
- * @note Bit(16) is used internally by SDK. Bits 17-29 and bit 31 are reserved.
+ * @note Bits 22-29 and bit 31 are reserved.
+ * @note Reserved bits must be set to 0.
  */
 #define SL_WIFI_FEAT_SECURE_ATTESTATION BIT(30)
 
@@ -2776,7 +2789,7 @@ typedef struct {
 /**
  * @struct sl_si91x_rsp_wireless_info_t
  * @brief si91x Specific Wireless information.
- * @note This structure is deprecated. Use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-interface-info-t) for new implementations.
+ * @note This structure is deprecated. Use [sl_wifi_interface_info_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-interface-info-t) for new implementations.
  */
 typedef struct {
 

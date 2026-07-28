@@ -62,6 +62,9 @@
 
 #ifdef SL_NET_COMPONENT_INCLUDED
 #include "sli_net_common_utility.h"
+#if defined(SLI_SI91X_LWIP_HOSTED_NETWORK_STACK) || defined(SLI_SI91X_NETWORK_DUAL_STACK)
+#include "sl_net_for_lwip.h"
+#endif
 #endif
 
 #include "sli_code_classification.h"
@@ -405,7 +408,8 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         }
         case SLI_WIFI_RSP_SET_BC_MC_FILTER_CONFIG:
         case SLI_WIFI_RSP_UPDATE_MC_ALLOWLIST:
-        case SLI_WIFI_RSP_SET_BEACON_DROP_THRESHOLD: {
+        case SLI_WIFI_RSP_SET_BEACON_DROP_THRESHOLD:
+        case SLI_WIFI_RSP_SET_ADVANCED_CONFIG: {
           metadata->tx_info.packet_type = SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET;
           break;
         }
@@ -913,6 +917,10 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
 #ifdef SL_NET_COMPONENT_INCLUDED
 static void sli_post_disconnect_event_to_network_manager(sl_net_interface_t interface)
 {
+#if defined(SLI_SI91X_LWIP_HOSTED_NETWORK_STACK) || defined(SLI_SI91X_NETWORK_DUAL_STACK)
+  sli_si91x_lwip_notify_wifi_disconnect();
+#endif
+
   if (sli_network_manager_request_queue == NULL) {
     return;
   }
@@ -1082,7 +1090,7 @@ static void sli_post_packet_to_event_engine(sl_wifi_buffer_t *rx_buffer)
    * Allocate an RX-style buffer to hold the copied packet. Use HYBRID so the
    * allocation will fall back to heap if the pool is exhausted.
    */
-  allocation_status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_RX_POOL,
+  allocation_status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CP_CMD_RX_POOL,
                                                          SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
                                                          1000,
                                                          (sli_buffer_t *)&packet_buffer);
@@ -1128,5 +1136,5 @@ static void sli_post_packet_to_event_engine(sl_wifi_buffer_t *rx_buffer)
   }
 
   /* Signal the event engine to process the queued packet */
-  osEventFlagsSet(sli_wifi_event_engine_event_id, SLI_EVENT_ENGINE_ASYNC_EVENT);
+  sli_wifi_event_engine_signal_async();
 }

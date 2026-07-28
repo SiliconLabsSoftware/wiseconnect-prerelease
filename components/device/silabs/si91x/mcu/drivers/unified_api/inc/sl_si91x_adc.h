@@ -751,6 +751,8 @@ sl_status_t sl_si91x_adc_read_data(sl_adc_channel_config_t adcchconfig, uint8_t 
  *  - \ref sl_si91x_adc_start
  * 
  * @param[in] adc_channel_config ADC channels configuration structure variable, see \ref sl_adc_channel_config_t.
+ *                               For single-channel operation, set \c channel to the active channel before calling.
+ *                               For multi-channel operation, the driver rotates channel indices internally.
  * @param[in] adc_config ADC operation configuration structure variable, see \ref sl_adc_config_t.
  * @param[out] adc_value Store the reading data in adc_value.
  * 

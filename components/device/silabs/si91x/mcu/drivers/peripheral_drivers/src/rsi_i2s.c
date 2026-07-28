@@ -43,6 +43,11 @@
 #define I2S_ULP_PERI_ON_SOC_GPIO_SPECIFIC_RANGE_MAX \
   49 // Maximum pin number for specific range of HP pins to act as ULP pins
 
+// I2S FIFO entries are 32-bit wide for resolutions > 16-bit, 16-bit for 12/16-bit.
+// DMA transfer size must match FIFO entry width, NOT the raw data_bits / 8 value.
+// For 24-bit: data_bits/8 = 3, but DMA uses 32-bit (4-byte) transfers per sample.
+#define I2S_DMA_BYTES_PER_SAMPLE(data_bits) (((data_bits) <= 16U) ? 2U : 4U)
+
 /*****************************************************************************
  * Private types/enumerations/variables
  ****************************************************************************/
@@ -524,7 +529,9 @@ int32_t I2S_Control(uint32_t control,
     }
     if (i2s->reg == I2S1) {
       if (i2s->clk->clk_src == ULP_I2S_REF_CLK) {
-        val = system_clocks.ulpss_ref_clk / bit_freq;
+        /* (ref + bit_freq) / bit_freq ensures divider >= 1 and generated clock <= bit_freq.
+         * Differs from strict ceiling (ref+bit_freq-1)/bit_freq; hardware may expect this. */
+        val = ((system_clocks.ulpss_ref_clk + bit_freq) / bit_freq);
         RSI_ULPSS_UlpI2sClkConfig(ULPCLK, ULP_I2S_REF_CLK, (uint16_t)val / 2);
       }
       if (i2s->clk->clk_src == ULP_I2S_ULP_MHZ_RC_CLK) {
@@ -1016,8 +1023,6 @@ int32_t I2S_Transfer(const void *data_out,
   uint32_t rx_num              = 0;
   uint32_t tx_resolution       = 0;
   uint32_t rx_resolution       = 0;
-  uint32_t tx_byte_size        = 0;
-  uint32_t rx_byte_size        = 0;
   SAI_UDMA_I2S_Resources_t res = SAI_GetUDMAI2SResources(i2s_instance);
 
   I2S_RESOURCES *i2s = res.i2s_resources;
@@ -1043,23 +1048,15 @@ int32_t I2S_Transfer(const void *data_out,
   // Fetch the RX resolution from RCR register (from receive_data)
   rx_resolution = i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_RCR_b.WLEN;
 
-  tx_byte_size = data_out_size * (i2s->info->tx.data_bits / 8U);
-  rx_byte_size = data_in_size * (i2s->info->rx.data_bits / 8U);
-
-  // For 12-bit and 24-bit resolutions, transfer size should be multiple of 4
-  // (TX validation from transmit_data)
+  // For 12-bit and 24-bit resolutions, sample count must be a multiple of 4
+  // (validate before FIFO-width byte conversion; byte_size % 4 is always zero for 24-bit).
   if ((tx_resolution == RES_12_BIT) || (tx_resolution == RES_24_BIT)) {
-    if ((tx_byte_size % 4U) != 0U) {
-      // Invalid data size
+    if ((data_out_size % 4U) != 0U) {
       return ARM_DRIVER_ERROR_PARAMETER;
     }
   }
-
-  // For 12-bit and 24-bit resolutions, transfer size should be multiple of 4
-  // (RX validation from receive_data)
   if ((rx_resolution == RES_12_BIT) || (rx_resolution == RES_24_BIT)) {
-    if ((rx_byte_size % 4U) != 0U) {
-      // Invalid data size
+    if ((data_in_size % 4U) != 0U) {
       return ARM_DRIVER_ERROR_PARAMETER;
     }
   }
@@ -1075,7 +1072,7 @@ int32_t I2S_Transfer(const void *data_out,
   i2s->info->status.tx_underflow = 0U;
   i2s->info->tx.buf              = (uint8_t *)data_out;
   i2s->info->tx.cnt              = 0U;
-  tx_num                         = data_out_size * (i2s->info->tx.data_bits / 8U);
+  tx_num                         = data_out_size * I2S_DMA_BYTES_PER_SAMPLE(i2s->info->tx.data_bits);
 
   // Set TX FIFO level
   i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_TXFCR_b.TXCHET = (unsigned int)((i2s->tx_fifo_level) & 0x0F);
@@ -1110,7 +1107,7 @@ int32_t I2S_Transfer(const void *data_out,
   i2s->info->status.rx_overflow = 0U;
   i2s->info->rx.buf             = (uint8_t *)data_in;
   i2s->info->rx.cnt             = 0U;
-  rx_num                        = data_in_size * (i2s->info->rx.data_bits / 8U);
+  rx_num                        = data_in_size * I2S_DMA_BYTES_PER_SAMPLE(i2s->info->rx.data_bits);
 
   // Set RX FIFO level
   i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_RFCR_b.RXCHDT = (unsigned int)((i2s->rx_fifo_level) & 0x0F);
@@ -1133,10 +1130,9 @@ int32_t I2S_Transfer(const void *data_out,
   if (i2s->dma_tx != NULL) {
     uint32_t tx_dma_num = tx_num - i2s->info->tx.cnt;
     if (tx_dma_num >= 4U) {
-      uint32_t total_trans = ((tx_dma_num / 2) < 1024)
-                               ? (unsigned int)(((tx_dma_num / (i2s->info->tx.data_bits / 8U)) - 1) & 0x03FF)
-                               : 0x3FFU;
-      resolution           = i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_TCR_b.WLEN;
+      uint32_t tx_dma_xfers = tx_dma_num / I2S_DMA_BYTES_PER_SAMPLE(i2s->info->tx.data_bits);
+      uint32_t total_trans  = (tx_dma_xfers <= 1024U) ? (unsigned int)((tx_dma_xfers - 1U) & 0x03FF) : 0x3FFU;
+      resolution            = i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_TCR_b.WLEN;
       I2S_FillDmaChannelCfg(i2s, &chnl_cfg, total_trans, resolution, true);
       // Configure and enable TX DMA channel
       if ((i2s->reg == I2S0) || (i2s->reg == I2S1)) {
@@ -1144,7 +1140,7 @@ int32_t I2S_Transfer(const void *data_out,
                                       i2s->dma_tx->channel,
                                       (uint32_t)(i2s->info->tx.buf),
                                       (uint32_t)(&(i2s->reg->I2S_TXDMA)),
-                                      tx_dma_num / (i2s->info->tx.data_bits / 8U),
+                                      tx_dma_xfers,
                                       i2s->dma_tx->control,
                                       &chnl_cfg,
                                       i2s->dma_tx->cb_event,
@@ -1169,12 +1165,11 @@ int32_t I2S_Transfer(const void *data_out,
   if (i2s->dma_rx != NULL) {
     uint32_t rx_dma_num = rx_num - i2s->info->rx.cnt;
     if (rx_dma_num >= 4U) {
-      rx_dma_num           = rx_dma_num / 4;
-      i2s->info->rx.cnt    = i2s->info->rx.cnt + (rx_dma_num * 4);
-      uint32_t total_trans = ((rx_dma_num / 2) < 1024)
-                               ? (unsigned int)(((rx_dma_num / (i2s->info->rx.data_bits / 8U)) - 1) & 0x03FF)
-                               : 0x3FFU;
-      resolution           = i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_RCR_b.WLEN;
+      uint32_t dma_byte_count = (rx_dma_num / 4U) * 4U;
+      uint32_t rx_dma_xfers   = dma_byte_count / I2S_DMA_BYTES_PER_SAMPLE(i2s->info->rx.data_bits);
+      i2s->info->rx.cnt       = i2s->info->rx.cnt + dma_byte_count;
+      uint32_t total_trans    = (rx_dma_xfers <= 1024U) ? (unsigned int)((rx_dma_xfers - 1U) & 0x03FF) : 0x3FFU;
+      resolution              = i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_RCR_b.WLEN;
       I2S_FillDmaChannelCfg(i2s, &chnl_cfg, total_trans, resolution, false);
       // Configure and enable RX DMA channel
       if ((i2s->reg == I2S0) || (i2s->reg == I2S1)) {
@@ -1182,7 +1177,7 @@ int32_t I2S_Transfer(const void *data_out,
                                       i2s->dma_rx->channel,
                                       (uint32_t)(&(i2s->reg->I2S_RXDMA)),
                                       (uint32_t)(i2s->info->rx.buf),
-                                      (i2s->info->rx.cnt) / (i2s->info->rx.data_bits / 8U),
+                                      rx_dma_xfers,
                                       i2s->dma_rx->control,
                                       &chnl_cfg,
                                       i2s->dma_rx->cb_event,
@@ -1272,7 +1267,7 @@ int32_t I2S_Send(const void *data,
   i2s->info->status.tx_underflow = 0U;
   i2s->info->tx.buf              = (uint8_t *)data;
   i2s->info->tx.cnt              = 0U;
-  num                            = num * (i2s->info->tx.data_bits / 8U);
+  num                            = num * I2S_DMA_BYTES_PER_SAMPLE(i2s->info->tx.data_bits);
 
   i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_TXFCR_b.TXCHET = (unsigned int)((i2s->tx_fifo_level) & 0x0F);
 
@@ -1323,10 +1318,13 @@ int32_t I2S_Send(const void *data,
     } else {
       chnl_cfg.altStruct = 0;
       chnl_cfg.burstReq  = 1;
-      if ((num / 2) < 1024) {
-        i2s->dma_tx->control.totalNumOfDMATrans = (unsigned int)(((num / (i2s->info->tx.data_bits / 8U)) - 1) & 0x03FF);
-      } else {
-        i2s->dma_tx->control.totalNumOfDMATrans = 0x3FF;
+      {
+        uint32_t tx_dma_xfers = num / I2S_DMA_BYTES_PER_SAMPLE(i2s->info->tx.data_bits);
+        if (tx_dma_xfers <= 1024) {
+          i2s->dma_tx->control.totalNumOfDMATrans = (unsigned int)((tx_dma_xfers - 1) & 0x03FF);
+        } else {
+          i2s->dma_tx->control.totalNumOfDMATrans = 0x3FF;
+        }
       }
       if (i2s->reg == I2S0) {
         chnl_cfg.channelPrioHigh = UDMA0_CHNL_PRIO_LVL;
@@ -1355,7 +1353,7 @@ int32_t I2S_Send(const void *data,
                                       i2s->dma_tx->channel,
                                       (uint32_t)(i2s->info->tx.buf),
                                       (uint32_t)(&(i2s->reg->I2S_TXDMA)),
-                                      num / (i2s->info->tx.data_bits / 8U), //num / 4U,
+                                      num / I2S_DMA_BYTES_PER_SAMPLE(i2s->info->tx.data_bits),
                                       i2s->dma_tx->control,
                                       &chnl_cfg,
                                       i2s->dma_tx->cb_event,
@@ -1441,7 +1439,7 @@ int32_t I2S_Receive(void *data,
   i2s->info->rx.cnt = 0U;
 
   // Convert from number of samples to number of bytes
-  num = num * (i2s->info->rx.data_bits / 8U);
+  num = num * I2S_DMA_BYTES_PER_SAMPLE(i2s->info->rx.data_bits);
 
   // Set FIFO level and enable RX DMA
   i2s->reg->CHANNEL_CONFIG[i2s->xfer_chnl].I2S_RFCR_b.RXCHDT = (unsigned int)((i2s->rx_fifo_level) & 0x0F);
@@ -1468,14 +1466,18 @@ int32_t I2S_Receive(void *data,
     // Set offset in RX Buffer for DMA transfer
     //offset = i2s->info->rx.cnt;
 
-    // Update RX count
+    // Update RX count (total bytes: residue + this DMA chunk)
     num               = num / 4;
     i2s->info->rx.cnt = i2s->info->rx.cnt + (num * 4);
 
+    /* DMA transfer count = bytes transferred by this DMA / bytes per sample (FIFO width). */
+    uint32_t dma_byte_count = num * 4U;
+    uint32_t rx_dma_xfers   = dma_byte_count / I2S_DMA_BYTES_PER_SAMPLE(i2s->info->rx.data_bits);
+
     chnl_cfg.altStruct = 0;
     chnl_cfg.burstReq  = 1;
-    if ((num / 2) < 1024) {
-      i2s->dma_rx->control.totalNumOfDMATrans = (unsigned int)(((num / (i2s->info->rx.data_bits / 8U)) - 1) & 0x03FF);
+    if (rx_dma_xfers <= 1024) {
+      i2s->dma_rx->control.totalNumOfDMATrans = (unsigned int)((rx_dma_xfers - 1) & 0x03FF);
     } else {
       i2s->dma_rx->control.totalNumOfDMATrans = 0x3FF;
     }
@@ -1506,7 +1508,7 @@ int32_t I2S_Receive(void *data,
                                     i2s->dma_rx->channel,
                                     (uint32_t)(&(i2s->reg->I2S_RXDMA)),
                                     (uint32_t)(i2s->info->rx.buf),
-                                    (i2s->info->rx.cnt) / (i2s->info->rx.data_bits / 8U),
+                                    rx_dma_xfers,
                                     i2s->dma_rx->control,
                                     &chnl_cfg,
                                     i2s->dma_rx->cb_event,
@@ -1559,7 +1561,7 @@ uint32_t I2S_GetTxCount(I2S_RESOURCES *i2s)
   uint32_t cnt = 0;
 
   // Convert count in bytes to count of samples
-  cnt = i2s->info->tx.cnt / (i2s->info->tx.data_bits / 8U);
+  cnt = i2s->info->tx.cnt / I2S_DMA_BYTES_PER_SAMPLE(i2s->info->tx.data_bits);
   return (cnt);
 }
 
@@ -1575,7 +1577,7 @@ uint32_t I2S_GetRxCount(I2S_RESOURCES *i2s)
   uint32_t cnt = 0;
 
   // Convert count in bytes to count of samples
-  cnt = i2s->info->rx.cnt / (i2s->info->rx.data_bits / 8U);
+  cnt = i2s->info->rx.cnt / I2S_DMA_BYTES_PER_SAMPLE(i2s->info->rx.data_bits);
   return (cnt);
 }
 

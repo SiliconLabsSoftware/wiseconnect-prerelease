@@ -54,6 +54,8 @@
 #define SL_SI91X_WEBSOCKET_MAX_RESOURCE_LENGTH \
   51 /**< Websocket max resource length. Not to be configured by the user. */
 
+#define SL_SI91X_WEBSOCKET_MAX_ORIGIN_LENGTH 51 /**< Websocket max origin length. Not to be configured by the user. */
+
 /******************************************************
  *                   Enumerations
  ******************************************************/
@@ -79,15 +81,16 @@ typedef enum {
  * @details This enumeration defines the error codes that can be returned by WebSocket operations to indicate the result of the operation.
  */
 typedef enum {
-  SL_WEBSOCKET_SUCCESS               = 0,  /**< Operation successful */
-  SL_WEBSOCKET_ERR_SOCKET_CREATION   = -1, /**< Error creating socket */
-  SL_WEBSOCKET_ERR_SOCKET_BIND       = -2, /**< Error binding socket */
-  SL_WEBSOCKET_ERR_SOCKET_CONNECT    = -3, /**< Error connecting socket */
-  SL_WEBSOCKET_ERR_SEND_FRAME        = -4, /**< Error sending frame */
-  SL_WEBSOCKET_ERR_RECEIVE_FRAME     = -5, /**< Error receiving frame */
-  SL_WEBSOCKET_ERR_CLOSE_FRAME       = -6, /**< Error closing frame */
-  SL_WEBSOCKET_ERR_SSL_SETSOCKOPT    = -7, /**< Error setting socket options for SSL */
-  SL_WEBSOCKET_ERR_INVALID_PARAMETER = -8  /**< Invalid input parameter */
+  SL_WEBSOCKET_SUCCESS                 = 0,  /**< Operation successful */
+  SL_WEBSOCKET_ERR_SOCKET_CREATION     = -1, /**< Error creating socket */
+  SL_WEBSOCKET_ERR_SOCKET_BIND         = -2, /**< Error binding socket */
+  SL_WEBSOCKET_ERR_SOCKET_CONNECT      = -3, /**< Error connecting socket */
+  SL_WEBSOCKET_ERR_SEND_FRAME          = -4, /**< Error sending frame */
+  SL_WEBSOCKET_ERR_RECEIVE_FRAME       = -5, /**< Error receiving frame */
+  SL_WEBSOCKET_ERR_CLOSE_FRAME         = -6, /**< Error closing frame */
+  SL_WEBSOCKET_ERR_SSL_SETSOCKOPT      = -7, /**< Error setting socket options for SSL */
+  SL_WEBSOCKET_ERR_INVALID_PARAMETER   = -8, /**< Invalid input parameter */
+  SL_WEBSOCKET_ERR_MAX_LENGTH_EXCEEDED = -9  /**< Max length exceeded */
 } sl_websocket_error_t;
 
 /**
@@ -223,7 +226,8 @@ typedef struct sl_websocket_client_s {
   sl_websocket_tls_version_t tls_version;              /**< Configured TLS version for SSL connections. */
   void *user_context;                                  /**< User-defined context (for future reference). */
   sl_websocket_tcp_tls_advanced_options_t tcp_options; /**< Advanced TCP/TLS configuration options. */
-  bool tcp_options_configured; /**< Flag indicating if advanced TCP/TLS options have been set. */
+  bool tcp_options_configured;                       /**< Flag indicating if advanced TCP/TLS options have been set. */
+  char origin[SL_SI91X_WEBSOCKET_MAX_ORIGIN_LENGTH]; /**< WebSocket origin header value. */
 } sl_websocket_client_t;
 
 /**

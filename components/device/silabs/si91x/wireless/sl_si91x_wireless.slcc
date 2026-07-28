@@ -132,7 +132,6 @@ define:
 - name: SL_CODE_COMPONENT_SI91X_WIRELESS
   value: si91x_wireless
 requires:
-- name: sli_wifi
 - name: sli_wifi_power_profile
 - name: sli_si91x_wifi_command_engine
 - name: sli_si91x_wifi_event_handler

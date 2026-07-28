@@ -45,6 +45,9 @@
 
 /* Test network interface */
 static struct netif test_netif;
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+static struct netif test_netif2;
+#endif
 
 /* Test IPv6 addresses */
 static ip6_addr_t test_ip6_addr;
@@ -92,6 +95,9 @@ nd6_setup(void)
   
   /* Clear test netif structure */
   memset(&test_netif, 0, sizeof(struct netif));
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+  memset(&test_netif2, 0, sizeof(struct netif));
+#endif
   
   /* Clear any stale neighbor cache entries from previous tests */
   for (i = 0; i < LWIP_ND6_NUM_NEIGHBORS; i++) {
@@ -164,6 +170,14 @@ nd6_teardown(void)
   
   /* Check if netif was added to the list before cleaning up */
   if (test_netif.num != 0 || netif_list == &test_netif) {
+    /* Bring link down so ND6/MLD6 timers stop before netif removal */
+    if (netif_is_link_up(&test_netif)) {
+#if SL_LWIP_ADAPTIVE_TIMERS
+      netif_stop_timers(&test_netif);
+#endif
+      netif_set_link_down(&test_netif);
+    }
+
     /* Clean up any loop buffers */
     if (test_netif.loop_first != NULL) {
       pbuf_free(test_netif.loop_first);
@@ -177,12 +191,28 @@ nd6_teardown(void)
     /* Remove network interface */
     netif_remove(&test_netif);
   }
+
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+  if (test_netif2.num != 0 || netif_list == &test_netif2) {
+    if (netif_is_link_up(&test_netif2)) {
+#if SL_LWIP_ADAPTIVE_TIMERS
+      netif_stop_timers(&test_netif2);
+#endif
+      netif_set_link_down(&test_netif2);
+    }
+    nd6_cleanup_netif(&test_netif2);
+    netif_remove(&test_netif2);
+  }
+#endif
   
   /* Poll tcpip thread to process any pending operations and free memory */
   tcpip_thread_poll_one();
   
   /* Ensure test_netif is fully cleared */
   memset(&test_netif, 0, sizeof(struct netif));
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+  memset(&test_netif2, 0, sizeof(struct netif));
+#endif
   
   lwip_check_ensure_no_alloc(SKIP_POOL(MEMP_SYS_TIMEOUT));
 }
@@ -268,6 +298,75 @@ END_TEST
 /* ============================================================
  * DYNAMIC TIMER TESTS - only when SL_LWIP_ND6_DYNAMIC_TIMER enabled
  * ============================================================ */
+
+static int
+nd6_timeout_count(void)
+{
+  struct sys_timeo **list_head = sys_timeouts_get_next_timeout();
+  struct sys_timeo *t;
+  int count = 0;
+
+  if (list_head == NULL) {
+    return 0;
+  }
+  for (t = *list_head; t != NULL; t = t->next) {
+    if (t->h == nd6_tmr) {
+      count++;
+    }
+  }
+  return count;
+}
+
+static s8_t
+nd6_test_setup_reachable_neighbor(void)
+{
+  s8_t i;
+
+  for (i = 0; i < LWIP_ND6_NUM_NEIGHBORS; i++) {
+    if (neighbor_cache[i].state == ND6_NO_ENTRY) {
+      break;
+    }
+  }
+  if (i >= LWIP_ND6_NUM_NEIGHBORS) {
+    return -1;
+  }
+
+#if LWIP_HAVE_LOOPIF
+  /* Isolate test netif: loopback would otherwise keep ND6 timer active */
+  if (netif_get_loopif() != NULL) {
+#if SL_LWIP_ADAPTIVE_TIMERS
+    netif_stop_timers(netif_get_loopif());
+#endif
+    netif_set_link_down(netif_get_loopif());
+  }
+#endif
+
+  netif_add(&test_netif, NULL, NULL, NULL, NULL, testif_init, ethernet_input);
+  test_netif.linkoutput = testif_linkoutput;
+  netif_set_link_up(&test_netif);
+  netif_set_up(&test_netif);
+
+  neighbor_cache[i].state = ND6_REACHABLE;
+  neighbor_cache[i].netif = &test_netif;
+  neighbor_cache[i].counter.reachable_time = ND6_TMR_ECO_INTERVAL;
+  ip6_addr_copy(neighbor_cache[i].next_hop_address, test_neighbor_ip6_addr);
+
+  return i;
+}
+
+static void
+nd6_test_cleanup_reachable_neighbor(s8_t idx)
+{
+  if (idx >= 0) {
+    neighbor_cache[idx].state = ND6_NO_ENTRY;
+    neighbor_cache[idx].netif = NULL;
+  }
+#if LWIP_HAVE_LOOPIF
+  if (netif_get_loopif() != NULL) {
+    netif_set_link_up(netif_get_loopif());
+  }
+#endif
+}
 
 START_TEST(test_nd6_timer_initialization)
 {
@@ -831,6 +930,168 @@ START_TEST(test_nd6_all_eco_states_timer_selection)
 }
 END_TEST
 
+START_TEST(test_nd6_link_down_stops_timer)
+{
+  s8_t idx;
+  LWIP_UNUSED_ARG(_i);
+
+  idx = nd6_test_setup_reachable_neighbor();
+  if (idx < 0) {
+    return;
+  }
+
+  fail_unless(nd6_timeout_count() == 1);
+
+#if SL_LWIP_ADAPTIVE_TIMERS
+  netif_stop_timers(&test_netif);
+#endif
+  netif_set_link_down(&test_netif);
+  fail_unless(nd6_timeout_count() == 0, "No ND6 timeout should remain after link-down");
+
+  nd6_test_cleanup_reachable_neighbor(idx);
+}
+END_TEST
+
+START_TEST(test_nd6_link_up_restarts_timer)
+{
+  s8_t idx;
+  LWIP_UNUSED_ARG(_i);
+
+  idx = nd6_test_setup_reachable_neighbor();
+  if (idx < 0) {
+    return;
+  }
+
+#if SL_LWIP_ADAPTIVE_TIMERS
+  netif_stop_timers(&test_netif);
+#endif
+  netif_set_link_down(&test_netif);
+  fail_unless(nd6_timeout_count() == 0, "ND6 timer should be stopped after link-down");
+
+  netif_set_link_up(&test_netif);
+  fail_unless(nd6_timeout_count() == 1, "Exactly one ND6 timeout after link-up restart");
+
+  nd6_test_cleanup_reachable_neighbor(idx);
+}
+END_TEST
+
+START_TEST(test_nd6_link_up_does_not_duplicate_existing_timer)
+{
+  s8_t idx;
+  LWIP_UNUSED_ARG(_i);
+
+  idx = nd6_test_setup_reachable_neighbor();
+  if (idx < 0) {
+    return;
+  }
+
+#if SL_LWIP_ADAPTIVE_TIMERS
+  netif_stop_timers(&test_netif);
+#endif
+  netif_set_link_down(&test_netif);
+  fail_unless(nd6_timeout_count() == 0, "ND6 timer should be stopped after link-down");
+
+  /* Simulate another ND6 path re-arming the timer before link-up. */
+  nd6_tmr_init();
+  fail_unless(nd6_timeout_count() == 1, "Exactly one ND6 timeout before link-up");
+
+  netif_set_link_up(&test_netif);
+  fail_unless(nd6_timeout_count() == 1,
+              "Link-up should not schedule a duplicate ND6 timeout");
+
+  nd6_test_cleanup_reachable_neighbor(idx);
+}
+END_TEST
+
+START_TEST(test_nd6_link_down_keeps_timer_for_other_netif)
+{
+  s8_t idx1, idx2;
+  ip6_addr_t neighbor2;
+  LWIP_UNUSED_ARG(_i);
+
+  idx1 = nd6_test_setup_reachable_neighbor();
+  if (idx1 < 0) {
+    return;
+  }
+
+  for (idx2 = 0; idx2 < LWIP_ND6_NUM_NEIGHBORS; idx2++) {
+    if (neighbor_cache[idx2].state == ND6_NO_ENTRY) {
+      break;
+    }
+  }
+  if (idx2 >= LWIP_ND6_NUM_NEIGHBORS) {
+    nd6_test_cleanup_reachable_neighbor(idx1);
+    return;
+  }
+
+  memset(&test_netif2, 0, sizeof(struct netif));
+  netif_add(&test_netif2, NULL, NULL, NULL, NULL, testif_init, ethernet_input);
+  test_netif2.name[0] = 'a';
+  test_netif2.name[1] = 'p';
+  test_netif2.linkoutput = testif_linkoutput;
+  netif_set_link_up(&test_netif2);
+  netif_set_up(&test_netif2);
+
+  IP6_ADDR(&neighbor2, 0xfe800000, 0, 0, 0x3);
+  neighbor_cache[idx2].state = ND6_REACHABLE;
+  neighbor_cache[idx2].netif = &test_netif2;
+  neighbor_cache[idx2].counter.reachable_time = ND6_TMR_ECO_INTERVAL;
+  ip6_addr_copy(neighbor_cache[idx2].next_hop_address, neighbor2);
+
+  fail_unless(nd6_timeout_count() == 1, "ND6 timer should be active with two netifs");
+
+#if SL_LWIP_ADAPTIVE_TIMERS
+  netif_stop_timers(&test_netif);
+#endif
+  netif_set_link_down(&test_netif);
+  fail_unless(nd6_timeout_count() == 1,
+              "ND6 timer should keep running when another link-up netif needs it");
+
+#if SL_LWIP_ADAPTIVE_TIMERS
+  netif_stop_timers(&test_netif2);
+#endif
+  netif_set_link_down(&test_netif2);
+  fail_unless(nd6_timeout_count() == 0,
+              "ND6 timer should stop when no link-up netif needs it");
+
+  netif_set_link_up(&test_netif);
+  fail_unless(nd6_timeout_count() == 1,
+              "ND6 timer should restart after link-up when paused for link-down");
+
+  neighbor_cache[idx2].state = ND6_NO_ENTRY;
+  neighbor_cache[idx2].netif = NULL;
+  nd6_test_cleanup_reachable_neighbor(idx1);
+}
+END_TEST
+
+START_TEST(test_nd6_rapid_link_cycle_no_timer_leak)
+{
+  s8_t idx;
+  int cycle;
+  LWIP_UNUSED_ARG(_i);
+
+  idx = nd6_test_setup_reachable_neighbor();
+  if (idx < 0) {
+    return;
+  }
+
+  fail_unless(nd6_timeout_count() == 1, "Exactly one ND6 timeout should be scheduled initially");
+
+  for (cycle = 0; cycle < 10; cycle++) {
+#if SL_LWIP_ADAPTIVE_TIMERS
+    netif_stop_timers(&test_netif);
+#endif
+    netif_set_link_down(&test_netif);
+    /* No timeout should leak across a stop/link-down transition. */
+    fail_unless(nd6_timeout_count() == 0, "No ND6 timeout should remain after link-down");
+    netif_set_link_up(&test_netif);
+    fail_unless(nd6_timeout_count() == 1, "Exactly one ND6 timeout should exist after link-up");
+  }
+
+  nd6_test_cleanup_reachable_neighbor(idx);
+}
+END_TEST
+
 #else /* !SL_LWIP_ND6_DYNAMIC_TIMER */
 
 /* ============================================================
@@ -925,6 +1186,11 @@ nd6_suite(void)
     TESTFUNC(test_nd6_timer_overflow_protection),
     TESTFUNC(test_nd6_mixed_states_timer_selection),
     TESTFUNC(test_nd6_all_eco_states_timer_selection),
+    TESTFUNC(test_nd6_link_down_stops_timer),
+    TESTFUNC(test_nd6_link_up_restarts_timer),
+    TESTFUNC(test_nd6_link_up_does_not_duplicate_existing_timer),
+    TESTFUNC(test_nd6_link_down_keeps_timer_for_other_netif),
+    TESTFUNC(test_nd6_rapid_link_cycle_no_timer_leak),
 #else
     /* Standard timer tests */
     TESTFUNC(test_nd6_standard_timer_operation),

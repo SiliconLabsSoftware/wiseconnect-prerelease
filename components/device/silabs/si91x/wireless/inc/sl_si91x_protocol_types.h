@@ -98,6 +98,9 @@
 // Websocket max subprotocol length
 #define SLI_WEBS_MAX_SUBPROTOCOL_LENGTH 51
 
+// Websocket max origin length
+#define SLI_WEBS_MAX_ORIGIN_LENGTH 51
+
 #if defined(SLI_SI917)
 #define SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA 256
 #else
@@ -442,6 +445,7 @@ typedef struct {
   uint8_t webs_subprotocol_name[SLI_WEBS_MAX_SUBPROTOCOL_LENGTH]; ///< web socket subprotocol name
   uint8_t domain_name[SLI_SI91X_MAX_DOMAIN_NAME_LENGTH];          ///< Domain name for SNI or Host header
   uint8_t socket_ext_bitmap;                                      ///< Extended socket bitmap
+  uint8_t webs_origin[SLI_WEBS_MAX_ORIGIN_LENGTH];                ///< web socket origin
 } sli_si91x_socket_create_request_t;
 #pragma pack()
 

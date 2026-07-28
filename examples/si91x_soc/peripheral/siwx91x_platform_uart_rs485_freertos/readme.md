@@ -68,7 +68,7 @@ This application demonstrates UART RS485 **multidrop** operation on the SiWx91x 
 ### Hardware Requirements
 
 - Windows PC
-- Three Silicon Labs SiWx917 Evaluation Kits [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)] (or equivalent supported radio board)
+- Silicon Labs SiWx917 Evaluation Kits [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)/[BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)/[BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)] (or equivalent supported radio board)
 - Three RS485 transceivers (as shown in the setup diagram)
 
 ### Software Requirements
@@ -113,7 +113,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following macros in [`uart_rs485_mode_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_uart_rs485_freertos/uart_rs485_mode_freertos.c) if required. `UART_INSTANCE` is chosen at compile time from project symbols: if `UART1_RS485_MODE` is defined it is `UART_1`; else if `UART0_RS485_MODE` is defined it is `USART_0`; otherwise it defaults to `UART_1`.
+- Configure the following macros in [`uart_rs485_mode_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_uart_rs485_freertos/uart_rs485_mode_freertos.c) if required. `UART_INSTANCE` is chosen at compile time from project symbols: if `UART1_RS485_MODE` is defined it is `UART_1`; else if `UART0_RS485_MODE` is defined it is `USART_0`; otherwise it defaults to `UART_1`.
 
 - `UART_RS485_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive RS485 UART data. By default, it is set to 1024.
 
@@ -234,6 +234,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | Receive Data (RxD)    | GPIO29[P33]       | RO                        |
 | Driver Enable (DE)    | GPIO51[P34]       | DE                        |
 | Receiver Enable (~RE) | GPIO28[P31]       | ~RE                       |
+
+> **Note:**
+>- On the 4342A PSRAM board, GPIO8 [F8] must not be used as the UART1 Receiver Enable (~RE) pin. Use another available GPIO pin instead.
 
 ### UART and RS485 Universal Configuration
 

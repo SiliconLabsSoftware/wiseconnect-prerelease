@@ -190,7 +190,7 @@ void message_arrived(MessageData *md)
   }
   memcpy(payload_log, md->message->payload, payload_len);
   payload_log[payload_len] = '\0';
-  SL_DEBUG_LOG_V2(INFO, "Message: %s", (uintptr_t)payload_log);
+  printf("Message: %s\r\n", payload_log);
   halt = 1;
 }
 

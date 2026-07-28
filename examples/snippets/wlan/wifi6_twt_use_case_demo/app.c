@@ -210,15 +210,10 @@ void data_callback(uint32_t sock_no,
 {
   UNUSED_PARAMETER(firmware_socket_response);
   UNUSED_PARAMETER(sock_no);
-  uint32_t i;
 
-  SL_DEBUG_LOG_V2(DEBUG, "Command length : %ld\r\n", length);
-  SL_DEBUG_LOG_V2(DEBUG, "Command Received from remote app is:\r\n");
-  SL_DEBUG_LOG_V2(DEBUG, "\"\r\n");
-  for (i = 0; i < length; i++) {
-    SL_DEBUG_LOG_V2(DEBUG, "%c", buffer[i]);
-  }
-  SL_DEBUG_LOG_V2(DEBUG, "\"\r\n");
+  printf("Command length : %ld\r\n", length);
+  printf("Command Received from remote app is:\r\n");
+  printf("%.*s\r\n", (int)length, (char *)buffer);
   data_received_flag = true;
   osSemaphoreRelease(data_semaphore);
 }

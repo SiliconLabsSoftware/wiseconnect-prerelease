@@ -50,6 +50,27 @@ component:
   - exp
 - id: iostream_retarget_stdio
 - id: iostream_recommended_stream
+- id: iostream_rtt
+- id: iostream_eusart
+  instance:
+  - vcom
+  condition:
+  - brd4186c
+- id: iostream_usart
+  instance:
+  - vcom
+  condition:
+  - brd4180a
+- id: iostream_usart
+  instance:
+  - vcom
+  condition:
+  - brd4180b
+- id: iostream_usart
+  instance:
+  - vcom
+  condition:
+  - brd4120a
 - id: iostream_stdlib_config
 - id: wiseconnect_common
 - id: wifi

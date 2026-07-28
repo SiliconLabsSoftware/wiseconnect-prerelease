@@ -146,7 +146,7 @@ upgrade:
   - sdk:
       id: wiseconnect3_sdk
       vendor: silabs
-      version: "4.1.0"
+      version: "4.1.1"
     component:
       - trigger: psram_aps6404l_sqh
         description: >
@@ -172,3 +172,6 @@ upgrade:
           Its replacement, 'Buffer Manager', is pulled in automatically 
           when you select the 'Wi-Fi' component.
         status: automatic
+      - script: upgrade_wiseconnect_ctm.lua
+        description: >
+          Migrate nvm3_network_config_manager and nvm3_credential_manager to flash (CTM) variants.

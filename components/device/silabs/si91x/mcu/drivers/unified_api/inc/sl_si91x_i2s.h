@@ -423,8 +423,12 @@ sl_status_t sl_si91x_i2s_receive_data(sl_i2s_handle_t i2s_handle, const void *da
  * @param[in] i2s_handle Pointer to the I2S driver handle.
  * @param[in] data_in Address of the receive data buffer.
  * @param[in] data_out Address of the transmit data buffer.
- * @param[in] data_in_size Size of the data to be received.
- * @param[in] data_out_size Size of the data to be transmitted.
+ * @param[in] data_in_size Size of the data to be received (number of samples).
+ * @param[in] data_out_size Size of the data to be transmitted (number of samples).
+ *
+ * @note Transfer sizes must be even for all resolutions. For 12-bit and 24-bit
+ *       resolutions, data_in_size and data_out_size must each be a
+ *       multiple of 4.
  *
  * @return sl_status_t Status code indicating the result:
  *         - SL_STATUS_OK  - Success.

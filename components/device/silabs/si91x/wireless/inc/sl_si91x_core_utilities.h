@@ -41,7 +41,10 @@
  * @details
  *   This function fetches the firmware status value that is specific to the current thread.
  *   On Zephyr builds, this function returns SL_STATUS_FAIL as task-register access is not available.
- * 
+ *
+ * @note
+ *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_get_saved_firmware_status()](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-get-saved-firmware-status) API. This is retained for backward compatibility.
+ *
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  ******************************************************************************/

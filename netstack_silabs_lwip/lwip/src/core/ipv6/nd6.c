@@ -112,6 +112,7 @@ static ip6_addr_t multicast_address;
 static u32_t nd6_tmr_rs_reduction = 0;
 static u32_t nd6_last_timer_call = 0xFFFFFFFF;
 static u8_t nd6_first_call = 1;
+static u8_t nd6_timer_active = 0;
 #else
 static u8_t nd6_tmr_rs_reduction;
 #endif
@@ -976,6 +977,7 @@ void
 nd6_tmr_init(void)
 {
   /* Start the nd6 timer with initial 1-second interval */
+  nd6_timer_active = 1;
   sys_timeout(ND6_TMR_ACTIVE_INTERVAL, nd6_tmr, NULL);
 }
 /**
@@ -1098,6 +1100,20 @@ void nd6_tmr(void *arg)
                neighbor_cache[i].state == ND6_DELAY || 
                neighbor_cache[i].state == ND6_PROBE) {
       active_mode = 1;
+    }
+  }
+
+  if (eco_mode) {
+    NETIF_FOREACH(netif) {
+      u8_t ll_state;
+
+      /* Keep ND6 on the active cadence until the link-local address exists
+       * and duplicate address detection has completed. */
+      ll_state = netif_ip6_addr_state(netif, 0);
+      if (ip6_addr_isinvalid(ll_state) || ip6_addr_istentative(ll_state)) {
+        active_mode = 1;
+        break;
+      }
     }
   }
 
@@ -1376,6 +1392,7 @@ void nd6_tmr(void *arg)
                         (next_callback_timeout - processing_time) : ND6_MIN_TMR_INTERVAL;
   
   /* Schedule next timer callback with the determined interval */
+  nd6_timer_active = 1;
   sys_timeout(compensated_timeout, nd6_tmr, NULL);
 }
 #else
@@ -2486,6 +2503,7 @@ nd6_get_next_hop_entry(const ip6_addr_t *ip6addr, struct netif *netif)
 #if SL_LWIP_ND6_DYNAMIC_TIMER
       /* Immediately reschedule timer to 1-second interval for INCOMPLETE state processing */
       sys_untimeout(nd6_tmr, NULL);
+      nd6_timer_active = 1;
       sys_timeout(ND6_TMR_ACTIVE_INTERVAL, nd6_tmr, NULL);
 #endif
     }
@@ -2728,6 +2746,7 @@ nd6_get_next_hop_addr_or_queue(struct netif *netif, struct pbuf *q, const ip6_ad
 #if SL_LWIP_ND6_DYNAMIC_TIMER
     /* Reschedule timer to service DELAY state promptly - don't wait for eco mode timer */
     sys_untimeout(nd6_tmr, NULL);
+    nd6_timer_active = 1;
     sys_timeout(ND6_TMR_ACTIVE_INTERVAL, nd6_tmr, NULL);
 #endif
   }
@@ -2893,6 +2912,65 @@ nd6_adjust_mld_membership(struct netif *netif, s8_t addr_idx, u8_t new_state)
   }
 }
 #endif /* LWIP_IPV6_MLD */
+
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+static void
+nd6_clear_ipv6_core(struct netif *netif)
+{
+  int i;
+
+  LWIP_ERROR("sli_net_lwip_clear_ipv6_core: invalid netif", netif != NULL, return);
+
+  for (i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++) {
+    ip_addr_set_zero_ip6(&(netif->ip6_addr[i]));
+    netif_ip6_addr_set_state(netif, i, IP6_ADDR_INVALID);
+  }
+
+#if LWIP_IPV6_AUTOCONFIG
+  netif_set_ip6_autoconfig_enabled(netif, 0);
+#endif
+}
+
+/** Clean up ND6 state on link-down and stop the global timer if unused. */
+void
+nd6_cleanup_on_link_down(struct netif *netif)
+{
+  LWIP_ASSERT_CORE_LOCKED();
+
+  /* Always clear IPv6 runtime state for the netif that went down. */
+  nd6_clear_ipv6_core(netif);
+
+  /* Keep the global ND6 timer alive while any other netif remains active. */
+  if (netif_other_netif_is_up_link_up(netif)) {
+    return;
+  }
+
+  nd6_timer_active = 0;
+  sys_untimeout(nd6_tmr, NULL);
+}
+
+/** Start ND6 dynamic timer when link comes up. */
+void
+nd6_timer_start(void)
+{
+  LWIP_ASSERT_CORE_LOCKED();
+
+  if (!nd6_timer_active) {
+    nd6_first_call = 1;
+    nd6_last_timer_call = 0xFFFFFFFF;
+    nd6_timer_active = 1;
+    sys_timeout(ND6_TMR_ACTIVE_INTERVAL, nd6_tmr, NULL);
+  }
+}
+
+#if LWIP_TESTMODE
+int
+nd6_timer_is_active(void)
+{
+  return nd6_timer_active;
+}
+#endif /* LWIP_TESTMODE */
+#endif /* SL_LWIP_ND6_DYNAMIC_TIMER */
 
 /** Netif was added, set up, or reconnected (link up) */
 void

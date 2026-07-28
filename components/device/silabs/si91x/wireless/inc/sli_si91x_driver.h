@@ -171,6 +171,16 @@ sl_status_t sli_verify_device_boot(uint32_t *rom_version);
  ******************************************************************************/
 sl_status_t sli_wifi_select_option(const uint8_t configuration);
 
+/***************************************************************************/ /**
+ * @brief Set feature bit map from boot config (called during sl_wifi_init).
+ ******************************************************************************/
+void sli_si91x_set_feature_bit_map(uint32_t feature_bit_map);
+
+/***************************************************************************/ /**
+ * @brief Get feature bit map from boot config (set during sl_wifi_init).
+ ******************************************************************************/
+uint32_t sli_si91x_get_feature_bit_map(void);
+
 #ifdef __cplusplus
 }
 #endif

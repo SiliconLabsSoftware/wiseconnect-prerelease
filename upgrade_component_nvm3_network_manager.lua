@@ -18,19 +18,19 @@ if nvm3_common_flash and network_manager_missing and (not is_psa_app) then
   })
   -- Add NVM3 variants (required for NVM3 common-flash). Do NOT add basic_*;
   -- basic_* and nvm3_* are mutually exclusive.
-  if (not slc.is_selected("nvm3_network_config_manager")) and (not slc.is_provided("nvm3_network_config_manager")) then
+  if (not slc.is_selected("flash_network_config_manager")) and (not slc.is_provided("flash_network_config_manager")) then
     table.insert(changeset, {
-      ['component'] = 'nvm3_network_config_manager',
+      ['component'] = 'flash_network_config_manager',
       ['action'] = 'add'
     })
   end
-  if (not slc.is_selected("nvm3_credential_manager")) and (not slc.is_provided("nvm3_credential_manager")) then
+  if (not slc.is_selected("flash_credential_manager")) and (not slc.is_provided("flash_credential_manager")) then
     table.insert(changeset, {
-      ['component'] = 'nvm3_credential_manager',
+      ['component'] = 'flash_credential_manager',
       ['action'] = 'add'
     })
   end
-  -- Remove basic variants when present so they do not conflict with nvm3_*.
+  -- Remove basic variants when present so they do not conflict with flash_*.
   if slc.is_selected("basic_network_config_manager") then
     table.insert(changeset, {
       ['component'] = 'basic_network_config_manager',

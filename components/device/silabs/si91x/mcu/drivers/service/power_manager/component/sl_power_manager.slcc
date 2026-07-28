@@ -36,6 +36,8 @@ requires:
   - name: systemlevel_time_period
   - name: sl_clock_manager
   - name: log_none
+  - name: code_classification
+    condition: [psram_core]
 define:
   - name: SLI_WIRELESS_COMPONENT_PRESENT
     value: "1"
@@ -43,7 +45,14 @@ define:
       - sl_si91x_wireless
   - name: SLI_POWER_MANAGER_USE_CRITICAL_IRQ_FOR_PS_API
     value: "1"
+  - name: SL_CODE_COMPONENT_SL_POWER_MANAGER
+    value: sl_power_manager
 template_contribution:
+  - name: code_classification_components
+    value: sl_power_manager
+    condition: [psram_core]
+  - name: psram_ram_data_files
+    value: sl_si91x_power_manager
   - name: device_ram_addr
     value: 1024
     priority: -2

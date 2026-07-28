@@ -97,6 +97,7 @@ typedef sl_status_t (*sl_wifi_callback_function_t)(sl_wifi_event_t event,
  *   In case of event failure, SL_WIFI_FAIL_EVENT_STATUS_INDICATION bit is set in the event.
  *   When this bit is set, the `data` parameter will be of type `sl_status_t`, and the `data_length` parameter can be ignored.
  * @note
+ *   This API is supported only on SiWx91x devices. 
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_scan_callback_v2_t](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-scan-callback-v2-t) API. This is retained for backward compatibility.
  */
 typedef sl_status_t (*sl_wifi_scan_callback_t)(sl_wifi_event_t event,
@@ -117,10 +118,10 @@ typedef sl_status_t (*sl_wifi_scan_callback_t)(sl_wifi_event_t event,
  *   | @ref sl_wifi_event_t                 | DataType                                    |
  *   |:-------------------------------------|:--------------------------------------------|
  *   | SL_WIFI_STATS_EVENT                  | Not supported in current release            |
- *   | SL_WIFI_STATS_ASYNC_EVENT            | [sl_wifi_async_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-async-stats-response-t)        |
+ *   | SL_WIFI_STATS_ASYNC_EVENT            | [sl_wifi_async_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-async-stats-response-t)        |
  *   | SL_WIFI_STATS_ADVANCE_EVENT          | Not supported in current release            |
  *   | SL_WIFI_STATS_TEST_MODE_EVENT        | Not supported in current release            |
- *   | SL_WIFI_STATS_MODULE_STATE_EVENT     | [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-module-state-stats-response-t) |
+ *   | SL_WIFI_STATS_MODULE_STATE_EVENT     | [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-module-state-stats-response-t) |
  * @param data
  *   Pointer to the payload received.
  * @param data_length
@@ -133,7 +134,7 @@ typedef sl_status_t (*sl_wifi_scan_callback_t)(sl_wifi_event_t event,
  *
  * @note
  *  SL_WIFI_STATS_MODULE_STATE_EVENT messages are used to indicate module state to the host. These messages are enabled by setting the 10th bit of the custom feature bitmap in opermode.
- *  For the event SL_WIFI_STATS_MODULE_STATE_EVENT response structure refer [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-module-state-stats-response-t).
+ *  For the event SL_WIFI_STATS_MODULE_STATE_EVENT response structure refer [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-module-state-stats-response-t).
  * - state_code of this response  (1 byte), indicates the state of the module. `state_code` contains two parts, the upper nibble and lower nibble.
  *  The state code is formed by combining the upper and the lower nibbles using a bitwise OR operation, that is, State code = upper nibble | lower nibble
  *  For example, if the state code is 82 but is not found in the table, it can be divided as follows: state_code = 80 | 02, where 80 is the upper nibble and 02 is the lower nibble.
@@ -303,7 +304,7 @@ typedef sl_status_t (*sl_wifi_join_callback_t)(sl_wifi_event_t event,
  *   | SL_WIFI_RESCHEDULE_TWT_SUCCESS_EVENT          | TWT session was successfully rescheduled.               |
  *   | SL_WIFI_TWT_INFO_FRAME_EXCHANGE_FAILED_EVENT  | TWT information frame exchange failed.                  |
  * @param data
- *   Pointer to the data received of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
+ *   Pointer to the data received of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
  *   This parameter provides detailed information about the TWT response event. The structure contains various fields that describe the TWT session parameters and status.
  * @param data_length
  *   Length of the data received in bytes.
@@ -452,6 +453,7 @@ typedef sl_status_t (*sl_wifi_callback_function_v2_t)(sl_wifi_event_t event,
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  * @note
+ *   This API is supported only on SiWx91x devices.
  *   In case of event failure, SL_WIFI_FAIL_EVENT_STATUS_INDICATION bit is set in the event.
  *   When this bit is set, the `data` parameter and the `data_length` parameter can be ignored.
  *   In the case of SL_WIFI_SCAN_TYPE_EXTENDED, the scan callback is invoked with data set to NULL and data_length
@@ -478,10 +480,10 @@ typedef sl_status_t (*sl_wifi_scan_callback_v2_t)(sl_wifi_event_t event,
  *   | @ref sl_wifi_event_t                 | DataType                                    |
  *   |:-------------------------------------|:--------------------------------------------|
  *   | SL_WIFI_STATS_EVENT                  | Not supported in current release            |
- *   | SL_WIFI_STATS_ASYNC_EVENT            | [sl_wifi_async_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-async-stats-response-t)        |
+ *   | SL_WIFI_STATS_ASYNC_EVENT            | [sl_wifi_async_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-async-stats-response-t)        |
  *   | SL_WIFI_STATS_ADVANCE_EVENT          | Not supported in current release            |
  *   | SL_WIFI_STATS_TEST_MODE_EVENT        | Not supported in current release            |
- *   | SL_WIFI_STATS_MODULE_STATE_EVENT     | [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-module-state-stats-response-t) |
+ *   | SL_WIFI_STATS_MODULE_STATE_EVENT     | [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-module-state-stats-response-t) |
  * @param status_code
  *   Status code of type sl_status_t. On successful events always indicates SL_STATUS_OK, on failure events indicates the status code of failure.
  *   See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
@@ -498,7 +500,7 @@ typedef sl_status_t (*sl_wifi_scan_callback_v2_t)(sl_wifi_event_t event,
  *
  * @note
  *  SL_WIFI_STATS_MODULE_STATE_EVENT messages are used to indicate module state to the host. These messages are enabled by setting the 10th bit of the custom feature bitmap in opermode.
- *  For the event SL_WIFI_STATS_MODULE_STATE_EVENT response structure refer [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-module-state-stats-response-t).
+ *  For the event SL_WIFI_STATS_MODULE_STATE_EVENT response structure refer [sl_wifi_module_state_stats_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-module-state-stats-response-t).
  * - state_code of this response  (1 byte), indicates the state of the module. `state_code` contains two parts, the upper nibble and lower nibble.
  *  The state code is formed by combining the upper and the lower nibbles using a bitwise OR operation, that is, State code = upper nibble | lower nibble
  *  For example, if the state code is 82 but is not found in the table, it can be divided as follows: state_code = 80 | 02, where 80 is the upper nibble and 02 is the lower nibble.
@@ -674,7 +676,7 @@ typedef sl_status_t (*sl_wifi_join_callback_v2_t)(sl_wifi_event_t event,
  *   See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  * @param data
- *   Pointer to the data received of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-twt-response-t).
+ *   Pointer to the data received of type [sl_wifi_twt_response_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-twt-response-t).
  *   This parameter provides detailed information about the TWT response event. The structure contains various fields that describe the TWT session parameters and status.
  * @param data_length
  *   Length of the data received in bytes.
@@ -827,6 +829,7 @@ extern sl_status_t sl_wifi_default_event_handler(sl_wifi_event_t event, sl_wifi_
  * @note
  *   All the individual Wi-Fi events related to this group would be triggered via this callback.
  * @note
+ *   This API is supported only on SiWx91x devices. 
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_set_scan_callback_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-scan-callback-v2) API. This is retained for backward compatibility.
  ******************************************************************************/
 static inline sl_status_t sl_wifi_set_scan_callback(sl_wifi_scan_callback_t function, void *optional_arg)
@@ -961,6 +964,7 @@ static inline sl_status_t sl_wifi_set_transceiver_callback(sl_wifi_transceiver_c
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  * @note
+ *   This API is supported only on SiWx91x devices. 
  *   All the individual Wi-Fi events related to this group would be triggered via this callback.
  ******************************************************************************/
 static inline sl_status_t sl_wifi_set_scan_callback_v2(sl_wifi_scan_callback_v2_t function, void *optional_arg)
@@ -1126,3 +1130,73 @@ static inline sl_status_t sl_wifi_set_command_engine_status_handler(sl_wifi_comm
 }
 
 /** @} */
+
+/**
+ * @typedef sl_wifi_scan_callback_ext_t
+ * @brief Callback for SL_WIFI_SCAN_RESULT_EVENTS group event of type @ref sl_wifi_event_group_t.
+ *
+ *   This typedef defines a callback function that handles Wi-Fi scan result events of type @ref sl_wifi_event_t.
+ *   The callback is triggered when a Wi-Fi module tries to scan and receive the response, providing the event details and any associated scan results.
+ *
+ * @param event
+ *   Wi-Fi event of type @ref sl_wifi_event_t. This parameter indicates the specific Wi-Fi event that triggered the callback.
+ *   | @ref sl_wifi_event_t                 | Description                                                          |
+ *   |:-------------------------------------|:---------------------------------------------------------------------|
+ *   | SL_WIFI_SCAN_RESULT_EVENTS           | It is an indication to host that the scan was successful or failed   |
+ * @param status_code
+ *   Status code of type sl_status_t. On successful scan event always indicates SL_STATUS_OK, on failure indicates the status code of failure.
+ *   See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
+ *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ * @param data
+ *   Pointer to the scan results of type @ref sl_wifi_scan_result_ext_t. This parameter provides the scan results obtained from the Wi-Fi scan operation.
+ * @param data_length
+ *   Length of the scan results data received in bytes.
+ * @param optional_arg
+ *   Optional user-provided argument passed in [sl_wifi_set_scan_callback_ext](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-scan-callback-ext).
+ *
+ * @pre Wi-Fi module must call @ref sl_wifi_start_scan to receive SL_WIFI_SCAN_RESULT_EVENTS event.
+ *
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
+ *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ * @note
+ *   This API is not supported on SiWx91x devices. 
+ *   The callbacks returns the scan results in the form of @ref sl_wifi_scan_result_ext_t. The RSSI value is signed 16-bit integer.
+ *   In case of event failure, SL_WIFI_FAIL_EVENT_STATUS_INDICATION bit is set in the event.
+ *   When this bit is set, the `data` parameter and the `data_length` parameter can be ignored.
+ */
+typedef sl_status_t (*sl_wifi_scan_callback_ext_t)(sl_wifi_event_t event,
+                                                   sl_status_t status_code,
+                                                   sl_wifi_scan_result_ext_t *data,
+                                                   uint32_t data_length,
+                                                   void *optional_arg);
+
+/***************************************************************************/
+/**
+ * @brief
+ *   Register a callback for the SL_WIFI_SCAN_RESULT_EVENTS group event from @ref sl_wifi_event_group_t.
+ *
+ *   This function allows the user to register a callback function for the SL_WIFI_SCAN_RESULT_EVENTS group.
+ *   When any event within this group occurs, the registered callback function would be invoked, providing the event details and any associated data.
+ *
+ * @param[in] function
+ *   Callback function to register. This parameter specifies the callback function of type @ref sl_wifi_scan_callback_ext_t that would be invoked when an event in the SL_WIFI_SCAN_RESULT_EVENTS group occurs.
+ * @param[in] optional_arg
+ *   Optional user-provided argument. This would be passed back to callback handler of type @ref sl_wifi_scan_callback_ext_t.
+ * @pre Pre-conditions:
+ *   - @ref sl_wifi_init should be called before this API.
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
+ *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ * @note
+ *   This API is not supported on SiWx91x devices.
+ *   All the individual Wi-Fi events related to this group would be triggered via this callback.
+ *   The callbacks returns the scan results in the form of @ref sl_wifi_scan_result_ext_t. The RSSI value is signed 16-bit integer.
+ ******************************************************************************/
+static inline sl_status_t sl_wifi_set_scan_callback_ext(sl_wifi_scan_callback_ext_t function, void *optional_arg)
+{
+  return sli_wifi_set_callback(SL_WIFI_SCAN_RESULT_EVENTS,
+                               NULL,
+                               (sl_wifi_callback_function_v2_t)function,
+                               optional_arg);
+}

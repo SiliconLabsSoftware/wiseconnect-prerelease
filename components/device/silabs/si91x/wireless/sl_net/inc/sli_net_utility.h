@@ -33,6 +33,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "sl_status.h"
+#include "sl_additional_status.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_protocol_types.h"
 #include "sl_net_constants.h"
@@ -81,3 +82,15 @@ sl_status_t sli_si91x_configure_ip_address(sl_net_ip_configuration_t *address,
  *         do not support the requested IP version.
  */
 sl_status_t sli_net_get_vap_for_ip_version(uint8_t vap_id, sl_ip_address_type_t ip_type);
+
+/**
+ * @brief Returns true when IP configuration fully or partially succeeded.
+ *
+ * IP configuration reports partial success for a dual-stack profile via
+ * @ref SL_STATUS_WIFI_IPV4_OK (only IPv4 configured) or @ref SL_STATUS_WIFI_IPV6_OK
+ * (only IPv6 configured). In both cases the link is usable and must not be torn down.
+ *
+ * @param[in] status Status returned by @ref sli_net_configure_ip_address().
+ * @return true if status is @ref SL_STATUS_OK or a partial-success code, false otherwise.
+ */
+bool sli_net_is_ip_config_success(sl_status_t status);

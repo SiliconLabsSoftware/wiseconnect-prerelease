@@ -18,6 +18,7 @@ include:
 - path: inc
   file_list:
     - path: sl_additional_status.h
+    - path: sl_application_profile_types.h
     - path: sl_cmsis_utility.h
     - path: sl_constants.h
     - path: sl_ieee802_types.h
@@ -34,3 +35,9 @@ requires:
 - name: malloc_thread_safety
 - name: log_none
   condition: ["device_si91x"]
+
+toolchain_settings:
+  - option: gcc_compiler_option
+    value: -Wno-error=deprecated-declarations
+  - option: llvm_compiler_option
+    value: -Wno-error=deprecated-declarations

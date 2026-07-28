@@ -347,6 +347,7 @@ typedef enum {
   SLI_WIFI_REQ_DISCOVER_SERVICE          = 0x8F,
   SLI_WIFI_REQ_IPCONFV6                  = 0x90,
   SLI_WIFI_REQ_IP_ADDRESS_INFO           = 0x94,
+  SLI_WIFI_REQ_SET_ADVANCED_CONFIG       = 0x96, ///< Set advanced Wi-Fi configuration (sub-cmd payload)
   SLI_WIFI_REQ_WMM_PS                    = 0x97,
   SLI_WIFI_REQ_WEBPAGE_ERASE             = 0x9A,
   SLI_WIFI_REQ_JSON_OBJECT_ERASE         = 0x9B,
@@ -493,6 +494,7 @@ typedef enum {
   SLI_WIFI_RSP_RADIO                     = 0x81,
   SLI_WIFI_RSP_DISCOVER_SERVICE          = 0x8F,
   SLI_WIFI_RSP_IP_ADDRESS_INFO           = 0x94,
+  SLI_WIFI_RSP_SET_ADVANCED_CONFIG       = 0x96, ///< Set advanced Wi-Fi configuration response
   SLI_WIFI_RSP_WMM_PS                    = 0x97,
   SLI_WIFI_RSP_FWUP                      = 0x99,
   SLI_WIFI_RSP_WEBPAGE_ERASE             = 0x9A,
@@ -843,3 +845,6 @@ typedef enum {
 #define SLI_WIFI_RSP_DNS_SERVER_ADD_WAIT_TIME ((150000 * SL_WIFI_NETWORK_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for Socket create response command
 #define SLI_WIFI_RSP_SOCKET_CREATE_WAIT_TIME ((100000 * SL_WIFI_NETWORK_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+/// Timeout value for set advanced configuration response command
+#define SLI_WIFI_RSP_SET_ADVANCED_CONFIG_WAIT_TIME \
+  ((SLI_WIFI_MANAGEMENT_COMMANDS_BASE_VALUE * SL_WIFI_MANAGEMENT_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))

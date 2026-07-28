@@ -125,6 +125,9 @@ static u8_t netif_client_id;
 #define NETIF_REPORT_TYPE_IPV6  0x02
 static void netif_issue_reports(struct netif *netif, u8_t report_type);
 
+#if SL_LWIP_ADAPTIVE_TIMERS
+static void netif_start_timers(void);
+#endif /* SL_LWIP_ADAPTIVE_TIMERS */
 #if LWIP_IPV6
 static err_t netif_null_output_ip6(struct netif *netif, struct pbuf *p, const ip6_addr_t *ipaddr);
 #endif /* LWIP_IPV6 */
@@ -941,6 +944,17 @@ netif_issue_reports(struct netif *netif, u8_t report_type)
 #endif /* LWIP_IPV6 */
 }
 
+#if SL_LWIP_ADAPTIVE_TIMERS
+/* Centralize timer start hooks so future modules can join here. */
+static void
+netif_start_timers(void)
+{
+#if LWIP_IPV6 && SL_LWIP_ND6_DYNAMIC_TIMER
+  nd6_timer_start();
+#endif /* LWIP_IPV6 && SL_LWIP_ND6_DYNAMIC_TIMER */
+}
+#endif /* SL_LWIP_ADAPTIVE_TIMERS */
+
 /**
  * @ingroup netif
  * Bring an interface down, disabling any traffic processing.
@@ -1036,7 +1050,9 @@ netif_set_link_up(struct netif *netif)
 #if LWIP_IPV6
     nd6_restart_netif(netif);
 #endif /* LWIP_IPV6 */
-
+#if SL_LWIP_ADAPTIVE_TIMERS
+    netif_start_timers();
+#endif /* SL_LWIP_ADAPTIVE_TIMERS */
     NETIF_LINK_CALLBACK(netif);
 #if LWIP_NETIF_EXT_STATUS_CALLBACK
     {
@@ -1084,6 +1100,39 @@ netif_set_link_down(struct netif *netif)
 #endif
   }
 }
+
+#if SL_LWIP_ADAPTIVE_TIMERS
+/** Return whether any other netif is admin-up and link-up. */
+u8_t
+netif_other_netif_is_up_link_up(struct netif *skip_netif)
+{
+  struct netif *n;
+
+  NETIF_FOREACH(n) {
+    if ((n != skip_netif) && netif_is_up(n) && netif_is_link_up(n)) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/** Stop ND6/MLD6 timers without changing link state. */
+void
+netif_stop_timers(struct netif *netif)
+{
+  LWIP_ASSERT_CORE_LOCKED();
+
+  LWIP_ERROR("netif_stop_timers: invalid netif", netif != NULL, return);
+
+#if SL_LWIP_ND6_DYNAMIC_TIMER
+  nd6_cleanup_on_link_down(netif);
+#endif /* SL_LWIP_ND6_DYNAMIC_TIMER */
+#if SL_LWIP_MLD6_ONDEMAND_TIMER
+  mld6_cleanup_on_link_down(netif);
+#endif /* SL_LWIP_MLD6_ONDEMAND_TIMER */
+}
+
+#endif /* SL_LWIP_ADAPTIVE_TIMERS */
 
 #if LWIP_NETIF_LINK_CALLBACK
 /**

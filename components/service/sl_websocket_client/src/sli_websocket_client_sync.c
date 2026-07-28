@@ -141,14 +141,15 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
   }
   si91x_socket->ssl_bitmap |= SLI_SI91X_WEBSOCKET_FEAT;
 
-  // Copy the host name,resource name and subprotocol name from client to si91x_socket->websocket_info
+  // Copy the host name, resource name, subprotocol name and origin from client to si91x_socket->websocket_info
   size_t host_length        = strlen(client->host);
   size_t resource_length    = strlen(client->resource);
   size_t subprotocol_length = strlen(client->subprotocol);
+  size_t origin_length      = strlen(client->origin);
 
   // Allocate memory for websocket_info
-  si91x_socket->websocket_info = (sli_si91x_websocket_info_t *)malloc(sizeof(sli_si91x_websocket_info_t) + host_length
-                                                                      + resource_length + subprotocol_length);
+  si91x_socket->websocket_info = (sli_si91x_websocket_info_t *)malloc(
+    sizeof(sli_si91x_websocket_info_t) + host_length + resource_length + subprotocol_length + origin_length);
 
   if (si91x_socket->websocket_info == NULL) {
     SL_DEBUG_LOG_V2(ERROR, "\r\nMemory allocation for WebSocket info failed\r\n");
@@ -161,13 +162,17 @@ sl_websocket_error_t sli_websocket_connect_sync(sl_websocket_client_t *client)
   si91x_socket->websocket_info->host_length        = host_length;
   si91x_socket->websocket_info->resource_length    = resource_length;
   si91x_socket->websocket_info->subprotocol_length = subprotocol_length;
+  si91x_socket->websocket_info->origin_length      = origin_length;
 
-  // Copy the host, resource name and subprotocol name to websocket_info
+  // Copy the host, resource name, subprotocol name and origin to websocket_info
   memcpy(si91x_socket->websocket_info->websocket_data, client->host, host_length);
   memcpy(si91x_socket->websocket_info->websocket_data + host_length, client->resource, resource_length);
   memcpy(si91x_socket->websocket_info->websocket_data + host_length + resource_length,
          client->subprotocol,
          subprotocol_length);
+  memcpy(si91x_socket->websocket_info->websocket_data + host_length + resource_length + subprotocol_length,
+         client->origin,
+         origin_length);
 
   sock_result = connect(sock_fd, (struct sockaddr *)&server_address, socket_length);
   if (sock_result < 0) {
@@ -191,4 +196,28 @@ sl_status_t sli_websocket_set_subprotocol(sl_websocket_client_t *client, const c
   strncpy(client->subprotocol, subprotocol, SLI_WEBS_MAX_SUBPROTOCOL_LENGTH - 1);
   client->subprotocol[SLI_WEBS_MAX_SUBPROTOCOL_LENGTH - 1] = '\0'; // Ensure null termination
   return SL_STATUS_OK;
+}
+
+sl_websocket_error_t sli_websocket_set_origin(sl_websocket_client_t *handle, const char *origin)
+{
+  if (!handle) {
+    return SL_WEBSOCKET_ERR_INVALID_PARAMETER;
+  }
+
+  // Check if the WebSocket client is in a valid state to initialize
+  if (handle->state != SL_WEBSOCKET_STATE_DISCONNECTED) {
+    SL_DEBUG_LOG_V2(DEBUG, "\r\nInvalid state for initializing a WebSocket client\r\n");
+    return SL_WEBSOCKET_ERR_INVALID_PARAMETER;
+  }
+
+  if (origin == NULL || origin[0] == '\0') {
+    return SL_WEBSOCKET_ERR_INVALID_PARAMETER;
+  }
+
+  if (strlen(origin) >= SL_SI91X_WEBSOCKET_MAX_ORIGIN_LENGTH) {
+    return SL_WEBSOCKET_ERR_MAX_LENGTH_EXCEEDED;
+  }
+
+  snprintf(handle->origin, sizeof(handle->origin), "%s", origin);
+  return SL_WEBSOCKET_SUCCESS;
 }

@@ -143,6 +143,8 @@ sl_status_t sli_memlcd_spi_tx(const void *data, unsigned len)
     SL_PRINT_STRING_ERROR("\r\n Failed to Active Slave Select Line for SPI "
                           "Transfer, Error Code : %ld\r\n",
                           (long)status_spi);
+    free(temp);
+    temp = NULL;
     return SL_STATUS_FAIL;
   }
 
@@ -152,9 +154,16 @@ sl_status_t sli_memlcd_spi_tx(const void *data, unsigned len)
 
   // Trigger the SPI data transfer
   status_spi = SPIdrv->Send(temp, len);
+  if (status_spi != ARM_DRIVER_OK) {
+    SL_PRINT_STRING_ERROR("\r\n Failed to Send SPI data, Error Code : %ld\r\n", (long)status_spi);
+    free(temp);
+    temp = NULL;
+    return SL_STATUS_FAIL;
+  }
 
   // Free allocated memory
   free(temp);
+  temp = NULL;
 
   return SL_STATUS_OK;
 }

@@ -9,8 +9,6 @@
       license: MSLA
 - define:
   - name: SIWN917M100LGTBA
-    unless:
-    - device_content_override
   - name: SLI_SI917
     value: '1'
   - name: SLI_SI917B0

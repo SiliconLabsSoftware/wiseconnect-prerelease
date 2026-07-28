@@ -34,6 +34,7 @@
     - [APIs and functions (implementation reference)](#apis-and-functions-implementation-reference)
     - [Runtime sequence when enabled](#runtime-sequence-when-enabled)
     - [Failure behavior and disconnected path](#failure-behavior-and-disconnected-path)
+    - [Example serial output (macro = 1)](#example-serial-output-macro--1)
   
 ## Purpose / Scope
 
@@ -43,7 +44,7 @@ An **optional** build-time path can run **runtime BLE disable**, a **16k-record 
 
 ## Soc Mode
 
-Si917 connected to LM75 Temperature Sensor via I2C interface collects real time temperature data publishes to the cloud until the device is disconnected from the access point. After publish, the NWP processor is set into associated power save. The application works differently in NCP and SoC modes as defined below.  
+The Si917 is connected to LM75 Temperature Sensor through I2C interface that collects real time temperature data publishes to the cloud until the device is disconnected from the access point. After publishing, the NWP processor is set to the associated power save mode. The application works differently in NCP and SoC modes.  
 
 If macro **SL_SI91X_TICKLESS_MODE** enabled, then the M4 processor is set in sleep mode. The M4 processor can be woken in several ways as mentioned below:
 
@@ -85,7 +86,7 @@ A timer is run with a periodicity of **PUBLISH_PERIODICITY** milliseconds. The a
 - USB-C cable
 - A Wireless Access Point (which has an active internet access)
 - Android Phone or iPhone with **Simplicity Connect App (formerly EFR Connect App)** App, which is available in Play Store and App Store.
-- **Temperature Sensor Requirement**: Please note that an external LM75 temperature sensor must be connected for the application to function correctly, as the WSDK/WPK board does not have a built-in sensor.
+- **Temperature Sensor Requirement**: Note that an external LM75 temperature sensor must be connected for the application to function correctly, as the WSDK/WPK board does not have a built-in sensor.
 - **SoC Mode**:
   - Standalone
     - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
@@ -135,7 +136,7 @@ The diagram below illustrates the detailed flow of the application:
 
 ## Getting Started
 
-The below instructions are provided in [here]( https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
+The below instructions are provided in [Developing with Boards in SoC Mode]( https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
 
 - Install Simplicity Studio and WiSeConnect extension
 - Connect your device to the computer
@@ -150,9 +151,9 @@ The application can be configured to suit your requirements and development envi
 
 For SoC Mode only:
 
-- Below is the default configuration for I2C2 instance define in RTE_Device_917.h file (path: /$project/config/RTE_Device_917.h)
 - I2C2 is utilized for communication with the temperature sensor.
 - You can change the I2C instance in the Universal Configurator using the **I2C** component (i2c_instance). Enable only one instance (i2c0/i2c1/i2c2); the application auto-selects the enabled instance at build time.
+- Following is the default configuration for I2C2 instance defined in the RTE_Device_917.h file (path: /$project/config/RTE_Device_917.h).
 
     ```c
 
@@ -257,7 +258,7 @@ The following are the **non-configurable** macros in the application.
 
 ### Configure the following parameters in `aws_iot_config.h` file present at `<project>/config`
 
-Before configuring the parameters in `aws_iot_config.h`, register the SiWx917 device in the AWS IoT registry by following the steps mentioned in the [Create an AWS Thing](#create-an-aws-thing) section.
+Before configuring the parameters in `aws_iot_config.h`, register the SiWx917 device in the AWS IoT registry by performing the steps mentioned in the [Create an AWS Thing](#create-an-aws-thing) section.
 
 Configure AWS_IOT_MQTT_HOST macro with the device data endpoint to connect to AWS. To get the device data endpoint in the AWS IoT Console, navigate to Settings, copy the Endpoint, and define the AWS_IOT_MQTT_HOST macro with this value.
 
@@ -289,12 +290,12 @@ By default, the WiSeConnect SDK contains the Starfield Root CA Certificate in C-
 
 ## Test the Application
 
-The below instructions are provided in [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
+The followng instructions are provided in [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
 
 - Build the application.
 - Flash, run, and debug the application.
 
-Follow the steps below for successful execution of the application:
+Perform the following steps for successful execution of the application:
 
 1. Configure the access point in OPEN/WPA-PSK/WPA2-PSK/WPA3 mode to connect the SiWx917 in STA mode.
 
@@ -302,31 +303,31 @@ Follow the steps below for successful execution of the application:
 
 3. When the SiWx917 EVK enters BLE advertising mode, launch the **Simplicity Connect App (formerly EFR Connect App)**.
 
-4. Click on Demo and select Wi-Fi Commissioning over BLE.
+4. Click **Demo** and select **Wi-Fi Commissioning over BLE**.
 
    ![](resources/readme/remote_screen1.png)
 
-5. It will scan for the module, and it appears as `BLE_CONFIGURATOR` on the UI. Select as shown below.
+5. It will scan for the module, and it appears as `BLE_CONFIGURATOR` on the UI. Select as shown in the image.
 
    ![](resources/readme/dut_scan_result.png)
 
-6. Now, SiWx917 module will start as a station and scan for the access points (AP) nearby.
+  The SiWx917 module starts as a station and scan for the nearby access points (AP).
 
-7. Once the list of AP scan results is displayed on the screen, you can select the SSID of the AP to which you want to connect.
+7. After the list of AP scan results is displayed on the screen, you can select the SSID of the AP to which you want to connect.
 
    ![](resources/readme/remote_screen2.png)
 
-8. Click on the SSID of the AP, enter a password if the AP is in security mode. Click on connect to associate with the access point.
+8. Click the SSID of the AP, enter a password if the AP is in security mode. Click on connect to associate with the access point.
 
    ![](resources/readme/remote_screen3.png)
 
-9. Once the Silicon Labs module is connected to the access point, you can see it on the GUI, as shown below.
+9. After the Silicon Labs module is connected to the access point, you can see it on the GUI, as shown in the image.
 
    ![](resources/readme/remote_screen4.png)
 
-10. This completes the BLE provisioning using Android application. The next step is the [MQTT Connection](#mqtt-connection). If **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **1** in **`wifi_config.h`**, expect additional serial activity (BLE disable, 16k TLS demo, reconnect) before MQTT; see [Optional: Dynamic BLE enable/disable and 16k SSL demo](#optional-dynamic-ble-enable-disable-and-16k-ssl-demo).
+10. This completes the BLE provisioning using Android application. The next step is the [MQTT Connection](#mqtt-connection). If **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **1** in **`wifi_config.h`**, do additional serial activity (BLE disable, 16k TLS demo, reconnect) before MQTT. See [Runtime sequence when enabled](#runtime-sequence-when-enabled) and [Example serial output (macro = 1)](#example-serial-output-macro--1).
 
-11. To disconnect from the access point, click on connected AP and click on YES.
+11. To disconnect from the access point, select the connected AP and click **YES**.
 
     ![](resources/readme/remote_screen5.png)
 
@@ -346,8 +347,8 @@ Follow the steps below for successful execution of the application:
 
 **Note:**
 
-- To learn more about aws mqtt apis error codes, refer to the `aws_iot_error.h` file present in the `<SDK>\third_party\aws_sdk\include\`.
-- If the user is calling select and experiencing long wait times, and if no data is received, it is the user's responsibility to manage sending the keepalive packets to maintain the connection.
+- To learn more about aws mqtt APIs error codes, refer to the `aws_iot_error.h` file present in the `<SDK>\third_party\aws_sdk\include\`.
+- If the user is calling and experiencing long wait times, and if no data is received, it recommended to keep sending the keepalive packets to maintain the connection.
   
 ### MQTT Connection
 
@@ -357,17 +358,17 @@ Follow the steps below for successful execution of the application:
 
   1. Go to the  [AWS IoT console](https://console.aws.amazon.com/iot/home). In the navigation pane, under Manage, choose All devices, and then choose Things.
 
-  2. Click on the thing you have created. Go to activity as shown below. Click on MQTT test client as shown below.
+  2. Click on the thing you have created. Go to activity as shown in the image. Click **MQTT test client** as shown in the image.
 
      ![](resources/readme/aws_screen.png)
 
-  3. Then subscribe to a topic that is configured in the application, give the name of the topic, and click on subscribe as shown below. You can see the published data from the device.
+  3. Then subscribe to a topic that is configured in the application, provide the name of the topic, and click **Subscribe** as shown in the image. You can see the published data from the device.
 
      ![](resources/readme/aws_screen1.png)
 
      ![](resources/readme/aws_screen2.png)
 
-  4. To publish data from AWS, enter the name of the topic configured in the application and write down the data at Message payload as shown below. Then click on publish.
+  4. To publish data from AWS, enter the name of the topic configured in the application and write the data at Message payload as shown in the image, and then click **Publish**.
 
      ![](resources/readme/aws_screen3.png)
 
@@ -387,9 +388,9 @@ After flashing the application code to the module, the energy profiler can be us
 
    ![Figure: Energy Profiler Step 7](resources/readme/energy_profiler_step_7.png)
 
-   **NOTE** :
+   **Note**
 
-    - The measured current may vary if the scenario is performed in an open environment. AP to AP variation is also observed.
+    - The measured current may vary if the scenario is performed in an open environment. Variation in different access points is also observed.
     - To achieve the lowest power numbers in connected sleep, in SoC mode, configure mem_config to
   `MEMORY_MCU_ADVANCED_WIRELESS_BASIC` in software components and M4 to without RAM retention, i.e., `sl_si91x_configure_ram_retention` should not be done.
 
@@ -397,9 +398,9 @@ After flashing the application code to the module, the energy profiler can be us
 
   ![output_prints](resources/readme/power_meter_avg_current_consumption.png)
 
-**NOTE:**
+**Note**
 
-For NCP mode, following defines have to enabled manually in preprocessor setting of example project
+For NCP mode, following defines have to enabled manually in preprocessor setting of example project.
 
 - For 917A0 expansion board, enable SLI_SI917 = 1
 - For 917B0 1.2 expansion board, enable SLI_SI917 = 1, SLI_SI917B0 = 1
@@ -407,7 +408,7 @@ For NCP mode, following defines have to enabled manually in preprocessor setting
 
 ### Setting up Security Certificates
 
-- The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/resources/certificates/).
+- The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/resources/certificates/).
 
 - Copy the downloaded device certificate, private key from AWS, and also the certificate_to_array.py to the `<SDK>/resources/certificates`.
 
@@ -421,7 +422,7 @@ For NCP mode, following defines have to enabled manually in preprocessor setting
   $> python3 certificate_to_array.py d8f3a44d3f.pem.key aws_client_private_key.pem
   ```
 
-- After running the above commands, two new files are created as below:
+- After running the above commands, two new files are created as follows:
 
    ```sh
    aws_client_certificate.pem.crt.h
@@ -442,11 +443,11 @@ For NCP mode, following defines have to enabled manually in preprocessor setting
 
 - The Starfield Root CA certificate used by your Wi-Fi device to verify the AWS server is already included in the WiSeConnect SDK at `<SDK>/resources/certificates`; no additional setup is required.
 
-  > **NOTE :**
+  > **Note**
   > Support for the SNI extension has been added to the AWS SDK, ensuring it is set by the client when connecting to an AWS server using TLS 1.3. This is handled internally by the AWS SDK and does not affect compatibility with other TLS versions.
 
-  > **NOTE :**
-  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
+  > **Note**
+  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
   >
   > AWS has announced that there will be changes in their root CA chain. More details can be found in the reference link: [here](https://aws.amazon.com/blogs/security/acm-will-no-longer-cross-sign-certificates-with-starfield-class-2-starting-august-2024/)
   >
@@ -458,7 +459,7 @@ For NCP mode, following defines have to enabled manually in preprocessor setting
   >
   > On a SiWx91x device, we do not maintain the root CA trust repository due to memory constraints, so it is mandatory to load Starfield Root CA certificate for successful mutual authentication to the AWS server.
   >
-  > The certificate chain sent by AWS server is as below:
+  > The certificate chain sent by AWS server:
   > **Starfield Class 2**:
   > id-at-commonName=Amazon,RSA 2048 M01,id-at-organizationName=Amazon,id-at-countryName=US
   > id-at-commonName=Amazon Root CA 1,id-at-organizationName=Amazon,id-at-countryName=US
@@ -482,11 +483,11 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 
    ![AWS console](resources/readme/aws_create_thing_step1.png)
 
-2. If **No things** message is displayed, click on **Create things**.
+2. If **No things** message is displayed, click **Create things**.
 
    ![AWS thing](resources/readme/aws_create_thing_step2.png)
 
-3. On the **Create things** page, choose **Create single thing** and click next.
+3. On the **Create things** page, select **Create single thing** and click **Next**.
 
    ![AWS thing creation](resources/readme/aws_create_thing_step3.png)
 
@@ -494,7 +495,7 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 
    ![Add Device 1](resources/readme/aws_create_thing_step4.png)
 
-5. During **Configure device certificate** step, choose **Auto-generate a new certificate (recommended)** option and click next.
+5. During **Configure device certificate** step, select **Auto-generate a new certificate (recommended)**, and then click **Next**.
 
    ![Add Device 2](resources/readme/aws_create_thing_step5.png)
 
@@ -506,15 +507,15 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 
    - If policy is not yet created, follow the steps below.
   
-     1. Choose **Create policy** and fill the fields as per your requirements.
+     1. Select **Create policy** and fill the fields as per your requirements.
 
          ![Create policy](resources/readme/aws_create_thing_attach_policy.png)
 
-     2. Give the **Name** to your Policy. Fill in the **Action** and **Resource ARN** fields as shown in the image below. Click on **Allow** under **Effect** and click **Create**.
+     2. Enter a **Name** for your Policy. Fill in the **Action** and **Resource ARN** fields as shown in the image below. Click **Allow** under **Effect**, and thn click **Create**.
 
         ![Filling fields for policy](resources/readme/aws_create_thing_policy_create.png)
 
-     3. Choose the created policy and click on **Create thing**.
+     3. Select the created policy and click on **Create thing**.
 
 7. Choose the **Download** links to download the device certificate and private key. Note that Root CA certificate is already present in the SDK (aws_starfield_ca.pem.h), and can be directly used.
   
@@ -526,7 +527,7 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 
    The created thing should now be visible on the AWS console (**Manage > All devices > Things**).
 
-## Optional: Dynamic BLE enable/disable and 16k SSL demo
+## Optional: Dynamic BLE Enable/Disable and 16k SSL Demo
 
 This section documents the **optional** code path compiled when **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **1** in **`wifi_config.h`**. The **default** in this example tree is **0**: standard BLE provisioning, then MQTT, with no runtime BLE stack disable/enable.
 
@@ -534,23 +535,27 @@ When you set the macro to **1**, edit **`SSL_16K_DEMO_SERVER_IP`**, **`SSL_16K_D
 
 ### Overview
 
+**Simplicity Connect mobile app:** Initial Wi‑Fi provisioning over BLE uses the **Simplicity Connect App** (formerly EFR Connect App) and the **Wi‑Fi Commissioning over BLE** demo, as described in [Test the Application](#test-the-application). That flow is unchanged when **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **0** or **1**. The optional dynamic segment runs **automatically in firmware after DHCP**; it is **not** triggered by MQTT data and does **not** require the mobile app during BLE disable, the 16k SSL lab demo, BLE enable, or Wi‑Fi reconnect.
+
+**16k SSL record demo:** A **lab-only** step that validates TLS using a **16 KB SSL record** size. When the macro is **1**, **`app.c`** ORs **`SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD`** into the boot **`ext_tcp_ip_feature_bit_map`** so the network stack can use 16k-record TLS. After BLE is disabled, **`wifi_app_ssl_16k_demo()`** opens **two** TLS 1.2 TCP clients to **`SSL_16K_DEMO_SERVER_IP`** on **`SSL_16K_DEMO_SERVER_PORT_1`** and **`SSL_16K_DEMO_SERVER_PORT_2`** (OpenSSL **`s_server`** listeners on a lab PC). This is separate from AWS MQTT TLS.
+
 | `SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO` | Behavior summary |
 |--------------------------------------|------------------|
 | **0** (default) | After DHCP, the Wi‑Fi task proceeds to **MQTT** immediately. **`rsi_wlan_mqtt_certs_init()`** calls **`load_certificates_in_flash()`** at boot. No FreeRTOS message queues for BLE disable/enable, no **`WIFI_APP_BLE_ENABLE_REQUEST`**, and **`SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD`** is not added to boot **`ext_tcp_ip_feature_bit_map`**. |
-| **1** | After first DHCP success, the firmware **quiesces BLE**, calls **`rsi_ble_disable()`**, runs **`wifi_app_ssl_16k_demo()`** (two TLS 1.2 TCP clients), **`sl_wifi_disconnect()`**, **`rsi_ble_enable()`**, **`wifi_app_init_and_reconnect()`** ( **`sl_net_set_credential`** for PSK, **`sl_wifi_connect`**, DHCP only — **no** **`sl_wifi_init()`** ), then **`load_certificates_in_flash()`** for AWS and starts **MQTT**. Failures in that block skip MQTT and use the disconnected / reprovision path. |
+| **1** | After first DHCP success, the firmware runs the [runtime sequence](#runtime-sequence-when-enabled) below (BLE quiesce → disable → 16k SSL demo → station disconnect → BLE enable → Wi‑Fi reconnect → AWS cert load), then starts **MQTT**. Failures skip MQTT and use the [disconnected path](#failure-behavior-and-disconnected-path). |
 
-### Return codes for runtime BLE enable and disable (SDK)
+### Return Codes for Runtime BLE Enable and Disable (SDK)
 
 The WiseConnect stack tracks BLE runtime enable state (initialized from the Wi‑Fi/BLE coex opermode during driver init and updated after successful **`rsi_ble_enable()`** / **`rsi_ble_disable()`**). Those APIs perform an internal state check before sending a firmware command, so application code does **not** need to call **`rsi_ble_state_is_enabled()`** explicitly for a redundant call to be skipped.
 
-- **`rsi_ble_enable()`** — On success, BLE was off and the enable command completes. Otherwise you may see **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already enabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`** if the device or driver is not initialized.
-- **`rsi_ble_disable()`** — On success, BLE was on and the disable command completes. Otherwise you may see **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already disabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`**.
+- **`rsi_ble_enable()`** — On success, BLE will be enabled. Otherwise, the API might return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already enabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`** if the device or driver is not initialized.
+- **`rsi_ble_disable()`** — On success, BLE will be disabled. Otherwise, the API might return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already disabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`**.
 
 **Queues:** **`ble_enable_done_queue`** and **`ble_disable_done_queue`** carry the **`int32_t`** return value from **`app_ble_enable()`** / **`app_ble_disable()`** (wrappers around the APIs above). A **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** result therefore reaches the Wi‑Fi task as **non-success** even when the firmware was already in the desired state (idempotent no-op). This example treats any non-success from those queues as a **failed** step for MQTT or disconnect recovery; product code may map **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** to success when the goal is only “ensure enabled” or “ensure disabled.”
 
 **Other BLE commands** may return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if issued while the stack believes BLE is **disabled**.
 
-### Build-time configuration
+### Build-time Configuration
 
 | Component | File | Purpose / setting |
 |-----------|------|-------------------|
@@ -568,11 +573,11 @@ The WiseConnect stack tracks BLE runtime enable state (initialized from the Wi�
 | **Demo CA `cacert` load** | **`wifi_app.c`** | **`sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, ...)`** before **`wifi_app_ssl_16k_demo()`** when macro **1**. |
 | **`load_certificates_in_flash()`** (post-reconnect) | **`wifi_app.c`** | After **`wifi_app_init_and_reconnect()`** succeeds in **`WIFI_APP_IPCONFIG_DONE_STATE`**; loads AWS Starfield CA, client cert, private key at index **0**. |
 
-### Lab TLS server (OpenSSL example)
+### Lab TLS Server (OpenSSL example)
 
 The 16k SSL demo opens **two** TLS 1.2 TCP **clients** on the same host (**`SSL_16K_DEMO_SERVER_IP`**) to **two different ports** (**`SSL_16K_DEMO_SERVER_PORT_1`** and **`SSL_16K_DEMO_SERVER_PORT_2`** in **`wifi_config.h`**). You must have **two separate TLS listeners** on the PC or appliance that runs OpenSSL—one process (one listening socket) per port.
 
-Reference **server** PEM files (same convention as other WiseConnect TLS examples, e.g. **tls_client**, **three_ssl_concurrent_client_sockets**): use **`/<SDK>/resources/certificates/server-cert.pem`** and **`/<SDK>/resources/certificates/server-key.pem`**. Copy them to the directory from which you run **`openssl`**, pass full paths on **`-cert`** / **`-key`**, or copy them next to **`openssl.exe`** on Windows as those readmes describe.
+Reference **server** PEM files (same convention as other WiseConnect TLS examples, e.g., **tls_client**, **three_ssl_concurrent_client_sockets**): use **`/<SDK>/resources/certificates/server-cert.pem`** and **`/<SDK>/resources/certificates/server-key.pem`**. Copy them to the directory from which you run **`openssl`**, pass full paths on **`-cert`** / **`-key`**, or copy them next to **`openssl.exe`** on Windows as those readmes describe.
 
 Use the same command shape for each listener; only **`-accept <port>`** (and optionally cert/key paths) changes between the two:
 
@@ -589,7 +594,7 @@ openssl s_server -accept 4444 -cert server-cert.pem -key server-key.pem -tls1_2
 
 The sample you start from is the same structure with **`-accept 4444`**; duplicate that line for the second port (**`-accept 4443`**, or whatever you set for **`SSL_16K_DEMO_SERVER_PORT_1`** / **`SSL_16K_DEMO_SERVER_PORT_2`**). Use a server certificate chain that matches the demo signing CA (**`cacert`**) loaded on the device for the 16k demo, or adjust **`cacert`** / server material so verification succeeds.
 
-### Data structures, queues, and Wi-Fi/BLE IPC
+### Data Structures, Queues, and Wi-Fi/BLE IPC
 
 **`rsi_app_cmd_t` values (Wi‑Fi → BLE mailbox)**
 
@@ -627,16 +632,13 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 | 1 | **`WIFI_APP_IPCONFIG_DONE_STATE`** | Wi‑Fi | Dynamic path entered after DHCP. |
 | 2 | **`osMessageQueueGet(ble_disable_done_queue, ...)`** | Wi‑Fi | Blocks until BLE posts disable result. |
 | 3 | **`WIFI_APP_CONNECTION_STATUS`** | Wi‑Fi → BLE | Sent with join; BLE runs join → quiesce when macro **1**. |
-| 4 | **`RSI_BLE_WLAN_JOIN_STATUS`** | BLE | GATT “AP joined”; then stop advertising + disconnect when macro **1**. |
-| 5 | **`rsi_ble_stop_advertising()`** | BLE | Stop advertising before disable. This API **may return an error** if advertising is **not** active (already stopped); the example **logs and continues**—see **Note** below. |
-| 6 | **`rsi_ble_disconnect()`** | BLE | Drop BLE link; on sync error, post to **`ble_disable_done_queue`** and skip pending disable. |
-| 7 | **`RSI_BLE_DISCONN_EVENT`** | BLE | Disconnect complete. |
-| 8 | **`ble_disable_after_disconnect_pending`** | BLE | If set, run **`rsi_ble_disable`** after disconnect event. |
-| 9 | **`app_ble_disable()`** | BLE | Wrapper for **`rsi_ble_disable()`**. |
-| 10 | **`rsi_ble_disable()`** | BLE | Turn off BLE stack after link quiesced. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already disabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
-| 11 | **`osMessageQueuePut(ble_disable_done_queue, ...)`** | BLE | Posts **`RSI_SUCCESS`**, **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`**, **`SL_STATUS_NOT_INITIALIZED`**, or other error to Wi‑Fi. |
-
-**Note:** A non-success status from **`rsi_ble_stop_advertising()`** does **not** abort the disable path by itself. Typical case: **no advertising** is running when the call is made. **`ble_app.c`** prints **`rsi_ble_stop_advertising before BLE disable: 0x… (continuing)`** and proceeds to **`rsi_ble_disconnect()`** and **`rsi_ble_disable()`** as usual.
+| 4 | **`RSI_BLE_WLAN_JOIN_STATUS`** | BLE | GATT “AP joined”; then disconnect when macro **1**. |
+| 5 | **`rsi_ble_disconnect()`** | BLE | Drop BLE link; on sync error, post to **`ble_disable_done_queue`** and skip pending disable. |
+| 6 | **`RSI_BLE_DISCONN_EVENT`** | BLE | Disconnect complete. |
+| 7 | **`ble_disable_after_disconnect_pending`** | BLE | If set, run **`rsi_ble_disable`** after disconnect event. |
+| 8 | **`app_ble_disable()`** | BLE | Wrapper for **`rsi_ble_disable()`**. |
+| 9 | **`rsi_ble_disable()`** | BLE | Turn off BLE stack after link quiesced. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already disabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
+| 10 | **`osMessageQueuePut(ble_disable_done_queue, ...)`** | BLE | Posts **`RSI_SUCCESS`**, **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`**, **`SL_STATUS_NOT_INITIALIZED`**, or other error to Wi‑Fi. |
 
 **BLE enable chain (explicit; one row per step)**
 
@@ -645,7 +647,7 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 | 1 | **`wifi_app_send_to_ble(WIFI_APP_BLE_ENABLE_REQUEST, ...)`** | Wi‑Fi | Queues enable request to BLE task. |
 | 2 | **`RSI_BLE_ENABLE_REQUEST`** | BLE | Internal event **`0x1B`** in **`rsi_ble_configurator_task`**. |
 | 3 | **`app_ble_enable()`** | BLE | Wrapper for **`rsi_ble_enable()`**. |
-| 4 | **`rsi_ble_enable()`** | BLE | Turn BLE stack back on. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already enabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
+| 4 | **`rsi_ble_enable()`** | BLE | Enable the BLE stack. May return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE is **already enabled** (no command sent). May return **`SL_STATUS_NOT_INITIALIZED`** if not initialized. |
 | 5 | **`osMessageQueuePut(ble_enable_done_queue, ...)`** | BLE | Posts **`RSI_SUCCESS`**, **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`**, **`SL_STATUS_NOT_INITIALIZED`**, or other error to Wi‑Fi. |
 
 **Reconnect after demo (one row per API / symbol)**
@@ -659,12 +661,12 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 | 5 | **`sl_wifi_init`** | — | **Not** called; stack stays initialized from boot. |
 | 6 | **`rsi_wlan_init_wifi()`** | **`app.c`** | **Not** invoked by **`wifi_app_init_and_reconnect()`** in this tree. |
 
-### APIs and functions (implementation reference)
+### APIs and Functions (implementation reference)
 
 | Location | Symbol | Role |
 |----------|--------|------|
 | `ble_app.c` | `app_ble_disable`, `app_ble_enable` | Thin wrappers around **`rsi_ble_disable()`** / **`rsi_ble_enable()`**; used only when the macro is **1**. See [Return codes for runtime BLE enable and disable (SDK)](#return-codes-for-runtime-ble-enable-and-disable-sdk). |
-| `ble_app.c` | `rsi_ble_stop_advertising`, `rsi_ble_disconnect`, `rsi_ble_start_advertising` | Quiesce link before disable (**`rsi_ble_stop_advertising`** errors ignored when not advertising—log and continue); restart advertising on normal disconnect when not in disable-pending path. |
+| `ble_app.c` | `rsi_ble_disconnect`, `rsi_ble_start_advertising` | Disconnect before disable; restart advertising on normal disconnect when not in disable-pending path. |
 | `wifi_app.c` | `wifi_app_ssl_16k_demo` | **`socket`**, **`setsockopt(..., TCP_ULP, TLS_1_2, ...)`**, sequential **`connect()`** to **`SSL_16K_DEMO_SERVER_IP`** on **`PORT_1`** then **`PORT_2`**, **`send`** on each, **`close`**. Returns **0** or **-1**. |
 | `wifi_app.c` | `sl_wifi_disconnect` | Drops station association before BLE re-enable so TLS demo does not run while associated. |
 | `wifi_app.c` | `load_certificates_in_flash` | **`sl_net_set_credential`** for AWS CA, client certificate, and private key (indices **0**). |
@@ -672,21 +674,49 @@ The sample you start from is the same structure with **`-accept 4444`**; duplica
 | `wifi_app.c` | `wifi_app_send_to_ble` | FreeRTOS/BLE task mailbox for **`rsi_app_cmd_t`** and payload. |
 | `wifi_app.c` | `wifi_app_init_and_reconnect` | Join + DHCP after dynamic segment (**`sl_wifi_connect`** + **`sl_si91x_configure_ip_address`**; no **`sl_wifi_init`**). |
 
-### Runtime sequence when enabled
+### Runtime Sequence When Enabled
 
-1. User provisions Wi‑Fi over BLE (same as the main readme).
-2. DHCP success → **`WIFI_APP_IPCONFIG_DONE_STATE`** and **`wifi_app_send_to_ble(WIFI_APP_CONNECTION_STATUS, ...)`**.
-3. BLE: join status handling → GATT “AP joined” → **`rsi_ble_stop_advertising()`** (may error if not advertising; logged, flow continues) → disconnect → **`RSI_BLE_DISCONN_EVENT`** → **`rsi_ble_disable()`** → post to **`ble_disable_done_queue`**.
-4. Wi‑Fi: **`osMessageQueueGet(ble_disable_done_queue)`** → on success, load **`cacert`** for slot **0** → **`wifi_app_ssl_16k_demo()`** → **`sl_wifi_disconnect()`** → **`WIFI_APP_BLE_ENABLE_REQUEST`** → wait **`ble_enable_done_queue`**.
-5. **`wifi_app_init_and_reconnect()`** → **`load_certificates_in_flash()`** → MQTT state machine (**`wifi_app_mqtt_task()`**).
+Perform the following steps when **`SL_BLE_DYNAMIC_ENABLE_DISABLE_DEMO`** is **1**:
 
-### Failure behavior and disconnected path
+1. Provision Wi‑Fi over BLE using the **Simplicity Connect App** (same as the main readme).
+2. DHCP succeeds. The Wi‑Fi task enters **`WIFI_APP_IPCONFIG_DONE_STATE`** and notifies the BLE task using **`WIFI_APP_CONNECTION_STATUS`**.
+3. The BLE task handles **`RSI_BLE_WLAN_JOIN_STATUS`**: updates the GATT “AP joined” status, then quiesces BLE (**`rsi_ble_disconnect()`** → **`rsi_ble_disable()`** after disconnect). The Wi‑Fi task blocks on **`ble_disable_done_queue`**.   **`rsi_ble_disconnect()`** failure is handled in **`ble_app.c`**: the error status is posted to **`ble_disable_done_queue`** immediately (the Wi‑Fi task does not wait for a disconnect event that will never arrive).
+4. On successful BLE disable, the Wi‑Fi task loads the lab **`cacert`** and runs **`wifi_app_ssl_16k_demo()`** — two TLS 1.2 clients to **`SSL_16K_DEMO_SERVER_IP`** on **two different ports** (**`SSL_16K_DEMO_SERVER_PORT_1`** and **`SSL_16K_DEMO_SERVER_PORT_2`**). Both sockets connect to the **same lab host**; run **two** OpenSSL **`s_server`** processes (one per port). The demo sends **`Hello from Socket 1`** / **`Hello from Socket 2`**, then closes both sockets.
+5. **After** **`wifi_app_ssl_16k_demo()`** completes (both TLS sessions finished and closed), the Wi‑Fi task calls **`sl_wifi_disconnect()`** to drop the station association.
+6. The Wi‑Fi task requests BLE re-enable: **`wifi_app_send_to_ble(WIFI_APP_BLE_ENABLE_REQUEST, ...)`**. The BLE task calls **`rsi_ble_enable()`** and posts to **`ble_enable_done_queue`**. This step **does not** call **`rsi_ble_start_advertising()`** and does not require a new phone connection — it only turns the BLE stack back on before Wi‑Fi reconnect.
+7. **`wifi_app_init_and_reconnect()`** rejoins the **same AP** commissioned in step 1. It uses the SSID, security type, and password stored during BLE provisioning (**`coex_ssid`**, **`sec_type`**, **`pwd`** in **`wifi_app.c`**). No new scan or different AP is selected.
+8. **`load_certificates_in_flash()`** for AWS MQTT TLS material.
+9. Start the MQTT state machine (**`wifi_app_mqtt_task()`**).
 
-If BLE disable fails, demo CA load fails, **`wifi_app_ssl_16k_demo()`** fails, **`sl_wifi_disconnect`** fails, BLE re-enable fails, **`wifi_app_init_and_reconnect()`** fails, or post-reconnect **`load_certificates_in_flash()`** fails, the code sets **`disconnected`** and enters **`WIFI_APP_DISCONNECTED_STATE`** without starting MQTT. Here “BLE disable fails” / “BLE re-enable fails” includes any **non-** **`RSI_SUCCESS`** status on **`ble_disable_done_queue`** / **`ble_enable_done_queue`**, including **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** when the stack was **already** disabled or **already** enabled (see [Return codes for runtime BLE enable and disable (SDK)](#return-codes-for-runtime-ble-enable-and-disable-sdk)); that code is a **no firmware command** outcome, not a radio fault, but this example still treats it as failure unless you change the application.
+### Failure Behavior and Disconnected Path
 
-In **`WIFI_APP_DISCONNECTED_STATE`**, when the macro is **1**, the Wi‑Fi task sends **`WIFI_APP_BLE_ENABLE_REQUEST`** and waits on **`ble_enable_done_queue`** before **`WIFI_APP_DISCONNECTION_STATUS`** so GATT updates can run. If BLE re-enable fails here (including **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if BLE was already on), **`retry`** is cleared so the state machine does not immediately loop **`FLASH_STATE`** / **`sl_wifi_connect`** while BLE is still unusable; recovery is via reprovision (e.g. phone-side flow that drives **`WIFI_APP_DISCONN_NOTIFY_STATE`** as implemented in **`ble_app.c`**).
+**Any step in the [runtime sequence](#runtime-sequence-when-enabled) fails** (BLE disable, demo CA load, **`wifi_app_ssl_16k_demo()`**, **`sl_wifi_disconnect`**, BLE enable, **`wifi_app_init_and_reconnect()`**, or post-reconnect **`load_certificates_in_flash()`**):
 
-See below for example run.
+- The Wi‑Fi task sets **`disconnected`** and enters **`WIFI_APP_DISCONNECTED_STATE`**.
+- **MQTT does not start.**
+
+Non-**`RSI_SUCCESS`** on **`ble_disable_done_queue`** / **`ble_enable_done_queue`** counts as failure, including **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** when BLE was already in the target state (see [Return codes](#return-codes-for-runtime-ble-enable-and-disable-sdk)).
+
+**`WIFI_APP_DISCONNECTED_STATE`** (macro **1**):
+
+- Wi‑Fi sends **`WIFI_APP_BLE_ENABLE_REQUEST`** and waits on **`ble_enable_done_queue`** so BLE is on before **`WIFI_APP_DISCONNECTION_STATUS`** updates the GATT.
+- Advertising is **not** restarted automatically. Use the Simplicity Connect reprovision flow if the user must commission Wi‑Fi again.
+- If BLE enable fails here, **`retry`** is cleared to avoid looping **`sl_wifi_connect`** while BLE is unusable.
+
+**Boot configuration:** When the macro is **1**, **`app.c`** sets **`SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD`** in **`ext_tcp_ip_feature_bit_map`**. BLE disable requires quiescing the link first (**`rsi_ble_disconnect()`**). Wi‑Fi/BLE coordination uses **`WIFI_APP_CONNECTION_STATUS`**, **`WIFI_APP_BLE_ENABLE_REQUEST`**, and the **`ble_disable_done_queue`** / **`ble_enable_done_queue`** queues. The application does **not** call **`rsi_ble_start_advertising()`** in the dynamic demo path.
+
+### Example serial output (macro = 1)
+
+Typical UART sequence after BLE provisioning and DHCP:
+
+1. **`16k demo: Certificate loading successful`**
+2. **`16k SSL demo: 2 TLS connections up (sequential connects, same server)`** — two clients to the **same** lab IP on ports **4443** and **4444** (not two different server hosts).
+3. **`16k demo: wifi reconnect successful`** — after **`sl_wifi_disconnect`**, BLE re-enable, and **`wifi_app_init_and_reconnect()`** to the **same provisioned AP**.
+4. **`Certificate loading successful`** — AWS MQTT certs loaded before MQTT.
+
+On the OpenSSL PCs, expect **`Hello from Socket 1`** on port **4443** and **`Hello from Socket 2`** on port **4444**.
+
+See below for example screenshots.
 
 ![](resources/readme/ble_enable_disable_1.png)
 

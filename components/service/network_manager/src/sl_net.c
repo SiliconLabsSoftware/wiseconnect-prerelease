@@ -53,9 +53,21 @@ bool sl_net_interface_initialized[SL_NET_INTERFACE_MAX] = { false };
 
 #ifdef SLI_NVM3_CONFIG_MANAGER
 static bool nvm3_default_initialized = false;
+
+// NVM3 common-flash access requires NWP-M4 communication; init only after wireless bring-up.
+static sl_status_t sli_init_nvm3_default(void)
+{
+  if (!nvm3_default_initialized) {
+    sl_status_t status = nvm3_initDefault();
+    VERIFY_STATUS_AND_RETURN(status);
+    nvm3_default_initialized = true;
+  }
+  return SL_STATUS_OK;
+}
 #endif
 
 extern bool device_initialized;
+
 // Helper function to check if any network interface is initialized
 static bool sli_is_any_interface_initialized(void)
 {
@@ -83,14 +95,10 @@ static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
   sl_net_profile_id_t profile_id = SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID;
 
 #ifdef SLI_NVM3_CONFIG_MANAGER
-  // Initialize NVM3 once for credentials and profiles (shared by all interfaces)
-  if (!nvm3_default_initialized) {
-    status = nvm3_initDefault();
-    VERIFY_STATUS_AND_RETURN(status);
-    nvm3_default_initialized = true;
-  }
+  status = sli_init_nvm3_default();
+  VERIFY_STATUS_AND_RETURN(status);
 
-  // When NVM3 is enabled, use NVM profile + NVM credential only when both are valid in NVM.
+  // When NVM3 persistence is enabled, use stored profile + credential only when both are valid.
   // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
   sl_net_wifi_client_profile_t stored_profile;
   bool is_nvm_profile_valid;
@@ -100,7 +108,7 @@ static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
       && (sli_net_validate_sl_net_profile((const sl_net_profile_t *)&stored_profile, interface) == SL_STATUS_OK);
   } else {
     is_nvm_profile_valid =
-      true; // No default profile is defined in sl_net_default_values.h, so consider NVM profile as valid
+      true; // No default profile is defined in sl_net_default_values.h, so consider stored profile as valid
   }
   bool is_nvm_credential_valid;
   if (default_wifi_client_credential.data_length > 0) {
@@ -112,10 +120,49 @@ static sl_status_t sli_init_wifi_client_interface(sl_net_interface_t interface,
        == SL_STATUS_OK);
   } else {
     is_nvm_credential_valid =
-      true; // No default credential is defined in sl_net_default_values.h, so consider NVM credential as valid
+      true; // No default credential is defined in sl_net_default_values.h, so consider stored credential as valid
   }
   if ((is_nvm_profile_valid == false) || (is_nvm_credential_valid == false)) {
-    // If either profile or credential present in NVM is invalid, then overwrite both values in NVM with the corresponding default values present in sl_net_default_values.h file.
+    // If either profile or credential in NVM3 is invalid, overwrite both with defaults from sl_net_default_values.h.
+    if (default_wifi_client_credential.data_length > 0) {
+      status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
+                                     default_wifi_client_credential.type,
+                                     (const void *)default_wifi_client_credential.data,
+                                     default_wifi_client_credential.data_length);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+    if (DEFAULT_WIFI_CLIENT_PROFILE.config.ssid.length > 0) {
+      status = sl_net_set_profile(interface, profile_id, (const sl_net_profile_t *)&DEFAULT_WIFI_CLIENT_PROFILE);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+  }
+#elif defined(SLI_FLASH_CONFIG_MANAGER)
+  // When flash persistence is enabled, use stored profile + credential only when both are valid.
+  // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
+  sl_net_wifi_client_profile_t stored_profile;
+  bool is_flash_profile_valid;
+  if (DEFAULT_WIFI_CLIENT_PROFILE.config.ssid.length > 0) {
+    is_flash_profile_valid =
+      (sl_net_get_profile(interface, profile_id, (sl_net_profile_t *)&stored_profile) == SL_STATUS_OK)
+      && (sli_net_validate_sl_net_profile((const sl_net_profile_t *)&stored_profile, interface) == SL_STATUS_OK);
+  } else {
+    is_flash_profile_valid =
+      true; // No default profile is defined in sl_net_default_values.h, so consider stored profile as valid
+  }
+  bool is_flash_credential_valid;
+  if (default_wifi_client_credential.data_length > 0) {
+    sl_net_credential_type_t cred_type;
+    uint8_t cred_buf[SL_WIFI_MAX_PSK_LENGTH];
+    uint32_t cred_len = sizeof(cred_buf);
+    is_flash_credential_valid =
+      (sl_net_get_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, &cred_type, cred_buf, &cred_len)
+       == SL_STATUS_OK);
+  } else {
+    is_flash_credential_valid =
+      true; // No default credential is defined in sl_net_default_values.h, so consider stored credential as valid
+  }
+  if ((is_flash_profile_valid == false) || (is_flash_credential_valid == false)) {
+    // If either profile or credential in flash is invalid, overwrite both with defaults from sl_net_default_values.h.
     if (default_wifi_client_credential.data_length > 0) {
       status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
                                      default_wifi_client_credential.type,
@@ -176,14 +223,10 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
   }
 
 #ifdef SLI_NVM3_CONFIG_MANAGER
-  // Initialize NVM3 once for credentials and profiles (shared by all interfaces)
-  if (!nvm3_default_initialized) {
-    status = nvm3_initDefault();
-    VERIFY_STATUS_AND_RETURN(status);
-    nvm3_default_initialized = true;
-  }
+  status = sli_init_nvm3_default();
+  VERIFY_STATUS_AND_RETURN(status);
 
-  // When NVM3 is enabled, use NVM profile + NVM credential only when both are valid in NVM.
+  // When NVM3 persistence is enabled, use stored profile + credential only when both are valid.
   // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
   sl_net_wifi_ap_profile_t stored_ap_profile;
   bool is_nvm_profile_valid;
@@ -193,7 +236,7 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
       && (sli_net_validate_sl_net_profile((const sl_net_profile_t *)&stored_ap_profile, interface) == SL_STATUS_OK);
   } else {
     is_nvm_profile_valid =
-      true; // No default profile is defined in sl_net_default_values.h, so consider NVM profile as valid
+      true; // No default profile is defined in sl_net_default_values.h, so consider stored profile as valid
   }
   bool is_nvm_credential_valid;
   if (default_wifi_ap_credential.data_length > 0) {
@@ -204,10 +247,48 @@ static sl_status_t sli_init_wifi_ap_interface(sl_net_interface_t interface,
       (sl_net_get_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID, &cred_type, cred_buf, &cred_len) == SL_STATUS_OK);
   } else {
     is_nvm_credential_valid =
-      true; // No default credential is defined in sl_net_default_values.h, so consider NVM credential as valid
+      true; // No default credential is defined in sl_net_default_values.h, so consider stored credential as valid
   }
   if ((is_nvm_profile_valid == false) || (is_nvm_credential_valid == false)) {
-    // If either profile or credential present in NVM is invalid, then overwrite both values in NVM with the corresponding default values present in sl_net_default_values.h file.
+    // If either profile or credential in NVM3 is invalid, overwrite both with defaults from sl_net_default_values.h.
+    if (default_wifi_ap_credential.data_length > 0) {
+      status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
+                                     default_wifi_ap_credential.type,
+                                     (const void *)default_wifi_ap_credential.data,
+                                     default_wifi_ap_credential.data_length);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+    if (DEFAULT_WIFI_ACCESS_POINT_PROFILE.config.ssid.length > 0) {
+      status = sl_net_set_profile(interface, profile_id, (const sl_net_profile_t *)&ap_profile);
+      VERIFY_STATUS_AND_RETURN(status);
+    }
+  }
+#elif defined(SLI_FLASH_CONFIG_MANAGER)
+  // When flash persistence is enabled, use stored profile + credential only when both are valid.
+  // If either is missing/corrupt, set both to defaults from sl_net_default_values.h so the device can connect (no mismatch).
+  sl_net_wifi_ap_profile_t stored_ap_profile;
+  bool is_flash_profile_valid;
+  if (DEFAULT_WIFI_ACCESS_POINT_PROFILE.config.ssid.length > 0) {
+    is_flash_profile_valid =
+      (sl_net_get_profile(interface, profile_id, (sl_net_profile_t *)&stored_ap_profile) == SL_STATUS_OK)
+      && (sli_net_validate_sl_net_profile((const sl_net_profile_t *)&stored_ap_profile, interface) == SL_STATUS_OK);
+  } else {
+    is_flash_profile_valid =
+      true; // No default profile is defined in sl_net_default_values.h, so consider stored profile as valid
+  }
+  bool is_flash_credential_valid;
+  if (default_wifi_ap_credential.data_length > 0) {
+    sl_net_credential_type_t cred_type;
+    uint8_t cred_buf[SL_WIFI_MAX_PSK_LENGTH];
+    uint32_t cred_len = sizeof(cred_buf);
+    is_flash_credential_valid =
+      (sl_net_get_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID, &cred_type, cred_buf, &cred_len) == SL_STATUS_OK);
+  } else {
+    is_flash_credential_valid =
+      true; // No default credential is defined in sl_net_default_values.h, so consider stored credential as valid
+  }
+  if ((is_flash_profile_valid == false) || (is_flash_credential_valid == false)) {
+    // If either profile or credential in flash is invalid, overwrite both with defaults from sl_net_default_values.h.
     if (default_wifi_ap_credential.data_length > 0) {
       status = sl_net_set_credential(SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
                                      default_wifi_ap_credential.type,
@@ -507,4 +588,102 @@ sl_status_t sl_net_nat_disable(const sl_net_interface_t interface)
 sl_status_t sl_net_get_interface_info(sl_net_interface_t interface, sl_net_interface_info_t *info)
 {
   return sli_net_get_interface_info(interface, info);
+}
+
+static const sl_application_profile_preset_t sli_net_application_profile_presets[SL_NET_APPLICATION_PROFILE_MAX] = {
+  [SL_NET_APPLICATION_PROFILE_DEFAULT] = {
+    .opportunistic_sleep = {
+      .opportunistic_sleep_enable   = 0,
+      .limit_rates                  = 0,
+      .average_current_window_ms    = 0,
+      .current_limit_ma             = 0,
+      .scan_off_time_ms             = 0,
+    },
+    .retry = { .max_tx_retransmissions = 15 },
+    .aggregation = {
+      .vap_id                     = SL_WIFI_CLIENT_VAP_ID,
+      .aggregation_tx_enable      = 1,
+      .aggregation_rx_buffer_size = 8,
+    },
+    .active_scan_timeout_ms  = 100,
+    .passive_scan_timeout_ms = 400,
+  },
+  [SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH] = {
+    .opportunistic_sleep = {
+      .opportunistic_sleep_enable   = 1,
+      .limit_rates                  = 1,
+      .average_current_window_ms    = 250,
+      .current_limit_ma             = 30,
+      .scan_off_time_ms             = 100,
+    },
+    .retry = { .max_tx_retransmissions = 4 },
+    .aggregation = {
+      .vap_id                     = SL_WIFI_CLIENT_VAP_ID,
+      .aggregation_tx_enable      = 0,
+      .aggregation_rx_buffer_size = 1,
+    },
+    .active_scan_timeout_ms  = 30,
+    .passive_scan_timeout_ms = 110,
+  },
+};
+
+sl_status_t sl_net_set_application_profile(sl_net_interface_t interface, sl_net_application_profile_t profile)
+{
+  sl_status_t status;
+  const sl_application_profile_preset_t *preset;
+  const sl_wifi_interface_t wifi_interface = SL_WIFI_CLIENT_INTERFACE;
+
+  if ((interface != SL_NET_WIFI_CLIENT_1_INTERFACE) && (interface != SL_NET_WIFI_CLIENT_2_INTERFACE)) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  if (!sl_net_interface_initialized[interface]) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if (profile >= SL_NET_APPLICATION_PROFILE_MAX) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (!device_initialized) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  if ((profile == SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH) && !sli_wifi_is_11n_only_mode_enabled()) {
+    return SL_STATUS_INVALID_CONFIGURATION;
+  }
+
+  preset = &sli_net_application_profile_presets[profile];
+
+  status = sli_wifi_set_opportunistic_sleep_config(wifi_interface, &preset->opportunistic_sleep);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  status = sli_wifi_set_retry_config(wifi_interface, &preset->retry);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  status = sli_wifi_set_aggregation_config(wifi_interface, &preset->aggregation);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  status = sli_wifi_configure_profile_timeout(wifi_interface,
+                                              SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT,
+                                              preset->active_scan_timeout_ms);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  status = sli_wifi_configure_profile_timeout(wifi_interface,
+                                              SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT,
+                                              preset->passive_scan_timeout_ms);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  sli_wifi_set_active_application_profile((sli_wifi_application_profile_t)profile);
+  return SL_STATUS_OK;
 }

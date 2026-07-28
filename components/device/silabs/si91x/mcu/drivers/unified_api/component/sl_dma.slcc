@@ -41,6 +41,3 @@ define:
 template_contribution:
   - name: udma_enable
     value: true
-documentation:
-    docset: wiseconnect
-    document: wiseconnect-api-reference-guide-si91x-peripherals/dma

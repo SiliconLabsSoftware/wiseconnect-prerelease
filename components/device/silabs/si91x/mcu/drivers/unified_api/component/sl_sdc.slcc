@@ -24,6 +24,3 @@ provides:
 requires:
   - name: sl_sdc_peripheral
   - name: log_none
-documentation:
-  docset: wiseconnect
-  document: wiseconnect-api-reference-guide-si91x-peripherals/sdc

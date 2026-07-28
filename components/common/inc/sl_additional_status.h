@@ -136,6 +136,15 @@
 #define SL_STATUS_TRANSCEIVER_INVALID_CONFIG \
   ((sl_status_t)0x0B67) ///< Provided transceiver configuration parameters are invalid.
 
+// Partial IP configuration status codes (end of WiFi SDK space: 0x0B00–0x0B69).
+// Returned when a dual-stack (IPv4 + IPv6) profile is only partially configured.
+// Query the underlying per-family firmware error via sl_wifi_get_ip_config_failure_reason().
+// When both families fail, the aggregate return is the IPv4 error; use that API for IPv6 as well.
+#define SL_STATUS_WIFI_IPV4_OK \
+  ((sl_status_t)0x0B68) ///< IPv4 configured successfully but IPv6 configuration failed (dual-stack partial success).
+#define SL_STATUS_WIFI_IPV6_OK \
+  ((sl_status_t)0x0B69) ///< IPv6 configured successfully but IPv4 configuration failed (dual-stack partial success).
+
 // Si91X Crypto Firmware Errors
 #define SL_STATUS_CRYPTO_INVALID_PARAMETER \
   ((sl_status_t)0x1CCFE) ///< Return when parameter passed to Crypto SAPI is invalid.

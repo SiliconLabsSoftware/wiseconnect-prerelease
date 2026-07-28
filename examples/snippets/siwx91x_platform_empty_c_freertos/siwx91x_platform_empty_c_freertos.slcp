@@ -1,0 +1,56 @@
+project_name: siwx91x_platform_empty_c_freertos
+package: platform_siwx91x_app
+description: 'Empty C project template running under FreeRTOS on the SiWx91x SoC.
+
+  '
+category: Example|Platform
+quality: production
+label: SiWx91x Platform - Empty C FreeRTOS
+source:
+- path: app.c
+- path: empty_c_freertos.c
+include:
+- path: .
+  file_list:
+  - path: app.h
+  - path: empty_c_freertos.h
+component:
+- id: freertos_heap_4
+- id: sl_main
+- id: status
+- id: syscalls
+- id: si91x_memory_default_config
+define:
+- name: SLI_SI91X_EMPTY_PROJECT
+toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+readme:
+- path: readme.md
+ui_hints:
+  highlight: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Project Difficulty
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
+post_build:
+  profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.2.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2026.12.0

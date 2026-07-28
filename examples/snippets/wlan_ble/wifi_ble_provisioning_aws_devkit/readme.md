@@ -46,6 +46,10 @@ The application also publishes the real-time sensor data (LUX, Temperature, Humi
 - [Simplicity Studio](https://www.silabs.com/developers/simplicity-studio)
 - Silicon Labs [Si Connect App (formerly Simplicity Connect / EFR Connect App)](https://www.silabs.com/developers/simplicity-connect-mobile-app?tab=downloads), the app can be downloaded from Google Play store/Apple App store.
   > IMPORTANT: This example requires Si Connect App version 3.2.0 or later. Earlier versions do not prompt for the AWS certificate and endpoint configuration required by this application.
+- **OpenSSL** command-line tool (required on the development PC to create the AWS device `.p12` certificate bundle for the Si Connect App):
+  - **Windows:** Install from [OpenSSL for Windows](https://slproweb.com/products/Win32OpenSSL.html) (64-bit installer recommended).
+  - **Linux / macOS:** Install the OpenSSL package from your OS distribution (for example, the `openssl` package on Ubuntu).
+  - **Version:** OpenSSL with `pkcs12` support. OpenSSL 3.0 and later may require the `-legacy` flag when exporting the `.p12` file (see [Prepare the AWS Certificate for the Si Connect Mobile App](#prepare-the-aws-certificate-for-the-si-connect-mobile-app)).
 
 ### Setup Diagram
 
@@ -102,7 +106,7 @@ Starting with **Si Connect App version 3.2.0**, the mobile app prompts you to pr
 
    The Si Connect app requires the device certificate and private key in PKCS#12 format. Use the device certificate and private key files that were downloaded when you [created the AWS Thing](#create-an-aws-thing).
 
-   Run the following command using OpenSSL to create the `.p12` file (the device certificate and key alone are sufficient -- the Si Connect app does not require the root CA inside the bundle):
+   Run the following command using OpenSSL to create the `.p12` file (the device certificate and key alone are sufficient, the Si Connect app does not require the root CA inside the bundle):
 
    ```sh
    openssl pkcs12 -export -out aws_device_cert.p12 \
@@ -110,7 +114,7 @@ Starting with **Si Connect App version 3.2.0**, the mobile app prompts you to pr
      -in <device-certificate>.pem.crt
    ```
 
-   You will be prompted to set an **export password**. Remember this password -- you will need to enter it in the Si Connect app.
+   You will be prompted to set an **export password**. Remember this password, you will need to enter it in the Si Connect app.
 
    > **Note (OpenSSL 3.x):** OpenSSL 3.0 and later use modern PBE/MAC defaults that some mobile keystores (notably older Android versions and some iOS releases) cannot import. If the Si Connect app rejects the generated `.p12`, regenerate it with the `-legacy` flag, or specify legacy algorithms explicitly:
    >
@@ -133,13 +137,13 @@ Starting with **Si Connect App version 3.2.0**, the mobile app prompts you to pr
 
 3. **Note down the AWS IoT Endpoint URL**
 
-   This is the same endpoint configured in `AWS_IOT_MQTT_HOST` in `aws_iot_config.h`. You can find it in the [AWS IoT Console](https://console.aws.amazon.com/iot/home) under **Settings > Device data endpoint**. It has the format:
+   This is the same endpoint configured in `AWS_IOT_MQTT_HOST` in `aws_iot_config.h`. You can find it in the [AWS IoT Console](https://console.aws.amazon.com/iot/home) under **Settings > Device data endpoint**. It has the following format:
 
    ```text
    <unique-id>.iot.<region>.amazonaws.com
    ```
 
-During the mobile app provisioning flow, you will be prompted to provide:
+During the mobile app provisioning flow, you will be prompted to provide the following:
 
 | Mobile App Field       | Value to Enter                                                                 |
 |------------------------|--------------------------------------------------------------------------------|
@@ -149,7 +153,7 @@ During the mobile app provisioning flow, you will be prompted to provide:
 | **Subscriber topic**   | The MQTT topic to subscribe to for sensor data (e.g., `MQTT_TOPIC2`)           |
 | **Publisher topic**    | The MQTT topic to publish LED control commands to (e.g., `MQTT_TOPIC1`)        |
 
-> **Note on topic perspective:** The **Subscriber topic** and **Publisher topic** field labels above are from the **mobile app's** perspective -- the topic the mobile app subscribes to (to receive sensor data) and the topic the mobile app publishes to (to send LED commands). From the **device firmware's** perspective these are reversed: in `wifi_app.c`, `MQTT_TOPIC1` is the topic the SiWx917 *subscribes* to (to receive LED commands) and `MQTT_TOPIC2` is the topic the SiWx917 *publishes* to (to send sensor data).
+> **Note**: The Subscriber topic and Publisher topic field labels above are from the mobile app's perspective — the topic the mobile app subscribes to (to receive sensor data) and the topic the mobile app publishes to (to send LED commands). From the device firmware's perspective these are reversed: in `wifi_app.c`, the `MQTT_TOPIC1` is the topic to which the SiWx917 subscribes (to receive LED commands) and the `MQTT_TOPIC2` is the topic to which the SiWx917 publishes (to send sensor data).
 
 ## Test the Application
 
@@ -189,7 +193,7 @@ Complete the following steps for successful execution of the application:
    - **Certificate file**: Tap to browse and select the `.p12` certificate file you transferred to your device.
    - **Certificate password**: Enter the export password you set when creating the `.p12` file.
    - **Endpoint URL**: Enter your AWS IoT device data endpoint (e.g., `a2m21kovu9tcsh-ats.iot.us-east-2.amazonaws.com`).
-   - **Subscriber topic**: Enter the MQTT topic to subscribe to for sensor data (e.g., `MQTT_TOPIC2`).
+   - **Subscriber topic**: Enter the MQTT topic to subscribe to for sensor data (e.g., `MQTT_TOPIC2`) — temperature, humidity, light (lux), and accelerometer/gyroscope readings from the Dev Kit sensors.
    - **Publisher topic**: Enter the MQTT topic to publish LED control commands to (e.g., `MQTT_TOPIC1`).
 
    ![](resources/readme/Mobile_app_ui_2.png)
@@ -231,7 +235,7 @@ After successfully connecting to Wi-Fi, the application establishes a connection
 
 ### Setting up Security Certificates
 
-The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/resources/scripts/).
+The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/resources/scripts/).
 
 1. Copy the downloaded device certificate, private key from AWS, and the certificate_to_array.py to `<SDK>/resources/certificates`.
 
@@ -270,7 +274,7 @@ The Starfield Root CA certificate used by your Wi-Fi device to verify the AWS se
   > Support for the SNI extension has been added to the AWS SDK, ensuring it is set by the client when connecting to an AWS server using TLS 1.3. This is handled internally by the AWS SDK and does not affect compatibility with other TLS versions.
 
   > **NOTE :**
-  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.0-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
+  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
   >
   > AWS has announced that there will be changes in their root CA chain. More details can be found in the reference link: [here](https://aws.amazon.com/blogs/security/acm-will-no-longer-cross-sign-certificates-with-starfield-class-2-starting-august-2025/)
   >

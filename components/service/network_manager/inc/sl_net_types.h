@@ -35,6 +35,7 @@
 #include "sl_constants.h"
 #include "sl_status.h"
 #include "sl_utility.h"
+#include "sl_application_profile_types.h"
 #include "sl_wifi_types.h"
 #include <stdint.h>
 
@@ -116,7 +117,7 @@ typedef struct {
  * for a ping operation, including IP version, ping size, and the pinged IP address.
  * 
  * @note
- * Moving forward, this `sl_si91x_ping_response_t` type will be deprecated. Instead, use @ref sl_net_ping_response_t type. This is retained for backward compatibility.
+ * Moving forward, this `sl_si91x_ping_response_t` type will be deprecated. Instead, use [sl_net_ping_response_t](../wiseconnect-api-reference-guide-nwk-mgmt/sl-net-types#sl-net-ping-response-t). This is retained for backward compatibility.
  */
 typedef sl_net_ping_response_t SL_DEPRECATED_API_WISECONNECT_4_0 sl_si91x_ping_response_t;
 
@@ -154,4 +155,18 @@ typedef struct {
     // Add other hardware-specific structs here if needed
   } hw_info; ///< Hardware-specific information
 } sl_net_interface_info_t;
+
+/**
+ * @brief Application power/behavior profile selector for @ref sl_net_set_application_profile.
+ * @details Non-default profiles require the application to re-call
+ *          @ref sl_net_set_application_profile after Wi-Fi disconnect and join failure;
+ *          see that API for the recovery contract.
+ */
+typedef enum {
+  SL_NET_APPLICATION_PROFILE_DEFAULT = SL_APPLICATION_PROFILE_DEFAULT, ///< Default Wi-Fi behavior
+  SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH =
+    SL_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH, ///< Neutral-less Matter switch power preset
+  SL_NET_APPLICATION_PROFILE_MAX = SL_APPLICATION_PROFILE_MAX
+} sl_net_application_profile_t;
+
 /** @} */

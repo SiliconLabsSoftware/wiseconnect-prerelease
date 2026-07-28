@@ -14,10 +14,15 @@
     - [Common Steps](#common-steps)
       - [WLAN throughputs: UDP/TCP/TLS unidirectional](#wlan-throughputs-udptcptls-unidirectional)
   - [Test the Application](#test-the-application)
+  - [Optional: Dynamic BLE disable for WLAN throughput](#optional-dynamic-ble-disable-for-wlan-throughput)
+    - [Runtime sequence when enabled](#runtime-sequence-when-enabled)
+    - [Example serial output](#example-serial-output)
 
 ## Purpose/Scope
 
-The coex application demonstrates throughput measurement of Wi‑Fi while a BLE central is connected. With **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** set to **1**, the application also runs a **second** throughput pass after BLE is disabled (see [Application Build Environment](#application-build-environment)).
+The coexistence application demonstrates Wi-Fi throughput measurement while a BLE central device is connected.
+
+When **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** is set to **1**, the application runs a second **WLAN throughput** measurement after BLE is disabled and then reconnects Wi‑Fi. See [Optional: Dynamic BLE disable for WLAN throughput](#optional-dynamic-ble-disable-for-wlan-throughput).
 
 The coex application has WLAN and BLE tasks and acts as an interface between a smartphone and a PC. A smartphone interacts with the BLE task, while both PC and Silicon Labs device would be connected to a Wireless Access Point, thus both are connected together wirelessly when a smartphone connects to Silicon Labs device. Data transfer will happen between the Station and AP.
 
@@ -26,7 +31,7 @@ The coex application has WLAN and BLE tasks and acts as an interface between a s
 ### Hardware Requirements
 
 - Windows PC with Host interface (UART / SPI).
-- SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-constants#sl-si91x-operation-mode-t) for details.
+- SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-operation-mode-t) for details.
 - **SoC Mode**:
   - Standalone
     - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
@@ -85,34 +90,29 @@ The application can be configured to suit your requirements and development envi
 
 1. Open `wifi_config.h` and edit the following parameters:
 
-    - **Optional: Dynamic BLE disable for throughput**
+    - **Optional: Dynamic BLE disable for WLAN throughput**
 
-      - **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** in `wifi_config.h`:
-        - **`1`** — Runs **two** WLAN throughput passes: first with BLE still connected (after Wi‑Fi is up), then again after BLE has been disabled.
-        - **`0`** (default in this tree) — One **`wlan_throughput_task()`** with BLE connected as usual after Wi‑Fi comes up.
-      - **Runtime sequence when the macro is `1`:**
-        1. **`wlan_throughput_task()`** while BLE is up.
-        2. **`rsi_ble_app_request_disable()`** — BLE task **quiesces** (`rsi_ble_stop_advertising`, **`rsi_ble_disconnect`** using the peer address), completes the disable stub after **`RSI_BLE_DISCONN_EVENT`**, and posts to **`ble_disable_done_queue`**. If **`rsi_ble_disconnect`** fails synchronously, the failure is posted immediately and advertising is not restarted from the disconnect path.
-        3. **`wlan_throughput_task()`** again with BLE off.
-        4. **`sl_wifi_disconnect()`** (drops station association).
-        5. **`rsi_ble_app_request_enable()`** and wait on **`ble_enable_done_queue`**.
-        6. **`wifi_app_init_and_reconnect()`** — set credential, **`sl_wifi_connect`**, DHCP (no **`sl_wifi_init()`**).
-      - **`rsi_ble_stop_advertising()`** may return an error if advertising was already stopped; the example continues.
+      Set **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** in **`wifi_config.h`**:
+
+      | Value | WLAN throughput behavior |
+      |-------|--------------------------|
+      | **0** | One **WLAN throughput** run with BLE connected for the entire test (**`wlan_throughput_task()`** only). |
+      | **1** | Two **WLAN throughput** runs: first with BLE connected, then after BLE disable with BLE off, followed by station disconnect, BLE re-enable, and Wi‑Fi reconnect to the same AP. |
+
+      Full flow and expected serial output: [Optional: Dynamic BLE disable for WLAN throughput](#optional-dynamic-ble-disable-for-wlan-throughput).
 
       ```c
-      #define SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO 0   /* 0 = one throughput pass with BLE; 1 = second pass after BLE off */
+      #define SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO 0   /* 0 = WLAN throughput with BLE; 1 = add second WLAN run after BLE off */
       ```
 
-      - **`CONTINUOUS_THROUGHPUT`** and **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** are **mutually exclusive** at build time in `wifi_config.h`:
-        - When **`CONTINUOUS_THROUGHPUT`** is **`1`**, **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** is forced to **`0`** (the dynamic BLE disable / second-pass / reconnect segment is **not** compiled). Continuous mode loops inside **`wlan_throughput_task()`**, which never returns to run that segment.
-        - When you need **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** **`1`**, set **`CONTINUOUS_THROUGHPUT`** to **`0`** so the second pass after BLE disable can run.
+      **`CONTINUOUS_THROUGHPUT`** and **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** are mutually exclusive: set **`CONTINUOUS_THROUGHPUT`** to **`0`** when using the dynamic BLE disable path.
 
     - **Runtime BLE enable/disable return codes (SDK)**
 
       Runtime **`rsi_ble_enable()`** and **`rsi_ble_disable()`** check internal BLE state before sending a firmware command; you do not need to call **`rsi_ble_state_is_enabled()`** in application code for a redundant call to be skipped.
 
-      - **`rsi_ble_enable()`** — On success, BLE was off and the enable command completes. Otherwise you may see **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already enabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`** if the device is not initialized.
-      - **`rsi_ble_disable()`** — On success, BLE was on and the disable command completes. Otherwise you may see **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already disabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`**.
+      - **`rsi_ble_enable()`** — On success, BLE will be enabled. Otherwise, the API might return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already enabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`** if the device is not initialized.
+      - **`rsi_ble_disable()`** — On success, BLE will be disabled. Otherwise, the API might return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** (BLE **already disabled**, no command sent) or **`SL_STATUS_NOT_INITIALIZED`**.
 
       The BLE task posts the **`int32_t`** status from those APIs to **`ble_enable_done_queue`** / **`ble_disable_done_queue`**, so **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** can appear there when the stack was already in the target state. This example treats non-success on those queues as failure; your product code may treat that specific code as a benign no-op if you only need idempotent enable/disable. Other BLE APIs may return **`RSI_ERROR_COMMAND_GIVEN_IN_WRONG_STATE`** if called while the stack is disabled.
 
@@ -225,9 +225,9 @@ The application can be configured to suit your requirements and development envi
 
 #### WLAN throughputs: UDP/TCP/TLS unidirectional
 
-1. Compile the project and flash the binary onto STM32
+1. Build and flash the project in Simplicity Studio (SoC: flash the SiWx917 EVK; NCP: flash the host project per your board — see [Getting Started](#getting-started)).
 
-2. To measure **WLAN throughput**, run the below iPerf commands or tls scripts.
+2. To measure **WLAN throughput**, run the iPerf commands or TLS scripts below on the remote PC.
 
    > **Note (RX timing):** For asynchronous RX modes (`UDP_RX` / `TCP_RX`) the throughput timer starts when the **first RX packet** is received (not when the receive function is entered). This avoids counting “idle wait” time before traffic starts and is the intended throughput measurement behavior.
 
@@ -309,11 +309,55 @@ The application can be configured to suit your requirements and development envi
 
 ## Test the Application
 
-Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
+Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to build, flash, run, and debug the application.
 
-1. Build the application.
-2. Flash, run and debug the application
-
-3. Observe the output prints on serial terminal
+1. Configure **`SSID`**, **`PSK`**, and **`THROUGHPUT_TYPE`** in **`wifi_config.h`**.
+2. Start the iPerf or TLS server on the PC (see [WLAN throughputs](#wlan-throughputs-udptcptls-unidirectional)).
+3. Connect a BLE central (Simplicity Connect or similar) to **`BLE_THROUGHPUT_APP`** before WLAN connects — the Wi‑Fi task waits on **`ble_conn_sem`** until BLE is connected.
+4. Observe **WLAN throughput** results on the serial terminal and on the PC (iPerf / TLS server).
 
    ![](resources/readme/output1.png)
+
+When **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** is **1**, expect two **WLAN throughput** measurement passes and additional BLE disable/enable logs. See [Example serial output](#example-serial-output).
+
+## Optional: Dynamic BLE disable for WLAN throughput
+
+Compiled when **`SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO`** is **1** in **`wifi_config.h`**.
+
+### Overview
+
+| `SL_BLE_DYNAMIC_DISABLE_THROUGHPUT_DEMO` | Behavior |
+|------------------------------------------|----------|
+| **0** | Single **WLAN throughput** measurement with BLE connected. |
+| **1** | **WLAN throughput** with BLE on → BLE disable → **WLAN throughput** with BLE off → **`sl_wifi_disconnect()`** → BLE re-enable → reconnect to the **same AP** (**`SSID`** / **`PSK`** from **`wifi_config.h`**). |
+
+This example does **not** use BLE Wi‑Fi provisioning. WLAN credentials are fixed at build time; reconnect uses the same **`SSID`** and **`PSK`**, not a new AP.
+
+### Runtime sequence when enabled
+
+1. BLE central connects; device advertises until connected (advertising stops on connection).
+2. WLAN connects and obtains DHCP.
+3. **First WLAN throughput** — **`wlan_throughput_task()`** runs while BLE is connected.
+4. **`rsi_ble_app_request_disable()`** — called from the Wi‑Fi task **immediately after** the first **`wlan_throughput_task()`** returns (not before WLAN connect, not during the throughput transfer).
+5. BLE task: **`rsi_ble_disconnect()`** → **`rsi_ble_disable()`**. On **`rsi_ble_disconnect()`** failure, status is posted to **`ble_disable_done_queue`** immediately.
+6. **Second WLAN throughput** — **`wlan_throughput_task()`** runs again with BLE disabled.
+7. **`sl_wifi_disconnect()`** — called **after** the second **`wlan_throughput_task()`** completes (not during either throughput run).
+8. **`rsi_ble_app_request_enable()`** — BLE stack re-enabled only; **`rsi_ble_start_advertising()`** is **not** called. No new phone connection is required.
+9. **`wifi_app_init_and_reconnect()`** — **`sl_wifi_connect()`** to the **same AP** configured in **`wifi_config.h`**, then DHCP.
+
+### Example serial output
+
+**Macro = 0** — one **`in wlan_throughput_task`** pass, then throughput stats for the selected **`THROUGHPUT_TYPE`**.
+
+**Macro = 1** — expect this order on UART:
+
+1. First pass: **`in wlan_throughput_task`** → WLAN throughput result (BLE connected).
+2. Second pass: **`in wlan_throughput_task`** → WLAN throughput result (BLE disabled).
+3. **`Dynamic demo: sl_wifi_disconnect`** (on success, no error line).
+4. After BLE re-enable and reconnect: **`WLAN connected`** and DHCP IP print from **`wifi_app_init_and_reconnect()`**.
+
+See below for reference.
+
+   ![](resources/readme/BLE_enable_disable_1.png)
+
+   ![](resources/readme/BLE_enable_disable_2.png)

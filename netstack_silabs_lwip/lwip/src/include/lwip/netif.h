@@ -489,6 +489,12 @@ void netif_set_link_up(struct netif *netif);
 void netif_set_link_down(struct netif *netif);
 /** Ask if a link is up */
 #define netif_is_link_up(netif) (((netif)->flags & NETIF_FLAG_LINK_UP) ? (u8_t)1 : (u8_t)0)
+#if SL_LWIP_ADAPTIVE_TIMERS
+/** Ask if any other netif is admin-up and link-up. */
+u8_t netif_other_netif_is_up_link_up(struct netif *skip_netif);
+/** Stop ND6/MLD6 timers without changing link state. */
+void netif_stop_timers(struct netif *netif);
+#endif /* SL_LWIP_ADAPTIVE_TIMERS */
 
 #if LWIP_NETIF_LINK_CALLBACK
 void netif_set_link_callback(struct netif *netif, netif_status_callback_fn link_callback);

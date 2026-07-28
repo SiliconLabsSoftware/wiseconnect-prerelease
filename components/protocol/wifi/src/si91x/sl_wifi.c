@@ -701,7 +701,7 @@ sl_wifi_interface_t sl_wifi_get_default_interface(void)
 
 void sl_wifi_set_default_interface(sl_wifi_interface_t interface)
 {
-  return sli_wifi_set_default_interface(interface);
+  sli_wifi_set_default_interface(interface);
 }
 
 sl_status_t sl_wifi_deinit(void)

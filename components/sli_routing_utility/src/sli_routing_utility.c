@@ -96,6 +96,9 @@ sl_status_t sli_routing_utility_route_packet(sli_routing_table_t *routing_table,
   if (entry->destination_packet_handler != NULL) {
     status =
       entry->destination_packet_handler((void *)packet, packet_size, entry->packet_status_handler, (void *)context);
+    if (SL_STATUS_IN_PROGRESS == status) {
+      return status;
+    }
     VERIFY_STATUS_AND_RETURN(status);
   }
 

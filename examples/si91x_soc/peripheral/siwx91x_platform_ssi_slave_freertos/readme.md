@@ -57,7 +57,7 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 This example demonstrates SSI transfer (full-duplex communication) and SSI send/SSI receive (half-duplex communication) running as a dedicated FreeRTOS task.
 
 - Various parameters like SSI clock mode, Bit-width, Manual cs pin, and SSI baud rate can be configured using the UC. Also, Master or Slave or ULP Master DMA can be configured using UC.
-- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
+- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
 
 ### FreeRTOS Architecture
 
@@ -76,7 +76,7 @@ This example demonstrates SSI transfer (full-duplex communication) and SSI send/
 
 ### Task Flow (ssi_slave_task)
 
-After initialization, the task uses `osDelay(SYNC_TIME)` (5 seconds) to synchronize with the master board, then executes the transfer phases sequentially based on the macros enabled in `ssi_slave_freertos.h`:
+After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and waits for a button press from the master-side sync line, then executes the transfer phases sequentially based on the macros enabled in `ssi_slave_freertos.h`:
 
 - If the **SSI_SLAVE_TRANSFER** macro is enabled, it will transfer the data (that is, send and receive data) in full-duplex mode.
 
@@ -91,6 +91,7 @@ After initialization, the task uses `osDelay(SYNC_TIME)` (5 seconds) to synchron
 
 - If the **SSI_SLAVE_SEND** macro is enabled, it only sends the data to master. The SPI master must be connected; it cannot be tested in loopback mode.
 
+  - If send follows an earlier transfer or receive phase, the task waits for another master-side `BTN0` press before starting the send phase.
   - Calls [sl_si91x_ssi_send_data](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-send-data) which expects data_out (data buffer that needs to be sent) and number of bytes to send.
   - The task blocks on `osSemaphoreAcquire()` until the send completes, then compares the data.
 
@@ -102,7 +103,7 @@ After initialization, the task uses `osDelay(SYNC_TIME)` (5 seconds) to synchron
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs SiWx917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx917 Evaluation Kit [[BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 
 ### Software Requirements
@@ -184,7 +185,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 >
 > Where F<sub>sclk_in</sub> is the incoming clock from the master. The SSI Secondary (Slave) peripheral clock (F<sub>ssi_clk</sub>) must satisfy this condition. If the master is configured for a specific frequency, ensure that the slave's clock is properly configured. Failure to properly configure the clock may result in communication errors or unreliable data transfer.
 
-- Configure the following macros in [`ssi_slave_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.0-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_slave_freertos/ssi_slave_freertos.c) if required:
+- Configure the following macros in [`ssi_slave_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_slave_freertos/ssi_slave_freertos.c) if required:
 
 - `SSI_SLAVE_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
 
@@ -210,10 +211,10 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define SSI_SLAVE_MAX_BIT_WIDTH    16       // Maximum bit width
   ```
 
-- `SYNC_TIME`: Defines the delay (in milliseconds) used to synchronize master and slave before starting the transfer. By default, it is set to 5000.
+- `PRIMARY_SECONDARY_SYNC_PIN`: Defines the GPIO used for the button-based master/slave synchronization. By default, it is `RTE_UULP_GPIO_2_PIN`.
 
   ```c
-  #define SYNC_TIME                  5000     // Delay to sync master and slave (ms)
+  #define PRIMARY_SECONDARY_SYNC_PIN RTE_UULP_GPIO_2_PIN
   ```
 
 ### Pin Configuration
@@ -227,6 +228,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | GPIO_27 [P29]              | GPIO_27                 | RTE_SSI_SLAVE_MOSI_PIN  |
 | GPIO_28 [P31]              | GPIO_26                 | RTE_SSI_SLAVE_MISO_PIN  |
 
+`UULP_VBAT_GPIO_2` which is `BTN0` on WPK is connected to `F12`. This example uses that signal as the synchronization input on the slave side.
+
 ![Figure: Pin Configuration for SSI1](resources/readme/image511d.png)
 
 ### Pin Connections Between Master and Slave
@@ -239,17 +242,19 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | CS     | GPIO_28                 | P31             | GPIO_9                 | F09            | CS → CS                    |
 | MOSI   | GPIO_26                 | P27             | GPIO_27                | P29            | Master MOSI → Slave MOSI   |
 | MISO   | GPIO_27                 | P29             | GPIO_28                | P31            | Master MISO → Slave MISO   |
+| SYNC   | UULP_VBAT_GPIO_2        | F12             | UULP_VBAT_GPIO_2       | F12            | F12 → F12                  |
 | GND    | GND                     | GND             | GND                    | GND            | GND → GND                  |
 
 **If using Explorer Kit (BRD2708A) on both sides:**
 
-| Signal | Master Board GPIO | Slave Board GPIO | Wire                       |
-| ------ | ----------------- | ---------------- | -------------------------- |
-| SCK    | GPIO_25 [SCK]     | GPIO_25          | SCK → SCK                  |
-| CS     | GPIO_28 [CS]      | GPIO_28          | CS → CS                    |
-| MOSI   | GPIO_26 [MOSI]    | GPIO_27          | Master MOSI → Slave MOSI   |
-| MISO   | GPIO_27 [MISO]    | GPIO_26          | Master MISO → Slave MISO   |
-| GND    | GND               | GND              | GND → GND                  |
+| Signal | Master Board GPIO | Slave Board GPIO | Wire                     |
+| ------ | ----------------- | ---------------- | ------------------------ |
+| SCK    | GPIO_25 [SCK]     | GPIO_25          | SCK → SCK                |
+| CS     | GPIO_28 [CS]      | GPIO_28          | CS → CS                  |
+| MOSI   | GPIO_26 [MOSI]    | GPIO_27          | Master MOSI → Slave MOSI |
+| MISO   | GPIO_27 [MISO]    | GPIO_26          | Master MISO → Slave MISO |
+| SYNC   | UULP_VBAT_GPIO_2  | UULP_VBAT_GPIO_2 | SYNC → SYNC              |
+| GND    | GND               | GND              | GND → GND                |
 
 >**Note:** Make sure the following pin configurations are in the `RTE_Device_917.h` file:
 >
@@ -261,9 +266,11 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 1. Compile and run the application.
 2. Connect master SSI pins to slave SSI pins as per the pin connection tables above.
-3. First reset the slave board and then reset the master board. The time difference between these resets is expected up to 5 seconds.
-4. Post transfer the data with master, the slave should print the console output as test case passed.
-5. After successful program execution, the prints in serial console looks as shown below.
+3. On WPK hardware, connect the sync signal between the two boards by wiring `F12` on the master board to `F12` on the slave board.
+4. Reset the slave board and then run or reset the master board.
+5. When the slave prints `Waiting for master button 0 press to sync with master.`, press `BTN0` on the master board to start the active phase.
+6. If both the master and slave complete the transfer successfully, the slave prints the data comparison result and completion logs.
+7. After successful program execution, the prints in serial console looks as shown below.
 
     ![Figure: output](resources/readme/output.png)
 

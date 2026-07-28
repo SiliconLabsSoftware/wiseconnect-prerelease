@@ -43,7 +43,6 @@
 #include "sli_net_common_utility.h"
 #include <stdbool.h>
 #include <string.h>
-#include <stdio.h>
 #include "sl_wifi_callback_framework.h"
 #include "sl_net_dns.h"
 #include "sli_wifi_constants.h"
@@ -161,7 +160,6 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
   if (len < LWIP_FRAME_ALIGNMENT) { /* 60 : LWIP frame alignment */
     len = LWIP_FRAME_ALIGNMENT;
   }
-
   // Drop packets originated from the same interface and is not destined for the said interface
   const uint8_t *src_mac = b + netif->hwaddr_len;
   const uint8_t *dst_mac = b;
@@ -170,26 +168,13 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
   if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0)))
       && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0)
       && (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0)) {
-    char sl_net_ds_ipv6_drop_eth_log[256];
-    snprintf(sl_net_ds_ipv6_drop_eth_log,
-             sizeof(sl_net_ds_ipv6_drop_eth_log),
-             "%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-             __func__,
-             dst_mac[0],
-             dst_mac[1],
-             dst_mac[2],
-             dst_mac[3],
-             dst_mac[4],
-             dst_mac[5],
-             src_mac[0],
-             src_mac[1],
-             src_mac[2],
-             src_mac[3],
-             src_mac[4],
-             src_mac[5],
-             b[12],
-             b[13]);
-    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)sl_net_ds_ipv6_drop_eth_log);
+    SL_DEBUG_LOG_V2(DEBUG, "%s: DROP, [%02x:%02x:", (uintptr_t) __func__, dst_mac[0], dst_mac[1]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x:", dst_mac[2], dst_mac[3], dst_mac[4]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x]<-", dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
+
     return;
   }
 #endif
@@ -204,25 +189,13 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
     }
 
     SL_DEBUG_LOG_V2(DEBUG, "%s: ACCEPT %d,", (uintptr_t) __func__, bufferoffset);
-    char sl_net_ds_rx_eth_log[256];
-    snprintf(sl_net_ds_rx_eth_log,
-             sizeof(sl_net_ds_rx_eth_log),
-             " [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-             dst_mac[0],
-             dst_mac[1],
-             dst_mac[2],
-             dst_mac[3],
-             dst_mac[4],
-             dst_mac[5],
-             src_mac[0],
-             src_mac[1],
-             src_mac[2],
-             src_mac[3],
-             src_mac[4],
-             src_mac[5],
-             b[12],
-             b[13]);
-    SL_DEBUG_LOG_V2(DEBUG, "%s", (uintptr_t)sl_net_ds_rx_eth_log);
+#ifdef SLI_NET_LWIP_RX_FRAME_DEBUG
+    SL_DEBUG_LOG_V2(DEBUG, " [%02x:%02x:%02x:", dst_mac[0], dst_mac[1], dst_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]<-", dst_mac[3], dst_mac[4], dst_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
+    SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
+    SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
+#endif
 
     if (netif->input(p, netif) != ERR_OK) {
       gOverrunCount++;
@@ -693,7 +666,9 @@ static sl_status_t sli_set_sta_link_up_by_profile_mode(sl_net_wifi_client_profil
       // Default dual mode: single ipconfig, then sync to LwIP
       SL_DEBUG_LOG_V2(DEBUG, "Dual: DHCP performed by NWP, synced to LwIP");
       status = sl_si91x_configure_ip_address(&profile->ip, SL_SI91X_WIFI_CLIENT_VAP_ID);
-      if (status == SL_STATUS_OK) {
+      // Bring the link up on full or partial IP configuration success. profile->ip.type now
+      // reflects only the families that configured successfully, so LwIP is synced accordingly.
+      if (sli_net_is_ip_config_success(status)) {
         set_sta_link_up(profile);
       }
     }
@@ -724,15 +699,43 @@ static sl_status_t sli_set_sta_link_up_by_profile_mode(sl_net_wifi_client_profil
   return status;
 }
 
-static void set_sta_link_down(void)
+static void sli_sta_link_down_on_tcpip(void *arg)
 {
+  struct netif *netif = (struct netif *)arg;
+
+  if (!netif_is_link_up(netif) && !netif_is_up(netif)) {
+    return;
+  }
+
 #if LWIP_IPV4 && LWIP_DHCP
   SL_DEBUG_LOG_V2(DEBUG, "DHCP Link down\r\n");
-  dhcp_stop(&(wifi_client_context->netif));
+  dhcp_stop(netif);
 #endif /* LWIP_IPV4 && LWIP_DHCP */
+#if SL_LWIP_ADAPTIVE_TIMERS
+  netif_stop_timers(netif);
+#endif
+  netif_set_link_down(netif);
+  netif_set_down(netif);
+}
 
-  netifapi_netif_set_link_down(&(wifi_client_context->netif));
-  netifapi_netif_set_down(&(wifi_client_context->netif));
+static void set_sta_link_down(void)
+{
+  struct netif *netif = &(wifi_client_context->netif);
+
+  if (tcpip_callback(sli_sta_link_down_on_tcpip, netif) != ERR_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to schedule STA link down on tcpip thread\r\n");
+  }
+}
+
+void sli_si91x_lwip_notify_wifi_disconnect(void)
+{
+  if (wifi_client_context == NULL) {
+    return;
+  }
+
+  if (dual_mode_enabled || bypass_mode_enabled) {
+    set_sta_link_down();
+  }
 }
 
 static void set_ap_link_down(void)
@@ -831,12 +834,16 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Configure IP based on the management type
   status = sli_set_sta_link_up_by_profile_mode(&profile);
-  if (status != SL_STATUS_OK) {
+  if (!sli_net_is_ip_config_success(status)) {
     SL_DEBUG_LOG_V2(ERROR, "IP/link config failed with error: 0x%lX", status);
-    // Disconnect WiFi on IP configuration failure
+    // Disconnect WiFi only when no IP family could be configured.
     sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
     return status;
   }
+
+  // Preserve the IP configuration status (which may be a partial-success code) so it can be
+  // propagated to the caller.
+  const sl_status_t ip_config_status = status;
 
   // Store the IP configuration for later retrieval
   stored_ip_config[SLI_SI91X_CLIENT] = profile.ip;
@@ -848,7 +855,7 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
   status = sli_send_ip_info_to_firmware_from_profile(&profile);
   VERIFY_STATUS_AND_RETURN(status);
 
-  return status;
+  return ip_config_status;
 }
 
 sl_status_t sl_net_wifi_client_down(sl_net_interface_t interface)

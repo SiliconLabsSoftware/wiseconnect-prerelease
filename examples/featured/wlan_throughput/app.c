@@ -235,9 +235,9 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
 
 volatile uint8_t has_data_received = 0;
 volatile uint32_t bytes_read       = 0;
-uint32_t start                     = 0;
+volatile uint32_t start            = 0;
 uint32_t now                       = 0;
-uint8_t first_data_frame           = 1;
+volatile uint8_t first_data_frame  = 1;
 
 void data_callback(uint32_t sock_no,
                    uint8_t *buffer,
@@ -279,6 +279,23 @@ void data_callback(uint32_t sock_no,
     has_data_received = 1;
   }
 }
+
+#if SOCKET_ASYNC_FEATURE
+static void wait_for_async_rx_complete(void)
+{
+  while (!has_data_received) {
+    if (!first_data_frame) {
+      now = osKernelGetTickCount();
+      if ((now - start) > TEST_TIMEOUT) {
+        SL_DEBUG_LOG_V2(INFO, "Time Out: %ld ms", (now - start));
+        has_data_received = 1;
+        break;
+      }
+    }
+    osThreadYield();
+  }
+}
+#endif
 
 static void application_start(void *argument)
 {
@@ -487,9 +504,7 @@ void receive_data_from_tcp_client(void)
     return;
   }
 
-  while (!has_data_received) {
-    osThreadYield();
-  }
+  wait_for_async_rx_complete();
 
   now = osKernelGetTickCount();
 
@@ -656,9 +671,8 @@ void receive_data_from_udp_client(void)
   }
   SL_DEBUG_LOG_V2(INFO, "Listening on Local Port %d\r\n", LISTENING_PORT);
 
-  while (!has_data_received) {
-    osThreadYield();
-  }
+  wait_for_async_rx_complete();
+
   now = osKernelGetTickCount();
   SL_DEBUG_LOG_V2(INFO, "UDP_RX Async Throughput test finished\r\n");
   SL_DEBUG_LOG_V2(INFO, "Total bytes received : %ld\r\n", bytes_read);

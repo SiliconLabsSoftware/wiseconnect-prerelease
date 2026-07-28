@@ -306,7 +306,7 @@ sl_status_t http_client_application(void)
   };
   status = sl_http_client_set_tcp_tls_advanced_configuration(&client_handle, &tcp_tls_opts);
   CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_SYNC_RESPONSE, callback_status);
-  SL_DEBUG_LOG_V2(INFO, "HTTP Client TCP/TLS advanced configuration set");
+  SL_DEBUG_LOG_V2(INFO, "HTTP Client TCP/TLS advanced configuration set\r\n");
 
 #if EXTENDED_HEADER_ENABLE
   //! Add extended headers
@@ -369,7 +369,7 @@ sl_status_t http_client_application(void)
     }
   }
 
-  SL_DEBUG_LOG_V2(INFO, "HTTP PUT request Success!\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\nHTTP PUT request Success!\r\n");
   reset_http_handles();
 
   //! Configure HTTP GET request
@@ -388,7 +388,7 @@ sl_status_t http_client_application(void)
     CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "HTTP GET request Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\nHTTP GET request Success\r\n");
   reset_http_handles();
 
   //! Configure HTTP POST request
@@ -409,7 +409,7 @@ sl_status_t http_client_application(void)
     CLEAN_HTTP_CLIENT_IF_FAILED(status, &client_handle, HTTP_ASYNC_RESPONSE, callback_status);
   }
 
-  SL_DEBUG_LOG_V2(INFO, "HTTP POST request Success\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\nHTTP POST request Success\r\n");
   reset_http_handles();
 
 #if EXTENDED_HEADER_ENABLE
@@ -436,12 +436,14 @@ sl_status_t http_put_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *put_response = (sl_http_client_response_t *)data;
   callback_status                         = put_response->status;
 
-  SL_DEBUG_LOG_V2(INFO, "===========HTTP PUT RESPONSE START===========\r\n");
-  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", put_response->status);
-  SL_DEBUG_LOG_V2(INFO, "> PUT response: %u", put_response->http_response_code);
-  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)put_response->end_of_data);
-  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u", put_response->data_length);
-  SL_DEBUG_LOG_V2(INFO, "> Request Context: %s", (uintptr_t)request_context);
+  SL_DEBUG_LOG_V2(INFO, "\r\n===========HTTP PUT RESPONSE START===========\r\n");
+  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X ", put_response->status);
+  SL_DEBUG_LOG_V2(INFO, "> PUT response: %u ", put_response->http_response_code);
+  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu ", (unsigned long)put_response->end_of_data);
+  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u ", put_response->data_length);
+  if (request_context != NULL) {
+    SL_DEBUG_LOG_V2(INFO, "> Request Context: %s ", (uintptr_t)request_context);
+  }
 
   if (put_response->status != SL_STATUS_OK && put_response->status != SL_STATUS_IN_PROGRESS) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;
@@ -474,12 +476,14 @@ sl_status_t http_get_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *get_response = (sl_http_client_response_t *)data;
   callback_status                         = get_response->status;
 
-  SL_DEBUG_LOG_V2(INFO, "===========HTTP GET RESPONSE START===========\r\n");
-  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", get_response->status);
-  SL_DEBUG_LOG_V2(INFO, "> GET response: %u", get_response->http_response_code);
-  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)get_response->end_of_data);
-  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u", get_response->data_length);
-  SL_DEBUG_LOG_V2(INFO, "> Request Context: %s", (uintptr_t)request_context);
+  SL_DEBUG_LOG_V2(INFO, "\r\n===========HTTP GET RESPONSE START===========\r\n");
+  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X ", get_response->status);
+  SL_DEBUG_LOG_V2(INFO, "> GET response: %u ", get_response->http_response_code);
+  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu ", (unsigned long)get_response->end_of_data);
+  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u ", get_response->data_length);
+  if (request_context != NULL) {
+    SL_DEBUG_LOG_V2(INFO, "> Request Context: %s ", (uintptr_t)request_context);
+  }
 
   if (get_response->status != SL_STATUS_OK && get_response->status != SL_STATUS_IN_PROGRESS) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;
@@ -507,7 +511,7 @@ sl_status_t http_get_response_callback_handler(const sl_http_client_t *client,
     http_rsp_received = HTTP_SUCCESS_RESPONSE;
   }
 
-  SL_DEBUG_LOG_V2(INFO, "GET Data response: %s Offset: %ld", (uintptr_t)app_buffer, (long)app_buff_index);
+  SL_DEBUG_LOG_V2(INFO, "GET Data response: %s Offset: %ld\r\n", (uintptr_t)app_buffer, (long)app_buff_index);
   app_buff_index = 0;
 
   return SL_STATUS_OK;
@@ -524,12 +528,14 @@ sl_status_t http_post_response_callback_handler(const sl_http_client_t *client,
   sl_http_client_response_t *post_response = (sl_http_client_response_t *)data;
   callback_status                          = post_response->status;
 
-  SL_DEBUG_LOG_V2(INFO, "===========HTTP POST RESPONSE START===========\r\n");
-  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X", post_response->status);
-  SL_DEBUG_LOG_V2(INFO, "> POST response: %u", post_response->http_response_code);
-  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu", (unsigned long)post_response->end_of_data);
-  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u", post_response->data_length);
-  SL_DEBUG_LOG_V2(INFO, "> Request Context: %s", (uintptr_t)request_context);
+  SL_DEBUG_LOG_V2(INFO, "\r\n===========HTTP POST RESPONSE START===========\r\n");
+  SL_DEBUG_LOG_V2(INFO, "> Status: 0x%X ", post_response->status);
+  SL_DEBUG_LOG_V2(INFO, "> POST response: %u ", post_response->http_response_code);
+  SL_DEBUG_LOG_V2(INFO, "> End of data: %lu ", (unsigned long)post_response->end_of_data);
+  SL_DEBUG_LOG_V2(INFO, "> Data Length: %u ", post_response->data_length);
+  if (request_context != NULL) {
+    SL_DEBUG_LOG_V2(INFO, "> Request Context: %s ", (uintptr_t)request_context);
+  }
 
   if (post_response->status != SL_STATUS_OK && post_response->status != SL_STATUS_IN_PROGRESS) {
     http_rsp_received = HTTP_FAILURE_RESPONSE;

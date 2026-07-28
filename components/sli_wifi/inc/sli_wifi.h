@@ -54,7 +54,7 @@
 /// DCM offset
 #define RATE_OFFSET_DCM 13
 /// Coding type offset
-#define RATE_OFFSET_CODING_TYPE 9
+#define RATE_OFFSET_CODING_TYPE 4
 
 /** Internal TWT auto-selection defaults (SDK use only) */
 #define SLI_TWT_INTERNAL_DEVICE_AVERAGE_THROUGHPUT     20000
@@ -177,7 +177,8 @@ typedef struct {
   int16_t Txpower;
 } sli_wifi_request_tx_power_t;
 
-#define SLI_WIFI_TX_TEST_NWP_RESERVED_LEN 4U
+/* NWP reserved gaps in text_tx_cmd: 2 bytes after base_info + 4 after per_params = 6 bytes. */
+#define SLI_WIFI_TX_TEST_NWP_RESERVED_LEN 2U
 
 typedef struct {
   uint16_t frame_control; // Frame Control field
@@ -201,6 +202,7 @@ typedef struct __attribute__((packed)) {
   uint16_t channel_bw;
   uint16_t aggr_enable;
   uint16_t aggr_count;
+  uint16_t flags;
 } sli_wifi_tx_test_base_info_wire_t;
 
 typedef struct __attribute__((packed)) {
@@ -251,14 +253,17 @@ typedef struct __attribute__((packed)) {
   uint8_t disregard;
 } sli_wifi_11be_per_params_wire_t;
 
-/* Largest v2 PER command: base_info + 4 reserved + 11ax per + 4 reserved = 59 bytes. */
-#define SLI_WIFI_TX_TEST_CMD_MAX_LEN                                                    \
-  (sizeof(sli_wifi_tx_test_base_info_wire_t) + (SLI_WIFI_TX_TEST_NWP_RESERVED_LEN * 2U) \
-   + sizeof(sli_wifi_11ax_per_params_wire_t))
+/* Largest v2 PER command: base_info + 6 reserved + 11ax per = 59 bytes (2 after base + 4 after per). */
+#define SLI_WIFI_TX_TEST_CMD_MAX_LEN                                                   \
+  (sizeof(sli_wifi_tx_test_base_info_wire_t) + sizeof(sli_wifi_11ax_per_params_wire_t) \
+   + (SLI_WIFI_TX_TEST_NWP_RESERVED_LEN * 3U))
 
 sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
                                        sl_wifi_timeout_type_t timeout_type,
                                        uint16_t timeout_value);
+sl_status_t sli_wifi_configure_profile_timeout(sl_wifi_interface_t interface,
+                                               sl_wifi_timeout_type_t timeout_type,
+                                               uint16_t timeout_value);
 sl_status_t sli_wifi_get_timeout(sl_wifi_interface_t interface,
                                  sl_wifi_timeout_type_t timeout_type,
                                  uint16_t *timeout_value);
@@ -492,4 +497,12 @@ sl_status_t sli_wifi_send_data_packet(const void *data, uint16_t length, const v
  */
 sl_status_t sli_wifi_send_ip_address_info(sl_wifi_interface_t interface,
                                           const sli_wifi_ip_address_info_t *ip_address_info);
+
+sl_status_t sli_wifi_set_opportunistic_sleep_config(sl_wifi_interface_t interface,
+                                                    const sli_wifi_opportunistic_sleep_config_t *config);
+sl_status_t sli_wifi_set_retry_config(sl_wifi_interface_t interface, const sli_wifi_retry_config_t *config);
+sl_status_t sli_wifi_set_aggregation_config(sl_wifi_interface_t interface, const sli_wifi_aggregation_config_t *config);
+
+void sli_wifi_set_active_application_profile(sli_wifi_application_profile_t profile);
+sli_wifi_application_profile_t sli_wifi_get_active_application_profile(void);
 #endif

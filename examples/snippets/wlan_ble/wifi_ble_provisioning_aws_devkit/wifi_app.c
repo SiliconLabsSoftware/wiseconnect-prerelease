@@ -64,7 +64,6 @@
 
 #include "cmsis_os2.h"
 #include <string.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -338,10 +337,7 @@ static void iot_subscribe_callback_handler(AWS_IoT_Client *pClient,
   UNUSED_PARAMETER(topicNameLen);
   UNUSED_PARAMETER(pData);
 
-  SL_DEBUG_LOG_V2(INFO,
-                  "Data received on the Subscribed Topic: %.*s ",
-                  pParams->payloadLen,
-                  (uintptr_t)(char *)pParams->payload);
+  printf("Data received on the Subscribed Topic: %.*s \r\n", (int)pParams->payloadLen, (char *)pParams->payload);
 
   // Initialize the JSON parser
   jsmn_parser parser;
@@ -977,7 +973,7 @@ void wifi_app_mqtt_task(void)
           publish_QOS0.payload    = temp_string;
           publish_QOS0.payloadLen = strlen(temp_string);
 #endif
-          SL_DEBUG_LOG_V2(INFO, "Data to be published: %s\r\n", (uintptr_t)response_data_buffer);
+          printf("Data to be published: %s\r\n", response_data_buffer);
           // mqtt publish with QOS0
           rc = aws_iot_mqtt_publish(&mqtt_client, MQTT_TOPIC2, strlen(MQTT_TOPIC2), &publish_QOS0);
 

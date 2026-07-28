@@ -431,7 +431,7 @@ static int32_t I2S0_Receive (void *data, uint32_t num)
 
 static uint32_t I2S0_GetTxCount (void) 
 {
-#if defined(A11_ROM)
+#if defined(A11_ROM) && defined(I2S_ROMDRIVER_PRESENT)
 	return ROMAPI_I2S_API->I2S_GetTxCount (&I2S0_Resources); 	 				
 #else
 	return I2S_GetTxCount (&I2S0_Resources); 	
@@ -440,7 +440,7 @@ static uint32_t I2S0_GetTxCount (void)
 
 static uint32_t I2S0_GetRxCount (void) 
 {
-#if defined(A11_ROM)
+#if defined(A11_ROM) && defined(I2S_ROMDRIVER_PRESENT)
 	return ROMAPI_I2S_API->I2S_GetRxCount (&I2S0_Resources); 	 
 #else
 	return I2S_GetRxCount (&I2S0_Resources);
@@ -567,7 +567,7 @@ static int32_t I2S1_Receive (void *data, uint32_t num)
 
 static uint32_t I2S1_GetTxCount (void) 
 {
-#if defined(A11_ROM)
+#if defined(A11_ROM) && defined(I2S_ROMDRIVER_PRESENT)
 	return ROMAPI_I2S_API->I2S_GetTxCount (&I2S1_Resources); 	 
 #else
 	return I2S_GetTxCount (&I2S1_Resources); 	
@@ -576,7 +576,7 @@ static uint32_t I2S1_GetTxCount (void)
 
 static uint32_t I2S1_GetRxCount (void) 
 {
-#if defined(A11_ROM)
+#if defined(A11_ROM) && defined(I2S_ROMDRIVER_PRESENT)
 	return ROMAPI_I2S_API->I2S_GetRxCount (&I2S1_Resources); 	 	
 #else
 	return I2S_GetRxCount (&I2S1_Resources);

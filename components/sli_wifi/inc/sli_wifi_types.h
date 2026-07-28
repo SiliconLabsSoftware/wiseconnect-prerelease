@@ -33,6 +33,7 @@
 #include <stdbool.h>
 #include "sl_wifi_device.h"
 #include "sl_wifi_constants.h"
+#include "sl_application_profile_types.h"
 #include "sl_wifi_types.h"
 #include "sli_queue_manager.h"
 #include "cmsis_os2.h"
@@ -798,5 +799,59 @@ typedef struct {
   sli_wifi_bc_mc_filter_stats_t nwp_filter_stats; ///< NWP B/M filter statistics
   sli_wifi_ppe_filter_stats_t ppe_filter_stats;   ///< PPE B/M filter statistics
 } sli_wifi_statistics_v2_t;
+
+// -----------------------------------------------------------------------------
+// Advanced Wi-Fi configuration
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief Active application profile state tracked by the Wi-Fi layer (host-side).
+ * @details Aliases @ref sl_application_profile_t. @ref SLI_WIFI_APPLICATION_PROFILE_MAX is the
+ *          sentinel meaning no profile has been applied yet. Updated by
+ *          @ref sl_net_set_application_profile() via @ref sli_wifi_set_active_application_profile()
+ *          after all preset configuration succeeds. Reset to @ref SLI_WIFI_APPLICATION_PROFILE_MAX
+ *          in @ref sli_wifi_deinit(). This host state survives Wi-Fi disconnect and is used for
+ *          scan-time behavior (for example `lp_chain_scan` override in @ref sli_handle_standard_scan)
+ *          and to no-op scan-timeout configuration in @ref sli_wifi_configure_timeout(). Profile
+ *          configuration applied by @ref sl_net_set_application_profile is **not** retained across
+ *          disconnect or join failure; the application must re-call that API to restore configuration.
+ */
+typedef enum {
+  SLI_WIFI_APPLICATION_PROFILE_DEFAULT = SL_APPLICATION_PROFILE_DEFAULT, ///< Default Wi-Fi behavior
+  SLI_WIFI_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH =
+    SL_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH, ///< Neutral-less Matter switch preset
+  SLI_WIFI_APPLICATION_PROFILE_MAX = SL_APPLICATION_PROFILE_MAX
+} sli_wifi_application_profile_t;
+
+/**
+ * @brief Sub-command IDs for @ref SLI_WIFI_REQ_SET_ADVANCED_CONFIG.
+ * @details Symbolic values for @ref sli_wifi_advanced_configuration_t::sub_cmd_id, which is
+ *          transmitted as a 32-bit little-endian field on the wire.
+ */
+typedef enum {
+  SLI_WIFI_ADVANCED_CONFIG_OPPORTUNISTIC_SLEEP = 0x01, ///< @ref sli_wifi_opportunistic_sleep_config_t
+  SLI_WIFI_ADVANCED_CONFIG_RETRY               = 0x02, ///< @ref sli_wifi_retry_config_t
+  SLI_WIFI_ADVANCED_CONFIG_AGGREGATION         = 0x03, ///< @ref sli_wifi_aggregation_config_t
+} sli_wifi_advanced_configuration_sub_cmd_t;
+
+typedef sl_application_profile_opportunistic_sleep_config_t sli_wifi_opportunistic_sleep_config_t;
+typedef sl_application_profile_retry_config_t sli_wifi_retry_config_t;
+typedef sl_application_profile_aggregation_config_t sli_wifi_aggregation_config_t;
+typedef sl_application_profile_preset_t sli_wifi_application_profile_preset_t;
+
+/**
+ * @brief Host-to-NWP advanced configuration frame payload for cmd @c 0x96.
+ * @details @a sub_cmd_id is a 32-bit field (little-endian on the wire) that selects the active
+ *          @a config union member. Use @ref sli_wifi_advanced_configuration_sub_cmd_t values when
+ *          assigning @a sub_cmd_id.
+ */
+typedef struct {
+  uint32_t sub_cmd_id; ///< Advanced-config sub-command ID (@ref sli_wifi_advanced_configuration_sub_cmd_t)
+  union {
+    sli_wifi_opportunistic_sleep_config_t opportunistic_sleep; ///< sub-cmd @c 1
+    sli_wifi_retry_config_t retry;                             ///< sub-cmd @c 2
+    sli_wifi_aggregation_config_t aggregation;                 ///< sub-cmd @c 3
+  } config;
+} sli_wifi_advanced_configuration_t;
 
 #endif // SLI_WIFI_TYPES_H

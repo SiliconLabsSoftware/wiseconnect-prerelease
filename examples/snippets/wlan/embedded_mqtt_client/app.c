@@ -265,10 +265,6 @@ void print_char_buffer(char *buffer, uint32_t buffer_length)
     return;
   }
 
-  if (buffer_length > SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE) {
-    buffer_length = SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE;
-  }
-
   char *line = (char *)malloc(buffer_length + 1);
   if (line == NULL) {
     SL_DEBUG_LOG_V2(ERROR, "print_char_buffer: malloc failed");
@@ -277,7 +273,7 @@ void print_char_buffer(char *buffer, uint32_t buffer_length)
 
   memcpy(line, buffer, buffer_length);
   line[buffer_length] = '\0';
-  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)line);
+  printf("%s", line);
   free(line);
 }
 

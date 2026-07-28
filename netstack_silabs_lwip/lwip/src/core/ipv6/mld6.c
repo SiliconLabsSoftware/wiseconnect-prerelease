@@ -503,6 +503,31 @@ mld6_timeout_cb(void *arg)
 
   mld6_tmr();
 }
+
+/** Clean up MLD6 state on link-down and stop the global timer if unused. */
+void
+mld6_cleanup_on_link_down(struct netif *netif)
+{
+  struct mld_group *group;
+
+  LWIP_ASSERT_CORE_LOCKED();
+
+  /* Always clear per-netif MLD timer state for the link that went down. */
+  for (group = netif_mld6_data(netif); group != NULL; group = group->next) {
+    group->timer = 0;
+    if (group->group_state == MLD6_GROUP_DELAYING_MEMBER) {
+      group->group_state = MLD6_GROUP_IDLE_MEMBER;
+    }
+  }
+
+  /* Only stop the global timer if no other active netif still needs it. */
+  if (netif_other_netif_is_up_link_up(netif)) {
+    return;
+  }
+
+  sys_untimeout(mld6_timeout_cb, NULL);
+  mld6_timer_active = 0;
+}
 #endif /* SL_LWIP_MLD6_ONDEMAND_TIMER */
 /**
  * Periodic timer for mld processing. Must be called every

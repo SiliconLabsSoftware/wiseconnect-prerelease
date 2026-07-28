@@ -31,7 +31,6 @@
 #include "sl_net.h"
 #include "app.h"
 #include "errno.h"
-#include <stdio.h>
 #include "sl_utility.h"
 #include "sl_wifi.h"
 #include "sl_net_wifi_types.h"
@@ -989,7 +988,7 @@ sl_status_t connect_data_handler(sl_http_server_t *handle, sl_http_server_reques
 
     sl_http_server_read_request_data(handle, &recvData);
     response[recvData.received_data_length] = 0;
-    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s\r\n", (uintptr_t)response);
+    printf("Got request data as : %s\r\n", response);
   }
 
   // Set the response code to 200 (OK)
@@ -1025,7 +1024,7 @@ sl_status_t default_handler(sl_http_server_t *handle, sl_http_server_request_t *
 
     sl_http_server_read_request_data(handle, &recvData);
     response[recvData.received_data_length] = 0;
-    SL_DEBUG_LOG_V2(INFO, "Got request data as : %s\r\n", (uintptr_t)response);
+    printf("Got request data as : %s\r\n", response);
   }
 
   http_response.response_code = SL_HTTP_RESPONSE_NOT_FOUND;

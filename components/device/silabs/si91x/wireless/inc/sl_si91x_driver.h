@@ -325,6 +325,10 @@ sl_status_t sl_si91x_configure_timestamp_memory_location(uint8_t addr_len, const
  *   - After a successful IP configuration, Gratuitous ARP is used as the periodic WLAN Keep-Alive packet with the configured keep_alive_timeout interval.
  *   - If there is no IP configuration, NULL Data Packets are used as the WLAN Keep-Alive packet. 
  *   - As an alternative, users can use @ref sl_si91x_set_timeout to set all timeouts before calling `sl_wifi_init()`.
+ *   - After sl_net_set_application_profile() has been applied successfully, active and passive
+ *     channel scan timeouts return @c SL_STATUS_OK without changing the profile-managed values
+ *     (@a timeout_value is ignored). Use sl_net_set_application_profile() to change those scan
+ *     timeouts.
  *******************************************************************************/
 sl_status_t sl_si91x_configure_timeout(sl_wifi_timeout_type_t timeout_type,
                                        uint16_t timeout_value) SL_DEPRECATED_API_WISECONNECT_4_1;
@@ -597,7 +601,7 @@ sl_status_t sl_si91x_debug_log(const sl_si91x_assertion_t *assertion);
  *
  *  By default, the `SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID` bitmap is enabled.
  *
- *  Users can call this API before calling [sl_wifi_connect](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-connect), [sl_wifi_start_ap](../wiseconnect-api-reference-guide-wi-fi/wifi-ap-api#sl-wifi-start-ap), [sl_wifi_start_wps](../wiseconnect-api-reference-guide-wi-fi/wifi-wps-api#sl-wifi-start-wps) to overwrite the join feature bitmap.
+ *  Users can call this API before calling [sl_wifi_connect](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-connect), [sl_wifi_start_ap](../wiseconnect-api-reference-guide-wi-fi/wifi-ap-api#sl-wifi-start-ap), [sl_wifi_start_wps_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-wps-api#sl-wifi-start-wps-v2) to overwrite the join feature bitmap.
  *
  * @param[in] interface
  *   The selected Wi-Fi interface. Refer to [sl_wifi_interface_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-interface-t) for possible values.

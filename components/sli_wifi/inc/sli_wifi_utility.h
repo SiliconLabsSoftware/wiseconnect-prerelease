@@ -40,8 +40,11 @@
 #define SLI_WIFI_WAIT_ON_THREAD_ID 0
 #define SLI_WIFI_WAIT_ON_EVENT_ID  1
 
-#define SLI_WIFI_HEADER_SIZE               16
-#define SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE 4
+#define SLI_WIFI_HEADER_SIZE                   16
+#define SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE     4
+#define SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE 1640
+#define SLI_WIFI_TRANSMIT_TEST_MAX_MEMCPY_CHUNK \
+  (SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE - (SLI_WIFI_HEADER_SIZE + SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE))
 
 /***************************************************************************/ /**
  * @brief
@@ -313,5 +316,22 @@ uint32_t sli_wifi_host_elapsed_time(uint32_t starting_timestamp);
  ******************************************************************************/
 sl_status_t sli_fw_status_storage_index_init(void);
 #endif
+
+/***************************************************************************/ /**
+ * @brief Cache boot feature bit map pushed from driver init.
+ ******************************************************************************/
+void sli_wifi_save_boot_feature_bit_map(uint32_t feature_bit_map);
+
+/***************************************************************************/ /**
+ * @brief Returns true if 11n-only mode was configured at Wi-Fi init.
+ *
+ * @details
+ *   Checks whether @ref SL_WIFI_FEAT_DISABLE_11AX_SUPPORT was set in
+ *   sl_wifi_device_configuration_t::boot_config::feature_bit_map during
+ *   sl_wifi_init(). Neutral-less switch profile requires this prerequisite.
+ *
+ * @return true if 11n-only (11ax disabled) was configured at init, else false.
+ ******************************************************************************/
+bool sli_wifi_is_11n_only_mode_enabled(void);
 
 #endif

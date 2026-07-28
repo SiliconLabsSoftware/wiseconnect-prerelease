@@ -1,27 +1,32 @@
-/* -----------------------------------------------------------------------------
- * Copyright (c) 2013-2016 ARM Ltd.
- *
- * This software is provided 'as-is', without any express or implied warranty.
- * In no event will the authors be held liable for any damages arising from
- * the use of this software. Permission is granted to anyone to use this
- * software for any purpose, including commercial applications, and to alter
- * it and redistribute it freely, subject to the following restrictions:
- *
- * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software. If you use this software in
- *    a product, an acknowledgement in the product documentation would be
- *    appreciated but is not required.
- *
- * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.
- *
- * 3. This notice may not be removed or altered from any source distribution.
- *
- * $Date:        1. June 2024
- * $Revision:    V2.4.4
- *
- * Project:      RTE Device Configuration for Si91x 2.0 B0 BRD4342A
- * -------------------------------------------------------------------------- */
+/******************************************************************************
+* @file RTE_Device_917.h
+* @brief RTE Device Configuration for SiWG917 BRD4342A
+*******************************************************************************
+* # License
+* <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
+*******************************************************************************
+*
+* SPDX-License-Identifier: Zlib
+*
+* The licensor of this software is Silicon Laboratories Inc.
+*
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely, subject to the following restrictions:
+*
+* 1. The origin of this software must not be misrepresented; you must not
+*    claim that you wrote the original software. If you use this software
+*    in a product, an acknowledgment in the product documentation would be
+*    appreciated but is not required.
+* 2. Altered source versions must be plainly marked as such, and must not be
+*    misrepresented as being the original software.
+* 3. This notice may not be removed or altered from any source distribution.
+*
+******************************************************************************/
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -1393,7 +1398,6 @@
 //Pintool data
 #endif
 
-// <e> Enable multiple CSN lines
 #define M4_SSI_CS0 1
 #define M4_SSI_CS1 0
 #define M4_SSI_CS2 0
@@ -1515,16 +1519,12 @@
 //Pintool data
 #endif
 
-//   <e> DMA Rx
-//     <o3> Channel <28=>28
+//     <o> RTE_SSI_MASTER_UDMA_RX_CH Channel <28=>28
 //     <i>  Selects DMA Channel (only Channel 28 can be used)
-//   </e>
 #define RTE_SSI_MASTER_UDMA_RX_CH 28
 
-//   <e> DMA Tx
-//     <o3> Channel <29=>29
+//     <o> RTE_SSI_MASTER_UDMA_TX_CH Channel <29=>29
 //     <i>  Selects DMA Channel (only Channel 29 can be used)
-//   </e>
 #define RTE_SSI_MASTER_UDMA_TX_CH 29
 // </e>
 
@@ -1754,17 +1754,13 @@
 //Pintool data
 #endif
 
-//   <e> DMA Rx
-//     <o3> Channel <22=>22
+//     <o> RTE_SSI_SLAVE_UDMA_RX_CH Channel <22=>22
 //     <i>  Selects DMA Channel (only Channel 22 can be used)
-//   </e>
 #define RTE_SSI_SLAVE_UDMA_RX_CH         22
 #define RTE_SSI_SLAVE_DMA_RX_LEN_PER_DES 1024
 
-//   <e> DMA Tx
-//     <o3> Channel <23=>23
+//     <o> RTE_SSI_SLAVE_UDMA_TX_CH Channel <23=>23
 //     <i>  Selects DMA Channel (only Channel 23 can be used)
-//   </e>
 #define RTE_SSI_SLAVE_UDMA_TX_CH         23
 #define RTE_SSI_SLAVE_DMA_TX_LEN_PER_DES 1024
 
@@ -1774,7 +1770,6 @@
 // <i> Configuration settings for Driver_SSI_ULP_MASTER in component ::CMSIS Driver:SPI
 #define RTE_SSI_ULP_MASTER 1
 
-// <e> Enable multiple CSN lines
 #define ULP_SSI_CS0 1
 #define ULP_SSI_CS1 0
 #define ULP_SSI_CS2 0
@@ -2105,21 +2100,18 @@
 #endif
 #define RTE_SSI_ULP_MASTER_CS2_MODE 1
 
-//   <e> DMA Rx
-//     <o3> Channel <2=>2
+//     <o> RTE_SSI_ULP_MASTER_UDMA_RX_CH Channel <2=>2
 //     <i>  Selects DMA Channel (only Channel 2 can be used)
-//   </e>
 #define RTE_SSI_ULP_MASTER_UDMA_RX_CH         2
 #define RTE_SSI_ULP_MASTER_DMA_RX_LEN_PER_DES 96
 
-//   <e> DMA Tx
-//     <o3> Channel <3=>3
+//     <o> RTE_SSI_ULP_MASTER_UDMA_TX_CH Channel <3=>3
 //     <i>  Selects DMA Channel (only Channel 3 can be used)
-//   </e>
 #define RTE_SSI_ULP_MASTER_UDMA_TX_CH         3
 #define RTE_SSI_ULP_MASTER_DMA_TX_LEN_PER_DES 96
 
 // </e>
+
 /*===================================================================
                             UDMA Defines
 ====================================================================*/
@@ -3419,10 +3411,8 @@
 //Pintool data
 #endif
 
-//   <e> GSPI_MASTER_CS0
-//   <o>  <0=>P0_9 <1=>P0_28 <2=>P0_49 <3=>P0_53
+//   <o> GSPI_MASTER_CS0 Pin <0=>P0_9 <1=>P0_28 <2=>P0_49 <3=>P0_53
 //   <i> CS0 of GSPI0
-//   </e>
 #ifndef GSPI_MASTER_CS0_LOC
 #define RTE_GSPI_MASTER_CS0_PORT_ID 1
 
@@ -3474,10 +3464,8 @@
 //Pintool data
 #endif
 
-//   <e> GSPI_MASTER_CS1
-//   <o>  <0=>P0_10 <1=>P0_29 <2=>P0_50 <3=>P0_54
+//   <o> GSPI_MASTER_CS1 Pin <0=>P0_10 <1=>P0_29 <2=>P0_50 <3=>P0_54
 //   <i> CS1 of GSPI0
-//   </e>
 #ifndef GSPI_MASTER_CS1_LOC
 #define RTE_GSPI_MASTER_CS1_PORT_ID 1
 #if (RTE_GSPI_MASTER_CS1_PORT_ID == 0)
@@ -3528,10 +3516,8 @@
 //Pintool data
 #endif
 
-//   <e> GSPI_MASTER_CS2
-//   <o>  <0=>P0_15 <1=>P0_30 <2=>P0_51 <3=>P0_55
+//   <o> GSPI_MASTER_CS2 Pin <0=>P0_15 <1=>P0_30 <2=>P0_51 <3=>P0_55
 //   <i> CS2 of GSPI0
-//   </e>
 #ifndef GSPI_MASTER_CS2_LOC
 #define RTE_GSPI_MASTER_CS2_PORT_ID 1
 #if (RTE_GSPI_MASTER_CS2_PORT_ID == 0)

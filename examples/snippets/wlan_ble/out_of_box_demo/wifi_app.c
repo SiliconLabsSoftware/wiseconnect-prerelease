@@ -38,7 +38,6 @@
 #include "sl_net_wifi_types.h"
 #include "sl_si91x_driver.h"
 #include <string.h>
-#include <stdio.h>
 
 #include "rsi_common_apis.h"
 #include "rsi_bt_common_apis.h"
@@ -291,9 +290,7 @@ static sl_net_wifi_client_profile_t wifi_client_profile = {
     .ip = {
         .mode = SL_IP_MANAGEMENT_DHCP,
         .type = SL_IPV4,
-        .host_name = DHCP_HOST_NAME,
-        .ip = {{{0}}},
-
+        .host_name = DHCP_HOST_NAME
     }
 };
 
@@ -573,11 +570,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 
 void print_char_buffer(char *buffer, uint32_t buffer_length)
 {
-  SL_DEBUG_LOG_V2(INFO, "\r\n");
-
-  for (uint32_t index = 0; index < buffer_length; index++) {
-    SL_DEBUG_LOG_V2(INFO, "%c", buffer[index]);
-  }
+  printf("\r\n%.*s", (int)buffer_length, buffer);
 }
 
 void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)

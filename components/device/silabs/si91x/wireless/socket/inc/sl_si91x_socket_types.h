@@ -268,7 +268,8 @@ typedef struct {
   uint8_t host_length;        ///< Length of WebSocket host name
   uint8_t resource_length;    ///< Length of WebSocket resource name
   uint8_t subprotocol_length; ///< Length of WebSocket subprotocol name
-  uint8_t websocket_data[];   ///< WebSocket host name, resource name and subprotocol name
+  uint8_t origin_length;      ///< Length of WebSocket origin
+  uint8_t websocket_data[];   ///< WebSocket host name, resource name, subprotocol name and origin
 } sli_si91x_websocket_info_t;
 
 #pragma pack()

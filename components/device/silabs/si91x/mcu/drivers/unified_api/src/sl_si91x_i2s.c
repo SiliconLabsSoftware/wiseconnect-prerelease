@@ -614,6 +614,8 @@ sl_status_t sl_si91x_i2s_transfer(sl_i2s_handle_t i2s_handle,
 {
   sl_status_t status   = SL_STATUS_OK;
   int32_t error_status = 0;
+  uint32_t tx_resolution;
+  uint32_t rx_resolution;
 
   do {
 
@@ -639,6 +641,34 @@ sl_status_t sl_si91x_i2s_transfer(sl_i2s_handle_t i2s_handle,
       // Invalid data size. transfer size should be even for I2S transfers
       status = SL_STATUS_INVALID_PARAMETER;
       SL_PRINT_STRING_ERROR("sl_si91x_i2s_transfer: data_out_size or data_in_size is not even,line no : %d\r\n",
+                            (int)__LINE__);
+      break;
+    }
+
+    if (i2s_handle == &Driver_SAI0) {
+#ifdef SL_I2S0_CHANNEL
+      tx_resolution = I2S0->CHANNEL_CONFIG[SL_I2S0_CHANNEL].I2S_TCR_b.WLEN;
+      rx_resolution = I2S0->CHANNEL_CONFIG[SL_I2S0_CHANNEL].I2S_RCR_b.WLEN;
+#else
+      tx_resolution = I2S0->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;
+      rx_resolution = I2S0->CHANNEL_CONFIG[0].I2S_RCR_b.WLEN;
+#endif
+    } else {
+      tx_resolution = I2S1->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;
+      rx_resolution = I2S1->CHANNEL_CONFIG[0].I2S_RCR_b.WLEN;
+    }
+
+    if (((tx_resolution == RES_12_BIT) || (tx_resolution == RES_24_BIT)) && ((data_out_size % 4U) != 0U)) {
+      status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_i2s_transfer: data_out_size %lu must be x4 for 12/24-bit,line no : %d\r\n",
+                            (unsigned long)data_out_size,
+                            (int)__LINE__);
+      break;
+    }
+    if (((rx_resolution == RES_12_BIT) || (rx_resolution == RES_24_BIT)) && ((data_in_size % 4U) != 0U)) {
+      status = SL_STATUS_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_i2s_transfer: data_in_size %lu must be x4 for 12/24-bit,line no : %d\r\n",
+                            (unsigned long)data_in_size,
                             (int)__LINE__);
       break;
     }

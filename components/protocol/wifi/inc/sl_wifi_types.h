@@ -46,7 +46,7 @@
  * @{
  */
 
-/** Max SSID size in an 802.11 SSID information element (32 bytes in the IE body, not counting IE header). */
+/** Maximum SSID size in an 802.11 SSID information element (32 bytes in the IE body, not counting IE header). */
 #define SL_WIFI_MAX_SSID_IE_OCTETS 32U
 
 /** Legacy alias for @ref SL_WIFI_MAX_SSID_LENGTH (NWP/host SSID buffers, often includes space for a null terminator). */
@@ -101,11 +101,11 @@
  * @{
  */
 
-/** Tell the firmware to use its default auth/association timeout. */
+/** Instruct firmware to use its default auth/association timeout. */
 #define SL_WIFI_DEFAULT_AUTH_ASSOCIATION_TIMEOUT 0xFFFF
-/** Tell the firmware to use its default dwell time on each channel during active scan. */
+/** Instruct firmware to use its default dwell time on each channel during active scan. */
 #define SL_WIFI_DEFAULT_ACTIVE_CHANNEL_SCAN_TIME 0xFFFF
-/** Tell the firmware to use its default keep-alive timeout. */
+/** Instruct firmware to use its default keep-alive timeout. */
 #define SL_WIFI_DEFAULT_KEEP_ALIVE_TIMEOUT 0xFFFF
 /** Passive scan: @c 0 means use the default passive scan dwell time. */
 #define SL_WIFI_DEFAULT_PASSIVE_CHANNEL_SCAN_TIME 0
@@ -284,6 +284,7 @@ typedef struct {
  * @brief Wi-Fi scan result structure.
  *
  * Indicates the results of a Wi-Fi scan operation.
+ * @note This strucuture is supported only on SiWx91x devices. 
  */
 typedef struct {
   uint32_t scan_count; ///< Number of available scan results
@@ -462,12 +463,12 @@ typedef struct {
     options; ///< Optional flags for AP configuration. @note Dynamic configurability of hidden SSIDs is only available in APCONF when it is disabled in opermode.
   sl_wifi_credential_id_t credential_id; ///< ID of secure credentials
   uint8_t
-    keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91-x-types#sl-si91x-ap-keepalive-type-t)
+    keepalive_type; ///< Keep alive type of the access point. One of the values from [sl_wifi_ap_keepalive_type_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-ap-keepalive-type-t)
   uint16_t beacon_interval;     ///< Beacon interval of the access point in time units (1 TU = 1024 microseconds)
   uint32_t client_idle_timeout; ///< Period after which AP will disconnect the station
   uint16_t dtim_beacon_count;   ///< Number of beacons per DTIM
   uint8_t
-    maximum_clients; ///< The maximum number of associated clients must not exceed [SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap#sl-si91x-custom-feat-max-num-of-clients). If this bit is not set in device configuration, the default maximum is 8 clients in AP-only mode and 4 clients in concurrent mode.
+    maximum_clients; ///< The maximum number of associated clients must not exceed [SL_WIFI_CUSTOM_FEAT_MAX_NUM_OF_CLIENTS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap#sl-wifi-custom-feat-max-num-of-clients). If this bit is not set in device configuration, the default maximum is 8 clients in AP-only mode and 4 clients in concurrent mode.
   uint8_t beacon_stop; ///< Flag to stop beaconing when there are no associated clients
   sl_wifi_tdi_t
     tdi_flags; ///< Flags to enable Transition Disable Indication (TDI). One of the values from @ref sl_wifi_tdi_t
@@ -863,7 +864,7 @@ typedef struct {
 typedef struct {
   uint32_t listen_interval; ///< Wi-Fi Listen interval in time units (1 TU = 1024 microseconds)
   uint32_t
-    listen_interval_multiplier; ///< Multiplier for the listen interval, sent by the device in the association request to the AP. Default: 1. Max recommended: 10. Higher values may lead to interoperability issues.
+    listen_interval_multiplier; ///< Multiplier for the listen interval, sent by the device in the association request to the AP. Default: 1. Maximum recommended: 10. Higher values may lead to interoperability issues.
 } sl_wifi_listen_interval_v2_t;
 
 /**
@@ -1203,6 +1204,7 @@ typedef struct __attribute__((packed)) {
   uint16_t channel_bw;  ///< Channel bandwidth
   uint16_t aggr_enable; ///< Enable/disable aggregation
   uint16_t aggr_count;  ///< Aggregation count
+  uint16_t flags;       ///< Flags. BIT(0) - to indicate immediate transfer, BIT(1) through BIT(15) are reserved.
 } sl_wifi_transmitter_test_base_info_t;
 
 /**
@@ -1891,6 +1893,27 @@ typedef struct {
 } sl_wifi_groupcast_filter_config_t;
 
 /** @} */
+
+/**
+ * @struct sl_wifi_scan_result_ext_t
+ * @brief Wi-Fi scan result structure.
+ *
+ * Indicates the results of a Wi-Fi scan operation.
+ * @note This strucuture is not supported on SiWx91x devices. 
+ */
+typedef struct __attribute__((packed)) {
+  uint32_t scan_count; ///< Number of available scan results
+  uint32_t reserved;   ///< Reserved
+  struct __attribute__((packed)) {
+    uint8_t rf_channel;                        ///< Channel number of the AP
+    uint8_t security_mode;                     ///< Security mode of the AP
+    int16_t rssi_val;                          ///< RSSI value of the AP
+    uint8_t network_type;                      ///< AP network type
+    uint8_t ssid[SL_WIFI_MAX_SSID_LENGTH];     ///< SSID of the AP
+    uint8_t bssid[SL_WIFI_MAC_ADDRESS_LENGTH]; ///< BSSID of the AP
+    uint8_t reserved[2];                       ///< Reserved
+  } scan_info[];                               ///< Array of scan result data
+} sl_wifi_scan_result_ext_t;
 
 /**
  * @struct sl_wifi_p2p_configuration_t

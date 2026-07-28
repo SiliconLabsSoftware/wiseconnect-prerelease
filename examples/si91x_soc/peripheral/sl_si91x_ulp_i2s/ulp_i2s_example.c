@@ -162,14 +162,18 @@ void ulp_i2s_example_process_action(void)
     case SL_ULP_I2S_PROCESS_ACTION:
       if ((i2s_lowpower_send_complete && i2s_lowpower_receive_complete)) {
         memcpy(i2s_lowpower_data_in, (uint16_t *)I2S_RX_BUF_MEMORY, sizeof(i2s_lowpower_data_in));
-        // Data has been transferred and received successfully
-        // Validate the transmit and receive data count
-        if ((sl_si91x_i2s_get_transmit_data_count(i2s_driver_handle) == I2S_LOWPOWER_BUFFER_SIZE)
-            && (sl_si91x_i2s_get_receive_data_count(i2s_driver_handle) == I2S_LOWPOWER_BUFFER_SIZE)) {
-          // I2S transfer completed
-          SL_PRINT_STRING_ERROR("I2S transfer complete\r\n");
+        // Validate transfer count (GetTxCount/GetRxCount use correct FIFO width for 24-bit)
+        uint32_t tx_count = sl_si91x_i2s_get_transmit_data_count(i2s_driver_handle);
+        uint32_t rx_count = sl_si91x_i2s_get_receive_data_count(i2s_driver_handle);
+        if ((tx_count == I2S_LOWPOWER_BUFFER_SIZE) && (rx_count == I2S_LOWPOWER_BUFFER_SIZE)) {
+          SL_PRINT_STRING_ERROR("I2S transfer complete.\r\n");
           // Compare transmit data and receive data
           compare_loop_back_data();
+        } else {
+          SL_PRINT_STRING_ERROR("I2S transfer count mismatch: tx=%lu rx=%lu expected=%lu\r\n",
+                                (unsigned long)tx_count,
+                                (unsigned long)rx_count,
+                                (unsigned long)I2S_LOWPOWER_BUFFER_SIZE);
         }
         // reset send and receive complete status flags
         i2s_lowpower_send_complete    = 0;

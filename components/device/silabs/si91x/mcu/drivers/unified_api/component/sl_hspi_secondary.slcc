@@ -26,8 +26,5 @@ include:
 config_file:
   - path: config/sl_si91x_hspi_secondary_drv_config.h
     file_id: hspi_secondary_drv_config
-documentation:
-    docset: wiseconnect
-    document: wiseconnect-api-reference-guide-si91x-peripherals/hspi
 conflicts:
   - name: sl_sdio_secondary

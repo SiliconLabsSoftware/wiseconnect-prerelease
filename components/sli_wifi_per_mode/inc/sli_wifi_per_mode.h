@@ -59,7 +59,7 @@
 #define SLI_WIFI_SET_SYTH_CONFIG_COUNT                4    ///< Set syth config configs array size
 #define SLI_WIFI_READ_HMATRIX_CONFIG_COUNT            4    ///< Read H-matrix configs array size
 #define SLI_WIFI_QUERY_COMMAND_CONFIG_COUNT           4    ///< Query command configs array size
-#define SLI_WIFI_STATICS_COMMAND_CONFIG_COUNT         64   ///< Statics command configs array size
+#define SLI_WIFI_STATICS_COMMAND_CONFIG_COUNT         256  ///< Statics command configs array size
 #define SLI_WIFI_READ_HMATRIX_RESPONSE_DATA_SIZE      1024 ///< Read H-matrix response data buffer size
 #define SLI_WIFI_QUERY_COMMAND_RESPONSE_DATA_SIZE     1024 ///< Query command response data buffer size
 #define SLI_WIFI_STATICS_COMMAND_RESPONSE_DATA_SIZE   1024 ///< Statics command response data buffer size
