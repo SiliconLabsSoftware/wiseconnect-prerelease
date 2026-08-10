@@ -425,7 +425,7 @@ sl_status_t sli_si91x_bus_read_frame(sl_wifi_buffer_t **buffer)
   local_buffer[1] = htole16(local_buffer[1]) - 4;
 
   // Allocate packet to receive packet from module
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CP_CMD_RX_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
                                               SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
                                               (sli_buffer_t *)buffer);

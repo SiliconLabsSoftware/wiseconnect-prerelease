@@ -33,6 +33,7 @@
 #include "errno.h"
 #include "sl_utility.h"
 #include "sl_wifi.h"
+#include "sl_si91x_driver.h"
 #include "sl_net_wifi_types.h"
 #include "sl_si91x_socket_support.h"
 #include "sl_si91x_socket_constants.h"
@@ -1100,7 +1101,11 @@ void parse_json_response()
       SL_DEBUG_LOG_V2(INFO, "- Security Type: %s", (uintptr_t)WIFI_CLIENT_SECURITY_TYPE);
       i++;
     } else {
-      SL_DEBUG_LOG_V2(WARN, "Unexpected key: %.*s\r\n", t[i].end - t[i].start, (uintptr_t)(response + t[i].start));
+      {
+        char key_log[64];
+        snprintf(key_log, sizeof(key_log), "%.*s", (int)(t[i].end - t[i].start), response + t[i].start);
+        SL_DEBUG_LOG_V2(WARN, "Unexpected key: %s\r\n", (uintptr_t)key_log);
+      }
     }
   }
 }
@@ -1271,11 +1276,11 @@ void send_data_to_udp_server(void)
 
 void sl_fw_task_up()
 {
-  sl_status_t status                          = SL_STATUS_OK;
-  sl_wifi_firmware_version_t firmware_version = { 0 };
+  sl_status_t status                           = SL_STATUS_OK;
+  sl_si91x_firmware_version_t firmware_version = { 0 };
 
   fw_update_status(false);
-  status = sl_wifi_get_firmware_version(&firmware_version);
+  status = sl_si91x_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
     return;

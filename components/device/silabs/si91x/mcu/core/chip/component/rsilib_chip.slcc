@@ -39,8 +39,6 @@ include:
     - path: "si91x_mvp.h"
 provides:
   - name: rsilib_chip
-  - name: memory_manager_region
-    condition: [device_si91x]
 requires:
   - name: systemlevel_ipmu
   - name: systemlevel_temp_sensor
@@ -50,8 +48,6 @@ requires:
 template_contribution:
   - name: code_classification_components
     value: rsilib_chip
-  - name: psram_ram_data_files
-    value: rsi_deepsleep_soc
   - name: event_handler
     value:
       event: platform_init

@@ -35,7 +35,7 @@
   | *ULP ADC*        |
   | *ULP Comparator* |
   | *ULP UART*       |
-> To configure the other peripheral in PS1 State, refer to the [SiWx917 Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+> To configure the other peripheral in PS1 State, refer to the [SiWx917 Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 
 ## About Example Code
 

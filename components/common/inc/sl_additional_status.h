@@ -383,7 +383,7 @@
 #define SL_STATUS_SI91X_SSL_TLS_HANDSHAKE_FAIL \
   ((sl_status_t)0x100D2) ///< SSL/TLS handshake failed. Socket will be closed.
 #define SL_STATUS_SI91X_SSL_TLS_MAX_SOCKETS_REACHED ((sl_status_t)0x100D3) ///< SSL/TLS max sockets reached.
-#define SL_STATUS_SI91X_FTP_CLIENT_NOT_CONNECTED    ((sl_status_t)0x100D3) ///< FTP client is not connected.
+#define SL_STATUS_SI91X_FTP_CLIENT_NOT_CONNECTED    ((sl_status_t)0x101D6) ///< FTP client is not connected.
 #define SL_STATUS_SI91X_CIPHER_SET_FAILED           ((sl_status_t)0x100D4) ///< Cipher set failure.
 #define SL_STATUS_SI91X_HTTP_CREDENTIALS_MAX_LEN_EXCEEDED \
   ((sl_status_t)0x100F1)                                             ///< HTTP credentials maximum length exceeded.
@@ -502,7 +502,12 @@
 #define SL_STATUS_SI91X_SERVER_RESPONDS_BEFORE_REQUEST_COMPLETE \
   ((sl_status_t)0x1BBEF) ///< Server responds before HTTP client request is complete.
 #define SL_STATUS_SI91X_HTTP_PASSWORD_TOO_LONG ((sl_status_t)0x1BBF0) ///< HTTP/HTTPS password is too long.
-#define SL_STATUS_SI91X_MQTT_PING_TIMEOUT      ((sl_status_t)0x1BBF1) ///< MQTT ping timeout error.
+/**
+ * @def SL_STATUS_SI91X_MQTT_PING_TIMEOUT
+ * @note This macro is being deprecated and will be removed in the future. Use
+ *       SL_STATUS_SI91X_MQTT_KEEP_ALIVE_TERMINATE_ERROR instead.
+ */
+#define SL_STATUS_SI91X_MQTT_PING_TIMEOUT SL_STATUS_SI91X_MQTT_KEEP_ALIVE_TERMINATE_ERROR
 #define SL_STATUS_SI91X_MQTT_COMMAND_SENT_IN_INCORRECT_STATE \
   ((sl_status_t)0x1BBF2)                                               ///< MQTT command sent in incorrect state.
 #define SL_STATUS_SI91X_MQTT_ACK_TIMEOUT        ((sl_status_t)0x1BBF3) ///< MQTT ACK timeout error.
@@ -625,7 +630,7 @@
 #define SL_STATUS_SI91X_DNS_RESPONSE_TIMEOUT_ERROR  ((sl_status_t)0x1FF42) ///< The DNS response timed out.
 #define SL_STATUS_SI91X_HTTP_SOCKET_CREATION_FAILED ((sl_status_t)0x1FF41) ///< Failed to create an HTTP socket.
 #define SL_STATUS_SI91X_HTTP_GET_CMD_IN_PROGRESS \
-  ((sl_status_t)0x10005) ///< An HTTP GET command is currently in progress.
+  ((sl_status_t)0x1000B) ///< An HTTP GET command is currently in progress.
 #define SL_STATUS_SI91X_TCP_CLOSE_BEFORE_RESPONSE_ERROR \
   ((sl_status_t)0x1FF40) ///< TCP socket close command issued before receiving the response of the previous close command.
 #define SL_STATUS_SI91X_WAIT_ON_HOST_FEATURE_NOT_ENABLED \

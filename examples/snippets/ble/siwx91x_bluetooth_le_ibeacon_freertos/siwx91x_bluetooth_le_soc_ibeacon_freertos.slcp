@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_ibeacon_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC iBeacon FreeRTOS
+label: SiWx91x Bluetooth LE - SoC iBeacon FreeRTOS
 category: Example|BLE
-description: 'Demonstrates how to advertise Apple iBeacon-formatted data on SiWx91x in SoC FreeRTOS BLE peripheral mode. Demonstrated by UUID, major, minor, and TX power in the advertising payload.
+description: 'Demonstrates how to advertise Apple iBeacon-formatted data using SiWx91x Bluetooth LE.
 
   '
 filter:

@@ -47,13 +47,16 @@ sl_status_t sli_buffer_manager_init(sli_buffer_manager_configuration_t *configur
 sl_status_t sli_buffer_manager_deinit(void);
 
 /**
- * @brief Allocate a buffer.
- * @param pool_type Buffer manager pool Type.
- * @param allocation_type Buffer manager pool type.
- * @param wait_duration_ms Duration to wait for the buffer to be allocated.
- * @param buffer Pointer to the buffer. This pointer points to valid memory in case of successful allocation.
- *               If the allocation fails, it points to null.
- */
+ * @brief Allocate a buffer.
+ * @param pool_type Buffer manager pool type.
+ * @param allocation_type Allocation strategy.
+ *   - @ref SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED: wait on the dedicated pool for @p wait_duration_ms.
+ *   - @ref SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID: wait on the common and dedicated pools for
+ *     @p wait_duration_ms. If no buffer is available after that wait, a new common pool is created and one
+ *     immediate allocation attempt is made from it (no additional wait).
+ * @param wait_duration_ms Maximum time to wait while trying the allocation strategy above.
+ * @param buffer Pointer to the buffer. Points to valid memory on success; set to NULL on failure.
+ */
 sl_status_t sli_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_types_t pool_type,
                                                const sli_buffer_manager_allocation_types_t allocation_type,
                                                const uint32_t wait_duration_ms,

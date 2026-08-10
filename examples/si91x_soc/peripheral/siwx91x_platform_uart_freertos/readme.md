@@ -105,7 +105,7 @@ Configuration of UART at UC (Universal Configuration):
 
 - By default in UC, UART1 clock source will be configured to `ULP REF CLK`, select `INTF PLL CLK`.
 
-- Configure the following macros in [`uart_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_uart_freertos/uart_freertos.c) if required:
+- Configure the following macros in [`uart_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_uart_freertos/uart_freertos.c) if required:
 
 - `UART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive UART data. By default, it is set to 1024.
 
@@ -123,7 +123,7 @@ Configuration of UART at UC (Universal Configuration):
 
 This example uses **UART1** on the following pins. An external USB-to-Serial TTL adapter cable is required to connect these pins to a PC serial terminal.
 
-| UART Pin      | GPIO   | WPK (BRD4002A) + BRD4338A | Explorer kit (BRD2708A) | UART-TTL Cable |
+| UART Pin      | GPIO   | WPK (BRD4002B) + BRD4338A | Explorer kit (BRD2708A) | UART-TTL Cable |
 | ------------- | ------ | -------------------------- | ----------------------- | -------------- |
 | UART1_TX_PIN  | GPIO_7 | P20                        | [SCL]                   | RX pin         |
 | UART1_RX_PIN  | GPIO_6 | P19                        | [SDA]                   | TX pin         |
@@ -140,7 +140,7 @@ This example uses **UART1** on the following pins. An external USB-to-Serial TTL
   #define RTE_UART1_RTS_PORT_ID    1
   ```
 
-| UART Pin       | GPIO    | WPK (BRD4002A) Breakout | Explorer kit (BRD2708A) |
+| UART Pin       | GPIO    | WPK (BRD4002B) Breakout | Explorer kit (BRD2708A) |
 | -------------- | ------- | ----------------------- | ----------------------- |
 | UART_CTS_PIN   | GPIO_28 | P31                     | [CS]                    |
 | UART_RTS_PIN   | GPIO_27 | P29                     | [MOSI]                  |

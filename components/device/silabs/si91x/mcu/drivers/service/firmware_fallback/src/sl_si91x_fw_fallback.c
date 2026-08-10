@@ -847,7 +847,7 @@ void sl_si91x_nwp_soft_reset_from_updater(const uint32_t m4_slot_image_offset)
                                  NULL);
   (void)status;
   // Wait for the memory to match the expected value(SL_SI91X_MEM_CHECK_VALUE) for the NWP firmware
-  while ((*addr != SL_SI91X_MEM_CHECK_VALUE)) {
+  while (*addr != SL_SI91X_MEM_CHECK_VALUE) {
     __NOP();
     // Continue checking until a match is found
   }
@@ -984,7 +984,7 @@ sl_status_t sl_si91x_get_m4_app_addr(uint32_t *app_addr)
     }
 
     // Validate backup CRC and Magic Word
-    if ((fw_slot_info_t.slot_magic_word != SLI_SI91X_AB_FW_SLOT_MAGIC_WORD)) {
+    if (fw_slot_info_t.slot_magic_word != SLI_SI91X_AB_FW_SLOT_MAGIC_WORD) {
       DEBUGOUT("[m4_app_addr] Magic number mismatch,line %d", __LINE__);
       return SL_SI91X_AB_ERR_MAGIC_NUMBER; // Magic number mismatch
     }

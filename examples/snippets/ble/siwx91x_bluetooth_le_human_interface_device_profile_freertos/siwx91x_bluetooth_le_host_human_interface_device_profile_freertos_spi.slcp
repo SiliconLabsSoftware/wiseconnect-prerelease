@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_human_interface_device_profile_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP HID On GATT FreeRTOS
+label: SiWx91x Bluetooth LE - Host Human Interface Device Profile FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates how to configure BLE device as GATT server in BLE peripheral mode and as GATT client in BLE central mode on SiWx91x over SPI NCP with FreeRTOS.
+description: 'Demonstrates how to use the GATT Human Interface Device (HID) Profile using SiWx91x Bluetooth LE with an external host connected over SPI.
 
   '
 filter:

@@ -1,5 +1,5 @@
 id: azure_freertos_middleware
-package: wifi
+package: azure_freertos_middleware
 description: >
   AZURE IoT Device SDK for Embedded C
 label: AZURE FreeRTOS Middleware

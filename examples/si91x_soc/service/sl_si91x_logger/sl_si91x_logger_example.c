@@ -15,6 +15,7 @@
  *
  ******************************************************************************/
 #include "sl_wifi.h"
+#include "sl_si91x_driver.h"
 #include "sl_net.h"
 #include "sl_si91x_power_manager.h"
 #include "sl_si91x_logger_example.h"
@@ -313,28 +314,32 @@ static sl_status_t initialize_wireless(void)
 
   // Standard STA‑mode configuration with low‑power features
   static const sl_wifi_device_configuration_t station_init_configuration = {
-    .boot_option = LOAD_NWP_FW,
-    .mac_address = NULL,
-    .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-    .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
-                     .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
-                     .feature_bit_map =
-                       (SL_WIFI_FEAT_SECURITY_OPEN | SL_WIFI_FEAT_AGGREGATION | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE),
-                     .tcp_ip_feature_bit_map =
-                       (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
-                     .custom_feature_bit_map     = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID),
-                     .ext_custom_feature_bit_map = (SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK
+    .boot_option     = LOAD_NWP_FW,
+    .mac_address     = NULL,
+    .band            = SL_SI91X_WIFI_BAND_2_4GHZ,
+    .boot_config     = { .oper_mode = SL_SI91X_CLIENT_MODE,
+                         .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
+                         .feature_bit_map =
+                           (SL_WIFI_FEAT_SECURITY_OPEN | SL_WIFI_FEAT_AGGREGATION | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE),
+                         .tcp_ip_feature_bit_map =
+                           (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
+                         .custom_feature_bit_map     = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID),
+                         .ext_custom_feature_bit_map = (SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK
                                                     | SL_SI91X_EXT_FEAT_UART_SEL_FOR_DEBUG_PRINTS | MEMORY_CONFIG),
-                     .bt_feature_bit_map         = 0,
-                     .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
-                     .ble_feature_bit_map        = 0,
-                     .ble_ext_feature_bit_map    = 0,
-                     .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
+                         .bt_feature_bit_map         = 0,
+                         .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
+                         .ble_feature_bit_map        = 0,
+                         .ble_ext_feature_bit_map    = 0,
+                         .config_feature_bit_map =
+                           (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
+    .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+    .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+    .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
   };
 
   sl_status_t status;
-  sl_wifi_firmware_version_t version = { 0 };
-  sl_mac_address_t mac_addr          = { 0 };
+  sl_si91x_firmware_version_t version = { 0 };
+  sl_mac_address_t mac_addr           = { 0 };
 
   // Initialize Wi‑Fi stack and load firmware
   status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &station_init_configuration, NULL, NULL);
@@ -349,7 +354,7 @@ static sl_status_t initialize_wireless(void)
     SL_PRINT_STRING_ERROR("MAC fail 0x%X\r\n", (unsigned int)status);
 
   // Retrieve firmware version
-  status = sl_wifi_get_firmware_version(&version);
+  status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("FW ver fail 0x%X\r\n", (unsigned int)status);
   }

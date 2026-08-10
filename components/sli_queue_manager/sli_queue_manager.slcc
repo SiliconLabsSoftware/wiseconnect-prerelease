@@ -1,6 +1,6 @@
 id: sli_queue_manager
 label:  SLI Queue Manager
-package: wifi
+package: wiseconnect_common
 description: >
     This package provides common queue manager
 category: SLI Queue Manager

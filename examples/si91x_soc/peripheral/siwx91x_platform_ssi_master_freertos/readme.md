@@ -58,7 +58,7 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 This example demonstrates SSI transfer (full-duplex communication) and SSI send/SSI receive (half-duplex communication) running as a dedicated FreeRTOS task.
 
 - Various parameters like SSI clock mode, Bit-width, Manual cs pin, and SSI baud rate can be configured using the UC. Also, Master or Slave or ULP Master DMA can be configured using the UC.
-- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations, and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
+- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations, and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
 
 ### FreeRTOS Architecture
 
@@ -78,7 +78,7 @@ This example demonstrates SSI transfer (full-duplex communication) and SSI send/
 
 ### Task Flow (ssi_master_task)
 
-After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and waits for a button press on the master-side sync line before starting the first active phase. If a later receive phase follows a transfer or send phase, the task waits for a second button press before starting that receive phase. The transfer phases then execute sequentially based on the macros enabled in `ssi_master_freertos.h`:
+After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and waits for a button press on the master sync line before it starts the first active phase. If a receive phase follows a transfer or send phase, the task waits for a second button press before it starts that receive phase. The task then runs the enabled transfer phases in sequence according to the macros in `ssi_master_freertos.h`:
 
 >**Note:** The frequency of the SSI master bit-rate clock is one-half the frequency of SSI master input clock.
 
@@ -95,7 +95,7 @@ After initialization, the task configures `UULP_VBAT_GPIO_2` as a sync input and
 
 - If the **SSI_MASTER_RECEIVE** macro is enabled, it only receives the data from slave. SPI slave must be connected; it cannot be tested in loopback mode.
 
-  - If receive follows an earlier transfer or send phase, the task waits for another `BTN0` press before starting the receive phase.
+  - If receive follows an earlier transfer or send phase, the task waits for another `BTN0` press before it starts the receive phase.
   - Calls [sl_si91x_ssi_receive_data](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-receive-data) which expects data_in (empty buffer) and number of data bytes to be received.
   - The task blocks on `osSemaphoreAcquire()` until the receive completes, then compares the data.
 
@@ -195,7 +195,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   static uint32_t ssi_slave_number = SSI_SLAVE_3;  
   ```
 
-- Configure the following macros in [`ssi_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_master_freertos/ssi_master_freertos.c) if required:
+- Configure the following macros in [`ssi_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_master_freertos/ssi_master_freertos.c) if required:
 
 - `SSI_MASTER_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
 
@@ -241,13 +241,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 >
 > Where F<sub>sclk_out</sub> is the bit rate output from the master. Make sure the SSI Primary (Master) peripheral clock (F<sub>ssi_clk</sub>) is set accordingly. Incorrect clock configuration may result in communication errors or unreliable data transfer.
 >
-> **SSI Secondary (Slave) Setup:** For instructions on configuring the SSI slave, refer to the [SSI slave](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/readme.md) to ensure correct setup and operation.
+> **SSI Secondary (Slave) Setup:** For instructions on configuring the SSI slave, refer to the [SSI slave](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/_internal/peripheral_examples/sl_si91x_ssi_slave/readme.md) to ensure correct setup and operation.
 
 ### Pin Configuration
 
 **SSI Master Pin Configuration:**
 
-| WPK [BRD4002A] + BRD4338A | Explorer kit (BRD2708A) | Description             |
+| WPK [BRD4002B] + BRD4338A | Explorer kit (BRD2708A) | Description             |
 | -------------------------- | ----------------------- | ----------------------- |
 | GPIO_25 [P25]              | GPIO_25 [SCK]           | RTE_SSI_MASTER_SCK_PIN  |
 | GPIO_28 [P31]              | GPIO_28 [CS]            | RTE_SSI_MASTER_CS0_PIN  |
@@ -260,7 +260,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Pin Connections Between Master and Slave
 
-**If using WPK (BRD4002A) baseboard with BRD4338A radio board:**
+**If using WPK (BRD4002B) baseboard with BRD4338A radio board:**
 
 | Signal | Master Board Pin (GPIO) | Master Breakout | Slave Board Pin (GPIO) | Slave Breakout | Wire                       |
 | ------ | ----------------------- | --------------- | ---------------------- | -------------- | -------------------------- |
@@ -288,15 +288,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Test the Application
 
-Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
+Refer to the instructions [Getting Started with the WiSeConnect SDK](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
 1. Compile and run the application.
-2. Connect the master SSI pins to the slave SSI pins as listed above. On WPK hardware, also connect `F12` on the master board to `F12` on the slave board for synchronization.
-3. Reset the slave board and then run or reset the master board.
-4. When the master prints `Press button 0 on master to sync.`, press `BTN0` on the master board to start the first active phase.
-5. If the enabled flow later reaches a receive phase after a transfer or send phase, press `BTN0` on the master board again when prompted to start that receive phase.
-6. In the case of loopback mode, when the loopback jumper wire is removed and the test is run, the result should come as data comparison fail and test case fail.
-7. After successful program execution, the prints in serial console looks as shown below.
+2. Connect the master SSI pins to the slave SSI pins as listed in [Pin Connections Between Master and Slave](#pin-connections-between-master-and-slave). On WPK hardware, connect `F12` on the master board to `F12` on the slave board for synchronization.
+3. Reset the slave board and run or reset the master board.
+4. When the master displays `Press button 0 on master to sync.`, press `BTN0` on the master board to start the first active phase.
+5. If the enabled flow later reaches a receive phase after a transfer or send phase, press **BTN0** on the master board again when prompted to start the receive phase.
+6. In loopback mode, remove the loopback jumper wire and run the test. Verify that the test reports data comparison fail and test case fail.
+7. After the program runs successfully, the serial console output looks similar to the following.
 
    ![Figure: output](resources/readme/output.png)
 

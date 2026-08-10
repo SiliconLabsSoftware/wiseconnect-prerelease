@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_ae_central_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP AE Central FreeRTOS
+label: SiWx91x Bluetooth LE - Host AE Central FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets on SiWx91x over SPI NCP with FreeRTOS. This is demonstrated by two scan sets in the application.
+description: 'Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets, using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by two scan sets in the application.
 
   '
 filter:

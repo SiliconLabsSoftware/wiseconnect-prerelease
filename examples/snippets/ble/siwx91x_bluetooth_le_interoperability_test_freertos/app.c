@@ -143,7 +143,7 @@ int32_t result;
 //! Packet count used during throughput
 uint64_t tx_pkt_cnt = 0;
 //! To store the firmware version
-sl_wifi_firmware_version_t version = { 0 };
+sl_si91x_firmware_version_t version = { 0 };
 
 #if FWUP_UPGRADE
 /* Variables used in OTA Test Cases*/
@@ -227,56 +227,62 @@ void vApplicationIdleHook(void)
 }
 #endif
 
-static const sl_wifi_device_configuration_t
-  config = { .boot_option = LOAD_NWP_FW,
-             .mac_address = NULL,
-             .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-             .region_code = US,
-             .boot_config = {
-               .oper_mode              = SL_SI91X_CLIENT_MODE,
-               .coex_mode              = SL_SI91X_WLAN_BLE_MODE,
-               .feature_bit_map        = (SL_WIFI_FEAT_WPS_DISABLE | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE
-                                   | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1),
-               .tcp_ip_feature_bit_map = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
-               .custom_feature_bit_map = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID),
+static const sl_wifi_device_configuration_t config = {
+  .boot_option = LOAD_NWP_FW,
+  .mac_address = NULL,
+  .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
+  .region_code = US,
+  .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
+                   .coex_mode       = SL_SI91X_WLAN_BLE_MODE,
+                   .feature_bit_map = (SL_WIFI_FEAT_WPS_DISABLE | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE
+                                       | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1),
+                   .tcp_ip_feature_bit_map =
+                     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
+                   .custom_feature_bit_map = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID),
 
-               .ext_custom_feature_bit_map =
-                 (SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK | MEMORY_CONFIG
-                  | SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 | SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE),
-               .bt_feature_bit_map         = (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL),
-               .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
-               //!ENABLE_BLE_PROTOCOL in bt_feature_bit_map
-               .ble_feature_bit_map =
-                 ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS)
-                   | SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS)
-                   | SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV)
-                   | SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC))
-                  | SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENSION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX)
-                  | SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS) | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
+                   .ext_custom_feature_bit_map =
+                     (SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK | MEMORY_CONFIG
+                      | SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
+                      | SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE),
+                   .bt_feature_bit_map         = (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL),
+                   .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
+                   //!ENABLE_BLE_PROTOCOL in bt_feature_bit_map
+                   .ble_feature_bit_map =
+                     ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS)
+                       | SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS)
+                       | SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV)
+                       | SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC))
+                      | SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENSION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX)
+                      | SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS)
+                      | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
 #if 1
-                  | SL_SI91X_BLE_GATT_ASYNC_ENABLE
+                      | SL_SI91X_BLE_GATT_ASYNC_ENABLE
 #endif
-                  ),
-               .ble_ext_feature_bit_map =
-                 ((SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS)
-                   | SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES))
+                      ),
+                   .ble_ext_feature_bit_map =
+                     ((SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS)
+                       | SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES))
 #if RSI_BLE_INDICATE_CONFIRMATION_FROM_HOST
-                  | SL_SI91X_BLE_INDICATE_CONFIRMATION_FROM_HOST //indication response from app
+                      | SL_SI91X_BLE_INDICATE_CONFIRMATION_FROM_HOST //indication response from app
 #endif
 #if RSI_BLE_MTU_EXCHANGE_FROM_HOST
-                  | SL_SI91X_BLE_MTU_EXCHANGE_FROM_HOST //MTU Exchange request initiation from app
+                      | SL_SI91X_BLE_MTU_EXCHANGE_FROM_HOST //MTU Exchange request initiation from app
 #endif
 #if RSI_BLE_SET_SCAN_RESP_DATA_FROM_HOST
-                  | (SL_SI91X_BLE_SET_SCAN_RESP_DATA_FROM_HOST) //Set SCAN Resp Data from app
+                      | (SL_SI91X_BLE_SET_SCAN_RESP_DATA_FROM_HOST) //Set SCAN Resp Data from app
 #endif
 #if RSI_BLE_DISABLE_CODED_PHY_FROM_HOST
-                  | (SL_SI91X_BLE_DISABLE_CODED_PHY_FROM_HOST) //Disable Coded PHY from app
+                      | (SL_SI91X_BLE_DISABLE_CODED_PHY_FROM_HOST) //Disable Coded PHY from app
 #endif
 #if RSI_BLE_GATT_INIT
-                  | SL_SI91X_BLE_GATT_INIT
+                      | SL_SI91X_BLE_GATT_INIT
 #endif
-                  ),
-               .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP) } };
+                      ),
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP) },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
+};
 
 const osThreadAttr_t thread_attributes = {
   .name       = "application_thread",
@@ -2341,10 +2347,18 @@ int32_t handle_ota_process(uint16_t handle_value)
             SL_DEBUG_LOG_V2(INFO, "Wi-Fi Initialization Successful\r\n");
           }
 
-          status = sl_wifi_get_firmware_version(&version);
+          status = sl_si91x_get_firmware_version(&version);
           VERIFY_STATUS_AND_RETURN(status);
           SL_DEBUG_LOG_V2(INFO, "Firmware version after update:\r\n");
-          print_firmware_version(&version);
+          printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+                 version.chip_id,
+                 version.rom_id,
+                 version.major,
+                 version.minor,
+                 version.security_version,
+                 version.patch_num,
+                 version.customer_id,
+                 version.build_num);
           return SL_STATUS_OK;
 #endif
 
@@ -2952,11 +2966,19 @@ void ble_iop_test_app(void *argument)
   SL_DEBUG_LOG_V2(INFO, "Wireless Initialization Success\r\n");
 
   //! Firmware version Prints
-  status = sl_wifi_get_firmware_version(&version);
+  status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Firmware version Failed, Error Code : 0x%lX\r\n", status);
   } else {
-    print_firmware_version(&version);
+    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+           version.chip_id,
+           version.rom_id,
+           version.major,
+           version.minor,
+           version.security_version,
+           version.patch_num,
+           version.customer_id,
+           version.build_num);
   }
 
   //! get the local device MAC address.

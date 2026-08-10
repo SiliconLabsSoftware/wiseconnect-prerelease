@@ -1,15 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_bypass_of_ble_stack_layer_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP BT Stack Bypass
+label: SiWx91x Bluetooth LE - Host Bypass of BLE Stack Layer FreeRTOS (SPI)
 category: Example|BLE
-description: 'BLE HCI raw (stack bypass) on NCP host MCU (EFR32 + Si91x module) over SPI.
-
-  Open this .slcp in Simplicity Studio to generate CMake/autogen for the host target.
-
-  Application source: app.c (NCP path when SLI_SI91X_MCU_INTERFACE is not defined).
-
-  NCP host bus matches wireless_test_ncp: sl_si91x_spi_bus + spidrv (EXP header); HCI to host PC uses VCOM/iostream (recommended stream), not the SPI link.
+description: 'Demonstrates the HCI interface for transmitting HCI raw commands and receiving HCI events by bypassing the SiWx91x NWP BLE stack, using SiWx91x Bluetooth LE with an external host connected over SPI.
 
   '
 filter:

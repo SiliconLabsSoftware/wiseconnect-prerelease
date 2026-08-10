@@ -36,6 +36,7 @@
 #include "sli_queue_manager.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_wifi_types.h"
+#include "sl_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,17 +76,10 @@ extern "C" {
 /** @} */ // end of SLI_SI91X_INTERNAL_CONSTANTS
 
 /** Command queues used by the command engine (defined in sli_si91x_driver.c). */
-extern sli_queue_t cmd_queues[SI91X_CMD_MAX];
+extern sli_queue_t cmd_queues[SLI_SI91X_CMD_MAX];
 
 /** Event flags for command-engine / NCP notification (defined in sli_si91x_driver.c). */
 extern osEventFlagsId_t sli_wifi_events;
-
-/***************************************************************************/ /**
- * @brief Send a Bluetooth command.
- ******************************************************************************/
-sl_status_t sli_si91x_driver_send_bt_command(sli_wlan_cmd_request_t command,
-                                             sli_wifi_command_type_t command_type,
-                                             sl_wifi_system_packet_t *data);
 
 /***************************************************************************/ /**
  * @brief Set event flags (e.g. to wake waiters on sli_si91x_wait_for_event).

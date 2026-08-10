@@ -14,8 +14,8 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
-  - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with BRD4338A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-brd4338a-radio-board)
-  - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with BRD4343A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-brd4343a-radio-board)
+  - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with BRD4338A radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-brd4338a-radio-board)
+  - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with BRD4343A radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-brd4343a-radio-board)
   - [Required configuration for BRD4343C](#required-configuration-for-brd4343c)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
@@ -170,7 +170,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - To unregister a user event callback for a specific instance, use the API [sl_si91x_ssi_per_instance_unregister_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-per-instance-unregister-event-callback). Alternatively, to unregister callbacks for all instances simultaneously, use the API [sl_si91x_ssi_unregister_event_callback](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi#sl-si91x-ssi-unregister-event-callback).
 
-## Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
+## Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4338A radio board
 
 | GPIO pin           | Description              |
 | ------------------ | ------------------------ |
@@ -179,7 +179,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 | ULP_GPIO_1  [P16]  | ULP_SSI_MASTER_MOSI_PIN  |
 | ULP_GPIO_2  [F10]  | ULP_SSI_MASTER_MISO_PIN  |
 
-## Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4343A radio board
+## Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4343A radio board
 
 | GPIO pin           | Description              |
 | ------------------ | ------------------------ |

@@ -38,7 +38,7 @@ This application demonstrates the use of the Sensor Data Collector (SDC) periphe
 
 - This example demonstrates SDC operation in PS1 mode, reading sampled data and converting it to the corresponding input voltage.
 - Parameters such as the number of channels, SDC operation mode, sampling interval, and sample threshold are configurable via UC.
-- Common SDC configurations are defined in [`sl_si91x_sdc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_sdc_common_config.h), while channel-specific settings are in [`sl_si91x_sdc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_sdc_init_inst_config.h).
+- Common SDC configurations are defined in [`sl_si91x_sdc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_sdc_common_config.h), while channel-specific settings are in [`sl_si91x_sdc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_sdc_init_inst_config.h).
 - Initialize SDC using the `sl_si91x_sdc_driver_init` API, providing the reference voltage.
 - Configure SDC parameters with `sl_si91x_sdc_driver_config`, passing a `sl_si91x_sdc_config_t` structure.
 - Channel parameters are set using `sl_si91x_sdc_driver_channel_config`, which expects pointers to `sl_si91x_sdc_adc_config_t`, `sl_si91x_sdc_channel_info_t`, and `sl_si91x_sdc_channel_misc_config_t`.
@@ -157,12 +157,12 @@ Configure UC from the slcp component:
 
 ## Pin Configuration
 
-### Pin Mapping for WPK [BRD4002A] Base Board and Radio Board
+### Pin Mapping for WPK [BRD4002B] Base Board and Radio Board
 
 - The following tables list the supported ULP GPIO pins for SDC. For other radio boards, refer to the board-specific user guide.
 - Channels can be reconfigured to any SDC-supported pins.
 
-| PIN TO SDCP    | BRD4338A/4342A+BRD4002A | BRD4343A+BRD4002A | BRD2708A  |
+| PIN TO SDCP    | BRD4338A/4342A+BRD4002B | BRD4343A+BRD4002B | BRD2708A  |
 | ----------------------- | ------------------------------------ | ------------------------- | -------------- |
 | ULP_GPIO_0     |  NA                     |   NA             | Breakout 6  |
 | ULP_GPIO_1     |  P16                     |   P16             | Breakout 5 |
@@ -176,7 +176,7 @@ Configure UC from the slcp component:
 | ULP_GPIO_10    |  P17                     |   NA             | NA        |
 | ULP_GPIO_11    |  F6                     |   NA              | NA       |
 
-| PIN TO SDCN   | BRD4338A/4342A+BRD4002A | BRD4343A+BRD4002A | BRD2708A  |
+| PIN TO SDCN   | BRD4338A/4342A+BRD4002B | BRD4343A+BRD4002B | BRD2708A  |
 | ----------------------- | ---------------------------------- | ---------------------------| -------------- |
 | ULP_GPIO_1     |  P16                    |  P16              | Breakout 5 |
 | ULP_GPIO_5     |  NA                    |  P18              | Breakout 9 |

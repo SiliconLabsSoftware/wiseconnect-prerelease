@@ -30,6 +30,7 @@
 #pragma once
 
 #include "sl_additional_status.h"
+#include "sl_status.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -209,24 +210,24 @@
     }                                  \
   } while (0)
 
-#define VERIFY_STATUS_AND_RETURN(status) \
-  do {                                   \
-    if (status != SL_STATUS_OK) {        \
-      if (PRINT_ERROR_LOGS) {            \
-        PRINT_STATUS(ERROR_TAG, status)  \
-      }                                  \
-      return status;                     \
-    }                                    \
+#define VERIFY_STATUS_AND_RETURN(status)                             \
+  do {                                                               \
+    if (status != SL_STATUS_OK) {                                    \
+      if (PRINT_ERROR_LOGS && ((status) != SL_STATUS_IN_PROGRESS)) { \
+        PRINT_STATUS(ERROR_TAG, status)                              \
+      }                                                              \
+      return status;                                                 \
+    }                                                                \
   } while (0)
 
-#define SLI_VERIFY_STATUS_AND_GOTO(status, goto_label) \
-  do {                                                 \
-    if (status != SL_STATUS_OK) {                      \
-      if (PRINT_ERROR_LOGS) {                          \
-        PRINT_STATUS(ERROR_TAG, status)                \
-      }                                                \
-      goto goto_label;                                 \
-    }                                                  \
+#define SLI_VERIFY_STATUS_AND_GOTO(status, goto_label)               \
+  do {                                                               \
+    if (status != SL_STATUS_OK) {                                    \
+      if (PRINT_ERROR_LOGS && ((status) != SL_STATUS_IN_PROGRESS)) { \
+        PRINT_STATUS(ERROR_TAG, status)                              \
+      }                                                              \
+      goto goto_label;                                               \
+    }                                                                \
   } while (0)
 
 #define PRINT_ERROR_STATUS(tag, status)            \

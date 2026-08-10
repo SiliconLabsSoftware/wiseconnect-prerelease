@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_interoperability_test_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Interoperability Testing Application FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Interoperability Test FreeRTOS
 category: Example|BLE
-description: 'Demonstrates BLE interoperability testing on SiWx91x SoC using the BLE stack and FreeRTOS. Covers IOP GATT services and procedures for interoperability validation scenarios.
+description: 'Demonstrates how to perform interoperability testing using SiWx91x Bluetooth LE. This is demonstrated using GATT exchanges between the peer devices targeted for interoperability testing.
 
   '
 filter:

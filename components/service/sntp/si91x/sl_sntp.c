@@ -71,7 +71,7 @@ static sl_status_t sli_sntp_client_get_time_date(uint8_t *data,
   if (timeout > 0) {
     wait_time = SLI_WIFI_WAIT_FOR_RESPONSE(timeout);
   } else {
-    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
                                                 SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                                 1000,
                                                 (sli_buffer_t *)&sdk_context);
@@ -216,7 +216,7 @@ sl_status_t sl_sntp_client_start(sl_sntp_client_config_t *config, uint32_t timeo
   if (timeout > 0) {
     wait_time = SLI_WIFI_WAIT_FOR_RESPONSE(timeout);
   } else {
-    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
                                                 SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                                 1000,
                                                 (sli_buffer_t *)&sdk_context);
@@ -270,7 +270,7 @@ sl_status_t sl_sntp_client_get_server_info(sl_sntp_server_info_t *data, uint32_t
   if (timeout > 0) {
     wait_time = SLI_WIFI_WAIT_FOR_RESPONSE(timeout);
   } else {
-    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
                                                 SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                                 1000,
                                                 (sli_buffer_t *)&sdk_context);
@@ -321,7 +321,7 @@ sl_status_t sl_sntp_client_stop(uint32_t timeout)
   if (timeout > 0) {
     wait_time = SLI_WIFI_WAIT_FOR_RESPONSE(timeout);
   } else {
-    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
                                                 SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                                 1000,
                                                 (sli_buffer_t *)&sdk_context);

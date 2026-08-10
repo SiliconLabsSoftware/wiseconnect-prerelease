@@ -35,7 +35,7 @@ In this application, module connects with remote device and initiates SMP pairin
 - Windows PC with Host interface(UART/ SPI/ SDIO).
   - SiWx91x Wi-Fi Evaluation Kit.
   - SoC Mode:
-    - Silicon Labs [[BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+    - Silicon Labs [[BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
     - Kits
       - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
   - PSRAM Mode:  
@@ -61,11 +61,11 @@ In this application, module connects with remote device and initiates SMP pairin
 
 | Mode | Host / target | Project file (this example folder) |
 |------|----------------|-------------------------------------|
-| SoC | Application runs on SiWx91x. | `ble_secureconnection_soc.slcp` |
-| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `ble_secureconnection_psram.slcp` |
-| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `ble_secureconnection_ncp.slcp` |
+| SoC | Application runs on SiWx91x. | `siwx91x_bluetooth_le_soc_secure_connection_freertos.slcp` |
+| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `siwx91x_bluetooth_le_soc_secure_connection_freertos_psram.slcp` |
+| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `siwx91x_bluetooth_le_host_secure_connection_freertos_spi.slcp` |
 
-Open the `.slcp` for your kit from **`examples/snippets/ble/ble_secureconnection/`** in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+Open the `.slcp` for your kit from **`examples/snippets/ble/siwx91x_bluetooth_le_secure_connection_freertos/`** in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
 
 ### Setup Diagram
 

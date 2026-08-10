@@ -37,14 +37,6 @@ requires:
 - name: log_none
 - condition: ["device_si91x"]
   name: sl_si91x_mcu
-- condition: ["device_si91x"]
-  name: rsilib_headers
-- condition: ["device_si91x"]
-  name: romdriver_headers
-- condition: ["device_si91x"]
-  name: cmsis_driver_headers
-- condition: ["device_si91x"]
-  name: romdriver_romtable_headers
 - condition: ["device_efx"]
   name: efx32_si91x_wireless_connector
 - condition: ["device_efx"]

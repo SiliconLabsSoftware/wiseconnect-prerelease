@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_central_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Central FreeRTOS
+label: SiWx91x Bluetooth LE - Host Central FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates how to connect SiWx91x to a remote BLE device in central role over SPI NCP with FreeRTOS. This is demonstrated by scanning for peripherals and establishing a BLE link.
+description: 'Demonstrates how to operate as a central device using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by scanning for and connecting to a peripheral.
 
   '
 filter:

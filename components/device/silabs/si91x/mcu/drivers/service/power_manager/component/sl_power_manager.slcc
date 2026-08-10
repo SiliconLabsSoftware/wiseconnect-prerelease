@@ -51,8 +51,6 @@ template_contribution:
   - name: code_classification_components
     value: sl_power_manager
     condition: [psram_core]
-  - name: psram_ram_data_files
-    value: sl_si91x_power_manager
   - name: device_ram_addr
     value: 1024
     priority: -2

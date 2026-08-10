@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_ae_peripheral_freertos_uart
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - UART NCP AE Peripheral FreeRTOS
+label: SiWx91x Bluetooth LE - Host AE Peripheral FreeRTOS (UART)
 category: Example|BLE
-description: 'Demonstrates how to use BLE Extended Advertising in peripheral role with dual adv sets and periodic advertising on SiWx91x over UART NCP with FreeRTOS. This is demonstrated by two adv sets.
+description: 'Demonstrates how to advertise as a BLE Extended Advertising (AE) peripheral with dual advertising sets and periodic advertising, using SiWx91x Bluetooth LE with an external host connected over UART.
 
   '
 filter:

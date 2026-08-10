@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_ibeacon_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP iBeacon FreeRTOS
+label: SiWx91x Bluetooth LE - Host iBeacon FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates how to advertise Apple iBeacon-formatted data on SiWx91x over SPI NCP with FreeRTOS in BLE peripheral mode. Demonstrated by UUID, major, minor, and TX power in advertising.
+description: 'Demonstrates how to advertise Apple iBeacon-formatted data using SiWx91x Bluetooth LE with an external host connected over SPI.
 
   '
 filter:

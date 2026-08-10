@@ -34,6 +34,7 @@
 #include "sl_si91x_protocol_types.h"
 #include "sl_si91x_constants.h"
 #include "sl_constants.h"
+#include "sl_types.h"
 #include "sl_bit.h"
 #include <stdint.h>
 #include <stddef.h>
@@ -2764,25 +2765,6 @@ typedef struct {
   uint8_t reserved1[2]; ///< Reserved bits
 } si91x_calibration_data_t;
 
-// driver TX/RX packet structure
-/** Command header size in @ref sl_wifi_system_packet_t (bytes). Same value as @c SLI_FRAME_DESC_LEN (16). */
-#define SL_SI91X_WIFI_PACKET_DESC_SIZE SLI_FRAME_DESC_LEN
-
-/// Wi-Fi packet structure
-typedef struct {
-  union {
-    struct {
-      uint16_t length;  ///< Length of data
-      uint16_t command; ///< command type
-      uint8_t unused
-        [12]; ///< Contains command status and other additional information. Unused for TX and only used for RX packets.
-    };
-    uint8_t desc[SL_SI91X_WIFI_PACKET_DESC_SIZE]; ///< packet header
-  };                                              ///< Command header
-
-  uint8_t data[]; ///< Data to be transmitted or received
-} sl_wifi_system_packet_t;
-
 /** \addtogroup SL_SI91X_TYPES
  * @{
  * */
@@ -2860,7 +2842,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_client_configuration
                       | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS)),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 }
+                   .config_feature_bit_map  = 0 },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /// Default Wi-Fi enterprise client configuration
@@ -2887,7 +2872,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_enterprise_client_co
                       | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(SL_SI91X_DEFAULT_EXT_TCP_IP_SELECTS)),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 }
+                   .config_feature_bit_map  = 0 },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /// Default Wi-Fi ap configuration
@@ -2911,7 +2899,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_ap_configuration = {
                    .ext_tcp_ip_feature_bit_map = 0,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 }
+                   .config_feature_bit_map     = 0 },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /// Default Wi-Fi concurrent (AP + STATION) configuration
@@ -2935,7 +2926,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_configura
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
+                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /// Default Wi-Fi concurrent (AP + STATION) configuration
@@ -2962,7 +2956,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_v6_config
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
+                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /// Default Wi-Fi transmit configuration
@@ -2991,7 +2988,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transmit_test_config
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
+                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /// Default Wi-Fi transceiver mode configuration
@@ -3019,7 +3019,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transceiver_configur
                    .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 }
+                   .config_feature_bit_map     = 0 },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /// The typedefs in the below header depends on the structs defination in this .h

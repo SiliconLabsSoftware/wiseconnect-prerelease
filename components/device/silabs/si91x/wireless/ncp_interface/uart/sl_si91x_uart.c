@@ -157,7 +157,7 @@ sl_status_t sl_si91x_bus_init(void)
   VERIFY_STATUS_AND_RETURN(status);
 
   // Allocate packet to receive packet from module
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CP_CMD_RX_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               10000,
                                               (sli_buffer_t *)&resp_buffer);
@@ -357,7 +357,7 @@ sl_status_t sli_si91x_bus_rx_irq_handler(void)
   status = sli_queue_manager_enqueue(&sli_uart_bus_rx_queue, (void *)resp_buffer);
 
   // Allocate a buffer for the next frame
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CP_CMD_RX_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               10000,
                                               (sli_buffer_t *)&resp_buffer);
@@ -381,7 +381,7 @@ void sli_si91x_bus_rx_done_handler(void)
     status = sli_queue_manager_enqueue(&sli_uart_bus_rx_queue, (void *)resp_buffer);
 
     // Allocate a buffer for the next frame
-    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CP_CMD_RX_POOL,
+    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL,
                                                 SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                                 10000,
                                                 (sli_buffer_t *)&resp_buffer);

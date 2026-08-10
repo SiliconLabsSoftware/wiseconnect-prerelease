@@ -1,9 +1,14 @@
 # Wi-Fi BLE Power Save
 
+## High-Level Overview
+
+SiWx91x Wi-Fi BLE power save example: Run concurrent WLAN and BLE tasks with associated power save and tickless sleep in SoC and NCP modes.
+
 ## Table of Contents
 
 - [Wi-Fi BLE Power Save](#wi-fi-ble-power-save)
   - [Table of Contents](#table-of-contents)
+  - [High-Level Overview](#high-level-overview)
   - [Purpose / Scope](#purpose--scope)
   - [Prerequisites / Setup Requirements](#prerequisites--setup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -27,6 +32,10 @@
     - [Steps to verify the WLAN Station BLE Power Save Example](#steps-to-verify-the-wlan-station-ble-power-save-example)
       - [Steps to be followed to verify WLAN Station BLE Provisioning with Android **Simplicity Connect App**](#steps-to-be-followed-to-verify-wlan-station-ble-provisioning-with-android-simplicity-connect-app)
 
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+
 ## Purpose / Scope
 
 The coex application demonstrates the procedure for configuring a device in WiSeConnect coex mode with WLAN standby and BLE connected power save.
@@ -44,24 +53,29 @@ Before running the application, the user will need the following things to setup
 - SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes]() for details.
 - **SoC Mode**:
   - Standalone
-    - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
+    - BRD4002B Wireless pro kit mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards 
-      - BRD4338A [SiWx917-RB4338A]
-      - BRD4339B [SiWx917-RB4339B]
-      - BRD4340A [SiWx917-RB4340A]
-      - BRD4343A [SiWx917-RB4343A]
+      - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+      - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
+      - BRD4339B [SiWx917-RB4339B](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
+      - BRD4340A [SiWx917-RB4340A](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
+      - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+      - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+      - BRD4343S
   - Kits
+  	- SiWG917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
   	- SiWx917 Pro Kit [Si917-PK6031A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-pro-kit?tab=overview)
   	- SiWx917 Pro Kit [Si917-PK6032A]
-    - SiWx917 AC1 Module Explorer Kit (BRD2708A)
+    - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit?tab=overview)
   	
 - **NCP Mode**:
   - Standalone
-    - BRD4002A Wireless pro kit mainboard [SI-MB4002A]
+    - BRD4002B Wireless pro kit mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
     - NCP Expansion Kit with NCP Radio boards
-      - (BRD4346A + BRD8045A) [SiWx917-EB4346A]
-      - (BRD4357A + BRD8045A) [SiWx917-EB4357A]
+      - [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
+      - [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
+      - [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
   - Kits
   	- EFR32xG24 Pro Kit +10 dBm [xG24-PK6009A](https://www.silabs.com/development-tools/wireless/efr32xg24-pro-kit-10-dbm?tab=overview)
 
@@ -165,7 +179,7 @@ The application can be configured to suit your requirements and development envi
 
 ### Configuring the WLAN task
 
-1. Open `wifi_app.c` file and update/modify the following macros:
+1. Open `wifi_app.c` and update/modify the following macros:
 
    - SSID refers to the name of the Access point.
 
@@ -179,7 +193,7 @@ The application can be configured to suit your requirements and development envi
      #define PSK           "<psk>"
      ```
 
-   - To run as SSL client :
+   - To run as SSL client, set `SSL_CLIENT` in `app_config.h`:
 
      ```c
      #define SSL_CLIENT     1
@@ -189,6 +203,12 @@ The application can be configured to suit your requirements and development envi
      By default, application loading "cacert.pem" certificate if it is enabled.
 
      If SSL_CLIENT set to 0, will use the normal TCP sockets for communication.
+
+     When SSL is enabled, the CA certificate is loaded into NWP flash at credential index `CERTIFICATE_INDEX` in `app_config.h` (default `0`). This example uses a single CA (`cacert.pem`); keep `CERTIFICATE_INDEX` at `0` unless you align socket/TLS configuration with another slot.
+
+     ```c
+     #define CERTIFICATE_INDEX  0
+     ```
 
    - SERVER_PORT port refers remote SSL server port number
 
@@ -396,3 +416,24 @@ In Tickless Mode, the device enters sleep based on the idle time set by the sche
 13. The following are the serial prints:
 
     ![](resources/readme/serial_prints.png)
+
+## Troubleshooting
+
+If you encounter issues while running this example, check the following:
+
+- Verify Wi-Fi credentials in `sl_net_default_values.h` and BLE task configuration in your application configuration files.
+- If either protocol fails to start, review WLAN and BLE task priorities and stack sizes.
+- In tickless mode, confirm wakeup sources are configured as described in [Tickless Mode](#tickless-mode).
+- Use Energy Profiler to validate current consumption during associated power save.
+
+## Resources
+
+- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
+- [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)

@@ -79,7 +79,7 @@ The application toggles the selected LED on each selected button press.
 
 > ![Figure: Introduction](resources/readme/image600a.png)
 
-- Configure the following macros in [`simple_button_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_simple_button_freertos/simple_button_freertos.c) if required (each is guarded with `#ifndef` so you can also override them from the build):
+- Configure the following macros in [`simple_button_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_simple_button_freertos/simple_button_freertos.c) if required (each is guarded with `#ifndef` so you can also override them from the build):
 
   - `BUTTON_INSTANCE`: Selects the button instance whose press events unblock the FreeRTOS task and toggle the LED. By default, it is set to `button_btn0`.
 

@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_accept_list_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Acceptlist FreeRTOS
+label: SiWx91x Bluetooth LE - Host Accept List FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates how to use the BLE Accept List so only a selected BD address can connect on SiWx91x over SPI NCP with FreeRTOS. This is demonstrated by programming the controller accept list.
+description: 'Demonstrates how to configure the BLE Accept List to restrict the peers that can connect to your device, using SiWx91x Bluetooth LE with an external host connected over SPI.
 
   '
 filter:

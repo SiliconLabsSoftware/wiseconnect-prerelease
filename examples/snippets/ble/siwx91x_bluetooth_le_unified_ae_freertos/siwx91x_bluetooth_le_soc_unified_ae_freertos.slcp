@@ -1,11 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_unified_ae_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Unified AE Coex App FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Unified AE FreeRTOS
 category: Example|BLE
-description: 'Bluetooth Low energy Extended Advertising features(Central/Peripheral) on SiWx91x in SoC FreeRTOS.
-
-  '
+description: "Demonstrates BLE Advertising Extensions (AE) in central and peripheral roles with a provision to connect to 1 central and 1 peripheral, using SiWx91x Bluetooth LE. \n"
 filter:
 - name: Wireless Technology
   value:

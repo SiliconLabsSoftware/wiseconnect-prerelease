@@ -37,6 +37,7 @@
 #include "sl_board_configuration.h"
 #include "sl_constants.h"
 #include "sl_wifi.h"
+#include "sl_si91x_driver.h"
 #include "sl_net_ip_types.h"
 #include "cmsis_os2.h"
 #include "sl_utility.h"
@@ -735,19 +736,27 @@ adv:
         }
       } break;
       case RSI_APP_FW_VERSION: {
-        sl_wifi_firmware_version_t firmware_version = { 0 };
+        sl_si91x_firmware_version_t firmware_version = { 0 };
 
         rsi_ble_app_clear_event(RSI_APP_FW_VERSION);
         memset(data, 0, RSI_BLE_MAX_DATA_LEN);
 
-        status = sl_wifi_get_firmware_version(&firmware_version);
+        status = sl_si91x_get_firmware_version(&firmware_version);
         if (status == SL_STATUS_OK) {
           data[0] = 0x08;
-          data[1] = sizeof(sl_wifi_firmware_version_t);
-          memcpy(&data[2], &firmware_version, sizeof(sl_wifi_firmware_version_t));
+          data[1] = sizeof(sl_si91x_firmware_version_t);
+          memcpy(&data[2], &firmware_version, sizeof(sl_si91x_firmware_version_t));
 
           rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, data);
-          print_firmware_version(&firmware_version);
+          printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
+                 firmware_version.chip_id,
+                 firmware_version.rom_id,
+                 firmware_version.major,
+                 firmware_version.minor,
+                 firmware_version.security_version,
+                 firmware_version.patch_num,
+                 firmware_version.customer_id,
+                 firmware_version.build_num);
         }
       } break;
 

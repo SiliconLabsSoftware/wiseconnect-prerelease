@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_per_test_freertos_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE PSRAM PER FreeRTOS
+label: SiWx91x Bluetooth LE - SoC PER Test FreeRTOS (PSRAM)
 category: Example|BLE
-description: 'Demonstrates BLE Packet Error Rate (PER) TX/RX testing on SiWx91x with PSRAM in SoC FreeRTOS. Demonstrated by configuring parameters to transmit or receive PER packets.
+description: 'Demonstrates Packet Error Rate (PER) TX/RX testing using SiWx91x Bluetooth LE with PSRAM.
 
   '
 filter:

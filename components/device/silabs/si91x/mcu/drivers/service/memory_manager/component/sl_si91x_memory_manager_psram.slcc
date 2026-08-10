@@ -1,0 +1,67 @@
+id: sl_si91x_memory_manager_psram
+label: Memory Manager PSRAM Heap (SiWx917)
+package: platform_siwx91x
+description: >
+  Registers PSRAM as a managed Native Memory Manager heap (sli_psram_heap) on the
+  SiWx917 and links it into the allocator fallback chain (internal SRAM heap first,
+  then PSRAM). Keeps the fast internal general-purpose heap and lets sl_malloc /
+  malloc / pvPortMalloc spill into PSRAM automatically when the internal heap is
+  exhausted.
+
+  This component provides the `memory_manager_psram` feature required by the Native
+  Memory Manager and, by providing `device_has_psram`, activates the (otherwise
+  dormant) EFR PSRAM heap code path on the 917. It also emits the linker flag that
+  carves the dedicated PSRAM heap window (__HeapPsramBase / __HeapPsramLimit).
+
+  This is a DIFFERENT strategy from "Heap Segment in PSRAM": that moves the single
+  general heap into PSRAM, whereas this keeps a fast internal heap and adds a
+  separate PSRAM fallback heap. The two are mutually exclusive.
+category: Device|Si91x|MCU|Service|Memory Manager
+quality: production
+metadata:
+  sbom:
+    license: Zlib
+component_root_path: components/device/silabs/si91x/mcu/drivers/service/memory_manager
+provides:
+  - name: memory_manager_psram
+  # Provide device_has_psram ONLY from this component so the EFR Native Memory
+  # Manager PSRAM gate (memory_manager.slcc: requires memory_manager_psram when
+  # device_has_psram) is satisfied exclusively when the user installs this
+  # component. Non-PSRAM-heap projects (code/const placement only) are unaffected.
+  - name: device_has_psram
+requires:
+  - name: memory_manager
+    condition: [device_si91x]
+  - name: psram_core
+  - name: wiseconnect_toolchain_psram_linker
+conflicts:
+  # Mutually exclusive PSRAM-as-heap-backing strategies. heap_segment_in_psram
+  # moves the SINGLE general heap (__HeapBase/__HeapLimit) into PSRAM; this
+  # component keeps the general heap internal and carves a SEPARATE PSRAM heap
+  # from the same PSRAM tail window. Allowing both would double-book that window.
+  - name: heap_segment_in_psram
+# Native MM encodes free-block length in 16 bits (~512 KB max) unless
+# SLI_LARGE_BLOCK_SUPPORT is enabled. That gate keys off PSRAM_MAX_SIZE /
+# DMEM_MEM_SIZE / DTCM_MAX_SIZE from em_device.h — none of which exist on
+# SiWx917. Without PSRAM_MAX_SIZE, sl_memory_init_psram() truncates the ~8 MB
+# PSRAM free-block length and corrupts the heap. Physical APS6404L size is 8 MB.
+# Also define PSRAM_BASE (EFR em_device.h pattern). PSRAM_MAX_SIZE alone enables
+# SLI_LARGE_BLOCK_SUPPORT via sli_memory_manager.h — do not -D that macro or
+# -Werror hits a redefine.
+define:
+  - name: PSRAM_MAX_SIZE
+    value: 0x800000
+  - name: PSRAM_BASE
+    value: 0x0A000000
+
+template_contribution:
+  # Generates SL_CATALOG_MEMORY_MANAGER_PSRAM_PRESENT, which activates
+  # sli_psram_heap, sl_memory_init_psram(), sl_memory_get_psram_heap_region()
+  # and the fallback-chain linking already present in the Memory Manager source,
+  # plus the sl_memory_init_psram() call already wired in sl_main_init.c.
+  - name: component_catalog
+    value: memory_manager_psram
+  # Linker flag consumed by linkerfile_psram_SoC.ld.jinja to emit the dedicated
+  # PSRAM heap window and its __HeapPsramBase / __HeapPsramLimit symbols.
+  - name: psram_mm_heap_enabled
+    value: 1

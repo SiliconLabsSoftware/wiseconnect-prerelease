@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_throughput_freertos_uart
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - UART NCP Throughput FreeRTOS
+label: SiWx91x Bluetooth LE - Host Throughput FreeRTOS (UART)
 category: Example|BLE
-description: 'Demonstrates BLE on-air throughput by exchanging continuous data on SiWx91x over UART NCP with FreeRTOS. Demonstrated by sustained transfers measurable with a sniffer.
+description: 'Demonstrates how to measure BLE throughput using SiWx91x Bluetooth LE with an external host connected over UART. This is demonstrated by exchanging continuous data and measuring it with a sniffer.
 
   '
 filter:

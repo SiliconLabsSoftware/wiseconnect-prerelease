@@ -33,6 +33,8 @@
 #include "sl_wifi_constants.h"
 #include "sli_wifi_constants.h"
 #include "sl_constants.h"
+#include "sli_constants.h"
+
 /** \addtogroup SI91X_LOAD_IMAGE_TYPES
   * @{ */
 /// Load the default NWP firmware at location 0.
@@ -158,23 +160,9 @@
 #define SLI_MODE_8BIT  0
 #define SLI_MODE_32BIT 1
 
-// frame descriptor length
-#define SLI_FRAME_DESC_LEN 16
-
-// Bus interrupt register values
-// Wi-Fi buffer full indication register value from NWP module
-#ifndef SLI_WIFI_BUFFER_FULL
-#define SLI_WIFI_BUFFER_FULL (1 << 0)
-#endif
-
-// BLE buffer full indication register value from NWP module
-#ifndef SLI_BLE_BUFFER_FULL
-#define SLI_BLE_BUFFER_FULL (1 << 4)
-#endif
 // Wi-Fi buffer empty indication register value from NWP module
 #define SLI_BUFFER_EMPTY 0x02
-// RX packet pending register value from NWP module
-#define SLI_RX_PKT_PENDING 0x08
+
 // Assertion Interrupt indication from NWP module
 #define SLI_ASSERT_INTR 0x80
 
@@ -348,18 +336,6 @@ typedef enum {
 
 #define SLI_INT_MASK_REG_ADDR 0x41050000 // Interrupt mask register
 #define SLI_INT_CLR_REG_ADDR  0x22000010 // Interrupt clear register
-
-// Packet queue identifiers
-#define SLI_COMMON_Q    0
-#define SLI_ZB_Q        1
-#define SLI_BT_Q        2
-#define SLI_WLAN_MGMT_Q 4
-#define SLI_WLAN_DATA_Q 5
-#ifdef SAPIS_BT_STACK_ON_HOST
-#define SLI_BT_INT_MGMT_Q 6
-#define SLI_BT_HCI_Q      7
-#endif
-#define SLI_LOG_Q 8
 
 // Event IDs
 #define SLI_RX_EVENT       0 // RX event number used in the driver

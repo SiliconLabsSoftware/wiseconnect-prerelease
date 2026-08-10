@@ -101,16 +101,14 @@ typedef enum {
   SLI_WLAN_COMMON_CMD  = 0, ///< SI91X Common Command
   SLI_WLAN_WIFI_CMD    = 1, ///< SI91X Wireless LAN Command
   SLI_WLAN_NETWORK_CMD = 2, ///< SI91X Network Command
-  SLI_WLAN_BT_CMD      = 3, ///< SI91X Bluetooth Command
-  SLI_WLAN_SOCKET_CMD  = 4, ///< SI91X Socket Command
-  SLI_WLAN_CMD_MAX     = 5  ///< SI91X Maximum Command value
+  SLI_WLAN_SOCKET_CMD  = 3, ///< SI91X Socket Command
+  SLI_WLAN_CMD_MAX     = 4  ///< SI91X Maximum Command value
 } sli_wlan_command_type_t;
 
 typedef enum {
   SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET = 0,
   SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET,
   SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET,
-  SLI_WIFI_COMMAND_ENGINE_BLE_COMMAND_PACKET,
   SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET,
   SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES
 } sli_wifi_command_engine_packet_types_t;
@@ -138,9 +136,6 @@ typedef enum {
 
 // Indicates RX response received for SOCKET command type
 #define SL_WIFI_SOCKET_RESPONSE_EVENT (1 << SLI_WLAN_SOCKET_CMD)
-
-// Indicates RX response received for BLE command type
-#define SL_WIFI_BT_RESPONSE_EVENT (1 << SLI_WLAN_BT_CMD)
 
 extern sli_command_engine_configuration_t sli_wifi_command_engine_config;
 

@@ -32,5 +32,3 @@ template_contribution:
   - name: code_classification_components
     value: rsilib_qspi
     condition: [psram_core]
-  - name: psram_ram_data_files
-    value: rsi_qspi

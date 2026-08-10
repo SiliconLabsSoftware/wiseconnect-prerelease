@@ -112,7 +112,10 @@ static const sl_wifi_device_configuration_t client_configuration = {
                    .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) }
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 static sl_net_wifi_lwip_context_t wifi_client_context;
@@ -179,14 +182,14 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_beacon_drop_threshold failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Filter Broadcast Done");
+  SL_DEBUG_LOG_V2(INFO, "Filter Broadcast Done\n");
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to get client profile: 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Success to get client profile");
+  SL_DEBUG_LOG_V2(INFO, "Success to get client profile\n");
 
   ip_address.type = SL_IPV4;
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
@@ -198,7 +201,7 @@ static void application_start(void *argument)
     SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Performance profile set\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\nPerformance profile set\r\n");
 
   send_data_to_tcp_server();
 
@@ -275,11 +278,11 @@ void send_data_to_tcp_server()
     }
   }
 
-  SL_DEBUG_LOG_V2(INFO, "%d packets sent success", packet_count);
+  SL_DEBUG_LOG_V2(INFO, "%d packets sent success\n", packet_count);
 
   //!Socket close
   close(client_socket);
-  SL_DEBUG_LOG_V2(INFO, "Socket close success");
+  SL_DEBUG_LOG_V2(INFO, "Socket close success\n");
 
   return;
 }

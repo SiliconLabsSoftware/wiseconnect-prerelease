@@ -799,13 +799,8 @@ sl_status_t sli_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_typ
     *buffer = internal_buffer->data;
     return SL_STATUS_OK;
   } else if (allocation_type == SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID) {
-
-    // reserve 1ms for creating the new common pool when buffer allocation fails so pass 1ms less than the wait duration
-    uint32_t wait_duration_ms_adjusted = wait_duration_ms > 1U ? wait_duration_ms - 1U : 0U;
-    sl_status_t status                 = sli_buffer_manager_allocate_buffer_from_hybrid_pool(&internal_buffer,
-                                                                             start,
-                                                                             wait_duration_ms_adjusted,
-                                                                             pool_type);
+    sl_status_t status =
+      sli_buffer_manager_allocate_buffer_from_hybrid_pool(&internal_buffer, start, wait_duration_ms, pool_type);
     if ((status != SL_STATUS_OK) && (status != SL_STATUS_ALLOCATION_FAILED)) {
       return status;
     }
@@ -831,7 +826,9 @@ sl_status_t sli_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_typ
 
 sl_status_t sli_buffer_manager_free_buffer(sli_buffer_t buffer)
 {
-  SL_VERIFY_POINTER_OR_RETURN(buffer, SL_STATUS_NULL_POINTER);
+  if (buffer == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
 
   bool suppress_common_pool_event = false;
   CORE_irqState_t state           = CORE_EnterAtomic();

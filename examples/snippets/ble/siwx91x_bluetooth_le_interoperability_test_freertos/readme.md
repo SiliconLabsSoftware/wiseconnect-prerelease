@@ -45,7 +45,7 @@ This document outlines the requirements, setup process, test execution, and data
 - Test Hardware:
 	- SiWG917 SoC Family Development Kits:
     - Standalone
-      - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
+      - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002B]
     - Radio Boards 
   	  - [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) [SiWx917-RB4338A]
       - [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343A]
@@ -75,11 +75,11 @@ This document outlines the requirements, setup process, test execution, and data
 
 | Mode | Host / target                | Project file (this example folder) |
 |------|------------------------------|------------------------------------|
-| SoC  | Application runs on SiWx91x. | `ble_iop_test.slcp`                |
+| SoC  | Application runs on SiWx91x. | `siwx91x_bluetooth_le_soc_interoperability_test_freertos.slcp`                |
 
 > **Note:** The BLE IOP Test example is provided only in **SoC** mode. PSRAM and NCP variants are not shipped for this example.
 
-Open `ble_iop_test.slcp` from `examples/snippets/ble/ble_iop_test/` in Simplicity Studio.
+Open `siwx91x_bluetooth_le_soc_interoperability_test_freertos.slcp` from `examples/snippets/ble/siwx91x_bluetooth_le_interoperability_test_freertos/` in Simplicity Studio.
 
 ### Setup Diagram
 

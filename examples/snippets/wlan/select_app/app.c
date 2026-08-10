@@ -39,6 +39,7 @@
 #include "select.h"
 #include "string.h"
 #include "sl_net_wifi_types.h"
+#include "sl_additional_status.h"
 #include "sl_si91x_core_utilities.h"
 #include <stdbool.h>
 
@@ -210,9 +211,13 @@ void socket_select()
 
     if (total_set_fds_count == -1) {
       if (errno == 0) {
-        // get the error code returned by the firmware
+        // The stack can report remote close as a firmware status while errno stays 0.
         sl_status_t status = sl_wifi_get_saved_firmware_status();
-        SL_DEBUG_LOG_V2(ERROR, "Socket select failed with bsd error: %d and status = 0x%lx\r\n", errno, status);
+        if (status == SL_STATUS_SI91X_SOCKET_NOT_CONNECTED) {
+          SL_DEBUG_LOG_V2(INFO, "Client closed connection\r\n");
+        } else {
+          SL_DEBUG_LOG_V2(ERROR, "Socket select failed with bsd error: %d and status = 0x%lx\r\n", errno, status);
+        }
       } else {
         SL_DEBUG_LOG_V2(ERROR, "Socket select failed with bsd error: %d\r\n", errno);
       }

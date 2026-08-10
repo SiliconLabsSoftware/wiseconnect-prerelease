@@ -54,7 +54,7 @@ This application explains to the user how to:
 - SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes]() for details.
 - **SoC Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002B]
   - Radio Boards 
       - [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) [SiWx917-RB4338A]
       - [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343A]
@@ -66,7 +66,7 @@ This application explains to the user how to:
   	
 - **NCP Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002B]
     - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
   - NCP Expansion Kit with NCP Radio boards
       - [[BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview) + [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) / [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) / [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview)]
@@ -98,12 +98,12 @@ This application explains to the user how to:
 
 | Mode       | Host / target                                                                           | Project file (this example folder)   |
 |------------|-----------------------------------------------------------------------------------------|--------------------------------------|
-| SoC        | Application runs on SiWx91x.                                                            | `ble_throughput_app_soc.slcp`        |
-| PSRAM      | Application runs on SiWx91x with PSRAM-capable radio board.                             | `ble_throughput_app_psram.slcp`      |
-| NCP (SPI)  | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**.   | `ble_throughput_app_ncp.slcp`        |
-| NCP (UART) | Application runs on **EFR32** host; SiWx917 NCP over **UART**.                          | `ble_throughput_app_uart_ncp.slcp`   |
+| SoC        | Application runs on SiWx91x.                                                            | `siwx91x_bluetooth_le_soc_throughput_freertos.slcp`        |
+| PSRAM      | Application runs on SiWx91x with PSRAM-capable radio board.                             | `siwx91x_bluetooth_le_soc_throughput_freertos_psram.slcp`      |
+| NCP (SPI)  | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**.   | `siwx91x_bluetooth_le_host_throughput_freertos_spi.slcp`        |
+| NCP (UART) | Application runs on **EFR32** host; SiWx917 NCP over **UART**.                          | `siwx91x_bluetooth_le_host_throughput_freertos_uart.slcp`   |
 
-Open the `.slcp` for your kit from `examples/snippets/ble/ble_throughput_app/` in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+Open the `.slcp` for your kit from `examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/` in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
 
 ### Setup Diagram
 
@@ -136,7 +136,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - After connecting all the boards, the setup should look like the image shown below:
     ![Figure: Setup](resources/readme/stm32_setup.png)
   - Connect the setup to the computer.
-  - Open the BLE PER µVision project - **ble_throughput_app.uvprojx** by navigating to **WiSeConnect SDK → examples → snippets → ble → ble_throughput_app → keil_project**.
+  - Open the BLE PER µVision project - **siwx91x_bluetooth_le_throughput_freertos.uvprojx** by navigating to **WiSeConnect SDK → examples → snippets → ble → siwx91x_bluetooth_le_throughput_freertos → keil_project**.
 
 ### Configuration and Setup
 

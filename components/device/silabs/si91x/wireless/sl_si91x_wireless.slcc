@@ -97,7 +97,6 @@ include:
   - path: sl_si91x_iot_socket.h
   - path: sl_si91x_protocol_types.h
   - path: sl_si91x_spi_constants.h
-  - path: sl_si91x_status.h
   - path: sl_si91x_types.h
   - path: sl_wifi_device.h
 - path: sl_net/inc

@@ -30,6 +30,7 @@
 #pragma once
 #include "sl_si91x_constants.h"
 #include "sl_wifi_host_interface.h"
+#include "sl_types.h"
 #include "sl_wifi_device.h"
 #include <stdint.h>
 

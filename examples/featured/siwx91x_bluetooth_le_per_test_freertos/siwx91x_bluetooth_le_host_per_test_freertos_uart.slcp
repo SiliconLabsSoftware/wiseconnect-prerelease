@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_per_test_freertos_uart
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE UART NCP PER FreeRTOS
+label: SiWx91x Bluetooth LE - Host PER Test FreeRTOS (UART)
 category: Example|BLE
-description: 'Demonstrates BLE Packet Error Rate (PER) TX/RX testing on SiWx91x over UART NCP with FreeRTOS. Demonstrated by configuring parameters to transmit or receive PER packets.
+description: 'Demonstrates Packet Error Rate (PER) TX/RX testing using SiWx91x Bluetooth LE with an external host connected over UART.
 
   '
 filter:

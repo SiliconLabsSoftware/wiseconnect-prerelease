@@ -442,16 +442,6 @@ typedef struct {
   uint8_t beacon_miss_ignore_limit;
 } sli_wifi_power_save_request_t;
 
-/// Si91x specific command type
-typedef enum {
-  SLI_WIFI_COMMON_CMD   = 0, ///< SI91X Common Command
-  SLI_WIFI_WLAN_CMD     = 1, ///< SI91X Wireless LAN Command
-  SLI_SI91X_NETWORK_CMD = 2, ///< SI91X Network Command
-  SLI_SI91X_BT_CMD      = 3, ///< SI91X Bluetooth Command
-  SLI_SI91X_SOCKET_CMD  = 4, ///< SI91X Socket Command
-  SI91X_CMD_MAX         = 5  ///< SI91X Maximum Command value
-} sli_wifi_command_type_t;
-
 // Scan Information
 typedef struct sli_scan_info_s {
   struct sli_scan_info_s *next;
@@ -591,6 +581,7 @@ typedef struct {
   uint8_t ie_buffer[];        ///< Flexible array for raw IE buffer
 } sli_wifi_manage_vendor_ie_packet_t;
 
+#pragma pack(1)
 typedef struct {
   uint8_t
     pll_mode; ///< PLL Mode. 0 - less than 120 Mhz NWP SoC clock; 1 - greater than 120 Mhz NWP SoC clock (Mode 1 is not currently supported for coex)
@@ -600,6 +591,7 @@ typedef struct {
   uint8_t afe_type;         ///< AFE Type.
   uint32_t feature_enables; ///< Feature Enables.
 } sli_wifi_feature_frame_request;
+#pragma pack()
 
 // WLAN Frame
 typedef struct {

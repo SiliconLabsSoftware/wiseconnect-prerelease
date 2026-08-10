@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_privacy_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Privacy FreeRTOS
+label: SiWx91x Bluetooth LE - Host Privacy FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates BLE privacy with resolving-list management on SiWx91x over SPI NCP with FreeRTOS. Demonstrated by private connections to a remote device.
+description: 'Demonstrates BLE privacy with resolving-list management, using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by establishing private connections to a remote device.
 
   '
 filter:

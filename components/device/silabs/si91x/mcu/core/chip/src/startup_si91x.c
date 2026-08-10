@@ -78,8 +78,13 @@ extern unsigned long _edata;        /*!< End address for the .data section      
 extern unsigned long __bss_start__; /*!< Start address for the .bss section     */
 extern unsigned long __bss_end__;   /*!< End address for the .bss section         */
 
-#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
-  && defined(DATA_SEGMENT_IN_PSRAM)
+/* Classified LMA→VMA sections are emitted by linkerfile_psram_SoC when
+ * DATA+TEXT are in PSRAM (Gecko SL_CODE_CLASSIFY catch-all text_*, and/or the
+ * SiWx91x code_classifier demo). Startup MUST copy them whenever that layout
+ * is active. Gating only on SL_SI91X_CODE_CLASSIFIER_ENABLE left .classified_text
+ * uncopied for Native MM (dmachannelperf/sl_free in SRAM VMA) → HardFault. */
+#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(DATA_SEGMENT_IN_PSRAM) \
+  && (defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) || defined(TEXT_SEGMENT_IN_PSRAM))
 extern unsigned long _classified_text_;               /*!< Start address for the initialization
                                         values of the .classified_text section.            */
 extern unsigned long _classified_text_section_start_; /*!< Start address for the .classified_text section     */
@@ -91,8 +96,8 @@ extern unsigned long _classified_data_section_start_; /*!< Start address for the
 extern unsigned long _classified_data_section_end_;   /*!< End address for the .classified_data section       */
 #endif
 
-#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
-  && !defined(BSS_SEGMENT_IN_PSRAM)
+#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && !defined(BSS_SEGMENT_IN_PSRAM) \
+  && (defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) || defined(DATA_SEGMENT_IN_PSRAM))
 extern unsigned long _classified_bss_section_start_; /*!< Start address for the .classified_bss section     */
 extern unsigned long _classified_bss_section_end_;   /*!< End address for the .classified_bss section       */
 #endif
@@ -106,9 +111,12 @@ void Copy_Table();
 void Zero_Table();
 #define WEAK __attribute__((weak))
 
-/* Gecko code_classification + device_si91x: SLI_CODE_CLASSIFICATION_GCC_USE_USED (LTO used+section); copy text_ram without full RAM execution. */
-#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED)
-/** Copy text_ram from LMA in flash to VMA in SRAM; same role as EFR copy path, run before .data copy. */
+/* Copy text_ram when RAM execution, code classification (LTO), or PSRAM .data
+ * placement is enabled. PSRAM needs this for SL_SI91X_RETAINED_DATA in text_ram: Clang's
+ * copy table only initializes .data, not text_ram. No-op when linker spans are empty. */
+#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED) \
+  || defined(DATA_SEGMENT_IN_PSRAM)
+/** Copy text_ram from LMA to VMA in SRAM; run before Copy_Table(). */
 #if defined(__GNUC__) && !defined(__clang__)
 __attribute__((optimize("no-tree-loop-distribute-patterns")))
 #endif
@@ -286,8 +294,8 @@ void Copy_Table(void)
     *(pulDest++) = *(pulSrc++);
   }
 #endif
-#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
-  && defined(DATA_SEGMENT_IN_PSRAM)
+#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(DATA_SEGMENT_IN_PSRAM) \
+  && (defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) || defined(TEXT_SEGMENT_IN_PSRAM))
   /* Copy the classified text segment to SRAM */
   pulSrc = &_classified_text_;
   for (volatile unsigned long *pulDest = &_classified_text_section_start_; pulDest < &_classified_text_section_end_;) {
@@ -334,12 +342,26 @@ void Zero_Table(void)
     *pulDest++ = 0UL;
   }
 #endif
-#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) \
-  && !defined(BSS_SEGMENT_IN_PSRAM)
+#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && !defined(BSS_SEGMENT_IN_PSRAM) \
+  && (defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) || defined(DATA_SEGMENT_IN_PSRAM))
   /* Classified BSS in PSRAM: no load image - zero-init only */
   pulDest = (unsigned long *)&_classified_bss_section_start_;
   for (; pulDest < (unsigned long *)&_classified_bss_section_end_;) {
     *pulDest++ = 0UL;
+  }
+#endif
+
+#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(DATA_SEGMENT_IN_PSRAM)
+  /* LTO-safe retained BSS (variables tagged SL_SI91X_RETAINED_BSS): always in internal
+   * RAM, NOLOAD, so it must be zero-initialized here. Section is emitted by the
+   * PSRAM linker whenever data is placed in PSRAM. */
+  {
+    extern unsigned long __retained_bss_start__;
+    extern unsigned long __retained_bss_end__;
+    pulDest = (unsigned long *)&__retained_bss_start__;
+    for (; pulDest < (unsigned long *)&__retained_bss_end__;) {
+      *pulDest++ = 0UL;
+    }
   }
 #endif
 }
@@ -357,7 +379,8 @@ __attribute__((section(".reset_handler")))
 {
   /* NVIC must use this image's vector table (flash __Vectors). ROM may leave VTOR elsewhere. */
   SCB->VTOR = (uint32_t)__Vectors;
-#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED)
+#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED) \
+  || defined(DATA_SEGMENT_IN_PSRAM)
   copy_functions_to_ram();
 #endif
   Copy_Table();
@@ -372,8 +395,14 @@ __attribute__((section(".reset_handler")))
 #endif
   /*Init system level initializations */
   SystemInit();
-  /* This macro enables support for C++ linkage in the startup code. */
-#ifdef SUPPORT_CPLUSPLUS
+  /* This macro enables support for C++ linkage in the startup code.
+     SL_CATALOG_CPP_SUPPORT_PRESENT is auto-defined by the cpp_support component,
+     so C++ projects (e.g. Matter, AI/ML) run __libc_init_array() without needing
+     the legacy SUPPORT_CPLUSPLUS define. __libc_init_array() executes .preinit_array,
+     which is where the Memory Manager registers sl_memory_init() for C++ builds
+     (the C init path is suppressed when cpp_support is present). Without this the
+     heap would be left uninitialized on a C++ build. */
+#if defined(SUPPORT_CPLUSPLUS) || defined(SL_CATALOG_CPP_SUPPORT_PRESENT)
   /* Initialize global and static C++ objects. This function must be called after SystemInit() to ensure that the hardware is 
     properly initialized before any global or static constructors are executed. */
   extern void __libc_init_array(void);

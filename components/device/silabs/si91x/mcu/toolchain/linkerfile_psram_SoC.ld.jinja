@@ -63,19 +63,19 @@
 {%- set app_ram_start = sram_addr %}
 {%- set app_ram_end = sram_size %}
 
-{%- if psram_present %}	
-	{%- set app_psram_start = psram_addr %}
-
-	{#- This linker file is only used when wiseconnect_toolchain_psram_linker is installed #}
-
-	{#- Always apply 0x1000 offset (4096 in decimal) to skip reserved area #}
-
-	{%- set psram_start_offset = 4096 %}
-
+{%- if psram_present %}
+	{#- This linker file is only used when wiseconnect_toolchain_psram_linker is installed.
+	    PSRAM MEMORY region always skips the first 4 KB (0x1000) reserved area:
+	      ORIGIN = device_psram_addr + 0x1000
+	      LENGTH = device_psram_size - 0x1000
+	    Example (8 MB APS6404 @ 0x0A000000):
+	      ORIGIN = 0x0A001000, LENGTH = 0x7FF000, end = 0x0A800000
+	    The MM .psram_heap block then claims only the unused TAIL of this region
+	    (ORIGIN(psram)+LENGTH(psram)); do NOT subtract the 4 KB offset again there. #}
+	{%- set psram_start_offset = 0x1000 %}
 	{%- set app_psram_start = psram_addr + psram_start_offset %}
-
-	{%- set app_psram_end = psram_addr + psram_size %}
-
+	{%- set app_psram_size = psram_size - psram_start_offset %}
+	{%- set app_psram_end = app_psram_start + app_psram_size %}
 {%- endif %}
 
 {#-
@@ -91,10 +91,6 @@
   {%- set app_ram_size = app_ram_size - udma_buffer %}
   {%- set udma0_start_addr = app_ram_size + app_ram_start %}
   {%- set udma1_start_addr = udma1_start_addr -  udma_buffer%}
-{%- endif %}
-
-{%- if psram_present %}	
-	{%- set app_psram_size = app_psram_end - app_psram_start %}
 {%- endif %}
 
 {%- set rtt = 0 %}
@@ -168,9 +164,6 @@ PHDRS
 }
 {%- endif %}
 
-{%- if (nvm3_enable and text_segment_in_psram) %}
-_last_rom_location = ORIGIN(rom);
-{%- endif %}
 {%- if psram_present and psram_linker_config_enabled %}
 _last_psram_location = ORIGIN(psram);
 _last_ram_location = ALIGN(ORIGIN(ram), 16);
@@ -217,9 +210,10 @@ SECTIONS
 		*(text_freertos_kernel_*timecritical*)
 {%- endif %}
 {%- if data_segment_in_psram %}
-{%-   for file in psram_ram_data_files | default([]) %}
-		*/{{ file }}.*(.data*)
-{%-   endfor %}
+		/* LTO-safe retained data: variables tagged SL_SI91X_RETAINED_DATA are collected
+		 * by SECTION NAME (object-file-independent), so they stay in RAM even with
+		 * LTO enabled. This supersedes the file-based psram_ram_data_files rule. */
+		KEEP(*(.retained_data*))
 		*(.common_ipmu_ram*)
 {%- endif %}
 {%- if ram_execution and data_segment_in_psram %}
@@ -260,10 +254,10 @@ SECTIONS
 		*(text_freertos_kernel_*timecritical*)
 {%- endif %}
 {%- if data_segment_in_psram %}
-		/* PSRAM-critical drivers: move .data* into RAM (contributed via psram_ram_data_files). */
-{%-   for file in psram_ram_data_files | default([]) %}
-		*/{{ file }}.*(.data*)
-{%-   endfor %}
+		/* LTO-safe retained data: variables tagged SL_SI91X_RETAINED_DATA are collected
+		 * by SECTION NAME (object-file-independent), so they stay in RAM even with
+		 * LTO enabled. This supersedes the file-based psram_ram_data_files rule. */
+		KEEP(*(.retained_data*))
 		/* ipmu calibration data */
 		*(.common_ipmu_ram*)
 {%- endif %}
@@ -456,9 +450,6 @@ SECTIONS
 
 	__etext = .;
 
-{%- if (nvm3_enable and text_segment_in_psram) %}
-	__nvm3text = _last_rom_location;
-{% endif %}	
 	
 {% if data_segment_in_psram %}
 	{% if psram_present and psram_linker_config_enabled %}
@@ -628,7 +619,29 @@ SECTIONS
 	{%- else %} 
 	} > ram 
 	{% endif %}
-		
+
+{%- if data_segment_in_psram %}
+	/* LTO-safe retained BSS: zero-initialized variables tagged SL_SI91X_RETAINED_BSS
+	 * that must always live in internal RAM (never PSRAM), collected by SECTION
+	 * NAME so placement is object-file-independent and LTO-safe. Always in RAM,
+	 * independent of bss_segment_in_psram. Zeroed at startup via the symbols below. */
+	.retained_bss (NOLOAD) :
+	{
+		. = ALIGN(8);
+		__retained_bss_start__ = .;
+		KEEP(*(.retained_bss*))
+		. = ALIGN(4);
+		__retained_bss_end__ = .;
+	{%- if psram_present and psram_linker_config_enabled %}
+		_last_ram_location = .;
+	} > ram :NONE
+	{%- elif flash_present %}
+	} > ram :ram_pre_code
+	{%- else %}
+	} > ram
+	{% endif %}
+{%- endif %}
+
 	.stack {%- if psram_present and psram_linker_config_enabled and stack_segment_in_psram %} ALIGN(_last_psram_location, 8) {%- elif psram_present and psram_linker_config_enabled %} ALIGN(_last_ram_location, 8) {%- endif %} (NOLOAD):
 	{
 		__StackLimit = .;
@@ -690,6 +703,33 @@ SECTIONS
 	/* Final heap validation */
 	ASSERT((__heap_size >= 0), "CRITICAL: Heap region is invalid (negative size) - stack and heap are overlapping")
 
+{%- if psram_present and psram_mm_heap_enabled %}
+	/* Native Memory Manager PSRAM heap (SiWx917).
+	 * A dedicated managed heap carved from the UNUSED TAIL of the PSRAM region,
+	 * after all classified/segment placement (_last_psram_location is the cursor
+	 * those placements leave behind). The Native Memory Manager reads
+	 * __HeapPsramBase / __HeapPsramLimit (GCC and LLVM both define __GNUC__) in
+	 * sl_memory_get_psram_heap_region() to build sli_psram_heap and link it into
+	 * the allocator fallback chain (internal heap -> PSRAM).
+	 * NOLOAD: runtime RAM only, no image bytes.
+	 * This block is only emitted when the memory_manager_psram component is
+	 * installed, which conflicts with heap_segment_in_psram, so the general .heap
+	 * above never also consumes this PSRAM tail. */
+	.psram_heap {%- if psram_linker_config_enabled %} _last_psram_location {%- else %} ORIGIN(psram) {%- endif %} (NOLOAD) :
+	{
+		. = ALIGN(8);
+		__HeapPsramBase = .;
+		KEEP(*(.psram_heap*))
+		. = ORIGIN(psram) + LENGTH(psram);
+		__HeapPsramLimit = .;
+	{%- if psram_linker_config_enabled %}
+		_last_psram_location = .;
+	{%- endif %}
+	} > psram :NONE
+	__psram_heap_size = __HeapPsramLimit - __HeapPsramBase;
+	ASSERT((__psram_heap_size >= 0), "CRITICAL: PSRAM heap region invalid (negative size) - PSRAM placement overflowed before the Memory Manager PSRAM heap")
+{%- endif %}
+
 {%- if flash_present %}
 {%- if udma_enable %}
 {%- if psram_present and text_segment_in_psram %}
@@ -741,7 +781,12 @@ SECTIONS
   linker_storage_begin = linker_storage_end - SIZEOF(.internal_storage1);
   linker_storage_size = SIZEOF(.internal_storage1);
  {%- if text_segment_in_psram %}
-  ASSERT((linker_storage_begin >= (__nvm3text + SIZEOF(.data))), "FLASH memory overflowed !")
+  /* Program executes from PSRAM, so `rom` (internal flash) holds no program bytes.
+     NVM3 storage is laid out top-down from the top of flash; `linker_storage_begin`
+     is its LOWEST address. Overflow = storage grows past the flash floor, i.e. its
+     lowest address drops below ORIGIN(rom). `.data` is not counted (its LMA is in
+     PSRAM, not rom). */
+  ASSERT((linker_storage_begin >= ORIGIN(rom)), "FLASH memory overflowed: NVM3 storage does not fit in flash")
  {%- else %}
   ASSERT((linker_storage_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
  {%- endif %} 
@@ -775,7 +820,11 @@ SECTIONS
   linker_storage2_begin = linker_storage2_end - SIZEOF(.internal_storage2);
   linker_storage2_size = SIZEOF(.internal_storage2);
  {%- if text_segment_in_psram %}
-  ASSERT((linker_storage2_begin >= (__nvm3text + SIZEOF(.data))), "FLASH memory overflowed !")
+  /* Program executes from PSRAM, so `rom` (internal flash) holds no program bytes.
+     LittleFS storage is laid out top-down (below NVM3 when present); its LOWEST
+     address is `linker_storage2_begin`. Overflow = it drops below ORIGIN(rom).
+     `.data` is not counted (its LMA is in PSRAM, not rom). */
+  ASSERT((linker_storage2_begin >= ORIGIN(rom)), "FLASH memory overflowed: LittleFS storage does not fit in flash")
  {%- else %}
   ASSERT((linker_storage2_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
  {%- endif %}

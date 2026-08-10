@@ -577,7 +577,7 @@ ssize_t recvfrom(int socket_id, void *buf, size_t buf_len, int flags, struct soc
 
   si91x_socket->is_receive_cmd_pending = true;
   status                               = sli_wifi_async_send_command(SLI_WIFI_REQ_SOCKET_READ_DATA,
-                                       (SI91X_CMD_MAX + si91x_socket->index),
+                                       (SLI_SI91X_CMD_MAX + si91x_socket->index),
                                        &request,
                                        sizeof(request),
                                        NULL);
@@ -586,7 +586,7 @@ ssize_t recvfrom(int socket_id, void *buf, size_t buf_len, int flags, struct soc
     VERIFY_STATUS_AND_RETURN(status);
   }
 
-  status = sli_wifi_receive_response_buffer((uint16_t)(SI91X_CMD_MAX + si91x_socket->index),
+  status = sli_wifi_receive_response_buffer((uint16_t)(SLI_SI91X_CMD_MAX + si91x_socket->index),
                                             0,
                                             wait_time,
                                             SLI_WIFI_WAIT_ON_EVENT_ID,
@@ -747,16 +747,13 @@ static int sli_handle_sl_so_high_performance_socket(sli_si91x_socket_t *si91x_so
   return SLI_SI91X_NO_ERROR;
 }
 
-static int sli_handle_sl_so_tls_sni_alpn(sli_si91x_socket_t *si91x_socket, const void *option_value)
+static int sli_handle_sl_so_tls_sni_alpn(sli_si91x_socket_t *si91x_socket,
+                                         const void *option_value,
+                                         socklen_t option_length)
 {
-  // Call a function to add a TLS extension to si91x_socket
-  sl_status_t status = sli_si91x_add_tls_extension(&si91x_socket->tls_extensions,
-                                                   (const sl_si91x_socket_type_length_value_t *)option_value);
-  // Check if the operation was successful
-  if (status != SL_STATUS_OK) {
-    SLI_SET_ERROR_AND_RETURN(ENOMEM);
-  }
-  return SLI_SI91X_NO_ERROR;
+  return sli_si91x_configure_tls_extension(&si91x_socket->tls_extensions,
+                                           (const sl_si91x_socket_type_length_value_t *)option_value,
+                                           option_length);
 }
 
 static int sli_handle_sl_so_mss(sli_si91x_socket_t *si91x_socket, const void *option_value, socklen_t option_length)
@@ -879,7 +876,7 @@ int setsockopt(int socket_id, int option_level, int option_name, const void *opt
 
     case SL_SO_TLS_SNI:
     case SL_SO_TLS_ALPN:
-      return sli_handle_sl_so_tls_sni_alpn(si91x_socket, option_value);
+      return sli_handle_sl_so_tls_sni_alpn(si91x_socket, option_value, option_length);
 
     case SL_SO_MSS:
       return sli_handle_sl_so_mss(si91x_socket, option_value, option_length);

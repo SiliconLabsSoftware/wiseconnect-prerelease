@@ -45,7 +45,7 @@ Supported upgrade methods:
 - **Development PC** — Windows or Linux with Simplicity Studio for build, flash, and debug.
 - SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) for details.
   - SoC Mode:
-    - Silicon Labs [[BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+    - Silicon Labs [[BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
     - Kits: SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
   - PSRAM Mode:
     - Silicon Labs [[BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)]
@@ -73,9 +73,9 @@ Supported upgrade methods:
 
 | Mode | Host / target | Project file (this example folder) |
 |------|----------------|-------------------------------------|
-| SoC | Application runs on SiWx91x. | `ble_fw_ota_upgrade_soc.slcp` |
-| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `ble_fw_ota_upgrade_psram.slcp` |
-| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `ble_fw_ota_upgrade_ncp.slcp` |
+| SoC | Application runs on SiWx91x. | `siwx91x_bluetooth_le_soc_ota_firmware_update_freertos.slcp` |
+| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `siwx91x_bluetooth_le_soc_ota_firmware_update_freertos_psram.slcp` |
+| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `siwx91x_bluetooth_le_host_ota_firmware_update_freertos_spi.slcp` |
 
 The table above lists the SLCP source files in this example folder for each product type. These `.slcp` files cannot be opened directly from the file system. In **all modes (SoC, PSRAM, and NCP)**, the project must be created from **File → New → Silicon Labs Project → Examples and Demos** in Simplicity Studio (WiSeConnect SDK). Select **BLE - FW OTA Upgrade** for your target (**SoC**, **PSRAM**, or **NCP**) and board. For NCP, also follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
 
@@ -220,7 +220,7 @@ A Python-based OTA tool is provided to run on a PC. It uses BLE to scan for the 
 1. Navigate to the Python script directory in the SDK:
 
    ```
-   <SDK>/examples/snippets/ble/ble_fw_ota_upgrade/tools/Python_script
+   <SDK>/examples/snippets/ble/siwx91x_bluetooth_le_ota_firmware_update_freertos/tools/Python_script
    ```
 
    ![Python script directory](resources/readme/pythonscriptpath.png)

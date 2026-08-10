@@ -40,7 +40,7 @@ This means that the Controller autonomously establishes a connection with the de
   - SiWx91x Wi-Fi Evaluation Kit. The SiWx91x supports multiple operating modes. See [Operating Modes]() for details.
 - **SoC Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002B]
     - Radio Boards 
   	  - [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) [SiWx917-RB4338A]
       - [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343A]
@@ -53,7 +53,7 @@ This means that the Controller autonomously establishes a connection with the de
   - Silicon Labs [[BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)]  	
 - **NCP Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002B]
     - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
   - NCP Expansion Kit with NCP Radio boards
       - [[BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview) + [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) / [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) / [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview)]
@@ -71,11 +71,11 @@ This means that the Controller autonomously establishes a connection with the de
 
 | Mode | Host / target | Project file (this example folder) |
 |------|---------------|--------------------------------------|
-| SoC | Application runs on SiWx91x | `ble_accept_list_soc.slcp` |
-| PSRAM | Application runs on SiWx91x with PSRAM-supported radio board | `ble_accept_list_psram.slcp` |
-| NCP | Application runs on **EFR32** host; SiWx917 is the network co-processor over SPI | `ble_accept_list_ncp.slcp` |
+| SoC | Application runs on SiWx91x | `siwx91x_bluetooth_le_soc_accept_list_freertos.slcp` |
+| PSRAM | Application runs on SiWx91x with PSRAM-supported radio board | `siwx91x_bluetooth_le_soc_accept_list_freertos_psram.slcp` |
+| NCP | Application runs on **EFR32** host; SiWx917 is the network co-processor over SPI | `siwx91x_bluetooth_le_host_accept_list_freertos_spi.slcp` |
 
-For NCP, create or open the Studio project from **`examples/snippets/ble/ble_accept_list/ble_accept_list_ncp.slcp`**, wire the kit per your board guide, and follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+For NCP, create or open the Studio project from **`examples/snippets/ble/siwx91x_bluetooth_le_accept_list_freertos/siwx91x_bluetooth_le_host_accept_list_freertos_spi.slcp`**, wire the kit per your board guide, and follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
 
 ### Setup Diagram
 
@@ -211,7 +211,7 @@ Follow the steps as mentioned for the successful execution of the application:
 | No connection | Confirm the advertiser’s BD address and type match `RSI_BLE_DEV_ADDR` / `RSI_BLE_DEV_ADDR_TYPE` and the bytes in `ble_acceptlist_addr1` (big-endian). Phones often use **random** addresses; set `RSI_BLE_DEV_ADDR_TYPE` to `LE_RANDOM_ADDRESS` for Android/iOS. |
 | No advertising reports | With `SCAN_FILTER_TYPE_ONLY_ACCEPT_LIST`, only accept-listed peers appear. Ensure accept list entries match the advertisers you expect. |
 | Wrong peer connects | You can use either **`RSI_BLE_DEV_ADDR`** or **`RSI_REMOTE_DEVICE_NAME`**; ensure only the intended macro pairing is consistent with your DUT. |
-| NCP: no traffic / boot failure | Verify SPI (or documented host interface), power, and that connectivity firmware on the SiWx917 NCP module is updated per [NCP getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode). Build and flash the **`ble_accept_list_ncp.slcp`** target on the **EFR32** host. |
+| NCP: no traffic / boot failure | Verify SPI (or documented host interface), power, and that connectivity firmware on the SiWx917 NCP module is updated per [NCP getting started](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode). Build and flash the **`siwx91x_bluetooth_le_host_accept_list_freertos_spi.slcp`** target on the **EFR32** host. |
 | Build or flash errors | Confirm the correct `.slcp` for your kit (SoC vs PSRAM vs NCP) and the WiSeConnect / SDK versions required by the project. |
 
 ## Resources

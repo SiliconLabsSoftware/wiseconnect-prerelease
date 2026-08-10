@@ -430,6 +430,7 @@ void data_callback(uint32_t sock_no,
   if (first_data_frame) {
     start = osKernelGetTickCount();
     SL_DEBUG_LOG_V2(INFO, "Client Socket ID : %ld\r\n", sock_no);
+#if ((THROUGHPUT_TYPE == UDP_RX) || (THROUGHPUT_TYPE == TCP_RX) || (THROUGHPUT_TYPE == TLS_RX))
     switch (THROUGHPUT_TYPE) {
       case UDP_RX:
         SL_DEBUG_LOG_V2(INFO, "UDP_RX Throughput test start\r\n");
@@ -441,6 +442,7 @@ void data_callback(uint32_t sock_no,
         SL_DEBUG_LOG_V2(INFO, "TLS_RX Throughput test start\r\n");
         break;
     }
+#endif
     first_data_frame = 0;
   }
 

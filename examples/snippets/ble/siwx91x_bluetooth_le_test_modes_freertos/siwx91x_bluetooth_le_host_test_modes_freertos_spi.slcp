@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_test_modes_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Testmodes FreeRTOS
+label: SiWx91x Bluetooth LE - Host Test Modes FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates BLE GAP peripheral test procedures on SiWx91x over SPI NCP with FreeRTOS. Demonstrated by controlled GAP test behavior for validation with peers.
+description: 'Demonstrates how to use test modes for testing GAP peripherals using SiWx91x Bluetooth LE with an external host connected over SPI.
 
   '
 filter:

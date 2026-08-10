@@ -36,6 +36,7 @@
 #include "sl_ip_types.h"
 #include "sl_slist.h"
 #include <stdint.h>
+#include "sl_types.h"
 
 /**
  * @name Wi-Fi layout and size constants
@@ -187,20 +188,6 @@
 
 /** @addtogroup SL_WIFI_TYPES Types
   * @{ */
-
-/**
- * @struct sl_wifi_buffer_t
- * @brief Structure representing a Wi-Fi buffer.
- */
-typedef struct {
-  sl_slist_node_t node; ///< Pointer to the node of the list of which the buffer is part of
-  uint32_t length;      ///< Size of the buffer in bytes
-  uint8_t
-    type; ///< Indicates the buffer type (SL_WIFI_TX_FRAME_BUFFER, SL_WIFI_RX_FRAME_BUFFER, and so on.) corresponding to the buffer.
-  uint8_t id;           ///< Buffer identifier. Can be used to uniquely identify a buffer. Loops every 256 packets.
-  uint8_t _reserved[2]; ///< Reserved.
-  uint8_t data[];       ///< Stores the data (header + payload) to be send to NWP
-} sl_wifi_buffer_t;
 
 /**
  * @typedef sl_wifi_event_handler_t
@@ -881,9 +868,13 @@ typedef struct {
 /**
  * @struct sl_wifi_client_info_response_t
  * @brief Wi-Fi client information response structure.
+ *
+ * Returned by @ref sl_wifi_get_ap_client_info. Only @c client_info[0 .. client_count-1] contain
+ * valid data. Entries beyond @c client_count may be stale unless this structure was zero-initialized
+ * before the API call.
  */
 typedef struct {
-  uint8_t client_count; ///< Indicates the total count of Wi-Fi clients currently connected to the network
+  uint8_t client_count; ///< Number of valid entries in @c client_info (max @ref SL_WIFI_MAX_CLIENT_COUNT)
   sl_wifi_client_info_t client_info[SL_WIFI_MAX_CLIENT_COUNT]; ///< Array of client information
 } sl_wifi_client_info_response_t;
 

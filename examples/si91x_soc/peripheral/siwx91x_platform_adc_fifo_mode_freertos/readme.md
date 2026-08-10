@@ -14,7 +14,7 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
     - [Pin Configuration](#pin-configuration)
-      - [Pin Configuration of the WPK \[BRD4002A\] Base Board, and with radio board](#pin-configuration-of-the-wpk-brd4002a-base-board-and-with-radio-board)
+      - [Pin Configuration of the WPK \[BRD4002B\] Base Board, and with radio board](#pin-configuration-of-the-wpk-brd4002b-base-board-and-with-radio-board)
       - [Pin Configuration of the AC1 Module Explorer Kit](#pin-configuration-of-the-ac1-module-explorer-kit)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
@@ -65,7 +65,7 @@ This application demonstrates the ADC peripheral driver usage in a FreeRTOS envi
 
 - **Ping/Pong DMA buffers are required for FIFO mode** – the task configures `chnl_ping_address`, `chnl_pong_address`, and `rx_buf` per channel before init.
 - Various parameters like Number of Channel, ADC operation mode, Input type, Sampling rate, and Sample length can be configured using UC.
-- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC, and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains channel instance configuration.
+- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC, and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains channel instance configuration.
 - This example uses ADC FIFO mode with **internal DMA** and **Ping/Pong dual-buffer** operation.
 
 ### DMA Ping/Pong buffer configuration
@@ -198,7 +198,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Pin Configuration
 
-#### Pin Configuration of the WPK [BRD4002A] Base Board, and with radio board
+#### Pin Configuration of the WPK [BRD4002B] Base Board, and with radio board
 
 The following table lists the mentioned pin numbers for the radio board. If you want to use a different radio board, see the board-specific user guide.
 

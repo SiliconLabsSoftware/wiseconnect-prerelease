@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM Multiconnection GATT Test FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Multi-connection GATT Test FreeRTOS (PSRAM)
 category: Example|BLE
-description: 'Demonstrates multiple simultaneous BLE links on SiWx91x with PSRAM in SoC FreeRTOS using central and peripheral roles with GATT. Demonstrated by secure connections and multi-peer access.
+description: 'Demonstrates how to perform GATT testing with multiple simultaneous links between central and peripheral devices, using SiWx91x Bluetooth LE with PSRAM.
 
   '
 filter:

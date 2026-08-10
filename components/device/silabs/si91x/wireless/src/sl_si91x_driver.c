@@ -373,52 +373,39 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   // Wi-Fi data pools use SLI_WIFI_BUFFER_BLOCK_SIZE (1640 default, or SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE when set).
   // Pools with block_count = 0 have no dedicated blocks; HYBRID allocations fall back to the common pool.
   sli_buffer_manager_pool_info_t default_buffer_configuration[SLI_BUFFER_MANAGER_MAX_POOL] = {
-    // [0] SLI_BUFFER_MANAGER_CE_TX_POOL: Command Engine TX command buffers.
+    // [0] SLI_BUFFER_MANAGER_CE_CMD_TX_POOL: Command Engine TX command buffers.
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 5,
     },
-    // [1] SLI_BUFFER_MANAGER_CE_RX_POOL: Command Engine RX command buffers.
-    {
-      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 0,
-    },
-    // [2] SLI_BUFFER_MANAGER_CE_DATA_POOL: Command Engine data/command payload buffers.
+    // [1] SLI_BUFFER_MANAGER_DATA_TX_POOL: Host TX data payload buffers (socket, transceiver, raw TX).
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
       .block_count = 5,
     },
-    // [3] SLI_BUFFER_MANAGER_CE_METADATA_POOL: Command Engine packet metadata (sli_command_engine_metadata_t).
+    // [2] SLI_BUFFER_MANAGER_CE_METADATA_POOL: Command Engine packet metadata (sli_command_engine_metadata_t).
     {
       .block_size  = sizeof(sli_command_engine_metadata_t),
       .block_count = SLI_WIFI_BUFFER_BLOCK_COUNT,
     },
-    // [4] SLI_BUFFER_MANAGER_HAL_METADATA_POOL: HAL packet metadata (sli_si91x_hal_packet_t).
+    // [3] SLI_BUFFER_MANAGER_HAL_TX_METADATA_POOL: HAL packet metadata (sli_si91x_hal_packet_t).
     {
       .block_size  = sizeof(sli_command_engine_metadata_t),
       .block_count = SLI_WIFI_BUFFER_BLOCK_COUNT,
     },
-    // [5] SLI_BUFFER_MANAGER_CP_CMD_TX_POOL: UNUSED POOL in Si91x
+    // [4] SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL: HAL bus-interface RX buffers (SPI/UART/AHB).
     {
-      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 0,
-    },
-    // [6] SLI_BUFFER_MANAGER_CP_CMD_RX_POOL: Bus RX command buffers (SPI/UART/AHB).
-    {
-      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
+      .block_size = SLI_WIFI_BUFFER_BLOCK_SIZE,
+#ifndef SL_NCP_UART_INTERFACE
+      // SPI (NCP) and AHB (SOC): HAL thread posts and reads one RX frame at a time.
+      .block_count = 5,
+#else
+      // NCP UART: the UART ISR/callback enqueues each frame and allocates the next RX
+      // buffer before the HAL thread drains the queue; a larger pool avoids drops.
       .block_count = 10,
+#endif
     },
-    // [7] SLI_BUFFER_MANAGER_CP_DATA_TX_POOL: UNUSED POOL in Si91x
-    {
-      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 0,
-    },
-    // [8] SLI_BUFFER_MANAGER_CP_DATA_RX_POOL: UNUSED POOL in Si91x
-    {
-      .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 0,
-    },
-    // [9] SLI_BUFFER_MANAGER_QUEUE_NODE_POOL: Queue manager node buffers (sli_queue_node_t).
+    // [5] SLI_BUFFER_MANAGER_QUEUE_NODE_POOL: Queue manager node buffers (sli_queue_node_t).
     {
       .block_size  = sizeof(sli_queue_node_t),
       .block_count = 20,
@@ -521,6 +508,9 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     boot_config.custom_feature_bit_map &= ~SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_160MHZ;
     boot_config.custom_feature_bit_map |= SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_120MHZ;
   }
+
+  // Set SLI_SI3XX_FEAT_FW_UPDATE_NEW_CODE in the feature bit map to retrieve the latest firmware result codes
+  boot_config.feature_bit_map |= SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE;
 
   // Send WLAN request to set the operating mode and configuration
   status = sli_wifi_send_command(SLI_WIFI_REQ_OPERMODE,
@@ -758,7 +748,7 @@ sl_status_t sl_si91x_driver_raw_send_command(uint8_t command,
   sl_status_t status              = SL_STATUS_OK;
 
   // Allocate a buffer for the command with appropriate size
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_DATA_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_DATA_TX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
                                               (sli_buffer_t)&packet);
@@ -801,7 +791,7 @@ sl_status_t sl_si91x_driver_send_side_band_crypto(uint32_t command,
   sl_status_t status = SL_STATUS_OK;
 
   // Allocate a buffer for the command with appropriate size
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
                                               (sli_buffer_t)&buffer);
@@ -1604,7 +1594,7 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
   }
 
   // Allocate a buffer for the command with appropriate size
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_DATA_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_DATA_TX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
                                               (sli_buffer_t)&packet);

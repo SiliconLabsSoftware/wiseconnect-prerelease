@@ -1,6 +1,6 @@
 id: sli_buffer_manager
 label: sli Buffer Manager
-package: wifi
+package: wiseconnect_common
 description: >
   This package provides buffer management
 category: Buffer Manager
@@ -14,10 +14,22 @@ ui_hints:
 source:
 - path: src/sli_buffer_manager.c
 include:
-- path: inc
-  file_list:
-    - path: sli_buffer_manager.h
-    - path: sli_buffer_manager_types.h
+  - path: inc/si91x
+    condition:
+      - sl_si91x_wireless
+    file_list:
+      - path: sli_buffer_manager_config.h
+
+  - path: inc/siwx3xx
+    unless:
+      - sl_si91x_wireless
+    file_list:
+      - path: sli_buffer_manager_config.h
+
+  - path: inc
+    file_list:
+      - path: sli_buffer_manager.h
+      - path: sli_buffer_manager_types.h
 provides:
   - name: sli_buffer_manager
 requires:

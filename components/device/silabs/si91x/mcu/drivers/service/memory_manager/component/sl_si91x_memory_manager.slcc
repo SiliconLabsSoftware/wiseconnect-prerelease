@@ -1,8 +1,15 @@
 id: sl_si91x_memory_manager
-label: Memory Manager
+label: SiWx91x FreeRTOS Heap Statistics
 package: platform_siwx91x
 description: >
-  This component provides heap statistics by mapping application requirements to FreeRTOS heap utilities.
+  Provides SiWx91x FreeRTOS heap statistics APIs (used/free size, high watermark,
+  reset) via xPortGetFreeHeapSize and related FreeRTOS heap APIs. Works with
+  FreeRTOS heap_4 and heap_5 (used/watermark use configTOTAL_HEAP_SIZE; for heap_5
+  this matches when region total equals that size). Requires memory_manager_redirect
+  for Gecko sl_memory_manager API compatibility and sets si91x_soc_mode so redirect
+  heap-stat hooks call these FreeRTOS APIs. Does not provide memory_manager (that
+  conflicts with memory_manager_redirect on device_si91x; use Native Memory Manager
+  when a memory_manager provider is required).
 category: Device|Si91x|MCU|Service
 quality: production
 metadata:
@@ -20,3 +27,9 @@ requires:
   - name: memory_manager_redirect
 provides:
   - name: sl_si91x_memory_manager
+template_contribution:
+  # Enables SL_CATALOG_SI91X_SOC_MODE_PRESENT so Gecko memory_manager_redirect
+  # routes sl_memory_get_* heap stats to sl_si91x_memory_get_* APIs.
+  - name: component_catalog
+    value: si91x_soc_mode
+    condition: [device_si91x]

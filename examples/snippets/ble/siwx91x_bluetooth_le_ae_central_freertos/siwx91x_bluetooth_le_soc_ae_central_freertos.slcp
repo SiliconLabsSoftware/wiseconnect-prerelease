@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_ae_central_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC AE Central FreeRTOS
+label: SiWx91x Bluetooth LE - SoC AE Central FreeRTOS
 category: Example|BLE
-description: 'Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets on SiWx91x in SoC FreeRTOS. This is demonstrated by two scan sets in the application.
+description: 'Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets, using SiWx91x Bluetooth LE. This is demonstrated by two scan sets in the application.
 
   '
 filter:

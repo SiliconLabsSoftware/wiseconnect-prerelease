@@ -1,10 +1,11 @@
 id: sl_si91x_freertos_heap_4_redirect
-label: SiWx91x Memory Manager Redirect
+label: SiWx91x FreeRTOS Unified Heap Redirect
 package: platform_siwx91x
 description: >
-  Redirects malloc/free and aligned APIs to FreeRTOS heap_4 via --wrap for a
-  single unified heap. GCC only (requires GCC toolchain). When installed, sets
-  80 KB heap and enables configUSE_MALLOC_FAILED_HOOK for heap-exhaustion tracking.
+  Redirects C library malloc/free/calloc/realloc and aligned allocation APIs to
+  the FreeRTOS heap (pvPortMalloc/vPortFree) via linker --wrap, so application and
+  library allocations share one unified heap. Works with any FreeRTOS heap that
+  provides pvPortMalloc (e.g. heap_4 or heap_5). Supports GCC and LLVM toolchains.
 category: Device|Si91x|MCU|Service
 quality: production
 metadata:
@@ -18,17 +19,18 @@ define:
     value: '1'
 requires:
   - name: freertos
-  - name: freertos_heap_4
-  - name: wiseconnect_toolchain_plugin
 provides:
   - name: sl_si91x_freertos_heap_4_redirect
-  - name: memory_manager_redirect
 toolchain_settings:
   - option: gcc_linker_option
-    value: -Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=calloc -Wl,--wrap=realloc
+    value: -Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,-u,__wrap_malloc -Wl,-u,__wrap_free -Wl,-u,__wrap_calloc -Wl,-u,__wrap_realloc
+  - option: llvm_linker_option
+    value: -Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,-u,__wrap_malloc -Wl,-u,__wrap_free -Wl,-u,__wrap_calloc -Wl,-u,__wrap_realloc
   - option: gcc_linker_option
-    value: -Wl,--wrap=aligned_alloc -Wl,--wrap=memalign -Wl,--wrap=posix_memalign
+    value: -Wl,--wrap=aligned_alloc -Wl,--wrap=memalign -Wl,--wrap=posix_memalign -Wl,-u,__wrap_aligned_alloc -Wl,-u,__wrap_memalign -Wl,-u,__wrap_posix_memalign
+  - option: llvm_linker_option
+    value: -Wl,--wrap=aligned_alloc -Wl,--wrap=memalign -Wl,--wrap=posix_memalign -Wl,-u,__wrap_aligned_alloc -Wl,-u,__wrap_memalign -Wl,-u,__wrap_posix_memalign
   - option: gcc_linker_option
-    value: -Wl,-u,__wrap_aligned_alloc -Wl,-u,__wrap_memalign -Wl,-u,__wrap_posix_memalign
-  - option: gcc_linker_option
-    value: -Wl,--wrap=_free_r -Wl,--wrap=_malloc_r -Wl,--wrap=_calloc_r -Wl,--wrap=_realloc_r
+    value: -Wl,--wrap=_free_r -Wl,--wrap=_malloc_r -Wl,--wrap=_calloc_r -Wl,--wrap=_realloc_r -Wl,-u,__wrap__free_r -Wl,-u,__wrap__malloc_r -Wl,-u,__wrap__calloc_r -Wl,-u,__wrap__realloc_r
+  - option: llvm_linker_option
+    value: -Wl,--wrap=_free_r -Wl,--wrap=_malloc_r -Wl,--wrap=_calloc_r -Wl,--wrap=_realloc_r -Wl,-u,__wrap__free_r -Wl,-u,__wrap__malloc_r -Wl,-u,__wrap__calloc_r -Wl,-u,__wrap__realloc_r

@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_heart_rate_profile_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Heart Rate FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Heart Rate Profile FreeRTOS
 category: Example|BLE
-description: 'Demonstrates how to use the BLE Heart Rate Profile over GATT on SiWx91x in SoC FreeRTOS with HR service and notifications.
+description: 'Demonstrates how to use the BLE Heart Rate Profile over GATT, using SiWx91x Bluetooth LE.
 
   '
 filter:

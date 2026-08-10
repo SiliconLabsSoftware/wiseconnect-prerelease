@@ -34,11 +34,11 @@
 
 /**
  * @details
- * The component sl_si91x_freertos_heap_4_redirect adds GCC linker options
+ * The component sl_si91x_freertos_heap_4_redirect adds GCC/LLVM linker options
  * -Wl,--wrap=malloc, --wrap=free, etc. References to malloc() are then
  * resolved to __wrap_malloc(); the real symbol is available as __real_malloc()
  * (unused here). All wrappers allocate via pvPortMalloc/vPortFree so the
- * application and libraries share one heap (heap_4).
+ * application and libraries share one FreeRTOS heap (e.g. heap_4 or heap_5).
  *
  * Block layouts:
  * - Normal (malloc/calloc/realloc result): [NORMAL_BLOCK_MAGIC][size] then
@@ -55,7 +55,7 @@
 #include <string.h>   /* memcpy, memset */
 #include <errno.h>    /* EINVAL, ENOMEM for posix_memalign */
 #include "FreeRTOS.h" /* pvPortMalloc, vPortFree */
-#if defined(__GNUC__) && defined(__arm__)
+#if (defined(__GNUC__) || defined(__clang__)) && defined(__arm__)
 #include <reent.h> /* struct _reent and _errno for setting errno on OOM in _*_r */
 #endif
 
@@ -338,7 +338,7 @@ int __wrap_posix_memalign(void **memptr, size_t alignment, size_t size)
  * newlib re-entrant variants (ignore reent ptr; use same FreeRTOS heap).
  * Linker uses --wrap=_malloc_r so it expects __wrap__malloc_r (one underscore).
  *------------------------------------------------------------------------------*/
-#if defined(__GNUC__) && defined(__arm__) /* newlib _*_r only used on ARM+GCC */
+#if (defined(__GNUC__) || defined(__clang__)) && defined(__arm__) /* newlib _*_r on ARM GCC/LLVM */
 
 /***************************************************************************/ /**
  * Wrapper for newlib _malloc_r. Uses same heap; sets reent errno on failure.
@@ -386,4 +386,4 @@ void *__wrap__realloc_r(struct _reent *reent_ptr, void *addr, size_t size)
   }
   return p;
 }
-#endif /* __GNUC__ && __arm__ */
+#endif /* (__GNUC__ || __clang__) && __arm__ */

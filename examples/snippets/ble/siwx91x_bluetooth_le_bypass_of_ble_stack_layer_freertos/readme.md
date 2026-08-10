@@ -48,7 +48,7 @@ Before running the application, ensure that you have the following.
 
 - **SoC Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless Pro Kit Mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards
       - [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) [SiWx917-RB4338A]
       - [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343A]
@@ -60,7 +60,7 @@ Before running the application, ensure that you have the following.
 
 - **NCP Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless Pro Kit Mainboard [SI-MB4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless Pro Kit Mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
     - NCP Expansion Kit with NCP Radio Boards
       - [[BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview) + [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) / [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) / [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview)]
@@ -90,8 +90,8 @@ Before running the application, ensure that you have the following.
 
 | Mode | Host / target                                                                         | Project file (this example folder) |
 | ---- | ------------------------------------------------------------------------------------- | ---------------------------------- |
-| SoC  | Application runs on SiWx91x.                                                          | `bt_stack_bypass.slcp`             |
-| NCP  | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `bt_stack_bypass_spi_ncp.slcp`     |
+| SoC  | Application runs on SiWx91x.                                                          | `siwx91x_bluetooth_le_soc_bypass_of_ble_stack_layer_freertos.slcp`             |
+| NCP  | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `siwx91x_bluetooth_le_host_bypass_of_ble_stack_layer_freertos_spi.slcp`     |
 
 > **Note:** The BT Stack Bypass example is provided only in **SoC** and **NCP** mode. PSRAM variants are not shipped for this example.
 
@@ -249,7 +249,7 @@ Use this flow on **Raspberry Pi OS**, **Debian Bookworm**, and other hosts with 
     sudo apt install bluez
     ```
 
-2. Copy `examples/snippets/ble/bt_stack_bypass/binaries/hci_uart_attach.sh` to the Pi and make it executable:
+2. Copy `examples/snippets/ble/siwx91x_bluetooth_le_bypass_of_ble_stack_layer_freertos/binaries/hci_uart_attach.sh` to the Pi and make it executable:
 
     ```sh
     chmod +x hci_uart_attach.sh
@@ -276,7 +276,7 @@ The script stops **ModemManager** and the host **bluetooth** service (which can 
 
 #### Legacy Fedora (hciattach)
 
-On older Fedora hosts that ship the bundled `hciattach` binary in `examples/snippets/ble/bt_stack_bypass/binaries/`:
+On older Fedora hosts that ship the bundled `hciattach` binary in `examples/snippets/ble/siwx91x_bluetooth_le_bypass_of_ble_stack_layer_freertos/binaries/`:
 
 1. Copy the `hciattach` binary to a folder on the host.
 

@@ -48,7 +48,7 @@ sl_status_t sli_wifi_per_reset_statistics(sl_wifi_interface_t interface)
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -83,7 +83,7 @@ sl_status_t sli_wifi_configure_chipscope_capture(sl_wifi_interface_t interface,
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -141,7 +141,7 @@ sl_status_t sli_wifi_measure_noise_density(sl_wifi_interface_t interface, void *
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -185,7 +185,7 @@ sl_status_t sli_wifi_set_channel_config(sl_wifi_interface_t interface, sli_wifi_
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -218,7 +218,7 @@ sl_status_t sli_wifi_config_dpd(sl_wifi_interface_t interface, sli_wifi_config_d
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -256,7 +256,7 @@ sl_status_t sli_wifi_readback_dpd_lut_gain(sl_wifi_interface_t interface,
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -304,7 +304,7 @@ sl_status_t sli_wifi_populate_dpd_lut(sl_wifi_interface_t interface, sli_wifi_dp
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Check if the operation mode is PER mode
@@ -343,7 +343,7 @@ sl_status_t sli_wifi_txir_calib(sl_wifi_interface_t interface,
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Check if the operation mode is PER mode
@@ -389,7 +389,7 @@ sl_status_t sli_wifi_get_txir_dcoc_calibration(sl_wifi_interface_t interface, sl
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Check if the operation mode is PER mode
@@ -437,7 +437,7 @@ sl_status_t sli_wifi_rxir_calib(sl_wifi_interface_t interface,
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Check if the operation mode is PER mode
@@ -485,7 +485,7 @@ sl_status_t sli_wifi_get_rxircal_data(sl_wifi_interface_t interface, sli_wifi_rx
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
   // Check if the operation mode is PER mode
@@ -593,7 +593,7 @@ sl_status_t sli_wifi_read_aux_adc(sl_wifi_interface_t interface,
   if (!sl_wifi_is_interface_up(interface)) {
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -639,12 +639,12 @@ sl_status_t sli_wifi_tx_dac(sl_wifi_interface_t interface, uint32_t enable, uint
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
   // Allocate buffer for tx_dac_request structure
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
                                               (sli_buffer_t *)&buffer);
@@ -698,7 +698,7 @@ sl_status_t sli_wifi_config_mlo(sl_wifi_interface_t interface, mlo_config_t mlo_
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -730,7 +730,7 @@ sl_status_t sli_wifi_mlo_set_link(sl_wifi_interface_t interface, mlo_set_link_re
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -774,7 +774,7 @@ sl_status_t sli_wifi_mlo_add_rem_link(sl_wifi_interface_t interface, mlo_add_lin
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -806,7 +806,7 @@ sl_status_t sli_wifi_loadphy(sl_wifi_interface_t interface)
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -837,7 +837,7 @@ sl_status_t sli_wifi_configure_frequency_planning(sl_wifi_interface_t interface,
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -876,7 +876,7 @@ sl_status_t sli_wifi_get_frequency_planning_params(sl_wifi_interface_t interface
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -932,7 +932,7 @@ sl_status_t sli_wifi_set_get_dig_clk_div(sl_wifi_interface_t interface, sli_wifi
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -969,7 +969,7 @@ sl_status_t sli_wifi_enable_disable_dig_freq_plan(sl_wifi_interface_t interface,
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -1009,7 +1009,7 @@ sl_status_t sli_wifi_set_syth_config(sl_wifi_interface_t interface, sli_wifi_set
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -1053,7 +1053,7 @@ sl_status_t sli_wifi_read_hmatrix(sl_wifi_interface_t interface,
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -1112,7 +1112,7 @@ sl_status_t sli_wifi_query_command(sl_wifi_interface_t interface,
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -1172,7 +1172,7 @@ sl_status_t sli_wifi_statics_command(sl_wifi_interface_t interface,
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
@@ -1232,7 +1232,7 @@ sl_status_t sli_wifi_transmit_loopback(sl_wifi_interface_t interface,
     return SL_STATUS_WIFI_INTERFACE_NOT_UP;
   }
 
-  if (!((default_interface & interface) == interface)) {
+  if ((default_interface & interface) != interface) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 

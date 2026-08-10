@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_secure_connection_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Secure Connection FreeRTOS
+label: SiWx91x Bluetooth LE - Host Secure Connection FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates the SMP (Security Manager Protocol) pairing and a secured passkey pairing feature on SiWx91x over SPI NCP with FreeRTOS.
+description: 'Demonstrates how to implement secure connections using Security Manager Protocol (SMP) pairing and secured passkey pairing, using SiWx91x Bluetooth LE with an external host connected over SPI.
 
   '
 filter:

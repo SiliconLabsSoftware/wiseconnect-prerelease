@@ -65,6 +65,7 @@ static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interfac
 static sl_wifi_interface_t nmap_ap_interface_with_band[MAX_NET_AP_INTERFACES]         = { 0 };
 static sl_wifi_interface_t nmap_client_interface_with_band[MAX_NET_CLIENT_INTERFACES] = { 0 };
 static sl_ip_management_t dhcp_type[SLI_SI91X_MAX_INTERFACES]                         = { 0 };
+static sl_net_profile_id_t sli_client_active_profile_id;
 
 sl_status_t sl_net_wifi_client_init(sl_net_interface_t interface,
                                     const void *configuration,
@@ -142,7 +143,8 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   const sl_status_t ip_config_status = status;
 
-  dhcp_type[SLI_SI91X_CLIENT] = profile.ip.mode;
+  dhcp_type[SLI_SI91X_CLIENT]  = profile.ip.mode;
+  sli_client_active_profile_id = profile_id;
 
   // Set the client profile
   status = sl_net_set_profile(interface, profile_id, &profile);
@@ -489,6 +491,10 @@ sl_status_t sl_net_configure_ip(sl_net_interface_t interface,
     vap_id                      = SL_WIFI_CLIENT_VAP_ID;
     dhcp_type[SLI_SI91X_CLIENT] = ip_config->mode;
   } else if (SL_NET_WIFI_AP_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {
+    // Only static IP is supported for AP mode
+    if (ip_config->mode != SL_IP_MANAGEMENT_STATIC_IP) {
+      return SL_STATUS_INVALID_CONFIGURATION;
+    }
     vap_id                  = SL_WIFI_AP_VAP_ID;
     dhcp_type[SLI_SI91X_AP] = ip_config->mode;
   } else {
@@ -499,14 +505,38 @@ sl_status_t sl_net_configure_ip(sl_net_interface_t interface,
   return sli_net_configure_ip_address(&config, vap_id, timeout);
 }
 
+static sl_status_t sli_net_get_ip_address_from_profile(sl_net_interface_t interface, sl_net_ip_address_t *ip_address)
+{
+  sl_net_wifi_client_profile_t profile = { 0 };
+  sl_status_t status;
+
+  status = sl_net_get_profile(interface, sli_client_active_profile_id, (sl_net_profile_t *)&profile);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  ip_address->mode = profile.ip.mode;
+  ip_address->type = profile.ip.type;
+  memcpy(&ip_address->v4, &profile.ip.ip.v4, sizeof(sl_net_ipv4_setting_t));
+  memcpy(&ip_address->v6, &profile.ip.ip.v6, sizeof(sl_net_ipv6_setting_t));
+  return SL_STATUS_OK;
+}
+
 sl_status_t sl_net_get_ip_address(sl_net_interface_t interface, sl_net_ip_address_t *ip_address, uint32_t timeout)
 {
   uint8_t vap_id                      = 0;
-  sl_status_t status                  = 0;
+  sl_status_t status                  = SL_STATUS_OK;
   sl_net_ip_configuration_t ip_config = { 0 };
+  sl_net_interface_t iface_type       = SL_NET_INTERFACE_TYPE(interface);
 
-  if (SL_NET_WIFI_CLIENT_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {
-    vap_id           = SL_WIFI_CLIENT_VAP_ID;
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(ip_address);
+
+  if (iface_type == SL_NET_WIFI_CLIENT_1_INTERFACE || iface_type == SL_NET_WIFI_CLIENT_2_INTERFACE) {
+    if (dhcp_type[SLI_SI91X_CLIENT] == SL_IP_MANAGEMENT_STATIC_IP) {
+      return sli_net_get_ip_address_from_profile(interface, ip_address);
+    }
+
+    vap_id           = (iface_type == SL_NET_WIFI_CLIENT_2_INTERFACE) ? SL_WIFI_CLIENT_VAP_ID_1 : SL_WIFI_CLIENT_VAP_ID;
     ip_address->mode = dhcp_type[SLI_SI91X_CLIENT];
 
   } else if (SL_NET_WIFI_AP_INTERFACE == SL_NET_INTERFACE_TYPE(interface)) {

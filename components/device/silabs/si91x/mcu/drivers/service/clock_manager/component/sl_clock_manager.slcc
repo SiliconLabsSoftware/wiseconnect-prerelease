@@ -36,8 +36,6 @@ template_contribution:
   - name: code_classification_components
     value: sl_clock_manager
     condition: [psram_core]
-  - name: psram_ram_data_files
-    value: sli_si91x_clock_manager
   - name: event_handler
     value:
       event: platform_init

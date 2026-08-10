@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_data_length_extension_freertos_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM Datalength FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Data Length Extension FreeRTOS (PSRAM)
 category: Example|BLE
-description: 'Demonstrates how to negotiate BLE Data Length Extension for larger link PDUs as a central on SiWx91x with PSRAM in SoC FreeRTOS. Demonstrated by controller BLE procedures with the peer.
+description: 'Demonstrates how to negotiate a data length extension for larger link PDUs, using SiWx91x Bluetooth LE with PSRAM. This is demonstrated while acting as a central device.
 
   '
 filter:

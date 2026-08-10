@@ -38,7 +38,6 @@ typedef enum {
   SLI_WIFI_COMMAND_PACKET = 0,
   SLI_WIFI_DATA_PACKET,
   SLI_WIFI_SOCKET_DATA_PACKET,
-  SLI_BT_PACKET,
   SLI_WIFI_COMMAND_ENGINE_MAX_PACKET
 } sli_wifi_command_engine_packet_t;
 

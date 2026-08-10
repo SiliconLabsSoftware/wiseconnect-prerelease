@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_privacy_freertos_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM Privacy FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Privacy FreeRTOS (PSRAM)
 category: Example|BLE
-description: 'Demonstrates BLE privacy with resolving-list management on SiWx91x with PSRAM in SoC FreeRTOS. Demonstrated by private connections to a remote device.
+description: 'Demonstrates BLE privacy with resolving-list management, using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by establishing private connections to a remote device.
 
   '
 filter:

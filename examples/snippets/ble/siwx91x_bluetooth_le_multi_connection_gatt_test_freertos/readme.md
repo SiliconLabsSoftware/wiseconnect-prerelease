@@ -37,7 +37,7 @@ This also displays all the remote GATT profiles and service characteristics logs
 - Windows PC
 - **SoC Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002B]
     - Radio Boards 
       - [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) [SiWx917-RB4338A]
       - [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) [SiWx917-RB4343A]
@@ -50,7 +50,7 @@ This also displays all the remote GATT profiles and service characteristics logs
   - Silicon Labs [[BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)]
 - **NCP Mode**:
   - Standalone
-    - [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002A]
+    - [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) Wireless pro kit mainboard [SI-MB4002B]
     - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
    - NCP Expansion Kit with NCP Radio boards
       - [[BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview) + [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) / [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) / [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview)]
@@ -70,11 +70,11 @@ This also displays all the remote GATT profiles and service characteristics logs
 
 | Mode | Host / target | Project file (this example folder) |
 |------|----------------|-------------------------------------|
-| SoC | Application runs on SiWx91x. | `ble_multiconnection_gatt_test_soc.slcp` |
-| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `ble_multiconnection_gatt_test_psram.slcp` |
-| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `ble_multiconnection_gatt_test_ncp.slcp` |
+| SoC | Application runs on SiWx91x. | `siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos.slcp` |
+| PSRAM | Application runs on SiWx91x with PSRAM-capable radio board. | `siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos_psram.slcp` |
+| NCP (SPI) | Application runs on **EFR32** host; SiWx917 is the network co-processor over **SPI**. | `siwx91x_bluetooth_le_host_multi_connection_gatt_test_freertos_spi.slcp` |
 
-Open the `.slcp` for your kit from **`examples/snippets/ble/ble_multiconnection_gatt_test/`** in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
+Open the `.slcp` for your kit from **`examples/snippets/ble/siwx91x_bluetooth_le_multi_connection_gatt_test_freertos/`** in Simplicity Studio. For NCP, follow [Getting started with NCP mode](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-ncp-mode).
 
 ### Setup Diagram
 

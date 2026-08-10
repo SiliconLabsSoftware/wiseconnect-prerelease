@@ -105,7 +105,7 @@ sl_status_t sli_si91x_submit_rx_pkt(uint32_t timeout)
   }
 
   // Allocate packet to receive packet from module
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CP_CMD_RX_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               timeout,
                                               (sli_buffer_t *)&rx_pkt_buffer);

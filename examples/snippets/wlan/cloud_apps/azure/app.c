@@ -257,9 +257,10 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
                       | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP)
-
-  }
+                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
+  .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
+  .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 /******************************************************
 *               Function Definitions
@@ -536,11 +537,10 @@ static void prvHandleCloudMessage(AzureIoTHubClientCloudToDeviceMessageRequest_t
   (void)pxMessage;
 
   C2DMessageCount++;
-  SL_DEBUG_LOG_V2(INFO,
-                  "Cloud message payload : %.*s , C2DMessageCount : %d",
-                  (int)pxMessage->ulPayloadLength,
-                  (uintptr_t)(const char *)pxMessage->pvMessagePayload,
-                  C2DMessageCount);
+  printf("Cloud message payload : %.*s , C2DMessageCount : %d\r\n",
+         (int)pxMessage->ulPayloadLength,
+         (const char *)pxMessage->pvMessagePayload,
+         C2DMessageCount);
 }
 /*-----------------------------------------------------------*/
 
@@ -549,10 +549,7 @@ static void prvHandleCloudMessage(AzureIoTHubClientCloudToDeviceMessageRequest_t
  */
 static void prvHandleCommand(AzureIoTHubClientCommandRequest_t *pxMessage, void *pvContext)
 {
-  SL_DEBUG_LOG_V2(INFO,
-                  "Command payload : %.*s ",
-                  (int)pxMessage->ulPayloadLength,
-                  (uintptr_t)(const char *)pxMessage->pvMessagePayload);
+  printf("Command payload : %.*s \r\n", (int)pxMessage->ulPayloadLength, (const char *)pxMessage->pvMessagePayload);
 
   AzureIoTHubClient_t *xHandle = (AzureIoTHubClient_t *)pvContext;
 
@@ -586,10 +583,9 @@ static void prvHandlePropertiesMessage(AzureIoTHubClientPropertiesResponse_t *px
       SL_DEBUG_LOG_V2(WARN, "Unknown property message");
   }
 
-  SL_DEBUG_LOG_V2(INFO,
-                  "Property document payload : %.*s ",
-                  (int)pxMessage->ulPayloadLength,
-                  (uintptr_t)(const char *)pxMessage->pvMessagePayload);
+  printf("Property document payload : %.*s \r\n",
+         (int)pxMessage->ulPayloadLength,
+         (const char *)pxMessage->pvMessagePayload);
 }
 /*-----------------------------------------------------------*/
 

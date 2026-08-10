@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_unified_ae_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Unified AE Coex App FreeRTOS
+label: SiWx91x Bluetooth LE - Host Unified AE FreeRTOS (SPI)
 category: Example|BLE
-description: 'Bluetooth Low energy Extended Advertising features(Central/Peripheral) on SiWx91x over SPI NCP with FreeRTOS.
+description: 'Demonstrates BLE Advertising Extensions (AE) in central and peripheral roles with a provision to connect to 1 central and 1 peripheral, using SiWx91x Bluetooth LE with an external host connected over SPI.
 
   '
 filter:

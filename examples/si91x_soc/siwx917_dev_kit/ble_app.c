@@ -38,6 +38,7 @@
 //! SL Wi-Fi SDK includes
 #include "sl_net_wifi_types.h"
 #include "sl_wifi.h"
+#include "sl_si91x_driver.h"
 #include "sl_net_ip_types.h"
 #include "cmsis_os2.h"
 #include "sl_utility.h"
@@ -614,9 +615,9 @@ static void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t
  */
 void rsi_ble_configurator_init(void)
 {
-  uint8_t adv[31]                             = { 2, 1, 6 };
-  sl_wifi_firmware_version_t firmware_version = { 0 };
-  sl_status_t status                          = 0;
+  uint8_t adv[31]                              = { 2, 1, 6 };
+  sl_si91x_firmware_version_t firmware_version = { 0 };
+  sl_status_t status                           = 0;
 
   //  initializing the application events map
   rsi_ble_app_init_events();
@@ -680,7 +681,7 @@ void rsi_ble_configurator_init(void)
   LOG_PRINT(RSI_BLE_APP_DEVICE_NAME);
   LOG_PRINT("\r\n");
 
-  status = sl_wifi_get_firmware_version(&firmware_version);
+  status = sl_si91x_get_firmware_version(&firmware_version);
   if (status != SL_STATUS_OK) {
     printf("\r\nFirmware version query failed, Error Code : 0x%X\r\n", (unsigned int)status);
   }
@@ -763,16 +764,16 @@ adv:
       } break;
 
       case RSI_APP_FW_VERSION: {
-        sl_wifi_firmware_version_t firmware_version = { 0 };
+        sl_si91x_firmware_version_t firmware_version = { 0 };
         rsi_ble_app_clear_event(RSI_APP_FW_VERSION);
         memset(data, 0, RSI_BLE_MAX_DATA_LEN);
 
-        status = sl_wifi_get_firmware_version(&firmware_version);
+        status = sl_si91x_get_firmware_version(&firmware_version);
         if (status == SL_STATUS_OK) {
           data[0] = 0x08;
-          data[1] = sizeof(sl_wifi_firmware_version_t);
+          data[1] = sizeof(sl_si91x_firmware_version_t);
 
-          memcpy(&data[2], &firmware_version, sizeof(sl_wifi_firmware_version_t));
+          memcpy(&data[2], &firmware_version, sizeof(sl_si91x_firmware_version_t));
           rsi_ble_set_local_att_value(rsi_ble_att2_val_hndl, RSI_BLE_MAX_DATA_LEN, data);
         } else {
           LOG_PRINT("\r\nFirmware version query failed, Error Code : 0x%X\r\n", (unsigned int)status);

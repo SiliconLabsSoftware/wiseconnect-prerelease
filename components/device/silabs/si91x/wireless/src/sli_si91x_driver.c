@@ -94,22 +94,20 @@ static uint32_t config_feature_bit_map        = 0;
 static uint32_t feature_bit_map               = 0;
 static sli_wifi_efuse_data_t si91x_efuse_data = { 0 };
 
-sli_queue_t cmd_queues[SI91X_CMD_MAX] = { 0 };
-osEventFlagsId_t sli_wifi_events      = NULL;
+sli_queue_t cmd_queues[SLI_SI91X_CMD_MAX] = { 0 };
+osEventFlagsId_t sli_wifi_events          = NULL;
 
-uint8_t firmware_queue_id[SI91X_CMD_MAX] = { [SLI_WIFI_COMMON_CMD]   = SLI_WLAN_MGMT_Q,
-                                             [SLI_WIFI_WLAN_CMD]     = SLI_WLAN_MGMT_Q,
-                                             [SLI_SI91X_NETWORK_CMD] = SLI_WLAN_MGMT_Q,
-                                             [SLI_SI91X_SOCKET_CMD]  = SLI_WLAN_MGMT_Q,
-                                             [SLI_SI91X_BT_CMD]      = SLI_BT_Q };
-
-uint8_t command_packet_type[SLI_WLAN_CMD_MAX] = {
+static uint8_t command_packet_type[SLI_WLAN_CMD_MAX] = {
   [SLI_WLAN_COMMON_CMD]   = SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET,
   [SLI_WIFI_WLAN_CMD]     = SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET,
   [SLI_SI91X_NETWORK_CMD] = SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET,
-  [SLI_SI91X_BT_CMD]      = SLI_WIFI_COMMAND_ENGINE_BLE_COMMAND_PACKET,
   [SLI_SI91X_SOCKET_CMD]  = SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET,
 };
+
+uint8_t sli_get_command_packet_type(sli_wifi_command_type_t command_type)
+{
+  return command_packet_type[command_type];
+}
 
 void sli_si91x_set_xtal_pmu_good_time_from_host(uint32_t code, uint16_t value)
 {
@@ -215,33 +213,6 @@ sl_status_t sli_si91x_get_flash_efuse_data(sli_wifi_efuse_data_t *efuse_data, ui
   // Success path: always free buffer to avoid leak (single return path)
   sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
-}
-
-sl_status_t sli_si91x_driver_send_bt_command(sli_wifi_request_commands_t command,
-                                             sli_wifi_command_type_t command_type,
-                                             sl_wifi_system_packet_t *packet)
-{
-  UNUSED_PARAMETER(command);
-  sl_status_t status = SL_STATUS_OK;
-
-  // Validate parameters
-  if (packet == NULL) {
-    return SL_STATUS_NULL_POINTER;
-  }
-
-  // Only accept BT commands; on rejection caller retains ownership and must free the packet
-  if (command_type != SLI_SI91X_BT_CMD) {
-    return SL_STATUS_INVALID_INDEX;
-  }
-
-  // Route (send) the packet via routing utility (may be async)
-  status = sli_routing_utility_route_packet(&wifi_command_engine_routing_table,
-                                            SLI_BT_PACKET,
-                                            packet,
-                                            sizeof(sl_wifi_system_packet_t) + (packet->length & 0xFFF),
-                                            (void *)packet);
-
-  return status;
 }
 
 sl_status_t sli_verify_device_boot(uint32_t *rom_version)
@@ -498,7 +469,7 @@ static sl_status_t sli_si91x_check_thread_priority_order(void)
   // order is Event engine > HAL > Command engine
   if (event_engine_thread_priority > hal_thread_priority && hal_thread_priority > command_engine_thread_priority) {
     // clang-format off
-    SL_DEBUG_LOG_V2(INFO,
+    SL_DEBUG_LOG_V2(DEBUG,
                     "\r\nevent_engine_thread_priority: %" PRIu32
                     ", hal_thread_priority: %" PRIu32
                     ", command_engine_thread_priority: %" PRIu32
@@ -541,7 +512,7 @@ sl_status_t sli_si91x_wifi_platform_init(void)
     }
   }
 
-  for (int i = 0; i < SI91X_CMD_MAX; i++) {
+  for (int i = 0; i < SLI_SI91X_CMD_MAX; i++) {
     status = sli_queue_manager_init(&cmd_queues[i], SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
     VERIFY_STATUS_AND_RETURN(status);
   }

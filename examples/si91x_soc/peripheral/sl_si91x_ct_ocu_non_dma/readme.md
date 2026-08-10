@@ -47,7 +47,7 @@
 ## About Example Code
 
 - This example demonstrates the Config Timer as a normal counter and Output Compare unit for PWM output generator.
-- Configure the following macros in'config_timer_ocu_non_dma_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)]Two macros are present: CT_PWM_MODE_USECASE and CT_COUNTER_MODE_USECASE. By default, the normal counter use case is enabled.
+- Configure the following macros in'config_timer_ocu_non_dma_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)]Two macros are present: CT_PWM_MODE_USECASE and CT_COUNTER_MODE_USECASE. By default, the normal counter use case is enabled.
 - Enable only one of the following use case macros at a time.
   - If **CT_PWM_MODE_USECASE** is enabled:
     - The Config Timer is initialized using [sl_si91x_config_timer_init()](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/config-timer#sl-si91x-config-timer-init) API.
@@ -103,7 +103,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in 'config_timer_ocu_non_dma_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)](enable any one at a time).
+- Configure the following macros in 'config_timer_ocu_non_dma_example.h'[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)](enable any one at a time).
 
 - `CT_PWM_MODE_USECASE`: When enabled (`SET`), runs the PWM output use case using the Output Compare Unit to generate waveforms on CT Output-0 and CT Output-1. Enable only one use-case macro at a time. By default, it is set to `CLEAR` (disabled).
 
@@ -117,9 +117,9 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     #define CT_COUNTER_MODE_USECASE SET   //< To run normal counter code
   ```
 
-- Also enable the CT configuration macro for the PWM mode use case by setting `CT_PWM_MODE_USECASE` to `SET` and ensuring `CT_COUNTER_MODE_USECASE` is set to `CLEAR` in the `config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] file.
+- Also enable the CT configuration macro for the PWM mode use case by setting `CT_PWM_MODE_USECASE` to `SET` and ensuring `CT_COUNTER_MODE_USECASE` is set to `CLEAR` in the `config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] file.
 
-- In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value for a counter-mode use case. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
+- In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)] file, configure the "TIME_PERIOD_VALUE" macro to facilitate user-defined adjustments of the time period value for a counter-mode use case. Modify or update the following macro as necessary to allow flexible customization of the timer's period and compare value.
 
 - `TIME_PERIOD_VALUE`: Time period (in microseconds) used to compute the match value of the counter for the counter-mode use case. By default, it is set to 1000.
 
@@ -127,7 +127,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
    #define TIME_PERIOD_VALUE     1000         // Time period in microseconds
   ```
 
-- Change the following macro in `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)] file to change the counter number used for the counter-mode use case. By default, the application uses counter-0; to use counter-1, change it to `SL_COUNTER_1`.
+- Change the following macro in `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)] file to change the counter number used for the counter-mode use case. By default, the application uses counter-0; to use counter-1, change it to `SL_COUNTER_1`.
 
 - `CT_COUNTER_USED`: Selects which Config Timer counter (`SL_COUNTER_0` or `SL_COUNTER_1`) is used for the normal counter-mode application. By default, it is set to `SL_COUNTER_0`.
 
@@ -159,7 +159,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Macros for CT Configurations
 
- In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)]file,these macros are present.
+ In the `config_timer_ocu_non_dma_example.c`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.c)]file,these macros are present.
 
 - \ref SL_CT_MODE_32BIT_ENABLE_MACRO,  for possible values refer \ref sl_config_timer_mode_t
 - \ref SL_COUNTER0_DIRECTION_MACRO,  for possible values refer \ref sl_counter0_direction_t
@@ -174,7 +174,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Run the application in counter mode
 
-- To verify the counter mode, ensure that `CT_COUNTER_MODE_USECASE` is enabled in`config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] Build and flash the application. When the timer reaches the configured match value, an interrupt is triggered automatically. You will see a console message indicating that the interrupt has occurred, confirming that the counter mode is working as expected.
+- To verify the counter mode, ensure that `CT_COUNTER_MODE_USECASE` is enabled in`config_timer_ocu_non_dma_example.h`[(https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ct_ocu_non_dma/config_timer_ocu_non_dma_example.h)] Build and flash the application. When the timer reaches the configured match value, an interrupt is triggered automatically. You will see a console message indicating that the interrupt has occurred, confirming that the counter mode is working as expected.
 - Following prints will be observed on the console:
 
   > ![Figure: Result](resources/readme/OutputConsole_CT.png)

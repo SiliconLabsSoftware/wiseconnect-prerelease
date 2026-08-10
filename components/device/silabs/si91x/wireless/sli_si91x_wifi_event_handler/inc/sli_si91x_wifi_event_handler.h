@@ -63,8 +63,4 @@ sl_status_t sli_si91x_wifi_event_engine_init(void);
 sl_status_t sli_si91x_wifi_event_engine_deinit(void);
 void sli_wifi_event_engine_signal_async(void);
 
-#ifdef SLI_SI91X_ENABLE_BLE
-void sli_si91x_ble_send_packet_tx_status(uint16_t packet_type, sl_status_t status, void *context);
-#endif
-
 #endif

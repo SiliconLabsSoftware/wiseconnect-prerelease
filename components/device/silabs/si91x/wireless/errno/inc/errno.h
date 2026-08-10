@@ -34,10 +34,10 @@
 extern "C" {
 #endif
 
-// #include_next pulls in the next standard library's <errno.h> in the search path, providing the full libc's errno symbol set before the SDK overrides the errno symbols below.
+// #include_next pulls in the next standard library's <errno.h> in the search path, providing the full libc's errno symbol set before the SDK overrides the errno symbols.
 #include_next <errno.h>
 
-// Override the standard library's errno symbol with the one provided by the SDK.
+// Overrides the standard library's errno symbol with the one provided by the SDK.
 #undef errno
 
 /*******************************************************************************

@@ -813,18 +813,44 @@ static bool sli_is_port_available(uint16_t port_number)
  * 
  * @param socket_tls_extensions pointer to TLS extension in socket structure
  * @param tls_extension pointer to the TLS information provided by application
- * @return sl_status_t possible return values are SL_STATUS_OK and SL_STATUS_SI91X_MEMORY_ERROR
+ * @param option_length length of the TLS extension buffer passed by the application
+ * @return sl_status_t possible return values are SL_STATUS_OK, SL_STATUS_NULL_POINTER,
+ *         SL_STATUS_INVALID_PARAMETER, and SL_STATUS_SI91X_MEMORY_ERROR
  */
 sl_status_t sli_si91x_add_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
-                                        const sl_si91x_socket_type_length_value_t *tls_extension)
+                                        const sl_si91x_socket_type_length_value_t *tls_extension,
+                                        socklen_t option_length)
 {
+  const size_t tls_extension_header_size = sizeof(sl_si91x_socket_type_length_value_t);
+
+  if (socket_tls_extensions == NULL || tls_extension == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
+  if (option_length < (socklen_t)tls_extension_header_size) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (tls_extension->length == 0) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if ((tls_extension->type != SL_SI91X_TLS_EXTENSION_SNI_TYPE)
+      && (tls_extension->type != SL_SI91X_TLS_EXTENSION_ALPN_TYPE)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (option_length != (socklen_t)(tls_extension_header_size + tls_extension->length)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
   // To check if memory available for new extension in buffer of socket, max 256 Bytes only
   if (SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA - socket_tls_extensions->current_size_of_extensions
-      < (int)(sizeof(sl_si91x_socket_type_length_value_t) + tls_extension->length)) {
+      < (int)(tls_extension_header_size + tls_extension->length)) {
     return SL_STATUS_SI91X_MEMORY_ERROR;
   }
 
-  uint8_t extension_size = (uint8_t)(sizeof(sl_si91x_socket_type_length_value_t) + tls_extension->length);
+  const uint16_t extension_size = (uint16_t)(tls_extension_header_size + tls_extension->length);
 
   // copies TLS extension provided by app into SDK socket struct
   memcpy(&socket_tls_extensions->buffer[socket_tls_extensions->current_size_of_extensions],
@@ -834,6 +860,22 @@ sl_status_t sli_si91x_add_tls_extension(sli_si91x_tls_extensions_t *socket_tls_e
   socket_tls_extensions->total_extensions++;
 
   return SL_STATUS_OK;
+}
+
+int sli_si91x_configure_tls_extension(sli_si91x_tls_extensions_t *socket_tls_extensions,
+                                      const sl_si91x_socket_type_length_value_t *tls_extension,
+                                      socklen_t option_length)
+{
+  const sl_status_t status = sli_si91x_add_tls_extension(socket_tls_extensions, tls_extension, option_length);
+
+  if (status == SL_STATUS_SI91X_MEMORY_ERROR) {
+    SLI_SET_ERROR_AND_RETURN(ENOMEM);
+  }
+  if (status != SL_STATUS_OK) {
+    SLI_SET_ERROR_AND_RETURN(EINVAL);
+  }
+
+  return SLI_SI91X_NO_ERROR;
 }
 
 int32_t sli_get_socket_command_from_host_packet(sl_wifi_buffer_t *buffer)
@@ -1139,7 +1181,7 @@ int sli_si91x_accept(int socket, struct sockaddr *addr, socklen_t *addr_len, sl_
   sli_si91x_set_accept_callback(si91x_server_socket, callback, client_socket_id);
   if (callback != NULL) {
     status = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_ACCEPT,
-                                   (client_socket_id + SI91X_CMD_MAX),
+                                   (client_socket_id + SLI_SI91X_CMD_MAX),
                                    &accept_request,
                                    sizeof(accept_request),
                                    SLI_WIFI_RETURN_IMMEDIATELY,
@@ -1149,7 +1191,7 @@ int sli_si91x_accept(int socket, struct sockaddr *addr, socklen_t *addr_len, sl_
     return SL_STATUS_OK;
   } else {
     status = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_ACCEPT,
-                                   (client_socket_id + SI91X_CMD_MAX),
+                                   (client_socket_id + SLI_SI91X_CMD_MAX),
                                    &accept_request,
                                    sizeof(accept_request),
                                    (SLI_WIFI_WAIT_FOR_EVER | SLI_WIFI_WAIT_FOR_RESPONSE_BIT),
@@ -1249,7 +1291,7 @@ int sli_si91x_shutdown(int socket, int how)
   socket_close_request.port_number = (close_request_type == SHUTDOWN_BY_ID) ? 0 : si91x_socket->local_address.sin6_port;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_SOCKET_CLOSE,
-                                 (si91x_socket->index + SI91X_CMD_MAX),
+                                 (si91x_socket->index + SLI_SI91X_CMD_MAX),
                                  &socket_close_request,
                                  sizeof(socket_close_request),
                                  wait_period,
@@ -1338,8 +1380,10 @@ static void sli_handle_remote_terminate(sl_wifi_system_packet_t *rx_packet)
     socket->disconnect_reason = SLI_SI91X_BSD_DISCONNECT_REASON_REMOTE_CLOSED;
 
     if (user_remote_socket_termination_callback != NULL) {
-      user_remote_socket_termination_callback(socket->id,
-                                              socket->local_address.sin6_port,
+      // Pass host/BSD socket descriptor and remote peer port so applications can
+      // correlate the callback with socket()/connect() state (SI91X-21999).
+      user_remote_socket_termination_callback((int)index,
+                                              socket->remote_address.sin6_port,
                                               remote_socket_closure->sent_bytes_count);
     }
     break;
@@ -1382,7 +1426,7 @@ static sl_status_t sli_handle_data_read_request(sl_status_t frame_status,
     sli_command_engine_packet_type_configuration_t packet_type_info = { 0 };
     // Get packet type configuration for the given command type
     status = sli_command_engine_get_rx_queue_info_from_packet_type(&sli_wifi_command_engine,
-                                                                   (uint16_t)(client_socket->index + SI91X_CMD_MAX),
+                                                                   (uint16_t)(client_socket->index + SLI_SI91X_CMD_MAX),
                                                                    &packet_type_info);
     VERIFY_STATUS_AND_RETURN(status);
 
@@ -1522,7 +1566,7 @@ static sl_status_t sli_handle_select_request(sl_wifi_system_packet_t *rx_packet,
     data_len           = rx_packet->length & 0xFFF;
     packet_size        = sizeof(rx_packet->desc) + data_len;
 
-    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CP_DATA_RX_POOL,
+    status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL,
                                                 SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
                                                 1000,
                                                 (sli_buffer_t *)&response_buffer);
@@ -1706,7 +1750,7 @@ sl_status_t sli_si91x_socket_data_event_handler(sl_wifi_buffer_t *rx_buffer)
     // Get packet type configuration for the given command type
     sl_status_t status =
       sli_command_engine_get_rx_queue_info_from_packet_type(&sli_wifi_command_engine,
-                                                            (uint16_t)(client_socket->index + SI91X_CMD_MAX),
+                                                            (uint16_t)(client_socket->index + SLI_SI91X_CMD_MAX),
                                                             &packet_type_info);
     if (status != SL_STATUS_OK) {
       sli_buffer_manager_free_buffer(rx_buffer);
@@ -1762,7 +1806,7 @@ sl_status_t sli_si91x_send_socket_data(sli_si91x_socket_t *si91x_socket,
   }
 
   // Allocate a buffer for the command with appropriate size
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_DATA_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_DATA_TX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
                                               (sli_buffer_t)&packet);

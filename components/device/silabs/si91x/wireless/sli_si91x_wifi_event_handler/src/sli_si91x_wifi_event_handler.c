@@ -122,8 +122,12 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
                                                                    (uint16_t)(SLI_WLAN_COMMON_CMD),
                                                                    &packet_type_info);
     if (SL_STATUS_OK != status) {
-      sli_buffer_manager_free_buffer(buffer);
-      sli_buffer_manager_free_buffer(metadata);
+      if (buffer != NULL) {
+        sli_buffer_manager_free_buffer(buffer);
+      }
+      if (metadata != NULL) {
+        sli_buffer_manager_free_buffer(metadata);
+      }
       sli_buffer_manager_free_buffer(response);
       return;
     }
@@ -134,8 +138,12 @@ static void sli_si91x_wifi_event_engine_common_event_handler(uint32_t event, voi
       SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for CARDREADY response\r\n");
     }
   }
-  sli_buffer_manager_free_buffer(buffer);
-  sli_buffer_manager_free_buffer(metadata);
+  if (buffer != NULL) {
+    sli_buffer_manager_free_buffer(buffer);
+  }
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   sli_buffer_manager_free_buffer(response);
 
   return;
@@ -151,7 +159,9 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
   sli_command_engine_metadata_t *metadata        = sli_wifi_get_response_metadata(engine_response);
   sl_wifi_buffer_t *buffer                       = sli_wifi_get_response_buffer(engine_response);
   if (buffer == NULL) {
-    sli_buffer_manager_free_buffer(metadata);
+    if (metadata != NULL) {
+      sli_buffer_manager_free_buffer(metadata);
+    }
     sli_buffer_manager_free_buffer(engine_response);
     return;
   }
@@ -162,7 +172,9 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
   sl_wifi_system_packet_t *packet = (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data(buffer, 0, NULL);
   if (packet == NULL) {
     sli_buffer_manager_free_buffer(buffer);
-    sli_buffer_manager_free_buffer(metadata);
+    if (metadata != NULL) {
+      sli_buffer_manager_free_buffer(metadata);
+    }
     sli_buffer_manager_free_buffer(engine_response);
     return;
   }
@@ -180,7 +192,9 @@ static void sli_si91x_wifi_event_engine_wifi_event_handler(uint32_t event, void 
   }
 
   sli_buffer_manager_free_buffer(buffer);
-  sli_buffer_manager_free_buffer(metadata);
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   sli_buffer_manager_free_buffer(engine_response);
   return;
 }
@@ -212,9 +226,13 @@ static void sli_si91x_wifi_event_engine_network_event_handler(uint32_t event, vo
 
   SL_NET_EVENT_DISPATCH_HANDLER(response);
 
-  sli_buffer_manager_free_buffer(buffer);
+  if (buffer != NULL) {
+    sli_buffer_manager_free_buffer(buffer);
+  }
   sli_buffer_manager_free_buffer(response);
-  sli_buffer_manager_free_buffer(metadata);
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   return;
 }
 
@@ -230,9 +248,13 @@ static void sli_si91x_wifi_event_engine_socket_cmd_event_handler(uint32_t event,
 
   SL_NET_EVENT_DISPATCH_HANDLER(response);
 
-  sli_buffer_manager_free_buffer(buffer);
+  if (buffer != NULL) {
+    sli_buffer_manager_free_buffer(buffer);
+  }
   sli_buffer_manager_free_buffer(response);
-  sli_buffer_manager_free_buffer(metadata);
+  if (metadata != NULL) {
+    sli_buffer_manager_free_buffer(metadata);
+  }
   return;
 }
 
@@ -541,15 +563,3 @@ sl_status_t sli_si91x_wifi_event_engine_deinit(void)
 
   return SL_STATUS_OK;
 }
-
-#ifdef SLI_SI91X_ENABLE_BLE
-void sli_si91x_ble_send_packet_tx_status(uint16_t packet_type, sl_status_t status, void *context)
-{
-  UNUSED_PARAMETER(packet_type); // Packet type not needed in this callback
-  const sl_wifi_system_packet_t *packet = (const sl_wifi_system_packet_t *)context;
-  // Notify BLE stack that transmission is done
-  rsi_bt_common_tx_done(packet, status);
-  sli_buffer_manager_free_buffer(context);
-  return;
-}
-#endif

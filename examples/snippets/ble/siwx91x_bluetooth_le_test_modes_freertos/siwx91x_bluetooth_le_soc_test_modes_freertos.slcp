@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_test_modes_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Testmodes FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Test Modes FreeRTOS
 category: Example|BLE
-description: 'Demonstrates BLE GAP peripheral test procedures on SiWx91x in SoC FreeRTOS. Demonstrated by controlled GAP test behavior for validation with peers or test gear.
+description: 'Demonstrates how to use test modes for testing GAP peripherals using SiWx91x Bluetooth LE.
 
   '
 filter:

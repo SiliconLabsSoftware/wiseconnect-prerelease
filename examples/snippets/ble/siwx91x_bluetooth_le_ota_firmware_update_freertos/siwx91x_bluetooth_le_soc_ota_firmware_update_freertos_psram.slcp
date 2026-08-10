@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_ota_firmware_update_freertos_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM Fw_ota FreeRTOS
+label: SiWx91x Bluetooth LE - SoC OTA Firmware Update FreeRTOS (PSRAM)
 category: Example|BLE
-description: 'Demonstrates how to perform a BLE firmware OTA upgrade on SiWx91x with PSRAM in SoC FreeRTOS as a peripheral receiving an image from a central. Demonstrated by OTA GATT and flash programming.
+description: 'Demonstrates how to perform an Over-the-air (OTA) Firmware Update using SiWx91x Bluetooth LE with PSRAM. This is demonstrated using GATT to download an OTA image.
 
   '
 filter:

@@ -13,8 +13,8 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
     - [Configuration of USART at UC (Universal Configuration)](#configuration-of-usart-at-uc-universal-configuration)
-    - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with BRD4338A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-brd4338a-radio-board)
-    - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with BRD4343A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-brd4343a-radio-board)
+    - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with BRD4338A radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-brd4338a-radio-board)
+    - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with BRD4343A radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-brd4343a-radio-board)
     - [Pin Configuration of the AC1 Module Explorer Kit](#pin-configuration-of-the-ac1-module-explorer-kit)
     - [Flow Control Configuration](#flow-control-configuration)
   - [Test the Application](#test-the-application)
@@ -111,7 +111,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Connect master (this example) and a board flashed with the slave example: master clock pin (GPIO_8 or GPIO_25 depending on board) to slave clock pin, master TX (GPIO_30) to slave RX, master RX (GPIO_29) to slave TX.
 
-- Configure the following macros in [`usart_sync_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_master_freertos/usart_sync_master_freertos.c) if required:
+- Configure the following macros in [`usart_sync_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_usart_sync_master_freertos/usart_sync_master_freertos.c) if required:
 
 - `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
 
@@ -131,7 +131,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define MASTER_STARTUP_DELAY  5000   // ms — wait for slave before first transfer
   ```
 
-### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
+### Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4338A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
   | ----------------------- | ------- | ------------- |
@@ -139,7 +139,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | USART_MASTER_TX_PIN     | GPIO_30 |     P35       |
   | USART_MASTER_RX_PIN     | GPIO_29 |     P33       |  
 
-### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4343A radio board
+### Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4343A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
   | ----------------------- | ------- | ------------- |
@@ -147,7 +147,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | USART_MASTER_TX_PIN     | GPIO_30 |     P35       |
   | USART_MASTER_RX_PIN     | GPIO_29 |     P33       |  
 
-### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4342A radio board
+### Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4342A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
   | ----------------------- | ------- | ------------- |

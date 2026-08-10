@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <model:MDescriptors xmlns:model="http://www.silabs.com/ss/Studio.ecore">
-  <descriptors name="siwx91x_bluetooth_le_host_central_freertos_spi" label="BLE - Central (NCP)" description="Start a BLE device in central mode.">
+  <descriptors name="siwx91x_bluetooth_le_host_central_freertos_spi" label="SiWx91x Bluetooth LE - Host Central FreeRTOS (SPI)" description="Demonstrates how to operate as a central device using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by scanning for and connecting to a peripheral.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_central_freertos/siwx91x_bluetooth_le_host_central_freertos_spi.slcp" />
@@ -13,9 +13,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_central_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_central_freertos_psram" label="BLE - Central (PSRAM)" description="Start a BLE device in central mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_central_freertos_psram" label="SiWx91x Bluetooth LE - SoC Central FreeRTOS (PSRAM)" description="Demonstrates how to operate as a central device using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by scanning for and connecting to a peripheral.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_central_freertos/siwx91x_bluetooth_le_soc_central_freertos_psram.slcp" />
@@ -28,13 +28,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_central_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_central_freertos" label="BLE - Central (SoC)" description="Start a BLE device in central mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_central_freertos" label="SiWx91x Bluetooth LE - SoC Central FreeRTOS" description="Demonstrates how to operate as a central device using SiWx91x Bluetooth LE. This is demonstrated by scanning for and connecting to a peripheral.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_central_freertos/siwx91x_bluetooth_le_soc_central_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -43,9 +43,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_central_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_ibeacon_freertos_spi" label="BLE - iBeacon (NCP)" description="Start a BLE device in peripheral mode">
+  <descriptors name="siwx91x_bluetooth_le_host_ibeacon_freertos_spi" label="SiWx91x Bluetooth LE - Host iBeacon FreeRTOS (SPI)" description="Demonstrates how to advertise Apple iBeacon-formatted data using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ibeacon_freertos/siwx91x_bluetooth_le_host_ibeacon_freertos_spi.slcp" />
@@ -58,9 +58,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ibeacon_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ibeacon_freertos_psram" label="BLE - iBeacon (PSRAM)" description="Start a BLE device in peripheral mode">
+  <descriptors name="siwx91x_bluetooth_le_soc_ibeacon_freertos_psram" label="SiWx91x Bluetooth LE - SoC iBeacon FreeRTOS (PSRAM)" description="Demonstrates how to advertise Apple iBeacon-formatted data using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ibeacon_freertos/siwx91x_bluetooth_le_soc_ibeacon_freertos_psram.slcp" />
@@ -73,13 +73,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ibeacon_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ibeacon_freertos" label="BLE - iBeacon (SoC)" description="Start a BLE device in peripheral mode">
+  <descriptors name="siwx91x_bluetooth_le_soc_ibeacon_freertos" label="SiWx91x Bluetooth LE - SoC iBeacon FreeRTOS" description="Demonstrates how to advertise Apple iBeacon-formatted data using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ibeacon_freertos/siwx91x_bluetooth_le_soc_ibeacon_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -88,13 +88,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ibeacon_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_secure_connection_freertos" label="BLE - Secure Connection (SoC)" description="This application demonstrates the SMP (Security Manager Protocol) pairing and a secured passkey pairing feature.">
+  <descriptors name="siwx91x_bluetooth_le_soc_secure_connection_freertos" label="SiWx91x Bluetooth LE - SoC Secure Connection FreeRTOS" description="Demonstrates how to implement secure connections using Security Manager Protocol (SMP) pairing and secured passkey pairing, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_secure_connection_freertos/siwx91x_bluetooth_le_soc_secure_connection_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -103,9 +103,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_secure_connection_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_secure_connection_freertos_spi" label="BLE - Secure Connection (NCP)" description="This application demonstrates the SMP (Security Manager Protocol) pairing and a secured passkey pairing feature.">
+  <descriptors name="siwx91x_bluetooth_le_host_secure_connection_freertos_spi" label="SiWx91x Bluetooth LE - Host Secure Connection FreeRTOS (SPI)" description="Demonstrates how to implement secure connections using Security Manager Protocol (SMP) pairing and secured passkey pairing, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_secure_connection_freertos/siwx91x_bluetooth_le_host_secure_connection_freertos_spi.slcp" />
@@ -118,9 +118,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_secure_connection_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_secure_connection_freertos_psram" label="BLE - Secure Connection (PSRAM)" description="This application demonstrates the SMP (Security Manager Protocol) pairing and a secured passkey pairing feature.">
+  <descriptors name="siwx91x_bluetooth_le_soc_secure_connection_freertos_psram" label="SiWx91x Bluetooth LE - SoC Secure Connection FreeRTOS (PSRAM)" description="Demonstrates how to implement secure connections using Security Manager Protocol (SMP) pairing and secured passkey pairing, using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_secure_connection_freertos/siwx91x_bluetooth_le_soc_secure_connection_freertos_psram.slcp" />
@@ -133,9 +133,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_secure_connection_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_gatt_long_read_freertos_spi" label="BLE - Gatt Long Read (NCP)" description="Demonstrates how a GATT client device accesses a GATT server device for long read">
+  <descriptors name="siwx91x_bluetooth_le_host_gatt_long_read_freertos_spi" label="SiWx91x Bluetooth LE - Host GATT Long Read FreeRTOS (SPI)" description="Demonstrates how to perform a GATT long read using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by reading long characteristic data using prepared ATT procedures.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_gatt_long_read_freertos/siwx91x_bluetooth_le_host_gatt_long_read_freertos_spi.slcp" />
@@ -148,13 +148,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_gatt_long_read_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_gatt_long_read_freertos" label="BLE - Gatt Long Read (SoC)" description="Demonstrates how a GATT client device accesses a GATT server device for long read">
+  <descriptors name="siwx91x_bluetooth_le_soc_gatt_long_read_freertos" label="SiWx91x Bluetooth LE - SoC GATT Long Read FreeRTOS" description="Demonstrates how to perform a GATT long read using SiWx91x Bluetooth LE. This is demonstrated by reading long characteristic data using prepared ATT procedures.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_gatt_long_read_freertos/siwx91x_bluetooth_le_soc_gatt_long_read_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -163,9 +163,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_gatt_long_read_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_gatt_long_read_freertos_psram" label="BLE - Gatt Long Read (PSRAM)" description="Demonstrates how a GATT client device accesses a GATT server device for long read">
+  <descriptors name="siwx91x_bluetooth_le_soc_gatt_long_read_freertos_psram" label="SiWx91x Bluetooth LE - SoC GATT Long Read FreeRTOS (PSRAM)" description="Demonstrates how to perform a GATT long read using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by reading long characteristic data using prepared ATT procedures.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_gatt_long_read_freertos/siwx91x_bluetooth_le_soc_gatt_long_read_freertos_psram.slcp" />
@@ -178,9 +178,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_gatt_long_read_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos_psram" label="BLE - Multiconnection GATT Test (PSRAM)" description="The Application demonstrates how to configure SiWx91x EVK in central/peripheral modes and then connect with multiple peripherals/centrals.">
+  <descriptors name="siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos_psram" label="SiWx91x Bluetooth LE - SoC Multi-connection GATT Test FreeRTOS (PSRAM)" description="Demonstrates how to perform GATT testing with multiple simultaneous links between central and peripheral devices, using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_multi_connection_gatt_test_freertos/siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos_psram.slcp" />
@@ -193,13 +193,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_multi_connection_gatt_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos" label="BLE - Multiconnection GATT Test (SoC)" description="The Application demonstrates how to configure SiWx91x EVK in central/peripheral modes and then connect with multiple peripherals/centrals.">
+  <descriptors name="siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos" label="SiWx91x Bluetooth LE - SoC Multi-connection GATT Test FreeRTOS" description="Demonstrates how to perform GATT testing with multiple simultaneous links between central and peripheral devices, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_multi_connection_gatt_test_freertos/siwx91x_bluetooth_le_soc_multi_connection_gatt_test_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -208,9 +208,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_multi_connection_gatt_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_multi_connection_gatt_test_freertos_spi" label="BLE - Multiconnection GATT Test (NCP)" description="The Application demonstrates how to configure SiWx91x EVK in central/peripheral modes and then connect with multiple peripherals/centrals.">
+  <descriptors name="siwx91x_bluetooth_le_host_multi_connection_gatt_test_freertos_spi" label="SiWx91x Bluetooth LE - Host Multi-connection GATT Test FreeRTOS (SPI)" description="Demonstrates how to perform GATT testing with multiple simultaneous links between central and peripheral devices, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_multi_connection_gatt_test_freertos/siwx91x_bluetooth_le_host_multi_connection_gatt_test_freertos_spi.slcp" />
@@ -223,9 +223,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_multi_connection_gatt_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_long_range_freertos_psram" label="BLE - Long Range (PSRAM)" description="This application demonstrates how to configure/connects BLE device as Central and can be used to update the PHY rates.">
+  <descriptors name="siwx91x_bluetooth_le_soc_long_range_freertos_psram" label="SiWx91x Bluetooth LE - SoC Long Range FreeRTOS (PSRAM)" description="Demonstrates how to switch the link PHY to long range (LE Coded) using SiWx91x Bluetooth LE with PSRAM. This is demonstrated using PHY update procedures with a remote peripheral.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_long_range_freertos/siwx91x_bluetooth_le_soc_long_range_freertos_psram.slcp" />
@@ -238,9 +238,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_long_range_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_long_range_freertos_spi" label="BLE - Long Range (NCP)" description="This application demonstrates how to configure/connects BLE device as Central and can be used to update the PHY rates.">
+  <descriptors name="siwx91x_bluetooth_le_host_long_range_freertos_spi" label="SiWx91x Bluetooth LE - Host Long Range FreeRTOS (SPI)" description="Demonstrates how to switch the link PHY to long range (LE Coded) using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated using PHY update procedures with a remote peripheral.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_long_range_freertos/siwx91x_bluetooth_le_host_long_range_freertos_spi.slcp" />
@@ -253,13 +253,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_long_range_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_long_range_freertos" label="BLE - Long Range (SoC)" description="This application demonstrates how to configure/connects BLE device as Central and can be used to update the PHY rates.">
+  <descriptors name="siwx91x_bluetooth_le_soc_long_range_freertos" label="SiWx91x Bluetooth LE - SoC Long Range FreeRTOS" description="Demonstrates how to switch the link PHY to long range (LE Coded) using SiWx91x Bluetooth LE. This is demonstrated using PHY update procedures with a remote peripheral.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_long_range_freertos/siwx91x_bluetooth_le_soc_long_range_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -268,13 +268,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_long_range_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_unified_freertos" label="BLE - Unified Coex App (SoC)" description="BLE Unified Component Framework - GAP, GATT, SMP, Extended/Legacy Advertising.">
+  <descriptors name="siwx91x_bluetooth_le_soc_unified_freertos" label="SiWx91x Bluetooth LE - SoC Unified FreeRTOS" description="Demonstrates a unified component framework with modular GAP, GATT Server/Client, SMP, and Legacy Advertising with BLE co-existence, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_freertos/siwx91x_bluetooth_le_soc_unified_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343c brd4343q brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343c brd4343q brd2708a brd2911a brd9084b brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -283,9 +283,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_unified_freertos_spi" label="BLE - Unified Coex App (NCP)" description="BLE Unified Component Framework - GAP, GATT, SMP, Extended/Legacy Advertising.">
+  <descriptors name="siwx91x_bluetooth_le_host_unified_freertos_spi" label="SiWx91x Bluetooth LE - Host Unified FreeRTOS (SPI)" description="Demonstrates a unified component framework with modular GAP, GATT Server/Client, SMP, and Legacy Advertising with BLE co-existence, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_freertos/siwx91x_bluetooth_le_host_unified_freertos_spi.slcp" />
@@ -298,9 +298,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_unified_freertos_psram" label="BLE - Unified Coex App (PSRAM)" description="BLE Unified Component Framework - GAP, GATT, SMP, Extended/Legacy Advertising.">
+  <descriptors name="siwx91x_bluetooth_le_soc_unified_freertos_psram" label="SiWx91x Bluetooth LE - SoC Unified FreeRTOS (PSRAM)" description="Demonstrates a unified component framework with modular GAP, GATT Server/Client, SMP, and Legacy Advertising with BLE co-existence, using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_freertos/siwx91x_bluetooth_le_soc_unified_freertos_psram.slcp" />
@@ -313,9 +313,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_heart_rate_profile_freertos_psram" label="BLE - Heart Rate (PSRAM)" description="This application demonstrates BLE heart rate profile">
+  <descriptors name="siwx91x_bluetooth_le_soc_heart_rate_profile_freertos_psram" label="SiWx91x Bluetooth LE - SoC Heart Rate Profile FreeRTOS (PSRAM)" description="Demonstrates how to use the BLE Heart Rate Profile over GATT, using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_heart_rate_profile_freertos/siwx91x_bluetooth_le_soc_heart_rate_profile_freertos_psram.slcp" />
@@ -328,13 +328,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_heart_rate_profile_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_heart_rate_profile_freertos" label="BLE - Heart Rate (SoC)" description="This application demonstrates BLE heart rate profile">
+  <descriptors name="siwx91x_bluetooth_le_soc_heart_rate_profile_freertos" label="SiWx91x Bluetooth LE - SoC Heart Rate Profile FreeRTOS" description="Demonstrates how to use the BLE Heart Rate Profile over GATT, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_heart_rate_profile_freertos/siwx91x_bluetooth_le_soc_heart_rate_profile_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m100xntba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -343,9 +343,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_heart_rate_profile_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_heart_rate_profile_freertos_spi" label="BLE - Heart Rate (NCP)" description="This application demonstrates BLE heart rate profile">
+  <descriptors name="siwx91x_bluetooth_le_host_heart_rate_profile_freertos_spi" label="SiWx91x Bluetooth LE - Host Heart Rate Profile FreeRTOS (SPI)" description="Demonstrates how to use the BLE Heart Rate Profile over GATT, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_heart_rate_profile_freertos/siwx91x_bluetooth_le_host_heart_rate_profile_freertos_spi.slcp" />
@@ -358,9 +358,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_heart_rate_profile_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_throughput_freertos_psram" label="BLE - Throughput (PSRAM)" description="This application demonstrates how to exchange continuous data to the remote device to measure the On-Air Throughput using a BLE Sniffer.">
+  <descriptors name="siwx91x_bluetooth_le_soc_throughput_freertos_psram" label="SiWx91x Bluetooth LE - SoC Throughput FreeRTOS (PSRAM)" description="Demonstrates how to measure BLE throughput using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by exchanging continuous data and measuring it with a sniffer.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/siwx91x_bluetooth_le_soc_throughput_freertos_psram.slcp" />
@@ -373,9 +373,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_throughput_freertos_uart" label="BLE - Throughput (UART NCP)" description="This application demonstrates how to exchange continuous data to the remote device to measure the On-Air Throughput using a BLE Sniffer.">
+  <descriptors name="siwx91x_bluetooth_le_host_throughput_freertos_uart" label="SiWx91x Bluetooth LE - Host Throughput FreeRTOS (UART)" description="Demonstrates how to measure BLE throughput using SiWx91x Bluetooth LE with an external host connected over UART. This is demonstrated by exchanging continuous data and measuring it with a sniffer.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/siwx91x_bluetooth_le_host_throughput_freertos_uart.slcp" />
@@ -388,9 +388,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_throughput_freertos_spi" label="BLE - Throughput (NCP)" description="This application demonstrates how to exchange continuous data to the remote device to measure the On-Air Throughput using a BLE Sniffer.">
+  <descriptors name="siwx91x_bluetooth_le_host_throughput_freertos_spi" label="SiWx91x Bluetooth LE - Host Throughput FreeRTOS (SPI)" description="Demonstrates how to measure BLE throughput using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by exchanging continuous data and measuring it with a sniffer.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/siwx91x_bluetooth_le_host_throughput_freertos_spi.slcp" />
@@ -403,13 +403,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_throughput_freertos" label="BLE - Throughput (SoC)" description="This application demonstrates how to exchange continuous data to the remote device to measure the On-Air Throughput using a BLE Sniffer.">
+  <descriptors name="siwx91x_bluetooth_le_soc_throughput_freertos" label="SiWx91x Bluetooth LE - SoC Throughput FreeRTOS" description="Demonstrates how to measure BLE throughput using SiWx91x Bluetooth LE. This is demonstrated by exchanging continuous data and measuring it with a sniffer.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/siwx91x_bluetooth_le_soc_throughput_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m100xntba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -418,13 +418,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_throughput_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ae_peripheral_freertos" label="BLE - AE Peripheral (SoC)" description="Start a BLE device in Extended Advertising Peripheral mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_ae_peripheral_freertos" label="SiWx91x Bluetooth LE - SoC AE Peripheral FreeRTOS" description="Demonstrates how to advertise as a BLE Extended Advertising (AE) peripheral with dual advertising sets and periodic advertising, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/siwx91x_bluetooth_le_soc_ae_peripheral_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -433,9 +433,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ae_peripheral_freertos_psram" label="BLE - AE Peripheral (PSRAM)" description="Start a BLE device in Extended Advertising Peripheral mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_ae_peripheral_freertos_psram" label="SiWx91x Bluetooth LE - SoC AE Peripheral FreeRTOS (PSRAM)" description="Demonstrates how to advertise as a BLE Extended Advertising (AE) peripheral with dual advertising sets and periodic advertising, using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/siwx91x_bluetooth_le_soc_ae_peripheral_freertos_psram.slcp" />
@@ -448,9 +448,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_ae_peripheral_freertos_spi" label="BLE - AE Peripheral (NCP)" description="Start a BLE device in Extended Advertising Peripheral mode.">
+  <descriptors name="siwx91x_bluetooth_le_host_ae_peripheral_freertos_spi" label="SiWx91x Bluetooth LE - Host AE Peripheral FreeRTOS (SPI)" description="Demonstrates how to advertise as a BLE Extended Advertising (AE) peripheral with dual advertising sets and periodic advertising, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/siwx91x_bluetooth_le_host_ae_peripheral_freertos_spi.slcp" />
@@ -463,9 +463,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_ae_peripheral_freertos_uart" label="BLE - AE Peripheral (UART NCP)" description="Start a BLE device in Extended Advertising Peripheral mode.">
+  <descriptors name="siwx91x_bluetooth_le_host_ae_peripheral_freertos_uart" label="SiWx91x Bluetooth LE - Host AE Peripheral FreeRTOS (UART)" description="Demonstrates how to advertise as a BLE Extended Advertising (AE) peripheral with dual advertising sets and periodic advertising, using SiWx91x Bluetooth LE with an external host connected over UART.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/siwx91x_bluetooth_le_host_ae_peripheral_freertos_uart.slcp" />
@@ -478,9 +478,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_peripheral_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_accept_list_freertos_psram" label="BLE - Acceptlist (PSRAM)" description="This application demonstrates how to add a particular BD-Address to the Allow List. The Allow List can restrict which device are allowed to connect to other device.">
+  <descriptors name="siwx91x_bluetooth_le_soc_accept_list_freertos_psram" label="SiWx91x Bluetooth LE - SoC Accept List FreeRTOS (PSRAM)" description="Demonstrates how to configure the BLE Accept List to restrict the peers that can connect to your device, using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_accept_list_freertos/siwx91x_bluetooth_le_soc_accept_list_freertos_psram.slcp" />
@@ -493,9 +493,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_accept_list_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_accept_list_freertos_spi" label="BLE - Acceptlist (NCP)" description="This application demonstrates how to add a particular BD-Address to the Allow List. The Allow List can restrict which device are allowed to connect to other device.">
+  <descriptors name="siwx91x_bluetooth_le_host_accept_list_freertos_spi" label="SiWx91x Bluetooth LE - Host Accept List FreeRTOS (SPI)" description="Demonstrates how to configure the BLE Accept List to restrict the peers that can connect to your device, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_accept_list_freertos/siwx91x_bluetooth_le_host_accept_list_freertos_spi.slcp" />
@@ -508,13 +508,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_accept_list_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_accept_list_freertos" label="BLE - Acceptlist (SoC)" description="This application demonstrates how to add a particular BD-Address to the Allow List. The Allow List can restrict which device are allowed to connect to other device.">
+  <descriptors name="siwx91x_bluetooth_le_soc_accept_list_freertos" label="SiWx91x Bluetooth LE - SoC Accept List FreeRTOS" description="Demonstrates how to configure the BLE Accept List to restrict the peers that can connect to your device, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_accept_list_freertos/siwx91x_bluetooth_le_soc_accept_list_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -523,9 +523,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_accept_list_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_ae_central_freertos_uart" label="BLE - AE Central (UART NCP)" description="Start a BLE device in central with AE properties.">
+  <descriptors name="siwx91x_bluetooth_le_host_ae_central_freertos_uart" label="SiWx91x Bluetooth LE - Host AE Central FreeRTOS (UART)" description="Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets, using SiWx91x Bluetooth LE with an external host connected over UART. This is demonstrated by two scan sets in the application.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/siwx91x_bluetooth_le_host_ae_central_freertos_uart.slcp" />
@@ -538,13 +538,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ae_central_freertos" label="BLE - AE Central (SoC)" description="Start a BLE device in central with AE properties.">
+  <descriptors name="siwx91x_bluetooth_le_soc_ae_central_freertos" label="SiWx91x Bluetooth LE - SoC AE Central FreeRTOS" description="Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets, using SiWx91x Bluetooth LE. This is demonstrated by two scan sets in the application.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/siwx91x_bluetooth_le_soc_ae_central_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -553,9 +553,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_ae_central_freertos_spi" label="BLE - AE Central (NCP)" description="Start a BLE device in central with AE properties.">
+  <descriptors name="siwx91x_bluetooth_le_host_ae_central_freertos_spi" label="SiWx91x Bluetooth LE - Host AE Central FreeRTOS (SPI)" description="Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets, using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by two scan sets in the application.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/siwx91x_bluetooth_le_host_ae_central_freertos_spi.slcp" />
@@ -568,9 +568,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ae_central_freertos_psram" label="BLE - AE Central (PSRAM)" description="Start a BLE device in central with AE properties.">
+  <descriptors name="siwx91x_bluetooth_le_soc_ae_central_freertos_psram" label="SiWx91x Bluetooth LE - SoC AE Central FreeRTOS (PSRAM)" description="Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets, using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by two scan sets in the application.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/siwx91x_bluetooth_le_soc_ae_central_freertos_psram.slcp" />
@@ -583,9 +583,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ae_central_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_gain_table_configuration_freertos_psram" label="BLE - Update Gain Table (PSRAM)" description="Bluetooth Low Energy Update Gain table.">
+  <descriptors name="siwx91x_bluetooth_le_soc_gain_table_configuration_freertos_psram" label="SiWx91x Bluetooth LE - SoC Gain Table Configuration FreeRTOS (PSRAM)" description="Demonstrates how to configure the BLE Gain table using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_gain_table_configuration_freertos/siwx91x_bluetooth_le_soc_gain_table_configuration_freertos_psram.slcp" />
@@ -598,9 +598,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_gain_table_configuration_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_gain_table_configuration_freertos_spi" label="BLE - Update Gain Table (NCP)" description="Bluetooth Low Energy Update Gain table.">
+  <descriptors name="siwx91x_bluetooth_le_host_gain_table_configuration_freertos_spi" label="SiWx91x Bluetooth LE - Host Gain Table Configuration FreeRTOS (SPI)" description="Demonstrates how to configure the BLE Gain table using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_gain_table_configuration_freertos/siwx91x_bluetooth_le_host_gain_table_configuration_freertos_spi.slcp" />
@@ -613,13 +613,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_gain_table_configuration_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_gain_table_configuration_freertos" label="BLE - Update Gain Table (SoC)" description="Bluetooth Low Energy Update Gain table.">
+  <descriptors name="siwx91x_bluetooth_le_soc_gain_table_configuration_freertos" label="SiWx91x Bluetooth LE - SoC Gain Table Configuration FreeRTOS" description="Demonstrates how to configure the BLE Gain table using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_gain_table_configuration_freertos/siwx91x_bluetooth_le_soc_gain_table_configuration_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343c brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343c brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -628,9 +628,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_gain_table_configuration_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_privacy_freertos_psram" label="BLE - Privacy (PSRAM)" description="This application demonstrates how to configure device with privacy feature by organizing resolving list and resolution process and how to connect to remote peripheral device.">
+  <descriptors name="siwx91x_bluetooth_le_soc_privacy_freertos_psram" label="SiWx91x Bluetooth LE - SoC Privacy FreeRTOS (PSRAM)" description="Demonstrates BLE privacy with resolving-list management, using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by establishing private connections to a remote device.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_privacy_freertos/siwx91x_bluetooth_le_soc_privacy_freertos_psram.slcp" />
@@ -643,9 +643,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_privacy_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_privacy_freertos_spi" label="BLE - Privacy (NCP)" description="This application demonstrates how to configure device with privacy feature by organizing resolving list and resolution process and how to connect to remote peripheral device.">
+  <descriptors name="siwx91x_bluetooth_le_host_privacy_freertos_spi" label="SiWx91x Bluetooth LE - Host Privacy FreeRTOS (SPI)" description="Demonstrates BLE privacy with resolving-list management, using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by establishing private connections to a remote device.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_privacy_freertos/siwx91x_bluetooth_le_host_privacy_freertos_spi.slcp" />
@@ -658,13 +658,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_privacy_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_privacy_freertos" label="BLE - Privacy (SoC)" description="This application demonstrates how to configure device with privacy feature by organizing resolving list and resolution process and how to connect to remote peripheral device.">
+  <descriptors name="siwx91x_bluetooth_le_soc_privacy_freertos" label="SiWx91x Bluetooth LE - SoC Privacy FreeRTOS" description="Demonstrates BLE privacy with resolving-list management, using SiWx91x Bluetooth LE. This is demonstrated by establishing private connections to a remote device.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_privacy_freertos/siwx91x_bluetooth_le_soc_privacy_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -673,13 +673,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_privacy_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_power_save_freertos" label="BLE - Power Save (SoC)" description="This application demonstrates how to configure/connects BLE device as Central and can be used to update the PHY rates in Low Power mode">
+  <descriptors name="siwx91x_bluetooth_le_soc_power_save_freertos" label="SiWx91x Bluetooth LE - SoC Power Save FreeRTOS" description="Demonstrates how to configure power save modes for a device using SiWx91x Bluetooth LE. This is demonstrated by configuring advertising, scanning, and connected roles in power save modes.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/siwx91x_bluetooth_le_soc_power_save_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m100xntba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -688,9 +688,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_power_save_freertos_spi" label="BLE - Power Save (NCP)" description="This application demonstrates how to configure/connects BLE device as Central and can be used to update the PHY rates in Low Power mode">
+  <descriptors name="siwx91x_bluetooth_le_host_power_save_freertos_spi" label="SiWx91x Bluetooth LE - Host Power Save FreeRTOS (SPI)" description="Demonstrates how to configure power save modes for a device using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by configuring advertising, scanning, and connected roles in power save modes.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/siwx91x_bluetooth_le_host_power_save_freertos_spi.slcp" />
@@ -703,9 +703,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_power_save_freertos_psram" label="BLE - Power Save (PSRAM)" description="This application demonstrates how to configure/connects BLE device as Central and can be used to update the PHY rates in Low Power mode">
+  <descriptors name="siwx91x_bluetooth_le_soc_power_save_freertos_psram" label="SiWx91x Bluetooth LE - SoC Power Save FreeRTOS (PSRAM)" description="Demonstrates how to configure power save modes for a device using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by configuring advertising, scanning, and connected roles in power save modes.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/siwx91x_bluetooth_le_soc_power_save_freertos_psram.slcp" />
@@ -718,9 +718,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_power_save_freertos_uart" label="BLE - Power Save (UART NCP)" description="This application demonstrates how to configure/connects BLE device as Central and can be used to update the PHY rates in Low Power mode">
+  <descriptors name="siwx91x_bluetooth_le_host_power_save_freertos_uart" label="SiWx91x Bluetooth LE - Host Power Save FreeRTOS (UART)" description="Demonstrates how to configure power save modes for a device using SiWx91x Bluetooth LE with an external host connected over UART. This is demonstrated by configuring advertising, scanning, and connected roles in power save modes.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/siwx91x_bluetooth_le_host_power_save_freertos_uart.slcp" />
@@ -733,9 +733,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_power_save_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_data_length_extension_freertos_psram" label="BLE - Datalength (PSRAM)" description="Start a BLE device in central central role and can be used to set data length extension with the connected remote device.">
+  <descriptors name="siwx91x_bluetooth_le_soc_data_length_extension_freertos_psram" label="SiWx91x Bluetooth LE - SoC Data Length Extension FreeRTOS (PSRAM)" description="Demonstrates how to negotiate a data length extension for larger link PDUs, using SiWx91x Bluetooth LE with PSRAM. This is demonstrated while acting as a central device.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_data_length_extension_freertos/siwx91x_bluetooth_le_soc_data_length_extension_freertos_psram.slcp" />
@@ -748,9 +748,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_data_length_extension_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_data_length_extension_freertos_spi" label="BLE - Datalength (NCP)" description="Start a BLE device in central central role and can be used to set data length extension with the connected remote device.">
+  <descriptors name="siwx91x_bluetooth_le_host_data_length_extension_freertos_spi" label="SiWx91x Bluetooth LE - Host Data Length Extension FreeRTOS (SPI)" description="Demonstrates how to negotiate a data length extension for larger link PDUs, using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated while acting as a central device.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_data_length_extension_freertos/siwx91x_bluetooth_le_host_data_length_extension_freertos_spi.slcp" />
@@ -763,13 +763,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_data_length_extension_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_data_length_extension_freertos" label="BLE - Datalength (SoC)" description="Start a BLE device in central central role and can be used to set data length extension with the connected remote device.">
+  <descriptors name="siwx91x_bluetooth_le_soc_data_length_extension_freertos" label="SiWx91x Bluetooth LE - SoC Data Length Extension FreeRTOS" description="Demonstrates how to negotiate a data length extension for larger link PDUs, using SiWx91x Bluetooth LE. This is demonstrated while acting as a central device.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_data_length_extension_freertos/siwx91x_bluetooth_le_soc_data_length_extension_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -778,13 +778,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_data_length_extension_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_test_modes_freertos" label="BLE - Testmodes (SoC)" description="This application demonstrates how to test the BLE GAP peripheral role.">
+  <descriptors name="siwx91x_bluetooth_le_soc_test_modes_freertos" label="SiWx91x Bluetooth LE - SoC Test Modes FreeRTOS" description="Demonstrates how to use test modes for testing GAP peripherals using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_test_modes_freertos/siwx91x_bluetooth_le_soc_test_modes_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -793,9 +793,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_test_modes_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_test_modes_freertos_psram" label="BLE - Testmodes (PSRAM)" description="This application demonstrates how to test the BLE GAP peripheral role.">
+  <descriptors name="siwx91x_bluetooth_le_soc_test_modes_freertos_psram" label="SiWx91x Bluetooth LE - SoC Test Modes FreeRTOS (PSRAM)" description="Demonstrates how to use test modes for testing GAP peripherals using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_test_modes_freertos/siwx91x_bluetooth_le_soc_test_modes_freertos_psram.slcp" />
@@ -808,9 +808,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_test_modes_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_test_modes_freertos_spi" label="BLE - Testmodes (NCP)" description="This application demonstrates how to test the BLE GAP peripheral role.">
+  <descriptors name="siwx91x_bluetooth_le_host_test_modes_freertos_spi" label="SiWx91x Bluetooth LE - Host Test Modes FreeRTOS (SPI)" description="Demonstrates how to use test modes for testing GAP peripherals using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_test_modes_freertos/siwx91x_bluetooth_le_host_test_modes_freertos_spi.slcp" />
@@ -823,13 +823,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_test_modes_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_interoperability_test_freertos" label="BLE - Interoperability Testing Application (SoC)" description="BLE Interoperability Test">
+  <descriptors name="siwx91x_bluetooth_le_soc_interoperability_test_freertos" label="SiWx91x Bluetooth LE - SoC Interoperability Test FreeRTOS" description="Demonstrates how to perform interoperability testing using SiWx91x Bluetooth LE. This is demonstrated using GATT exchanges between the peer devices targeted for interoperability testing.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_interoperability_test_freertos/siwx91x_bluetooth_le_soc_interoperability_test_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -838,9 +838,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_interoperability_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_human_interface_device_profile_freertos_spi" label="BLE - HID On GATT (NCP)" description="This application demonstrates how to configure BLE device as GATT server in BLE peripheral mode and as GATT client in BLE central mode.">
+  <descriptors name="siwx91x_bluetooth_le_host_human_interface_device_profile_freertos_spi" label="SiWx91x Bluetooth LE - Host Human Interface Device Profile FreeRTOS (SPI)" description="Demonstrates how to use the GATT Human Interface Device (HID) Profile using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_human_interface_device_profile_freertos/siwx91x_bluetooth_le_host_human_interface_device_profile_freertos_spi.slcp" />
@@ -853,13 +853,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_human_interface_device_profile_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_human_interface_device_profile_freertos" label="BLE - HID On GATT (SoC)" description="This application demonstrates how to configure BLE device as GATT server in BLE peripheral mode and as GATT client in BLE central mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_human_interface_device_profile_freertos" label="SiWx91x Bluetooth LE - SoC Human Interface Device Profile FreeRTOS" description="Demonstrates how to use the GATT Human Interface Device (HID) Profile using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_human_interface_device_profile_freertos/siwx91x_bluetooth_le_soc_human_interface_device_profile_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -868,9 +868,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_human_interface_device_profile_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_human_interface_device_profile_freertos_psram" label="BLE - HID On GATT (PSRAM)" description="This application demonstrates how to configure BLE device as GATT server in BLE peripheral mode and as GATT client in BLE central mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_human_interface_device_profile_freertos_psram" label="SiWx91x Bluetooth LE - SoC Human Interface Device Profile FreeRTOS (PSRAM)" description="Demonstrates how to use the GATT Human Interface Device (HID) Profile using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_human_interface_device_profile_freertos/siwx91x_bluetooth_le_soc_human_interface_device_profile_freertos_psram.slcp" />
@@ -883,9 +883,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_human_interface_device_profile_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_bypass_of_ble_stack_layer_freertos_spi" label="BLE - BT_STACK_BYPASS (NCP)" description="BLE HCI raw (stack bypass) on NCP host MCU (EFR32 + Si91x module) over SPI. Demonstrates sending raw HCI commands to the SiWx91x module from a host MCU.">
+  <descriptors name="siwx91x_bluetooth_le_host_bypass_of_ble_stack_layer_freertos_spi" label="SiWx91x Bluetooth LE - Host Bypass of BLE Stack Layer FreeRTOS (SPI)" description="Demonstrates the HCI interface for transmitting HCI raw commands and receiving HCI events by bypassing the SiWx91x NWP BLE stack, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_bypass_of_ble_stack_layer_freertos/siwx91x_bluetooth_le_host_bypass_of_ble_stack_layer_freertos_spi.slcp" />
@@ -898,14 +898,14 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_bypass_of_ble_stack_layer_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_bypass_of_ble_stack_layer_freertos" label="BLE - BT_STACK_BYPASS" description="This application demonstrates how to configure the Raw HCI commands through uart.">
+  <descriptors name="siwx91x_bluetooth_le_soc_bypass_of_ble_stack_layer_freertos" label="SiWx91x Bluetooth LE - SoC Bypass of BLE Stack Layer FreeRTOS" description="Demonstrates the HCI interface for transmitting HCI raw commands and receiving HCI events by bypassing the SiWx91x NWP BLE stack, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_bypass_of_ble_stack_layer_freertos/siwx91x_bluetooth_le_soc_bypass_of_ble_stack_layer_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343c brd4343q brd4343s brd2708a brd2911a" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.*" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
     <properties key="quality" value="production" />
@@ -913,13 +913,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_bypass_of_ble_stack_layer_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ota_firmware_update_freertos_psram" label="BLE - FW OTA Upgrade (PSRAM)" description="This application demonstrates BLE OTA firmware upgrade in standalone mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_ota_firmware_update_freertos_psram" label="SiWx91x Bluetooth LE - SoC OTA Firmware Update FreeRTOS (PSRAM)" description="Demonstrates how to perform an Over-the-air (OTA) Firmware Update using SiWx91x Bluetooth LE with PSRAM. This is demonstrated using GATT to download an OTA image.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ota_firmware_update_freertos/siwx91x_bluetooth_le_soc_ota_firmware_update_freertos_psram.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4340a brd4342a brd4339a brd4343q" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4340a brd4342a brd4339a brd4343q brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -928,9 +928,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ota_firmware_update_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_ota_firmware_update_freertos_spi" label="BLE - FW OTA Upgrade (NCP)" description="This application demonstrates BLE OTA firmware upgrade in standalone mode.">
+  <descriptors name="siwx91x_bluetooth_le_host_ota_firmware_update_freertos_spi" label="SiWx91x Bluetooth LE - Host OTA Firmware Update FreeRTOS (SPI)" description="Demonstrates how to perform an Over-the-air (OTA) Firmware Update using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated using GATT to download an OTA image.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ota_firmware_update_freertos/siwx91x_bluetooth_le_host_ota_firmware_update_freertos_spi.slcp" />
@@ -943,13 +943,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ota_firmware_update_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_ota_firmware_update_freertos" label="BLE - FW OTA Upgrade (SoC)" description="This application demonstrates BLE OTA firmware upgrade in standalone mode.">
+  <descriptors name="siwx91x_bluetooth_le_soc_ota_firmware_update_freertos" label="SiWx91x Bluetooth LE - SoC OTA Firmware Update FreeRTOS" description="Demonstrates how to perform an Over-the-air (OTA) Firmware Update using SiWx91x Bluetooth LE. This is demonstrated using GATT to download an OTA image.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_ota_firmware_update_freertos/siwx91x_bluetooth_le_soc_ota_firmware_update_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4339b brd4340b brd4343q brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4339b brd4340b brd4343q brd2708a brd2911a brd9084b brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -958,9 +958,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_ota_firmware_update_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_unified_ae_freertos_spi" label="BLE - Unified AE Coex App (NCP)" description="Bluetooth Low Energy Extended Advertising features(Central/Peripheral).">
+  <descriptors name="siwx91x_bluetooth_le_host_unified_ae_freertos_spi" label="SiWx91x Bluetooth LE - Host Unified AE FreeRTOS (SPI)" description="Demonstrates BLE Advertising Extensions (AE) in central and peripheral roles with a provision to connect to 1 central and 1 peripheral, using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_ae_freertos/siwx91x_bluetooth_le_host_unified_ae_freertos_spi.slcp" />
@@ -973,9 +973,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_ae_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_unified_ae_freertos_psram" label="BLE - Unified AE Coex App (PSRAM)" description="Bluetooth Low Energy Extended Advertising features(Central/Peripheral).">
+  <descriptors name="siwx91x_bluetooth_le_soc_unified_ae_freertos_psram" label="SiWx91x Bluetooth LE - SoC Unified AE FreeRTOS (PSRAM)" description="Demonstrates BLE Advertising Extensions (AE) in central and peripheral roles with a provision to connect to 1 central and 1 peripheral, using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_ae_freertos/siwx91x_bluetooth_le_soc_unified_ae_freertos_psram.slcp" />
@@ -988,13 +988,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_ae_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_unified_ae_freertos" label="BLE - Unified AE Coex App (SoC)" description="Bluetooth Low Energy Extended Advertising features(Central/Peripheral).">
+  <descriptors name="siwx91x_bluetooth_le_soc_unified_ae_freertos" label="SiWx91x Bluetooth LE - SoC Unified AE FreeRTOS" description="Demonstrates BLE Advertising Extensions (AE) in central and peripheral roles with a provision to connect to 1 central and 1 peripheral, using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_ae_freertos/siwx91x_bluetooth_le_soc_unified_ae_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343c brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4339b brd4343a brd4343b brd4343c brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1003,9 +1003,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/ble/siwx91x_bluetooth_le_unified_ae_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_per_test_freertos_uart" label="BLE - PER (UART NCP)" description="This application demonstrates how to configure the necessary parameters to start transmitting or receiving BLE PER packets.">
+  <descriptors name="siwx91x_bluetooth_le_host_per_test_freertos_uart" label="SiWx91x Bluetooth LE - Host PER Test FreeRTOS (UART)" description="Demonstrates Packet Error Rate (PER) TX/RX testing using SiWx91x Bluetooth LE with an external host connected over UART.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/siwx91x_bluetooth_le_host_per_test_freertos_uart.slcp" />
@@ -1018,9 +1018,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_host_per_test_freertos_spi" label="BLE - PER (NCP)" description="This application demonstrates how to configure the necessary parameters to start transmitting or receiving BLE PER packets.">
+  <descriptors name="siwx91x_bluetooth_le_host_per_test_freertos_spi" label="SiWx91x Bluetooth LE - Host PER Test FreeRTOS (SPI)" description="Demonstrates Packet Error Rate (PER) TX/RX testing using SiWx91x Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/siwx91x_bluetooth_le_host_per_test_freertos_spi.slcp" />
@@ -1033,9 +1033,9 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_per_test_freertos_psram" label="BLE - PER(PSRAM)" description="This application demonstrates how to configure the necessary parameters to start transmitting or receiving BLE PER packets.">
+  <descriptors name="siwx91x_bluetooth_le_soc_per_test_freertos_psram" label="SiWx91x Bluetooth LE - SoC PER Test FreeRTOS (PSRAM)" description="Demonstrates Packet Error Rate (PER) TX/RX testing using SiWx91x Bluetooth LE with PSRAM.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/siwx91x_bluetooth_le_soc_per_test_freertos_psram.slcp" />
@@ -1048,13 +1048,13 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
-  <descriptors name="siwx91x_bluetooth_le_soc_per_test_freertos" label="BLE - PER (SoC)" description="This application demonstrates how to configure the necessary parameters to start transmitting or receiving BLE PER packets.">
+  <descriptors name="siwx91x_bluetooth_le_soc_per_test_freertos" label="SiWx91x Bluetooth LE - SoC PER Test FreeRTOS" description="Demonstrates Packet Error Rate (PER) TX/RX testing using SiWx91x Bluetooth LE.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/siwx91x_bluetooth_le_soc_per_test_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd2708a brd2911a brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m100xntba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.*  .*siwg917y111mgaxa.* .*siwg917y121mgnxa.* .*siwg917y111mgnxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1063,6 +1063,6 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/featured/siwx91x_bluetooth_le_per_test_freertos/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Bluetooth Project\ Difficulty|Beginner Quality|Production" />
   </descriptors>
 </model:MDescriptors>

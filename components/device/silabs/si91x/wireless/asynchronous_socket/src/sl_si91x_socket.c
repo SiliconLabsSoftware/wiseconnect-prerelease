@@ -242,11 +242,11 @@ int sl_si91x_setsockopt(int32_t sockID, int level, int option_name, const void *
 
     case SL_SI91X_SO_TLS_SNI:
     case SL_SI91X_SO_TLS_ALPN: {
-      sl_status_t status = sli_si91x_add_tls_extension(&si91x_socket->tls_extensions,
-                                                       (const sl_si91x_socket_type_length_value_t *)option_value);
-
-      if (status != SL_STATUS_OK) {
-        SLI_SET_ERROR_AND_RETURN(ENOMEM);
+      const int result = sli_si91x_configure_tls_extension(&si91x_socket->tls_extensions,
+                                                           (const sl_si91x_socket_type_length_value_t *)option_value,
+                                                           option_len);
+      if (result != SLI_SI91X_NO_ERROR) {
+        return result;
       }
       break;
     }
@@ -631,7 +631,7 @@ int sl_si91x_recvfrom(int socket,
 
   si91x_socket->is_receive_cmd_pending = true;
   sl_status_t status                   = sli_wifi_async_send_command(SLI_WIFI_REQ_SOCKET_READ_DATA,
-                                                   (SI91X_CMD_MAX + si91x_socket->index),
+                                                   (SLI_SI91X_CMD_MAX + si91x_socket->index),
                                                    &request,
                                                    sizeof(request),
                                                    NULL);
@@ -640,7 +640,7 @@ int sl_si91x_recvfrom(int socket,
     VERIFY_STATUS_AND_RETURN(status);
   }
 
-  status = sli_wifi_receive_response_buffer((uint16_t)(SI91X_CMD_MAX + si91x_socket->index),
+  status = sli_wifi_receive_response_buffer((uint16_t)(SLI_SI91X_CMD_MAX + si91x_socket->index),
                                             0,
                                             wait_time,
                                             SLI_WIFI_WAIT_ON_EVENT_ID,

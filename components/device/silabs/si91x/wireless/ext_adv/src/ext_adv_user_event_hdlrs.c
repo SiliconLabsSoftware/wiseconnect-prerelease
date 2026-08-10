@@ -168,7 +168,7 @@ void rsi_adv_restart_event()
 #endif
     }
 
-    if ((adv_state_dut == adv_disabled)) {
+    if (adv_state_dut == adv_disabled) {
       //! advertise device with default interval
       status = ble_ae_set_1_advertising_enable();
       printf("\r\n Advertising Restarted \n");

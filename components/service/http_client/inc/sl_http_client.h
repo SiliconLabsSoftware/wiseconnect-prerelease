@@ -92,10 +92,34 @@
 #define SL_HTTPS_CLIENT_CERTIFICATE_INDEX_2 2
 
 /**
+ * @def SL_HTTP_CLIENT_PUT_DATA_TRANSMISSION_COMPLETE
+ * @brief
+ *   End-of-data code indicating HTTP PUT body transmission is complete on Si91x.
+ *
+ * @details
+ *   On Si91x, during an HTTP PUT upload the Network Processor acknowledges transmitted
+ *   body chunks via @ref sl_http_client_response_t::end_of_data. When that field equals
+ *   this macro, the request body has been fully sent and the server-response phase may follow.
+ */
+#define SL_HTTP_CLIENT_PUT_DATA_TRANSMISSION_COMPLETE 1
+
+/**
+ * @def SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_MORE_DATA
+ * @brief
+ *   End-of-data code for a non-final HTTP PUT server response segment on Si91x.
+ *
+ * @details
+ *   After the PUT body is sent, the Network Processor may deliver the server response in
+ *   multiple callbacks. When @ref sl_http_client_response_t::end_of_data equals this macro,
+ *   more server-response data is expected.
+ */
+#define SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_MORE_DATA 8
+
+/**
  * @def SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_END_OF_DATA
  * @brief
  *   End-of-data code for the final HTTP PUT server response segment on Si91x.
- * 
+ *
  * @details
  *   On Si91x, after the HTTP PUT request body is sent, the Network Processor delivers the server's HTTP response in one or more application callbacks. When @ref sl_http_client_response_t::end_of_data equals this macro, the current callback holds the last part of that server response and the server-response phase for this PUT is complete. Check that @ref sl_http_client_response_t::end_of_data equals this macro before you release PUT context or finish cleanup.
  */
@@ -284,13 +308,20 @@ typedef struct {
   uint16_t port; ///< Port number of the HTTP server.
   sl_si91x_socket_type_length_value_t *
     sni_extension; ///< SNI (Server Name Indication) extension to specify the hostname for servers hosting multiple domains on the same IP address of type [si91x_socket_type_length_value_t](../wiseconnect-api-reference-guide-sockets/si91x-socket-type-length-value-t).
-  uint8_t
-    *body; ///< HTTP body to be sent to the server. Setting this to NULL will process the request in chunked encoding.
+  uint8_t *body;   ///< HTTP body to be sent to the server. On Si91x POST, this selects the transfer mode:
+  ///<   - Small POST: non-NULL; body is sent inline with @ref sl_http_client_send_request
+  ///<     (single host-to-NWP transfer when the request fits in
+  ///<     @ref SL_HTTP_CLIENT_MAX_WRITE_BUFFER_LENGTH / 900 bytes).
+  ///<   - Large POST: NULL; body must be sent afterward in chunks via
+  ///<     @ref sl_http_client_write_chunked_data (each chunk up to
+  ///<     @ref SL_HTTP_CLIENT_MAX_WRITE_BUFFER_LENGTH / 900 bytes).
+  ///<   For PUT on Si91x, body must be NULL; use @ref sl_http_client_write_chunked_data.
   uint32_t
     body_length; ///< Length of the HTTP body data to be posted. In the case of a chunked request, body length should be equal to the total content length.
   sl_http_client_header_t *
     extended_header; ///< User-defined extended header. If NULL, the default extended header will be added internally. See @ref sl_http_client_header_t.
-  uint16_t timeout_ms; ///< HTTP request timeout period in milliseconds. (Si91x chipsets do not support this feature).
+  uint16_t
+    timeout_ms; ///< HTTP request timeout period in milliseconds. (Not configurable on Si91x: the NWP ignores this value and uses its own fixed HTTP timeout of 100 seconds.)
   uint16_t
     retry_count; ///< Maximum number of retry attempts after a timeout. (Si91x chipsets do not support this feature).
   uint16_t
@@ -316,17 +347,27 @@ typedef struct {
   uint8_t *data_buffer; ///< Pointer to the buffer containing the response data.
   uint16_t data_length; ///< Length of the received data in bytes.
   uint32_t end_of_data; ///< Indicates the completion status of a data chunk or communication phase.
+    ///< For Si91x small vs large POST modes, see @ref sl_http_client_request_t::body.
     ///<
-    ///< GET/POST (indications from server):
+    ///< GET / small POST (indications from the NWP):
     ///<   0: More response data is expected.
     ///<   1: This is the final chunk of the response.
     ///<
-    ///< PUT:
-    ///<   Acknowledgment for transmitted data (notification from NWP):
-    ///<     0: Further data transmission is expected.
-    ///<     1: Data transmission is complete.
-    ///<   Server response (data received from server after transmission):
+    ///< Large POST (indications from the NWP):
+    ///<   Upload phase:
+    ///<     2: Large POST started successfully; the NWP is ready for upload chunks.
+    ///<     4: Upload chunk accepted; more host data is still expected.
+    ///<     5: Upload chunk accepted; host upload is complete (last chunk acknowledgment).
+    ///<   Server response (data received from the server after transmission):
     ///<     8: More response data is expected.
+    ///<     9: This is the final chunk of the response.
+    ///<
+    ///< PUT:
+    ///<   Acknowledgment for transmitted data (notification from the NWP):
+    ///<     0: Further data transmission is expected.
+    ///<     1: Data transmission is complete. See @ref SL_HTTP_CLIENT_PUT_DATA_TRANSMISSION_COMPLETE.
+    ///<   Server response (data received from server after transmission):
+    ///<     8: More response data is expected. See @ref SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_MORE_DATA.
     ///<     9: This is the final chunk of the response. See @ref SL_HTTP_CLIENT_PUT_SERVER_RESPONSE_END_OF_DATA.
   uint16_t
     http_response_code; ///< HTTP response code from the server. (Si91x chipsets do not support this feature for SL_HTTP_PUT).
@@ -569,6 +610,8 @@ sl_status_t sl_http_client_delete_all_headers(sl_http_client_request_t *request)
  * @note
  *   - HTTP HEAD and DELETE methods are not supported on Si91x specific chipsets.
  *   - The `body_length` header in the request is set internally by default on Si91x specific chipsets.
+ *   - On Si91x, POST small vs large mode is selected by @ref sl_http_client_request_t::body
+ *     (see that field). Large POST and PUT require @ref sl_http_client_write_chunked_data.
  *   - HTTP PUT does not support sending the body through this API; it is mandatory to call @ref sl_http_client_write_chunked_data on Si91x specific chipsets.
  *   - HTTP response status and response codes (e.g., 200, 201, 404) would be returned in the corresponding event handler registered during @ref sl_http_client_request_init.
  *   - If the `sni_extension` field in the `sl_http_client_request_t` structure is NULL, the `host_name` field will be used as the SNI, provided that `host_name` is not equal to `ip_address`.

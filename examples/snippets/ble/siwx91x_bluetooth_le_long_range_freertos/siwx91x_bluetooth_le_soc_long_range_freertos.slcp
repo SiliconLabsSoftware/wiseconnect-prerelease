@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_long_range_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - SoC Long Range FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Long Range FreeRTOS
 category: Example|BLE
-description: 'Demonstrates how to act as a BLE central on SiWx91x in SoC FreeRTOS and switch the link PHY to coded or 2 Mbps. Demonstrated by connection PHY update procedures with a remote peripheral.
+description: 'Demonstrates how to switch the link PHY to long range (LE Coded) using SiWx91x Bluetooth LE. This is demonstrated using PHY update procedures with a remote peripheral.
 
   '
 filter:

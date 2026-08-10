@@ -1,5 +1,5 @@
 id: wiseconnect_common
-package: wifi
+package: wiseconnect_common
 description: >
   Provides a library of commonly used components in the WiSeConnect SDK.
 label: WiSeConnect Common Library
@@ -14,6 +14,7 @@ provides:
 - name: wiseconnect3_common
 source:
 - path: src/sl_utility.c
+- path: src/sli_utility.c
 include:
 - path: inc
   file_list:
@@ -23,7 +24,11 @@ include:
     - path: sl_constants.h
     - path: sl_ieee802_types.h
     - path: sl_ip_types.h
+    - path: sl_si91x_status.h
     - path: sl_utility.h
+    - path: sli_constants.h
+    - path: sl_types.h
+    - path: sli_utility.h
 
 requires:
 - name: status
@@ -33,6 +38,7 @@ requires:
 - name: atomic
 - name: cmsis_core
 - name: malloc_thread_safety
+- name: sli_command_engine
 - name: log_none
   condition: ["device_si91x"]
 

@@ -21,6 +21,7 @@ include:
 - path: .
   file_list:
   - path: app.h
+  - path: app_config.h
   - path: ble_config.h
   - path: wifi_app.h
 define:

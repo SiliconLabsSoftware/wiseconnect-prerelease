@@ -198,7 +198,7 @@ static sl_status_t sli_hal_si91x_send_packet(void *packet,
 
   sli_si91x_hal_packet_t *hal_packet = NULL;
 
-  sl_status_t status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_METADATA_POOL,
+  sl_status_t status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_HAL_TX_METADATA_POOL,
                                                           SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                                           1000,
                                                           (sli_buffer_t *)&hal_packet);

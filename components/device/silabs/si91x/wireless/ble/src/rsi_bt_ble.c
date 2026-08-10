@@ -36,7 +36,8 @@
 #include "cmsis_os2.h"
 
 #include "sl_wifi_host_interface.h"
-#include "sl_si91x_driver.h"
+#include "sli_hal_si91x.h"
+#include "sli_constants.h"
 
 #include "rsi_bt_common.h"
 #include "rsi_ble.h"
@@ -47,14 +48,13 @@
 #include "rsi_ble_common_config.h"
 #include "rsi_common_apis.h"
 
-sl_status_t sli_si91x_allocate_command_buffer(sl_wifi_buffer_t **host_buffer,
-                                              void **buffer,
-                                              uint32_t requested_buffer_size,
-                                              uint32_t wait_duration_ms);
 uint32_t rsi_get_bt_state(const rsi_bt_cb_t *bt_cb);
 
 #define BT_SEM     0x1
 #define BT_CMD_SEM 0x2
+
+// HAL async TX completion callback for BLE
+void sli_si91x_ble_send_packet_tx_status(uint16_t packet_type, sl_status_t status, void *context);
 
 /*
  * Global Variables
@@ -2281,6 +2281,16 @@ uint16_t rsi_bt_prepare_le_pkt(uint16_t cmd_type, void *cmd_struct, sl_wifi_syst
   return payload_size;
 }
 
+void sli_si91x_ble_send_packet_tx_status(uint16_t packet_type, sl_status_t status, void *context)
+{
+  UNUSED_PARAMETER(packet_type); // Packet type not needed in this callback
+  const sl_wifi_system_packet_t *packet = (const sl_wifi_system_packet_t *)context;
+  // Notify BLE stack that transmission is done
+  rsi_bt_common_tx_done(packet, status);
+  sli_buffer_manager_free_buffer(context);
+  return;
+}
+
 /**
  * @brief       Fill commands and places into Bt TX queue
  * @param[in]   cmd          - Type of the command to send
@@ -2343,7 +2353,7 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
   }
 
   // Allocate a buffer for the command with appropriate size
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_TX_POOL,
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
                                               SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
                                               SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
                                               (sli_buffer_t)&pkt);
@@ -2425,7 +2435,10 @@ int32_t rsi_bt_driver_send_cmd(uint16_t cmd, void *cmd_struct, void *resp)
     bt_cb->sync_rsp               = 1;
   }
 
-  status = sli_si91x_driver_send_bt_command(cmd, SLI_SI91X_BT_CMD, pkt);
+  status = sli_hal_si91x_ble_send_packet(pkt,
+                                         sizeof(sl_wifi_system_packet_t) + (pkt->length & 0xFFF),
+                                         sli_si91x_ble_send_packet_tx_status,
+                                         pkt);
   if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS) {
     rsi_bt_set_status(bt_cb, status);
     osSemaphoreRelease(bt_cb->bt_cmd_sem);

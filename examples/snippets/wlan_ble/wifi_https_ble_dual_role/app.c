@@ -175,9 +175,11 @@ static const sl_wifi_device_configuration_t config = {
                      0
 #endif
                      ) },
-  .ta_pool = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
-               .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
-               .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO }
+  .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
+                           .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
+                           .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },
+  .efuse_data_type     = SL_SI91X_EFUSE_MFG_SW_VERSION,
+  .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
 };
 
 /*=======================================================================*/

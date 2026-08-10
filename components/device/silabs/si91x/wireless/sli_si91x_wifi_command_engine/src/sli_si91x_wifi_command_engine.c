@@ -35,6 +35,7 @@
 #include "sli_si91x_driver.h"
 #include "sli_command_engine.h"
 #include "sli_si91x_wifi_event_handler.h"
+#include "sli_utility.h"
 
 sl_status_t sli_si91x_wifi_command_engine_init(void)
 {
@@ -88,17 +89,6 @@ sl_status_t sli_si91x_wifi_command_engine_init(void)
       { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
         .pre_tx_handler              = NULL,
         .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
-        .route_packet_type           = SLI_BT_PACKET,
-        .sync_response_queue         = &cmd_queues[SLI_WLAN_BT_CMD],
-        .sync_response_event         = SL_WIFI_BT_RESPONSE_EVENT,
-        .sync_response_event_id      = &sli_wifi_events,
-        .max_in_flight_command_count = 1,
-        .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_BLE_EVENT],
-        .async_response_event_id     = &sli_wifi_event_engine_event_id,
-        .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
-      { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
-        .pre_tx_handler              = NULL,
-        .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
         .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
         .sync_response_queue         = &cmd_queues[SLI_WLAN_SOCKET_CMD],
         .sync_response_event         = SL_WIFI_SOCKET_RESPONSE_EVENT,
@@ -120,12 +110,15 @@ sl_status_t sli_si91x_wifi_command_engine_init(void)
     }
   }
 
-  return SL_STATUS_OK;
+  return sli_wifi_set_command_engine_instance(&sli_wifi_command_engine);
 }
 
 sl_status_t sli_si91x_wifi_command_engine_deinit(void)
 {
   sl_status_t status = SL_STATUS_OK;
+
+  status = sli_wifi_set_command_engine_instance(NULL);
+  VERIFY_STATUS_AND_RETURN(status);
 
   // Rely on sli_command_engine_deinit to free all dynamic packet types; remove_packet_type can time out
   // and would skip deinit/event teardown if chained with VERIFY_STATUS_AND_RETURN.

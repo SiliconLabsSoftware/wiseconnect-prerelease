@@ -1,18 +1,24 @@
 project_name: siwx91x_bluetooth_le_soc_unified_freertos
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE Unified Coex Application (SoC)
+label: SiWx91x Bluetooth LE - SoC Unified FreeRTOS
 category: Example|BLE
-description: 'Demonstrates BLE Unified Component Framework with modular protocol architecture on Si91x SoC. Supports GAP, GATT Server/Client, SMP, and Extended/Legacy Advertising.
+description: 'Demonstrates a unified component framework with modular GAP, GATT Server/Client, SMP, and Legacy Advertising with BLE co-existence, using SiWx91x Bluetooth LE.
 
   '
 filter:
 - name: Wireless Technology
   value:
   - BLE
+- name: Device Type
+  value:
+  - SoC
 - name: Project Difficulty
   value:
   - Advanced
+- name: Quality
+  value:
+  - Production
 source:
 - path: app.c
 include:

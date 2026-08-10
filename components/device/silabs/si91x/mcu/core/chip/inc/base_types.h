@@ -165,6 +165,53 @@ typedef struct _RSI_DRIVER_VERSION {
 #endif
 #endif
 
+/** @brief
+ *    Macro for disabling compiler optimization on a specific function.
+ *
+ *  @details
+ *    NO_OPTIMIZE expands to the compiler-specific attribute that forces a
+ *    function to be built without optimization. Clang/LLVM uses
+ *    __attribute__((optnone)) while GCC uses __attribute__((optimize("O0"))).
+ *    __clang__ is checked before __GNUC__ because Clang also defines __GNUC__
+ *    but does not implement the "optimize" function attribute. For any other
+ *    compiler the macro expands to nothing.
+ *
+ *    Usage: void NO_OPTIMIZE my_function(void) { ... }
+ */
+#ifndef NO_OPTIMIZE
+#if defined(__clang__)
+#define NO_OPTIMIZE __attribute__((optnone))
+#elif defined(__GNUC__)
+#define NO_OPTIMIZE __attribute__((optimize("O0")))
+#else
+#define NO_OPTIMIZE
+#endif
+#endif
+
+/**
+ * @brief Force the compiler to inline a function.
+ *
+ * Time-critical `STATIC INLINE` helpers are only *hinted* to inline; the
+ * compiler (especially under LTO) may still emit them out-of-line as
+ * standalone functions. In PSRAM builds the linker can then place those
+ * out-of-line copies in PSRAM, so they would execute from PSRAM during
+ * sleep/wake-up when QSPI/PSRAM is slow or not yet available - which breaks
+ * timing and power-state handling. Forcing inlining guarantees the code is
+ * emitted into its caller (internal RAM/flash text) and never relocated into
+ * PSRAM.
+ *
+ * Kept behind a portable macro so non-GNU toolchains stay source-compatible.
+ */
+#ifndef SL_SI91X_ATTRIBUTE_ALWAYS_INLINE
+#if defined(__GNUC__) || defined(__clang__)
+#define SL_SI91X_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
+#elif defined(__CC_ARM)
+#define SL_SI91X_ATTRIBUTE_ALWAYS_INLINE __forceinline
+#else
+#define SL_SI91X_ATTRIBUTE_ALWAYS_INLINE
+#endif
+#endif
+
 #define ENABLE  1
 #define DISABLE 0
 

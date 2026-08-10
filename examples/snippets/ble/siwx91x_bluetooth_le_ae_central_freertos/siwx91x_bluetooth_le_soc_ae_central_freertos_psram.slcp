@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_ae_central_freertos_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM AE Central FreeRTOS
+label: SiWx91x Bluetooth LE - SoC AE Central FreeRTOS (PSRAM)
 category: Example|BLE
-description: 'Demonstrates how to act as a BLE Extended Advertising central with dual scan sets for 1M and Coded PHY on SiWx91x with PSRAM in SoC FreeRTOS. This is demonstrated by two scan sets in the application.
+description: 'Demonstrates how to scan as a BLE Extended Advertising central using dual 1M and Coded PHY scan sets, using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by two scan sets in the application.
 
   '
 filter:

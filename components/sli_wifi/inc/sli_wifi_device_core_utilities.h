@@ -39,9 +39,9 @@
 extern sli_task_register_id_t sli_fw_status_storage_index;
 #endif
 
-/// Invalid index for firmware status storage. 0xFF is used as a sentinel value because
-/// sli_task_register_id_t is uint8_t; 0xFF is outside the valid range of task register indices.
+#ifndef SLI_FW_STATUS_STORAGE_INVALID_INDEX
 #define SLI_FW_STATUS_STORAGE_INVALID_INDEX 0xFF
+#endif
 
 /***************************************************************************/ /**
  * @brief 
@@ -60,35 +60,4 @@ static inline sl_status_t sli_wifi_get_saved_firmware_status(void)
   sli_osTaskRegisterGetValue(NULL, sli_fw_status_storage_index, &status);
 #endif
   return status;
-}
-
-/******************************************************************************
- * @brief
- * 	A utility function that store the firmware status code in thread specific storage.
- * @param[in] converted_firmware_status
- *	Firmware status code that needs to be saved.
- *****************************************************************************/
-static inline void sli_wifi_save_firmware_status(sl_status_t converted_firmware_status)
-{
-#ifndef __ZEPHYR__
-  sli_osTaskRegisterSetValue(NULL, sli_fw_status_storage_index, converted_firmware_status);
-#endif
-}
-
-/******************************************************************************
- * @brief
- *   A utility function that converts frame status sent by firmware to sl_status_t and stores in thread local storage of caller thread.
- * @param[in] firmware_status
- *   firmware_status that needs to be converted to sl_status_t.
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- *****************************************************************************/
-static inline sl_status_t sli_wifi_convert_and_save_firmware_status(uint16_t firmware_status)
-{
-  sl_status_t converted_firmware_status = (firmware_status == SL_STATUS_OK) ? SL_STATUS_OK
-                                                                            : (firmware_status | (1U << 16));
-#ifndef __ZEPHYR__
-  sli_wifi_save_firmware_status(converted_firmware_status);
-#endif
-  return converted_firmware_status;
 }

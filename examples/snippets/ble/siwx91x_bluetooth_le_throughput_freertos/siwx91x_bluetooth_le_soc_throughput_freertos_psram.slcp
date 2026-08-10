@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_soc_throughput_freertos_psram
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - PSRAM Throughput FreeRTOS
+label: SiWx91x Bluetooth LE - SoC Throughput FreeRTOS (PSRAM)
 category: Example|BLE
-description: 'Demonstrates BLE on-air throughput by exchanging continuous data on SiWx91x with PSRAM in SoC FreeRTOS. Demonstrated by sustained transfers measurable with a sniffer.
+description: 'Demonstrates how to measure BLE throughput using SiWx91x Bluetooth LE with PSRAM. This is demonstrated by exchanging continuous data and measuring it with a sniffer.
 
   '
 filter:

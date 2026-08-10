@@ -36,9 +36,8 @@
 #include "sl_wifi_host_interface.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_wifi_constants.h"
-
-#define SLI_WIFI_WAIT_ON_THREAD_ID 0
-#define SLI_WIFI_WAIT_ON_EVENT_ID  1
+#include "sli_utility.h"
+#include <stdint.h>
 
 #define SLI_WIFI_HEADER_SIZE                   16
 #define SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE     4
@@ -56,28 +55,6 @@
  *   Frame status (uint16_t)
  ******************************************************************************/
 uint16_t sli_wifi_get_wifi_frame_status(const sl_wifi_system_packet_t *packet);
-
-/***************************************************************************/ /**
- * @brief
- *   Retrieve data from a buffer with a specified offset.
- *
- * @details
- *   This function is designed to retrieve data from a buffer at a specified offset.
- *
- * @param[in]  buffer
- *   A pointer to an [sl_wifi_buffer_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-buffer-t) structure from which data is to be retrieved.
- * 
- * @param[in]  offset
- *   Offset from the start of the buffer where data retrieval begins.
- * 
- * @param[out] data_length
- *   Pointer to a variable where the remaining data length from the offset will be stored.
- *
- * @return
- *   Pointer to the data at the specified offset within the buffer.
- *
- ******************************************************************************/
-void *sli_wifi_host_get_buffer_data(void *buffer, uint16_t offset, uint16_t *data_length);
 
 /**
  * @brief
@@ -244,63 +221,11 @@ sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
                                                    void **response_buffer,
                                                    uint8_t custom_host_desc);
 
-sl_status_t sli_wifi_send_command(uint32_t command,
-                                  sli_wifi_command_type_t command_type,
-                                  const void *data,
-                                  uint32_t data_length,
-                                  sli_wifi_wait_period_t wait_period,
-                                  void *sdk_context,
-                                  void **data_buffer);
-
-sl_status_t sli_wifi_receive_response_buffer(uint16_t command_packet_type,
-                                             uint16_t packet_id,
-                                             sli_wifi_wait_period_t wait_time,
-                                             uint8_t wait_type,
-                                             void **response_packet);
-
 sl_status_t sli_wifi_async_send_command(uint32_t command,
                                         sli_wifi_command_type_t command_type,
                                         const void *data,
                                         uint32_t data_length,
                                         void *custom_desc);
-
-sl_status_t sli_wifi_driver_wait_for_response_packet(uint16_t command_packet_type,
-                                                     uint16_t packet_id,
-                                                     sli_wifi_wait_period_t wait_period,
-                                                     uint8_t wait_type,
-                                                     sli_command_engine_metadata_t **packet_buffer);
-/**
- * @brief Internal function to send a command packet to Command Engine
- *
- * @param command The command to be sent.
- * @param command_type The type of the command.
- * @param packet Pointer to the sl_wifi_system_packet_t containing the command data.
- * @param wait_period The wait period for the command response.
- * @param sdk_context Pointer to the SDK context.
- * @param response_buffer Pointer to the buffer where the response will be stored.
- * @return sl_status_t Status of the operation.
- */
-sl_status_t sli_wifi_send_command_packet(uint32_t command,
-                                         sli_wifi_command_type_t command_type,
-                                         sl_wifi_system_packet_t *packet,
-                                         sli_wifi_wait_period_t wait_period,
-                                         void *sdk_context,
-                                         void **response_buffer);
-
-/***************************************************************************/ /**
- * @brief
- *   Calculates the elapsed time since a given starting timestamp.
- * 
- * @details
- *   This function calculates the difference between the current timestamp and a provided starting timestamp. It is useful for measuring the time elapsed during operations.
- * 
- * @param[in] starting_timestamp
- *   The starting timestamp from which the elapsed time is calculated.
- * 
- * @return
- *   The elapsed time in milliseconds of type uint32_t.
- ******************************************************************************/
-uint32_t sli_wifi_host_elapsed_time(uint32_t starting_timestamp);
 
 #ifndef __ZEPHYR__
 /***************************************************************************/ /**

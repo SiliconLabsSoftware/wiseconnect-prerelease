@@ -82,7 +82,7 @@ For a division factor of 2, the output clock will be Clock_in divided by 4, i.e.
 /************************************************************************************
  *************************  LOCAL FUNCTION PROTOTYPES  ******************************
  ************************************************************************************/
-STATIC INLINE sl_status_t config_sleep_clks(void);
+STATIC INLINE SL_SI91X_ATTRIBUTE_ALWAYS_INLINE sl_status_t config_sleep_clks(void);
 /************************************************************************************
  *************************  GLOBAL FUNCTION DEFINITIONS  ****************************
  ************************************************************************************/
@@ -289,7 +289,7 @@ sl_status_t sli_si91x_clock_manager_config_clks_on_ps_change(sl_power_state_t po
  * Set M4 SOC and QSPI2 clock to Ref clock
  ******************************************************************************/
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SL_CLOCK_MANAGER, SL_CODE_CLASS_TIME_CRITICAL)
-STATIC INLINE sl_status_t config_sleep_clks(void)
+STATIC INLINE SL_SI91X_ATTRIBUTE_ALWAYS_INLINE sl_status_t config_sleep_clks(void)
 {
   sl_status_t sli_status = SL_STATUS_OK;
 

@@ -1,5 +1,5 @@
 id: malloc_thread_safety
-package: wifi
+package: wiseconnect_common
 description: >
   Provides thread safety to malloc() and free()
 label: Malloc thread safety

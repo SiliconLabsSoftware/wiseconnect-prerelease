@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_power_save_freertos_uart
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - UART NCP Power Save FreeRTOS
+label: SiWx91x Bluetooth LE - Host Power Save FreeRTOS (UART)
 category: Example|BLE
-description: 'Demonstrates how to configure the device in power save profile with Advertising, Scanning and Connected mode on SiWx91x over UART NCP with FreeRTOS.
+description: 'Demonstrates how to configure power save modes for a device using SiWx91x Bluetooth LE with an external host connected over UART. This is demonstrated by configuring advertising, scanning, and connected roles in power save modes.
 
   '
 filter:

@@ -1,9 +1,9 @@
 project_name: siwx91x_bluetooth_le_host_gatt_long_read_freertos_spi
 package: bluetooth_le_siwx91x_app
 quality: production
-label: BLE - NCP Gatt Long Read FreeRTOS
+label: SiWx91x Bluetooth LE - Host GATT Long Read FreeRTOS (SPI)
 category: Example|BLE
-description: 'Demonstrates GATT long read on SiWx91x over SPI NCP with FreeRTOS. Demonstrated by reading long characteristic data via prepared ATT procedures.
+description: 'Demonstrates how to perform a GATT long read using SiWx91x Bluetooth LE with an external host connected over SPI. This is demonstrated by reading long characteristic data using prepared ATT procedures.
 
   '
 filter:

@@ -32,6 +32,7 @@
 #define SLI_WIFI_BUFFER_MANAGER_TYPES_H
 
 #include "sli_mem_pool.h"
+#include "sli_buffer_manager_config.h"
 #include "stdint.h"
 
 typedef enum {
@@ -39,20 +40,6 @@ typedef enum {
     0, ///< Allocate from common pool first and then allocate from dedicated pool.
   SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED ///< Allocate from dedicated pool only.
 } sli_buffer_manager_allocation_types_t;
-
-typedef enum {
-  SLI_BUFFER_MANAGER_CE_TX_POOL = 0,    ///< Command Engine Command TX Pool.
-  SLI_BUFFER_MANAGER_CE_RX_POOL,        ///< Command Engine Command RX Pool.
-  SLI_BUFFER_MANAGER_CE_DATA_POOL,      ///< Command Engine Data Packet Pool.
-  SLI_BUFFER_MANAGER_CE_METADATA_POOL,  ///< Command Engine Meta Data Pool.
-  SLI_BUFFER_MANAGER_HAL_METADATA_POOL, ///< HAL Metadata Pool.
-  SLI_BUFFER_MANAGER_CP_CMD_TX_POOL,    ///< Command Parser Command TX Pool.
-  SLI_BUFFER_MANAGER_CP_CMD_RX_POOL,    ///< Command Parser Command RX Pool.
-  SLI_BUFFER_MANAGER_CP_DATA_TX_POOL,   ///< Command Parser Data TX Pool.
-  SLI_BUFFER_MANAGER_CP_DATA_RX_POOL,   ///< Command Parser Data RX Pool.
-  SLI_BUFFER_MANAGER_QUEUE_NODE_POOL,   ///< Command Parser Data RX Pool.
-  SLI_BUFFER_MANAGER_MAX_POOL           ///< Maximum Pool Size.
-} sli_buffer_manager_pool_types_t;
 
 /**
  * @typedef sli_buffer_t

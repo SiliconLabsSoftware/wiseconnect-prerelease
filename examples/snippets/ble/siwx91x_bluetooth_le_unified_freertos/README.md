@@ -45,8 +45,8 @@ The application showcases:
 
 ### Project Selection
 This example provides two project variants:
-- **`ble_unified_coex_app_soc.slcp`** - For Si917 SoC mode (recommended for most use cases)
-- **`ble_unified_coex_app_ncp.slcp`** - For Si917 NCP mode with external host MCU
+- **`siwx91x_bluetooth_le_soc_unified_freertos.slcp`** - For Si917 SoC mode (recommended for most use cases)
+- **`siwx91x_bluetooth_le_host_unified_freertos_spi.slcp`** - For Si917 NCP mode with external host MCU
 
 ## Configuration
 
@@ -74,13 +74,13 @@ Each protocol component provides its own configuration file:
 ### Building
 
 **For SoC Mode**:
-1. Import `ble_unified_coex_app_soc.slcp` in Simplicity Studio
+1. Import `siwx91x_bluetooth_le_soc_unified_freertos.slcp` in Simplicity Studio
 2. Uncomment required BLE protocol components as they become available (Tasks 4-8)
 3. Configure protocol parameters via component config files
 4. Build project
 
 **For NCP Mode**:
-1. Import `ble_unified_coex_app_ncp.slcp` in Simplicity Studio
+1. Import `siwx91x_bluetooth_le_host_unified_freertos_spi.slcp` in Simplicity Studio
 2. Uncomment required BLE protocol components as they become available (Tasks 4-8)
 3. Configure protocol parameters via component config files
 4. Configure SPI interface pins in component settings
@@ -143,6 +143,6 @@ Customize protocol initialization:
 
 ## References
 
-- [Si917 Component Framework Architecture](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
-- [Component Refactoring Plan](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
+- [Si917 Component Framework Architecture](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
+- [Component Refactoring Plan](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
 - WiSeConnect SDK Documentation

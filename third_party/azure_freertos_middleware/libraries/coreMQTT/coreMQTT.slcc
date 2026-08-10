@@ -1,5 +1,5 @@
 id: coreMQTT
-package: wifi
+package: azure_freertos_middleware
 description: >
   Core MQTT
 label: Core MQTT

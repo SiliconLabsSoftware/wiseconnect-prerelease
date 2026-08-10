@@ -1,9 +1,14 @@
 # Sensor Data Publishing and LED Control with AWS IoT MQTT for SiWG917 Dev Kit
 
+## High-Level Overview
+
+SiWG917 dev kit AWS example: Provision Wi-Fi over BLE using the Si Connect app, connect to AWS IoT Core via MQTT, and publish sensor data in SoC mode.
+
 ## Table of Contents
 
 - [Sensor Data Publishing and LED Control with AWS IoT MQTT for SiWG917 Dev Kit](#sensor-data-publishing-and-led-control-with-aws-iot-mqtt-for-siwg917-dev-kit)
   - [Table of Contents](#table-of-contents)
+  - [High-Level Overview](#high-level-overview)
   - [Purpose / Scope](#purpose--scope)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)
     - [Hardware Requirements](#hardware-requirements)
@@ -20,9 +25,15 @@
     - [Setting up Security Certificates](#setting-up-security-certificates)
     - [Create an AWS Thing](#create-an-aws-thing)
   
+  - [Troubleshooting](#troubleshooting)
+  - [Resources](#resources)
+  - [Report Bugs and Get Support](#report-bugs-and-get-support)
+
 ## Purpose / Scope
 
 In this application, the Bluetooth Low Energy (BLE) and Si Connect App (formerly Simplicity Connect / EFR Connect App) are used for provisioning the SiWx917 to a Wi-Fi Network. Once provisioned, SiWx917 acts as a Wi-Fi station and connects to the AWS cloud via MQTT.
+
+> **Note:** The Silabs AWS IoT Device SDK port supports **only one active AWS MQTT/TLS client connection at a time**. Multiple simultaneous `AWS_IoT_Client` sessions are not supported.
 
 The user can enable the required LED from the mobile app. The mobile app will publish the required LED state to MQTT_TOPIC1. SiWx917 subscribes to MQTT_TOPIC1 and enables the requested LED.
 
@@ -38,7 +49,7 @@ The application also publishes the real-time sensor data (LUX, Temperature, Humi
 - Wireless Access Point
 - **SoC Mode**:
   - Kits
-    - BRD2605A/BRD2605B (SiWG917 Dev Kit Board)
+    - [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)/[BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) (SiWG917 Dev Kit Board)
 - Android Phone or iPhone with Si Connect App (formerly Simplicity Connect / EFR Connect App), which is available in Play Store and App Store (or) Windows PC with Windows Silicon Labs connect application.
 
 ### Software Requirements
@@ -235,7 +246,7 @@ After successfully connecting to Wi-Fi, the application establishes a connection
 
 ### Setting up Security Certificates
 
-The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/resources/scripts/).
+The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/resources/scripts/).
 
 1. Copy the downloaded device certificate, private key from AWS, and the certificate_to_array.py to `<SDK>/resources/certificates`.
 
@@ -274,7 +285,7 @@ The Starfield Root CA certificate used by your Wi-Fi device to verify the AWS se
   > Support for the SNI extension has been added to the AWS SDK, ensuring it is set by the client when connecting to an AWS server using TLS 1.3. This is handled internally by the AWS SDK and does not affect compatibility with other TLS versions.
 
   > **NOTE :**
-  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.1-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
+  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
   >
   > AWS has announced that there will be changes in their root CA chain. More details can be found in the reference link: [here](https://aws.amazon.com/blogs/security/acm-will-no-longer-cross-sign-certificates-with-starfield-class-2-starting-august-2025/)
   >
@@ -353,3 +364,26 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 8. Click **Done**.
 
    The created thing should now be visible on the AWS console (**Manage > All devices > Things**).
+
+## Troubleshooting
+
+If you encounter issues while running this example, check the following:
+
+- Prepare AWS certificates and configure `aws_iot_config.h` before you build the application.
+- Use the Si Connect mobile app for BLE provisioning and verify the target AP credentials.
+- Review [Setting up Security Certificates](#setting-up-security-certificates) and [Create an AWS Thing](#create-an-aws-thing) for cloud setup.
+- Confirm MQTT connection status in the [MQTT Connection](#mqtt-connection) console output.
+
+## Resources
+
+- [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
+- [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
+- [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+- [AWS IoT Core Documentation](https://docs.aws.amazon.com/iot/)
+
+## Report Bugs and Get Support
+
+Report issues and get help from the Silicon Labs community:
+
+- [Silicon Labs Community](https://www.silabs.com/community)
+
