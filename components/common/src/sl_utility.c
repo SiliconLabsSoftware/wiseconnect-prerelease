@@ -40,7 +40,6 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
-extern bool device_initialized;
 
 #if ((!defined(SLI_SI91X_MCU_INTERFACE)) && (defined(SL_CATALOG_LOG_COMPONENT_PRESENT)))
 #define SLI_UTILITY_NCP_SL_LOG_ENABLED 1
@@ -78,6 +77,18 @@ typedef struct {
 } data_t;
 
 extern char *strtok_r(char *, const char *, char **);
+
+static bool device_initialized = false;
+
+void sli_si91x_set_device_initialized(bool initialized)
+{
+  device_initialized = initialized;
+}
+
+bool sl_si91x_is_device_initialized(void)
+{
+  return device_initialized;
+}
 
 void sli_convert_uint32_to_bytestream(uint16_t data, uint8_t *buffer)
 {
@@ -483,7 +494,7 @@ void sl_redirect_log(const char *format, ...)
 
 sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

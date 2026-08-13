@@ -35,8 +35,11 @@ template_contribution:
 requires:
 - name: sli_routing_utility
 - name: log_none
+- name: sl_si91x_host_control
 - condition: ["device_si91x"]
   name: sl_si91x_mcu
+- condition: ["device_si91x"]
+  name: sli_si91x_ahb_bus
 - condition: ["device_efx"]
   name: efx32_si91x_wireless_connector
 - condition: ["device_efx"]

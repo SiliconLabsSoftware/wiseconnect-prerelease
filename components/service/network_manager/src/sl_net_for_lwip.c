@@ -317,11 +317,11 @@ static sl_status_t set_sta_link_up(sl_net_wifi_client_profile_t *profile)
       osDelay(SLI_SYSTEM_MS_TO_TICKS(100));
     }
 #endif /* LWIP_IPV4 && LWIP_DHCP */
-       /*
-      * Enable DHCPv6 with IPV6
-      */
+  }
 
-    // Stateless DHCPv6
+  // IPv6 link-local / SLAAC is independent of IPv4 DHCP.
+  // Default mode is SL_IP_MANAGEMENT_LINK_LOCAL when LWIP_IPV6 is enabled.
+  if ((SL_IP_MANAGEMENT_DHCP == profile->ip.mode) || (SL_IP_MANAGEMENT_LINK_LOCAL == profile->ip.mode)) {
 #if LWIP_IPV6 && LWIP_IPV6_AUTOCONFIG
     // Automatically configure global addresses from Router Advertisements
     netif_set_ip6_autoconfig_enabled(&(wifi_client_context->netif), 1);
@@ -541,9 +541,9 @@ static sl_status_t set_sta_link_up_async(sl_net_wifi_client_profile_t *profile)
     return SL_STATUS_OK;
   }
 
-  if (SL_IP_MANAGEMENT_DHCP == profile->ip.mode) {
-    bool async_started = false;
+  bool async_started = false;
 
+  if (SL_IP_MANAGEMENT_DHCP == profile->ip.mode) {
     // Start IPv4 DHCP if IPv4 is configured
     if (profile->ip.type & SL_IPV4) {
 #if LWIP_IPV4 && LWIP_DHCP
@@ -558,31 +558,33 @@ static sl_status_t set_sta_link_up_async(sl_net_wifi_client_profile_t *profile)
       return SL_STATUS_NOT_SUPPORTED;
 #endif /* LWIP_IPV4 && LWIP_DHCP */
     }
+  }
 
-    // Start IPv6 autoconfig if IPv6 is configured
-    if (profile->ip.type & SL_IPV6) {
+  // IPv6 link-local / SLAAC is independent of IPv4 DHCP.
+  // Default mode is SL_IP_MANAGEMENT_LINK_LOCAL when LWIP_IPV6 is enabled.
+  if (((SL_IP_MANAGEMENT_DHCP == profile->ip.mode) || (SL_IP_MANAGEMENT_LINK_LOCAL == profile->ip.mode))
+      && (profile->ip.type & SL_IPV6)) {
 #if LWIP_IPV6 && LWIP_IPV6_AUTOCONFIG
-      // Automatically configure global addresses from Router Advertisements
-      netif_set_ip6_autoconfig_enabled(&(wifi_client_context->netif), 1);
-      // Create and set the link-local address
-      netif_create_ip6_linklocal_address(&(wifi_client_context->netif), MAC_48_BIT_SET);
-      SL_DEBUG_LOG_V2(DEBUG,
-                      "IPv6 autoconfig started - Address %s",
-                      (uintptr_t)ip6addr_ntoa(netif_ip6_addr(&(wifi_client_context->netif), 0)));
-      async_started = true;
+    // Automatically configure global addresses from Router Advertisements
+    netif_set_ip6_autoconfig_enabled(&(wifi_client_context->netif), 1);
+    // Create and set the link-local address
+    netif_create_ip6_linklocal_address(&(wifi_client_context->netif), MAC_48_BIT_SET);
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "IPv6 autoconfig started - Address %s",
+                    (uintptr_t)ip6addr_ntoa(netif_ip6_addr(&(wifi_client_context->netif), 0)));
+    async_started = true;
 #else
-      SL_DEBUG_LOG_V2(DEBUG,
-                      "IPv6 autoconfig requested but not supported (LWIP_IPV6 and LWIP_IPV6_AUTOCONFIG not enabled)");
-      if (!async_started) {
-        return SL_STATUS_NOT_SUPPORTED;
-      }
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "IPv6 autoconfig requested but not supported (LWIP_IPV6 and LWIP_IPV6_AUTOCONFIG not enabled)");
+    if (!async_started) {
+      return SL_STATUS_NOT_SUPPORTED;
+    }
 #endif /* LWIP_IPV6 && LWIP_IPV6_AUTOCONFIG */
-    }
+  }
 
-    // Return IN_PROGRESS if either IPv4 DHCP or IPv6 autoconfig was started
-    if (async_started) {
-      return SL_STATUS_IN_PROGRESS;
-    }
+  // Return IN_PROGRESS if either IPv4 DHCP or IPv6 autoconfig was started
+  if (async_started) {
+    return SL_STATUS_IN_PROGRESS;
   }
 
   return SL_STATUS_OK;

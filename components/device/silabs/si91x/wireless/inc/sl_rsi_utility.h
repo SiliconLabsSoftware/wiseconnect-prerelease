@@ -173,16 +173,13 @@ sl_status_t sli_si91x_bus_read_register(uint8_t address, uint8_t register_size, 
 /* Function used to write data into register */
 sl_status_t sli_si91x_bus_write_register(uint8_t address, uint8_t register_size, uint16_t data);
 
-/* Function used to read frame */
+/* Bus interface prototypes */
+sl_status_t sl_si91x_bus_init(void);
+sl_status_t sli_si91x_bus_read_interrupt_status(uint16_t *interrupt_status);
 sl_status_t sli_si91x_bus_read_frame(sl_wifi_buffer_t **buffer);
-
-/* Function used to write frames */
 sl_status_t sli_si91x_bus_write_frame(sl_wifi_system_packet_t *packet,
                                       const uint8_t *payloadparam,
                                       uint16_t size_param);
-
-/* Function used to check the bus availability */
-sl_status_t sl_si91x_bus_init(void);
 
 /* Function used to release bus-owned buffers; must be called before buffer manager deinit */
 sl_status_t sl_si91x_bus_deinit(void);
@@ -192,8 +189,6 @@ sl_status_t sli_si91x_bus_rx_irq_handler(void);
 
 /* Function used to check the bus availability */
 void sli_si91x_bus_rx_done_handler(void);
-
-sl_status_t sl_si91x_host_power_cycle(void);
 
 /***************************************************************************/ /**
  * @brief
@@ -207,20 +202,16 @@ sl_status_t sl_si91x_host_power_cycle(void);
  ******************************************************************************/
 sl_status_t sli_si91x_bus_enable_high_speed();
 
-/* Function used to read the interrupt register */
-sl_status_t sli_si91x_bus_read_interrupt_status(uint16_t *interrupt_status);
-
 /* Function used to block specified interrupts */
 sl_status_t sli_si91x_bus_set_interrupt_mask(uint32_t mask);
 
 /* Function used to initialize SPI interface on ULP wakeup */
 void sli_si91x_ulp_wakeup_init(void);
 
-bool sli_si91x_get_flash_command_status();
-
-void sli_si91x_update_flash_command_status(bool flag);
-
+#ifdef SLI_SI91X_MCU_INTERFACE
+// SOC-only: depends on command-status accessors
 bool sli_si91x_is_sdk_ok_to_sleep();
+#endif
 //! @endcond
 
 /**
@@ -289,44 +280,6 @@ sl_si91x_host_timestamp_t sl_si91x_host_elapsed_time(uint32_t starting_timestamp
  *   Pointer to the data at the given offset, or NULL if offset is beyond buffer length.
  */
 void *sl_si91x_host_get_buffer_data(sl_wifi_buffer_t *buffer, uint16_t offset, uint16_t *data_length);
-
-/**
- * @brief
- *   Checks if the device is initialized.
- * 
- * @details
- *   This function verifies whether the device has been properly initialized. It is typically used to ensure that the device is ready for operation before performing any further actions.
- * 
- * @return
- *   Returns `true` if the device is initialized, `false` otherwise.
- */
-bool sl_si91x_is_device_initialized(void);
-
-/***************************************************************************/ /**
- * @brief
- *   Retrieves the current status of the TX command.
- *
- * @details
- *   This function returns the current status flag indicating whether a TX (transmit) command is in progress or completed.
- *   It is typically used to check if the system is ready to send a new TX command or if a previous command is still pending.
- *
- * @return
- *   Returns `true` if a TX command is in progress, `false` otherwise.
- ******************************************************************************/
-bool sli_si91x_get_tx_command_status(void);
-
-/***************************************************************************/ /**
- * @brief
- *   Updates the status of the TX command.
- *
- * @details
- *   This function sets the status flag for the TX (transmit) command. It can be used to mark the TX command as in progress or completed.
- *   Typically, this is called internally when starting or finishing a TX command to keep track of the command state.
- *
- * @param[in] flag
- *   Set to `true` to indicate a TX command is in progress, or `false` to indicate it is completed.
- ******************************************************************************/
-void sli_si91x_update_tx_command_status(bool flag);
 
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 /**

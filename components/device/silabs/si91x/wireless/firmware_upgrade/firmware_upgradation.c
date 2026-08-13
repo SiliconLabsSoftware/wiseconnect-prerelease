@@ -38,6 +38,7 @@
 #include "sl_rsi_utility.h"
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 #include "sl_si91x_socket_utility.h"
+#include "sl_utility.h"
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -45,11 +46,6 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 #define IP_VERSION_6 BIT(1)
-
-/******************************************************
- *                 Global Variables
- ******************************************************/
-extern bool device_initialized;
 
 /******************************************************
  *                 Helper Functions
@@ -519,7 +515,7 @@ sl_status_t sl_si91x_http_otaf(uint8_t type,
                                const uint8_t *post_data,
                                uint32_t post_data_length)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -546,7 +542,7 @@ sl_status_t sl_si91x_http_otaf_v2(const sl_si91x_http_otaf_params_t *http_otaf_p
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

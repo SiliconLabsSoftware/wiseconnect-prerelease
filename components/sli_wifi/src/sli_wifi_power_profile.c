@@ -34,6 +34,7 @@
 #include "sl_wifi_types.h"
 #include <string.h>
 #include "sli_wifi_utility.h"
+#include "sl_utility.h"
 #define SLI_MAX_SIZE_OF_UINT16_T 65535
 #ifndef SLI_CONNECTED_GPIO_BASED_PS
 #define SLI_CONNECTED_GPIO_BASED_PS 2
@@ -48,7 +49,6 @@
 #define DEFAULT_BEACON_MISS_IGNORE_LIMIT  1
 #define SLI_DEFAULT_MONITOR_INTERVAL      50
 
-extern bool device_initialized;
 volatile bool power_save_sequence_in_progress = false;
 sli_wifi_performance_profile_t performance_profile;
 static sl_wifi_system_coex_mode_t coex_mode = 0;
@@ -187,7 +187,7 @@ sl_status_t sli_wifi_set_performance_profile(const sl_wifi_performance_profile_t
   profile_v2.twt_selection            = profile->twt_selection;
   profile_v2.beacon_miss_ignore_limit = 1;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -225,7 +225,7 @@ sl_status_t sli_wifi_set_performance_profile_v2(const sl_wifi_performance_profil
   sl_wifi_system_performance_profile_t selected_coex_profile_mode = { 0 };
   sl_wifi_performance_profile_v2_t current_wifi_profile_mode      = { 0 };
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -260,7 +260,7 @@ sl_status_t sli_wifi_set_performance_profile_v2(const sl_wifi_performance_profil
 sl_status_t sli_wifi_get_performance_profile(sl_wifi_performance_profile_t *profile)
 {
   SL_VERIFY_POINTER_OR_RETURN(profile, SL_STATUS_NULL_POINTER);
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -281,7 +281,7 @@ sl_status_t sli_wifi_get_performance_profile(sl_wifi_performance_profile_t *prof
 
 sl_status_t sli_wifi_get_performance_profile_v2(sl_wifi_performance_profile_v2_t *profile)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

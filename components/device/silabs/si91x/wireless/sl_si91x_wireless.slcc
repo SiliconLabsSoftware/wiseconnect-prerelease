@@ -14,12 +14,6 @@ component_root_path: ./components/device/silabs/si91x/wireless
 provides:
 - name: sl_si91x_wireless
 - name: wifi_driver
-- condition:
-  - brd4271a
-  name: efx_ncp_custom_host_mcu
-- condition:
-  - brd4270a
-  name: efx_ncp_custom_host_mcu
 source:
 - path: src/sl_si91x_driver.c
 - path: src/sli_si91x_driver.c
@@ -111,7 +105,6 @@ include:
   - path: rsi_common.h
   - path: rsi_data_types.h
   - path: rsi_driver.h
-  - path: rsi_m4.h
   - path: rsi_os.h
   - path: rsi_pkt_mgmt.h
   - path: rsi_user.h
@@ -150,6 +143,9 @@ requires:
 - condition:
   - device_si91x
   name: sl_si91x_mcu
+- condition:
+  - device_si91x
+  name: sli_si91x_ahb_bus
 - condition:
   - device_efx
   name: efx32_si91x_wireless_connector

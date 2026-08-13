@@ -31,6 +31,7 @@
 #include "sl_net_ping.h"
 #include "sli_wifi_utility.h"
 #include <string.h>
+#include "sl_utility.h"
 
 /******************************************************
  *                      Macros
@@ -51,7 +52,6 @@
 /******************************************************
  *               Extern Variable
  ******************************************************/
-extern bool device_initialized;
 
 /******************************************************
  *               Global Variable
@@ -66,7 +66,7 @@ sl_status_t sl_si91x_send_ping(sl_ip_address_t ip_address, uint16_t ping_size)
   sl_status_t status               = SL_STATUS_OK;
   sli_si91x_ping_request_t request = { 0 };
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

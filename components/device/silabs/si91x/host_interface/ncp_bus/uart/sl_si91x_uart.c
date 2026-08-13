@@ -27,8 +27,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-#include "sli_wifi_utility.h"
-#include "sl_si91x_driver.h"
+#include "sli_utility.h"
 #include "sli_buffer_manager.h"
 #include "sli_queue_manager.h"
 #include "sli_hal_si91x_constants.h"
@@ -37,6 +36,7 @@
 #include "sl_si91x_constants.h"
 #include "sl_si91x_spi_constants.h"
 #include "sl_si91x_host_interface.h"
+#include "sl_si91x_host_control.h"
 #include "sl_status.h"
 #include "sl_additional_status.h"
 #include "sl_wifi_constants.h"
@@ -44,6 +44,7 @@
 #include "sl_rsi_utility.h"
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifndef SL_SI91X_NCP_UART_BAUDRATE
 
@@ -102,6 +103,14 @@
 // This macro converts a 16-bit value from host to little-endian byte order
 #define htole16(x) (x)
 
+#ifndef SLI_VERIFY_STATUS
+#define SLI_VERIFY_STATUS(s) \
+  do {                       \
+    if ((s) != SL_STATUS_OK) \
+      return (s);            \
+  } while (0)
+#endif
+
 #define FRAME_SIZE 1600
 
 static sl_wifi_buffer_t *resp_buffer     = NULL;
@@ -113,6 +122,7 @@ static sli_queue_t sli_uart_bus_rx_queue = { 0 };
  * ******************************************************/
 sl_status_t sli_si91x_req_wakeup(void);
 sl_status_t sli_hal_si91x_notify_events(uint32_t flags);
+void sli_wifi_set_event(uint32_t event_mask);
 
 /************************************************************************************
  ******************************** Static Functions *********************************

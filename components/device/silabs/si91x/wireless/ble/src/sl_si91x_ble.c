@@ -30,7 +30,6 @@
 #include "sl_si91x_ble.h"
 #include "sl_rsi_utility.h"
 #include "sli_wifi_power_profile.h"
-extern bool device_initialized;
 
 /*=======================================================================*/
 
@@ -53,7 +52,7 @@ sl_status_t sl_si91x_bt_set_performance_profile(const sl_bt_performance_profile_
   sl_wifi_system_performance_profile_t selected_coex_profile_mode = { 0 };
   sl_bt_performance_profile_t current_bt_profile_mode             = { 0 };
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   SL_WIFI_ARGS_CHECK_NULL_POINTER(profile);
@@ -72,7 +71,7 @@ sl_status_t sl_si91x_bt_set_performance_profile(const sl_bt_performance_profile_
   // Set device_initialized as false since RAM of module would not be retained
   // in ULTRA_POWER_SAVE and module needs to be started from init again.
   if (selected_coex_profile_mode == DEEP_SLEEP_WITHOUT_RAM_RETENTION) {
-    device_initialized = false;
+    sli_si91x_set_device_initialized(false);
     sli_reset_coex_current_performance_profile();
   }
   return SL_STATUS_OK;
@@ -80,7 +79,7 @@ sl_status_t sl_si91x_bt_set_performance_profile(const sl_bt_performance_profile_
 
 sl_status_t sl_si91x_bt_get_performance_profile(sl_bt_performance_profile_t *profile)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

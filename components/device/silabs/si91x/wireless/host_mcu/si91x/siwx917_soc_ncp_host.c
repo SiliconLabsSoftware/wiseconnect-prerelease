@@ -98,16 +98,6 @@ sl_status_t sl_si91x_host_deinit(void)
   return SL_STATUS_OK;
 }
 
-void sl_si91x_host_hold_in_reset(void)
-{
-  // initializes and activates a GPIO pin to forcefully reset or disable a connected device.
-}
-
-void sl_si91x_host_release_from_reset(void)
-{
-  // Release the reset state of a connected device
-}
-
 void sl_si91x_host_enable_bus_interrupt(void)
 {
   // allowing the system to respond to specific events

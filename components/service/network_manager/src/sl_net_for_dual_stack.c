@@ -98,8 +98,6 @@ sl_status_t sl_net_dns_resolve_hostname_v2(const char *host_name,
                                            const sl_net_dns_resolution_ip_type_t dns_resolution_ip,
                                            sl_ip_address_t *sl_ip_address);
 
-extern bool device_initialized;
-
 // Per-interface IP configuration storage. Thread-safety is guaranteed by API semantics:
 // - Each interface (CLIENT/AP) uses a separate array index
 // - Writes occur only in sl_net_up() which can only succeed once per interface
@@ -1020,7 +1018,7 @@ static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interfac
   sli_si91x_req_multicast_t multicast = { 0 };
   sl_status_t status                  = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1218,7 +1216,7 @@ sl_status_t sl_net_set_dns_server(sl_net_interface_t interface, const sl_net_dns
   sl_status_t status                                  = 0;
   sli_dns_server_add_request_t dns_server_add_request = { 0 };
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

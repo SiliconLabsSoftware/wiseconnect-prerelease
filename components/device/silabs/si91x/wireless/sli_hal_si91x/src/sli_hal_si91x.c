@@ -34,6 +34,7 @@
 #include "sl_constants.h"
 #include "sl_rsi_utility.h"
 #include "sl_si91x_host_interface.h"
+#include "sl_si91x_host_control.h"
 #include "sli_si91x_wifi_event_handler.h"
 #include "sli_si91x_wifi_command_engine.h"
 #include "sli_wifi_command_engine_config.h"
@@ -44,6 +45,8 @@
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "rsi_m4.h"
+// SOC-only: command-status accessors
+#include "sli_si91x_nwp_interface.h"
 #endif
 #include "sli_code_classification.h"
 /******************************************************
@@ -314,7 +317,10 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
   SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\r\n", frame_status);
 
   if (SLI_HAL_SI91X_IS_FLASH_COMMAND(packet->command)) {
+#ifdef SLI_SI91X_MCU_INTERFACE
+    // SOC-only: command-status accessors
     sli_si91x_update_flash_command_status(false);
+#endif
   }
 
   // Since we received response for global frame, reset the flag
@@ -458,7 +464,10 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
     return status; // Skip processing if wakeup failed
   }
 
+#ifdef SLI_SI91X_MCU_INTERFACE
+  // SOC-only: command-status accessors
   sli_si91x_update_tx_command_status(true);
+#endif
   queue_id      = ((buffer->desc[1] & 0xF0) >> 4);                      // Extract the queue ID
   frame_type    = (uint16_t)(buffer->desc[2] + (buffer->desc[3] << 8)); // Extract the frame type
   packet_length = (buffer->length & (~0xF000));
@@ -478,7 +487,10 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
   SL_DEBUG_LOG_V2(DEBUG, "H TX-> Q: %u, C: 0x%X, L: %u.\r\n", queue_id, frame_type, packet_length);
 
   if ((status == SL_STATUS_OK) && SLI_HAL_SI91X_IS_FLASH_COMMAND(buffer->command)) {
+#ifdef SLI_SI91X_MCU_INTERFACE
+    // SOC-only: command-status accessors
     sli_si91x_update_flash_command_status(true);
+#endif
   }
 
   if (status == SL_STATUS_OK && SLI_HAL_SI91X_IS_GLOBAL_FRAME(buffer->command)) {
@@ -488,7 +500,10 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
 
   sl_si91x_host_clear_sleep_indicator();
 
+#ifdef SLI_SI91X_MCU_INTERFACE
+  // SOC-only: command-status accessors
   sli_si91x_update_tx_command_status(false);
+#endif
   return status;
 }
 

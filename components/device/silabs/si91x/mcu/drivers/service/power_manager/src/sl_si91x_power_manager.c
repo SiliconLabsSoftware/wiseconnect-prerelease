@@ -33,6 +33,7 @@
 #include "sl_wifi.h"
 #endif
 #include "sli_si91x_clock_manager.h"
+#include "sli_si91x_nwp_interface.h"
 #if SL_WIFI_COMPONENT_INCLUDED
 #include "sl_rsi_utility.h"
 #endif

@@ -12,5 +12,7 @@ metadata:
 component_root_path: ./components/device/silabs/si91x/wireless/ncp_interface
 provides:
 - name: sl_si91x_ncp_bus
+requires:
+- name: sl_si91x_host_control
 source:
 - path: sl_si91x_ncp_driver.c

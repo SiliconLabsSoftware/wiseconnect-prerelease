@@ -46,7 +46,6 @@
 #define SL_SI91X_DHCP_UNICAST_OFFER ((uint32_t)1U << 3)
 
 // Global variable indicating if the device is initialized
-extern bool device_initialized;
 
 // Per-family IP configuration status captured during the last IP configuration attempt.
 // Retrieved by the application via sl_wifi_get_ip_config_failure_reason().
@@ -240,7 +239,7 @@ sl_status_t sli_net_configure_ip_address(sl_net_ip_configuration_t *ip_config,
   uint32_t wait_time = (timeout ? SLI_WIFI_WAIT_FOR_RESPONSE(timeout) : SLI_WIFI_RETURN_IMMEDIATELY);
 
   // Check if the device is initialized
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

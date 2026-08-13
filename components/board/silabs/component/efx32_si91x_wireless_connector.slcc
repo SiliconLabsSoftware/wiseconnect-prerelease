@@ -13,6 +13,20 @@ define:
   - name: SLI_SI91X_NCP_INTERFACE
 provides:
   - name: efx32_si91x_wireless_connector
+  # FG25: exclude generic efx32 host in favor of board-specific hooks.
+  - condition: [brd4271a]
+    name: efx_ncp_custom_host_mcu
+  - condition: [brd4270a]
+    name: efx_ncp_custom_host_mcu
+source:
+  # SiWx91x NCP wake/sleep-indicator host hook, relocated here from the Wi-Fi package.
+  - path: src/sli_ncp_host_efx32.c
+    condition: [device_efx]
+    unless: [efx_ncp_custom_host_mcu]
+  - path: src/sli_ncp_host_efr32fg25.c
+    condition: [brd4271a]
+  - path: src/sli_ncp_host_efr32fg25.c
+    condition: [brd4270a]
 ui_hints:
   visibility: never
 include:

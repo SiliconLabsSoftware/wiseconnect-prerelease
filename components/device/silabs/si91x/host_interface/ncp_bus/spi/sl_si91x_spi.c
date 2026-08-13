@@ -27,20 +27,20 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-#include "sli_wifi_utility.h"
+#include "sli_utility.h"
 #include "sli_buffer_manager.h"
 #include "sl_si91x_status.h"
 #include "sl_si91x_types.h"
 #include "sl_si91x_constants.h"
 #include "sl_si91x_spi_constants.h"
 #include "sl_si91x_host_interface.h"
-#include "sl_si91x_driver.h"
 #include "sl_status.h"
 #include "sl_additional_status.h"
 #include "sl_wifi_constants.h"
 #include "sl_constants.h"
 #include "sl_rsi_utility.h"
-#include "sli_hal_si91x.h"
+#include "sli_hal_si91x_constants.h"
+#include "sl_si91x_host_control.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -52,6 +52,14 @@
 #define SECONDS    (1000)
 
 //! @cond Doxygen_Suppress
+#ifndef SLI_VERIFY_STATUS
+#define SLI_VERIFY_STATUS(s) \
+  do {                       \
+    if ((s) != SL_STATUS_OK) \
+      return (s);            \
+  } while (0)
+#endif
+
 #define SLI_SPI_VERIFY_STATUS(s)       \
   do {                                 \
     if (s != SL_STATUS_OK) {           \
@@ -59,6 +67,10 @@
       return s;                        \
     }                                  \
   } while (0)
+
+#ifndef SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME
+#define SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000
+#endif
 
 #ifdef SLI_BIT_32_SUPPORT
 #define SLI_C2_READ_WRITE_SIZE SLI_C2RDWR4BYTE

@@ -96,8 +96,6 @@ typedef struct {
  ******************************************************/
 static sl_http_client_internal_t http_client_handle = { 0 };
 
-extern bool device_initialized;
-
 /******************************************************
  *               Function Declarations
  ******************************************************/
@@ -130,7 +128,7 @@ static sl_status_t sli_configure_put_https_start(sli_si91x_http_client_put_start
  ******************************************************/
 sl_status_t sl_http_client_init(const sl_http_client_configuration_t *client_configuration, sl_http_client_t *client)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

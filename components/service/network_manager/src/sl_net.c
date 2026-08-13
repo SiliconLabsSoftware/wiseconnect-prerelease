@@ -46,6 +46,7 @@
 #if NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_1_INTERFACE) || NETWORK_INTERFACE_VALID(SL_NET_WIFI_AP_1_INTERFACE) \
   || NETWORK_INTERFACE_VALID(SL_NET_WIFI_CLIENT_2_INTERFACE) || NETWORK_INTERFACE_VALID(SL_NET_WIFI_AP_2_INTERFACE)
 #include "sl_wifi_device.h"
+#include "sl_utility.h"
 #endif
 
 // Global array to track the initialization state of each network interface
@@ -65,8 +66,6 @@ static sl_status_t sli_init_nvm3_default(void)
   return SL_STATUS_OK;
 }
 #endif
-
-extern bool device_initialized;
 
 // Helper function to check if any network interface is initialized
 static bool sli_is_any_interface_initialized(void)
@@ -645,7 +644,7 @@ sl_status_t sl_net_set_application_profile(sl_net_interface_t interface, sl_net_
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

@@ -16,6 +16,13 @@ provides:
   - name: sli_si91x_mcu_interface
   - name: hal_generic_common
     condition: [sl_si91x_mcu]
+source:
+  - path: core/common/src/sli_si91x_nwp_interface.c
+  - path: core/common/src/sli_si91x_host_reset.c
+include:
+  - path: core/common/inc
+    file_list:
+      - path: sli_si91x_nwp_interface.h
 requires:
   - name: component_catalog
   - name: rsilib_userconfig

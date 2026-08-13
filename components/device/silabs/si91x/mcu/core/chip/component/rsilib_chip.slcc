@@ -37,6 +37,7 @@ include:
     - path: "system_si91x.h"
     - path: "si91x_device.h"
     - path: "si91x_mvp.h"
+    - path: "rsi_m4.h"
 provides:
   - name: rsilib_chip
 requires:

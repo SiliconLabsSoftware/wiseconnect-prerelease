@@ -36,9 +36,9 @@
 #include "sli_wifi_utility.h"
 #include "sli_wifi_constants.h"
 #include "rsi_bt_common.h"
+#include "sl_utility.h"
 #include <stdbool.h>
 
-extern bool device_initialized;
 /*
   Global Variables
  * */
@@ -236,7 +236,7 @@ int32_t rsi_ble_enable(void)
   sl_status_t status;
   uint8_t sub_cmd = SLI_BLE_SUB_CMD_ENABLE;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return (int32_t)SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -271,7 +271,7 @@ int32_t rsi_ble_disable(void)
   sl_status_t status;
   uint8_t sub_cmd = SLI_BLE_SUB_CMD_DISABLE;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return (int32_t)SL_STATUS_NOT_INITIALIZED;
   }
 

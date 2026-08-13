@@ -38,6 +38,7 @@
 #include "sl_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
+#include "sl_utility.h"
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -49,7 +50,6 @@
 /******************************************************
  *                      Extern Variables
  ******************************************************/
-extern bool device_initialized;
 
 static uint8_t sli_get_certificate_index(sl_net_credential_id_t id)
 {
@@ -189,7 +189,7 @@ sl_status_t sli_net_get_interface_info(sl_net_interface_t interface, sl_net_inte
 {
   sl_status_t status       = 0;
   sl_wifi_buffer_t *buffer = NULL;
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   SL_WIFI_ARGS_CHECK_NULL_POINTER(info);

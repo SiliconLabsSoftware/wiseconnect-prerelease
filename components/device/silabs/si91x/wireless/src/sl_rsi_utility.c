@@ -55,8 +55,11 @@
 #include "sli_wifi.h"
 #include "sli_queue_manager.h"
 #include "sl_string.h"
+#ifdef SLI_SI91X_MCU_INTERFACE
+// SOC-only: command-status accessors
+#include "sli_si91x_nwp_interface.h"
+#endif
 
-static bool sli_si91x_tx_command_status = false;
 /******************************************************
  *               Macro Declarations
  ******************************************************/
@@ -79,9 +82,6 @@ static bool sli_si91x_tx_command_status = false;
 extern osMutexId_t side_band_crypto_mutex;
 #endif
 
-static bool sli_si91x_packet_status = 0;
-
-extern bool device_initialized;
 void sl_debug_log(const char *format, ...);
 
 extern sli_wifi_performance_profile_t performance_profile;
@@ -142,17 +142,6 @@ void sl_si91x_host_delay_ms(uint32_t delay_milliseconds)
   }
 }
 
-sl_status_t sl_si91x_host_power_cycle(void)
-{
-  sl_si91x_host_hold_in_reset();
-  sl_si91x_host_delay_ms(100);
-
-  sl_si91x_host_release_from_reset();
-  sl_si91x_host_delay_ms(100);
-
-  return SL_STATUS_OK;
-}
-
 void print_80211_packet(const uint8_t *packet, uint32_t packet_length, uint16_t max_payload_length)
 {
   uint32_t dump_bytes    = 0;
@@ -209,40 +198,16 @@ void print_80211_packet(const uint8_t *packet, uint32_t packet_length, uint16_t 
   sl_debug_log("|\r\n");
 }
 
-/* Function to get the current status of the NVM command progress
-Returns true if an NVM command is in progress, false otherwise*/
-bool sli_si91x_get_flash_command_status()
-{
-  return sli_si91x_packet_status;
-}
-
-void sli_si91x_update_flash_command_status(bool flag)
-{
-  sli_si91x_packet_status = flag;
-}
-
-bool sli_si91x_get_tx_command_status()
-{
-  return sli_si91x_tx_command_status;
-}
-
-void sli_si91x_update_tx_command_status(bool flag)
-{
-  sli_si91x_tx_command_status = flag;
-}
-
+#ifdef SLI_SI91X_MCU_INTERFACE
 /*  This function is used to update the power manager to see whether the device is ready for sleep or not.
- True indicates ready for sleep, and false indicates not ready for sleep.*/
+ True indicates ready for sleep, and false indicates not ready for sleep.
+ SOC-only: relies on command-status accessors*/
 bool sli_si91x_is_sdk_ok_to_sleep()
 {
   return ((!sli_si91x_get_flash_command_status()) && (sl_si91x_is_device_initialized())
           && (!sli_si91x_get_tx_command_status()));
 }
-
-bool sl_si91x_is_device_initialized(void)
-{
-  return device_initialized;
-}
+#endif
 
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 // Implementation of SNI extension setting for embedded sockets

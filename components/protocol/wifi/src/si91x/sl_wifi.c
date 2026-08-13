@@ -84,7 +84,6 @@ extern uint32_t sl_si91x_log_host_timesync_address;
 #endif
 #endif
 
-extern bool device_initialized;
 extern sl_wifi_advanced_scan_configuration_t advanced_scan_configuration;
 
 sl_status_t sl_wifi_init(const sl_wifi_device_configuration_t *configuration,
@@ -222,7 +221,7 @@ sl_status_t sl_wifi_get_channel(sl_wifi_interface_t interface, sl_wifi_channel_t
   sl_wifi_buffer_t *buffer            = NULL;
   sli_wifi_request_commands_t command = 0;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   if (!sli_wifi_is_interface_up(interface)) {
@@ -356,7 +355,7 @@ sl_status_t sl_wifi_get_interface_info(sl_wifi_interface_t interface, sl_wifi_in
 {
   sl_status_t status       = 0;
   sl_wifi_buffer_t *buffer = NULL;
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   SL_WIFI_ARGS_CHECK_NULL_POINTER(info);
@@ -417,7 +416,7 @@ sl_status_t sl_wifi_get_wireless_info(sl_si91x_rsp_wireless_info_t *info)
   sl_status_t status       = 0;
   sl_wifi_buffer_t *buffer = NULL;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   SL_WIFI_ARGS_CHECK_NULL_POINTER(info);
@@ -517,7 +516,7 @@ sl_status_t sl_wifi_get_operational_statistics(sl_wifi_interface_t interface,
 sl_status_t sl_wifi_transmit_test_start(sl_wifi_interface_t interface,
                                         const sl_wifi_transmitter_test_info_t *test_tx_info)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   return sli_wifi_transmit_test_start(interface, test_tx_info);
@@ -532,7 +531,7 @@ sl_status_t sl_wifi_transmit_test_start_11bgn(const sl_wifi_transmitter_test_bas
     SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11bgn: null arg");
     return SL_STATUS_INVALID_PARAMETER;
   }
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11bgn: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
@@ -582,7 +581,7 @@ sl_status_t sl_wifi_transmit_test_start_11ax(const sl_wifi_transmitter_test_base
     SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11ax: null arg");
     return SL_STATUS_INVALID_PARAMETER;
   }
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_start_11ax: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
@@ -621,7 +620,7 @@ sl_status_t sl_wifi_transmit_test_start_11be(const sl_wifi_transmitter_test_base
 sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_stop: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
@@ -632,7 +631,7 @@ sl_status_t sl_wifi_transmit_test_stop(sl_wifi_interface_t interface)
 
 sl_status_t sl_wifi_transmit_test_stop_v2(void)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     SL_DEBUG_LOG_V2(ERROR, "sl_wifi_transmit_test_stop_v2: not initialized");
     return SL_STATUS_NOT_INITIALIZED;
   }
@@ -643,7 +642,7 @@ sl_status_t sl_wifi_transmit_test_stop_v2(void)
 
 sl_status_t sl_wifi_frequency_offset(sl_wifi_interface_t interface, const sl_wifi_freq_offset_t *frequency_calibration)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   UNUSED_PARAMETER(interface);
@@ -652,7 +651,7 @@ sl_status_t sl_wifi_frequency_offset(sl_wifi_interface_t interface, const sl_wif
 
 sl_status_t sl_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi_dpd_calib_data_t *dpd_calib_data)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   return sli_wifi_dpd_calibration(interface, dpd_calib_data);
@@ -660,7 +659,7 @@ sl_status_t sl_wifi_dpd_calibration(sl_wifi_interface_t interface, const sl_wifi
 
 sl_status_t sl_wifi_start_statistic_report(sl_wifi_interface_t interface, sl_wifi_channel_t channel)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   return sli_wifi_start_statistic_report(interface, channel);
@@ -668,7 +667,7 @@ sl_status_t sl_wifi_start_statistic_report(sl_wifi_interface_t interface, sl_wif
 
 sl_status_t sl_wifi_stop_statistic_report(sl_wifi_interface_t interface)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   return sli_wifi_stop_statistic_report(interface);
@@ -788,7 +787,7 @@ sl_status_t sl_wifi_wps_get_remaining_credentials(sl_wifi_interface_t interface,
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -853,7 +852,7 @@ sl_status_t sl_wifi_set_ap_configuration(sl_wifi_interface_t interface, const sl
 {
   UNUSED_PARAMETER(interface);
   UNUSED_PARAMETER(configuration);
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   //Firmware unable to configure the ap configuration of a running AP interface
@@ -879,7 +878,7 @@ sl_status_t sl_wifi_test_client_configuration(sl_wifi_interface_t interface,
 
 sl_status_t sl_wifi_send_raw_data_frame(sl_wifi_interface_t interface, const void *data, uint16_t data_length)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1083,7 +1082,7 @@ sl_status_t sl_wifi_send_transceiver_data(sl_wifi_interface_t interface,
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

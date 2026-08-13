@@ -152,7 +152,6 @@ sl_wifi_event_handler_t si91x_event_handler = NULL;
 
 // Global variables for device and driver management
 sl_wifi_interface_t default_interface;
-bool device_initialized = false;
 
 bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX] = { false, false, false, false, false };
 bool bg_enabled                                   = false;
@@ -293,7 +292,7 @@ sl_status_t sl_si91x_driver_init_wifi_radio(const sl_wifi_device_configuration_t
 
 static void sli_si91x_set_device_initialized_status(const sl_wifi_device_configuration_t *config)
 {
-  device_initialized   = true;
+  sli_si91x_set_device_initialized(true);
   initialized_opermode = config->boot_config.oper_mode;
 
   // Set interface status flags based on operating mode and band
@@ -344,7 +343,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   si91x_event_handler = event_handler;
 
   // Check if the device is already initialized
-  if (device_initialized) {
+  if (sl_si91x_is_device_initialized()) {
     // If it's already initialized, ensure the requested operating mode is compatible
     if (initialized_opermode == SL_SI91X_CONCURRENT_MODE) {
       return (initialized_opermode == config->boot_config.oper_mode) ? SL_STATUS_OK : SL_STATUS_WIFI_INVALID_OPERMODE;
@@ -654,7 +653,7 @@ sl_status_t sl_si91x_driver_deinit(void)
   sl_status_t status = SL_STATUS_OK;
 
   // Check if the device has been initialized if not, return an error
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -724,8 +723,8 @@ sl_status_t sl_si91x_driver_deinit(void)
   VERIFY_STATUS_AND_RETURN(status);
 
   // Clear the event handler and reset initialization status
-  si91x_event_handler  = NULL;
-  device_initialized   = false;
+  si91x_event_handler = NULL;
+  sli_si91x_set_device_initialized(false);
   initialized_opermode = SLI_WIFI_INVALID_MODE;
 
   // Reset config feature bit map
@@ -888,7 +887,7 @@ sl_status_t sl_si91x_wifi_set_certificate_index(uint8_t certificate_type,
   sl_status_t status                        = SL_STATUS_OK;
   sli_si91x_req_set_certificate_t chunk_ptr = { 0 };
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -968,7 +967,7 @@ sl_status_t sl_si91x_set_rtc_timer(const sl_si91x_module_rtc_time_t *timer)
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -997,7 +996,7 @@ sl_status_t sl_si91x_get_rtc_timer(sl_si91x_module_rtc_time_t *response)
   sl_status_t status       = SL_STATUS_OK;
   sl_wifi_buffer_t *buffer = NULL;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1272,7 +1271,7 @@ sl_status_t sl_si91x_read_status(sl_si91x_read_status_t read_id, uint8_t *output
 static sl_status_t sl_si91x_soft_reset(void)
 {
   sl_status_t status;
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   status = sli_wifi_send_command(SLI_COMMON_REQ_SOFT_RESET,
@@ -1291,7 +1290,7 @@ sl_status_t sl_si91x_assert()
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   status = sli_wifi_send_command(SLI_COMMON_REQ_ASSERT,
@@ -1307,7 +1306,7 @@ sl_status_t sl_si91x_assert()
 
 sl_status_t sl_si91x_get_ram_log(uint32_t address, uint32_t length)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   sl_status_t status       = SL_STATUS_OK;
@@ -1365,7 +1364,7 @@ sl_status_t sl_si91x_calibration_write(sl_si91x_calibration_write_t calib_write)
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1385,7 +1384,7 @@ sl_status_t sl_si91x_calibration_read(sl_si91x_calibration_read_t target, sl_si9
   sl_wifi_buffer_t *buffer = NULL;
   sl_status_t status       = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   SL_VERIFY_POINTER_OR_RETURN(calibration_read, SL_STATUS_NULL_POINTER);
@@ -1413,7 +1412,7 @@ sl_status_t sl_si91x_frequency_offset(const sl_si91x_freq_offset_t *frequency_ca
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1435,7 +1434,7 @@ sl_status_t sl_si91x_evm_offset(const sl_si91x_evm_offset_t *evm_offset)
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1456,7 +1455,7 @@ sl_status_t sl_si91x_evm_write(const sl_si91x_evm_write_t *evm_write)
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1477,7 +1476,7 @@ sl_status_t sl_si91x_dpd_calibration(const sl_si91x_get_dpd_calib_data_t *dpd_ca
 {
   sl_status_t status = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1499,7 +1498,7 @@ sl_status_t sl_si91x_efuse_read(const sl_si91x_efuse_read_t *efuse_read, uint8_t
   sl_wifi_buffer_t *buffer = NULL;
   sl_status_t status       = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   SL_VERIFY_POINTER_OR_RETURN(efuse_read, SL_STATUS_NULL_POINTER);
@@ -1694,7 +1693,7 @@ sl_status_t sl_si91x_get_firmware_version(sl_si91x_firmware_version_t *version)
   sl_status_t status       = SL_STATUS_OK;
   sl_wifi_buffer_t *buffer = NULL;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   SL_WIFI_ARGS_CHECK_NULL_POINTER(version);
@@ -1840,7 +1839,7 @@ sl_status_t sl_si91x_debug_log(const sl_si91x_assertion_t *assertion)
   sl_status_t status                 = SL_STATUS_OK;
   sli_si91x_debug_log_t debug_config = { 0 };
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

@@ -42,6 +42,7 @@
 #include "sli_queue_manager.h"
 #include "sli_wifi_device_core_utilities.h"
 #include "sli_utility.h"
+#include "sl_utility.h"
 
 #define DEFAULT_BEACON_MISS_IGNORE_LIMIT 1
 
@@ -99,7 +100,6 @@ static sli_wifi_feature_frame_config_t global_feature_config = {
   .pll_mode    = SL_WIFI_PLL_MODE_20MHZ, // Default: PLL mode for 20MHz operations
   .power_chain = SL_WIFI_HP_CHAIN,       // Default: High Power chain
 };
-extern bool device_initialized;
 uint16_t initialized_opermode              = SLI_WIFI_INVALID_MODE;
 static bool is_card_ready_required         = true;
 static sl_wifi_rate_t saved_wifi_data_rate = SL_WIFI_AUTO_RATE;
@@ -153,7 +153,7 @@ sl_wifi_operation_mode_t sli_wifi_get_opermode(void)
 sl_status_t sli_wifi_set_listen_interval(sl_wifi_interface_t interface, sl_wifi_listen_interval_t listen_interval)
 {
   UNUSED_PARAMETER(interface);
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
   if (!sli_wifi_is_interface_up(interface)) {
@@ -180,7 +180,7 @@ sl_status_t sli_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wi
 }
 sl_status_t sli_wifi_get_listen_interval(sl_wifi_interface_t interface, sl_wifi_listen_interval_t *listen_interval)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -196,7 +196,7 @@ sl_status_t sli_wifi_get_listen_interval(sl_wifi_interface_t interface, sl_wifi_
 sl_status_t sli_wifi_get_listen_interval_v2(sl_wifi_interface_t interface,
                                             sl_wifi_listen_interval_v2_t *listen_interval)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -1163,7 +1163,7 @@ void sli_wifi_save_boot_feature_bit_map(uint32_t feature_bit_map)
 
 bool sli_wifi_is_11n_only_mode_enabled(void)
 {
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return false;
   }
 

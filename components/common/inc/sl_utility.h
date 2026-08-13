@@ -29,6 +29,7 @@
  ******************************************************************************/
 #pragma once
 
+#include <stdbool.h>
 #include "sl_status.h"
 #include "sl_ip_types.h"
 #include "sl_ieee802_types.h"
@@ -107,6 +108,35 @@ int sl_inet_pton6(const char *src, const char *src_endp, unsigned char *dst, uns
 void sli_reverse_digits(unsigned char *xx, int no_digits);
 sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config);
 void sli_handle_nwp_log_packet(const uint8_t *data, uint16_t length);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Sets the device initialized status.
+ *
+ * @details
+ *   This function updates the device initialization status. It is typically
+ *   used during device init/deinit and power-save transitions (for example when
+ *   entering deep sleep without RAM retention) to mark whether the device is
+ *   ready for operation.
+ *
+ * @param[in] initialized
+ *   `true` to mark the device as initialized, `false` otherwise.
+ ******************************************************************************/
+void sli_si91x_set_device_initialized(bool initialized);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Checks if the device is initialized.
+ *
+ * @details
+ *   This function verifies whether the device has been properly initialized.
+ *   It is typically used to ensure that the device is ready for operation
+ *   before performing any further actions.
+ *
+ * @return
+ *   Returns `true` if the device is initialized, `false` otherwise.
+ ******************************************************************************/
+bool sl_si91x_is_device_initialized(void);
 
 /***************************************************************************/ /**
  * @brief Print 802.11 packet

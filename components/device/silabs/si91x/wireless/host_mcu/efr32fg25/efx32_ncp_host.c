@@ -82,11 +82,6 @@ void sl_si91x_host_set_sleep_indicator(void)
   GPIO_PinOutSet(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin);
 }
 
-void sl_si91x_host_clear_sleep_indicator(void)
-{
-  GPIO_PinOutClear(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin);
-}
-
 uint32_t sl_si91x_host_get_wake_indicator(void)
 {
   return GPIO_PinInGet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
@@ -304,16 +299,6 @@ sl_status_t sl_si91x_host_spi_transfer(const void *tx_buffer, void *rx_buffer, u
   osMutexRelease(spi_transfer_mutex);
 
   return SL_STATUS_OK;
-}
-
-void sl_si91x_host_hold_in_reset(void)
-{
-  GPIO_PinOutClear(RESET_PIN.port, RESET_PIN.pin);
-}
-
-void sl_si91x_host_release_from_reset(void)
-{
-  GPIO_PinOutSet(RESET_PIN.port, RESET_PIN.pin);
 }
 
 void sl_si91x_host_enable_bus_interrupt(void)

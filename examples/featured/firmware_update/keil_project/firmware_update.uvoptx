@@ -891,6 +891,18 @@
       <bShared>0</bShared>
     </File>
     <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>77</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../../../../components/device/silabs/si91x/host_interface/src/sl_si91x_host_control.c</PathWithFileName>
+      <FilenameWithoutPath>sl_si91x_host_control.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
       <GroupNumber>10</GroupNumber>
       <FileNumber>54</FileNumber>
       <FileType>1</FileType>
@@ -981,7 +993,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../../../../components/device/silabs/si91x/wireless/ncp_interface/spi/sl_si91x_spi.c</PathWithFileName>
+      <PathWithFileName>../../../../components/device/silabs/si91x/host_interface/ncp_bus/spi/sl_si91x_spi.c</PathWithFileName>
       <FilenameWithoutPath>sl_si91x_spi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

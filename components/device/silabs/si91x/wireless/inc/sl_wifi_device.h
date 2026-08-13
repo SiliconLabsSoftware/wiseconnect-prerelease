@@ -159,12 +159,24 @@
 #define SL_WIFI_FEAT_CLEAR_SCAN_RESULTS_AFTER_USE BIT(21)
 
 /**
+ * @def SL_WIFI_FEAT_PM_MODE
+ * @brief Power management mode — WLAN low power code stays in RAM permanently.
+ * @details
+ * Optional bit (default: 0 / disabled). When enabled, WLAN/OBE low-power code is copied once to NWP RAM and kept there
+ * permanently (~20 KB). Unlike Low Power Mode, the code is not moved back and forth between Flash and RAM. Use this for stable low-power execution from RAM; leave it cleared to save the ~20 KB of NWP RAM.
+ *
+ * @note Do not enable this bit together with @ref SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE
+ *       (bit 19 in `ext_custom_feature_bit_map`). If both bits are enabled, the firmware returns `FEATURE_NOT_AVAILABLE`.
+ */
+#define SL_WIFI_FEAT_PM_MODE BIT(25)
+
+/**
  * @def SL_WIFI_FEAT_SECURE_ATTESTATION
  * @brief Secure attestation.
  * @details
  * Enables secure attestation functionality.
  * 
- * @note Bits 22-29 and bit 31 are reserved.
+ * @note Bits 22-24, bits 26-29 and bit 31 are reserved.
  * @note Reserved bits must be set to 0.
  */
 #define SL_WIFI_FEAT_SECURE_ATTESTATION BIT(30)
@@ -388,6 +400,9 @@
    * @details Enabling this bit activates low-power mode for WLAN, Active current would also be reduced.
    * As most of the code which is needed to maintain connection is kept in RAM,
    * there would be minimal execution of code from flash which in turn results in low average current.
+   *
+   * @note Do not enable this bit together with @ref SL_WIFI_FEAT_PM_MODE (bit 25 in `feature_bit_map`).
+   *       If both bits are enabled, the firmware returns `FEATURE_NOT_AVAILABLE`.
    */
 #define SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE BIT(19)
 /** @} */
@@ -775,7 +790,7 @@
  * @details
  * Enables secure attestation functionality.
  * 
- * @note Bit(16) is used internally by SDK. Bits 17-29 and bit 31 are reserved.
+ * @note Bit(16) is used internally by SDK. Bits 17, 19-20, 22-24, 26-29, and bit 31 are reserved.
  */
 #define SL_SI91X_FEAT_SECURE_ATTESTATION SL_WIFI_FEAT_SECURE_ATTESTATION
 /** @} */

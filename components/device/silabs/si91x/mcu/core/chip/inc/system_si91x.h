@@ -107,8 +107,11 @@ typedef enum SLEEP_TYPE {
 #define M4SS_CTRL_TASS_AON_PWR_DMN_RST_BYPASS_BIT BIT(2)
 #define M4_USING_FLASH                            BIT(3)
 #endif
-#define M4SS_P2P_INTR_SET_REG  *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x16C)
-#define P2P_STATUS_REG         *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x174)
+#define M4SS_P2P_INTR_SET_REG *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x16C)
+#define P2P_STATUS_REG        *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x174)
+#ifndef TASS_P2P_INTR_MASK_SET
+#define TASS_P2P_INTR_MASK_SET *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x178)
+#endif
 #define TASS_P2P_INTR_MASK_CLR *(volatile uint32_t *)(M4SS_P2P_INT_BASE_ADDRESS + 0x17C)
 
 #define M4_is_active    BIT(1)

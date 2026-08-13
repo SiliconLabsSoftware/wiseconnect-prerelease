@@ -169,6 +169,7 @@ The application can be configured to suit user requirements and development envi
 
     - The user can configure monitor interval through `sl_wifi_set_performance_profile_v2()` API. The default interval is set to 50 millisecs if montior_interval is set to 0. This is only valid when the performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
     - The user can configure listen interval through `sl_wifi_set_listen_interval_v2()` API. The default interval is set to 1000 time units (TU), where 1 TU = 1024 microseconds.
+    - This example enables `SL_WIFI_FEAT_PM_MODE` in `feature_bit_map` of `station_init_configuration` in **app.c**. When this bit is set, WLAN low-power code stays resident in NWP RAM permanently. In this example, power management mode replaces (does not combine with) low-power mode (`SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE`).
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 

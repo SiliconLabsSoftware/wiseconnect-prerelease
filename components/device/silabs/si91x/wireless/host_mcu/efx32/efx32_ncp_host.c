@@ -378,11 +378,6 @@ void sl_si91x_host_set_sleep_indicator(void)
   GPIO_PinOutSet(SI91X_NCP_WAKE_INDICATOR_PORT, SI91X_NCP_WAKE_INDICATOR_PIN);
 }
 
-void sl_si91x_host_clear_sleep_indicator(void)
-{
-  GPIO_PinOutClear(SI91X_NCP_WAKE_INDICATOR_PORT, SI91X_NCP_WAKE_INDICATOR_PIN);
-}
-
 uint32_t sl_si91x_host_get_wake_indicator(void)
 {
   return GPIO_PinInGet(SI91X_NCP_SLEEP_CONFIRM_PORT, SI91X_NCP_SLEEP_CONFIRM_PIN);
@@ -610,16 +605,6 @@ void sl_si91x_host_uart_enable_hardware_flow_control(void)
 #endif
 
   return;
-}
-
-void sl_si91x_host_hold_in_reset(void)
-{
-  GPIO_PinOutClear(SI91X_NCP_RESET_PORT, SI91X_NCP_RESET_PIN);
-}
-
-void sl_si91x_host_release_from_reset(void)
-{
-  GPIO_PinOutSet(SI91X_NCP_RESET_PORT, SI91X_NCP_RESET_PIN);
 }
 
 void sl_si91x_host_enable_bus_interrupt(void)

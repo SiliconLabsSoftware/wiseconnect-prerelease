@@ -56,7 +56,6 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
                                         const sl_net_dns_resolution_ip_type_t dns_resolution_ip,
                                         sl_ip_address_t *sl_ip_address);
 static bool sli_si91x_get_dns_mode(const sl_net_dns_address_t *address);
-extern bool device_initialized;
 extern osMessageQueueId_t sli_network_manager_request_queue;
 extern osEventFlagsId_t sli_network_manager_response_flags;
 static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interface,
@@ -277,7 +276,7 @@ static sl_status_t sli_si91x_send_multicast_request(sl_wifi_interface_t interfac
   sli_si91x_req_multicast_t multicast = { 0 };
   sl_status_t status                  = SL_STATUS_OK;
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
@@ -422,7 +421,7 @@ sl_status_t sl_net_set_dns_server(sl_net_interface_t interface, const sl_net_dns
   sl_status_t status                                  = 0;
   sli_dns_server_add_request_t dns_server_add_request = { 0 };
 
-  if (!device_initialized) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 

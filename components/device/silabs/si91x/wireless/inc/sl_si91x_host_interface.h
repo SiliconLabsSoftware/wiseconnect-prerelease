@@ -76,24 +76,40 @@ typedef struct {
 } sl_si91x_host_init_configuration_t;
 
 /***************************************************************************/ /**
- * @brief 
- *   Holds the SI91x host in a reset state.
+ * @brief
+ *   Holds the SiWx91x host in a reset state.
  *
  * @details
- *   This function drives the reset pin of the SI91x host to a low state, effectively holding the device in a reset condition. 
+ *   This function drives the reset pin of the SiWx91x host to a low state, effectively holding the device in a reset condition.
+ *   Implementation is provided by the `platform_siwx91x` package (SOC or NCP board component).
  *
  *****************************************************************************/
 void sl_si91x_host_hold_in_reset(void);
 
 /***************************************************************************/ /**
- * @brief 
- *   Releases the SI91x host from reset state.
+ * @brief
+ *   Releases the SiWx91x host from reset state.
  *
  * @details
- *   This function sets the specified GPIO pin high to release the SI91x host from its reset state. 
+ *   This function sets the reset GPIO high to release the SiWx91x device from reset.
+ *   Implementation is provided by the `platform_siwx91x` package (SOC or NCP board component).
  *
  *****************************************************************************/
 void sl_si91x_host_release_from_reset(void);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Power cycles the SiWx91x device by asserting then releasing reset.
+ *
+ * @details
+ *   This function asserts and then releases the host reset signal, applying
+ *   the required settling delay after each operation.
+ *
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ *
+ *****************************************************************************/
+sl_status_t sl_si91x_host_power_cycle(void);
 
 /***************************************************************************/ /**
  * @brief

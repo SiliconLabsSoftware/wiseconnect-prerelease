@@ -31,8 +31,9 @@
 #define _RSI_M4_HAL_H_
 #ifdef SLI_SI91X_MCU_INTERFACE
 
-#include "rsi_pkt_mgmt.h"
-#include "sl_device.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include "si91x_device.h"
 #include "sl_status.h"
 #include "sli_code_classification.h"
 /******************************************************
@@ -214,10 +215,6 @@ typedef struct rsi_p2p_intr_status_bkp_s {
 /******************************************************
  * *               Function Declarations
  * ******************************************************/
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
-int16_t rsi_frame_write(rsi_frame_desc_t *uFrameDscFrame, uint8_t *payloadparam, uint16_t size_param);
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
-rsi_pkt_t *rsi_frame_read(void);
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
 int16_t rsi_device_interrupt_status(uint8_t *int_status);
 

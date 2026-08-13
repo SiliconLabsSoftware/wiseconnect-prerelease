@@ -89,22 +89,6 @@ sl_status_t sli_si91x_bus_enable_high_speed(void)
   return sli_si91x_bus_write_register(0x08, 2, 0x3);
 }
 
-sl_status_t sli_si91x_req_wakeup(void)
-{
-  // Wake device, if needed
-  sl_si91x_host_set_sleep_indicator();
-  uint32_t timestamp = sl_si91x_host_get_timestamp();
-  do {
-    if (sl_si91x_host_get_wake_indicator()) {
-      sli_si91x_ulp_wakeup_init();
-      break;
-    }
-    if (sl_si91x_host_elapsed_time(timestamp) > SL_SI91X_NCP_REQ_WAKEUP_TIMEOUT_MS) {
-      return SL_STATUS_TIMEOUT;
-    }
-  } while (1);
-  return SL_STATUS_OK;
-}
 sl_status_t sli_submit_rx_buffer(uint32_t timeout)
 {
   UNUSED_PARAMETER(timeout);

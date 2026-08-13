@@ -36,6 +36,8 @@
 #include "sl_rsi_utility.h"
 #include "rsi_m4.h"
 #include "rsi_ipmu.h"
+#include "sli_si91x_ahb_bus.h"
+#include "sli_si91x_nwp_interface.h"
 #include "sli_code_classification.h"
 
 #ifdef SL_WIFI_COMPONENT_INCLUDED
@@ -43,37 +45,17 @@
 #endif
 
 #include "cmsis_os2.h"
-osEventFlagsId_t ta_events = NULL;
-#define TA_PKT_TX_DONE (1 << 1)
-#ifdef SL_SI91X_SIDE_BAND_CRYPTO
-#define SIDE_BAND_DONE (1 << 2)
-#endif
 
 static bool m4_is_using_xtal_without_ta_notification;
 static bool m4_using_xtal;
 
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
-void sl_si91x_host_clear_sleep_indicator(void);
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
 void IRQ074_Handler(void);
-SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
-sl_status_t sli_si91x_bus_read_interrupt_status(uint16_t *int_status);
 
 /** @addtogroup SOC4
 * @{
 */
-/**
- * @fn           void sli_si91x_raise_pkt_pending_interrupt_to_ta(void)
- * @brief        Raise the packet pending interrupt to NWP
- * @param[in]    void  
- * @return       void
- */
-void sli_si91x_raise_pkt_pending_interrupt_to_ta(void)
-{
-  // Write the packet pending interrupt to NWP register
-  M4SS_P2P_INTR_SET_REG = TX_PKT_PENDING_INTERRUPT;
-  osEventFlagsWait(ta_events, TA_PKT_TX_DONE, osFlagsWaitAny, osWaitForever);
-}
+
 /**
  * @fn          bool sli_si91x_is_m4_using_xtal(void);
  * @brief       This API is used to get the whether XTAL is enabled by M4 without notifying NWP
@@ -246,29 +228,6 @@ void sli_si91x_raise_side_band_interrupt_to_ta(void)
 #endif
 
 /**
- * @fn          void raise_m4_to_ta_interrupt(uint32_t interrupt_no)
- * @brief       Set interrupt.
- * @param[in]   interrupt_no - Process of a interrupt number 
- * @return      void 
- */
-
-void raise_m4_to_ta_interrupt(uint32_t interrupt_no)
-{
-  M4SS_P2P_INTR_SET_REG = interrupt_no;
-}
-
-/**
- * @fn          void mask_ta_interrupt(uint32_t interrupt_no)
- * @brief       Process a interrupt mask.
- * @param[in]   void  
- * @return      void
- */
-void mask_ta_interrupt(uint32_t interrupt_no)
-{
-  TASS_P2P_INTR_MASK_SET = interrupt_no;
-}
-
-/**
  * @fn          void clear_ta_to_m4_interrupt(uint32_t interrupt_no)
  * @brief       Clear interrupt raised by NWP.
  * @param[in]   interrupt_no - Process of a interrupt number 
@@ -291,7 +250,7 @@ sl_status_t sli_m4_interrupt_isr(void)
 {
   if (TASS_P2P_INTR_CLEAR & TX_PKT_TRANSFER_DONE_INTERRUPT) {
 
-    osEventFlagsSet(ta_events, TA_PKT_TX_DONE);
+    osEventFlagsSet(ta_events, SLI_SI91X_TA_PKT_TX_DONE);
     // Clear the interrupt
     clear_ta_to_m4_interrupt(TX_PKT_TRANSFER_DONE_INTERRUPT);
 
@@ -337,7 +296,7 @@ sl_status_t sli_m4_interrupt_isr(void)
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
   //! Below changes are requried for SIDE BAND CRYPTO
   else if (TASS_P2P_INTR_CLEAR & SIDE_BAND_CRYPTO_DONE) {
-    osEventFlagsSet(ta_events, SIDE_BAND_DONE);
+    osEventFlagsSet(ta_events, SLI_SI91X_SIDE_BAND_DONE);
     // Clear the interrupt
     clear_ta_to_m4_interrupt(SIDE_BAND_CRYPTO_DONE);
   }
@@ -371,48 +330,9 @@ __WEAK sl_status_t sli_receive_tx_buffer_available_isr(void)
   return SL_STATUS_OK;
 }
 
-/*==================================================*/
-/**
- * @fn          sl_status_t sli_si91x_bus_read_interrupt_status(uint8_t *int_status)
- * @brief       Returns the value of the Interrupt register
- * @param[in]   status
- * @param[out]  buffer full status reg value
- * @return      errorcode
- *               0 = Success
- *              -2 = Reg read failure
- */
-sl_status_t sli_si91x_bus_read_interrupt_status(uint16_t *int_status)
-{
-  *int_status = (uint8_t)HOST_INTR_STATUS_REG;
-
-  return RSI_SUCCESS;
-}
-
-sl_status_t sli_si91x_req_wakeup(void)
-{
-  P2P_STATUS_REG |= M4_wakeup_TA;
-  if (!(P2P_STATUS_REG & TA_is_active)) {
-    //!TBD Need add timeout
-    while (!(P2P_STATUS_REG & TA_is_active))
-      ;
-  }
-  return SL_STATUS_OK;
-}
-
-void sl_si91x_host_clear_sleep_indicator(void)
-{
-  P2P_STATUS_REG &= ~M4_wakeup_TA;
-}
-
 void IRQ074_Handler(void)
 {
   sli_m4_interrupt_isr();
 }
 
-void sli_si91x_ta_events_init(void)
-{
-  if (ta_events == NULL) {
-    ta_events = osEventFlagsNew(NULL);
-  }
-}
 /** @} */
