@@ -1,5 +1,5 @@
 project_name: crypto_sha3
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 quality: production
 label: Crypto SHA3
 category: Example|Crypto

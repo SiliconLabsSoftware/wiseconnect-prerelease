@@ -18,7 +18,7 @@
 #include "si91x_device.h"
 
 #include "system_si91x.h"
-#include "sl_si91x_driver.h"
+#include "sl_si91x_common_flash.h"
 #include "sl_core.h"
 #include "cmsis_os2.h"
 #if defined(SL_SI91X_TICKLESS_MODE) && (SL_SI91X_TICKLESS_MODE == 1)

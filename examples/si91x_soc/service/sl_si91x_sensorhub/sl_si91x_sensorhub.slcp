@@ -1,5 +1,5 @@
 project_name: sl_si91x_sensorhub
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'This application demonstrates how to use of the sensorhub in SI91x SoC device.
 
   '

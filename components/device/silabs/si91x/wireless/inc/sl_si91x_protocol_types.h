@@ -38,6 +38,7 @@
 #include "sl_constants.h"
 #include "sl_common.h"
 #include "cmsis_os2.h"
+#include "sli_constants.h"
 
 //! @cond Doxygen_Suppress
 // below defines and structure for CFG_GET: Getting user store configuration.
@@ -112,25 +113,6 @@
 #define SLI_SI91X_DNS_RESPONSE_MAX_ENTRIES 10
 
 #define SLI_SI91X_MAX_CERT_SEND_SIZE 1400
-
-/** NOTE: For power save related info
- * https://docs.silabs.com/rs9116/wiseconnect/rs9116w-wifi-at-command-prm/latest/wlan-commands#rsi-pwmode----power-mode
- * ****************************** POWER RELATED DEFINES START *******************************/
-#define SLI_POWER_MODE_DISABLE      0
-#define SLI_CONNECTED_SLEEP_PS      1
-#define SLI_CONNECTED_GPIO_BASED_PS 2
-#define SLI_CONNECTED_MSG_BASED_PS  3
-
-#ifdef SLI_SI91X_MCU_INTERFACE
-#define SLI_CONNECTED_M4_BASED_PS 4
-#endif
-
-#define SLI_GPIO_BASED_DEEP_SLEEP 8
-#define SLI_MSG_BASED_DEEP_SLEEP  9
-
-#ifdef SLI_SI91X_MCU_INTERFACE
-#define SLI_M4_BASED_DEEP_SLEEP 10
-#endif
 
 #define SLI_DEFAULT_DTIM_SKIP      0
 #define SLI_DEFAULT_DTIM_ALIGNMENT 0

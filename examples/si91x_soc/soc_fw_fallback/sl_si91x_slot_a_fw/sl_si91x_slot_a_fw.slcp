@@ -1,5 +1,5 @@
 project_name: sl_si91x_slot_a_fw
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'Wirelessly updates the M4 firmware from a remote TCP server
 
   '

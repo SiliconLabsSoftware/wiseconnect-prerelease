@@ -2528,18 +2528,6 @@
 
 /** \addtogroup SL_SI91X_CONSTANTS
   * @{ */
-/// Si91x performance profile
-#define HIGH_PERFORMANCE SL_WIFI_SYSTEM_HIGH_PERFORMANCE ///< Power save is disabled and throughput is maximum.
-#define ASSOCIATED_POWER_SAVE \
-  SL_WIFI_SYSTEM_ASSOCIATED_POWER_SAVE ///< Low power profile when the device is associated with an AP (MAX PSP).
-#define ASSOCIATED_POWER_SAVE_LOW_LATENCY \
-  SL_WIFI_SYSTEM_ASSOCIATED_POWER_SAVE_LOW_LATENCY ///< Low power profile when the device is associated with an AP (FAST PSP). If SL_WIFI_ENABLE_ENHANCED_MAX_PSP bit is set in config_feature_bit_map, then this mode enables the Enhanced Max PSP feature.
-#define DEEP_SLEEP_WITHOUT_RAM_RETENTION \
-  SL_WIFI_SYSTEM_DEEP_SLEEP_WITHOUT_RAM_RETENTION ///< Deep Sleep without RAM retention when the device is not associated with AP.
-#define DEEP_SLEEP_WITH_RAM_RETENTION \
-  SL_WIFI_SYSTEM_DEEP_SLEEP_WITH_RAM_RETENTION ///< Deep Sleep with RAM retention when the device is not associated with AP.
-/// Si91x performance profile
-typedef sl_wifi_system_performance_profile_t SL_DEPRECATED_API_WISECONNECT_4_0 sl_si91x_performance_profile_t;
 
 #define SL_SI91X_CLIENT_MODE            SL_WIFI_CLIENT_MODE                  ///< Wi-Fi personal client mode
 #define SL_SI91X_ENTERPRISE_CLIENT_MODE SL_WIFI_ENTERPRISE_CLIENT_MODE       ///< Wi-Fi enterprise client mode
@@ -2570,10 +2558,6 @@ typedef sl_wifi_operation_mode_t SL_DEPRECATED_API_WISECONNECT_4_0
   SL_WIFI_SYSTEM_BLE_MODE ///< Bluetooth Low Energy (BLE) only mode, used when power save mode is not needed.
 #define SL_SI91X_WLAN_BLE_MODE  SL_WIFI_SYSTEM_WLAN_BLE_MODE    ///< WLAN and BLE mode
 #define __FORCE_COEX_ENUM_16BIT __SL_WIFI_FORCE_COEX_ENUM_16BIT ///< Force the enumeration to be 16-bit
-
-/// Si91x wireless co-existence mode
-/// @note Only BLE, WLAN, and WLAN + BLE modes are supported.
-typedef sl_wifi_system_coex_mode_t SL_DEPRECATED_API_WISECONNECT_4_0 sl_si91x_coex_mode_t;
 
 /// Si91x efuse data index
 typedef enum {
@@ -3047,11 +3031,6 @@ static const sl_wifi_device_configuration_t sl_wifi_default_transceiver_configur
 /** \addtogroup SL_SI91X_TYPES
  * @{
  * */
-/// Bluetooth performance profile
-typedef struct {
-  sl_wifi_system_performance_profile_t
-    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
-} sl_bt_performance_profile_t;
 
 /**
 * Wi-Fi performance profile
@@ -3074,24 +3053,6 @@ typedef struct {
   };
 } sl_wifi_performance_profile_t;
 
-/// Wi-Fi performance profile v2
-typedef struct {
-  sl_wifi_system_performance_profile_t
-    profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
-  uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref SI91X_DTIM_ALIGNMENT_TYPES.
-  uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint32_t listen_interval;  ///< Listen interval in milliseconds.
-  uint16_t
-    monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
-  sl_wifi_twt_request_t twt_request; ///< Target Wake Time (TWT) request settings.
-  union {
-    sl_wifi_twt_selection_t
-      twt_selection; ///< @deprecated Use twt_selection_v2 instead. Target Wake Time (TWT) selection request settings.
-    sl_wifi_twt_selection_v2_t twt_selection_v2; ///< Target Wake Time (TWT) selection request settings.
-  };
-  uint8_t
-    beacon_miss_ignore_limit; ///< Number of consecutive missed beacons that can be ignored while the device remains in sleep mode. If the number of beacon misses exceeds this limit and the beacon is still not received, the device will wake up to listen for the beacon. The default value is 1. Recommended range: 1 - 10. Values beyond 10 might lead to interoperability issues.
-} sl_wifi_performance_profile_v2_t;
 /** @} */
 
 /**

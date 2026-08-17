@@ -1,5 +1,5 @@
 project_name: crypto_aes
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 quality: production
 label: Crypto AES
 category: Example|Crypto

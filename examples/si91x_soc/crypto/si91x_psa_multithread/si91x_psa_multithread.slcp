@@ -1,5 +1,5 @@
 project_name: si91x_psa_multithread
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'This example project demonstrates the use of thread-safe mechanism in crypto hardware accelerators in SI91x.
 
   '

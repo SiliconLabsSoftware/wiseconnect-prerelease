@@ -1091,6 +1091,18 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>89</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../../../../components/common/src/sli_power_profile.c</PathWithFileName>
+      <FilenameWithoutPath>sli_power_profile.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -1410,7 +1422,7 @@
   </Group>
 
   <Group>
-    <GroupName>components/device/silabs/si91x/wireless/sli_hal_si91x/src</GroupName>
+    <GroupName>components/device/silabs/si91x/mcu/hal/sli_hal_si91x/src</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1422,7 +1434,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\components\device\silabs\si91x\wireless\sli_hal_si91x\src\sli_hal_si91x.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\components\device\silabs\si91x\mcu\hal\sli_hal_si91x\src\sli_hal_si91x.c</PathWithFileName>
       <FilenameWithoutPath>sli_hal_si91x.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

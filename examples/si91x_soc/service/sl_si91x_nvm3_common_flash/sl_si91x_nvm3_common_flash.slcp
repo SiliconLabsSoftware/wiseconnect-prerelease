@@ -1,5 +1,5 @@
 project_name: sl_si91x_nvm3_common_flash
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'This application demonstrates how to use the NVM3 library to store and retrieve data in the common flash of the Si91x SoC device.
 
   '

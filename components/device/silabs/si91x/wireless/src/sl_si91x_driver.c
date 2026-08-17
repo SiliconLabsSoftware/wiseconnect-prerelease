@@ -559,12 +559,12 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   // Configure various wireless features
   sli_wifi_feature_frame_config_t current_config = sli_wifi_get_feature_frame_config();
 
-  sli_wifi_feature_frame_request feature_frame_request = { .pll_mode        = (uint8_t)current_config.pll_mode,
-                                                           .rf_type         = RF_TYPE,
-                                                           .wireless_mode   = (uint8_t)current_config.power_chain,
-                                                           .enable_ppp      = ENABLE_PPP,
-                                                           .afe_type        = AFE_TYPE,
-                                                           .feature_enables = SLI_FEATURE_ENABLES };
+  sli_wifi_feature_frame_request_t feature_frame_request = { .pll_mode        = (uint8_t)current_config.pll_mode,
+                                                             .rf_type         = RF_TYPE,
+                                                             .wireless_mode   = (uint8_t)current_config.power_chain,
+                                                             .enable_ppp      = ENABLE_PPP,
+                                                             .afe_type        = AFE_TYPE,
+                                                             .feature_enables = SLI_FEATURE_ENABLES };
 
   // Set PLL mode to 1 when 120 MHz or 160 MHz SoC clock is configured
   if (boot_config.custom_feature_bit_map
@@ -1034,143 +1034,6 @@ sl_status_t sl_si91x_set_device_region(sl_wifi_operation_mode_t operation_mode,
 }
 
 #ifdef SLI_SI91X_MCU_INTERFACE
-
-sl_status_t sl_si91x_command_to_write_common_flash(uint32_t write_address,
-                                                   const uint8_t *write_data,
-                                                   uint16_t write_data_length,
-                                                   uint8_t flash_sector_erase_enable)
-{
-  // Check if write_data_length is non-zero
-  if (write_data_length == 0) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  sl_status_t status                         = SL_STATUS_OK;
-  sli_si91x_request_ta2m4_t ta_to_m4_request = { 0 };
-  uint32_t send_size                         = 0;
-  uint16_t remaining_length                  = write_data_length;
-
-  // If flash_sector_erase_enable is 1, Send request to NWP in chunks of 4k
-  if (flash_sector_erase_enable == 1) {
-    while (remaining_length > 0) {
-      // Calculate the chunk size, capped at 4k
-      size_t chunkSize = (remaining_length < FLASH_SECTOR_SIZE) ? remaining_length : FLASH_SECTOR_SIZE;
-
-      // Fill the request structure
-      memset(&ta_to_m4_request, 0, sizeof(sli_si91x_request_ta2m4_t));
-      ta_to_m4_request.sub_cmd                   = SL_SI91X_WRITE_TO_COMMON_FLASH;
-      ta_to_m4_request.addr                      = write_address;
-      ta_to_m4_request.input_buffer_length       = (uint16_t)chunkSize;
-      ta_to_m4_request.flash_sector_erase_enable = flash_sector_erase_enable;
-
-      send_size = sizeof(sli_si91x_request_ta2m4_t);
-
-      status = sli_wifi_send_command(SLI_COMMON_REQ_TA_M4_COMMANDS,
-                                     SLI_WIFI_COMMON_CMD,
-                                     &ta_to_m4_request,
-                                     send_size,
-                                     SLI_COMMON_RSP_TA_M4_COMMANDS_WAIT_TIME,
-                                     NULL,
-                                     NULL);
-      VERIFY_STATUS_AND_RETURN(status);
-
-      // Adjust write_address for the next chunk
-      write_address += chunkSize;
-
-      // Adjust remaining_length for the next chunk
-      remaining_length -= chunkSize;
-    }
-  }
-
-  else {
-    // Check if write_data pointer is valid
-    SL_VERIFY_POINTER_OR_RETURN(write_data, SL_STATUS_INVALID_PARAMETER);
-
-    // Write in chunks of MAX_CHUNK_SIZE for flash_sector_erase_enable != 1
-    while (write_data_length > 0) {
-      size_t chunkSize = (write_data_length < MAX_CHUNK_SIZE) ? write_data_length : MAX_CHUNK_SIZE;
-
-      // Fill the request structure
-      memset(&ta_to_m4_request, 0, sizeof(sli_si91x_request_ta2m4_t));
-      ta_to_m4_request.sub_cmd                   = SL_SI91X_WRITE_TO_COMMON_FLASH;
-      ta_to_m4_request.addr                      = write_address;
-      ta_to_m4_request.input_buffer_length       = (uint16_t)chunkSize;
-      ta_to_m4_request.flash_sector_erase_enable = flash_sector_erase_enable;
-
-      // Copy write_data into the request structure
-      memcpy(&ta_to_m4_request.input_data, write_data, chunkSize);
-
-      // Calculate the send size and send the command to write to common flash
-      send_size = sizeof(sli_si91x_request_ta2m4_t) - MAX_CHUNK_SIZE + chunkSize;
-      status    = sli_wifi_send_command(SLI_COMMON_REQ_TA_M4_COMMANDS,
-                                     SLI_WIFI_COMMON_CMD,
-                                     &ta_to_m4_request,
-                                     send_size,
-                                     SLI_COMMON_RSP_TA_M4_COMMANDS_WAIT_TIME,
-                                     NULL,
-                                     NULL);
-      VERIFY_STATUS_AND_RETURN(status);
-
-      // Adjust pointers and counters
-      write_address += chunkSize;
-      write_data += chunkSize;
-      write_data_length -= chunkSize;
-    }
-  }
-  return status;
-}
-
-sl_status_t sl_si91x_command_to_read_common_flash(uint32_t read_address, size_t length, uint8_t *output_buffer)
-{
-  // Check if output_buffer pointer is valid
-  SL_VERIFY_POINTER_OR_RETURN(output_buffer, SL_STATUS_INVALID_PARAMETER);
-
-  // Check if length is non-zero
-  if (length == 0) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  sl_status_t status                    = SL_STATUS_OK;
-  sl_wifi_buffer_t *buffer              = NULL;
-  const sl_wifi_system_packet_t *packet = NULL;
-
-  while (length > 0) {
-    size_t chunkSize = (length < MAX_CHUNK_SIZE) ? length : MAX_CHUNK_SIZE;
-
-    sli_si91x_read_flash_request_t m4_to_ta_read_request = { 0 };
-    memset(&m4_to_ta_read_request, 0, sizeof(sli_si91x_read_flash_request_t));
-    m4_to_ta_read_request.sub_cmd              = SL_SI91X_READ_FROM_COMMON_FLASH;
-    m4_to_ta_read_request.nwp_address          = read_address;
-    m4_to_ta_read_request.output_buffer_length = (uint16_t)chunkSize;
-
-    uint32_t send_size = sizeof(sli_si91x_read_flash_request_t);
-
-    status = sli_wifi_send_command(SLI_COMMON_REQ_TA_M4_COMMANDS,
-                                   SLI_WIFI_COMMON_CMD,
-                                   &m4_to_ta_read_request,
-                                   send_size,
-                                   SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_TA_M4_COMMANDS_WAIT_TIME),
-                                   NULL,
-                                   (void **)&buffer);
-    if (status != SL_STATUS_OK) {
-      if (buffer != NULL)
-        sli_buffer_manager_free_buffer(buffer);
-      return status;
-    }
-    VERIFY_STATUS_AND_RETURN(status);
-
-    packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-    memcpy(output_buffer, packet->data, packet->length);
-    sli_buffer_manager_free_buffer(buffer);
-
-    // Adjust pointers and counters
-    read_address += chunkSize;
-    output_buffer += chunkSize;
-    length -= chunkSize;
-  }
-
-  return status;
-}
 
 sl_status_t sl_si91x_m4_ta_secure_handshake(uint8_t sub_cmd_type,
                                             uint8_t input_len,

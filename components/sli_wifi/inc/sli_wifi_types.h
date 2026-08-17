@@ -403,44 +403,11 @@ typedef struct {
   uint8_t channel[SL_WIFI_RX_STATS_REQUEST_CHANNEL_OCTETS];
 } sli_wifi_request_rx_stats_t;
 
-typedef struct {
-  sl_wifi_performance_profile_v2_t wifi_performance_profile;
-  sl_bt_performance_profile_t bt_performance_profile;
-  sl_wifi_system_coex_mode_t coex_mode;
-} sli_wifi_performance_profile_t;
-
 /// Internal structure to track individual feature configurations
 typedef struct {
   sl_wifi_pll_mode_t pll_mode;       ///< Configured PLL mode value
   sl_wifi_power_chain_t power_chain; ///< Configured power chain value
 } sli_wifi_feature_frame_config_t;
-
-/// structure for power save request
-typedef struct {
-  /// power mode to set
-  uint8_t power_mode;
-
-  /// set LP/ULP/ULP-without RAM retention
-  uint8_t ulp_mode_enable;
-
-  /// set DTIM aligment required
-  // 0 - module wakes up at beacon which is just before or equal to listen_interval
-  // 1 - module wakes up at DTIM beacon which is just before or equal to listen_interval
-  uint8_t dtim_aligned_type;
-
-  /// Set PSP type, 0-Max PSP, 1- FAST PSP, 2-APSD
-  uint8_t psp_type;
-
-  /// Monitor interval for the FAST PSP mode
-  // default is 50 ms, and this parameter is valid for FAST PSP only
-  uint16_t monitor_interval;
-  /// Number of DTIMs to skip
-  uint8_t num_of_dtim_skip;
-  /// Listen interval
-  uint16_t listen_interval;
-  /// Wake up for the next beacon if the number of missed beacons exceeds the limit. The default value is 1, with a recommended maximum value of 10. Higher values may cause interoperability issues.
-  uint8_t beacon_miss_ignore_limit;
-} sli_wifi_power_save_request_t;
 
 // Scan Information
 typedef struct sli_scan_info_s {
@@ -589,8 +556,10 @@ typedef struct {
   uint8_t wireless_mode;    ///< Wireless Mode.
   uint8_t enable_ppp;       ///< Enable PPP.
   uint8_t afe_type;         ///< AFE Type.
+  uint8_t reserved_1;       ///< Reserved.
+  uint16_t reserved_2;      ///< Reserved.
   uint32_t feature_enables; ///< Feature Enables.
-} sli_wifi_feature_frame_request;
+} sli_wifi_feature_frame_request_t;
 #pragma pack()
 
 // WLAN Frame

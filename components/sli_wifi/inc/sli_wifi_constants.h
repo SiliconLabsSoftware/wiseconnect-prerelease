@@ -130,11 +130,6 @@ typedef enum { SET_REGION_CODE_FROM_BEACONS, SET_REGION_CODE_FROM_USER } sli_wif
 
 typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_ENCRYPTION } sli_wifi_encryption_t;
 
-/// Timeout scaling factor for internal firmware operations
-#ifndef SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF
-#define SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF 1
-#endif
-
 /// Timeout scaling factor for over the air operations
 #ifndef SL_WIFI_MANAGEMENT_COMMANDS_TIMEOUT_SF
 #define SL_WIFI_MANAGEMENT_COMMANDS_TIMEOUT_SF 1
@@ -145,19 +140,8 @@ typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_E
 #define SL_WIFI_NETWORK_COMMANDS_TIMEOUT_SF 1
 #endif
 
-/// Base timeout value for internal operations
-#define SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE 1000
-
 /// Base timeout value for Wi-Fi management operations
 #define SLI_WIFI_MANAGEMENT_COMMANDS_BASE_VALUE 5000
-
-/// Additional wait time(in ms) for command timeout calculations
-#ifndef SL_TX_ADDITIONAL_WAIT_TIME
-#define SL_TX_ADDITIONAL_WAIT_TIME 0
-#endif
-
-/// Default timeout value for commands
-#define SLI_DEFAULT_TIMEOUT (30000 + SL_TX_ADDITIONAL_WAIT_TIME)
 
 /// Internal commands timeout defines
 /// Timeout value for waiting on operation mode response command
@@ -187,9 +171,7 @@ typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_E
 /// Timeout value for waiting on feature frame response command
 #define SLI_COMMON_RSP_FEATURE_FRAME_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
-/// Timeout value for Power Mode response command
-#define SLI_WIFI_RSP_PWRMODE_WAIT_TIME \
-  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+
 /// Sub-command IDs for SLI_COMMON_REQ_ENABLE_DISABLE_BLE payload
 #define SLI_BLE_SUB_CMD_ENABLE  0x01
 #define SLI_BLE_SUB_CMD_DISABLE 0x02

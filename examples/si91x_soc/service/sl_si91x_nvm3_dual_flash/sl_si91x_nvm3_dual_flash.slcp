@@ -1,5 +1,5 @@
 project_name: sl_si91x_nvm3_dual_flash
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'This application demonstrates NVM3 write, read and erase functions.
 
   '

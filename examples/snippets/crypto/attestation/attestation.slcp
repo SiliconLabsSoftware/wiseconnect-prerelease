@@ -4,7 +4,7 @@ description: 'Demonstates how to request and get attestation token.
 
   '
 category: example|crypto
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 quality: production
 source:
 - path: app.c

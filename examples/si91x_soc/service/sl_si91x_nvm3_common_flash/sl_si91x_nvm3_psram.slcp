@@ -1,5 +1,5 @@
 project_name: sl_si91x_nvm3_psram
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: "Testing NVM3 in Si91x PSRAM \n"
 category: Example|Service
 quality: production

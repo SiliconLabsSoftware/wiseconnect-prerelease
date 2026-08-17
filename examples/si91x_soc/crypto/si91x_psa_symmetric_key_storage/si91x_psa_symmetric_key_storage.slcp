@@ -1,5 +1,5 @@
 project_name: si91x_psa_symmetric_key_storage
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'This application demonstrates Key generate, import, export and PSA ITS write, read and erase functions for PERSISTENT PLAINTEXT and VOLATILE PLAINTEXT.
 
   '

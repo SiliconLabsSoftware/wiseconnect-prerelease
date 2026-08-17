@@ -188,8 +188,6 @@ uint8_t sli_lmac_crc8_c(uint8_t crc8_din, uint8_t crc8_state, uint8_t end);
  */
 uint8_t sli_multicast_mac_hash(const uint8_t *mac);
 
-/* Function used to set the bluetooth performance profile */
-void sli_save_bt_current_performance_profile(const sl_bt_performance_profile_t *profile);
 bool sli_wifi_get_card_ready_required();
 
 /* Function used to save the MFP mode */

@@ -41,6 +41,52 @@
 #define SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000 // 1 second to wait for a command buffer
 #endif
 
+/// Base timeout value for internal operations
+#define SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE 1000
+
+/// Timeout scaling factor for internal firmware operations
+#ifndef SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF
+#define SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF 1
+#endif
+
+/// Additional wait time(in ms) for command timeout calculations
+#ifndef SL_TX_ADDITIONAL_WAIT_TIME
+#define SL_TX_ADDITIONAL_WAIT_TIME 0
+#endif
+
+/// Default timeout value for commands
+#define SLI_DEFAULT_TIMEOUT (30000 + SL_TX_ADDITIONAL_WAIT_TIME)
+
+/// Timeout value for Power Mode response command
+#define SLI_WIFI_RSP_PWRMODE_WAIT_TIME \
+  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+#define SLI_CONNECTED_M4_BASED_PS 4
+#endif
+
+/** NOTE: For power save related info
+ * https://docs.silabs.com/rs9116/wiseconnect/rs9116w-wifi-at-command-prm/latest/wlan-commands#rsi-pwmode----power-mode
+ * ****************************** POWER RELATED DEFINES START *******************************/
+#define SLI_POWER_MODE_DISABLE      0
+#define SLI_CONNECTED_SLEEP_PS      1
+#define SLI_CONNECTED_GPIO_BASED_PS 2
+#define SLI_CONNECTED_MSG_BASED_PS  3
+
+#define SLI_GPIO_BASED_DEEP_SLEEP 8
+#define SLI_MSG_BASED_DEEP_SLEEP  9
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+#define SLI_M4_BASED_DEEP_SLEEP 10
+#endif
+
+#define SLI_ULP_WITH_RAM_RETENTION        1
+#define SLI_MAX_PSP                       0
+#define SLI_FAST_PSP                      1
+#define SLI_ULP_WITHOUT_RAM_RET_RETENTION 2
+#define DEFAULT_BEACON_MISS_IGNORE_LIMIT  1
+#define SLI_DEFAULT_MONITOR_INTERVAL      50
+
 // enumeration for command request used in common control block
 typedef enum {
   // Common command requests

@@ -29,10 +29,13 @@ component_path:
 - path: components/device/silabs/si91x/mcu/drivers/hardware_drivers/veml6035/component
 - path: components/device/silabs/si91x/mcu/drivers/peripheral_drivers/component
 - path: components/device/silabs/si91x/mcu/drivers/rom_driver/component
+- path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
 - path: components/device/silabs/si91x/mcu/drivers/service/clock_manager/component
 - path: components/device/silabs/si91x/mcu/drivers/service/memory_manager/component
 - path: components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/component
 - path: components/device/silabs/si91x/mcu/drivers/service/iostream/component
+- path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
+- path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
 - path: components/device/silabs/si91x/mcu/drivers/service/power_manager/component
 - path: components/device/silabs/si91x/mcu/drivers/service/secure_storage/component
 - path: components/device/silabs/si91x/mcu/drivers/service/sensorhub/component
@@ -44,6 +47,7 @@ component_path:
 - path: components/device/silabs/si91x/mcu/drivers/unified_api/component
 - path: components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/component
 - path: components/device/silabs/si91x/mcu/hal/component
+- path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
 - path: components/device/silabs/si91x/mcu/toolchain/component
 - path: components/device/silabs/si91x/sl_si91x_generative_ai/component
 - path: components/sli_buffer_manager
@@ -93,7 +97,6 @@ component_path:
 - path: components/device/silabs/si91x/wireless/sli_si91x_wifi_event_handler
 - path: components/sli_wifi
 - path: components/device/silabs/si91x/wireless/sli_si91x_wifi_command_engine
-- path: components/device/silabs/si91x/wireless/sli_hal_si91x/component
 - path: components/sli_wifi_per_mode
 - path: components/sli_wlan_command_engine/component
 - path: resources
@@ -103,10 +106,6 @@ component_path:
 - path: third_party/azure_freertos_middleware
 - path: third_party/azure_freertos_middleware/libraries/coreMQTT
 - path: third_party/tcose/component
-- path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
-- path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
-- path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
-- path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
 - path: components/device/silabs/si91x/wireless/ble
 - path: components/device/silabs/si91x/wireless/ble_unified
 - path: components/device/silabs/si91x/wireless/ble_unified_framework

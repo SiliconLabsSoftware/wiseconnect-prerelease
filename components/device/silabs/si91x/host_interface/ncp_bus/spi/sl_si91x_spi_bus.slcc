@@ -17,7 +17,7 @@ source:
 - path: sl_si91x_spi.c
 include:
 - path: ../../../wireless/inc
-- path: ../../../wireless/sli_hal_si91x/inc
+- path: ../../../mcu/hal/sli_hal_si91x/inc
 requires:
 - name: wiseconnect_common
 - name: sli_buffer_manager

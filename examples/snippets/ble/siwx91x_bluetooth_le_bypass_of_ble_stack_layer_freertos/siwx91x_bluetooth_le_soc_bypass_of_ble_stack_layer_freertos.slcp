@@ -86,6 +86,8 @@ toolchain_settings:
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 - name: SL_USART_MODE
   value: SL_USART_MODE_ASYNCHRONOUS
 readme:

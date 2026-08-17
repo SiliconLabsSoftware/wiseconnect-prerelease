@@ -28,7 +28,8 @@
  *
  ******************************************************************************/
 #include "sl_si91x_ble.h"
-#include "sl_rsi_utility.h"
+#include "sl_utility.h"
+#include "sli_power_profile.h"
 #include "sli_wifi_power_profile.h"
 
 /*=======================================================================*/
@@ -55,7 +56,10 @@ sl_status_t sl_si91x_bt_set_performance_profile(const sl_bt_performance_profile_
   if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
-  SL_WIFI_ARGS_CHECK_NULL_POINTER(profile);
+
+  if (profile == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
 
   // Take backup of current bt profile
   sli_get_bt_current_performance_profile(&current_bt_profile_mode);

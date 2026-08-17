@@ -16,7 +16,7 @@ source:
   - path: sl_si91x_uart.c
 include:
   - path: ../../../wireless/inc
-  - path: ../../../wireless/sli_hal_si91x/inc
+  - path: ../../../mcu/hal/sli_hal_si91x/inc
 define:
   - name: SL_NCP_UART_INTERFACE
   - name: SL_NCP_UART_INTERFACE

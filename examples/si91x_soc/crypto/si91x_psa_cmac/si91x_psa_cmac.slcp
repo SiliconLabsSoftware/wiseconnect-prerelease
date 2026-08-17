@@ -1,5 +1,5 @@
 project_name: si91x_psa_cmac
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'This example project demonstrates the PSA CMAC APIs in SI91x.
 
   '

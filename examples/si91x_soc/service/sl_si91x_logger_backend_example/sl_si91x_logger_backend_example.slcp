@@ -1,5 +1,5 @@
 project_name: sl_si91x_logger_backend_example
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: This application demonstrates the use of different backends for the logger service on the SI91x SoC device.
 category: example|service
 quality: production

@@ -61,6 +61,7 @@ SECTIONS
         *sl_si91x_power_manager_wakeup_handler*
         *sl_wifi*
         *sli_wifi_power_profile*
+        *sli_power_profile*
         *sl_si91x_m4_ps*
         *rsi_sysrtc*
         *sl_si91x_clock_manager*
@@ -214,8 +215,8 @@ SECTIONS
   __exidx_end = .;
   __etext = .;
 
-  __rom_start  = ORIGIN(rom);
-  __rom_length = LENGTH(rom);
+  __rom_start  = 0x8202000;
+  __rom_length = 0x1fe000;
 
   /* _sidata is used in code startup code */
   _sidata = __etext;
@@ -265,6 +266,7 @@ SECTIONS
     *strcmp*(.text*)
     *sl_wifi*(.text*)
     *sli_wifi_power_profile*(.text*)
+    *sli_power_profile*(.text*)
     *timers*(.text*)
     *heap_4*(.text*)
     *list*(.text*)
@@ -439,9 +441,11 @@ SECTIONS
          "CRITICAL: Stack overlaps with BSS section - increase RAM or reduce static allocation")
 
   /* End of RAM overflow detection section */
-  /* Overflow guard symbols derived from MEMORY (no hard-coding) */
-  __ram_start__ = ORIGIN(ram);
-  __ram_end__   = ORIGIN(ram) + LENGTH(ram);
+  /* Absolute values so map files are parseable by code-size tools.
+   * Keep in sync with MEMORY { rom/ram } above. */
+  __ram_start__ = 0x400;
+  __ram_end__   = 0x400 + 0x37000;
+  __main_flash_end__ = 0x8202000 + 0x1fe000;
 
   .heap (COPY):
   {

@@ -27,7 +27,8 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
-#include "sl_si91x_driver.h"
+#include "sl_constants.h"
+#include "sl_si91x_common_flash.h"
 #include "sl_si91x_littlefs_hal.h"
 #include "cmsis_os2.h"
 

@@ -1,5 +1,5 @@
 project_name: sl_si91x_m4_updater_security
-package: platform_nwp_siwx91x_app
+package: platform_siwx91x_app
 description: 'Demonstrates secure M4 firmware update (A/B fallback with signature verification) on Si91x SoC. Use with signed slot A/B images and host tooling.
 
   '
