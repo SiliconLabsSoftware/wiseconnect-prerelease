@@ -28,5 +28,7 @@ library:
 toolchain_settings:
   - option: gcc_linker_option
     value: "-u _printf_float"
+  - option: llvm_linker_option
+    value: "-u _printf_float"
   - option: gcc_compiler_option
     value: "-mcpu=cortex-m4"

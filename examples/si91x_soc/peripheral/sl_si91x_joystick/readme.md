@@ -12,7 +12,7 @@
   - [Application Build Environment](#application-build-environment)
     - [Application Configuration Parameters](#application-configuration-parameters)
     - [Pin Configuration](#pin-configuration)
-    - [Joystick on BRD4002A](#joystick-on-brd4002a)
+    - [Joystick on BRD4002B](#joystick-on-brd4002b)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
@@ -110,7 +110,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - JOYSTICK_MV_ERR_CARDINAL_ONLY : Joystick error mV value for Cardinal Directions only.
 ### Pin Configuration
 
-#### Pin Configuration of the WPK[BRD4002A] Base Board, and with radio board
+#### Pin Configuration of the WPK[BRD4002B] Base Board, and with radio board
 
 The following table lists the ADC channel pin mappings for the SiWx91x radio board. These pin configurations are essential for connecting the joystick input to the correct ADC channel based on your selected channel instance. If you want to use a different radio board, refer to the board-specific user guide.
 
@@ -133,9 +133,9 @@ The following table lists the ADC channel pin mappings for the SiWx91x radio boa
   | 15 | GPIO_28 [P31] |
   | 16 | GPIO_30 [P35] |
 
-### Joystick on BRD4002A
+### Joystick on BRD4002B
 
-Image shows Joystick located on BRD4002A, position/direction to press the Joystick and pin for Joystick.
+Image shows Joystick located on BRD4002B, position/direction to press the Joystick and pin for Joystick.
 
 ![Figure: Joystick Hardware](resources/readme/image520d.png)
 

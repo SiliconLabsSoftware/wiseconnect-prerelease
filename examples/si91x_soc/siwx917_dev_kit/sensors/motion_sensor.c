@@ -47,10 +47,10 @@ static uint32_t ssi_slave_number         = SSI_SLAVE_0;
 void motion_sensor_init(void)
 {
   sl_status_t sl_status;
-  sl_status_t status;
   uint8_t dev_id;
 
 #if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
+  sl_status_t status;
   if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) != 1) {
     // Enable GPIO ULP_CLK
     status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);

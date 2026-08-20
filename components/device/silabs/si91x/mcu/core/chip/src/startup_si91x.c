@@ -106,9 +106,12 @@ void Copy_Table();
 void Zero_Table();
 #define WEAK __attribute__((weak))
 
-/* Gecko code_classification + device_si91x: SLI_CODE_CLASSIFICATION_GCC_USE_USED (LTO used+section); copy text_ram without full RAM execution. */
-#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED)
-/** Copy text_ram from LMA in flash to VMA in SRAM; same role as EFR copy path, run before .data copy. */
+/* Copy text_ram when RAM execution, code classification (LTO), or PSRAM .data
+ * placement is enabled. PSRAM needs this for SL_SI91X_RETAINED_DATA in text_ram: Clang's
+ * copy table only initializes .data, not text_ram. No-op when linker spans are empty. */
+#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED) \
+  || defined(DATA_SEGMENT_IN_PSRAM)
+/** Copy text_ram from LMA to VMA in SRAM; run before Copy_Table(). */
 #if defined(__GNUC__) && !defined(__clang__)
 __attribute__((optimize("no-tree-loop-distribute-patterns")))
 #endif
@@ -342,6 +345,20 @@ void Zero_Table(void)
     *pulDest++ = 0UL;
   }
 #endif
+
+#if (SLI_SI91X_MCU_PSRAM_PRESENT == ENABLE) && defined(DATA_SEGMENT_IN_PSRAM)
+  /* LTO-safe retained BSS (variables tagged SL_SI91X_RETAINED_BSS): always in internal
+   * RAM, NOLOAD, so it must be zero-initialized here. Section is emitted by the
+   * PSRAM linker whenever data is placed in PSRAM. */
+  {
+    extern unsigned long __retained_bss_start__;
+    extern unsigned long __retained_bss_end__;
+    pulDest = (unsigned long *)&__retained_bss_start__;
+    for (; pulDest < (unsigned long *)&__retained_bss_end__;) {
+      *pulDest++ = 0UL;
+    }
+  }
+#endif
 }
 
 #if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION)
@@ -357,7 +374,8 @@ __attribute__((section(".reset_handler")))
 {
   /* NVIC must use this image's vector table (flash __Vectors). ROM may leave VTOR elsewhere. */
   SCB->VTOR = (uint32_t)__Vectors;
-#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED)
+#if defined(SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION) || defined(SLI_CODE_CLASSIFICATION_GCC_USE_USED) \
+  || defined(DATA_SEGMENT_IN_PSRAM)
   copy_functions_to_ram();
 #endif
   Copy_Table();

@@ -20,6 +20,7 @@ include:
   file_list:
   - path: app.h
 define:
+- name: SLI_SI91X_MCU_ENABLE_PSRAM_FEATURE
 - name: SL_SI91X_PRINT_DBG_LOG
 - name: SLI_SI91X_MCU_FW_UPGRADE_OTA_DUAL_FLASH
 component:
@@ -75,8 +76,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.1.1
+  version: 4.1.2
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2026.6.1
+  version: 2026.6.2

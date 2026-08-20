@@ -151,6 +151,19 @@ const osThreadAttr_t thread_attributes = {
   .priority   = osPriorityNormal,
   .tz_module  = 0,
 };
+
+#ifdef SL_WDT_MANAGER_PRESENT
+/*
+ * Test mode runs continuously in the controller, so the application thread has
+ * nothing left to do once it is started. Returning from a FreeRTOS task lands
+ * in the port's prvTaskExitError(), which disables interrupts permanently; the
+ * WDT interrupt would then never reach the WDT manager task that kicks the
+ * watchdog, and the device would be reset. This semaphore is never released -
+ * acquiring it parks the thread so the watchdog keeps being serviced.
+ */
+static osSemaphoreId_t ble_testmode_sem = NULL;
+#endif
+
 /*==============================================*/
 /**
  * @fn         rsi_ble_testmode
@@ -203,17 +216,38 @@ void ble_testmodes(void)
 
   if (RSI_CONFIG_TEST_MODE == RSI_BLE_TESTMODE_TRANSMIT) {
     //! start the tx test mode in controller
-    rsi_ble_tx_test_mode(RSI_BLE_TX_CHANNEL,       /* channel number*/
-                         RSI_BLE_TX_PHY,           /* phy - 1Mbps selected */
-                         RSI_BLE_TX_PAYLOAD_LEN,   //255,  /* data_length */
-                         RSI_BLE_TX_PAYLOAD_TYPE); /* packet payload sequence */
+    status = rsi_ble_tx_test_mode(RSI_BLE_TX_CHANNEL,       /* channel number*/
+                                  RSI_BLE_TX_PHY,           /* phy - 1Mbps selected */
+                                  RSI_BLE_TX_PAYLOAD_LEN,   //255,  /* data_length */
+                                  RSI_BLE_TX_PAYLOAD_TYPE); /* packet payload sequence */
+    if (status != RSI_SUCCESS) {
+      SL_DEBUG_LOG_V2(ERROR, "BLE TX test mode failed, Error Code: 0x%lX\r\n", status);
+    } else {
+      SL_DEBUG_LOG_V2(INFO, "BLE TX test mode started successfully\r\n");
+    }
 
   } else if (RSI_CONFIG_TEST_MODE == RSI_BLE_TESTMODE_RECEIVE) {
 
-    rsi_ble_rx_test_mode(RSI_BLE_RX_CHANNEL, /* channel number*/
-                         RSI_BLE_RX_PHY,     /* phy - 1Mbps selected */
-                         0x00);              /* standard modulation */
+    status = rsi_ble_rx_test_mode(RSI_BLE_RX_CHANNEL, /* channel number*/
+                                  RSI_BLE_RX_PHY,     /* phy - 1Mbps selected */
+                                  0x00);              /* standard modulation */
+    if (status != RSI_SUCCESS) {
+      SL_DEBUG_LOG_V2(ERROR, "BLE RX test mode failed, Error Code: 0x%lX\r\n", status);
+    } else {
+      SL_DEBUG_LOG_V2(INFO, "BLE RX test mode started successfully\r\n");
+    }
   }
+
+#ifdef SL_WDT_MANAGER_PRESENT
+  ble_testmode_sem = osSemaphoreNew(1, 0, NULL);
+  if (ble_testmode_sem == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Test mode semaphore creation failed\r\n");
+    return;
+  }
+  /*Waiting on this sempahore so that this thread doesn't exit and other threads 
+  gets opportunity to run. this sempahore is not released anywhere.*/
+  osSemaphoreAcquire(ble_testmode_sem, osWaitForever);
+#endif
 }
 
 void app_init(void)

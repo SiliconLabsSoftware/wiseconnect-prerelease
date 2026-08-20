@@ -829,7 +829,7 @@ void sl_cpc_process_tx_rx(void)
     } break;
     case SPI_CPC_RX_HEADER: {
       // Prepare for header rx
-      if ((no_tx_payload == FALSE)) {
+      if (no_tx_payload == FALSE) {
         prime_for_rx_header(SET_IRQ_HIGH);
       } else {
         cpc_tx_rx_state = SPI_CPC_RX_HEADER;
@@ -909,7 +909,7 @@ static void prime_dma_for_reception(size_t payload_size, enum header_situation l
 
   start_transfer :
 
-      if ((init_header_rx == TRUE))
+      if (init_header_rx == TRUE)
   {
     // initiate header rx
     memset(header_buffer, 0, SLI_CPC_HDLC_HEADER_RAW_SIZE);

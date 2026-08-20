@@ -32,6 +32,7 @@
 #include <rsi_bt_common_apis.h>
 #include <rsi_common_apis.h>
 #include <string.h>
+#include <inttypes.h>
 
 //! application defines
 
@@ -103,22 +104,22 @@ int32_t rsi_initiate_power_save(void)
 {
   int32_t status = RSI_SUCCESS;
 
-  SL_DEBUG_LOG_V2(INFO, " keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Keep module in power save\r\n");
 
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode\r\n");
     return status;
   }
 
   //! initiating power save in wlan mode
   status = sl_wifi_set_performance_profile_v2(&wifi_profile);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in Wi-Fi mode :%ld\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in Wi-Fi mode: 0x%" PRIx32 "\r\n", (uint32_t)status);
     return status;
   }
-  SL_DEBUG_LOG_V2(INFO, " Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "Module is in power save\r\n");
   return status;
 }
 #endif
@@ -656,7 +657,7 @@ adv:
       //! Send write response AFTER processing (ATT_REC_MAINTAIN_IN_HOST requirement)
       status = rsi_ble_gatt_write_response(app_ble_write_event.dev_addr, 0);
       if (status != RSI_SUCCESS) {
-        SL_DEBUG_LOG_V2(ERROR, "ERROR: GATT write response failed, error: 0x%lX\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "ERROR: GATT write response failed, error: 0x%" PRIx32 "\r\n", (uint32_t)status);
       }
     } break;
     default:

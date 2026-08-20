@@ -40,3 +40,5 @@
 - toolchain_settings:
     - option: gcc_compiler_option
       value: -w
+    - option: llvm_compiler_option
+      value: -w

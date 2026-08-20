@@ -14,7 +14,7 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
     - [Pin Configuration](#pin-configuration)
-      - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-radio-board)
+      - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-radio-board)
       - [Pin Configuration of the AC1 Module Explorer Kit](#pin-configuration-of-the-ac1-module-explorer-kit)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
@@ -49,7 +49,7 @@ This application also switches between PS4 and PS2 power states, samples, collec
 
 - This example demonstrates ADC in FIFO/Static mode of operation. It reads the sampled data and converts it into equivalent input voltage.
 - Various parameters like Number of channel, ADC operation mode, Input Type, Sampling Rate and Sample Length can be configured using UC.
-- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains the channel instance configuration.
+- The [`sl_si91x_adc_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_common_config.h) file contains the common configurations for ADC and [`sl_si91x_adc_init_inst_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_adc_init_inst_config.h) contains the channel instance configuration.
 - This example is working in both FIFO and static mode of ADC operations.
 
 - The firmware version of API is fetched using [sl_si91x_adc_get_version](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-si91x-adc-get-version), which includes the release version, major version and minor version [sl_adc_version_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/adc#sl-adc-version-t).
@@ -156,7 +156,7 @@ Configure UC from the slcp component.
 
 ### Pin Configuration
 
-#### Pin Configuration of the WPK[BRD4002A] Base Board, and with radio board
+#### Pin Configuration of the WPK[BRD4002B] Base Board, and with radio board
 
 - The following table lists the mentioned pin numbers for radio board. If you want to use different radio board, see the board-specific user guide.
 - The GPIO and ULP GPIO pins listed are capable of supporting ULP ADC capability.

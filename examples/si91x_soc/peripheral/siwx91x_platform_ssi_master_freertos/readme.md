@@ -58,7 +58,7 @@ This application demonstrates the use of Synchronous Serial Interface (SSI) for 
 This example demonstrates SSI transfer (full-duplex communication) and SSI send/SSI receive (half-duplex communication) running as a dedicated FreeRTOS task.
 
 - Various parameters like SSI clock mode, Bit-width, Manual cs pin, and SSI baud rate can be configured using the UC. Also, Master or Slave or ULP Master DMA can be configured using the UC.
-- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations, and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
+- The [`sl_si91x_ssi_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_config.h) file contains the control configurations, and [`sl_si91x_ssi_common_config.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/config/sl_si91x_ssi_common_config.h) contains DMA configuration selection.
 
 ### FreeRTOS Architecture
 
@@ -195,7 +195,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   static uint32_t ssi_slave_number = SSI_SLAVE_3;  
   ```
 
-- Configure the following macros in [`ssi_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_master_freertos/ssi_master_freertos.c) if required:
+- Configure the following macros in [`ssi_master_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_ssi_master_freertos/ssi_master_freertos.c) if required:
 
 - `SSI_MASTER_BUFFER_SIZE`: Defines the length of data (in data-width units) to be sent or received through SPI. By default, it is set to 1024.
 
@@ -241,13 +241,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 >
 > Where F<sub>sclk_out</sub> is the bit rate output from the master. Make sure the SSI Primary (Master) peripheral clock (F<sub>ssi_clk</sub>) is set accordingly. Incorrect clock configuration may result in communication errors or unreliable data transfer.
 >
-> **SSI Secondary (Slave) Setup:** For instructions on configuring the SSI slave, refer to the [SSI slave](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/readme.md) to ensure correct setup and operation.
+> **SSI Secondary (Slave) Setup:** For instructions on configuring the SSI slave, refer to the [SSI slave](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/sl_si91x_ssi_slave/readme.md) to ensure correct setup and operation.
 
 ### Pin Configuration
 
 **SSI Master Pin Configuration:**
 
-| WPK [BRD4002A] + BRD4338A | Explorer kit (BRD2708A) | Description             |
+| WPK [BRD4002B] + BRD4338A | Explorer kit (BRD2708A) | Description             |
 | -------------------------- | ----------------------- | ----------------------- |
 | GPIO_25 [P25]              | GPIO_25 [SCK]           | RTE_SSI_MASTER_SCK_PIN  |
 | GPIO_28 [P31]              | GPIO_28 [CS]            | RTE_SSI_MASTER_CS0_PIN  |
@@ -260,7 +260,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Pin Connections Between Master and Slave
 
-**If using WPK (BRD4002A) baseboard with BRD4338A radio board:**
+**If using WPK (BRD4002B) baseboard with BRD4338A radio board:**
 
 | Signal | Master Board Pin (GPIO) | Master Breakout | Slave Board Pin (GPIO) | Slave Breakout | Wire                       |
 | ------ | ----------------------- | --------------- | ---------------------- | -------------- | -------------------------- |

@@ -134,7 +134,7 @@ void iostream_rx()
     }
     if (c > 0) {
       cache_uart_rx_data(c);
-      if ((c == '\n')) {
+      if (c == '\n') {
         index      = 0;
         end_of_cmd = true;
       } else {

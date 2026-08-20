@@ -14,6 +14,7 @@ component:
 - id: iostream_retarget_stdio
 - id: sl_usart_iostream
 - id: si91x_log
+- id: syscalls
 - id: si91x_log_iostream_formatted
 - id: iostream_si91x
 - id: iostream_uart_si91x
@@ -77,8 +78,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.1.1
+  version: 4.1.2
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2026.6.1
+  version: 2026.6.2

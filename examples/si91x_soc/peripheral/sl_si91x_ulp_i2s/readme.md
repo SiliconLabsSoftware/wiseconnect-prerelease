@@ -179,7 +179,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
   - **Pin Configuration**
 
-      | Description      | SiWx917 GPIO | WPK [BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard)           | Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)         |
+      | Description      | SiWx917 GPIO | WPK [BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard)           | Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)         |
       | ---------------- | ------------ | ------------------------ | ------------------------------- |
       | I2S DOUT         | ULP_GPIO_1   | P16                      | EXP_HEADER-5                    |
       | I2S DIN          | ULP_GPIO_6   | EXP_HEADER-16            | RX                              |

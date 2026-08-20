@@ -14,8 +14,8 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
     - [Configuration of USART at UC (Universal Configuration)](#configuration-of-usart-at-uc-universal-configuration)
-    - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with BRD4338A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-brd4338a-radio-board)
-    - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with BRD4343A radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-brd4343a-radio-board)
+    - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with BRD4338A radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-brd4338a-radio-board)
+    - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with BRD4343A radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-brd4343a-radio-board)
     - [Pin Configuration of the AC1 Module Explorer Kit](#pin-configuration-of-the-ac1-module-explorer-kit)
     - [Flow Control Configuration](#flow-control-configuration)
   - [Test the Application](#test-the-application)
@@ -131,7 +131,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   #define NON_UC_DEFAULT_CONFIG 0      // Enable this macro to set the default configurations in non_uc case
   ```
 
-### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4338A radio board
+### Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4338A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
   | ----------------------- | ------- | ------------- |
@@ -139,7 +139,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | USART_MASTER_TX_PIN     | GPIO_30 |     P35       |
   | USART_MASTER_RX_PIN     | GPIO_29 |     P33       |
 
-### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4343A radio board
+### Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4343A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
   | ----------------------- | ------- | ------------- |
@@ -147,7 +147,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   | USART_MASTER_TX_PIN     | GPIO_30 |     P35       |
   | USART_MASTER_RX_PIN     | GPIO_29 |     P33       |
 
-### Pin Configuration of the WPK[BRD4002A] Base Board, and with BRD4342A radio board
+### Pin Configuration of the WPK[BRD4002B] Base Board, and with BRD4342A radio board
 
   | USART PINS              | GPIO    | Breakout pin  |
   | ----------------------- | ------- | ------------- |
@@ -174,7 +174,7 @@ To enable hardware flow control (RTS/CTS):
 3. Assign RTS and CTS pins either:
 
 - Through the UC pin assignment widget (preferred), OR
-- Manually by editing [`RTE_Device_917.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/core/chip/config/RTE_Device_917.h) and locating the USART0 RTS/CTS section.
+- Manually by editing [`RTE_Device_917.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/core/chip/config/RTE_Device_917.h) and locating the USART0 RTS/CTS section.
 
 4. Use the following default mapping if your Pin Tool is unavailable:
 

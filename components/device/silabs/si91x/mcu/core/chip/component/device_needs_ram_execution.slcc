@@ -14,7 +14,6 @@ provides:
   - name: device_needs_ram_execution
 requires:
   - name: code_classification
-    unless: [pm_ps2_component]
 define:
   - name: SLI_SI91X_MCU_ENABLE_RAM_BASED_EXECUTION 
 template_contribution:

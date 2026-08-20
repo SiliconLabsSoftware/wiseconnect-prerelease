@@ -46,6 +46,9 @@ Operating in Wi-Fi station mode, the SiWx91x connects to a local access point an
   - BRD4340A [SiWx917-RB4340A](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
   - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
   - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+  - Kits
+    - SiWG917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
+    - SiWG917 Dev Kit [BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605b-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
   - For Soc Mode, Simplicity Studio Energy Profiler can be used to measure current consumption - [Simplicity Studio Energy Profiler](#using-simplicity-studio-energy-profiler-for-current-measurement).
 - Network Co-Processor (NCP) Mode:
   - [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
@@ -334,7 +337,7 @@ Use this when the MQTT broker listens on port 443 and requires ALPN negotiation 
    - Enable SSL/TLS for the MQTT connection (same as the standard LwIP TLS procedure)
    - Set `MQTT_BROKER_PORT` to `443`
 
-4. Build, flash, and run. The Paho LwIP port configures ALPN through mbedTLS (`mbedtls_ssl_conf_set_alpn_protocols`) during TLS setup when `MQTT_TLS_ALPN_ENABLED` is `1`. ALPN support is enabled in `sli_lwip_mqtt_mbedtls_config.h` via `MBEDTLS_SSL_ALPN`.
+4. Build, flash, and run. The Paho LwIP port configures ALPN through mbedTLS (`mbedtls_ssl_conf_alpn_protocols`) during TLS setup when `MQTT_TLS_ALPN_ENABLED` is `1`. ALPN support is enabled in `sli_lwip_mqtt_mbedtls_config.h` via `MBEDTLS_SSL_ALPN`.
 
 > **Note:** ALPN support in this SDK applies to **MQTT over TCP/TLS** only. The WebSocket transport example does not configure TLS ALPN. Secure WebSocket (WSS) on port 443 would typically negotiate `http/1.1` at the TLS layer rather than `mqtt`; that use case is not covered by this integration.
 

@@ -79,7 +79,7 @@ The application toggles the selected LED on each selected button press.
 
 > ![Figure: Introduction](resources/readme/image600a.png)
 
-- Configure the following macros in [`simple_button_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_simple_button_freertos/simple_button_freertos.c) if required (each is guarded with `#ifndef` so you can also override them from the build):
+- Configure the following macros in [`simple_button_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_simple_button_freertos/simple_button_freertos.c) if required (each is guarded with `#ifndef` so you can also override them from the build):
 
   - `BUTTON_INSTANCE`: Selects the button instance whose press events unblock the FreeRTOS task and toggle the LED. By default, it is set to `button_btn0`.
 
@@ -110,7 +110,7 @@ The project uses BTN0 by default. To change the button to BTN1, follow the below
 
 > **Note:**
 >
-> - In case of DEVKIT board [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview), the blue LED toggles on button press. No other LED instance works for this board. To further use the DEVKIT LED, refer to the RGB LED application.
+> - In case of DEVKIT board [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)/ [BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605b-wifi-6-bluetooth-le-soc-dev-kit?tab=overview), the blue LED toggles on button press. No other LED instance works for this board. To further use the DEVKIT LED, refer to the RGB LED application.
 >
 > - Interrupt handlers are implemented in the driver layer, and user callbacks are provided for custom code. If you want to write your own interrupt handler instead of using the default one, make the driver interrupt handler a weak handler. Then, copy the necessary code from the driver handler to your custom interrupt handler.
 >

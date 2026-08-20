@@ -148,21 +148,21 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 **I2C0:**
 
-| PIN | WPK [BRD4002A] + BRD4338A | Explorer kit (BRD2708A) | Description              |
+| PIN | WPK [BRD4002B] + BRD4338A | Explorer kit (BRD2708A) | Description              |
 | --- | ------------------------- | ----------------------- | ------------------------ |
 | SCL | GPIO_7 [P20]              | GPIO_7 [SCL]            | Connect to Leader SCL    |
 | SDA | GPIO_6 [P19]              | GPIO_6 [SDA]            | Connect to Leader SDA    |
 
 **I2C1:**
 
-| PIN | WPK [BRD4002A] + BRD4338A | Explorer kit (BRD2708A) | Description              |
+| PIN | WPK [BRD4002B] + BRD4338A | Explorer kit (BRD2708A) | Description              |
 | --- | ------------------------- | ----------------------- | ------------------------ |
 | SCL | GPIO_54 [P42]             | GPIO_6 [SDA]            | Connect to Leader SCL    |
 | SDA | GPIO_55 [P43]             | GPIO_7 [SCL]            | Connect to Leader SDA    |
 
 **ULP_I2C (default):**
 
-| PIN | WPK [BRD4002A] + BRD4338A  | Explorer kit (BRD2708A) | Description              |
+| PIN | WPK [BRD4002B] + BRD4338A  | Explorer kit (BRD2708A) | Description              |
 | --- | -------------------------- | ----------------------- | ------------------------ |
 | SCL | ULP_GPIO_7 [EXP_HEADER-15] | ULP_GPIO_7 [TX]         | Connect to Leader SCL    |
 | SDA | ULP_GPIO_6 [EXP_HEADER-16] | ULP_GPIO_6 [RX]         | Connect to Leader SDA    |

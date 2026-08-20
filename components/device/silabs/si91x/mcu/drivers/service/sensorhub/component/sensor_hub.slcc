@@ -11,6 +11,9 @@ metadata:
 component_root_path: "components/device/silabs/si91x/mcu/drivers/service/sensorhub"
 template_file:
   - path: linker_file/linkerfile_SoC.ld
+    unless: [toolchain_llvm]
+  - path: linker_file/linkerfile_SoC_llvm.ld
+    condition: [toolchain_llvm]
 source:
   - path: "src/sensor_hub.c"
 include:
@@ -28,3 +31,7 @@ requires:
 toolchain_settings:
   - option: linkerfile
     value: autogen/linkerfile_SoC.ld
+    unless: [toolchain_llvm]
+  - option: linkerfile
+    value: autogen/linkerfile_SoC_llvm.ld
+    condition: [toolchain_llvm]

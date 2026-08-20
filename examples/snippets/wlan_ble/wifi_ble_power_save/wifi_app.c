@@ -39,8 +39,7 @@
 #include "ble_config.h"
 #include "rsi_ble_apis.h"
 #include "sl_string.h"
-//! Include SSL CA certificate
-#include "cacert.pem.h"
+#include "app_config.h"
 #include "sl_si91x_socket.h"
 #include "FreeRTOSConfig.h"
 
@@ -60,15 +59,14 @@
 //! Connection Type
 #define CONNECT_WITH_PMK 0
 
+//! @ref sl_wifi_get_pairwise_master_key `type` argument (3 = PMK generation; see sl_wifi.h)
+#define SL_WIFI_PAIRWISE_MASTER_KEY_TYPE (3U)
+
 //! Server port number
 #define SERVER_PORT 5001
 
 //! Server IP address.
 #define SERVER_IP_ADDRESS "192.168.0.156"
-
-//! Load certificate to device flash for SSL client:
-//! Certificate could be loaded once and need not be loaded for every boot up
-#define SSL_CLIENT 1
 
 #define DHCP_HOST_NAME NULL
 #define TIMEOUT_MS     25000
@@ -188,7 +186,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
   UNUSED_PARAMETER(arg);
 
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %lu bytes payload\r\n", result_length);
+    SL_DEBUG_LOG_V2(ERROR, "F: Join Event received with %" PRIu32 " bytes payload\r\n", result_length);
     if (client_socket) {
       close(client_socket);
     }
@@ -205,24 +203,6 @@ void wifi_app_callbacks_init(void)
   sl_wifi_set_join_callback_v2(join_callback_handler, NULL);
 }
 
-sl_status_t clear_and_load_certificates_in_flash(void)
-{
-  sl_status_t status;
-
-  // Load SSL CA certificate
-  status =
-    sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);
-  if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR,
-                    "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%" PRIx32 "",
-                    (uint32_t)status);
-  } else {
-    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %d Success", 0);
-  }
-
-  return status;
-}
-
 void rsi_wlan_app_task(void)
 {
   int32_t status = RSI_SUCCESS;
@@ -230,31 +210,24 @@ void rsi_wlan_app_task(void)
   switch (wifi_app_cb.state) {
     case WIFI_APP_INITIAL_STATE: {
       wifi_app_callbacks_init();
-#if SSL_CLIENT
-      //! Load certificates
-      status = clear_and_load_certificates_in_flash();
-      if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%" PRIx32 "", (uint32_t)status);
-        return;
-      } else
-#endif
-      {
 #if CONNECT_WITH_PMK
-        sl_wifi_ssid_t ssid;
-        uint8_t type = 3;
-        ssid.length  = (uint8_t)sl_strnlen(SSID, sizeof(ssid.value));
-        memcpy(ssid.value, SSID, ssid.length);
+      sl_wifi_ssid_t ssid;
+      ssid.length = (uint8_t)sl_strnlen(SSID, sizeof(ssid.value));
+      memcpy(ssid.value, SSID, ssid.length);
 
-        status = sl_wifi_get_pairwise_master_key(SL_WIFI_CLIENT_INTERFACE, type, &ssid, PSK, pairwise_master_key);
-        if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Get Pairwise Master Key Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
-          return;
-        }
-        SL_DEBUG_LOG_V2(INFO, "Get Pairwise Master Key Success\r\n");
-#endif
-        //! update wlan application state
-        wifi_app_cb.state = WIFI_APP_UNCONNECTED_STATE;
+      status = sl_wifi_get_pairwise_master_key(SL_WIFI_CLIENT_INTERFACE,
+                                               SL_WIFI_PAIRWISE_MASTER_KEY_TYPE,
+                                               &ssid,
+                                               PSK,
+                                               pairwise_master_key);
+      if (status != SL_STATUS_OK) {
+        SL_DEBUG_LOG_V2(ERROR, "Get Pairwise Master Key Failed, Error Code : 0x%" PRIx32 "\r\n", (uint32_t)status);
+        return;
       }
+      SL_DEBUG_LOG_V2(INFO, "Get Pairwise Master Key Success\r\n");
+#endif
+      //! update wlan application state
+      wifi_app_cb.state = WIFI_APP_UNCONNECTED_STATE;
     } break;
     case WIFI_APP_UNCONNECTED_STATE: {
       //! Connect to an Access point
@@ -270,7 +243,7 @@ void rsi_wlan_app_task(void)
       status = sl_net_set_credential(id, SL_NET_WIFI_PSK, PSK, strlen((char *)PSK));
 #endif
       if (status == SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %lu\r\n", id);
+        SL_DEBUG_LOG_V2(INFO, "Credentials set, id : %" PRIu32 "\r\n", (uint32_t)id);
 
         access_point.ssid.length = strlen((char *)SSID);
         memcpy(access_point.ssid.value, SSID, access_point.ssid.length);
@@ -280,20 +253,20 @@ void rsi_wlan_app_task(void)
 
         status = sl_wifi_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID);
         if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Failed to start set join configuration: 0x%" PRIx32 "", (uint32_t)status);
+          SL_DEBUG_LOG_V2(ERROR, "Failed to start set join configuration: 0x%" PRIx32 "\r\n", (uint32_t)status);
           return;
         }
 
         SL_DEBUG_LOG_V2(INFO, "SSID %s\r\n", (uintptr_t)access_point.ssid.value);
         status = sl_wifi_connect(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &access_point, TIMEOUT_MS);
         if (status != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%" PRIx32 "", (uint32_t)status);
+          SL_DEBUG_LOG_V2(ERROR, "WLAN Connect Failed, Error Code : 0x%" PRIx32 "\r\n", (uint32_t)status);
         } else {
-          SL_DEBUG_LOG_V2(INFO, " WLAN connection is successful\r\n");
+          SL_DEBUG_LOG_V2(INFO, "WLAN connection is successful\r\n");
           wifi_app_cb.state = WIFI_APP_CONNECTED_STATE;
         }
       } else {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials; status: %lu\r\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "Failed to set credentials; status: 0x%" PRIx32 "\r\n", (uint32_t)status);
       }
     } break;
     case WIFI_APP_CONNECTED_STATE: {
@@ -313,7 +286,7 @@ void rsi_wlan_app_task(void)
       SL_DEBUG_LOG_V2(INFO, "Initiating PowerSave\r\n");
       status = rsi_initiate_power_save();
       if (status != RSI_SUCCESS) {
-        SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode \r\n");
+        SL_DEBUG_LOG_V2(ERROR, "Failed to initiate power save in BLE mode\r\n");
         return;
       }
 
@@ -325,15 +298,15 @@ void rsi_wlan_app_task(void)
 
       status = sl_wifi_set_groupcast_filter_config(&groupcast_filter_config);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32 "", (uint32_t)status);
+        SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32 "\r\n", (uint32_t)status);
         return;
       }
       status = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, (uint16_t)BEACON_DROP_THRESHOLD_MS);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32 "", (uint32_t)status);
+        SL_DEBUG_LOG_V2(ERROR, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32 "\r\n", (uint32_t)status);
         return;
       }
-      SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter");
+      SL_DEBUG_LOG_V2(INFO, "Enabled Broadcast Data Filter\r\n");
 
 #endif
       break;

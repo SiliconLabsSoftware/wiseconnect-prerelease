@@ -124,7 +124,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-- Configure the following macros in the [`pwm_mode_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_pwm_freertos/pwm_mode_freertos.c) file and update/modify following macros, if required.
+- Configure the following macros in the [`pwm_mode_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_pwm_freertos/pwm_mode_freertos.c) file and update/modify following macros, if required.
 
   - Global parameters
 

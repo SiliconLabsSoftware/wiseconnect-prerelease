@@ -43,14 +43,11 @@ include:
   - path: inc
     file_list:
       - path: sl_si91x_psram.h
-      - path: sl_si91x_psram_handle.h     
+      - path: sl_si91x_psram_handle.h
+      - path: sl_si91x_psram_retained_data.h
 template_contribution:
   - name: code_classification_components
     value: psram_core
-  - name: psram_ram_data_files
-    value: sl_si91x_psram
-  - name: psram_ram_data_files
-    value: sl_si91x_psram_handle
 config_file:
   - path: config/sl_si91x_psram_pin_config.h
     file_id: psram_pin_config

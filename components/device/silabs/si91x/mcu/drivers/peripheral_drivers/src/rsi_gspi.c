@@ -156,7 +156,7 @@ int32_t GSPI_Initialize(ARM_SPI_SignalEvent_t cb_event,
   RSI_CLK_GspiClkConfig(M4CLK, gspi->clock_source);
 
   // Pin Mux
-  if ((gspi->reg == GSPI0)) {
+  if (gspi->reg == GSPI0) {
     // Configure GSPI pins.
     GSPI_CONFIGURE_EGPIO_PIN(gspi->io.clock);
     if (gspi->io.cs0 != NULL) {
@@ -176,7 +176,7 @@ int32_t GSPI_Initialize(ARM_SPI_SignalEvent_t cb_event,
   if (gspi->tx_dma || gspi->rx_dma) {
     if ((gspi->rx_dma != NULL) || (gspi->tx_dma != NULL)) {
       // Enable DMA instance
-      if ((gspi->reg == GSPI0)) {
+      if (gspi->reg == GSPI0) {
 #ifdef SL_SI91X_GSPI_DMA
         sl_dma_init_t dma_init;
         dma_init.dma_number = DMA_INSTANCE;
@@ -217,7 +217,7 @@ int32_t GSPI_Uninitialize(const GSPI_RESOURCES *gspi, UDMA_RESOURCES *udma)
 
   if ((gspi->rx_dma != NULL) || (gspi->tx_dma != NULL)) {
     // Diasable DMA instance
-    if ((gspi->reg == GSPI0)) {
+    if (gspi->reg == GSPI0) {
 #ifdef SL_SI91X_GSPI_DMA
       if (sl_si91x_dma_unregister_callbacks(DMA_INSTANCE,
                                             (gspi->tx_dma->channel + 1),

@@ -15,7 +15,7 @@
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
     - [Pin Configuration](#pin-configuration)
-      - [Pin Configuration of the WPK\[BRD4002A\] Base Board, and with radio board](#pin-configuration-of-the-wpkbrd4002a-base-board-and-with-radio-board)
+      - [Pin Configuration of the WPK\[BRD4002B\] Base Board, and with radio board](#pin-configuration-of-the-wpkbrd4002b-base-board-and-with-radio-board)
       - [Pin Configuration of the AC1 Module Explorer Kit](#pin-configuration-of-the-ac1-module-explorer-kit)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
@@ -158,7 +158,7 @@ Configure UC from the slcp component.
 
 ### Pin Configuration
 
-#### Pin Configuration of the WPK[BRD4002A] Base Board, and with radio board
+#### Pin Configuration of the WPK[BRD4002B] Base Board, and with radio board
 
 - The following table lists the mentioned pin numbers for radio board. If you want to use different radio board, see the board-specific user guide.
 - The GPIO and ULP GPIO pins listed are capable of supporting ULP ADC capability.

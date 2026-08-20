@@ -31,6 +31,7 @@ The application showcases:
 
 **SoC Mode**:
 - Si917 SoC development board (e.g., BRD4325A, BRD4338A)
+- SiWG917 Dev Kit [BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605b-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
 - USB cable for programming and debugging
 
 **NCP Mode**:
@@ -143,6 +144,6 @@ Customize protocol initialization:
 
 ## References
 
-- [Si917 Component Framework Architecture](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
-- [Component Refactoring Plan](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
+- [Si917 Component Framework Architecture](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/docs/architecture/ble_component_framework/Si917_Component_Framework_Architecture_Clean.md)
+- [Component Refactoring Plan](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/docs/plans/ble_unified_component_refactoring_plan_v2_overview.md)
 - WiSeConnect SDK Documentation

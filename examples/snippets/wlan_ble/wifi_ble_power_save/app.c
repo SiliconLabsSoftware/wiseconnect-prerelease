@@ -26,9 +26,12 @@
 /**
  * Include files
  **/
+#include "app_config.h"
+
 //! SL Wi-Fi SDK includes
 #include "sl_board_configuration.h"
 #include "sl_wifi.h"
+#include "sl_status.h"
 #include "sl_si91x_driver.h"
 #include "sl_wifi_callback_framework.h"
 #include "cmsis_os2.h"
@@ -45,6 +48,30 @@
 #endif
 #include "wifi_app.h"
 #include "sl_utility.h"
+#include "sl_net.h"
+#include "cacert.pem.h"
+#include <inttypes.h>
+
+#if SSL_CLIENT
+static sl_status_t clear_and_load_certificates_in_flash(void)
+{
+  sl_status_t status;
+
+  status = sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(CERTIFICATE_INDEX),
+                                 SL_NET_SIGNING_CERTIFICATE,
+                                 cacert,
+                                 sizeof(cacert) - 1);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR,
+                    "Loading TLS CA certificate in to FLASH Failed, Error Code : 0x%" PRIx32 "\r\n",
+                    (uint32_t)status);
+  } else {
+    SL_DEBUG_LOG_V2(INFO, "Load SSL CA certificate at index %" PRIu32 " Success\r\n", (uint32_t)CERTIFICATE_INDEX);
+  }
+
+  return status;
+}
+#endif
 
 static const sl_wifi_device_configuration_t config = {
   .boot_option = LOAD_NWP_FW,
@@ -136,7 +163,7 @@ extern int32_t rsi_ble_app_get_event(void);
 void rsi_wlan_ble_app(void *argument)
 {
   UNUSED_PARAMETER(argument);
-  int32_t status                      = SL_STATUS_OK;
+  sl_status_t status                  = SL_STATUS_OK;
   sl_si91x_firmware_version_t version = { 0 };
 #if SL_SI91X_TICKLESS_MODE
   data_received_semaphore = osSemaphoreNew(1, 0, NULL);
@@ -146,15 +173,15 @@ void rsi_wlan_ble_app(void *argument)
   //! Wi-Fi initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%lX\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Initialization Failed, Error Code : 0x%" PRIx32 "\r\n", (uint32_t)status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, " Wi-Fi initialization is successful\r\n");
+  SL_DEBUG_LOG_V2(INFO, "Wi-Fi initialization is successful\r\n");
 
   //! Firmware version Prints
   status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%lx\r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "Failed to fetch firmware version: 0x%" PRIx32 "\r\n", (uint32_t)status);
   } else {
     printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
            version.chip_id,
@@ -166,6 +193,15 @@ void rsi_wlan_ble_app(void *argument)
            version.customer_id,
            version.build_num);
   }
+
+#if SSL_CLIENT
+  //! Load certificates
+  status = clear_and_load_certificates_in_flash();
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Unexpected error while loading certificate: 0x%" PRIx32 "\r\n", (uint32_t)status);
+    return;
+  }
+#endif
 
   //! BLE initialization
   rsi_ble_app_init();

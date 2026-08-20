@@ -105,7 +105,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - By default in UC, USART0 clock source will be configured to `ULP REF CLK`, select `SOC PLL CLK`.
 
-- Configure the following macros in [`usart_async_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_usart_async_freertos/usart_async_freertos.c) if required:
+- Configure the following macros in [`usart_async_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_usart_async_freertos/usart_async_freertos.c) if required:
 
 - `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
 
@@ -123,7 +123,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 This example uses **USART0** on the following pins. An external USB-to-Serial TTL adapter cable is required to connect these pins to a PC serial terminal.
 
-| USART Pin      | GPIO    | WPK (BRD4002A) + BRD4338A | Explorer kit (BRD2708A) | UART-TTL Cable |
+| USART Pin      | GPIO    | WPK (BRD4002B) + BRD4338A | Explorer kit (BRD2708A) | UART-TTL Cable |
 | -------------- | ------- | -------------------------- | ----------------------- | -------------- |
 | USART0_TX_PIN  | GPIO_30 | P35                        | [RST]                   | RX pin         |
 | USART0_RX_PIN  | GPIO_29 | P33                        | [AN]                    | TX pin         |
@@ -142,7 +142,7 @@ This example uses **USART0** on the following pins. An external USB-to-Serial TT
   #define RTE_USART0_RTS_PORT_ID    1
   ```
 
-| USART Pin      | GPIO    | WPK (BRD4002A) Breakout | Explorer kit (BRD2708A) |
+| USART Pin      | GPIO    | WPK (BRD4002B) Breakout | Explorer kit (BRD2708A) |
 | -------------- | ------- | ----------------------- | ----------------------- |
 | USART0_CTS_PIN | GPIO_26 | P27                     | [MISO]                  |
 | USART0_RTS_PIN | GPIO_28 | P31                     | [CS]                    |

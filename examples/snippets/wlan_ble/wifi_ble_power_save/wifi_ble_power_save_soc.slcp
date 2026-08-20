@@ -21,6 +21,7 @@ include:
 - path: .
   file_list:
   - path: app.h
+  - path: app_config.h
   - path: ble_config.h
   - path: wifi_app.h
 define:
@@ -128,8 +129,8 @@ post_build:
 sdk_extension:
 - id: wiseconnect3_sdk
   vendor: silabs
-  version: 4.1.1
+  version: 4.1.2
 sdk:
   id: simplicity_sdk
   vendor: silabs
-  version: 2026.6.1
+  version: 2026.6.2

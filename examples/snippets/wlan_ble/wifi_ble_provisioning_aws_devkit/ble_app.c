@@ -784,6 +784,12 @@ adv:
 
           // WLAN Status Request
           case '7': {
+            memset(data, 0, sizeof(data));
+            if (connected) {
+              rsi_ble_app_set_event(RSI_WLAN_ALREADY);
+            } else {
+              rsi_ble_app_set_event(RSI_WLAN_NOT_ALREADY);
+            }
           } break;
 
           // WLAN disconnect request

@@ -2496,11 +2496,6 @@
                         Wi-Fi interface to perform the scan on (e.g., Client Interface, Access Point Interface).
                     </description>
                 </param>
-                <param name="ssid" type="api_ssid">
-                    <description>
-                        SSID to scan for. This is the identifier of the wireless network to be used in the scan.
-                    </description>
-                </param>
                 <param name="mode" type="uint8" enum="scan_mode">
                     <description>
                         Type of scan to perform (e.g., Active Scan, Passive Scan, Extended Active Scan).
@@ -2519,6 +2514,11 @@
                 <param name="lp_mode" type="uint8">
                     <description>
                         Low Power (LP) mode setting. Set to 1 to enable LP mode, or 0 to disable LP mode. Enabling LP mode can reduce power consumption during passive scans.
+                    </description>
+                </param>
+                <param name="ssid" type="api_ssid">
+                    <description>
+                        SSID to scan for. This is the identifier of the wireless network to be used in the scan.
                     </description>
                 </param>
             </params>

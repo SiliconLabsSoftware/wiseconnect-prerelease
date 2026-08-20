@@ -194,13 +194,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   2. Use Comparator-2 for 917 boards.
   3. To compare external input to buffer output, enable `COMPARE_POS_INPUT_EXTERNAL_NEG_INPUT_EXTERNAL` and select **External input-1** as non-inverting input and **Reference buffer output** as inverting input from UC. The reference buffer produces a fixed output of 1.2 V only.
 
-- `THRESHOLD_VALUE`: Threshold value that selects the resistor bank output voltage. For possible values, see [sl_analog_comparator_threshold_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-threshold-values-t) in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h). By default, it is set to `SL_COMPARATOR_THRESHOLD_VALUE_FOR_2_15_VOLT`, which configures the resistor bank output to 2.15 V.
+- `THRESHOLD_VALUE`: Threshold value that selects the resistor bank output voltage. For possible values, see [sl_analog_comparator_threshold_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-threshold-values-t) in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h). By default, it is set to `SL_COMPARATOR_THRESHOLD_VALUE_FOR_2_15_VOLT`, which configures the resistor bank output to 2.15 V.
 
   ```c
     #define THRESHOLD_VALUE SL_COMPARATOR_THRESHOLD_VALUE_FOR_2_15_VOLT // To change resistor bank output to 2.15 volts
   ```
 
-- `SCALE_FACT_VAL`: Scale-factor value that selects the reference scaler output voltage. For possible values, see [sl_analog_comparator_scale_factor_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-scale-factor-values-t) in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.1-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h).
+- `SCALE_FACT_VAL`: Scale-factor value that selects the reference scaler output voltage. For possible values, see [sl_analog_comparator_scale_factor_values_t](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp#sl-analog-comparator-scale-factor-values-t) in [`sl_si91x_analog_comparator.h`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/unified_api/inc/sl_si91x_analog_comparator.h).
 
   ```c
     #define SCALE_FACT_VAL

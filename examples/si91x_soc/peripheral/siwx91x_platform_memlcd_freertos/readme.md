@@ -30,7 +30,7 @@ dark, and no backlight is needed in normal daylight conditions.
 
 ## About Example Code
 
-- This example demonstrates how simple strings could be rendered on the MEMLCD LS013B7DH03, present on WPK[BRD4002A].
+- This example demonstrates how simple strings could be rendered on the MEMLCD LS013B7DH03, present on WPK[BRD4002B].
 
 ## Prerequisites/Setup Requirements
 

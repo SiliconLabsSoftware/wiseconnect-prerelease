@@ -34,8 +34,9 @@ This application demonstrates how to test the BLE GAP peripheral role.
 
 - Windows PC
 - SoC Mode:
-  - Silicon Labs [[BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+  - Silicon Labs [[BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
   - Kits
+    - SiWG917 Dev Kit [BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605b-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
     - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 - NCP Mode:
   - Silicon Labs [BRD4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
@@ -52,7 +53,7 @@ This application demonstrates how to test the BLE GAP peripheral role.
 - Simplicity Studio
 - SoC
   - Silicon Labs SiWx917 PK6030A SoC Kit which includes
-    - BRD4001A/BRD4002A Wireless Starter Kit Mainboard
+    - BRD4001A/BRD4002B Wireless Starter Kit Mainboard
     - BRD4325A Radio Board
   - USB TO UART converter / TTL cable
 - PSRAM Mode:  
@@ -60,7 +61,7 @@ This application demonstrates how to test the BLE GAP peripheral role.
 - NCP
   - Silicon Labs BRD8036A Si917 QMS SB Expansion Board
   - [Silicon Labs SLWSTK6006A EFR32xG21 Wireless Starter Kit](https://www.silabs.com/development-tools/wireless/efr32xg21-wireless-starter-kit) which includes
-    - BRD4001A/BRD4002A Wireless Starter Kit Mainboard
+    - BRD4001A/BRD4002B Wireless Starter Kit Mainboard
     - BRD4180A/BRD4180B Radio Board
   - Interface and Host MCU Supported
     - SPI - EFR32

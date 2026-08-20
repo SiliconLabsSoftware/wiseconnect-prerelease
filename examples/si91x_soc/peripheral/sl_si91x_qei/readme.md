@@ -53,7 +53,7 @@
 ### Hardware Requirements
 
 - Windows PC
-- Silicon Labs SiWx91x Evaluation Kit [[BRD4002A](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
+- Silicon Labs SiWx91x Evaluation Kit [[BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)]
 - Three jumper wires (for WPK setups to connect the on-chip QEI signal simulator outputs to the QEI input pins — see [Pin Configuration](#pin-configuration))
 
 ### Software Requirements
@@ -143,13 +143,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 This example does not use an external quadrature encoder. Instead, the firmware generates encoder-like pulses on the **QEI signal simulator output** GPIOs by using the ULP timer. Connect these output GPIOs to the **QEI input** GPIOs on the board expansion header with jumper wires so that the QEI peripheral can receive the Phase A, Phase B, and Index signals.
 
-The pin connections in the **BRD4002A + BRD4338A** tables below use the BRD4338A expansion-header (917 Breakout pin) labels.
+The pin connections in the **BRD4002B + BRD4338A** tables below use the BRD4338A expansion-header (917 Breakout pin) labels.
 
 If you are using a BRD4342A, BRD4343A, or BRD4343C radio board on the WPK, use the same GPIO mappings (GPIO_29 → GPIO_26, GPIO_30 → GPIO_27, and GPIO_6 → GPIO_25) and identify the corresponding expansion header pins in that radio board's user guide. Do not use the Explorer Kit tables for WPK radio boards.
 
 The **Explorer Kit** tables at the end of this section apply only to Explorer Kit boards, such as the BRD2708A, and not to WPK and radio board combinations.
 
-#### QEI input pins — BRD4002A + BRD4338A
+#### QEI input pins — BRD4002B + BRD4338A
 
 These GPIOs are the QEI peripheral inputs. Connect the simulator output pins to these pins using jumper wires.
 
@@ -159,7 +159,7 @@ These GPIOs are the QEI peripheral inputs. Connect the simulator output pins to 
 | Phase B Input | GPIO_27      | P29              |
 | Index Input   | GPIO_25      | P25              |
 
-#### QEI signal simulator output pins — BRD4002A + BRD4338A
+#### QEI signal simulator output pins — BRD4002B + BRD4338A
 
 These GPIOs are configured as outputs in firmware to simulate an external encoder. Connect each output pin to the QEI input pin using jumper wires as shown in the **Connect to** column.
 
@@ -200,7 +200,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    - **Phase A:** GPIO_29 → GPIO_26
    - **Phase B:** GPIO_30 → GPIO_27
    - **Index:** GPIO_6 → GPIO_25
-3. On **BRD4002A + BRD4338A**, use the expansion-header labels from [Pin Configuration](#pin-configuration) (for example, P33 → P27, P35 → P29, P19 → P25).
+3. On **BRD4002B + BRD4338A**, use the expansion-header labels from [Pin Configuration](#pin-configuration) (for example, P33 → P27, P35 → P29, P19 → P25).
 4. On **BRD4342A**, **BRD4343A**, or **BRD4343C**, use the same GPIO pairs and map them to that radio board's expansion-header pin names per its user guide.
 5. After successful program execution, the serial console output looks similar to the following.
 
