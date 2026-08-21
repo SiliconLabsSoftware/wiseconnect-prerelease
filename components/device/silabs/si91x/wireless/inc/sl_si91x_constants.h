@@ -69,31 +69,6 @@
 /*=========================================================================*/
 // TLS feature parameters description !//
 /*=========================================================================*/
-/// Bit to enable SSL feature
-#define SL_SI91X_ENABLE_TLS BIT(0)
-
-/// Bitmap to enable TLS version 1.0
-#define SL_SI91X_TLS_V_1_0 BIT(2)
-
-/// Bitmap to enable TLS version 1.2
-#define SL_SI91X_TLS_V_1_2 BIT(3)
-
-/// Bitmap to enable TLS version 1.1
-#define SL_SI91X_TLS_V_1_1 BIT(4)
-
-#if defined(SLI_SI917) || defined(DOXYGEN)
-/// Bitmap to enable TLS version 1.3
-#define SL_SI91X_TLS_V_1_3 BIT(8)
-#endif
-
-/// Bitmap to enable DTLS version 1.0
-#define SL_SI91X_DTLS_V_1_0 BIT(2)
-
-/// Bitmap to enable DTLS version 1.2
-#define SL_SI91X_DTLS_V_1_2 BIT(3)
-
-/// Bit to enable DTLS feature
-#define SL_SI91X_ENABLE_DTLS BIT(13)
 
 /** @} */
 

@@ -124,8 +124,6 @@ typedef enum {
   SLI_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT ///< Used for setting dwell time per channel in milliseconds during passive scan
 } sli_wifi_timeout_type_t;
 
-#define SLI_WIFI_DNS_RETRY_COUNT 1
-
 typedef enum { SET_REGION_CODE_FROM_BEACONS, SET_REGION_CODE_FROM_USER } sli_wifi_set_region_code_command_t;
 
 typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_ENCRYPTION } sli_wifi_encryption_t;
@@ -252,8 +250,6 @@ typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_E
 #define SLI_WIFI_RSP_CONFIG_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for Query Network Parameters response command
-#define SLI_WIFI_RSP_QUERY_NETWORK_PARAMS_WAIT_TIME \
-  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for set Certificate response command
 #define SLI_WIFI_RSP_SET_CERTIFICATE_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))

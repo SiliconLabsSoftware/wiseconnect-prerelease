@@ -145,11 +145,6 @@ void sli_wifi_set_opermode(sl_wifi_operation_mode_t mode)
   initialized_opermode = mode;
 }
 
-sl_wifi_operation_mode_t sli_wifi_get_opermode(void)
-{
-  return initialized_opermode;
-}
-
 sl_status_t sli_wifi_set_listen_interval(sl_wifi_interface_t interface, sl_wifi_listen_interval_t listen_interval)
 {
   UNUSED_PARAMETER(interface);
@@ -1039,93 +1034,6 @@ sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
   return sli_wifi_send_command_packet(command, command_type, packet, wait_period, sdk_context, response_buffer);
 }
 
-sl_status_t sli_wifi_async_send_command(uint32_t command,
-                                        sli_wifi_command_type_t command_type,
-                                        const void *data,
-                                        uint32_t data_length,
-                                        void *custom_desc)
-{
-  sl_wifi_system_packet_t *packet      = NULL;
-  sl_status_t status                   = SL_STATUS_OK;
-  sli_command_engine_tx_info_t tx_info = { 0 };
-
-  // Allocate a buffer for the command with appropriate size
-  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
-                                              SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
-                                              SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
-                                              (sli_buffer_t)&packet);
-  VERIFY_STATUS_AND_RETURN(status);
-  // Clear the packet descriptor and copy the command data if available
-  if (custom_desc != NULL) {
-    memcpy(packet->desc, custom_desc, sizeof(packet->desc));
-  } else {
-    memset(packet->desc, 0, sizeof(packet->desc));
-  }
-  if (data != NULL) {
-    memcpy(packet->data, data, data_length);
-  }
-
-  // Fill frame type
-  packet->length  = data_length & 0xFFF;
-  packet->command = (uint16_t)command;
-  if (command_type < SLI_SI91X_CMD_MAX) {
-    packet->desc[1] |= (SLI_WLAN_MGMT_Q << 4);
-    tx_info.packet_type = sli_get_command_packet_type(command_type);
-  } else {
-    tx_info.packet_type = command_type;
-  }
-
-  tx_info.data_packet        = (void *)packet;
-  tx_info.data_packet_length = ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t));
-  tx_info.frame_id           = (uint16_t)command;
-  tx_info.flags              = SLI_COMMAND_ENGINE_COMMAND_PACKET;
-  tx_info.timeout            = 0;
-  tx_info.context            = NULL;
-  tx_info.packet_id          = 0;
-  tx_info.flags |= SLI_COMMAND_ENGINE_ASYNC_RESPONSE_PACKET;
-
-  status = sli_command_engine_send_packet(&sli_wifi_command_engine, &tx_info);
-  if (status != SL_STATUS_OK) {
-    sli_buffer_manager_free_buffer(packet);
-  }
-  VERIFY_STATUS_AND_RETURN(status);
-
-  return SL_STATUS_IN_PROGRESS;
-}
-
-uint8_t sli_wifi_get_vap_id_from_operation_mode(const sl_wifi_system_packet_t *rx_packet)
-{
-  // Query the current operation mode
-  sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
-
-  // Station modes: CLIENT, ENTERPRISE_CLIENT, TRANSCEIVER, TRANSMIT_TEST
-  if (current_operation_mode == SL_WIFI_CLIENT_MODE || current_operation_mode == SL_WIFI_ENTERPRISE_CLIENT_MODE
-      || current_operation_mode == SL_WIFI_TRANSCEIVER_MODE || current_operation_mode == SL_WIFI_TRANSMIT_TEST_MODE) {
-    return SL_WIFI_CLIENT_VAP_ID;
-  }
-
-  // AP mode
-  if (current_operation_mode == SL_WIFI_ACCESS_POINT_MODE) {
-    return SL_WIFI_AP_VAP_ID;
-  }
-
-  // Concurrent mode: check packet descriptor byte 7 to determine VAP ID
-  if (current_operation_mode == SL_WIFI_CONCURRENT_MODE) {
-    if (rx_packet != NULL) {
-      if (rx_packet->desc[7] == SL_WIFI_CLIENT_VAP_ID) {
-        return SL_WIFI_CLIENT_VAP_ID;
-      } else {
-        return SL_WIFI_AP_VAP_ID;
-      }
-    }
-    // Default to AP VAP ID if rx_packet is not provided
-    return SL_WIFI_AP_VAP_ID;
-  }
-
-  // Default to client VAP ID for unknown modes
-  return SL_WIFI_CLIENT_VAP_ID;
-}
-
 sl_wifi_buffer_t *sli_wifi_get_response_buffer(sli_command_engine_response_t *response)
 {
   if (NULL == response) {
@@ -1134,11 +1042,6 @@ sl_wifi_buffer_t *sli_wifi_get_response_buffer(sli_command_engine_response_t *re
   return (response->type == SLI_COMMAND_ENGINE_METADATA_RESPONSE)
            ? (sl_wifi_buffer_t *)(((sli_command_engine_metadata_t *)response->data)->tx_info.data_packet)
            : (sl_wifi_buffer_t *)response->data;
-}
-
-uint16_t sli_wifi_get_wifi_frame_status(const sl_wifi_system_packet_t *packet)
-{
-  return (uint16_t)(packet->desc[12] + (packet->desc[13] << 8));
 }
 
 /**

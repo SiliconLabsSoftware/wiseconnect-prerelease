@@ -35,14 +35,11 @@
 #include "sli_command_engine.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sl_wifi_types.h"
-
+#include "sli_constants.h"
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 #include "sl_si91x_socket_types.h"
 #include "sl_ip_types.h"
 #endif
-
-extern osEventFlagsId_t sli_wifi_event_engine_event_id;
-extern sli_queue_t event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_MAX_EVENTS];
 
 sl_status_t sli_si91x_wifi_data_packet_handler(void *packet,
                                                uint32_t packet_size,

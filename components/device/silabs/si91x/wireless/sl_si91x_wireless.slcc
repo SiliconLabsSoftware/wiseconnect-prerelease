@@ -30,6 +30,9 @@ source:
 - path: sl_net/src/sli_net_si91x_utility.c
   condition:
   - sl_si91x_lwip_stack
+- path: sl_net/src/sli_net_si91x_utility.c
+  condition:
+  - sl_si91x_network_dual_stack
 - path: sl_net/src/sl_net_si91x_callback_framework.c
   condition:
   - network_manager
@@ -172,6 +175,7 @@ requires:
 - name: wifi_resources
 - name: sli_hal_si91x
 - name: log_none
+- name: network_stack_common
 recommends:
 - id: '%extension-wiseconnect3_sdk%sl_si91x_internal_stack'
   vendor: silabs

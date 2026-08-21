@@ -13,6 +13,7 @@ component:
 - id: syscalls
 - id: wiseconnect_common
 - id: wifi
+- id: sl_si91x_internal_stack
 - id: si91x_memory_default_config
 - id: bsd_socket
 - id: basic_network_config_manager

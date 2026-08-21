@@ -59,36 +59,6 @@ sl_status_t sli_convert_rsi_ipv4_address_to_sl_ip_address(sl_ip_address_t *ip_ad
   return SL_STATUS_OK;
 }
 
-sl_status_t sli_convert_si91x_dns_response(sl_ip_address_t *ip_address,
-                                           const sli_si91x_dns_response_t *si91x_dns_response)
-{
-  SL_VERIFY_POINTER_OR_RETURN(ip_address, SL_STATUS_WIFI_NULL_PTR_ARG);
-  SL_VERIFY_POINTER_OR_RETURN(si91x_dns_response, SL_STATUS_WIFI_NULL_PTR_ARG);
-
-  // Check if DNS response has IP addresses
-  if ((si91x_dns_response->ip_count[0] | (si91x_dns_response->ip_count[1] << 8)) <= 0) {
-    return SL_STATUS_OK;
-  }
-
-  // Determine IP address size (IPv4 or IPv6) and copy the address bytes
-  uint8_t ip_address_size = (si91x_dns_response->ip_version[0] | si91x_dns_response->ip_version[1] << 8)
-                                == SL_IPV4_ADDRESS_LENGTH
-                              ? SL_IPV4_ADDRESS_LENGTH
-                              : SL_IPV6_ADDRESS_LENGTH;
-  uint8_t *sl_ip_address;
-  const uint8_t *si91x_ip_address;
-
-  ip_address->type = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? SL_IPV4 : SL_IPV6;
-
-  si91x_ip_address = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? si91x_dns_response->ip_address[0].ipv4_address
-                                                               : si91x_dns_response->ip_address[0].ipv6_address;
-  sl_ip_address    = ip_address_size == SL_IPV4_ADDRESS_LENGTH ? ip_address->ip.v4.bytes : ip_address->ip.v6.bytes;
-
-  memcpy(sl_ip_address, si91x_ip_address, ip_address_size);
-
-  return SL_STATUS_OK;
-}
-
 sl_status_t sli_convert_si91x_event_to_sl_net_event(const uint16_t *event,
                                                     sl_net_event_t *sl_net_event,
                                                     const sl_wifi_system_packet_t *packet)
@@ -134,27 +104,6 @@ sl_status_t sli_convert_si91x_event_to_sl_net_event(const uint16_t *event,
   }
 
   return SL_STATUS_FAIL;
-}
-
-bool sli_wifi_is_ip_address_zero(const sl_ip_address_t *ip_addr)
-{
-  if (ip_addr->type == SL_IPV4) {
-    for (int i = 0; i < SL_IPV4_ADDRESS_LENGTH; i++) {
-      if (ip_addr->ip.v4.bytes[i] != 0) {
-        return false; // Non-zero byte found
-      }
-    }
-    return true; // All bytes are zero
-  } else if (ip_addr->type == SL_IPV6) {
-    for (int i = 0; i < SL_IPV6_ADDRESS_LENGTH; i++) {
-      if (ip_addr->ip.v6.bytes[i] != 0) {
-        return false; // Non-zero byte found
-      }
-    }
-    return true; // All bytes are zero
-  }
-
-  return false; // Invalid or unsupported type
 }
 
 #ifdef SLI_SI91X_INTERNAL_MDNS

@@ -89,17 +89,6 @@ typedef enum {
 #define MAX_NET_AP_INTERFACES 2
 /** \addtogroup SL_NET_CONSTANTS Constants
  * @{ */
-/**
- * @enum sl_net_dns_resolution_ip_type_t
- * @brief Enumeration of DNS resolution IP types.
- * 
- * @details
- * This enumeration defines the types of IP addresses that can be resolved by DNS. It includes both IPv4 and IPv6 address types.
- */
-typedef enum {
-  SL_NET_DNS_TYPE_IPV4, ///< IPV4 DNS Address resolution.
-  SL_NET_DNS_TYPE_IPV6  ///< IPV6 DNS Address resolution.
-} sl_net_dns_resolution_ip_type_t;
 
 /**
  * @enum sl_net_event_t

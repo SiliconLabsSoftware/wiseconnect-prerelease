@@ -28,6 +28,7 @@
  *
  ******************************************************************************/
 #include "sl_net_types.h"
+#include "sl_net_dns_utility.h"
 #include "sli_net_utility.h"
 #include "sli_net_common_utility.h"
 #include "sl_si91x_core_utilities.h"

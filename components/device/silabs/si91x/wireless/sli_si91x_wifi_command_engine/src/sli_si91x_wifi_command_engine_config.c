@@ -33,7 +33,7 @@
 #include "sl_status.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_si91x_wifi_event_handler.h"
-#include "sli_si91x_wifi_command_engine_packet.h"
+#include "sli_constants.h"
 #include "sli_wifi_types.h"
 #include "sli_hal_si91x.h"
 #include "sli_si91x_driver.h"
@@ -163,11 +163,10 @@ static bool sli_si91x_client_vap_id_to_net_interface(uint8_t vap_id, sl_net_inte
 /******************************************************
  *             Extern Variable Declarations
  ******************************************************/
-
 /******************************************************
  *               Local Variable Definitions
  ******************************************************/
-sli_routing_entry_t wifi_command_engine_routing_entries[SLI_WIFI_COMMAND_ENGINE_MAX_PACKET] = {
+sli_routing_entry_t wifi_command_engine_routing_entries[] = {
   [SLI_WIFI_COMMAND_PACKET] = {
     .destination_packet_handler = sli_hal_si91x_command_send_packet,
     .packet_status_handler     = sli_command_engine_send_packet_tx_status,
@@ -191,8 +190,10 @@ sli_routing_entry_t wifi_command_engine_routing_entries[SLI_WIFI_COMMAND_ENGINE_
   },
 };
 
-sli_routing_table_t wifi_command_engine_routing_table = { .routing_table      = wifi_command_engine_routing_entries,
-                                                          .routing_table_size = SLI_WIFI_COMMAND_ENGINE_MAX_PACKET };
+sli_routing_table_t wifi_command_engine_routing_table = {
+  .routing_table      = wifi_command_engine_routing_entries,
+  .routing_table_size = sizeof(wifi_command_engine_routing_entries) / sizeof(sli_routing_entry_t)
+};
 
 /******************************************************
  *               Global Variable Definitions
@@ -394,7 +395,8 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
           const sli_si91x_socket_t *socket = get_socket_from_packet(packet);
           if (socket != NULL) {
-            metadata->tx_info.packet_type = (uint16_t)(socket->index + SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES);
+            metadata->tx_info.packet_type =
+              (uint16_t)(socket->index + sli_get_wifi_command_engine_max_packet_type_count());
           } else {
             metadata->tx_info.packet_type = SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET;
           }
@@ -794,11 +796,11 @@ static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint1
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  if (packet_type < SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES) {
+  if (packet_type < sli_get_wifi_command_engine_max_packet_type_count()) {
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  uint8_t socket_index       = (uint8_t)(packet_type - SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES);
+  uint8_t socket_index       = (uint8_t)(packet_type - sli_get_wifi_command_engine_max_packet_type_count());
   sli_si91x_socket_t *socket = (socket_index >= SLI_NUMBER_OF_SOCKETS) ? NULL : sli_si91x_sockets[socket_index];
 
   if (socket == NULL) {
@@ -893,7 +895,7 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
       continue;
     }
     uint16_t socket_packet_type =
-      (uint16_t)(sli_si91x_sockets[index]->index + SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES);
+      (uint16_t)(sli_si91x_sockets[index]->index + sli_get_wifi_command_engine_max_packet_type_count());
     status = sli_flush_socket_queues(instance, socket_packet_type, error_status);
     if (status != SL_STATUS_OK) {
       return status;

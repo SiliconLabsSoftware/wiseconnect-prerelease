@@ -33,6 +33,7 @@ include:
     - path: sli_power_profile.h
     - path: sli_types.h
     - path: sl_types.h
+    - path: sli_types.h
     - path: sli_utility.h
 
 requires:

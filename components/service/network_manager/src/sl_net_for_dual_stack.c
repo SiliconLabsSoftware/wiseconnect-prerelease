@@ -29,7 +29,9 @@
  ******************************************************************************/
 #include "sl_status.h"
 #include "sl_wifi_types.h"
+#include <stdbool.h>
 #include "stddef.h"
+#include "sli_utility.h"
 #include "sl_utility.h"
 #include "sl_net.h"
 #include "sl_wifi.h"
@@ -37,8 +39,10 @@
 #include "sl_net_si91x.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_driver.h"
+#include "sli_constants.h"
 #include "sl_rsi_utility.h"
 #include "sli_net_utility.h"
+#include "sli_utility.h"
 #include "sl_si91x_core_utilities.h"
 #include "sli_net_common_utility.h"
 #include <stdbool.h>
@@ -57,6 +61,10 @@
 #include "sli_wifi_utility.h"
 #include "sl_cmsis_utility.h"
 #include <sl_string.h>
+#include "sl_si91x_socket_utility.h"
+#include "sli_net_ip_config.h"
+#include "sl_si91x_socket_constants.h"
+#include "sl_net_dns_utility.h"
 
 #define NETIF_IPV4_ADDRESS(X, Y) (uint8_t)(((X) >> (8 * Y)) & 0xFF)
 #define MAC_48_BIT_SET           (1)
@@ -68,8 +76,6 @@
 #define AP_INTERFACE_NAME_1      'p' ///< AP network interface name 1
 #define MAX_TRANSFER_UNIT        1500
 #define ETHERNET_MULTICAST_BIT   0x01
-
-typedef enum { SLI_SI91X_CLIENT = 0, SLI_SI91X_AP = 1, SLI_SI91X_MAX_INTERFACES } sli_si91x_interfaces_t;
 
 sl_net_wifi_lwip_context_t *wifi_client_context = NULL;
 sl_net_wifi_lwip_context_t *wifi_ap_context     = NULL;
@@ -92,20 +98,12 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
                                         const sl_net_dns_resolution_ip_type_t dns_resolution_ip,
                                         sl_ip_address_t *sl_ip_address);
 
-sl_status_t sl_net_dns_resolve_hostname_v2(const char *host_name,
-                                           const uint8_t initial_timeout_sec,
-                                           const uint8_t retry_count,
-                                           const sl_net_dns_resolution_ip_type_t dns_resolution_ip,
-                                           sl_ip_address_t *sl_ip_address);
-
 // Per-interface IP configuration storage. Thread-safety is guaranteed by API semantics:
 // - Each interface (CLIENT/AP) uses a separate array index
 // - Writes occur only in sl_net_up() which can only succeed once per interface
 // - Reads occur only after sl_net_up() completes (interface must be up)
 // - Clears occur in sl_net_down() which serializes with up() by API contract
-static sl_net_ip_configuration_t stored_ip_config[SLI_SI91X_MAX_INTERFACES] = { 0 };
 
-bool bypass_mode_enabled     = false;
 bool dual_mode_enabled       = false;
 static bool lwip_initialized = false;
 
@@ -670,7 +668,7 @@ static sl_status_t sli_set_sta_link_up_by_profile_mode(sl_net_wifi_client_profil
         set_sta_link_up(profile);
       }
     }
-  } else if (bypass_mode_enabled) {
+  } else if (sli_is_bypass_mode_enabled()) {
     // SL_SI91X_TCP_IP_FEAT_BYPASS mode: Host-only IP management (LwIP only)
     SL_DEBUG_LOG_V2(DEBUG, "Bypass mode - LwIP only IP management");
 
@@ -731,7 +729,7 @@ void sli_si91x_lwip_notify_wifi_disconnect(void)
     return;
   }
 
-  if (dual_mode_enabled || bypass_mode_enabled) {
+  if (dual_mode_enabled || sli_is_bypass_mode_enabled()) {
     set_sta_link_down();
   }
 }
@@ -755,10 +753,10 @@ sl_status_t sl_net_wifi_client_init(sl_net_interface_t interface,
     const sl_wifi_device_configuration_t *config = (const sl_wifi_device_configuration_t *)configuration;
 
     // Check if both SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE and SL_SI91X_TCP_IP_FEAT_BYPASS are set
-    dual_mode_enabled   = (config->boot_config.ext_tcp_ip_feature_bit_map & SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE) != 0;
-    bypass_mode_enabled = (config->boot_config.tcp_ip_feature_bit_map & SL_SI91X_TCP_IP_FEAT_BYPASS) != 0;
+    dual_mode_enabled = (config->boot_config.ext_tcp_ip_feature_bit_map & SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE) != 0;
+    sli_set_bypass_mode_enabled((config->boot_config.tcp_ip_feature_bit_map & SL_SI91X_TCP_IP_FEAT_BYPASS) != 0);
 
-    if (dual_mode_enabled && bypass_mode_enabled) {
+    if (dual_mode_enabled && sli_is_bypass_mode_enabled()) {
       SL_DEBUG_LOG_V2(ERROR,
                       "Error: SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE and SL_SI91X_TCP_IP_FEAT_BYPASS flags are mutually "
                       "exclusive");
@@ -777,7 +775,7 @@ sl_status_t sl_net_wifi_client_init(sl_net_interface_t interface,
 
   wifi_client_context = context;
   // Initialize LwIP stack and netif only if not in offload-only mode
-  if (dual_mode_enabled || bypass_mode_enabled) {
+  if (dual_mode_enabled || sli_is_bypass_mode_enabled()) {
     // Initialize LwIP stack only once
     if (!lwip_initialized) {
       tcpip_init(NULL, NULL);
@@ -794,7 +792,7 @@ sl_status_t sl_net_wifi_client_deinit(sl_net_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
 
-  if (dual_mode_enabled || bypass_mode_enabled) {
+  if (dual_mode_enabled || sli_is_bypass_mode_enabled()) {
 #if LWIP_TESTMODE
     struct sys_timeo **list_head = NULL;
 
@@ -841,10 +839,13 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
 
   // Preserve the IP configuration status (which may be a partial-success code) so it can be
   // propagated to the caller.
-  const sl_status_t ip_config_status = status;
-
-  // Store the IP configuration for later retrieval
-  stored_ip_config[SLI_SI91X_CLIENT] = profile.ip;
+  const sl_status_t ip_config_status          = status;
+  sl_net_ip_configuration_t *stored_ip_config = sli_get_stored_ip_config(SLI_SI91X_CLIENT);
+  if (stored_ip_config == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Stored IP configuration not found");
+    return SL_STATUS_NULL_POINTER;
+  }
+  *stored_ip_config = profile.ip;
 
   // Set the client profile
   status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, profile_id, &profile);
@@ -860,13 +861,17 @@ sl_status_t sl_net_wifi_client_down(sl_net_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
 
-  if (dual_mode_enabled || bypass_mode_enabled) {
+  if (dual_mode_enabled || sli_is_bypass_mode_enabled()) {
     // Set the link down for LWIP interface (includes DHCP cleanup)
     set_sta_link_down();
   }
-
+  sl_net_ip_configuration_t *stored_ip_config = sli_get_stored_ip_config(SLI_SI91X_CLIENT);
+  if (stored_ip_config == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Stored IP configuration not found");
+    return SL_STATUS_NULL_POINTER;
+  }
+  memset(stored_ip_config, 0, sizeof(sl_net_ip_configuration_t));
   // Clear stored IP configuration
-  memset(&stored_ip_config[SLI_SI91X_CLIENT], 0, sizeof(sl_net_ip_configuration_t));
 
   // Disconnect from the Wi-Fi network
   return sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
@@ -885,10 +890,10 @@ sl_status_t sl_net_wifi_ap_init(sl_net_interface_t interface,
     const sl_wifi_device_configuration_t *config = (const sl_wifi_device_configuration_t *)configuration;
 
     // Check if both SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE and SL_SI91X_TCP_IP_FEAT_BYPASS are set
-    dual_mode_enabled   = (config->boot_config.ext_tcp_ip_feature_bit_map & SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE) != 0;
-    bypass_mode_enabled = (config->boot_config.tcp_ip_feature_bit_map & SL_SI91X_TCP_IP_FEAT_BYPASS) != 0;
+    dual_mode_enabled = (config->boot_config.ext_tcp_ip_feature_bit_map & SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE) != 0;
+    sli_set_bypass_mode_enabled((config->boot_config.tcp_ip_feature_bit_map & SL_SI91X_TCP_IP_FEAT_BYPASS) != 0);
 
-    if (dual_mode_enabled && bypass_mode_enabled) {
+    if (dual_mode_enabled && sli_is_bypass_mode_enabled()) {
       SL_DEBUG_LOG_V2(ERROR,
                       "Error: SL_SI91X_EXT_TCP_IP_DUAL_MODE_ENABLE and SL_SI91X_TCP_IP_FEAT_BYPASS flags are mutually "
                       "exclusive");
@@ -896,7 +901,7 @@ sl_status_t sl_net_wifi_ap_init(sl_net_interface_t interface,
     }
   }
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -923,7 +928,7 @@ sl_status_t sl_net_wifi_ap_deinit(sl_net_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -940,7 +945,7 @@ sl_status_t sl_net_wifi_ap_up(sl_net_interface_t interface, sl_net_profile_id_t 
   sl_status_t status;
   sl_net_wifi_ap_profile_t profile;
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -957,7 +962,12 @@ sl_status_t sl_net_wifi_ap_up(sl_net_interface_t interface, sl_net_profile_id_t 
   VERIFY_STATUS_AND_RETURN(status);
 
   // Store the IP configuration for later retrieval
-  stored_ip_config[SLI_SI91X_AP] = profile.ip;
+  sl_net_ip_configuration_t *stored_ip_config = sli_get_stored_ip_config(SLI_SI91X_AP);
+  if (stored_ip_config == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Stored IP configuration not found");
+    return SL_STATUS_NULL_POINTER;
+  }
+  *stored_ip_config = profile.ip;
 
   // Set the AP profile
   status = sl_net_set_profile(SL_NET_WIFI_AP_INTERFACE, profile_id, &profile);
@@ -977,7 +987,7 @@ sl_status_t sl_net_wifi_ap_down(sl_net_interface_t interface)
 {
   UNUSED_PARAMETER(interface);
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -986,14 +996,14 @@ sl_status_t sl_net_wifi_ap_down(sl_net_interface_t interface)
   }
 
   // Clear stored IP configuration
-  memset(&stored_ip_config[SLI_SI91X_AP], 0, sizeof(sl_net_ip_configuration_t));
+  memset(sli_get_stored_ip_config(SLI_SI91X_AP), 0, sizeof(sl_net_ip_configuration_t));
 
   return sl_wifi_stop_ap(SL_WIFI_AP_INTERFACE);
 }
 
 sl_status_t sl_net_join_multicast_address(sl_net_interface_t interface, const sl_ip_address_t *ip_address)
 {
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -1003,7 +1013,7 @@ sl_status_t sl_net_join_multicast_address(sl_net_interface_t interface, const sl
 sl_status_t sl_net_leave_multicast_address(sl_net_interface_t interface, const sl_ip_address_t *ip_address)
 {
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -1051,14 +1061,19 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
                                         sl_ip_address_t *sl_ip_address)
 {
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
   // Check for a NULL pointer for sl_ip_address
   SL_WIFI_ARGS_CHECK_NULL_POINTER(sl_ip_address);
 
-  sl_ip_address_type_t client_ip_type = stored_ip_config[SLI_SI91X_CLIENT].type;
+  sl_net_ip_configuration_t *stored_ip_config = sli_get_stored_ip_config(SLI_SI91X_CLIENT);
+  if (stored_ip_config == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Stored IP configuration not found");
+    return SL_STATUS_NULL_POINTER;
+  }
+  sl_ip_address_type_t client_ip_type = stored_ip_config->type;
 
   // If client interface has not been brought up (ip_type == 0), allow the request
   // to proceed - the firmware will handle it or return an appropriate error.
@@ -1113,103 +1128,11 @@ sl_status_t sl_net_dns_resolve_hostname(const char *host_name,
   return SL_STATUS_OK;
 }
 
-// Resolve a host name to an IP address using DNS
-sl_status_t sl_net_dns_resolve_hostname_v2(const char *host_name,
-                                           const uint8_t initial_timeout_sec,
-                                           const uint8_t retry_count,
-                                           const sl_net_dns_resolution_ip_type_t dns_resolution_ip,
-                                           sl_ip_address_t *sl_ip_address)
-{
-
-  // Check for NULL pointers
-  SL_WIFI_ARGS_CHECK_NULL_POINTER(sl_ip_address);
-  SL_WIFI_ARGS_CHECK_NULL_POINTER(host_name);
-
-  if (bypass_mode_enabled) {
-    return SL_STATUS_WIFI_UNSUPPORTED;
-  }
-
-  sl_ip_address_type_t client_ip_type = stored_ip_config[SLI_SI91X_CLIENT].type;
-
-  // If client interface has not been brought up (ip_type == 0), allow the request
-  // to proceed - the firmware will handle it or return an appropriate error.
-  if (client_ip_type != 0) {
-    if (dns_resolution_ip == SL_NET_DNS_TYPE_IPV4) {
-      // IPv4 DNS requested - check if interface supports IPv4
-      if ((client_ip_type & SL_IPV4) == 0) {
-        return SL_STATUS_INVALID_CONFIGURATION;
-      }
-    } else if (dns_resolution_ip == SL_NET_DNS_TYPE_IPV6) {
-      // IPv6 DNS requested - check if interface supports IPv6
-      if ((client_ip_type & SL_IPV6) == 0) {
-        return SL_STATUS_INVALID_CONFIGURATION;
-      }
-    }
-  }
-
-  size_t len = sl_strnlen(host_name, SLI_SI91X_DNS_REQUEST_MAX_URL_LEN + 1);
-  if (len > SLI_SI91X_DNS_REQUEST_MAX_URL_LEN) {
-    return SL_STATUS_INVALID_PARAMETER;
-  }
-
-  sl_status_t status                                 = SL_STATUS_FAIL;
-  sl_wifi_system_packet_t *packet                    = NULL;
-  sl_wifi_buffer_t *buffer                           = NULL;
-  const sli_si91x_dns_response_t *dns_response       = NULL;
-  sli_si91x_dns_query_request_t dns_query_request_v2 = { 0 };
-  uint8_t dns_timeout                                = 0;
-
-  // Determine the wait period based on the timeout value
-  sli_wifi_wait_period_t wait_period =
-    initial_timeout_sec == 0 ? SLI_WIFI_RETURN_IMMEDIATELY : (SLI_WIFI_WAIT_FOR_EVER | SLI_WIFI_WAIT_FOR_RESPONSE_BIT);
-
-  if (wait_period != SLI_WIFI_RETURN_IMMEDIATELY) {
-    dns_timeout = initial_timeout_sec;
-
-    if (dns_timeout < SLI_NET_MIN_DNS_INITIAL_TIMEOUT) {
-      return SL_STATUS_INVALID_PARAMETER;
-    }
-
-    if (dns_timeout > SLI_NET_MAX_DNS_INITIAL_TIMEOUT) {
-      dns_timeout = SLI_NET_MAX_DNS_INITIAL_TIMEOUT; // Set the maximum timeout to 10 seconds
-    }
-  }
-
-  // Determine the IP version to be used (IPv4 or IPv6)
-  dns_query_request_v2.ip_version[0]       = (dns_resolution_ip == SL_NET_DNS_TYPE_IPV4) ? 4 : 6;
-  dns_query_request_v2.initial_timeout_sec = dns_timeout;
-  dns_query_request_v2.retry_count         = retry_count;
-  memcpy(dns_query_request_v2.url_name, host_name, len);
-
-  status = sli_wifi_send_command(SLI_WIFI_REQ_DNS_QUERY,
-                                 SLI_SI91X_NETWORK_CMD,
-                                 &dns_query_request_v2,
-                                 sizeof(dns_query_request_v2),
-                                 wait_period,
-                                 NULL,
-                                 (void **)&buffer);
-
-  // Check if the command failed and free the buffer if it was allocated
-  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_buffer_manager_free_buffer(buffer);
-  }
-  VERIFY_STATUS_AND_RETURN(status);
-
-  // Extract the DNS response from the SI91X packet buffer
-  packet       = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
-  dns_response = (sli_si91x_dns_response_t *)packet->data;
-
-  // Convert the SI91X DNS response to the sl_ip_address format
-  sli_convert_si91x_dns_response(sl_ip_address, dns_response);
-  sli_buffer_manager_free_buffer(buffer);
-  return SL_STATUS_OK;
-}
-
 sl_status_t sl_net_set_dns_server(sl_net_interface_t interface, const sl_net_dns_address_t *address)
 {
   UNUSED_PARAMETER(interface);
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -1283,7 +1206,7 @@ sl_status_t sl_net_configure_ip(sl_net_interface_t interface,
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -1307,7 +1230,7 @@ sl_status_t sl_net_get_ip_address(sl_net_interface_t interface, sl_net_ip_addres
   sli_si91x_interfaces_t interface_index  = SLI_SI91X_CLIENT;
   const sl_net_ip_configuration_t *stored = NULL;
 
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
@@ -1325,7 +1248,10 @@ sl_status_t sl_net_get_ip_address(sl_net_interface_t interface, sl_net_ip_addres
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 
-  stored           = &stored_ip_config[interface_index];
+  stored = sli_get_stored_ip_config(interface_index);
+  if (stored == NULL) {
+    return SL_STATUS_INVALID_CONFIGURATION;
+  }
   ip_address->mode = stored->mode;
 
   // Validate that the interface was brought up with a valid IP configuration

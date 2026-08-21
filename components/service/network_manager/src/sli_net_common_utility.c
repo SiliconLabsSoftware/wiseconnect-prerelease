@@ -48,6 +48,7 @@
 #endif
 #include "sli_wifi_constants.h"
 #include "sli_net_types.h"
+#include "sli_net_ip_config.h"
 
 #define CRED_TYPE_CERT 0
 #define CRED_TYPE_CRED 1
@@ -258,8 +259,7 @@ sl_status_t sli_net_get_vap_for_ip_version(uint8_t vap_id, sl_ip_address_type_t 
   sl_ip_address_type_t combined_ip_types = 0;
 
 #ifdef SLI_SI91X_LWIP_HOSTED_NETWORK_STACK
-  extern bool bypass_mode_enabled;
-  if (bypass_mode_enabled) {
+  if (sli_is_bypass_mode_enabled()) {
     return SL_STATUS_WIFI_UNSUPPORTED;
   }
 #endif

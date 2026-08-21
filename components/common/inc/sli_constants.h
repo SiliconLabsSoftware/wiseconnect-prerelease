@@ -1,6 +1,9 @@
 #ifndef SLI_CONSTANTS_H
 #define SLI_CONSTANTS_H
 
+#include "sli_routing_utility.h"
+#include "sli_command_engine.h"
+
 // Packet queue identifiers
 #define SLI_COMMON_Q    0
 #define SLI_ZB_Q        1
@@ -30,6 +33,52 @@
 // frame descriptor length
 #define SLI_FRAME_DESC_LEN 16
 
+#define SLI_NUMBER_OF_SOCKETS 20
+
+#define SLI_SI91X_DNS_REQUEST_MAX_URL_LEN 90
+
+/// Maximum length of the Wi-Fi Pre-Shared Key (PSK) credential.
+#define SL_WIFI_MAX_PSK_LENGTH 64
+
+/// Minimum length of the Wi-Fi Pre-Shared Key (PSK) credential.
+#define SL_WIFI_MIN_PSK_LENGTH 8
+
+/// Length of the Wi-Fi MAC address.
+#define SL_WIFI_MAC_ADDRESS_LENGTH 6
+
+/**
+  * @def SL_WIFI_MAX_SSID_LENGTH
+  * @brief Defines the maximum length of a Wi-Fi SSID.
+  *
+  * @details This macro specifies the maximum number of characters (including the null terminator) 
+  *          that a Wi-Fi SSID can have. It is used to ensure proper memory allocation and validation 
+  *          of SSID strings in Wi-Fi operations.
+  *
+  * @note The maximum SSID length is 34 characters, which includes the null terminator.
+  */
+#define SL_WIFI_MAX_SSID_LENGTH 34
+
+#define SLI_SSID_LEN SL_WIFI_MAX_SSID_LENGTH
+
+/// Timeout scaling factor for internal firmware operations
+#ifndef SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF
+#define SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF 1
+#endif
+/// Additional wait time(in ms) for command timeout calculations
+#ifndef SL_TX_ADDITIONAL_WAIT_TIME
+#define SL_TX_ADDITIONAL_WAIT_TIME 0
+#endif
+
+/// Base timeout value for internal operations
+#define SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE 1000
+/// Default timeout value for commands
+#define SLI_DEFAULT_TIMEOUT (30000 + SL_TX_ADDITIONAL_WAIT_TIME)
+
+#define SLI_WIFI_RSP_QUERY_NETWORK_PARAMS_WAIT_TIME \
+  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+
+#define SLI_WIFI_DNS_RETRY_COUNT 1
+
 // driver TX/RX packet structure
 /** Command header size in @ref sl_wifi_system_packet_t (bytes). Same value as @c SLI_FRAME_DESC_LEN (16). */
 #define SL_SI91X_WIFI_PACKET_DESC_SIZE SLI_FRAME_DESC_LEN
@@ -40,9 +89,7 @@
 #ifndef SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME
 #define SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000 // 1 second to wait for a command buffer
 #endif
-
-/// Base timeout value for internal operations
-#define SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE 1000
+#define SLI_SI91X_DNS_RESPONSE_MAX_ENTRIES 10
 
 /// Timeout scaling factor for internal firmware operations
 #ifndef SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF
@@ -53,9 +100,6 @@
 #ifndef SL_TX_ADDITIONAL_WAIT_TIME
 #define SL_TX_ADDITIONAL_WAIT_TIME 0
 #endif
-
-/// Default timeout value for commands
-#define SLI_DEFAULT_TIMEOUT (30000 + SL_TX_ADDITIONAL_WAIT_TIME)
 
 /// Timeout value for Power Mode response command
 #define SLI_WIFI_RSP_PWRMODE_WAIT_TIME \
@@ -473,6 +517,32 @@ typedef enum {
 /// Lower 16 bits hold raw wait time value
 #define SLI_WIFI_WAIT_TIME_BIT_MASK 0x1FFFFFFF
 
+/// Bit to enable SSL feature
+#define SL_SI91X_ENABLE_TLS BIT(0)
+
+/// Bitmap to enable TLS version 1.0
+#define SL_SI91X_TLS_V_1_0 BIT(2)
+
+/// Bitmap to enable TLS version 1.2
+#define SL_SI91X_TLS_V_1_2 BIT(3)
+
+/// Bitmap to enable TLS version 1.1
+#define SL_SI91X_TLS_V_1_1 BIT(4)
+
+#if defined(SLI_SI917) || defined(DOXYGEN)
+/// Bitmap to enable TLS version 1.3
+#define SL_SI91X_TLS_V_1_3 BIT(8)
+#endif
+
+/// Bitmap to enable DTLS version 1.0
+#define SL_SI91X_DTLS_V_1_0 BIT(2)
+
+/// Bitmap to enable DTLS version 1.2
+#define SL_SI91X_DTLS_V_1_2 BIT(3)
+
+/// Bit to enable DTLS feature
+#define SL_SI91X_ENABLE_DTLS BIT(13)
+
 typedef enum {
   SLI_WIFI_RETURN_IMMEDIATELY              = 0,
   SLI_WIFI_ASYNC_RESPONSE_BIT              = (1UL << 29),
@@ -488,5 +558,60 @@ typedef enum {
 
 #define SLI_WIFI_WAIT_FOR(x)          (sli_wifi_wait_period_t)(x)
 #define SLI_WIFI_WAIT_FOR_RESPONSE(x) (sli_wifi_wait_period_t)(SLI_WIFI_WAIT_FOR_RESPONSE_BIT | x)
+
+typedef enum {
+  SLI_WIFI_COMMAND_PACKET = 0,
+  SLI_WIFI_DATA_PACKET,
+  SLI_WIFI_SOCKET_DATA_PACKET,
+  SLI_WIFI_COMMAND_ENGINE_PACKET = 0
+} sli_wifi_command_engine_packet_t;
+
+extern sli_routing_table_t wifi_command_engine_routing_table;
+
+typedef enum {
+  SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET = 0,
+  SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET,
+  SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET,
+  SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET,
+} sli_wifi_command_engine_packet_types_t;
+
+typedef enum {
+  SLI_WIFI_ASYNC_EVENT_HANDLER_COMMON_EVENT = 0,
+  SLI_WIFI_ASYNC_EVENT_HANDLER_WIFI_EVENT,
+  SLI_WIFI_ASYNC_EVENT_HANDLER_NETWORK_EVENT,
+  SLI_WIFI_ASYNC_EVENT_HANDLER_BLE_EVENT,
+  SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_CMD_EVENT,
+  SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_DATA_EVENT,
+  SLI_WIFI_ASYNC_EVENT_HANDLER_ERROR_EVENT,
+  SLI_WIFI_ASYNC_EVENT_HANDLER_NWP_LOG_EVENT,
+} sli_wifi_async_event_handler_events_t;
+
+/// Si91x specific command type
+typedef enum {
+  SLI_WLAN_COMMON_CMD  = 0, ///< SI91X Common Command
+  SLI_WLAN_WIFI_CMD    = 1, ///< SI91X Wireless LAN Command
+  SLI_WLAN_NETWORK_CMD = 2, ///< SI91X Network Command
+  SLI_WLAN_SOCKET_CMD  = 3, ///< SI91X Socket Command
+  SLI_WLAN_CMD_MAX     = 4  ///< SI91X Maximum Command value
+} sli_wlan_command_type_t;
+
+/**
+  * @enum sl_wifi_vap_id_t
+  * @brief Wi-Fi VAP ID
+  */
+typedef enum {
+  SL_WIFI_CLIENT_VAP_ID,   ///< Wi-Fi Client VAP ID
+  SL_WIFI_AP_VAP_ID,       ///< Wi-Fi Access point VAP ID
+  SL_WIFI_CLIENT_VAP_ID_1, ///< Wi-Fi Client 1 VAP ID
+  SL_WIFI_AP_VAP_ID_1,     ///< Wi-Fi Access point 1 VAP ID
+} sl_wifi_vap_id_t;
+
+extern sli_queue_t event_queue[];
+extern osEventFlagsId_t sli_wifi_event_engine_event_id;
+
+#define SLI_SI91X_2BYTE_FIELD_SIZE 2
+#define SLI_SI91X_4BYTE_FIELD_SIZE 4
+
+typedef enum { SLI_SI91X_CLIENT = 0, SLI_SI91X_AP = 1, SLI_SI91X_MAX_INTERFACES } sli_si91x_interfaces_t;
 
 #endif // SLI_CONSTANTS_H

@@ -48,6 +48,7 @@
 #include <ctype.h>
 #include <inttypes.h>
 #include "sl_cmsis_utility.h"
+#include "sl_si91x_socket_types.h"
 
 #define BACK_LOG                      1 ///< As we are processing one request at a time, the backlog is set to one.
 #define SL_HIGH_PERFORMANCE_SOCKET    BIT(7)

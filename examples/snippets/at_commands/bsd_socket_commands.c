@@ -45,6 +45,7 @@ int errno;
 #include "sl_wifi.h"
 #include "sl_si91x_socket.h"
 #include "sl_si91x_socket_utility.h"
+#include "sl_si91x_socket_types.h"
 #include "at_utility.h"
 #include "at_command_data_mode.h"
 #include <string.h>

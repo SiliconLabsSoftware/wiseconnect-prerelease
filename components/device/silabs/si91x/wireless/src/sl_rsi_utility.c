@@ -86,9 +86,6 @@ void sl_debug_log(const char *format, ...);
 
 extern sli_wifi_performance_profile_t performance_profile;
 
-// NOTE: Boolean value determines whether firmware automatically closes the TCP socket in case of receiving termination from remote node or not.
-static bool tcp_auto_close_enabled;
-
 sl_wifi_system_performance_profile_t current_performance_profile = HIGH_PERFORMANCE;
 
 static sl_wifi_system_boot_configuration_t saved_boot_configuration = { 0 };
@@ -109,16 +106,6 @@ void sli_save_boot_configuration(const sl_wifi_system_boot_configuration_t *boot
 void sli_get_saved_boot_configuration(sl_wifi_system_boot_configuration_t *boot_configuration)
 {
   memcpy(boot_configuration, &saved_boot_configuration, sizeof(sl_wifi_system_boot_configuration_t));
-}
-
-void sli_save_tcp_auto_close_choice(bool is_tcp_auto_close_enabled)
-{
-  tcp_auto_close_enabled = is_tcp_auto_close_enabled;
-}
-
-bool sli_is_tcp_auto_close_enabled()
-{
-  return tcp_auto_close_enabled;
 }
 
 sl_si91x_host_timestamp_t sl_si91x_host_get_timestamp(void)

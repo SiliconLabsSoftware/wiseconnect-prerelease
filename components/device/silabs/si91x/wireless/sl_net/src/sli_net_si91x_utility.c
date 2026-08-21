@@ -38,6 +38,7 @@
 #include "sl_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
+#include "sli_types.h"
 #include "sl_utility.h"
 /******************************************************
  *                      Macros

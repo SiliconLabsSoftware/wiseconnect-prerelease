@@ -1498,45 +1498,6 @@ typedef struct {
 
 /// Wi-Fi Access Point dynamic configuration structure.
 typedef sl_wifi_ap_reconfiguration_t SL_DEPRECATED_API_WISECONNECT_4_0 sl_si91x_ap_reconfiguration_t;
-
-/**
- * @enum sl_wifi_operation_mode_t
- * @brief Enumeration of Wi-Fi operation modes for the Si91x wireless device.
- *
- * @details This enumeration defines the various operation modes supported by the wireless device.
- * Each mode configures the device for a specific use case, such as client mode, access point mode, or transceiver mode.
- *
- * @var SL_WIFI_CLIENT_MODE
- * Wi-Fi personal client mode.
- *
- * @var SL_WIFI_ENTERPRISE_CLIENT_MODE
- * Wi-Fi enterprise client mode.
- *
- * @var SL_WIFI_ACCESS_POINT_MODE
- * Wi-Fi access point mode.
- *
- * @var SL_WIFI_TRANSCEIVER_MODE
- * Wi-Fi transceiver mode.
- *
- * @var SL_WIFI_TRANSMIT_TEST_MODE
- * Wi-Fi transmit test mode.
- *
- * @var SL_WIFI_CONCURRENT_MODE
- * Wi-Fi concurrent mode (e.g., AP + STA).
- *
- * @var __SL_WIFI_FORCE_OPERATION_ENUM_16BIT
- * Forces the enumeration to be 16-bit wide.
- **/
-typedef enum {
-  SL_WIFI_CLIENT_MODE                  = 0,     ///< Wi-Fi personal client mode
-  SL_WIFI_ENTERPRISE_CLIENT_MODE       = 2,     ///< Wi-Fi enterprise client mode
-  SL_WIFI_ACCESS_POINT_MODE            = 6,     ///< Wi-Fi access point mode
-  SL_WIFI_TRANSCEIVER_MODE             = 7,     ///< Wi-Fi transceiver mode
-  SL_WIFI_TRANSMIT_TEST_MODE           = 8,     ///< Wi-Fi transmit test mode
-  SL_WIFI_CONCURRENT_MODE              = 9,     ///< Wi-Fi concurrent mode
-  __SL_WIFI_FORCE_OPERATION_ENUM_16BIT = 0xFFFF ///< Force the enumeration to be 16-bit
-} sl_wifi_operation_mode_t;
-
 /**
  * @struct sl_wifi_timeout_t
  * @brief Timeout Configuration Structure

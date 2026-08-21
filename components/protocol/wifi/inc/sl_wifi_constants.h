@@ -793,17 +793,6 @@ typedef enum {
 } sl_wifi_region_code_t;
 
 /**
-  * @enum sl_wifi_vap_id_t
-  * @brief Wi-Fi VAP ID
-  */
-typedef enum {
-  SL_WIFI_CLIENT_VAP_ID,   ///< Wi-Fi Client VAP ID
-  SL_WIFI_AP_VAP_ID,       ///< Wi-Fi Access point VAP ID
-  SL_WIFI_CLIENT_VAP_ID_1, ///< Wi-Fi Client 1 VAP ID
-  SL_WIFI_AP_VAP_ID_1,     ///< Wi-Fi Access point 1 VAP ID
-} sl_wifi_vap_id_t;
-
-/**
   * @enum sl_wifi_ap_keepalive_type_t
   * @brief Keepalive types
   */
@@ -837,17 +826,6 @@ typedef enum {
   * - The selected or preferred channels to be scanned before the client connects to the AP. A value of zero means to scan on all available channels.
   */
 #define SL_WIFI_DEFAULT_CHANNEL_BITMAP 0
-
-/**
-  * @def SL_WIFI_ARGS_CHECK_NULL_POINTER(ptr)
-  * @brief Macro to check for null pointers in API inputs.
-  */
-#define SL_WIFI_ARGS_CHECK_NULL_POINTER(ptr) \
-  do {                                       \
-    if (ptr == NULL) {                       \
-      return SL_STATUS_NULL_POINTER;         \
-    }                                        \
-  } while (0)
 
 /**
   * @def SL_WIFI_ARGS_CHECK_INVALID_INTERFACE(interface)

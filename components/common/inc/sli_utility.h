@@ -4,8 +4,10 @@
 #include <stdint.h>
 #include "sl_status.h"
 #include "sl_types.h"
+#include "sli_constants.h"
 #include "sli_command_engine.h"
-
+#include "sl_ip_types.h"
+#include <stddef.h>
 #ifndef __ZEPHYR__
 #include "sli_cmsis_os2_ext_task_register.h"
 #include "cmsis_os2.h"
@@ -44,6 +46,8 @@ uint8_t sli_get_command_packet_type(sli_wifi_command_type_t command_type);
 
 sl_status_t sli_wifi_set_command_engine_instance(sli_command_engine_t *instance);
 
+sli_command_engine_t *sli_wifi_get_command_engine_instance(void);
+
 sl_status_t sli_wifi_send_command(uint32_t command,
                                   sli_wifi_command_type_t command_type,
                                   const void *data,
@@ -51,6 +55,14 @@ sl_status_t sli_wifi_send_command(uint32_t command,
                                   sli_wifi_wait_period_t wait_period,
                                   void *sdk_context,
                                   void **data_buffer);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Get the current Opermode of the module.
+ * @return
+ *   sl_wifi_operation_mode_t.
+ ******************************************************************************/
+sl_wifi_operation_mode_t sli_wifi_get_opermode(void);
 
 /**
  * @brief Internal function to send a command packet to Command Engine
@@ -171,5 +183,34 @@ static inline sl_status_t sli_wifi_convert_and_save_firmware_status(uint16_t fir
 #endif
   return converted_firmware_status;
 }
-
+/***************************************************************************/ /**
+ * @brief
+ *   A utility function to extract firmware status from RX packet.
+ *   The extracted firmware status can be given to sli_wifi_convert_and_save_firmware_status() to get sl_status equivalent.
+ * @param[in] packet
+ *   Packet that contains the frame status which needs to be extracted.
+ * @return
+ *   Frame status (uint16_t)
+ ******************************************************************************/
+uint16_t sli_wifi_get_wifi_frame_status(const sl_wifi_system_packet_t *packet);
+/**
+ * @brief Get the VAP ID from the operation mode and packet descriptor
+ * 
+ * This function determines the VAP ID based on the current operation mode and,
+ * in concurrent mode, the packet descriptor byte 7.
+ * 
+ * @param rx_packet Pointer to the received packet structure. Can be NULL for non-concurrent modes.
+ *                  In concurrent mode, if NULL, defaults to AP VAP ID.
+ * @return uint8_t The VAP ID (SL_WIFI_CLIENT_VAP_ID or SL_WIFI_AP_VAP_ID)
+ */
+uint8_t sli_wifi_get_vap_id_from_operation_mode(const sl_wifi_system_packet_t *rx_packet);
+sl_status_t sli_wifi_async_send_command(uint32_t command,
+                                        sli_wifi_command_type_t command_type,
+                                        const void *data,
+                                        uint32_t data_length,
+                                        const void *custom_desc);
+void sli_save_tcp_auto_close_choice(bool is_tcp_auto_close_enabled);
+bool sli_is_tcp_auto_close_enabled();
+bool sli_wifi_is_ip_address_zero(const sl_ip_address_t *ip_addr);
+uint8_t sli_get_wifi_command_engine_max_packet_type_count(void);
 #endif // SLI_UTILITY_H

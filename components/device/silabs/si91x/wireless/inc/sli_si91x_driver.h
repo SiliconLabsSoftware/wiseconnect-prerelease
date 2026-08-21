@@ -37,6 +37,7 @@
 #include "sli_wifi_command_engine_config.h"
 #include "sli_wifi_types.h"
 #include "sl_types.h"
+#include "sli_constants.h"
 
 #ifdef __cplusplus
 extern "C" {

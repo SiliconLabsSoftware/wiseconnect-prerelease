@@ -37,6 +37,7 @@
 #include "sl_si91x_protocol_types.h"
 #include "sl_si91x_driver.h"
 #include "sl_rsi_utility.h"
+#include "sli_types.h"
 #include "sli_wifi_types.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"

@@ -140,9 +140,9 @@ upgrade:
         status: automatic  
         add:
            - sl_si91x_freertos_heap4_for_littlefs
-      - script: upgrade_component_nvm3_network_manager.lua
+      - script: upgrade_wireless_component_for_common_flash.lua
         description: >
-                          
+          Restore wireless components for common-flash NVM3 and LittleFS.
   - sdk:
       id: wiseconnect3_sdk
       vendor: silabs
@@ -175,3 +175,20 @@ upgrade:
       - script: upgrade_wiseconnect_ctm.lua
         description: >
           Migrate nvm3_network_config_manager and nvm3_credential_manager to flash (CTM) variants.
+  - sdk:
+      id: wiseconnect3_sdk
+      vendor: silabs
+      version: "4.2.0"
+    component:
+      - trigger: sl_si91x_littlefs_common_flash
+        description: >
+          Restore wireless components for common-flash LittleFS.
+        status: automatic
+        add:
+          - wifi
+          - sl_si91x_wireless
+          - network_manager
+          - wifi_resources
+      - script: upgrade_wireless_component_for_common_flash.lua
+        description: >
+          Restore wireless components removed from common-flash NVM3 and LittleFS.

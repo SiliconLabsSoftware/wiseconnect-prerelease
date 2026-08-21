@@ -31,11 +31,13 @@
 #include "sli_si91x_wifi_command_engine.h"
 #include "sl_constants.h"
 #include "sli_wifi_command_engine_config.h"
-#include "sli_si91x_wifi_command_engine_packet.h"
+#include "sli_constants.h"
 #include "sli_si91x_driver.h"
 #include "sli_command_engine.h"
 #include "sli_si91x_wifi_event_handler.h"
 #include "sli_utility.h"
+
+static uint8_t sli_wifi_command_engine_max_packet_type_count = 0;
 
 sl_status_t sli_si91x_wifi_command_engine_init(void)
 {
@@ -51,55 +53,56 @@ sl_status_t sli_si91x_wifi_command_engine_init(void)
     return status;
   }
 
-  sli_command_engine_packet_type_configuration_t
-    sli_wifi_command_engine_packet_type_configuration[SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES] = {
-      { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
-        .pre_tx_handler              = NULL,
-        .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
-        .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
-        .sync_response_queue         = &cmd_queues[SLI_WLAN_COMMON_CMD],
-        .sync_response_event         = SL_WIFI_HOST_COMMON_RESPONSE_EVENT,
-        .sync_response_event_id      = &sli_wifi_events,
-        .max_in_flight_command_count = 1,
-        .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_COMMON_EVENT],
-        .async_response_event_id     = &sli_wifi_event_engine_event_id,
-        .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
-      { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
-        .pre_tx_handler              = NULL,
-        .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
-        .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
-        .sync_response_queue         = &cmd_queues[SLI_WLAN_WIFI_CMD],
-        .sync_response_event         = SL_WIFI_RESPONSE_EVENT,
-        .sync_response_event_id      = &sli_wifi_events,
-        .max_in_flight_command_count = 1,
-        .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_WIFI_EVENT],
-        .async_response_event_id     = &sli_wifi_event_engine_event_id,
-        .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
-      { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
-        .pre_tx_handler              = NULL,
-        .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
-        .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
-        .sync_response_queue         = &cmd_queues[SLI_WLAN_NETWORK_CMD],
-        .sync_response_event         = SL_WIFI_NETWORK_RESPONSE_EVENT,
-        .sync_response_event_id      = &sli_wifi_events,
-        .max_in_flight_command_count = 1,
-        .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_NETWORK_EVENT],
-        .async_response_event_id     = &sli_wifi_event_engine_event_id,
-        .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
-      { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
-        .pre_tx_handler              = NULL,
-        .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
-        .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
-        .sync_response_queue         = &cmd_queues[SLI_WLAN_SOCKET_CMD],
-        .sync_response_event         = SL_WIFI_SOCKET_RESPONSE_EVENT,
-        .sync_response_event_id      = &sli_wifi_events,
-        .max_in_flight_command_count = 1,
-        .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_CMD_EVENT],
-        .async_response_event_id     = &sli_wifi_event_engine_event_id,
-        .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT }
-    };
+  sli_command_engine_packet_type_configuration_t sli_wifi_command_engine_packet_type_configuration[] = {
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_COMMON_CMD],
+      .sync_response_event         = SL_WIFI_HOST_COMMON_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_COMMON_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_WIFI_CMD],
+      .sync_response_event         = SL_WIFI_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_WIFI_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_NETWORK_CMD],
+      .sync_response_event         = SL_WIFI_NETWORK_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_NETWORK_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+    { .rx_event_handler            = sli_si91x_wifi_command_engine_rx_packet_handler,
+      .pre_tx_handler              = NULL,
+      .packet_processing_type      = SLI_COMMAND_ENGINE_COMMAND_PACKET,
+      .route_packet_type           = SLI_WIFI_COMMAND_PACKET,
+      .sync_response_queue         = &cmd_queues[SLI_WLAN_SOCKET_CMD],
+      .sync_response_event         = SL_WIFI_SOCKET_RESPONSE_EVENT,
+      .sync_response_event_id      = &sli_wifi_events,
+      .max_in_flight_command_count = 1,
+      .async_response_queue        = &event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_CMD_EVENT],
+      .async_response_event_id     = &sli_wifi_event_engine_event_id,
+      .async_response_event        = SLI_EVENT_ENGINE_ASYNC_EVENT },
+  };
 
-  for (uint8_t packet_type = 0; packet_type < SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES; packet_type++) {
+  sli_wifi_command_engine_max_packet_type_count = sizeof(sli_wifi_command_engine_packet_type_configuration)
+                                                  / sizeof(sli_wifi_command_engine_packet_type_configuration[0]);
+  for (uint8_t packet_type = 0; packet_type < sli_wifi_command_engine_max_packet_type_count; packet_type++) {
     status = sli_command_engine_add_packet_type(&sli_wifi_command_engine,
                                                 packet_type,
                                                 &sli_wifi_command_engine_packet_type_configuration[packet_type]);
@@ -130,4 +133,9 @@ sl_status_t sli_si91x_wifi_command_engine_deinit(void)
   VERIFY_STATUS_AND_RETURN(status);
 
   return SL_STATUS_OK;
+}
+
+uint8_t sli_get_wifi_command_engine_max_packet_type_count(void)
+{
+  return sli_wifi_command_engine_max_packet_type_count;
 }

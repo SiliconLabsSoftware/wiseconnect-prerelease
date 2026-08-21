@@ -55,7 +55,7 @@
 #include "sli_queue_manager.h"
 #include "sli_routing_utility.h"
 #include "sli_si91x_wifi_command_engine.h"
-#include "sli_si91x_wifi_command_engine_packet.h"
+#include "sli_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_wifi_constants.h"
@@ -97,7 +97,8 @@ static sli_wifi_efuse_data_t si91x_efuse_data = { 0 };
 sli_queue_t cmd_queues[SLI_SI91X_CMD_MAX] = { 0 };
 osEventFlagsId_t sli_wifi_events          = NULL;
 
-static uint8_t command_packet_type[SLI_WLAN_CMD_MAX] = {
+/* Static initializers must be compile-time constants — do not call functions here. */
+static const uint8_t command_packet_type[] = {
   [SLI_WLAN_COMMON_CMD]   = SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET,
   [SLI_WIFI_WLAN_CMD]     = SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET,
   [SLI_SI91X_NETWORK_CMD] = SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET,

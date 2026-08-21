@@ -43,16 +43,12 @@
 //! @cond Doxygen_Suppress
 // below defines and structure for CFG_GET: Getting user store configuration.
 #define SLI_IP_ADDRESS_SZ            SL_IPV4_ADDRESS_LENGTH
-#define SLI_SSID_LEN                 SL_WIFI_MAX_SSID_LENGTH
 #define SLI_WISE_PMK_LEN             SL_WIFI_MAX_PMK_LENGTH
 #define SLI_MAX_HTTP_SERVER_USERNAME 31
 #define SLI_MAX_HTTP_SERVER_PASSWORD 31
 #define SLI_DHCP_HOSTNAME_MAX_LENGTH 31 ///< Maximum length of DHCP client host name (bytes)
 #define SLI_PSK_LEN                  SL_WIFI_MAX_PSK_LENGTH
 #define SLI_MAC_ADDR_LEN             SL_WIFI_MAC_ADDRESS_LENGTH
-
-// Maximum length of the domain name for TLS certificate verification
-#define SLI_SI91X_MAX_DOMAIN_NAME_LENGTH 256
 
 // Maximum Access points that can be scanned
 #define SLI_AP_SCANNED_MAX 11
@@ -67,8 +63,6 @@
 #define SLI_MAX_FWUP_CHUNK_SIZE 1024
 #define SLI_RPS_HEADER_SIZE     64
 /// Protocol field sizes (bytes) for packed structs
-#define SLI_SI91X_2BYTE_FIELD_SIZE             2
-#define SLI_SI91X_4BYTE_FIELD_SIZE             4
 #define SLI_SI91X_MAX_CERT_KEY_PASSWORD_LENGTH 127
 
 //! @endcond
@@ -90,27 +84,12 @@
 /** @} */
 
 //! @cond Doxygen_Suppress
-// Websocket max url length
-#define SLI_WEBS_MAX_URL_LENGTH 51
-
-// Websocket max host length
-#define SLI_WEBS_MAX_HOST_LENGTH 51
-
-// Websocket max subprotocol length
-#define SLI_WEBS_MAX_SUBPROTOCOL_LENGTH 51
-
-// Websocket max origin length
-#define SLI_WEBS_MAX_ORIGIN_LENGTH 51
 
 #if defined(SLI_SI917)
 #define SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA 256
 #else
 #define SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA 64
 #endif
-
-#define SLI_SI91X_DNS_REQUEST_MAX_URL_LEN 90
-
-#define SLI_SI91X_DNS_RESPONSE_MAX_ENTRIES 10
 
 #define SLI_SI91X_MAX_CERT_SEND_SIZE 1400
 
@@ -126,7 +105,6 @@
 #define SLI_SI91X_BG_SCAN_ENABLE  1
 
 //**************************** Macros for BG end *********************************/
-#define SLI_NUMBER_OF_SOCKETS 20
 
 //**************************** Macros for WPS Method request START *********************************/
 
@@ -375,90 +353,6 @@ typedef struct {
 } sl_si91x_module_rtc_time_t;
 /** @} */
 
-///< socket create command request structure
-#pragma pack(1)
-typedef struct {
-  uint16_t ip_version;  ///< ip version4 or 6
-  uint16_t socket_type; ///< 0= TCP Client, 1= UDP Client, 2= TCP Server (Listening TCP)
-  uint16_t local_port;  ///< Our local module port number
-  uint16_t remote_port; ///< Port number of what we are connecting to
-  union {
-    uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH]; ///<  remote IPv4 Address
-    uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH]; ///<  remote IPv6 Address
-  } dest_ip_addr;                                 ///< Destination IP address
-  uint16_t max_count;                             ///< maximum no of LTCP sockets on same port
-#if defined(SLI_SI917)
-  uint16_t tos; ///< type of service
-
-#else
-  uint32_t tos;        ///< type of service
-
-#endif
-
-#if defined(SLI_SI917)
-  uint32_t ssl_bitmap; ///< ssl version select bit map
-
-#else
-  uint8_t ssl_bitmap;  ///< ssl version select bit map
-  uint8_t ssl_ciphers; ///< ssl ciphers bitmap
-#endif
-  uint8_t webs_resource_name[SLI_WEBS_MAX_URL_LENGTH]; ///< web socket resource name
-  uint8_t webs_host_name[SLI_WEBS_MAX_HOST_LENGTH];    ///< web socket host name
-  uint8_t max_tcp_retries_count;                       ///< TCP retries
-  uint8_t socket_bitmap;                               ///< Socket bitmap
-  uint8_t rx_window_size;                              ///< RX window size
-  uint16_t tcp_keepalive_initial_time;                 ///< TCP keepalive initial timeout
-  uint8_t vap_id;                                      ///< VAPID
-  uint8_t socket_cert_inx;                             ///< socket cert inx
-  uint32_t ssl_ciphers_bitmap;                         ///< ssl ciphers bitmap
-#if defined(SLI_SI917)
-  uint32_t ssl_ext_ciphers_bitmap;          ///< ssl extended ciphers bitmap
-  uint8_t max_retransmission_timeout_value; ///< max retransmission timeout value
-#endif
-  uint8_t tcp_retry_transmit_timer;                                 ///< tcp retry transmission timer
-  uint16_t tcp_mss;                                                 ///< TCP MSS
-  uint16_t no_of_tls_extensions;                                    ///< number of TLS extensions
-  uint16_t total_extension_length;                                  ///< total extension length
-  uint8_t tls_extension_data[SLI_SI91X_MAX_SIZE_OF_EXTENSION_DATA]; ///< TLS extension data
-#if defined(SLI_SI917)
-  uint16_t recv_buff_len; ///< receive buffer length
-#endif
-  uint32_t reserved;                                              ///< reserved
-  uint8_t webs_subprotocol_name[SLI_WEBS_MAX_SUBPROTOCOL_LENGTH]; ///< web socket subprotocol name
-  uint8_t domain_name[SLI_SI91X_MAX_DOMAIN_NAME_LENGTH];          ///< Domain name for SNI or Host header
-  uint8_t socket_ext_bitmap;                                      ///< Extended socket bitmap
-  uint8_t webs_origin[SLI_WEBS_MAX_ORIGIN_LENGTH];                ///< web socket origin
-} sli_si91x_socket_create_request_t;
-#pragma pack()
-
-/// socket create command response structure
-typedef struct {
-  uint8_t ip_version[SLI_SI91X_2BYTE_FIELD_SIZE];  ///< ip version 4 or 6
-  uint8_t socket_type[SLI_SI91X_2BYTE_FIELD_SIZE]; ///< 2 bytes, type of socket created
-  uint8_t socket_id[SLI_SI91X_2BYTE_FIELD_SIZE];   ///< 2 bytes socket descriptor, like a file handle, usually 0x00
-  uint8_t module_port[SLI_SI91X_2BYTE_FIELD_SIZE]; ///< 2 bytes, Port number of our local socket
-  uint8_t dst_port[SLI_SI91X_2BYTE_FIELD_SIZE];    ///< Destination port number
-  union {
-    uint8_t ipv4_addr[SL_IPV4_ADDRESS_LENGTH]; ///< 4 bytes, Our (module) IPv4 Address
-    uint8_t ipv6_addr[SL_IPV6_ADDRESS_LENGTH]; ///< 16 bytes, Our (module) IPv6 Address
-  } module_ip_addr;                            ///< Module IP address
-  union {
-    uint8_t ipv4_addr[SL_IPV4_ADDRESS_LENGTH];     ///< 4 bytes, Our (module) IPv4 Address
-    uint8_t ipv6_addr[SL_IPV6_ADDRESS_LENGTH];     ///< 16 bytes, Our (module) IPv6 Address
-  } dest_ip_addr;                                  ///< Destination IP address
-  uint8_t mss[SLI_SI91X_2BYTE_FIELD_SIZE];         ///< 2 bytes, Remote peer MSS size
-  uint8_t window_size[SLI_SI91X_4BYTE_FIELD_SIZE]; ///< 4 bytes, Remote peer Window size
-} sli_si91x_socket_create_response_t;
-#pragma pack()
-
-#pragma pack(1)
-/// Socket close command request structure
-typedef struct {
-  uint16_t socket_id;   ///< 2 bytes, socket that was closed
-  uint16_t port_number; ///< 4 bytes, port number
-} sli_si91x_socket_close_request_t;
-#pragma pack()
-
 #pragma pack(1)
 /// Socket close command response structure
 
@@ -469,142 +363,7 @@ typedef struct {
 } sl_si91x_socket_close_response_t;
 #pragma pack()
 
-#pragma pack(1)
-/// Si91x specifc send data on socket request structure
-typedef struct {
-  uint16_t ip_version;  ///< ip version 4 or 6
-  uint16_t socket_id;   ///< socket descriptor of the already opened socket connection
-  uint32_t length;      ///< length of the data to be sent
-  uint16_t data_offset; ///< Data Offset
-  uint16_t dest_port;   ///< destination port
-  union {
-    uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH]; ///< 4 bytes, IPv4 Address of the remote device
-    uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH]; ///< 16 bytes, IPv6 Address of the remote device
-  } dest_ip_addr;                                 ///< IP address of the remote device
-  uint8_t send_buffer[];                          ///< data buffer to send
-} sli_si91x_socket_send_request_t;
-#pragma pack()
-
-/// socket accept request structure
-#pragma pack(1)
-typedef struct {
-  uint8_t socket_id;    ///< Socket ID
-  uint16_t source_port; ///< Local port number
-} sli_si91x_socket_accept_request_t;
-#pragma pack()
-
-/// LTCP socket establish request structure
-#pragma pack(1)
-typedef struct {
-  /// IP version
-  uint16_t ip_version;
-
-  /// 2 bytes, socket handle
-  uint16_t socket_id;
-
-  /// 2 bytes, remote port number
-  uint16_t dest_port;
-
-  union {
-
-    ///  remote IPv4 Address
-    uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH];
-
-    ///  remote IPv6 Address
-    uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH];
-  } dest_ip_addr; ///< Destination IP address
-
-  /// 2 bytes, remote peer MSS size
-  uint16_t mss;
-
-  /// 4 bytes, remote peer Window size
-  uint32_t window_size;
-
-  /// source port number
-  uint16_t src_port_num;
-} sli_si91x_rsp_ltcp_est_t;
-#pragma pack()
-
-/// Internal SiWx91x Socket information query
-/// @note: This is internal structure and should not be used by the application. This is identical to sl_si91x_sock_info_query_t and, would be cleaned to have single structure in future.
-typedef struct {
-  uint8_t sock_id[SLI_SI91X_2BYTE_FIELD_SIZE]; ///< Identifier for the socket
-
-  uint8_t sock_type[SLI_SI91X_2BYTE_FIELD_SIZE]; ///< Type of the socket (TCP, UDP, and so on.)
-
-  uint8_t source_port[SLI_SI91X_2BYTE_FIELD_SIZE]; ///< Port number used by the source
-
-  uint8_t dest_port[SLI_SI91X_2BYTE_FIELD_SIZE]; ///< Port number used by the destination
-
-  union {
-    uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH]; ///< IPv4 address of the remote host
-
-    uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH]; ///< IPv6 address of the remote host
-
-  } dest_ip_address; ///< IP address of the destination host
-} sli_sock_info_query_t;
-
 /// Network params command response structure
-#pragma pack(1)
-typedef struct {
-  /// uint8, 0= NOT Connected, 1= Connected
-  uint8_t wlan_state;
-
-  /// channel number of connected AP
-  uint8_t channel_number;
-
-  /// PSK
-  uint8_t psk[SL_WIFI_MAX_PSK_LENGTH];
-
-  /// Mac address
-  uint8_t mac_address[SL_WIFI_MAC_ADDRESS_LENGTH];
-
-  /// uint8[32], SSID of connected access point
-  uint8_t ssid[SLI_SSID_LEN];
-
-  /// 2 bytes, 0= AdHoc, 1= Infrastructure
-  uint8_t connType[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-  /// security type
-  uint8_t sec_type;
-
-  /// uint8, 0= Manual IP Configuration,1= DHCP
-  uint8_t dhcpMode;
-
-  /// uint8[4], Module IP Address
-  uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH];
-
-  /// uint8[4], Module Subnet Mask
-  uint8_t subnetMask[SL_IPV4_ADDRESS_LENGTH];
-
-  /// uint8[4], Gateway address for the Module
-  uint8_t gateway[SL_IPV4_ADDRESS_LENGTH];
-
-  /// number of sockets opened
-  uint8_t num_open_socks[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-  /// prefix length for ipv6 address
-  uint8_t prefix_length[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-  /// modules ipv6 address
-  uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH];
-
-  /// router ipv6 address
-  uint8_t defaultgw6[SL_IPV6_ADDRESS_LENGTH];
-
-  /// BIT(0) =1 - ipv4, BIT(1)=2 - ipv6, BIT(0) & BIT(1)=3 - BOTH
-  uint8_t tcp_stack_used;
-
-  /// sockets information array
-  sli_sock_info_query_t socket_info[10];
-
-  /// BSSID address of connected AP
-  uint8_t bssid[SL_WIFI_MAC_ADDRESS_LENGTH];
-
-  /// Wireless mode used in connected AP (6 - AX, 4 - N, 3 - G, 1 - B)
-  uint8_t wireless_mode;
-} sli_si91x_network_params_response_t;
-#pragma pack()
 
 /// Si91x specific sockt send data parameters
 typedef struct {
@@ -636,39 +395,6 @@ typedef struct {
   uint32_t remote_ip_addr; ///< Remote IP address
 } sli_si91x_socket_connect_or_listen_parameters_t;
 
-/// DNS query request structure
-typedef struct {
-  //! Ip version value
-  uint8_t ip_version[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-  //! URL name
-  uint8_t url_name[SLI_SI91X_DNS_REQUEST_MAX_URL_LEN];
-
-  //! DNS servers count
-  uint8_t dns_server_number[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-  //! Timeout in seconds
-  uint8_t initial_timeout_sec;
-
-  //! Retry count
-  uint8_t retry_count;
-} sli_si91x_dns_query_request_t;
-
-/// DNS query response structure
-typedef struct {
-  //! Ip version of the DNS server
-  uint8_t ip_version[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-  //! DNS response count
-  uint8_t ip_count[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-  //! DNS address responses
-  union {
-    uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH];
-    uint8_t ipv6_address[SL_IPV6_ADDRESS_LENGTH];
-  } ip_address[SLI_SI91X_DNS_RESPONSE_MAX_ENTRIES];
-} sli_si91x_dns_response_t;
-
 /**
  * @brief DNS Server add request structure.
  *
@@ -688,67 +414,6 @@ typedef struct {
     uint8_t secondary_dns_ipv6[SL_IPV6_ADDRESS_LENGTH]; ///< Secondary DNS address in IPv6 format.
   } sli_ip_address2;                                    ///< Secondary DNS address.
 } sli_dns_server_add_request_t;
-
-/// Structure for TCP ACK indication
-typedef struct {
-  /// Socket ID
-  uint8_t socket_id;
-
-  /// Length
-  uint8_t length[SLI_SI91X_2BYTE_FIELD_SIZE];
-
-} sli_si91x_rsp_tcp_ack_t;
-
-/// Config command request structure
-typedef struct {
-  /// config type
-  uint16_t config_type;
-
-  /// value to set
-  uint16_t value;
-} sli_si91x_config_request_t;
-
-/// read bytes coming on socket request structure
-typedef struct {
-  /// socket id
-  uint8_t socket_id;
-
-  /// requested bytes
-  uint8_t requested_bytes[SLI_SI91X_4BYTE_FIELD_SIZE];
-
-  /// Timeout for read
-  uint8_t read_timeout[SLI_SI91X_2BYTE_FIELD_SIZE];
-} sli_si91x_req_socket_read_t;
-
-/// Si91x specific time value
-typedef struct {
-  uint32_t tv_sec;  ///< Time in Seconds
-  uint32_t tv_usec; ///< Time in microseconds
-} sl_si91x_time_value;
-
-/// The select socket array manager.  */
-typedef struct {
-  uint32_t fd_array[(SLI_NUMBER_OF_SOCKETS + 31) / 32]; ///< Bit map of SOCKET Descriptors.
-  int32_t fd_count;                                     ///< How many are SET
-} sli_si91x_fd_set_t;
-
-/// Si91x specifc socket select request structure
-typedef struct {
-  uint8_t num_fd;                     ///< Number of file descriptors
-  uint8_t select_id;                  ///< Select ID
-  sli_si91x_fd_set_t read_fds;        ///< Read file descriptors
-  sli_si91x_fd_set_t write_fds;       ///< Write file descriptors
-  sl_si91x_time_value select_timeout; ///< Select timeout
-  uint8_t no_timeout;                 ///< No timeout
-} sli_si91x_socket_select_req_t;
-
-/// Si91x specific socket select response structure
-typedef struct {
-  uint8_t select_id;                ///< Select ID
-  sli_si91x_fd_set_t read_fds;      ///< Read file descriptors
-  sli_si91x_fd_set_t write_fds;     ///< Write file descriptors
-  uint32_t socket_terminate_bitmap; ///< Socket terminate bitmap
-} sli_si91x_socket_select_rsp_t;
 
 /// Structure for OTA firmware upgradation
 typedef struct {
@@ -1727,15 +1392,3 @@ typedef struct sli_net_mdns_result_s {
   uint8_t data[];      ///< Flexible array member holding TXT and address data
 } sli_net_mdns_response_t;
 //! @endcond
-
-/// Access point disconnect response structure
-#pragma pack(1)
-typedef struct {
-  sl_mac_address_t client_mac_address;                ///< Client MAC address
-  uint8_t flag;                                       ///< Flag field
-  uint8_t ipv4_address[SL_IPV4_ADDRESS_LENGTH];       ///< Remote IPv4 Address
-  uint8_t link_local_address[SL_IPV6_ADDRESS_LENGTH]; ///< Remote link-local IPv6 Address
-  uint8_t global_address[SL_IPV6_ADDRESS_LENGTH];     ///< Remote unicast global IPv6 Address
-} sli_si91x_ap_disconnect_resp_t;
-
-#pragma pack()

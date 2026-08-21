@@ -29,7 +29,6 @@ include:
   file_list:
   - path: sl_net_constants.h
   - path: sl_net_dns.h
-  - path: sl_net_ip_types.h
   - path: sl_net_types.h
   - path: sl_net_wifi_types.h
   - path: sl_net.h

@@ -63,7 +63,7 @@
 #include "sli_hal_si91x.h"
 #include "sli_queue_manager.h"
 #include "sli_routing_utility.h"
-#include "sli_si91x_wifi_command_engine_packet.h"
+#include "sli_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_wifi_constants.h"

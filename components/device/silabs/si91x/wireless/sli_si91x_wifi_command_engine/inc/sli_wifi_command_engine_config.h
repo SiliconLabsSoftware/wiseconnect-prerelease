@@ -37,6 +37,7 @@
  * Include sl_si91x_driver.h or sli_si91x_driver.h in .c files that need driver types. */
 #include "sl_status.h"
 #include "sli_command_engine.h"
+#include "sli_constants.h"
 
 /**
  * @brief SLI event engine thread priority for SI91x WLAN command-engine builds.
@@ -96,35 +97,6 @@
 /******************************************************
  *               Type Definitions
  ******************************************************/
-/// Si91x specific command type
-typedef enum {
-  SLI_WLAN_COMMON_CMD  = 0, ///< SI91X Common Command
-  SLI_WLAN_WIFI_CMD    = 1, ///< SI91X Wireless LAN Command
-  SLI_WLAN_NETWORK_CMD = 2, ///< SI91X Network Command
-  SLI_WLAN_SOCKET_CMD  = 3, ///< SI91X Socket Command
-  SLI_WLAN_CMD_MAX     = 4  ///< SI91X Maximum Command value
-} sli_wlan_command_type_t;
-
-typedef enum {
-  SLI_WIFI_COMMAND_ENGINE_COMMON_COMMAND_PACKET = 0,
-  SLI_WIFI_COMMAND_ENGINE_WIFI_COMMAND_PACKET,
-  SLI_WIFI_COMMAND_ENGINE_NETWORK_COMMAND_PACKET,
-  SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET,
-  SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES
-} sli_wifi_command_engine_packet_types_t;
-
-typedef enum {
-  SLI_WIFI_ASYNC_EVENT_HANDLER_COMMON_EVENT = 0,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_WIFI_EVENT,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_NETWORK_EVENT,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_BLE_EVENT,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_CMD_EVENT,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_DATA_EVENT,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_ERROR_EVENT,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_NWP_LOG_EVENT,
-  SLI_WIFI_ASYNC_EVENT_HANDLER_MAX_EVENTS
-} sli_wifi_async_event_handler_events_t;
-
 // Indicates RX response received for COMMON command type
 #define SL_WIFI_HOST_COMMON_RESPONSE_EVENT (1 << SLI_WLAN_COMMON_CMD)
 

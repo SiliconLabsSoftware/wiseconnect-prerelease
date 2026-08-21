@@ -294,6 +294,17 @@ extern void sl_debug_log(const char *format, ...);
 
 #endif
 
+/**
+  * @def SL_WIFI_ARGS_CHECK_NULL_POINTER(ptr)
+  * @brief Macro to check for null pointers in API inputs.
+  */
+#define SL_WIFI_ARGS_CHECK_NULL_POINTER(ptr) \
+  do {                                       \
+    if (ptr == NULL) {                       \
+      return SL_STATUS_NULL_POINTER;         \
+    }                                        \
+  } while (0)
+
 typedef uint32_t sl_duration_t;
 
 typedef void (*sli_event_handler_t)(void);

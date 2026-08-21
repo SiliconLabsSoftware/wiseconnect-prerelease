@@ -45,17 +45,6 @@
 #define SLI_WIFI_TRANSMIT_TEST_MAX_MEMCPY_CHUNK \
   (SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE - (SLI_WIFI_HEADER_SIZE + SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE))
 
-/***************************************************************************/ /**
- * @brief
- *   A utility function to extract firmware status from RX packet.
- *   The extracted firmware status can be given to sli_wifi_convert_and_save_firmware_status() to get sl_status equivalent.
- * @param[in] packet
- *   Packet that contains the frame status which needs to be extracted.
- * @return
- *   Frame status (uint16_t)
- ******************************************************************************/
-uint16_t sli_wifi_get_wifi_frame_status(const sl_wifi_system_packet_t *packet);
-
 /**
  * @brief
  *   Retrieve the response buffer associated with a specific command engine response.
@@ -148,20 +137,6 @@ void sli_wifi_set_card_ready_required(bool card_ready_required);
  ******************************************************************************/
 void sli_wifi_set_opermode(sl_wifi_operation_mode_t mode);
 
-sl_wifi_operation_mode_t sli_wifi_get_opermode(void);
-
-/**
- * @brief Get the VAP ID from the operation mode and packet descriptor
- * 
- * This function determines the VAP ID based on the current operation mode and,
- * in concurrent mode, the packet descriptor byte 7.
- * 
- * @param rx_packet Pointer to the received packet structure. Can be NULL for non-concurrent modes.
- *                  In concurrent mode, if NULL, defaults to AP VAP ID.
- * @return uint8_t The VAP ID (SL_WIFI_CLIENT_VAP_ID or SL_WIFI_AP_VAP_ID)
- */
-uint8_t sli_wifi_get_vap_id_from_operation_mode(const sl_wifi_system_packet_t *rx_packet);
-
 sl_status_t sli_wifi_set_listen_interval(sl_wifi_interface_t interface, sl_wifi_listen_interval_t listen_interval);
 sl_status_t sli_wifi_set_listen_interval_v2(sl_wifi_interface_t interface,
                                             sl_wifi_listen_interval_v2_t listen_interval);
@@ -218,12 +193,6 @@ sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
                                                    void *sdk_context,
                                                    void **response_buffer,
                                                    uint8_t custom_host_desc);
-
-sl_status_t sli_wifi_async_send_command(uint32_t command,
-                                        sli_wifi_command_type_t command_type,
-                                        const void *data,
-                                        uint32_t data_length,
-                                        void *custom_desc);
 
 #ifndef __ZEPHYR__
 /***************************************************************************/ /**

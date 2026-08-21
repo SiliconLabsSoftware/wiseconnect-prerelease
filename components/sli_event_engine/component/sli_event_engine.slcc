@@ -1,6 +1,6 @@
 id: sli_event_engine
 label: Event Engine
-package: wifi
+package: wiseconnect_common
 description: >
     This package contains core Event Engine thread which handles the asynchronous events.
 category: Service

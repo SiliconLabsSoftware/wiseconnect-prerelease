@@ -2,12 +2,23 @@
 #include <string.h>
 #include "sli_utility.h"
 #include "sl_types.h"
+#include "sl_ip_types.h"
+#include "sli_constants.h"
 #include "sli_command_engine.h"
 #include "sl_cmsis_utility.h"
 #include "sl_constants.h"
 #include "sl_core.h"
+#include "sl_constants.h"
 
+extern uint16_t initialized_opermode;
+// NOTE: Boolean value determines whether firmware automatically closes the TCP socket in case of receiving termination from remote node or not.
+static bool tcp_auto_close_enabled;
 static sli_command_engine_t *sli_wifi_command_engine_instance = NULL;
+
+__WEAK uint8_t sli_get_wifi_command_engine_max_packet_type_count(void)
+{
+  return 0;
+}
 
 __WEAK uint8_t sli_get_command_packet_type(sli_wifi_command_type_t command_type)
 {
@@ -19,6 +30,11 @@ sl_status_t sli_wifi_set_command_engine_instance(sli_command_engine_t *instance)
 {
   sli_wifi_command_engine_instance = instance;
   return SL_STATUS_OK;
+}
+
+sli_command_engine_t *sli_wifi_get_command_engine_instance(void)
+{
+  return sli_wifi_command_engine_instance;
 }
 
 // Calculate elapsed time from the given starting timestamp
@@ -360,4 +376,136 @@ sl_status_t sli_wifi_send_command(uint32_t command,
   packet->command = (uint16_t)command;
 
   return sli_wifi_send_command_packet(command, command_type, packet, wait_period, sdk_context, response_buffer);
+}
+
+sl_wifi_operation_mode_t sli_wifi_get_opermode(void)
+{
+  return initialized_opermode;
+}
+
+uint16_t sli_wifi_get_wifi_frame_status(const sl_wifi_system_packet_t *packet)
+{
+  return (uint16_t)(packet->desc[12] + (packet->desc[13] << 8));
+}
+
+uint8_t sli_wifi_get_vap_id_from_operation_mode(const sl_wifi_system_packet_t *rx_packet)
+{
+  // Query the current operation mode
+  sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
+
+  // Station modes: CLIENT, ENTERPRISE_CLIENT, TRANSCEIVER, TRANSMIT_TEST
+  if (current_operation_mode == SL_WIFI_CLIENT_MODE || current_operation_mode == SL_WIFI_ENTERPRISE_CLIENT_MODE
+      || current_operation_mode == SL_WIFI_TRANSCEIVER_MODE || current_operation_mode == SL_WIFI_TRANSMIT_TEST_MODE) {
+    return SL_WIFI_CLIENT_VAP_ID;
+  }
+
+  // AP mode
+  if (current_operation_mode == SL_WIFI_ACCESS_POINT_MODE) {
+    return SL_WIFI_AP_VAP_ID;
+  }
+
+  // Concurrent mode: check packet descriptor byte 7 to determine VAP ID
+  if (current_operation_mode == SL_WIFI_CONCURRENT_MODE) {
+    if (rx_packet != NULL) {
+      if (rx_packet->desc[7] == SL_WIFI_CLIENT_VAP_ID) {
+        return SL_WIFI_CLIENT_VAP_ID;
+      } else {
+        return SL_WIFI_AP_VAP_ID;
+      }
+    }
+    // Default to AP VAP ID if rx_packet is not provided
+    return SL_WIFI_AP_VAP_ID;
+  }
+
+  // Default to client VAP ID for unknown modes
+  return SL_WIFI_CLIENT_VAP_ID;
+}
+
+sl_status_t sli_wifi_async_send_command(uint32_t command,
+                                        sli_wifi_command_type_t command_type,
+                                        const void *data,
+                                        uint32_t data_length,
+                                        const void *custom_desc)
+{
+  sl_wifi_system_packet_t *packet      = NULL;
+  sl_status_t status                   = SL_STATUS_OK;
+  sli_command_engine_tx_info_t tx_info = { 0 };
+
+  // Allocate a buffer for the command with appropriate size
+  status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
+                                              SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED,
+                                              SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
+                                              (sli_buffer_t)&packet);
+  VERIFY_STATUS_AND_RETURN(status);
+  // Clear the packet descriptor and copy the command data if available
+  if (custom_desc != NULL) {
+    memcpy(packet->desc, custom_desc, sizeof(packet->desc));
+  } else {
+    memset(packet->desc, 0, sizeof(packet->desc));
+  }
+  if (data != NULL) {
+    memcpy(packet->data, data, data_length);
+  }
+
+  // Fill frame type
+  packet->length  = data_length & 0xFFF;
+  packet->command = (uint16_t)command;
+  if (command_type < SLI_SI91X_CMD_MAX) {
+    packet->desc[1] |= (SLI_WLAN_MGMT_Q << 4);
+    tx_info.packet_type = sli_get_command_packet_type(command_type);
+  } else {
+    tx_info.packet_type = command_type;
+  }
+
+  tx_info.data_packet        = (void *)packet;
+  tx_info.data_packet_length = ((packet->length & 0xFFF) + sizeof(sl_wifi_system_packet_t));
+  tx_info.frame_id           = (uint16_t)command;
+  tx_info.flags              = SLI_COMMAND_ENGINE_COMMAND_PACKET;
+  tx_info.timeout            = 0;
+  tx_info.context            = NULL;
+  tx_info.packet_id          = 0;
+  tx_info.flags |= SLI_COMMAND_ENGINE_ASYNC_RESPONSE_PACKET;
+  sli_command_engine_t *command_engine_instance = sli_wifi_get_command_engine_instance();
+  if (command_engine_instance == NULL) {
+    sli_buffer_manager_free_buffer(packet);
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  status = sli_command_engine_send_packet(command_engine_instance, &tx_info);
+  if (status != SL_STATUS_OK) {
+    sli_buffer_manager_free_buffer(packet);
+  }
+  VERIFY_STATUS_AND_RETURN(status);
+
+  return SL_STATUS_IN_PROGRESS;
+}
+
+void sli_save_tcp_auto_close_choice(bool is_tcp_auto_close_enabled)
+{
+  tcp_auto_close_enabled = is_tcp_auto_close_enabled;
+}
+
+bool sli_is_tcp_auto_close_enabled()
+{
+  return tcp_auto_close_enabled;
+}
+
+bool sli_wifi_is_ip_address_zero(const sl_ip_address_t *ip_addr)
+{
+  if (ip_addr->type == SL_IPV4) {
+    for (int i = 0; i < SL_IPV4_ADDRESS_LENGTH; i++) {
+      if (ip_addr->ip.v4.bytes[i] != 0) {
+        return false; // Non-zero byte found
+      }
+    }
+    return true; // All bytes are zero
+  } else if (ip_addr->type == SL_IPV6) {
+    for (int i = 0; i < SL_IPV6_ADDRESS_LENGTH; i++) {
+      if (ip_addr->ip.v6.bytes[i] != 0) {
+        return false; // Non-zero byte found
+      }
+    }
+    return true; // All bytes are zero
+  }
+
+  return false; // Invalid or unsupported type
 }

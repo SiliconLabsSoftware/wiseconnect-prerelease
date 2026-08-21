@@ -96,8 +96,8 @@ extern bool bg_enabled;
 /******************************************************
  *               Global Variable Definitions
  ******************************************************/
-osEventFlagsId_t sli_wifi_event_engine_event_id                  = NULL;
-sli_queue_t event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_MAX_EVENTS] = { 0 };
+osEventFlagsId_t sli_wifi_event_engine_event_id = NULL;
+sli_queue_t event_queue[]                       = { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } };
 
 /******************************************************
   *               Local Function Definitions
@@ -384,9 +384,7 @@ sl_status_t sli_si91x_wifi_data_packet_handler(void *rx_buffer,
 
 #elif defined(SLI_SI91X_NETWORK_DUAL_STACK)
 
-    extern bool bypass_mode_enabled;
-
-    if (!bypass_mode_enabled) {
+    if (!(sli_is_bypass_mode_enabled())) {
 
       // Passes the asynchronous socket packet to the event engine for further processing.
       sli_queue_manager_enqueue(&event_queue[SLI_WIFI_ASYNC_EVENT_HANDLER_SOCKET_DATA_EVENT], rx_buffer);
@@ -462,7 +460,7 @@ sl_status_t sli_si91x_wifi_event_engine_init(void)
 {
   sl_status_t status = SL_STATUS_OK;
 
-  for (uint16_t i = 0; i < SLI_WIFI_ASYNC_EVENT_HANDLER_MAX_EVENTS; i++) {
+  for (uint16_t i = 0; i < sizeof(event_queue) / sizeof(sli_queue_t); i++) {
     status = sli_queue_manager_init(&event_queue[i], SLI_BUFFER_MANAGER_QUEUE_NODE_POOL);
     VERIFY_STATUS_AND_RETURN(status);
   }
