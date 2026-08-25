@@ -18,8 +18,6 @@
 #include <rsi_common.h>
 #include <rsi_bt_common.h>
 
-#include <sl_si91x_types.h>
-#include <sl_wifi_constants.h>
 #include <sl_si91x_ble.h>
 #include <sl_status.h>
 

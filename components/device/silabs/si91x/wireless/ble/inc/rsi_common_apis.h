@@ -54,12 +54,6 @@
 #endif
 #endif
 
-// success return value
-#define RSI_SUCCESS 0
-
-// failure return value
-#define RSI_FAILURE -1
-
 // Feature not supported
 #define RSI_FEATURE_NOT_SUPPORTED 0x00F7
 

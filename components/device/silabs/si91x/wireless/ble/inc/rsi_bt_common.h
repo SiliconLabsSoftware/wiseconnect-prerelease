@@ -30,9 +30,21 @@
 #ifndef RSI_BT_COMMON_H
 #define RSI_BT_COMMON_H
 
-#include "sl_si91x_types.h"
+#include "sl_types.h"
 
 #include "cmsis_os2.h"
+
+#ifndef BIT
+#define BIT(a) ((uint32_t)1U << (a))
+#endif
+
+#ifndef RSI_SUCCESS
+#define RSI_SUCCESS 0
+#endif
+
+#ifndef RSI_FAILURE
+#define RSI_FAILURE -1
+#endif
 
 /******************************************************
  * *                      Macros

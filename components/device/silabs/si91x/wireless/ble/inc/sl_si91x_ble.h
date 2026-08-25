@@ -30,7 +30,7 @@
 #pragma once
 
 #include "sl_status.h"
-#include "sl_wifi_device.h"
+#include "sl_types.h"
 
 /***************************************************************************/ /**
  * @brief

@@ -11,18 +11,16 @@ metadata:
 component_root_path: "components/device/silabs/si91x/mcu/core/common"
 source:
   - path: "src/syscalls.c"
-    unless: [no_syscalls]
+    unless: [iostream_retarget_stdio, test_framework_unity_gcov]
 include:
   - path: inc
     file_list:
       - path: syscalls.h
-        unless: [no_syscalls]
+        unless: [iostream_retarget_stdio, test_framework_unity_gcov]
 provides:
   - name: syscalls
   - name: sl_syscalls
     condition: [device_si91x]
-  - name: no_syscalls
-    condition: [sl_usart_iostream]
 requires:
   - name: si91x_debug
   - name: sl_common

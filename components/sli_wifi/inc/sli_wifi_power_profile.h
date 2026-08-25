@@ -44,8 +44,4 @@ sl_status_t sli_wifi_get_performance_profile(sl_wifi_performance_profile_t *prof
 
 sl_status_t sli_wifi_get_performance_profile_v2(sl_wifi_performance_profile_v2_t *profile);
 
-/* Function to send the requested Wi-Fi and BT/BLE performance profile to firmware */
-sl_status_t sli_wifi_send_power_save_request(const sl_wifi_performance_profile_v2_t *wifi_profile,
-                                             const sl_bt_performance_profile_t *bt_profile);
-
 #endif

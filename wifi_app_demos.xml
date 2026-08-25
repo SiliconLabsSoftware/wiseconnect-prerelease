@@ -6,8 +6,8 @@
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd4338a" />
     <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/wifi_app/brd4338a/wifi_commander_soc-brd4338a.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.5.0.0.24.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.5.0.0.24" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.5.0.0.25.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.5.0.0.25" />
     <property key="readmeFiles" value="examples/demos/wifi_commander/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
     <property key="core.quality" value="PRODUCTION" />

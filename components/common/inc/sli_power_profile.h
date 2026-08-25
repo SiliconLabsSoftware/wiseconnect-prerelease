@@ -33,4 +33,8 @@ void sli_wifi_reset_coex_current_performance_profile(void);
 void sli_convert_performance_profile_to_power_save_command(sl_wifi_system_performance_profile_t profile,
                                                            sli_wifi_power_save_request_t *power_save_request);
 
+/* Function to send the requested Wi-Fi and BT/BLE performance profile to firmware */
+sl_status_t sli_wifi_send_power_save_request(const sl_wifi_performance_profile_v2_t *wifi_profile,
+                                             const sl_bt_performance_profile_t *bt_profile);
+
 #endif // SLI_POWER_PROFILE_H

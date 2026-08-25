@@ -35,7 +35,6 @@
 #include "rsi_common.h"
 #include "cmsis_os2.h"
 
-#include "sl_wifi_host_interface.h"
 #include "sli_hal_si91x.h"
 #include "sli_constants.h"
 

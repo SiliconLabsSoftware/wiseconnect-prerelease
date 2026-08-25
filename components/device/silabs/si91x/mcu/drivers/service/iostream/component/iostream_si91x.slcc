@@ -47,7 +47,7 @@ provides:
   - name: iostream_si91x
   - name: si91x_iostream_transport
     allow_multiple: true
-    condition: [si91x_log_iostream]  
+    condition: [si91x_log_iostream]
 requires:
   - name: sl_usart_iostream
-  - name: iostream_retarget_stdio
+  - name: syscalls

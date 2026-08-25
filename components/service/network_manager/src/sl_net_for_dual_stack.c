@@ -185,13 +185,11 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
     }
 
     SL_DEBUG_LOG_V2(DEBUG, "%s: ACCEPT %d,", (uintptr_t) __func__, bufferoffset);
-#ifdef SLI_NET_LWIP_RX_FRAME_DEBUG
     SL_DEBUG_LOG_V2(DEBUG, " [%02x:%02x:%02x:", dst_mac[0], dst_mac[1], dst_mac[2]);
     SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]<-", dst_mac[3], dst_mac[4], dst_mac[5]);
     SL_DEBUG_LOG_V2(DEBUG, "[%02x:%02x:%02x:", src_mac[0], src_mac[1], src_mac[2]);
     SL_DEBUG_LOG_V2(DEBUG, "%02x:%02x:%02x]", src_mac[3], src_mac[4], src_mac[5]);
     SL_DEBUG_LOG_V2(DEBUG, " type=%02x%02x", b[12], b[13]);
-#endif
 
     if (netif->input(p, netif) != ERR_OK) {
       gOverrunCount++;

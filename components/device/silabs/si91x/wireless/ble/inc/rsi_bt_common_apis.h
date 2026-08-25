@@ -41,11 +41,6 @@
  *  @{
  */
 
-/// success return value
-#define RSI_SUCCESS 0
-
-/// failure return value
-#define RSI_FAILURE -1
 /** @} */
 /******************************************************
  * *                    Constants

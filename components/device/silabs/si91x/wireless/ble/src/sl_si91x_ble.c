@@ -30,9 +30,6 @@
 #include "sl_si91x_ble.h"
 #include "sl_utility.h"
 #include "sli_power_profile.h"
-#include "sli_wifi_power_profile.h"
-
-/*=======================================================================*/
 
 /**
  * @brief Sets the performance profile for the Si91x Bluetooth module.

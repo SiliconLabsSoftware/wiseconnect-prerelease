@@ -78,6 +78,10 @@ sl_status_t sl_si91x_icm40627_ssi_interface_init(sl_ssi_handle_t *ssi_driver_han
   sl_status_t sl_status = SL_STATUS_OK;
   sl_ssi_control_config_t ssi_master_config;
 
+  if (ssi_driver_handle == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
   ssi_master_config.bit_width            = SSI_MASTER_BIT_WIDTH;
   ssi_master_config.device_mode          = SL_SSI_ULP_MASTER_ACTIVE;
   ssi_master_config.clock_mode           = SL_SSI_PERIPHERAL_CPOL0_CPHA0;
@@ -104,7 +108,7 @@ sl_status_t sl_si91x_icm40627_ssi_interface_init(sl_ssi_handle_t *ssi_driver_han
     sl_si91x_ssi_set_slave_number((uint8_t)ssi_slave_number);
 
   } while (false);
-  return SL_STATUS_OK;
+  return sl_status;
 }
 
 /***************************************************************************/ /**
