@@ -130,7 +130,12 @@ SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_SI91X_WIFI_CMD_ENGINE, SL_CODE_CLASS_TIME
 static void sli_post_packet_to_event_engine(sl_wifi_buffer_t *rx_buffer);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_SI91X_WIFI_CMD_ENGINE, SL_CODE_CLASS_TIME_CRITICAL)
-static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint16_t packet_type, uint16_t error_status);
+static bool sli_flush_socket_read_compare_function(const sli_queue_t *handle, const void *data, const void *context);
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_SI91X_WIFI_CMD_ENGINE, SL_CODE_CLASS_TIME_CRITICAL)
+static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance,
+                                           uint16_t packet_type,
+                                           uint16_t error_status,
+                                           sli_flush_packet_compare_function_t compare_function);
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_SI91X_WIFI_CMD_ENGINE, SL_CODE_CLASS_TIME_CRITICAL)
 static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
                                                uint16_t error_status,
@@ -219,6 +224,18 @@ sli_command_engine_configuration_t sli_wifi_command_engine_config = {
   .error_buffer_pool_type    = SLI_BUFFER_MANAGER_CE_METADATA_POOL,
   .flush_handler             = sli_si91x_wifi_command_engine_flush_metadata,
 };
+
+#ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
+// Match only SOCKET_READ_DATA (0x6B). Used on REMOTE_TERMINATE so close (0x43) is left alone.
+static bool sli_flush_socket_read_compare_function(const sli_queue_t *handle, const void *data, const void *context)
+{
+  UNUSED_PARAMETER(handle);
+  UNUSED_PARAMETER(context);
+
+  const sli_command_engine_metadata_t *metadata = (const sli_command_engine_metadata_t *)data;
+  return (metadata != NULL) && (metadata->tx_info.frame_id == SLI_WIFI_REQ_SOCKET_READ_DATA);
+}
+#endif
 
 /******************************************************
  *               Function Definitions
@@ -756,6 +773,13 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
       }
     } break;
 
+    case SLI_WIFI_RSP_REMOTE_TERMINATE:
+      status = sli_flush_socket_queues(instance,
+                                       packet_type,
+                                       (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED,
+                                       sli_flush_socket_read_compare_function);
+      VERIFY_STATUS_AND_RETURN(status);
+      break;
     case SLI_WIFI_RSP_AP_STOP:
       if (frame_status == SL_STATUS_OK) {
         uint8_t vap_id = SL_WIFI_AP_VAP_ID;
@@ -798,7 +822,12 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
 }
 
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
-static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint16_t packet_type, uint16_t error_status)
+// compare_function NULL flushes all commands for the socket; otherwise only matching commands.
+// Flush first so a woken app cannot inject a new command into this same flush (disconnect / AP stop).
+static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance,
+                                           uint16_t packet_type,
+                                           uint16_t error_status,
+                                           sli_flush_packet_compare_function_t compare_function)
 {
   if (error_status == SL_STATUS_OK || instance == NULL) {
     return SL_STATUS_INVALID_PARAMETER;
@@ -828,7 +857,7 @@ static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint1
   sli_flush_queue_for_packet_type(instance,
                                   &dynamic_node->queue_info,
                                   &dynamic_node->packet_config,
-                                  NULL,
+                                  compare_function,
                                   NULL,
                                   error_status);
 
@@ -861,7 +890,6 @@ static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance, uint1
     sl_status_t enqueue_status =
       sli_queue_manager_enqueue(socket->socket_packet_type_configuration.sync_response_queue, (void *)metadata);
     if (enqueue_status != SL_STATUS_OK) {
-      // Enqueue failed (e.g., OOM): free metadata to prevent memory leak
       sli_buffer_manager_free_buffer(metadata);
       return enqueue_status;
     }
@@ -904,7 +932,7 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
     }
     uint16_t socket_packet_type =
       (uint16_t)(sli_si91x_sockets[index]->index + SLI_WIFI_COMMAND_ENGINE_MAX_PACKET_TYPES);
-    status = sli_flush_socket_queues(instance, socket_packet_type, error_status);
+    status = sli_flush_socket_queues(instance, socket_packet_type, error_status, NULL);
     if (status != SL_STATUS_OK) {
       return status;
     }
