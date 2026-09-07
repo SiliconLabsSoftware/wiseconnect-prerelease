@@ -3,18 +3,61 @@ label: Wiseconnect
 description: WiSeConnect extension for the Simplicity SDK (formerly Gecko SDK)
 version: 4.2.0
 component_path:
- - path: third_party/littlefs/component
- - path: third_party/iot_socket
- - path: third_party/json_parser
- - path: components/sli_buffer_manager
- - path: components/sli_queue_manager
- - path: components/sli_routing_utility
- - path: components/sli_command_engine/component
- - path: components/common
- - path: components/sli_event_engine/component
- - path: third_party/tcose/component
+ - path: components/device/silabs/si91x/wireless/ble
+ - path: components/device/silabs/si91x/wireless/ble_unified
+ - path: components/device/silabs/si91x/wireless/ble_unified_framework
+  # Protocol / feature implementation sources (application-as-component)
+ - path: components/device/silabs/si91x/wireless/gap
+ - path: components/device/silabs/si91x/wireless/ext_adv
+ - path: components/device/silabs/si91x/wireless/legacy_adv
+ - path: components/device/silabs/si91x/wireless/gatt
+ - path: components/device/silabs/si91x/wireless/smp
+  # Root-level BLE advertising/scan installer .slcc (extended, legacy, default)
+ - path: components/device/silabs/si91x/wireless
+ - path: components/at_commands_auto_gen
+ - path: components/console
+ - path: components/console/variables
+ - path: components/device/stm32
+ - path: components/device/silabs/si91x/wireless/crypto
+ - path: components/device/silabs/si91x/wireless/crypto/aead
+ - path: components/device/silabs/si91x/wireless/crypto/aes
+ - path: components/device/silabs/si91x/wireless/crypto/attestation
+ - path: components/device/silabs/si91x/wireless/crypto/ccm
+ - path: components/device/silabs/si91x/wireless/crypto/chachapoly
+ - path: components/device/silabs/si91x/wireless/crypto/crypto_utility
+ - path: components/device/silabs/si91x/wireless/crypto/ecdh
+ - path: components/device/silabs/si91x/wireless/crypto/ecdsa
+ - path: components/device/silabs/si91x/wireless/crypto/gcm
+ - path: components/device/silabs/si91x/wireless/crypto/hmac
+ - path: components/device/silabs/si91x/wireless/crypto/mac
+ - path: components/device/silabs/si91x/wireless/crypto/multithread
+ - path: components/device/silabs/si91x/wireless/crypto/sha
+ - path: components/device/silabs/si91x/wireless/crypto/trng
+ - path: components/device/silabs/si91x/wireless/crypto/wrap
+ - path: components/device/silabs/si91x/wireless/errno/component
+ - path: components/device/silabs/si91x/wireless/firmware_upgrade
+ - path: components/device/silabs/si91x/wireless/ncp_interface
+ - path: components/device/silabs/si91x/wireless/wc_device_configuration
+ - path: components/logger
+ - path: components/protocol/wifi
+ - path: components/service/http_client
+ - path: components/service/mdns
+ - path: components/service/mqtt
+ - path: components/service/network_manager
+ - path: components/service/sl_http_server
+ - path: components/service/sntp
+ - path: components/device/silabs/si91x/wireless/sli_si91x_wifi_event_handler
+ - path: components/sli_wifi
+ - path: components/device/silabs/si91x/wireless/sli_si91x_wifi_command_engine
+ - path: components/sli_wifi_per_mode
+ - path: components/sli_wlan_command_engine/component
+ - path: resources
+ - path: third_party/qcbor/component
  - path: third_party/azure_freertos_middleware
  - path: third_party/azure_freertos_middleware/libraries/coreMQTT
+ - path: third_party/aws_sdk
+ - path: third_party/iot_socket
+ - path: third_party/json_parser
  - path: components/board/silabs/component
  - path: components/device/silabs/si91x/host_interface
  - path: components/device/silabs/si91x/host_interface/ncp_bus/spi
@@ -61,78 +104,37 @@ component_path:
  - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
  - path: components/device/silabs/si91x/mcu/toolchain/component
  - path: components/device/silabs/si91x/sl_si91x_generative_ai/component
- - path: components/device/silabs/si91x/wireless/ble
- - path: components/device/silabs/si91x/wireless/ble_unified
- - path: components/device/silabs/si91x/wireless/ble_unified_framework
-  # Protocol / feature implementation sources (application-as-component)
- - path: components/device/silabs/si91x/wireless/gap
- - path: components/device/silabs/si91x/wireless/ext_adv
- - path: components/device/silabs/si91x/wireless/legacy_adv
- - path: components/device/silabs/si91x/wireless/gatt
- - path: components/device/silabs/si91x/wireless/smp
-  # Root-level BLE advertising/scan installer .slcc (extended, legacy, default)
- - path: components/device/silabs/si91x/wireless
- - path: third_party/aws_sdk
- - path: components/at_commands_auto_gen
- - path: components/console
- - path: components/console/variables
- - path: components/device/stm32
- - path: components/device/silabs/si91x/wireless/crypto
- - path: components/device/silabs/si91x/wireless/crypto/aead
- - path: components/device/silabs/si91x/wireless/crypto/aes
- - path: components/device/silabs/si91x/wireless/crypto/attestation
- - path: components/device/silabs/si91x/wireless/crypto/ccm
- - path: components/device/silabs/si91x/wireless/crypto/chachapoly
- - path: components/device/silabs/si91x/wireless/crypto/crypto_utility
- - path: components/device/silabs/si91x/wireless/crypto/ecdh
- - path: components/device/silabs/si91x/wireless/crypto/ecdsa
- - path: components/device/silabs/si91x/wireless/crypto/gcm
- - path: components/device/silabs/si91x/wireless/crypto/hmac
- - path: components/device/silabs/si91x/wireless/crypto/mac
- - path: components/device/silabs/si91x/wireless/crypto/multithread
- - path: components/device/silabs/si91x/wireless/crypto/sha
- - path: components/device/silabs/si91x/wireless/crypto/trng
- - path: components/device/silabs/si91x/wireless/crypto/wrap
- - path: components/device/silabs/si91x/wireless/errno/component
- - path: components/device/silabs/si91x/wireless/firmware_upgrade
- - path: components/device/silabs/si91x/wireless/ncp_interface
- - path: components/device/silabs/si91x/wireless/wc_device_configuration
- - path: components/logger
- - path: components/protocol/wifi
- - path: components/service/http_client
- - path: components/service/mdns
- - path: components/service/mqtt
- - path: components/service/network_manager
- - path: components/service/sl_http_server
- - path: components/service/sntp
- - path: components/device/silabs/si91x/wireless/sli_si91x_wifi_event_handler
- - path: components/sli_wifi
- - path: components/device/silabs/si91x/wireless/sli_si91x_wifi_command_engine
- - path: components/sli_wifi_per_mode
- - path: components/sli_wlan_command_engine/component
- - path: resources
- - path: third_party/paho_mqtt_embedded
+ - path: components/sli_buffer_manager
+ - path: components/sli_queue_manager
+ - path: components/sli_routing_utility
+ - path: components/sli_command_engine/component
+ - path: components/common
+ - path: components/sli_event_engine/component
+ - path: third_party/tcose/component
+ - path: third_party/littlefs/component
 documentation:
- - docset: littlefs
-   version: 2.9.3
+ - docset: bluetooth_le_siwx91x
+   version: 4.2.0
+ - docset: wifi
+   version: 4.2.0
+ - docset: qcbor
+   version: 1.2.0
+ - docset: azure_freertos_middleware
+   version: 1.1.0
+ - docset: aws_sdk
+   version: 3.1.0
  - docset: iot_socket
    version: 1.0.0
  - docset: json_parser
    version: 1.1.0
+ - docset: platform_siwx91x
+   version: 4.2.0
  - docset: wiseconnect_common
    version: 4.2.0
  - docset: tcose
    version: 1.1.1
- - docset: azure_freertos_middleware
-   version: 1.1.0
- - docset: platform_siwx91x
-   version: 4.2.0
- - docset: bluetooth_le_siwx91x
-   version: 4.2.0
- - docset: aws_sdk
-   version: 3.1.0
- - docset: wifi
-   version: 4.2.0
+ - docset: littlefs
+   version: 2.9.3
 upgrade_manifest:
  - path: upgrade.slcu
 post_build_profile:

@@ -8,7 +8,8 @@ quality: production
 label: SiWx91x Platform - M4 Updater Security
 component:
 - id: sl_main
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: freertos
 - id: syscalls
 - id: wiseconnect_common

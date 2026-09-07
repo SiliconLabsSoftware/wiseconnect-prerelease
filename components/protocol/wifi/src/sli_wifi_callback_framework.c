@@ -82,16 +82,21 @@ sl_status_t sli_wifi_set_callback(sl_wifi_event_group_t group,
   }
 
   if (function != NULL) {
-    entry->function = function;
-    entry->arg      = optional_arg;
+    entry->function    = function;
+    entry->function_v2 = NULL;
+    entry->arg         = optional_arg;
     return SL_STATUS_OK;
   }
 
   if (function_v2 != NULL) {
+    entry->function    = NULL;
     entry->function_v2 = function_v2;
     entry->arg         = optional_arg;
     return SL_STATUS_OK;
   }
 
-  return SL_STATUS_FAIL;
+  entry->function    = NULL;
+  entry->function_v2 = NULL;
+  entry->arg         = NULL;
+  return SL_STATUS_OK;
 }

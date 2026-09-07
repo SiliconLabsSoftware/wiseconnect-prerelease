@@ -7,7 +7,8 @@ category: example|peripheral
 quality: production
 label: SiWx91x Platform - SDIO Secondary FreeRTOS
 component:
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: sl_main
 - id: status
 - id: syscalls
@@ -35,6 +36,7 @@ toolchain_settings:
 other_file:
 - path: resources/readme/setupdiagram.png
 - path: resources/readme/output_sdio.png
+- path: resources/readme/raspberry_pi_handshake_brd8045.png
 - path: resources/uc_screen/sdio_secondary.png
 ui_hints:
   highlight:

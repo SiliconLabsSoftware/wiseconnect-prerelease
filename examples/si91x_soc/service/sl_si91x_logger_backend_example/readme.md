@@ -76,7 +76,7 @@ To use this application, the following hardware, software, and project setup are
 - Host PC (Windows, macOS, or Linux). Simplicity Studio is cross-platform; the optional Python decoder script (`Log_script.py`) runs on any of the three.
 - Silicon Labs SiWx91x evaluation kit. Boards covered by this template (per `wifi_templates.xml`):
   - WPK ([BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)) plus one of: [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / BRD4339B / BRD4340B / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / BRD4343B / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / BRD4343Q / BRD4343S.
-  - Standalone radio boards: [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) / BRD2605B / [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit).
+  - Standalone radio boards: -[BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)/ [BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605b-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) / [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit).
 
 ### Software Requirements
 
@@ -324,24 +324,28 @@ After the instance is created, IO Stream: Si91x UART shows as installed (with an
 
  **IO Stream Formatted Log Line Layout**
 
-With IO Stream Formatted, each printed line uses a fixed bracketed header followed by the message text (for example in SEGGER RTT "Data from stimulus port(s):" or a UART terminal).
+With IO Stream Formatted, each printed line is the expanded message text, optionally preceded by bracketed header fields (for example in SEGGER RTT "Data from stimulus port(s):" or a UART terminal). The log level is not printed, and no line terminator is appended: include `\r\n` in the format string where you want one.
 
-Pattern: `[<level><type>|<timestamp_hex>] <message>`
+Pattern: `[<epoch_hex>:<timestamp_hex>] [<core_hex>] <message>`
 
-| Field             | Meaning                                                                |
-| ----------------- | ---------------------------------------------------------------------- |
-| `<level>`         | First character: `D` = Debug, `I` = Info, `W` = Warn, `E` = Error.     |
-| `<type>`          | Second character: `S` = string log, `E` = event.                       |
-| `<timestamp_hex>` | Third field, an 8-character hexadecimal timestamp.                     |
-| `<message>`       | Human-readable string (for example `Info Print`).                      |
+Both header fields are optional and disabled by default. Enable them in `sl_log_formatted_iostream_config.h`:
 
-Example:
+| Field             | Enabled by                                       | Meaning                                                                                     |
+| ----------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `<epoch_hex>`     | `SL_LOG_FORMATTED_IOSTREAM_PREFIX_TIMESTAMP`     | 8 hexadecimal characters: how many times the microsecond counter has wrapped.                |
+| `<timestamp_hex>` | `SL_LOG_FORMATTED_IOSTREAM_PREFIX_TIMESTAMP`     | 8 hexadecimal characters: the counter itself, which wraps roughly every 71 minutes.          |
+| `<core_hex>`      | `SL_LOG_FORMATTED_IOSTREAM_APPEND_CORE_ID`       | 2 hexadecimal characters identifying the core that produced the log.                         |
+| `<message>`       | always                                           | Human-readable string (for example `Info Print`).                                           |
+
+Example with both header fields enabled:
 
 ```
-[I|S|0494B1BF] Info Print
+[00000000:0494B1BF] [00] Info Print
 ```
 
-`I` = Info, `S` = string, `0494B1BF` = timestamp, `Info Print` = message.
+`00000000` = epoch, `0494B1BF` = timestamp, `00` = host core, `Info Print` = message. Read the two time fields together as one 64-bit microsecond value; the epoch is what keeps entries ordered once the counter wraps.
+
+> **Note:** the timestamp field previously held a single `[0494B1BF]` counter value with no epoch. Host-side parsers written against that layout need updating.
 
 ### Switching or Replacing the Logger Backend
 

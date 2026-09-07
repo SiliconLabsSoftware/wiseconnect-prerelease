@@ -9,7 +9,8 @@ label: SiWx91x Platform - ULP UART FreeRTOS
 component:
 - id: sl_main
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: status
 - id: syscalls
 - id: wiseconnect_common

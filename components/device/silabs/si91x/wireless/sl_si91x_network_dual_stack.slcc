@@ -60,6 +60,6 @@ define:
 requires:
   - name: sl_si91x_wireless
   - name: log_none
-  - name: netstack_silabs_lwip_port_freertos
-  - name: netstack_silabs_lwip_api
-  - name: netstack_silabs_lwip_netif_ethernet
+  - name: silabs_lwip_port_freertos
+  - name: silabs_lwip_api
+  - name: silabs_lwip_netif_ethernet

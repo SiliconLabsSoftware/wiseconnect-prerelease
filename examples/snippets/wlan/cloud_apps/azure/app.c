@@ -29,6 +29,7 @@
  ******************************************************************************/
 
 #include <string.h>
+#include <stdlib.h>
 #include "cmsis_os2.h"
 #include "sl_status.h"
 #include "sl_net.h"
@@ -47,6 +48,7 @@
 #include "sl_si91x_socket.h"
 #include "sl_si91x_hmac.h"
 #include "sl_si91x_core_utilities.h"
+#include "sl_sntp.h"
 
 /* Demo Specific configs. */
 #include "demo_config.h"
@@ -161,6 +163,16 @@
 
 #define ENABLE_NWP_POWER_SAVE 1
 
+#define NTP_SERVER_NAME       "0.pool.ntp.org"
+#define SNTP_RETRY_COUNT      5
+#define SNTP_BLOCK_TIMEOUT_MS 30000
+#define SNTP_CMD_TIMEOUT_MS   1000
+
+/* Offset in seconds between the NTP epoch (1900-01-01 UTC) and the Unix
+ * epoch (1970-01-01 UTC). Used to convert SNTP get_time NTP timestamps
+ * to Unix time. */
+#define NTP_TO_UNIX_OFFSET 2208988800ULL
+
 /******************************************************
 *               Function Declarations
 ******************************************************/
@@ -179,7 +191,8 @@ uint32_t Crypto_HMAC(const uint8_t *pucKey,
                      uint8_t *pucOutput,
                      uint32_t ulOutputLength,
                      uint32_t *pulBytesCopied);
-uint32_t ullGetUnixTime(void);
+uint64_t ullGetUnixTime(void);
+static sl_status_t sync_unix_time_from_sntp(void);
 bool xAzureSample_IsConnectedToInternet();
 
 /******************************************************
@@ -207,6 +220,8 @@ struct NetworkContext {
 sl_si91x_hmac_config_t config = { 0 };
 
 static AzureIoTHubClient_t xAzureIoTHubClient;
+static uint64_t unix_time_at_sync;
+static uint32_t tick_at_sync;
 
 /**
  * @brief Static buffer used to hold MQTT messages being sent and received.
@@ -240,12 +255,12 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
                    .coex_mode = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map =
                      (SL_WIFI_FEAT_SECURITY_OPEN | SL_WIFI_FEAT_WPS_DISABLE | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE),
-                   .tcp_ip_feature_bit_map =
-                     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT | SL_SI91X_TCP_IP_FEAT_SSL
+                   .tcp_ip_feature_bit_map = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT
+                                              | SL_SI91X_TCP_IP_FEAT_SSL | SL_SI91X_TCP_IP_FEAT_SNTP_CLIENT
 #ifdef SLI_SI91X_ENABLE_IPV6
-                      | SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6
+                                              | SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6
 #endif
-                      | SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
+                                              | SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
                    .custom_feature_bit_map = SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID,
                    .ext_custom_feature_bit_map =
                      (SL_SI91X_EXT_FEAT_XTAL_CLK | SL_SI91X_EXT_FEAT_UART_SEL_FOR_DEBUG_PRINTS
@@ -491,14 +506,6 @@ uint32_t Crypto_HMAC(const uint8_t *pucKey,
                      uint32_t ulOutputLength,
                      uint32_t *pulBytesCopied)
 {
-  (void)pucKey;
-  (void)ulKeyLength;
-  (void)pucData;
-  (void)ulDataLength;
-  (void)pucOutput;
-  (void)ulOutputLength;
-  (void)pulBytesCopied;
-
   config.hmac_mode              = SL_SI91X_HMAC_SHA_256;
   config.msg_length             = ulDataLength;
   config.msg                    = pucData;
@@ -520,11 +527,93 @@ uint32_t Crypto_HMAC(const uint8_t *pucKey,
 /**
  * @brief Unix time.
  *
- * @return Time in milliseconds.
+ * @return Seconds since the Unix epoch (1970-01-01 UTC).
  */
-uint32_t ullGetUnixTime(void)
+uint64_t ullGetUnixTime(void)
 {
-  return (uint32_t)osKernelGetTickCount();
+  uint32_t elapsed_ticks = osKernelGetTickCount() - tick_at_sync;
+  return unix_time_at_sync + (elapsed_ticks / configTICK_RATE_HZ);
+}
+
+static sl_status_t sync_unix_time_from_sntp(void)
+{
+  sl_status_t status               = SL_STATUS_FAIL;
+  sl_ip_address_t ntp_ip           = { 0 };
+  sl_sntp_client_config_t sntp_cfg = { 0 };
+  uint8_t time_buf[64]             = { 0 };
+  uint8_t retry_count              = DNS_REQ_COUNT;
+  uint64_t epoch                   = 0;
+
+  do {
+    status = sl_net_dns_resolve_hostname_v2(NTP_SERVER_NAME, DNS_TIMEOUT, RETRY_COUNT, SL_NET_DNS_TYPE_IPV4, &ntp_ip);
+    if (status == SL_STATUS_OK) {
+      break;
+    }
+    retry_count--;
+  } while (retry_count != 0);
+
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  sntp_cfg.server_host_name = ntp_ip.ip.v4.bytes;
+  sntp_cfg.sntp_method      = SL_SNTP_UNICAST_MODE;
+  sntp_cfg.sntp_timeout     = SNTP_CMD_TIMEOUT_MS;
+  sntp_cfg.flags            = 0;
+  sntp_cfg.event_handler    = NULL;
+
+  status = sl_sntp_client_start(&sntp_cfg, SNTP_BLOCK_TIMEOUT_MS);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  retry_count = SNTP_RETRY_COUNT;
+  do {
+    status = sl_sntp_client_get_time(time_buf, sizeof(time_buf) - 1, SNTP_BLOCK_TIMEOUT_MS);
+    if (status == SL_STATUS_OK) {
+      break;
+    }
+    retry_count--;
+  } while (retry_count != 0);
+
+  if (status != SL_STATUS_OK) {
+    sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+    return status;
+  }
+
+  status = sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "SNTP client stop failed: 0x%lx\r\n", status);
+  }
+
+  SL_DEBUG_LOG_V2(DEBUG, "SNTP raw get_time: '%s'\r\n", (uintptr_t)time_buf);
+
+  /*
+   * sl_sntp_client_get_time() returns the NTP timestamp as a string
+   * (for example, "Time: 3996200822. sec."), not a binary integer.
+   * Advance to the first digit before converting with strtoull().
+   */
+  {
+    const char *p = (const char *)time_buf;
+    while ((*p != '\0') && ((*p < '0') || (*p > '9'))) {
+      p++;
+    }
+    epoch = strtoull(p, NULL, 10);
+  }
+
+  /* Ensure the parsed NTP timestamp is large enough for a valid Unix conversion. */
+  if (epoch < NTP_TO_UNIX_OFFSET) {
+    SL_DEBUG_LOG_V2(ERROR, "Invalid NTP timestamp: %lu\r\n", (unsigned long)epoch);
+    return SL_STATUS_FAIL;
+  }
+
+  /* Convert NTP timestamp to Unix time. */
+  epoch -= NTP_TO_UNIX_OFFSET;
+
+  unix_time_at_sync = epoch;
+  tick_at_sync      = osKernelGetTickCount();
+
+  return SL_STATUS_OK;
 }
 
 /*-----------------------------------------------------------*/
@@ -654,10 +743,6 @@ static void azure_iot_mqtt_demo()
 
   application_state = AZURE_MQTT_INIT_STATE;
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-#endif // __GNUC__
   while (true) {
     switch (application_state) {
       case AZURE_MQTT_INIT_STATE: {
@@ -672,9 +757,6 @@ static void azure_iot_mqtt_demo()
                                          sizeof(ucMQTTMessageBuffer),
                                          ullGetUnixTime,
                                          &xTransport);
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif // __GNUC__
         SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_Init: %x\r\n", xResult);
         assert(xResult == eAzureIoTSuccess);
 
@@ -686,6 +768,16 @@ static void azure_iot_mqtt_demo()
         SL_DEBUG_LOG_V2(DEBUG, "AzureIoTHubClient_SetSymmetricKey: %x\r\n", xResult);
         assert(xResult == eAzureIoTSuccess);
 #endif /* democonfigDEVICE_SYMMETRIC_KEY */
+
+        /* Refresh wall clock immediately before SAS generation (Connect). */
+        {
+          sl_status_t sntp_status = sync_unix_time_from_sntp();
+          if (sntp_status != SL_STATUS_OK) {
+            SL_DEBUG_LOG_V2(ERROR, "SNTP refresh before MQTT connect failed: 0x%lx\r\n", sntp_status);
+            application_state = AZURE_MQTT_DISCONNECT;
+            break;
+          }
+        }
 
         /* Sends an MQTT Connect packet over the already established TLS connection,
              * and waits for connection acknowledgment (CONNACK) packet. */

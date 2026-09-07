@@ -32,6 +32,7 @@
 
 #include "rsi_bt_common.h"
 #include "rsi_utils.h"
+#include "sl_constants.h"
 
 /******************************************************
  * *                      Macros
@@ -83,7 +84,7 @@ extern "C" {
  *              - 3       - Command is given in wrong state (that is, not immediate after opermode)
  * @note       This is a blocking API. Refer to the Status Codes section for the above error codes at [wiseconnect-status-codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) .
  */
-int32_t rsi_bt_set_bd_addr(const uint8_t *dev_addr);
+int32_t rsi_bt_set_bd_addr(const uint8_t *dev_addr) SL_DEPRECATED_API_WISECONNECT_4_2;
 
 /*==============================================*/
 /**
@@ -106,7 +107,7 @@ int32_t rsi_bt_set_local_name(const uint8_t *local_name);
  * @brief      Update gain table offset/max power. This is blocking API.
  * @pre Pre-conditions:
  * -        Device should be initialized before calling this API.
- * @param[in]  node_id     - Node ID (0 - BLE, 1 - BT).
+ * @param[in]  node_id     - Node ID (0 - BLE).
  * @param[in]  payload_len - Length of the payload.
  * @param[in]  payload     - Payload containing table data of gain table offset/max power
  * @param[in]  req_type    - Update gain table request type 
@@ -194,7 +195,7 @@ int32_t rsi_bt_get_bt_stack_version(rsi_bt_resp_get_bt_stack_version_t *bt_resp_
  *             - Non-Zero Value	-	Failure
  * @note       Refer to the Status Codes section for the above error codes at [wiseconnect-status-codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes).
  */
-int32_t rsi_bt_init(void);
+int32_t rsi_bt_init(void) SL_DEPRECATED_API_WISECONNECT_4_2;
 
 /*==============================================*/
 /**
@@ -207,7 +208,7 @@ int32_t rsi_bt_init(void);
  *            - Non-Zero Value	-	Failure
  * @note       Refer to the Status Codes section for the above error codes at [wiseconnect-status-codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes).
  */
-int32_t rsi_bt_deinit(void);
+int32_t rsi_bt_deinit(void) SL_DEPRECATED_API_WISECONNECT_4_2;
 
 /*==============================================*/
 /**
@@ -223,7 +224,7 @@ int32_t rsi_bt_deinit(void);
  *              - Non-Zero Value	-	Failure
  * @note       Refer to the Status Codes section for the above error codes at [wiseconnect-status-codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes).
  */
-int32_t rsi_bt_set_antenna(uint8_t antenna_value);
+int32_t rsi_bt_set_antenna(uint8_t antenna_value) SL_DEPRECATED_API_WISECONNECT_4_2;
 
 /*==============================================*/
 /**
@@ -281,7 +282,7 @@ int32_t rsi_bt_per_stats(uint8_t cmd_type, struct rsi_bt_per_stats_s *per_stats)
  * @fn         rsi_bt_set_feature_bitmap
  *
  */
-int32_t rsi_bt_set_feature_bitmap(uint32_t feature_bit_map);
+int32_t rsi_bt_set_feature_bitmap(uint32_t feature_bit_map) SL_DEPRECATED_API_WISECONNECT_4_2;
 
 #ifdef __cplusplus
 }

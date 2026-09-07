@@ -43,7 +43,8 @@ requires:
 - name: sl_si91x_internal_stack
 - name: wifi_resources
 - name: freertos
-- name: freertos_heap_4
+- name: freertos_heap_3
+- name: memory_manager
 - name: slist
 - name: iostream_retarget_stdio
   condition:

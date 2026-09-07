@@ -7,7 +7,8 @@ category: example|peripheral
 quality: production
 label: SiWx91x Platform - PCM Loopback FreeRTOS
 component:
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: sl_main
 - id: status
 - id: syscalls

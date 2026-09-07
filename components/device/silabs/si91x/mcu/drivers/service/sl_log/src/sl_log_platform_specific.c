@@ -10,7 +10,11 @@
 
 #include "sl_log_platform_specific.h"
 #include "sl_log_helper.h"
+#include "sl_log_hal_inline.h"
 #include "sl_si91x_ulp_timer.h"
+#ifdef SL_WIFI_COMPONENT_INCLUDED
+#include "sl_utility.h"
+#endif
 
 #ifdef SL_CATALOG_LOG_BACKEND_PROPRIETARY_PRESENT
 #include "sl_log_proprietary_config.h"
@@ -22,7 +26,6 @@
 #define SL_LOG_ULP_TIMER_INSTANCE 3       //  Ulp timer instance using for logger
 
 #if defined(SLI_CAPTIVE_CORE_PRESENT) && (SLI_CAPTIVE_CORE_PRESENT == 1)
-#include "sl_utility.h"
 #include "sl_si91x_constants.h"
 #include "sl_si91x_driver.h"
 #include "rsi_m4.h"
@@ -38,34 +41,17 @@ uint32_t sl_si91x_log_host_timesync_address =
 /*******************************************************************************
  *                               GLOBAL VARIABLES
  ******************************************************************************/
-bool is_timesync_done = false;
-int si91x_timestamp_delta;
-typedef __PACKED_STRUCT
-{
-  /** @brief Timestamp when the event was logged (in system timer units) */
-  uint32_t timestamp;
-  /** @brief Unique event identifier (pointer to format string or numeric ID) */
-  uint32_t event_id;
-  /** @brief Array of arguments associated with the event (up to
-   * SL_LOG_CONFIG_ARG items) */
-  uint32_t args[3];
-  /** @brief Number of valid arguments in the args array (0 to
-   * SL_LOG_CONFIG_ARG) */
-  uint8_t arg_count;
-  /** @brief Core identifier that generated the event (0 = host core) */
-  uint8_t core_id;
-  /** @brief Event flags - bits 1-7: log level, bit 0: event type (0=format
-   * string, 1=numeric) */
-  uint8_t flags;
-  /** @brief Version of the logging component that generated this event */
-  uint8_t version;
-}
-sl_log_nwp_event_t;
+volatile bool sli_log_si91x_timesync_done      = false;
+volatile int32_t sli_log_si91x_timestamp_delta = 0;
+volatile uint32_t sli_log_si91x_timer_epoch    = 0;
+
+/* sli_nwp_log_event_t (NWP wire format) is defined once in sl_utility.h and
+ * reached here through the si91x_log -> wiseconnect_common dependency. */
 
 /**
 * @brief Copy a packed NWP wire-format log record into a host ring-buffer slot.
 *
-* NWP uses @ref sl_log_nwp_event_t (packed, network layout). The M4 ring stores
+* NWP uses @ref sli_nwp_log_event_t (packed, network layout). The M4 ring stores
 * @ref sl_log_event_t. Layouts are kept identical so the log pipeline matches;
 * This function serves as the dedicated mapping point from NWP to the ring 
 * buffer and documents the relationship between them.
@@ -87,8 +73,16 @@ sl_log_nwp_event_t;
      || defined(SL_CATALOG_LOG_BACKEND_SYSTEMVIEW_PRESENT)                          \
      || (defined(SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_COMPACT_PRESENT)             \
          && defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT)))
-static void sli_sl_log_event_from_nwp(const sl_log_nwp_event_t *nwp, sl_log_event_t *out)
+static void sli_sl_log_event_from_nwp(const sli_nwp_log_event_t *nwp, sl_log_event_t *out)
 {
+  // Clear first: ring slots are reused and the stacked copy used by the
+  // SystemView and RTT paths is uninitialized, so any host field the wire format
+  // does not supply - the epoch, and args beyond the three on the wire - would
+  // otherwise reach the backend carrying stale data.
+  *out = (sl_log_event_t){ 0 };
+
+  // The NWP timestamp is on the captive core's timebase and carries no wrap
+  // count, so the epoch stays zero.
   out->timestamp = nwp->timestamp;
   out->event_id  = nwp->event_id;
   out->args[0]   = nwp->args[0];
@@ -134,6 +128,18 @@ sl_status_t sl_log_hal_stop_timestamp_counter(void);
  * @return Current timestamp in microseconds
  */
 uint32_t sl_log_hal_get_timestamp_count(uint8_t core_id);
+
+/**
+ * @brief Get the timestamp epoch (high 32 bits of the 64-bit host time).
+ *
+ * Counts how many times the value returned by
+ * sl_log_hal_get_timestamp_count() has wrapped. Read immediately after the
+ * count so the two halves describe the same instant.
+ *
+ * @param[in] core_id Core identifier (0 = host)
+ * @return Epoch paired with the most recent timestamp read
+ */
+uint32_t sl_log_hal_get_timestamp_epoch(uint8_t core_id);
 
 /**
  * @brief Get the timestamp timer frequency (Hz) for a core.
@@ -218,7 +224,7 @@ sl_status_t sl_log_hal_set_configuration(const void *args, uint8_t core_id);
  *      appropriately.  
  *
  * @param[in] events  
- *   Pointer to an array of @ref sl_log_nwp_event_t (NWP wire format); each entry
+ *   Pointer to an array of @ref sli_nwp_log_event_t (NWP wire format); each entry
  *   is converted into @ref sl_log_event_t in the ring buffer.
  *
  * @param[in] count  
@@ -245,7 +251,9 @@ sl_status_t sl_log_hal_set_configuration(const void *args, uint8_t core_id);
  * write and read indices are updated atomically relative to ISR-based backends.
  ******************************************************************************/
 
-sl_status_t sl_log_write_multiple_to_ring_buffer(const sl_log_nwp_event_t *events, uint32_t count);
+#ifdef SL_WIFI_COMPONENT_INCLUDED
+sl_status_t sl_log_write_multiple_to_ring_buffer(const sli_nwp_log_event_t *events, uint32_t count);
+#endif
 
 /**
  * @brief   Core API structure.
@@ -254,6 +262,7 @@ sl_status_t sl_log_write_multiple_to_ring_buffer(const sl_log_nwp_event_t *event
 sl_log_api_core_t sl_log_api_core = { .platform_core_init            = sl_log_hal_start_timestamp_counter,
                                       .platform_core_deinit          = sl_log_hal_stop_timestamp_counter,
                                       .get_timestamp                 = sl_log_hal_get_timestamp_count,
+                                      .get_timestamp_epoch           = sl_log_hal_get_timestamp_epoch,
                                       .get_timestamp_timer_frequency = sl_log_hal_get_timestamp_timer_frequency,
                                       .post_sleep_process            = sl_log_hal_post_sleep_process,
                                       .pre_sleep_process             = sl_log_hal_pre_sleep_process,
@@ -273,8 +282,7 @@ static void timer_overflow_callback(void);
  */
 void timer_overflow_callback(void)
 {
-  static uint32_t overflow_count = 0;
-  SL_PRINT_STRING_INFO("Timer overflow count %u", overflow_count++);
+  sli_log_si91x_timer_epoch++;
 }
 
 /**
@@ -299,6 +307,12 @@ sl_status_t sl_log_hal_start_timestamp_counter(void)
     .timer_match_value = 0xFFFFFFFF,
     .timer_direction   = UP_COUNTER,
   };
+
+  // The counter restarts from zero here, so the epoch has to restart with it or
+  // the two halves of the 64-bit time would describe different runs of the
+  // timer. Host time is therefore discontinuous across a stop/start cycle, as
+  // it already was before the epoch existed.
+  sli_log_si91x_timer_epoch = 0;
 
   // Start the timestamp counter from the host
   sl_status_t status = sl_si91x_ulp_timer_init(&ulp_timer_clk_handle);
@@ -326,7 +340,7 @@ sl_status_t sl_log_hal_start_timestamp_counter(void)
     return status;
   }
 #if !defined(SLI_CAPTIVE_CORE_PRESENT) || (SLI_CAPTIVE_CORE_PRESENT != 1)
-  is_timesync_done = true;
+  sli_log_si91x_timesync_done = true;
 #endif
   return status;
 }
@@ -363,12 +377,7 @@ uint32_t sl_log_hal_get_timestamp_count(uint8_t core_id)
 {
   switch (core_id) {
     case SL_SI91X_HOST_CORE_ID:
-      if (is_timesync_done) {
-        return (TIMERS->MATCH_CTRL[SL_LOG_ULP_TIMER_INSTANCE].MCUULP_TMR_MATCH + si91x_timestamp_delta);
-      } else {
-        return 0;
-      }
-      break;
+      return sli_log_hal_get_timestamp();
 
     case SL_SI91X_CAPTIVE_CORE_ID:
 #if defined(SLI_CAPTIVE_CORE_PRESENT) && (SLI_CAPTIVE_CORE_PRESENT == 1)
@@ -394,6 +403,25 @@ uint32_t sl_log_hal_get_timestamp_count(uint8_t core_id)
 }
 
 /**
+ * @brief   Get the timestamp epoch (high 32 bits of the 64-bit host time)
+ *
+ * The captive core reports a bare 32-bit microsecond value over the time-sync
+ * exchange with no wrap accounting of its own, so only the host core has an
+ * epoch to report.
+ *
+ * @param core_id
+ * @return uint32_t
+ */
+uint32_t sl_log_hal_get_timestamp_epoch(uint8_t core_id)
+{
+  if (core_id == SL_SI91X_HOST_CORE_ID) {
+    return sli_log_hal_get_epoch();
+  }
+
+  return 0;
+}
+
+/**
  * @brief   Get the current host timestamp timer frequency
  * 
  * @return uint32_t 
@@ -414,8 +442,8 @@ sl_status_t sl_log_hal_pre_sleep_process(const void *config)
 {
   sl_status_t status = SL_STATUS_OK;
   (void)config;
-  is_timesync_done          = false;
-  sl_log_api_backend_t *api = sl_log_get_api_backend();
+  sli_log_si91x_timesync_done = false;
+  sl_log_api_backend_t *api   = sl_log_get_api_backend();
   api->backend_deinit();
   status = sl_si91x_ulp_timer_stop(ULP_TIMER_3);
   if (status != SL_STATUS_OK) {
@@ -469,35 +497,38 @@ sl_status_t sl_log_hal_timer_sync(const void *args, uint8_t core_id)
   /*
    * PS2 note: This routine relies on sli_si91x_M4_TA_Timesync() to exchange a
    * timestamp with the captive core (NWP). In PS2 the NWP is powered down /
-   * unreachable, so the call returns a non-OK status, si91x_timestamp_delta is
-   * NOT updated, is_timesync_done stays false, and this function returns
+   * unreachable, so the call returns a non-OK status,
+   * sli_log_si91x_timestamp_delta is NOT updated,
+   * sli_log_si91x_timesync_done stays false, and this function returns
    * SL_STATUS_FAIL.
    *
    * Consequences while in PS2:
    *   - sl_log_hal_get_timestamp_count(SL_SI91X_HOST_CORE_ID) returns 0
-   *     because is_timesync_done is false (host-side log events captured
-   *     during PS2 will carry a 0 timestamp).
+   *     because sli_log_si91x_timesync_done is false (host-side log events
+   *     captured during PS2 will carry a 0 timestamp and a 0 epoch).
    *   - sl_log_hal_get_timestamp_count(SL_SI91X_CAPTIVE_CORE_ID) also
    *     returns 0 for the same reason (no NWP-side timestamp is available).
    *
    * Re-sync sequence:
-   *   - sl_log_hal_pre_sleep_process() clears is_timesync_done before sleep.
+   *   - sl_log_hal_pre_sleep_process() clears sli_log_si91x_timesync_done
+   *     before sleep.
    *   - sl_log_hal_post_sleep_process() calls this function again after wake.
    *     Once the NWP becomes reachable (i.e. the device is back in PS3/PS4),
    *     sli_si91x_M4_TA_Timesync() succeeds, the delta is recomputed against
-   *     the local ULP timer match value, and is_timesync_done is set so that
-   *     subsequent host-core timestamp queries return valid values.
+   *     the local ULP timer match value, and sli_log_si91x_timesync_done is
+   *     set so that subsequent host-core timestamp queries return valid values.
    */
   if (sli_si91x_M4_TA_Timesync() == SL_STATUS_OK) {
-    si91x_timestamp_delta = sl_si91x_cc_timestamp + SL_TIMESYNC_TURNAROUND_TIME
-                            - TIMERS->MATCH_CTRL[SL_LOG_ULP_TIMER_INSTANCE].MCUULP_TMR_MATCH;
-    is_timesync_done = true;
+    sli_log_si91x_timestamp_delta = (int32_t)(sl_si91x_cc_timestamp + SL_TIMESYNC_TURNAROUND_TIME
+                                              - TIMERS->MATCH_CTRL[SL_LOG_ULP_TIMER_INSTANCE].MCUULP_TMR_MATCH);
+    sli_log_si91x_timesync_done   = true;
     return SL_STATUS_OK;
   }
 #endif
   return SL_STATUS_FAIL;
 }
 
+#ifdef SL_WIFI_COMPONENT_INCLUDED
 /**
  * @brief   Handles incoming NWP log packets.
  * 
@@ -509,12 +540,13 @@ void sli_handle_nwp_log_packet(const uint8_t *data, uint16_t length)
   if (data == NULL || length == 0) {
     return;
   }
-  if ((length % sizeof(sl_log_nwp_event_t)) != 0) {
+  if ((length % sizeof(sli_nwp_log_event_t)) != 0) {
     return;
   }
-  uint32_t n = (uint32_t)length / (uint32_t)sizeof(sl_log_nwp_event_t);
-  (void)sl_log_write_multiple_to_ring_buffer((const sl_log_nwp_event_t *)data, n);
+  uint32_t n = (uint32_t)length / (uint32_t)sizeof(sli_nwp_log_event_t);
+  (void)sl_log_write_multiple_to_ring_buffer((const sli_nwp_log_event_t *)data, n);
 }
+#endif
 
 /**
  * @brief   Get the platform-specific logging configuration.
@@ -584,6 +616,7 @@ sl_log_api_core_t *sl_log_get_api_core(void)
   return &sl_log_api_core;
 }
 
+#ifdef SL_WIFI_COMPONENT_INCLUDED
 /***************************************************************************/ /**
  * @brief Write multiple log events into the ring buffer.
  *
@@ -608,7 +641,7 @@ sl_log_api_core_t *sl_log_get_api_core(void)
  *      appropriately.  
  *
  * @param[in] events  
- *   Pointer to an array of @ref sl_log_nwp_event_t (NWP wire format); each entry
+ *   Pointer to an array of @ref sli_nwp_log_event_t (NWP wire format); each entry
  *   is converted into @ref sl_log_event_t in the ring buffer.
  *
  * @param[in] count  
@@ -635,7 +668,7 @@ sl_log_api_core_t *sl_log_get_api_core(void)
  * write and read indices are updated atomically relative to ISR-based backends.
  ******************************************************************************/
 
-sl_status_t sl_log_write_multiple_to_ring_buffer(const sl_log_nwp_event_t *events, uint32_t count)
+sl_status_t sl_log_write_multiple_to_ring_buffer(const sli_nwp_log_event_t *events, uint32_t count)
 {
   if (events == NULL || count == 0) {
     return SL_STATUS_INVALID_PARAMETER;
@@ -722,3 +755,4 @@ sl_status_t sl_log_write_multiple_to_ring_buffer(const sl_log_nwp_event_t *event
 #endif
   return SL_STATUS_OK;
 }
+#endif

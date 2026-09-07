@@ -26,7 +26,7 @@
  */
 
 #include "sl_constants.h"
-#include "sl_wifi.h"
+#include "sl_power_profile.h"
 #include "cmsis_os2.h"
 #include <ble_unified_app_config.h> // resolved via -I: autogen/ (SLC-generated template)
 #include "ble_unified_app.h"        // Component API header

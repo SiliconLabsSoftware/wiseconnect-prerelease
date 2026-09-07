@@ -109,7 +109,6 @@ define:
 - name: SLI_SI91X_ENABLE_BLE_UNIFIED
 
 requires:
-- name: sl_si91x_wireless
 - name: ble
 - name: ble_unified_framework
 - name: cmsis_rtos2

@@ -826,6 +826,22 @@ typedef struct {
 } sl_wifi_max_tx_power_t;
 
 /**
+ * @struct sl_wifi_max_tx_power_decidbm_t
+ * @brief Wi-Fi maximum transmit power structure (deci-dBm).
+ *
+ * Indicates the maximum transmit power settings in deci-dBm (0.1 dBm resolution).
+ *
+ * @note
+ * Valid range: -150 to 310 (-15.0 dBm to 31.0 dBm).
+ * @note
+ * This structure is not supported on SiWx91x devices.
+ */
+typedef struct {
+  int16_t scan_tx_power; ///< Transmit power during scan in deci-dBm. Valid range: -150 to 310
+  int16_t join_tx_power; ///< Transmit power during join in deci-dBm. Valid range: -150 to 310
+} sl_wifi_max_tx_power_decidbm_t;
+
+/**
  * @struct sl_wifi_rts_threshold_t
  * @brief Wi-Fi Request to Send (RTS) threshold structure.
  * 
@@ -1182,6 +1198,67 @@ typedef struct __attribute__((packed)) {
   sl_wifi_beamformee_support_t beamformee_support; ///< Flag indicating Beamformee support.
     /// *        0: Enabled, 1: Disable SU (Single User), 2 : Disable MU (Multi User).
 } sl_wifi_11ax_config_params_t;
+
+//! @cond Doxygen_Suppress
+/**
+ * @struct sl_wifi_mode_rate_t
+ * @brief Common rate frame fields for E2E mode.
+ */
+typedef struct {
+  sl_wifi_rate_protocol_t wifi_protocol; ///< 802.11 protocol for the rate; see @ref sl_wifi_rate_protocol_t.
+  sl_wifi_mcs_rate_t rate;               ///< Encoded rate for the selected protocol; see @ref sl_wifi_mcs_rate_t.
+} sl_wifi_mode_rate_t;
+
+/**
+ * @struct sl_wifi_11bgn_rate_config_t
+ * @brief 802.11b/g/n rate configuration for E2E mode.
+ */
+typedef struct {
+  uint8_t bw;                     ///< Bandwidth.
+  uint8_t greenfield_mode_enable; ///< Greenfield mode (802.11n).
+  uint8_t short_gi_enable;        ///< Short guard interval enable.
+  uint8_t short_preamble_enable;  ///< Short preamble enable (802.11b).
+} sl_wifi_11bgn_rate_config_t;
+
+/**
+ * @struct sl_wifi_11ax_rate_config_t
+ * @brief 802.11ax (HE) rate configuration for E2E mode.
+ */
+typedef struct {
+  uint8_t bw;                          ///< Bandwidth.
+  uint8_t ul_dl;                       ///< Uplink (1) or downlink (0) PPDU direction.
+  sl_wifi_he_ppdu_type_t he_ppdu_type; ///< HE PPDU type; see @ref sl_wifi_he_ppdu_type_t.
+  uint8_t beam_change;                 ///< Spatial mapping between pre-HE and HE fields.
+  uint8_t stbc;                        ///< Space-time block coding.
+  uint8_t tx_bf;                       ///< Transmit beamforming matrix applied.
+  uint8_t nsts_midamble;               ///< NSTS and midamble periodicity.
+  uint8_t nominal_pe;                  ///< Nominal T-PE value.
+  sl_wifi_gi_ltf_t gi_ltf;             ///< GI and HE-LTF size; see @ref sl_wifi_gi_ltf_t.
+  sl_wifi_dcm_enable_t dcm;            ///< Dual carrier modulation; see @ref sl_wifi_dcm_enable_t.
+} sl_wifi_11ax_rate_config_t;
+
+/**
+ * @struct sl_wifi_11ac_rate_config_t
+ * @brief 802.11ac (VHT) rate configuration for E2E mode.
+ */
+typedef struct {
+  uint8_t bw;              ///< Bandwidth.
+  uint8_t short_gi_enable; ///< Short guard interval enable.
+} sl_wifi_11ac_rate_config_t;
+
+/**
+ * @struct sl_wifi_11be_rate_config_t
+ * @brief 802.11be (EHT) rate configuration for E2E mode.
+ */
+typedef struct {
+  uint8_t bw;              ///< Bandwidth.
+  uint8_t ul_dl;           ///< Uplink (1) or downlink (0) PPDU direction.
+  uint8_t be_ppdu_type;    ///< EHT PPDU type.
+  uint8_t eht_sig_mcs;     ///< EHT-SIG MCS.
+  uint8_t nominal_pe;      ///< Nominal T-PE value.
+  sl_wifi_gi_ltf_t gi_ltf; ///< GI and LTF; see @ref sl_wifi_gi_ltf_t.
+} sl_wifi_11be_rate_config_t;
+//! @endcond
 
 /**
  * @struct sl_wifi_freq_offset_t

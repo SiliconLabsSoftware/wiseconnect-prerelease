@@ -1884,7 +1884,7 @@ sl_status_t sl_wifi_filter_broadcast_command_handler(console_args_t *arguments)
 
 sl_status_t sl_wifi_assert_command_handler()
 {
-  return sl_si91x_assert();
+  return sli_si91x_assert();
 }
 
 sl_status_t sl_wifi_update_gain_table_command_handler(console_args_t *arguments)

@@ -15,12 +15,17 @@
  *
  ******************************************************************************/
 /**===========================================================================
- * @brief : This file contains application code for SDIO secondary device
- * @section Description :
+ * @brief This file contains application code for an SDIO secondary device.
+ * @section Description
  * This example demonstrates data transfer through SDIO. The device acts as a
- * secondary which interfaces with an external sdio host/master, running as a
+ * secondary which interfaces with an external SDIO host/master, running as a
  * dedicated FreeRTOS task using CMSIS-RTOS2 APIs.
-============================================================================**/
+ *
+ * When @ref SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE is set to 1, a GPIO
+ * handshake with the Raspberry Pi host runs after SDIO initialization and
+ * before data transfer begins. Install the GPIO component (`sl_gpio`)
+ * in the project before enabling that flag.
+ ========================================================================================**/
 #include "sdio_secondary_mode_freertos.h"
 #include "UDMA.h"
 #include "sl_si91x_sdio_secondary_drv_config.h"
@@ -29,6 +34,10 @@
 #include "rsi_rom_clks.h"
 #include "cmsis_os2.h"
 
+#if SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE
+#include "sl_si91x_driver_gpio.h"
+#include "sl_gpio_board.h"
+#endif
 /*******************************************************************************
  *******************************   DEFINES   ***********************************
  ******************************************************************************/
@@ -97,6 +106,16 @@ static const osThreadAttr_t sdio_secondary_mode_thread_attributes = {
  ******************************   CALLBACKS   **********************************
  ******************************************************************************/
 
+/***************************************************************************/ /**
+ * SDIO secondary host interrupt event callback.
+ *
+ * Releases @p host_intr_sem on receive/send events and unmasks SDIO
+ * interrupts on CMD52.
+ *
+ * @param[in] events  Bitmask of SDIO host interrupt events.
+ *
+ * @return None.
+ ******************************************************************************/
 static void application_callback(uint8_t events)
 {
   if (events & HOST_INTR_RECEIVE_EVENT) {
@@ -116,6 +135,15 @@ static void application_callback(uint8_t events)
   }
 }
 
+/***************************************************************************/ /**
+ * GPDMA transfer-complete callback.
+ *
+ * Releases @p dma_done_sem when a DMA transfer finishes.
+ *
+ * @param[in] dma_ch  DMA channel number (unused).
+ *
+ * @return None.
+ ******************************************************************************/
 static void gpdma_callback(uint8_t dma_ch)
 {
   UNUSED_PARAMETER(dma_ch);
@@ -128,8 +156,13 @@ static void gpdma_callback(uint8_t dma_ch)
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
 
-/*******************************************************************************
- * @brief  Entry point: creates the SDIO secondary FreeRTOS task.
+/***************************************************************************/ /**
+ * SDIO Secondary example initialization function.
+ *
+ * Creates a FreeRTOS task that handles SDIO configuration and data transfer.
+ *
+ * @param[in] None
+ *
  * @return None
  ******************************************************************************/
 void sdio_secondary_mode_example_init(void)
@@ -148,10 +181,18 @@ void sdio_secondary_mode_example_init(void)
   }
 }
 
-/*******************************************************************************
- * @brief  One-time SDIO hardware init: semaphores, SysTick, callback
- *         registration.
- * @return SL_STATUS_OK on success, error code on failure
+/***************************************************************************/ /**
+ * Initializes SDIO secondary resources used by the example task.
+ *
+ * Creates host-interrupt and DMA-done semaphores, and registers the SDIO and
+ * GPDMA event callbacks.
+ *
+ * @param[in] None
+ *
+ * @return Status code of the operation:
+ *         - SL_STATUS_OK               - Success
+ *         - SL_STATUS_ALLOCATION_FAILED - Semaphore creation failed
+ *         - Other                      - Callback registration failure
  ******************************************************************************/
 static sl_status_t sdio_secondary_init_function(void)
 {
@@ -178,11 +219,199 @@ static sl_status_t sdio_secondary_init_function(void)
   return SL_STATUS_OK;
 }
 
-/*******************************************************************************
- * @brief  SDIO Secondary FreeRTOS task. Initialises SDIO hardware, then loops
- *         forever running the send/receive state machine, blocking on
- *         semaphores for ISR events.
- * @param  argument  Unused (NULL)
+#if SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE
+/// Maximum time (ms) to wait for Raspberry Pi HOST_ACK during handshake.
+#define SLI_HANDSHAKE_TIMEOUT_MS 30000
+/// Duration (ms) DEVICE_READY is held low before asserting high.
+#define SLI_DEVICE_READY_HOLD_MS 1000
+/// Debounce interval (ms) between consecutive HOST_ACK samples.
+#define SLI_HANDSHAKE_DEBOUNCE_MS 500
+
+/// GPIO configuration for DEVICE_READY (UULP_GPIO_0, output to host).
+static sl_si91x_gpio_pin_config_t device_ready_gpio_config = { .port_pin  = { .port = SL_SI91X_UULP_GPIO_0_PORT,
+                                                                              .pin  = SL_SI91X_UULP_GPIO_0_PIN },
+                                                               .direction = GPIO_OUTPUT };
+/// GPIO configuration for HOST_ACK (UULP_GPIO_2, input from host).
+static sl_si91x_gpio_pin_config_t host_ack_gpio_config = { .port_pin  = { .port = SL_SI91X_UULP_GPIO_2_PORT,
+                                                                          .pin  = SL_SI91X_UULP_GPIO_2_PIN },
+                                                           .direction = GPIO_INPUT };
+
+/// First HOST_ACK sample used for debounce validation.
+static uint8_t host_ack_gpio_value1 = 0;
+/// Second HOST_ACK sample used for debounce validation.
+static uint8_t host_ack_gpio_value2 = 0;
+
+/***************************************************************************/ /**
+ * Busy-waits for the specified duration using CMSIS-RTOS2 kernel ticks.
+ *
+ * This helper intentionally avoids @p osDelay so the task does not yield and
+ * the M4 core does not enter idle/sleep during the handshake sequence.
+ *
+ * @pre Kernel tick interrupt must be running (@p configTICK_RATE_HZ = 1000).
+ *
+ * @param[in] delay_ms  Delay duration in milliseconds (1 tick = 1 ms).
+ *
+ * @return None
+ ******************************************************************************/
+static void handshake_busy_wait_ms(uint32_t delay_ms)
+{
+  uint32_t start = osKernelGetTickCount();
+  // Spin until the kernel tick advances; do not osDelay (M4 must not sleep).
+  while ((osKernelGetTickCount() - start) < delay_ms) {
+  }
+}
+
+/***************************************************************************/ /**
+ * Configures selected unused ULP GPIOs as inputs for Raspberry Pi SDIO use.
+ *
+ * Leaves VCOM UART pins (ULP_GPIO_9 / ULP_GPIO_11) unchanged so console
+ * logging continues to operate.
+ *
+ * @param[in] None
+ *
+ * @return Status code of the operation:
+ *         - SL_STATUS_OK  - All configured pins set successfully
+ *         - Other         - GPIO configuration failure for a pin
+ ******************************************************************************/
+static sl_status_t set_soc_gpio_input_mode(void)
+{
+  sl_status_t status = SL_STATUS_OK;
+  // set the ULP pins as input
+  sl_si91x_gpio_pin_config_t ulp_gpio6_config  = { .port_pin  = { .port = SL_SI91X_ULP_GPIO_6_PORT,
+                                                                  .pin  = SL_SI91X_ULP_GPIO_6_PIN },
+                                                   .direction = GPIO_INPUT };
+  sl_si91x_gpio_pin_config_t ulp_gpio7_config  = { .port_pin  = { .port = SL_SI91X_ULP_GPIO_7_PORT,
+                                                                  .pin  = SL_SI91X_ULP_GPIO_7_PIN },
+                                                   .direction = GPIO_INPUT };
+  sl_si91x_gpio_pin_config_t ulp_gpio2_config  = { .port_pin  = { .port = SL_SI91X_ULP_GPIO_2_PORT,
+                                                                  .pin  = SL_SI91X_ULP_GPIO_2_PIN },
+                                                   .direction = GPIO_INPUT };
+  sl_si91x_gpio_pin_config_t ulp_gpio10_config = { .port_pin  = { .port = SL_SI91X_ULP_GPIO_10_PORT,
+                                                                  .pin  = SL_SI91X_ULP_GPIO_10_PIN },
+                                                   .direction = GPIO_INPUT };
+  sl_si91x_gpio_pin_config_t ulp_gpio8_config  = { .port_pin  = { .port = SL_SI91X_ULP_GPIO_8_PORT,
+                                                                  .pin  = SL_SI91X_ULP_GPIO_8_PIN },
+                                                   .direction = GPIO_INPUT };
+
+  status = sl_gpio_set_configuration(ulp_gpio6_config);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure the ULP_GPIO6\r\n");
+    return status;
+  }
+  status = sl_gpio_set_configuration(ulp_gpio7_config);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure the ULP_GPIO7\r\n");
+    return status;
+  }
+  status = sl_gpio_set_configuration(ulp_gpio2_config);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure the ULP_GPIO2\r\n");
+    return status;
+  }
+  status = sl_gpio_set_configuration(ulp_gpio10_config);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure the ULP_GPIO10\r\n");
+    return status;
+  }
+  status = sl_gpio_set_configuration(ulp_gpio8_config);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure the ULP_GPIO8\r\n");
+    return status;
+  }
+
+  return SL_STATUS_OK;
+}
+
+/***************************************************************************/ /**
+ * Performs GPIO handshake with the Raspberry Pi SDIO host.
+ *
+ * Sequence:
+ * 1. Initialize GPIO and configure DEVICE_READY (UULP_GPIO_0) as output and
+ *    HOST_ACK (UULP_GPIO_2) as input.
+ * 2. Configure selected unused ULP pins as inputs.
+ * 3. Drive DEVICE_READY low for @ref SLI_DEVICE_READY_HOLD_MS, then assert high
+ *    to indicate the SiWx917 is ready for SDIO communication.
+ * 4. Poll HOST_ACK until it remains high across two samples separated by
+ *    @ref SLI_HANDSHAKE_DEBOUNCE_MS, or until @ref SLI_HANDSHAKE_TIMEOUT_MS
+ *    expires. On timeout, DEVICE_READY is driven low before returning.
+ *
+ * @note The Raspberry Pi should drive HOST_ACK low first, wait for DEVICE_READY
+ *       high (stable at least 500 ms), then drive HOST_ACK high.
+ * @note Uses busy-wait delays instead of @p osDelay to keep M4 from entering
+ *       idle/sleep during handshake.
+ *
+ * @param[in] None
+ *
+ * @return Status code of the operation:
+ *         - SL_STATUS_OK      - Handshake completed successfully
+ *         - SL_STATUS_TIMEOUT - HOST_ACK not received within timeout
+ *         - Other             - GPIO initialization or configuration failure
+ ******************************************************************************/
+static sl_status_t sdio_host_handshake(void)
+{
+  sl_status_t status       = SL_STATUS_OK;
+  uint32_t handshake_start = 0;
+
+  status = sl_gpio_driver_init();
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to initialize the GPIO driver\r\n");
+    return status;
+  }
+  status = sl_gpio_set_configuration(device_ready_gpio_config);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure the GPIO\r\n");
+    return status;
+  }
+
+  status = sl_gpio_set_configuration(host_ack_gpio_config);
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure the GPIO\r\n");
+    return status;
+  }
+
+  status = set_soc_gpio_input_mode();
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("Failed to configure ULP GPIOs as input\r\n");
+    return status;
+  }
+
+  sl_gpio_driver_clear_pin(&device_ready_gpio_config.port_pin);
+  handshake_busy_wait_ms(SLI_DEVICE_READY_HOLD_MS);
+  sl_gpio_driver_set_pin(&device_ready_gpio_config.port_pin);
+  // Host should treat DEVICE_READY high as valid only after >= 500 ms.
+
+  SL_PRINT_STRING_ERROR("SL917 SDIO CONFIGURATION COMPLETED\r\n");
+  SL_PRINT_STRING_ERROR("SL917 GPIO0 HIGH: Waiting for SDIO handshake from host\r\n");
+
+  handshake_start = osKernelGetTickCount();
+  while ((osKernelGetTickCount() - handshake_start) < SLI_HANDSHAKE_TIMEOUT_MS) {
+    sl_gpio_driver_get_pin(&host_ack_gpio_config.port_pin, &host_ack_gpio_value1);
+    handshake_busy_wait_ms(SLI_HANDSHAKE_DEBOUNCE_MS);
+    sl_gpio_driver_get_pin(&host_ack_gpio_config.port_pin, &host_ack_gpio_value2);
+    if (host_ack_gpio_value1 == 1 && host_ack_gpio_value2 == 1) {
+      SL_PRINT_STRING_ERROR("handshake completed successfully\r\n");
+      return SL_STATUS_OK;
+    }
+    SL_PRINT_STRING_ERROR("Waiting for handshake from Raspberry pi...\r\n");
+  }
+
+  SL_PRINT_STRING_ERROR("SDIO handshake timed out after %u ms\r\n", (unsigned)SLI_HANDSHAKE_TIMEOUT_MS);
+  sl_gpio_driver_clear_pin(&device_ready_gpio_config.port_pin);
+  return SL_STATUS_TIMEOUT;
+}
+
+#endif // SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE
+
+/***************************************************************************/ /**
+ * SDIO secondary FreeRTOS task entry point.
+ *
+ * Initializes SDIO hardware, optionally completes Raspberry Pi GPIO handshake
+ * when @ref SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE is 1 (install the GPIO
+ * component `sl_gpio` in the project), then runs the send/receive state
+ * machine, blocking on semaphores for ISR events.
+ *
+ * @param[in] argument  Unused task argument (pass NULL).
+ *
  * @return None
  ******************************************************************************/
 static void sdio_secondary_mode_task(void *argument)
@@ -194,6 +423,14 @@ static void sdio_secondary_mode_task(void *argument)
     SL_PRINT_STRING_ERROR("SDIO Secondary init failed, exiting task\r\n");
     osThreadExit();
   }
+
+#if SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE
+  status = sdio_host_handshake();
+  if (status != SL_STATUS_OK) {
+    SL_PRINT_STRING_ERROR("SDIO handshake failed, exiting task\r\n");
+    osThreadExit();
+  }
+#endif
 
   tt_start = osKernelGetTickCount();
 

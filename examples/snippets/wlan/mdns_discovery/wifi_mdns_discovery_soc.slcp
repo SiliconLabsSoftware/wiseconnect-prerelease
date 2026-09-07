@@ -23,7 +23,8 @@ define:
 component:
 - id: sl_main
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: mdns
 - id: sl_si91x_wireless
 - id: syscalls

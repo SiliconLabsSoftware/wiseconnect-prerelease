@@ -95,16 +95,18 @@ sli_wifi_callback_entry_t *sli_get_callback_entry(sl_wifi_event_group_t group);
  * @param[in] group
  *   Group ID of the event for which the callback is registered. See @ref sl_wifi_event_group_t for possible values.
  * @param[in] function
- *    Function pointer to callback of type @ref sl_wifi_callback_function_t that would be invoked when an event in the specified group occurs.
+ *    Function pointer to callback of type @ref sl_wifi_callback_function_t that would be invoked when an event in the specified group occurs. Pass non-NULL to register; mutually exclusive with @p function_v2.
  * @param[in] function_v2
- *    Function pointer to callback of type @ref sl_wifi_callback_function_v2_t that would be invoked when an event in the specified group occurs.
+ *    Function pointer to callback of type @ref sl_wifi_callback_function_v2_t that would be invoked when an event in the specified group occurs. Pass non-NULL to register; mutually exclusive with @p function.
  * @param[in] optional_arg
  *   Optional user provided argument to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_callback_function_t.
+ *   Ignored when both @p function and @p function_v2 are NULL.
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  * @note
  *   Callbacks can be set only for event groups defined in @ref sl_wifi_event_group_t, not for individual events defined in @ref sl_wifi_event_t.
+ *   When both @p function and @p function_v2 are NULL, the entry for @p group is cleared (deregister).
  ******************************************************************************/
 sl_status_t sli_wifi_set_callback(sl_wifi_event_group_t group,
                                   sl_wifi_callback_function_t function,

@@ -24,7 +24,8 @@ component:
   instance:
   - channel_0
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: sl_si91x_button_917
   instance:
   - btn0

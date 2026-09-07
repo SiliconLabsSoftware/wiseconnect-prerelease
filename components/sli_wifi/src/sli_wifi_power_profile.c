@@ -93,44 +93,6 @@ sl_status_t sli_wifi_set_performance_profile(const sl_wifi_performance_profile_t
   return SL_STATUS_OK;
 }
 
-sl_status_t sli_wifi_set_performance_profile_v2(const sl_wifi_performance_profile_v2_t *profile)
-{
-  sl_status_t status;
-  sl_wifi_system_performance_profile_t selected_coex_profile_mode = { 0 };
-  sl_wifi_performance_profile_v2_t current_wifi_profile_mode      = { 0 };
-
-  if (!sl_si91x_is_device_initialized()) {
-    return SL_STATUS_NOT_INITIALIZED;
-  }
-
-  SL_WIFI_ARGS_CHECK_NULL_POINTER(profile);
-
-  if (profile->profile > SL_WIFI_SYSTEM_DEEP_SLEEP_WITH_RAM_RETENTION) {
-    return SL_STATUS_INVALID_MODE;
-  }
-
-  // Take backup of current wifi profile
-  sli_wifi_get_current_performance_profile(&current_wifi_profile_mode);
-
-  // Send the power save command for the requested profile
-  status = sli_wifi_send_power_save_request(profile, NULL);
-  if (status != SL_STATUS_OK) {
-    sli_wifi_save_current_performance_profile(&current_wifi_profile_mode);
-    return status;
-  }
-  sli_get_coex_performance_profile(&selected_coex_profile_mode);
-
-  if (selected_coex_profile_mode == SL_WIFI_SYSTEM_DEEP_SLEEP_WITHOUT_RAM_RETENTION) {
-#ifdef SLI_SI91X_MCU_INTERFACE
-    // In soc mode m4 does not get the card ready for next init after deinit, but if device in DEEP_SLEEP_WITHOUT_RAM_RETENTION mode, m4 should wait for card ready for next init
-    sli_wifi_set_card_ready_required(true);
-#endif
-    sli_wifi_reset_coex_current_performance_profile();
-  }
-
-  return SL_STATUS_OK;
-}
-
 sl_status_t sli_wifi_get_performance_profile(sl_wifi_performance_profile_t *profile)
 {
   SL_VERIFY_POINTER_OR_RETURN(profile, SL_STATUS_NULL_POINTER);

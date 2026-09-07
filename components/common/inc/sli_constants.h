@@ -1,3 +1,32 @@
+/***************************************************************************/ /**
+ * @file
+ * @brief Internal Wi-Fi Constants
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ *    misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ *
+ ******************************************************************************/
 #ifndef SLI_CONSTANTS_H
 #define SLI_CONSTANTS_H
 
@@ -131,6 +160,39 @@
 #define DEFAULT_BEACON_MISS_IGNORE_LIMIT  1
 #define SLI_DEFAULT_MONITOR_INTERVAL      50
 
+#define ENABLE_MAC_INFO       BIT(0)
+#define QOS_EN                BIT(12)
+#define BROADCAST_IND         BIT(9)
+#define PER_CONT_MODE         1
+#define FRAME_DESC_SZ         16
+#define MIN_802_11_HDR_LEN    24
+#define SLI_SEND_MAC_FRAME    0x0
+#define SLI_11AX_BE_RATE_MASK 0x18f
+/// Nominal preamble length offset
+#define RATE_OFFSET_NOMINAL_PE 5
+/// Guard interval and LTF offset
+#define RATE_OFFSET_GI_LTF 11
+/// DCM offset
+#define RATE_OFFSET_DCM 13
+/// Coding type offset
+#define RATE_OFFSET_CODING_TYPE 4
+
+/** Internal TWT auto-selection defaults (SDK use only) */
+#define SLI_TWT_INTERNAL_DEVICE_AVERAGE_THROUGHPUT     20000
+#define SLI_TWT_INTERNAL_EXTRA_WAKE_DURATION_PERCENT   0
+#define SLI_TWT_INTERNAL_TOLERABLE_DEVIATION           10
+#define SLI_TWT_INTERNAL_DEFAULT_WAKE_INTERVAL_MS      1024
+#define SLI_TWT_INTERNAL_DEFAULT_WAKE_DURATION_MS      8
+#define SLI_TWT_INTERNAL_BEACON_WAKE_UP_COUNT_AFTER_SP 2
+
+/* NWP reserved gaps in text_tx_cmd: 2 bytes after base_info + 4 after per_params = 6 bytes. */
+#define SLI_WIFI_TX_TEST_NWP_RESERVED_LEN 2U
+
+/* Largest v2 PER command: base_info + 6 reserved + 11ax per = 59 bytes (2 after base + 4 after per). */
+#define SLI_WIFI_TX_TEST_CMD_MAX_LEN                                                   \
+  (sizeof(sli_wifi_tx_test_base_info_wire_t) + sizeof(sli_wifi_11ax_per_params_wire_t) \
+   + (SLI_WIFI_TX_TEST_NWP_RESERVED_LEN * 3U))
+
 // enumeration for command request used in common control block
 typedef enum {
   // Common command requests
@@ -241,6 +303,7 @@ typedef enum {
   SLI_WIFI_REQ_RX_STATS                     = 0xA2, ///< RX Statistics
   SLI_WIFI_REQ_ROAM_PARAMS                  = 0x7B, ///< Roam Parameters
   SLI_WIFI_REQ_TX_TEST_MODE                 = 0x7C, ///< TX Test Mode
+  SLI_WIFI_REQ_RATE                         = 0x87, ///< Fixed transmit rate
   SLI_WIFI_REQ_TWT_AUTO_CONFIG              = 0x2E, ///< TWT Auto Configuration
   SLI_WIFI_REQ_DYNAMIC_POOL                 = 0xC7, ///< Dynamic Pool
   SLI_WIFI_COMMON_REQ_FEATURE_FRAME         = 0xC8, ///< Feature Frame
@@ -398,6 +461,7 @@ typedef enum {
   SLI_WIFI_RSP_TRANSCEIVER_SET_MCAST_FILTER = 0x8D, ///< Set Transceiver Multicast Filter
   SLI_WIFI_RSP_TRANSCEIVER_FLUSH_DATA_Q     = 0x8E, ///< Flush Transceiver Data Queue
   SLI_WIFI_RSP_SET_MULTICAST_FILTER         = 0x40, ///< Set Multicast Filter
+  SLI_WIFI_RSP_RATE                         = 0x87, ///< Fixed transmit rate
   SLI_WIFI_RSP_CARDREADY                    = 0x89, ///< Card Ready
   SLI_WIFI_RSP_SCAN_RESULTS                 = 0xAF, ///< Scan Results
   SLI_WIFI_RSP_TSF                          = 0x65, ///< TSF

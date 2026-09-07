@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 #include <ble_unified_app_config.h> // resolved via -I: autogen/ (SLC-generated template)
-#include "sl_wifi_device.h"
+#include "sl_types.h"
 
 /**
  * @brief BLE unified task entry point

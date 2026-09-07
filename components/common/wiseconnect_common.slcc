@@ -17,6 +17,7 @@ source:
 - path: src/sl_utility.c
 - path: src/sli_utility.c
 - path: src/sli_power_profile.c
+- path: src/sl_power_profile.c
 include:
 - path: inc
   file_list:
@@ -33,8 +34,8 @@ include:
     - path: sli_power_profile.h
     - path: sli_types.h
     - path: sl_types.h
-    - path: sli_types.h
     - path: sli_utility.h
+    - path: sl_power_profile.h
 
 requires:
 - name: status

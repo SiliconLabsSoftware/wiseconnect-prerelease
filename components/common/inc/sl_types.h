@@ -1,9 +1,40 @@
+/***************************************************************************/ /**
+ * @file
+ * @brief WiFi type definitions
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ *    misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ *
+ ******************************************************************************/
 #ifndef SL_TYPES_H
 #define SL_TYPES_H
 
 #include "sl_slist.h"
 #include "sl_constants.h"
 #include "sli_constants.h"
+#include "sl_ieee802_types.h"
+#include <stdint.h>
 
 // driver TX/RX packet structure
 /// Wi-Fi packet structure
@@ -51,17 +82,14 @@ typedef enum {
   SL_WIFI_SYSTEM_DEEP_SLEEP_WITH_RAM_RETENTION ///< Deep Sleep with RAM Retention when the device is not associated with AP.
 } sl_wifi_system_performance_profile_t;
 
+/// Si91x performance profile
+typedef sl_wifi_system_performance_profile_t SL_DEPRECATED_API_WISECONNECT_4_0 sl_si91x_performance_profile_t;
+
 /// Bluetooth performance profile
 typedef struct {
   sl_wifi_system_performance_profile_t
     profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
 } sl_bt_performance_profile_t;
-/** @} */
-
-/** \addtogroup SL_SI91X_CONSTANTS
-  * @{ */
-/// Si91x performance profile
-typedef sl_wifi_system_performance_profile_t SL_DEPRECATED_API_WISECONNECT_4_0 sl_si91x_performance_profile_t;
 
 /** @} */
 
@@ -144,7 +172,7 @@ typedef struct {
 
 /**
  * @struct sl_wifi_twt_selection_v2_t
- * @brief TWT (Target Wake Time) auto-selection configuration. Use this structure with @ref sl_wifi_target_wake_time_auto_selection_v2.
+ * @brief TWT (Target Wake Time) auto-selection configuration. Use this structure with [sl_wifi_target_wake_time_auto_selection_v2](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-target-wake-time-auto-selection-v2).
  *        Only these four parameters are configurable; all other TWT parameters are set internally by the SDK.
  */
 typedef struct {
@@ -161,9 +189,10 @@ typedef struct {
 typedef struct {
   sl_wifi_system_performance_profile_t
     profile; ///< Performance profile of type [sl_wifi_system_performance_profile_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-performance-profile-t).
-  uint8_t dtim_aligned_type; ///< Set DTIM alignment required. One of the values from @ref WIFI_DTIM_ALIGNMENT_TYPES.
-  uint8_t num_of_dtim_skip;  ///< Number of DTIM intervals to skip. Default value is 0.
-  uint32_t listen_interval;  ///< Listen interval in milliseconds.
+  uint8_t
+    dtim_aligned_type; ///< Set DTIM alignment required. One of the values from [WIFI_DTIM_ALIGNMENT_TYPES](../wiseconnect-api-reference-guide-wi-fi/wifi-dtim-alignment-types).
+  uint8_t num_of_dtim_skip; ///< Number of DTIM intervals to skip. Default value is 0.
+  uint32_t listen_interval; ///< Listen interval in milliseconds.
   uint16_t
     monitor_interval; ///< Monitor interval in milliseconds. Default interval 50 milliseconds is used if monitor_interval is set to 0. This is only valid when performance profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY.
   sl_wifi_twt_request_t twt_request; ///< Target Wake Time (TWT) request settings.
@@ -234,6 +263,122 @@ typedef enum {
   SL_WIFI_CONCURRENT_MODE              = 9,     ///< Wi-Fi concurrent mode
   __SL_WIFI_FORCE_OPERATION_ENUM_16BIT = 0xFFFF ///< Force the enumeration to be 16-bit
 } sl_wifi_operation_mode_t;
+/** @} */
+
+/** \addtogroup SL_WIFI_CONSTANTS Constants
+   * @{ */
+
+/**
+  * @enum sl_wifi_band_mode_t
+  * @brief Band mode.
+  * @note Only 2.4 GHz is currently supported.
+  */
+typedef enum {
+  SL_WIFI_BAND_MODE_2_4GHZ = 0, ///< 2.4 GHz Wi-Fi band
+  SL_WIFI_BAND_MODE_5GHZ   = 1, ///< 5 GHz Wi-Fi band (not supported in SiWx91x devices)
+  SL_WIFI_DUAL_BAND_MODE   = 2  ///< Both 2.4 GHz and 5 GHz WiFi band (not supported in SiWx91x devices)
+} sl_wifi_band_mode_t;
+
+/**
+  * @enum sl_wifi_region_code_t
+  * 
+  * @brief
+  * Enumeration of Wi-Fi region codes.
+  * 
+  * @details
+  * Guidance for Region code Mapping for Different Countries
+  * | Country         | Country Code  |  Max power (Based on Regulatory domain)   | Frequency Range (Based on Regulatory Domain) | Suggested Region Code Mapping |
+  * |:----------------|:--------------|:------------------------------------------|:---------------------------------------------|:------------------------------|
+  * | Korea           | KR            | 23 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_KR             |
+  * | Hong Kong       | HK            | 36 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
+  * | Singapore       | SG            | 200 mW (23 dBm)                           | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
+  * | Malaysia        | MY            | 500 mW (27 dBm)                           | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
+  * | Australia       | AU            | 4000 mW (36 dBm)                          | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
+  * | Taiwan          | TW            | 30 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
+  * | Thailand        | TH            | 20 dBm                                    | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
+  * | Mexico          | MX            | 20 dBm                                    | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
+  * | Vietnam         | VN            | 20 dBm                                    | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
+  * | Indonesia       | ID            | 500mW (27 dBm)                            | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
+  * | China           | CN            | 20 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_CN             |
+  *
+  * @note `SL_WIFI_IGNORE_REGION` This option will be deprecated in future releases.
+  **/
+typedef enum {
+  SL_WIFI_DEFAULT_REGION,      ///< Factory default region
+  SL_WIFI_REGION_US,           ///< United States
+  SL_WIFI_REGION_EU,           ///< European Union
+  SL_WIFI_REGION_JP,           ///< Japan
+  SL_WIFI_REGION_WORLD_DOMAIN, ///< Worldwide domain
+  SL_WIFI_REGION_KR,           ///< Korea
+  SL_WIFI_REGION_SG,           ///< Singapore (not currently supported)
+  SL_WIFI_REGION_CN,           ///< China
+  SL_WIFI_IGNORE_REGION        ///< @deprecated This option will be deprecated in future releases.
+} sl_wifi_region_code_t;
+
+/** @} */
+
+/** \addtogroup SL_SI91X_TYPES Types
+ * @{
+ * */
+
+/**
+ * @struct sl_wifi_system_boot_configuration_t
+ * @brief Boot configuration structure.
+ * @note: Refer sl_wifi_device.h for complete bitmap details.
+ */
+typedef struct {
+  uint16_t
+    oper_mode; ///< Operation mode, one of the values from [sl_wifi_operation_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-operation-mode-t).
+  uint16_t
+    coex_mode; ///< Coexistence mode, one of the values from [sl_wifi_system_coex_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-coex-mode-t).
+  uint32_t
+    feature_bit_map; ///< Feature bitmap, [SI91X_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-feature-bitmap).
+  uint32_t
+    tcp_ip_feature_bit_map; ///< TCP/IP feature bitmap, [SI91X_TCP_IP_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-tcp-ip-feature-bitmap).
+  uint32_t
+    custom_feature_bit_map; ///< Custom feature bitmap, [SI91X_CUSTOM_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-custom-feature-bitmap).
+  uint32_t
+    ext_custom_feature_bit_map; ///< Extended custom feature bitmap, [SI91X_EXTENDED_CUSTOM_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-extended-custom-feature-bitmap).
+  uint32_t
+    bt_feature_bit_map; ///< BT featured bitmap, [SI91X_BT_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-bt-feature-bitmap).
+  uint32_t
+    ext_tcp_ip_feature_bit_map; ///< Extended TCP/IP feature bitmap, [SI91X_EXTENDED_TCP_IP_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-extended-tcp-ip-feature-bitmap).
+  uint32_t
+    ble_feature_bit_map; ///< BLE feature bitmap, [SI91X_BLE_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-ble-feature-bitmap).
+  uint32_t
+    ble_ext_feature_bit_map; ///< BLE extended feature bitmap, [SI91X_EXTENDED_BLE_CUSTOM_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-extended-ble-custom-feature-bitmap).
+  uint32_t
+    config_feature_bit_map; ///< Config feature bitmap, [SI91X_CONFIG_FEATURE_BITMAP](../wiseconnect-api-reference-guide-si91x-driver/si91-x-config-feature-bitmap).
+} sl_wifi_system_boot_configuration_t;
+
+/// NWP buffer allocation command parameters
+/// The summation of all three ratios should max 10 and the ratio should be in decimal value.
+typedef struct {
+  uint8_t tx_ratio_in_buffer_pool;     ///< tx ratio
+  uint8_t rx_ratio_in_buffer_pool;     ///< rx ratio
+  uint8_t global_ratio_in_buffer_pool; ///< global ratio
+} sl_wifi_system_dynamic_pool_t;
+
+// Device configuration for 911x. This should be in the 911x driver folder
+/// Device configuration for Si91x device
+typedef struct {
+  uint8_t
+    boot_option; ///< Boot option. One of the values from [SI91X_LOAD_IMAGE_TYPES](../wiseconnect-api-reference-guide-si91x-driver/si91-x-load-image-types).
+  sl_mac_address_t *
+    mac_address; ///< MAC address of type [sl_mac_address_t](../wiseconnect-api-reference-guide-nwk-mgmt/sl-net-types#sl-mac-address-t).
+  sl_wifi_band_mode_t
+    band; ///< Wi-Fi band of type [sl_wifi_band_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-band-mode-t).
+  sl_wifi_region_code_t
+    region_code; ///< Region code of type [sl_wifi_region_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-regulatory-region-t).
+  sl_wifi_system_boot_configuration_t
+    boot_config; ///< Boot configuration. [sl_wifi_system_boot_configuration_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-boot-configuration-t).
+  sl_wifi_system_dynamic_pool_t
+    ta_pool; ///< TA buffer allocation command parameters of type @ref sl_wifi_system_dynamic_pool_t.
+  uint8_t
+    efuse_data_type; ///< Type of eFuse data need to be read from flash. Refer to [sl_si91x_efuse_data_type_t](../wiseconnect-api-reference-guide-si91x-driver/sl-si91x-efuse-data-type-t).
+  uint8_t
+    nwp_fw_image_number; ///< Image number for the NWP firmware, used to specify which firmware image to load [SI91X_NWP_FW_IMAGE_NUMBERS](../wiseconnect-api-reference-guide-si91x-driver/si91-x-nwp-fw-image-numbers).
+} sl_wifi_device_configuration_t;
 
 /** @} */
 
@@ -242,5 +387,4 @@ typedef struct {
   uint32_t tv_sec;  ///< Time in Seconds
   uint32_t tv_usec; ///< Time in microseconds
 } sl_si91x_time_value;
-
 #endif // SL_TYPES_H

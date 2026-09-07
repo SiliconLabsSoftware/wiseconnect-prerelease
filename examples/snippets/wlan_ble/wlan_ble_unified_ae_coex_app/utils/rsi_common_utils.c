@@ -39,6 +39,7 @@
 #include "assert.h"
 #ifdef MXRT_595s
 #include "sl_hal_mcu_uart.h"
+#include "sl_constants.h"
 
 extern osSemaphoreId_t ui_task_sem;
 
@@ -619,7 +620,7 @@ void rsi_app_init_queue(rsi_app_queue_t *queue)
 }
 void _assert(uint8_t *msg, uint16_t line_number)
 {
-  printf("\r\n %s %u \n", msg, line_number);
+  SL_DEBUG_LOG_V2(INFO, "\r\n %s %u \n", (uintptr_t)msg, line_number);
   while (1)
     ;
 }

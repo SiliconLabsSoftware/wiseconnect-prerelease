@@ -31,6 +31,7 @@
 #define SLI_WIFI_H
 #include "sl_status.h"
 #include "sl_constants.h"
+#include "sli_constants.h"
 #include "sl_wifi_device.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
@@ -38,225 +39,6 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi_power_profile.h"
 #include "cmsis_os2.h"
-
-#define ENABLE_MAC_INFO       BIT(0)
-#define QOS_EN                BIT(12)
-#define BROADCAST_IND         BIT(9)
-#define PER_CONT_MODE         1
-#define FRAME_DESC_SZ         16
-#define MIN_802_11_HDR_LEN    24
-#define SLI_SEND_MAC_FRAME    0x0
-#define SLI_11AX_BE_RATE_MASK 0x18f
-/// Nominal preamble length offset
-#define RATE_OFFSET_NOMINAL_PE 5
-/// Guard interval and LTF offset
-#define RATE_OFFSET_GI_LTF 11
-/// DCM offset
-#define RATE_OFFSET_DCM 13
-/// Coding type offset
-#define RATE_OFFSET_CODING_TYPE 4
-
-/** Internal TWT auto-selection defaults (SDK use only) */
-#define SLI_TWT_INTERNAL_DEVICE_AVERAGE_THROUGHPUT     20000
-#define SLI_TWT_INTERNAL_EXTRA_WAKE_DURATION_PERCENT   0
-#define SLI_TWT_INTERNAL_TOLERABLE_DEVIATION           10
-#define SLI_TWT_INTERNAL_DEFAULT_WAKE_INTERVAL_MS      1024
-#define SLI_TWT_INTERNAL_DEFAULT_WAKE_DURATION_MS      8
-#define SLI_TWT_INTERNAL_BEACON_WAKE_UP_COUNT_AFTER_SP 2
-
-/**
- * @struct sli_wifi_twt_selection_t
- * @brief TWT auto-selection request structure.
- */
-typedef struct {
-  uint8_t twt_enable;
-  uint16_t average_tx_throughput;
-  uint32_t tx_latency;
-  uint32_t rx_latency;
-  uint16_t device_average_throughput;
-  uint8_t estimated_extra_wake_duration_percent;
-  uint8_t twt_tolerable_deviation;
-  uint32_t default_wake_interval_ms;
-  uint32_t default_minimum_wake_duration_ms;
-  uint8_t beacon_wake_up_count_after_sp;
-} sli_wifi_twt_selection_t;
-
-/**
- * @enum sli_wifi_rail_cmd_subtype_t
- * @brief Enumeration of Wi-Fi RAIL command subtypes.
- *
- * This enumeration defines the various subtypes of Wi-Fi RAIL commands used for specific operations.
- *
- * @details
- * Each subtype corresponds to a specific Wi-Fi operation or request, such as measuring noise density, 
- * starting or stopping ADC captures, configuring DPD, or resetting PER statistics.
- *
- * @var SLI_WIFI_SUBTYPE_SET_TX_POWER_DBM
- *  Subtype for setting transmission power in dBm.
- * 
- * @var SLI_WIFI_SUBTYPE_TRANSMIT_CW
- *   Subtype for starting Continuous Wave (CW) transmission.
- *
- * @var SLI_WIFI_SUBTYPE_RX_STOP
- *   Subtype for stopping RX (Receive) operations.
- * 
- * @var SLI_WIFI_SUBTYPE_CONFIG_XO_CTUNE
- *   Subtype for configuring XO (Crystal Oscillator) CTUNE (Capacitor Tuning).  
- * 
- * @var SLI_WIFI_SUBTYPE_GET_XO_CTUNE
- *   Subtype for getting CTUNE (Capacitor Tuning) values.
- *
- */
-typedef enum {
-  SLI_WIFI_SUBTYPE_SET_TX_POWER_DBM = 1,  ///< Set transmission power in dBm.
-  SLI_WIFI_SUBTYPE_TRANSMIT_CW      = 4,  ///< Start Continuous Wave (CW) transmission.
-  SLI_WIFI_SUBTYPE_RX_STOP          = 10, ///< Stop RX (Receive) operations.
-  SLI_WIFI_SUBTYPE_CONFIG_XO_CTUNE  = 21, ///< Configure XO (Crystal Oscillator) CTUNE (Capacitor Tuning).
-  SLI_WIFI_SUBTYPE_GET_XO_CTUNE     = 22, ///< Get CTUNE (Capacitor Tuning) values.
-} sli_wifi_rail_cmd_subtype_t;
-
-/**
- * @struct sli_wifi_frame_body_type_t
- * @brief Represents the frame body type for Wi-Fi operations.
- *
- * This structure is used to define the subtype of a Wi-Fi request and includes
- * a reserved field for future use.
- *
- * @var sli_wifi_frame_body_type_t::sub_type
- *   Subtype of the request. This field specifies the type of operation or request being made.
- *
- * @var sli_wifi_frame_body_type_t::reserved
- *   Reserved for future use. This field is intended for potential extensions or additional data.
- */
-typedef struct {
-  uint16_t sub_type; ///< Sub_type of the request.
-  uint16_t reserved; ///< Reserved for future use.
-} sli_wifi_frame_body_type_t;
-
-typedef struct {
-  sli_wifi_frame_body_type_t frame_body_type;
-  uint32_t ctune_data;
-} sli_wifi_request_configure_xo_ctune_t;
-typedef struct {
-  sli_wifi_frame_body_type_t frame_body_type;
-  uint32_t ctune_data[2];
-} sli_wifi_request_get_xo_ctune_t;
-
-typedef struct {
-  sli_wifi_frame_body_type_t frame_body_type;
-} sli_wifi_request_stop_rx_t;
-
-/**
- * @struct sli_wifi_request_cw_tone_config_t
- * @brief Structure representing the configuration for transmitting Continuous Wave (CW) tones in Wi-Fi.
- *
- * This structure is used to configure and control the transmission of CW tones, 
- * including enabling/disabling the transmission, and specifying the tone configuration.
- *
- * @details
- * - CW tones are primarily used for testing and calibration purposes in Wi-Fi systems.
- * - The structure allows enabling/disabling CW tone transmission and provides a configuration structure for tone settings.
- *
- * @var sli_wifi_request_cw_tone_config_t::frame_body_type
- *   Transmit CW tone request structure. Specifies the frame body type for the request.
- *
- * @var sli_wifi_request_cw_tone_config_t::enable
- *   Enable or disable CW tone transmission. Set to 1 to enable, 0 to disable.
- *
- * @var sli_wifi_request_cw_tone_config_t::cw_tone_config
- *   CW tone configuration structure. Contains detailed settings for tone frequencies, scaling, and modes.
- */
-typedef struct {
-  sli_wifi_frame_body_type_t frame_body_type; ///< Transmit CW tone request structure.
-  uint8_t enable;                             ///< Enable or disable CW tone transmission. 1 to enable, 0 to disable.
-  sl_wifi_cw_tone_config_t cw_tone_config;    ///< CW tone configuration structure.
-} sli_wifi_request_cw_tone_config_t;
-
-typedef struct {
-  sli_wifi_frame_body_type_t frame_body_type;
-  int16_t Txpower;
-} sli_wifi_request_tx_power_t;
-
-/* NWP reserved gaps in text_tx_cmd: 2 bytes after base_info + 4 after per_params = 6 bytes. */
-#define SLI_WIFI_TX_TEST_NWP_RESERVED_LEN 2U
-
-typedef struct {
-  uint16_t frame_control; // Frame Control field
-  uint16_t duration_id;   // Duration/ID field
-  uint8_t addr1[6];       // Address 1 (Receiver Address - RA)
-  uint8_t addr2[6];       // Address 2 (Transmitter Address - TA)
-  uint8_t addr3[6];       // Address 3 (Destination Address - DA or Source Address - SA)
-  uint16_t seq_ctrl;      // Sequence Control field
-} sli_ieee80211_hdr_t;
-
-typedef struct __attribute__((packed)) {
-  uint16_t wifi_protocol;
-  uint16_t enable;
-  int16_t power;
-  uint32_t rate;
-  uint16_t length;
-  uint16_t mode;
-  uint16_t channel;
-  uint16_t no_of_pkts;
-  uint32_t delay;
-  uint16_t channel_bw;
-  uint16_t aggr_enable;
-  uint16_t aggr_count;
-  uint16_t flags;
-} sli_wifi_tx_test_base_info_wire_t;
-
-typedef struct __attribute__((packed)) {
-  uint8_t short_gi_enable;
-  uint8_t greenfield_mode_enable;
-  uint8_t short_preamble_enable;
-} sli_wifi_11bgn_per_params_wire_t;
-
-typedef struct __attribute__((packed)) {
-  uint8_t short_gi_enable;
-} sli_wifi_11ac_per_params_wire_t;
-
-typedef struct __attribute__((packed)) {
-  uint8_t coding_type;
-  uint8_t nominal_pe;
-  uint8_t ul_dl;
-  uint8_t he_ppdu_type;
-  uint8_t beam_change;
-  uint8_t bw;
-  uint8_t stbc;
-  uint8_t tx_bf;
-  uint8_t gi_ltf;
-  uint8_t dcm;
-  uint8_t nsts_midamble;
-  uint8_t spatial_reuse;
-  uint8_t bss_color;
-  uint8_t ru_allocation;
-  uint16_t he_siga2_reserved;
-  uint8_t n_heltf_tot;
-  uint8_t sigb_dcm;
-  uint8_t sigb_mcs;
-  uint8_t user_idx;
-  uint16_t user_sta_id;
-  uint8_t sigb_compression;
-} sli_wifi_11ax_per_params_wire_t;
-
-typedef struct __attribute__((packed)) {
-  uint8_t coding_type;
-  uint8_t nominal_pe;
-  uint8_t ul_dl;
-  uint8_t be_ppdu_type;
-  uint8_t bw;
-  uint8_t gi_ltf;
-  uint8_t spatial_reuse;
-  uint8_t ru_allocation;
-  uint8_t n_heltf_tot;
-  uint8_t eht_sig_mcs;
-  uint8_t disregard;
-} sli_wifi_11be_per_params_wire_t;
-
-/* Largest v2 PER command: base_info + 6 reserved + 11ax per = 59 bytes (2 after base + 4 after per). */
-#define SLI_WIFI_TX_TEST_CMD_MAX_LEN                                                   \
-  (sizeof(sli_wifi_tx_test_base_info_wire_t) + sizeof(sli_wifi_11ax_per_params_wire_t) \
-   + (SLI_WIFI_TX_TEST_NWP_RESERVED_LEN * 3U))
 
 sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
                                        sl_wifi_timeout_type_t timeout_type,
@@ -269,9 +51,6 @@ sl_status_t sli_wifi_get_timeout(sl_wifi_interface_t interface,
                                  uint16_t *timeout_value);
 sl_wifi_interface_t sli_wifi_get_default_interface(void);
 sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_response_t *wps_response);
-sl_status_t sli_wifi_connect(sl_wifi_interface_t interface,
-                             const sl_wifi_client_configuration_t *ap,
-                             uint32_t timeout_ms);
 void sli_wifi_set_default_interface(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_set_antenna(sl_wifi_interface_t interface, sl_wifi_antenna_t antenna);
 sl_status_t sli_wifi_wait_for_scan_results(sl_wifi_scan_result_t **scan_results, uint32_t max_scan_result_count);
@@ -291,7 +70,6 @@ sl_status_t sli_wifi_set_max_tx_power(sl_wifi_interface_t interface, sl_wifi_max
 sl_status_t sli_wifi_get_max_tx_power(sl_wifi_interface_t interface, sl_wifi_max_tx_power_t *max_tx_power);
 sl_status_t sli_wifi_config_pll_mode(sl_wifi_pll_mode_t pll_mode);
 sl_status_t sli_wifi_config_power_chain(sl_wifi_power_chain_t power_chain);
-sl_status_t sli_wifi_start_ap(sl_wifi_interface_t interface, const sl_wifi_ap_configuration_t *configuration);
 sl_status_t sli_wifi_get_pairwise_master_key(sl_wifi_interface_t interface,
                                              const uint8_t type,
                                              const sl_wifi_ssid_t *ssid,
@@ -422,9 +200,6 @@ sl_status_t sli_wifi_allowlist_mcast_remove_all(void);
 sl_status_t sli_wifi_set_beacon_drop_threshold(sl_wifi_interface_t interface, uint16_t beacon_drop_threshold);
 /* Function used to update the variable that stores the wifi rate */
 sl_status_t sli_wifi_save_rate(sl_wifi_rate_t transfer_rate);
-sl_status_t sli_wifi_get_configured_join_request(sl_wifi_interface_t module_interface,
-                                                 const void *configuration,
-                                                 sli_wifi_join_request_t *join_request);
 sl_status_t sli_wifi_get_mfp(sl_wifi_interface_t interface, sl_wifi_mfp_mode_t *config);
 sl_status_t sli_wifi_set_mfp(sl_wifi_interface_t interface, const sl_wifi_mfp_mode_t config);
 sl_status_t sli_wifi_set_rts_threshold(sl_wifi_interface_t interface, uint16_t rts_threshold);
@@ -445,6 +220,40 @@ sl_status_t sli_wifi_remove_all_vendor_ie(void);
 
 sl_status_t sli_wifi_get_join_configuration(sl_wifi_interface_t interface, uint8_t *join_feature_bitmap);
 sl_status_t sli_wifi_set_join_configuration(sl_wifi_interface_t interface, uint8_t join_feature_bitmap);
+
+/* Helpers shared with siwx3xx / si91x */
+uint8_t sli_wifi_convert_5g_chnl_indx_to_rf(uint8_t channel_index);
+/**
+ * @brief Apply scan channel bitmaps and optional single-channel selection.
+ *
+ * @param[in]  interface            Wi-Fi interface (role-only values inherit band from default_interface).
+ * @param[in]  configuration        Scan configuration containing channel bitmaps.
+ * @param[out] channel              Firmware scan channel field (at least channel[0] is written).
+ * @param[out] channel_bit_map_2_4  2-byte 2.4 GHz channel bitmap field.
+ * @param[out] channel_bit_map_5    4-byte 5 GHz channel bitmap field.
+ *
+ * @note Works for both @ref sli_wifi_request_scan_t and @ref sli_wifi_scan_request_ext_t
+ *       by writing only the common channel/bitmap fields.
+ */
+sl_status_t sli_wifi_configure_scan_channel_bitmap(sl_wifi_interface_t interface,
+                                                   const sl_wifi_scan_configuration_t *configuration,
+                                                   uint8_t *channel,
+                                                   uint8_t *channel_bit_map_2_4,
+                                                   uint8_t *channel_bit_map_5);
+sl_status_t sli_wifi_configure_mfp_mode(sl_wifi_mfp_config_t *mfp_config,
+                                        uint8_t security_type,
+                                        uint8_t *join_feature_bitmap);
+sl_status_t sli_wifi_fill_join_request_security_using_encryption(sl_wifi_encryption_t encryption_mode,
+                                                                 uint8_t *security_type);
+sl_status_t sli_handle_enterprise_security(const sl_wifi_client_configuration_t *ap,
+                                           sli_wifi_request_eap_config_t *eap_req);
+sl_status_t sli_handle_psk_security(const sl_wifi_client_configuration_t *ap);
+sl_status_t sli_handle_client_security(const sl_wifi_client_configuration_t *ap,
+                                       sli_wifi_request_eap_config_t *eap_req);
+sl_status_t sli_handle_ap_security(const sl_wifi_ap_configuration_t *configuration,
+                                   sli_wifi_ap_config_request *request);
+sl_status_t sli_wifi_set_high_throughput_capability(sl_wifi_interface_t interface,
+                                                    sli_wifi_request_ap_high_throughput_capability_t HtCaps);
 sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
                                        sl_wifi_band_mode_t band,
                                        sl_wifi_region_code_t region_code);

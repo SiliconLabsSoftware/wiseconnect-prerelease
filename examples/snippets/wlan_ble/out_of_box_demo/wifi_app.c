@@ -535,8 +535,12 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
   SL_DEBUG_LOG_V2(INFO, "\r\n");
   print_char_buffer((char *)message->content, message->content_length);
   SL_DEBUG_LOG_V2(INFO, "\r\n");
-  strncpy(msg, (char *)message->content, message->content_length);
-  msg[message->content_length] = '\0';
+  uint32_t copy_len = message->content_length;
+  if (copy_len >= sizeof(msg)) {
+    copy_len = sizeof(msg) - 1;
+  }
+  memcpy(msg, message->content, copy_len);
+  msg[copy_len] = '\0';
   GLIB_clear(&glibContext);
   GLIB_drawBitmap(&glibContext,
                   SILABS_LOGO_POSITION_X,
@@ -564,7 +568,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
   GLIB_drawStringOnLine(&glibContext, TOPIC_TO_BE_SUBSCRIBED, currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
   GLIB_drawStringOnLine(&glibContext, "", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
   GLIB_drawStringOnLine(&glibContext, "Message:", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
-  GLIB_drawStringOnLine(&glibContext, (char *)message->content, currentLine, GLIB_ALIGN_LEFT, 5, 5, true);
+  GLIB_drawStringOnLine(&glibContext, msg, currentLine, GLIB_ALIGN_LEFT, 5, 5, true);
   DMD_updateDisplay();
 }
 

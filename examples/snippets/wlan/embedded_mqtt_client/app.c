@@ -36,6 +36,7 @@
 #include "cacert.pem.h"
 #include "sl_wifi.h"
 #include "string.h"
+#include <stdlib.h>
 
 /******************************************************
  *                    Constants
@@ -80,6 +81,8 @@
 
 #define USERNAME "username"
 #define PASSWORD "password"
+
+#define PRINT_CHAR_BUFFER_CHUNK_SIZE 128
 
 /******************************************************
  *               Variable Definitions
@@ -242,7 +245,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 {
   UNUSED_PARAMETER(context);
   sl_status_t status;
-  SL_DEBUG_LOG_V2(INFO, "Message Received on Topic: ");
+  SL_DEBUG_LOG_V2(INFO, "Message Received on Topic:\r\n");
 
   print_char_buffer((char *)message->topic, message->topic_length);
   print_char_buffer((char *)message->content, message->content_length);
@@ -263,21 +266,37 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 
 void print_char_buffer(char *buffer, uint32_t buffer_length)
 {
-  if (buffer == NULL || buffer_length == 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Buffer is NULL or buffer_length is 0");
+  if (buffer == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Buffer is NULL\r\n");
     return;
   }
 
-  char *line = (char *)malloc(buffer_length + 1);
-  if (line == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "print_char_buffer: malloc failed");
+  /* Zero-length MQTT payloads are valid; mark them explicitly in the log. */
+  if (buffer_length == 0) {
+    SL_DEBUG_LOG_V2(INFO, "(empty)\r\n");
     return;
   }
 
-  memcpy(line, buffer, buffer_length);
-  line[buffer_length] = '\0';
-  printf("%s", line);
-  free(line);
+  if (buffer_length > SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE) {
+    buffer_length = SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE;
+  }
+
+  char chunk[PRINT_CHAR_BUFFER_CHUNK_SIZE + 1];
+  uint32_t offset = 0;
+
+  while (offset < buffer_length) {
+    uint32_t remaining  = buffer_length - offset;
+    uint32_t this_chunk = (remaining > PRINT_CHAR_BUFFER_CHUNK_SIZE) ? PRINT_CHAR_BUFFER_CHUNK_SIZE : remaining;
+
+    memcpy(chunk, &buffer[offset], this_chunk);
+    chunk[this_chunk] = '\0';
+    offset += this_chunk;
+    if (offset >= buffer_length) {
+      SL_DEBUG_LOG_V2(INFO, "%s\r\n", (uintptr_t)chunk);
+    } else {
+      SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)chunk);
+    }
+  }
 }
 
 void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)
@@ -345,7 +364,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     case SL_MQTT_CLIENT_MESSAGE_PUBLISHED_EVENT: {
       sl_mqtt_client_message_t *published_message = (sl_mqtt_client_message_t *)context;
 
-      SL_DEBUG_LOG_V2(INFO, "Published message successfully on topic: ");
+      SL_DEBUG_LOG_V2(INFO, "Published message successfully on topic:\r\n");
       print_char_buffer((char *)published_message->topic, published_message->topic_length);
       break;
     }

@@ -54,6 +54,8 @@
 /** Number of events passed to sl_log_backend_write per call when draining NWP RX records. */
 #define SLI_NWP_LOG_BACKEND_EVENT_COUNT (1U)
 
+/* sli_nwp_log_event_t (NWP wire format) is defined once in sl_utility.h. */
+
 #endif
 
 #define NWP_LOGGING_ENABLE  1
@@ -554,9 +556,12 @@ static uint32_t sli_log_nwp_event_host_timestamp_us(void)
 }
 
 /** @param host_timestamp_us Host ingest time (µs); same for all events in one RX packet when batched. */
-static void sli_log_fill_event(const sl_log_event_t *nwp, sl_log_event_t *out, uint32_t host_timestamp_us)
+static void sli_log_fill_event(const sli_nwp_log_event_t *nwp, sl_log_event_t *out, uint32_t host_timestamp_us)
 {
   out->timestamp = host_timestamp_us;
+  /* The ingest time is read straight from the kernel tick counter rather than
+   * from the logger's own timebase, so there is no wrap count to report. */
+  out->epoch     = 0U;
   out->event_id  = nwp->event_id;
   out->args[0]   = nwp->args[0];
   out->args[1]   = nwp->args[1];
@@ -583,13 +588,13 @@ __WEAK void sli_handle_nwp_log_packet(const uint8_t *data, uint16_t length)
   if (data == NULL || length == 0) {
     return;
   }
-  if ((length % sizeof(sl_log_event_t)) != 0) {
+  if ((length % sizeof(sli_nwp_log_event_t)) != 0) {
     return;
   }
-  uint32_t count       = (uint32_t)length / (uint32_t)sizeof(sl_log_event_t);
-  sl_log_event_t event = { 0 };
-  sl_log_event_t *nwp  = (sl_log_event_t *)data;
-  uint32_t ingest_ts   = sli_log_nwp_event_host_timestamp_us();
+  uint32_t count                 = (uint32_t)length / (uint32_t)sizeof(sli_nwp_log_event_t);
+  sl_log_event_t event           = { 0 };
+  const sli_nwp_log_event_t *nwp = (const sli_nwp_log_event_t *)data;
+  uint32_t ingest_ts             = sli_log_nwp_event_host_timestamp_us();
 
   for (uint32_t i = 0; i < count; i++) {
     sli_log_fill_event(&nwp[i], &event, ingest_ts);

@@ -192,3 +192,87 @@ upgrade:
       - script: upgrade_wireless_component_for_common_flash.lua
         description: >
           Restore wireless components removed from common-flash NVM3 and LittleFS.
+      - trigger: sl_si91x_asynchronous_socket
+        description: >
+          'Asynchronous Socket' moved from the WiSeConnect wifi package into
+          Simplicity SDK network_stack_sdk. The selection is re-pointed at the
+          Simplicity SDK package.
+        status: automatic
+        remove:
+          - sl_si91x_asynchronous_socket
+        add:
+          - id: sl_si91x_asynchronous_socket
+            package: simplicity_sdk
+            vendor: silabs
+      - trigger: sl_si91x_socket
+        description: >
+          'Socket' moved from the WiSeConnect wifi package into Simplicity SDK
+          network_stack_sdk. The selection is re-pointed at the Simplicity SDK
+          package.
+        status: automatic
+        remove:
+          - sl_si91x_socket
+        add:
+          - id: sl_si91x_socket
+            package: simplicity_sdk
+            vendor: silabs
+      - trigger: bsd_socket
+        description: >
+          'BSD Socket' moved from the WiSeConnect wifi package into Simplicity
+          SDK network_stack_sdk. The selection is re-pointed at the Simplicity
+          SDK package.
+        status: automatic
+        remove:
+          - bsd_socket
+        add:
+          - id: bsd_socket
+            package: simplicity_sdk
+            vendor: silabs
+      - trigger: bsd_socket_api
+        description: >
+          'BSD Socket API' moved from the WiSeConnect wifi package into
+          Simplicity SDK network_stack_sdk. The selection is re-pointed at the
+          Simplicity SDK package.
+        status: automatic
+        remove:
+          - bsd_socket_api
+        add:
+          - id: bsd_socket_api
+            package: simplicity_sdk
+            vendor: silabs
+      - trigger: sl_websocket_client
+        description: >
+          'Websocket Client' moved from the WiSeConnect wifi package into
+          Simplicity SDK network_stack_sdk. The selection is re-pointed at the
+          Simplicity SDK package.
+        status: automatic
+        remove:
+          - sl_websocket_client
+        add:
+          - id: sl_websocket_client
+            package: simplicity_sdk
+            vendor: silabs
+      - trigger: paho_mqtt_embedded
+        description: >
+          'paho_mqtt_embedded' moved from the WiSeConnect wifi package into
+          Simplicity SDK network_stack. The selection is re-pointed at the
+          Simplicity SDK package.
+        status: automatic
+        remove:
+          - paho_mqtt_embedded
+        add:
+          - id: paho_mqtt_embedded
+            package: simplicity_sdk
+            vendor: silabs
+      - trigger: paho_mqtt_embedded_dual_stack
+        description: >
+          'paho_mqtt_embedded_dual_stack' moved from the WiSeConnect wifi package
+          into Simplicity SDK network_stack. The selection is re-pointed at the
+          Simplicity SDK package.
+        status: automatic
+        remove:
+          - paho_mqtt_embedded_dual_stack
+        add:
+          - id: paho_mqtt_embedded_dual_stack
+            package: simplicity_sdk
+            vendor: silabs

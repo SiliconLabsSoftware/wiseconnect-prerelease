@@ -14,9 +14,25 @@ provides:
 requires:
   - name: sl_ulp_timer
     condition: [log_backend]
+  # sl_log_platform_specific.c uses sli_nwp_log_event_t (defined in
+  # sl_utility.h from wiseconnect_common) only inside NWP-log code that is
+  # guarded by #ifdef SL_WIFI_COMPONENT_INCLUDED.  Pull wiseconnect_common in
+  # only when both a log backend AND the wireless stack are present so that
+  # peripheral-only (non-Wi-Fi) builds are not burdened with RTOS / Wi-Fi
+  # headers that wiseconnect_common transitively requires.
+  - name: wiseconnect_common
+    condition: [log_backend, sl_si91x_wireless]
 ui_hints:
   visibility: never
 root_path: components/device/silabs/si91x/mcu/drivers/service/sl_log
+include:
+  # The logger core (sl_log.c) includes the fixed name "sl_log_hal_inline.h" for
+  # its inlined event-stamping accessors and relies on whichever component
+  # provides log_platform_core to put the matching implementation on the include
+  # path. On SiWx91x that is this component.
+  - path: inc
+    file_list:
+      - path: sl_log_hal_inline.h
 source:
   - path: src/sl_log_platform_specific.c  
     condition: [log_backend]

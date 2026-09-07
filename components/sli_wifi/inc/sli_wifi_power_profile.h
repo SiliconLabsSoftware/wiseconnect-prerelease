@@ -38,8 +38,6 @@
 
 sl_status_t sli_wifi_set_performance_profile(const sl_wifi_performance_profile_t *profile);
 
-sl_status_t sli_wifi_set_performance_profile_v2(const sl_wifi_performance_profile_v2_t *profile);
-
 sl_status_t sli_wifi_get_performance_profile(sl_wifi_performance_profile_t *profile);
 
 sl_status_t sli_wifi_get_performance_profile_v2(sl_wifi_performance_profile_v2_t *profile);

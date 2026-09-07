@@ -104,6 +104,17 @@ int32_t rsi_ble_dual_role(void);
 #define PSP_TYPE RSI_MAX_PSP
 #endif
 
+/*
+ * FreeRTOS idle hook: drains the logger ring buffer via sl_log_flush().
+ * Active only for backends that emit the proprietary stream (IOStream
+ * Compact over UART/VCOM and the proprietary UART backend); a no-op for
+ * IOStream Compact over RTT, IOStream Formatted, SystemView, and Log None.
+ */
+void vApplicationIdleHook(void)
+{
+  sl_log_flush();
+}
+
 osThreadId_t wifi_app_thread_id;
 osThreadId_t ble_app_thread_id;
 static const sl_wifi_device_configuration_t config = {
@@ -260,7 +271,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val,
                                     uint8_t char_prop)
 {
   if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE) { //! Check for max data length for the characteristic value
-    printf("\r\n no data memory for att rec values \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\n no data memory for att rec values \r\n");
     return;
   }
 
@@ -1263,11 +1274,12 @@ int8_t rsi_ble_initialize_conn_buffer(rsi_ble_conn_config_t *ble_conn_spec_conf)
     /* Check the Total Number of Buffers allocated.*/
     if ((DLE_BUFFER_COUNT_P1 + DLE_BUFFER_COUNT_P2 + DLE_BUFFER_COUNT_P3 + DLE_BUFFER_COUNT_C1 + DLE_BUFFER_COUNT_C2)
         > RSI_BLE_NUM_CONN_EVENTS) {
-      printf("\r\n Total number of per connection buffer count is more than the total number alllocated \r\n");
+      SL_DEBUG_LOG_V2(ERROR,
+                      "\r\n Total number of per connection buffer count is more than the total number alllocated \r\n");
       status = RSI_FAILURE;
     }
   } else {
-    printf("\r\n Invalid buffer passed \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\n Invalid buffer passed \r\n");
     status = RSI_FAILURE;
   }
   return status;
@@ -1283,7 +1295,7 @@ int8_t rsi_fill_ble_user_config()
   //! copy ble connection specific configurations
 
   if ((RSI_BLE_MAX_NBR_CENTRALS > 2) || (RSI_BLE_MAX_NBR_PERIPHERALS > 3)) {
-    printf("\r\n number of BLE CENTRALS or BLE PERIPHERALS Given wrong declaration\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\n number of BLE CENTRALS or BLE PERIPHERALS Given wrong declaration\r\n");
     return RSI_FAILURE;
   }
 
@@ -1309,7 +1321,7 @@ extern osSemaphoreId_t ui_task_sem;
 int32_t ble_init_hook(void);
 void ble_private_default_init(void)
 {
-  printf("\r\n private default init\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "\r\n private default init\r\n");
   // for loop
 
   uint8_t iter;
@@ -1396,29 +1408,23 @@ void rsi_ble_main_app_task(void)
   sl_wifi_firmware_version_t version = { 0 };
   status                             = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    printf("\r\nWi-Fi Initialization Failed, Error Code : 0x%" PRIX32 "\r\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\nWi-Fi Initialization Failed, Error Code : 0x%X\r\n", (uint32_t)status);
     return;
   } else {
-    printf("\r\n Wi-Fi Initialization Success\n");
+    SL_DEBUG_LOG_V2(INFO, "\r\n Wi-Fi Initialization Success\n");
   }
 
   //! Firmware version Prints
   status = sl_wifi_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFirmware version Failed, Error Code : 0x%" PRIX32 "\r\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\nFirmware version Failed, Error Code : 0x%X\r\n", (uint32_t)status);
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           version.chip_id,
-           version.rom_id,
-           version.major,
-           version.minor,
-           version.security_version,
-           version.patch_num,
-           version.customer_id,
-           version.build_num);
+    SL_DEBUG_LOG_V2(INFO, "\r\nFirmware version is: %x%x.%d", version.chip_id, version.rom_id, version.major);
+    SL_DEBUG_LOG_V2(INFO, ".%d.%d.%d", version.minor, version.security_version, version.patch_num);
+    SL_DEBUG_LOG_V2(INFO, ".%d.%d\r\n", version.customer_id, version.build_num);
   }
 #endif
-  printf("\r\n BLE Main Task Invoked\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\n BLE Main Task Invoked\r\n");
 
   ble_private_default_init();
   ble_generic_cb.init_hook            = ble_init_hook;
@@ -1430,26 +1436,26 @@ void rsi_ble_main_app_task(void)
 
   status = rsi_fill_ble_user_config();
   if (status != RSI_SUCCESS) {
-    printf("\r\n failed to fill the configurations in local buffer \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\n failed to fill the configurations in local buffer \r\n");
     return;
   } else {
-    printf("\n FILL USER config successful \n");
+    SL_DEBUG_LOG_V2(INFO, "\n FILL USER config successful \n");
   }
 
 #if ENABLE_NWP_POWER_SAVE
-  printf("\r\n keep module in to power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\n keep module in to power save \r\n");
   //! initiating power save in BLE mode
   status = rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to initiate power save in BLE mode \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\n Failed to initiate power save in BLE mode \r\n");
     return;
   }
-  printf("\r\n Module is in power save \r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\n Module is in power save \r\n");
 #endif
 
   status = rsi_app_common_event_loop(&ble_generic_cb);
 
-  printf("\r\n BLE task excution fails with error status 0X%" PRIX32 " \r\n", (uint32_t)status);
+  SL_DEBUG_LOG_V2(ERROR, "\r\n BLE task excution fails with error status 0X%X \r\n", (uint32_t)status);
   while (1)
     ;
 }
@@ -1473,7 +1479,7 @@ int32_t ble_init_hook(void)
   //! BLE dual role Initialization
   status = rsi_ble_dual_role();
   if (status != RSI_SUCCESS) {
-    printf("BLE DUAL role init failed \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "BLE DUAL role init failed \r\n");
   }
 #ifdef M4_UART
   osSemaphoreRelease(ui_task_sem);
@@ -1534,18 +1540,18 @@ int32_t rsi_ble_dual_role(void)
   //! get the local device address(MAC address).
   status = rsi_bt_get_local_device_address(rsi_app_resp_get_dev_addr);
   if (status != RSI_SUCCESS) {
-    printf("\n rsi_bt_get_local_device_address failed with 0x%" PRIX32 " \n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "\n rsi_bt_get_local_device_address failed with 0x%X \n", (uint32_t)status);
   } else {
     rsi_6byte_dev_address_to_ascii(local_dev_addr, rsi_app_resp_get_dev_addr);
-    printf("\n Local device address = %s", local_dev_addr);
+    SL_DEBUG_LOG_V2(INFO, "\n Local device address = %s\r\n", (uintptr_t)local_dev_addr);
   }
 
   //! Set local IRK Value
   //! This value should be fixed on every reset
-  printf("\r\n Setting the Local IRK Value\r\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\n Setting the Local IRK Value\r\n");
   status = rsi_ble_set_local_irk_value(local_irk);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Setting the Local IRK Value Failed = %" PRIX32 "\r\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\n Setting the Local IRK Value Failed = %X\r\n", (uint32_t)status);
     return status;
   }
   uint8_t role_priority_payload[21] = {
@@ -1556,10 +1562,10 @@ int32_t rsi_ble_dual_role(void)
   };
   status = rsi_ble_set_coex_roles_priority(role_priority_payload);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Setting the coex roles priority Failed = %" PRIX32 "\r\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\n Setting the coex roles priority Failed = %X\r\n", (uint32_t)status);
     return status;
   } else {
-    printf("\r\n Setting the coex roles priority Successful = %" PRIX32 "\r\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(INFO, "\r\n Setting the coex roles priority Successful = %X\r\n", (uint32_t)status);
   }
   smp_capabilities.io_capability = RSI_BLE_SMP_IO_CAPABILITY;
   smp_capabilities.oob_data_flag = LOCAL_OOB_DATA_FLAG_NOT_PRESENT;
@@ -1571,7 +1577,7 @@ int32_t rsi_ble_dual_role(void)
   smp_capabilities.auth_req             = AUTH_REQ_BITS;
   status                                = rsi_ble_set_smp_pairing_cap_data(&smp_capabilities);
   if (status != RSI_SUCCESS) {
-    printf("\n rsi_ble_set_smp_pairing_cap_data = %" PRIX32 "", (uint32_t)status);
+    SL_DEBUG_LOG_V2(INFO, "\n rsi_ble_set_smp_pairing_cap_data = %X\r\n", (uint32_t)status);
     return status;
   }
 
@@ -1592,50 +1598,54 @@ int32_t rsi_ble_dual_role(void)
   status = rsi_ble_get_max_adv_data_len((uint8_t *)&rsi_app_resp_max_adv_data_len);
 
   if (status != RSI_SUCCESS) {
-    printf("get max adv data length failed with 0x%" PRIX32 " \n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "get max adv data length failed with 0x%X \n", (uint32_t)status);
   } else {
-    printf("Max supported Adv Data length is %d \n", (uint8_t)rsi_app_resp_max_adv_data_len);
+    SL_DEBUG_LOG_V2(INFO, "Max supported Adv Data length is %d \n", (uint8_t)rsi_app_resp_max_adv_data_len);
   }
 
   //! get the Max no.of supported adv sets
   status = rsi_ble_get_max_no_of_supp_adv_sets((uint8_t *)&rsi_app_resp_max_no_of_supp_adv_sets);
   if (status != RSI_SUCCESS) {
-    printf("get max supported adv sets failed with 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "get max supported adv sets failed with 0x%X\n", (uint32_t)status);
   } else {
-    printf("Max number of supported Adv sets are %" PRIu32 "  \n", rsi_app_resp_max_no_of_supp_adv_sets);
+    SL_DEBUG_LOG_V2(INFO, "Max number of supported Adv sets are %u  \n", rsi_app_resp_max_no_of_supp_adv_sets);
   }
 
 #if ADV_ENABLED_DEFAULT
 
   status = ble_ae_set_1_parameters();
   if (status != RSI_SUCCESS) {
-    printf("set ae params failed with 0x%" PRIX32 " \n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae params failed with 0x%X \n", (uint32_t)status);
   } else {
-    printf("Setting AE params of set 1 successful and selected TX Power is %d dbm \n", rsi_app_resp_tx_power);
+    SL_DEBUG_LOG_V2(INFO,
+                    "Setting AE params of set 1 successful and selected TX Power is %d dbm \n",
+                    rsi_app_resp_tx_power);
   }
 #if PERIODIC_ADV_EN
   status = ble_ae_set_periodic_parameters();
   if (status != RSI_SUCCESS) {
-    printf("set ae Periodic adv data failed with 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae Periodic adv data failed with 0x%X\n", (uint32_t)status);
   } else {
-    printf("set ae periodic adv data success \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae periodic adv data success \n");
   }
 
   //SAPI Function call for periodic advertising enable
   status = rsi_ble_app_set_periodic_ae_enable(BLE_AE_PER_ADV_EN, BLE_AE_ADV_HNDL_SET_1);
   if (status != RSI_SUCCESS) {
-    printf("set ae Periodic adv enable failed with 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae Periodic adv enable failed with 0x%X\n", (uint32_t)status);
   } else {
     //adv_state_dut = adv_enabled;
-    printf("set ae periodic adv enable success \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae periodic adv enable success \n");
   }
 #endif
 #if ADV_SET2
   status = ble_ae_set_2_parameters();
   if (status != RSI_SUCCESS) {
-    printf("set ae params failed with 0x%" PRIX32 " \n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae params failed with 0x%X \n", (uint32_t)status);
   } else {
-    printf("Setting AE params of set 2 successful and selected TX Power is %d dbm \n", rsi_app_resp_tx_power);
+    SL_DEBUG_LOG_V2(INFO,
+                    "Setting AE params of set 2 successful and selected TX Power is %d dbm \n",
+                    rsi_app_resp_tx_power);
   }
 
 #endif
@@ -1643,24 +1653,24 @@ int32_t rsi_ble_dual_role(void)
 #if PERIODIC_ADV_EN
   status = ble_ae_set_periodic_data();
   if (status != RSI_SUCCESS) {
-    printf("set ae adv enable failed with status 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae adv enable failed with status 0x%X\n", (uint32_t)status);
   } else {
-    printf("set ae adv enable success \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae adv enable success \n");
   }
 #else
 
   status = ble_ae_set_1_adv_data();
   if (status != RSI_SUCCESS) {
-    printf("set ae adv data for set 1 failed with status 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae adv data for set 1 failed with status 0x%X\n", (uint32_t)status);
   } else {
-    printf("set ae adv data for set 1 success \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae adv data for set 1 success \n");
   }
 
   status = ble_ae_set_1_scan_resp_data();
   if (status != RSI_SUCCESS) {
-    printf("set ae scan resp data for set 1 failed with 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae scan resp data for set 1 failed with 0x%X\n", (uint32_t)status);
   } else {
-    printf("set ae scan resp data for set 1 success \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae scan resp data for set 1 success \n");
   }
 
 #endif
@@ -1668,16 +1678,16 @@ int32_t rsi_ble_dual_role(void)
 
   status = ble_ae_set_2_adv_data();
   if (status != RSI_SUCCESS) {
-    printf("set ae adv data for set 2 failed with status 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae adv data for set 2 failed with status 0x%X\n", (uint32_t)status);
   } else {
-    printf("set ae adv data for set 2 success \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae adv data for set 2 success \n");
   }
 
   status = ble_ae_set_2_scan_resp_data();
   if (status != RSI_SUCCESS) {
-    printf("set ae scan resp data for set 2 failed with 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae scan resp data for set 2 failed with 0x%X\n", (uint32_t)status);
   } else {
-    printf("set ae scan resp data for set 2 success \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae scan resp data for set 2 success \n");
   }
 
 #endif
@@ -1685,25 +1695,25 @@ int32_t rsi_ble_dual_role(void)
   //! set AE set random address
   status = rsi_ble_set_ae_set_random_address(BLE_AE_ADV_HNDL_SET_1, rand_addr);
   if (status != RSI_SUCCESS) {
-    printf("set ae set random address failed with 0x%" PRIX32 " \n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set ae set random address failed with 0x%X \n", (uint32_t)status);
   } else {
-    printf("set ae set random address successful \n");
+    SL_DEBUG_LOG_V2(INFO, "set ae set random address successful \n");
   }
 
   status = ble_ae_set_1_advertising_enable();
   if (status != RSI_SUCCESS) {
-    printf("set 1 ae adv enable failed with status 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set 1 ae adv enable failed with status 0x%X\n", (uint32_t)status);
   } else {
-    printf("set 1 ae adv enable success \n");
+    SL_DEBUG_LOG_V2(INFO, "set 1 ae adv enable success \n");
   }
 
 #if ADV_SET2
 
   status = ble_ae_set_2_advertising_enable();
   if (status != RSI_SUCCESS) {
-    printf("set 2 ae adv enable failed with status 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "set 2 ae adv enable failed with status 0x%X\n", (uint32_t)status);
   } else {
-    printf("set 2 ae adv enable success \n");
+    SL_DEBUG_LOG_V2(INFO, "set 2 ae adv enable success \n");
   }
 
 #endif
@@ -1715,17 +1725,17 @@ int32_t rsi_ble_dual_role(void)
 
   status = ble_ext_scan_params();
   if (status != RSI_SUCCESS) {
-    printf(" \n set ae scan params failed with status 0x%" PRIX32 "\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, " \n set ae scan params failed with status 0x%X\n", (uint32_t)status);
   } else {
-    printf(" \n set ae scan params success \n");
+    SL_DEBUG_LOG_V2(INFO, " \n set ae scan params success \n");
   }
 
   status = ble_ext_scan_enable();
   if (status != RSI_SUCCESS) {
-    printf(" \n set ae scan enable failed with 0x%" PRIX32 " \n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, " \n set ae scan enable failed with 0x%X \n", (uint32_t)status);
   } else {
     scan_state_dut = connectable_scan;
-    printf(" \n set ae scan enable success \n");
+    SL_DEBUG_LOG_V2(INFO, " \n set ae scan enable success \n");
   }
 
 #if WLAN_TRANSIENT_CASE
@@ -1744,31 +1754,25 @@ void rsi_wlan_ble_app_init(void)
   //! WiSeConnect initialization
   status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
   if (status != SL_STATUS_OK) {
-    printf("\r\nWi-Fi Initialization Failed, Error Code : 0x%" PRIX32 "\r\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\nWi-Fi Initialization Failed, Error Code : 0x%X\r\n", (uint32_t)status);
     return;
   }
-  printf("\r\nWi-Fi initialization is successful\n");
+  SL_DEBUG_LOG_V2(INFO, "\r\nWi-Fi initialization is successful\n");
   //! Firmware version Prints
   status = sl_si91x_get_firmware_version(&version);
   if (status != SL_STATUS_OK) {
-    printf("\r\nFirmware version Failed, Error Code : 0x%" PRIX32 "\r\n", (uint32_t)status);
+    SL_DEBUG_LOG_V2(ERROR, "\r\nFirmware version Failed, Error Code : 0x%X\r\n", (uint32_t)status);
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           version.chip_id,
-           version.rom_id,
-           version.major,
-           version.minor,
-           version.security_version,
-           version.patch_num,
-           version.customer_id,
-           version.build_num);
+    SL_DEBUG_LOG_V2(INFO, "\r\nFirmware version is: %x%x.%d", version.chip_id, version.rom_id, version.major);
+    SL_DEBUG_LOG_V2(INFO, ".%d.%d.%d", version.minor, version.security_version, version.patch_num);
+    SL_DEBUG_LOG_V2(INFO, ".%d.%d\r\n", version.customer_id, version.build_num);
   }
 
 #if ENABLE_NWP_POWER_SAVE
   // Create power_cmd_mutex mutex
   power_cmd_mutex = osMutexNew(NULL);
   if (power_cmd_mutex == NULL) {
-    printf("\r\npower_cmd_mutex creation failed\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\npower_cmd_mutex creation failed\r\n");
     return;
   }
 #endif
@@ -1776,14 +1780,14 @@ void rsi_wlan_ble_app_init(void)
   //! Thread created for BLE task
   ble_app_thread_id = osThreadNew((osThreadFunc_t)rsi_ble_main_app_task, NULL, &ble_thread_attributes);
   if (ble_app_thread_id == NULL) {
-    printf("\r\nwifi_app_thread failed to create\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\nwifi_app_thread failed to create\r\n");
     return;
   }
   //! Thread created for WIFI task
 #if WLAN_TASK_ENABLE
   wifi_app_thread_id = osThreadNew((osThreadFunc_t)wlan_app_thread, NULL, &wifi_thread_attributes);
   if (wifi_app_thread_id == NULL) {
-    printf("\r\nwifi_app_thread failed to create\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "\r\nwifi_app_thread failed to create\r\n");
     return;
   }
 #endif

@@ -735,6 +735,52 @@ typedef sl_status_t (*sl_wifi_transceiver_callback_v2_t)(sl_wifi_event_t event,
                                                          uint32_t data_length,
                                                          void *optional_arg);
 
+/**
+ * @typedef sl_wifi_raw_data_packet_callback_t
+ * @brief Callback for SL_WIFI_RX_PACKET_EVENTS group events of type @ref sl_wifi_event_group_t.
+ *
+ *   This typedef defines a callback function that handles Wi-Fi raw data packet receive events.
+ *   The callback is invoked when a raw data packet is received, providing the event details and the associated packet data.
+ *
+ * @param event
+ *   Wi-Fi event of type @ref sl_wifi_event_t. This parameter indicates the specific Wi-Fi event that triggered the callback.
+ *   Individual Wi-Fi events related to SL_WIFI_RX_PACKET_EVENTS are as follows:
+ *   | @ref sl_wifi_event_t      | Description                                         |
+ *   |:--------------------------|:----------------------------------------------------|
+ *   | SL_WIFI_RX_PACKET_EVENT   | Indicates that a raw data packet has been received. |
+ * @param status_code
+ *   Status code of type sl_status_t. On successful events always indicates SL_STATUS_OK, on failure events indicates the status code of failure.
+ *   See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
+ *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ * @param data
+ *   Pointer to the received raw Ethernet frame payload. Valid only for the duration of this callback; do not store or free it.
+ * @param data_length
+ *   Length of the raw Ethernet frame in bytes.
+ * @param optional_arg
+ *   Optional user-provided argument passed in [sl_wifi_set_raw_data_packet_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-raw-data-packet-callback).
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
+ *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ * @note
+ *   This API is only supported on SiWx3xx devices.
+ *   RX delivery depends on which consumers are present:
+ *   - NAL only (no callback): all frames go to the NAL/LwIP path.
+ *   - Host netstack only (callback registered, NAL not up): all frames go to this
+ *     callback. Use with @ref sl_wifi_send_raw_data_frame for TX.
+ *   - Dual-stack (callback and NAL): each frame is classified using
+ *     [@ref SL_WIFI_MIN_HOST_STACK_PORT, @ref SL_WIFI_MAX_HOST_STACK_PORT] as
+ *     native-only, host-only, or both. The SDK delivers accordingly (same frame
+ *     pointer when both). Defaults leave LwIP ephemeral ports (49152-65535) to
+ *     NAL; bind host/raw sockets in the host-stack range, or override the macros.
+ *   In case of event failure, the `SL_WIFI_FAIL_EVENT_STATUS_INDICATION` bit is set in the `event` parameter.
+ *   When this bit is set, the `data` parameter and the `data_length` parameter can be ignored.
+ */
+typedef sl_status_t (*sl_wifi_raw_data_packet_callback_t)(sl_wifi_event_t event,
+                                                          sl_status_t status_code,
+                                                          void *data,
+                                                          uint32_t data_length,
+                                                          void *optional_arg);
+
 /***************************************************************************/
 /**
  * @brief
@@ -775,6 +821,7 @@ sl_status_t sl_wifi_set_callback(sl_wifi_event_group_t group,
  *   Group ID of the event for which the callback is registered. See @ref sl_wifi_event_group_t for possible values.
  * @param[in] function
  *   Function pointer to callback of type @ref sl_wifi_callback_function_v2_t that would be invoked when an event in the specified group occurs.
+ *   Pass NULL to deregister the callback for @p group; @p optional_arg is ignored when clearing.
  * @param[in] optional_arg
  *   Optional user-provided argument to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_callback_function_v2_t.
  * @pre Pre-conditions:
@@ -784,6 +831,7 @@ sl_status_t sl_wifi_set_callback(sl_wifi_event_group_t group,
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  * @note
  *   Callbacks can be set only for event groups defined in @ref sl_wifi_event_group_t, not for individual events defined in @ref sl_wifi_event_t.
+ *   Registering a callback clears any previously registered legacy or v2 handler for the same group.
  ******************************************************************************/
 sl_status_t sl_wifi_set_callback_v2(sl_wifi_event_group_t group,
                                     sl_wifi_callback_function_v2_t function,
@@ -1083,6 +1131,44 @@ static inline sl_status_t sl_wifi_set_transceiver_callback_v2(sl_wifi_transceive
                                NULL,
                                (sl_wifi_callback_function_v2_t)function,
                                optional_arg);
+}
+
+/***************************************************************************/
+/**
+ * @brief
+ *   Register a callback for the SL_WIFI_RX_PACKET_EVENTS group event from @ref sl_wifi_event_group_t.
+ *
+ *   This function allows the user to register a callback function for the SL_WIFI_RX_PACKET_EVENTS group.
+ *   When any event within this group occurs, the registered callback function would be invoked, providing the event details and any associated data or failure code.
+ *
+ * @param[in] function
+ *   Function pointer to the callback of type @ref sl_wifi_raw_data_packet_callback_t. This parameter specifies the callback function that would be invoked when an event in the SL_WIFI_RX_PACKET_EVENTS group occurs.
+ *   Pass NULL to deregister; on SiWx3xx, raw RX delivery returns to the NAL/LwIP path when NAL is present.
+ * @param[in] optional_arg
+ *   Optional user-provided argument. This parameter allows the user to pass additional context or information to the callback function. This would be passed back to callback handler of type @ref sl_wifi_raw_data_packet_callback_t.
+ *   Ignored when @p function is NULL.
+ * @pre Pre-conditions:
+ *   - @ref sl_wifi_init should be called before this API.
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
+ *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ * @note
+ *   This API is only supported on SiWx3xx devices.
+ *   RX delivery depends on which consumers are present:
+ *   - NAL only (no callback): all frames go to the NAL/LwIP path.
+ *   - Host netstack only (callback registered, NAL not up): all frames go to this
+ *     callback. Use with @ref sl_wifi_send_raw_data_frame for TX.
+ *   - Dual-stack (callback and NAL): each frame is classified using
+ *     [@ref SL_WIFI_MIN_HOST_STACK_PORT, @ref SL_WIFI_MAX_HOST_STACK_PORT] as
+ *     native-only, host-only, or both. The SDK delivers accordingly (same frame
+ *     pointer when both). Defaults leave LwIP ephemeral ports (49152-65535) to
+ *     NAL; bind host/raw sockets in the host-stack range, or override the macros.
+ *   All the individual Wi-Fi events related to this group would be triggered via this callback.
+ ******************************************************************************/
+static inline sl_status_t sl_wifi_set_raw_data_packet_callback(sl_wifi_raw_data_packet_callback_t function,
+                                                               void *optional_arg)
+{
+  return sli_wifi_set_callback(SL_WIFI_RX_PACKET_EVENTS, NULL, (sl_wifi_callback_function_v2_t)function, optional_arg);
 }
 
 #ifndef __ZEPHYR__

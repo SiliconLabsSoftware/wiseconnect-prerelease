@@ -17,11 +17,22 @@
 #ifndef SDIO_SECONDARY_MODE_FREERTOS_H
 #define SDIO_SECONDARY_MODE_FREERTOS_H
 
-// -----------------------------------------------------------------------------
-// Prototypes
+/***************************************************************************/ /**
+ * Set to 1 to run a GPIO handshake with a Raspberry Pi SDIO host after SDIO
+ * init and before send/receive. Default is 0 so generic hosts that wire only
+ * DATA/CLK/CMD skip the handshake.
+ *
+ * @note When set to 1, install the GPIO component (`sl_gpio`) in the
+ *       project in Simplicity Studio before building.
+ *
+ * @def SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE
+ ******************************************************************************/
+#define SL_SIWX91X_RASPBERRY_PI_HANDSHAKE_ENABLE 0
+
 /***************************************************************************/ /**
  * SDIO Secondary example initialization function. Creates a FreeRTOS task
  * that handles SDIO configuration and data transfer.
+ *
  * @param none
  * @return none
  ******************************************************************************/

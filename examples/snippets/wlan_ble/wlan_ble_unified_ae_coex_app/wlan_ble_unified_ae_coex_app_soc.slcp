@@ -53,7 +53,8 @@ include:
 component:
 - id: sl_main
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: syscalls
 - id: si91x_memory_default_config
 - id: wiseconnect_common
@@ -66,6 +67,12 @@ component:
 - id: sl_si91x_asynchronous_socket
 - id: bsd_socket
 - id: sl_power_manager
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 requires:
 - name: device_needs_ram_execution
   condition:
@@ -78,6 +85,8 @@ toolchain_settings:
 configuration:
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 readme:
 - path: readme.md
 other_file:

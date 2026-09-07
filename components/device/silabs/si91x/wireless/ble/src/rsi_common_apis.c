@@ -34,7 +34,6 @@
 #include "sl_si91x_status.h"
 #include "rsi_ble_common_config.h"
 #include "sli_utility.h"
-#include "sli_wifi_constants.h"
 #include "rsi_bt_common.h"
 #include "sl_utility.h"
 #include <stdbool.h>

@@ -50,4 +50,4 @@ provides:
     condition: [si91x_log_iostream]
 requires:
   - name: sl_usart_iostream
-  - name: syscalls
+  - name: iostream_retarget_stdio

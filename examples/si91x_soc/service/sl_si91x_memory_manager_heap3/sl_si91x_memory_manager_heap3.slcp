@@ -1,0 +1,65 @@
+project_name: sl_si91x_memory_manager_heap3
+package: platform_siwx91x_app
+description: 'This application demonstrates Native Memory Manager with FreeRTOS Heap 3 on the SiWx917 SoC. It prints heap statistics in hexadecimal, exercises the C library, Native, and FreeRTOS allocator APIs, then creates and deletes one memory pool. Results are printed over VCOM.
+
+  '
+category: example|service
+quality: production
+label: SiWx91x Platform - Memory Manager Heap 3
+component:
+- id: sl_main
+- id: freertos
+- id: freertos_heap_3
+- id: memory_manager
+- id: syscalls
+- id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_uart_si91x
+  instance:
+  - vcom
+source:
+- path: app.c
+- path: memory_manager_heap3_application.c
+include:
+- path: .
+  file_list:
+  - path: app.h
+  - path: memory_manager_heap3_application.h
+define:
+- name: SYSCALLS_WRITE
+toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+ui_hints:
+  highlight:
+  - path: readme.md
+    focus: true
+readme:
+- path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
+post_build:
+  profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.2.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2026.12.0

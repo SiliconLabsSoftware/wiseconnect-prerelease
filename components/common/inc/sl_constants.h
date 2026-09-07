@@ -69,6 +69,12 @@
 #define SL_DEPRECATED_API_WISECONNECT_4_1 __attribute__((deprecated))
 #endif
 
+#ifdef SL_SUPPRESS_DEPRECATION_WARNINGS_WISECONNECT_4_2
+#define SL_DEPRECATED_API_WISECONNECT_4_2
+#else
+#define SL_DEPRECATED_API_WISECONNECT_4_2 __attribute__((deprecated))
+#endif
+
 #define SLI_STATUS_ENUM(prefix, name, value) prefix##_##name = (prefix##_ENUM_OFFSET + value)
 #define SLI_STATUS_SHARED_ENUM(prefix, name) prefix##_##name = (SL_##name)
 
@@ -133,6 +139,14 @@
 #define PRINT_ERROR_LOGS 0
 
 #define PRINT_STATUS(tag, status) printf("\r\n%s %s:%d: 0x%lx \r\n", tag, __FILE__, __LINE__, (unsigned long)status);
+
+// Expected / interim statuses that must not be tagged as ERROR when PRINT_ERROR_LOGS is enabled.
+// Callers still return/goto on these values; only the ERROR console print is suppressed.
+#define SLI_STATUS_IS_NON_ERROR_FOR_PRINT(status)                                                \
+  (((status) == SL_STATUS_IN_PROGRESS) || ((status) == SL_STATUS_SI91X_HTTP_GET_CMD_IN_PROGRESS) \
+   || ((status) == SL_STATUS_SI91X_COMMAND_ISSUED_IN_REJOIN_STATE)                               \
+   || ((status) == SL_STATUS_SI91X_SOCKET_READ_TIMEOUT)                                          \
+   || ((status) == SL_STATUS_SI91X_NO_DATA_RECEIVED_OR_RECEIVE_TIMEOUT))
 
 #define SL_CHECK_STATUS(x)    \
   do {                        \
@@ -210,24 +224,24 @@
     }                                  \
   } while (0)
 
-#define VERIFY_STATUS_AND_RETURN(status)                             \
-  do {                                                               \
-    if (status != SL_STATUS_OK) {                                    \
-      if (PRINT_ERROR_LOGS && ((status) != SL_STATUS_IN_PROGRESS)) { \
-        PRINT_STATUS(ERROR_TAG, status)                              \
-      }                                                              \
-      return status;                                                 \
-    }                                                                \
+#define VERIFY_STATUS_AND_RETURN(status)                                    \
+  do {                                                                      \
+    if (status != SL_STATUS_OK) {                                           \
+      if (PRINT_ERROR_LOGS && !SLI_STATUS_IS_NON_ERROR_FOR_PRINT(status)) { \
+        PRINT_STATUS(ERROR_TAG, status)                                     \
+      }                                                                     \
+      return status;                                                        \
+    }                                                                       \
   } while (0)
 
-#define SLI_VERIFY_STATUS_AND_GOTO(status, goto_label)               \
-  do {                                                               \
-    if (status != SL_STATUS_OK) {                                    \
-      if (PRINT_ERROR_LOGS && ((status) != SL_STATUS_IN_PROGRESS)) { \
-        PRINT_STATUS(ERROR_TAG, status)                              \
-      }                                                              \
-      goto goto_label;                                               \
-    }                                                                \
+#define SLI_VERIFY_STATUS_AND_GOTO(status, goto_label)                      \
+  do {                                                                      \
+    if (status != SL_STATUS_OK) {                                           \
+      if (PRINT_ERROR_LOGS && !SLI_STATUS_IS_NON_ERROR_FOR_PRINT(status)) { \
+        PRINT_STATUS(ERROR_TAG, status)                                     \
+      }                                                                     \
+      goto goto_label;                                                      \
+    }                                                                       \
   } while (0)
 
 #define PRINT_ERROR_STATUS(tag, status)            \

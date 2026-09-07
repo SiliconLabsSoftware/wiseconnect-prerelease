@@ -200,7 +200,8 @@ static void sli_handle_socket_events(const sli_command_engine_metadata_t *data, 
   bool is_socket_command =
     (packet->command == SLI_WIFI_REQ_SOCKET_ACCEPT || packet->command == SLI_WIFI_RSP_REMOTE_TERMINATE
      || packet->command == SLI_RECEIVE_RAW_DATA || packet->command == SLI_WIFI_RSP_TCP_ACK_INDICATION
-     || packet->command == SLI_WIFI_RSP_SELECT_REQUEST || packet->command == SLI_WIFI_RSP_SOCKET_READ_DATA);
+     || packet->command == SLI_WIFI_RSP_SELECT_REQUEST || packet->command == SLI_WIFI_RSP_SOCKET_READ_DATA
+     || packet->command == SLI_WIFI_RSP_SOCKET_CREATE);
   if (is_socket_command) {
     sl_wifi_system_packet_t *raw_rx_packet = packet;
     uint16_t si91x_event_status            = sli_wifi_get_wifi_frame_status(raw_rx_packet);

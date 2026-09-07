@@ -31,6 +31,7 @@
 #define _SL_WIFI_CONSTANTS_H_
 
 #include <stdint.h>
+#include "sl_types.h"
 
 /** \addtogroup SL_WIFI_CONSTANTS Constants
    * @{ */
@@ -53,6 +54,37 @@
 
 /// Maximum number of clients supported when module is running in Access Point mode.
 #define SL_WIFI_MAX_CLIENT_COUNT 16
+
+/**
+ * @def SL_WIFI_MIN_HOST_STACK_PORT
+ * @brief Lowest destination TCP/UDP port used for SiWx3xx dual-stack RX demux.
+ *
+ * @details Used only when [sl_wifi_set_raw_data_packet_callback](../wiseconnect-api-reference-guide-wi-fi/wifi-callback-framework#sl-wifi-set-raw-data-packet-callback)
+ *          is registered and NAL is also active (dual-stack). Frames are classified as native-only,
+ *          host-only, or both using this inclusive lower bound with @ref SL_WIFI_MAX_HOST_STACK_PORT.
+ *          Override before including this header, or via compiler -D, if the product uses a different range.
+ *
+ *          The default is a small dedicated host-stack range (45000-45099) so stock LwIP
+ *          can keep its usual ephemeral/local ports (49152-65535:
+ *          TCP_LOCAL_PORT_RANGE_START / UDP_LOCAL_PORT_RANGE_START through 65535).
+ *          Host/raw dual-stack apps should bind sockets in this range (or override the macros).
+ *          Do not set the host range to overlap LwIP ephemeral ports unless LwIP is also
+ *          reconfigured; otherwise unicast replies to LwIP local ports may be delivered
+ *          only to the raw-data callback and LwIP never receives them.
+ */
+#ifndef SL_WIFI_MIN_HOST_STACK_PORT
+#define SL_WIFI_MIN_HOST_STACK_PORT 45000U
+#endif
+
+/**
+ * @def SL_WIFI_MAX_HOST_STACK_PORT
+ * @brief Highest destination TCP/UDP port used for SiWx3xx dual-stack RX demux.
+ *
+ * @details See @ref SL_WIFI_MIN_HOST_STACK_PORT.
+ */
+#ifndef SL_WIFI_MAX_HOST_STACK_PORT
+#define SL_WIFI_MAX_HOST_STACK_PORT 45099U
+#endif
 
 /// Maximum length of the Wi-Fi Pre-Shared Key (PSK) credential.
 #define SL_WIFI_MAX_PSK_LENGTH 64
@@ -127,11 +159,11 @@ typedef enum {
 
 /**
  * @enum sl_wifi_he_ppdu_type_t
- * @brief HE PPDU type for 802.11ax HE operations (transmit test / PER).
+ * @brief HE PPDU type for 802.11ax HE operations (transmit test / PER / E2E rate).
  *
- * Stored as @c uint8_t in structures for firmware layout compatibility.
+ * Packed to one byte for firmware command payloads (e.g. sl_wifi_11ax_rate_config_t).
  */
-typedef enum {
+typedef enum __attribute__((packed)) {
   SL_WIFI_HE_PPDU_TYPE_SU    = 0, ///< HE SU PPDU
   SL_WIFI_HE_PPDU_TYPE_ER_SU = 1, ///< HE ER SU PPDU
   SL_WIFI_HE_PPDU_TYPE_TB    = 2, ///< HE TB PPDU
@@ -283,8 +315,9 @@ typedef enum {
   * @brief Wi-Fi rate protocols.
   * @note Recommended value for default behavior is SL_WIFI_RATE_PROTOCOL_AUTO.
   * @note 802.11ac not currently supported.
+  * Packed to one byte for E2E fixed transmit-rate command payloads (sl_wifi_mode_rate_t).
   */
-typedef enum {
+typedef enum __attribute__((packed)) {
   SL_WIFI_RATE_PROTOCOL_B_ONLY,  ///< 802.11b rates only (rates go here)
   SL_WIFI_RATE_PROTOCOL_G_ONLY,  ///< 802.11g rates only (rates go here)
   SL_WIFI_RATE_PROTOCOL_N_ONLY,  ///< 802.11n rates only (rates go here)
@@ -375,7 +408,7 @@ typedef enum {
   * @note Only the 2.4 GHz band is currently supported.
   */
 typedef enum {
-  SL_WIFI_AUTO_BAND   = 0, ///< Wi-Fi Band Auto
+  SL_WIFI_AUTO_BAND   = 0, ///< Wi-Fi Band Auto (currently defaults to 2.4 GHz)
   SL_WIFI_BAND_900MHZ = 1, ///< Wi-Fi Band 900 MHz (not currently supported)
   SL_WIFI_BAND_2_4GHZ = 2, ///< Wi-Fi Band 2.4 GHz
   SL_WIFI_BAND_5GHZ   = 3, ///< Wi-Fi Band 5 GHz (Supported in Series-3)
@@ -469,7 +502,7 @@ typedef enum {
   SL_WIFI_SCAN_RESULT_EVENTS = 0, ///< Event group for Wi-Fi scan results
   SL_WIFI_JOIN_EVENTS        = 1, ///< Event group for Wi-Fi join status
   SL_WIFI_RX_PACKET_EVENTS =
-    2, ///< Event group for Wi-Fi received packet. This feature is not supported in current release
+    2, ///< Event group for Wi-Fi received raw data packet. Data is the raw Ethernet frame payload; see @ref sl_wifi_raw_data_packet_callback_t. This API is only supported on SiWx3xx devices.
   SL_WIFI_COMMAND_RESPONSE_EVENTS =
     3, ///< Event group for Wi-Fi command response. This feature is not supported in current release
   SL_WIFI_STATS_RESPONSE_EVENTS     = 4, ///< Event group for Wi-Fi statistics response
@@ -498,7 +531,7 @@ typedef enum {
     SL_WIFI_SCAN_RESULT_EVENTS, ///< Event for Wi-Fi scan result. Data would be type of @ref sl_wifi_scan_result_t
   SL_WIFI_JOIN_EVENT = SL_WIFI_JOIN_EVENTS, ///< Event for Wi-Fi join status. Data would be of type string
   SL_WIFI_RX_PACKET_EVENT =
-    SL_WIFI_RX_PACKET_EVENTS, ///< Event for Wi-Fi received packet. This feature is not supported in current release
+    SL_WIFI_RX_PACKET_EVENTS, ///< Event for Wi-Fi received raw data packet. Data would be the raw Ethernet frame payload. This API is only supported on SiWx3xx devices.
   SL_WIFI_COMMAND_RESPONSE_EVENT =
     SL_WIFI_COMMAND_RESPONSE_EVENTS, ///< Event for Wi-Fi command response. This feature is not supported in current release
   SL_WIFI_STATS_RESPONSE_EVENT =
@@ -644,7 +677,9 @@ typedef enum {
 
 /**
   * @enum sl_wifi_mcs_rate_t
-  * @brief PER / descriptor rate values; numeric values match @ref sl_wifi_data_rate_t (firmware encoding).
+  * @brief Encoded Wi-Fi data rate / MCS index for PER descriptors and E2E fixed transmit rate
+  *        command payloads. Numeric values match firmware encoding; interpret together with
+  *        @ref sl_wifi_rate_protocol_t.
   */
 typedef enum __attribute__((packed)) {
   SL_WIFI_RATE_1    = 0,                ///< Wi-Fi 1 Mbps transfer rate
@@ -744,53 +779,6 @@ typedef enum {
   SLI_WIFI_STOP_STATISTICS_REPORT,  ///< Stop statistics report
 } sli_wifi_statistics_report_t;
 //! @endcond
-
-/**
-  * @enum sl_wifi_band_mode_t
-  * @brief Band mode.
-  * @note Only 2.4 GHz is currently supported.
-  */
-typedef enum {
-  SL_WIFI_BAND_MODE_2_4GHZ = 0, ///< 2.4 GHz Wi-Fi band
-  SL_WIFI_BAND_MODE_5GHZ   = 1, ///< 5 GHz Wi-Fi band (not supported in SiWx91x devices)
-  SL_WIFI_DUAL_BAND_MODE   = 2  ///< Both 2.4 GHz and 5 GHz WiFi band (not supported in SiWx91x devices)
-} sl_wifi_band_mode_t;
-
-/**
-  * @enum sl_wifi_region_code_t
-  * 
-  * @brief
-  * Enumeration of Wi-Fi region codes.
-  * 
-  * @details
-  * Guidance for Region code Mapping for Different Countries
-  * | Country         | Country Code  |  Max power (Based on Regulatory domain)   | Frequency Range (Based on Regulatory Domain) | Suggested Region Code Mapping |
-  * |:----------------|:--------------|:------------------------------------------|:---------------------------------------------|:------------------------------|
-  * | Korea           | KR            | 23 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_KR             |
-  * | Hong Kong       | HK            | 36 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
-  * | Singapore       | SG            | 200 mW (23 dBm)                           | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
-  * | Malaysia        | MY            | 500 mW (27 dBm)                           | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
-  * | Australia       | AU            | 4000 mW (36 dBm)                          | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
-  * | Taiwan          | TW            | 30 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
-  * | Thailand        | TH            | 20 dBm                                    | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
-  * | Mexico          | MX            | 20 dBm                                    | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
-  * | Vietnam         | VN            | 20 dBm                                    | 2402 - 2482                                  | SL_WIFI_REGION_EU             |
-  * | Indonesia       | ID            | 500mW (27 dBm)                            | 2400 - 2483.5                                | SL_WIFI_REGION_EU             |
-  * | China           | CN            | 20 dBm                                    | 2400 - 2483.5                                | SL_WIFI_REGION_CN             |
-  *
-  * @note `SL_WIFI_IGNORE_REGION` This option will be deprecated in future releases.
-  **/
-typedef enum {
-  SL_WIFI_DEFAULT_REGION,      ///< Factory default region
-  SL_WIFI_REGION_US,           ///< United States
-  SL_WIFI_REGION_EU,           ///< European Union
-  SL_WIFI_REGION_JP,           ///< Japan
-  SL_WIFI_REGION_WORLD_DOMAIN, ///< Worldwide domain
-  SL_WIFI_REGION_KR,           ///< Korea
-  SL_WIFI_REGION_SG,           ///< Singapore (not currently supported)
-  SL_WIFI_REGION_CN,           ///< China
-  SL_WIFI_IGNORE_REGION        ///< @deprecated This option will be deprecated in future releases.
-} sl_wifi_region_code_t;
 
 /**
   * @enum sl_wifi_ap_keepalive_type_t

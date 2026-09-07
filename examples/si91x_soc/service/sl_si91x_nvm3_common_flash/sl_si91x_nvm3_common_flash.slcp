@@ -9,7 +9,8 @@ label: SiWx91x Platform - NVM3 Common Flash
 component:
 - id: sl_main
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: nvm3_lib
 - id: slist
 - id: syscalls

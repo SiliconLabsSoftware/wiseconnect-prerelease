@@ -105,6 +105,15 @@
 // <i> Default: 0 (disabled)
 #define SL_LOG_DEBUG_ASSERT_ENABLE 0
 
+// <o SL_LOG_IOSTREAM_HANDLE> The iostream handle used by the logger instance
+// <i> Specifies the iostream handle used by the logger.
+// <i> The available iostream handles can be found in the "sl_iostream_handles.h"
+// <i> file in the autogen/ folder in the project.
+// <i> It is also possible to update the global variable
+// <i> "sl_iostream_recommended_console_stream" in "sl_iostream_handles.c"
+// <i> Default: sl_iostream_recommended_console_stream
+#define SL_LOG_IOSTREAM_HANDLE sl_iostream_recommended_console_stream
+
 #endif /* SL_LOG_COMMON_CONFIG_H */
 
 // <<< end of configuration section >>>

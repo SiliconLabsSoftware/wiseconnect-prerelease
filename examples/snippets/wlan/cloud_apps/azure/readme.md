@@ -35,6 +35,8 @@ This application demonstrates how to configure the SiWx91x module as an Azure de
 
 ## Prerequisites/Setup Requirements
 
+> **NOTE:** The application uses SNTP to obtain Unix time required for SAS token generation. SAS token generation requires access to the NTP server `0.pool.ntp.org` before the device can connect to Azure IoT Hub over MQTT.
+
 ### Hardware Requirements  
 
 - A Windows PC
@@ -468,6 +470,7 @@ The device is now successfully registered to IoT Hub with Symmetric key authenti
 If you encounter issues while running the Azure IoT MQTT Client example, check the following:
 
 - Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID`, `DEFAULT_WIFI_CLIENT_CREDENTIAL`, and `DEFAULT_WIFI_CLIENT_SECURITY_TYPE` in `sl_net_default_values.h` match your access point settings and that the AP has internet access.
+- Confirm that the device can reach the NTP server `0.pool.ntp.org`. SAS token generation requires a successful SNTP time sync before the device can connect to Azure IoT Hub over MQTT.
 - Confirm that `democonfigHOSTNAME`, `democonfigDEVICE_ID`, and authentication credentials in `demo_config.h` match your Azure IoT Hub and registered device settings.
 - For symmetric key authentication, set `USE_SYMMETRIC_KEY` to `1` and configure `democonfigDEVICE_SYMMETRIC_KEY` from the IoT Hub primary connection string as described in [Register IoT Device with Symmetric Key Authentication in IoT Hub](#131-register-iot-device-with-symmetric-key-authentication-in-iot-hub).
 - For X.509 authentication, set `USE_SYMMETRIC_KEY` to `0`, generate and convert device certificates using `certificate_to_array.py`, and include the generated `.h` files as described in [Register IoT Device with X.509 Authenticated Device with IoT Hub](#132-register-iot-device-with-x509-authenticated-device-with-iot-hub).

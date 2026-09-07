@@ -1028,6 +1028,12 @@ extern "C" {
 #define SL_SI91X_WC_EXT_TCP_IP_CERT_BYPASS  0
 #define SLI_SI91X_WC_EXT_TCP_IP_CERT_BYPASS (SL_SI91X_WC_EXT_TCP_IP_CERT_BYPASS << 5)
 
+// <q SL_SI91X_WC_EXT_TCP_IP_FEAT_HTTP_HP_SUPPORT> Enable HTTP Client High-Performance Mode
+// <i> Enables NWP-managed, buffer-adaptive HTTP receive window sizing (up to ~8 KB).
+// <i> Not supported with 352K/320K RAM config. Default: Disable
+#define SL_SI91X_WC_EXT_TCP_IP_FEAT_HTTP_HP_SUPPORT  0
+#define SLI_SI91X_WC_EXT_TCP_IP_FEAT_HTTP_HP_SUPPORT (SL_SI91X_WC_EXT_TCP_IP_FEAT_HTTP_HP_SUPPORT << 22)
+
 // <q SL_SI91X_WC_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS> Enable Three SSL/TLS Sockets
 // <i> This feature allows the device to support up to three simultaneous SSL/TLS connections.
 // <i> Enable or disable three SSL/TLS sockets feature.
@@ -1527,8 +1533,8 @@ extern "C" {
    | SLI_SI91X_WC_EXT_TCP_IP_TOTAL_SELECTS | SLI_SI91X_WC_EXT_TCP_IP_WAIT_FOR_SOCKET_CLOSE                             \
    | SLI_SI91X_WC_EXT_EMB_MQTT_ENABLE | SLI_SI91X_WC_EXT_FEAT_HTTP_OTAF_SUPPORT                                        \
    | SLI_SI91X_WC_EXT_TCP_DYNAMIC_WINDOW_UPDATE_FROM_HOST | SLI_SI91X_WC_EXT_TCP_MAX_RECV_LENGTH                       \
-   | SLI_SI91X_WC_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS | SLI_SI91X_WC_EXT_TCP_IP_FEAT_SSL_MEMORY_CLOUD                    \
-   | SLI_SI91X_WC_CONFIG_FEAT_EXTENTION_VALID)
+   | SLI_SI91X_WC_EXT_TCP_IP_FEAT_HTTP_HP_SUPPORT | SLI_SI91X_WC_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS                     \
+   | SLI_SI91X_WC_EXT_TCP_IP_FEAT_SSL_MEMORY_CLOUD | SLI_SI91X_WC_CONFIG_FEAT_EXTENTION_VALID)
 
 #define SL_SI91X_WC_BLE_FEATURE_BITMAP                                                                         \
   (SLI_SI91X_WC_BLE_MAX_NBR_ATT_REC | SLI_SI91X_WC_BLE_MAX_NBR_ATT_SERV | SLI_SI91X_WC_BLE_MAX_NBR_PERIPHERALS \

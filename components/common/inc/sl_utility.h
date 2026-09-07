@@ -30,10 +30,28 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "sl_status.h"
 #include "sl_ip_types.h"
 #include "sl_ieee802_types.h"
 #include "sl_wifi_types.h"
+
+// cmsis_compiler.h provides __PACKED_STRUCT on MCU/NWP targets. It is not on the
+// include path for host builds (e.g. unit tests), so include it only when
+// available and fall back to a portable packed-struct definition otherwise.
+#if defined(__has_include)
+#if __has_include("cmsis_compiler.h")
+#include "cmsis_compiler.h"
+#endif
+#endif
+
+#ifndef __PACKED_STRUCT
+#if defined(__GNUC__) || defined(__clang__)
+#define __PACKED_STRUCT struct __attribute__((packed))
+#else
+#define __PACKED_STRUCT struct
+#endif
+#endif
 
 typedef struct {
   uint8_t common_log_level;
@@ -59,6 +77,38 @@ typedef struct {
   uint8_t log_config_level;
 } sli_nwp_log_config_t;
 
+/**
+ * @brief NWP wire format for a log record.
+ *
+ * Fixed by the NWP firmware, so it is spelled out here instead of reusing
+ * @ref sl_log_event_t: the host structure carries a 64-bit event time (a
+ * timestamp plus an epoch) and its args[] length follows SL_LOG_CONFIG_ARG, so
+ * the two layouts no longer coincide. Sizing the receive path off the host
+ * structure would make every RX packet fail the length check and be dropped.
+ *
+ * Single source of truth for the wire layout, shared by both the NCP host path
+ * (sl_utility.c) and the SiWx91x MCU platform path (sl_log_platform_specific.c).
+ * The MCU log component pulls this header in through its wiseconnect_common
+ * dependency, so the definition lives in exactly one place.
+ */
+typedef __PACKED_STRUCT
+{
+  /** @brief Timestamp on the NWP timebase, in microseconds */
+  uint32_t timestamp;
+  /** @brief Unique event identifier (pointer to format string or numeric ID) */
+  uint32_t event_id;
+  /** @brief Event arguments; the NWP always emits three slots */
+  uint32_t args[3];
+  /** @brief Number of valid entries in args */
+  uint8_t arg_count;
+  /** @brief Core identifier that generated the event */
+  uint8_t core_id;
+  /** @brief Event flags - bits 1-7: log level, bit 0: event type */
+  uint8_t flags;
+  /** @brief Version of the logging component that generated this event */
+  uint8_t version;
+}
+sli_nwp_log_event_t;
 /***************************************************************************/ /**
  * @brief 
  *   Convert a character string into a sl_ipv4_address_t

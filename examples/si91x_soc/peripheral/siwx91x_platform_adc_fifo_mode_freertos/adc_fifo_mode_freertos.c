@@ -39,7 +39,6 @@
 #define ADC_MAX_OP_VALUE      4095
 #define ADC_DATA_CLEAR        0xF7FF
 #define VREF_VALUE            3.3
-#define ADC_PING_BUFFER       0x0000A000
 #define MEASUREMENT_DELAY_MS  1000
 
 /** Event flag: FIFO DMA transfer complete (set in callback when using slot 0). */
@@ -49,7 +48,12 @@
  *************************** LOCAL VARIABLES   *******************************
  ******************************************************************************/
 static float vref_value = (float)VREF_VALUE;
-static int16_t adc_output[CHANNEL_SAMPLE_LENGTH];
+/* CPU-side sample buffer filled by sl_si91x_adc_read_data() (already .bss). */
+static int16_t adc_output[CHANNEL_SAMPLE_LENGTH] = { 0 };
+/* ADC internal-DMA ping/pong destination in M4 RAM (.bss). Linker places this
+ * in the ram region (below 0x2F400), which the FIFO DMA path accepts — no
+ * hardcoded absolute/offset address required. Sized for ping + pong. */
+static int16_t adc_ping_pong_buf[CHANNEL_SAMPLE_LENGTH * 2] = { 0 };
 static osEventFlagsId_t adc_event_flags;
 #ifdef DAC_FIFO_MODE_EN
 static volatile boolean_t dac_fifo_intr_flag = false;
@@ -144,8 +148,9 @@ static void read_adc_value(uint8_t channel_num)
   local_adc_channel_config.sampling_rate[0]  = sl_adc_channel_config.sampling_rate[channel_num];
 
   local_adc_channel_config.rx_buf[0]            = adc_output;
-  local_adc_channel_config.chnl_ping_address[0] = ADC_PING_BUFFER;
-  local_adc_channel_config.chnl_pong_address[0] = ADC_PING_BUFFER + local_adc_channel_config.num_of_samples[0];
+  local_adc_channel_config.chnl_ping_address[0] = (uint32_t)adc_ping_pong_buf;
+  local_adc_channel_config.chnl_pong_address[0] =
+    (uint32_t)adc_ping_pong_buf + local_adc_channel_config.num_of_samples[0];
 
   status = sl_si91x_adc_init(local_adc_channel_config, local_sl_adc_config, vref_value);
   DEBUGINIT();

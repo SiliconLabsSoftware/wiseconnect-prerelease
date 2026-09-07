@@ -1149,7 +1149,7 @@ static sl_status_t sl_si91x_soft_reset(void)
 }
 #endif
 
-sl_status_t sl_si91x_assert()
+sl_status_t sli_si91x_assert(void)
 {
   sl_status_t status = SL_STATUS_OK;
 
@@ -1165,6 +1165,11 @@ sl_status_t sl_si91x_assert()
                                  NULL);
   VERIFY_STATUS_AND_RETURN(status);
   return status;
+}
+
+sl_status_t sl_si91x_assert(void)
+{
+  return sli_si91x_assert();
 }
 
 sl_status_t sl_si91x_get_ram_log(uint32_t address, uint32_t length)

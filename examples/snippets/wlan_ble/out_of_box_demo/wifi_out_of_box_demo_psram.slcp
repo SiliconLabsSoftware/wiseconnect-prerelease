@@ -41,6 +41,7 @@ component:
 - id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: psram_core
+- id: sl_si91x_memory_manager_psram
 - id: sleeptimer
 - id: memlcd_917
 - id: sl_power_manager
@@ -76,7 +77,8 @@ requires:
 - name: sl_si91x_internal_stack
 - name: wifi_resources
 - name: freertos
-- name: freertos_heap_4
+- name: freertos_heap_3
+- name: memory_manager
 - name: slist
 - name: sl_si91x_asynchronous_socket
 - name: basic_network_config_manager

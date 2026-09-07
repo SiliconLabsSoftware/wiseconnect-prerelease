@@ -176,6 +176,18 @@ void sli_si91x_set_feature_bit_map(uint32_t feature_bit_map);
  ******************************************************************************/
 uint32_t sli_si91x_get_feature_bit_map(void);
 
+/***************************************************************************/ /**
+ * @brief
+ *   Trigger an assert in the Si91x NWP firmware.
+ * @details
+ *   Internal use only. Sends an assert command to the NWP firmware, which
+ *   indicates the assert to the host and then triggers an internal firmware
+ *   assertion. This is a blocking API.
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ ******************************************************************************/
+sl_status_t sli_si91x_assert(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -277,6 +277,37 @@ typedef struct {
 } sli_wifi_join_request_t;
 #pragma pack()
 
+/// Everest (siwx3xx) join command request: power_level is int16_t (deci-dBm), no data_rate field
+#pragma pack(1)
+typedef struct {
+  uint8_t reserved1;
+  uint8_t security_type;
+  int16_t power_level; ///< Transmit power in deci-dBm. Range -150 to 310
+  uint8_t psk[SLI_WIFI_PSK_LEN];
+  uint8_t ssid[SLI_WIFI_SSID_LEN];
+  uint8_t join_feature_bitmap;
+  uint8_t reserved2[1];
+  uint8_t listen_interval_multiplier;
+  uint8_t ssid_len;
+  uint32_t listen_interval;
+  uint8_t vap_id;
+  uint8_t join_bssid[6];
+} sli_wifi_join_request_ext_t;
+#pragma pack()
+
+/// Everest (siwx3xx) scan request: scan TX power is in power_level (deci-dBm). scan_feature_bitmap: bits [0:2] optional features; bits [3:7] optional encoded power if firmware uses them (otherwise zero).
+#pragma pack(1)
+typedef struct {
+  uint8_t channel[4];
+  uint8_t ssid[SLI_WIFI_SSID_LEN];
+  uint8_t pscan_bitmap[2];
+  int16_t power_level; ///< Transmit power in deci-dBm. Range -150 to 310
+  uint8_t scan_feature_bitmap;
+  uint8_t channel_bit_map_2_4[2];
+  uint8_t channel_bit_map_5[4];
+} sli_wifi_scan_request_ext_t;
+#pragma pack()
+
 /// Roam parameters request
 typedef struct {
   uint32_t roam_enable;           ///< Enable or disable roaming
@@ -483,6 +514,42 @@ typedef struct {
   uint32_t timeout_bitmap; ///< Timeout bitmap
   uint16_t timeout_value;  ///< Timeout value
 } sli_wifi_request_timeout_t;
+
+/**
+ * @struct sli_wifi_request_transmit_rate_11bgn_t
+ * @brief Host WLAN command payload for 802.11b/g/n fixed transmit rate (SiWx3xx).
+ */
+typedef struct {
+  sl_wifi_mode_rate_t mode_rate;            ///< Protocol and rate selection
+  sl_wifi_11bgn_rate_config_t config_11bgn; ///< 802.11b/g/n PHY options
+} sli_wifi_request_transmit_rate_11bgn_t;
+
+/**
+ * @struct sli_wifi_request_transmit_rate_11ac_t
+ * @brief Host WLAN command payload for 802.11ac fixed transmit rate (SiWx3xx).
+ */
+typedef struct {
+  sl_wifi_mode_rate_t mode_rate;          ///< Protocol and rate selection
+  sl_wifi_11ac_rate_config_t config_11ac; ///< 802.11ac PHY options
+} sli_wifi_request_transmit_rate_11ac_t;
+
+/**
+ * @struct sli_wifi_request_transmit_rate_11ax_t
+ * @brief Host WLAN command payload for 802.11ax fixed transmit rate (SiWx3xx).
+ */
+typedef struct {
+  sl_wifi_mode_rate_t mode_rate;          ///< Protocol and rate selection
+  sl_wifi_11ax_rate_config_t config_11ax; ///< 802.11ax PHY options
+} sli_wifi_request_transmit_rate_11ax_t;
+
+/**
+ * @struct sli_wifi_request_transmit_rate_11be_t
+ * @brief Host WLAN command payload for 802.11be fixed transmit rate (SiWx3xx).
+ */
+typedef struct {
+  sl_wifi_mode_rate_t mode_rate;          ///< Protocol and rate selection
+  sl_wifi_11be_rate_config_t config_11be; ///< 802.11be PHY options
+} sli_wifi_request_transmit_rate_11be_t;
 
 // Config command request structure
 typedef struct {
@@ -772,7 +839,7 @@ typedef struct {
  *          @ref sl_net_set_application_profile() via @ref sli_wifi_set_active_application_profile()
  *          after all preset configuration succeeds. Reset to @ref SLI_WIFI_APPLICATION_PROFILE_MAX
  *          in @ref sli_wifi_deinit(). This host state survives Wi-Fi disconnect and is used for
- *          scan-time behavior (for example `lp_chain_scan` override in @ref sli_handle_standard_scan)
+ *          scan-time behavior (for example `lp_chain_scan` override in platform standard-scan handlers)
  *          and to no-op scan-timeout configuration in @ref sli_wifi_configure_timeout(). Profile
  *          configuration applied by @ref sl_net_set_application_profile is **not** retained across
  *          disconnect or join failure; the application must re-call that API to restore configuration.
@@ -814,5 +881,191 @@ typedef struct {
     sli_wifi_aggregation_config_t aggregation;                 ///< sub-cmd @c 3
   } config;
 } sli_wifi_advanced_configuration_t;
+
+/**
+ * @struct sli_wifi_twt_selection_t
+ * @brief TWT auto-selection request structure.
+ */
+typedef struct {
+  uint8_t twt_enable;
+  uint16_t average_tx_throughput;
+  uint32_t tx_latency;
+  uint32_t rx_latency;
+  uint16_t device_average_throughput;
+  uint8_t estimated_extra_wake_duration_percent;
+  uint8_t twt_tolerable_deviation;
+  uint32_t default_wake_interval_ms;
+  uint32_t default_minimum_wake_duration_ms;
+  uint8_t beacon_wake_up_count_after_sp;
+} sli_wifi_twt_selection_t;
+
+/**
+ * @enum sli_wifi_rail_cmd_subtype_t
+ * @brief Enumeration of Wi-Fi RAIL command subtypes.
+ *
+ * This enumeration defines the various subtypes of Wi-Fi RAIL commands used for specific operations.
+ *
+ * @details
+ * Each subtype corresponds to a specific Wi-Fi operation or request, such as measuring noise density, 
+ * starting or stopping ADC captures, configuring DPD, or resetting PER statistics.
+ *
+ * @var SLI_WIFI_SUBTYPE_SET_TX_POWER_DBM
+ *  Subtype for setting transmission power in dBm.
+ * 
+ * @var SLI_WIFI_SUBTYPE_TRANSMIT_CW
+ *   Subtype for starting Continuous Wave (CW) transmission.
+ *
+ * @var SLI_WIFI_SUBTYPE_RX_STOP
+ *   Subtype for stopping RX (Receive) operations.
+ * 
+ * @var SLI_WIFI_SUBTYPE_CONFIG_XO_CTUNE
+ *   Subtype for configuring XO (Crystal Oscillator) CTUNE (Capacitor Tuning).  
+ * 
+ * @var SLI_WIFI_SUBTYPE_GET_XO_CTUNE
+ *   Subtype for getting CTUNE (Capacitor Tuning) values.
+ *
+ */
+typedef enum {
+  SLI_WIFI_SUBTYPE_SET_TX_POWER_DBM = 1,  ///< Set transmission power in dBm.
+  SLI_WIFI_SUBTYPE_TRANSMIT_CW      = 4,  ///< Start Continuous Wave (CW) transmission.
+  SLI_WIFI_SUBTYPE_RX_STOP          = 10, ///< Stop RX (Receive) operations.
+  SLI_WIFI_SUBTYPE_CONFIG_XO_CTUNE  = 21, ///< Configure XO (Crystal Oscillator) CTUNE (Capacitor Tuning).
+  SLI_WIFI_SUBTYPE_GET_XO_CTUNE     = 22, ///< Get CTUNE (Capacitor Tuning) values.
+} sli_wifi_rail_cmd_subtype_t;
+
+/**
+ * @struct sli_wifi_frame_body_type_t
+ * @brief Represents the frame body type for Wi-Fi operations.
+ *
+ * This structure is used to define the subtype of a Wi-Fi request and includes
+ * a reserved field for future use.
+ *
+ * @var sli_wifi_frame_body_type_t::sub_type
+ *   Subtype of the request. This field specifies the type of operation or request being made.
+ *
+ * @var sli_wifi_frame_body_type_t::reserved
+ *   Reserved for future use. This field is intended for potential extensions or additional data.
+ */
+typedef struct {
+  uint16_t sub_type; ///< Sub_type of the request.
+  uint16_t reserved; ///< Reserved for future use.
+} sli_wifi_frame_body_type_t;
+
+typedef struct {
+  sli_wifi_frame_body_type_t frame_body_type;
+  uint32_t ctune_data;
+} sli_wifi_request_configure_xo_ctune_t;
+typedef struct {
+  sli_wifi_frame_body_type_t frame_body_type;
+  uint32_t ctune_data[2];
+} sli_wifi_request_get_xo_ctune_t;
+
+typedef struct {
+  sli_wifi_frame_body_type_t frame_body_type;
+} sli_wifi_request_stop_rx_t;
+
+/**
+ * @struct sli_wifi_request_cw_tone_config_t
+ * @brief Structure representing the configuration for transmitting Continuous Wave (CW) tones in Wi-Fi.
+ *
+ * This structure is used to configure and control the transmission of CW tones, 
+ * including enabling/disabling the transmission, and specifying the tone configuration.
+ *
+ * @details
+ * - CW tones are primarily used for testing and calibration purposes in Wi-Fi systems.
+ * - The structure allows enabling/disabling CW tone transmission and provides a configuration structure for tone settings.
+ *
+ * @var sli_wifi_request_cw_tone_config_t::frame_body_type
+ *   Transmit CW tone request structure. Specifies the frame body type for the request.
+ *
+ * @var sli_wifi_request_cw_tone_config_t::enable
+ *   Enable or disable CW tone transmission. Set to 1 to enable, 0 to disable.
+ *
+ * @var sli_wifi_request_cw_tone_config_t::cw_tone_config
+ *   CW tone configuration structure. Contains detailed settings for tone frequencies, scaling, and modes.
+ */
+typedef struct {
+  sli_wifi_frame_body_type_t frame_body_type; ///< Transmit CW tone request structure.
+  uint8_t enable;                             ///< Enable or disable CW tone transmission. 1 to enable, 0 to disable.
+  sl_wifi_cw_tone_config_t cw_tone_config;    ///< CW tone configuration structure.
+} sli_wifi_request_cw_tone_config_t;
+
+typedef struct {
+  sli_wifi_frame_body_type_t frame_body_type;
+  int16_t Txpower;
+} sli_wifi_request_tx_power_t;
+
+typedef struct {
+  uint16_t frame_control; // Frame Control field
+  uint16_t duration_id;   // Duration/ID field
+  uint8_t addr1[6];       // Address 1 (Receiver Address - RA)
+  uint8_t addr2[6];       // Address 2 (Transmitter Address - TA)
+  uint8_t addr3[6];       // Address 3 (Destination Address - DA or Source Address - SA)
+  uint16_t seq_ctrl;      // Sequence Control field
+} sli_ieee80211_hdr_t;
+
+typedef struct __attribute__((packed)) {
+  uint16_t wifi_protocol;
+  uint16_t enable;
+  int16_t power;
+  uint32_t rate;
+  uint16_t length;
+  uint16_t mode;
+  uint16_t channel;
+  uint16_t no_of_pkts;
+  uint32_t delay;
+  uint16_t channel_bw;
+  uint16_t aggr_enable;
+  uint16_t aggr_count;
+  uint16_t flags;
+} sli_wifi_tx_test_base_info_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t short_gi_enable;
+  uint8_t greenfield_mode_enable;
+  uint8_t short_preamble_enable;
+} sli_wifi_11bgn_per_params_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t short_gi_enable;
+} sli_wifi_11ac_per_params_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t coding_type;
+  uint8_t nominal_pe;
+  uint8_t ul_dl;
+  uint8_t he_ppdu_type;
+  uint8_t beam_change;
+  uint8_t bw;
+  uint8_t stbc;
+  uint8_t tx_bf;
+  uint8_t gi_ltf;
+  uint8_t dcm;
+  uint8_t nsts_midamble;
+  uint8_t spatial_reuse;
+  uint8_t bss_color;
+  uint8_t ru_allocation;
+  uint16_t he_siga2_reserved;
+  uint8_t n_heltf_tot;
+  uint8_t sigb_dcm;
+  uint8_t sigb_mcs;
+  uint8_t user_idx;
+  uint16_t user_sta_id;
+  uint8_t sigb_compression;
+} sli_wifi_11ax_per_params_wire_t;
+
+typedef struct __attribute__((packed)) {
+  uint8_t coding_type;
+  uint8_t nominal_pe;
+  uint8_t ul_dl;
+  uint8_t be_ppdu_type;
+  uint8_t bw;
+  uint8_t gi_ltf;
+  uint8_t spatial_reuse;
+  uint8_t ru_allocation;
+  uint8_t n_heltf_tot;
+  uint8_t eht_sig_mcs;
+  uint8_t disregard;
+} sli_wifi_11be_per_params_wire_t;
 
 #endif // SLI_WIFI_TYPES_H

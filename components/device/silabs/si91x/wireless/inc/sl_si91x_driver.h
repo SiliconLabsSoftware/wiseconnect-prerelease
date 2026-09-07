@@ -588,19 +588,15 @@ sl_status_t sl_si91x_set_join_configuration(sl_wifi_interface_t interface,
 sl_status_t sl_si91x_get_join_configuration(sl_wifi_interface_t interface,
                                             uint8_t *join_feature_bitmap) SL_DEPRECATED_API_WISECONNECT_4_0;
 
+//! @cond Doxygen_Suppress
 /***************************************************************************/ /**
  * @brief
- *   Trigger an assert in firmware.
- * 
- * @details
- *   This function is used to signal that an assertion has occurred in the firmware. It helps in debugging by indicating that a specific condition has failed.
- * 
- *   This is blocking API.
- * 
- * @return
- *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.  
- *******************************************************************************/
-sl_status_t sl_si91x_assert(void);
+ *   Trigger an assert in the Si91x NWP firmware.
+ * @deprecated Use @ref sli_si91x_assert instead. This API is retained for
+ *   backward compatibility and will be removed after the deprecation period.
+ ******************************************************************************/
+sl_status_t sl_si91x_assert(void) SL_DEPRECATED_API_WISECONNECT_4_2;
+//! @endcond
 
 /***************************************************************************/ /**
  * @brief

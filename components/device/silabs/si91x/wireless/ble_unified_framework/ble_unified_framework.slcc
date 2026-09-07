@@ -24,7 +24,6 @@ include:
 define:
 - name: SLI_SI91X_ENABLE_BLE_UNIFIED_FRAMEWORK
 requires:
-- name: sl_si91x_wireless
 - name: ble
 template_file:
   - path: templates/ble_event_hdlr_auto_gen.c.jinja

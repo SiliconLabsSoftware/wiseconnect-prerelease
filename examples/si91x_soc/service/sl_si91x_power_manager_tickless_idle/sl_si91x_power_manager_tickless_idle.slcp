@@ -9,7 +9,8 @@ label: SiWx91x Platform - Power Manager Tickless Idle
 component:
 - id: sl_main
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: syscalls
 - id: si91x_mem_config_3
 - id: si91x_log

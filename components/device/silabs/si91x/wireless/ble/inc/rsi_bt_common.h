@@ -33,6 +33,7 @@
 #include "sl_types.h"
 
 #include "cmsis_os2.h"
+#include "sl_constants.h"
 
 #ifndef BIT
 #define BIT(a) ((uint32_t)1U << (a))
@@ -115,6 +116,13 @@
 #define STACK_BT_MODE 0x01
 ///Defines the stack mode for Bluetooth Low Energy (BLE).
 #define STACK_BTLE_MODE 0x02
+/// Sub-command ID for the SLI_COMMON_REQ_ENABLE_DISABLE_BLE payload to enable BLE.
+#define SLI_BLE_SUB_CMD_ENABLE 0x01
+/// Sub-command ID for the SLI_COMMON_REQ_ENABLE_DISABLE_BLE payload to disable BLE.
+#define SLI_BLE_SUB_CMD_DISABLE 0x02
+/// Timeout value for the BLE Enable/Disable response command.
+#define SLI_COMMON_RSP_BLE_ENABLE_DISABLE_WAIT_TIME \
+  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 //RF types
 /// Specify the external RF mode.
 #define RSI_EXTERNAL_RF 0x00
@@ -156,7 +164,8 @@
   * @{ */
 typedef struct rsi_ble_cb_s
   rsi_ble_cb_t; ///< Typedef for the BLE control block structure refer \ref rsi_ble_cb_s_group  for complete information of Driver BLE control block.
-typedef struct rsi_bt_classic_cb_s rsi_bt_classic_cb_t; ///< Typedef for the Bluetooth Classic control block structure.
+typedef struct rsi_bt_classic_cb_s SL_DEPRECATED_API_WISECONNECT_4_2
+  rsi_bt_classic_cb_t; ///< Typedef for the Bluetooth Classic control block structure. This structure is deprecated in WiseConnect 4.2.
 typedef struct rsi_bt_common_specific_cb_s
   rsi_bt_common_specific_cb_t; ///< Typedef for the Bluetooth common specific control block structure.
 typedef int32_t (*rsi_bt_get_ber_pkt_t)(uint8_t *pkt,
@@ -263,7 +272,7 @@ struct rsi_bt_common_specific_cb_s {
  * @brief Structure representing the Bluetooth global callback.
  *
  * This structure is used to define the parameters for Bluetooth global callbacks,
- * which includes common specific callbacks, BLE specific callbacks, and BT Classic specific callbacks.
+ * which includes common specific callbacks and BLE specific callbacks.
  */
 typedef struct rsi_bt_global_cb_s {
   /** BT Common specific callback */
@@ -435,7 +444,7 @@ typedef struct rsi_bt_resp_get_bt_stack_version_s {
 typedef struct rsi_ble_set_antenna_s {
   /** Antenna value - internal/external */
   uint8_t value;
-} rsi_ble_set_antenna_t;
+} rsi_ble_set_antenna_t SL_DEPRECATED_API_WISECONNECT_4_2;
 
 /**
  * @brief Structure represents the Bluetooth set feature bitmap.
@@ -446,7 +455,7 @@ typedef struct rsi_ble_set_antenna_s {
 typedef struct rsi_bt_set_feature_bitmap_s {
   /** Features bits (bit map) */
   uint32_t bit_map;
-} rsi_bt_set_feature_bitmap_t;
+} rsi_bt_set_feature_bitmap_t SL_DEPRECATED_API_WISECONNECT_4_2;
 
 /**
  * @brief Structure represents the BLE operation mode.
@@ -487,7 +496,7 @@ typedef struct rsi_bt_set_antenna_tx_power_level_s {
   uint8_t protocol_mode;
   /** Transmit power */
   int8_t tx_power;
-} rsi_bt_set_antenna_tx_power_level_t;
+} rsi_bt_set_antenna_tx_power_level_t SL_DEPRECATED_API_WISECONNECT_4_2;
 
 // BT PER Stats
 /**

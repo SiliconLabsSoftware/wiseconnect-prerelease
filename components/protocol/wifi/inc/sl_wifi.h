@@ -35,7 +35,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "sli_wifi.h"
-
+#include "sl_power_profile.h"
 /// Default Wi-Fi scan configuration
 extern const sl_wifi_scan_configuration_t default_wifi_scan_configuration;
 
@@ -268,6 +268,36 @@ sl_status_t sl_wifi_set_max_tx_power(sl_wifi_interface_t interface, sl_wifi_max_
 
 /***************************************************************************/ /**
  * @brief
+ *   Get the maximum Wi-Fi transmit power (deci-dBm).
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[out] max_tx_power
+ *   Maximum transmit power in deci-dBm as identified by @ref sl_wifi_max_tx_power_decidbm_t
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is not supported on SiWx91x devices.
+ ******************************************************************************/
+sl_status_t sl_wifi_get_max_tx_power_decidbm(sl_wifi_interface_t interface,
+                                             sl_wifi_max_tx_power_decidbm_t *max_tx_power);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Set the maximum Wi-Fi transmit power (deci-dBm).
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] max_tx_power
+ *   Maximum transmit power in deci-dBm as identified by @ref sl_wifi_max_tx_power_decidbm_t
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   This API is not supported on SiWx91x devices.
+ ******************************************************************************/
+sl_status_t sl_wifi_set_max_tx_power_decidbm(sl_wifi_interface_t interface,
+                                             const sl_wifi_max_tx_power_decidbm_t *max_tx_power);
+
+/***************************************************************************/ /**
+ * @brief
  *   Configures the Request-To-Send (RTS) threshold in bytes.
  *   When a frame’s size meets or exceeds this value, the RTS/CTS handshake is initiated to reduce collisions. Frames smaller than the threshold are sent directly, avoiding the extra overhead of control frames.
  * @param[in] interface
@@ -439,6 +469,8 @@ sl_status_t sl_wifi_set_channel(sl_wifi_interface_t interface, sl_wifi_channel_t
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
+ *   Supported only on SiWx91x devices.
+ * @note
  *   Only 1 and 2 Mbps rates are allowed in channel 14.
  ******************************************************************************/
 sl_status_t sl_wifi_set_transmit_rate(sl_wifi_interface_t interface,
@@ -459,10 +491,86 @@ sl_status_t sl_wifi_set_transmit_rate(sl_wifi_interface_t interface,
  *   Data rate as identified by @ref sl_wifi_rate_t
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ * @note
+ *   Supported only on SiWx91x devices.
  ******************************************************************************/
 sl_status_t sl_wifi_get_transmit_rate(sl_wifi_interface_t interface,
                                       sl_wifi_rate_protocol_t *rate_protocol,
                                       sl_wifi_rate_t *mask);
+
+//! @cond Doxygen_Suppress
+/***************************************************************************/ /**
+ * @brief
+ *   Set E2E fixed transmit rate for 802.11b/g/n.
+ * @note
+ *   Not supported on SiWx91x; use @ref sl_wifi_set_transmit_rate instead.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] mode_rate
+ *   802.11 protocol and rate selection (@ref sl_wifi_mode_rate_t).
+ * @param[in] config_11bgn
+ *   802.11b/g/n PHY options (@ref sl_wifi_11bgn_rate_config_t).
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *******************************************************************************/
+sl_status_t sl_wifi_set_transmit_rate_11bgn(sl_wifi_interface_t interface,
+                                            sl_wifi_mode_rate_t mode_rate,
+                                            sl_wifi_11bgn_rate_config_t config_11bgn);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Set fixed transmit rate for 802.11ac.
+ * @note
+ *   Not supported on SiWx91x; use @ref sl_wifi_set_transmit_rate where applicable.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] mode_rate
+ *   802.11 protocol and rate selection (@ref sl_wifi_mode_rate_t).
+ * @param[in] config_11ac
+ *   802.11ac PHY options (@ref sl_wifi_11ac_rate_config_t).
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *******************************************************************************/
+sl_status_t sl_wifi_set_transmit_rate_11ac(sl_wifi_interface_t interface,
+                                           sl_wifi_mode_rate_t mode_rate,
+                                           sl_wifi_11ac_rate_config_t config_11ac);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Set fixed transmit rate for 802.11ax.
+ * @note
+ *   Not supported on SiWx91x; use @ref sl_wifi_set_transmit_rate where applicable.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] mode_rate
+ *   802.11 protocol and rate selection (@ref sl_wifi_mode_rate_t).
+ * @param[in] config_11ax
+ *   802.11ax PHY options (@ref sl_wifi_11ax_rate_config_t).
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *******************************************************************************/
+sl_status_t sl_wifi_set_transmit_rate_11ax(sl_wifi_interface_t interface,
+                                           sl_wifi_mode_rate_t mode_rate,
+                                           sl_wifi_11ax_rate_config_t config_11ax);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Set fixed transmit rate for 802.11be.
+ * @note
+ *   Not supported on SiWx91x; use @ref sl_wifi_set_transmit_rate where applicable.
+ * @param[in] interface
+ *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
+ * @param[in] mode_rate
+ *   802.11 protocol and rate selection (@ref sl_wifi_mode_rate_t).
+ * @param[in] config_11be
+ *   802.11be PHY options (@ref sl_wifi_11be_rate_config_t).
+ * @return
+ *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
+ *******************************************************************************/
+sl_status_t sl_wifi_set_transmit_rate_11be(sl_wifi_interface_t interface,
+                                           sl_wifi_mode_rate_t mode_rate,
+                                           sl_wifi_11be_rate_config_t config_11be);
+//! @endcond
 
 /***************************************************************************/ /**
  * @brief
@@ -1870,34 +1978,6 @@ sl_status_t sl_wifi_set_performance_profile(const sl_wifi_performance_profile_t 
 
 /***************************************************************************/ /**
  * @brief
- *   Set Wi-Fi performance profile.
- * @pre Pre-conditions:
- * -
- *   @ref sl_wifi_init should be called before this API.
- * @param[in] profile
- *   Wi-Fi performance profile as indicated by [sl_wifi_performance_profile_v2_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-performance-profile-v2-t) 
- * @return
- *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
- * @note
- *   For SI91x chips Enhanced MAX PSP is supported when profile is set to ASSOCIATED_POWER_SAVE_LOW_LATENCY and SL_WIFI_ENABLE_ENHANCED_MAX_PSP bit is enabled in config feature bitmap
- * @note
- *   This v2 API is defined due to a new configuration member beacon_miss_ignore_limit added to the structure sl_wifi_performance_profile_v2_t.
- *   Default value for beacon_miss_ignore_limit is 1. Recommended max value is 10. Higher value may cause interop issues.
- * @note 
- *   For POWER_SAVE_PROFILE with DEEP_SLEEP_WITHOUT_RAM_RETENTION, call [sl_net_deinit](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-deinit) before calling [sl_net_init](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-init).
- * @note
- *   To configure listen_interval in [sl_wifi_performance_profile_v2_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-performance-profile-v2-t), the SL_WIFI_JOIN_FEAT_PS_CMD_LISTEN_INTERVAL_VALID
- *   flag must be set using @ref sl_wifi_set_join_configuration() before connecting to the AP. Without this flag, the listen_interval value is ignored.
- * @note
- *   The listen interval configured through sl_wifi_set_performance_profile_v2() must not be greater than the listen interval set using @ref sl_wifi_set_listen_interval_v2().
- *   The default listen interval configured in the WiSeConnect SDK is 1000 ms. This interval is used when associating with the AP unless a different value is set by  @ref sl_wifi_set_listen_interval_v2(). 
- * @note
- *   For more details about connected and non-connected mode, see https://www.silabs.com/documents/public/application-notes/an1430-siwx917-soc-low-power.pdf.
- ******************************************************************************/
-sl_status_t sl_wifi_set_performance_profile_v2(const sl_wifi_performance_profile_v2_t *profile);
-
-/***************************************************************************/ /**
- * @brief
  *   Get Wi-Fi performance profile.
  * @pre Pre-conditions:
  * - 
@@ -2673,11 +2753,11 @@ sl_status_t sl_wifi_transmit_cw_tone_stop(sl_wifi_interface_t interface);
  *
  * @details
  *   This function sets the transmit power for the specified Wi-Fi interface.
- *   The value is in decidBm (tenths of dBm), e.g. 210 = 21.0 dBm, -150 = -15.0 dBm.
+ *   The value is in decidBm (tenths of dBm), e.g. 310 = 31.0 dBm, -150 = -15.0 dBm.
  *
  * @param[in] txPower
- *   Transmit power in decidBm (tenths of dBm). Valid range is -150 to 210 decidBm
- *   (-15.0 dBm to 21.0 dBm).
+ *   Transmit power in decidBm (tenths of dBm). Valid range is -150 to 310 decidBm
+ *   (-15.0 dBm to 31.0 dBm).
  *
  * @return
  *   sl_status_t. See [Status Codes](../../wiseconnect-api-reference-guide-err-codes/pages/sl-additional-status-errors).

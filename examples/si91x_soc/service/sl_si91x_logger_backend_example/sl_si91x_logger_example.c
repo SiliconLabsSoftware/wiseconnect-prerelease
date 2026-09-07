@@ -286,19 +286,21 @@ static void sl_log_run_format_specifier_check(void)
 {
   /* ---------------------------------------------------------------- *
    * 1. Log level smoke test (one line per level).                    *
-   *    Expected header letters: D, I, W, E.                          *
+   *    The formatted backend does not print the level, so the lines  *
+   *    are told apart by their text and by which of them the active  *
+   *    log level lets through.                                       *
    * ---------------------------------------------------------------- */
   {
-    SL_PRINT_STRING_DEBUG("LEVEL DEBUG line\r\n"); /* [D|S|...] LEVEL DEBUG line */
+    SL_PRINT_STRING_DEBUG("LEVEL DEBUG line\r\n");
   }
   {
-    SL_PRINT_STRING_INFO("LEVEL INFO  line\r\n"); /* [I|S|...] LEVEL INFO  line */
+    SL_PRINT_STRING_INFO("LEVEL INFO  line\r\n");
   }
   {
-    SL_PRINT_STRING_WARN("LEVEL WARN  line\r\n"); /* [W|S|...] LEVEL WARN  line */
+    SL_PRINT_STRING_WARN("LEVEL WARN  line\r\n");
   }
   {
-    SL_PRINT_STRING_ERROR("LEVEL ERROR line\r\n"); /* [E|S|...] LEVEL ERROR line */
+    SL_PRINT_STRING_ERROR("LEVEL ERROR line\r\n");
   }
 
   /* ---------------------------------------------------------------- *

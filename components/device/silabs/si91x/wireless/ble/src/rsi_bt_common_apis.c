@@ -20,6 +20,7 @@
 
 #include <sl_si91x_ble.h>
 #include <sl_status.h>
+#include "sl_constants.h"
 
 /******************************************************
  *               Function Declarations
@@ -103,7 +104,7 @@ int32_t rsi_bt_set_local_name(const uint8_t *local_name)
  * @fn         int32_t rsi_bt_cmd_update_gain_table_offset_or_max_pwr(uint8_t node_id, uint8_t payload_len, uint8_t *payload, uint8_t req_type)
  * @brief      Update gain table offset/max power. This is blocking API.
  * @pre        Device should be initialized before calling this API.
- * @param[in]  node_id     - Node ID (0 - BLE, 1 - BT).
+ * @param[in]  node_id     - Node ID (0 - BLE).
  * @param[in]  payload_len - Length of the payload.
  * @param[in]  payload     - Payload containing table data of gain table offset/max power
  * @param[in]  req_type    - update gain table request type \n

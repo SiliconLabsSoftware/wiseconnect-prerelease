@@ -88,7 +88,8 @@ define:
 component:
 - id: sl_main
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: syscalls
 - id: si91x_memory_default_config
 - id: wiseconnect_common

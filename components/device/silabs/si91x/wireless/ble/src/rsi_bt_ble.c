@@ -42,7 +42,6 @@
 #include "rsi_ble.h"
 #include "stdio.h"
 
-#include "sl_si91x_host_interface.h"
 #include "sli_buffer_manager.h"
 #include "rsi_ble_common_config.h"
 #include "rsi_common_apis.h"

@@ -7,7 +7,9 @@ category: example|peripheral
 quality: production
 label: SiWx91x Platform - PSRAM Blinky FreeRTOS
 component:
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
+- id: sl_si91x_memory_manager_psram
 - id: sl_main
 - id: status
 - id: syscalls

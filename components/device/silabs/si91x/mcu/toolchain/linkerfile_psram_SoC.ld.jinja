@@ -540,6 +540,10 @@ SECTIONS
 		PROVIDE_HIDDEN (__fini_array_end = .);
 		
 		KEEP(*(.jcr*))
+{%- if rtt == 1 %}
+		. = ALIGN(4);
+		*(SEGGER_RTT)
+{%- endif %}
 		. = ALIGN(4);
 		/* All data end */
 		__data_end__ = .;

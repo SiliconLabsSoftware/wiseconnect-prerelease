@@ -39,7 +39,7 @@ define:
 - name: SL_SI91X_ENABLE_LITTLE_ENDIAN
 
 requires:
-- name: sl_si91x_wireless
+- name: wiseconnect_common
 
 template_contribution:
 - name: agents_slab

@@ -87,9 +87,9 @@
 /**
  * @def SLI_WIFI_TX_POWER_DECIDBM_MAX
  * @brief Maximum transmit power in decidBm (tenths of dBm).
- * @details Used with sl_wifi_set_test_tx_power(); value 210 corresponds to 21.0 dBm.
+ * @details Used with sl_wifi_set_test_tx_power(); value 310 corresponds to 31.0 dBm.
  */
-#define SLI_WIFI_TX_POWER_DECIDBM_MAX 210
+#define SLI_WIFI_TX_POWER_DECIDBM_MAX 310
 /// Default listen interval multiplier for STA (association / power save).
 #define DEFAULT_LISTEN_INTERVAL_MULTIPLIER 1
 
@@ -102,6 +102,11 @@
 /// Flags for IP address availability used in sli_wifi_ip_address_info_t structure.
 #define SLI_WIFI_IPV4_AVAILABLE (1U << 0) ///< Bit 0: IPv4 address is available
 #define SLI_WIFI_IPV6_AVAILABLE (1U << 1) ///< Bit 1: IPv6 address is available
+
+/// Bit fields of the 'options' member of sli_wifi_ap_config_request.
+#define SLI_WIFI_AP_OPT_KEEPALIVE_TYPE_MASK      0x03   ///< Bits 0-1: AP keep-alive type
+#define SLI_WIFI_AP_OPT_BEACON_STOP              BIT(2) ///< Bit 2: stop beaconing when no clients are associated
+#define SLI_WIFI_AP_OPT_DYNAMIC_HIDDEN_SSID_CONF BIT(3) ///< Bit 3: dynamic hidden SSID configuration
 
 /**
  * @def SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE
@@ -170,13 +175,6 @@ typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_E
 #define SLI_COMMON_RSP_FEATURE_FRAME_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 
-/// Sub-command IDs for SLI_COMMON_REQ_ENABLE_DISABLE_BLE payload
-#define SLI_BLE_SUB_CMD_ENABLE  0x01
-#define SLI_BLE_SUB_CMD_DISABLE 0x02
-
-/// Timeout value for BLE Enable/Disable response command
-#define SLI_COMMON_RSP_BLE_ENABLE_DISABLE_WAIT_TIME \
-  ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
 /// Timeout value for PUF Start response command
 #define SLI_COMMON_RSP_PUF_START_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))

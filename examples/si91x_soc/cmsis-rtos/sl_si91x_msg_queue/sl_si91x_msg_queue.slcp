@@ -10,7 +10,8 @@ component:
 - id: syscalls
 - id: si91x_memory_default_config
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: sl_i2c
 - id: i2c_instance
   instance:

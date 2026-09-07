@@ -91,6 +91,12 @@ static sl_wifi_rts_threshold_t wifi_rts_threshold = {
   .rts_threshold = SLI_WIFI_RTS_THRESHOLD // Default RTS threshold value
 };
 
+// Maximum transmit power in deci-dBm for Everest (siwx3xx). Range -150 to 310 (-15.0 to 31.0 dBm).
+static sl_wifi_max_tx_power_decidbm_t wifi_max_tx_power_decidbm = {
+  .scan_tx_power = SLI_WIFI_TX_POWER_DECIDBM_MAX, // 31.0 dBm default
+  .join_tx_power = SLI_WIFI_TX_POWER_DECIDBM_MAX  // 31.0 dBm default
+};
+
 // This value will be used in set MFP mode command to set the MFP mode of the module
 static sl_wifi_mfp_config_t wifi_mfp_config = { .mfp_mode      = SL_WIFI_MFP_DISABLED,
                                                 .is_configured = false,
@@ -101,7 +107,6 @@ static sli_wifi_feature_frame_config_t global_feature_config = {
   .power_chain = SL_WIFI_HP_CHAIN,       // Default: High Power chain
 };
 uint16_t initialized_opermode              = SLI_WIFI_INVALID_MODE;
-static bool is_card_ready_required         = true;
 static sl_wifi_rate_t saved_wifi_data_rate = SL_WIFI_AUTO_RATE;
 static sl_wifi_ap_configuration_t ap_configuration;
 static sli_scan_info_t *scan_info_database    = NULL;
@@ -358,6 +363,17 @@ void sli_wifi_save_max_tx_power(uint8_t max_scan_tx_power, uint8_t max_join_tx_p
   wifi_max_tx_power.join_tx_power = max_join_tx_power;
 }
 
+sl_wifi_max_tx_power_decidbm_t sli_get_max_tx_power_decidbm(void)
+{
+  return wifi_max_tx_power_decidbm;
+}
+
+void sli_wifi_save_max_tx_power_decidbm(int16_t scan_tx_power, int16_t join_tx_power)
+{
+  wifi_max_tx_power_decidbm.scan_tx_power = scan_tx_power;
+  wifi_max_tx_power_decidbm.join_tx_power = join_tx_power;
+}
+
 void sli_wifi_save_rts_threshold(uint16_t rts_threshold)
 {
   wifi_rts_threshold.rts_threshold = rts_threshold;
@@ -479,23 +495,15 @@ sl_status_t sli_wifi_save_rate(sl_wifi_rate_t transfer_rate)
 
 void sli_wifi_reset_max_tx_power()
 {
-  wifi_max_tx_power.scan_tx_power = 0x1f;
-  wifi_max_tx_power.join_tx_power = 0x1f;
+  wifi_max_tx_power.scan_tx_power         = 0x1f;
+  wifi_max_tx_power.join_tx_power         = 0x1f;
+  wifi_max_tx_power_decidbm.scan_tx_power = SLI_WIFI_TX_POWER_DECIDBM_MAX;
+  wifi_max_tx_power_decidbm.join_tx_power = SLI_WIFI_TX_POWER_DECIDBM_MAX;
 }
 
 void sli_wifi_reset_sl_wifi_rate()
 {
   saved_wifi_data_rate = 0;
-}
-
-bool sli_wifi_get_card_ready_required()
-{
-  return is_card_ready_required;
-}
-
-void sli_wifi_set_card_ready_required(bool card_ready_required)
-{
-  is_card_ready_required = card_ready_required;
 }
 
 //In Access point mode NWP only supports No Encryption, TKIP and CCMP encryptions.

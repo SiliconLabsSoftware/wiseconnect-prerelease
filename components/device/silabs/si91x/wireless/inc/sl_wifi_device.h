@@ -1863,10 +1863,22 @@
  * @details
  * This feature enables Network Address Translation (NAT) support, allowing
  * stations connected to SiWx91x to access the internet through a third-party AP.
- * 
- * @note Bits 22-27 are reserved.
  */
 #define SL_SI91X_EXT_TCP_NAT_SUPPORT BIT(21)
+
+/**
+ * @def SL_SI91X_EXT_TCP_IP_FEAT_HTTP_HP_SUPPORT
+ * @brief Enable HTTP client high-performance mode (larger TCP receive window).
+ * @details
+ * This feature enables a larger TCP receive window for the HTTP/HTTPS client.
+ * The NWP sizes the window from available RX buffers (up to approximately 8 KB).
+ * When disabled, the HTTP client uses the default ~1 KB window. The host does not
+ * select a specific window size in bytes.
+ *
+ * @note Not supported with memory configuration @ref SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV.
+ * @note Bits 23-27 are reserved.
+ */
+#define SL_SI91X_EXT_TCP_IP_FEAT_HTTP_HP_SUPPORT BIT(22)
 
 /**
  * @def SL_SI91X_EXT_TCP_IP_FEAT_SSL_HEAP_SIZE
@@ -2699,55 +2711,6 @@ typedef enum {
 /** \addtogroup SL_SI91X_TYPES Types
  * @{
  * */
-
-/**
- * @struct sl_wifi_system_boot_configuration_t
- * @brief Boot configuration structure.
- * @note: Refer sl_wifi_device.h for complete bitmap details.
- */
-typedef struct {
-  uint16_t
-    oper_mode; ///< Operation mode, one of the values from [sl_wifi_operation_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-operation-mode-t).
-  uint16_t
-    coex_mode; ///< Coexistence mode, one of the values from [sl_wifi_system_coex_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-coex-mode-t).
-  uint32_t feature_bit_map;            ///< Feature bitmap, @ref SI91X_FEATURE_BITMAP
-  uint32_t tcp_ip_feature_bit_map;     ///< TCP/IP feature bitmap, @ref SI91X_TCP_IP_FEATURE_BITMAP
-  uint32_t custom_feature_bit_map;     ///< Custom feature bitmap, @ref SI91X_CUSTOM_FEATURE_BITMAP
-  uint32_t ext_custom_feature_bit_map; ///< Extended custom feature bitmap, @ref SI91X_EXTENDED_CUSTOM_FEATURE_BITMAP
-  uint32_t bt_feature_bit_map;         ///< BT featured bitmap, @ref SI91X_BT_FEATURE_BITMAP
-  uint32_t ext_tcp_ip_feature_bit_map; ///< Extended TCP/IP feature bitmap, @ref SI91X_EXTENDED_TCP_IP_FEATURE_BITMAP
-  uint32_t ble_feature_bit_map;        ///< BLE feature bitmap, @ref SI91X_BLE_FEATURE_BITMAP
-  uint32_t ble_ext_feature_bit_map;    ///< BLE extended feature bitmap, @ref SI91X_EXTENDED_BLE_CUSTOM_FEATURE_BITMAP
-  uint32_t config_feature_bit_map;     ///< Config feature bitmap, @ref SI91X_CONFIG_FEATURE_BITMAP
-} sl_wifi_system_boot_configuration_t;
-
-/// NWP buffer allocation command parameters
-/// The summation of all three ratios should max 10 and the ratio should be in decimal value.
-typedef struct {
-  uint8_t tx_ratio_in_buffer_pool;     ///< tx ratio
-  uint8_t rx_ratio_in_buffer_pool;     ///< rx ratio
-  uint8_t global_ratio_in_buffer_pool; ///< global ratio
-} sl_wifi_system_dynamic_pool_t;
-
-// Device configuration for 911x. This should be in the 911x driver folder
-/// Device configuration for Si91x device
-typedef struct {
-  uint8_t boot_option; ///< Boot option. One of the values from @ref SI91X_LOAD_IMAGE_TYPES
-  sl_mac_address_t *
-    mac_address; ///< MAC address of type [sl_mac_address_t](../wiseconnect-api-reference-guide-nwk-mgmt/sl-net-types#sl-mac-address-t).
-  sl_wifi_band_mode_t
-    band; ///< Wi-Fi band of type [sl_wifi_band_mode_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-band-mode-t).
-  sl_wifi_region_code_t
-    region_code; ///< Region code of type [sl_wifi_region_code_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-constants#sl-wifi-regulatory-region-t).
-  sl_wifi_system_boot_configuration_t
-    boot_config; ///< Boot configuration. [sl_wifi_system_boot_configuration_t](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-types#sl-wifi-system-boot-configuration-t).
-  sl_wifi_system_dynamic_pool_t
-    ta_pool;               ///< TA buffer allocation command parameters of type @ref sl_wifi_system_dynamic_pool_t.
-  uint8_t efuse_data_type; ///<Type of eFuse data need to be read from flash. Refer to @ref sl_si91x_efuse_data_type_t.
-  uint8_t
-    nwp_fw_image_number; ///< Image number for the NWP firmware, used to specify which firmware image to load @ref SI91X_NWP_FW_IMAGE_NUMBERS.
-} sl_wifi_device_configuration_t;
-
 /// Wi-Fi device context
 typedef struct {
   void *device_context; ///< Reserved for future use

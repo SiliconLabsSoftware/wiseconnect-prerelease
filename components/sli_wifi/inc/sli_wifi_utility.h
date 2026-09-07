@@ -81,6 +81,12 @@ sl_status_t sli_wifi_host_get_credentials(sl_wifi_credential_id_t id, uint8_t ty
 /* Function used to set the maximum transmission power */
 void sli_wifi_save_max_tx_power(uint8_t max_scan_tx_power, uint8_t max_join_tx_power);
 
+/* Function used to get the maximum transmission power in deci-dBm (Everest/siwx3xx) */
+sl_wifi_max_tx_power_decidbm_t sli_get_max_tx_power_decidbm(void);
+
+/* Function used to set the maximum transmission power in deci-dBm (Everest/siwx3xx) */
+void sli_wifi_save_max_tx_power_decidbm(int16_t scan_tx_power, int16_t join_tx_power);
+
 /* Function converts SDK encryption mode to NWP supported mode */
 sl_status_t sli_wifi_get_nwp_encryption(sl_wifi_encryption_t encryption_mode, uint8_t *encryption_request);
 
@@ -121,14 +127,18 @@ sl_status_t sli_wifi_get_saved_ap_configuration(sl_wifi_ap_configuration_t *wifi
 sl_status_t sli_wifi_get_rate_protocol_and_data_rate(const uint8_t data_rate,
                                                      sl_wifi_rate_protocol_t *rate_protocol,
                                                      sl_wifi_rate_t *transfer_rate);
-/* Function used to set maximum transmission power to default value(31 dBm) */
-void sli_wifi_reset_max_tx_power();
+/***************************************************************************/ /**
+ * @brief
+ *   Reset cached maximum TX power to defaults (for example when Wi-Fi is deinitialized).
+ * @details
+ *   Resets both the legacy \c sl_wifi_max_tx_power_t storage (31 dBm per field) and the
+ *   Everest/siwx3xx \c sl_wifi_max_tx_power_decidbm_t storage (310 deci-dBm per field, 31.0 dBm).
+ ******************************************************************************/
+void sli_wifi_reset_max_tx_power(void);
 
 /* Function used to set wifi rate to default value of 1 Mbps */
 void sli_wifi_reset_sl_wifi_rate();
 
-/* Function used to set whether card ready is required or not */
-void sli_wifi_set_card_ready_required(bool card_ready_required);
 /***************************************************************************/ /**
  * @brief
  *   Get the current Opermode of the module.
@@ -162,8 +172,6 @@ uint8_t sli_lmac_crc8_c(uint8_t crc8_din, uint8_t crc8_state, uint8_t end);
  *
  */
 uint8_t sli_multicast_mac_hash(const uint8_t *mac);
-
-bool sli_wifi_get_card_ready_required();
 
 /* Function used to save the MFP mode */
 sl_status_t sli_wifi_save_mfp_mode(const sl_wifi_mfp_config_t *mfp_config);

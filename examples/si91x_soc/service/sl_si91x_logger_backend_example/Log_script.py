@@ -22,15 +22,20 @@ Supports (sources are separate — core 0 never uses the descriptor; core 1 neve
 - Core 1: pass `--descriptor` to a SystemView descriptor .txt. EVENT = debug_id; MESSAGE = rest of the row (no leading numeric id), printf args applied.
 
 UART records match ``sl_log_event_t`` (``uint8_t`` ``arg_count``). Use ``--max-args N`` to match
-``SL_LOG_CONFIG_ARG`` in firmware (fixed packet size ``8 + 4*N + 4`` bytes). Use ``--variable-packet`` if
+``SL_LOG_CONFIG_ARG`` in firmware (fixed packet size ``12 + 4*N + 4`` bytes). Use ``--variable-packet`` if
 the link sends the compact frame (length ``12 + 4*arg_count``).
+
+Each record carries a 64-bit event time: a 32-bit ``timestamp`` counter plus a 32-bit
+``epoch`` counting how many times it has wrapped. The two are recombined here, so the
+TS column keeps increasing past the ~71 minute wrap of the microsecond counter. The
+compact ``--variable-packet`` frame predates the epoch and is decoded with an epoch of 0.
 
 Features:
 - Auto-detection of JLink CDC UART port
 - Auto-search for latest .out in C:\\Users\\surondla\\Logger\\ (recursive) by default
 - Optional flashing (reset -> flash .out -> continue)
 - Real-time log message decoding with timestamps
-- DELTA column: difference between consecutive timestamps (per-core)
+- DELTA column: difference between consecutive 64-bit event times (per-core)
 - Color-coded log levels (DEBUG, INFO, WARN, ERROR)
 - Overflow detection and reporting
 - Discard/resync logic to skip extra/misaligned bytes
@@ -82,8 +87,16 @@ EVENT_COLUMN_WIDTH = 48
 
 
 def record_size_fixed(max_args: int) -> int:
-    """Packed sl_log_event_t: II + max_args×I + BBBB (uint8 arg_count + core + flags + version)."""
-    return 8 + 4 * max_args + 4
+    """Packed sl_log_event_t: III + max_args×I + BBBB (uint8 arg_count + core + flags + version).
+
+    The three leading uint32s are timestamp, epoch and event_id.
+    """
+    return 12 + 4 * max_args + 4
+
+
+def combine_time(epoch: int, timestamp: int) -> int:
+    """Recombine the two halves of the event time into one 64-bit value."""
+    return (epoch << 32) | timestamp
 
 LEVEL_MAP = {1: "DEBUG", 2: "INFO", 3: "WARN", 4: "ERROR"}
 
@@ -128,10 +141,10 @@ def print_config(
     print("└──────────────────────────────────────────────────────────────────────────────┘")
     print()
     print("Press Ctrl+C to stop the console.\n")
-    sep_w = 132
+    sep_w = 140
     print("─" * sep_w)
     print(
-        f"{'TIME':<12} {'LEVEL':<8} {'CORE':<6} {'TS':<12} {'DELTA':<12} "
+        f"{'TIME':<12} {'LEVEL':<8} {'CORE':<6} {'TS':<20} {'DELTA':<12} "
         f"{'EVENT':<{EVENT_COLUMN_WIDTH}} MESSAGE"
     )
     print("─" * sep_w)
@@ -307,7 +320,7 @@ Examples (core 0: .out | core 1: descriptor .txt):
         metavar="N",
         help=(
             f"Number of uint32 slots in sl_log_event_t.args[] (must match SL_LOG_CONFIG_ARG in firmware). "
-            f"Fixed packet size = 8 + 4*N + 4 bytes. Range: 1..{SL_LOG_CONFIG_ARG_HARD_MAX} (default: 10)."
+            f"Fixed packet size = 12 + 4*N + 4 bytes. Range: 1..{SL_LOG_CONFIG_ARG_HARD_MAX} (default: 10)."
         ),
     )
 
@@ -329,15 +342,18 @@ Examples (core 0: .out | core 1: descriptor .txt):
 # -------------------------------------------------------------------------
 def mk_struct_fmt(max_args: int, big_endian: bool) -> str:
     endian = ">" if big_endian else "<"
-    # timestamp(4) + event_id(4) + args(max_args×4) + arg_count(1) + core(1) + flags(1) + version(1)
-    return endian + ("II" + "I" * max_args + "BBBB")
+    # timestamp(4) + epoch(4) + event_id(4) + args(max_args×4)
+    # + arg_count(1) + core(1) + flags(1) + version(1)
+    return endian + ("III" + "I" * max_args + "BBBB")
 
 
-def parse_record(chunk: bytes, fmt: str, max_args: int) -> Tuple[int, int, Tuple[int, ...], int, int, int, int]:
-    ts, event_id, *rest = struct.unpack(fmt, chunk)
+def parse_record(
+    chunk: bytes, fmt: str, max_args: int
+) -> Tuple[int, int, int, Tuple[int, ...], int, int, int, int]:
+    ts, epoch, event_id, *rest = struct.unpack(fmt, chunk)
     args = tuple(rest[:max_args])
     arg_count, core_id, flags, version = rest[max_args : max_args + 4]
-    return ts, event_id, args, arg_count, core_id, flags, version
+    return ts, epoch, event_id, args, arg_count, core_id, flags, version
 
 
 def validate_log_fields(
@@ -348,10 +364,13 @@ def validate_log_fields(
     flags: int,
     version: int,
     max_args: int,
+    epoch: int = 0,
 ) -> bool:
     if arg_count > max_args:
         return False
-    if ts == 0:
+    # A zero timestamp only means "no time yet" while the epoch is also zero; once
+    # the counter has wrapped, ts == 0 is a legitimate reading.
+    if ts == 0 and epoch == 0:
         return False
     if ts == 0xFFFFFFFF and event_id == 0xFFFFFFFF:
         return True
@@ -782,9 +801,11 @@ def is_valid_record(chunk: bytes, fmt: str, max_args: int, record_size: int) -> 
         return False
 
     try:
-        ts, event_id, *rest = struct.unpack(fmt, chunk)
+        ts, epoch, event_id, *rest = struct.unpack(fmt, chunk)
         arg_count, core_id, flags, version = rest[max_args : max_args + 4]
-        return validate_log_fields(ts, event_id, arg_count, core_id, flags, version, max_args)
+        return validate_log_fields(
+            ts, event_id, arg_count, core_id, flags, version, max_args, epoch
+        )
     except Exception:
         return False
 
@@ -1058,11 +1079,12 @@ def main():
     record_count = 0
     error_count = 0
 
-    # Per-core last timestamp for DELTA column
+    # Per-core last 64-bit event time for DELTA column
     last_ts_by_core: Dict[int, Optional[int]] = {}
 
     def handle_one_record(
         ts: int,
+        epoch: int,
         event_id: int,
         args_val: Tuple[int, ...],
         arg_count: int,
@@ -1073,9 +1095,12 @@ def main():
     ) -> None:
         nonlocal record_count, last_ts_by_core
         record_count += 1
+        # Work on the recombined 64-bit time so deltas stay correct across a wrap
+        # of the 32-bit counter.
+        event_time = combine_time(epoch, ts)
         last_ts = last_ts_by_core.get(core_id)
-        delta = (ts - last_ts) if (last_ts is not None) else None
-        last_ts_by_core[core_id] = ts
+        delta = (event_time - last_ts) if (last_ts is not None) else None
+        last_ts_by_core[core_id] = event_time
 
         level_str, msg, event_disp = decode_message(
             event_id=event_id,
@@ -1099,13 +1124,13 @@ def main():
             raw_hex = format_raw_hex(raw_chunk)
             output = (
                 f"{current_time} [{colorize(level_str, level_str):>8}] "
-                f"{core_id:<6} {ts:>10} {delta_str:>12} {event_col} {msg}\n"
+                f"{core_id:<6} {event_time:>18} {delta_str:>12} {event_col} {msg}\n"
                 f"           RAW: {raw_hex}\n"
             )
         else:
             output = (
                 f"{current_time} [{colorize(level_str, level_str):>8}] "
-                f"{core_id:<6} {ts:>10} {delta_str:>12} {event_col} {msg}\n"
+                f"{core_id:<6} {event_time:>18} {delta_str:>12} {event_col} {msg}\n"
             )
 
         sys.stdout.write(output)
@@ -1163,8 +1188,10 @@ def main():
                         del buffer[:reclen]
 
                         try:
+                            # The compact frame carries no epoch field.
                             handle_one_record(
                                 ts,
+                                0,
                                 event_id,
                                 args_val,
                                 arg_count,
@@ -1198,15 +1225,23 @@ def main():
                         del buffer[:record_size]
 
                         try:
-                            ts, event_id, args_val, arg_count, core_id, flags, version = parse_record(
-                                chunk, rec_fmt, max_args
-                            )
+                            (
+                                ts,
+                                epoch,
+                                event_id,
+                                args_val,
+                                arg_count,
+                                core_id,
+                                flags,
+                                version,
+                            ) = parse_record(chunk, rec_fmt, max_args)
                         except Exception:
                             error_count += 1
                             continue
 
                         handle_one_record(
                             ts,
+                            epoch,
                             event_id,
                             args_val,
                             arg_count,

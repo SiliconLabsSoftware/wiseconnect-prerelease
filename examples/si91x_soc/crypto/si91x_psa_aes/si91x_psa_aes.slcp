@@ -9,7 +9,8 @@ label: SiWx91x Platform - PSA AES Cipher
 component:
 - id: sl_main
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: psa_crypto
 - id: psa_driver
 - id: psa_crypto_trng
