@@ -30,6 +30,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
+#include "sl_status.h"
 #include "sl_slist.h"
 #include "sl_net_constants.h"
 #include "sl_ip_types.h"
@@ -154,6 +155,24 @@ typedef enum {
   SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED, ///< Error status indicating data corruption during message reassembly (e.g., buffer overflow, invalid lengths).
   SL_MQTT_CLIENT_UNKNOWN_ERROR ///< Error status indicating that an unknown error occurred in the MQTT client.
 } sl_mqtt_client_error_status_t;
+
+/**
+ * @brief MQTT Client error information passed with @ref SL_MQTT_CLIENT_ERROR_EVENT.
+ *
+ * @details
+ *   This structure holds the MQTT client error status and the underlying SDK/firmware status code.
+ *   The `error_status` indicates the type of error that has occurred during the client's operations,
+ *   and `status_code` provides the detailed firmware/SDK reason code when available.
+ *
+ * @note
+ *   For host-side validation errors with no firmware status, `status_code` is
+ *   typically SL_STATUS_FAIL. For reassembly buffer allocation failure,
+ *   `status_code` is SL_STATUS_ALLOCATION_FAILED.
+ */
+typedef struct {
+  sl_mqtt_client_error_status_t error_status; ///< High-level MQTT client error classification.
+  sl_status_t status_code;                    ///< Underlying SDK/firmware status code.
+} sl_mqtt_client_error_info_t;
 
 /**
  * @enum sl_mqtt_client_disconnection_reason_t
@@ -367,8 +386,11 @@ typedef struct {
  *   The type of event that occurred. This is of type @ref sl_mqtt_client_event_t.
  * 
  * @param event_data
- *   Pointer to the event data. This parameter is non-null only for events of type MQTT_CLIENT_MESSAGE_RECEIVED and MQTT_CLIENT_ERROR.
- * 
+ *   Pointer to event-specific data, or NULL if the event has no data.
+ *   For @ref SL_MQTT_CLIENT_ERROR_EVENT, cast to @ref sl_mqtt_client_error_info_t * which includes
+ *   `error_status` and `status_code`.
+ *   Use these values only inside the callback; do not save this pointer.
+ *
  * @param context
  *   Pointer to the user-provided context. This context is provided at the time of the API call (e.g., @ref sl_mqtt_client_init). The caller must ensure that the lifecycle of the context is retained until the callback is invoked. The deallocation of the context is also the responsibility of the caller.
  */

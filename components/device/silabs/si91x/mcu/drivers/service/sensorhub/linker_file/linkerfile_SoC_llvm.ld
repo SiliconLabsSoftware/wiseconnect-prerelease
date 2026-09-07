@@ -176,7 +176,7 @@ SECTIONS
         *rsi_udma*
         *rsi_udma_wrapper*
         *sensor_hub*
-        *sensorhub*
+        *sensorhub_config*
         *sensorhub_app*
         *sensorhub_aws_app*
         *hub_hal_intf*
@@ -199,7 +199,8 @@ SECTIONS
         *power_manager_m4_wireless_example*
         *sl_si91x_button*
         *sl_si91x_button_instances*
-        *app*
+        *app.c*
+        *app.o*
         *main*
         *ps2_state*
         *sl_log*
@@ -375,7 +376,8 @@ SECTIONS
     *tempSensor_hal*(.text* text_*)
     *sl_main_process_action*(.text* text_*)
     *ps2_state*(.text* text_*)
-    *app*(.text* text_*)
+    *app.c*(.text* text_*)
+    *app.o*(.text* text_*)
     *main*(.text* text_*)
     *sl_event_handler*(.text* text_*)
     *sl_si91x_driver*(.text* text_*)
@@ -401,7 +403,7 @@ SECTIONS
     *sl_si91x_button_instances*(.text* text_*)
     *em_core*(.text* text_*)
     *sl_si91x_power_manager_wakeup_init*(.text* text_*)
-    *sensorhub*(.text* text_*)
+    *sensorhub_config*(.text* text_*)
     *power_manager_m4_wireless_example*(.text* text_*)
 
     /* Platform-core logging stack (sl_log + iostream backends + UART). In PS2 the

@@ -110,6 +110,10 @@ static sli_mqtt_rx_reassembly_context_t mqtt_rx_reassembly = { 0 };
 
 static sl_mqtt_client_t *mqtt_client;
 static sl_mqtt_client_error_status_t sli_si91x_get_event_error_status(sl_mqtt_client_event_t event);
+static void sli_si91x_notify_mqtt_error(sl_mqtt_client_t *client,
+                                        void *user_context,
+                                        sl_mqtt_client_error_status_t error_status,
+                                        sl_status_t status);
 static void sli_si91x_handle_connected_event(sl_status_t status,
                                              sl_si91x_mqtt_client_context_t *sdk_context,
                                              const sl_wifi_system_packet_t *rx_packet,
@@ -310,6 +314,18 @@ static sl_mqtt_client_error_status_t sli_si91x_get_event_error_status(sl_mqtt_cl
       return SL_MQTT_CLIENT_UNKNOWN_ERROR;
     }
   }
+}
+
+/**
+ * @brief Notify the application of an MQTT error with classification and firmware/SDK status.
+ */
+static void sli_si91x_notify_mqtt_error(sl_mqtt_client_t *client,
+                                        void *user_context,
+                                        sl_mqtt_client_error_status_t error_status,
+                                        sl_status_t status)
+{
+  sl_mqtt_client_error_info_t error_info = { .error_status = error_status, .status_code = status };
+  client->client_event_handler(client, SL_MQTT_CLIENT_ERROR_EVENT, (void *)&error_info, user_context);
 }
 
 /**
@@ -895,27 +911,28 @@ sl_status_t sli_si91x_mqtt_event_handler(sl_status_t status,
       break;
   }
 
-  // Populate the error status only if the event is an error event.
-  sl_mqtt_client_error_status_t *error_status = NULL;
+  // Populate the error info only if the event is an error event.
+  sl_mqtt_client_error_info_t *error_info = NULL;
   if (is_error_event) {
-    error_status = malloc(sizeof(sl_mqtt_client_error_status_t));
-    if (error_status == NULL) {
+    error_info = malloc(sizeof(sl_mqtt_client_error_info_t));
+    if (error_info == NULL) {
       free(sdk_context);
       return SL_STATUS_ALLOCATION_FAILED;
     }
-    *error_status = sli_si91x_get_event_error_status(sdk_context->event);
+    error_info->error_status = sli_si91x_get_event_error_status(sdk_context->event);
+    error_info->status_code  = status;
   }
 
   sdk_context->client->client_event_handler(sdk_context->client,
                                             is_error_event ? SL_MQTT_CLIENT_ERROR_EVENT : sdk_context->event,
-                                            is_error_event ? (void *)error_status : (void *)event_data,
+                                            is_error_event ? (void *)error_info : (void *)event_data,
                                             sdk_context->user_context);
 
   // Free the sdk_context after event handler is triggered.
   free(sdk_context);
-  // Free error_status if it was allocated.
-  if (error_status != NULL) {
-    free(error_status);
+  // Free error_info if it was allocated.
+  if (error_info != NULL) {
+    free(error_info);
   }
   return SL_STATUS_OK;
 }
@@ -1004,11 +1021,7 @@ static void sli_si91x_handle_message_received_event(sl_status_t status,
     // Reset any in-progress reassembly state (firmware won't send more chunks after error)
     sli_si91x_mqtt_reset_reassembly_state();
 
-    sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_FAILED;
-    sdk_context->client->client_event_handler(sdk_context->client,
-                                              SL_MQTT_CLIENT_ERROR_EVENT,
-                                              (void *)&error_status,
-                                              sdk_context->user_context);
+    sli_si91x_notify_mqtt_error(sdk_context->client, sdk_context->user_context, SL_MQTT_CLIENT_RECEIVE_FAILED, status);
     free(sdk_context);
     return;
   }
@@ -1079,11 +1092,10 @@ static void sli_si91x_handle_subsequent_chunk(sl_si91x_mqtt_client_context_t *sd
       mqtt_rx_reassembly.in_progress         = true;
     }
 
-    sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED;
-    sdk_context->client->client_event_handler(sdk_context->client,
-                                              SL_MQTT_CLIENT_ERROR_EVENT,
-                                              (void *)&error_status,
-                                              sdk_context->user_context);
+    sli_si91x_notify_mqtt_error(sdk_context->client,
+                                sdk_context->user_context,
+                                SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED,
+                                SL_STATUS_FAIL);
     return;
   }
 
@@ -1101,11 +1113,10 @@ static void sli_si91x_handle_subsequent_chunk(sl_si91x_mqtt_client_context_t *sd
                       mqtt_rx_reassembly.total_length);
       sli_si91x_mqtt_reset_reassembly_state();
 
-      sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED;
-      sdk_context->client->client_event_handler(sdk_context->client,
-                                                SL_MQTT_CLIENT_ERROR_EVENT,
-                                                (void *)&error_status,
-                                                sdk_context->user_context);
+      sli_si91x_notify_mqtt_error(sdk_context->client,
+                                  sdk_context->user_context,
+                                  SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED,
+                                  SL_STATUS_FAIL);
       return;
     }
 
@@ -1199,11 +1210,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
     mqtt_rx_reassembly.discard_in_progress = true;
     mqtt_rx_reassembly.in_progress         = true;
 
-    sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED;
-    sdk_context->client->client_event_handler(sdk_context->client,
-                                              SL_MQTT_CLIENT_ERROR_EVENT,
-                                              (void *)&error_status,
-                                              sdk_context->user_context);
+    sli_si91x_notify_mqtt_error(sdk_context->client,
+                                sdk_context->user_context,
+                                SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED,
+                                SL_STATUS_FAIL);
     return;
   }
 
@@ -1218,11 +1228,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
     mqtt_rx_reassembly.discard_in_progress = true;
     mqtt_rx_reassembly.in_progress         = true;
 
-    sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE;
-    sdk_context->client->client_event_handler(sdk_context->client,
-                                              SL_MQTT_CLIENT_ERROR_EVENT,
-                                              (void *)&error_status,
-                                              sdk_context->user_context);
+    sli_si91x_notify_mqtt_error(sdk_context->client,
+                                sdk_context->user_context,
+                                SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE,
+                                SL_STATUS_FAIL);
     return;
   }
 
@@ -1236,11 +1245,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
     mqtt_rx_reassembly.discard_in_progress = true;
     mqtt_rx_reassembly.in_progress         = true;
 
-    sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED;
-    sdk_context->client->client_event_handler(sdk_context->client,
-                                              SL_MQTT_CLIENT_ERROR_EVENT,
-                                              (void *)&error_status,
-                                              sdk_context->user_context);
+    sli_si91x_notify_mqtt_error(sdk_context->client,
+                                sdk_context->user_context,
+                                SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED,
+                                SL_STATUS_FAIL);
     return;
   }
 
@@ -1254,11 +1262,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
     mqtt_rx_reassembly.discard_in_progress = true;
     mqtt_rx_reassembly.in_progress         = true;
 
-    sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED;
-    sdk_context->client->client_event_handler(sdk_context->client,
-                                              SL_MQTT_CLIENT_ERROR_EVENT,
-                                              (void *)&error_status,
-                                              sdk_context->user_context);
+    sli_si91x_notify_mqtt_error(sdk_context->client,
+                                sdk_context->user_context,
+                                SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED,
+                                SL_STATUS_FAIL);
     return;
   }
 
@@ -1273,11 +1280,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
     mqtt_rx_reassembly.discard_in_progress = true;
     mqtt_rx_reassembly.in_progress         = true;
 
-    sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_MEMORY_ALLOCATION_FAILED;
-    sdk_context->client->client_event_handler(sdk_context->client,
-                                              SL_MQTT_CLIENT_ERROR_EVENT,
-                                              (void *)&error_status,
-                                              sdk_context->user_context);
+    sli_si91x_notify_mqtt_error(sdk_context->client,
+                                sdk_context->user_context,
+                                SL_MQTT_CLIENT_RECEIVE_MEMORY_ALLOCATION_FAILED,
+                                SL_STATUS_ALLOCATION_FAILED);
     return;
   }
 
@@ -1306,11 +1312,10 @@ static void sli_si91x_handle_first_chunk(sl_si91x_mqtt_client_context_t *sdk_con
   mqtt_rx_reassembly.discard_in_progress = true;
   mqtt_rx_reassembly.in_progress         = true;
 
-  sl_mqtt_client_error_status_t error_status = SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE;
-  sdk_context->client->client_event_handler(sdk_context->client,
-                                            SL_MQTT_CLIENT_ERROR_EVENT,
-                                            (void *)&error_status,
-                                            sdk_context->user_context);
+  sli_si91x_notify_mqtt_error(sdk_context->client,
+                              sdk_context->user_context,
+                              SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE,
+                              SL_STATUS_FAIL);
 #endif // SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE > 0
 }
 

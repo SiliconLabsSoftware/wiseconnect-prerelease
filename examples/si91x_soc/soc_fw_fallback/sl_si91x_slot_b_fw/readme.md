@@ -15,6 +15,7 @@
     - [STA Instance-related Parameters](#sta-instance-related-parameters)
     - [TCP Configuration](#tcp-configuration)
   - [Test the Application](#test-the-application)
+    - [Combined Image Firmware Update](#combined-image-firmware-update)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
   - [Report Bugs/Support](#report-bugssupport)
@@ -65,6 +66,7 @@ For more details on firmware fallback feature enablement and usage, refer to UG6
   - Installation of build tools for Linux including the gcc compiler (or equivalent on PC or Mac).
   - For Ubuntu, use the following command for installation: `user@ubuntu:~$ sudo apt install build-essential`.
   - If you do not have Linux, you can use [Cygwin for Windows](https://www.cygwin.com/) instead.
+- Python 3 (required for combined-image OTA using `firmware_update_two_images_tcp_server.py`)
 - VCOM Setup
   - The Docklight tool's setup instructions are provided below.
 
@@ -133,6 +135,7 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
   ```
 
   - **Note:** When enabled, the socket connection remains open between images to allow downloading the second image. The socket is closed only after all images are processed.
+  - This is **not** the same as the general combined firmware update in the [Wi-Fi - NWP Or Combined (NWP & M4) Firmware Update via TCP](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/featured/firmware_update/readme.md) example. Firmware fallback does not use a Commander-merged single combined `.rps`. It downloads two separate RPS files (M4 and NWP) in sequence. See [Combined Image Firmware Update](#combined-image-firmware-update).
 
 - `DISABLE_AB_DEBUG_LOGS`: Controls whether debug logs are enabled or disabled in the A/B Firmware Fallback module. By default, it is set to 1 (debug logs disabled). The macro is defined in [`components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c).
 
@@ -222,11 +225,53 @@ To establish the TCP server with firmware file on remote PC, follow the steps be
 
  ![Figure: output_soc_1](resources/readme/output_soc_1.png)
 
+### Combined Image Firmware Update
+
+Firmware fallback combined-image OTA transfers **two separate RPS files** (M4 and NWP) back-to-back over one TCP connection. This is different from the general combined firmware update.
+
+**Difference from the general combined firmware update:**
+
+- **General combined firmware update** (`examples/featured/firmware_update`): Commander merges the M4 and NWP images into a **single** combined `.rps` using `commander rps convert ... --combinedimage`. The C TCP server (`firmware_update_tcp_server_9117.c`) then serves that one file. Enable this with `COMBINED_IMAGE` in that example.
+- **Firmware fallback combined image update** (this example): The M4 and NWP images stay as **two separate `.rps` files**. They are sent sequentially on the same socket so each image can be written to its A/B slot. Slot information is committed only after both images are verified. Do **not** use a Commander-merged combined `.rps` with this example. Enable this with `SL_APP_COMBINED_IMAGE_SUPPORT`.
+
+To run a combined-image (M4 + NWP) firmware fallback update:
+
+1. In `app.c`, set `SL_APP_COMBINED_IMAGE_SUPPORT` to `1`. To commit A/B slot information after both images succeed, also set `SL_APP_UPDATE_FIRMWARE_SLOT` to `1`.
+
+   ```c
+   #define SL_APP_COMBINED_IMAGE_SUPPORT 1
+   #define SL_APP_UPDATE_FIRMWARE_SLOT   1
+   ```
+
+2. Use M4 and NWP `.rps` images from the **same** WiSeConnect release package. Using images from different versions can cause undefined behavior. The device identifies each image type from the RPS header, so either file order is accepted.
+
+3. Copy the combined-image TCP server [firmware_update_two_images_tcp_server.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/examples/si91x_soc/soc_fw_fallback/sl_si91x_slot_b_fw/firmware_update_two_images_tcp_server.py) provided with the application source to a PC connected to the same Wi-Fi access point as the device.
+
+4. Start the Python 3 TCP server. The port must match `SERVER_PORT` in `app.c`:
+
+   ```
+   python firmware_update_two_images_tcp_server.py <local port> <RPS file path 1> <RPS file path 2>
+   ```
+
+   Example:
+
+   ```
+   user@linux:~$ python firmware_update_two_images_tcp_server.py 5000 m4_application.rps SiWG917-B.2.x.x.x.x.x.rps
+   ```
+
+   ... where **m4_application.rps** is the M4 slot image and **SiWG917-B.2.x.x.x.x.x.rps** is the NWP image from the same release.
+
+5. Build, flash, and run this application. The device downloads the first image, keeps the socket open, then downloads the second image. After both images are verified, slot information is updated (when enabled) and the socket is closed.
+
+> **Note:**
+> The C TCP servers (`firmware_update_tcp_server_9117.c` and `firmware_update_tcp_server_for_updater.c`) serve a single RPS file. Use `firmware_update_two_images_tcp_server.py` whenever `SL_APP_COMBINED_IMAGE_SUPPORT` is enabled.
+
 ## Troubleshooting
 
 - If the project does not build, ensure Simplicity Studio and the WiSeConnect extension are installed and the board is connected.
 - If the device is not detected, reinstall the connectivity firmware and check USB drivers.
 - If OTA update fails, verify Wi-Fi connection, TCP server is running with the correct firmware file, and MBR fallback profile is provisioned.
+- For combined-image OTA, set `SL_APP_COMBINED_IMAGE_SUPPORT` to `1` and use `firmware_update_two_images_tcp_server.py` with two `.rps` files from the same release. Do not pass a Commander-merged combined `.rps` to this server.
 
 ## Resources
 

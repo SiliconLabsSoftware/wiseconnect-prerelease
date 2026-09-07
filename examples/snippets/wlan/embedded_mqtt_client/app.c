@@ -81,6 +81,8 @@
 #define USERNAME "username"
 #define PASSWORD "password"
 
+#define PRINT_CHAR_BUFFER_CHUNK_SIZE 128
+
 /******************************************************
  *               Variable Definitions
  ******************************************************/
@@ -186,7 +188,7 @@ sl_mqtt_client_last_will_message_t last_will_message = {
 static void application_start(void *argument);
 void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message, void *context);
 void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void *event_data, void *context);
-void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error);
+void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_info_t *error);
 void mqtt_client_cleanup();
 void print_char_buffer(char *buffer, uint32_t buffer_length);
 sl_status_t mqtt_example();
@@ -242,7 +244,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 {
   UNUSED_PARAMETER(context);
   sl_status_t status;
-  SL_DEBUG_LOG_V2(INFO, "Message Received on Topic: ");
+  SL_DEBUG_LOG_V2(INFO, "Message Received on Topic:\r\n");
 
   print_char_buffer((char *)message->topic, message->topic_length);
   print_char_buffer((char *)message->content, message->content_length);
@@ -263,8 +265,14 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
 
 void print_char_buffer(char *buffer, uint32_t buffer_length)
 {
-  if (buffer == NULL || buffer_length == 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Buffer is NULL or buffer_length is 0");
+  if (buffer == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "Buffer is NULL\r\n");
+    return;
+  }
+
+  /* Zero-length MQTT payloads are valid; mark them explicitly in the log. */
+  if (buffer_length == 0) {
+    SL_DEBUG_LOG_V2(INFO, "(empty)\r\n");
     return;
   }
 
@@ -272,44 +280,63 @@ void print_char_buffer(char *buffer, uint32_t buffer_length)
     buffer_length = SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE;
   }
 
-  char *line = (char *)malloc(buffer_length + 1);
-  if (line == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "print_char_buffer: malloc failed");
-    return;
-  }
+  char chunk[PRINT_CHAR_BUFFER_CHUNK_SIZE + 1];
+  uint32_t offset = 0;
 
-  memcpy(line, buffer, buffer_length);
-  line[buffer_length] = '\0';
-  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)line);
-  free(line);
+  while (offset < buffer_length) {
+    uint32_t remaining  = buffer_length - offset;
+    uint32_t this_chunk = (remaining > PRINT_CHAR_BUFFER_CHUNK_SIZE) ? PRINT_CHAR_BUFFER_CHUNK_SIZE : remaining;
+
+    memcpy(chunk, &buffer[offset], this_chunk);
+    chunk[this_chunk] = '\0';
+    offset += this_chunk;
+    if (offset >= buffer_length) {
+      SL_DEBUG_LOG_V2(INFO, "%s\r\n", (uintptr_t)chunk);
+    } else {
+      SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)chunk);
+    }
+  }
 }
 
-void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)
+void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_info_t *error)
 {
   UNUSED_PARAMETER(client);
 
-  switch (*error) {
+  if (error == NULL) {
+    SL_DEBUG_LOG_V2(ERROR, "MQTT Error: event data is NULL\r\n");
+    return;
+  }
+
+  switch (error->error_status) {
     case SL_MQTT_CLIENT_RECEIVE_FAILED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.\r\n");
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed with status: 0x%lx\r\n", error->status_code);
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE:
       SL_DEBUG_LOG_V2(ERROR,
                       "MQTT Error: Received payload exceeds max size (%u bytes). "
-                      "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE.",
-                      SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE);
+                      "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE. Failed with status: 0x%lx",
+                      SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE,
+                      error->status_code);
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_MEMORY_ALLOCATION_FAILED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Failed to allocate memory for message reassembly.");
+      SL_DEBUG_LOG_V2(ERROR,
+                      "MQTT Error: Failed to allocate memory for message reassembly with status: 0x%lx",
+                      error->status_code);
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Data corruption detected during message reassembly.");
+      SL_DEBUG_LOG_V2(ERROR,
+                      "MQTT Error: Data corruption detected during message reassembly with status: 0x%lx",
+                      error->status_code);
       break;
 
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Terminating program, Error: %d", *error);
+      SL_DEBUG_LOG_V2(ERROR,
+                      "Terminating program due to error: %d, status: 0x%lx\r\n",
+                      error->error_status,
+                      error->status_code);
       mqtt_client_cleanup();
       break;
   }
@@ -349,7 +376,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     case SL_MQTT_CLIENT_MESSAGE_PUBLISHED_EVENT: {
       sl_mqtt_client_message_t *published_message = (sl_mqtt_client_message_t *)context;
 
-      SL_DEBUG_LOG_V2(INFO, "Published message successfully on topic: ");
+      SL_DEBUG_LOG_V2(INFO, "Published message successfully on topic:\r\n");
       print_char_buffer((char *)published_message->topic, published_message->topic_length);
       break;
     }
@@ -378,7 +405,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     }
 
     case SL_MQTT_CLIENT_ERROR_EVENT: {
-      mqtt_client_error_event_handler(client, (sl_mqtt_client_error_status_t *)event_data);
+      mqtt_client_error_event_handler(client, (sl_mqtt_client_error_info_t *)event_data);
       break;
     }
     default:

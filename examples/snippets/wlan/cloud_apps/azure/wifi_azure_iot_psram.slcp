@@ -24,6 +24,7 @@ include:
 define:
 - name: SLI_SI91X_MCU_ENABLE_PSRAM_FEATURE
 - name: SL_SI91X_PRINT_DBG_LOG
+- name: SLI_SI91X_INTERNAL_SNTP_CLIENT
 - name: azureiotconfigKEEP_ALIVE_TIMEOUT_SECONDS
   value: '600'
 component:
@@ -47,6 +48,7 @@ component:
 - id: basic_network_config_manager
 - id: sl_si91x_asynchronous_socket
 - id: azure_freertos_middleware
+- id: sntp
 - id: sl_power_manager
 - id: log_none
 - id: si91x_log
