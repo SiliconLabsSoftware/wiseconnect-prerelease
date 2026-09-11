@@ -23,6 +23,7 @@
 #include "sl_wifi.h"
 #include "sl_net_default_values.h"
 #include "sl_si91x_driver.h"
+#include "sl_wifi_device.h"
 #include <string.h>
 
 /******************************************************
@@ -69,6 +70,15 @@ sl_status_t ping_response_callback_handler(sl_net_event_t event, sl_status_t sta
 
 #endif
 
+static sl_wifi_device_configuration_t wifi_client_device_configuration;
+static sl_wifi_device_configuration_t wifi_ap_device_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 sl_status_t net_init_command_handler(console_args_t *arguments)
 {
   sl_status_t status;
@@ -85,19 +95,23 @@ sl_status_t net_init_command_handler(console_args_t *arguments)
 
 #ifdef SL_WIFI_COMPONENT_INCLUDED
     case SL_NET_WIFI_CLIENT_INTERFACE:
+      wifi_client_device_configuration = sl_wifi_default_client_configuration;
+      apply_nwp_logging(&wifi_client_device_configuration);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
       event_handler = ping_response_callback_handler;
-      status        = sl_net_init(interface, &sl_wifi_default_client_configuration, NULL, event_handler);
+      status        = sl_net_init(interface, &wifi_client_device_configuration, NULL, event_handler);
 #elif SLI_SI91X_LWIP_HOSTED_NETWORK_STACK
-      status = sl_net_init(interface, &sl_wifi_default_client_configuration, &wifi_client_context, event_handler);
+      status = sl_net_init(interface, &wifi_client_device_configuration, &wifi_client_context, event_handler);
 #endif
       VERIFY_STATUS_AND_RETURN(status);
       break;
     case SL_NET_WIFI_AP_INTERFACE:
+      wifi_ap_device_configuration = sl_wifi_default_ap_configuration;
+      apply_nwp_logging(&wifi_ap_device_configuration);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
-      status = sl_net_init(interface, (const void *)&sl_wifi_default_ap_configuration, NULL, NULL);
+      status = sl_net_init(interface, (const void *)&wifi_ap_device_configuration, NULL, NULL);
 #elif SLI_SI91X_LWIP_HOSTED_NETWORK_STACK
-      status = sl_net_init(interface, (const void *)&sl_wifi_default_ap_configuration, (void *)&wifi_ap_context, NULL);
+      status = sl_net_init(interface, (const void *)&wifi_ap_device_configuration, (void *)&wifi_ap_context, NULL);
 #endif
       VERIFY_STATUS_AND_RETURN(status);
       break;

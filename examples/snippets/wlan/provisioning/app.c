@@ -181,6 +181,15 @@ static const sl_http_server_handler_t provisioning_server_request_handlers[] = {
   { .uri = "/scan", .handler = wifi_scan_request_handler }
 };
 
+static sl_wifi_device_configuration_t wifi_ap_configuration;
+static sl_wifi_device_configuration_t wifi_client_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -222,8 +231,10 @@ static void application_start(void *argument)
         // Initialize and start Wi-Fi AP (Access Point) interface
         sl_net_wifi_ap_profile_t ap_profile;
 
-        // Initialize the Wi-Fi AP interface with default configuration
-        status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, (const void *)&sl_wifi_default_ap_configuration, NULL, NULL);
+        // Duplicate default AP profile locally and enable NWP logging
+        wifi_ap_configuration = sl_wifi_default_ap_configuration;
+        apply_nwp_logging(&wifi_ap_configuration);
+        status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, (const void *)&wifi_ap_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx\r\n", status);
           return;
@@ -300,8 +311,10 @@ static void application_start(void *argument)
         }
         SL_DEBUG_LOG_V2(INFO, "Wi-Fi AP deinitialized\r\n");
 
-        // Initialize the Wi-Fi client interface
-        status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_client_configuration, NULL, NULL);
+        // Duplicate default client profile locally and enable NWP logging
+        wifi_client_configuration = sl_wifi_default_client_configuration;
+        apply_nwp_logging(&wifi_client_configuration);
+        status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_client_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
           return;

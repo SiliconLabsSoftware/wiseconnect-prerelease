@@ -508,8 +508,8 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     boot_config.custom_feature_bit_map |= SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_120MHZ;
   }
 
-  // Set SLI_SI3XX_FEAT_FW_UPDATE_NEW_CODE in the feature bit map to retrieve the latest firmware result codes
-  boot_config.feature_bit_map |= SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE;
+  // Set SL_WIFI_FEAT_FW_UPDATE_NEW_CODE in the feature bit map to retrieve the latest firmware result codes
+  boot_config.feature_bit_map |= SL_WIFI_FEAT_FW_UPDATE_NEW_CODE;
 
   // Send WLAN request to set the operating mode and configuration
   status = sli_wifi_send_command(SLI_WIFI_REQ_OPERMODE,

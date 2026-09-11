@@ -207,12 +207,14 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
 #ifdef SLI_SI91X_MCU_INTERFACE
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP)
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
+                                              | SL_SI91X_ENABLE_NWP_LOGGING)
 #else
 #if ENABLE_NWP_POWER_SAVE
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP)
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
+                                              | SL_SI91X_ENABLE_NWP_LOGGING)
 #else
-                   .config_feature_bit_map = 0
+                   .config_feature_bit_map = SL_SI91X_ENABLE_NWP_LOGGING
 #endif
 #endif
   },

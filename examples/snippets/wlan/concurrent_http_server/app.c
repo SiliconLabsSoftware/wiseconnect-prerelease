@@ -143,6 +143,14 @@ sl_status_t connect_data_handler(sl_http_server_t *handle, sl_http_server_reques
 static sl_http_server_handler_t request_handlers[2] = { { .uri = "/login", .handler = login_request_handler },
                                                         { .uri = "/connect", .handler = connect_data_handler } };
 
+static sl_wifi_device_configuration_t wifi_concurrent_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -344,7 +352,10 @@ static void application_start(void *argument)
   sl_net_wifi_client_profile_t profile = { 0 };
   sl_ip_address_t ip_address           = { 0 };
 
-  status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
+  wifi_concurrent_configuration = sl_wifi_default_concurrent_configuration;
+  apply_nwp_logging(&wifi_concurrent_configuration);
+
+  status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &wifi_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx\r\n", status);
     return;
@@ -426,7 +437,7 @@ static void application_start(void *argument)
   }
   SL_DEBUG_LOG_V2(INFO, " Server deinit done\r\n");
 
-  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
+  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;

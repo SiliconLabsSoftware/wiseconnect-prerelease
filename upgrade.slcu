@@ -188,7 +188,14 @@ upgrade:
           - wifi
           - sl_si91x_wireless
           - network_manager
+          - basic_network_config_manager
           - wifi_resources
+      - trigger: sl_si91x_fw_fallback
+        description: >
+          Preserve the internal network stack for firmware-fallback applications.
+        status: automatic
+        add:
+          - sl_si91x_internal_stack
       - script: upgrade_wireless_component_for_common_flash.lua
         description: >
           Restore wireless components removed from common-flash NVM3 and LittleFS.

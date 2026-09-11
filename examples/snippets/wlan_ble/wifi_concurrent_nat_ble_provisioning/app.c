@@ -86,10 +86,10 @@ const sl_wifi_device_configuration_t config = {
 #endif
                                                   ),
                    .bt_feature_bit_map         = 0,
-                   .ext_tcp_ip_feature_bit_map = 0,
+                   .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
+                   .config_feature_bit_map     = SL_SI91X_ENABLE_NWP_LOGGING },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -157,7 +157,8 @@ const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_BLE_GATT_INIT
 #endif
                       ),
-                       .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
+                       .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
+                                              | SL_SI91X_ENABLE_NWP_LOGGING) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0

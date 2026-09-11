@@ -16,6 +16,7 @@ SiWx91x TWT remote trigger example: Send periodic TCP triggers to the TWT Use Ca
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
     - [Configure the Application](#configure-the-application)
   - [Test the Application](#test-the-application)
 
@@ -95,6 +96,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate power-save measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact power-save current.
+
 
 The application can be configured to suit your requirements and development environment.
 

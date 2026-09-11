@@ -18,6 +18,7 @@ SiWx91x deep sleep example: Configure standby power save in unassociated mode wi
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes)
     - [Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)](#instructions-for-keil-ide-and-stm32f411re-mcu-ncp-mode)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
   - [Test the Application](#test-the-application)
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes-1)
     - [Instructions for Keil IDE and STM32F411RE MCU](#instructions-for-keil-ide-and-stm32f411re-mcu)
@@ -112,6 +113,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - Open the POWERSAVE DEEP SLEEP µVision project - **power_save_deep_sleep.uvprojx** by navigating to **WiSeConnect SDK → examples → featured → low_power → power_save_deep_sleep → keil_project**. 
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate power-save measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact power-save current.
+
 
 **Soc Mode**:
 

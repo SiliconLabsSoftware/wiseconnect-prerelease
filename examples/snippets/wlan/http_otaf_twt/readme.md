@@ -16,6 +16,7 @@ SiWx91x HTTP OTAF with TWT example: Use Target Wake Time power save while downlo
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
   - [iTWT Session Status Codes](#itwt-session-status-codes)
   - [TWT Recommendations](#twt-recommendations)
   - [Test the Application](#test-the-application)
@@ -96,6 +97,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate power-save measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact power-save current.
+
 
 The application can be configured to suit your requirements and the development environment. Read through the following sections and make any changes needed.
 

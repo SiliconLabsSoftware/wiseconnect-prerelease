@@ -195,7 +195,7 @@ static const sl_wifi_device_configuration_t wifi_throughput_configuration = {
                       | SL_SI91X_EXT_TCP_IP_FEAT_SSL_THREE_SOCKETS | SL_SI91X_EXT_TCP_IP_WAIT_FOR_SOCKET_CLOSE),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_NWP_LOGGING) },
   .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
                            .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
                            .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },

@@ -18,6 +18,7 @@ SiWx91x WLAN throughput example: Connect to a Wi-Fi access point and measure UDP
     - [Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)](#instructions-for-keil-ide-and-stm32f411re-mcu-ncp-mode)
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
     - [Configure sl\_net\_default\_values.h](#configure-sl_net_default_valuesh)
   - [Test the Application](#test-the-application)
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes-1)
@@ -142,6 +143,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate throughput measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact throughput performance.
+
 
 The application can be configured to suit user requirements and development environment. Read through the following sections and make any changes needed.
 

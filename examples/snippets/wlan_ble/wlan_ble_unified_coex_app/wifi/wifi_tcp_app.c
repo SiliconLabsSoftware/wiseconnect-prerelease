@@ -79,7 +79,6 @@
 #elif ((THROUGHPUT_TYPE == TCP_RX) || (THROUGHPUT_TYPE == TCP_TX))
 #define BUFFER_SIZE TCP_BUFFER_SIZE
 #elif ((THROUGHPUT_TYPE == TLS_RX) || (THROUGHPUT_TYPE == TLS_TX))
-#include "cacert.pem.h"
 #define BUFFER_SIZE TLS_BUFFER_SIZE
 #endif
 
@@ -372,8 +371,8 @@ void wlan_app_thread(void *unused)
 
 void wlan_throughput_task()
 {
-
 #if ((THROUGHPUT_TYPE == TLS_RX) || (THROUGHPUT_TYPE == TLS_TX))
+  sl_status_t status;
   // Load SSL CA certificate
   status =
     sl_net_set_credential(SL_NET_TLS_SERVER_CREDENTIAL_ID(0), SL_NET_SIGNING_CERTIFICATE, cacert, sizeof(cacert) - 1);

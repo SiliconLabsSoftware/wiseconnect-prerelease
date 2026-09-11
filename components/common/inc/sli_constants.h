@@ -65,6 +65,22 @@
 #define SLI_NUMBER_OF_SOCKETS 20
 
 #define SLI_SI91X_DNS_REQUEST_MAX_URL_LEN 90
+/** Wi-Fi constants */
+// Wi-Fi Pre-Shared Key (PSK) length
+#define SLI_WIFI_PSK_LEN 64
+// Wi-Fi SSID length
+#define SLI_WIFI_SSID_LEN 34
+// Wi-Fi WPS PIN length
+#define SLI_WIFI_WPS_PIN_LEN 8
+// Wi-Fi Maximum PMK length
+#define SLI_WIFI_MAX_PMK_LENGTH 64
+// Wi-Fi Hardware Address Length
+#define SLI_WIFI_HARDWARE_ADDRESS_LENGTH 6 // Hardware Address Length
+// Wi-Fi Maximum Certificate Send Size
+#define SLI_WIFI_MAX_CERT_SEND_SIZE 1400
+
+// Maximum number of stations associated when running as an AP
+#define SLI_WIFI_MAX_STATIONS 16
 
 /// Maximum length of the Wi-Fi Pre-Shared Key (PSK) credential.
 #define SL_WIFI_MAX_PSK_LENGTH 64
@@ -88,6 +104,123 @@
 #define SL_WIFI_MAX_SSID_LENGTH 34
 
 #define SLI_SSID_LEN SL_WIFI_MAX_SSID_LENGTH
+
+//**************************** Macros for FEATURE frame Method request START *********************************/
+// Preamble Duty Cycle
+#define SLI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE (1 << 0)
+
+// Permit Undestinated Packets
+#define SLI_FEAT_FRAME_PERMIT_UNDESTINED_PACKETS (1 << 1)
+
+// LP Chain
+#define SLI_FEAT_FRAME_LP_CHAIN (1 << 4)
+
+// In Packet Duty Cycle
+#define SLI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE (1 << 5)
+
+// PLL Mode
+#define PLL_MODE 0
+
+// RF Type
+#define RF_TYPE 1 // 0 - External RF 1- Internal RF
+
+// Wireless Mode
+#define WIRELESS_MODE 0
+
+// Enable PPP
+#define ENABLE_PPP 0
+
+// AFE Type
+#define AFE_TYPE 1
+
+#ifndef SLI_FEATURE_ENABLES
+#define SLI_FEATURE_ENABLES \
+  (SLI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE | SLI_FEAT_FRAME_LP_CHAIN | SLI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE)
+#endif
+
+// -----------------------------------------------------------------------------
+// Internal macros and enums for vendor-specific IE management
+// -----------------------------------------------------------------------------
+
+/// Defines the maximum number of vendor-specific IEs that can be configured.
+#define SLI_WIFI_MAX_VENDOR_IE 2
+
+// Defines the Header length in vendor-specific IE buffer.
+#define SLI_WIFI_VENDOR_IE_HEADER_LENGTH 2
+
+/// Defines the maximum length of the vendor-specific IE buffer 256 Bytes (254 bytes for data + 2 bytes for header).
+#define SLI_WIFI_MAX_VENDOR_IE_BUFFER_LENGTH (254 + SLI_WIFI_VENDOR_IE_HEADER_LENGTH)
+
+/// Defines the frame version for vendor-specific IE.
+#define SLI_WIFI_VENDOR_IE_FRAME_VERSION 0
+
+/// Timeout for vendor-specific commands (1 sec).
+#define SLI_WIFI_VENDOR_IE_CMD_TIMEOUT 1000
+
+#define SLI_WIFI_COUNTRY_CODE_LENGTH  3
+#define SLI_WIFI_MAX_POSSIBLE_CHANNEL 24
+
+// WLAN Management Frame Sub-Type
+#define SLI_WIFI_FRAME_SUBTYPE_MASK       0xf0 // WLAN Management Frame Sub-Type Mask
+#define SLI_WIFI_FRAME_SUBTYPE_PROBE_RESP 0x50 // WLAN Management Frame Sub-Type Probe Response Frame
+#define SLI_WIFI_FRAME_SUBTYPE_BEACON     0x80 // WLAN Management Frame Sub-Type Beacon Frame
+#define SLI_WIFI_MINIMUM_FRAME_LENGTH     36   // Minimum Frame Length of WLAN Management Frame
+#define SLI_WIFI_HARDWARE_ADDRESS_LENGTH  6    // Hardware Address Length
+
+// WLAN Information Element Type
+#define SLI_WLAN_TAG_SSID            0   // WLAN Information Element Type SSID
+#define SLI_WLAN_TAG_RSN             48  // WLAN Robust Security Network Information Element
+#define SLI_WLAN_TAG_VENDOR_SPECIFIC 221 // WLAN Vendor Specific Information Element
+
+// Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_UNSPEC_802_1X   0x000FAC01 // Unspecified Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_PSK_OVER_802_1X 0x000FAC02 // PSK Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_802_1X_SHA256   0x000FAC05 // SHA256 Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_PSK_SHA256      0x000FAC06 // PSK SHA256 Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_SAE             0x000FAC08 // SAE Authentication key Management Type
+#define SLI_AUTH_KEY_MGMT_FT_SAE          0x000FAC09 // FT_SAE Authentication key Management Type
+
+// Authentication key Management Type Flags
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA           0x00000001 // WPA AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA2          0x00000002 // WPA2 AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA_PSK       0x00000004 // WPA_PSK AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_WPA2_PSK      0x00000008 // WPA2_PSK AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_SAE           0x00010000 // SAE AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_FT_SAE        0x00100000 // FT_SAE AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_802_1X_SHA256 0x00020000 // SHA256 AKM Type
+#define SLI_WLAN_AUTH_KEY_MGMT_TYPE_PSK_SHA256    0x00040000 // PSK_SHA256 AKM Type
+
+// -----------------------------------------------------------------------------
+// Internal macros for multicast allowlist (IP-based) management
+// -----------------------------------------------------------------------------
+/** Maximum concurrent multicast allowlist entries on the NWP (IPv4 + IPv6 combined).
+ *  Valid slot handles returned on ADD are @c 0 .. @c SLI_WIFI_MAX_MC_ALLOWLIST_IP_ADDRESSES - 1
+ *  (see @ref sl_wifi_allowlist_mcast_add_ip / @ref sl_wifi_allowlist_mcast_remove_ip).
+ *  Host updates use @ref SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST with @ref sli_wifi_mc_allowlist_update_req_t.
+ */
+#define SLI_WIFI_MAX_MC_ALLOWLIST_IP_ADDRESSES 6
+/// Operation field for @ref SLI_WIFI_REQ_UPDATE_MC_ALLOWLIST (command @c 0x5C).
+#define SLI_WIFI_MC_ALLOWLIST_OP_ADD        0
+#define SLI_WIFI_MC_ALLOWLIST_OP_REMOVE     1
+#define SLI_WIFI_MC_ALLOWLIST_OP_REMOVE_ALL 2
+
+// -----------------------------------------------------------------------------
+// Generic firmware configuration request (host to NWP)
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief Byte length of an @ref sli_wifi_fw_config_req_t command buffer including @a _len tail bytes.
+ * @details @c sizeof(sli_wifi_fw_config_req_t) counts only the fixed header (flexible member excluded).
+ *          For @a _len @c 0 (e.g. @ref sl_wifi_set_beacon_drop_threshold), this equals @c sizeof(struct).
+ */
+#define SLI_WIFI_FW_CONFIG_REQ_TOTAL_SIZE(_len) ((size_t)sizeof(sli_wifi_fw_config_req_t) + (size_t)(_len))
+
+/**
+ * @def SLI_SET_BEACON_DROP_THRESHOLD
+ * @brief Bit in @ref sli_wifi_fw_config_req_t::config_bitmap that selects beacon drop threshold (scalar in @c value; @c length 0)
+ *        for @ref SLI_WIFI_REQ_SET_BEACON_DROP_THRESHOLD / @ref sl_wifi_set_beacon_drop_threshold.
+ */
+#define SLI_SET_BEACON_DROP_THRESHOLD BIT(0)
 
 /// Timeout scaling factor for internal firmware operations
 #ifndef SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF

@@ -16,6 +16,7 @@ SiWx91x Wi-Fi BLE power save example: Run concurrent WLAN and BLE tasks with ass
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
     - [Project Creation](#project-creation)
       - [SoC Mode](#soc-mode)
       - [NCP Mode](#ncp-mode)
@@ -120,6 +121,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate power-save measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact power-save current.
+
 
 ### Project Creation
 

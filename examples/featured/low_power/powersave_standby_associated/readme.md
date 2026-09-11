@@ -18,6 +18,7 @@ SiWx91x associated power save example: Connect to Wi-Fi, send UDP data in low-po
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes)
     - [Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)](#instructions-for-keil-ide-and-stm32f411re-mcu-ncp-mode)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
     - [Configure sl\_net\_default\_values.h](#configure-sl_net_default_valuesh)
   - [Test the Application](#test-the-application)
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes-1)
@@ -120,6 +121,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 5. Open the Powersave standby associated µVision project - **powersave_standby_associated.uvprojx** by navigating to **WiSeConnect SDK → examples → featured → powersave_standby_associated → keil_project**.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate power-save measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact power-save current.
+
 
 The application can be configured to suit user requirements and development environment. Read through the following sections and make any changes needed.
 

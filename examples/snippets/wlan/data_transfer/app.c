@@ -173,6 +173,14 @@ void data_transfer_through_client_and_ap_interface();
 sl_status_t initialize_wifi_client_interface();
 void remote_terminate_callback(int socket_id, uint16_t port_number, uint32_t bytes_sent);
 
+static sl_wifi_device_configuration_t wifi_concurrent_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -192,7 +200,10 @@ sl_status_t initialize_wifi_client_interface()
   sl_status_t status = SL_STATUS_OK;
 
   //! Initialize Wi-Fi client interface
-  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
+  wifi_concurrent_configuration = sl_wifi_default_concurrent_configuration;
+  apply_nwp_logging(&wifi_concurrent_configuration);
+
+  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Wi-Fi Client initialization failed, Error Code : 0x%lX\r\n", status);
     return status;
@@ -250,7 +261,7 @@ sl_status_t initialize_wifi_ap_interface()
   sl_wifi_channel_t client_channel = { 0 };
 
   //! Initialize Wi-Fi Access Point interface
-  status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
+  status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &wifi_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Wi-Fi AP initialization failed, Error code: 0x%lx\r\n", status);
     return status;

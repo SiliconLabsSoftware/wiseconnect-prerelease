@@ -49,6 +49,11 @@
 /******************************************************
  *                      Macros
  ******************************************************/
+// Set to 1 to enable NWP logging for debug. Disabled by default to avoid impacting throughput measurements.
+#ifndef ENABLE_NWP_LOGGING
+#define ENABLE_NWP_LOGGING 0
+#endif
+
 // Type of throughput
 #define UDP_TX 0
 #define UDP_RX 1
@@ -172,7 +177,13 @@ static const sl_wifi_device_configuration_t throughput_configuration = {
                      (SL_SI91X_EXT_TCP_IP_WINDOW_DIV | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 },
+                   .config_feature_bit_map =
+#if ENABLE_NWP_LOGGING
+                     SL_SI91X_ENABLE_NWP_LOGGING
+#else
+                     0
+#endif
+  },
   .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
                            .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
                            .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },
@@ -527,9 +538,9 @@ void receive_data_from_tcp_client(void)
   measure_and_print_throughput(bytes_read, (now - start));
 #else
 
-  uint32_t start                = 0;
-  uint32_t now                  = 0;
-  int read_bytes                = 1;
+  uint32_t start = 0;
+  uint32_t now = 0;
+  int read_bytes = 1;
   uint32_t total_bytes_received = 0;
 
   server_socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
@@ -551,8 +562,8 @@ void receive_data_from_tcp_client(void)
   }
 
   server_address6.sin6_family = AF_INET6;
-  server_address6.sin6_port   = LISTENING_PORT;
-  socket_return_value         = bind(server_socket, (struct sockaddr *)&server_address6, socket_length);
+  server_address6.sin6_port = LISTENING_PORT;
+  socket_return_value = bind(server_socket, (struct sockaddr *)&server_address6, socket_length);
   if (socket_return_value < 0) {
     SL_DEBUG_LOG_V2(ERROR, "Socket bind failed with bsd error: %d\r\n", errno);
     close(server_socket);
@@ -707,10 +718,10 @@ void receive_data_from_udp_client(void)
 
   close(client_socket);
 #else
-  sl_status_t status            = SL_STATUS_OK;
-  uint32_t start                = 0;
-  uint32_t now                  = 0;
-  int read_bytes                = 1;
+  sl_status_t status = SL_STATUS_OK;
+  uint32_t start = 0;
+  uint32_t now = 0;
+  int read_bytes = 1;
   uint32_t total_bytes_received = 0;
 
   client_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
@@ -721,7 +732,7 @@ void receive_data_from_udp_client(void)
   SL_DEBUG_LOG_V2(INFO, "Socket ID : %d\r\n", client_socket);
 
   server_address6.sin6_family = AF_INET6;
-  server_address6.sin6_port   = LISTENING_PORT;
+  server_address6.sin6_port = LISTENING_PORT;
 
   socket_return_value = bind(client_socket, (struct sockaddr *)&server_address6, socket_length);
   if (socket_return_value < 0) {
@@ -751,7 +762,7 @@ void receive_data_from_udp_client(void)
     }
 
     total_bytes_received = total_bytes_received + read_bytes;
-    now                  = osKernelGetTickCount();
+    now = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
       SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms\r\n", (now - start));
@@ -837,9 +848,9 @@ void receive_data_from_tls_server(void)
   close(client_socket);
   measure_and_print_throughput(bytes_read, (now - start));
 #else
-  uint32_t start                = 0;
-  uint32_t now                  = 0;
-  int read_bytes                = 1;
+  uint32_t start = 0;
+  uint32_t now = 0;
+  int read_bytes = 1;
   uint32_t total_bytes_received = 0;
 
   client_socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
@@ -868,7 +879,7 @@ void receive_data_from_tls_server(void)
   }
 
   server_address6.sin6_family = AF_INET6;
-  server_address6.sin6_port   = SERVER_PORT;
+  server_address6.sin6_port = SERVER_PORT;
 
   int ret_status = sl_inet_pton6(SERVER_IP,
                                  &SERVER_IP[strlen(SERVER_IP)],
@@ -907,7 +918,7 @@ void receive_data_from_tls_server(void)
     }
 
     total_bytes_received = total_bytes_received + read_bytes;
-    now                  = osKernelGetTickCount();
+    now = osKernelGetTickCount();
 
     if ((now - start) > TEST_TIMEOUT) {
       SL_DEBUG_LOG_V2(INFO, "Test Time Out: %ld ms\r\n", (now - start));

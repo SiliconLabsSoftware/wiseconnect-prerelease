@@ -147,6 +147,14 @@ sl_wifi_request_tx_test_info_t tx_test_info = {
 
 static void application_start(void *argument);
 
+static sl_wifi_device_configuration_t wifi_transmit_test_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -161,7 +169,9 @@ static void application_start(void *argument)
   UNUSED_PARAMETER(argument);
   sl_status_t status;
 
-  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_transmit_test_configuration, NULL, NULL);
+  wifi_transmit_test_configuration = sl_wifi_default_transmit_test_configuration;
+  apply_nwp_logging(&wifi_transmit_test_configuration);
+  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_transmit_test_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;

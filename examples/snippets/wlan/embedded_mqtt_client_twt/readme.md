@@ -16,6 +16,7 @@ SiWx91x embedded MQTT with TWT example: Connect to a Wi-Fi 6 AP, establish an iT
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
       - [In the Project explorer pane, expand the **config** folder and open the **sl\_net\_default\_values.h** file. Configure the following parameters to enable your Silicon Labs Wi-Fi device to connect to your Wi-Fi network.](#in-the-project-explorer-pane-expand-the-config-folder-and-open-the-sl_net_default_valuesh-file-configure-the-following-parameters-to-enable-your-silicon-labs-wi-fi-device-to-connect-to-your-wi-fi-network)
   - [iTWT Session Status Codes](#itwt-session-status-codes)
   - [TWT Recommendations](#twt-recommendations)
@@ -101,6 +102,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate power-save measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact power-save current.
+
 The application can be configured to suit user requirements and development environment. Read through the following sections and make any changes needed.
 
 #### In the Project explorer pane, expand the **config** folder and open the **sl_net_default_values.h** file. Configure the following parameters to enable your Silicon Labs Wi-Fi device to connect to your Wi-Fi network.

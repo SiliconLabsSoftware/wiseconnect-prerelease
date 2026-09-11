@@ -109,7 +109,7 @@
 #define SLI_WIFI_AP_OPT_DYNAMIC_HIDDEN_SSID_CONF BIT(3) ///< Bit 3: dynamic hidden SSID configuration
 
 /**
- * @def SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE
+ * @def SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
  * @brief Indicates support for a new set of firmware update result codes. This bit is used for internal purpose.
  * @details
  * This bit in the feature bitmap is used to inform the NWP firmware whether
@@ -118,7 +118,21 @@
  * the NWP firmware would send result codes from the new set after a firmware update.
  * If the bit is not set, the legacy result codes would be used.
  */
-#define SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE BIT(16)
+#ifndef SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+#define SL_WIFI_FEAT_FW_UPDATE_NEW_CODE BIT(16)
+#endif
+
+/**
+ * @def SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE
+ * @brief Alias for SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+ * @details Ensure smooth migration to SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+ * @note The macro SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE is being deprecated and
+ *       will be removed in the future. Please use
+ *       SL_WIFI_FEAT_FW_UPDATE_NEW_CODE instead.
+ */
+#ifndef SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE
+#define SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+#endif
 
 /// Wifi Timeout types
 typedef enum {

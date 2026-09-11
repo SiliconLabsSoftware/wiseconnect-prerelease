@@ -17,6 +17,7 @@ SiWx91x associated power save TCP example: Connect to Wi-Fi, send TCP data in lo
   - [Getting Started](#getting-started)
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
     - [Configure sl\_net\_default\_values.h](#configure-sl_net_default_valuesh)
   - [Test the Application](#test-the-application)
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes-1)
@@ -91,6 +92,13 @@ The application also demonstrates SiWx91x to connect to a remote server to send 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate power-save measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact power-save current.
+
 
 The application can be configured to suit user requirements and development environment. Read through the following sections and make any changes needed.
 

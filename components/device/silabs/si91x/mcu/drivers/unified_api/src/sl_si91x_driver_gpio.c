@@ -28,6 +28,7 @@
 ******************************************************************************/
 #include "sl_si91x_driver_gpio.h"
 #include "sl_status.h"
+#include <stdbool.h>
 #include <stdio.h>
 /*******************************************************************************
  ***************************  DEFINES / MACROS ********************************
@@ -178,7 +179,8 @@ static uint8_t ulp_gpio_pad[12] = { GPIO_PAD_SELECT_22, GPIO_PAD_SELECT_23, GPIO
                                     GPIO_PAD_SELECT_26, GPIO_PAD_SELECT_27, GPIO_PAD_SELECT_28, GPIO_PAD_SELECT_29,
                                     GPIO_PAD_SELECT_30, GPIO_PAD_SELECT_31, GPIO_PAD_SELECT_32, GPIO_PAD_SELECT_33 };
 
-static uint32_t soc_peri_on_ulp_gpio_status = 0; // Holds the status of SOC peripheral on ulp gpio
+static uint32_t soc_peri_on_ulp_gpio_status = 0;     // Holds the status of SOC peripheral on ulp gpio
+static bool gpio_driver_initialized         = false; // Tracks GPIO driver initialization state
 /*******************************************************************************
  ***********************  Global function Prototypes ***************************
  ******************************************************************************/
@@ -206,12 +208,21 @@ sl_gpio_irq_callback_t gpio_ulp_group_int_callback_fptr[MAX_GROUP_INT];
 sl_gpio_irq_callback_t gpio_uulp_pin_int_callback_fptr[MAX_UULP_INT];
 
 /*******************************************************************************
+ * @brief Returns whether the GPIO driver has been initialized.
+ ******************************************************************************/
+bool sl_gpio_driver_is_initialized(void)
+{
+  return gpio_driver_initialized;
+}
+
+/*******************************************************************************
  * @brief This API is used for GPIO pin configuration to set the direction, mode,
  *  pin and port, clock.
  ******************************************************************************/
 sl_status_t sl_gpio_set_configuration(sl_si91x_gpio_pin_config_t pin_config)
 {
   sl_status_t status;
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   switch (pin_config.port_pin.port) {
     case SL_GPIO_PORT_A:
     case SL_GPIO_PORT_B:
@@ -356,6 +367,7 @@ sl_status_t sl_gpio_driver_configure_interrupt(sl_gpio_t *gpio,
                                                uint32_t *avl_intr_no)
 {
   sl_status_t status;
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   (void)avl_intr_no;
   // Check if gpio pointer and gpio_callback pointer is NULL
   if ((gpio == NULL) || (gpio_callback == NULL)) {
@@ -472,6 +484,7 @@ sl_status_t sl_gpio_configure_group_interrupt(sl_si91x_gpio_group_interrupt_conf
                                               sl_gpio_irq_callback_t gpio_callback)
 {
   // Check if configuration pointer and gpio_callback pointer is NULL.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((configuration == NULL) || (gpio_callback == NULL)) {
     // Return error code for NULL pointer
     SL_PRINT_STRING_ERROR("sl_gpio_configure_group_interrupt: NULL configuration/callback st=0x%04lX,line no : %d\r\n",
@@ -543,6 +556,7 @@ sl_status_t sl_gpio_driver_set_pin_mode(sl_gpio_t *gpio, sl_gpio_mode_t mode, ui
 {
   sl_status_t status;
   // Check if the GPIO pointer is NULL.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio == NULL) {
     SL_PRINT_STRING_ERROR("sl_gpio_driver_set_pin_mode: gpio is NULL,line no : %d\r\n", (int)__LINE__);
     return SL_STATUS_NULL_POINTER;
@@ -598,6 +612,7 @@ sl_status_t sl_gpio_driver_get_pin_mode(sl_gpio_t *gpio, sl_gpio_mode_t *mode)
 {
   sl_status_t status;
   // Check if the GPIO pointer and mode pointer is NULL.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio == NULL) || (mode == NULL)) {
     SL_PRINT_STRING_ERROR("sl_gpio_driver_get_pin_mode: gpio or mode is NULL,line no : %d\r\n", (int)__LINE__);
     return SL_STATUS_NULL_POINTER;
@@ -621,6 +636,10 @@ sl_status_t sl_gpio_driver_init(void)
 {
   uint32_t flag;
   sl_status_t status;
+
+  // Allow APIs invoked during init (clock enable, interrupt clear) to proceed.
+  gpio_driver_initialized = true;
+
   GPIO_NPSS_GPIO_CONFIG_REG = CLR; //By default making all the interrupts zero.
   for (flag = 0; flag < GPIO_MAX_INTR_VALUE; flag++) {
     sl_gpio_driver_clear_interrupts(flag);
@@ -644,10 +663,12 @@ sl_status_t sl_gpio_driver_init(void)
   }
   status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)M4CLK_GPIO); // Enable GPIO M4_CLK
   if (status != SL_STATUS_OK) {
+    gpio_driver_initialized = false;
     return status;
   }
   status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO); // Enable GPIO ULP_CLK
   if (status != SL_STATUS_OK) {
+    gpio_driver_initialized = false;
     return status;
   }
   // Clearing the soc peripheral on ulp gpio status flag
@@ -671,6 +692,7 @@ sl_si91x_gpio_version_t sl_si91x_gpio_driver_get_version(void)
 sl_status_t sl_si91x_gpio_driver_set_uulp_pad_configuration(uulp_pad_config_t *pad_config)
 {
   // Check if the pad configuration pointer is NULL.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (pad_config == NULL) {
     return SL_STATUS_NULL_POINTER;
   }
@@ -708,7 +730,8 @@ sl_status_t sl_si91x_gpio_driver_set_pin_direction(uint8_t port, uint8_t pin, sl
 {
   sl_status_t status;
   sl_gpio_t gpio = { (sl_gpio_port_t)port, pin };
-  status         = sl_gpio_validation(&gpio);
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
+  status = sl_gpio_validation(&gpio);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_set_pin_direction: sl_gpio_validation failed with status 0x%04lX,line no : %d\r\n",
@@ -795,6 +818,7 @@ uint8_t sl_si91x_gpio_driver_get_pin_direction(uint8_t port, uint8_t pin)
 sl_status_t sl_si91x_gpio_driver_enable_pad_receiver(uint8_t gpio_num)
 {
   // Check if the GPIO pin number exceeds the maximum allowed value or is in a reserved range.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_enable_pad_receiver: GPIO pin number exceeds the maximum allowed value "
                           "or is in a reserved range,line no : %d\r\n",
@@ -820,6 +844,7 @@ sl_status_t sl_si91x_gpio_driver_enable_pad_receiver(uint8_t gpio_num)
 sl_status_t sl_si91x_gpio_driver_disable_pad_receiver(uint8_t gpio_num)
 {
   // Check if the GPIO pin number exceeds the maximum allowed value or is in a reserved range.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_disable_pad_receiver: GPIO pin number exceeds the maximum allowed "
                           "value or is in a reserved range,line no : %d\r\n",
@@ -845,6 +870,7 @@ sl_status_t sl_si91x_gpio_driver_disable_pad_receiver(uint8_t gpio_num)
 sl_status_t sl_si91x_gpio_driver_enable_pad_selection(uint8_t gpio_padnum)
 {
   // Check if the GPIO pad number exceeds the maximum allowed value.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio_padnum > GPIO_MAX_PAD_NUM) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_enable_pad_selection: GPIO pad number exceeds the maximum allowed value,line no : %d\r\n",
@@ -863,6 +889,7 @@ sl_status_t sl_si91x_gpio_driver_enable_pad_selection(uint8_t gpio_padnum)
 sl_status_t sl_si91x_gpio_driver_enable_host_pad_selection(uint8_t gpio_num)
 {
   // Check if the GPIO pin number exceeds the maximum allowed value.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (!(gpio_num >= HOST_PAD_MIN && gpio_num <= HOST_PAD_MAX)) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_enable_host_pad_selection: GPIO pin number is not in the host pad range,line no : %d\r\n",
@@ -893,6 +920,7 @@ sl_status_t sl_si91x_gpio_driver_select_pad_driver_strength(uint8_t gpio_num,
                                                             sl_si91x_gpio_driver_strength_select_t strength)
 {
   // Check if GPIO pin number or strength value exceeds the maximum allowed, or pin is reserved.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
       || (strength > GPIO_STRENGTH_MAX_VAL)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_pad_driver_strength: GPIO pin number or strength value exceeds "
@@ -921,6 +949,7 @@ sl_status_t sl_si91x_gpio_driver_select_pad_driver_strength(uint8_t gpio_num,
 sl_status_t sl_si91x_gpio_driver_enable_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos_t pos)
 {
   // Validate GPIO number and position parameter, reject reserved pins.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
       || (pos >= GPIO_POS_LAST)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_enable_pad_power_on_start: GPIO pin number or position parameter is "
@@ -949,6 +978,7 @@ sl_status_t sl_si91x_gpio_driver_enable_pad_power_on_start(uint8_t gpio_num, sl_
 sl_status_t sl_si91x_gpio_driver_select_pad_schmitt_trigger(uint8_t gpio_num, sl_si91x_gpio_schmitt_trig_t schmitt_trig)
 {
   // Validate GPIO number and schmitt trigger parameter, reject reserved pins.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
       || (schmitt_trig >= GPIO_SCHMITT_TRIG_LAST)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_pad_schmitt_trigger: GPIO pin number or schmitt trigger "
@@ -980,6 +1010,7 @@ sl_status_t sl_si91x_gpio_driver_select_pad_driver_disable_state(uint8_t gpio_nu
                                                                  sl_si91x_gpio_driver_disable_state_t disable_state)
 {
   // Check if GPIO pin number or disable state value exceeds the maximum allowed, or pin is reserved.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num < GPIO_PA_PIN_0_5_VALIDATE) || (gpio_num > GPIO_MAX_PIN_NUM) || GPIO_PIN_IS_RESERVED(gpio_num)
       || (disable_state > GPIO_DISABLE_STATE_MAX_VAL)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_pad_driver_disable_state: GPIO pin number or disable state "
@@ -1002,6 +1033,7 @@ sl_status_t sl_si91x_gpio_driver_select_pad_driver_disable_state(uint8_t gpio_nu
 sl_status_t sl_si91x_gpio_driver_enable_clock(sl_si91x_gpio_select_clock_t clock)
 {
   // Check if clock value exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (clock > GPIO_CLOCK_MAX_VAL) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_enable_clock: clock value exceeds the maximum allowed,line no : %d\r\n",
                           (int)__LINE__);
@@ -1022,6 +1054,7 @@ sl_status_t sl_si91x_gpio_driver_enable_clock(sl_si91x_gpio_select_clock_t clock
 sl_status_t sl_si91x_gpio_driver_disable_clock(sl_si91x_gpio_select_clock_t clock)
 {
   // Check if clock value exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (clock > GPIO_CLOCK_MAX_VAL) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_disable_clock: clock value exceeds the maximum allowed,line no : %d\r\n",
@@ -1053,7 +1086,8 @@ sl_status_t sl_si91x_gpio_driver_enable_group_interrupt(sl_si91x_group_interrupt
 {
   sl_status_t status;
   sl_gpio_t gpio = { (sl_gpio_port_t)port, pin };
-  status         = sl_gpio_validation(&gpio);
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
+  status = sl_gpio_validation(&gpio);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_enable_group_interrupt: sl_gpio_validation failed with status 0x%04lX,line no : %d\r\n",
@@ -1088,7 +1122,8 @@ sl_status_t sl_si91x_gpio_driver_disable_group_interrupt(sl_si91x_group_interrup
 {
   sl_status_t status;
   sl_gpio_t gpio = { (sl_gpio_port_t)port, pin };
-  status         = sl_gpio_validation(&gpio);
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
+  status = sl_gpio_validation(&gpio);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_disable_group_interrupt: sl_gpio_validation failed with status 0x%04lX,line no : %d\r\n",
@@ -1116,6 +1151,7 @@ sl_status_t sl_si91x_gpio_driver_disable_group_interrupt(sl_si91x_group_interrup
 sl_status_t sl_si91x_gpio_driver_mask_group_interrupt(uint8_t port, sl_si91x_group_interrupt_t group_interrupt)
 {
   // Check if group interrupt or port value exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((port > GPIO_PORT_MAX_VALUE) || (group_interrupt > GPIO_GROUP_INTERRUPT_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_mask_group_interrupt: group interrupt or port value exceeds the "
                           "maximum allowed,line no : %d\r\n",
@@ -1140,6 +1176,7 @@ sl_status_t sl_si91x_gpio_driver_mask_group_interrupt(uint8_t port, sl_si91x_gro
 sl_status_t sl_si91x_gpio_driver_unmask_group_interrupt(uint8_t port, sl_si91x_group_interrupt_t group_interrupt)
 {
   // Check if group interrupt or port value exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((port > GPIO_PORT_MAX_VALUE) || (group_interrupt > GPIO_GROUP_INTERRUPT_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_unmask_group_interrupt: group interrupt or port value exceeds the "
                           "maximum allowed,line no : %d\r\n",
@@ -1166,6 +1203,7 @@ sl_status_t sl_si91x_gpio_driver_set_group_interrupt_level_edge(uint8_t port,
                                                                 sl_si91x_gpio_level_edge_t level_edge)
 {
   // Check if group interrupt or port value or level edge exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((port > GPIO_PORT_MAX_VALUE) || (group_interrupt > GPIO_GROUP_INTERRUPT_MAX_VALUE)
       || (level_edge > GPIO_LEVEL_EDGE_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_group_interrupt_level_edge: group interrupt or port value or level "
@@ -1218,7 +1256,8 @@ sl_status_t sl_si91x_gpio_driver_set_group_interrupt_polarity(sl_si91x_group_int
 {
   sl_status_t status;
   sl_gpio_t gpio = { (sl_gpio_port_t)port, pin };
-  status         = sl_gpio_validation(&gpio);
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
+  status = sl_gpio_validation(&gpio);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_group_interrupt_polarity: sl_gpio_validation failed with status "
                           "0x%04lX,line no : %d\r\n",
@@ -1294,6 +1333,7 @@ sl_status_t sl_si91x_gpio_driver_select_group_interrupt_and_or(uint8_t port,
                                                                sl_si91x_gpio_and_or_t and_or)
 {
   // Check if group interrupt or port value or and_or exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((port > GPIO_PORT_MAX_VALUE) || (group_interrupt > GPIO_GROUP_INTERRUPT_MAX_VALUE)
       || (and_or > GPIO_AND_OR_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_group_interrupt_and_or: group interrupt or port value or and_or "
@@ -1331,6 +1371,7 @@ sl_status_t sl_si91x_gpio_driver_configure_group_interrupt(sl_si91x_gpio_group_i
                                                            sl_gpio_irq_callback_t gpio_callback)
 {
   // Check if configuration pointer and gpio_callback pointer is NULL.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((configuration == NULL) || (gpio_callback == NULL)) {
     // Return error code for NULL pointer
     SL_PRINT_STRING_ERROR(
@@ -1369,6 +1410,7 @@ sl_status_t sl_si91x_gpio_driver_configure_ulp_pin_interrupt(uint8_t int_no,
                                                              sl_gpio_irq_callback_t gpio_callback)
 {
   // Check if gpio_callback pointer is NULL.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio_callback == NULL) {
     // Return error code for NULL pointer
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_configure_ulp_pin_interrupt: gpio_callback is NULL,line no : %d\r\n",
@@ -1415,6 +1457,7 @@ sl_status_t sl_si91x_gpio_driver_configure_ulp_group_interrupt(sl_si91x_gpio_gro
                                                                sl_gpio_irq_callback_t gpio_callback)
 {
   // Check if configuration pointer and gpio_callback pointer is NULL.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((configuration == NULL) || (gpio_callback == NULL)) {
     // Return error code for NULL pointer
     SL_PRINT_STRING_ERROR(
@@ -1443,6 +1486,7 @@ sl_status_t sl_si91x_gpio_driver_configure_ulp_group_interrupt(sl_si91x_gpio_gro
 sl_status_t sl_si91x_gpio_driver_clear_group_interrupt(sl_si91x_group_interrupt_t group_interrupt)
 {
   // Check if group_interrupt exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (group_interrupt > GPIO_GROUP_INTERRUPT_MAX_VALUE) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_clear_group_interrupt: group interrupt exceeds the maximum allowed,line no : %d\r\n",
@@ -1482,6 +1526,7 @@ sl_status_t sl_si91x_gpio_driver_select_group_interrupt_wakeup(uint8_t port,
                                                                sl_si91x_gpio_wakeup_t flags)
 {
   // Check if group_interrupt or port exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((port > GPIO_PORT_MAX_VALUE) || (group_interrupt > GPIO_GROUP_INTERRUPT_MAX_VALUE)
       || (flags > GPIO_FLAGS_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_group_interrupt_wakeup: group interrupt or port or flags "
@@ -1507,6 +1552,7 @@ sl_status_t sl_si91x_gpio_driver_select_group_interrupt_wakeup(uint8_t port,
 sl_status_t sl_si91x_gpio_driver_enable_ulp_pad_receiver(uint8_t gpio_num)
 {
   // Check if gpio_num exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio_num > GPIO_ULP_MAX_PIN_NUM) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -1523,6 +1569,7 @@ sl_status_t sl_si91x_gpio_driver_enable_ulp_pad_receiver(uint8_t gpio_num)
 sl_status_t sl_si91x_gpio_driver_disable_ulp_pad_receiver(uint8_t gpio_num)
 {
   // Check if gpio_num exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio_num > GPIO_ULP_MAX_PIN_NUM) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_disable_ulp_pad_receiver: gpio_num exceeds the maximum allowed,line no : %d\r\n",
@@ -1550,6 +1597,7 @@ sl_status_t sl_si91x_gpio_driver_select_ulp_pad_driver_disable_state(uint8_t gpi
                                                                      sl_si91x_gpio_driver_disable_state_t disable_state)
 {
   // Check if gpio_num or disable_state exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num > GPIO_ULP_MAX_PIN_NUM) || (disable_state > GPIO_DISABLE_STATE_MAX_VAL)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_ulp_pad_driver_disable_state: gpio_num or disable_state exceeds "
                           "the maximum allowed,line no : %d\r\n",
@@ -1577,6 +1625,7 @@ sl_status_t sl_si91x_gpio_driver_select_ulp_pad_driver_strength(uint8_t gpio_num
                                                                 sl_si91x_gpio_driver_strength_select_t strength)
 {
   // Check if gpio_num or strength exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num > GPIO_ULP_MAX_PIN_NUM) || (strength > GPIO_STRENGTH_MAX_VAL)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_ulp_pad_driver_strength: gpio_num or strength exceeds the "
                           "maximum allowed,line no : %d\r\n",
@@ -1602,6 +1651,7 @@ sl_status_t sl_si91x_gpio_driver_select_ulp_pad_driver_strength(uint8_t gpio_num
 sl_status_t sl_si91x_gpio_driver_enable_ulp_pad_power_on_start(uint8_t gpio_num, sl_si91x_gpio_pos_t pos)
 {
   // Validate GPIO number and position parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num > GPIO_ULP_MAX_PIN_NUM) || (pos >= GPIO_POS_LAST)) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_enable_ulp_pad_power_on_start: gpio_num or position parameter is invalid,line no : %d\r\n",
@@ -1630,6 +1680,7 @@ sl_status_t sl_si91x_gpio_driver_select_ulp_pad_schmitt_trigger(uint8_t gpio_num
                                                                 sl_si91x_gpio_schmitt_trig_t schmitt_trig)
 {
   // Validate GPIO number and schmitt trigger parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num > GPIO_ULP_MAX_PIN_NUM) || (schmitt_trig >= GPIO_SCHMITT_TRIG_LAST)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_ulp_pad_schmitt_trigger: gpio_num or schmitt trigger parameter "
                           "is invalid,line no : %d\r\n",
@@ -1657,6 +1708,7 @@ sl_status_t sl_si91x_gpio_driver_select_ulp_pad_schmitt_trigger(uint8_t gpio_num
 sl_status_t sl_si91x_gpio_driver_select_ulp_pad_slew_rate(uint8_t gpio_num, sl_si91x_gpio_slew_rate_t slew_rate)
 {
   // Check if gpio_num or slew_rate exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((gpio_num > GPIO_ULP_MAX_PIN_NUM) || (slew_rate > GPIO_SLEW_RATE_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_select_ulp_pad_slew_rate: gpio_num or slew rate exceeds the maximum "
                           "allowed,line no : %d\r\n",
@@ -1678,6 +1730,7 @@ sl_status_t sl_si91x_gpio_driver_select_ulp_pad_slew_rate(uint8_t gpio_num, sl_s
 sl_status_t sl_si91x_gpio_driver_set_uulp_npss_pin_mux(uint8_t pin, sl_si91x_uulp_npss_mode_t mode)
 {
   // Check if pin or mode exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((pin > GPIO_UULP_MAX_PIN_NUM) || (mode > GPIO_MODE_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_set_uulp_npss_pin_mux: pin or mode exceeds the maximum allowed,line no : %d\r\n",
@@ -1698,6 +1751,7 @@ sl_status_t sl_si91x_gpio_driver_set_uulp_npss_pin_mux(uint8_t pin, sl_si91x_uul
 sl_status_t sl_si91x_gpio_driver_select_uulp_npss_receiver(uint8_t pin, sl_si91x_gpio_receiver_t receiver)
 {
   // Check if pin or receiver exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((pin > GPIO_UULP_MAX_PIN_NUM) || (receiver > GPIO_RECEIVER_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_select_uulp_npss_receiver: pin or receiver exceeds the maximum allowed,line no : %d\r\n",
@@ -1722,6 +1776,7 @@ sl_status_t sl_si91x_gpio_driver_select_uulp_npss_receiver(uint8_t pin, sl_si91x
 sl_status_t sl_si91x_gpio_driver_set_uulp_npss_direction(uint8_t pin, sl_si91x_gpio_direction_t direction)
 {
   // Check if pin or direction exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((pin > GPIO_UULP_MAX_PIN_NUM) || (direction > GPIO_DIRECTION_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_set_uulp_npss_direction: pin or direction exceeds the maximum allowed,line no : %d\r\n",
@@ -1773,6 +1828,7 @@ uint8_t sl_si91x_gpio_driver_get_uulp_npss_direction(uint8_t pin)
 sl_status_t sl_si91x_gpio_driver_set_uulp_npss_pin_value(uint8_t pin, sl_si91x_gpio_pin_value_t pin_value)
 {
   // Check if pin or pin_value exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((pin > GPIO_UULP_MAX_PIN_NUM) || (pin_value > GPIO_PIN_VALUE_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_set_uulp_npss_pin_value: pin or pin_value exceeds the maximum allowed,line no : %d\r\n",
@@ -1797,6 +1853,7 @@ sl_status_t sl_si91x_gpio_driver_set_uulp_npss_pin_value(uint8_t pin, sl_si91x_g
 sl_status_t sl_si91x_gpio_driver_toggle_uulp_npss_pin(uint8_t pin)
 {
   // Check if pin exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (pin > GPIO_UULP_MAX_PIN_NUM) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_toggle_uulp_npss_pin: pin exceeds the maximum allowed,line no : %d\r\n",
                           (int)__LINE__);
@@ -1840,6 +1897,7 @@ uint8_t sl_si91x_gpio_driver_get_uulp_npss_pin(uint8_t pin)
 sl_status_t sl_si91x_gpio_driver_select_uulp_npss_polarity(uint8_t pin, sl_si91x_gpio_polarity_t polarity)
 {
   // Check if pin or polarity exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((pin > GPIO_UULP_MAX_PIN_NUM) || (polarity > GPIO_POLARITY_MAX_VALUE)) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_select_uulp_npss_polarity: pin or polarity exceeds the maximum allowed,line no : %d\r\n",
@@ -1857,6 +1915,7 @@ sl_status_t sl_si91x_gpio_driver_select_uulp_npss_polarity(uint8_t pin, sl_si91x
 sl_status_t sl_si91x_gpio_driver_set_uulp_npss_wakeup_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_WAKEUP_MAX_VALUE) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_set_uulp_npss_wakeup_interrupt: npssgpio_interrupt exceeds the maximum "
                           "allowed,line no : %d\r\n",
@@ -1874,6 +1933,7 @@ sl_status_t sl_si91x_gpio_driver_set_uulp_npss_wakeup_interrupt(uint8_t npssgpio
 sl_status_t sl_si91x_gpio_driver_clear_uulp_npss_wakeup_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_WAKEUP_MAX_VALUE) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_clear_uulp_npss_wakeup_interrupt: npssgpio_interrupt exceeds the "
                           "maximum allowed,line no : %d\r\n",
@@ -1897,6 +1957,7 @@ sl_status_t sl_si91x_gpio_driver_clear_uulp_npss_wakeup_interrupt(uint8_t npssgp
 sl_status_t sl_si91x_gpio_driver_mask_uulp_npss_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_INTERRUPT_VALUE_MAX_VALUE) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_mask_uulp_npss_interrupt: npssgpio_interrupt exceeds the maximum allowed,line no : %d\r\n",
@@ -1944,6 +2005,7 @@ uint32_t sl_si91x_gpio_driver_get_ulp_interrupt_status(uint32_t flags)
 sl_status_t sl_si91x_gpio_driver_unmask_uulp_npss_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_INTERRUPT_VALUE_MAX_VALUE) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_unmask_uulp_npss_interrupt: npssgpio_interrupt exceeds the maximum "
                           "allowed,line no : %d\r\n",
@@ -1962,6 +2024,7 @@ sl_status_t sl_si91x_gpio_driver_unmask_uulp_npss_interrupt(uint8_t npssgpio_int
 sl_status_t sl_si91x_gpio_driver_clear_uulp_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_INTERRUPT_VALUE_MAX_VALUE) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_clear_uulp_interrupt: npssgpio_interrupt exceeds the maximum allowed,line no : %d\r\n",
@@ -1984,6 +2047,7 @@ sl_status_t sl_si91x_gpio_driver_clear_uulp_interrupt(uint8_t npssgpio_interrupt
 sl_status_t sl_si91x_gpio_driver_mask_set_uulp_npss_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_PIN_MAX_VALUE) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_mask_set_uulp_npss_interrupt: npssgpio_interrupt exceeds the maximum "
                           "allowed,line no : %d\r\n",
@@ -2010,6 +2074,7 @@ sl_status_t sl_si91x_gpio_driver_mask_set_uulp_npss_interrupt(uint8_t npssgpio_i
 sl_status_t sl_si91x_gpio_driver_mask_clear_uulp_npss_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_PIN_MAX_VALUE) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpio_driver_mask_clear_uulp_npss_interrupt: npssgpio_interrupt exceeds the maximum "
                           "allowed,line no : %d\r\n",
@@ -2027,6 +2092,7 @@ sl_status_t sl_si91x_gpio_driver_mask_clear_uulp_npss_interrupt(uint8_t npssgpio
 sl_status_t sl_si91x_gpio_driver_clear_uulp_npss_interrupt(uint8_t npssgpio_interrupt)
 {
   // Check if npssgpio_interrupt exceeds the maximum allowed
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (npssgpio_interrupt > GPIO_UULP_PIN_MAX_VALUE) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_clear_uulp_npss_interrupt: npssgpio_interrupt exceeds the maximum allowed,line no : %d\r\n",
@@ -2056,6 +2122,7 @@ sl_status_t sl_si91x_gpio_driver_configure_uulp_interrupt(sl_si91x_gpio_interrup
                                                           sl_gpio_irq_callback_t gpio_callback)
 {
   // Check if gpio_callback pointer is NULL
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio_callback == NULL) {
     return SL_STATUS_NULL_POINTER;
   }
@@ -2086,6 +2153,7 @@ sl_status_t sl_si91x_gpio_driver_configure_uulp_interrupt(sl_si91x_gpio_interrup
 sl_status_t sl_si91x_gpio_driver_clear_ulp_interrupt(uint32_t flags)
 {
   // Check if flags exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (flags > GPIO_FLAGS_MAX_VALUE) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_clear_ulp_interrupt: flags exceeds the maximum allowed,line no : %d\r\n",
@@ -2103,6 +2171,7 @@ sl_status_t sl_si91x_gpio_driver_clear_ulp_interrupt(uint32_t flags)
 sl_status_t sl_si91x_gpio_driver_clear_ulp_group_interrupt(sl_si91x_group_interrupt_t group_interrupt)
 {
   // Check if group interrupt exceeds the maximum allowed.
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (group_interrupt > GPIO_GROUP_INTERRUPT_MAX_VALUE) {
     SL_PRINT_STRING_ERROR(
       "sl_si91x_gpio_driver_clear_ulp_group_interrupt: group interrupt exceeds the maximum allowed,line no : %d\r\n",
@@ -2300,6 +2369,8 @@ sl_status_t sl_gpio_driver_deinit(void)
 {
   sl_status_t status;
   uint8_t flag;
+
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   do {
     for (flag = 0; flag < GPIO_MAX_INTR_VALUE; flag++) {
       gpio_callback_function_pointer[flag] = NULL;
@@ -2327,6 +2398,7 @@ sl_status_t sl_gpio_driver_deinit(void)
     // Clearing the soc peripheral on ulp gpio status flag
     soc_peri_on_ulp_gpio_status = 0;
   } while (false);
+  gpio_driver_initialized = false;
   return SL_STATUS_OK;
 }
 
@@ -2337,6 +2409,7 @@ sl_status_t sl_gpio_driver_unregister(sl_si91x_gpio_instances_t gpio_instance,
                                       sl_si91x_gpio_intr_t gpio_intr,
                                       uint8_t flag)
 {
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio_instance >= GPIO_INSTANCE_LAST) {
     // Returns invalid parameter status code if gpio_instance > GPIO_INSTANCE_LAST
     return SL_STATUS_INVALID_PARAMETER;
@@ -2414,6 +2487,7 @@ sl_status_t sl_gpio_driver_unregister(sl_si91x_gpio_instances_t gpio_instance,
 ******************************************************************************/
 sl_status_t sl_si91x_gpio_validate_soc_peri_on_ulp_gpio(uint8_t pin)
 {
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (soc_peri_on_ulp_gpio_status & BIT(pin - SOC_PERI_ON_ULP_GPIO_OFFSET)) {
     return SL_STATUS_OK;
   } else {
@@ -2434,6 +2508,7 @@ sl_status_t sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode(sl_gpio_t *gpio, s
 {
   sl_status_t status = SL_STATUS_OK;
   // Check if the GPIO pointer is NULL
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio == NULL) {
     // Return error if GPIO pointer is NULL
     status = SL_STATUS_NULL_POINTER;
@@ -2485,6 +2560,7 @@ sl_status_t sl_si91x_gpio_driver_set_ulp_peri_on_soc_pin_mode(sl_gpio_t *gpio, s
 {
   sl_status_t status = SL_STATUS_OK;
   // Check if the GPIO pointer is NULL
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio == NULL) {
     // Return error if GPIO pointer is NULL
     status = SL_STATUS_NULL_POINTER;

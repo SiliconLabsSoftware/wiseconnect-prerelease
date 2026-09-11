@@ -193,7 +193,7 @@ sl_status_t console_parse_command(char *command_line,
     type = argument_list[arg_index];
 
     // Validate arg_count is within bounds
-    if (arg_count >= SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT) {
+    if (arg_count >= SL_CLI_CONSOLE_MAX_ARG_COUNT) {
       return SL_STATUS_INVALID_COUNT;
     }
 
@@ -267,7 +267,7 @@ static sl_status_t process_optional_argument(const console_argument_type_t *argu
     }
     // Found a match!
     // Check bounds before accessing array
-    if (arg_number >= SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT) {
+    if (arg_number >= SL_CLI_CONSOLE_MAX_ARG_COUNT) {
       return SL_STATUS_INVALID_COUNT;
     }
     args->bitmap |= (1 << arg_number);
@@ -316,7 +316,7 @@ static sl_status_t validate_and_parse_ordered_arg(const console_argument_type_t 
   }
 
   // Check bounds before accessing array
-  if (*arg_count >= SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT) {
+  if (*arg_count >= SL_CLI_CONSOLE_MAX_ARG_COUNT) {
     return SL_STATUS_INVALID_COUNT;
   }
 

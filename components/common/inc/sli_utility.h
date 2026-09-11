@@ -242,6 +242,31 @@ void sli_save_tcp_auto_close_choice(bool is_tcp_auto_close_enabled);
 bool sli_is_tcp_auto_close_enabled();
 bool sli_wifi_is_ip_address_zero(const sl_ip_address_t *ip_addr);
 uint8_t sli_get_wifi_command_engine_max_packet_type_count(void);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Wi-Fi command-engine RX handler (also used as per-socket CE RX hook).
+ *
+ * @details
+ *   Declared in wiseconnect_common so network_stack_sdk can register it on
+ *   dynamic socket packet types without linking the wifi package. A weak no-op
+ *   stub is provided here; the wifi package supplies the strong implementation
+ *   (REMOTE_TERMINATE flush, disconnect handling, etc.).
+ *
+ * @param[in] instance
+ *   Command engine instance.
+ * @param[in] packet_type
+ *   Command-engine packet type (static 0–3 or dynamic max + socket index).
+ * @param[in] data
+ *   RX buffer pointer.
+ *
+ * @return
+ *   Status from the wifi override, or SL_STATUS_OK from the weak stub.
+ ******************************************************************************/
+sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t *instance,
+                                                            uint16_t packet_type,
+                                                            void *data);
+
 /* Function used to set whether card ready is required or not */
 void sli_wifi_set_card_ready_required(bool card_ready_required);
 /* Function used to get whether card ready is required or not */

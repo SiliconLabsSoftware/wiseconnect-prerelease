@@ -771,7 +771,7 @@
 /** @} */
 
 /**
- * @def SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE
+ * @def SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
  * @brief Indicates support for a new set of firmware update result codes. This bit is used for internal purpose.
  * @details
  * This bit in the feature bitmap is used to inform the NWP firmware whether
@@ -780,7 +780,19 @@
  * the NWP firmware would send result codes from the new set after a firmware update.
  * If the bit is not set, the legacy result codes would be used.
  */
-#define SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE BIT(16)
+#ifndef SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+#define SL_WIFI_FEAT_FW_UPDATE_NEW_CODE BIT(16)
+#endif
+
+/**
+ * @def SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE
+ * @brief Alias for SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+ * @details Ensure smooth migration to SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+ * @note The macro SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE is being deprecated and
+ *       will be removed in the future. Please use
+ *       SL_WIFI_FEAT_FW_UPDATE_NEW_CODE instead.
+ */
+#define SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
 
 /** \addtogroup SI91X_FEATURE_BITMAP
   * @{ */
@@ -2387,9 +2399,19 @@
 
 /**
  * @def SL_SI91X_ENABLE_NWP_LOGGING
- * @brief Enables NWP logging feature.
- * @details This bit enables the logging feature for the Network Processor (NWP), allowing for better debugging and monitoring of network activities.
- * 
+ * @brief Enables Network Processor (NWP / captive-core) logging.
+ * @details Set this bit in `config_feature_bit_map` of
+ *          `sl_wifi_device_configuration_t` / boot config to enable NWP
+ *          debug logs over the selected debug UART.
+ *
+ * @note Firmware applies `config_feature_bit_map` only through this
+ *       dependency chain (all three are required):
+ *       1. Set @ref SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID in
+ *          `tcp_ip_feature_bit_map` so `ext_tcp_ip_feature_bit_map` is used.
+ *       2. Set @ref SL_SI91X_CONFIG_FEAT_EXTENSION_VALID in
+ *          `ext_tcp_ip_feature_bit_map` so `config_feature_bit_map` is used.
+ *       3. Set @ref SL_SI91X_ENABLE_NWP_LOGGING in `config_feature_bit_map`.
+ *       If step 1 or 2 is omitted, this bit has no effect.
  */
 #define SL_SI91X_ENABLE_NWP_LOGGING BIT(12)
 

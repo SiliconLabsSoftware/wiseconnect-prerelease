@@ -179,7 +179,8 @@ static const sl_wifi_device_configuration_t sl_wifi_default_client_configuration
                       | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP) },
+                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_WIFI_ENABLE_ENHANCED_MAX_PSP
+                                              | SL_SI91X_ENABLE_NWP_LOGGING) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -191,10 +192,11 @@ static const sl_wifi_device_configuration_t sl_wifi_default_ap_configuration_cli
   .mac_address = NULL,
   .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
   .region_code = US,
-  .boot_config = { .oper_mode                  = SL_SI91X_ACCESS_POINT_MODE,
-                   .coex_mode                  = SL_SI91X_WLAN_ONLY_MODE,
-                   .feature_bit_map            = SL_WIFI_FEAT_SECURITY_OPEN,
-                   .tcp_ip_feature_bit_map     = SL_SI91X_TCP_IP_FEAT_DHCPV4_SERVER,
+  .boot_config = { .oper_mode       = SL_SI91X_ACCESS_POINT_MODE,
+                   .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
+                   .feature_bit_map = SL_WIFI_FEAT_SECURITY_OPEN,
+                   .tcp_ip_feature_bit_map =
+                     (SL_SI91X_TCP_IP_FEAT_DHCPV4_SERVER | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
                    .custom_feature_bit_map     = SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID,
                    .ext_custom_feature_bit_map = (
 #if ENABLE_POWERSAVE_CLI
@@ -207,10 +209,10 @@ static const sl_wifi_device_configuration_t sl_wifi_default_ap_configuration_cli
 #endif
                      ),
                    .bt_feature_bit_map         = 0,
-                   .ext_tcp_ip_feature_bit_map = 0,
+                   .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
+                   .config_feature_bit_map     = SL_SI91X_ENABLE_NWP_LOGGING },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -240,7 +242,7 @@ static const sl_wifi_device_configuration_t sl_wifi_default_concurrent_configura
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+                   .config_feature_bit_map     = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_NWP_LOGGING) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -269,10 +271,11 @@ static const sl_wifi_device_configuration_t sl_wifi_default_enterprise_client_co
                       ),
                    .bt_feature_bit_map = 0,
                    .ext_tcp_ip_feature_bit_map =
-                     (SL_SI91X_EXT_TCP_IP_WINDOW_SCALING | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(10)),
+                     (SL_SI91X_EXT_TCP_IP_WINDOW_SCALING | SL_SI91X_EXT_TCP_IP_TOTAL_SELECTS(10)
+                      | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = 0 },
+                   .config_feature_bit_map  = SL_SI91X_ENABLE_NWP_LOGGING },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -304,7 +307,7 @@ static const sl_wifi_device_configuration_t sl_wifi_transmit_test_configuration_
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+                   .config_feature_bit_map     = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_NWP_LOGGING) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -316,19 +319,21 @@ sl_wifi_device_configuration_t si91x_init_configuration = {
   .boot_option     = LOAD_NWP_FW,
   .mac_address     = NULL,
   .band            = SL_SI91X_WIFI_BAND_2_4GHZ,
-  .boot_config     = { .oper_mode              = SL_SI91X_CLIENT_MODE,
-                       .coex_mode              = SL_SI91X_WLAN_ONLY_MODE,
-                       .feature_bit_map        = (SL_WIFI_FEAT_EAP_LEAP_IN_COEX),
-                       .tcp_ip_feature_bit_map = (SL_SI91X_TCP_IP_FEAT_LOAD_PUBLIC_PRIVATE_CERTS),
+  .boot_config     = { .oper_mode       = SL_SI91X_CLIENT_MODE,
+                       .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
+                       .feature_bit_map = (SL_WIFI_FEAT_EAP_LEAP_IN_COEX),
+                       .tcp_ip_feature_bit_map =
+                         (SL_SI91X_TCP_IP_FEAT_LOAD_PUBLIC_PRIVATE_CERTS | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
                        .custom_feature_bit_map = SL_SI91X_CUSTOM_FEAT_HTTP_HTTPS_AUTH,
                        .ext_custom_feature_bit_map =
                          (SL_SI91X_EXT_FEAT_1P8V_SUPPORT | SL_SI91X_EXT_FEAT_UART_SEL_FOR_DEBUG_PRINTS
                       | SL_SI91X_EXT_FEAT_XTAL_CLK),
                        .bt_feature_bit_map         = 0,
-                       .ext_tcp_ip_feature_bit_map = 0,
+                       .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                        .ble_feature_bit_map        = 0,
                        .ble_ext_feature_bit_map    = 0,
-                       .config_feature_bit_map     = (SL_SI91X_FEAT_DVS_SEL_CONFIG_3 | SL_SI91X_XTAL_GOODTIME_2000us) },
+                       .config_feature_bit_map =
+                         (SL_SI91X_FEAT_DVS_SEL_CONFIG_3 | SL_SI91X_XTAL_GOODTIME_2000us | SL_SI91X_ENABLE_NWP_LOGGING) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0

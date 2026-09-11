@@ -103,8 +103,18 @@ extern "C" {
  *                    Constants
  ******************************************************/
 
+/* Canonical console max-arg count. Everest and Sutlej both use this name. */
+#ifndef SL_CLI_CONSOLE_MAX_ARG_COUNT
+#if defined(SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT)
+/* Backward compatibility for Sutlej projects that still define the Si91x-named macro. */
+#define SL_CLI_CONSOLE_MAX_ARG_COUNT SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT
+#else
+#define SL_CLI_CONSOLE_MAX_ARG_COUNT (18)
+#endif
+#endif
+
 #ifndef SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT
-#define SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT (18)
+#define SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT SL_CLI_CONSOLE_MAX_ARG_COUNT
 #endif
 
 #define CONSOLE_ARG_OPTIONAL_CHARACTER_MASK 0x7F

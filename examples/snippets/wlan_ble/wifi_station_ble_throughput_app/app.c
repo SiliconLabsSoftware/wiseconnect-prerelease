@@ -51,6 +51,14 @@
 #include "cmsis_os2.h"
 #include "wifi_config.h"
 
+/******************************************************
+ *                      Macros
+ ******************************************************/
+// Set to 1 to enable NWP logging for debug. Disabled by default to avoid impacting throughput measurements.
+#ifndef ENABLE_NWP_LOGGING
+#define ENABLE_NWP_LOGGING 0
+#endif
+
 const osThreadAttr_t thread_attributes = {
   .name       = "common_thread",
   .attr_bits  = 0,
@@ -142,7 +150,11 @@ static const sl_wifi_device_configuration_t config = {
                       | SL_SI91X_BLE_GATT_INIT
 #endif
                       ),
-                   .config_feature_bit_map = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              ) },
   .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
                            .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
                            .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },

@@ -25,3 +25,10 @@ provides:
 requires:
   - name: sl_gpio_peripheral
   - name: log_none
+template_contribution:
+  - name: event_handler
+    priority: -9996
+    value:
+      event: driver_init
+      handler: sl_gpio_driver_init
+      include: sl_driver_gpio.h

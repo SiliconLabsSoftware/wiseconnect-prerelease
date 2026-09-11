@@ -50,6 +50,11 @@
 /******************************************************
  *                      Macros
  ******************************************************/
+// Set to 1 to enable NWP logging for debug. Disabled by default to avoid impacting throughput measurements.
+#ifndef ENABLE_NWP_LOGGING
+#define ENABLE_NWP_LOGGING 0
+#endif
+
 // Type of throughput
 #define UDP_TX 0
 #define UDP_RX 1
@@ -185,7 +190,11 @@ static const sl_wifi_device_configuration_t throughput_configuration = {
                                                   ),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP },
+                   .config_feature_bit_map  = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              ) },
   .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
                            .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
                            .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },

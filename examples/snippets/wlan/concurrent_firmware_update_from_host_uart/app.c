@@ -275,6 +275,14 @@ static sl_status_t ap_disconnected_event_handler(sl_wifi_event_t event,
                                                  uint32_t data_length,
                                                  void *arg);
 
+static sl_wifi_device_configuration_t wifi_concurrent_v6_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -439,12 +447,15 @@ static void application_start(void *argument)
 
   int return_value;
 
+  wifi_concurrent_v6_configuration = sl_wifi_default_concurrent_v6_configuration;
+  apply_nwp_logging(&wifi_concurrent_v6_configuration);
+
   while (1) {
     switch (app_cb) {
 
       case INITIAL_STATE:
 
-        status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_v6_configuration, NULL, NULL);
+        status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &wifi_concurrent_v6_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx\r\n", status);
           return;
@@ -530,7 +541,7 @@ static void application_start(void *argument)
 
       case STA_BRINGUP_STATE:
 
-        status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_v6_configuration, NULL, NULL);
+        status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_concurrent_v6_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
           return;
@@ -698,7 +709,7 @@ static void application_start(void *argument)
 
       case AP_BRINGUP_STATE:
 
-        status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_v6_configuration, NULL, NULL);
+        status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &wifi_concurrent_v6_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx\r\n", status);
           return;

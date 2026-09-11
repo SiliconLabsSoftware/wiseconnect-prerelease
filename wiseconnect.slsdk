@@ -4,4 +4,4 @@ version=4.2.0
 label=BLE applications
 description=This is bluetooth le siwx91x app package!!
 prop.file.templatesFile=bluetooth_le_siwx91x_app_templates.xml multi_protocol_siwx91x_app_templates.xml platform_siwx91x_app_templates.xml wifi_app_templates.xml
-prop.file.demosFile=multi_protocol_siwx91x_app_demos.xml
+prop.file.demosFile=multi_protocol_siwx91x_app_demos.xml platform_siwx91x_app_demos.xml wifi_app_demos.xml

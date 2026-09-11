@@ -18,6 +18,7 @@ SiWx91x AP throughput example: Configure the device as a soft access point and m
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes)
     - [Instructions for Keil IDE and STM32F411RE MCU (NCP Mode)](#instructions-for-keil-ide-and-stm32f411re-mcu-ncp-mode)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
     - [Test the application](#test-the-application)
     - [Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)](#instructions-for-simplicity-studio-ide-and-silicon-labs-devices-soc-and-ncp-modes-1)
     - [Instructions for Keil IDE and STM32F411RE MCU](#instructions-for-keil-ide-and-stm32f411re-mcu)
@@ -117,6 +118,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
   - Open the FIRMWARE UPDATE µVision project - **ap_throughput.uvprojx** by navigating to **WiSeConnect SDK → examples → snippets → wlan → ap_throughput → keil_project**. 
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate throughput measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact throughput performance.
+
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
 - In the Project Explorer pane, expand the **config** folder and open the **sl_net_default_values.h** file. Configure the following parameters to enable your Silicon Labs Wi-Fi device to act as a soft access point.

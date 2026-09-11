@@ -31,6 +31,7 @@
 
 #if !defined(GPIO_PRESENT)
 #include "sl_status.h"
+#include <stdbool.h>
 #include "sl_si91x_peripheral_gpio.h"
 
 #ifdef __cplusplus
@@ -104,6 +105,22 @@ typedef void (*sl_gpio_irq_callback_t)(uint32_t flag);
 
 /*******************************************************************************
  *****************************   PROTOTYPES   ********************************* ******************************************************************************/
+/**
+ * @brief Returns true if @ref sl_gpio_driver_init() has completed successfully.
+ *
+ * @return true if the GPIO driver is initialized, false otherwise.
+ */
+bool sl_gpio_driver_is_initialized(void);
+
+/**
+ * @brief Return SL_STATUS_NOT_INITIALIZED when the GPIO driver is not initialized.
+ */
+#define SLI_GPIO_RETURN_IF_NOT_INITIALIZED() \
+  do {                                       \
+    if (!sl_gpio_driver_is_initialized()) {  \
+      return SL_STATUS_NOT_INITIALIZED;      \
+    }                                        \
+  } while (0)
 
 /***************************************************************************/
 /**
@@ -128,6 +145,7 @@ typedef void (*sl_gpio_irq_callback_t)(uint32_t flag);
  ******************************************************************************/
 STATIC __INLINE sl_status_t sl_gpio_driver_clear_interrupts(uint32_t flags)
 {
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   sl_gpio_clear_interrupts(flags);
   return SL_STATUS_OK;
 }
@@ -308,7 +326,8 @@ sl_status_t sl_gpio_driver_get_pin_mode(sl_gpio_t *gpio, sl_gpio_mode_t *mode);
  * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  * 
  * @note This function should be called before any other GPIO driver functions 
- *       to ensure proper initialization.
+ *       to ensure proper initialization. Public GPIO APIs return
+ *       SL_STATUS_NOT_INITIALIZED if called before a successful init.
   ******************************************************************************/
 sl_status_t sl_gpio_driver_init(void);
 
@@ -322,6 +341,7 @@ sl_status_t sl_gpio_driver_init(void);
  * 
  * @return Status code indicating the result:
  * -   SL_STATUS_OK - Success.
+ * -   SL_STATUS_NOT_INITIALIZED - GPIO driver was not initialized.
  * 
  * For more information on status codes, refer to [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  * 
@@ -475,6 +495,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_set_pin(sl_gpio_t *gpio)
 {
   sl_status_t status;
   // Checks if the gpio pointer is NULL
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio == NULL) {
     return SL_STATUS_NULL_POINTER;
   }
@@ -521,6 +542,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_clear_pin(sl_gpio_t *gpio)
 {
   sl_status_t status;
   // Checks if the gpio pointer is NULL. Returns error code for NULL pointer
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio == NULL) {
     return SL_STATUS_NULL_POINTER;
   }
@@ -567,6 +589,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_toggle_pin(sl_gpio_t *gpio)
 {
   sl_status_t status;
   // Checks if the gpio pointer is NULL. Returns error code for NULL pointer
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio == NULL) {
     return SL_STATUS_NULL_POINTER;
   }
@@ -615,6 +638,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_get_pin(sl_gpio_t *gpio, uint8_t *pin
 {
   sl_status_t status;
   // Checks if the gpio pointer is NULL. Returns error code for NULL pointer
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (gpio == NULL) {
     return SL_STATUS_NULL_POINTER;
   }
@@ -665,6 +689,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_get_pin(sl_gpio_t *gpio, uint8_t *pin
 STATIC __INLINE sl_status_t sl_gpio_driver_set_port(sl_gpio_port_t port, uint32_t pins)
 {
   // Checks if the gpio port value exceeds maximum allowed value. Return error code for invalid parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (((unsigned int)port > GPIO_PORT_MAX_VALUE) || (pins > GPIO_MAX_PORT_PINS)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -711,6 +736,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_set_port(sl_gpio_port_t port, uint32_
 STATIC __INLINE sl_status_t sl_gpio_driver_clear_port(sl_gpio_port_t port, uint32_t pins)
 {
   // Checks if the gpio port value exceeds maximum allowed value. Return error code for invalid parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (((unsigned int)port > GPIO_PORT_MAX_VALUE) || (pins > GPIO_MAX_PORT_PINS)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -755,6 +781,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_clear_port(sl_gpio_port_t port, uint3
 STATIC __INLINE sl_status_t sl_gpio_driver_get_port_output(sl_gpio_port_t port, uint32_t *port_value)
 {
   // Checks if the gpio port value exceeds maximum allowed value. Return error code for invalid parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((unsigned int)port > GPIO_PORT_MAX_VALUE) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -838,6 +865,7 @@ STATIC __INLINE uint8_t sl_gpio_driver_get_pin_output(sl_gpio_t *gpio)
 STATIC __INLINE sl_status_t sl_gpio_driver_set_port_output_value(sl_gpio_port_t port, uint32_t val, uint32_t mask)
 {
   // Checks if the gpio port value exceeds maximum allowed value. Return error code for invalid parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((unsigned int)port > GPIO_PORT_MAX_VALUE) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -873,6 +901,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_set_port_output_value(sl_gpio_port_t 
 STATIC __INLINE sl_status_t sl_gpio_driver_set_slew_rate(sl_gpio_port_t port, uint32_t slewrate, uint32_t slewrate_alt)
 {
   // Checks if the gpio port value exceeds maximum allowed value. Return error code for invalid parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if ((unsigned int)port > GPIO_PORT_MAX_VALUE) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -950,6 +979,7 @@ STATIC __INLINE uint32_t sl_gpio_driver_get_port_input(sl_gpio_port_t port)
 STATIC __INLINE sl_status_t sl_gpio_driver_toggle_port_output(sl_gpio_port_t port, uint32_t pins)
 {
   // Checks if the gpio port value exceeds maximum allowed value. Return error code for invalid parameter
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   if (((unsigned int)port > GPIO_PORT_MAX_VALUE) || (pins > GPIO_MAX_PORT_PINS)) {
     return SL_STATUS_INVALID_PARAMETER;
   }
@@ -983,6 +1013,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_toggle_port_output(sl_gpio_port_t por
  ******************************************************************************/
 STATIC __INLINE sl_status_t sl_gpio_driver_enable_interrupts(uint32_t flags)
 {
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   sl_gpio_enable_interrupts(flags);
   return SL_STATUS_OK;
 }
@@ -1004,6 +1035,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_enable_interrupts(uint32_t flags)
   ******************************************************************************/
 STATIC __INLINE sl_status_t sl_gpio_driver_disable_interrupts(uint32_t flags)
 {
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   sl_gpio_disable_interrupts(flags);
   return SL_STATUS_OK;
 }
@@ -1032,6 +1064,7 @@ STATIC __INLINE sl_status_t sl_gpio_driver_disable_interrupts(uint32_t flags)
  ******************************************************************************/
 STATIC __INLINE sl_status_t sl_gpio_driver_set_interrupts(uint32_t flags)
 {
+  SLI_GPIO_RETURN_IF_NOT_INITIALIZED();
   sl_gpio_set_interrupts(flags);
   return SL_STATUS_OK;
 }

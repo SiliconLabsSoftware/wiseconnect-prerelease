@@ -8,7 +8,7 @@
 #include "sl_cmsis_utility.h"
 #include "sl_constants.h"
 #include "sl_core.h"
-#include "sl_constants.h"
+#include "cmsis_compiler.h"
 
 static bool is_card_ready_required = true;
 extern uint16_t initialized_opermode;
@@ -25,6 +25,16 @@ __WEAK uint8_t sli_get_command_packet_type(sli_wifi_command_type_t command_type)
 {
   UNUSED_PARAMETER(command_type);
   return 0;
+}
+
+__WEAK sl_status_t sli_si91x_wifi_command_engine_rx_packet_handler(sli_command_engine_t *instance,
+                                                                   uint16_t packet_type,
+                                                                   void *data)
+{
+  UNUSED_PARAMETER(instance);
+  UNUSED_PARAMETER(packet_type);
+  UNUSED_PARAMETER(data);
+  return SL_STATUS_OK;
 }
 
 sl_status_t sli_wifi_set_command_engine_instance(sli_command_engine_t *instance)

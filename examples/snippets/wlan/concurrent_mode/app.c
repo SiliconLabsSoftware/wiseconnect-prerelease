@@ -234,6 +234,14 @@ static sl_status_t ap_disconnected_event_handler(sl_wifi_event_t event,
 static void application_start(void *argument);
 static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t test_timeout);
 
+static sl_wifi_device_configuration_t wifi_concurrent_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -288,7 +296,10 @@ static void application_start(void *argument)
   sl_status_t status;
   sl_wifi_channel_t client_channel = { 0 };
 
-  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
+  wifi_concurrent_configuration = sl_wifi_default_concurrent_configuration;
+  apply_nwp_logging(&wifi_concurrent_configuration);
+
+  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
@@ -330,7 +341,7 @@ static void application_start(void *argument)
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
   print_sl_ip_address(&ip_address);
 
-  status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &sl_wifi_default_concurrent_configuration, NULL, NULL);
+  status = sl_net_init(SL_NET_WIFI_AP_INTERFACE, &wifi_concurrent_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi AP interface: 0x%lx\r\n", status);
     return;

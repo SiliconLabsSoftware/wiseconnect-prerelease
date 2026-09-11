@@ -73,6 +73,17 @@ volatile bool handshake_complete = false;
 volatile bool tx_done            = false;
 
 /******************************************************
+ *               Variable Definitions
+ ******************************************************/
+static sl_wifi_device_configuration_t wifi_concurrent_v6_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
+/******************************************************
  *               Function Declarations
  ******************************************************/
 sl_status_t update_firmware(void);
@@ -209,7 +220,9 @@ void fw_up_configurator_task(void *argument)
         } else {
           SL_DEBUG_LOG_V2(INFO, "Wi-Fi Deinit is successful\r\n");
         }
-        status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_concurrent_v6_configuration, NULL, NULL);
+        wifi_concurrent_v6_configuration = sl_wifi_default_concurrent_v6_configuration;
+        apply_nwp_logging(&wifi_concurrent_v6_configuration);
+        status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_concurrent_v6_configuration, NULL, NULL);
         if (status != SL_STATUS_OK) {
           SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
           return;

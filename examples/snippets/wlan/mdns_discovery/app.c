@@ -88,6 +88,14 @@ sl_net_wifi_client_profile_t profile = { 0 };
 static void application_start(void *argument);
 static sl_status_t mdns_event_handler(sl_net_event_t event, sl_status_t status, void *data, uint32_t data_length);
 
+static sl_wifi_device_configuration_t wifi_client_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -210,7 +218,9 @@ static void application_start(void *argument)
                                      .port            = MDNS_SERVICE_PORT,
                                      .ttl             = MDNS_SERVICE_TTL };
 
-  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_client_configuration, NULL, mdns_event_handler);
+  wifi_client_configuration = sl_wifi_default_client_configuration;
+  apply_nwp_logging(&wifi_client_configuration);
+  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_client_configuration, NULL, mdns_event_handler);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi Client interface: 0x%lx\r\n", status);
     return;

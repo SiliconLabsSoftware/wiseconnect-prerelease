@@ -174,7 +174,7 @@ static const sl_wifi_device_configuration_t config = {
 #else
                      0
 #endif
-                     ) },
+                     | SL_SI91X_ENABLE_NWP_LOGGING) },
   .ta_pool             = { .tx_ratio_in_buffer_pool     = TX_POOL_RATIO,
                            .rx_ratio_in_buffer_pool     = RX_POOL_RATIO,
                            .global_ratio_in_buffer_pool = GLOBAL_POOL_RATIO },

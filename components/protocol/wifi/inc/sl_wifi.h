@@ -138,6 +138,7 @@ sl_status_t sl_wifi_get_firmware_version(sl_wifi_firmware_version_t *version);
  ******************************************************************************/
 sl_status_t sl_wifi_get_interface_info(sl_wifi_interface_t interface, sl_wifi_interface_info_t *info);
 
+#ifndef SLI_SIWX3XX
 /***************************************************************************/ /**
  * @brief
  *   Gets wlan info in AP mode / Client mode.
@@ -152,8 +153,11 @@ sl_status_t sl_wifi_get_interface_info(sl_wifi_interface_t interface, sl_wifi_in
  * @note
  *   Moving forward, this API will be deprecated. Instead, use the [sl_wifi_get_interface_info](../wiseconnect-api-reference-guide-wi-fi/sl-wifi-get-interface-info) API.
  *   The sl_si91x_rsp_wireless_info_t structure is also deprecated and replaced by sl_wifi_interface_info_t.
+ * @note
+ *   This API is Si91x-specific and is not available on SiWx3xx.
  ******************************************************************************/
 sl_status_t sl_wifi_get_wireless_info(sl_si91x_rsp_wireless_info_t *info) SL_DEPRECATED_API_WISECONNECT_4_0;
+#endif
 
 /***************************************************************************/ /**
  * @brief

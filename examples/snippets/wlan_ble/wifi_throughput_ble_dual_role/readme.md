@@ -16,6 +16,7 @@ SiWx91x Wi-Fi BLE dual-role throughput example: measure WLAN and BLE throughput 
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
+    - [Optional NWP Logging](#optional-nwp-logging)
     - [WLAN Throughput](#wlan-throughput)
   - [BLE throughput](#ble-throughput)
   - [Test the Application](#test-the-application)
@@ -97,6 +98,12 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
 ## Application Build Environment
+
+### Optional NWP Logging
+
+NWP logging is disabled by default in this example to preserve accurate throughput measurements.
+
+To enable NWP logging for debugging, set `ENABLE_NWP_LOGGING` to `1` in `app.c`. Enabling NWP logging may impact throughput performance.
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 

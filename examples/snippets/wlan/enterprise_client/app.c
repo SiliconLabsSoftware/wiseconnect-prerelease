@@ -105,6 +105,14 @@ static const sl_net_wifi_eap_credential_entry_t wifi_client_enterprise_eap_crede
   .data.eap_flags       = 0
 };
 
+static sl_wifi_device_configuration_t wifi_enterprise_client_configuration;
+
+static void apply_nwp_logging(sl_wifi_device_configuration_t *config)
+{
+  config->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_CONFIG_FEAT_EXTENSION_VALID;
+  config->boot_config.config_feature_bit_map |= SL_SI91X_ENABLE_NWP_LOGGING;
+}
+
 /******************************************************
  *               Function Definitions
  ******************************************************/
@@ -119,8 +127,12 @@ static void application_start(void *argument)
   UNUSED_PARAMETER(argument);
   sl_status_t status = SL_STATUS_OK;
 
+  // Duplicate default profile locally and enable NWP logging
+  wifi_enterprise_client_configuration = sl_wifi_default_enterprise_client_configuration;
+  apply_nwp_logging(&wifi_enterprise_client_configuration);
+
   // Initialize the network interface
-  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &sl_wifi_default_enterprise_client_configuration, NULL, NULL);
+  status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &wifi_enterprise_client_configuration, NULL, NULL);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to start Wi-Fi client interface: 0x%lx\r\n", status);
     return;
