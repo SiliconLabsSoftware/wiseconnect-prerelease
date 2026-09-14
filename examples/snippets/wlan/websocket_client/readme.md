@@ -42,6 +42,8 @@ This application demonstrates how to configure SiWx91x device as a WebSocket cli
 	  - BRD4340A [SiWx917-RB4340A](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/getting-started-with-at)
 	  - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
 	  - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
+  - Kits
+	- SiWG917 Dev Kit [BRD2605B]
 
 - **NCP Mode** (select either the EFR32 or STM32 host MCU platform; a single platform is sufficient to run the application):
   - **Option 1: EFR32 host**

@@ -48,7 +48,7 @@ Operating in Wi-Fi station mode, the SiWx91x connects to a local access point an
   - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
   - Kits
     - SiWG917 Dev Kit [BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
-    - SiWG917 Dev Kit [BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605b-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)
+    - SiWG917 Dev Kit [BRD2605B]
   - For Soc Mode, Simplicity Studio Energy Profiler can be used to measure current consumption - [Simplicity Studio Energy Profiler](#using-simplicity-studio-energy-profiler-for-current-measurement).
 - **NCP Mode** (select either the EFR32 or STM32 host MCU platform; a single platform is sufficient to run the application):
   - **Option 1: EFR32 host**

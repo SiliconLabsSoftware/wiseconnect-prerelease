@@ -43,6 +43,7 @@ In this example application, the SiWx91x's AP instance acts as an HTTP Server an
 	  - BRD4343A [SiWx917-RB4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
 	  - BRD4343C [SiWx917-RB4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview)
   - Kits
+	- SiWG917 Dev Kit [BRD2605B]
     - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit?tab=overview)
 
 - **NCP Mode** (select either the EFR32 or STM32 host MCU platform; a single platform is sufficient to run the application):

@@ -3,22 +3,17 @@ label: Wiseconnect
 description: WiSeConnect extension for the Simplicity SDK (formerly Gecko SDK)
 version: 4.1.2
 component_path:
- - path: components/device/silabs/si91x/wireless/ble
- - path: components/device/silabs/si91x/wireless/ble_unified
- - path: components/device/silabs/si91x/wireless/ble_unified_framework
-  # Protocol / feature implementation sources (application-as-component)
- - path: components/device/silabs/si91x/wireless/gap
- - path: components/device/silabs/si91x/wireless/ext_adv
- - path: components/device/silabs/si91x/wireless/legacy_adv
- - path: components/device/silabs/si91x/wireless/gatt
- - path: components/device/silabs/si91x/wireless/smp
-  # Root-level BLE advertising/scan installer .slcc (extended, legacy, default)
- - path: components/device/silabs/si91x/wireless
+ - path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
+ - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
+ - path: third_party/littlefs/component
  - path: components/at_commands_auto_gen
  - path: components/common
  - path: components/console
  - path: components/console/variables
  - path: components/device/stm32
+ - path: components/device/silabs/si91x/wireless
  - path: components/device/silabs/si91x/wireless/asynchronous_socket
  - path: components/device/silabs/si91x/wireless/crypto
  - path: components/device/silabs/si91x/wireless/crypto/aead
@@ -73,11 +68,6 @@ component_path:
  - path: third_party/paho_mqtt_embedded
  - path: third_party/qcbor/component
  - path: third_party/tcose/component
- - path: components/device/silabs/si91x/mcu/drivers/service/cpc/component
- - path: components/device/silabs/si91x/mcu/drivers/service/littlefs/component
- - path: components/device/silabs/si91x/mcu/drivers/service/nvm3/component
- - path: components/device/silabs/si91x/mcu/hal/sli_hal_si91x/component
- - path: third_party/littlefs/component
  - path: components/board/silabs/component
  - path: components/device/silabs/si91x/mcu
  - path: components/device/silabs/si91x/mcu/core/chip/component
@@ -117,15 +107,25 @@ component_path:
  - path: components/device/silabs/si91x/mcu/hal/component
  - path: components/device/silabs/si91x/mcu/toolchain/component
  - path: components/device/silabs/si91x/sl_si91x_generative_ai/component
+ - path: components/device/silabs/si91x/wireless/ble
+ - path: components/device/silabs/si91x/wireless/ble_unified
+ - path: components/device/silabs/si91x/wireless/ble_unified_framework
+  # Protocol / feature implementation sources (application-as-component)
+ - path: components/device/silabs/si91x/wireless/gap
+ - path: components/device/silabs/si91x/wireless/ext_adv
+ - path: components/device/silabs/si91x/wireless/legacy_adv
+ - path: components/device/silabs/si91x/wireless/gatt
+ - path: components/device/silabs/si91x/wireless/smp
+  # Root-level BLE advertising/scan installer .slcc (extended, legacy, default)
  - path: netstack_silabs_lwip/component
 documentation:
- - docset: bluetooth_le_siwx91x
+ - docset: platform_nwp_siwx91x
    version: 4.1.2
  - docset: wifi
    version: 4.1.2
- - docset: platform_nwp_siwx91x
-   version: 4.1.2
  - docset: platform_siwx91x
+   version: 4.1.2
+ - docset: bluetooth_le_siwx91x
    version: 4.1.2
  - docset: unknown
    version: 0.0.0
