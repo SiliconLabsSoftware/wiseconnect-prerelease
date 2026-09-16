@@ -134,12 +134,9 @@ static void sli_event_handler_thread(void *args)
   SL_DEBUG_LOG_V2(DEBUG, "Event Engine thread Started\r\n");
 
   while (1) {
-    SL_DEBUG_LOG_V2(DEBUG, "Event Engine thread waiting for events\r\n");
     // Wait for any of the events
     events_received |=
       sli_event_handler_wait_for_event(event_engine_Id, SLI_EVENT_ENGINE_EVENTS_TO_WAIT_ON, osWaitForever);
-
-    SL_DEBUG_LOG_V2(DEBUG, "Got events : 0x%lX in event engine thread\r\n", events_received);
 
     if (events_received & SLI_EVENT_ENGINE_THREAD_TERMINATE_EVENT) {
       // Clear the termination event flag
@@ -153,7 +150,6 @@ static void sli_event_handler_thread(void *args)
     }
 
     if (events_received & SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT) {
-      SL_DEBUG_LOG_V2(DEBUG, "Handling : SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT.\r\n");
       // Clear the registration event flag
       events_received &= ~SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT;
 
@@ -183,7 +179,6 @@ static void sli_event_handler_thread(void *args)
     }
 
     if (events_received & SLI_EVENT_ENGINE_ASYNC_EVENT) {
-      SL_DEBUG_LOG_V2(DEBUG, "Handling : SLI_EVENT_ENGINE_ASYNC_EVENT.\r\n");
       bool event_queues_empty               = true;
       sli_event_engine_handler_node_t *list = event_handler_list;
       // Clear the async event flag

@@ -69,10 +69,11 @@ volatile uint32_t sli_log_si91x_timer_epoch    = 0;
  *     transports does not currently consume NWP events, so this path is compiled out for
  *     those builds to avoid an unused-function warning.
  */
-#if (defined(SL_LOG_CONFIG_MODE) && (SL_LOG_CONFIG_MODE == SL_LOG_CONFIG_MODE_HOST) \
-     || defined(SL_CATALOG_LOG_BACKEND_SYSTEMVIEW_PRESENT)                          \
-     || (defined(SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_COMPACT_PRESENT)             \
-         && defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT)))
+#if (defined(SL_WIFI_COMPONENT_INCLUDED)                                                  \
+     && ((defined(SL_LOG_CONFIG_MODE) && (SL_LOG_CONFIG_MODE == SL_LOG_CONFIG_MODE_HOST)) \
+         || defined(SL_CATALOG_LOG_BACKEND_SYSTEMVIEW_PRESENT)                            \
+         || (defined(SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_COMPACT_PRESENT)               \
+             && defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT))))
 static void sli_sl_log_event_from_nwp(const sli_nwp_log_event_t *nwp, sl_log_event_t *out)
 {
   // Clear first: ring slots are reused and the stacked copy used by the
@@ -335,12 +336,10 @@ sl_status_t sl_log_hal_start_timestamp_counter(void)
   }
   // Starting Timer instance with default parameters
   status = sl_si91x_ulp_timer_start(ULP_TIMER_3);
-  if (status != SL_STATUS_OK) {
-
-    return status;
-  }
 #if !defined(SLI_CAPTIVE_CORE_PRESENT) || (SLI_CAPTIVE_CORE_PRESENT != 1)
-  sli_log_si91x_timesync_done = true;
+  if (status == SL_STATUS_OK) {
+    sli_log_si91x_timesync_done = true;
+  }
 #endif
   return status;
 }
@@ -356,15 +355,9 @@ sl_status_t sl_log_hal_stop_timestamp_counter(void)
 
   status = sl_si91x_ulp_timer_stop(ULP_TIMER_3);
   if (status != SL_STATUS_OK) {
-
     return status;
   }
-  status = sl_si91x_ulp_timer_unregister_timeout_callback(ULP_TIMER_3);
-  if (status != SL_STATUS_OK) {
-
-    return status;
-  }
-  return status;
+  return sl_si91x_ulp_timer_unregister_timeout_callback(ULP_TIMER_3);
 }
 
 /**
@@ -447,15 +440,9 @@ sl_status_t sl_log_hal_pre_sleep_process(const void *config)
   api->backend_deinit();
   status = sl_si91x_ulp_timer_stop(ULP_TIMER_3);
   if (status != SL_STATUS_OK) {
-
     return status;
   }
-  status = sl_si91x_ulp_timer_unregister_timeout_callback(ULP_TIMER_3);
-  if (status != SL_STATUS_OK) {
-
-    return status;
-  }
-  return status;
+  return sl_si91x_ulp_timer_unregister_timeout_callback(ULP_TIMER_3);
 }
 
 /**
