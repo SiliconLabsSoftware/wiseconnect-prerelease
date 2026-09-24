@@ -27,3 +27,6 @@ template_contribution:
     priority: -333
     condition:
       - lite_image_for_4mb
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wifi-siwx917-soc-memory-map/flash-memory

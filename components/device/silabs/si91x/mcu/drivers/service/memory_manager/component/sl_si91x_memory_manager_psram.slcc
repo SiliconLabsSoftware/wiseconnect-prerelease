@@ -65,3 +65,6 @@ template_contribution:
   # PSRAM heap window and its __HeapPsramBase / __HeapPsramLimit symbols.
   - name: psram_mm_heap_enabled
     value: 1
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/memory-manager

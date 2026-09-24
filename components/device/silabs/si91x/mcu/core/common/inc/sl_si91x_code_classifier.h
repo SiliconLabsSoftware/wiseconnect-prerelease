@@ -31,14 +31,25 @@
 #ifndef _SL_SI91X_CODE_CLASSIFICATION_H_
 #define _SL_SI91X_CODE_CLASSIFICATION_H_
 
+/***************************************************************************/ /**
+ * @addtogroup CODE-CLASSIFIER Code Classifier
+ * @ingroup SI91X_PERIPHERAL_APIS
+ * @{
+ ******************************************************************************/
+
 /******************************************************************************/
 /* Standard Code Classes for Memory Placement                                */
 /******************************************************************************/
-#define SL_CODE_CLASS_TIME_CRITICAL  timecritical
-#define SL_CODE_CLASS_FORCE_RAM      force_ram
-#define SL_CODE_CLASS_FORCE_PSRAM    force_psram
+/// Place latency-sensitive functions or data for fast access.
+#define SL_CODE_CLASS_TIME_CRITICAL timecritical
+/// Force placement in internal SRAM.
+#define SL_CODE_CLASS_FORCE_RAM force_ram
+/// Force placement in external PSRAM.
+#define SL_CODE_CLASS_FORCE_PSRAM force_psram
+/// Place data where DMA can access it without extra copies.
 #define SL_CODE_CLASS_DMA_ACCESSIBLE dma_accessible
 
+/** @cond INTERNAL_MACROS */
 /******************************************************************************/
 /* Helper Macros                                                              */
 /******************************************************************************/
@@ -72,10 +83,22 @@
 #define _SL_SI91X_CC_APPLY(macro, ...)       _SL_SI91X_CC_IDENTITY(macro(__VA_ARGS__))
 
 #define _SL_SI91X_CC_DISPATCH(N) _SL_SI91X_CLASS##N
+/** @endcond */
 
-/* Unified Macro for Classifying Functions and Variables */
+/***************************************************************************/ /**
+ * Classify a function or variable into a named linker section.
+ *
+ * Place this macro immediately before the declaration. `segment` is the
+ * section prefix, `component` is a unique identifier, and the remaining
+ * arguments are one or two memory classes (`SL_CODE_CLASS_*`).
+ *
+ * @param segment   Section prefix (`text`, `data`, `bss_to_psram`, ...)
+ * @param component Unique name used in the generated section
+ ******************************************************************************/
 #define SL_SI91X_CODE_CLASSIFY(segment, component, ...)                                             \
   _SL_SI91X_CC_IDENTITY(_SL_SI91X_CC_APPLY(_SL_SI91X_CC_DISPATCH, _SL_SI91X_CC_COUNT(__VA_ARGS__))) \
   (segment, component, __VA_ARGS__)
+
+/** @} (end addtogroup CODE-CLASSIFIER) */
 
 #endif // _SL_SI91X_CODE_CLASSIFICATION_H_

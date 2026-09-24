@@ -37,3 +37,5 @@ template_contribution:
         name: sl_si91x_calendar.h
     priority: -5000
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

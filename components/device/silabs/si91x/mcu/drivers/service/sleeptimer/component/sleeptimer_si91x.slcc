@@ -40,3 +40,6 @@ template_contribution:
     value: sleeptimer_si91x
 provides:
   - name: sleeptimer_si91x
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/sleeptimer

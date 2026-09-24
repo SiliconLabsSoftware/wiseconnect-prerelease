@@ -34,3 +34,6 @@ provides:
   - name: memlcd_driver
 define:
   - name: SI917_MEMLCD
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/memlcd

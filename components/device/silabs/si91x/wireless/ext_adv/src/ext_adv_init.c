@@ -30,6 +30,7 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
 #include <string.h>
 #include "rsi_ble_apis.h" // BLE APIs: rsi_ble_get_max_adv_data_len(), rsi_ble_set_ae_set_random_address(), etc.
 #include "rsi_utils.h"    // rsi_ascii_dev_address_to_6bytes_rev()
@@ -88,17 +89,17 @@ int32_t ble_ext_adv_init(void)
   // Step 3: Get max advertising data length
   status = rsi_ble_get_max_adv_data_len((uint8_t *)&rsi_app_resp_max_adv_data_len);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to get max adv data length: 0x%lx\r\n", status);
+    printf("\r\n Failed to get max adv data length: 0x%" PRIX32 "\r\n", status);
   } else {
-    printf("\r\n Max supported Adv Data length is %ld\r\n", rsi_app_resp_max_adv_data_len);
+    printf("\r\n Max supported Adv Data length is %" PRIu32 "\r\n", rsi_app_resp_max_adv_data_len);
   }
 
   // Step 4: Get max number of supported advertising sets
   status = rsi_ble_get_max_no_of_supp_adv_sets((uint8_t *)&rsi_app_resp_max_no_of_supp_adv_sets);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to get max supported adv sets: 0x%lx\r\n", status);
+    printf("\r\n Failed to get max supported adv sets: 0x%" PRIX32 "\r\n", status);
   } else {
-    printf("\r\n Max number of supported Adv sets are %ld\r\n", rsi_app_resp_max_no_of_supp_adv_sets);
+    printf("\r\n Max number of supported Adv sets are %" PRIu32 "\r\n", rsi_app_resp_max_no_of_supp_adv_sets);
   }
 
 #if ADV_ENABLED_DEFAULT
@@ -111,7 +112,7 @@ int32_t ble_ext_adv_init(void)
   // Step 5: Configure advertising parameters for Set 1
   status = ble_ae_set_1_parameters();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae params failed with 0x%lX\r\n", status);
+    printf("\r\n set ae params failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n Setting AE params of set 1 successful and selected TX Power is %d dbm\r\n", rsi_app_resp_tx_power);
@@ -121,7 +122,7 @@ int32_t ble_ext_adv_init(void)
   // EXTRACTED FROM: Reference app line 1566
   status = ble_ae_set_periodic_parameters();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae Periodic adv data failed with 0x%lX\r\n", status);
+    printf("\r\n set ae Periodic adv data failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae periodic adv data success\r\n");
@@ -130,7 +131,7 @@ int32_t ble_ext_adv_init(void)
   // EXTRACTED FROM: Reference app line 1574
   status = rsi_ble_app_set_periodic_ae_enable(BLE_AE_PER_ADV_EN, BLE_AE_ADV_HNDL_SET_1);
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae Periodic adv enable failed with 0x%lX\r\n", status);
+    printf("\r\n set ae Periodic adv enable failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae periodic adv enable success\r\n");
@@ -140,7 +141,7 @@ int32_t ble_ext_adv_init(void)
   // Step 8: Configure advertising parameters for Set 2
   status = ble_ae_set_2_parameters();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae params failed with 0x%lX\r\n", status);
+    printf("\r\n set ae params failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n Setting AE params of set 2 successful and selected TX Power is %d dbm\r\n", rsi_app_resp_tx_power);
@@ -157,7 +158,7 @@ int32_t ble_ext_adv_init(void)
   // EXTRACTED FROM: Reference app line 1593
   status = ble_ae_set_periodic_data();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae adv enable failed with status 0x%lX\r\n", status);
+    printf("\r\n set ae adv enable failed with status 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae adv enable success\r\n");
@@ -165,7 +166,7 @@ int32_t ble_ext_adv_init(void)
   // Step 10: Configure advertising data for Set 1 (when periodic not enabled)
   status = ble_ae_set_1_adv_data();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae adv data for set 1 failed with status 0x%lX\r\n", status);
+    printf("\r\n set ae adv data for set 1 failed with status 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae adv data for set 1 success\r\n");
@@ -173,7 +174,7 @@ int32_t ble_ext_adv_init(void)
   // Step 11: Configure scan response data for Set 1
   status = ble_ae_set_1_scan_resp_data();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae scan resp data for set 1 failed with 0x%lX\r\n", status);
+    printf("\r\n set ae scan resp data for set 1 failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae scan resp data for set 1 success\r\n");
@@ -183,7 +184,7 @@ int32_t ble_ext_adv_init(void)
   // Step 12: Configure advertising data for Set 2
   status = ble_ae_set_2_adv_data();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae adv data for set 2 failed with status 0x%lX\r\n", status);
+    printf("\r\n set ae adv data for set 2 failed with status 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae adv data for set 2 success\r\n");
@@ -191,7 +192,7 @@ int32_t ble_ext_adv_init(void)
   // Step 13: Configure scan response data for Set 2
   status = ble_ae_set_2_scan_resp_data();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae scan resp data for set 2 failed with 0x%lX\r\n", status);
+    printf("\r\n set ae scan resp data for set 2 failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae scan resp data for set 2 success\r\n");
@@ -206,7 +207,7 @@ int32_t ble_ext_adv_init(void)
   rsi_ascii_dev_address_to_6bytes_rev(adv_random_address, (int8_t *)RSI_BLE_SET_RAND_ADDR);
   status = rsi_ble_set_ae_set_random_address(BLE_AE_ADV_HNDL_SET_1, (uint8_t *)adv_random_address);
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae set random address failed with 0x%lX\r\n", status);
+    printf("\r\n set ae set random address failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae set random address successful\r\n");
@@ -219,7 +220,7 @@ int32_t ble_ext_adv_init(void)
   // Step 15: Enable advertising for Set 1
   status = ble_ae_set_1_advertising_enable();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set 1 ae adv enable failed with status 0x%lX\r\n", status);
+    printf("\r\n set 1 ae adv enable failed with status 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set 1 ae adv enable success\r\n");
@@ -228,7 +229,7 @@ int32_t ble_ext_adv_init(void)
   // Step 13: Enable advertising for Set 2
   status = ble_ae_set_2_advertising_enable();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set 2 ae adv enable failed with status 0x%lX\r\n", status);
+    printf("\r\n set 2 ae adv enable failed with status 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set 2 ae adv enable success\r\n");
@@ -245,7 +246,7 @@ int32_t ble_ext_adv_init(void)
   // Step 17: Configure extended scan parameters
   status = ble_ext_scan_params();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae scan params failed with status 0x%lX\r\n", status);
+    printf("\r\n set ae scan params failed with status 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae scan params success\r\n");
@@ -253,7 +254,7 @@ int32_t ble_ext_adv_init(void)
   // Step 18: Enable extended scanning
   status = ble_ext_scan_enable();
   if (status != RSI_SUCCESS) {
-    printf("\r\n set ae scan enable failed with 0x%lX\r\n", status);
+    printf("\r\n set ae scan enable failed with 0x%" PRIX32 "\r\n", status);
     return status;
   }
   printf("\r\n set ae scan enable success\r\n");

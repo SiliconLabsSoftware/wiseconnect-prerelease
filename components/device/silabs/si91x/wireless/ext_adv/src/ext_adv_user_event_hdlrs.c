@@ -45,6 +45,7 @@
 //  ! INCLUDES
 /*=======================================================================*/
 #include <stdio.h>          // printf()
+#include <inttypes.h>       // PRIX32
 #include <stdlib.h>         // malloc(), free()
 #include <string.h>         // memcpy(), memset(), strlen()
 #include <gap_config.h>     // resolved via -I: config/ble_config/ (user override) first, then component inc/
@@ -112,7 +113,7 @@ void rsi_scan_restart_event()
     ae_set_scan_enable.period            = BLE_AE_SCAN_PERIOD;
     status                               = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
     if (status != RSI_SUCCESS) {
-      printf(" \n set ae scan disable failed with 0x%lX \n", status);
+      printf(" \n set ae scan disable failed with 0x%" PRIX32 " \n", status);
     } else {
       scan_state_dut = scan_off;
       printf(" \n set ae scan disable success \n");
@@ -126,7 +127,7 @@ void rsi_scan_restart_event()
     if (peripheral_count <= RSI_BLE_MAX_NBR_PERIPHERALS) {
       status = ble_ext_scan_enable();
       if (status != RSI_SUCCESS) {
-        printf("\r\n scanning start failed, cmd status = %lx -conn\n", status);
+        printf("\r\n scanning start failed, cmd status = %" PRIX32 " -conn\n", status);
         rsi_ble_event_scan_restart_driver_callback();
       } else {
         scan_state_dut = connectable_scan;
@@ -158,7 +159,7 @@ void rsi_adv_restart_event()
       //SAPI function call for enabling extended advertising for set 1
       status = rsi_ble_start_ae_advertising(&ble_ae_adv);
       if (status != RSI_SUCCESS) {
-        printf("\r\n advertising failed to stop, with status = 0x%lx -conn\n", status);
+        printf("\r\n advertising failed to stop, with status = 0x%" PRIX32 " -conn\n", status);
 
       } else {
         adv_state_dut = adv_disabled;
@@ -173,7 +174,7 @@ void rsi_adv_restart_event()
       status = ble_ae_set_1_advertising_enable();
       printf("\r\n Advertising Restarted \n");
       if (status != RSI_SUCCESS) {
-        printf("\r\n advertising failed with status = 0x%lx -conn \n", status);
+        printf("\r\n advertising failed with status = 0x%" PRIX32 " -conn \n", status);
       } else {
 #if WLAN_TRANSIENT_CASE
         ble_adv_is_there = 1;
@@ -235,7 +236,7 @@ void rsi_ble_ae_adv_report(uint16_t status, void *event_data)
   ae_set_scan_enable.period            = BLE_AE_SCAN_PERIOD;
   status                               = rsi_ble_ae_set_scan_enable(&ae_set_scan_enable);
   if (status != RSI_SUCCESS) {
-    printf(" \n set ae scan disable failed with 0x%x \n", status);
+    printf(" \n set ae scan disable failed with 0x%" PRIX32 " \n", status);
   } else {
     scan_state_dut = scan_off;
     printf(" \n set ae scan disable success \n");
@@ -265,7 +266,7 @@ void rsi_ble_ae_adv_report(uint16_t status, void *event_data)
          (int8_t *)remote_dev_addr_conn /*rsi_ble_conn_info[ble_conn_id].remote_dev_addr*/,
          ble_conn_id);
   if (status != RSI_SUCCESS) {
-    printf("\r\n Connecting failed with status : 0x%x -conn%d\n", status, ble_conn_id);
+    printf("\r\n Connecting failed with status : 0x%" PRIX32 " -conn%d\n", status, ble_conn_id);
 
     rsi_ble_event_scan_restart_driver_callback();
   } else {
@@ -411,7 +412,7 @@ void rsi_ble_adv_set_terminated(uint16_t __attribute__((unused)) status, void __
 
   status = rsi_ble_start_ae_advertising(&ble_ae_adv);
   if (status != RSI_SUCCESS) {
-    printf("set ae adv enable failed with 0x%lX \n", status);
+    printf("set ae adv enable failed with 0x%" PRIX32 " \n", status);
   } else {
     printf("set ae adv enable success \n");
   }
@@ -438,7 +439,7 @@ void rsi_ble_scan_req_recvd(uint16_t status, void *event_data)
   rsi_ble_scan_req_recvd_t *scan_req_recvd = (rsi_ble_scan_req_recvd_t *)event_data;
 
   printf("\n ExScnReq \n");
-  LOG_PRINT_D("\n status = %x \n", status);
+  LOG_PRINT_D("\n status = %" PRIX32 " \n", status);
   LOG_PRINT_D("\n adv_handle = %x \n", scan_req_recvd->adv_handle);
   LOG_PRINT_D("\n scanner_addr_type = %x \n", scan_req_recvd->scanner_addr_type);
   rsi_6byte_dev_address_to_ascii(remote_dev_str_addr, scan_req_recvd->scanner_addr);

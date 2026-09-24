@@ -92,6 +92,18 @@ extern osMutexId_t side_band_crypto_mutex;
 
 #define SLI_SI91X_GET_TCP_IP_TOTAL_SELECTS_BITS(x) ((x & 0x0000F000) >> 12)
 
+// Valid ranges for sl_si91x_module_rtc_time_t fields
+#define SLI_SI91X_RTC_MAX_SECOND  59
+#define SLI_SI91X_RTC_MAX_MINUTE  59
+#define SLI_SI91X_RTC_MAX_HOUR    23
+#define SLI_SI91X_RTC_MIN_DAY     1
+#define SLI_SI91X_RTC_MAX_DAY     31
+#define SLI_SI91X_RTC_MAX_MONTH   11
+#define SLI_SI91X_RTC_MIN_WEEKDAY 1
+#define SLI_SI91X_RTC_MAX_WEEKDAY 7
+#define SLI_SI91X_RTC_MIN_YEAR    1990
+#define SLI_SI91X_RTC_MAX_YEAR    2099
+
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
 #define SL_HOST_DESC_LEN  16
 #define SL_CRYPTO_PKT_LEN 128
@@ -967,13 +979,21 @@ sl_status_t sl_si91x_set_rtc_timer(const sl_si91x_module_rtc_time_t *timer)
 {
   sl_status_t status = SL_STATUS_OK;
 
+  SL_WIFI_ARGS_CHECK_NULL_POINTER(timer);
+
   if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  if ((timer->tm_sec > 59) || (timer->tm_min > 59) || (timer->tm_hour > 23)
-      || ((timer->tm_mday < 1) || (timer->tm_mday > 31)) || (timer->tm_mon > 11)
-      || ((timer->tm_wday < 1) || (timer->tm_wday > 7))) {
+  // tm_year must be an absolute calendar year (for example, 2024). Values such as
+  // years-since-1990 or years-since-1900 are rejected because they produce an
+  // incorrect module clock and TLS certificate validation failures.
+  if ((timer->tm_sec > SLI_SI91X_RTC_MAX_SECOND) || (timer->tm_min > SLI_SI91X_RTC_MAX_MINUTE)
+      || (timer->tm_hour > SLI_SI91X_RTC_MAX_HOUR)
+      || ((timer->tm_mday < SLI_SI91X_RTC_MIN_DAY) || (timer->tm_mday > SLI_SI91X_RTC_MAX_DAY))
+      || (timer->tm_mon > SLI_SI91X_RTC_MAX_MONTH)
+      || ((timer->tm_wday < SLI_SI91X_RTC_MIN_WEEKDAY) || (timer->tm_wday > SLI_SI91X_RTC_MAX_WEEKDAY))
+      || (timer->tm_year < SLI_SI91X_RTC_MIN_YEAR) || (timer->tm_year > SLI_SI91X_RTC_MAX_YEAR)) {
 
     // Checking Invalid Parameters
     return SL_STATUS_INVALID_PARAMETER;

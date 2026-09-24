@@ -51,9 +51,22 @@ extern "C" {
 #include "sl_log_helper.h"
 #else
 
+/** @brief Magic address used when compact logging discards the format string. */
 #define SL_LOG_EMPTY_STRING_ADDRESS 0xFFFFFFFE
 
+/***************************************************************************/ /**
+ * @addtogroup SL-LOG SL Log
+ * @ingroup SI91X_SERVICE_APIS
+ * @{
+ * @brief Helper macros and utilities for the Silicon Labs logging system on SiWx91x.
+ *
+ * This module provides the core helper macros and utilities that enable
+ * efficient logging with compile-time optimization, argument validation,
+ * and backend abstraction.
+ ******************************************************************************/
+
 /** @addtogroup sl_log_helper SL Log Helper Functions
+ * @ingroup SL-LOG
  * @brief Helper macros and utilities for the Silicon Labs logging system
  *
  * This module provides the core helper macros and utilities that enable
@@ -115,6 +128,7 @@ extern "C" {
 
 /** @} (end addtogroup sl_log_compiler_support) */
 
+/** @cond INTERNAL_MACROS */
 #define SL_PRINT_ARG0_DBG(EVENT, EVENT_TYPE) \
   ({                                         \
     (void)sizeof(EVENT);                     \
@@ -222,6 +236,7 @@ extern "C" {
     (void)sizeof(ARG2);                                         \
     (void)sizeof(ARG3);                                         \
   })
+/** @endcond */
 
 /** @} (end addtogroup sl_log_disabled_macros) */
 
@@ -293,18 +308,6 @@ extern "C" {
  * @{
  */
 
-// Common API Functions
-
-/**
- * @defgroup sl_log_common_macros Common Logging Macros
- * @brief Core macros for printf-style and event-based logging
- *
- * These macros provide the foundation for both printf-style string logging
- * and numeric event-based logging with compile-time argument validation.
- *
- * @{
- */
-
 /**
  * @brief Common printf-style logging macro
  *
@@ -336,6 +339,7 @@ extern "C" {
 
 /* Compile-time–controlled PRINTF-style macros */
 
+/** @cond INTERNAL_MACROS */
 #define SL_PRINT_STRING_INFO(fmt, ...) sl_printf_common(INFO, fmt, ##__VA_ARGS__)
 
 #define SL_PRINT_STRING_DEBUG(fmt, ...) sl_printf_common(DBG, fmt, ##__VA_ARGS__)
@@ -353,6 +357,11 @@ extern "C" {
 #define SL_PRINT_EVENT_WARN(event_id, ...) sl_event_common(WRN, event_id, ##__VA_ARGS__)
 
 #define SL_PRINT_EVENT_ERROR(event_id, ...) sl_event_common(ERR, event_id, ##__VA_ARGS__)
+/** @endcond */
+
+/** @} (end addtogroup sl_log_common_macros) */
+/** @} (end addtogroup sl_log_helper) */
+/** @} (end addtogroup SL-LOG) */
 
 #endif
 

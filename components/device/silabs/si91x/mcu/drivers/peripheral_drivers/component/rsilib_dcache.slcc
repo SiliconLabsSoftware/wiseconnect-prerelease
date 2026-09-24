@@ -30,3 +30,6 @@ template_contribution:
   - name: code_classification_components
     value: rsilib_dcache
     condition: [psram_core]
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

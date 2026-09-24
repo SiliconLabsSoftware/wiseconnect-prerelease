@@ -39,7 +39,8 @@ extern "C" {
 #endif
 
 /***************************************************************************/ /**
- * @addtogroup sl_si91x_memory_manager Si91x Memory Manager
+ * @addtogroup MEMORY-MANAGER Memory Manager
+ * @ingroup SI91X_SERVICE_APIS
  * @{
  ******************************************************************************/
 
@@ -92,11 +93,10 @@ size_t sl_si91x_memory_get_free_heap_size(void);
  *
  *       For other heap implementations, this function will be a no-op.
  *
- * @return None
  ******************************************************************************/
 void sl_si91x_memory_reset_heap_high_watermark(void);
 
-/** @} (end addtogroup sl_si91x_memory_manager) */
+/** @} (end addtogroup MEMORY-MANAGER) */
 
 #ifdef __cplusplus
 }

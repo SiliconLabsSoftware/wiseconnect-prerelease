@@ -7,7 +7,7 @@ metadata:
     license: Zlib
 category: Device|Si91x|MCU|Core
 description: >
-  This component enables SiWx91x SoC user configuration macros.
+  This component enables SiWx91x SoC user configuration macros. To enable opn specific configurations user must enable soc user configuration.
 define:
   - name: USER_CONFIGURATION_ENABLE
     value: '1'
@@ -15,3 +15,6 @@ define:
     value: '1'
 provides:
   - name: soc_configuration_enable
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

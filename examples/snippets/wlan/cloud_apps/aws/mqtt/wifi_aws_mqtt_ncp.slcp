@@ -21,6 +21,7 @@ include:
   - path: app.h
 define:
 - name: SL_SI91X_PRINT_DBG_LOG
+- name: SLI_SI91X_INTERNAL_SNTP_CLIENT
 component:
 - id: sl_main
 - id: freertos
@@ -41,6 +42,7 @@ component:
 - id: basic_network_config_manager
 - id: sl_si91x_asynchronous_socket
 - id: aws_sdk
+- id: sntp
 - id: sl_si91x_wrap
 - id: log_none
 - id: log_backend_iostream

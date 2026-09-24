@@ -348,7 +348,7 @@ typedef struct {
   uint32_t tm_hour; ///< Hours since midnight [0-23]
   uint32_t tm_mday; ///< Day of the month [1-31]
   uint32_t tm_mon;  ///< Months since January [0-11]
-  uint32_t tm_year; ///< Years since 1990
+  uint32_t tm_year; ///< Absolute calendar year (for example, 2024). Do not pass years-since-1990/1900 offsets.
   uint32_t tm_wday; ///< Weekday from Sunday to Saturday [1-7]
 } sl_si91x_module_rtc_time_t;
 /** @} */

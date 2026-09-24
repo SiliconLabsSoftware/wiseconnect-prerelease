@@ -39,11 +39,15 @@ extern "C" {
 
 #if defined(SLI_SI91X_MCU_COMMON_FLASH_MODE)
 
-#define SL_SLEEP_STACK_USAGE_ADDRESS          0x1b000    // STACK_USAGE_ADDRESS for Si917 B0 Common flash
-#define SL_SLEEP_RAM_USAGE_ADDRESS            0x24061EFC // RAM_USAGE_ADDRESS for Si917 B0 Common flash
-#define SL_SLEEP_VECTOR_OFFSET                0x0 // Vector offset: sleep without retention for Si917 B0 Common flash
-#define SL_SLEEP_VECTOR_OFFSET_WITH_RETENTION 0x8202000 // Vector offset: sleep with retention for Si917 B0 Common flash
-#define SL_SLEEP_WAKEUP_CALLBACK_ADDRESS      0x1e000   // Wakeup callback address for Si917 B0 Common flash
+#define SL_SLEEP_STACK_USAGE_ADDRESS 0x1b000    // STACK_USAGE_ADDRESS for Si917 B0 Common flash
+#define SL_SLEEP_RAM_USAGE_ADDRESS   0x24061EFC // RAM_USAGE_ADDRESS for Si917 B0 Common flash
+#define SL_SLEEP_VECTOR_OFFSET       0x0        // Vector offset: sleep without retention for Si917 B0 Common flash
+#ifdef SLI_SI91X_MCU_4MB_LITE_IMAGE
+#define SL_SLEEP_VECTOR_OFFSET_WITH_RETENTION 0x8172000 // IVT: 4MB lite common flash (AN1416)
+#else
+#define SL_SLEEP_VECTOR_OFFSET_WITH_RETENTION 0x8202000 // IVT: 8MB common flash (AN1416)
+#endif
+#define SL_SLEEP_WAKEUP_CALLBACK_ADDRESS 0x1e000 // Wakeup callback address for Si917 B0 Common flash
 
 #else
 
@@ -52,26 +56,6 @@ extern "C" {
 #define SL_SLEEP_VECTOR_OFFSET                0x0 // Vector offset: sleep without retention for Si917 B0 Dual flash
 #define SL_SLEEP_VECTOR_OFFSET_WITH_RETENTION 0x8012000 // Vector offset: sleep with retention for Si917 B0 Dual flash
 #define SL_SLEEP_WAKEUP_CALLBACK_ADDRESS      0x1e000   // Wakeup callback address for Si917 B0 Dual flash
-
-#endif // SLI_SI91X_MCU_COMMON_FLASH_MODE
-
-#else
-
-#if defined(SLI_SI91X_MCU_COMMON_FLASH_MODE)
-
-#define SL_SLEEP_STACK_USAGE_ADDRESS          0x1b000    // STACK_USAGE_ADDRESS for Si917 A0 Common flash
-#define SL_SLEEP_RAM_USAGE_ADDRESS            0x24061000 // RAM_USAGE_ADDRESS for Si917 A0 Common flash
-#define SL_SLEEP_VECTOR_OFFSET                0x0 // Vector offset: sleep without retention for Si917 A0 Common flash
-#define SL_SLEEP_VECTOR_OFFSET_WITH_RETENTION 0x8212000 // Vector offset: sleep with retention for Si917 A0 Common flash
-#define SL_SLEEP_WAKEUP_CALLBACK_ADDRESS      0x1e000   // Wakeup callback address for Si917 A0 Common flash
-
-#else
-
-#define SL_SLEEP_STACK_USAGE_ADDRESS          0x1b000    // STACK_USAGE_ADDRESS for Si917 A0 Dual flash
-#define SL_SLEEP_RAM_USAGE_ADDRESS            0x24061000 // RAM_USAGE_ADDRESS for Si917 A0 Dual flash
-#define SL_SLEEP_VECTOR_OFFSET                0x0 // Vector offset: sleep without retention for Si917 A0 Dual flash
-#define SL_SLEEP_VECTOR_OFFSET_WITH_RETENTION 0x8012000 // Vector offset: sleep with retention for Si917 A0 Dual flash
-#define SL_SLEEP_WAKEUP_CALLBACK_ADDRESS      0x1e000   // Wakeup callback address for Si917 A0 Dual flash
 
 #endif // SLI_SI91X_MCU_COMMON_FLASH_MODE
 

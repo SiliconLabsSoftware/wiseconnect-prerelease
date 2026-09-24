@@ -42,3 +42,6 @@ template_contribution:
       handler: sl_si91x_iostream_instance_debug_info
   - name: component_catalog
     value: iostream_debug_si91x
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/iostream

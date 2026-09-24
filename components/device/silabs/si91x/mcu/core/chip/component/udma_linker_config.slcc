@@ -22,3 +22,6 @@ template_contribution:
     value: 0x24062000
   - name: udma1_size
     value: 0x00000400
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

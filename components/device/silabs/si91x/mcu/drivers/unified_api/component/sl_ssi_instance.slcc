@@ -48,3 +48,6 @@ template_contribution:
 requires:
   - name: sl_ssi
   - name: log_none
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/ssi

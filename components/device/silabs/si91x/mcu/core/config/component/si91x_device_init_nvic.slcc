@@ -19,3 +19,6 @@ provides:
   - name: si91x_device_init_nvic
 requires:
   - name: freertos_config
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

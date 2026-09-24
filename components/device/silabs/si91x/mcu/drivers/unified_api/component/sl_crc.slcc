@@ -20,3 +20,6 @@ include:
     - path: "sl_si91x_crc.h"
 provides:
   - name: sl_crc
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/crc

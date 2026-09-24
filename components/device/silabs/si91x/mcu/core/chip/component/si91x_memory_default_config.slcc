@@ -16,3 +16,6 @@ provides:
 conflicts:
   - name: si91x_mem_config_2
   - name: si91x_mem_config_3
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wifi-siwx917-soc-memory-map/static-random-access-memory-sram#memory-configurations

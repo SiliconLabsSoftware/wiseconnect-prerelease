@@ -23,3 +23,6 @@ provides:
 requires:
   - name: sl_ssi
   - name: log_none
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/icm40627

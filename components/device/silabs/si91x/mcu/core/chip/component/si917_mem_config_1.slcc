@@ -18,3 +18,6 @@ define:
 template_contribution:
   - name: device_ram_size
     value: 196608
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wifi-siwx917-soc-memory-map/static-random-access-memory-sram#memory-configurations

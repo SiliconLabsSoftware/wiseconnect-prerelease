@@ -16,3 +16,6 @@ define:
     value: '1'
 provides:
   - name: sl_si91x_sleep_timer_clock_selection
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/sleeptimer

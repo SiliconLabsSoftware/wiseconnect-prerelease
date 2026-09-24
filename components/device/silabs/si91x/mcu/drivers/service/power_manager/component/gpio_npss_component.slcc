@@ -36,3 +36,5 @@ template_contribution:
       include:
         name: sl_si91x_driver_gpio.h
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

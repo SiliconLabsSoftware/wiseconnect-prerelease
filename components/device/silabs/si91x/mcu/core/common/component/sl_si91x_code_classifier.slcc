@@ -24,3 +24,6 @@ define:
 template_contribution:
   - name: psram_linker_config_enabled
     value: 1
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/code-classifier

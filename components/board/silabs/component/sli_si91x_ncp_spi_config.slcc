@@ -41,3 +41,6 @@ include:
     condition: [brd4120a]
     file_list:
       - path: si91x_ncp_spi_config.h
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wifi-siwx917-ncp-spi-protocol-application-note/

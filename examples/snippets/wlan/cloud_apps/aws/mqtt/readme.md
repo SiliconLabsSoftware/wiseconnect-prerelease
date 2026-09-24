@@ -82,6 +82,8 @@ The AWS IoT Device SDK allows applications to securely connect to the AWS IoT pl
 
 ## Prerequisites/Setup Requirements
 
+> **NOTE:** With `ENABLE_SNTP` set to `1` (default), the application uses SNTP to set the module RTC before TLS. Certificate validation requires access to the NTP server `0.pool.ntp.org` after Wi-Fi connect and before the device can connect to AWS IoT Core over MQTT. Setting `ENABLE_SNTP` to `0` also disables `SL_SI91X_CUSTOM_FEAT_RTC_FROM_HOST`; without another way to set a correct absolute RTC year, TLS certificate validation with AWS IoT Core is likely to fail (for example, status `0xD2`). On failure paths, DNS/SNTP retries can block for up to roughly `MAX_DNS_RETRY_COUNT` DNS attempts plus `SNTP_RETRY_COUNT` × `SNTP_BLOCK_TIMEOUT_MS` (defaults: 5 DNS attempts and 5 × 30 s SNTP waits).
+
 ### Hardware Requirements
 
 - Windows PC with Host interface (UART)
@@ -155,11 +157,14 @@ The application can be configured to suit your requirements and development envi
  #define PUBLISH_PERIODICITY       30000             //! Publish periodicity in milliseconds.
  #define ENABLE_NWP_POWER_SAVE         1             //! Set this macro to 1 for enabling NWP power save.
  #define WRAP_PRIVATE_KEY              0             //! Enable this to wrap the private key.
+ #define ENABLE_SNTP                   1             //! Sync module RTC from SNTP before TLS certificate validation.
  ```
 
 - `SUBSCRIBE_TO_TOPIC` refers to the topic to which the device subscribes.
 - `PUBLISH_ON_TOPIC` refers to the topic to which the device publishes.
 - When `WRAP_PRIVATE_KEY` is enabled, the `aws_client_private_key` provided by the user will be wrapped using `sl_si91x_wrap()`. This `wrapped_private_key` will be loaded into the flash and used for the AWS connection.
+- When `ENABLE_SNTP` is enabled, the application resolves `0.pool.ntp.org`, fetches date/time via SNTP, and sets the module RTC with `sl_si91x_set_rtc_timer()` before TLS.
+- Keep `ENABLE_SNTP` enabled unless the application sets module RTC another way before TLS. Disabling it removes both SNTP sync and `SL_SI91X_CUSTOM_FEAT_RTC_FROM_HOST`, which typically causes AWS TLS certificate validation failures.
 
 > Note: To use the `sl_si91x_wrap()` function, security must be enabled on the device. Follow the detailed instructions in **Section 5.4 and Section 5.5 - Enable Security Configurations in NWP and M4 Firmware Images** of the [UG574 SiWx917 SoC Manufacturing Utility User Guide](https://www.silabs.com/documents/public/user-guides/ug574-siwx917-soc-manufacturing-utility-user-guide.pdf).
 
@@ -393,6 +398,7 @@ Create a thing in the AWS IoT registry to represent your IoT device.
 If you encounter issues while running the AWS IoT MQTT Client example, check the following:
 
 - Verify that `DEFAULT_WIFI_CLIENT_PROFILE_SSID` and `DEFAULT_WIFI_CLIENT_CREDENTIAL` in `sl_net_default_values.h` match your access point settings and that the AP has internet access.
+- Confirm that the device can reach the NTP server `0.pool.ntp.org`. Module RTC sync via SNTP is required before TLS certificate validation with AWS IoT Core.
 - Confirm that `AWS_IOT_MQTT_HOST` matches the **Device data endpoint** on the **Settings** page in the AWS IoT console.
 - Ensure that `AWS_IOT_MQTT_CLIENT_ID` and `AWS_IOT_MY_THING_NAME` match the Thing name registered in AWS IoT Core.
 - Replace the default certificates in the WiseConnect SDK with the device certificate and private key you downloaded when you created the AWS Thing. The default certificates are for reference only.

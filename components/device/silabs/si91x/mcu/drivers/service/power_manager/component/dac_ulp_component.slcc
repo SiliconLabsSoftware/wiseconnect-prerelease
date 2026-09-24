@@ -33,3 +33,6 @@ template_contribution:
     value: aux_reference_volt_config.*
   - name: dac_ps2
     value: sl_si91x_dac.* 
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

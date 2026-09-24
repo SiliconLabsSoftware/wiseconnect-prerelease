@@ -53,6 +53,7 @@
 #include "cmsis_os2.h"
 #include <rsi_common_apis.h>
 #include <string.h>
+#include <stdio.h>
 #if USE_SELECT_FEATURE
 #include "select.h"
 #endif
@@ -63,6 +64,7 @@
 
 #define BACK_LOG                   1
 #define SL_HIGH_PERFORMANCE_SOCKET BIT(7)
+#define THROUGHPUT_MSG_SIZE        80
 
 #if ((THROUGHPUT_TYPE == UDP_RX) || (THROUGHPUT_TYPE == UDP_TX))
 #define BUFFER_SIZE UDP_BUFFER_SIZE
@@ -97,7 +99,14 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
   float duration = ((test_timeout) / 1000);                    // ms to sec
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
+  // SL_DEBUG_LOG_V2 packs args as uint32_t; format floats via snprintf, then log as %s.
+  char throughput_msg[THROUGHPUT_MSG_SIZE];
+  snprintf(throughput_msg,
+           sizeof(throughput_msg),
+           "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n",
+           result,
+           duration);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)throughput_msg);
 }
 
 /*************************************************************************/

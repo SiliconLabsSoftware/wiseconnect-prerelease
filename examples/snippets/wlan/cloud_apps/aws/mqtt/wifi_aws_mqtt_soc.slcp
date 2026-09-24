@@ -21,6 +21,7 @@ include:
   - path: app.h
 define:
 - name: SL_SI91X_PRINT_DBG_LOG
+- name: SLI_SI91X_INTERNAL_SNTP_CLIENT
 - name: SLI_SI91X_MCU_MOV_ROM_API_TO_FLASH
 component:
 - id: sl_main
@@ -37,6 +38,7 @@ component:
 - id: basic_network_config_manager
 - id: sl_si91x_asynchronous_socket
 - id: aws_sdk
+- id: sntp
 - id: sl_power_manager
 - id: gpio_npss_component
 - id: wireless_wakeup_ulp_component
@@ -46,6 +48,7 @@ component:
 - id: si91x_log
 - id: si91x_log_iostream_formatted
 - id: iostream_si91x
+- id: iostream_retarget_stdio
 - id: iostream_uart_si91x
   instance:
   - vcom

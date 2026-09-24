@@ -24,3 +24,6 @@ template_contribution:
     value: rsi_comparator.*
   - name: comparator_ps2
     value: sl_si91x_analog_comparator.*
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

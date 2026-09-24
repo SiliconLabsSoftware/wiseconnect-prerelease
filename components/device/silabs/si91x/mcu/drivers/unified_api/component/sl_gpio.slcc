@@ -25,6 +25,9 @@ provides:
 requires:
   - name: sl_gpio_peripheral
   - name: log_none
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio
 template_contribution:
   - name: event_handler
     priority: -9996

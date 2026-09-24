@@ -19,3 +19,6 @@ provides:
   - name: sl_si91x_soc_soft_reset
 requires:
   - name: systemlevel_wwdt
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-common/soft-reset-functions

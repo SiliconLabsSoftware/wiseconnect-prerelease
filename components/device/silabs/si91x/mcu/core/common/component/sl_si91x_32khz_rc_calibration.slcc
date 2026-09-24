@@ -41,3 +41,6 @@ template_contribution:
       include: sli_si91x_32khz_rc_calibration.h
       handler: sli_si91x_calibration_initialization
     priority: -9
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/clock-manager

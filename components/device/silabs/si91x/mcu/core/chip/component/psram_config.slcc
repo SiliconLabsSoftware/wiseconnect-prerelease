@@ -20,3 +20,5 @@ config_file:
     vendor: silabs
   unless:
   - opn_config
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/psram

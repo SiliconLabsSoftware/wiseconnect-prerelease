@@ -37,3 +37,6 @@ template_contribution:
     value:
       include: sl_si91x_iostream_rtt.h
       handler: sl_si91x_iostream_instance_rtt_info
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/iostream

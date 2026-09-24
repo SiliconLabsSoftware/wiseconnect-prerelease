@@ -11,3 +11,6 @@ metadata:
 provides:
   - name: si91x_common_flash
   - name: sl_si91x_common_flash
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wifi-siwx917-soc-memory-map/flash-memory#common-flash

@@ -39,3 +39,6 @@ template_contribution:
     value: rsi_i2c.*
   - name: i2c_ps2
     value: sl_si91x_clock_manager.*
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

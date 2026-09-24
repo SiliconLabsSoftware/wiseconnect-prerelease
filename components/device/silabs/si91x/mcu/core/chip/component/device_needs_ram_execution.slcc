@@ -22,3 +22,6 @@ template_contribution:
   - name: device_ram_addr
     value: 1024
     priority: -2
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

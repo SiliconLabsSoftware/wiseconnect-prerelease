@@ -19,3 +19,6 @@ config_file:
     file_id: psram_config
 define:
   - name: SLI_SI91X_MCU_PSRAM_APS6404L_SQRH
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/psram

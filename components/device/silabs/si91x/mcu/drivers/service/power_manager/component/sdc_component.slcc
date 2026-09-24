@@ -38,5 +38,5 @@ template_contribution:
   - name: sdc_ps2
     value: sl_si91x_peripheral_sdc.*   
 
-
-
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

@@ -50,4 +50,6 @@ provides:
     condition: [si91x_log_iostream]
 requires:
   - name: sl_usart_iostream
-  - name: iostream_retarget_stdio
+  - name: syscalls
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/iostream

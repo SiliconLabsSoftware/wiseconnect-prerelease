@@ -64,3 +64,6 @@ template_contribution:
     value: true
 provides:
   - name: sl_power_manager
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

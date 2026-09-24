@@ -19,3 +19,6 @@ provides:
   - name: sllib_wireless_shutdown
 requires:
   - name: systemlevel_power_save
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

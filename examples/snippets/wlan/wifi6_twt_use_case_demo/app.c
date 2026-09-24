@@ -222,7 +222,7 @@ void data_callback(uint32_t sock_no,
   UNUSED_PARAMETER(firmware_socket_response);
   UNUSED_PARAMETER(sock_no);
 
-  printf("Command length : %ld\r\n", length);
+  printf("Command length : %" PRIu32 "\r\n", length);
   printf("Command Received from remote app is:\r\n");
   printf("%.*s\r\n", (int)length, (char *)buffer);
   data_received_flag = true;

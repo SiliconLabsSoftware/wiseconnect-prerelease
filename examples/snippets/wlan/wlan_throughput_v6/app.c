@@ -86,6 +86,8 @@
 #define BUFFER_SIZE TLS_BUFFER_SIZE
 #endif
 
+#define THROUGHPUT_MSG_SIZE 80
+
 // Server port number
 #if ((THROUGHPUT_TYPE == TLS_RX) || (THROUGHPUT_TYPE == TLS_TX))
 #define SERVER_PORT 443
@@ -230,7 +232,14 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
   float duration = ((test_timeout) / 1000);                    // ms to sec
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
+  // SL_DEBUG_LOG_V2 packs args as uint32_t; format floats via snprintf, then log as %s.
+  char throughput_msg[THROUGHPUT_MSG_SIZE];
+  snprintf(throughput_msg,
+           sizeof(throughput_msg),
+           "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n",
+           result,
+           duration);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)throughput_msg);
 }
 
 volatile uint8_t has_data_received = 0;

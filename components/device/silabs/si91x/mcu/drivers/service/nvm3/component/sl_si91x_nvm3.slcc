@@ -36,3 +36,6 @@ conflicts:
   - name: sl_si91x_littlefs
   - name: sl_si91x_littlefs_common_flash
   - name: sl_si91x_littlefs_ext_flash
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/4.1.1/wiseconnect-api-reference-guide-si91x-services/nvm3

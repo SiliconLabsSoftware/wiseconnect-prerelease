@@ -47,3 +47,6 @@ template_contribution:
       event: driver_init
       include: sl_si91x_button_instances.h
       handler: button_init_instances
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/button

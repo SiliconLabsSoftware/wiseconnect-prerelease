@@ -25,3 +25,5 @@ template_contribution:
   - name: bod_ps2
     value: sl_si91x_bod.*
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

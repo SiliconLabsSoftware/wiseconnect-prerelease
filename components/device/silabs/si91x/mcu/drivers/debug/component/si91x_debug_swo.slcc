@@ -39,3 +39,6 @@ template_contribution:
       handler: sl_si91x_debug_swo_init
   - name: component_catalog
     value: debug_swo_si91x
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-preprocessor-build-settings/list-of-preprocessor-build-settings

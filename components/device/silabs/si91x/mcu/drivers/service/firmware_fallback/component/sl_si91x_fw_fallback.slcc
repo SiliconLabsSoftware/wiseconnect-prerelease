@@ -19,3 +19,6 @@ provides:
   - name: sl_si91x_fw_fallback
 requires:
   - name: log_none
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/firmware-fallback

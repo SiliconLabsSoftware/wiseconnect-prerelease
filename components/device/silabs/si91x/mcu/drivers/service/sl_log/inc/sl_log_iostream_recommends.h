@@ -37,14 +37,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/***************************************************************************/ /**
+ * @addtogroup SL-LOG SL Log
+ * @ingroup SI91X_SERVICE_APIS
+ * @{
+ ******************************************************************************/
+
 /**
- * @brief Set the console instance
- * 
- * @details This function will set the console instance for the logger based on priority UART>RTT>SWO>VUART>DEBUG
- * 
- * @return void
+ * @brief Set the console instance for SL Log IOStream backends.
+ *
+ * @details Selects the console IOStream instance for the logger based on
+ *          priority UART > RTT > SWO > VUART > DEBUG.
  */
 void sl_si91x_iostream_set_console_instance(void);
+
+/** @} (end addtogroup SL-LOG) */
 
 #ifdef __cplusplus
 }

@@ -57,3 +57,6 @@ template_contribution:
     value: 'libm_a*'
   - name: debug_ps2
     value: 'sbrk.*'
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

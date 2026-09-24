@@ -87,3 +87,6 @@ template_contribution:
   - name: user_files_ps2
     value: sl_si91x_button_instances.*
     condition: [calendar_ulp_component, timer_ulp_component]
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

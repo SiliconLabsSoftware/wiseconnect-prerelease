@@ -25,3 +25,6 @@ requires:
   - name: sl_power_manager
 provides:
   - name: sl_power_manager_debug
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

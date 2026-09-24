@@ -25,3 +25,6 @@ requires:
   - name: log_none
 provides:
   - name: sl_si91x_mic
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/mic

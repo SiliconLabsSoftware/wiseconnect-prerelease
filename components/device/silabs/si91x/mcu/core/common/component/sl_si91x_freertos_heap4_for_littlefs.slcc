@@ -13,3 +13,6 @@ requires:
 - name: freertos_heap_4
 provides:
   - name: sl_si91x_freertos_heap4_for_littlefs
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/memory-littlefs/littlefs-initialization-and-configuration

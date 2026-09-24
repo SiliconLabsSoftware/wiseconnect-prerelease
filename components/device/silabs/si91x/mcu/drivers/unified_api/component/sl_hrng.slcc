@@ -22,3 +22,6 @@ provides:
 requires:
   - name: romdriver_rng
   - name: log_none
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hrng

@@ -59,8 +59,8 @@
 
 #include "cmsis_os2.h"
 #include <string.h>
-#include <stdio.h>
 
+#include <stdio.h>
 // BLE includes
 #include "rsi_common_apis.h"
 #include "rsi_bt_common_apis.h"
@@ -91,9 +91,10 @@ extern rsi_ble_event_conn_status_t conn_event_to_app;
 /******************************************************
  *                    Constants
  ******************************************************/
-#define DHCP_HOST_NAME    NULL
-#define TIMEOUT_MS        20000
-#define WIFI_SCAN_TIMEOUT 10000
+#define DHCP_HOST_NAME      NULL
+#define TIMEOUT_MS          20000
+#define WIFI_SCAN_TIMEOUT   10000
+#define THROUGHPUT_MSG_SIZE 80
 
 /*
  *********************************************************************************************************
@@ -361,7 +362,14 @@ static void measure_and_print_throughput(size_t total_num_of_bytes, uint32_t tes
   float duration = (test_timeout / 1000);                      // ms to sec
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
+  // SL_DEBUG_LOG_V2 packs args as uint32_t; format floats via snprintf, then log as %s.
+  char throughput_msg[THROUGHPUT_MSG_SIZE];
+  snprintf(throughput_msg,
+           sizeof(throughput_msg),
+           "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n",
+           result,
+           duration);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)throughput_msg);
 }
 #endif
 

@@ -22,3 +22,6 @@ include:
   - path: inc
     file_list:
       - path: sl_si91x_peripheral_sdio_secondary.h
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sdio

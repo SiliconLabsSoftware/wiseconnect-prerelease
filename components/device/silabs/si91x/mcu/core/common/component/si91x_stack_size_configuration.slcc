@@ -16,3 +16,6 @@ source:
 provides:
 - name: si91x_stack_size_configuration
   condition: [device_si91x]
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

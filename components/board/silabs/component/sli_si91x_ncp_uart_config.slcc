@@ -37,3 +37,6 @@ include:
     condition: [brd4120a]
     file_list:
       - path: si91x_ncp_uart_config.h
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-migr-porting-steps/implement-hardware-abstraction

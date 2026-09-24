@@ -11,3 +11,6 @@ metadata:
 provides:
   - name: si91x_dual_flash
   - name: sl_si91x_dual_flash
+
+documentation:
+  url: https://www.silabs.com/documents/public/application-notes/an1494-siwx917_external_flash-psram.pdf#page=4

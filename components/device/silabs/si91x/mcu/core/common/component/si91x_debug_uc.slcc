@@ -15,3 +15,6 @@ provides:
   - name: si91x_debug_uc
 define:
   - name: DEBUG_UART_UC
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-preprocessor-build-settings/list-of-preprocessor-build-settings

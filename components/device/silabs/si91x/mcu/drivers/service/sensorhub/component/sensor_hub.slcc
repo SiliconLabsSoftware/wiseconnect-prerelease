@@ -28,3 +28,6 @@ requires:
 toolchain_settings:
   - option: linkerfile
     value: autogen/linkerfile_SoC.ld
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/sensor-hub

@@ -15,3 +15,6 @@ provides:
 template_contribution:
     - name: external_psram_present
       value: 0
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/external-memory-psram/

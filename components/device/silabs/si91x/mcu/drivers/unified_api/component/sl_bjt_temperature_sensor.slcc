@@ -23,3 +23,6 @@ requires:
   - name: sl_adc
   - name: rsilib_opamp
   - name: log_none
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/bjttempsensor

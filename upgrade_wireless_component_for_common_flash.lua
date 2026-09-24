@@ -72,6 +72,22 @@ local function has_selected_network_stack()
   return slc.is_selected("sl_si91x_internal_stack")
       or slc.is_selected("sl_si91x_lwip_stack")
       or slc.is_selected("sl_si91x_network_dual_stack")
+      -- wisun_br_si91x provides sl_si91x_network_stack for BRCLI Wi-Fi apps.
+      or slc.is_selected("wisun_br_si91x")
+end
+
+-- wisun_br_si91x provides sl_si91x_network_stack for Wi-SUN BR Wi-Fi backhaul.
+-- wisun_br_wifi is the provided API from that component and may remain visible
+-- when wisun_br_si91x itself is not during wiseconnect3_sdk upgrade scripts.
+local function uses_wisun_br_si91x_wifi_backhaul()
+  return uses_component("wisun_br_si91x")
+      or uses_component("wisun_br_wifi")
+end
+
+local function has_available_alternate_network_stack()
+  return uses_component("sl_si91x_lwip_stack")
+      or uses_component("sl_si91x_network_dual_stack")
+      or uses_wisun_br_si91x_wifi_backhaul()
 end
 
 local function restore_network_stack_provider()
@@ -79,19 +95,23 @@ local function restore_network_stack_provider()
     return
   end
   -- Preserve an autoselected alternate provider by pinning it before the
-  -- upgrade drops autoselected dependencies. Prefer dual if it is visible.
+  -- upgrade drops autoselected dependencies. Never default to internal_stack
+  -- when another sl_si91x_network_stack provider is already visible.
+  --
+  -- Do NOT add wisun_br_si91x from here: it belongs to the base simplicity_sdk
+  -- package, not the wiseconnect3_sdk extension running this script. Adds from
+  -- an extension Lua get tagged with the extension's package, producing an
+  -- unresolvable `package: wiseconnect3_sdk / id: wisun_br_si91x` entry. If a
+  -- Wi-SUN backhaul marker is present, the provider is already in the project.
   if slc.is_provided("sl_si91x_network_dual_stack") then
     add_if_not_selected("sl_si91x_network_dual_stack")
   elseif slc.is_provided("sl_si91x_lwip_stack") then
     add_if_not_selected("sl_si91x_lwip_stack")
+  elseif uses_wisun_br_si91x_wifi_backhaul() then
+    return
   else
     add_if_not_selected("sl_si91x_internal_stack")
   end
-end
-
-local function has_available_alternate_network_stack()
-  return uses_component("sl_si91x_lwip_stack")
-      or uses_component("sl_si91x_network_dual_stack")
 end
 
 local function firmware_fallback_uses_network()
@@ -190,15 +210,21 @@ if common_flash_nvm3 and not is_psa_app then
 end
 
 -- In 4.2.0, sl_si91x_wireless requires sl_si91x_network_stack whenever network_manager
--- is present. internal/lwip/dual all provide that API, so SLC will not autoselect the
--- historical recommend. Apps that omitted an explicit stack in 4.1 (notably
--- m4_updater_security) need internal_stack pinned. Restrict this compatibility fix to
--- the Si91x wireless backend; other backends share network/config managers but must not
--- receive a Si91x stack. The manager check avoids adding a stack to Si91x wifi-only
--- projects that never linked one. has_selected_network_stack leaves lwip/dual alone:
--- pinning internal_stack there would double-provide sl_si91x_network_stack.
+-- is present. internal/lwip/dual/wisun_br_si91x all provide that API, so SLC will not
+-- autoselect the historical recommend. Apps that omitted an explicit stack in 4.1
+-- (notably m4_updater_security) need internal_stack pinned. Restrict this compatibility
+-- fix to the Si91x wireless backend; other backends share network/config managers but
+-- must not receive a Si91x stack. Never pin internal_stack when another provider is
+-- already selected or provided (WiSUN BR, lwip, dual).
 local function needs_network_stack_provider()
   if uses_component("sl_siwx3xx_wireless") then
+    return false
+  end
+  -- Selected providers (including wisun_br_si91x) need no restore. When a
+  -- Wi-SUN backhaul marker is only provided, restore_network_stack_provider
+  -- returns without adding anything — wisun_br_si91x must not be added from
+  -- this wiseconnect3_sdk script (wrong package attribution).
+  if has_selected_network_stack() then
     return false
   end
   -- sl_si91x_wireless may only be scheduled later in the same upgrade. Use
@@ -243,6 +269,13 @@ elseif needs_network_stack_provider()
     and not (common_flash_nvm3 and not is_psa_app)
     and not firmware_fallback then
   restore_network_stack_provider()
+end
+
+-- wisun_br_si91x.slcc declares Provides sl_si91x_network_stack and is
+-- explicitly selected by wisun_soc_br_agent / wisun_soc_brcli_wifi. Drop
+-- sl_si91x_internal_stack when a Wi-SUN-specific backhaul marker is present.
+if uses_wisun_br_si91x_wifi_backhaul() then
+  remove_if_present("sl_si91x_internal_stack")
 end
 
 return changeset

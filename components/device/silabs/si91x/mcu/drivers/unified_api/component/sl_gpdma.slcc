@@ -37,3 +37,6 @@ template_contribution:
       event: driver_init
       include: "sl_si91x_gpdma.h"
       handler: sl_si91x_gpdma_init
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpdma

@@ -33,3 +33,6 @@ template_contribution:
     value: "temp_analog_comparator_{{instance}}"
 requires:
   - name: sl_analog_comparator
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/analogcomp

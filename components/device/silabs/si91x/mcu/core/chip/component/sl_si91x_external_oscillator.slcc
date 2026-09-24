@@ -18,3 +18,6 @@ conflicts:
   - name: sl_si91x_lf_fsm_clock_selection
 provides:
   - name: si91x_32kHz_external_oscillator
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/clock-manager

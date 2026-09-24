@@ -792,7 +792,9 @@
  *       will be removed in the future. Please use
  *       SL_WIFI_FEAT_FW_UPDATE_NEW_CODE instead.
  */
+#ifndef SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE
 #define SLI_SI91X_FEAT_FW_UPDATE_NEW_CODE SL_WIFI_FEAT_FW_UPDATE_NEW_CODE
+#endif
 
 /** \addtogroup SI91X_FEATURE_BITMAP
   * @{ */

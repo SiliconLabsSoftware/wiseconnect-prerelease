@@ -26,3 +26,5 @@ template_contribution:
   - name: sysrtc_ps2
     value: rsi_sysrtc.*
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

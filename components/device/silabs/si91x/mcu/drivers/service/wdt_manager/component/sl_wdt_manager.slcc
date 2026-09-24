@@ -48,3 +48,6 @@ define:
     condition: [device_is_module]
   - name: SL_WDT_MANAGER_PRESENT_M4_UC_XTAL
     condition: [device_has_chip]
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/wdt-manager

@@ -180,6 +180,18 @@ upgrade:
       vendor: silabs
       version: "4.2.0"
     component:
+      - trigger: iostream_si91x
+        description: >
+          iostream_si91x no longer depends on iostream_retarget_stdio.
+          Automatically add iostream_retarget_stdio for
+          projects that use iostream_si91x after SDK upgrade.
+        status: automatic
+        remove:
+          - iostream_retarget_stdio
+        add:
+          - id: iostream_retarget_stdio
+            package: simplicity_sdk
+            vendor: silabs
       - trigger: sl_si91x_littlefs_common_flash
         description: >
           Restore wireless components for common-flash LittleFS.
@@ -283,3 +295,10 @@ upgrade:
           - id: paho_mqtt_embedded_dual_stack
             package: simplicity_sdk
             vendor: silabs
+      - trigger: wisun_br_si91x
+        description: >
+          WiSUN BR Wi-Fi backhaul provides sl_si91x_network_stack. Cancel any
+          sl_si91x_internal_stack pinned by earlier 4.2.0 migration rules.
+        status: automatic
+        remove:
+          - sl_si91x_internal_stack

@@ -32,3 +32,6 @@ toolchain_settings:
     value: "-u _printf_float"
   - option: gcc_compiler_option
     value: "-mcpu=cortex-m4"
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

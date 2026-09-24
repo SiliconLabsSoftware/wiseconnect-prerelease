@@ -21,3 +21,6 @@ define:
 template_contribution:
   - name: code_classification_components
     value: si91x_tickless
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

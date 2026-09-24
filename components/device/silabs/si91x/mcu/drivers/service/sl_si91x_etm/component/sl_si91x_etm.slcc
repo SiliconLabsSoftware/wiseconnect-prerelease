@@ -24,3 +24,6 @@ template_contribution:
       include: sl_si91x_etm.h
       handler: sl_si91x_etm_int
     priority: -9996
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-troubleshoot-application-debugging/#etm-debugging-on-siwx917

@@ -27,3 +27,6 @@ requires:
   - name: log_none
 provides:
   - name: sl_veml6035
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/veml6035

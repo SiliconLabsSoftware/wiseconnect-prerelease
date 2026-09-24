@@ -112,7 +112,6 @@ include:
   - path: rsi_pkt_mgmt.h
   - path: rsi_user.h
   - path: rsi_wisemcu_hardware_setup.h
-  - path: rsi_wlan_common_config.h
   - path: rsi_wlan_defines.h
   - path: sli_siwx917_soc.h
   - path: sli_siwx917_timer.h

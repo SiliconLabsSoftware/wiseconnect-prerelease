@@ -22,3 +22,6 @@ template_contribution:
 metadata:
     sbom:
       license: Zlib
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wifi-siwx917-soc-memory-map/flash-memory

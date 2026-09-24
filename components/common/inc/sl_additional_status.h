@@ -306,7 +306,7 @@
 #define SL_STATUS_SI91X_NON_PREF_CHAN_CONFIG_FAILED \
   ((sl_status_t)0x1006D) ///< Non-preferred channel configuration failed.
 #define SL_STATUS_TWT_SUPPORT_NOT_ENABLED_ERR \
-  ((sl_status_t)0x10070) ///< Error occurs when HE_PARAMS_SUPPORT and SLI_SI91X_ENABLE_TWT_FEATURE macros are not enabled.
+  ((sl_status_t)0x10070) ///< Error occurs when SLI_SI91X_ENABLE_TWT_FEATURE is not enabled.
 #define SL_STATUS_TWT_SETUP_ERR_SESSION_ACTIVE \
   ((sl_status_t)0x10071) ///< Error occurs when a TWT config command is issued while there is already an active TWT session.
 #define SL_STATUS_TWT_TEARDOWN_ERR_FLOWID_NOT_MATCHED \

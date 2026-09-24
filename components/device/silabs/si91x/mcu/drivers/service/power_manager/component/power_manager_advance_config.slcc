@@ -62,3 +62,6 @@ template_contribution:
       - si91x_mem_config_3
 provides:
   - name: power_manager_advance_config
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

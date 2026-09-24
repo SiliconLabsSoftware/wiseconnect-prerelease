@@ -16,6 +16,7 @@
 ******************************************************************************/
 
 #include <stdio.h>
+#include <inttypes.h>
 #include <gatt_server_config.h> // resolved via -I: config/ble_config/ (user override) first, then component inc/
 #include "gatt_server.h"
 #include "gap.h"
@@ -50,7 +51,7 @@ int32_t ble_gatt_server_init(void)
   // Step 4: Register GATT services via hook (weak default or strong override)
   status = sl_gatt_server_register_services_hook();
   if (status != RSI_SUCCESS) {
-    printf("\r\n Failed to register GATT services: 0x%lx\r\n", status);
+    printf("\r\n Failed to register GATT services: 0x%" PRIX32 "\r\n", status);
     return status;
   }
 

@@ -42,3 +42,6 @@ template_contribution:
       include: sl_si91x_clock_manager.h
       handler: sl_si91x_clock_manager_init
     priority: -9997
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/clock-manager

@@ -29,6 +29,8 @@
  ******************************************************************************/
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "cmsis_os2.h"
 #include "sl_status.h"
 #include "sl_net.h"
@@ -37,6 +39,8 @@
 #include "sl_net_wifi_types.h"
 #include "sl_utility.h"
 #include "sl_si91x_driver.h"
+#include "sl_sntp.h"
+#include "sl_net_dns.h"
 
 #include "sl_board_configuration.h"
 #include "errno.h"
@@ -79,6 +83,40 @@
 #define ENABLE_NWP_POWER_SAVE 1
 #define LOW                   0
 #define WRAP_PRIVATE_KEY      0 //! Enable this to wrap the private key.
+//! When enabled, sync module RTC from SNTP (with SL_SI91X_CUSTOM_FEAT_RTC_FROM_HOST)
+//! before TLS. Required for AWS MQTT certificate validation.
+#define ENABLE_SNTP 1
+
+#if ENABLE_SNTP
+#define NTP_SERVER_IP            "0.pool.ntp.org"
+#define DNS_TIMEOUT              10
+#define DNS_API_RETRY_COUNT      1
+#define MAX_DNS_RETRY_COUNT      5
+#define SNTP_RETRY_COUNT         5
+#define SNTP_BLOCK_TIMEOUT_MS    30000
+#define SNTP_CMD_TIMEOUT_MS      1000
+#define NTP_DATA_BUFFER_LENGTH   64
+#define SNTP_MONTH_COUNT         12
+#define SNTP_MAX_PARSE_TOKENS    10
+#define SNTP_MIN_PARSE_TOKENS    4
+#define SNTP_TOKEN_MONTH         0
+#define SNTP_TOKEN_DAY           1
+#define SNTP_TOKEN_YEAR          2
+#define SNTP_TOKEN_TIME          3
+#define SNTP_TIME_FIELD_COUNT    4
+#define SNTP_RTC_MAX_HOUR        23
+#define SNTP_RTC_MAX_MINUTE      59
+#define SNTP_RTC_MAX_SECOND      59
+#define SNTP_RTC_MIN_DAY         1
+#define SNTP_RTC_MIN_YEAR        1990
+#define SNTP_RTC_MAX_YEAR        2099
+#define SNTP_FEBRUARY_INDEX      1
+#define SNTP_LEAP_FEB_DAYS       29
+#define SNTP_RTC_DEFAULT_WEEKDAY 1
+#define SNTP_LEAP_YEAR_DIV4      4
+#define SNTP_LEAP_YEAR_DIV100    100
+#define SNTP_LEAP_YEAR_DIV400    400
+#endif
 
 #if ENABLE_NWP_POWER_SAVE
 volatile uint8_t powersave_given = 0;
@@ -101,6 +139,9 @@ uint8_t iv[SL_SI91X_IV_SIZE] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 static void application_start(void *argument);
 sl_status_t load_certificates_in_flash(void);
 sl_status_t start_aws_mqtt(void);
+#if ENABLE_SNTP
+static sl_status_t sync_module_rtc_from_sntp(void);
+#endif
 void subscribe_handler(struct _Client *pClient,
                        char *pTopicName,
                        short unsigned int topicNameLen,
@@ -133,6 +174,13 @@ volatile app_state_t application_state;
 /******************************************************
 *               Variable Definitions
 ******************************************************/
+
+#if ENABLE_SNTP
+/* Days per month for non-leap years; February adjusted when validating. */
+static const uint8_t sntp_days_in_month[SNTP_MONTH_COUNT]   = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+static const char *const sntp_month_names[SNTP_MONTH_COUNT] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+#endif
 
 IoT_Publish_Message_Params publish_iot_msg = { 0 };
 
@@ -187,11 +235,18 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
 
                    .tcp_ip_feature_bit_map =
                      (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT | SL_SI91X_TCP_IP_FEAT_SSL
+#if ENABLE_SNTP
+                      | SL_SI91X_TCP_IP_FEAT_SNTP_CLIENT
+#endif
 #ifdef SLI_SI91X_ENABLE_IPV6
                       | SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6
 #endif
                       | SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
-                   .custom_feature_bit_map = SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID,
+                   .custom_feature_bit_map = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID
+#if ENABLE_SNTP
+                                              | SL_SI91X_CUSTOM_FEAT_RTC_FROM_HOST
+#endif
+                                              ),
                    .ext_custom_feature_bit_map =
                      (SL_SI91X_EXT_FEAT_XTAL_CLK | SL_SI91X_EXT_FEAT_UART_SEL_FOR_DEBUG_PRINTS
                       | SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 | SL_WIFI_SYSTEM_EXT_FEAT_LOW_POWER_MODE
@@ -375,6 +430,16 @@ static void application_start(void *argument)
   SL_DEBUG_LOG_V2(INFO, "\r\n");
 #endif
 
+#if ENABLE_SNTP
+  /* Sync module RTC from SNTP before TLS. Incorrect year causes TLS handshake
+   * failure 0xD2 (expired server certificate). Paired with SL_SI91X_CUSTOM_FEAT_RTC_FROM_HOST. */
+  status = sync_module_rtc_from_sntp();
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to sync RTC from SNTP: 0x%lx\r\n", status);
+    return;
+  }
+#endif
+
   status = load_certificates_in_flash();
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Error while loading certificates: 0x%lx\r\n", status);
@@ -472,6 +537,148 @@ sl_status_t load_certificates_in_flash(void)
 
   return SL_STATUS_OK;
 }
+
+#if ENABLE_SNTP
+static sl_status_t sync_module_rtc_from_sntp(void)
+{
+  sl_status_t status                   = SL_STATUS_FAIL;
+  sl_status_t stop_status              = SL_STATUS_OK;
+  sl_ip_address_t address              = { 0 };
+  sl_sntp_client_config_t config       = { 0 };
+  uint8_t data[NTP_DATA_BUFFER_LENGTH] = { 0 };
+  sl_si91x_module_rtc_time_t rtc_time  = { 0 };
+  int32_t dns_retry_count              = MAX_DNS_RETRY_COUNT;
+  uint8_t sntp_retry_count             = SNTP_RETRY_COUNT;
+  char time_string_copy[NTP_DATA_BUFFER_LENGTH];
+  char *arr[SNTP_MAX_PARSE_TOKENS] = { 0 };
+  char *token                      = NULL;
+  int token_count                  = 0;
+  int month_index                  = -1;
+  int hour = 0, minute = 0, second = 0, millisecond = 0;
+  int day = 0, year = 0;
+  uint8_t max_day = 0;
+
+  do {
+    status =
+      sl_net_dns_resolve_hostname_v2(NTP_SERVER_IP, DNS_TIMEOUT, DNS_API_RETRY_COUNT, SL_NET_DNS_TYPE_IPV4, &address);
+    dns_retry_count--;
+  } while ((dns_retry_count != 0) && (status != SL_STATUS_OK));
+
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to resolve NTP server: 0x%lx\r\n", status);
+    return status;
+  }
+
+  config.server_host_name = address.ip.v4.bytes;
+  config.sntp_method      = SL_SNTP_UNICAST_MODE;
+  config.sntp_timeout     = SNTP_CMD_TIMEOUT_MS;
+  config.event_handler    = NULL;
+  config.flags            = 0;
+
+  status = sl_sntp_client_start(&config, SNTP_BLOCK_TIMEOUT_MS);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to start SNTP client: 0x%lx\r\n", status);
+    return status;
+  }
+  SL_DEBUG_LOG_V2(INFO, "SNTP Client started successfully\r\n");
+
+  do {
+    status = sl_sntp_client_get_time_date(data, sizeof(data) - 1, SNTP_BLOCK_TIMEOUT_MS);
+    if (status == SL_STATUS_OK) {
+      break;
+    }
+    sntp_retry_count--;
+  } while (sntp_retry_count != 0);
+
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to get date and time from NTP server: 0x%lx\r\n", status);
+    sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+    return status;
+  }
+
+  SL_DEBUG_LOG_V2(INFO, "SNTP time/date: %s\r\n", (uintptr_t)data);
+
+  /* Parse "MMM DD, YYYY HH:MM:SS.ms" (month abbreviation) into module RTC fields. */
+  strncpy(time_string_copy, (const char *)data, sizeof(time_string_copy) - 1);
+  time_string_copy[sizeof(time_string_copy) - 1] = '\0';
+
+  token = strtok(time_string_copy, " ,");
+  while ((token != NULL) && (token_count < SNTP_MAX_PARSE_TOKENS)) {
+    arr[token_count++] = token;
+    token              = strtok(NULL, " ,");
+  }
+
+  if (token_count < SNTP_MIN_PARSE_TOKENS) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to parse SNTP time/date string\r\n");
+    sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+    return SL_STATUS_FAIL;
+  }
+
+  for (int i = 0; i < SNTP_MONTH_COUNT; i++) {
+    if (strstr(arr[SNTP_TOKEN_MONTH], sntp_month_names[i]) != NULL) {
+      month_index = i;
+      break;
+    }
+  }
+  if (month_index < 0) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to parse month from SNTP time/date string\r\n");
+    sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+    return SL_STATUS_FAIL;
+  }
+
+  if (sscanf(arr[SNTP_TOKEN_TIME], "%d:%d:%d.%d", &hour, &minute, &second, &millisecond) != SNTP_TIME_FIELD_COUNT) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to parse time from SNTP time/date string\r\n");
+    sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+    return SL_STATUS_FAIL;
+  }
+  (void)millisecond;
+
+  day  = atoi(arr[SNTP_TOKEN_DAY]);
+  year = atoi(arr[SNTP_TOKEN_YEAR]); /* Absolute calendar year */
+
+  max_day = sntp_days_in_month[month_index];
+  if ((month_index == SNTP_FEBRUARY_INDEX) && ((year % SNTP_LEAP_YEAR_DIV4) == 0)
+      && (((year % SNTP_LEAP_YEAR_DIV100) != 0) || ((year % SNTP_LEAP_YEAR_DIV400) == 0))) {
+    max_day = SNTP_LEAP_FEB_DAYS;
+  }
+
+  if ((hour < 0) || (hour > SNTP_RTC_MAX_HOUR) || (minute < 0) || (minute > SNTP_RTC_MAX_MINUTE) || (second < 0)
+      || (second > SNTP_RTC_MAX_SECOND) || (day < SNTP_RTC_MIN_DAY) || (day > max_day) || (year < SNTP_RTC_MIN_YEAR)
+      || (year > SNTP_RTC_MAX_YEAR)) {
+    SL_DEBUG_LOG_V2(ERROR, "Parsed SNTP date/time is out of range\r\n");
+    sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  rtc_time.tm_sec  = (uint32_t)second;
+  rtc_time.tm_min  = (uint32_t)minute;
+  rtc_time.tm_hour = (uint32_t)hour;
+  rtc_time.tm_mday = (uint32_t)day;
+  rtc_time.tm_mon  = (uint32_t)month_index;
+  rtc_time.tm_year = (uint32_t)year;
+  /* Weekday is unused for TLS validation; set a value in the valid [1-7] range. */
+  rtc_time.tm_wday = SNTP_RTC_DEFAULT_WEEKDAY;
+
+  stop_status = sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+  if (stop_status != SL_STATUS_OK) {
+    /* Retry once; RTC sync can still succeed for TLS even if cleanup fails. */
+    stop_status = sl_sntp_client_stop(SNTP_BLOCK_TIMEOUT_MS);
+    if (stop_status != SL_STATUS_OK) {
+      SL_DEBUG_LOG_V2(ERROR, "Failed to stop SNTP client: 0x%lx\r\n", stop_status);
+    }
+  }
+
+  status = sl_si91x_set_rtc_timer(&rtc_time);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to set RTC time: 0x%lx\r\n", status);
+    return status;
+  }
+  SL_DEBUG_LOG_V2(INFO, "RTC time set successfully (year=%lu)\r\n", (unsigned long)rtc_time.tm_year);
+
+  /* RTC is set for TLS; do not fail the example if SNTP stop still reported an error. */
+  return SL_STATUS_OK;
+}
+#endif
 
 sl_status_t start_aws_mqtt(void)
 {

@@ -28,3 +28,6 @@ config_file:
     file_id: hspi_secondary_drv_config
 conflicts:
   - name: sl_sdio_secondary
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/hspi

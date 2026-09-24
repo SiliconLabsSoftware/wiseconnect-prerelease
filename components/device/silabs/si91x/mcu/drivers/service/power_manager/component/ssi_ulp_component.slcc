@@ -36,3 +36,5 @@ template_contribution:
   - name: ssi_ps2
     value: rsi_udma_wrapper.*
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

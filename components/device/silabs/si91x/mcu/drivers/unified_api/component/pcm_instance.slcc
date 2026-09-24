@@ -38,3 +38,5 @@ template_contribution:
 requires:
 - name: sl_i2s
 - name: sl_pcm
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/pcm

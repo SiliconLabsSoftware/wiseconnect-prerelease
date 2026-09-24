@@ -14,3 +14,6 @@ metadata:
 component_root_path: "components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led"
 provides:
   - name: sl_si91x_rgb_led
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/rgb-led

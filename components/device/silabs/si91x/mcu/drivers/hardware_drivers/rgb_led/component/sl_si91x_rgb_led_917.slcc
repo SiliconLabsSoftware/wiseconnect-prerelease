@@ -59,3 +59,6 @@ template_contribution:
       include: sl_si91x_rgb_led_instances.h
       handler: rgb_led_init_instances
     unless: [sl_si91x_led_917]
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/rgb-led

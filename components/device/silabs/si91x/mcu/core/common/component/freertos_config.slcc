@@ -34,3 +34,5 @@ provides:
 define:
 - name: __FREERTOS_OS_WISECONNECT
   value: '1'
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

@@ -33,26 +33,43 @@
 #include <stdint.h>
 
 /***************************************************************************/ /**
- * @brief
- *   SiWx91x host control hooks for reset, power cycle, and NCP wakeup.
+ * @addtogroup HOST-INTERFACE Host Interface
+ * @ingroup SI91X_SERVICE_APIS
+ * @{
+ * @brief SiWx91x host control hooks for reset, power cycle, and NCP wakeup.
  ******************************************************************************/
 
-/* Assert the SiWx91x reset (host-specific; no-op on SOC). */
+/***************************************************************************/ /**
+ * @brief Assert the SiWx91x reset (host-specific; no-op on SoC).
+ ******************************************************************************/
 void sl_si91x_host_hold_in_reset(void);
 
-/* Release the SiWx91x reset (host-specific; no-op on SOC). */
+/***************************************************************************/ /**
+ * @brief Release the SiWx91x reset (host-specific; no-op on SoC).
+ ******************************************************************************/
 void sl_si91x_host_release_from_reset(void);
 
-/* Power cycle the SiWx91x by asserting then releasing reset with settle delays. */
+/***************************************************************************/ /**
+ * @brief Power cycle the SiWx91x by asserting then releasing reset with settle delays.
+ * @return SL_STATUS_OK on success, or an error status from the host platform.
+ ******************************************************************************/
 sl_status_t sl_si91x_host_power_cycle(void);
 
 #ifndef SLI_SI91X_MCU_INTERFACE
-/* Maximum time (ms) to wait for the NWP wake indicator during NCP req_wakeup. */
+/***************************************************************************/ /**
+ * @brief Maximum time (ms) to wait for the NWP wake indicator during NCP req_wakeup.
+ ******************************************************************************/
 #define SLI_SI91X_NCP_REQ_WAKEUP_TIMEOUT_MS 5000
 
-/* Request the NWP to wake from sleep (NCP GPIO handshake path). SOC builds
- * use sli_si91x_nwp_interface.c instead; declared in sli_si91x_nwp_interface.h. */
+/***************************************************************************/ /**
+ * @brief Request the NWP to wake from sleep (NCP GPIO handshake path).
+ * @details SoC builds use `sli_si91x_nwp_interface.c` instead; declared in
+ *          `sli_si91x_nwp_interface.h`.
+ * @return SL_STATUS_OK on success, or a timeout/error status.
+ ******************************************************************************/
 sl_status_t sli_si91x_req_wakeup(void);
 #endif // !SLI_SI91X_MCU_INTERFACE
+
+/** @} (end addtogroup HOST-INTERFACE) */
 
 #endif // SL_SI91X_HOST_CONTROL_H

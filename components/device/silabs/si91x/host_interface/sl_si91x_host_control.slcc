@@ -23,3 +23,6 @@ requires:
     name: sl_si91x_mcu
   - condition: [device_efx]
     name: efx32_si91x_wireless_connector
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/host-interface

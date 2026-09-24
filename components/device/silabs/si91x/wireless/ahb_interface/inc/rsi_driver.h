@@ -41,9 +41,7 @@
 #include "rsi_ble_common_config.h"
 #endif
 #endif
-#ifndef RSI_ENABLE_DEMOS
-#include <rsi_wlan_common_config.h>
-#endif
+
 #include <rsi_user.h>
 
 #include "rsi_pkt_mgmt.h"

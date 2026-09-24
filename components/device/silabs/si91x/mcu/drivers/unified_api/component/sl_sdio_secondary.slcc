@@ -34,3 +34,6 @@ template_contribution:
       handler: sl_si91x_sdio_secondary_init
 conflicts:
   - name: sl_hspi_secondary    
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sdio

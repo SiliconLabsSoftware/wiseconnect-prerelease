@@ -21,3 +21,6 @@ template_contribution:
 metadata:
     sbom:
       license: Zlib
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/external-memory-psram/

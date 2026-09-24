@@ -32,3 +32,6 @@ conflicts:
   - name: sl_si91x_littlefs_ext_flash
   - name: sl_si91x_littlefs_common_flash
   - name: sl_si91x_nvm3
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/memory-littlefs/littlefs-initialization-and-configuration#little-file-system-littlefs-initialization-and-configuration

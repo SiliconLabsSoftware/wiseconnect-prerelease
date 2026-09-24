@@ -15,6 +15,9 @@ provides:
 source:
   - path: sl_si91x_uart.c
 include:
+  - path: .
+    file_list:
+      - path: sl_si91x_uart_bus.h
   - path: ../../../wireless/inc
   - path: ../../../mcu/hal/sli_hal_si91x/inc
 define:
@@ -28,3 +31,6 @@ requires:
   - name: sl_si91x_host_control
   - condition: ["device_efx"]
     name: sli_si91x_ncp_uart_config
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/host-interface

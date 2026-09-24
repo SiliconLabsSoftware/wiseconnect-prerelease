@@ -32,3 +32,6 @@ requires:
   - name: log_none
 conflicts:
   - name: sleeptimer_si91x
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sysrtc

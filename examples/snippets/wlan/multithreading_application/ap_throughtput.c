@@ -48,6 +48,7 @@
 #include "sl_utility.h"
 #include "errno.h"
 #include <string.h>
+#include <stdio.h>
 #include "sl_si91x_driver.h"
 #include "sl_net_wifi_types.h"
 #include "sl_si91x_socket_utility.h"
@@ -81,6 +82,8 @@
 #elif ((THROUGHPUT_TYPE == TCP_RX) || (THROUGHPUT_TYPE == TCP_TX))
 #define BUFFER_SIZE TCP_BUFFER_SIZE
 #endif
+
+#define THROUGHPUT_MSG_SIZE 80
 
 #define SERVER_IP   "172.20.10.3"
 #define SERVER_PORT 5000
@@ -140,8 +143,14 @@ static void measure_and_print_throughput(uint32_t total_num_of_bytes, uint32_t t
   float duration = ((test_timeout) / 1000.0f);
   float result   = ((float)total_num_of_bytes * 8) / duration; // bytes to bps
   result         = (result / 1000000);                         // bps to Mbps
-  // NOTE: SL_DEBUG_LOG_V2 binary encoder doesn't support %f; keep level INFO and review later.
-  SL_DEBUG_LOG_V2(INFO, "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n", result, duration);
+  // SL_DEBUG_LOG_V2 packs args as uint32_t; format floats via snprintf, then log as %s.
+  char throughput_msg[THROUGHPUT_MSG_SIZE];
+  snprintf(throughput_msg,
+           sizeof(throughput_msg),
+           "Throughput achieved @ %0.02f Mbps in %0.03f sec successfully\r\n",
+           result,
+           duration);
+  SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)throughput_msg);
 }
 
 // Async callback state -- volatile because updated from firmware context

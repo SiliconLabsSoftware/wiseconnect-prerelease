@@ -35,3 +35,6 @@ template_contribution:
       include: sl_si91x_iostream_log.h
       handler: sl_si91x_set_log_iostream
       priority: 1000
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/iostream

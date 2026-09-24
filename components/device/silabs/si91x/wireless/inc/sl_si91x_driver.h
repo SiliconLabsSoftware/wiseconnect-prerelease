@@ -193,6 +193,8 @@ typedef struct {
  *  
  * @param[in]   timer
  *  Pointer to an @ref sl_si91x_module_rtc_time_t structure that contains the RTC time to be set.
+ *  The @ref sl_si91x_module_rtc_time_t::tm_year field must be the absolute calendar year
+ *  (for example, 2024), not an offset from 1990 or 1900.
  * 
  * @pre 
  *  Pre-conditions:
@@ -203,7 +205,11 @@ typedef struct {
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  * 
  * @note
- *   Ensure that the Real-Time Clock (RTC) timer is configured to enable SSL certificate validation.
+ *   Ensure that the Real-Time Clock (RTC) timer is configured with a correct absolute year to enable SSL certificate validation.
+ * @note
+ *   **Breaking change:** `tm_year` must be an absolute calendar year (for example, 2024).
+ *   Years-since-1990 or years-since-1900 offsets are rejected with SL_STATUS_INVALID_PARAMETER.
+ *   Applications that previously followed the older "years since 1990" documentation must pass the full year instead.
  ******************************************************************************/
 sl_status_t sl_si91x_set_rtc_timer(const sl_si91x_module_rtc_time_t *timer);
 

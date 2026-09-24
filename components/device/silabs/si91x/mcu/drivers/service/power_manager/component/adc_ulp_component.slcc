@@ -40,5 +40,5 @@ template_contribution:
   - name: adc_ps2
     value: cmpdf2*
 
-
-
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/power-manager

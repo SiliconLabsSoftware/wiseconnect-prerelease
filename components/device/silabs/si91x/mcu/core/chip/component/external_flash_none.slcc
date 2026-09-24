@@ -15,3 +15,6 @@ provides:
 template_contribution:
     - name: flash_present
       value: 0
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wifi-siwx917-soc-memory-map/flash-memory

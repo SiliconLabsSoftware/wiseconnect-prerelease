@@ -213,3 +213,6 @@ template_contribution:
   - name: component_catalog
     value: "led_{{instance}}"
     condition: [si917_dev_board]
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-drivers/led
