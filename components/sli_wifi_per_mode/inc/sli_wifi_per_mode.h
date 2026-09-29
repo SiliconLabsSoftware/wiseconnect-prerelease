@@ -297,11 +297,12 @@ typedef struct {
  * @brief Wi-Fi channel configuration.
  */
 typedef struct {
-  uint16_t channel;              ///< Channel number
-  uint16_t power;                ///< Power level in dBm
-  sl_wifi_band_t band;           ///< Wi-Fi radio band of type @ref sl_wifi_band_t
-  sl_wifi_bandwidth_t bandwidth; ///< Channel bandwidth of type @ref sl_wifi_bandwidth_t
-  uint32_t reserved[4];          ///< Reserved for future use
+  uint16_t channel;         ///< Channel number
+  int16_t power;            ///< Power level in deci-dBm
+  sl_wifi_band_mode_t band; ///< Wi-Fi radio band of type @ref sl_wifi_band_mode_t
+  uint16_t
+    bandwidth; ///< Channel bandwidth for PER set-channel (0 = 20 MHz, 1 = 40 MHz, 2 = 80 MHz). Not of type @ref sl_wifi_bandwidth_t.
+  uint32_t reserved[4]; ///< Reserved for future use
 } sli_wifi_channel_config_t;
 
 /**

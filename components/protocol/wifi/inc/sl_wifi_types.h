@@ -1125,15 +1125,16 @@ typedef struct {
 typedef struct __attribute__((packed)) {
   sl_wifi_rate_protocol_t wifi_protocol; ///< PHY for TX test; values from @ref sl_wifi_rate_protocol_t
   uint16_t enable;                       ///< Enable/disable TX test mode
-  int16_t power;                         ///< TX power in dBm
+  int16_t power;                         ///< TX power in deci-dBm. Example: 200 = +20.0 dBm
   sl_wifi_mcs_rate_t rate;               ///< Transmit data rate; values from @ref sl_wifi_mcs_rate_t
   uint16_t length;                       ///< TX packet length in bytes
   uint16_t
     mode; ///< TX test mode (0 - Burst, 1 - Continuous, 2 - CW DC, 3 - CW single tone -2.5 MHz, 4 - CW single tone +5 MHz)
-  uint16_t channel;     ///< Channel number in 2.4 GHz / 5 GHz / 6 GHz band
-  uint16_t no_of_pkts;  ///< Number of packets to transmit. 0 for continuous transmission until stopped.
-  uint32_t delay;       ///< Delay between packets in microseconds
-  uint16_t channel_bw;  ///< Channel bandwidth
+  uint16_t channel;    ///< Channel number in 2.4 GHz / 5 GHz / 6 GHz band
+  uint16_t no_of_pkts; ///< Number of packets to transmit. 0 for continuous transmission until stopped.
+  uint32_t delay;      ///< Delay between packets in microseconds
+  uint16_t
+    channel_bw; ///< Channel bandwidth for PER rate_flags (0 = 20 MHz, 1 = 40 MHz, 2 = 80 MHz). Not of type @ref sl_wifi_bandwidth_t.
   uint16_t aggr_enable; ///< Enable/disable aggregation
   uint16_t aggr_count;  ///< Aggregation count
   uint16_t flags;       ///< Flags. BIT(0) - to indicate immediate transfer, BIT(1) through BIT(15) are reserved.
