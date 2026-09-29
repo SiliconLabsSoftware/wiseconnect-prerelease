@@ -144,6 +144,7 @@ other_file:
 - path: resources/readme/sta_ncp.png
 - path: resources/readme/cli_ble_ncp.png
 - path: resources/readme/configure_static_ip_address.png
+- path: resources/readme/RTT_logs.png
 ui_hints:
   highlight:
   - path: readme.md

@@ -16,6 +16,9 @@ SiWx91x Wireless Test CLI example: Exercise Wi-Fi and BLE features through a com
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
   - [Application Build Environment](#application-build-environment)
+    - [CLI Command Input and Response Output](#cli-command-input-and-response-output)
+    - [How to View UART Logs in Serial Debug Assistant](#how-to-view-uart-logs-in-serial-debug-assistant)
+    - [How to View RTT Logs](#how-to-view-rtt-logs)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
   - [Resources](#resources)
@@ -68,17 +71,18 @@ The Wireless Test application is a Command-Line Interface (CLI) application desi
       - [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
       - [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
 
-  - Interface and Host MCU Supported
-    - SPI - EFR32 & STM32
-    - UART - EFR32
+  - Interface and host MCU supported
+    - SPI : EFR32 and STM32
+    - UART : EFR32
 
 ### Software Requirements
 
 - Simplicity Studio IDE - [Simplicity Studio IDE](https://www.silabs.com/developer-tools/simplicity-studio)
 - [Keil IDE](https://www.keil.com/) (to be used with STM32F411RE MCU)
 - A Serial terminal software such as [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in)
+- Optional, for RTT response output: J-Link RTT Viewer, Simplicity Commander RTT tab, or the Simplicity Studio RTT Console
 
-Note : The user can also use the Simplicity studio’s console window for sending and receiving the CLI command but it is recommended to use Serial Debug Assistant for ease of the command usage.
+Note : The user can also use the Simplicity studio’s console window for sending and receiving the CLI command but it is recommended to use Serial Debug Assistant for ease of the command usage. CLI commands are always entered over UART/VCOM. In SoC mode, where command responses appear depends on `SL_WIRELESS_TEST_LOG_OUTPUT` (UART by default). In NCP mode, responses are on RTT.
 
 
 ### Setup Diagram
@@ -129,6 +133,69 @@ For project folder structure details, see the [WiSeConnect Examples](https://doc
 
 The application can be configured to suit your requirements and development environment.
 
+### CLI Command Input and Response Output
+
+CLI **commands are always typed on UART/VCOM** (Serial Debug Assistant).
+
+**SoC mode:** CLI **responses** can be shown on UART or on RTT. This is selected at **build time** in `demo.c`:
+
+```c
+#define SL_WIRELESS_TEST_LOG_OUTPUT SL_WIRELESS_TEST_LOG_OUTPUT_UART
+```
+
+| Setting | Commands (input) | Responses (output) | When to use |
+|---------|------------------|--------------------|-------------|
+| `SL_WIRELESS_TEST_LOG_OUTPUT_UART` (**default**) | Serial Debug Assistant | Serial Debug Assistant | Backward compatible with earlier releases. Use this when RTT Viewer is not used. |
+| `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` | Serial Debug Assistant | J-Link RTT Viewer, Simplicity Commander RTT tab, or Studio RTT Console | When you want formatted logger output on RTT Channel 0 |
+
+**Backward compatibility:** The SoC default is UART. If RTT logging is not required, leave `SL_WIRELESS_TEST_LOG_OUTPUT_UART` selected, rebuild, and flash. Command responses then appear in Serial Debug Assistant again.
+
+Closing an RTT viewer does **not** automatically move output to UART. To return logs to UART, set `SL_WIRELESS_TEST_LOG_OUTPUT_UART`, rebuild, and flash.
+
+Do not add an `iostream_uart_si91x` VCOM logger instance to the SoC project. Reinitializing that UART for logging can stop the CLI from receiving commands.
+
+**NCP mode:** Command input stays on the host UART/VCOM path. Log and command responses are always routed to RTT so they do not mix with the HCI/CLI transport on VCOM. The `SL_WIRELESS_TEST_LOG_OUTPUT` macro applies to SoC builds only.
+
+### How to View UART Logs in Serial Debug Assistant
+
+Use this path for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIRELESS_TEST_LOG_OUTPUT_UART` (default).
+
+1. Create, build, and flash **Wi-Fi Coex - Wireless Test (SOC)** (`wireless_test_soc`).
+2. Open [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) (or Docklight / another serial terminal).
+3. Select the board VCOM port. Typical settings: **115200 8N1**, no flow control.
+4. Disable **Auto Reconnect** if it is enabled. Auto reconnect toggles DTR/RTS and can reset the board while you are testing.
+5. Reset the board. The terminal should show `Ready` and the `>` prompt.
+6. Send **one** CLI command per line (for example `help` or `wifi_init`) with a single line ending. Do not leave trailing blank lines in a multi-line send box.
+7. Responses appear in the same Serial Debug Assistant window.
+
+### How to View RTT Logs
+
+Use this section for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIRELESS_TEST_LOG_OUTPUT_RTT`. For **NCP** builds, logs are already on RTT; skip the `demo.c` macro change and connect an RTT viewer as below.
+
+Before connecting RTT on SiWx91x, configure the host debugger with these settings (self-contained here so this section works when Simplicity Studio copies only this example). They match the SEGGER SystemView Backend guidance in the Si91x Logger Backend example in the WiseConnect SDK package at `examples/si91x_soc/service/sl_si91x_logger_backend_example/readme.md` (SEGGER SystemView Backend). Logger backend overview is also in `docs/software-reference/manuals/siwx91x-software-reference-manual.md` (SL Debug Logger) in the same SDK package.
+
+- Target device: **CORTEX-M4** (application core)
+- Interface: **SWD**
+- Number of cores: **2** (do not leave this on Auto)
+- Prefer resolving `_SEGGER_RTT` from the flashed application **ELF/OUT** (or set the control-block address from `arm-none-eabi-nm <image>.out | grep _SEGGER_RTT`)
+
+1. In `demo.c` (SoC only), set:
+
+   ```c
+   #define SL_WIRELESS_TEST_LOG_OUTPUT SL_WIRELESS_TEST_LOG_OUTPUT_RTT
+   ```
+
+2. Rebuild and flash the SoC application. Keep the USB/J-Link debug connection attached.
+3. Open Serial Debug Assistant on the board VCOM port and type commands there. Command **input** stays on UART.
+4. Open an RTT viewer on **Channel 0** using one of the following:
+   - **Simplicity Commander:** open the **RTT** tab, enable **Reset target on connect**, and click **Connect**.
+   - **Simplicity Studio:** start a debug session on the M4 application image, then open the RTT / Serial 1 console view.
+   - **J-Link RTT Viewer:** connect to the SiWx91x M4 core, select Channel 0, and start the session.
+5. Command responses and `SL_DEBUG_LOG_V2` lines appear in the RTT viewer as formatted logger text, for example `[I](S|<timestamp>) Ready`.
+6. If the board is reset while Commander RTT is open, quit Commander completely and open it again to restore the RTT session.
+
+![RTT logs: commands in Serial Debug Assistant and responses in Simplicity Commander RTT](resources/readme/RTT_logs.png)
+
 - The application uses the default configurations as provided in the **wifi_commands.c** and you can choose to configure these parameters as needed.
  
 > **Note** :
@@ -150,6 +217,12 @@ See the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconne
 
 - Build the application in Studio.
 - Flash, run, and debug the application.
+
+Confirm CLI output using the mode selected in [CLI Command Input and Response Output](#cli-command-input-and-response-output):
+
+- **SoC UART (default):** `Ready` and command responses appear in Serial Debug Assistant.
+- **SoC RTT:** type commands in Serial Debug Assistant; `Ready` and command responses appear in the RTT viewer.
+- **NCP:** type commands on the host UART/VCOM path; logs and responses appear in the RTT viewer.
 
 ![wireless_test_Output](resources/readme/Ready.PNG)
 
@@ -1207,8 +1280,9 @@ In the command handler, the arguments passed in the cli command are internally m
 
 If you encounter issues while running the Wireless Test application, check the following:
 
-- Use [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) or an equivalent serial terminal instead of the Simplicity Studio console for reliable CLI input and output.
-- Confirm that the correct serial port and baud rate are selected and that the `Ready` prompt appears after flashing, as shown in [Test the Application](#test-the-application).
+- Use [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) or an equivalent serial terminal instead of the Simplicity Studio console for reliable CLI **input**. On SoC, command **responses** appear in that terminal only when `SL_WIRELESS_TEST_LOG_OUTPUT_UART` is selected.
+- If Serial Debug Assistant shows no `Ready` prompt or no command responses on SoC, confirm `SL_WIRELESS_TEST_LOG_OUTPUT` in `demo.c`. For UART output, rebuild with `SL_WIRELESS_TEST_LOG_OUTPUT_UART`. For RTT output (SoC opt-in or NCP), open an RTT viewer as described in [How to View RTT Logs](#how-to-view-rtt-logs).
+- Confirm that the correct serial port and baud rate are selected. In SoC UART mode, the `Ready` prompt appears after flashing, as shown in [Test the Application](#test-the-application).
 - Verify the default SSID and passphrase in `wifi_commands.c` (`SOFT_AP_SSID`, `SOFT_AP_PSK`), or update them to match your test network configuration.
 - For Wi-Fi PER and RF measurements, confirm that the U.Fl to SMA cable, spectrum analyzer, or signal generator connections match the setup diagrams in [Setup Diagram](#setup-diagram).
 - When a CLI command fails with invalid arguments, check the corresponding string values in `console_commands/src/console_argument_types.c` (for example, data rate enums map to strings such as `1Mbps`).

@@ -60,7 +60,7 @@
 #define FW_SECURITY_VERSION 5
 #define FW_PATCH_NUM        2
 #define FW_CUSTOMER_ID      0
-#define FW_BUILD_NUM        2
+#define FW_BUILD_NUM        10
 
 /******************************************************
  *                   Enumerations

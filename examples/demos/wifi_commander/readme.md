@@ -29,7 +29,7 @@ Before running the application, the user will need to set up the following thing
 
 - **SoC Mode**:
   - Standalone
-    - BRD4002B Wireless pro kit mainboard [SI-MB4002B]
+    - BRD4002B Wireless Pro Kit Mainboard [SI-MB4002B]
     - Radio Boards 
       - BRD4338A [SiWx917-RB4338A]
   - Kits

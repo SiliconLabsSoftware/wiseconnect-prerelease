@@ -2150,7 +2150,7 @@
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_net_dual_stack_nwp_m4/wifi_net_dual_stack_nwp_m4_psram.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
     <properties key="quality" value="production" />
@@ -2565,6 +2565,21 @@
     <properties key="readmeFiles" value="examples/featured/low_power/twt_tcp_client/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="wifi_twt_tcp_client_psram" label="Wi-Fi - TWT TCP Client (PSRAM)" description="Demonstrates the procedure to setup TWT session and open a TCP client socket and sends data to TCP server socket in Low Power mode">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/featured/low_power/twt_tcp_client/wifi_twt_tcp_client_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/featured/low_power/twt_tcp_client/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
   <descriptors name="wifi_power_save_deep_sleep_soc" label="Wi-Fi - Powersave Deep Sleep (SoC)" description="Enable power save deep sleep profile with SiWx91x in Low Power mode">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -2594,6 +2609,21 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/featured/low_power/power_save_deep_sleep/readme.md" />
     <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="wifi_power_save_deep_sleep_psram" label="Wi-Fi - Powersave Deep Sleep (PSRAM)" description="Enable power save deep sleep profile with SiWx91x in Low Power mode">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/featured/low_power/power_save_deep_sleep/wifi_power_save_deep_sleep_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/featured/low_power/power_save_deep_sleep/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="wifi_power_save_deep_sleep_uart_ncp" label="Wi-Fi - Powersave Deep Sleep (UART NCP)" description="Enable power save deep sleep profile with SiWx91x in Low Power mode">
     <properties key="namespace" value="template.uc" />

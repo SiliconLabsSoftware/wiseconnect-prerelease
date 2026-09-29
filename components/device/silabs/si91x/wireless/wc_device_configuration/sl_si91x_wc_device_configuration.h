@@ -233,7 +233,7 @@ extern "C" {
 
 // <h> Authentication Modes
 // <q SL_SI91X_WC_FEAT_SECURITY_OPEN> Open Security (No Authentication)
-// <i> This feature supports open security type in client mode.
+// <i> This feature supports open security type in client mode and AP mode.
 // <i> @note It is recommended to enable this macro to configure the security type as open mode.
 // <i> Default: Disable
 #define SL_SI91X_WC_FEAT_SECURITY_OPEN  0

@@ -42,7 +42,7 @@ This application demonstrates how to configure SiWx91x in Advertising Extended p
     - SiWG917 Dev Kit [BRD2605B]
     - SiWx917 AC1 Module Explorer Kit [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit)
 - PSRAM Mode:  
-  - Silicon Labs [[BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)]
+  - Silicon Labs [[BRD4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview) + [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)]
 - NCP Mode:
   - Silicon Labs [BRD4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
   - Host MCU Eval Kit. This example has been tested with:
@@ -52,9 +52,9 @@ This application demonstrates how to configure SiWx91x in Advertising Extended p
   - STM32F411RE MCU
     - [STM32F411RE](https://www.st.com/en/microcontrollers-microprocessors/stm32f411re.html) MCU
     - NCP Radio Board (BRD4346A + BRD8045C)
-  - Interface and Host MCU Supported
-    - SPI - EFR32 
-    - UART - EFR32
+  - Interface and host MCU supported
+    - SPI : EFR32
+    - UART : EFR32
 - Smartphone configured as BLE central which supports extended scanning
 
 ### Software Requirements

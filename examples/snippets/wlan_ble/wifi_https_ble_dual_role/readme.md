@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x HTTPS BLE dual-role coex example: download files over HTTPS while maintaining BLE central and peripheral connections on SoC, PSRAM, and NCP modes.
+SiWx91x HTTPS BLE dual-role coex example: download files over HTTPS while maintaining BLE central and peripheral connections in SoC and NCP modes.
 
 ## Table of Contents
 
@@ -36,7 +36,7 @@ The Application can be configured for the individual protocol execution as well 
 - Windows PC with Host interface(UART/ SPI) in case of WiSeConnect.
 - **SoC Mode**:
   - Standalone
-    - BRD4002B Wireless pro kit mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - BRD4002B Wireless Pro Kit Mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards 
       - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
       - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
@@ -54,7 +54,7 @@ The Application can be configured for the individual protocol execution as well 
 - **NCP Mode** (select either the EFR32 or STM32 host MCU platform; a single platform is sufficient to run the application):
   - **Option 1: EFR32 host**
     - Standalone
-      - BRD4002B Wireless pro kit mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+      - BRD4002B Wireless Pro Kit Mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
       - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
       - NCP Expansion Kit with NCP Radio Boards
         - [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
@@ -70,9 +70,9 @@ The Application can be configured for the individual protocol execution as well 
       - [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
       - [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
 
-  - Interface and Host MCU Supported
-    - SPI - EFR32 & STM32
-    - UART - EFR32
+  - Interface and host MCU supported
+    - SPI : EFR32 and STM32
+    - UART : EFR32
  - Wireless Access Point
  - Smart phone/tablet with BLE Application (Ex: Light Blue / BLE Connect App)
  - Windows PC with HTTP/HTTPS server running.
@@ -319,7 +319,7 @@ The application can be configured to suit your requirements and development envi
 
 - Build the application
 
-  - SoC / PSRAM mode:  Build as  Https Ble Dual Role  Example
+  - SoC mode:  Build as  Https Ble Dual Role  Example
 
       ![Build as](resources/readme/htttp_dualrole_build.png)
 
@@ -336,7 +336,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 - Once the build was successful, right click on project and click on Debug As->Silicon Labs ARM Program as shown in below image.
 
-  - SoC / PSRAM
+  - SoC
 
     ![debug_mode_soc](resources/readme/htttp_dualrole_run.png)
 

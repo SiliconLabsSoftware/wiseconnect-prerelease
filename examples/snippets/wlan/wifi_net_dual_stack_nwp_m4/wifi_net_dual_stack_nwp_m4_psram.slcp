@@ -32,7 +32,6 @@ component:
 - id: syscalls
 - id: si91x_memory_default_config
 - id: wiseconnect_common
-- id: text_segment_in_psram
 - id: data_segment_in_psram
 - id: udma_linker_config
 - id: psram_core

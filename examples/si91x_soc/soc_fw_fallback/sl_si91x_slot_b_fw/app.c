@@ -218,10 +218,10 @@ static void sl_app_reset_state_for_next_image(uint16_t *data_chunk,
 /******************************************************
   *               Global Variable
   ******************************************************/
-
+#define APP_THREAD_STACK_SIZE (4 * 1024) // 4KB stack size for the application thread
 static const osThreadAttr_t thread_attributes = {
   .name       = "app",
-  .stack_size = 3072,
+  .stack_size = APP_THREAD_STACK_SIZE,
   .priority   = osPriorityLow,
 };
 

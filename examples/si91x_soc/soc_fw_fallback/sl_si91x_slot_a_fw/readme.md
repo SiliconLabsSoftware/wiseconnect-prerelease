@@ -135,7 +135,7 @@ In the Project Explorer pane, expand the **config** folder and open the [`sl_net
   ```
 
   - **Note:** When enabled, the socket connection remains open between images to allow downloading the second image. The socket is closed only after all images are processed.
-  - This is **not** the same as the general combined firmware update in the [Wi-Fi - NWP Or Combined (NWP & M4) Firmware Update via TCP](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/featured/firmware_update/readme.md) example. Firmware fallback does not use a Commander-merged single combined `.rps`. It downloads two separate RPS files (M4 and NWP) in sequence. See [Combined Image Firmware Update](#combined-image-firmware-update).
+  - This is not the same as the general combined firmware update in the [Wi-Fi - NWP Or Combined (NWP & M4) Firmware Update via TCP](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/featured/firmware_update/readme.md) example. Firmware fallback does not use a Commander-merged single combined `.rps`. It downloads two separate RPS files (M4 and NWP) in sequence. See [Combined Image Firmware Update](#combined-image-firmware-update).
 
 - `DISABLE_AB_DEBUG_LOGS`: Controls whether debug logs are enabled or disabled in the A/B Firmware Fallback module. By default, it is set to 1 (debug logs disabled). The macro is defined in [`components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/components/device/silabs/si91x/mcu/drivers/service/firmware_fallback/src/sl_si91x_fw_fallback.c).
 
@@ -227,12 +227,10 @@ To establish the TCP server with firmware file on remote PC, follow the steps be
 
 ### Combined Image Firmware Update
 
-Firmware fallback combined-image OTA transfers **two separate RPS files** (M4 and NWP) back-to-back over one TCP connection. This is different from the general combined firmware update.
+Firmware fallback combined-image OTA transfers two separate RPS files (M4 and NWP) back-to-back over one TCP connection. This is different from the general combined firmware update.
 
-**Difference from the general combined firmware update:**
-
-- **General combined firmware update** (`examples/featured/firmware_update`): Commander merges the M4 and NWP images into a **single** combined `.rps` using `commander rps convert ... --combinedimage`. The C TCP server (`firmware_update_tcp_server_9117.c`) then serves that one file. Enable this with `COMBINED_IMAGE` in that example.
-- **Firmware fallback combined image update** (this example): The M4 and NWP images stay as **two separate `.rps` files**. They are sent sequentially on the same socket so each image can be written to its A/B slot. Slot information is committed only after both images are verified. Do **not** use a Commander-merged combined `.rps` with this example. Enable this with `SL_APP_COMBINED_IMAGE_SUPPORT`.
+**Firmware fallback combined image update**: The M4 and NWP images stay as two separate `.rps` files. They are sent sequentially on the same socket so each image can be written to its A/B slot. Slot information is committed only after both images are verified. 
+> **Note**: Do not use a Commander-merged combined `.rps` with this example. Enable this with `SL_APP_COMBINED_IMAGE_SUPPORT`.
 
 To run a combined-image (M4 + NWP) firmware fallback update:
 

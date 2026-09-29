@@ -161,7 +161,7 @@ typedef enum {
  *
  * @details
  *   This structure holds the MQTT client error status and the underlying SDK/firmware status code.
- *   The `error_status` indicates the type of error that has occurred during the client's operations,
+ *   The `error_status` indicates the error type encountered during the client's operations,
  *   and `status_code` provides the detailed firmware/SDK reason code when available.
  *
  * @note

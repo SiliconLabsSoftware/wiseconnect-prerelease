@@ -359,11 +359,26 @@
     <properties key="readmeFiles" value="examples/snippets/wlan_ble/wlan_ble_unified_coex_app/readme.md" />
     <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
   </descriptors>
+  <descriptors name="wifi_station_ble_throughput_app_psram" label="Wi-Fi Coex - Wi-Fi Client BLE Throughput App (PSRAM)" description="This application demonstrates throughput measurement of Wi-Fi while BLE is in connection.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan_ble/wifi_station_ble_throughput_app/wifi_station_ble_throughput_app_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan_ble/wifi_station_ble_throughput_app/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+  </descriptors>
   <descriptors name="wifi_station_ble_throughput_app_soc" label="Wi-Fi Coex - Wi-Fi Client BLE Throughput App (SoC)" description="This application demonstrates throughput measurement of Wi-Fi while BLE is in connection.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan_ble/wifi_station_ble_throughput_app/wifi_station_ble_throughput_app_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343a brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605b brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343a brd4343q brd9084b brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />

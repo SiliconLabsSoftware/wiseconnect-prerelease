@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x BLE provisioning with AWS example: provision Wi-Fi over BLE, connect to AWS IoT Core via MQTT, and support optional I2C sensor data on SoC and PSRAM modes.
+SiWx91x BLE provisioning with AWS example: provision Wi-Fi over BLE and connect to AWS IoT Core via MQTT in SoC and NCP modes, with optional I2C sensor data in SoC mode.
 
 ## Table of Contents
 
@@ -99,7 +99,7 @@ A timer is run with a periodicity of **PUBLISH_PERIODICITY** milliseconds. The a
 - **Temperature Sensor Requirement**: Note that an external LM75 temperature sensor must be connected for the application to function correctly, as the WSDK/WPK board does not have a built-in sensor.
 - **SoC Mode**:
   - Standalone
-    - BRD4002B Wireless pro kit mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - BRD4002B Wireless Pro Kit Mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards
       - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
       - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
@@ -117,7 +117,7 @@ A timer is run with a periodicity of **PUBLISH_PERIODICITY** milliseconds. The a
 - **NCP Mode** (select either the EFR32 or STM32 host MCU platform; a single platform is sufficient to run the application):
   - **Option 1: EFR32 host**
     - Standalone
-      - BRD4002B Wireless pro kit mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+      - BRD4002B Wireless Pro Kit Mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
       - EFR32xG24 Wireless 2.4 GHz +10 dBm Radio Board [xG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board?tab=overview)
       - NCP Expansion Kit with NCP Radio Boards
         - [BRD4346A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4346a-wifi-6-bluetooth-le-soc-4mb-flash-radio-board?tab=overview) + [BRD8045A](https://www.silabs.com/development-tools/wireless/wi-fi/expansion-adapter-board-for-co-processor-radio-boards?tab=overview)
@@ -131,9 +131,9 @@ A timer is run with a periodicity of **PUBLISH_PERIODICITY** milliseconds. The a
       - [BRD4357A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357a-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
       - [BRD4357C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4357c-wi-fi-6-bluetooth-le-4mb-flash-radio-board-for-rcp-and-ncp-modules?tab=overview) + [BRD8045C](https://www.silabs.com/development-tools/wireless/wi-fi/shield-adapter-board-for-co-processor-radio-boards?tab=overview)
 
-  - Interface and Host MCU Supported
-    - SPI - EFR32 & STM32
-    - UART - EFR32
+  - Interface and host MCU supported
+    - SPI : EFR32 and STM32
+    - UART : EFR32
 
 #### Base Board Pin Configuration for I2C B0 Board(BRD4338A SOC Boards)
 
@@ -174,7 +174,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 The application can be configured to suit your requirements and development environment. Read through the following sections and make any changes needed.
 
-For SoC and PSRAM Modes only:
+For SoC Mode only:
 
 - I2C2 is utilized for communication with the temperature sensor.
 - You can change the I2C instance in the Universal Configurator using the **I2C** component (i2c_instance). Enable only one instance (i2c0/i2c1/i2c2); the application auto-selects the enabled instance at build time.

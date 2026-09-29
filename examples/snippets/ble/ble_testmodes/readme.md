@@ -63,8 +63,8 @@ This application demonstrates how to test the BLE GAP peripheral role.
   - [Silicon Labs SLWSTK6006A EFR32xG21 Wireless Starter Kit](https://www.silabs.com/development-tools/wireless/efr32xg21-wireless-starter-kit) which includes
     - BRD4001A/BRD4002B Wireless Starter Kit Mainboard
     - BRD4180A/BRD4180B Radio Board
-  - Interface and Host MCU Supported
-    - SPI - EFR32
+  - Interface and host MCU supported
+    - SPI : EFR32
 
 ### NCP mode: host application and project files
 

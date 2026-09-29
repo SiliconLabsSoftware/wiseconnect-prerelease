@@ -46,6 +46,9 @@
 
 #if MQTT_TLS_ENABLE
 #include "mbedtls/platform.h"
+#if defined(MBEDTLS_PSA_CRYPTO_C)
+#include "psa/crypto.h"
+#endif
 #endif
 
 // Configuration
@@ -213,11 +216,50 @@ static void mqtt_tls_free_resources(mqtt_tls_context_t *tls_ctx)
   mbedtls_ctr_drbg_free(&tls_ctx->ctr_drbg);
 }
 
+#if defined(MBEDTLS_SSL_PROTO_TLS1_3)
+// True when the configured ciphersuite list contains at least one TLS 1.3 suite.
+// Projects may pin MBEDTLS_SSL_CIPHERSUITES to a fixed list, in which case
+// mbedtls_ssl_list_ciphersuites() returns exactly that list with no filtering.
+// mbedTLS has no public getter for ciphersuite min_tls_version; classify via
+// mbedtls_ssl_ciphersuite_from_id() + the "TLS1-3-" name prefix used in
+// ssl_ciphersuites.c.
+static bool mqtt_tls_list_has_tls13_suite(const int *ciphersuites)
+{
+  for (; ciphersuites != NULL && *ciphersuites != 0; ciphersuites++) {
+    const mbedtls_ssl_ciphersuite_t *info = mbedtls_ssl_ciphersuite_from_id(*ciphersuites);
+    const char *name;
+
+    if (info == NULL) {
+      continue;
+    }
+
+    name = mbedtls_ssl_ciphersuite_get_name(info);
+    if (name != NULL && strncmp(name, "TLS1-3-", 7) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+#endif
+
 // TLS initialization
 static int mqtt_tls_init(mqtt_tls_context_t *tls_ctx, int socket_fd, const char *hostname)
 {
   int ret;
   const char *pers = "mqtt_client_lwip";
+
+#if defined(MBEDTLS_PSA_CRYPTO_C)
+  static uint8_t psa_crypto_initialized = 0;
+  if (!psa_crypto_initialized) {
+    psa_status_t psa_status = psa_crypto_init();
+    if (psa_status != PSA_SUCCESS) {
+      SL_DEBUG_LOG_V2(ERROR, "psa_crypto_init failed: %ld\r\n", (long)psa_status);
+      return MBEDTLS_ERR_SSL_INTERNAL_ERROR;
+    }
+    psa_crypto_initialized = 1;
+    SL_DEBUG_LOG_V2(INFO, "PSA crypto initialized for MQTT TLS");
+  }
+#endif
 
   // Initialize structures
   mbedtls_ssl_init(&tls_ctx->ssl);
@@ -265,6 +307,14 @@ static int mqtt_tls_init(mqtt_tls_context_t *tls_ctx, int socket_fd, const char 
     mqtt_tls_free_resources(tls_ctx);
     return ret;
   }
+
+#if defined(MBEDTLS_SSL_PROTO_TLS1_3)
+  const bool tls13_offered = mqtt_tls_list_has_tls13_suite(mbedtls_ssl_list_ciphersuites());
+  mbedtls_ssl_conf_min_tls_version(&tls_ctx->conf, MBEDTLS_SSL_VERSION_TLS1_2);
+  mbedtls_ssl_conf_max_tls_version(&tls_ctx->conf,
+                                   tls13_offered ? MBEDTLS_SSL_VERSION_TLS1_3 : MBEDTLS_SSL_VERSION_TLS1_2);
+  SL_DEBUG_LOG_V2(INFO, "MQTT TLS min=1.2 max=%s (preset ciphers)", tls13_offered ? "1.3" : "1.2");
+#endif
 
   // Server certificate verification: REQUIRED when CA is provided, else NONE
   if (tls_ctx->cert_ctx.cacert && tls_ctx->cert_ctx.cacert_len > 0) {
