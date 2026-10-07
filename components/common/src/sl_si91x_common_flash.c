@@ -62,7 +62,7 @@ typedef struct {
   uint32_t addr;
   uint16_t input_buffer_length;
   uint8_t flash_sector_erase_enable;
-  uint8_t input_data[SL_SI91X_COMMON_FLASH_MAX_CHUNK_SIZE];
+  uint8_t input_data[]; /* flexible; payload sent as second fragment via send_command_with_payload */
 } SL_ATTRIBUTE_PACKED sl_si91x_common_flash_write_request_t;
 
 typedef struct {
@@ -82,7 +82,6 @@ sl_status_t sl_si91x_command_to_write_common_flash(uint32_t write_address,
 
   sl_status_t status                                  = SL_STATUS_OK;
   sl_si91x_common_flash_write_request_t flash_request = { 0 };
-  uint32_t send_size                                  = 0;
   uint16_t remaining_length                           = write_data_length;
 
   if (flash_sector_erase_enable == 1) {
@@ -90,18 +89,17 @@ sl_status_t sl_si91x_command_to_write_common_flash(uint32_t write_address,
       size_t chunk_size = (remaining_length < SL_SI91X_COMMON_FLASH_SECTOR_SIZE) ? remaining_length
                                                                                  : SL_SI91X_COMMON_FLASH_SECTOR_SIZE;
 
+      // Fill the request structure (header only; no payload for erase)
       memset(&flash_request, 0, sizeof(sl_si91x_common_flash_write_request_t));
       flash_request.sub_cmd                   = SL_SI91X_COMMON_FLASH_WRITE_COMMAND;
       flash_request.addr                      = write_address;
       flash_request.input_buffer_length       = (uint16_t)chunk_size;
       flash_request.flash_sector_erase_enable = flash_sector_erase_enable;
 
-      send_size = sizeof(sl_si91x_common_flash_write_request_t);
-
       status = sli_wifi_send_command(SLI_COMMON_REQ_TA_M4_COMMANDS,
                                      SLI_WIFI_COMMON_CMD,
                                      &flash_request,
-                                     send_size,
+                                     sizeof(sl_si91x_common_flash_write_request_t),
                                      SL_SI91X_COMMON_FLASH_TA_M4_COMMANDS_WAIT_TIME,
                                      NULL,
                                      NULL);
@@ -122,22 +120,25 @@ sl_status_t sl_si91x_command_to_write_common_flash(uint32_t write_address,
                             ? write_data_length
                             : SL_SI91X_COMMON_FLASH_MAX_CHUNK_SIZE;
 
+      // Fill the request structure (header only; payload sent as second fragment)
       memset(&flash_request, 0, sizeof(sl_si91x_common_flash_write_request_t));
       flash_request.sub_cmd                   = SL_SI91X_COMMON_FLASH_WRITE_COMMAND;
       flash_request.addr                      = write_address;
       flash_request.input_buffer_length       = (uint16_t)chunk_size;
       flash_request.flash_sector_erase_enable = flash_sector_erase_enable;
 
-      memcpy(&flash_request.input_data, write_data, chunk_size);
-
-      send_size = sizeof(sl_si91x_common_flash_write_request_t) - SL_SI91X_COMMON_FLASH_MAX_CHUNK_SIZE + chunk_size;
-      status    = sli_wifi_send_command(SLI_COMMON_REQ_TA_M4_COMMANDS,
-                                     SLI_WIFI_COMMON_CMD,
-                                     &flash_request,
-                                     send_size,
-                                     SL_SI91X_COMMON_FLASH_TA_M4_COMMANDS_WAIT_TIME,
-                                     NULL,
-                                     NULL);
+      sli_wifi_command_payload_t fragments = {
+        .header         = &flash_request,
+        .header_length  = sizeof(sl_si91x_common_flash_write_request_t),
+        .payload        = write_data,
+        .payload_length = (uint32_t)chunk_size,
+      };
+      status = sli_wifi_send_command_with_payload(SLI_COMMON_REQ_TA_M4_COMMANDS,
+                                                  SLI_WIFI_COMMON_CMD,
+                                                  &fragments,
+                                                  SL_SI91X_COMMON_FLASH_TA_M4_COMMANDS_WAIT_TIME,
+                                                  NULL,
+                                                  NULL);
       if (status != SL_STATUS_OK) {
         return status;
       }

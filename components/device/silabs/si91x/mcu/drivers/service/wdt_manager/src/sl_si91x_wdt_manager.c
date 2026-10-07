@@ -165,9 +165,11 @@ sl_status_t sl_watchdog_manager_init(void)
 {
   sl_status_t status                               = SL_STATUS_OK;
   watchdog_timer_config_t watchdog_config_internal = { 0 }; // Initialized the watch dog structure with zero
+  uint32_t npss_power_mask                         = SLPSS_PWRGATE_ULP_MCUWDT;
+  watchdog_timer_callback_t timeout_callback       = on_timeout_callback;
 
   // Power-Up WDT domain
-  RSI_PS_NpssPeriPowerUp(SLPSS_PWRGATE_ULP_MCUWDT);
+  RSI_PS_NpssPeriPowerUp(npss_power_mask);
 
 #if defined(SLI_SI91X_ENABLE_OS)
   osThreadId_t si91x_thread = 0;
@@ -190,13 +192,21 @@ sl_status_t sl_watchdog_manager_init(void)
 
   // Update system reset value based on configured interrupt time
 #if defined(SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_PERIOD)
-  watchdog_config_internal.interrupt_time = SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_PERIOD;
+  {
+    /* Map UC timeout to driver config; window_time 0 keeps non-window WDT mode. */
+    uint8_t interrupt_time    = (uint8_t)SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_PERIOD;
+    uint8_t system_reset_time = (uint8_t)SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_INDEX_17;
+    uint8_t window_time       = 0;
 
-  // Assigning system reset value to 4sec ,if WDT is not kicked at programmed interval it resets the system after 4sec(reset counter starts counting after the interrupt time expiry)
-  watchdog_config_internal.system_reset_time = SL_SI91X_WATCHDOG_MANAGER_TIMEOUT_INDEX_17;
+    watchdog_config_internal.interrupt_time = interrupt_time;
+    // Assigning system reset value to 4sec ,if WDT is not kicked at programmed interval it resets the system after 4sec(reset counter starts counting after the interrupt time expiry)
+    watchdog_config_internal.system_reset_time = system_reset_time;
+    watchdog_config_internal.window_time       = window_time;
+  }
 #endif
   // Configuring watchdog-timer
-  status = sl_si91x_watchdog_set_configuration(&watchdog_config_internal);
+  watchdog_timer_config_t *config_ptr = &watchdog_config_internal;
+  status                              = sl_si91x_watchdog_set_configuration(config_ptr);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR(
       "sl_watchdog_manager_init: sl_si91x_watchdog_set_configuration failed st=0x%04lX,line no : %d\r\n",
@@ -206,7 +216,7 @@ sl_status_t sl_watchdog_manager_init(void)
   }
 
   // Registering timeout callback
-  status = sl_si91x_watchdog_register_timeout_callback(on_timeout_callback);
+  status = sl_si91x_watchdog_register_timeout_callback(timeout_callback);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR(
       "sl_watchdog_manager_init: sl_si91x_watchdog_register_timeout_callback failed st=0x%04lX,line no : %d\r\n",
@@ -231,10 +241,11 @@ sl_status_t sl_watchdog_manager_init(void)
  ******************************************************************************/
 sl_status_t sl_watchdog_manager_start(void)
 {
+  sl_status_t status = SL_STATUS_OK;
   // Start WDT timer
   sl_si91x_watchdog_start_timer();
 
-  return SL_STATUS_OK;
+  return status;
 }
 
 /*******************************************************************************

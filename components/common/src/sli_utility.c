@@ -417,8 +417,58 @@ sl_status_t sli_wifi_send_command(uint32_t command,
                                   void *sdk_context,
                                   void **response_buffer)
 {
+  sli_wifi_command_payload_t fragments = {
+    .header         = data,
+    .header_length  = data_length,
+    .payload        = NULL,
+    .payload_length = 0,
+  };
+  return sli_wifi_send_command_with_payload(command,
+                                            command_type,
+                                            &fragments,
+                                            wait_period,
+                                            sdk_context,
+                                            response_buffer);
+}
+
+sl_status_t sli_wifi_send_command_with_payload(uint32_t command,
+                                               sli_wifi_command_type_t command_type,
+                                               const sli_wifi_command_payload_t *fragments,
+                                               sli_wifi_wait_period_t wait_period,
+                                               void *sdk_context,
+                                               void **response_buffer)
+{
   sl_wifi_system_packet_t *packet = NULL;
   sl_status_t status              = SL_STATUS_OK;
+  const void *header;
+  uint32_t header_length;
+  const void *payload;
+  uint32_t payload_length;
+  uint32_t total_length;
+  uint32_t offset = 0;
+
+  if (fragments == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  header         = fragments->header;
+  header_length  = fragments->header_length;
+  payload        = fragments->payload;
+  payload_length = fragments->payload_length;
+  total_length   = header_length + payload_length;
+
+  // Reject length/pointer mismatches so packet->length never exceeds copied data
+  // (NULL + non-zero length would otherwise send uninitialized TX buffer contents).
+  if (((header == NULL) && (header_length != 0)) || ((payload == NULL) && (payload_length != 0))) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  // Reject wrap, descriptor overflow, or a frame that cannot fit in the NWP/host
+  // SAPI command buffer (1600 bytes including the 16-byte host descriptor).
+  if ((total_length < header_length) || (total_length > 0xFFFu)
+      || ((total_length + SLI_WIFI_HEADER_SIZE) > SLI_WIFI_MAX_SAPI_COMMAND_SIZE)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
 
   // Allocate a buffer for the command with appropriate size
   status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
@@ -427,14 +477,18 @@ sl_status_t sli_wifi_send_command(uint32_t command,
                                               (sli_buffer_t)&packet);
   VERIFY_STATUS_AND_RETURN(status);
 
-  // Clear the packet descriptor and copy the command data if available
+  // Clear the packet descriptor and copy command fragments if available
   memset(packet->desc, 0, sizeof(packet->desc));
-  if (data != NULL) {
-    memcpy(packet->data, data, data_length);
+  if ((header != NULL) && (header_length > 0)) {
+    memcpy(packet->data, header, header_length);
+    offset = header_length;
+  }
+  if ((payload != NULL) && (payload_length > 0)) {
+    memcpy(&packet->data[offset], payload, payload_length);
   }
 
   // Fill frame type
-  packet->length  = data_length & 0xFFF;
+  packet->length  = total_length & 0xFFF;
   packet->command = (uint16_t)command;
 
   return sli_wifi_send_command_packet(command, command_type, packet, wait_period, sdk_context, response_buffer);

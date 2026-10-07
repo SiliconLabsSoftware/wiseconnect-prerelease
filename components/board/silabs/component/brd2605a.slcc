@@ -24,6 +24,13 @@
   - name: hardware_board_supports_multi_slave
   - name: si91x_b0_board
   - name: si917_dev_board
+  - name: hardware_board_has_rgb
+  - name: hardware_board_has_btn0
+  - name: hardware_board_has_btn1
+  - name: hardware_board_has_led0
+  - name: hardware_board_has_led1
+  - name: hardware_board_has_led2
+  - name: hardware_board_has_exclusive_button_led
 - define:
   - name: SL_BOARD_NAME
     value: '"BRD2605A"'
@@ -80,4 +87,5 @@
   - board:revision:A02
   - board:device:siwg917m111mgtba
   - hardware:has:vcom
-  
+  - hardware:has:button:2
+  - hardware:has:led:3

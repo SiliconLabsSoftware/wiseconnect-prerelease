@@ -341,6 +341,7 @@ typedef sl_status_t (*sl_wifi_twt_config_callback_t)(sl_wifi_event_t event,
  * @param[out] data
  *   - Data received is of type @ref sl_wifi_transceiver_rx_data_t for SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB event.
  *   - Data received is of type @ref sl_wifi_transceiver_tx_data_confirmation_t for SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB event.
+ *   - The `data` pointer is valid only for the duration of this callback. Do not free it (the framework frees it after return), and copy any fields that must be used after return.
  * @param[out] data_length
  *   Reserved.
  * @param[out] optional_arg
@@ -716,6 +717,7 @@ typedef sl_status_t (*sl_wifi_twt_config_callback_v2_t)(sl_wifi_event_t event,
  * @param[out] data
  *   - Data received is of type @ref sl_wifi_transceiver_rx_data_t for SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB event.
  *   - Data received is of type @ref sl_wifi_transceiver_tx_data_confirmation_t for SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB event.
+ *   - The `data` pointer is valid only for the duration of this callback. Do not free it (the framework frees it after return), and copy any fields that must be used after return.
  * @param[out] data_length
  *   Reserved.
  * @param[out] optional_arg

@@ -1550,8 +1550,7 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
   host_desc[14] =
     (uint8_t)(((WME_AC_TO_TID(control->priority) & 0xf) << 4) | (WME_AC_TO_QNUM(control->priority) & 0xf));
 
-  //! Initialize extended desc
-  memcpy(&host_desc[16], &control->token, TRANSCEIVER_TX_DATA_EXT_DESC_SIZE);
+  memcpy(packet->data, &control->token, TRANSCEIVER_TX_DATA_EXT_DESC_SIZE);
 
   // Note: Bits 6 and 7 of ctrl_flags, bit 0 of ctrl_flags1, and the channel and tx_power fields are currently not supported.
   //! If it is an EIA packet, update extended descriptor fields
@@ -1560,10 +1559,10 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
     if (SLI_IS_IMMEDIATE_TRF(control->ctrl_flags)) {
       host_desc[7] |= SLI_IMMEDIATE_TRF_HOST_DESC; //! Immediate Transfer
     }
-    host_desc[20] = control->channel;  //! Channel
-    host_desc[21] = control->tx_power; //! Transmission Power
+    packet->data[4] = control->channel;  //! Channel
+    packet->data[5] = control->tx_power; //! Transmission Power
     if (SLI_IS_LAST_PKT(control->ctrl_flags1)) {
-      host_desc[22] |= SLI_LAST_PKT; //! Last Packet
+      packet->data[6] |= SLI_LAST_PKT; //! Last Packet
     }
   }
 

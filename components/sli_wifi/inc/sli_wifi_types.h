@@ -721,23 +721,27 @@ typedef struct {
 // -----------------------------------------------------------------------------
 
 /**
- * @brief Active application profile state tracked by the Wi-Fi layer (host-side).
- * @details Aliases @ref sl_application_profile_t. @ref SLI_WIFI_APPLICATION_PROFILE_MAX is the
- *          sentinel meaning no profile has been applied yet. Updated by
- *          @ref sl_net_set_application_profile() via @ref sli_wifi_set_active_application_profile()
- *          after all preset configuration succeeds. Reset to @ref SLI_WIFI_APPLICATION_PROFILE_MAX
- *          in @ref sli_wifi_deinit(). This host state survives Wi-Fi disconnect and is used for
- *          scan-time behavior (for example `lp_chain_scan` override in platform standard-scan handlers)
- *          and to no-op scan-timeout configuration in @ref sli_wifi_configure_timeout(). Profile
- *          configuration applied by @ref sl_net_set_application_profile is **not** retained across
- *          disconnect or join failure; the application must re-call that API to restore configuration.
+ * @brief Active application profile config group tracked by the Wi-Fi layer (host-side).
+ * @details Alias of @ref sl_application_profile_config_group_t.
+ *          @ref SL_APPLICATION_PROFILE_CONFIG_NOT_SET means no group has been applied yet.
+ *          This is the single host-side store for the active config group.
+ *          Updated by @ref sl_net_set_application_profile_config() via
+ *          @ref sli_wifi_set_active_application_profile_config_group() after all apply steps
+ *          succeed. Read by @ref sl_net_get_application_profile_config_group() via
+ *          @ref sli_wifi_get_active_application_profile_config_group().
+ *          Reset to @ref SL_APPLICATION_PROFILE_CONFIG_NOT_SET in @ref sli_wifi_deinit() and
+ *          on successful @ref sl_net_deinit().
+ *          Host state survives Wi-Fi disconnect and is used for scan-time behavior
+ *          (for example `lp_chain_scan` override when in-use is active) and to no-op
+ *          scan-timeout configuration in @ref sli_wifi_configure_timeout(). NWP configuration
+ *          applied by @ref sl_net_set_application_profile_config is retained across disconnect
+ *          or join failure (FW retention).
  */
-typedef enum {
-  SLI_WIFI_APPLICATION_PROFILE_DEFAULT = SL_APPLICATION_PROFILE_DEFAULT, ///< Default Wi-Fi behavior
-  SLI_WIFI_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH =
-    SL_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH, ///< Neutral-less Matter switch preset
-  SLI_WIFI_APPLICATION_PROFILE_MAX = SL_APPLICATION_PROFILE_MAX
-} sli_wifi_application_profile_t;
+typedef sl_application_profile_config_group_t sli_wifi_application_profile_config_group_t;
+
+#define SLI_WIFI_APP_PROFILE_CONFIG_IN_USE_SET     SL_APPLICATION_PROFILE_CONFIG_IN_USE_SET
+#define SLI_WIFI_APP_PROFILE_CONFIG_NOT_IN_USE_SET SL_APPLICATION_PROFILE_CONFIG_NOT_IN_USE_SET
+#define SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET        SL_APPLICATION_PROFILE_CONFIG_NOT_SET
 
 /**
  * @brief Sub-command IDs for @ref SLI_WIFI_REQ_SET_ADVANCED_CONFIG.
@@ -955,5 +959,13 @@ typedef struct __attribute__((packed)) {
   uint8_t eht_sig_mcs;
   uint8_t disregard;
 } sli_wifi_11be_per_params_wire_t;
+
+/// NWP buffer allocation command parameters
+/// The summation of all three ratios should max 10 and the ratio should be in decimal value.
+typedef struct {
+  uint8_t tx_ratio_in_buffer_pool;     ///< tx ratio
+  uint8_t rx_ratio_in_buffer_pool;     ///< rx ratio
+  uint8_t global_ratio_in_buffer_pool; ///< global ratio
+} sli_wifi_dynamic_pool;
 
 #endif // SLI_WIFI_TYPES_H

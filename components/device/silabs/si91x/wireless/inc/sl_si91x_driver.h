@@ -332,9 +332,9 @@ sl_status_t sl_si91x_configure_timestamp_memory_location(uint8_t addr_len, const
  *   - After a successful IP configuration, Gratuitous ARP is used as the periodic WLAN Keep-Alive packet with the configured keep_alive_timeout interval.
  *   - If there is no IP configuration, NULL Data Packets are used as the WLAN Keep-Alive packet. 
  *   - As an alternative, users can use @ref sl_si91x_set_timeout to set all timeouts before calling `sl_wifi_init()`.
- *   - After sl_net_set_application_profile() has been applied successfully, active and passive
+ *   - After sl_net_set_application_profile_config() has been applied successfully, active and passive
  *     channel scan timeouts return @c SL_STATUS_OK without changing the profile-managed values
- *     (@a timeout_value is ignored). Use sl_net_set_application_profile() to change those scan
+ *     (@a timeout_value is ignored). Use sl_net_set_application_profile_config() to change those scan
  *     timeouts.
  *******************************************************************************/
 sl_status_t sl_si91x_configure_timeout(sl_wifi_timeout_type_t timeout_type,

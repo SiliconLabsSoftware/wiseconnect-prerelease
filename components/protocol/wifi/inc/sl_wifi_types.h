@@ -1455,6 +1455,10 @@ typedef struct {
  * @brief Wi-Fi transceiver TX data confirmation structure.
  *
  * Indicates the status report for a transmitted data packet identified by a token.
+ *
+ * @note When this structure is passed to a transceiver callback, the pointer is valid only for the
+ *       duration of the callback. Do not free it (the framework frees it after return); copy any
+ *       fields needed after the callback returns.
  */
 typedef struct {
   /// Status report for the data packet identified by token.
@@ -1478,6 +1482,10 @@ typedef struct {
  * @brief Structure for handling received Wi-Fi transceiver data.
  *
  * Contains information about the received Wi-Fi transceiver data, which includes status, RSSI, data rate, length, and the actual data buffer.
+ *
+ * @note When this structure is passed to a transceiver callback, the pointer is valid only for the
+ *       duration of the callback. Do not free it (the framework frees it after return); copy any
+ *       fields (and payload, if needed) after return.
  */
 typedef struct {
   /// Status code for the received RX packet.

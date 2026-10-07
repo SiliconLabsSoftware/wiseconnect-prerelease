@@ -1388,10 +1388,18 @@
 //Pintool data
 #endif
 
+#ifndef M4_SSI_CS0
 #define M4_SSI_CS0 1
+#endif
+#ifndef M4_SSI_CS1
 #define M4_SSI_CS1 0
+#endif
+#ifndef M4_SSI_CS2
 #define M4_SSI_CS2 0
+#endif
+#ifndef M4_SSI_CS3
 #define M4_SSI_CS3 0
+#endif
 
 // <o> SSI_MASTER_CS Pin <0=>GPIO_9 <1=>GPIO_28 <2=>GPIO_53 <3=>GPIO_10 <4=>GPIO_15 <5=>GPIO_50 <6=>GPIO_51
 #ifndef SSI_MASTER_CS0_LOC
@@ -1440,9 +1448,11 @@
 #ifndef SSI_MASTER_CS1_LOC
 #define RTE_SSI_MASTER_CS1_PORT_ID 0
 #if (RTE_SSI_MASTER_CS1_PORT_ID == 0)
-#define RTE_SSI_MASTER_CS1      M4_SSI_CS1
-#define RTE_SSI_MASTER_CS1_PORT HP
-#define RTE_SSI_MASTER_CS1_PIN  10
+#define RTE_SSI_MASTER_CS1        M4_SSI_CS1
+#define RTE_SSI_MASTER_CS1_PORT   HP
+#define RTE_SSI_MASTER_CS1_PIN    10
+#define RTE_SSI_MASTER_CS1_MODE   EGPIO_PIN_MUX_MODE3
+#define RTE_SSI_MASTER_CS1_PADSEL 5
 #else
 #error "Invalid SSI_MASTER_CS1 Pin Configuration!"
 #endif
@@ -1493,9 +1503,11 @@
 #ifndef SSI_MASTER_CS3_LOC
 #define RTE_SSI_MASTER_CS3_PORT_ID 0
 #if (RTE_SSI_MASTER_CS3_PORT_ID == 0)
-#define RTE_SSI_MASTER_CS3      M4_SSI_CS3
-#define RTE_SSI_MASTER_CS3_PORT HP
-#define RTE_SSI_MASTER_CS3_PIN  51
+#define RTE_SSI_MASTER_CS3        M4_SSI_CS3
+#define RTE_SSI_MASTER_CS3_PORT   HP
+#define RTE_SSI_MASTER_CS3_PIN    51
+#define RTE_SSI_MASTER_CS3_MODE   EGPIO_PIN_MUX_MODE3
+#define RTE_SSI_MASTER_CS3_PADSEL 15
 #else
 #error "Invalid SSI_MASTER_CS3 Pin Configuration!"
 #endif
@@ -1764,9 +1776,15 @@
 // <i> Configuration settings for Driver_SSI_ULP_MASTER in component ::CMSIS Driver:SPI
 #define RTE_SSI_ULP_MASTER 1
 
+#ifndef ULP_SSI_CS0
 #define ULP_SSI_CS0 1
+#endif
+#ifndef ULP_SSI_CS1
 #define ULP_SSI_CS1 0
+#endif
+#ifndef ULP_SSI_CS2
 #define ULP_SSI_CS2 0
+#endif
 
 // <o> SSI_ULP_MASTER_MISO Pin <0=>Not Used <1=>ULP_GPIO_2 <2=>ULP_GPIO_9
 #if !defined(ULP_SPI_MISO_LOC) && !defined(ULP_SSI_MISO_LOC)
@@ -2070,7 +2088,7 @@
 #define RTE_SSI_ULP_MASTER_CS2_PORT   RTE_ULP_PORT
 #define RTE_SSI_ULP_MASTER_CS2_PIN    (6 + GPIO_MAX_PIN)
 #define RTE_SSI_ULP_MASTER_CS2_PADSEL 0
-#elif (RTE_SSI_ULP_MASTER_CS1_PORT_ID == 1)
+#elif (RTE_SSI_ULP_MASTER_CS2_PORT_ID == 1)
 #define RTE_SSI_ULP_MASTER_CS2        ULP_SSI_CS2
 #define RTE_SSI_ULP_MASTER_CS2_PORT   RTE_ULP_PORT
 #define RTE_SSI_ULP_MASTER_CS2_PIN    12

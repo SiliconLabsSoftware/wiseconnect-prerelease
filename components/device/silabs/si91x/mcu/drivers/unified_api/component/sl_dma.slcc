@@ -6,7 +6,7 @@ description: >
   peripehral to memory, memory to peripheral to another without the direct involvement 
   of the processor (CPU). The main benefit of using DMA is more efficient data movement 
   in the embedded system.
- 
+
   Offering simple memory to memory transfer, peripheral to memory and memory to peripheral transfer functions.
 
   When you install this component, it will also be installing the  DMA dependency component, 
@@ -31,13 +31,14 @@ source:
 include:
   - path: "inc"
     file_list:
-    - path: "sl_si91x_dma.h"
+      - path: "sl_si91x_dma.h"
 provides:
   - name: sl_dma
 define:
   - name: __STATIC_INLINE
     value: "static inline"
   - name: UDMA_ROMDRIVER_PRESENT
+    unless: [sl_dma_software]
 template_contribution:
   - name: udma_enable
     value: true

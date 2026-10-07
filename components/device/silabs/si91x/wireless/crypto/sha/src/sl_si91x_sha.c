@@ -40,6 +40,7 @@
 #ifdef SL_SI91X_SHA3_ENABLE
 #include "sl_si91x_sha3.h"
 #endif
+#include <stddef.h>
 #include <string.h>
 #include "sli_wifi_utility.h"
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
@@ -61,14 +62,15 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
                                          uint8_t *digest)
 {
   sl_status_t status = SL_STATUS_OK;
-  uint16_t send_size = 0;
   sl_wifi_buffer_t *buffer;
   const sl_wifi_system_packet_t *packet;
-  sli_si91x_sha_request_t *request = (sli_si91x_sha_request_t *)malloc(sizeof(sli_si91x_sha_request_t));
+  // Header only — msg is a FAM sent as a second fragment (avoids ~1.4KB staging buffer)
+  sli_si91x_sha_request_t *request = (sli_si91x_sha_request_t *)malloc(sizeof(*request));
+  uint32_t header_length           = sizeof(*request);
 
   SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
 
-  memset(request, 0, sizeof(sli_si91x_sha_request_t));
+  memset(request, 0, header_length);
 
 // Fill Algorithm type
 // SHA1/SHA2 use algorithm_type = SHA (4)
@@ -93,23 +95,7 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
   // Fill current chunk length
   request->current_chunk_length = chunk_len;
 
-  // Memset before filling
-  memset(&request->msg[0], 0, SL_SI91X_MAX_DATA_SIZE_IN_BYTES);
-
-  // Copy Data
-  if ((msg != NULL) && (chunk_len != 0)) {
-    memcpy(&request->msg[0], msg, chunk_len);
-  }
-
-  send_size = sizeof(sli_si91x_sha_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES + chunk_len;
-
-  status = sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-                                 SLI_WIFI_COMMON_CMD,
-                                 request,
-                                 send_size,
-                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-                                 NULL,
-                                 (void **)&buffer);
+  status = sli_si91x_crypto_send_command(request, header_length, msg, chunk_len, (void **)&buffer);
   if (status != SL_STATUS_OK) {
     free(request);
     if (buffer != NULL)

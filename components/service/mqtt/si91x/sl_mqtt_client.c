@@ -676,12 +676,9 @@ sl_status_t sl_mqtt_client_publish(sl_mqtt_client_t *client,
 
   sl_status_t status;
   sl_si91x_mqtt_client_context_t *sdk_context = NULL;
-  uint32_t publish_request_size = sizeof(sli_si91x_mqtt_client_publish_request_t) + message->content_length;
+  // Header only — message content is passed as a second fragment (no content staging buffer)
+  sli_si91x_mqtt_client_publish_request_t si91x_publish_request = { 0 };
 
-  sli_si91x_mqtt_client_publish_request_t *si91x_publish_request = calloc(1, publish_request_size);
-  if (si91x_publish_request == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
   status = sli_si91x_build_mqtt_sdk_context_if_async(SL_MQTT_CLIENT_MESSAGE_PUBLISHED_EVENT,
                                                      client,
                                                      context,
@@ -690,31 +687,34 @@ sl_status_t sl_mqtt_client_publish(sl_mqtt_client_t *client,
                                                      &sdk_context);
 
   if (status != SL_STATUS_OK) {
-    SL_CLEANUP_MALLOC(si91x_publish_request);
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
-  si91x_publish_request->command_type = SLI_SI91X_MQTT_CLIENT_PUBLISH_COMMAND;
+  si91x_publish_request.command_type = SLI_SI91X_MQTT_CLIENT_PUBLISH_COMMAND;
 
-  si91x_publish_request->dup      = message->is_duplicate_message;
-  si91x_publish_request->qos      = (uint8_t)(message->qos_level);
-  si91x_publish_request->retained = message->is_retained;
+  si91x_publish_request.dup      = message->is_duplicate_message;
+  si91x_publish_request.qos      = (uint8_t)(message->qos_level);
+  si91x_publish_request.retained = message->is_retained;
 
-  si91x_publish_request->topic_len = (uint8_t)(message->topic_length);    // Narrowing of variable
-  si91x_publish_request->msg_len   = (uint16_t)(message->content_length); // Narrowing of variable
+  si91x_publish_request.topic_len = (uint8_t)(message->topic_length);    // Narrowing of variable
+  si91x_publish_request.msg_len   = (uint16_t)(message->content_length); // Narrowing of variable
+  // msg pointer is unused on the wire; content follows the fixed header as payload
+  si91x_publish_request.msg = NULL;
 
-  si91x_publish_request->msg = (int8_t *)si91x_publish_request + sizeof(sli_si91x_mqtt_client_publish_request_t);
-  memcpy(si91x_publish_request->topic, message->topic, message->topic_length);
-  memcpy(si91x_publish_request->msg, message->content, message->content_length);
+  memcpy(si91x_publish_request.topic, message->topic, message->topic_length);
 
-  status = sli_wifi_send_command(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
-                                 SLI_SI91X_NETWORK_CMD,
-                                 si91x_publish_request,
-                                 publish_request_size,
-                                 timeout <= 0 ? SLI_WIFI_RETURN_IMMEDIATELY : SLI_WIFI_WAIT_FOR(timeout),
-                                 sdk_context,
-                                 NULL);
-  free(si91x_publish_request);
+  sli_wifi_command_payload_t fragments = {
+    .header         = &si91x_publish_request,
+    .header_length  = sizeof(si91x_publish_request),
+    .payload        = message->content,
+    .payload_length = message->content_length,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_EMB_MQTT_CLIENT,
+                                              SLI_SI91X_NETWORK_CMD,
+                                              &fragments,
+                                              timeout <= 0 ? SLI_WIFI_RETURN_IMMEDIATELY : SLI_WIFI_WAIT_FOR(timeout),
+                                              sdk_context,
+                                              NULL);
 
   if (status == SL_STATUS_IN_PROGRESS) {
     return status;

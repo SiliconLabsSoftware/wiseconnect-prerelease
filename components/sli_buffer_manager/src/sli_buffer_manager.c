@@ -794,6 +794,12 @@ sl_status_t sli_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_typ
   if (allocation_type == SLI_BUFFER_MANAGER_ALLOCATION_TYPE_DEDICATED) {
     sl_status_t status =
       sli_buffer_manager_allocate_buffer_from_dedicated_pool(&internal_buffer, pool_type, start, wait_duration_ms);
+    // Exhaustion of the TX data pool is transient backpressure on the send path, so it is returned
+    // without an ERROR tag. Every other pool keeps reporting allocation failures as errors.
+    if ((pool_type == SLI_BUFFER_MANAGER_DATA_TX_POOL)
+        && ((status == SL_STATUS_ALLOCATION_FAILED) || (status == SL_STATUS_NO_MORE_RESOURCE))) {
+      return status;
+    }
     VERIFY_STATUS_AND_RETURN(status);
 
     *buffer = internal_buffer->data;

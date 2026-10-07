@@ -221,7 +221,7 @@ static sl_status_t sli_si91x_handle_standard_scan(sl_wifi_interface_t interface,
   if (configuration->type == SL_WIFI_SCAN_TYPE_PASSIVE) {
     scan_request.pscan_bitmap[3] |= PASSIVE_SCAN_ENABLE;
   }
-  if (sli_wifi_get_active_application_profile() == SLI_WIFI_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH) {
+  if (sli_wifi_get_active_application_profile_config_group() == SLI_WIFI_APP_PROFILE_CONFIG_IN_USE_SET) {
     scan_request.pscan_bitmap[3] |= LP_CHAIN_ENABLE;
   } else if (configuration->lp_mode) {
     scan_request.pscan_bitmap[3] |= LP_CHAIN_ENABLE;

@@ -334,8 +334,8 @@ typedef struct {
   /// Length of the packet
   uint16_t length;
 
-  /// RPS content
-  uint8_t content[SLI_MAX_FWUP_CHUNK_SIZE];
+  /// RPS content (flexible; length given by @ref length, up to SLI_MAX_FWUP_CHUNK_SIZE)
+  uint8_t content[];
 } sli_si91x_req_fwup_t;
 
 /** \addtogroup SL_SI91X_TYPES
@@ -1194,7 +1194,8 @@ typedef struct {
   uint8_t key[SL_SI91X_KEY_BUFFER_SIZE];
 #endif
   uint8_t IV[SL_SI91X_IV_SIZE];
-  uint8_t msg[1408];
+  /// Message (flexible; sent as a second fragment, up to 1408 bytes)
+  uint8_t msg[];
 } sli_si91x_aes_request_t;
 
 typedef struct {
@@ -1225,7 +1226,8 @@ typedef struct {
 #else
   uint32_t key_length;
 #endif
-  uint8_t hmac_data[1400];
+  /// HMAC data (flexible; sent as a second fragment, up to 1400 bytes)
+  uint8_t hmac_data[];
 } sli_si91x_hmac_sha_request_t;
 
 /// Si91x specific SHA request
@@ -1235,7 +1237,7 @@ typedef struct {
   uint8_t sha_flags;             ///< SHA flags
   uint16_t total_msg_length;     ///< Total message length
   uint16_t current_chunk_length; ///< Current chunk length
-  uint8_t msg[1400];             ///< Message
+  uint8_t msg[];                 ///< Message (flexible; sent as a second fragment, up to 1400 bytes)
 } sli_si91x_sha_request_t;
 
 /// Si91x specific CCM request
@@ -1257,7 +1259,7 @@ typedef struct {
   uint8_t nonce[SLI_SI91X_CCM_IV_BUFF_LEN]; ///< Nonce
   uint8_t ad[SLI_SI91X_CCM_AD_MAX_SIZE];    ///< AD
   uint8_t tag[SL_SI91X_TAG_SIZE];           ///< tag size = 16
-  uint8_t msg[SLI_SI91X_CCM_MSG_MAX_SIZE];  ///< max msg size = 1200 bytes
+  uint8_t msg[]; ///< Message (flexible; sent as a second fragment, up to SLI_SI91X_CCM_MSG_MAX_SIZE)
 } sli_si91x_ccm_request_t;
 
 typedef struct {
@@ -1277,7 +1279,8 @@ typedef struct {
 #endif
   uint8_t nonce[SLI_SI91X_GCM_IV_SIZE]; // iv length = 12 bytes
   uint8_t ad[SLI_SI91X_GCM_AD_MAX_SIZE];
-  uint8_t msg[SLI_SI91X_GCM_MSG_MAX_SIZE];
+  /// Message (flexible; sent as a second fragment, up to SLI_SI91X_GCM_MSG_MAX_SIZE)
+  uint8_t msg[];
 } sli_si91x_gcm_request_t;
 
 typedef struct {
@@ -1298,7 +1301,8 @@ typedef struct {
   uint8_t keys_in[SLI_SI91X_KEYS_SIZE];
 #endif
   uint8_t header_input[SLI_SI91X_GCM_AD_MAX_SIZE];
-  uint8_t msg[SLI_SI91X_CHACHAPOLY_MSG_MAX_SIZE];
+  /// Message (flexible; sent as a second fragment, up to SLI_SI91X_CHACHAPOLY_MSG_MAX_SIZE)
+  uint8_t msg[];
 } sli_si91x_chachapoly_request_t;
 
 typedef struct {
@@ -1320,7 +1324,8 @@ typedef struct {
   uint8_t private_key[SLI_SI91X_PRIVATE_KEY_MAX_SIZE];
   uint8_t public_key[SLI_SI91X_PUBLIC_KEY_MAX_SIZE];
   uint8_t signature[SLI_SI91X_SIGNATURE_MAX_SIZE];
-  uint8_t msg[SLI_SI91X_ECDSA_MSG_MAX_SIZE];
+  /// Message (flexible; sent as a second fragment, up to SLI_SI91X_ECDSA_MSG_MAX_SIZE)
+  uint8_t msg[];
 } sl_si91x_ecdsa_request_t;
 
 typedef struct {

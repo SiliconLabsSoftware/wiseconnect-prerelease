@@ -57,6 +57,8 @@ toolchain_settings:
 - option: llvm_compiler_option
   value: -Wall -Werror -Wno-error=deprecated-declarations
 configuration:
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
 readme:
@@ -69,6 +71,7 @@ other_file:
 - path: resources/readme/connect_subscribe.png
 - path: resources/readme/delete_connections.png
 - path: resources/readme/mqtt_explorer_msg.png
+- path: resources/readme/mqtt_server.png
 - path: resources/readme/setup_soc_ncp.png
 requires:
 - name: device_needs_ram_execution

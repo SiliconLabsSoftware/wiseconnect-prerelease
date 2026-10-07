@@ -31,6 +31,7 @@
 
 #include "sl_status.h"
 #include "sl_net_types.h"
+#include "sl_net_application_profile.h"
 
 /** 
  * \addtogroup NET_INTERFACE_FUNCTIONS Network Interface
@@ -718,56 +719,3 @@ sl_status_t sl_net_wifi_ap_up(sl_net_interface_t interface, sl_net_profile_id_t 
  * @return sl_status_t Status of the operation.
  */
 sl_status_t sl_net_wifi_ap_down(sl_net_interface_t interface);
-
-/***************************************************************************/ /**
- * @brief
- *   Apply an SDK application profile preset.
- *
- * @details
- *   Selects between Default and Neutral-less Matter switch opaque presets and applies
- *   the corresponding internal Wi-Fi configuration (advanced-config frames, scan timeouts,
- *   and scan-time overrides). Applications pass only the profile enum; preset values are
- *   internal to the SDK.
- *
- * @pre Pre-conditions:
- * - @ref sl_net_init should be called before this API.
- * - **Initial apply:** Call after @ref sl_net_init and before the first @ref sl_net_up / connect
- *   when configuring scan-related parameters ahead of connect.
- *
- * @param[in] interface
- *   Network interface identified by @ref sl_net_interface_t. Only Wi-Fi client interfaces
- *   (`SL_NET_WIFI_CLIENT_INTERFACE` or `SL_NET_WIFI_CLIENT_2_INTERFACE`) are supported.
- *
- * @param[in] profile
- *   Application profile of type @ref sl_net_application_profile_t.
- *
- * @return
- *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
- *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
- *
- * @note
- *   When selecting @ref SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH, **11n mode must
- *   already be enabled during Wi-Fi initialization** (for example via
- *   @c SL_WIFI_FEAT_DISABLE_11AX_SUPPORT in the device boot configuration). The Neutral-less
- *   switch profile does not enable 11n. If 11n is not enabled, this API returns an error.
- * @note
- *   Profile application invokes multiple internal Wi-Fi APIs sequentially. If any internal API
- *   fails, this function returns the corresponding error status. The SDK does **not** roll back
- *   configuration that was already applied before the failure. The application **must re-call**
- *   this API with the desired profile to complete configuration.
- * @note
- *   **Recovery reapply (required for non-default profiles):** Profile configuration
- *   (advanced-config and scan-timeout settings) is not retained across Wi-Fi disconnect
- *   or join failure. When using a profile other than @ref SL_NET_APPLICATION_PROFILE_DEFAULT,
- *   the application **must call this API again** with the same @a interface and @a profile
- *   after disconnect or join failure, **before** the next connect or auto-join retry.
- *   The SDK does not perform automatic reapply. This API is idempotent and safe to call
- *   multiple times with the same arguments. Re-calling this API also restores scan-timeout
- *   settings applied by the preset.
- * @note
- *   Once this API has been applied successfully, active and passive channel scan timeouts
- *   are owned by the profile preset. sl_wifi_configure_timeout() and
- *   sl_si91x_configure_timeout() return @c SL_STATUS_OK for those timeout types without
- *   changing the profile-managed values until Wi-Fi is deinitialized.
- ******************************************************************************/
-sl_status_t sl_net_set_application_profile(sl_net_interface_t interface, sl_net_application_profile_t profile);

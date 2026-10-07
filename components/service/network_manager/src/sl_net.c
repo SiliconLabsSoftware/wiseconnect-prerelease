@@ -29,6 +29,7 @@
 
 #include "sl_net.h"
 #include "sl_net_constants.h"
+#include "sl_net_application_profile.h"
 #include "sl_wifi_device.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
@@ -421,6 +422,9 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface)
       sl_net_interface_initialized[i] = false;
     }
 
+    // Single host store lives in the Wi-Fi layer; clear it on net deinit too.
+    sli_wifi_set_active_application_profile_config_group(SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET);
+
     // Deinitialize network manager thread
     status = sli_network_manager_deinit();
   }
@@ -589,100 +593,112 @@ sl_status_t sl_net_get_interface_info(sl_net_interface_t interface, sl_net_inter
   return sli_net_get_interface_info(interface, info);
 }
 
-static const sl_application_profile_preset_t sli_net_application_profile_presets[SL_NET_APPLICATION_PROFILE_MAX] = {
-  [SL_NET_APPLICATION_PROFILE_DEFAULT] = {
-    .opportunistic_sleep = {
-      .opportunistic_sleep_enable   = 0,
-      .limit_rates                  = 0,
-      .average_current_window_ms    = 0,
-      .current_limit_ma             = 0,
-      .scan_off_time_ms             = 0,
-    },
-    .retry = { .max_tx_retransmissions = 15 },
-    .aggregation = {
-      .vap_id                     = SL_WIFI_CLIENT_VAP_ID,
-      .aggregation_tx_enable      = 1,
-      .aggregation_rx_buffer_size = 8,
-    },
-    .active_scan_timeout_ms  = 100,
-    .passive_scan_timeout_ms = 400,
-  },
-  [SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH] = {
-    .opportunistic_sleep = {
-      .opportunistic_sleep_enable   = 1,
-      .limit_rates                  = 1,
-      .average_current_window_ms    = 250,
-      .current_limit_ma             = 30,
-      .scan_off_time_ms             = 100,
-    },
-    .retry = { .max_tx_retransmissions = 4 },
-    .aggregation = {
-      .vap_id                     = SL_WIFI_CLIENT_VAP_ID,
-      .aggregation_tx_enable      = 0,
-      .aggregation_rx_buffer_size = 1,
-    },
-    .active_scan_timeout_ms  = 30,
-    .passive_scan_timeout_ms = 110,
-  },
-};
-
-sl_status_t sl_net_set_application_profile(sl_net_interface_t interface, sl_net_application_profile_t profile)
+sl_status_t sl_net_set_application_profile_config(sl_net_application_profile_config_group_t config_group)
 {
-  sl_status_t status;
-  const sl_application_profile_preset_t *preset;
-  const sl_wifi_interface_t wifi_interface = SL_WIFI_CLIENT_INTERFACE;
-
-  if ((interface != SL_NET_WIFI_CLIENT_1_INTERFACE) && (interface != SL_NET_WIFI_CLIENT_2_INTERFACE)) {
-    return SL_STATUS_NOT_SUPPORTED;
-  }
-
-  if (!sl_net_interface_initialized[interface]) {
+  if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  if (profile >= SL_NET_APPLICATION_PROFILE_MAX) {
-    return SL_STATUS_INVALID_PARAMETER;
+  if (!sli_is_any_interface_initialized()) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+#if SL_NET_APP_PROFILE != SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+  (void)config_group;
+  return SL_STATUS_INVALID_PROFILE;
+#else
+  {
+    sl_status_t status;
+    const sl_wifi_interface_t wifi_interface                  = SL_WIFI_CLIENT_INTERFACE;
+    sli_wifi_opportunistic_sleep_config_t opportunistic_sleep = { 0 };
+    sli_wifi_retry_config_t retry                             = { 0 };
+    sli_wifi_aggregation_config_t aggregation                 = { 0 };
+    uint16_t active_scan_timeout_ms                           = 0;
+    uint16_t passive_scan_timeout_ms                          = 0;
+
+    if ((config_group != SL_NET_APP_PROFILE_CONFIG_IN_USE_SET)
+        && (config_group != SL_NET_APP_PROFILE_CONFIG_NOT_IN_USE_SET)) {
+      return SL_STATUS_INVALID_PARAMETER;
+    }
+
+    if ((config_group == SL_NET_APP_PROFILE_CONFIG_IN_USE_SET) && !sli_wifi_is_11n_only_mode_enabled()) {
+      return SL_STATUS_INVALID_CONFIGURATION;
+    }
+
+    if (config_group == SL_NET_APP_PROFILE_CONFIG_IN_USE_SET) {
+      opportunistic_sleep.opportunistic_sleep_enable =
+        SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_OPPORTUNISTIC_SLEEP_ENABLE;
+      opportunistic_sleep.limit_rates = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_LIMIT_RATES;
+      opportunistic_sleep.average_current_window_ms =
+        SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_AVERAGE_CURRENT_WINDOW_MS;
+      opportunistic_sleep.current_limit_ma   = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_CURRENT_LIMIT_MA;
+      opportunistic_sleep.scan_off_time_ms   = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_SCAN_OFF_TIME_MS;
+      retry.max_tx_retransmissions           = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_MAX_TX_RETRANSMISSIONS;
+      aggregation.vap_id                     = SL_WIFI_CLIENT_VAP_ID;
+      aggregation.aggregation_tx_enable      = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_AGGREGATION_TX_ENABLE;
+      aggregation.aggregation_rx_buffer_size = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_AGGREGATION_RX_BUFFER_SIZE;
+      active_scan_timeout_ms                 = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_ACTIVE_SCAN_TIMEOUT_MS;
+      passive_scan_timeout_ms                = SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE_PASSIVE_SCAN_TIMEOUT_MS;
+    } else {
+      opportunistic_sleep.opportunistic_sleep_enable =
+        SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_OPPORTUNISTIC_SLEEP_ENABLE;
+      opportunistic_sleep.limit_rates = SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_LIMIT_RATES;
+      opportunistic_sleep.average_current_window_ms =
+        SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_AVERAGE_CURRENT_WINDOW_MS;
+      opportunistic_sleep.current_limit_ma = SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_CURRENT_LIMIT_MA;
+      opportunistic_sleep.scan_off_time_ms = SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_SCAN_OFF_TIME_MS;
+      retry.max_tx_retransmissions         = SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_MAX_TX_RETRANSMISSIONS;
+      aggregation.vap_id                   = SL_WIFI_CLIENT_VAP_ID;
+      aggregation.aggregation_tx_enable    = SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_AGGREGATION_TX_ENABLE;
+      aggregation.aggregation_rx_buffer_size =
+        SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_AGGREGATION_RX_BUFFER_SIZE;
+      active_scan_timeout_ms  = SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_ACTIVE_SCAN_TIMEOUT_MS;
+      passive_scan_timeout_ms = SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE_PASSIVE_SCAN_TIMEOUT_MS;
+    }
+
+    status = sli_wifi_set_opportunistic_sleep_config(wifi_interface, &opportunistic_sleep);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    status = sli_wifi_set_retry_config(wifi_interface, &retry);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    status = sli_wifi_set_aggregation_config(wifi_interface, &aggregation);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    status =
+      sli_wifi_configure_profile_timeout(wifi_interface, SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT, active_scan_timeout_ms);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    status =
+      sli_wifi_configure_profile_timeout(wifi_interface, SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT, passive_scan_timeout_ms);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+
+    sli_wifi_set_active_application_profile_config_group((sli_wifi_application_profile_config_group_t)config_group);
+    return SL_STATUS_OK;
+  }
+#endif
+}
+
+sl_status_t sl_net_get_application_profile_config_group(sl_net_application_profile_config_group_t *config_group)
+{
+  if (config_group == NULL) {
+    return SL_STATUS_NULL_POINTER;
   }
 
   if (!sl_si91x_is_device_initialized()) {
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  if ((profile == SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH) && !sli_wifi_is_11n_only_mode_enabled()) {
-    return SL_STATUS_INVALID_CONFIGURATION;
-  }
-
-  preset = &sli_net_application_profile_presets[profile];
-
-  status = sli_wifi_set_opportunistic_sleep_config(wifi_interface, &preset->opportunistic_sleep);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  status = sli_wifi_set_retry_config(wifi_interface, &preset->retry);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  status = sli_wifi_set_aggregation_config(wifi_interface, &preset->aggregation);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  status = sli_wifi_configure_profile_timeout(wifi_interface,
-                                              SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT,
-                                              preset->active_scan_timeout_ms);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  status = sli_wifi_configure_profile_timeout(wifi_interface,
-                                              SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT,
-                                              preset->passive_scan_timeout_ms);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
-
-  sli_wifi_set_active_application_profile((sli_wifi_application_profile_t)profile);
+  *config_group = sli_wifi_get_active_application_profile_config_group();
   return SL_STATUS_OK;
 }

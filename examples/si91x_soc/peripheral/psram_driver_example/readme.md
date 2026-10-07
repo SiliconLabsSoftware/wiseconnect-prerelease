@@ -52,7 +52,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Application Build Environment
 
-- Configure the following macros in [`main.c`](main.c) file and update/modify following macros, if required.
+- Configure the following macros in [`app.c`](app.c) and update/modify following macros, if required.
 
   - `READ_WRITE_LENGTH`: Number of bytes transferred in each PSRAM read/write test (auto mode, manual mode, and DMA mode). By default, it is set to 256.
 
@@ -85,20 +85,13 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Test the Application
 
-> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
->
-> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
->
-> Replace **COM5** with the serial port your board uses on the host PC.
-
-
 1. Compile and run the application.
 2. Logs are printed with success or failure status for PSRAM read & write events in auto mode, manual mode, and manual via DMA mode.
 3. Serial console output will be below.
 
     > ![Figure: outputConsole_PSRAM_DRIVER_Example](resources/readme/outputConsole_PSRAM_DRIVER_Example.png)
 
-> **Note:** PSRAM driver application is integrated with logger, where sl_si91x_log_backend_uart is used as the backend.
+> **Note:** This application uses formatted IOStream logging over UART VCOM (`si91x_log_iostream_formatted`). Open the Simplicity Studio serial console on the board VCOM port to see the text output.
 
 > **Note:**
 >

@@ -1463,10 +1463,10 @@ sl_status_t sl_wifi_set_advanced_client_configuration(sl_wifi_interface_t interf
  *
  * @note For BSS_MAX_IDLE_PERIOD: can be called after opermode set and before association.
  * @note Configuration is applied during the next association/reconnection.
- * @note After sl_net_set_application_profile() has been applied successfully,
+ * @note After sl_net_set_application_profile_config() has been applied successfully,
  *       @ref SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT and @ref SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT
  *       return @c SL_STATUS_OK without changing the profile-managed values (@a timeout_value is
- *       ignored). Use sl_net_set_application_profile() to change those scan timeouts.
+ *       ignored). Use sl_net_set_application_profile_config() to change those scan timeouts.
  ******************************************************************************/
 sl_status_t sl_wifi_configure_timeout(sl_wifi_interface_t interface,
                                       sl_wifi_timeout_type_t timeout_type,

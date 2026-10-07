@@ -39,7 +39,9 @@
 #include "sli_utility.h"
 #include <stdint.h>
 
-#define SLI_WIFI_HEADER_SIZE                   16
+#ifndef SLI_WIFI_HEADER_SIZE
+#define SLI_WIFI_HEADER_SIZE 16
+#endif
 #define SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE     4
 #define SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE 1640
 #define SLI_WIFI_TRANSMIT_TEST_MAX_MEMCPY_CHUNK \
@@ -233,5 +235,32 @@ void sli_wifi_save_boot_feature_bit_map(uint32_t feature_bit_map);
  * @return true if 11n-only (11ax disabled) was configured at init, else false.
  ******************************************************************************/
 bool sli_wifi_is_11n_only_mode_enabled(void);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Send an encrypt-crypto command with a request header and optional payload.
+ * @details
+ *   Builds the header/payload fragments and dispatches
+ *   @ref SLI_COMMON_REQ_ENCRYPT_CRYPTO. Shared by the AES, CCM, GCM, HMAC,
+ *   SHA, ECDSA, and ChaChaPoly engines so the send sequence is not duplicated.
+ ******************************************************************************/
+static inline sl_status_t sli_si91x_crypto_send_command(const void *header,
+                                                        uint32_t header_length,
+                                                        const void *payload,
+                                                        uint32_t payload_length,
+                                                        void **response_buffer)
+{
+  sli_wifi_command_payload_t fragments;
+  fragments.header         = header;
+  fragments.header_length  = header_length;
+  fragments.payload        = payload;
+  fragments.payload_length = payload_length;
+  return sli_wifi_send_command_with_payload(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
+                                            SLI_WIFI_COMMON_CMD,
+                                            &fragments,
+                                            SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
+                                            NULL,
+                                            response_buffer);
+}
 
 #endif

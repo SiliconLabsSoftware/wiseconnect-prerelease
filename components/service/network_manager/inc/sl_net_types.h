@@ -35,7 +35,6 @@
 #include "sl_constants.h"
 #include "sl_status.h"
 #include "sl_utility.h"
-#include "sl_application_profile_types.h"
 #include "sl_wifi_types.h"
 #include <stdint.h>
 
@@ -155,18 +154,5 @@ typedef struct {
     // Add other hardware-specific structs here if needed
   } hw_info; ///< Hardware-specific information
 } sl_net_interface_info_t;
-
-/**
- * @brief Application power/behavior profile selector for @ref sl_net_set_application_profile.
- * @details Non-default profiles require the application to re-call
- *          @ref sl_net_set_application_profile after Wi-Fi disconnect and join failure;
- *          see that API for the recovery contract.
- */
-typedef enum {
-  SL_NET_APPLICATION_PROFILE_DEFAULT = SL_APPLICATION_PROFILE_DEFAULT, ///< Default Wi-Fi behavior
-  SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH =
-    SL_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH, ///< Neutral-less Matter switch power preset
-  SL_NET_APPLICATION_PROFILE_MAX = SL_APPLICATION_PROFILE_MAX
-} sl_net_application_profile_t;
 
 /** @} */

@@ -20,6 +20,11 @@
 #include "sl_log_proprietary_config.h"
 #endif
 
+#ifdef SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_PRESENT
+#include "sl_iostream_init_instances.h"
+#include "sl_event_handler.h"
+#endif
+
 #define SL_SI91X_HOST_CORE_ID     0       // Host core identifier
 #define SL_SI91X_LOG_TIMER_FREQ   1000000 // 1 MHz timer frequency for microsecond resolution
 #define SL_SI91X_CAPTIVE_CORE_ID  1       // Captive core identifier
@@ -33,10 +38,6 @@
 uint32_t sl_si91x_cc_timestamp = 0;    //Variable holding captive core timestamp
 uint32_t sl_si91x_log_host_timesync_address =
   (uint32_t)&sl_si91x_cc_timestamp; //Variable holding address of Captive core timestamp
-#endif
-#ifdef SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_PRESENT
-#include "sl_iostream_init_instances.h"
-#include "sl_event_handler.h"
 #endif
 /*******************************************************************************
  *                               GLOBAL VARIABLES
@@ -186,7 +187,7 @@ sl_status_t sl_log_hal_post_sleep_process(const void *config);
 /**
  * @brief Get the platform-specific logging configuration.
  *
- * @param[out] args Pointer to a platform config structure to fill
+ * @param[out] args Pointer to a platform config structure to fill (currently unused)
  * @param[in]  core_id Core identifier
  * @return SL_STATUS_OK currently always returned
  */
@@ -281,7 +282,7 @@ static void timer_overflow_callback(void);
  * @brief Timer overflow callback function.
  * 
  */
-void timer_overflow_callback(void)
+static void timer_overflow_callback(void)
 {
   sli_log_si91x_timer_epoch++;
 }
@@ -435,8 +436,8 @@ sl_status_t sl_log_hal_pre_sleep_process(const void *config)
 {
   sl_status_t status = SL_STATUS_OK;
   (void)config;
-  sli_log_si91x_timesync_done = false;
-  sl_log_api_backend_t *api   = sl_log_get_api_backend();
+  sli_log_si91x_timesync_done     = false;
+  const sl_log_api_backend_t *api = sl_log_get_api_backend();
   api->backend_deinit();
   status = sl_si91x_ulp_timer_stop(ULP_TIMER_3);
   if (status != SL_STATUS_OK) {
@@ -456,7 +457,7 @@ sl_status_t sl_log_hal_post_sleep_process(const void *config)
   // Implementation for post-sleep process
   (void)config;
 
-  sl_log_api_backend_t *api = sl_log_get_api_backend();
+  const sl_log_api_backend_t *api = sl_log_get_api_backend();
 #ifdef SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_PRESENT
   sl_iostream_init_instances_stage_1();
   sl_iostream_init_instances_stage_2();
@@ -538,8 +539,8 @@ void sli_handle_nwp_log_packet(const uint8_t *data, uint16_t length)
 /**
  * @brief   Get the platform-specific logging configuration.
  * 
- * @param args  Pointer to a platform config structure to fill
- * @param core_id  Core identifier
+ * @param[out] args  Pointer to a platform config structure to fill (currently unused)
+ * @param[in] core_id  Core identifier
  * @return sl_status_t 
  */
 sl_status_t sl_log_hal_get_configuration(void *args, uint8_t core_id)
@@ -580,7 +581,7 @@ sl_status_t sl_log_hal_set_configuration(const void *args, uint8_t core_id)
   sl_iostream_init_instances_stage_2();
 #endif
   sl_log_hal_timer_sync(NULL, SL_SI91X_CAPTIVE_CORE_ID);
-  sl_log_api_backend_t *api = sl_log_get_api_backend();
+  const sl_log_api_backend_t *api = sl_log_get_api_backend();
   if (api != NULL) {
     api->backend_deinit();
     api->backend_init();
@@ -734,10 +735,10 @@ sl_status_t sl_log_write_multiple_to_ring_buffer(const sli_nwp_log_event_t *even
      || (defined(SL_CATALOG_SI91X_LOG_BACKEND_IOSTREAM_COMPACT_PRESENT) \
          && defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT)))
   sl_log_event_t buffer;
-  sl_log_api_backend_t *sl_log_backend_api = sl_log_get_api_backend();
+  const sl_log_api_backend_t *sl_log_backend_api = sl_log_get_api_backend();
   for (uint32_t i = 0; i < count; i++) {
     sli_sl_log_event_from_nwp(&events[i], &buffer);
-    sl_log_backend_api->backend_write((sl_log_event_t *)&buffer, 0, 1);
+    sl_log_backend_api->backend_write(&buffer, 0, 1);
   }
 #endif
   return SL_STATUS_OK;

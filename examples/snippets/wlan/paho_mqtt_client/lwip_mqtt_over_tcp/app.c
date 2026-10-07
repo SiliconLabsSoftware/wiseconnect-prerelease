@@ -87,9 +87,6 @@
 #define WILL_FLAG_ENABLE      0
 #define IPV6_PARSE_SUCCESS    1
 
-// Set to 1 to call sl_net_set_application_profile() in this example (Neutral-less Matter switch preset).
-#define ENABLE_APPLICATION_PROFILE 0
-
 /******************************************************
  *               Variable Definitions
  ******************************************************/
@@ -117,8 +114,8 @@ static const sl_wifi_device_configuration_t wifi_mqtt_client_configuration = {
   .boot_config = { .oper_mode       = SL_SI91X_CLIENT_MODE,
                    .coex_mode       = SL_SI91X_WLAN_ONLY_MODE,
                    .feature_bit_map = (SL_WIFI_FEAT_SECURITY_PSK | SL_WIFI_FEAT_AGGREGATION
-#if ENABLE_APPLICATION_PROFILE
-                                       | SL_WIFI_FEAT_DISABLE_11AX_SUPPORT
+#if SL_NET_APP_PROFILE == SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+                                       | SL_WIFI_FEAT_DISABLE_11AX_SUPPORT | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE
 #endif
                                        ),
                    .tcp_ip_feature_bit_map =
@@ -131,6 +128,9 @@ static const sl_wifi_device_configuration_t wifi_mqtt_client_configuration = {
                    .custom_feature_bit_map     = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID),
                    .ext_custom_feature_bit_map = (SL_SI91X_EXT_FEAT_SSL_VERSIONS_SUPPORT | SL_SI91X_EXT_FEAT_XTAL_CLK
                                                   | SL_SI91X_EXT_FEAT_UART_SEL_FOR_DEBUG_PRINTS | MEMORY_CONFIG
+#if SL_NET_APP_PROFILE == SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+                                                  | SL_SI91X_EXT_FEAT_LOW_POWER_MODE
+#endif
 #ifdef SLI_SI917
                                                   | SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
 #endif
@@ -142,7 +142,11 @@ static const sl_wifi_device_configuration_t wifi_mqtt_client_configuration = {
                       | SL_SI91X_CONFIG_FEAT_EXTENSION_VALID),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
-                   .config_feature_bit_map  = SL_SI91X_ENABLE_NWP_LOGGING },
+                   .config_feature_bit_map  = (SL_SI91X_ENABLE_NWP_LOGGING
+#if SL_NET_APP_PROFILE == SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+                                              | SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_ENHANCED_MAX_PSP
+#endif
+                                              ) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -178,6 +182,10 @@ static sl_net_wifi_lwip_context_t wifi_client_context;
 ******************************************************/
 static void application_start(void *argument);
 int paho_mqtt_demo();
+#if SL_NET_APP_PROFILE == SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+static sl_status_t enable_associated_power_save(void);
+static sl_status_t apply_neutral_less_with_power_save(void);
+#endif
 
 /******************************************************
  *               Function Definitions
@@ -197,6 +205,50 @@ int configure_tls_certificates(TLS_cert_ctx_t *tls_config)
 
   return 0;
 }
+
+#if SL_NET_APP_PROFILE == SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+/***************************************************************************/ /**
+ * @brief Enable Wi-Fi associated power save (low latency / enhanced MAX PSP).
+ * @return SL_STATUS_OK on success, or the failing API status.
+ ******************************************************************************/
+static sl_status_t enable_associated_power_save(void)
+{
+  sl_status_t status;
+  // Associated power save low latency; remaining fields left at defaults.
+  sl_wifi_performance_profile_v2_t performance_profile = { .profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY };
+
+  status = sl_wifi_set_performance_profile_v2(&performance_profile);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lx\r\n", status);
+    return status;
+  }
+  SL_DEBUG_LOG_V2(INFO, "Associated Power Save Low latency enabled\r\n");
+
+  return SL_STATUS_OK;
+}
+
+/***************************************************************************/ /**
+ * @brief Apply Neutral-less POWER_SAVE config, then enable associated power save.
+ * @details Matter Neutral-less in-use mode requires both the application-profile
+ *          knobs and Wi-Fi associated power save. Power save is applied only
+ *          after the Neutral-less API succeeds. Uses
+ *          ASSOCIATED_POWER_SAVE_LOW_LATENCY.
+ * @return SL_STATUS_OK on success, or the failing API status.
+ ******************************************************************************/
+static sl_status_t apply_neutral_less_with_power_save(void)
+{
+  sl_status_t status;
+
+  status = sl_net_set_application_profile_config(SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE);
+  if (status != SL_STATUS_OK) {
+    SL_DEBUG_LOG_V2(ERROR, "Failed to apply Neutral-less POWER_SAVE config: 0x%lx\r\n", status);
+    return status;
+  }
+  SL_DEBUG_LOG_V2(INFO, "Neutral-less POWER_SAVE application profile config applied\r\n");
+
+  return enable_associated_power_save();
+}
+#endif
 
 void app_init(void)
 {
@@ -227,21 +279,28 @@ static void application_start(void *argument)
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi client initialized successfully\r\n");
-#if ENABLE_APPLICATION_PROFILE
-  status =
-    sl_net_set_application_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH);
+
+#if SL_NET_APP_PROFILE == SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+  status = apply_neutral_less_with_power_save();
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to set application profile: 0x%lx\r\n", status);
     return;
   }
-  SL_DEBUG_LOG_V2(INFO, "Application profile applied\r\n");
 #endif
+
   status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
   if (status != SL_STATUS_OK) {
     SL_DEBUG_LOG_V2(ERROR, "Failed to bring Wi-Fi client interface up: 0x%lX\r\n", status);
     return;
   }
   SL_DEBUG_LOG_V2(INFO, "Wi-Fi client connected\r\n");
+
+#if SL_NET_APP_PROFILE == SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+  // Associated power save requires an active association; re-apply after sl_net_up().
+  status = enable_associated_power_save();
+  if (status != SL_STATUS_OK) {
+    return;
+  }
+#endif
 
   status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
   if (status != SL_STATUS_OK) {

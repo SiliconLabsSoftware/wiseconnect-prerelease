@@ -249,7 +249,11 @@ sl_status_t sli_queue_manager_remove_node_from_queue(sli_queue_t *handle,
     } else if (handle->tail == node) {
       handle->tail = prev;
     } else {
-      prev->next = node->next;
+      // Non-head/non-tail node: prev is always set by traversal on a consistent list.
+      assert(prev != NULL);
+      if (prev != NULL) {
+        prev->next = node->next;
+      }
     }
   }
   CORE_ExitAtomic(state);

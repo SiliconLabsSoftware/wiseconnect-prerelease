@@ -69,17 +69,17 @@ sl_bh1750_handle_t sl_si91x_bh1750_create(sl_sensor_bus_t bus, uint8_t dev_addr)
   uint8_t a[5];
   (void)bus;
   if (sensor == NULL) {
-    DEBUGOUT("\r\n BH1750 Create fail Unable to allocate memory \r\n");
+    SL_PRINT_STRING_ERROR("\r\n BH1750 Create fail Unable to allocate memory \r\n");
   }
   a[0]            = (uint8_t)(0x01 & 0xFF);
   sensor->i2c_dev = I2Cdrv->MasterTransmit(SL_BH1750_I2C_ADDRESS_DEFAULT, a, 1, false);
 
   if (sensor->i2c_dev != SL_DRIVER_OK) {
-    DEBUGOUT("bh1750 create fail I2C unable to transmit:%" PRId32 "\r\n", sensor->i2c_dev);
+    SL_PRINT_STRING_ERROR("bh1750 create fail I2C unable to transmit:%" PRId32 "\r\n", sensor->i2c_dev);
     return NULL;
   }
 
-  DEBUGOUT("\r\n I2C - BH1750 Light Sensor Create \r\n");
+  SL_PRINT_STRING_ERROR("\r\n I2C - BH1750 Light Sensor Create \r\n");
   while (I2Cdrv->GetStatus().busy)
     ;
   /*TODO: check the time out */
@@ -154,7 +154,7 @@ sl_bh170_err_t sl_si91x_bh1750_power_on(sl_bh1750_handle_t sensor)
   a[0] = (uint8_t)(SL_BH1750_POWER_ON & 0xFF);
   ret  = (int32_t)I2Cdrv->MasterTransmit(SL_BH1750_I2C_ADDRESS_DEFAULT, a, 1, false); //sens->i2c_dev
   if (ret != ARM_DRIVER_OK) {
-    DEBUGOUT("\r\n BH1750 Power on command transmit fail %" PRId32 " \r\n", ret);
+    SL_PRINT_STRING_ERROR("\r\n BH1750 Power on command transmit fail %" PRId32 " \r\n", ret);
     return ret;
   }
 
@@ -235,7 +235,7 @@ sl_bh170_err_t sl_si91x_bh1750_set_measure_mode(sl_bh1750_handle_t sensor, sl_bh
   a[0] = (uint8_t)(cmd_measure & 0xFF);
   ret  = (int32_t)I2Cdrv->MasterTransmit(SL_BH1750_I2C_ADDRESS_DEFAULT, a, 1, false);
   if (ret != ARM_DRIVER_OK) {
-    DEBUGOUT("\r\n BH1750 set measure mode command transmit fail :%" PRId32 "\r\n", ret);
+    SL_PRINT_STRING_ERROR("\r\n BH1750 set measure mode command transmit fail :%" PRId32 "\r\n", ret);
     return ret;
   }
   /* TODO: Add timeout and PASS error*/
@@ -262,7 +262,7 @@ sl_bh170_err_t sl_si91x_bh1750_get_data(sl_bh1750_handle_t sensor, float *data)
   uint8_t bh1750_data[2] = { 0 };
   ret                    = (int32_t)I2Cdrv->MasterReceive(SL_BH1750_I2C_ADDRESS_DEFAULT, bh1750_data, 2, false);
   if (ret != RSI_OK) {
-    DEBUGOUT("\r\n BH1750 Data transmit fail :%" PRId32 "\r\n", ret);
+    SL_PRINT_STRING_ERROR("\r\n BH1750 Data transmit fail :%" PRId32 "\r\n", ret);
     return ret;
   }
   /* TODO: Add timeout and PASS error*/
@@ -313,7 +313,7 @@ sl_bh170_err_t sl_si91x_bh1750_init(sl_sensor_bus_t i2c_bus)
   bh1750 = sl_si91x_bh1750_create(i2c_bus, SL_BH1750_I2C_ADDRESS_DEFAULT);
 
   if (bh1750 == NULL) {
-    DEBUGOUT("\r\n BH1750 Init fail \r\n");
+    SL_PRINT_STRING_ERROR("\r\n BH1750 Init fail \r\n");
     return RSI_FAIL;
   }
   is_light_init = true;
@@ -329,13 +329,13 @@ sl_bh170_err_t sl_si91x_bh1750_init(sl_sensor_bus_t i2c_bus)
 sl_bh170_err_t sl_si91x_bh1750_deinit(void)
 {
   if (!is_light_init) {
-    DEBUGOUT("\r\n BH1750 denit fail, not initialized \r\n");
+    SL_PRINT_STRING_ERROR("\r\n BH1750 denit fail, not initialized \r\n");
     return RSI_FAIL;
   }
 
   sl_bh170_err_t ret = sl_si91x_bh1750_delete(&bh1750);
   if (ret != RSI_OK) {
-    DEBUGOUT("\r\n BH1750 deinit fail \r\n");
+    SL_PRINT_STRING_ERROR("\r\n BH1750 deinit fail \r\n");
     return RSI_FAIL;
   }
 

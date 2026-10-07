@@ -232,12 +232,7 @@ void disconnect_notify_handler(AWS_IoT_Client *pClient, void *data)
 {
   UNUSED_PARAMETER(pClient);
   UNUSED_PARAMETER(data);
-  /* Note: All status messages in this example — both success and failure — are
- * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
- * on the console at the default log level. This is a demonstration choice, not
- * a recommendation: in production code, ERROR severity should be reserved for
- * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
- * (or SL_PRINT_STRING_DEBUG for verbose trace). */
+  // Failures use SL_PRINT_STRING_ERROR; success/status use SL_PRINT_STRING_ERROR.
 
   SL_PRINT_STRING_ERROR("\r\nMQTT disconnected abruptly and pClient state is: %d\r\n",
                         pClient->clientStatus.clientState);
@@ -308,7 +303,7 @@ void sl_si91x_aws_task(void)
   memcpy(&ip_address.ip.v4.bytes, &profile.ip.ip.v4.ip_address.bytes, sizeof(sl_ipv4_address_t));
   SL_PRINT_STRING_ERROR("\r\nIP address is ");
   print_sl_ip_address(&ip_address);
-  printf("\r\n");
+  SL_PRINT_STRING_ERROR("\r\n");
 
   sh_aws_status = load_certificates_in_flash();
   if (sh_aws_status != SL_STATUS_OK) {
@@ -381,32 +376,20 @@ sl_status_t start_aws_mqtt(void)
 #endif
 
   sl_mac_address_t mac_addr = { 0 };
-  char mac_id[18];
   sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
-  sprintf(mac_id,
-          "%x:%x:%x:%x:%x:%x",
-          mac_addr.octet[0],
-          mac_addr.octet[1],
-          mac_addr.octet[2],
-          mac_addr.octet[3],
-          mac_addr.octet[4],
-          mac_addr.octet[5]);
-  SL_PRINT_STRING_ERROR("\r\n client_id:%s \r\n", (uint32_t)(uintptr_t)mac_id);
+  // Logger accepts at most 3 args per call, so split the MAC print.
+  SL_PRINT_STRING_ERROR("\r\n client_id:%x:%x:%x", mac_addr.octet[0], mac_addr.octet[1], mac_addr.octet[2]);
+  SL_PRINT_STRING_ERROR(":%x:%x:%x \r\n", mac_addr.octet[3], mac_addr.octet[4], mac_addr.octet[5]);
 
   sl_si91x_firmware_version_t fw_version = { 0 };
   sh_aws_status                          = sl_si91x_get_firmware_version(&fw_version);
   if (sh_aws_status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("\r\nFirmware version Failed, Error Code : 0x%lX\r\n", sh_aws_status);
   } else {
-    printf("\r\nFirmware version is: %x%x.%d.%d.%d.%d.%d.%d\r\n",
-           fw_version.chip_id,
-           fw_version.rom_id,
-           fw_version.major,
-           fw_version.minor,
-           fw_version.security_version,
-           fw_version.patch_num,
-           fw_version.customer_id,
-           fw_version.build_num);
+    // Logger accepts at most 3 args per call, so split the version print.
+    SL_PRINT_STRING_ERROR("\r\nFirmware version is: %x%x.%d", fw_version.chip_id, fw_version.rom_id, fw_version.major);
+    SL_PRINT_STRING_ERROR(".%d.%d.%d", fw_version.minor, fw_version.security_version, fw_version.patch_num);
+    SL_PRINT_STRING_ERROR(".%d.%d\r\n", fw_version.customer_id, fw_version.build_num);
   }
 
   mqtt_init_params.enableAutoReconnect       = true;
@@ -545,7 +528,7 @@ sl_status_t start_aws_mqtt(void)
         publish_iot_msg.isRetained = 0;
         publish_iot_msg.payloadLen = strlen(mqtt_publish_payload);
 #else
-        printf("\rData to be published: %s\n", MQTT_PUBLISH_PAYLOAD);
+        SL_PRINT_STRING_ERROR("\rData to be published: %s\n", (uintptr_t)MQTT_PUBLISH_PAYLOAD);
 
         publish_iot_msg.qos        = PUBLISH_QOS;
         publish_iot_msg.payload    = MQTT_PUBLISH_PAYLOAD;

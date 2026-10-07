@@ -138,7 +138,7 @@ The example uses five log levels:
 | **WARN** | Non-fatal anomalies such as repeated requests for the same state. | `SL_PRINT_STRING_WARN` |
 | **ERROR** | Most severe among the macros used in this example. Failures that require attention (API failures, resource creation failures). | `SL_PRINT_STRING_ERROR` |
 
-The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the WiSeConnect API reference). UC **Debug Level** names map to `SL_LOG_CONFIG_LEVEL_*` in `config/sl_log_common_config.h`—the authoritative in-repo definitions for compile-time values (`SL_LOG_CONFIG_LEVEL_NONE`, and so on) and for levels not shown above (for example, `SL_LOG_CONFIG_LEVEL_CRASH`).  
+The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the WiSeConnect API reference). UC **Debug Level** names map to `SL_LOG_CONFIG_LEVEL_*` in `config/sl_log_common_config.h` —the authoritative in-repo definitions for compile-time values (`SL_LOG_CONFIG_LEVEL_NONE`, and so on) and for levels not shown above (for example, `SL_LOG_CONFIG_LEVEL_CRASH`).  
 
 ## UC Config
 

@@ -32,6 +32,7 @@ include:
   - path: sl_net_types.h
   - path: sl_net_wifi_types.h
   - path: sl_net.h
+  - path: sl_net_application_profile.h
   - path: sli_net_credentials.h
   - path: sli_net_common_utility.h
   - path: sli_net_constants.h
@@ -50,6 +51,14 @@ define:
 - name: SL_NET_COMPONENT_INCLUDED
 - name: __STATIC_INLINE
   value: static inline
+# UC profile select (Studio Software Components → Network Manager → Configure).
+# Do not also put SL_NET_APP_PROFILE in example .slcp configuration — that fights the wizard.
+# Knob header is a config_file too so Studio copies it into project config/ (not via include path).
+config_file:
+- path: config/sl_net_application_profile_config.h
+  file_id: sl_net_application_profile_config
+- path: config/sl_net_application_profile_neutral_less_config.h
+  file_id: sl_net_application_profile_neutral_less_config
 requires:
 - name: wifi
 - name: network_config_manager

@@ -38,6 +38,7 @@
 #if defined(SLI_MULTITHREAD_DEVICE_SI91X)
 #include "sl_si91x_crypto_thread.h"
 #endif
+#include <stddef.h>
 #include <string.h>
 
 #if defined(SLI_SI917B0)
@@ -62,12 +63,12 @@ static sl_status_t sli_si91x_gcm_pending(sl_si91x_gcm_config_t *config,
                                          uint8_t gcm_flags,
                                          uint8_t *output)
 {
-  sl_status_t status               = SL_STATUS_FAIL;
-  sl_wifi_buffer_t *buffer         = NULL;
-  sl_wifi_system_packet_t *packet  = NULL;
-  sli_si91x_gcm_request_t *request = (sli_si91x_gcm_request_t *)malloc(sizeof(sli_si91x_gcm_request_t));
-
-  SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
+  sl_status_t status              = SL_STATUS_FAIL;
+  sl_wifi_buffer_t *buffer        = NULL;
+  sl_wifi_system_packet_t *packet = NULL;
+  // Header only — msg is a FAM sent as a second fragment (avoids ~1.4KB staging buffer)
+  uint32_t header_length = sizeof(sli_si91x_gcm_request_t);
+  sli_si91x_gcm_request_t *request;
 
   // Only 32 bytes M4 OTA built-in key support is present
   if (config->key_config.b0.key_type == SL_SI91X_BUILT_IN_KEY) {
@@ -86,7 +87,10 @@ static sl_status_t sli_si91x_gcm_pending(sl_si91x_gcm_config_t *config,
   }
 #endif
 
-  memset(request, 0, sizeof(sli_si91x_gcm_request_t));
+  request = (sli_si91x_gcm_request_t *)malloc(sizeof(*request));
+  SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
+
+  memset(request, 0, header_length);
 
   request->algorithm_type       = GCM;
   request->gcm_flags            = gcm_flags;
@@ -98,7 +102,6 @@ static sl_status_t sli_si91x_gcm_pending(sl_si91x_gcm_config_t *config,
 
   memcpy(request->ad, config->ad, config->ad_length);
   memcpy(request->nonce, config->nonce, config->nonce_length);
-  memcpy(request->msg, config->msg, chunk_length);
 
 #if defined(SLI_SI917B0)
   sli_si91x_gcm_get_key_info(request, config);
@@ -108,13 +111,7 @@ static sl_status_t sli_si91x_gcm_pending(sl_si91x_gcm_config_t *config,
   request->key_length = config->key_config.a0.key_length;
 #endif
 
-  status = sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-                                 SLI_WIFI_COMMON_CMD,
-                                 request,
-                                 (sizeof(sli_si91x_gcm_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES + chunk_length),
-                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-                                 NULL,
-                                 (void **)&buffer);
+  status = sli_si91x_crypto_send_command(request, header_length, config->msg, chunk_length, (void **)&buffer);
 
   if (status != SL_STATUS_OK) {
     free(request);

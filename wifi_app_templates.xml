@@ -510,6 +510,36 @@
     <properties key="readmeFiles" value="examples/snippets/wlan/wifi_roaming/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="wifi_soc_empty" label="Wi-Fi - SoC Empty" description="Minimal Wi-Fi SoC Empty template: initialize and connect as a station using compile-time credential placeholders. No board pinouts.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_soc_empty/wifi_soc_empty.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/wifi_soc_empty/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="wifi_lwip_soc_empty" label="Wi-Fi - SoC Empty (lwIP)" description="Minimal Wi-Fi SoC Empty FreeRTOS template using the lwIP stack: initialize and connect as a station. No board pinouts. No TCP demo.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_lwip_soc_empty/wifi_lwip_soc_empty.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/wifi_lwip_soc_empty/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
   <descriptors name="wifi_lwip_tcp_client_ncp" label="Wi-Fi -LwIP TCP Client (NCP)" description="Start a Wi-Fi client and transfer data using LWIP stack to TCP Server">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />

@@ -24,6 +24,11 @@
   - name: hardware_board_supports_multi_slave
   - name: si91x_b0_board
   - name: device_is_917_module_dev_kit
+  - name: hardware_board_has_led0
+  - name: hardware_board_has_led1
+  - name: hardware_board_has_btn0
+  - name: hardware_board_has_btn1
+  - name: hardware_board_has_shared_button_led
 - define:
   - name: SL_BOARD_NAME
     value: '"BRD2708A"'
@@ -79,4 +84,7 @@
   - board:revision:A02
   - board:device:siwg917y111mgaba
   - hardware:has:vcom
+  - hardware:has:led:2
+  - hardware:has:button:2
+  - hardware:shares:button:led
   

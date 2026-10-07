@@ -873,11 +873,19 @@
 #error "Invalid SSI_MASTER_SCK Pin Configuration!"
 #endif
 
+#ifndef M4_SSI_CS0
 #define M4_SSI_CS0  1
+#endif
+#ifndef M4_SSI_CS1
 #define M4_SSI_CS1  0
+#endif
 #ifndef CHIP_917_6x6
+#ifndef M4_SSI_CS2
 #define M4_SSI_CS2  0
+#endif
+#ifndef M4_SSI_CS3
 #define M4_SSI_CS3  0
+#endif
 #endif
 
 // <o> SSI_MASTER_CS Pin <0=>GPIO_9 <1=>GPIO_28 <2=>GPIO_53 <3=>GPIO_10 <4=>GPIO_15 <5=>GPIO_50 <6=>GPIO_51
@@ -1146,9 +1154,15 @@
 // <i> Configuration settings for Driver_SSI_ULP_MASTER in component ::CMSIS Driver:SPI
 #define RTE_SSI_ULP_MASTER                  1
 
+#ifndef ULP_SSI_CS0
 #define ULP_SSI_CS0     1
+#endif
+#ifndef ULP_SSI_CS1
 #define ULP_SSI_CS1     0
+#endif
+#ifndef ULP_SSI_CS2
 #define ULP_SSI_CS2     0
+#endif
  
 // <o> SSI_ULP_MASTER_MISO Pin <0=>Not Used <1=>ULP_GPIO_2 <2=>ULP_GPIO_9
 #define RTE_SSI_ULP_MASTER_MISO_PORT_ID           2

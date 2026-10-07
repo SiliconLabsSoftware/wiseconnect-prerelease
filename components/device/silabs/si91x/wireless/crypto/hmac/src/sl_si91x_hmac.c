@@ -36,6 +36,7 @@
 #if defined(SLI_MULTITHREAD_DEVICE_SI91X)
 #include "sl_si91x_crypto_thread.h"
 #endif
+#include <stddef.h>
 #include <string.h>
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
 static sl_status_t sli_si91x_hmac_pending(const sl_si91x_hmac_config_t *config,
@@ -48,17 +49,18 @@ static sl_status_t sli_si91x_hmac_pending(const sl_si91x_hmac_config_t *config,
   sl_status_t status                    = SL_STATUS_FAIL;
   sl_wifi_buffer_t *buffer              = NULL;
   const sl_wifi_system_packet_t *packet = NULL;
-  sli_si91x_hmac_sha_request_t *request = (sli_si91x_hmac_sha_request_t *)malloc(sizeof(sli_si91x_hmac_sha_request_t));
+  // Header only — hmac_data is a FAM sent as a second fragment (avoids ~1.4KB staging buffer)
+  sli_si91x_hmac_sha_request_t *request = (sli_si91x_hmac_sha_request_t *)malloc(sizeof(*request));
+  uint32_t header_length                = sizeof(*request);
   SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
 
-  memset(request, 0, sizeof(sli_si91x_hmac_sha_request_t));
+  memset(request, 0, header_length);
 
   request->algorithm_type       = HMAC_SHA;
   request->algorithm_sub_type   = (uint8_t)config->hmac_mode;
   request->hmac_sha_flags       = hmac_sha_flags;
   request->total_length         = (uint16_t)total_length;
   request->current_chunk_length = chunk_length;
-  memcpy(request->hmac_data, data, chunk_length);
 
 #if defined(SLI_SI917B0)
   request->key_info.key_type                         = config->key_config.B0.key_type;
@@ -75,14 +77,7 @@ static sl_status_t sli_si91x_hmac_pending(const sl_si91x_hmac_config_t *config,
   request->key_length = config->key_config.A0.key_length;
 #endif
 
-  status =
-    sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-                          SLI_WIFI_COMMON_CMD,
-                          request,
-                          (sizeof(sli_si91x_hmac_sha_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES + chunk_length),
-                          SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-                          NULL,
-                          (void **)&buffer);
+  status = sli_si91x_crypto_send_command(request, header_length, data, chunk_length, (void **)&buffer);
 
   if (status != SL_STATUS_OK) {
     free(request);

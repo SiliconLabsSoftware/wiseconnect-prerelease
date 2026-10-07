@@ -38,6 +38,7 @@
 #if defined(SLI_MULTITHREAD_DEVICE_SI91X)
 #include "sl_si91x_crypto_thread.h"
 #endif
+#include <stddef.h>
 #include <string.h>
 
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
@@ -46,14 +47,16 @@ static sl_status_t sl_si91x_ecdsa_pending(sl_si91x_ecdsa_config_t *config,
                                           uint8_t ecdsa_flags,
                                           uint8_t *output)
 {
-  sl_status_t status                = SL_STATUS_FAIL;
-  sl_wifi_buffer_t *buffer          = NULL;
-  sl_wifi_system_packet_t *packet   = NULL;
-  sl_si91x_ecdsa_request_t *request = (sl_si91x_ecdsa_request_t *)malloc(sizeof(sl_si91x_ecdsa_request_t));
+  sl_status_t status              = SL_STATUS_FAIL;
+  sl_wifi_buffer_t *buffer        = NULL;
+  sl_wifi_system_packet_t *packet = NULL;
+  // Header only — msg is a FAM sent as a second fragment (avoids ~1KB staging buffer)
+  sl_si91x_ecdsa_request_t *request = (sl_si91x_ecdsa_request_t *)malloc(sizeof(*request));
+  uint32_t header_length            = sizeof(*request);
 
   SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
 
-  memset(request, 0, sizeof(sl_si91x_ecdsa_request_t));
+  memset(request, 0, header_length);
 
   request->algorithm_type       = ECDSA;
   request->algorithm_sub_type   = config->ecdsa_operation;
@@ -74,10 +77,6 @@ static sl_status_t sl_si91x_ecdsa_pending(sl_si91x_ecdsa_config_t *config,
     memcpy(request->public_key, config->public_key, config->public_key_length);
   }
 
-  if (chunk_length > 0) {
-    memcpy(request->msg, config->msg, chunk_length);
-  }
-
   if (config->signature_length > 0) {
     memcpy(request->signature, config->signature, config->signature_length);
   }
@@ -95,14 +94,7 @@ static sl_status_t sl_si91x_ecdsa_pending(sl_si91x_ecdsa_config_t *config,
   request->key_length = config->key_config.a0.key_length;
 #endif
 
-  status =
-    sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-                          SLI_WIFI_COMMON_CMD,
-                          request,
-                          (sizeof(sl_si91x_ecdsa_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES_FOR_ECDSA + chunk_length),
-                          SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-                          NULL,
-                          (void **)&buffer);
+  status = sli_si91x_crypto_send_command(request, header_length, config->msg, chunk_length, (void **)&buffer);
 
   if (status != SL_STATUS_OK) {
     free(request);

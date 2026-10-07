@@ -36,17 +36,15 @@
  */
 
 /**
- * @brief Application power/behavior profile selector.
- * @details Canonical profile values; @ref sl_net_application_profile_t and
- *          @ref sli_wifi_application_profile_t alias these enumerators.
- *          When a non-default profile is active, the application must re-call
- *          @ref sl_net_set_application_profile after disconnect or join failure.
+ * @brief Config group of a compile-time application profile (host-side apply state).
+ * @details Shared by SL Net and the Wi-Fi layer. Profile-specific names (for example
+ *          Neutral-less POWER_SAVE / HIGH_PERFORMANCE) are optional aliases of these values.
  */
 typedef enum {
-  SL_APPLICATION_PROFILE_DEFAULT = 0,                ///< Default Wi-Fi behavior
-  SL_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH, ///< Neutral-less Matter switch preset
-  SL_APPLICATION_PROFILE_MAX
-} sl_application_profile_t;
+  SL_APPLICATION_PROFILE_CONFIG_IN_USE_SET     = 0, ///< Profile in use (enable / power-constrained)
+  SL_APPLICATION_PROFILE_CONFIG_NOT_IN_USE_SET = 1, ///< Temporary non-profile defaults (disable)
+  SL_APPLICATION_PROFILE_CONFIG_NOT_SET        = 2, ///< No group applied yet (get before successful set)
+} sl_application_profile_config_group_t;
 
 /** Opportunistic-sleep advanced-config payload (union member after 32-bit sub_cmd_id). */
 typedef struct {
@@ -71,8 +69,8 @@ typedef struct {
 
 /**
  * @brief Preset bundle for one application profile.
- * @details Aggregates advanced-config structs and scan timeout values used by
- *          @ref sl_net_set_application_profile().
+ * @details Aggregates advanced-config structs and scan timeout values used when
+ *          applying an application profile config group.
  */
 typedef struct {
   sl_application_profile_opportunistic_sleep_config_t opportunistic_sleep; ///< Opportunistic-sleep preset

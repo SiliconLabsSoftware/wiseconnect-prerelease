@@ -127,7 +127,8 @@ sl_wifi_advanced_scan_configuration_t advanced_scan_configuration            = {
 static sl_wifi_advanced_client_configuration_t advanced_client_configuration = { 0 };
 static uint8_t client_join_feature_bitmap                                    = SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID;
 static uint8_t ap_join_feature_bitmap                                        = SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID;
-static sli_wifi_application_profile_t sli_wifi_active_application_profile    = SLI_WIFI_APPLICATION_PROFILE_MAX;
+static sli_wifi_application_profile_config_group_t sli_wifi_active_app_profile_config_group =
+  SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET;
 
 sl_status_t sli_handle_enterprise_security(const sl_wifi_client_configuration_t *ap,
                                            sli_wifi_request_eap_config_t *eap_req)
@@ -382,10 +383,10 @@ sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
                                        sl_wifi_timeout_type_t timeout_type,
                                        uint16_t timeout_value)
 {
-  if ((sli_wifi_active_application_profile != SLI_WIFI_APPLICATION_PROFILE_MAX)
+  if ((sli_wifi_active_app_profile_config_group != SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET)
       && ((timeout_type == SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT)
           || (timeout_type == SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT))) {
-    // Profile preset owns these timeouts; ignore redundant requests (e.g. from connect/scan).
+    // Profile config group owns these timeouts; ignore redundant requests (e.g. from connect/scan).
     (void)timeout_value;
     return SL_STATUS_OK;
   }
@@ -1858,7 +1859,7 @@ void sli_wifi_deinit(void)
   sli_wifi_reset_sl_wifi_rate();
   memset(&advanced_scan_configuration, 0, sizeof(sl_wifi_advanced_scan_configuration_t));
   sli_wifi_flush_scan_results_database();
-  sli_wifi_active_application_profile = SLI_WIFI_APPLICATION_PROFILE_MAX;
+  sli_wifi_active_app_profile_config_group = SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET;
   return;
 }
 
@@ -2417,31 +2418,29 @@ sl_status_t sli_wifi_update_gain_table(uint8_t band, uint8_t bandwidth, const ui
     free(su_tb_payload);
     return status;
   }
-  sli_wifi_gain_table_info_t *gain_table_info = malloc(sizeof(sli_wifi_gain_table_info_t) + su_tb_payload_length);
-  if (gain_table_info == NULL) {
-    free(su_tb_payload);
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-  memset(gain_table_info, 0, sizeof(sli_wifi_gain_table_info_t) + su_tb_payload_length);
-  gain_table_info->band               = band;
-  gain_table_info->bandwidth          = bandwidth;
-  gain_table_info->size               = su_tb_payload_length;
-  gain_table_info->x_offset           = 0;
-  gain_table_info->y_offset           = 0;
-  gain_table_info->gain_table_version = 1;
-  gain_table_info->reserved           = 0;
+  // Header only — converted table is passed as a second fragment
+  sli_wifi_gain_table_info_t gain_table_info = { 0 };
+  gain_table_info.band                       = band;
+  gain_table_info.bandwidth                  = bandwidth;
+  gain_table_info.size                       = su_tb_payload_length;
+  gain_table_info.x_offset                   = 0;
+  gain_table_info.y_offset                   = 0;
+  gain_table_info.gain_table_version         = 1;
+  gain_table_info.reserved                   = 0;
 
-  memcpy(gain_table_info->gain_table, su_tb_payload, su_tb_payload_length);
-
-  status = sli_wifi_send_command(SLI_WIFI_REQ_GAIN_TABLE,
-                                 SLI_WIFI_WLAN_CMD,
-                                 gain_table_info,
-                                 sizeof(sli_wifi_gain_table_info_t) + (gain_table_info->size),
-                                 SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
-                                 NULL,
-                                 NULL);
+  sli_wifi_command_payload_t fragments = {
+    .header         = &gain_table_info,
+    .header_length  = sizeof(gain_table_info),
+    .payload        = su_tb_payload,
+    .payload_length = su_tb_payload_length,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_GAIN_TABLE,
+                                              SLI_WIFI_WLAN_CMD,
+                                              &fragments,
+                                              SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
+                                              NULL,
+                                              NULL);
   free(su_tb_payload);
-  free(gain_table_info);
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -2468,28 +2467,28 @@ sl_status_t sli_wifi_update_su_gain_table(uint8_t band,
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  sli_wifi_gain_table_info_t *gain_table_info = malloc(sizeof(sli_wifi_gain_table_info_t) + payload_length);
-  if (gain_table_info == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-  memset(gain_table_info, 0, sizeof(sli_wifi_gain_table_info_t) + payload_length);
-  gain_table_info->band               = band;
-  gain_table_info->bandwidth          = bandwidth;
-  gain_table_info->size               = payload_length;
-  gain_table_info->x_offset           = x_offset;
-  gain_table_info->y_offset           = y_offset;
-  gain_table_info->gain_table_version = 1;
-  gain_table_info->reserved           = 0;
+  // Header only — caller payload is passed as a second fragment (no staging buffer)
+  sli_wifi_gain_table_info_t gain_table_info = { 0 };
+  gain_table_info.band                       = band;
+  gain_table_info.bandwidth                  = bandwidth;
+  gain_table_info.size                       = payload_length;
+  gain_table_info.x_offset                   = x_offset;
+  gain_table_info.y_offset                   = y_offset;
+  gain_table_info.gain_table_version         = 1;
+  gain_table_info.reserved                   = 0;
 
-  memcpy(gain_table_info->gain_table, payload, payload_length);
-  status = sli_wifi_send_command(SLI_WIFI_REQ_GAIN_TABLE,
-                                 SLI_WIFI_WLAN_CMD,
-                                 gain_table_info,
-                                 sizeof(sli_wifi_gain_table_info_t) + (gain_table_info->size),
-                                 SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
-                                 NULL,
-                                 NULL);
-  free(gain_table_info);
+  sli_wifi_command_payload_t fragments = {
+    .header         = &gain_table_info,
+    .header_length  = sizeof(gain_table_info),
+    .payload        = payload,
+    .payload_length = payload_length,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_GAIN_TABLE,
+                                              SLI_WIFI_WLAN_CMD,
+                                              &fragments,
+                                              SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
+                                              NULL,
+                                              NULL);
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -2575,9 +2574,6 @@ sl_status_t sli_wifi_set_11ax_config(const sl_wifi_11ax_config_params_t *config_
                                  SLI_WIFI_RSP_11AX_PARAMS_WAIT_TIME,
                                  NULL,
                                  NULL);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
   return status;
 }
 
@@ -3174,10 +3170,11 @@ sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
 sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id)
 {
   sl_status_t status;
-  uint16_t ie_buffer_length                  = 0;
-  uint16_t ie_buffer_size                    = 0;
-  sli_wifi_manage_vendor_ie_packet_t *packet = NULL;
-  sl_wifi_buffer_t *buffer                   = NULL;
+  uint16_t ie_buffer_length = 0;
+  uint16_t ie_buffer_size   = 0;
+  // Header only — IE bytes are passed as a second fragment (no staging buffer)
+  sli_wifi_manage_vendor_ie_packet_t packet = { 0 };
+  sl_wifi_buffer_t *buffer                  = NULL;
 
   // Validate input parameters
   if ((vendor_ie == NULL) || (vendor_ie->ie_buffer == NULL)) {
@@ -3195,30 +3192,27 @@ sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_u
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  packet = (sli_wifi_manage_vendor_ie_packet_t *)malloc(sizeof(sli_wifi_manage_vendor_ie_packet_t) + ie_buffer_size);
-  if (packet == NULL) {
-    return SL_STATUS_FAIL;
-  }
-
-  // Prepare the packet to send to firmware
-  packet->version           = SLI_WIFI_VENDOR_IE_FRAME_VERSION;
-  packet->action            = SLI_WIFI_VENDOR_IE_ACTION_ADD;
-  packet->unique_id         = vendor_ie->unique_id;
-  packet->mgmt_frame_bitmap = vendor_ie->mgmt_frame_bitmap;
-  memset(packet->reserved, 0, sizeof(packet->reserved));
-  packet->ie_buffer_length = vendor_ie->ie_buffer_length;
-  memcpy(packet->ie_buffer, vendor_ie->ie_buffer, ie_buffer_size);
+  // Prepare the packet header to send to firmware
+  packet.version           = SLI_WIFI_VENDOR_IE_FRAME_VERSION;
+  packet.action            = SLI_WIFI_VENDOR_IE_ACTION_ADD;
+  packet.unique_id         = vendor_ie->unique_id;
+  packet.mgmt_frame_bitmap = vendor_ie->mgmt_frame_bitmap;
+  packet.ie_buffer_length  = vendor_ie->ie_buffer_length;
 
   // Send the command to firmware
-  status = sli_wifi_send_command(SLI_WIFI_REQ_VENDOR_IE,
-                                 SLI_WIFI_WLAN_CMD,
-                                 packet,
-                                 sizeof(sli_wifi_manage_vendor_ie_packet_t) + ie_buffer_size,
-                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_VENDOR_IE_CMD_TIMEOUT),
-                                 NULL,
-                                 (void **)&buffer);
+  sli_wifi_command_payload_t fragments = {
+    .header         = &packet,
+    .header_length  = sizeof(packet),
+    .payload        = vendor_ie->ie_buffer,
+    .payload_length = ie_buffer_size,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_VENDOR_IE,
+                                              SLI_WIFI_WLAN_CMD,
+                                              &fragments,
+                                              SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_VENDOR_IE_CMD_TIMEOUT),
+                                              NULL,
+                                              (void **)&buffer);
 
-  free(packet);
   if ((status != SL_STATUS_OK) && (NULL != buffer)) {
     sli_buffer_manager_free_buffer(buffer);
   }
@@ -3226,7 +3220,7 @@ sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_u
   const sl_wifi_system_packet_t *resp_packet =
     (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
 
-  if ((resp_packet != NULL)) {
+  if (resp_packet != NULL) {
     *fw_unique_id = resp_packet->data[0];
     SL_DEBUG_LOG_V2(INFO, "vendor IE added with unique ID: %d\r\n", *fw_unique_id);
     sli_buffer_manager_free_buffer(buffer);
@@ -3349,7 +3343,7 @@ sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
       // Configure region-specific settings based on the region code and band
       switch (region_code) {
         // Configure settings for different regions and bands
-        case DEFAULT_REGION:
+        case SL_WIFI_DEFAULT_REGION:
         case SL_WIFI_REGION_US: {
           if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
             request = default_US_region_2_4GHZ_configurations;
@@ -4264,12 +4258,12 @@ sl_status_t sli_wifi_set_aggregation_config(sl_wifi_interface_t interface, const
   return SL_STATUS_OK;
 }
 
-void sli_wifi_set_active_application_profile(sli_wifi_application_profile_t profile)
+void sli_wifi_set_active_application_profile_config_group(sli_wifi_application_profile_config_group_t config_group)
 {
-  sli_wifi_active_application_profile = profile;
+  sli_wifi_active_app_profile_config_group = config_group;
 }
 
-sli_wifi_application_profile_t sli_wifi_get_active_application_profile(void)
+sli_wifi_application_profile_config_group_t sli_wifi_get_active_application_profile_config_group(void)
 {
-  return sli_wifi_active_application_profile;
+  return sli_wifi_active_app_profile_config_group;
 }

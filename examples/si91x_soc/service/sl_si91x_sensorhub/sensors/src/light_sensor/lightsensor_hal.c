@@ -118,12 +118,12 @@ sl_sensor_light_handle_t sl_si91x_lightsensor_create(sl_sensor_bus_t bus, int id
   const sl_light_sensor_impl_t *sensor_impl = find_implementation(id);
 
   if (sensor_impl == NULL) {
-    DEBUGOUT("No driver founded, LIGHT ID = %d", id);
+    SL_PRINT_STRING_ERROR("No driver founded, LIGHT ID = %d", id);
     return NULL;
   }
   sl_sensor_light_t *p_sensor = (sl_sensor_light_t *)pvPortMalloc(sizeof(sl_sensor_light_t));
   if (p_sensor == NULL) {
-    DEBUGOUT("\r\n Light sensor HAL Memory allocation fail:%u \r\n", sizeof(sl_sensor_light_t));
+    SL_PRINT_STRING_ERROR("\r\n Light sensor HAL Memory allocation fail:%u \r\n", sizeof(sl_sensor_light_t));
     return NULL;
   }
   p_sensor->id         = id;
@@ -132,7 +132,7 @@ sl_sensor_light_handle_t sl_si91x_lightsensor_create(sl_sensor_bus_t bus, int id
   sl_light_error_t ret = p_sensor->impl->init(bus);
   if (ret != RSI_OK) {
     free(p_sensor);
-    DEBUGOUT("light sensor init failed");
+    SL_PRINT_STRING_ERROR("light sensor init failed");
     return NULL;
   }
   p_sensor->is_light_init = true;
