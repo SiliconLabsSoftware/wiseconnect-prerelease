@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x WLAN BLE unified coex example: Run AWS MQTT over Wi-Fi with multiple BLE central and peripheral connections in SoC and NCP modes.
+SiWx91x WLAN BLE unified coex example: run AWS MQTT over Wi-Fi with BLE data transfer across 2 central and 8 peripheral connections in SoC and NCP modes.
 
 ## Table of Contents
 

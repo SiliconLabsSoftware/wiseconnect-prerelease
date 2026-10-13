@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x Wi-Fi BLE power save example: Run concurrent WLAN and BLE tasks with associated power save and tickless sleep in SoC and NCP modes.
+SiWx91x Wi-Fi BLE power save coex example: connect as a Wi-Fi station and BLE peripheral with associated power save and tickless sleep in SoC and NCP modes.
 
 ## Table of Contents
 

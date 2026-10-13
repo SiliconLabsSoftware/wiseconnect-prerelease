@@ -52,7 +52,7 @@ void *sli_si91x_iostream_swo_itm_8_init(void)
 {
   // Configure SWO module
   sl_si91x_debug_swo_enable_itm(8U);
-  return SL_STATUS_OK;
+  return NULL;
 }
 
 /***************************************************************************/ /**

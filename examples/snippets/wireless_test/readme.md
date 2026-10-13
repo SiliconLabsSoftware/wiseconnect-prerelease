@@ -145,10 +145,17 @@ CLI **commands are always typed on UART/VCOM** (Serial Debug Assistant).
 
 | Setting | Commands (input) | Responses (output) | When to use |
 |---------|------------------|--------------------|-------------|
-| `SL_WIRELESS_TEST_LOG_OUTPUT_UART` (**default**) | Serial Debug Assistant | Serial Debug Assistant | Backward compatible with earlier releases. Use this when RTT Viewer is not used. |
-| `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` | Serial Debug Assistant | J-Link RTT Viewer, Simplicity Commander RTT tab, or Studio RTT Console | When you want formatted logger output on RTT Channel 0 |
+| `SL_WIRELESS_TEST_LOG_OUTPUT_UART` (**default**) | Serial Debug Assistant | Serial Debug Assistant | Backward compatible with earlier releases. Works on both plain and encrypted boards. Use this when RTT Viewer is not used, or when the SoC board is encrypted. |
+| `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` | Serial Debug Assistant | J-Link RTT Viewer, Simplicity Commander RTT tab, or Studio RTT Console | When you want formatted logger output on RTT Channel 0 on a **plain** (non-encrypted) board |
 
-**Backward compatibility:** The SoC default is UART. If RTT logging is not required, leave `SL_WIRELESS_TEST_LOG_OUTPUT_UART` selected, rebuild, and flash. Command responses then appear in Serial Debug Assistant again.
+**Expected behavior on plain vs encrypted boards (SoC):**
+
+| Board type | `SL_WIRELESS_TEST_LOG_OUTPUT_UART` (default) | `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` |
+|------------|-----------------------------------------------|-----------------------------------|
+| Plain (non-encrypted) | Works as expected; responses appear in Serial Debug Assistant | Works as expected; responses appear in the RTT viewer |
+| Encrypted | Works as expected; responses appear in Serial Debug Assistant | **Not supported.** No CLI command responses are observed in the RTT viewer. The RTT buffer name and other flash-resident strings may also appear as garbage. Keep the default UART setting on encrypted boards. |
+
+**Backward compatibility:** The SoC default is UART. If RTT logging is not required, leave `SL_WIRELESS_TEST_LOG_OUTPUT_UART` selected, rebuild, and flash. Command responses then appear in Serial Debug Assistant again. On encrypted boards, always use the UART default.
 
 Closing an RTT viewer does **not** automatically move output to UART. To return logs to UART, set `SL_WIRELESS_TEST_LOG_OUTPUT_UART`, rebuild, and flash.
 
@@ -170,7 +177,9 @@ Use this path for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIREL
 
 ### How to View RTT Logs
 
-Use this section for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIRELESS_TEST_LOG_OUTPUT_RTT`. For **NCP** builds, logs are already on RTT; skip the `demo.c` macro change and connect an RTT viewer as below.
+Use this section for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` on a **plain** (non-encrypted) board. For **NCP** builds, logs are already on RTT; skip the `demo.c` macro change and connect an RTT viewer as below.
+
+> **Note:** On encrypted SoC boards, RTT response output is not supported. Leave `SL_WIRELESS_TEST_LOG_OUTPUT` set to `SL_WIRELESS_TEST_LOG_OUTPUT_UART` and use [How to View UART Logs in Serial Debug Assistant](#how-to-view-uart-logs-in-serial-debug-assistant) instead. Missing RTT responses or garbage buffer names on an encrypted board are expected.
 
 Before connecting RTT on SiWx91x, configure the host debugger with these settings (self-contained here so this section works when Simplicity Studio copies only this example). They match the SEGGER SystemView Backend guidance in the Si91x Logger Backend example in the WiseConnect SDK package at `examples/si91x_soc/service/sl_si91x_logger_backend_example/readme.md` (SEGGER SystemView Backend). Logger backend overview is also in `docs/software-reference/manuals/siwx91x-software-reference-manual.md` (SL Debug Logger) in the same SDK package.
 
@@ -220,8 +229,8 @@ See the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconne
 
 Confirm CLI output using the mode selected in [CLI Command Input and Response Output](#cli-command-input-and-response-output):
 
-- **SoC UART (default):** `Ready` and command responses appear in Serial Debug Assistant.
-- **SoC RTT:** type commands in Serial Debug Assistant; `Ready` and command responses appear in the RTT viewer.
+- **SoC UART (default):** `Ready` and command responses appear in Serial Debug Assistant on both plain and encrypted boards.
+- **SoC RTT:** type commands in Serial Debug Assistant; `Ready` and command responses appear in the RTT viewer on plain boards only. On encrypted boards, use UART instead.
 - **NCP:** type commands on the host UART/VCOM path; logs and responses appear in the RTT viewer.
 
 ![wireless_test_Output](resources/readme/Ready.PNG)
@@ -1281,7 +1290,8 @@ In the command handler, the arguments passed in the cli command are internally m
 If you encounter issues while running the Wireless Test application, check the following:
 
 - Use [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) or an equivalent serial terminal instead of the Simplicity Studio console for reliable CLI **input**. On SoC, command **responses** appear in that terminal only when `SL_WIRELESS_TEST_LOG_OUTPUT_UART` is selected.
-- If Serial Debug Assistant shows no `Ready` prompt or no command responses on SoC, confirm `SL_WIRELESS_TEST_LOG_OUTPUT` in `demo.c`. For UART output, rebuild with `SL_WIRELESS_TEST_LOG_OUTPUT_UART`. For RTT output (SoC opt-in or NCP), open an RTT viewer as described in [How to View RTT Logs](#how-to-view-rtt-logs).
+- If Serial Debug Assistant shows no `Ready` prompt or no command responses on SoC, confirm `SL_WIRELESS_TEST_LOG_OUTPUT` in `demo.c`. For UART output, rebuild with `SL_WIRELESS_TEST_LOG_OUTPUT_UART`. For RTT output (SoC opt-in on plain boards, or NCP), open an RTT viewer as described in [How to View RTT Logs](#how-to-view-rtt-logs).
+- On an encrypted SoC board, if RTT shows no response to commands such as `help`, or shows garbage in the RTT read-buffer name, switch back to `SL_WIRELESS_TEST_LOG_OUTPUT_UART`. That behavior with `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` on encrypted boards is expected.
 - Confirm that the correct serial port and baud rate are selected. In SoC UART mode, the `Ready` prompt appears after flashing, as shown in [Test the Application](#test-the-application).
 - Verify the default SSID and passphrase in `wifi_commands.c` (`SOFT_AP_SSID`, `SOFT_AP_PSK`), or update them to match your test network configuration.
 - For Wi-Fi PER and RF measurements, confirm that the U.Fl to SMA cable, spectrum analyzer, or signal generator connections match the setup diagrams in [Setup Diagram](#setup-diagram).

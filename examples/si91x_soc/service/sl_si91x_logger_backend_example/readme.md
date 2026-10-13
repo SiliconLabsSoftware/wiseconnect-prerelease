@@ -417,6 +417,8 @@ The captures below show the same firmware running with each backend. The first I
 
 Default install. With `si91x_log_iostream_formatted` and the auto-pulled `iostream_rtt` component, open Simplicity Commander, switch to the **RTT** tab, enable **Reset target on connect**, and click **Connect**:
 
+> **Note:** On encrypted SiWx91x SoC boards, RTT log output is not supported. Flash-resident strings may appear as garbage in the RTT viewer, and log lines that depend on those strings may be missing or unreadable. Use [IO Stream Formatted over UART (VCOM)](#io-stream-formatted-over-uart-vcom) on encrypted boards. RTT works as expected on plain (non-encrypted) boards.
+
 ![Figure: IO Stream Formatted backend over RTT, viewed in Simplicity Commander](resources/readme/console_iostream_rtt_commander.png)
 
 ### IO Stream Formatted over UART (VCOM)
@@ -476,11 +478,14 @@ With `log_backend_systemview` installed and the [SEGGER SystemView host setup](#
 
 4. **Lowest allowable power state is PS3 for RTT and SystemView backends when a debugger is connected.** When using an RTT-based IO Stream backend or the SEGGER SystemView backend, the logger prevents the device from entering sleep or active power states below PS3 while an active debugger connection is detected, so debug and log capture sessions can remain connected.
 
+5. **RTT and SystemView are not supported on encrypted SoC boards.** On an encrypted board, the RTT viewer may show a garbage buffer name and missing or unreadable log text. Switch the logger transport to UART (VCOM) as described in [IO Stream Formatted over UART (VCOM)](#io-stream-formatted-over-uart-vcom). This limitation applies to SiWx91x SoC RTT usage in general.
+
 ## Troubleshooting
 
 - If the project does not build, confirm Simplicity Studio, the WiSeConnect extension, and SDK versions match the `.slcp` requirements.
 - If the device is not detected, refresh connectivity firmware and USB drivers.
 - If IO Stream UART shows no output, confirm IO Stream Si91x, IO Stream: Si91x UART, and the `vcom` instance are installed and configured.
+- If RTT shows no logs or a garbage buffer name on an encrypted SoC board, switch to UART (VCOM). That behavior with RTT on encrypted boards is expected.
 - `Log_script.py --reset` on a multi-kit bench: the helper invokes `commander device reset` without `--serialno` / `--ip`, so it targets the first attached J-Link / WSTK adapter. If you have more than one kit connected, either disconnect the others, or add the appropriate selector flag to the command (or extend `reset_device()` in `Log_script.py`) so the correct board is reset.
 - On Windows, COM ports appear as `COM<N>` (for example `COM3`). On macOS and Linux they appear as `/dev/tty.usbmodem*` and `/dev/ttyACM*` / `/dev/ttyUSB*` respectively; pass the matching path via `--port` to `Log_script.py`.
 

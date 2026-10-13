@@ -157,6 +157,9 @@ extern int32_t rsi_ble_driver_init(uint8_t *buffer, uint32_t length);
  */
 extern int32_t rsi_ble_driver_deinit(void);
 
+/** @addtogroup BT-BLE
+* @{
+*/
 /*==============================================*/
 /**
  * @fn         int32_t rsi_ble_enable(void)
@@ -218,6 +221,8 @@ extern int32_t rsi_ble_enable(void);
  *               `SLI_COMMON_RSP_BLE_ENABLE_DISABLE_WAIT_TIME`.
  */
 extern int32_t rsi_ble_disable(void);
+/** @} */
+
 extern void rsi_ble_set_opermode_state(bool is_ble_enabled);
 extern bool rsi_ble_state_is_enabled(void);
 extern int32_t rsi_get_fw_version(uint8_t *response, uint16_t length);

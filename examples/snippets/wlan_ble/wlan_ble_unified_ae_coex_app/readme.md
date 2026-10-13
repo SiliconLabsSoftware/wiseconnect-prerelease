@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWx91x WLAN BLE unified extended advertising coex example: Run WLAN throughput with BLE extended advertising central and peripheral roles in SoC and NCP modes.
+SiWx91x WLAN BLE unified extended advertising coex example: measure WLAN TCP throughput while running BLE extended advertising/scanning with one central and one peripheral connection and BLE data transfer in SoC and NCP modes.
 
 ## Table of Contents
 

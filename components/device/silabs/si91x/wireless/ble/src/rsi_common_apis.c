@@ -240,6 +240,9 @@ int32_t rsi_ble_driver_deinit(void)
   return RSI_SUCCESS;
 }
 
+/** @addtogroup BT-BLE
+* @{
+*/
 /*==============================================*/
 /**
  * @brief      Enable BLE at runtime. See @ref rsi_ble_enable() in rsi_common_apis.h for
@@ -313,6 +316,7 @@ int32_t rsi_ble_disable(void)
 
   return (int32_t)status;
 }
+/** @} */
 
 /*==============================================*/
 /**
