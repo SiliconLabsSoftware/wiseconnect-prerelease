@@ -16,8 +16,6 @@ provides:
     allow_multiple: true
   - name: iostream_transport
     allow_multiple: true
-  - name: iostream_console_support
-    allow_multiple: true
 requires:
   - name: segger_rtt
   - name: iostream

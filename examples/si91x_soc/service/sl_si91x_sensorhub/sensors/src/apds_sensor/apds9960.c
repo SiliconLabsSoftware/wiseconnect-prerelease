@@ -96,7 +96,7 @@ sl_apds9960_handle_t sl_si91x_apds9960_create(sl_sensor_bus_t bus, uint8_t dev_a
   a[0]            = (0x01 & 0xFF);
   sensor->i2c_dev = I2Cdrv->MasterTransmit(SL_APDS9960_I2C_ADDRESS_DEFAULT, a, 1, false);
 
-  SL_PRINT_STRING_ERROR("\r\n I2C - APDS9960 Sensor Create \r\n");
+  DEBUGOUT("\r\n I2C - APDS9960 Sensor Create \r\n");
   while (I2Cdrv->GetStatus().busy)
     ;
   /*TODO: check the time out */
@@ -145,7 +145,7 @@ int32_t sl_si91x_apds9960_power_down(sl_apds9960_handle_t sensor)
   a[0] = (uint8_t)(SL_APDS9960_POWER_DOWN & 0xFF);
   ret  = I2Cdrv->MasterTransmit(SL_APDS9960_I2C_ADDRESS_DEFAULT, a, 1, false);
 
-  SL_PRINT_STRING_ERROR("\r\n I2C sensor create \r\n");
+  DEBUGOUT("\r\n I2C sensor create \r\n");
   while (I2Cdrv->GetStatus().busy)
     ;
 
@@ -190,12 +190,12 @@ sl_apds_err_t sl_si91x_apds9960_init(sl_sensor_bus_t i2c_bus)
   status = sl_si91x_apds9960_sensor_init();
 
   if (status) {
-    SL_PRINT_STRING_ERROR("\r\n APDS Sensor Init Failed = %d \r\n", status);
+    DEBUGOUT("\r\n APDS Sensor Init Failed = %d \r\n", status);
     return SL_STATUS_FAIL;
   }
 
   if (NULL == apds9960) {
-    SL_PRINT_STRING_ERROR("\r\n Sensor APDS Creation Failed \r\n");
+    DEBUGOUT("\r\n Sensor APDS Creation Failed \r\n");
     return SL_STATUS_FAIL;
   }
   is_gpr_init = true;
@@ -792,7 +792,7 @@ uint8_t sl_si91x_apds9960_get_mode(void)
 
   /* Read current ENABLE register */
   if (sl_si91x_read_buffer(0x80, &enable_value, 1)) {
-    SL_PRINT_STRING_ERROR("Err= %d\r\n", SL_ERROR);
+    DEBUGOUT("Err= %d\r\n", SL_ERROR);
     return SL_ERROR;
   }
   return enable_value;
@@ -1242,7 +1242,7 @@ bool sl_si91x_apds9960_sensor_init(void)
     return RSI_FAIL;
   }
   if (!(id == SL_ID_1_9960 || id == SL_ID_2_9960 || id == SL_ID_3_9960)) {
-    SL_PRINT_STRING_ERROR("APDS9960 ID mismatch: 0x%02X\r\n", id);
+    DEBUGOUT("APDS9960 ID mismatch: 0x%02X\r\n", id);
     return RSI_FAIL;
   }
 
@@ -1588,13 +1588,13 @@ sl_apds_err_t sl_si91x_apds9960_sample_colordata(float *r, float *g, float *b, f
   if (!sl_si91x_apds9960_enable_lightsensor(false)) {
 
   } else {
-    SL_PRINT_STRING_ERROR("\r\n light sensor sample_colordata failed !\r\n");
+    DEBUGOUT("\r\n light sensor sample_colordata failed !\r\n");
     return RSI_FAIL;
   }
 
   if (sl_si91x_apds9960_read_ambientlight(&ambient_light) || sl_si91x_apds9960_read_redlight(&red_light)
       || sl_si91x_apds9960_read_greenlight(&green_light) || sl_si91x_apds9960_read_bluelight(&blue_light)) {
-    SL_PRINT_STRING_ERROR("\r\nError reading light values\r\n");
+    DEBUGOUT("\r\nError reading light values\r\n");
     return RSI_FAIL;
   } else {
     *r = (float)red_light;
@@ -1622,17 +1622,17 @@ sl_apds_err_t sl_si91x_apds9960_sample_proximitydata(float *data)
   *data                  = 0;
   uint8_t proximity_data = 0;
   if (sl_si91x_apds9960_set_proximitygain(SL_PGAIN_2X)) {
-    SL_PRINT_STRING_ERROR("\r\n Set PGAIN wrong\r\n");
+    DEBUGOUT("\r\n Set PGAIN wrong\r\n");
   }
 
   // Start running the APDS-9960 proximity sensor (no interrupts)
   if (!sl_si91x_apds9960_enable_proximitysensor(false)) {
   } else {
-    SL_PRINT_STRING_ERROR("\r\n enable proximity sensor fail apds9960!\r\n");
+    DEBUGOUT("\r\n enable proximity sensor fail apds9960!\r\n");
   }
 
   if (sl_si91x_apds9960_read_proximity(&proximity_data)) {
-    SL_PRINT_STRING_ERROR("\r\n Error reading proximity value\r\n");
+    DEBUGOUT("\r\n Error reading proximity value\r\n");
     return RSI_FAIL;
   } else {
     *data = (float)proximity_data;
@@ -1666,40 +1666,40 @@ sl_apds_err_t sl_si91x_apds9960_sample_gesturedata(char *data)
   if (!sl_si91x_apds9960_enable_gesturesensor(true)) {
     //DEBUGOUT("\r\nGesture sensor is now running\r\n");
   } else {
-    SL_PRINT_STRING_ERROR("\r\nSomething went wrong during gesture sensor sl_si91x_apds9960_init!\r\n");
+    DEBUGOUT("\r\nSomething went wrong during gesture sensor sl_si91x_apds9960_init!\r\n");
     return RSI_FAIL;
   }
   if (!sl_si91x_apds9960_is_gesture_available()) {
     direction = sl_si91x_apds9960_read_gesture();
-    SL_PRINT_STRING_ERROR("\r\n *********** direction ********* %d \r\n", direction);
+    DEBUGOUT("\r\n *********** direction ********* %d \r\n", direction);
     switch (direction) {
 
       case SL_DIR_UP:
-        SL_PRINT_STRING_ERROR("\r\nUP\r\n");
+        DEBUGOUT("\r\nUP\r\n");
         *data = 'U';
         break;
       case SL_DIR_DOWN:
-        SL_PRINT_STRING_ERROR("\r\nDOWN\r\n");
+        DEBUGOUT("\r\nDOWN\r\n");
         *data = 'D';
         break;
       case SL_DIR_LEFT:
-        SL_PRINT_STRING_ERROR("\r\nLEFT\r\n");
+        DEBUGOUT("\r\nLEFT\r\n");
         *data = 'L';
         break;
       case SL_DIR_RIGHT:
-        SL_PRINT_STRING_ERROR("\r\nRIGHT\r\n");
+        DEBUGOUT("\r\nRIGHT\r\n");
         *data = 'R';
         break;
       case SL_DIR_NEAR:
-        SL_PRINT_STRING_ERROR("\r\nNEAR\r\n");
+        DEBUGOUT("\r\nNEAR\r\n");
         *data = 'N';
         break;
       case SL_DIR_FAR:
-        SL_PRINT_STRING_ERROR("\r\nFAR\r\n");
+        DEBUGOUT("\r\nFAR\r\n");
         *data = 'F';
         break;
       default:
-        SL_PRINT_STRING_ERROR("\r\nNONE\r\n");
+        DEBUGOUT("\r\nNONE\r\n");
     }
   }
   return RSI_OK;

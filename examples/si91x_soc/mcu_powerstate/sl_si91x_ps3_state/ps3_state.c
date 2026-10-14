@@ -19,7 +19,6 @@
 #include "rsi_debug.h"
 #include "rsi_rom_clks.h"
 #include "rsi_rom_ulpss_clk.h"
-#include "sl_log.h"
 
 /*******************************************************************************
  ***************************  Defines / Macros  ********************************
@@ -40,6 +39,7 @@ void ps3_state_init(void)
   low_power_configuration();
   // Shutdown Wireless NWP.
   ps_wireless_shutdown();
+  sl_log_post_sleep_process(NULL);
 
   /* Note: All status messages in this example — both success and failure — are
  * intentionally emitted via SL_PRINT_STRING_ERROR so that they remain visible
@@ -48,23 +48,19 @@ void ps3_state_init(void)
  * actual failures, with successful operations logged via SL_PRINT_STRING_INFO
  * (or SL_PRINT_STRING_DEBUG for verbose trace). */
 
-  SL_PRINT_STRING_ERROR("Current State: PS%d \n", (uint32_t)sl_si91x_power_manager_get_current_state());
+  SL_PRINT_STRING_ERROR("Current State: PS%d \n", sl_si91x_power_manager_get_current_state());
   // Change the clock mode to performace mode(In ps3 clk frequency is 80MHz).
   sl_si91x_power_manager_set_clock_scaling(SL_SI91X_POWER_MANAGER_PERFORMANCE);
 
 #if ACTIVE_STATE
-  {
-    SL_PRINT_STRING_ERROR("PS%d Active State  \n", (uint32_t)sl_si91x_power_manager_get_current_state());
-  }
+  SL_PRINT_STRING_ERROR("PS%d Active State  \n", sl_si91x_power_manager_get_current_state());
   while (1) {
     // Idle loop to measure active current consumption
   }
 #endif
-  SL_PRINT_STRING_ERROR("PS%d Sleep State\n", (uint32_t)sl_si91x_power_manager_get_current_state());
+  SL_PRINT_STRING_ERROR("PS%d Sleep State\n", sl_si91x_power_manager_get_current_state());
 
   // Call the sleep function, it goes to PS3 sleep as current state is PS3.
-  // Keep the ULP timer clock enabled until here so sl_log_pre_sleep_process()
-  // (called from sli_si91x_power_manager_sleep) can unregister logger timer 3.
   sli_si91x_power_manager_sleep();
 }
 
@@ -75,9 +71,8 @@ void low_power_configuration(void)
 {
   // Disable OTHER_CLK which is enabled at Start-up
   RSI_CLK_PeripheralClkDisable3(M4CLK, M4_SOC_CLK_FOR_OTHER_ENABLE);
-  // Do not call RSI_ULPSS_TimerClkDisable() here: the logger timestamp uses
-  // ULP timer 3, and sli_si91x_power_manager_sleep() must unregister it while
-  // the timer clock is still on.
+  // Disable Timer clock which is enabled in Bootloader
+  RSI_ULPSS_TimerClkDisable(ULPCLK);
   // Disabling LF_RC Clocks
   RSI_ULPSS_DisableRefClks(MCU_ULP_32KHZ_RC_CLK_EN);
   // Power-Down Button Calibration

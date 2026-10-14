@@ -60,33 +60,41 @@ void sl_si91x_iostream_set_console_instance()
   uint32_t best_priority              = 0xFFFFFFFF;
 
   for (uint32_t i = 0; i < sl_iostream_instances_count; i++) {
-    uint32_t current_priority = 0xFFFFFFFF;
+    uint32_t current_priority;
 
+    switch (sl_iostream_instances_info[i]->type) {
 #if defined(SL_CATALOG_IOSTREAM_SI91X_PRESENT)
-    if (sl_iostream_instances_info[i]->type == SL_IOSTREAM_TYPE_91X_UART) {
-      current_priority = 0;
-    }
+      case SL_IOSTREAM_TYPE_91X_UART:
+        current_priority = 0;
+        break;
 #endif
 #if defined(SL_CATALOG_IOSTREAM_RTT_SI91X_PRESENT)
-    if (sl_iostream_instances_info[i]->type == SL_SI91X_IOSTREAM_TYPE_RTT_OUTPUT) {
-      current_priority = 1;
-    }
+      case SL_SI91X_IOSTREAM_TYPE_RTT_OUTPUT:
+        current_priority = 1;
+        break;
 #endif
+
 #if defined(SL_CATALOG_IOSTREAM_SWO_SI91X_PRESENT)
-    if (sl_iostream_instances_info[i]->type == SL_SI91X_IOSTREAM_TYPE_SWO) {
-      current_priority = 2;
-    }
+      case SL_SI91X_IOSTREAM_TYPE_SWO:
+        current_priority = 2;
+        break;
 #endif
+
 #if defined(SL_CATALOG_IOSTREAM_VUART_SI91X_PRESENT)
-    if (sl_iostream_instances_info[i]->type == SL_SI91X_IOSTREAM_TYPE_VUART) {
-      current_priority = 3;
-    }
+      case SL_SI91X_IOSTREAM_TYPE_VUART:
+        current_priority = 3;
+        break;
 #endif
+
 #if defined(SL_CATALOG_IOSTREAM_DEBUG_SI91X_PRESENT)
-    if (sl_iostream_instances_info[i]->type == SL_SI91X_IOSTREAM_TYPE_DEBUG_OUTPUT) {
-      current_priority = 4;
-    }
+      case SL_SI91X_IOSTREAM_TYPE_DEBUG_OUTPUT:
+        current_priority = 4;
+        break;
 #endif
+
+      default:
+        continue;
+    }
 
     if (current_priority < best_priority) {
       best_priority              = current_priority;
