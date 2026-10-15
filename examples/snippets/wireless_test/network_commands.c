@@ -24,6 +24,7 @@
 #include "sl_net_default_values.h"
 #include "sl_si91x_driver.h"
 #include "sl_wifi_device.h"
+#include <stdio.h>
 #include <string.h>
 
 /******************************************************
@@ -117,7 +118,7 @@ sl_status_t net_init_command_handler(console_args_t *arguments)
       break;
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
+      printf("Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
 
@@ -142,7 +143,7 @@ sl_status_t net_deinit_command_handler(console_args_t *arguments)
       break;
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
+      printf("Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
   return status;
@@ -162,10 +163,10 @@ sl_status_t net_up_command_handler(console_args_t *arguments)
       // Fetch the profile and print some information about it
       status = sl_net_get_profile(SL_NET_WIFI_CLIENT_INTERFACE, profile_id, &profile);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to load profile with id: %u\r\n", profile_id);
+        printf("Failed to load profile with id: %u\r\n", profile_id);
         return status;
       }
-      SL_DEBUG_LOG_V2(INFO, "Connecting to '%s'\r\n", (uintptr_t)profile.config.ssid.value);
+      printf("Connecting to '%s'\r\n", profile.config.ssid.value);
       status = sl_net_wifi_client_up(interface, profile_id);
       VERIFY_STATUS_AND_RETURN(status);
     } break;
@@ -176,16 +177,16 @@ sl_status_t net_up_command_handler(console_args_t *arguments)
       // Fetch the profile and print some information about it
       status = sl_net_get_profile(SL_NET_WIFI_AP_INTERFACE, profile_id, &profile);
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to load profile with id: %u\r\n", profile_id);
+        printf("Failed to load profile with id: %u\r\n", profile_id);
         return status;
       }
-      SL_DEBUG_LOG_V2(INFO, "Starting AP with SSID '%s'\r\n", (uintptr_t)profile.config.ssid.value);
+      printf("Starting AP with SSID '%s'\r\n", profile.config.ssid.value);
       status = sl_net_wifi_ap_up(interface, profile_id);
       VERIFY_STATUS_AND_RETURN(status);
     } break;
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
+      printf("Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
   return status;
@@ -210,7 +211,7 @@ sl_status_t net_down_command_handler(console_args_t *arguments)
 #endif
 
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
+      printf("Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
 
@@ -238,8 +239,6 @@ sl_status_t set_nvm_profile_command_handler(console_args_t *arguments)
               .ssid.value = DEFAULT_WIFI_CLIENT_PROFILE_SSID,
               .ssid.length = sizeof(DEFAULT_WIFI_CLIENT_PROFILE_SSID)-1,
               .channel.channel = SL_WIFI_AUTO_CHANNEL,
-              .channel.band = SL_WIFI_AUTO_BAND,
-              .channel.bandwidth = SL_WIFI_AUTO_BANDWIDTH,
               .bssid = {{0}},
               .bss_type = SL_WIFI_BSS_TYPE_INFRASTRUCTURE,
               .security = SL_WIFI_WPA_WPA2_MIXED,
@@ -277,8 +276,6 @@ sl_status_t set_nvm_profile_command_handler(console_args_t *arguments)
     		        .ssid.value = DEFAULT_WIFI_AP_PROFILE_SSID,
     		        .ssid.length = sizeof(DEFAULT_WIFI_AP_PROFILE_SSID)-1,
                 .channel.channel = SL_WIFI_AUTO_CHANNEL,
-                .channel.band = SL_WIFI_AUTO_BAND,
-                .channel.bandwidth = SL_WIFI_AUTO_BANDWIDTH,
                 .security = SL_WIFI_WPA_WPA2_MIXED,
     		        .encryption = SL_WIFI_CCMP_ENCRYPTION,
     		        .rate_protocol = SL_WIFI_RATE_PROTOCOL_AUTO,
@@ -316,7 +313,7 @@ sl_status_t set_nvm_profile_command_handler(console_args_t *arguments)
 #endif
 #endif
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Unsupported interface\r\n");
+      printf("Unsupported interface\r\n");
       return SL_STATUS_FAIL;
   }
 
@@ -359,14 +356,13 @@ sl_status_t ping_response_callback_handler(sl_net_event_t event, sl_status_t sta
 
   if (SL_NET_PING_RESPONSE_EVENT == event) {
     if (status != SL_STATUS_OK) {
-      SL_DEBUG_LOG_V2(ERROR, " Ping request failed! \r\n");
+      printf(" Ping request failed! \r\n");
       return status;
     } else {
-      SL_DEBUG_LOG_V2(INFO,
-                      " Ping reply received from %u.%u.",
-                      response->ping_address.ipv4_address[0],
-                      response->ping_address.ipv4_address[1]);
-      SL_DEBUG_LOG_V2(INFO, "%u.%u ", response->ping_address.ipv4_address[2], response->ping_address.ipv4_address[3]);
+      printf(" Ping reply received from %u.%u.",
+             response->ping_address.ipv4_address[0],
+             response->ping_address.ipv4_address[1]);
+      printf("%u.%u ", response->ping_address.ipv4_address[2], response->ping_address.ipv4_address[3]);
     }
   }
 
@@ -424,39 +420,39 @@ sl_status_t start_dhcp_command_handler(console_args_t *arguments)
     sl_ip_address_t address = { 0 };
     address.type            = ip_address.type;
     memcpy(&address.ip.v4, &ip_address.ip.v4.ip_address, SL_IPV4_ADDRESS_LENGTH);
-    SL_DEBUG_LOG_V2(INFO, "IP Address: ");
+    printf("IP Address: ");
     print_sl_ip_address(&address);
 
     sl_ip_address_t gateway = { 0 };
     gateway.type            = ip_address.type;
     memcpy(&gateway.ip.v4, &ip_address.ip.v4.gateway, SL_IPV4_ADDRESS_LENGTH);
-    SL_DEBUG_LOG_V2(INFO, " Gateway: ");
+    printf(" Gateway: ");
     print_sl_ip_address(&gateway);
 
     sl_ip_address_t netmask = { 0 };
     netmask.type            = ip_address.type;
     memcpy(&netmask.ip.v4, &ip_address.ip.v4.netmask, SL_IPV4_ADDRESS_LENGTH);
-    SL_DEBUG_LOG_V2(INFO, " Netmask: ");
+    printf(" Netmask: ");
     print_sl_ip_address(&netmask);
 
   } else if (ip_address.type == SL_IPV6) {
     sl_ip_address_t link_local_address;
     memcpy(&link_local_address.ip.v6, &ip_address.ip.v6.link_local_address, SL_IPV6_ADDRESS_LENGTH);
     link_local_address.type = SL_IPV6;
-    SL_DEBUG_LOG_V2(INFO, "Link Local Address: ");
+    printf("Link Local Address: ");
     print_sl_ip_address(&link_local_address);
 
     sl_ip_address_t global_address;
     memcpy(&global_address.ip.v6, &ip_address.ip.v6.global_address, SL_IPV6_ADDRESS_LENGTH);
     global_address.type = SL_IPV6;
-    SL_DEBUG_LOG_V2(INFO, "Global Address: ");
+    printf("Global Address: ");
     print_sl_ip_address(&global_address);
 
     sl_ip_address_t gateway;
     gateway.ip.v6 = ip_address.ip.v6.gateway;
     memcpy(&gateway.ip.v6, &ip_address.ip.v6.gateway, SL_IPV6_ADDRESS_LENGTH);
     gateway.type = SL_IPV6;
-    SL_DEBUG_LOG_V2(INFO, "Gateway Address: ");
+    printf("Gateway Address: ");
     print_sl_ip_address(&gateway);
   }
 

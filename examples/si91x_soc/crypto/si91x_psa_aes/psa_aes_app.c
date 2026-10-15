@@ -18,7 +18,6 @@
 #include <inttypes.h>
 #include "psa/crypto.h"
 #include <stdio.h>
-
 /* Test vector (AES) for  AES-128/256 key */
 // 128 Key Size
 uint8_t aes_key_16[KEY_SIZE_16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,

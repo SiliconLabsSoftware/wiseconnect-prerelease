@@ -123,11 +123,14 @@ extern sli_wifi_performance_profile_t performance_profile;
 extern bool bg_enabled;
 extern bool interface_is_up[SL_WIFI_MAX_INTERFACE_INDEX];
 extern sl_wifi_interface_t default_interface;
+/* Operating band from sl_wifi_device_configuration_t.band at init; not tied to default_interface. */
+static sl_wifi_band_mode_t wifi_operating_band                               = SL_WIFI_BAND_MODE_2_4GHZ;
 sl_wifi_advanced_scan_configuration_t advanced_scan_configuration            = { 0 };
 static sl_wifi_advanced_client_configuration_t advanced_client_configuration = { 0 };
 static uint8_t client_join_feature_bitmap                                    = SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID;
 static uint8_t ap_join_feature_bitmap                                        = SL_WIFI_JOIN_FEAT_LISTEN_INTERVAL_VALID;
-static sli_wifi_application_profile_t sli_wifi_active_application_profile    = SLI_WIFI_APPLICATION_PROFILE_MAX;
+static sli_wifi_application_profile_config_group_t sli_wifi_active_app_profile_config_group =
+  SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET;
 
 sl_status_t sli_handle_enterprise_security(const sl_wifi_client_configuration_t *ap,
                                            sli_wifi_request_eap_config_t *eap_req)
@@ -153,26 +156,26 @@ sl_status_t sli_handle_enterprise_security(const sl_wifi_client_configuration_t 
                  && (sizeof(eap_req->eap_method)) > sl_strlen(SL_EAP_TLS_METHOD))) {
     memcpy(eap_req->eap_method, SL_EAP_TLS_METHOD, sl_strlen(SL_EAP_TLS_METHOD));
   } else if ((SL_WIFI_EAP_TTLS_ENCRYPTION == ap->encryption)
-             && (sizeof(eap_req->eap_method) > (size_t)sl_strlen(SL_EAP_TTLS_METHOD))) {
+             && (sizeof(eap_req->eap_method) > sl_strlen(SL_EAP_TTLS_METHOD))) {
     memcpy(eap_req->eap_method, SL_EAP_TTLS_METHOD, sl_strlen(SL_EAP_TTLS_METHOD));
   } else if ((SL_WIFI_EAP_FAST_ENCRYPTION == ap->encryption)
-             && (sizeof(eap_req->eap_method) > (size_t)sl_strlen(SL_EAP_FAST_METHOD))) {
+             && (sizeof(eap_req->eap_method) > sl_strlen(SL_EAP_FAST_METHOD))) {
     memcpy(eap_req->eap_method, SL_EAP_FAST_METHOD, sl_strlen(SL_EAP_FAST_METHOD));
   } else if ((SL_WIFI_PEAP_MSCHAPV2_ENCRYPTION == ap->encryption)
-             && (sizeof(eap_req->eap_method) > (size_t)sl_strlen(SL_EAP_PEAP_METHOD))) {
+             && (sizeof(eap_req->eap_method) > sl_strlen(SL_EAP_PEAP_METHOD))) {
     memcpy(eap_req->eap_method, SL_EAP_PEAP_METHOD, sl_strlen(SL_EAP_PEAP_METHOD));
   } else if (SL_WIFI_PEAP_SAFE1_ENCRYPTION == ap->encryption) {
     memcpy(eap_req->eap_method, SL_EAP_PEAPSAFE1_METHOD, sl_strlen(SL_EAP_PEAPSAFE1_METHOD));
   } else if (SL_WIFI_PEAP_SAFE2_ENCRYPTION == ap->encryption) {
     memcpy(eap_req->eap_method, SL_EAP_PEAPSAFE2_METHOD, sl_strlen(SL_EAP_PEAPSAFE2_METHOD));
   } else if ((SL_WIFI_EAP_LEAP_ENCRYPTION == ap->encryption)
-             && (sizeof(eap_req->eap_method) > (size_t)sl_strlen(SL_EAP_LEAP_METHOD))) {
+             && (sizeof(eap_req->eap_method) > sl_strlen(SL_EAP_LEAP_METHOD))) {
     memcpy(eap_req->eap_method, SL_EAP_LEAP_METHOD, sl_strlen(SL_EAP_LEAP_METHOD));
   } else {
     return SL_STATUS_WIFI_INVALID_ENCRYPTION_METHOD;
   }
 
-  if (sizeof(eap_req->inner_method) > (size_t)sl_strlen(SL_EAP_INNER_METHOD)) {
+  if (sizeof(eap_req->inner_method) > sl_strlen(SL_EAP_INNER_METHOD)) {
     memcpy(eap_req->inner_method, SL_EAP_INNER_METHOD, sl_strlen(SL_EAP_INNER_METHOD));
   }
   memcpy(eap_req->okc_enable, &cred.eap.eap_flags, sizeof(cred.eap.eap_flags));
@@ -382,10 +385,10 @@ sl_status_t sli_wifi_configure_timeout(sl_wifi_interface_t interface,
                                        sl_wifi_timeout_type_t timeout_type,
                                        uint16_t timeout_value)
 {
-  if ((sli_wifi_active_application_profile != SLI_WIFI_APPLICATION_PROFILE_MAX)
+  if ((sli_wifi_active_app_profile_config_group != SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET)
       && ((timeout_type == SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT)
           || (timeout_type == SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT))) {
-    // Profile preset owns these timeouts; ignore redundant requests (e.g. from connect/scan).
+    // Profile config group owns these timeouts; ignore redundant requests (e.g. from connect/scan).
     (void)timeout_value;
     return SL_STATUS_OK;
   }
@@ -493,6 +496,27 @@ bool sli_wifi_is_interface_up(sl_wifi_interface_t interface)
   }
 }
 
+// Returns true when the inner region loop should stop (end of current region rows).
+static bool sli_wifi_copy_gain_table_column(const uint8_t old_table[],
+                                            uint8_t new_table[],
+                                            uint8_t *old_offset,
+                                            uint8_t *new_offset,
+                                            uint8_t *column_num,
+                                            uint8_t *extra_col_len,
+                                            uint8_t loop_size)
+{
+  if (*column_num == 5) {
+    // Duplicate the 5th row (11ax SU) to the 6th row (11ax TB).
+    new_table[(*new_offset)++] = old_table[*old_offset - 1];
+    (*extra_col_len)++;
+    *column_num = 0;
+    return (*old_offset == loop_size);
+  }
+  (*column_num)++;
+  new_table[(*new_offset)++] = old_table[(*old_offset)++];
+  return false;
+}
+
 static sl_status_t sli_wifi_convert_old_gain_table_to_su_gain_table(const uint8_t old_table[],
                                                                     uint8_t new_table[],
                                                                     uint16_t payload_length,
@@ -514,15 +538,14 @@ static sl_status_t sli_wifi_convert_old_gain_table_to_su_gain_table(const uint8_
   new_table[new_offset++] = old_table[old_offset++];                 // Num of channels
   while (old_offset <= payload_length) {
     while (old_offset <= loop_size) { // Repeat loop for number of current region rows*columns
-      if (column_num == 5) {
-        new_table[new_offset++] = old_table[old_offset - 1]; // Duplicating the 5th row(11ax SU) to 6th row(11ax TB)
-        extra_col_len++;
-        column_num = 0;
-        if (old_offset == loop_size)
-          break;
-      } else {
-        column_num++;
-        new_table[new_offset++] = old_table[old_offset++];
+      if (sli_wifi_copy_gain_table_column(old_table,
+                                          new_table,
+                                          &old_offset,
+                                          &new_offset,
+                                          &column_num,
+                                          &extra_col_len,
+                                          loop_size)) {
+        break;
       }
     }
     new_table[new_offset++] = old_table[old_offset++];                // Region code
@@ -720,10 +743,10 @@ sl_status_t sli_wifi_configure_scan_channel_bitmap(sl_wifi_interface_t interface
 sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_response_t *wps_response)
 {
   sl_status_t status;
-  sli_wifi_request_scan_t scan_request = { 0 };
-  sli_wifi_join_request_t join_request = { 0 };
-  sl_wifi_buffer_t *buffer             = NULL;
-  sl_wifi_system_packet_t *packet      = NULL;
+  sli_wifi_request_scan_t scan_request  = { 0 };
+  sli_wifi_join_request_t join_request  = { 0 };
+  sl_wifi_buffer_t *buffer              = NULL;
+  const sl_wifi_system_packet_t *packet = NULL;
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_SCAN,
                                  SLI_WIFI_WLAN_CMD,
@@ -768,18 +791,14 @@ sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_r
     }
   }
 
-  if (wps_config.auto_connect == 0 && status != SL_STATUS_OK) {
-    if (status == SL_STATUS_SI91X_WPS_CREDENTIALS_RECEIVED_WITHOUT_JOIN_COMMAND) {
-      // Return SL_STATUS_OK because credentials were received successfully.
-      // Since auto_connect is disabled, joining is not required and the WPS operation is considered successful.
-      return SL_STATUS_OK;
-    }
+  if ((wps_config.auto_connect == 0) && (status == SL_STATUS_SI91X_WPS_CREDENTIALS_RECEIVED_WITHOUT_JOIN_COMMAND)) {
+    // Return SL_STATUS_OK because credentials were received successfully.
+    // Since auto_connect is disabled, joining is not required and the WPS operation is considered successful.
+    return SL_STATUS_OK;
   }
 
-  if (wps_config.auto_connect == 1 && status != SL_STATUS_OK) {
-    if (wps_response->ssid_len != 0) {
-      SL_DEBUG_LOG_V2(WARN, "Receive credential success but join failure\r\n");
-    }
+  if ((wps_config.auto_connect == 1) && (status != SL_STATUS_OK) && (wps_response->ssid_len != 0)) {
+    SL_DEBUG_LOG_V2(WARN, "Receive credential success but join failure\r\n");
   }
   return status;
 }
@@ -848,6 +867,16 @@ static sl_status_t sli_handle_background_scan(const sl_wifi_scan_configuration_t
 sl_wifi_interface_t sli_wifi_get_default_interface(void)
 {
   return default_interface;
+}
+
+sl_wifi_band_mode_t sli_wifi_get_band(void)
+{
+  return wifi_operating_band;
+}
+
+void sli_wifi_set_band(sl_wifi_band_mode_t band)
+{
+  wifi_operating_band = band;
 }
 
 void sli_wifi_set_default_interface(sl_wifi_interface_t interface)
@@ -1187,7 +1216,7 @@ sl_status_t sli_wifi_get_pairwise_master_key(sl_wifi_interface_t interface,
   }
 
   pairwise_master_key_request.type = type;
-  memcpy(pairwise_master_key_request.psk_or_pmk, pre_shared_key, sl_strlen((char *)pre_shared_key));
+  memcpy(pairwise_master_key_request.psk_or_pmk, pre_shared_key, sl_strlen(pre_shared_key));
   memcpy(pairwise_master_key_request.ap_ssid, ssid->value, ssid->length);
 
   status = sli_wifi_send_command(SLI_WIFI_REQ_HOST_PSK,
@@ -1233,7 +1262,7 @@ sl_status_t sli_wifi_disconnect_ap_client(sl_wifi_interface_t interface,
                                              &disconnect_request,
                                              sizeof(disconnect_request),
                                              SLI_WIFI_RSP_DISCONNECT_WAIT_TIME,
-                                             (void *)mac,
+                                             (void *)mac, // NOSONAR - sdk_context is void * in sli_wifi_send_command
                                              NULL);
   VERIFY_STATUS_AND_RETURN(status);
   return status;
@@ -1858,7 +1887,8 @@ void sli_wifi_deinit(void)
   sli_wifi_reset_sl_wifi_rate();
   memset(&advanced_scan_configuration, 0, sizeof(sl_wifi_advanced_scan_configuration_t));
   sli_wifi_flush_scan_results_database();
-  sli_wifi_active_application_profile = SLI_WIFI_APPLICATION_PROFILE_MAX;
+  sli_wifi_active_app_profile_config_group = SLI_WIFI_APP_PROFILE_CONFIG_NOT_SET;
+  wifi_operating_band                      = SL_WIFI_BAND_MODE_2_4GHZ;
   return;
 }
 
@@ -2417,31 +2447,29 @@ sl_status_t sli_wifi_update_gain_table(uint8_t band, uint8_t bandwidth, const ui
     free(su_tb_payload);
     return status;
   }
-  sli_wifi_gain_table_info_t *gain_table_info = malloc(sizeof(sli_wifi_gain_table_info_t) + su_tb_payload_length);
-  if (gain_table_info == NULL) {
-    free(su_tb_payload);
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-  memset(gain_table_info, 0, sizeof(sli_wifi_gain_table_info_t) + su_tb_payload_length);
-  gain_table_info->band               = band;
-  gain_table_info->bandwidth          = bandwidth;
-  gain_table_info->size               = su_tb_payload_length;
-  gain_table_info->x_offset           = 0;
-  gain_table_info->y_offset           = 0;
-  gain_table_info->gain_table_version = 1;
-  gain_table_info->reserved           = 0;
+  // Header only — converted table is passed as a second fragment
+  sli_wifi_gain_table_info_t gain_table_info = { 0 };
+  gain_table_info.band                       = band;
+  gain_table_info.bandwidth                  = bandwidth;
+  gain_table_info.size                       = su_tb_payload_length;
+  gain_table_info.x_offset                   = 0;
+  gain_table_info.y_offset                   = 0;
+  gain_table_info.gain_table_version         = 1;
+  gain_table_info.reserved                   = 0;
 
-  memcpy(gain_table_info->gain_table, su_tb_payload, su_tb_payload_length);
-
-  status = sli_wifi_send_command(SLI_WIFI_REQ_GAIN_TABLE,
-                                 SLI_WIFI_WLAN_CMD,
-                                 gain_table_info,
-                                 sizeof(sli_wifi_gain_table_info_t) + (gain_table_info->size),
-                                 SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
-                                 NULL,
-                                 NULL);
+  sli_wifi_command_payload_t fragments = {
+    .header         = &gain_table_info,
+    .header_length  = sizeof(gain_table_info),
+    .payload        = su_tb_payload,
+    .payload_length = su_tb_payload_length,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_GAIN_TABLE,
+                                              SLI_WIFI_WLAN_CMD,
+                                              &fragments,
+                                              SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
+                                              NULL,
+                                              NULL);
   free(su_tb_payload);
-  free(gain_table_info);
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -2468,28 +2496,28 @@ sl_status_t sli_wifi_update_su_gain_table(uint8_t band,
     return SL_STATUS_NOT_INITIALIZED;
   }
 
-  sli_wifi_gain_table_info_t *gain_table_info = malloc(sizeof(sli_wifi_gain_table_info_t) + payload_length);
-  if (gain_table_info == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-  memset(gain_table_info, 0, sizeof(sli_wifi_gain_table_info_t) + payload_length);
-  gain_table_info->band               = band;
-  gain_table_info->bandwidth          = bandwidth;
-  gain_table_info->size               = payload_length;
-  gain_table_info->x_offset           = x_offset;
-  gain_table_info->y_offset           = y_offset;
-  gain_table_info->gain_table_version = 1;
-  gain_table_info->reserved           = 0;
+  // Header only — caller payload is passed as a second fragment (no staging buffer)
+  sli_wifi_gain_table_info_t gain_table_info = { 0 };
+  gain_table_info.band                       = band;
+  gain_table_info.bandwidth                  = bandwidth;
+  gain_table_info.size                       = payload_length;
+  gain_table_info.x_offset                   = x_offset;
+  gain_table_info.y_offset                   = y_offset;
+  gain_table_info.gain_table_version         = 1;
+  gain_table_info.reserved                   = 0;
 
-  memcpy(gain_table_info->gain_table, payload, payload_length);
-  status = sli_wifi_send_command(SLI_WIFI_REQ_GAIN_TABLE,
-                                 SLI_WIFI_WLAN_CMD,
-                                 gain_table_info,
-                                 sizeof(sli_wifi_gain_table_info_t) + (gain_table_info->size),
-                                 SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
-                                 NULL,
-                                 NULL);
-  free(gain_table_info);
+  sli_wifi_command_payload_t fragments = {
+    .header         = &gain_table_info,
+    .header_length  = sizeof(gain_table_info),
+    .payload        = payload,
+    .payload_length = payload_length,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_GAIN_TABLE,
+                                              SLI_WIFI_WLAN_CMD,
+                                              &fragments,
+                                              SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME,
+                                              NULL,
+                                              NULL);
   VERIFY_STATUS_AND_RETURN(status);
   return status;
 }
@@ -2575,9 +2603,6 @@ sl_status_t sli_wifi_set_11ax_config(const sl_wifi_11ax_config_params_t *config_
                                  SLI_WIFI_RSP_11AX_PARAMS_WAIT_TIME,
                                  NULL,
                                  NULL);
-  if (status != SL_STATUS_OK) {
-    return status;
-  }
   return status;
 }
 
@@ -3171,13 +3196,14 @@ sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
   return status;
 }
 
-sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id)
+sl_status_t sli_wifi_add_vendor_ie(const sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id)
 {
   sl_status_t status;
-  uint16_t ie_buffer_length                  = 0;
-  uint16_t ie_buffer_size                    = 0;
-  sli_wifi_manage_vendor_ie_packet_t *packet = NULL;
-  sl_wifi_buffer_t *buffer                   = NULL;
+  uint16_t ie_buffer_length = 0;
+  uint16_t ie_buffer_size   = 0;
+  // Header only — IE bytes are passed as a second fragment (no staging buffer)
+  sli_wifi_manage_vendor_ie_packet_t packet = { 0 };
+  sl_wifi_buffer_t *buffer                  = NULL;
 
   // Validate input parameters
   if ((vendor_ie == NULL) || (vendor_ie->ie_buffer == NULL)) {
@@ -3195,30 +3221,27 @@ sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_u
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  packet = (sli_wifi_manage_vendor_ie_packet_t *)malloc(sizeof(sli_wifi_manage_vendor_ie_packet_t) + ie_buffer_size);
-  if (packet == NULL) {
-    return SL_STATUS_FAIL;
-  }
-
-  // Prepare the packet to send to firmware
-  packet->version           = SLI_WIFI_VENDOR_IE_FRAME_VERSION;
-  packet->action            = SLI_WIFI_VENDOR_IE_ACTION_ADD;
-  packet->unique_id         = vendor_ie->unique_id;
-  packet->mgmt_frame_bitmap = vendor_ie->mgmt_frame_bitmap;
-  memset(packet->reserved, 0, sizeof(packet->reserved));
-  packet->ie_buffer_length = vendor_ie->ie_buffer_length;
-  memcpy(packet->ie_buffer, vendor_ie->ie_buffer, ie_buffer_size);
+  // Prepare the packet header to send to firmware
+  packet.version           = SLI_WIFI_VENDOR_IE_FRAME_VERSION;
+  packet.action            = SLI_WIFI_VENDOR_IE_ACTION_ADD;
+  packet.unique_id         = vendor_ie->unique_id;
+  packet.mgmt_frame_bitmap = vendor_ie->mgmt_frame_bitmap;
+  packet.ie_buffer_length  = vendor_ie->ie_buffer_length;
 
   // Send the command to firmware
-  status = sli_wifi_send_command(SLI_WIFI_REQ_VENDOR_IE,
-                                 SLI_WIFI_WLAN_CMD,
-                                 packet,
-                                 sizeof(sli_wifi_manage_vendor_ie_packet_t) + ie_buffer_size,
-                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_VENDOR_IE_CMD_TIMEOUT),
-                                 NULL,
-                                 (void **)&buffer);
+  sli_wifi_command_payload_t fragments = {
+    .header         = &packet,
+    .header_length  = sizeof(packet),
+    .payload        = vendor_ie->ie_buffer,
+    .payload_length = ie_buffer_size,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_VENDOR_IE,
+                                              SLI_WIFI_WLAN_CMD,
+                                              &fragments,
+                                              SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_VENDOR_IE_CMD_TIMEOUT),
+                                              NULL,
+                                              (void **)&buffer);
 
-  free(packet);
   if ((status != SL_STATUS_OK) && (NULL != buffer)) {
     sli_buffer_manager_free_buffer(buffer);
   }
@@ -3226,7 +3249,7 @@ sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_u
   const sl_wifi_system_packet_t *resp_packet =
     (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
 
-  if ((resp_packet != NULL)) {
+  if (resp_packet != NULL) {
     *fw_unique_id = resp_packet->data[0];
     SL_DEBUG_LOG_V2(INFO, "vendor IE added with unique ID: %d\r\n", *fw_unique_id);
     sli_buffer_manager_free_buffer(buffer);
@@ -3295,6 +3318,77 @@ sl_status_t sli_wifi_remove_all_vendor_ie(void)
   return status;
 }
 
+static sl_status_t sli_wifi_send_set_region_command(sl_wifi_region_code_t region_code)
+{
+  sli_wifi_set_region_request_t request = { 0 };
+
+  request.set_region_code_from_user_cmd = SET_REGION_CODE_FROM_USER;
+  request.region_code                   = (uint8_t)region_code;
+
+  return sli_wifi_send_command(SLI_WIFI_REQ_SET_REGION,
+                               SLI_WIFI_WLAN_CMD,
+                               &request,
+                               sizeof(sli_wifi_set_region_request_t),
+                               SLI_WIFI_RSP_SET_REGION_WAIT_TIME,
+                               NULL,
+                               NULL);
+}
+
+static sl_status_t sli_wifi_load_ap_region_configuration(sl_wifi_band_mode_t band,
+                                                         sl_wifi_region_code_t region_code,
+                                                         sli_wifi_set_region_ap_request_t *request)
+{
+  switch (region_code) {
+    case SL_WIFI_DEFAULT_REGION:
+    case SL_WIFI_REGION_US:
+      if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
+        *request = default_US_region_2_4GHZ_configurations;
+      } else {
+        *request = default_US_region_5GHZ_configurations;
+      }
+      break;
+    case SL_WIFI_REGION_EU:
+      if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
+        *request = default_EU_region_2_4GHZ_configurations;
+      } else {
+        *request = default_EU_region_5GHZ_configurations;
+      }
+      break;
+    case SL_WIFI_REGION_JP:
+      if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
+        *request = default_JP_region_2_4GHZ_configurations;
+      } else {
+        *request = default_JP_region_5GHZ_configurations;
+      }
+      break;
+    case SL_WIFI_REGION_KR:
+      if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
+        *request = default_KR_region_2_4GHZ_configurations;
+      } else {
+        *request = default_KR_region_5GHZ_configurations;
+      }
+      break;
+    case SL_WIFI_REGION_SG:
+      if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
+        *request = default_SG_region_2_4GHZ_configurations;
+      } else {
+        return SL_STATUS_NOT_SUPPORTED;
+      }
+      break;
+    case SL_WIFI_REGION_CN:
+      if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
+        *request = default_CN_region_2_4GHZ_configurations;
+      } else {
+        *request = default_CN_region_5GHZ_configurations;
+      }
+      break;
+    default:
+      return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  return SL_STATUS_OK;
+}
+
 sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
                                        sl_wifi_band_mode_t band,
                                        sl_wifi_region_code_t region_code)
@@ -3305,102 +3399,24 @@ sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
     case SL_WIFI_CLIENT_MODE:
     case SL_WIFI_ENTERPRISE_CLIENT_MODE:
     case SL_WIFI_TRANSMIT_TEST_MODE:
-    case SL_WIFI_TRANSCEIVER_MODE: {
-      // For client and transmit test modes, send a command to set the region code
-      sli_wifi_set_region_request_t request = { 0 };
-
-      request.set_region_code_from_user_cmd = SET_REGION_CODE_FROM_USER;
-      request.region_code                   = (uint8_t)region_code;
-
-      status = sli_wifi_send_command(SLI_WIFI_REQ_SET_REGION,
-                                     SLI_WIFI_WLAN_CMD,
-                                     &request,
-                                     sizeof(sli_wifi_set_region_request_t),
-                                     SLI_WIFI_RSP_SET_REGION_WAIT_TIME,
-                                     NULL,
-                                     NULL);
+    case SL_WIFI_TRANSCEIVER_MODE:
+      status = sli_wifi_send_set_region_command(region_code);
       VERIFY_STATUS_AND_RETURN(status);
       break;
-    }
 
     case SL_WIFI_CONCURRENT_MODE:
     case SL_WIFI_ACCESS_POINT_MODE: {
       if (operation_mode == SL_WIFI_CONCURRENT_MODE) {
-        // For concurrent mode, send a command to set the region code
-        sli_wifi_set_region_request_t request = { 0 };
-
-        request.set_region_code_from_user_cmd = SET_REGION_CODE_FROM_USER;
-        request.region_code                   = (uint8_t)region_code;
-
-        status = sli_wifi_send_command(SLI_WIFI_REQ_SET_REGION,
-                                       SLI_WIFI_WLAN_CMD,
-                                       &request,
-                                       sizeof(sli_wifi_set_region_request_t),
-                                       SLI_WIFI_RSP_SET_REGION_WAIT_TIME,
-                                       NULL,
-                                       NULL);
+        status = sli_wifi_send_set_region_command(region_code);
         VERIFY_STATUS_AND_RETURN(status);
       }
 
-      // For AP and concurrent modes, configure region-specific settings
       sli_wifi_set_region_ap_request_t request = { 0 };
       request.set_region_code_from_user_cmd    = SET_REGION_CODE_FROM_USER;
 
-      // Configure region-specific settings based on the region code and band
-      switch (region_code) {
-        // Configure settings for different regions and bands
-        case DEFAULT_REGION:
-        case SL_WIFI_REGION_US: {
-          if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
-            request = default_US_region_2_4GHZ_configurations;
-          } else {
-            request = default_US_region_5GHZ_configurations;
-          }
-          break;
-        }
-        case SL_WIFI_REGION_EU: {
-          if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
-            request = default_EU_region_2_4GHZ_configurations;
-          } else {
-            request = default_EU_region_5GHZ_configurations;
-          }
-          break;
-        }
-        case SL_WIFI_REGION_JP: {
-          if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
-            request = default_JP_region_2_4GHZ_configurations;
-          } else {
-            request = default_JP_region_5GHZ_configurations;
-          }
-          break;
-        }
-        case SL_WIFI_REGION_KR: {
-          if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
-            request = default_KR_region_2_4GHZ_configurations;
-          } else {
-            request = default_KR_region_5GHZ_configurations;
-          }
-          break;
-        }
-        case SL_WIFI_REGION_SG: {
-          if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
-            request = default_SG_region_2_4GHZ_configurations;
-          } else {
-            return SL_STATUS_NOT_SUPPORTED;
-          }
-          break;
-        }
-        case SL_WIFI_REGION_CN: {
-          if (band == SL_WIFI_BAND_MODE_2_4GHZ) {
-            request = default_CN_region_2_4GHZ_configurations;
-          } else {
-            request = default_CN_region_5GHZ_configurations;
-          }
-          break;
-        }
-        default:
-          return SL_STATUS_NOT_SUPPORTED;
-      }
+      status = sli_wifi_load_ap_region_configuration(band, region_code, &request);
+      VERIFY_STATUS_AND_RETURN(status);
+
       status = sli_wifi_send_command(SLI_WIFI_REQ_SET_REGION_AP,
                                      SLI_WIFI_WLAN_CMD,
                                      &request,
@@ -3419,10 +3435,7 @@ sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
   return status;
 }
 
-void sli_wifi_prepare_mac_frame_header(const void *buf,
-                                       const uint8_t *addr1,
-                                       const uint8_t *addr2,
-                                       const uint8_t *addr3)
+void sli_wifi_prepare_mac_frame_header(void *buf, const uint8_t *addr1, const uint8_t *addr2, const uint8_t *addr3)
 {
   if (buf == NULL || addr1 == NULL || addr2 == NULL || addr3 == NULL) {
     return;
@@ -3526,9 +3539,10 @@ sl_status_t sli_wifi_send_mac_data_frame(const sl_wifi_transmitter_test_info_t *
   packet->command = (uint16_t)SLI_SEND_MAC_FRAME;
 
   // Set the packet's transmitter test information
-  tx_11ax_transmit = (uint8_t)per_params->enable_11ax;
-  uint8_t mode     = tx_11ax_transmit ? (per_params->rate & BIT(7) ? 2 : 1) : 0;
+  tx_11ax_transmit = per_params->enable_11ax;
+  uint8_t mode     = 0;
   if (tx_11ax_transmit) {
+    mode = (per_params->rate & BIT(7)) ? 2 : 1;
     if (mode == 2) {
       bbp_info = ((per_params->bw << 0) | (per_params->he_ppdu_type << 4) | (per_params->ul_dl << 6)
                   | (per_params->sigb_mcs << 7));
@@ -3789,7 +3803,7 @@ static sl_status_t sli_wifi_transmit_test_send_mac_data_chunk(const sl_wifi_tran
                                                 chunk_length);
     case SL_WIFI_RATE_PROTOCOL_AC_ONLY:
     case SL_WIFI_RATE_PROTOCOL_BE_ONLY:
-      /* 11ac / 11be PER MAC framing is implemented only on the SiWx3xx (Everest) port, which routes
+      /* 11ac / 11be PER MAC framing is implemented only on the siwx3xx port, which routes
        * its own chunk-builder through sli_wifi_transmit_test_send_payload. The shared send_frames
        * path should never see AC/BE here. */
       SL_DEBUG_LOG_V2(ERROR,
@@ -3812,15 +3826,106 @@ static sl_status_t sli_wifi_transmit_test_send_mac_data_chunk(const sl_wifi_tran
   }
 }
 
+static sl_status_t sli_wifi_tx_test_send_user_payload(const sl_wifi_transmitter_test_base_info_t *base_info,
+                                                      const void *per_params,
+                                                      const uint8_t *payload,
+                                                      uint16_t payload_length,
+                                                      sli_wifi_transmit_test_chunk_builder_t build_chunk,
+                                                      uint16_t *remaining_length)
+{
+  sl_wifi_system_packet_t *packet;
+  uint16_t payload_offset         = 0;
+  const uint16_t max_memcpy_chunk = (uint16_t)SLI_WIFI_TRANSMIT_TEST_MAX_MEMCPY_CHUNK;
+
+  while ((payload_offset < payload_length) && (*remaining_length > 0)) {
+    sl_status_t status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_DATA_TX_POOL,
+                                                            SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
+                                                            SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
+                                                            (sli_buffer_t *)(&packet));
+    VERIFY_STATUS_AND_RETURN(status);
+
+    uint16_t this_chunk = (uint16_t)(payload_length - payload_offset);
+    if (this_chunk > *remaining_length) {
+      this_chunk = *remaining_length;
+    }
+    if (this_chunk > max_memcpy_chunk) {
+      this_chunk = max_memcpy_chunk;
+    }
+
+    memcpy(packet->data + SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE, payload + payload_offset, this_chunk);
+
+    status = build_chunk(base_info, per_params, packet, this_chunk);
+    if (status != SL_STATUS_OK) {
+      SL_DEBUG_LOG_V2(ERROR, "tx test send_payload: user chunk failed status=0x%lx\r\n", (unsigned long)status);
+      return status;
+    }
+
+    payload_offset += this_chunk;
+    *remaining_length -= this_chunk;
+  }
+  return SL_STATUS_OK;
+}
+
+static sl_status_t sli_wifi_tx_test_send_pattern_payload(const sl_wifi_transmitter_test_base_info_t *base_info,
+                                                         const void *per_params,
+                                                         sli_wifi_transmit_test_chunk_builder_t build_chunk,
+                                                         uint16_t *remaining_length)
+{
+  sl_wifi_system_packet_t *packet;
+
+  do {
+    sl_status_t status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_DATA_TX_POOL,
+                                                            SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
+                                                            SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
+                                                            (sli_buffer_t *)(&packet));
+    VERIFY_STATUS_AND_RETURN(status);
+
+    sli_wifi_prepare_mac_frame_header(packet->data + 4,
+                                      sli_wifi_per_transmit_test_mac_addr,
+                                      sli_wifi_per_transmit_test_mac_addr,
+                                      sli_wifi_per_transmit_test_mac_addr);
+
+    uint16_t chunk_length = *remaining_length;
+    if (chunk_length > SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE) {
+      chunk_length = SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE;
+    }
+
+    uint8_t *payload_start        = (packet->data + 4) + sizeof(sli_ieee80211_hdr_t);
+    const uint16_t header_and_fcs = (uint16_t)(sizeof(sli_ieee80211_hdr_t) + 4);
+    uint16_t data_length          = 0;
+    if (chunk_length > header_and_fcs) {
+      data_length = (uint16_t)(chunk_length - header_and_fcs);
+    }
+
+    /* Fill with 0xAA, 0x55, 0xAA, 0x55, ... using 16-bit stores; handle odd tail byte. */
+    uint16_t i               = 0;
+    const uint16_t pair_stop = (uint16_t)(data_length & ~1U);
+    for (; i < pair_stop; i += 2) {
+      payload_start[i]     = 0xAA;
+      payload_start[i + 1] = 0x55;
+    }
+    if (i < data_length) {
+      payload_start[i] = 0xAA;
+    }
+
+    status = build_chunk(base_info, per_params, packet, chunk_length);
+    if (status != SL_STATUS_OK) {
+      SL_DEBUG_LOG_V2(ERROR, "tx test send_payload: pattern chunk failed status=0x%lx\r\n", (unsigned long)status);
+      return status;
+    }
+
+    *remaining_length -= chunk_length;
+  } while (*remaining_length > 0);
+
+  return SL_STATUS_OK;
+}
+
 sl_status_t sli_wifi_transmit_test_send_payload(const sl_wifi_transmitter_test_base_info_t *base_info,
                                                 const void *per_params,
                                                 const uint8_t *payload,
                                                 uint16_t payload_length,
                                                 sli_wifi_transmit_test_chunk_builder_t build_chunk)
 {
-  sl_wifi_system_packet_t *packet;
-  uint16_t chunk_length;
-  uint16_t data_length;
   uint16_t remaining_length = base_info->length;
   sl_status_t status        = SL_STATUS_OK;
 
@@ -3828,84 +3933,18 @@ sl_status_t sli_wifi_transmit_test_send_payload(const sl_wifi_transmitter_test_b
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  const uint16_t max_memcpy_chunk = (uint16_t)SLI_WIFI_TRANSMIT_TEST_MAX_MEMCPY_CHUNK;
-
-  if (payload != NULL && payload_length > 0) {
-    uint16_t payload_offset = 0;
-    while (payload_offset < payload_length && remaining_length > 0) {
-      status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_DATA_TX_POOL,
-                                                  SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
-                                                  SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
-                                                  (sli_buffer_t *)(&packet));
-      VERIFY_STATUS_AND_RETURN(status);
-
-      uint16_t this_chunk = (uint16_t)(payload_length - payload_offset);
-      if (this_chunk > remaining_length) {
-        this_chunk = remaining_length;
-      }
-      if (this_chunk > max_memcpy_chunk) {
-        this_chunk = max_memcpy_chunk;
-      }
-
-      memcpy(packet->data + SLI_WIFI_TRANSMIT_TEST_HEADER_SIZE, payload + payload_offset, this_chunk);
-
-      status = build_chunk(base_info, per_params, packet, this_chunk);
-
-      if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "tx test send_payload: user chunk failed status=0x%lx\r\n", (unsigned long)status);
-        return status;
-      }
-
-      payload_offset += this_chunk;
-      remaining_length -= this_chunk;
-    }
+  if ((payload != NULL) && (payload_length > 0)) {
+    status = sli_wifi_tx_test_send_user_payload(base_info,
+                                                per_params,
+                                                payload,
+                                                payload_length,
+                                                build_chunk,
+                                                &remaining_length);
+    VERIFY_STATUS_AND_RETURN(status);
   }
   if (remaining_length > 0) {
-    do {
-      status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_DATA_TX_POOL,
-                                                  SLI_BUFFER_MANAGER_ALLOCATION_TYPE_HYBRID,
-                                                  SLI_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME,
-                                                  (sli_buffer_t *)(&packet));
-      VERIFY_STATUS_AND_RETURN(status);
-
-      sli_wifi_prepare_mac_frame_header(packet->data + 4,
-                                        sli_wifi_per_transmit_test_mac_addr,
-                                        sli_wifi_per_transmit_test_mac_addr,
-                                        sli_wifi_per_transmit_test_mac_addr);
-
-      chunk_length = remaining_length;
-      if (chunk_length > SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE) {
-        chunk_length = SLI_WIFI_TRANSMIT_TEST_MAX_PACKET_SIZE;
-      }
-
-      uint8_t *payload_start        = (packet->data + 4) + sizeof(sli_ieee80211_hdr_t);
-      const uint16_t header_and_fcs = (uint16_t)(sizeof(sli_ieee80211_hdr_t) + 4);
-      if (chunk_length <= header_and_fcs) {
-        data_length = 0;
-      } else {
-        data_length = (uint16_t)(chunk_length - header_and_fcs);
-      }
-
-      /* Fill with 0xAA, 0x55, 0xAA, 0x55, ... using 16-bit stores; handle odd tail byte. */
-      uint16_t i               = 0;
-      const uint16_t pair_stop = (uint16_t)(data_length & ~1U);
-      for (; i < pair_stop; i += 2) {
-        payload_start[i]     = 0xAA;
-        payload_start[i + 1] = 0x55;
-      }
-      if (i < data_length) {
-        payload_start[i] = 0xAA;
-      }
-
-      status = build_chunk(base_info, per_params, packet, chunk_length);
-
-      if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "tx test send_payload: pattern chunk failed status=0x%lx\r\n", (unsigned long)status);
-        return status;
-      }
-
-      remaining_length -= chunk_length;
-    } while (remaining_length > 0);
+    status = sli_wifi_tx_test_send_pattern_payload(base_info, per_params, build_chunk, &remaining_length);
+    VERIFY_STATUS_AND_RETURN(status);
   }
 
   return status;
@@ -3918,14 +3957,12 @@ sl_status_t sli_wifi_transmit_test_send_frames(const sl_wifi_transmitter_test_ba
 {
   sl_status_t status;
 
-  if (payload != NULL && payload_length > 0) {
-    if (payload_length > base_info->length) {
-      SL_DEBUG_LOG_V2(ERROR,
-                      "tx test send_frames: payload_len %u > frame len %u\n",
-                      (unsigned)payload_length,
-                      (unsigned)base_info->length);
-      return SL_STATUS_INVALID_PARAMETER;
-    }
+  if ((payload != NULL) && (payload_length > 0) && (payload_length > base_info->length)) {
+    SL_DEBUG_LOG_V2(ERROR,
+                    "tx test send_frames: payload_len %u > frame len %u\n",
+                    (unsigned)payload_length,
+                    (unsigned)base_info->length);
+    return SL_STATUS_INVALID_PARAMETER;
   }
 
   SL_DEBUG_LOG_V2(DEBUG,
@@ -4264,12 +4301,12 @@ sl_status_t sli_wifi_set_aggregation_config(sl_wifi_interface_t interface, const
   return SL_STATUS_OK;
 }
 
-void sli_wifi_set_active_application_profile(sli_wifi_application_profile_t profile)
+void sli_wifi_set_active_application_profile_config_group(sli_wifi_application_profile_config_group_t config_group)
 {
-  sli_wifi_active_application_profile = profile;
+  sli_wifi_active_app_profile_config_group = config_group;
 }
 
-sli_wifi_application_profile_t sli_wifi_get_active_application_profile(void)
+sli_wifi_application_profile_config_group_t sli_wifi_get_active_application_profile_config_group(void)
 {
-  return sli_wifi_active_application_profile;
+  return sli_wifi_active_app_profile_config_group;
 }

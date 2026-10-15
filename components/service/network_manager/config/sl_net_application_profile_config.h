@@ -1,6 +1,6 @@
-/*******************************************************************************
- * @file  sl_si91x_sha3.h
- * @brief SHA3 (Keccak) hash API for Si91x
+/***************************************************************************/ /**
+ * @file sl_net_application_profile_config.h
+ * @brief SL Net application profile compile-time selection (UC)
  *******************************************************************************
  * # License
  * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
@@ -28,40 +28,33 @@
  *
  ******************************************************************************/
 
-#pragma once
-#include "sl_si91x_crypto.h"
-#include "sl_status.h"
+#ifndef SL_NET_APPLICATION_PROFILE_CONFIG_H
+#define SL_NET_APPLICATION_PROFILE_CONFIG_H
 
-/******************************************************
- *                    Constants
- ******************************************************/
-/**
- * @addtogroup CRYPTO_SHA3_CONSTANTS
- * @{
- */
+/* Profile identifiers used as UC option values (and by application code). */
+#ifndef SL_NET_APP_PROFILE_NONE
+#define SL_NET_APP_PROFILE_NONE 0
+#endif
+#ifndef SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH
+#define SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH 1
+#endif
 
-#define SL_SI91X_SHA3_LEN_INVALID 0 ///< SHA3 length is invalid
+// <<< Use Configuration Wizard in Context Menu >>>
 
-/**
- * @brief SHA3 modes supported by the SI91X device (algorithm_sub_type for SHA3).
- *
- * Values align with the SHA API mapping for digest width: 224, 256, 384, and 512-bit.
- */
-typedef enum {
-  SL_SI91X_SHA3_512 = 9,  ///< SHA3-512
-  SL_SI91X_SHA3_384 = 13, ///< SHA3-384
-  SL_SI91X_SHA3_256 = 17, ///< SHA3-256
-  SL_SI91X_SHA3_224 = 18, ///< SHA3-224
-} sl_si91x_crypto_sha3_mode_t;
+// <h> SL Net Application Profile
 
-/**
- * @brief Digest lengths for SHA3 modes (bytes).
- */
-typedef enum {
-  SL_SI91X_SHA3_224_DIGEST_LEN = 28, ///< SHA3-224
-  SL_SI91X_SHA3_256_DIGEST_LEN = 32, ///< SHA3-256
-  SL_SI91X_SHA3_384_DIGEST_LEN = 48, ///< SHA3-384
-  SL_SI91X_SHA3_512_DIGEST_LEN = 64, ///< SHA3-512
-} sl_si91x_sha3_length_t;
+// <o SL_NET_APP_PROFILE> Application profile
+// <i> Selects which application profile is compiled into the build.
+// <i> Runtime APIs apply the in-use or not-in-use config group for this profile.
+// <SL_NET_APP_PROFILE_NONE=> None
+// <SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH=> Neutral-less Matter switch
+// <i> Default: SL_NET_APP_PROFILE_NONE
+#ifndef SL_NET_APP_PROFILE
+#define SL_NET_APP_PROFILE SL_NET_APP_PROFILE_NONE
+#endif
 
-/** @} */
+// </h>
+
+// <<< end of configuration section >>>
+
+#endif /* SL_NET_APPLICATION_PROFILE_CONFIG_H */

@@ -77,7 +77,7 @@ sl_adxl345_handle_t sl_si91x_adxl345_create(sl_sensor_bus_t bus)
 {
   sl_adxl345_dev_t *sensor = (sl_adxl345_dev_t *)pvPortMalloc(sizeof(sl_adxl345_dev_t));
   (void)bus;
-  DEBUGOUT("\r\n SPI - ADXL345 Sensor created \r\n");
+  SL_PRINT_STRING_ERROR("\r\n SPI - ADXL345 Sensor created \r\n");
   return (sl_adxl345_handle_t)sensor;
 }
 
@@ -135,31 +135,31 @@ void sl_si91x_adxl345_isr(void)
 
   // Free Fall Detection
   if (sl_si91x_adxl345_triggered(interrupts, SL_ADXL345_FREE_FALL)) {
-    DEBUGOUT("\r\n*** FREE FALL ***\r\n");
+    SL_PRINT_STRING_ERROR("\r\n*** FREE FALL ***\r\n");
     //add code here to do when free fall is sensed
   }
 
   // Inactivity
   if (sl_si91x_adxl345_triggered(interrupts, SL_ADXL345_INACTIVITY)) {
-    DEBUGOUT("\r\n*** INACTIVITY ***\r\n");
+    SL_PRINT_STRING_ERROR("\r\n*** INACTIVITY ***\r\n");
     //add code here to do when inactivity is sensed
   }
 
   // Activity
   if (sl_si91x_adxl345_triggered(interrupts, SL_ADXL345_ACTIVITY)) {
-    DEBUGOUT("\r\n*** ACTIVITY ***\r\n");
+    SL_PRINT_STRING_ERROR("\r\n*** ACTIVITY ***\r\n");
     //add code here to do when activity is sensed
   }
 
   // Double Tap Detection
   if (sl_si91x_adxl345_triggered(interrupts, SL_ADXL345_DOUBLE_TAP)) {
-    DEBUGOUT("\r\n*** DOUBLE TAP ***\r\n");
+    SL_PRINT_STRING_ERROR("\r\n*** DOUBLE TAP ***\r\n");
     //add code here to do when a 2X tap is sensed
   }
 
   // Tap Detection
   if (sl_si91x_adxl345_triggered(interrupts, SL_ADXL345_SINGLE_TAP)) {
-    DEBUGOUT("\r\n*** TAP ***\r\n");
+    SL_PRINT_STRING_ERROR("\r\n*** TAP ***\r\n");
     //add code here to do when a tap is sensed
   }
 }
@@ -280,7 +280,7 @@ sl_adxl_err_t sl_si91x_adxl345_test(void)
 sl_adxl_err_t sl_si91x_adxl345_sample_accelerometer(float *x, float *y, float *z)
 {
   if (!is_accelerometer_init) {
-    DEBUGOUT("\r\n ADXL sensor data reading fail \r\n");
+    SL_PRINT_STRING_ERROR("\r\n ADXL sensor data reading fail \r\n");
     return RSI_FAIL;
   }
   sl_adxl_err_t ret = 0;
@@ -340,7 +340,7 @@ void write(uint8_t address, uint8_t value)
   status = SPIdrv->Send(data, 2);
   /*TODO: add the failure case */
   if (status != RSI_OK) {
-    DEBUGOUT("\r\n SPI Send FAIL \r\n");
+    SL_PRINT_STRING_ERROR("\r\n SPI Send FAIL \r\n");
   }
 }
 
@@ -367,7 +367,7 @@ void read(uint8_t address, uint32_t len, uint8_t *buffer)
   status = SPIdrv->Transfer(data, buffer, len + 1);
 
   if (status != RSI_OK) {
-    DEBUGOUT("\r\n SPI Transfer FAIL \r\n");
+    SL_PRINT_STRING_ERROR("\r\n SPI Transfer FAIL \r\n");
   }
 }
 

@@ -13,6 +13,7 @@
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
     - [Powersave Commands](#powersave-commands)
+    - [TWT Commands](#twt-commands)
   - [Creating a new command handler](#creating-a-new-command-handler)
     - [Argument types](#argument-types)
 
@@ -116,6 +117,52 @@ For testing power manager sleep and standby modes, modify the macro to `SL_SI91X
 
     And so on...
 
+### TWT Commands
+
+Target Wake Time (TWT) requires an 11ax AP that supports TWT. The STA must be
+connected (`at+net-up`) before enabling TWT.
+
+This example turns on 802.11ax configuration at NWP init with
+`SLI_SI91X_CONFIG_WIFI6_PARAMS` in `at_commands_soc.slcp`. That is the host
+define that sends 11ax parameters (including TWT support in the 11ax request).
+`SLI_SI91X_ENABLE_TWT_FEATURE` is present for consistency with other TWT
+examples; it is not a host compile switch that enables or disables the TWT
+AT commands.
+
+TWT commands wait for the TWT response event (up to 5 seconds) before
+completing. `OK` means a success event was received (`+TWT:SETUP_OK`,
+`+TWT:UNSOLICITED_OK`, `+TWT:TEARDOWN_OK`, or `+TWT:AP_TEARDOWN`). A reject
+or other failure event completes the command with `ERROR`. If no event
+arrives before the wait expires, the command returns a timeout error. Later
+unsolicited TWT events still print as `+TWT:...` lines.
+
+**Recommended sequence (Auto-TWT, for power estimation):**
+
+1. `at+net-init=8`
+2. `at+net-cred-wifipsk=1,<password>`
+3. `at+net-sta-cred=0,<ssid>,1`
+4. `at+net-up=8`
+5. `at+wifi-twt-auto=1,0,0,60000` — Auto-TWT setup (`enable`, `avg_tx_kbps`,
+   `tx_latency_ms`, `rx_latency_ms`). Defaults if args omitted: `1,0,0,60000`.
+6. `at+wifi-perf-prof=2,0,0,0,0` — associated power save low latency
+   (`ASSOCIATED_POWER_SAVE_LOW_LATENCY`).
+7. Use existing MCU sleep commands from `at_power_manager` (for example
+   `at+m4-deep-sleep`).
+8. Teardown the auto-TWT session with `at+wifi-twt-auto=0,0,0,60000`.
+
+**Manual iTWT:**
+
+- `at+wifi-enable-twt[=flow_id,wake_duration,wake_int_exp,wake_int_mantissa,req_type]`
+  Optional args default to featured-example values (`flow_id=1`,
+  `wake_duration=0x60`, `wake_int_exp=13`, `wake_int_mantissa=0x1D4C`,
+  `req_type=1` Suggest). Remaining TWT fields use fixed defaults
+  (implicit/unannounced, and so on).
+- `at+wifi-disable-twt[=flow_id]` — default `flow_id=0xFF` tears down all
+  manual sessions started with `at+wifi-enable-twt`.
+
+Use auto-TWT setup and teardown together (`at+wifi-twt-auto`). Use manual
+setup and teardown together (`at+wifi-enable-twt` / `at+wifi-disable-twt`).
+Do not mix the two APIs on the same session.
 
 ## Creating a new command handler
 

@@ -50,6 +50,8 @@
 #define SL_STATUS_SPI_BUSY                   ((sl_status_t)0x16058) ///< SPI is currently busy.
 #define SL_STATUS_CARD_READY_TIMEOUT         ((sl_status_t)0x16059) ///< Timeout waiting for card to be ready.
 #define SL_STATUS_FW_LOAD_OR_UPGRADE_TIMEOUT ((sl_status_t)0x1605A) ///< Firmware load or upgrade operation timed out.
+#define SL_STATUS_INVALID_PROFILE \
+  ((sl_status_t)0x1605B) ///< No application profile compiled in (`SL_NET_APP_PROFILE` is NONE), or profile invalid for this build.
 
 // Additional Wi-Fi errors
 #define SL_STATUS_WIFI_DOES_NOT_EXIST    ((sl_status_t)0x0B21) ///< WiFi network does not exist.

@@ -839,20 +839,18 @@ static void sli_handle_disconnect_or_connect_failure_event(const sli_network_man
 }
 
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
-// Helper: determine client interface for offload stack
-static sl_wifi_interface_t sli_get_client_interface(const sl_net_wifi_client_profile_t *profile)
+// Helper: determine client interface from band configured at Wi-Fi init
+static sl_wifi_interface_t sli_get_client_interface(void)
 {
-  sl_wifi_interface_t client_interface = 0;
-
-  if (profile->config.channel.band == SL_WIFI_BAND_2_4GHZ || profile->config.channel.band == SL_WIFI_AUTO_BAND) {
-    client_interface = SL_WIFI_CLIENT_2_4GHZ_INTERFACE;
-  } else if (profile->config.channel.band == SL_WIFI_BAND_5GHZ) {
-    client_interface = SL_WIFI_CLIENT_5GHZ_INTERFACE;
-  } else if (profile->config.channel.band == SL_WIFI_BAND_DUAL) {
-    client_interface = SL_WIFI_CLIENT_DUAL_INTERFACE;
+  switch (sli_wifi_get_band()) {
+    case SL_WIFI_BAND_MODE_5GHZ:
+      return SL_WIFI_CLIENT_5GHZ_INTERFACE;
+    case SL_WIFI_DUAL_BAND_MODE:
+      return SL_WIFI_CLIENT_DUAL_INTERFACE;
+    case SL_WIFI_BAND_MODE_2_4GHZ:
+    default:
+      return SL_WIFI_CLIENT_2_4GHZ_INTERFACE;
   }
-
-  return client_interface;
 }
 #endif /* SLI_SI91X_OFFLOAD_NETWORK_STACK */
 
@@ -922,7 +920,7 @@ static void sli_handle_auto_join_event(const sli_network_manager_message_t *mess
   }
 
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
-  sl_wifi_interface_t client_interface = sli_get_client_interface(&profile);
+  sl_wifi_interface_t client_interface = sli_get_client_interface();
 #else
   sl_wifi_interface_t client_interface = SL_WIFI_CLIENT_INTERFACE;
 #endif /* SLI_SI91X_OFFLOAD_NETWORK_STACK */

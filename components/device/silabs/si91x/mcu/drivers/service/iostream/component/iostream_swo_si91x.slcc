@@ -18,6 +18,8 @@ provides:
     allow_multiple: true
   - name: si91x_iostream_transport
     allow_multiple: true
+  - name: iostream_console_support
+    allow_multiple: true
 requires:
   - name: iostream
   - name: si91x_debug_swo

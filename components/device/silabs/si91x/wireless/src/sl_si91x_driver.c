@@ -362,6 +362,9 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     }
     return SL_STATUS_ALREADY_INITIALIZED;
   }
+
+  // Persist init band separately so sl_wifi_set_default_interface() cannot overwrite it
+  sli_wifi_set_band(config->band);
   // Initialize BLE if BLE is enabled
 #ifdef SLI_SI91X_ENABLE_BLE
   int32_t rsi_status = 0;
@@ -844,8 +847,12 @@ sl_status_t sl_si91x_driver_send_side_band_crypto(uint32_t command,
     return SL_STATUS_TIMEOUT;
   }
 
-  status =
-    (((uint8_t *)crypto_desc[0].addr)[12] + (((uint8_t *)crypto_desc[0].addr)[13] << 8)); // Extract the frame status
+  /* TA returns a 16-bit frame status (e.g. 0xCC9A for tag mismatch). Named
+   * sl_status codes set bit 16 (SL_STATUS_CRYPTO_INVALID_SIGNATURE = 0x1CC9A),
+   * so promote the same way the command path does. */
+  uint16_t firmware_status =
+    (uint16_t)(((uint8_t *)crypto_desc[0].addr)[12] + (((uint8_t *)crypto_desc[0].addr)[13] << 8));
+  status = (firmware_status == SL_STATUS_OK) ? SL_STATUS_OK : (sl_status_t)(firmware_status | (1U << 16));
 
   // Release Mutex
   osMutexRelease(side_band_crypto_mutex);
@@ -1550,8 +1557,7 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
   host_desc[14] =
     (uint8_t)(((WME_AC_TO_TID(control->priority) & 0xf) << 4) | (WME_AC_TO_QNUM(control->priority) & 0xf));
 
-  //! Initialize extended desc
-  memcpy(&host_desc[16], &control->token, TRANSCEIVER_TX_DATA_EXT_DESC_SIZE);
+  memcpy(packet->data, &control->token, TRANSCEIVER_TX_DATA_EXT_DESC_SIZE);
 
   // Note: Bits 6 and 7 of ctrl_flags, bit 0 of ctrl_flags1, and the channel and tx_power fields are currently not supported.
   //! If it is an EIA packet, update extended descriptor fields
@@ -1560,10 +1566,10 @@ sl_status_t sl_si91x_driver_send_transceiver_data(sl_wifi_transceiver_tx_data_co
     if (SLI_IS_IMMEDIATE_TRF(control->ctrl_flags)) {
       host_desc[7] |= SLI_IMMEDIATE_TRF_HOST_DESC; //! Immediate Transfer
     }
-    host_desc[20] = control->channel;  //! Channel
-    host_desc[21] = control->tx_power; //! Transmission Power
+    packet->data[4] = control->channel;  //! Channel
+    packet->data[5] = control->tx_power; //! Transmission Power
     if (SLI_IS_LAST_PKT(control->ctrl_flags1)) {
-      host_desc[22] |= SLI_LAST_PKT; //! Last Packet
+      packet->data[6] |= SLI_LAST_PKT; //! Last Packet
     }
   }
 

@@ -25,6 +25,11 @@ provides:
 - name: si91x_b0_board
 - name: si917_prod_board
 - name: si917_module_radio_board
+- name: hardware_board_has_led0
+- name: hardware_board_has_led1
+- name: hardware_board_has_btn0
+- name: hardware_board_has_btn1
+- name: hardware_board_has_shared_button_led
 recommends:
 - id: brd4002a
   vendor: silabs
@@ -76,3 +81,6 @@ tag:
 - board:revision:A02
 - board:device:siwg917y111mgnba
 - hardware:has:vcom
+- hardware:has:led:2
+- hardware:has:button:2
+- hardware:shares:button:led

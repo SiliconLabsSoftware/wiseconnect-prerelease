@@ -117,7 +117,8 @@ This process allows the device to update its software over the air (OTA) without
    	- After connecting all the boards, the setup should look like the following image:
     ![Figure: Setup](resources/readme/stm32_setup.png)
    	- Connect the setup to the computer.
-  - Open the FIRMWARE UPDATE µVision project - **firmware_update.uvprojx** by navigating to **WiSeConnect SDK → examples → featured → firmware_update → keil_project**. 
+  - **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
+  - Open the FIRMWARE UPDATE µVision project - **firmware_update.uvprojx** by navigating to **Gecko SDK → extension → wiseconnect → examples → featured → firmware_update → keil_project**. 
 
 ## Application Build Environment
 
@@ -194,7 +195,13 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
   ![Figure: Log of firmware transfer](resources/readme/output_soc.png)
 
-- When the firmware update completes, the SiWx91x should be rebooted after which it may take a few minutes to overwrite the old firmware with the new firmware in Flash memory.
+- Once the image has been successfully downloaded to the secondary location, the device must be rebooted to complete the update process. During boot, the bootloader automatically copies the image from the secondary location to the primary location. This image transfer process can take approximately 40 seconds.
+- During this period, the host must not initiate any operations or communication requests to the device. The host should wait until the device has fully completed the image copy process and is ready for normal operation.
+- The host confirms readiness when Wi-Fi/network re-initialization succeeds after reboot (for example, `sl_net_init()` or `sl_wifi_init()`). How the host waits for the approximately 40-second secondary-to-primary image copy depends on the interface:
+  - **NCP SPI**: The driver polls for board-ready for up to approximately 40 seconds (timeout returns `SL_STATUS_TIMEOUT`), then for card-ready for approximately 5 seconds (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+  - **SoC**: The driver polls for board-ready (no fixed 40-second SPI timeout), then for card-ready for approximately 5 seconds when required (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+  - **NCP UART**: The driver does not poll for board-ready. The application should wait approximately 40 seconds before re-initializing (for example, `osDelay(40000)` under `SL_NCP_UART_INTERFACE` in this example). Card-ready wait is approximately 5 seconds (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+- See the [WiSeConnect status codes](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) documentation.
 
   > Note:
   > Image size displayed may vary depending on the firmware provided by the server.
@@ -270,7 +277,7 @@ If you encounter issues while running the Firmware Update example, check the fol
 - On devices with 4 MB flash, do not use a combined image. Update the NWP image first, then update the M4 image separately.
 - In NCP mode, update the NWP image first, then update the host image from the same release version.
 - On Windows, use Cygwin to build the TCP server as described in [Build and Run the TCP Server (Windows PC)](#build-and-run-the-tcp-server-windows-pc).
-- If the update become unresponsive after download, wait a few minutes while the device writes the new firmware to flash and reboots.
+- If the update becomes unresponsive after download, wait approximately 40 seconds for the secondary-to-primary image copy to complete (see the post-download reboot guidance above).
 
 ## Resources
 

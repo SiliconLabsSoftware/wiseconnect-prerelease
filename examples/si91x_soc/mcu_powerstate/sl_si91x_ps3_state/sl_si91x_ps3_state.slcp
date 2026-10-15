@@ -14,7 +14,12 @@ component:
 - id: sl_power_manager
 - id: debug_ulp_component
 - id: si91x_log
-- id: si91x_log_backend_uart
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_retarget_stdio
+- id: iostream_uart_si91x
+  instance:
+  - vcom
 - id: pm_ps2_component
 template_contribution:
 - name: user_files_ps2

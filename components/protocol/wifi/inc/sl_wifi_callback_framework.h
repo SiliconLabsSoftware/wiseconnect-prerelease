@@ -341,6 +341,7 @@ typedef sl_status_t (*sl_wifi_twt_config_callback_t)(sl_wifi_event_t event,
  * @param[out] data
  *   - Data received is of type @ref sl_wifi_transceiver_rx_data_t for SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB event.
  *   - Data received is of type @ref sl_wifi_transceiver_tx_data_confirmation_t for SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB event.
+ *   - The `data` pointer is valid only for the duration of this callback. Do not free it (the framework frees it after return), and copy any fields that must be used after return.
  * @param[out] data_length
  *   Reserved.
  * @param[out] optional_arg
@@ -716,6 +717,7 @@ typedef sl_status_t (*sl_wifi_twt_config_callback_v2_t)(sl_wifi_event_t event,
  * @param[out] data
  *   - Data received is of type @ref sl_wifi_transceiver_rx_data_t for SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB event.
  *   - Data received is of type @ref sl_wifi_transceiver_tx_data_confirmation_t for SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB event.
+ *   - The `data` pointer is valid only for the duration of this callback. Do not free it (the framework frees it after return), and copy any fields that must be used after return.
  * @param[out] data_length
  *   Reserved.
  * @param[out] optional_arg
@@ -1247,7 +1249,7 @@ static inline sl_status_t sl_wifi_set_command_engine_status_handler(sl_wifi_comm
  *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
  * @note
  *   This API is not supported on SiWx91x devices. 
- *   The callbacks returns the scan results in the form of @ref sl_wifi_scan_result_ext_t. The RSSI value is signed 16-bit integer.
+ *   The callbacks returns the scan results in the form of @ref sl_wifi_scan_result_ext_t. The RSSI value is signed 16-bit integer in deci-dBm format.
  *   In case of event failure, SL_WIFI_FAIL_EVENT_STATUS_INDICATION bit is set in the event.
  *   When this bit is set, the `data` parameter and the `data_length` parameter can be ignored.
  */
@@ -1277,7 +1279,7 @@ typedef sl_status_t (*sl_wifi_scan_callback_ext_t)(sl_wifi_event_t event,
  * @note
  *   This API is not supported on SiWx91x devices.
  *   All the individual Wi-Fi events related to this group would be triggered via this callback.
- *   The callbacks returns the scan results in the form of @ref sl_wifi_scan_result_ext_t. The RSSI value is signed 16-bit integer.
+ *   The callbacks returns the scan results in the form of @ref sl_wifi_scan_result_ext_t. The RSSI value is signed 16-bit integer in deci-dBm format.
  ******************************************************************************/
 static inline sl_status_t sl_wifi_set_scan_callback_ext(sl_wifi_scan_callback_ext_t function, void *optional_arg)
 {

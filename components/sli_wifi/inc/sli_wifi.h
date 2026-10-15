@@ -50,6 +50,19 @@ sl_status_t sli_wifi_get_timeout(sl_wifi_interface_t interface,
                                  sl_wifi_timeout_type_t timeout_type,
                                  uint16_t *timeout_value);
 sl_wifi_interface_t sli_wifi_get_default_interface(void);
+/**
+ * @brief Get the Wi-Fi operating band saved during initialization.
+ * @details Returns the band from `sl_wifi_device_configuration_t.band` stored at init
+ *          via @ref sli_wifi_set_band. Independent of @ref sli_wifi_set_default_interface.
+ * @return sl_wifi_band_mode_t configured at initialization.
+ */
+sl_wifi_band_mode_t sli_wifi_get_band(void);
+/**
+ * @brief Save the Wi-Fi operating band from device configuration at initialization.
+ * @param[in] band Band from `sl_wifi_device_configuration_t.band`.
+ * @note Call only from Wi-Fi driver init. Do not use when changing the default interface.
+ */
+void sli_wifi_set_band(sl_wifi_band_mode_t band);
 sl_status_t sli_wifi_wps_connect(sli_wifi_wps_config_t wps_config, sl_wifi_wps_response_t *wps_response);
 void sli_wifi_set_default_interface(sl_wifi_interface_t interface);
 sl_status_t sli_wifi_set_antenna(sl_wifi_interface_t interface, sl_wifi_antenna_t antenna);
@@ -214,7 +227,7 @@ sl_status_t sli_wifi_config_xo_ctune(sl_wifi_interface_t interface,
 sl_status_t sli_wifi_read_ctune(sl_wifi_interface_t interface,
                                 sl_wifi_response_get_ctune_data_t *get_xo_ctune,
                                 const uint32_t *ctune_data);
-sl_status_t sli_wifi_add_vendor_ie(sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id);
+sl_status_t sli_wifi_add_vendor_ie(const sl_wifi_vendor_ie_t *vendor_ie, uint8_t *fw_unique_id);
 sl_status_t sli_wifi_remove_vendor_ie(uint8_t unique_id);
 sl_status_t sli_wifi_remove_all_vendor_ie(void);
 
@@ -257,10 +270,7 @@ sl_status_t sli_wifi_set_high_throughput_capability(sl_wifi_interface_t interfac
 sl_status_t sli_wifi_set_device_region(sl_wifi_operation_mode_t operation_mode,
                                        sl_wifi_band_mode_t band,
                                        sl_wifi_region_code_t region_code);
-void sli_wifi_prepare_mac_frame_header(const void *buf,
-                                       const uint8_t *addr1,
-                                       const uint8_t *addr2,
-                                       const uint8_t *addr3);
+void sli_wifi_prepare_mac_frame_header(void *buf, const uint8_t *addr1, const uint8_t *addr2, const uint8_t *addr3);
 sl_status_t sli_wifi_send_mac_data_frame(const sl_wifi_transmitter_test_info_t *per_params,
                                          sl_wifi_system_packet_t *packet,
                                          uint16_t chunk_length);
@@ -312,6 +322,6 @@ sl_status_t sli_wifi_set_opportunistic_sleep_config(sl_wifi_interface_t interfac
 sl_status_t sli_wifi_set_retry_config(sl_wifi_interface_t interface, const sli_wifi_retry_config_t *config);
 sl_status_t sli_wifi_set_aggregation_config(sl_wifi_interface_t interface, const sli_wifi_aggregation_config_t *config);
 
-void sli_wifi_set_active_application_profile(sli_wifi_application_profile_t profile);
-sli_wifi_application_profile_t sli_wifi_get_active_application_profile(void);
+void sli_wifi_set_active_application_profile_config_group(sli_wifi_application_profile_config_group_t config_group);
+sli_wifi_application_profile_config_group_t sli_wifi_get_active_application_profile_config_group(void);
 #endif

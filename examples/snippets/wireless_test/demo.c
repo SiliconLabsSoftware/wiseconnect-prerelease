@@ -31,6 +31,8 @@
 #include "sl_utility.h"
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
+#include <inttypes.h>
 /******************************************************
  *                    Constants
  ******************************************************/
@@ -154,16 +156,25 @@ void application_start(const void *unused)
   const console_descriptive_command_t *command;
 #if defined(SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT)
   iostream_usart_init();
+#else
+  /* SoC: unbuffered stdout so Ready/help/status appear promptly on VCOM/Docklight. */
+#if !defined(__CROSSWORKS_ARM) && defined(__GNUC__)
+  setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stdin, NULL, _IONBF, 0);
+#endif
 #endif
 
   SL_DEBUG_LOG_V2(INFO, "app start\r\n");
 
-  SL_DEBUG_LOG_V2(INFO, "Ready\r\n");
+  // CLI UX must use printf/UART (VCOM/Docklight). SL_DEBUG_LOG_V2 is backed by
+  // si91x_log + iostream_rtt_si91x on SoC, so Ready/help/status would not appear
+  // on the serial terminal used by SQA (see Everest wireless_test and at_commands).
+  printf("Ready\r\n");
 
   console_line_ready = 0;
 
   while (1) {
-    SL_DEBUG_LOG_V2(INFO, "> \r\n");
+    printf("\r\n> \r\n");
 #if defined(SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT)
     while (!end_of_cmd) {
       iostream_rx();
@@ -180,18 +191,18 @@ void application_start(const void *unused)
     if (result == SL_STATUS_OK) {
       SL_DEBUG_LOG_V2(DEBUG, "Processing command\r\n");
       if (command->handler) {
-        SL_DEBUG_LOG_V2(INFO, "\r\n");
+        printf("\r\n");
         uint32_t start_time = osKernelGetTickCount();
         result              = command->handler(&args);
         uint32_t duration   = osKernelGetTickCount() - start_time;
         print_status(result, duration);
       }
     } else if (result == SL_STATUS_COMMAND_IS_INVALID) {
-      SL_DEBUG_LOG_V2(INFO, "Args: ");
+      printf("\r\nArgs: ");
       print_command_args(command);
       print_status(SL_STATUS_INVALID_PARAMETER, 0);
     } else {
-      SL_DEBUG_LOG_V2(INFO, "Not supported\r\n");
+      printf("\r\nNot supported\r\n");
     }
     console_line_ready = 0;
   }
@@ -199,26 +210,18 @@ void application_start(const void *unused)
 
 void print_status(sl_status_t status, uint32_t duration)
 {
-  SL_DEBUG_LOG_V2(INFO,
-                  "0x%05lX: (%lums) %s",
-                  status,
-                  duration,
-                  (uintptr_t)((status == SL_STATUS_OK) ? "Success" : ""));
+  printf("\r\n0x%05" PRIx32 ": (%" PRIu32 "ms) %s\r\n", status, duration, (status == SL_STATUS_OK) ? "Success" : "");
 }
 
 sl_status_t help_command_handler(console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
   for (uint8_t a = 0; a < console_command_database.length; ++a) {
-    SL_DEBUG_LOG_V2(INFO, "\r\n");
-    SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)console_command_database.entries[a].key);
-    SL_DEBUG_LOG_V2(INFO, "  ");
-    print_command_args((console_descriptive_command_t *)console_command_database.entries[a].value);
-    SL_DEBUG_LOG_V2(INFO, "   ");
-    SL_DEBUG_LOG_V2(
-      INFO,
-      "%s",
-      (uintptr_t)((console_descriptive_command_t *)console_command_database.entries[a].value)->description);
+    const console_descriptive_command_t *cmd =
+      (console_descriptive_command_t *)console_command_database.entries[a].value;
+    printf("\r\n%s  ", console_command_database.entries[a].key);
+    print_command_args(cmd);
+    printf("\r\n   %s", cmd->description);
   }
   return SL_STATUS_OK;
 }
@@ -273,39 +276,27 @@ static void print_command_args(const console_descriptive_command_t *command)
   for (int a = 0; command->argument_list[a] != CONSOLE_ARG_END; ++a) {
     if (command->argument_list[a] & CONSOLE_ARG_OPTIONAL) {
       char option_char[2] = { (char)command->argument_list[a] & CONSOLE_ARG_OPTIONAL_CHARACTER_MASK, 0 };
-      SL_DEBUG_LOG_V2(INFO, "[-");
-      SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)option_char);
-      SL_DEBUG_LOG_V2(INFO, " ");
+      printf("[-%s ", option_char);
       is_optional = true;
       continue;
     } else if (command->argument_list[a] & CONSOLE_ARG_ENUM) {
-      SL_DEBUG_LOG_V2(INFO, "{");
+      printf("{");
       uint8_t enum_index = command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK;
       for (int b = 0; console_argument_types[enum_index][b] != NULL;
            /* Increment occurs in internal logic */) {
-        SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)console_argument_types[enum_index][b]);
+        printf("%s", console_argument_types[enum_index][b]);
         if (console_argument_types[enum_index][++b]) {
-          SL_DEBUG_LOG_V2(INFO, "|");
+          printf("|");
         }
       }
-      SL_DEBUG_LOG_V2(INFO, "}");
+      printf("}");
     } else {
-      SL_DEBUG_LOG_V2(INFO, "<");
-      if (command->argument_help && command->argument_help[a]) {
-        SL_DEBUG_LOG_V2(INFO, "%s", (uintptr_t)command->argument_help[a]);
-      } else {
-        SL_DEBUG_LOG_V2(
-          INFO,
-          "%s",
-          (uintptr_t)console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK]);
-      }
-      SL_DEBUG_LOG_V2(INFO, ">");
+      const char *arg_name = (command->argument_help && command->argument_help[a])
+                               ? command->argument_help[a]
+                               : console_argument_type_strings[command->argument_list[a] & CONSOLE_ARG_ENUM_INDEX_MASK];
+      printf("<%s>", arg_name);
     }
-    if (is_optional) {
-      SL_DEBUG_LOG_V2(INFO, "] ");
-      is_optional = false;
-    } else {
-      SL_DEBUG_LOG_V2(INFO, " ");
-    }
+    printf(is_optional ? "] " : " ");
+    is_optional = false;
   }
 }

@@ -824,7 +824,13 @@ If you encounter issues while running this example, check the following:
 - Verify Wi-Fi credentials and HTTP/HTTPS URL settings in your application configuration.
 - Ensure the firmware URL is accessible from the device and points to a valid `.bin` or `.rps` image.
 - For HTTPS OTAF, load valid server CA certificates. Default certificates are for reference only.
-- After the download completes, allow sufficient time for the device to write the firmware to flash and reboot.
+- Once the image has been successfully downloaded to the secondary location, the device must be rebooted to complete the update process. During boot, the bootloader automatically copies the image from the secondary location to the primary location. This image transfer process can take approximately 40 seconds.
+- During this period, the host must not initiate any operations or communication requests to the device. The host should wait until the device has fully completed the image copy process and is ready for normal operation.
+- The host confirms readiness when Wi-Fi/network re-initialization succeeds after reboot (for example, `sl_net_init()` or `sl_wifi_init()`). How the host waits for the approximately 40-second secondary-to-primary image copy depends on the interface:
+  - **NCP SPI**: The driver polls for board-ready for up to approximately 40 seconds (timeout returns `SL_STATUS_TIMEOUT`), then for card-ready for approximately 5 seconds (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+  - **SoC**: The driver polls for board-ready (no fixed 40-second SPI timeout), then for card-ready for approximately 5 seconds when required (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+  - **NCP UART**: The driver does not poll for board-ready. The application should wait approximately 40 seconds before re-initializing (for example, `osDelay(40000)` under `SL_NCP_UART_INTERFACE` in this example). Card-ready wait is approximately 5 seconds (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+- See the [WiSeConnect status codes](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) documentation.
 
 ## Resources
 

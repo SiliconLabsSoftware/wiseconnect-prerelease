@@ -142,10 +142,14 @@ static sl_status_t sli_handle_tx_transceiver_event(sli_wifi_callback_entry_t *en
   tx_cfm_cb_data->priority = packet->data[4];          //Extended descriptor in data[] for priority
   memcpy(&tx_cfm_cb_data->token, &packet->data[8], 4); //Extended descriptor in data[] for token
 
+  sl_status_t result;
   if (entry->function_v2) {
-    return entry->function_v2(SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB, SL_STATUS_OK, tx_cfm_cb_data, 0, entry->arg);
+    result = entry->function_v2(SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB, SL_STATUS_OK, tx_cfm_cb_data, 0, entry->arg);
+  } else {
+    result = entry->function(SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB, tx_cfm_cb_data, 0, entry->arg);
   }
-  return entry->function(SL_WIFI_TRANSCEIVER_TX_DATA_STATUS_CB, tx_cfm_cb_data, 0, entry->arg);
+  free(tx_cfm_cb_data);
+  return result;
 }
 
 // Helper function to handle RX transceiver events
@@ -178,10 +182,14 @@ static sl_status_t sli_handle_rx_transceiver_event(sli_wifi_callback_entry_t *en
                          ? SL_STATUS_OK
                          : SL_STATUS_UNKNOWN_PEER;
 
+  sl_status_t result;
   if (entry->function_v2) {
-    return entry->function_v2(SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB, SL_STATUS_OK, rx_cb_data, 0, entry->arg);
+    result = entry->function_v2(SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB, SL_STATUS_OK, rx_cb_data, 0, entry->arg);
+  } else {
+    result = entry->function(SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB, rx_cb_data, 0, entry->arg);
   }
-  return entry->function(SL_WIFI_TRANSCEIVER_RX_DATA_RECEIVE_CB, rx_cb_data, 0, entry->arg);
+  free(rx_cb_data);
+  return result;
 }
 
 sl_status_t sl_wifi_default_event_handler(sl_wifi_event_t event, sl_wifi_buffer_t *buffer)

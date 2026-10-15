@@ -88,20 +88,20 @@ sl_status_t sl_si91x_iostream_rtt_init(void)
  ******************************************************************************/
 static sl_status_t rtt_write(void *context, const void *buffer, size_t buffer_length)
 {
-  uint32_t ret       = 0;
   sl_status_t status = SL_STATUS_OK;
   (void)context;
-  (void)ret;
-
-  ret = SEGGER_RTT_Write(0, buffer, buffer_length);
 
 #if ((IOSTREAM_RTT_UP_MODE == SEGGER_RTT_MODE_NO_BLOCK_TRIM) || (IOSTREAM_RTT_UP_MODE == SEGGER_RTT_MODE_NO_BLOCK_SKIP))
+  (void)SEGGER_RTT_Write(0, buffer, buffer_length);
   status = SL_STATUS_OK; // Ignore error
 #else
-  if (ret > 0) {
-    status = SL_STATUS_OK;
-  } else {
-    status = SL_STATUS_IO;
+  {
+    uint32_t ret = SEGGER_RTT_Write(0, buffer, buffer_length);
+    if (ret > 0) {
+      status = SL_STATUS_OK;
+    } else {
+      status = SL_STATUS_IO;
+    }
   }
 #endif
 

@@ -131,11 +131,17 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Test the Application
 
-> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+> **Note:** Use **`log_compact_decoder.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
 >
-> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+> `python log_compact_decoder.py --m4-out m4_firmware.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 10`
 >
-> Replace **COM5** with the serial port your board uses on the host PC.
+> Replace **COM4** with the serial port your board uses on the host PC.
+>
+> These flags are optional. Omit them to keep the defaults:
+>
+> - `--baud` — default `115200`. Use `921600` when NWP logging is enabled on UART.
+> - `--event-width` — default `56`. Longer EVENT names are clipped with `...`; the full text stays in MESSAGE.
+> - `--log-file` — also write the decoded lines to this path, as plain text.
 
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:

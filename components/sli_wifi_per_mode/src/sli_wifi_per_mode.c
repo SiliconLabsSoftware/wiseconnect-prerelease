@@ -33,7 +33,7 @@
 #include "sli_buffer_manager.h"
 #include "sli_wifi_utility.h"
 #include <string.h>
-#include "sl_wlan_types.h"
+#include "sli_wifi_types.h"
 #include "sl_utility.h"
 
 extern sl_wifi_interface_t default_interface;

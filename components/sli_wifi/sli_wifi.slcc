@@ -2,7 +2,7 @@ id: sli_wifi
 label:  SLI Wi-Fi 
 package: wifi
 description: >
-    This package provides common wifi code between Sutlej and Everest
+    This package provides common wifi code between Sutlej and siwx3xx
 category: SLI WIFI component
 component_root_path: ./components/sli_wifi
 quality: production

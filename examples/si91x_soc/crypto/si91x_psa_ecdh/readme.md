@@ -21,7 +21,7 @@
 ## Purpose/Scope
 
 - This application contains an example code to demonstrate the PSA ECDH functionality
-- This application uses hardware accelerators for key generation and shared secret computation using P256 and P192 ecc curve
+- This application uses hardware accelerators for key generation and shared secret computation using the P-256 ECC curve.
 - TRNG generation is done using hardware accelerator
 
 ## Prerequisites/Setup Requirements

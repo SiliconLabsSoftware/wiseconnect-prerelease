@@ -178,7 +178,7 @@ typedef struct {
  * 
  * For more information on status codes, see [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  ***************************************************************************/
-sl_status_t sl_si91x_ulp_timer_init(ulp_timer_clk_src_config_t *timer_clk_ptr);
+sl_status_t sl_si91x_ulp_timer_init(const ulp_timer_clk_src_config_t *timer_clk_ptr);
 
 /***************************************************************************/
 /**
@@ -205,7 +205,7 @@ sl_status_t sl_si91x_ulp_timer_init(ulp_timer_clk_src_config_t *timer_clk_ptr);
  * 
  * For more information on status codes, see [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  ***************************************************************************/
-sl_status_t sl_si91x_ulp_timer_configure_clock(ulp_timer_clk_src_config_t *timer_clk_ptr);
+sl_status_t sl_si91x_ulp_timer_configure_clock(const ulp_timer_clk_src_config_t *timer_clk_ptr);
 
 /***************************************************************************/
 /**
@@ -230,7 +230,7 @@ sl_status_t sl_si91x_ulp_timer_configure_clock(ulp_timer_clk_src_config_t *timer
  * 
  * For more information on status codes, see [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  ***************************************************************************/
-sl_status_t sl_si91x_ulp_timer_set_configuration(ulp_timer_config_t *timer_config_ptr);
+sl_status_t sl_si91x_ulp_timer_set_configuration(const ulp_timer_config_t *timer_config_ptr);
 
 /***************************************************************************/
 /**

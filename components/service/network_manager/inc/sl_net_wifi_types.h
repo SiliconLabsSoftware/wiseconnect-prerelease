@@ -40,6 +40,10 @@
  * 
  * @details
  * This structure holds the configuration for a Wi-Fi client profile, including the Wi-Fi client settings and the network IP configuration.
+ *
+ * @note
+ * `config.channel.band` and `config.channel.bandwidth` are currently not supported.
+ * Set the operating band in `sl_wifi_device_configuration_t.band` during init.
  */
 typedef struct {
   sl_wifi_client_configuration_t
@@ -52,7 +56,11 @@ typedef struct {
  * @brief Network Wi-Fi AP profile.
  * 
  * @details
- * This structure holds the configuration for a Wi-Fi Access Point (AP) profile, including the Wi-Fi AP settings and the network IP configuration. 
+ * This structure holds the configuration for a Wi-Fi Access Point (AP) profile, including the Wi-Fi AP settings and the network IP configuration.
+ *
+ * @note
+ * `config.channel.band` and `config.channel.bandwidth` are currently not supported.
+ * Set the operating band in `sl_wifi_device_configuration_t.band` during init.
  */
 typedef struct {
   sl_wifi_ap_configuration_t

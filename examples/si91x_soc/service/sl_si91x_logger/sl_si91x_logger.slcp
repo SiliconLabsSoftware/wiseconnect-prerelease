@@ -48,6 +48,7 @@ toolchain_settings:
 requires:
 - name: device_needs_ram_execution
 other_file:
+- path: log_compact_decoder.py
 - path: resources/readme/setupdiagram.png
 - path: resources/readme/output1.png
 - path: resources/readme/logger_uc_config.png

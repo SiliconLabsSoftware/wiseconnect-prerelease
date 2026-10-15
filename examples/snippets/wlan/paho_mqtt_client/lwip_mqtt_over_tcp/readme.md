@@ -210,43 +210,73 @@ TX and RX buffer sizes can be configured in `app.c`:
 #define TCP_MQTT_CLIENT_RX_BUFFER_SIZE 1500
 ```
 
-### Neutral-less Matter Switch Profile (optional)
+### Neutral-less Matter Switch Application Profile (optional)
 
-This example can optionally call `sl_net_set_application_profile()` to select an SDK-defined Wi-Fi application profile. The API supports a default profile and a Neutral-less Matter switch profile; this example applies the Neutral-less Matter switch preset when the feature is enabled.
+This example can apply the Neutral-less Matter switch **POWER_SAVE** (in-use) config group on a real LwIP + MQTT workload. Profile selection is **compile-time**; runtime only chooses which config group to apply.
 
-In `app.c`, set `ENABLE_APPLICATION_PROFILE` to `1` to enable profile selection, or leave it at `0` (default) for standard Wi-Fi behavior without calling the API:
+#### Enable Neutral-less at compile time
+
+**Studio (Software Components):** Install/open **Network Manager** → **Configure** → **Application profile** → **Neutral-less Matter switch** → Save.  
+That writes `#define SL_NET_APP_PROFILE SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH` in `config/sl_net_application_profile_config.h`. Default is `SL_NET_APP_PROFILE_NONE`.
+
+Do not also set `SL_NET_APP_PROFILE` in the project `.slcp` `configuration:` section (that conflicts with the wizard).
+
+If Save still fails, close any VS Code/Cursor window attached to the Simplicity Studio `v6_workspace`, Refresh the project, and try Configure again.
+
+**Non-Studio:** Edit `config/sl_net_application_profile_config.h`, or pass `-DSL_NET_APP_PROFILE=SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH`. The config header defines `SL_NET_APP_PROFILE` only inside `#ifndef SL_NET_APP_PROFILE`, so a `-D` override is not overwritten by the default `NONE` value.
+
+Parameter knobs (current limit, scan timeouts, etc.) are `#ifndef` macros in `sl_net_application_profile_neutral_less_config.h` and are not Studio UC fields.
+
+#### Runtime behavior when Neutral-less is selected
+
+When `SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH` is selected, the example adds Neutral-less-only boot opermode flags (compiled out otherwise):
+
+| Bitmap | Flags |
+| --- | --- |
+| `feature_bit_map` | `SL_WIFI_FEAT_DISABLE_11AX_SUPPORT`, `SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE` |
+| `ext_custom_feature_bit_map` | `SL_SI91X_EXT_FEAT_LOW_POWER_MODE` (with existing `SL_SI91X_EXT_FEAT_XTAL_CLK`) |
+| `ext_tcp_ip_feature_bit_map` | `SL_SI91X_CONFIG_FEAT_EXTENSION_VALID` (already set for all builds) |
+| `config_feature_bit_map` | `SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP`, `SL_SI91X_ENABLE_ENHANCED_MAX_PSP` |
+
+`SL_WIFI_FEAT_DISABLE_11AX_SUPPORT` keeps 802.11n-only mode active (required for POWER_SAVE / in-use).
+
+After `sl_net_init()` and before `sl_net_up()`, the example calls `apply_neutral_less_with_power_save()`, which applies the Neutral-less **POWER_SAVE** (in-use) config group and then enables associated power save:
 
 ```c
-#define ENABLE_APPLICATION_PROFILE 0
+sl_net_set_application_profile_config(SL_NET_APP_PROFILE_NEUTRAL_LESS_POWER_SAVE);
+
+sl_wifi_performance_profile_v2_t performance_profile = { .profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY };
+sl_wifi_set_performance_profile_v2(&performance_profile);
 ```
 
-When set to `1`:
+Associated power save is enabled only after the Neutral-less API succeeds. The performance profile uses `ASSOCIATED_POWER_SAVE_LOW_LATENCY` (enhanced MAX PSP with the config bitmap above); remaining fields are left at defaults.
 
-- `SL_WIFI_FEAT_DISABLE_11AX_SUPPORT` is included in the Wi-Fi boot configuration (`feature_bit_map`) so that 802.11n-only mode is active before the Neutral-less Matter switch profile is applied.
-- `sl_net_set_application_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH)` is called after `sl_net_init()` and before `sl_net_up()`.
+Because associated power save requires an active association, the example calls `enable_associated_power_save()` again after a successful `sl_net_up()`.
 
-When set to `0`, the example does not call `sl_net_set_application_profile()` and does not modify the boot feature bitmap for 11n-only mode.
+On success, the console logs include:
 
-**Scan timeout ownership (when profile is enabled):**
+- `Neutral-less POWER_SAVE application profile config applied`
+- `Associated Power Save Low latency enabled`
 
-After `sl_net_set_application_profile()` succeeds (for any profile, including default), active and passive channel scan timeouts are owned by the profile preset. `sl_wifi_configure_timeout()` and `sl_si91x_configure_timeout()` return `SL_STATUS_OK` for `SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT` and `SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT` without changing the profile-managed values until Wi-Fi is deinitialized. To change those scan timeouts, call `sl_net_set_application_profile()` again with the desired profile rather than the generic timeout APIs.
-
-**Recovery after disconnect or join failure (production requirement):**
-
-Profile configuration (advanced-config and scan-timeout settings) is not retained across Wi-Fi disconnect or join failure. This example demonstrates **initial** profile application only. Matter and other production applications **must** re-call `sl_net_set_application_profile()` with the same interface and profile in the Wi-Fi disconnect or join-failure event handler, **before** the next connect or auto-join retry:
+To temporarily leave the power-constrained set (for example when mains are present), a product application can call:
 
 ```c
-// Wi-Fi disconnect or join-failure event (application callback)
-sl_net_set_application_profile(SL_NET_WIFI_CLIENT_INTERFACE,
-                               SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH);
-// then reconnect
+sl_net_set_application_profile_config(SL_NET_APP_PROFILE_NEUTRAL_LESS_HIGH_PERFORMANCE);
 ```
 
-The SDK does not automatically reapply the profile on these events.
+Those aliases map to `IN_USE_SET` and `NOT_IN_USE_SET`.
 
-To compare behavior with and without the application profile on the same MQTT workload, build and run the application with `ENABLE_APPLICATION_PROFILE` set to `0` and then to `1`.
+#### Scan timeout ownership
 
-Alternatively, the feature can be enabled or disabled at build time by defining `ENABLE_APPLICATION_PROFILE` to `1` or `0` in the compiler preprocessor settings (for example, `-DENABLE_APPLICATION_PROFILE=1`).
+After a successful `sl_net_set_application_profile_config()`, active and passive channel scan timeouts are owned by the applied config group. `sl_wifi_configure_timeout()` / `sl_si91x_configure_timeout()` return `SL_STATUS_OK` for those timeout types without changing profile-managed values until Wi-Fi is deinitialized. Change them by calling `sl_net_set_application_profile_config()` again with the desired group.
+
+#### FW retention (no disconnect reapply)
+
+After a successful apply, NWP retains advanced-config and scan-timeout settings across Wi-Fi disconnect and join/rejoin failure. The application does **not** need to re-call `sl_net_set_application_profile_config()` on those events unless switching between POWER_SAVE and HIGH_PERFORMANCE, or completing a failed mid-sequence apply.
+
+#### A/B comparison
+
+Build once with `SL_NET_APP_PROFILE_NONE` and once with `SL_NET_APP_PROFILE_NEUTRAL_LESS_SWITCH` to compare MQTT behavior and current on Energy Profiler–capable hardware (for example BRD4338A / BRD4343A). Target: average current over any 250 ms interval below 30 mA with associated power save enabled (requires FW support).
 
 > **Note**: For recommended settings, see the [Recommendations Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 

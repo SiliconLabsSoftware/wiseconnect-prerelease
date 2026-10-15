@@ -4,7 +4,7 @@ package: platform_siwx91x
 description: >
   This component provides the debug logger core files for the SiWx91x platform.
 category: Device|Si91x|MCU|Service
-quality: evaluation
+quality: production
 metadata:
   sbom:
     license: Zlib

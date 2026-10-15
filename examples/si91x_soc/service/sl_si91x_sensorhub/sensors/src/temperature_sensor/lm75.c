@@ -69,7 +69,7 @@ sl_lm75_handle_t sl_si91x_lm75_create(sl_sensor_bus_t bus, uint8_t dev_addr)
   sl_lm75_dev_t *sensor = (sl_lm75_dev_t *)pvPortMalloc(sizeof(sl_lm75_dev_t));
   uint8_t a[3];
   if (sensor == NULL) {
-    DEBUGOUT("\r\n LM75 Create fail Unable to allocate memory \r\n");
+    SL_PRINT_STRING_ERROR("\r\n LM75 Create fail Unable to allocate memory \r\n");
   }
 
   a[2]            = '\0';
@@ -78,7 +78,7 @@ sl_lm75_handle_t sl_si91x_lm75_create(sl_sensor_bus_t bus, uint8_t dev_addr)
   while (I2Cdrv->GetStatus().busy)
     ;
   if (sensor->i2c_dev != SL_DRIVER_OK) {
-    DEBUGOUT("lm75 create fail I2C unable to transmit1:%" PRId32 "\r\n", sensor->i2c_dev);
+    SL_PRINT_STRING_ERROR("lm75 create fail I2C unable to transmit1:%" PRId32 "\r\n", sensor->i2c_dev);
     return NULL;
   }
 
@@ -88,11 +88,11 @@ sl_lm75_handle_t sl_si91x_lm75_create(sl_sensor_bus_t bus, uint8_t dev_addr)
   while (I2Cdrv->GetStatus().busy)
     ;
   if (sensor->i2c_dev != SL_DRIVER_OK) {
-    DEBUGOUT("lm75 create fail I2C unable to transmit2:%" PRId32 "\r\n", sensor->i2c_dev);
+    SL_PRINT_STRING_ERROR("lm75 create fail I2C unable to transmit2:%" PRId32 "\r\n", sensor->i2c_dev);
     return NULL;
   }
 
-  DEBUGOUT("\r\n I2C - LM75 Temperature sensor create \r\n");
+  SL_PRINT_STRING_ERROR("\r\n I2C - LM75 Temperature sensor create \r\n");
   /*TODO: check the time out */
   //  vTaskSetTimeOutState( &xTimeOut );
   //  while (I2Cdrv->GetStatus().busy) {
@@ -152,7 +152,7 @@ sl_lm75_err_t sl_si91x_lm75_power_down(sl_lm75_handle_t sensor)
   a[1] = (uint8_t)(0x0000 & 0xFFFF);
   ret  = (uint8_t)I2Cdrv->MasterTransmit(SL_LM75_I2C_ADDRESS_DEFAULT, a, 2, false);
 
-  DEBUGOUT("\r\n I2C sensor create  Power down\r\n");
+  SL_PRINT_STRING_ERROR("\r\n I2C sensor create  Power down\r\n");
   while (I2Cdrv->GetStatus().busy)
     ;
 
@@ -174,7 +174,7 @@ sl_lm75_err_t sl_si91x_lm75_power_on(sl_lm75_handle_t sensor)
   a[0] = (uint8_t)(SL_LM75_TEMPERATURE & 0xFF);
   ret  = (uint8_t)I2Cdrv->MasterTransmit(SL_LM75_I2C_ADDRESS_DEFAULT, a, 1, false); //sens->i2c_dev
   if (ret != ARM_DRIVER_OK) {
-    DEBUGOUT("\r\n LM75 Power on command transmit fail %" PRId32 " \r\n", ret);
+    SL_PRINT_STRING_ERROR("\r\n LM75 Power on command transmit fail %" PRId32 " \r\n", ret);
     return ret;
   }
   while (I2Cdrv->GetStatus().busy)
@@ -223,7 +223,7 @@ sl_lm75_err_t sl_si91x_lm75_get_data(sl_lm75_handle_t sensor, float *data)
   (void)sens;
   ret = I2Cdrv->MasterReceive(SL_LM75_I2C_ADDRESS_DEFAULT, lm75_data, 4, false);
   if (ret != RSI_OK) {
-    DEBUGOUT("\r\n LM75 Data transmit fail :%" PRId32 "\r\n", ret);
+    SL_PRINT_STRING_ERROR("\r\n LM75 Data transmit fail :%" PRId32 "\r\n", ret);
     return ret;
   }
   /* TODO: Add timeout and PASS error*/
@@ -266,7 +266,7 @@ sl_lm75_err_t sl_si91x_lm75_init(sl_sensor_bus_t i2c_bus)
 {
   lm75 = sl_si91x_lm75_create(i2c_bus, SL_LM75_I2C_ADDRESS_DEFAULT);
   if (lm75 == NULL) {
-    DEBUGOUT("\r\n LM75 Init fail \r\n");
+    SL_PRINT_STRING_ERROR("\r\n LM75 Init fail \r\n");
     return RSI_FAIL;
   }
   is_lm_init = true;
@@ -282,14 +282,14 @@ sl_lm75_err_t sl_si91x_lm75_init(sl_sensor_bus_t i2c_bus)
 sl_lm75_err_t sl_si91x_lm75_deinit(void)
 {
   if (!is_lm_init) {
-    DEBUGOUT("\r\n LM75 denit fail, not initialized \r\n");
+    SL_PRINT_STRING_ERROR("\r\n LM75 denit fail, not initialized \r\n");
     return RSI_FAIL;
   }
 
   sl_lm75_err_t ret = sl_si91x_lm75_delete(&lm75);
 
   if (ret != RSI_OK) {
-    DEBUGOUT("\r\n BH1750 deinit fail \r\n");
+    SL_PRINT_STRING_ERROR("\r\n BH1750 deinit fail \r\n");
     return RSI_FAIL;
   }
 
@@ -306,7 +306,7 @@ sl_lm75_err_t sl_si91x_lm75_deinit(void)
 sl_lm75_err_t sl_si91x_lm75_test(void)
 {
   if (!is_lm_init) {
-    DEBUGOUT("\r\n LM75 test fail, not initialized \r\n");
+    SL_PRINT_STRING_ERROR("\r\n LM75 test fail, not initialized \r\n");
     return RSI_FAIL;
   }
 
@@ -330,14 +330,14 @@ sl_lm75_err_t sl_si91x_lm75_sample_temperature(float *l)
   float lm75_data;
   sl_lm75_err_t ret = sl_si91x_lm75_power_on(lm75);
   if (ret != RSI_OK) {
-    DEBUGOUT("\r\n LM75 Sample temperature fail \r\n");
+    SL_PRINT_STRING_ERROR("\r\n LM75 Sample temperature fail \r\n");
     return RSI_FAIL;
   }
   //vTaskDelay(300 / portTICK_RATE_MS); /*TODO:check if need or change*/
   ret = sl_si91x_lm75_get_data(lm75, &lm75_data);
 
   if (ret != RSI_OK) {
-    DEBUGOUT("\r\n LM75 Sample temperature fail \r\n");
+    SL_PRINT_STRING_ERROR("\r\n LM75 Sample temperature fail \r\n");
     *l = 0;
     return RSI_FAIL;
   }

@@ -49,6 +49,14 @@ extern sli_task_register_id_t sli_fw_status_storage_index;
 #define SLI_FW_STATUS_STORAGE_INVALID_INDEX 0xFF
 #endif
 
+/// Host descriptor size included in every SAPI TX frame.
+#ifndef SLI_WIFI_HEADER_SIZE
+#define SLI_WIFI_HEADER_SIZE 16
+#endif
+
+/// NWP/host SAPI command buffer, including the 16-byte host descriptor.
+#define SLI_WIFI_MAX_SAPI_COMMAND_SIZE 1600
+
 /***************************************************************************/ /**
  * @brief
  *   Retrieve data from a buffer with a specified offset.
@@ -77,13 +85,51 @@ sl_status_t sli_wifi_set_command_engine_instance(sli_command_engine_t *instance)
 
 sli_command_engine_t *sli_wifi_get_command_engine_instance(void);
 
+/***************************************************************************/ /**
+ * @brief
+ *   Build and send a command to the Wi-Fi command engine.
+ ******************************************************************************/
 sl_status_t sli_wifi_send_command(uint32_t command,
                                   sli_wifi_command_type_t command_type,
                                   const void *data,
                                   uint32_t data_length,
                                   sli_wifi_wait_period_t wait_period,
                                   void *sdk_context,
-                                  void **data_buffer);
+                                  void **response_buffer);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Header and optional payload fragments for sli_wifi_send_command_with_payload().
+ ******************************************************************************/
+typedef struct {
+  const void *header;
+  uint32_t header_length;
+  const void *payload;
+  uint32_t payload_length;
+} sli_wifi_command_payload_t;
+
+/***************************************************************************/ /**
+ * @brief
+ *   Build and send a command with a separate header and payload.
+ * @details
+ *   Copies @p fragments->header and optional @p fragments->payload contiguously
+ *   into the TX packet so callers can avoid allocating a combined stack/heap
+ *   buffer (e.g. a fixed request header plus content provided separately).
+ * @note
+ *   A non-zero header_length requires a non-NULL header, and a non-zero
+ *   payload_length requires a non-NULL payload. Both-zero (NULL pointer
+ *   with length 0) is allowed for either fragment. Combined payload must fit in
+ *   the SAPI command buffer (@ref SLI_WIFI_MAX_SAPI_COMMAND_SIZE minus
+ *   @ref SLI_WIFI_HEADER_SIZE) and in the 12-bit host descriptor (at most
+ *   0xFFF). Returns @ref SL_STATUS_INVALID_PARAMETER if @p fragments is NULL,
+ *   on mismatch, or if the total is too large.
+ ******************************************************************************/
+sl_status_t sli_wifi_send_command_with_payload(uint32_t command,
+                                               sli_wifi_command_type_t command_type,
+                                               const sli_wifi_command_payload_t *fragments,
+                                               sli_wifi_wait_period_t wait_period,
+                                               void *sdk_context,
+                                               void **response_buffer);
 
 /***************************************************************************/ /**
  * @brief

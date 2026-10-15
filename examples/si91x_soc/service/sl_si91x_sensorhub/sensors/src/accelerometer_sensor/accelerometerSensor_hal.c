@@ -115,12 +115,12 @@ sl_sensor_accelerometer_handle_t sl_si91x_accelerometer_sensor_create(sl_sensor_
   const sl_accelerometer_sensor_impl_t *sensor_impl = find_implementation(id);
 
   if (sensor_impl == NULL) {
-    DEBUGOUT("no driver founded, ACCELEROMETER ID = %d", id);
+    SL_PRINT_STRING_ERROR("no driver founded, ACCELEROMETER ID = %d", id);
     return NULL;
   }
   sl_sensor_accelerometer_t *p_sensor = (sl_sensor_accelerometer_t *)pvPortMalloc(sizeof(sl_sensor_accelerometer_t));
   if (p_sensor == NULL) {
-    DEBUGOUT("\r\n accelerometer sensor create failed:%u \r\n", sizeof(sl_sensor_accelerometer_t));
+    SL_PRINT_STRING_ERROR("\r\n accelerometer sensor create failed:%u \r\n", sizeof(sl_sensor_accelerometer_t));
     return NULL;
   }
   p_sensor->id                  = id;
@@ -129,7 +129,7 @@ sl_sensor_accelerometer_handle_t sl_si91x_accelerometer_sensor_create(sl_sensor_
   sl_acceleromerter_error_t ret = p_sensor->impl->init(bus);
   if (ret != RSI_OK) {
     free(p_sensor);
-    DEBUGOUT("accelerometer sensor init failed:%" PRId32, ret);
+    SL_PRINT_STRING_ERROR("accelerometer sensor init failed:%" PRId32, ret);
     return NULL;
   }
   p_sensor->sl_acceleromerter_is_init = true;

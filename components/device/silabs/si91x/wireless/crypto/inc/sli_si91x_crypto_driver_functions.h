@@ -63,6 +63,10 @@
 #include "sl_si91x_psa_sha.h"
 #endif
 
+#ifdef SLI_SHA3_DEVICE_SI91X
+#include "sl_si91x_psa_sha3.h"
+#endif
+
 /******************************************************
  *                Function Declarations
 *******************************************************/

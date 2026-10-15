@@ -106,7 +106,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
    - After connecting all the boards, the setup should look like the image shown below:
     ![Figure: Setup](resources/readme/stm32_setup.png)
    - Connect the setup to the computer.
-  - Open the AWS DEVICE SHADOW µVision project - **user_gain_table.uvprojx** by navigating to **WiSeConnect SDK → examples → featured → user_gain_table → keil_project**. 
+  - **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
+  - Open the USER GAIN TABLE µVision project - **user_gain_table.uvprojx** by navigating to **Gecko SDK → extension → wiseconnect → examples → snippets → wlan → user_gain_table → keil_project**. 
 
 ## Application Build Environment
 

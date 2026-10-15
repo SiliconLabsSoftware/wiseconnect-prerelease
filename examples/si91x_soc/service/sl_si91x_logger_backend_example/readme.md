@@ -64,7 +64,7 @@ The example exercises a subset of the service. The full feature set you can buil
 | **Multi-core timestamp sync** | `sl_log_sync_timestamp(core_id, args)` aligns timestamps between the M4 (host) core and the NWP / captive core. | No |
 | **Power-management hooks** | `sl_log_pre_sleep_process()` / `sl_log_post_sleep_process()` save/restore logger state across sleep modes. | No, refer to the example **Platform SiWx91x - Logger Example** for power manager with logger|
 | **Assert with CRASH-level logging** | `SL_LOG_CRASH_ASSERT(cond)` / `SL_LOG_DEBUG_ASSERT(cond)` log the file/line/expression and trap to the debugger when attached. | No |
-| **Host-side decoder** | `Log_script.py` reads the firmware `.log_fmt` ELF section and decodes the encoded UART/IO Stream stream in real time, with colored per-level output. | Yes |
+| **Host-side decoder** | `log_compact_decoder.py` reads the firmware `.log_fmt` ELF section and decodes the encoded UART/IO Stream stream in real time, with colored per-level output. | Yes |
 
 
 ## Prerequisites/Setup Requirements
@@ -73,7 +73,7 @@ To use this application, the following hardware, software, and project setup are
 
 ### Hardware Requirements
 
-- Host PC (Windows, macOS, or Linux). Simplicity Studio is cross-platform; the optional Python decoder script (`Log_script.py`) runs on any of the three.
+- Host PC (Windows, macOS, or Linux). Simplicity Studio is cross-platform; the optional Python decoder script (`log_compact_decoder.py`) runs on any of the three.
 - Silicon Labs SiWx91x evaluation kit. Boards covered by this template (per `wifi_templates.xml`):
   - WPK ([BRD4002](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)) plus one of: [BRD4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / BRD4339B / BRD4340B / [BRD4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview) / [BRD4343A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343a-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / BRD4343B / [BRD4343C](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-rb4343c-wi-fi-6-bluetooth-le-8mb-flash-radio-board-for-module?tab=overview) / BRD4343Q / BRD4343S.
   - Standalone radio boards: -[BRD2605A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605a-wifi-6-bluetooth-le-soc-dev-kit?tab=overview)/ [BRD2605B](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-dk2605b-wifi-6-bluetooth-le-soc-dev-kit?tab=overview) / [BRD2708A](https://www.silabs.com/development-tools/wireless/wi-fi/siw917y-ek2708a-explorer-kit).
@@ -83,7 +83,7 @@ To use this application, the following hardware, software, and project setup are
 - Simplicity Studio.
 - Serial console setup (for UART-encoded logs or IO Stream UART). See the WiSeConnect *Console input and output* section.
 - Embedded development environment. Use a supported Simplicity Studio release (see "Download and Install Simplicity Studio" in the *getting-started-with-siwx917-soc* guide in `release_package/docs/index.html`).
-- Python 3.8+ on the host if you plan to run `Log_script.py` (UART or IO Stream Compact decoding):
+- Python 3.8+ on the host if you plan to run `log_compact_decoder.py` (UART or IO Stream Compact decoding):
 
   ```bash
   pip install pyserial pyelftools colorama
@@ -93,7 +93,7 @@ To use this application, the following hardware, software, and project setup are
 
 ### Setup Diagram
 
-![Setup: Si917 board connected to a host PC over USB; the PC runs Simplicity Studio and the optional Log_script.py decoder.](resources/readme/setupdiagram.png)
+![Setup: Si917 board connected to a host PC over USB; the PC runs Simplicity Studio and the optional log_compact_decoder.py decoder.](resources/readme/setupdiagram.png)
 
 ## Getting Started
 
@@ -117,7 +117,7 @@ Main files for this example:
 | --- | --- |
 | `app.c` / `app.h` | Standard WiSeConnect entry. `app_init()` calls `logger_example_init()`. |
 | `sl_si91x_logger_example.c/.h` | Creates the `application_start` FreeRTOS task, prints a line at each level once per second, handles the BTN0 ISR, and provides the FreeRTOS idle hook that calls `sl_log_flush()`. |
-| `Log_script.py` | Host-side decoder for the encoded UART / IO Stream compact streams. |
+| `log_compact_decoder.py` | Host-side decoder for the encoded UART / IO Stream compact streams. |
 | `sl_si91x_logger_backend.slcp` | Project descriptor. Selects the default backend (`si91x_log_iostream_formatted`); change one line to swap backends. |
 
 > `sl_log_init()` is invoked automatically during `sl_main` startup by the `si91x_log` component — your application code does not need to call it.
@@ -208,7 +208,7 @@ The SL Log core (`si91x_log`) routes events to **exactly one** installed backend
 
 | Backend component | Component id | On-the-wire format | Best for |
 | --- | --- | --- | --- |
-| SL Log Si91x Backend IO Stream **compact** | `si91x_log_iostream_compact` | Encoded `sl_log_event_t` records | Highest log throughput, lowest on-wire overhead. Decoded by `Log_script.py`. |
+| SL Log Si91x Backend IO Stream **compact** | `si91x_log_iostream_compact` | Encoded `sl_log_event_t` records | Highest log throughput, lowest on-wire overhead. Decoded by `log_compact_decoder.py`. |
 | SL Log Si91x Backend IO Stream **formatted** | `si91x_log_iostream_formatted` | Human-readable text lines | Quick on-screen reading in an RTT viewer or terminal — no host decoder needed. |
 | SL Log Si91x Backend SEGGER SystemView | `log_backend_systemview` | SystemView trace events over RTT | Trace correlation alongside FreeRTOS task / interrupt timelines. |
 
@@ -284,10 +284,10 @@ Pick one of the Si91x IO Stream logger components:
 
 | Mode      | Component (id)                                                              | On-the-wire output                                                                            |
 | --------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Compact   | SL Log Si91x Backend Iostream compact (`si91x_log_iostream_compact`)        | Encoded proprietary stream (same family as UART; tool-oriented, decoded by `Log_script.py`).  |
+| Compact   | SL Log Si91x Backend Iostream compact (`si91x_log_iostream_compact`)        | Encoded proprietary stream (same family as UART; tool-oriented, decoded by `log_compact_decoder.py`).  |
 | Formatted | SL Log Si91x Backend Iostream formatted (`si91x_log_iostream_formatted`)    | Human-readable, printf-like lines suitable for a terminal or RTT viewer.                      |
 
-> **Note — Use IO Stream Compact for ULP / PS2 use cases:** When the application enters the PS2 ULP power state, Flash is powered down. The IO Stream **Formatted** backend reads its printf format strings from Flash (`.log_fmt`) at runtime to render each log line, so any log emitted while in PS2 — or before the format strings become reachable again after wake-up — appears as a `(null)` / empty message on the host. The IO Stream **Compact** backend emits only the format-string address (plus the cast arguments) and the strings are resolved host-side by `Log_script.py` using the application ELF, so it does not require Flash to be powered to produce valid log output.
+> **Note — Use IO Stream Compact for ULP / PS2 use cases:** When the application enters the PS2 ULP power state, Flash is powered down. The IO Stream **Formatted** backend reads its printf format strings from Flash (`.log_fmt`) at runtime to render each log line, so any log emitted while in PS2 — or before the format strings become reachable again after wake-up — appears as a `(null)` / empty message on the host. The IO Stream **Compact** backend emits only the format-string address (plus the cast arguments) and the strings are resolved host-side by `log_compact_decoder.py` using the application ELF, so it does not require Flash to be powered to produce valid log output.
 >
 > For this reason, the WiSeConnect ULP/UULP peripheral examples and the Power Manager Tickless Idle example are configured with `si91x_log_iostream_compact` rather than `si91x_log_iostream_formatted`. Use the same backend in your own application whenever the device must produce log output while running in (or transitioning through) PS2.
 
@@ -405,9 +405,9 @@ The **SL Log None** component (id: `log_none`) is a lightweight stub that expose
 
    | Backend | How to view |
    | --- | --- |
-   | IO Stream **compact** (RTT) | Capture RTT, then run `Log_script.py` against the captured stream. |
+   | IO Stream **compact** (RTT) | Capture RTT, then run `log_compact_decoder.py` against the captured stream. |
    | IO Stream **formatted** (RTT) | Open an RTT viewer (J-Link RTT Viewer or Studio's Serial 1 Console) — text appears directly. |
-   | IO Stream **UART (VCOM)** | Open the board VCOM port at the configured baud — text appears directly (formatted) or pipe through `Log_script.py` (compact). |
+   | IO Stream **UART (VCOM)** | Open the board VCOM port at the configured baud — text appears directly (formatted) or pipe through `log_compact_decoder.py` (compact). |
    | SystemView | Run SEGGER SystemView with the project as set up above. |
 
 5. **Press BTN0** to cycle the runtime log level (`DEBUG → INFO → WARN → ERROR → DEBUG`). Observe how lower-priority lines disappear from the host as the threshold rises.
@@ -444,7 +444,7 @@ With `log_backend_systemview` installed and the [SEGGER SystemView host setup](#
    | Backend             | Allowed specifiers     | Required cast                                                                                            | Mixing rules                              |
    | ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
    | IO Stream Formatted | `%d`, `%x`, `%p`, `%s` | `(uint32_t)` for non-pointer / non-string args; `(uintptr_t)` for `%p` and `%s` arguments.               | May mix freely.                           |
-   | IO Stream Compact   | `%lu`                  | `(uint32_t)` for every argument; strings cannot be rendered (decode on the host with `Log_script.py`).   | Numeric only.                             |
+   | IO Stream Compact   | `%lu`                  | `(uint32_t)` for every argument; strings cannot be rendered (decode on the host with `log_compact_decoder.py`).   | Numeric only.                             |
    | SEGGER SystemView   | `%d`, `%u`, `%x` | None enforced by the macro.                              | None |
 
    IO Stream Formatted -- allowed:
@@ -485,8 +485,8 @@ With `log_backend_systemview` installed and the [SEGGER SystemView host setup](#
 - If the project does not build, confirm Simplicity Studio, the WiSeConnect extension, and SDK versions match the `.slcp` requirements.
 - If the device is not detected, refresh connectivity firmware and USB drivers.
 - If IO Stream UART shows no output, confirm IO Stream Si91x, IO Stream: Si91x UART, and the `vcom` instance are installed and configured.
-- `Log_script.py --reset` on a multi-kit bench: the helper invokes `commander device reset` without `--serialno` / `--ip`, so it targets the first attached J-Link / WSTK adapter. If you have more than one kit connected, either disconnect the others, or add the appropriate selector flag to the command (or extend `reset_device()` in `Log_script.py`) so the correct board is reset.
-- On Windows, COM ports appear as `COM<N>` (for example `COM3`). On macOS and Linux they appear as `/dev/tty.usbmodem*` and `/dev/ttyACM*` / `/dev/ttyUSB*` respectively; pass the matching path via `--port` to `Log_script.py`.
+- `log_compact_decoder.py --reset` on a multi-kit bench: the helper invokes `commander device reset` without `--serialno` / `--ip`, so it targets the first attached J-Link / WSTK adapter. If you have more than one kit connected, either disconnect the others, or add the appropriate selector flag to the command (or extend `reset_device()` in `log_compact_decoder.py`) so the correct board is reset.
+- On Windows, COM ports appear as `COM<N>` (for example `COM3`). On macOS and Linux they appear as `/dev/tty.usbmodem*` and `/dev/ttyACM*` / `/dev/ttyUSB*` respectively; pass the matching path via `--port` to `log_compact_decoder.py`.
 
 ## Resources
 

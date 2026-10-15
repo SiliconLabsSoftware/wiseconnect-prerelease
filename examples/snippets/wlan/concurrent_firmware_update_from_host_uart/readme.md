@@ -183,13 +183,17 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 	    ```
 
         ![Figure: Log of firmware transfer](resources/readme/python_script_output.png)
-        
-        
-     3. When the firmware update completes, the SiWx91x should be rebooted, after which it may take a few minutes to overwrite the old firmware with the new firmware in flash memory.
+  8. Once the image has been successfully downloaded to the secondary location, the device must be rebooted to complete the update process. During boot, the bootloader automatically copies the image from the secondary location to the primary location. This image transfer process can take approximately 40 seconds.
+  9. During this period, the host must not initiate any operations or communication requests to the device. The host should wait until the device has fully completed the image copy process and is ready for normal operation.
+  10. The host confirms readiness when Wi-Fi/network re-initialization succeeds after reboot (for example, `sl_net_init()` or `sl_wifi_init()`). How the host waits for the approximately 40-second secondary-to-primary image copy depends on the interface:
+      - **NCP SPI**: The driver polls for board-ready for up to approximately 40 seconds (timeout returns `SL_STATUS_TIMEOUT`), then for card-ready for approximately 5 seconds (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+      - **SoC**: The driver polls for board-ready (no fixed 40-second SPI timeout), then for card-ready for approximately 5 seconds when required (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+      - **NCP UART**: The driver does not poll for board-ready. The application should wait approximately 40 seconds before re-initializing (for example, `osDelay(40000)` under `SL_NCP_UART_INTERFACE`). Card-ready wait is approximately 5 seconds (timeout returns `SL_STATUS_CARD_READY_TIMEOUT`).
+      See the [WiSeConnect status codes](https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) documentation.
          
         ![Figure: Log of firmware transfer](resources/readme/concurrent_firmware_output_1.png) 
         ![Figure: Log of firmware transfer](resources/readme/concurrent_firmware_output_2.png) 
-  8. If users intend to employ different configurations, they must make corresponding adjustments in both the Python script and the Host UART configuration.
+  11. If users intend to employ different configurations, they must make corresponding adjustments in both the Python script and the Host UART configuration.
 
 Note: Python 3.9.0 version used to test this application.
 
@@ -203,7 +207,7 @@ If you encounter issues while running the Concurrent Firmware Update from Host U
 - Confirm that the host MCU completes the handshake with the Python script before firmware chunks are sent.
 - Ensure that the firmware file path you pass to the script points to a valid `.rps` image compatible with the target device.
 - If WLAN traffic fails during the update, verify concurrent mode Wi-Fi configuration in `sl_wifi_device.h` and throughput parameters in `app.c`.
-- If the update appears to hang after download, wait a few minutes while the device writes firmware to flash and reboots.
+- If the update appears to hang after download, wait approximately 40 seconds for the secondary-to-primary image copy to complete (see steps 8–10 above).
 - Match any custom chunk size or UART settings between the Python script and the host MCU firmware configuration.
 
 ## Resources

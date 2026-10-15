@@ -28,29 +28,24 @@
  *
  ******************************************************************************/
 
-#include "sl_si91x_crypto.h"
-#include "sl_status.h"
 #include "sl_constants.h"
+#include "sl_si91x_crypto.h"
 #include "sl_si91x_protocol_types.h"
+#include "sl_status.h"
 #if defined(SLI_MULTITHREAD_DEVICE_SI91X)
 #include "sl_si91x_crypto_thread.h"
 #endif
 #include "sl_si91x_driver.h"
 #include "sl_si91x_sha.h"
-#ifdef SL_SI91X_SHA3_ENABLE
-#include "sl_si91x_sha3.h"
-#endif
-#include <string.h>
+#include <stddef.h>
 #include "sli_wifi_utility.h"
+#include <string.h>
+
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
 static const uint8_t sha_digest_len_table[] = {
-  [SL_SI91X_SHA_1] = SL_SI91X_SHA_1_DIGEST_LEN,       [SL_SI91X_SHA_224] = SL_SI91X_SHA_224_DIGEST_LEN,
-  [SL_SI91X_SHA_256] = SL_SI91X_SHA_256_DIGEST_LEN,   [SL_SI91X_SHA_384] = SL_SI91X_SHA_384_DIGEST_LEN,
+  [SL_SI91X_SHA_1] = SL_SI91X_SHA_1_DIGEST_LEN,     [SL_SI91X_SHA_224] = SL_SI91X_SHA_224_DIGEST_LEN,
+  [SL_SI91X_SHA_256] = SL_SI91X_SHA_256_DIGEST_LEN, [SL_SI91X_SHA_384] = SL_SI91X_SHA_384_DIGEST_LEN,
   [SL_SI91X_SHA_512] = SL_SI91X_SHA_512_DIGEST_LEN,
-#ifdef SL_SI91X_SHA3_ENABLE
-  [SL_SI91X_SHA3_224] = SL_SI91X_SHA3_224_DIGEST_LEN, [SL_SI91X_SHA3_256] = SL_SI91X_SHA3_256_DIGEST_LEN,
-  [SL_SI91X_SHA3_384] = SL_SI91X_SHA3_384_DIGEST_LEN, [SL_SI91X_SHA3_512] = SL_SI91X_SHA3_512_DIGEST_LEN,
-#endif
 };
 
 static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
@@ -61,26 +56,19 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
                                          uint8_t *digest)
 {
   sl_status_t status = SL_STATUS_OK;
-  uint16_t send_size = 0;
   sl_wifi_buffer_t *buffer;
   const sl_wifi_system_packet_t *packet;
-  sli_si91x_sha_request_t *request = (sli_si91x_sha_request_t *)malloc(sizeof(sli_si91x_sha_request_t));
+  // Header only — msg is a FAM sent as a second fragment (avoids ~1.4KB staging buffer)
+  sli_si91x_sha_request_t *request = (sli_si91x_sha_request_t *)malloc(sizeof(*request));
+  uint32_t header_length           = sizeof(*request);
 
   SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
 
-  memset(request, 0, sizeof(sli_si91x_sha_request_t));
+  memset(request, 0, header_length);
 
-// Fill Algorithm type
-// SHA1/SHA2 use algorithm_type = SHA (4)
-// SHA3 uses algorithm_type = SHA3 (16)
-#ifdef SL_SI91X_SHA3_ENABLE
-  if ((sha_mode == SL_SI91X_SHA3_224) || (sha_mode == SL_SI91X_SHA3_256) || (sha_mode == SL_SI91X_SHA3_384)
-      || (sha_mode == SL_SI91X_SHA3_512)) {
-    request->algorithm_type = SHA3;
-  }
-#else
+  // Fill Algorithm type
+  // SHA1/SHA2 use algorithm_type = SHA (4)
   request->algorithm_type = SHA;
-#endif
 
   request->algorithm_sub_type = sha_mode;
 
@@ -93,23 +81,7 @@ static sl_status_t sli_si91x_sha_pending(uint8_t sha_mode,
   // Fill current chunk length
   request->current_chunk_length = chunk_len;
 
-  // Memset before filling
-  memset(&request->msg[0], 0, SL_SI91X_MAX_DATA_SIZE_IN_BYTES);
-
-  // Copy Data
-  if ((msg != NULL) && (chunk_len != 0)) {
-    memcpy(&request->msg[0], msg, chunk_len);
-  }
-
-  send_size = sizeof(sli_si91x_sha_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES + chunk_len;
-
-  status = sli_wifi_send_command(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-                                 SLI_WIFI_COMMON_CMD,
-                                 request,
-                                 send_size,
-                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-                                 NULL,
-                                 (void **)&buffer);
+  status = sli_si91x_crypto_send_command(request, header_length, msg, chunk_len, (void **)&buffer);
   if (status != SL_STATUS_OK) {
     free(request);
     if (buffer != NULL)
@@ -142,21 +114,8 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
 {
   sl_status_t status  = SL_STATUS_OK;
   uint8_t *output_ptr = (uint8_t *)digest;
-// Fill Algorithm type
-// SHA1/SHA2 use algorithm_type = SHA (4)
-// SHA3 uses algorithm_type = SHA3 (16)
-#ifdef SL_SI91X_SHA3_ENABLE
-
-  sli_si91x_sha_request_t *request = (sli_si91x_sha_request_t *)malloc(sizeof(sli_si91x_sha_request_t));
-
-  if (request == NULL) {
-    return SL_STATUS_ALLOCATION_FAILED;
-  }
-
-  memset(request, 0, sizeof(sli_si91x_sha_request_t));
-  (void)current_chunk_length;
-  (void)sha_flags;
-#else
+  // Fill Algorithm type
+  // SHA1/SHA2 use algorithm_type = SHA (4)
 
   sli_si91x_sha_mp_request_t *request = (sli_si91x_sha_mp_request_t *)malloc(sizeof(sli_si91x_sha_mp_request_t));
 
@@ -165,32 +124,21 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
   }
 
   memset(request, 0, sizeof(sli_si91x_sha_mp_request_t));
-#endif
 
-// Fill Algorithm type
-// SHA1/SHA2 use algorithm_type = SHA (4)
-// SHA3 uses algorithm_type = SHA3 (16)
-#ifdef SL_SI91X_SHA3_ENABLE
-  if ((sha_mode == SL_SI91X_SHA3_224) || (sha_mode == SL_SI91X_SHA3_256) || (sha_mode == SL_SI91X_SHA3_384)
-      || (sha_mode == SL_SI91X_SHA3_512)) {
-    request->algorithm_type = SHA3;
-  }
-#else
+  // Fill Algorithm type
+  // SHA1/SHA2 use algorithm_type = SHA (4)
   request->algorithm_type = SHA;
-#endif
 
   request->algorithm_sub_type = sha_mode;
 
-#ifndef SL_SI91X_SHA3_ENABLE
   // Fill sha flags
-  request->sha_flags            = sha_flags;
-  request->current_chunk_length = current_chunk_length;
-#endif
+  request->sha_flags = sha_flags;
 
   // Fill total msg length
   request->total_msg_length = msg_length;
 
-  // Fill currnet chunk length
+  // Fill current chunk length
+  request->current_chunk_length = current_chunk_length;
 
   // Fill msg ptr
   request->msg = msg;
@@ -199,11 +147,7 @@ static sl_status_t sli_si91x_sha_mp_side_band(uint8_t sha_mode,
 
   status = sl_si91x_driver_send_side_band_crypto(SLI_COMMON_REQ_ENCRYPT_CRYPTO,
                                                  request,
-#ifdef SL_SI91X_SHA3_ENABLE
-                                                 (sizeof(sli_si91x_sha_request_t)),
-#else
                                                  (sizeof(sli_si91x_sha_mp_request_t)),
-#endif
                                                  SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME));
   free(request);
   request = NULL;
@@ -252,7 +196,7 @@ sl_status_t sl_si91x_sha(uint8_t sha_mode, const uint8_t *msg, uint16_t msg_leng
         sha_flags = LAST_CHUNK;
         if (offset == 0) {
           /* If the total length is less than 1400 and offset is zero,
-             make sha_flag as both first chunk as well as last chunk*/
+               make sha_flag as both first chunk as well as last chunk*/
           sha_flags |= FIRST_CHUNK;
         }
       }
@@ -299,11 +243,11 @@ sl_status_t sl_si91x_mp_sha(uint8_t sha_mode,
                             const uint8_t *digest)
 {
   /*
-   * digest is legitimately NULL for FIRST_CHUNK (setup) and MIDDLE_CHUNK
-   * (update) calls where no output is produced yet. A non-NULL digest is
-   * only required when LAST_CHUNK is set, as that is when the final hash
-   * is written out.
-   */
+     * digest is legitimately NULL for FIRST_CHUNK (setup) and MIDDLE_CHUNK
+     * (update) calls where no output is produced yet. A non-NULL digest is
+     * only required when LAST_CHUNK is set, as that is when the final hash
+     * is written out.
+     */
   if (((msg == NULL) != (msg_length == 0)) || ((hash_flags & LAST_CHUNK) && (digest == NULL))) {
     return SL_STATUS_INVALID_PARAMETER;
   }

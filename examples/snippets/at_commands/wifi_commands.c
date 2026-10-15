@@ -158,6 +158,55 @@
 #define WIFI_NUM_OF_INTERFACE (13)
 #endif
 
+// Auto-TWT defaults (aligned with twt_tcp_client)
+#ifndef SLI_TWT_AUTO_DEFAULT_ENABLE
+#define SLI_TWT_AUTO_DEFAULT_ENABLE 1
+#endif
+#ifndef SLI_TWT_AUTO_DEFAULT_AVG_TX_KBPS
+#define SLI_TWT_AUTO_DEFAULT_AVG_TX_KBPS 0
+#endif
+#ifndef SLI_TWT_AUTO_DEFAULT_TX_LATENCY_MS
+#define SLI_TWT_AUTO_DEFAULT_TX_LATENCY_MS 0
+#endif
+#ifndef SLI_TWT_AUTO_DEFAULT_RX_LATENCY_MS
+#define SLI_TWT_AUTO_DEFAULT_RX_LATENCY_MS 60000
+#endif
+
+// Manual iTWT defaults (aligned with twt_tcp_client / wireless_test)
+#ifndef SLI_TWT_DEFAULT_FLOW_ID
+#define SLI_TWT_DEFAULT_FLOW_ID 1
+#endif
+#ifndef SLI_TWT_DEFAULT_WAKE_DURATION
+#define SLI_TWT_DEFAULT_WAKE_DURATION 0x60
+#endif
+#ifndef SLI_TWT_DEFAULT_WAKE_INT_EXP
+#define SLI_TWT_DEFAULT_WAKE_INT_EXP 13
+#endif
+#ifndef SLI_TWT_DEFAULT_WAKE_INT_MANTISSA
+#define SLI_TWT_DEFAULT_WAKE_INT_MANTISSA 0x1D4C
+#endif
+#ifndef SLI_TWT_DEFAULT_REQ_TYPE
+#define SLI_TWT_DEFAULT_REQ_TYPE 1
+#endif
+#ifndef SLI_TWT_TEARDOWN_ALL_FLOW_ID
+#define SLI_TWT_TEARDOWN_ALL_FLOW_ID 0xFF
+#endif
+
+#define SLI_TWT_MAX_FLOW_ID             7
+#define SLI_TWT_MAX_WAKE_INT_EXP        31
+#define SLI_TWT_MAX_REQ_TYPE            2
+#define SLI_TWT_WAKE_DURATION_UNIT      0
+#define SLI_TWT_IMPLICIT                1
+#define SLI_TWT_UNANNOUNCED             1
+#define SLI_TWT_TRIGGERED               0
+#define SLI_TWT_CHANNEL                 0
+#define SLI_TWT_PROTECTION              0
+#define SLI_TWT_RESTRICT_TX_OUTSIDE_TSP 1
+#define SLI_TWT_RETRY_LIMIT             6
+#define SLI_TWT_RETRY_INTERVAL          10
+#define SLI_TWT_NEGOTIATION_TYPE        0
+#define SLI_TWT_RESPONSE_WAIT_MS        5000
+
 /******************************************************
  *               Static Function Declarations
  ******************************************************/
@@ -165,6 +214,19 @@ typedef struct {
   sl_wifi_interface_t interface;
   sl_wifi_transmitter_test_info_t test_info;
 } at_wifi_tx_test_info_t;
+
+static sl_status_t at_twt_register_callback(void);
+static void at_twt_reset_wait_state(void);
+static sl_status_t at_twt_wait_for_response(void);
+static sl_status_t at_twt_arm_and_wait(sl_status_t command_status);
+static void at_twt_signal_response(sl_status_t status);
+static sl_status_t at_twt_status_from_event(sl_wifi_event_t event, sl_status_t status_code);
+static bool at_twt_event_completes_command(sl_wifi_event_t event);
+static sl_status_t on_twt_config(sl_wifi_event_t event,
+                                 sl_status_t status_code,
+                                 sl_wifi_twt_response_t *result,
+                                 uint32_t result_length,
+                                 void *arg);
 
 /******************************************************
  *               Extern Variable
@@ -174,8 +236,11 @@ typedef struct {
  *               Global Variable
  ******************************************************/
 
-static uint8_t scan_type          = 0;
-static uint16_t scan_result_count = SCAN_RESULT_COUNT_EXTENDED_DEFAULT;
+static uint8_t scan_type                        = 0;
+static uint16_t scan_result_count               = SCAN_RESULT_COUNT_EXTENDED_DEFAULT;
+static osSemaphoreId_t twt_response_semaphore   = NULL;
+static volatile bool twt_response_pending       = false;
+static volatile sl_status_t twt_response_status = SL_STATUS_OK;
 
 volatile bool scan_results_complete  = false;
 volatile sl_status_t callback_status = SL_STATUS_OK;
@@ -933,6 +998,294 @@ sl_status_t wifi_get_performance_profile_command_handler(console_args_t *argumen
   return status;
 }
 
+static sl_status_t at_twt_register_callback(void)
+{
+  if (twt_response_semaphore == NULL) {
+    twt_response_semaphore = osSemaphoreNew(1, 0, NULL);
+    if (twt_response_semaphore == NULL) {
+      return SL_STATUS_ALLOCATION_FAILED;
+    }
+  }
+
+  // Re-register after net-deinit so TWT URCs keep working.
+  return sl_wifi_set_twt_config_callback_v2(on_twt_config, NULL);
+}
+
+static void at_twt_reset_wait_state(void)
+{
+  twt_response_pending = false;
+  twt_response_status  = SL_STATUS_OK;
+  if (twt_response_semaphore != NULL) {
+    while (osSemaphoreAcquire(twt_response_semaphore, 0) == osOK) {
+      // Drain a stale token from a previous TWT command.
+    }
+  }
+}
+
+static sl_status_t at_twt_wait_for_response(void)
+{
+  uint32_t tick_hz       = osKernelGetTickFreq();
+  uint32_t timeout_ticks = (tick_hz == 0) ? (uint32_t)SLI_TWT_RESPONSE_WAIT_MS
+                                          : ((tick_hz * (uint32_t)SLI_TWT_RESPONSE_WAIT_MS) / 1000U);
+
+  if (osSemaphoreAcquire(twt_response_semaphore, timeout_ticks) != osOK) {
+    twt_response_pending = false;
+    return SL_STATUS_TIMEOUT;
+  }
+  return twt_response_status;
+}
+
+static void at_twt_signal_response(sl_status_t status)
+{
+  if (twt_response_pending) {
+    twt_response_status  = status;
+    twt_response_pending = false;
+    if (twt_response_semaphore != NULL) {
+      osSemaphoreRelease(twt_response_semaphore);
+    }
+  }
+}
+
+static bool at_twt_event_completes_command(sl_wifi_event_t event)
+{
+  if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
+    return true;
+  }
+
+  switch (event) {
+    case SL_WIFI_TWT_RESPONSE_EVENT:
+    case SL_WIFI_TWT_UNSOLICITED_SESSION_SUCCESS_EVENT:
+    case SL_WIFI_TWT_TEARDOWN_SUCCESS_EVENT:
+    case SL_WIFI_TWT_AP_TEARDOWN_SUCCESS_EVENT:
+    case SL_WIFI_TWT_AP_REJECTED_EVENT:
+    case SL_WIFI_TWT_OUT_OF_TOLERANCE_EVENT:
+    case SL_WIFI_TWT_RESPONSE_NOT_MATCHED_EVENT:
+    case SL_WIFI_TWT_UNSUPPORTED_RESPONSE_EVENT:
+    case SL_WIFI_TWT_FAIL_MAX_RETRIES_REACHED_EVENT:
+    case SL_WIFI_TWT_INACTIVE_NO_AP_SUPPORT_EVENT:
+    case SL_WIFI_TWT_INFO_FRAME_EXCHANGE_FAILED_EVENT:
+      return true;
+
+    default:
+      return false;
+  }
+}
+
+static sl_status_t at_twt_status_from_event(sl_wifi_event_t event, sl_status_t status_code)
+{
+  if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
+    return (status_code != SL_STATUS_OK) ? status_code : SL_STATUS_FAIL;
+  }
+
+  switch (event) {
+    case SL_WIFI_TWT_RESPONSE_EVENT:
+    case SL_WIFI_TWT_UNSOLICITED_SESSION_SUCCESS_EVENT:
+    case SL_WIFI_TWT_TEARDOWN_SUCCESS_EVENT:
+    case SL_WIFI_TWT_AP_TEARDOWN_SUCCESS_EVENT:
+      return SL_STATUS_OK;
+
+    default:
+      return (status_code != SL_STATUS_OK) ? status_code : SL_STATUS_FAIL;
+  }
+}
+
+static sl_status_t on_twt_config(sl_wifi_event_t event,
+                                 sl_status_t status_code,
+                                 sl_wifi_twt_response_t *result,
+                                 uint32_t result_length,
+                                 void *arg)
+{
+  UNUSED_PARAMETER(result_length);
+  UNUSED_PARAMETER(arg);
+
+  sl_status_t response_status = at_twt_status_from_event(event, status_code);
+
+  if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
+    AT_PRINTF("\r\n+TWT:FAIL,0x%" PRIx32 "\r\n", (uint32_t)status_code);
+    at_twt_signal_response(response_status);
+    return status_code;
+  }
+
+  switch (event) {
+    case SL_WIFI_TWT_RESPONSE_EVENT:
+      AT_PRINTF("\r\n+TWT:SETUP_OK");
+      break;
+    case SL_WIFI_TWT_UNSOLICITED_SESSION_SUCCESS_EVENT:
+      AT_PRINTF("\r\n+TWT:UNSOLICITED_OK");
+      break;
+    case SL_WIFI_TWT_AP_REJECTED_EVENT:
+      AT_PRINTF("\r\n+TWT:AP_REJECTED");
+      break;
+    case SL_WIFI_TWT_OUT_OF_TOLERANCE_EVENT:
+      AT_PRINTF("\r\n+TWT:OUT_OF_TOLERANCE");
+      break;
+    case SL_WIFI_TWT_RESPONSE_NOT_MATCHED_EVENT:
+      AT_PRINTF("\r\n+TWT:NOT_MATCHED");
+      break;
+    case SL_WIFI_TWT_UNSUPPORTED_RESPONSE_EVENT:
+      AT_PRINTF("\r\n+TWT:UNSUPPORTED");
+      break;
+    case SL_WIFI_TWT_FAIL_MAX_RETRIES_REACHED_EVENT:
+      AT_PRINTF("\r\n+TWT:MAX_RETRIES");
+      break;
+    case SL_WIFI_TWT_INACTIVE_DUE_TO_ROAMING_EVENT:
+      AT_PRINTF("\r\n+TWT:INACTIVE_ROAMING");
+      break;
+    case SL_WIFI_TWT_INACTIVE_DUE_TO_DISCONNECT_EVENT:
+      AT_PRINTF("\r\n+TWT:INACTIVE_DISCONNECT");
+      break;
+    case SL_WIFI_TWT_TEARDOWN_SUCCESS_EVENT:
+      AT_PRINTF("\r\n+TWT:TEARDOWN_OK");
+      break;
+    case SL_WIFI_TWT_AP_TEARDOWN_SUCCESS_EVENT:
+      AT_PRINTF("\r\n+TWT:AP_TEARDOWN");
+      break;
+    case SL_WIFI_TWT_INACTIVE_NO_AP_SUPPORT_EVENT:
+      AT_PRINTF("\r\n+TWT:NO_AP_SUPPORT");
+      break;
+    case SL_WIFI_RESCHEDULE_TWT_SUCCESS_EVENT:
+      AT_PRINTF("\r\n+TWT:RESCHEDULE_OK");
+      break;
+    case SL_WIFI_TWT_INFO_FRAME_EXCHANGE_FAILED_EVENT:
+      AT_PRINTF("\r\n+TWT:INFO_FRAME_FAIL");
+      break;
+    default:
+      AT_PRINTF("\r\n+TWT:EVENT,0x%" PRIx32 "", (uint32_t)event);
+      break;
+  }
+
+  if (result != NULL) {
+    if (event < SL_WIFI_TWT_TEARDOWN_SUCCESS_EVENT) {
+      AT_PRINTF(",wake_dur=0x%X,wake_unit=0x%X,wake_exp=0x%X,"
+                "wake_mant=0x%X,neg=0x%X,impl=0x%X,unann=0x%X,"
+                "trig=0x%X,flow=0x%X",
+                result->wake_duration,
+                result->wake_duration_unit,
+                result->wake_int_exp,
+                result->wake_int_mantissa,
+                result->negotiation_type,
+                result->implicit_twt,
+                result->un_announced_twt,
+                result->triggered_twt,
+                result->twt_flow_id);
+    } else {
+      AT_PRINTF(",flow=0x%X,neg=0x%X", result->twt_flow_id, result->negotiation_type);
+    }
+  }
+  AT_PRINTF("\r\n");
+  if (at_twt_event_completes_command(event)) {
+    at_twt_signal_response(response_status);
+  }
+  return SL_STATUS_OK;
+}
+
+static sl_status_t at_twt_arm_and_wait(sl_status_t command_status)
+{
+  if (command_status != SL_STATUS_OK) {
+    twt_response_pending = false;
+    return command_status;
+  }
+
+  sl_status_t status = at_twt_wait_for_response();
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  PRINT_AT_CMD_SUCCESS;
+  return status;
+}
+
+// at+wifi-twt-auto=<enable>,<avg_tx_kbps>,<tx_latency_ms>,<rx_latency_ms>
+sl_status_t wifi_twt_auto_command_handler(console_args_t *arguments)
+{
+  sl_status_t status = at_twt_register_callback();
+  VERIFY_STATUS_AND_RETURN(status);
+
+  sl_wifi_twt_selection_v2_t twt_config = {
+    .twt_enable            = GET_OPTIONAL_COMMAND_ARG(arguments, 0, SLI_TWT_AUTO_DEFAULT_ENABLE, uint8_t),
+    .average_tx_throughput = GET_OPTIONAL_COMMAND_ARG(arguments, 1, SLI_TWT_AUTO_DEFAULT_AVG_TX_KBPS, uint16_t),
+    .tx_latency            = GET_OPTIONAL_COMMAND_ARG(arguments, 2, SLI_TWT_AUTO_DEFAULT_TX_LATENCY_MS, uint32_t),
+    .rx_latency            = GET_OPTIONAL_COMMAND_ARG(arguments, 3, SLI_TWT_AUTO_DEFAULT_RX_LATENCY_MS, uint32_t),
+  };
+
+  if (twt_config.twt_enable > 1) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  at_twt_reset_wait_state();
+  twt_response_pending = true;
+  status               = sl_wifi_target_wake_time_auto_selection_v2(&twt_config);
+  return at_twt_arm_and_wait(status);
+}
+
+// at+wifi-enable-twt=<flow_id>,<wake_duration>,<wake_int_exp>,
+//                    <wake_int_mantissa>,<req_type>
+sl_status_t wifi_enable_twt_command_handler(console_args_t *arguments)
+{
+  sl_status_t status = at_twt_register_callback();
+  VERIFY_STATUS_AND_RETURN(status);
+
+  uint8_t flow_id            = GET_OPTIONAL_COMMAND_ARG(arguments, 0, SLI_TWT_DEFAULT_FLOW_ID, uint8_t);
+  uint8_t wake_duration      = GET_OPTIONAL_COMMAND_ARG(arguments, 1, SLI_TWT_DEFAULT_WAKE_DURATION, uint8_t);
+  uint8_t wake_int_exp       = GET_OPTIONAL_COMMAND_ARG(arguments, 2, SLI_TWT_DEFAULT_WAKE_INT_EXP, uint8_t);
+  uint16_t wake_int_mantissa = GET_OPTIONAL_COMMAND_ARG(arguments, 3, SLI_TWT_DEFAULT_WAKE_INT_MANTISSA, uint16_t);
+  uint8_t req_type           = GET_OPTIONAL_COMMAND_ARG(arguments, 4, SLI_TWT_DEFAULT_REQ_TYPE, uint8_t);
+
+  if ((flow_id > SLI_TWT_MAX_FLOW_ID) || (wake_int_exp > SLI_TWT_MAX_WAKE_INT_EXP)
+      || (req_type > SLI_TWT_MAX_REQ_TYPE)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  sl_wifi_twt_request_t twt_req = {
+    .twt_enable              = 1,
+    .twt_flow_id             = flow_id,
+    .wake_duration           = wake_duration,
+    .wake_duration_unit      = SLI_TWT_WAKE_DURATION_UNIT,
+    .wake_duration_tol       = wake_duration,
+    .wake_int_exp            = wake_int_exp,
+    .wake_int_exp_tol        = wake_int_exp,
+    .wake_int_mantissa       = wake_int_mantissa,
+    .wake_int_mantissa_tol   = wake_int_mantissa,
+    .implicit_twt            = SLI_TWT_IMPLICIT,
+    .un_announced_twt        = SLI_TWT_UNANNOUNCED,
+    .triggered_twt           = SLI_TWT_TRIGGERED,
+    .twt_channel             = SLI_TWT_CHANNEL,
+    .twt_protection          = SLI_TWT_PROTECTION,
+    .restrict_tx_outside_tsp = SLI_TWT_RESTRICT_TX_OUTSIDE_TSP,
+    .twt_retry_limit         = SLI_TWT_RETRY_LIMIT,
+    .twt_retry_interval      = SLI_TWT_RETRY_INTERVAL,
+    .req_type                = req_type,
+    .negotiation_type        = SLI_TWT_NEGOTIATION_TYPE,
+  };
+
+  at_twt_reset_wait_state();
+  twt_response_pending = true;
+  status               = sl_wifi_enable_target_wake_time(&twt_req);
+  return at_twt_arm_and_wait(status);
+}
+
+// at+wifi-disable-twt[=flow_id]
+sl_status_t wifi_disable_twt_command_handler(console_args_t *arguments)
+{
+  sl_status_t status = at_twt_register_callback();
+  VERIFY_STATUS_AND_RETURN(status);
+
+  uint8_t flow_id = GET_OPTIONAL_COMMAND_ARG(arguments, 0, SLI_TWT_TEARDOWN_ALL_FLOW_ID, uint8_t);
+  if ((flow_id > SLI_TWT_MAX_FLOW_ID) && (flow_id != SLI_TWT_TEARDOWN_ALL_FLOW_ID)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  sl_wifi_twt_request_t twt_req = {
+    .twt_enable  = 0,
+    .twt_flow_id = flow_id,
+  };
+
+  at_twt_reset_wait_state();
+  twt_response_pending = true;
+  status               = sl_wifi_disable_target_wake_time(&twt_req);
+  return at_twt_arm_and_wait(status);
+}
+
 // at+wifi-is-ifup=<interface>
 sl_status_t wifi_is_interface_up_command_handler(console_args_t *arguments)
 {
@@ -1294,4 +1647,5 @@ sl_status_t wifi_peripherals_stop_command_handler(console_args_t *arguments)
 void wifi_set_default_configuration(void)
 {
   si91x_init_configuration = sl_wifi_default_client_configuration_cli;
+  at_twt_reset_wait_state();
 }

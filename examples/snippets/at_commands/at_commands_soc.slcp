@@ -44,6 +44,8 @@ define:
 - name: SLI_SI91X_MCU_INTR_BASED_RX_ON_UART
 - name: SLI_AT_COMMAND_SUPPORT
 - name: SLI_CONSOLE_SUPPRESS_AUTO_ECHO
+- name: SLI_SI91X_CONFIG_WIFI6_PARAMS
+- name: SLI_SI91X_ENABLE_TWT_FEATURE
 component:
 - id: sl_main
 - id: freertos

@@ -71,7 +71,6 @@ static psa_status_t sli_si91x_get_sha_params_from_alg(psa_algorithm_t alg, uint8
   }
   return PSA_SUCCESS;
 }
-
 static psa_status_t sli_si91x_get_sha_algo_from_digest_size(size_t digest_size, uint8_t *sha_algo)
 {
   switch (digest_size) {
@@ -106,7 +105,6 @@ static psa_status_t sli_si91x_get_sha_algo_from_digest_size(size_t digest_size, 
   return PSA_SUCCESS;
 }
 #endif
-
 psa_status_t sli_si91x_crypto_hash_compute(psa_algorithm_t alg,
                                            const uint8_t *input,
                                            size_t input_length,
@@ -156,6 +154,7 @@ psa_status_t sli_si91x_crypto_hash_compute(psa_algorithm_t alg,
   (void)hash_length;
   (void)sha_algo;
 #endif
+
   return status;
 }
 
@@ -215,11 +214,11 @@ psa_status_t sli_si91x_crypto_hash_update(sli_si91x_crypto_sha_operation_t *oper
   }
 
   /*
-   * Per the PSA Crypto specification, a zero-length update is a valid no-op
-   * and must succeed regardless of the input pointer value. Return early to
-   * avoid forwarding this to sl_si91x_mp_sha, which rejects a non-NULL msg
-   * with msg_length == 0 via its (msg == NULL) != (msg_length == 0) check.
-   */
+    * Per the PSA Crypto specification, a zero-length update is a valid no-op
+    * and must succeed regardless of the input pointer value. Return early to
+    * avoid forwarding this to sl_si91x_mp_sha, which rejects a non-NULL msg
+    * with msg_length == 0 via its (msg == NULL) != (msg_length == 0) check.
+    */
   if (input_length == 0) {
     return PSA_SUCCESS;
   }
@@ -233,12 +232,12 @@ psa_status_t sli_si91x_crypto_hash_update(sli_si91x_crypto_sha_operation_t *oper
     sl_si91x_mp_sha(sha_algo, input, (uint16_t)input_length, MIDDLE_CHUNK, NULL));
   if (status != PSA_SUCCESS) {
     /*
-     * Mark the operation as invalid so that subsequent update/finish calls
-     * fail immediately. No internal abort is performed here; the PSA core
-     * calls the driver's abort after a failed update before returning to the
-     * application, and the application is also expected to call
-     * psa_hash_abort() on any error per the PSA Crypto specification.
-     */
+      * Mark the operation as invalid so that subsequent update/finish calls
+      * fail immediately. No internal abort is performed here; the PSA core
+      * calls the driver's abort after a failed update before returning to the
+      * application, and the application is also expected to call
+      * psa_hash_abort() on any error per the PSA Crypto specification.
+      */
     operation->digest_size = SL_SI91X_SHA_LEN_INVALID;
   }
   return status;
@@ -281,12 +280,12 @@ psa_status_t sli_si91x_crypto_hash_finish(sli_si91x_crypto_sha_operation_t *oper
   status = convert_si91x_error_code_to_psa_status(sl_si91x_mp_sha(sha_algo, NULL, 0, LAST_CHUNK, hash));
   if (status != PSA_SUCCESS) {
     /*
-     * Mark the operation as invalid so that a repeated finish call fails
-     * immediately. No internal abort is performed here; the PSA core calls
-     * the driver's abort after a failed finish before returning to the
-     * application, and the application is also expected to call
-     * psa_hash_abort() on any error per the PSA Crypto specification.
-     */
+      * Mark the operation as invalid so that a repeated finish call fails
+      * immediately. No internal abort is performed here; the PSA core calls
+      * the driver's abort after a failed finish before returning to the
+      * application, and the application is also expected to call
+      * psa_hash_abort() on any error per the PSA Crypto specification.
+      */
     operation->digest_size = SL_SI91X_SHA_LEN_INVALID;
   }
   *hash_length = operation->digest_size;
@@ -314,13 +313,13 @@ psa_status_t sli_si91x_crypto_hash_abort(sli_si91x_crypto_sha_operation_t *opera
   }
 
   /*
-   * No explicit command is needed to clear the firmware SHA context:
-   *   1. On success, sha_final internally resets the SHA context.
-   *   2. On failure, the firmware automatically resets the SHA context.
-   *   3. If abort is called without a preceding init, the firmware SHA
-   *      context was never allocated, so there is nothing to clear.
-   * In all cases only the local operation context needs to be wiped.
-   */
+    * No explicit command is needed to clear the firmware SHA context:
+    *   1. On success, sha_final internally resets the SHA context.
+    *   2. On failure, the firmware automatically resets the SHA context.
+    *   3. If abort is called without a preceding init, the firmware SHA
+    *      context was never allocated, so there is nothing to clear.
+    * In all cases only the local operation context needs to be wiped.
+    */
   memset(operation, 0, sizeof(sli_si91x_crypto_sha_operation_t));
   return PSA_SUCCESS;
 

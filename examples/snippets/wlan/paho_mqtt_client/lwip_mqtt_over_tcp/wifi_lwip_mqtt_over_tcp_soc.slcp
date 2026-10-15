@@ -43,9 +43,7 @@ component:
 - id: mbedtls_ecdhe_key_exchange
 - id: mbedtls_sha256
 - id: mbedtls_sha512
-- id: mbedtls_hkdf
 - id: mbedtls_source
-- id: mbedtls_oid
 - id: mbedtls_rsa
 - id: mbedtls_cipher_cbc
 - id: mbedtls_ecdsa
@@ -74,6 +72,8 @@ toolchain_settings:
 - option: llvm_compiler_option
   value: -Wall -Werror -Wno-error=deprecated-declarations
 configuration:
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
 - name: SL_MBEDTLS_SSL_IN_CONTENT_LEN

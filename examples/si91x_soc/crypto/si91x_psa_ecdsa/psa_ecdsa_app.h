@@ -20,17 +20,9 @@
 
 #include "psa/crypto.h"
 
-#define PUBLIC_KEY_SIZE_P192R1       49
-#define PUBLIC_KEY_SIZE_P224R1       57
 #define PUBLIC_KEY_SIZE_P256R1       65
-#define PRIVATE_KEY_SIZE_P192R1      24
-#define PRIVATE_KEY_SIZE_P224R1      28
 #define PRIVATE_KEY_SIZE_P256R1      32
-#define SIGNATURE_SIZE_P192R1        48
-#define SIGNATURE_SIZE_P224R1        56
 #define SIGNATURE_SIZE_P256R1        64
-#define PRIVATE_KEY_SIZE_P192R1_BITS 192
-#define PRIVATE_KEY_SIZE_P224R1_BITS 224
 #define PRIVATE_KEY_SIZE_P256R1_BITS 256
 
 void test_psa_ecdsa(void);

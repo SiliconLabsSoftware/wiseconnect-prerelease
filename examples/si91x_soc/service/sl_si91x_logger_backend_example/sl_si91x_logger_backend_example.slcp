@@ -38,7 +38,7 @@ configuration:
 - name: SL_LOG_CONFIG_ARG
   value: SL_LOG_CONFIG_ARG5
 other_file:
-- path: Log_script.py
+- path: log_compact_decoder.py
 - path: resources/readme/setupdiagram.png
 - path: resources/readme/backend_replace.png
 - path: resources/readme/iostream_formatted_install.png

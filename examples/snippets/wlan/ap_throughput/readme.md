@@ -115,7 +115,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
    	- After connecting all the boards, the setup should look like the image shown below:
     ![Figure: Setup](resources/readme/stm32_setup.png)
    	- Connect the setup to the computer.
-  - Open the FIRMWARE UPDATE µVision project - **ap_throughput.uvprojx** by navigating to **WiSeConnect SDK → examples → snippets → wlan → ap_throughput → keil_project**. 
+  - **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
+  - Open the AP THROUGHPUT µVision project - **ap_throughput.uvprojx** by navigating to **Gecko SDK → extension → wiseconnect → examples → snippets → wlan → ap_throughput → keil_project**. 
 
 ## Application Build Environment
 

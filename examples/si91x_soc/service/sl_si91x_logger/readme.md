@@ -138,7 +138,7 @@ The example uses five log levels:
 | **WARN** | Non-fatal anomalies such as repeated requests for the same state. | `SL_PRINT_STRING_WARN` |
 | **ERROR** | Most severe among the macros used in this example. Failures that require attention (API failures, resource creation failures). | `SL_PRINT_STRING_ERROR` |
 
-The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the WiSeConnect API reference). UC **Debug Level** names map to `SL_LOG_CONFIG_LEVEL_*` in `config/sl_log_common_config.h`—the authoritative in-repo definitions for compile-time values (`SL_LOG_CONFIG_LEVEL_NONE`, and so on) and for levels not shown above (for example, `SL_LOG_CONFIG_LEVEL_CRASH`).  
+The `SL_PRINT_STRING_*` macros are provided by the **Logger** component (see the WiSeConnect API reference). UC **Debug Level** names map to `SL_LOG_CONFIG_LEVEL_*` in `config/sl_log_common_config.h` —the authoritative in-repo definitions for compile-time values (`SL_LOG_CONFIG_LEVEL_NONE`, and so on) and for levels not shown above (for example, `SL_LOG_CONFIG_LEVEL_CRASH`).  
 
 ## UC Config
 
@@ -262,8 +262,13 @@ Follow these steps to build and test the SiWx91x Logger example:
 
 4. **Decode and view logger output**
    - To convert the encoded logger stream into readable text format, run the Python decoding script located in the example project folder.
-   - Sample command for converting raw log events to readable text is  **python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 10**.
-      Ex Command "python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 10"
+   - Sample command for converting raw log events to readable text is  **python log_compact_decoder.py --m4-out m4_firmware.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 10**.
+      Ex Command "python log_compact_decoder.py --m4-out m4_firmware.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 10"
+   - `--port` may be `COM4`, `COM5`, or the matching host device path.
+   - These flags are optional. Omit them to keep the defaults:
+     - `--baud` — default `115200`. Use `921600` when NWP logging is enabled on UART.
+     - `--event-width` — default `56`. Longer EVENT names are clipped with `...`; the full text stays in MESSAGE.
+     - `--log-file` — also write the decoded lines to this path, as plain text.
 
 5. ## Console Output
 

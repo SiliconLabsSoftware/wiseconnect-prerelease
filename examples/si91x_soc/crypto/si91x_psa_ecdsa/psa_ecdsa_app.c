@@ -69,7 +69,7 @@ void test_psa_ecdsa()
   // Set up attributes for a volatile private key
   key_attr = psa_key_attributes_init();
   psa_set_key_type(&key_attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
-  psa_set_key_bits(&key_attr, PRIVATE_KEY_SIZE_P256R1_BITS); // Set PRIVATE_KEY_SIZE_P192R1_BITS for secp192r1
+  psa_set_key_bits(&key_attr, PRIVATE_KEY_SIZE_P256R1_BITS);
   psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
   psa_set_key_algorithm(&key_attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
 
@@ -102,7 +102,7 @@ void test_psa_ecdsa()
   // Set up attributes for a volatile private key
   key_attr = psa_key_attributes_init();
   psa_set_key_type(&key_attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
-  psa_set_key_bits(&key_attr, PRIVATE_KEY_SIZE_P256R1_BITS); // Set PRIVATE_KEY_SIZE_P192R1_BITS for secp192r1
+  psa_set_key_bits(&key_attr, PRIVATE_KEY_SIZE_P256R1_BITS);
   psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
   psa_set_key_algorithm(&key_attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
 #if WRAP_INPUT_KEYS

@@ -85,6 +85,8 @@ toolchain_settings:
 - option: llvm_compiler_option
   value: -Wall -Werror -Wno-error=deprecated-declarations
 configuration:
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
 readme:

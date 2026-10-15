@@ -91,6 +91,8 @@
 #define DEFAULT_WIFI_GATEWAY_ADDRESS 0x0A0AA8C0
 #endif
 
+// Note: config.channel.band and config.channel.bandwidth are not supported in network profiles.
+// Configure band via sl_wifi_device_configuration_t.band at init.
 //For open security networks (SL_WIFI_OPEN), use SL_WIFI_NO_CREDENTIAL_ID.
 #define DEFAULT_WIFI_CLIENT_PROFILE \
   (sl_net_wifi_client_profile_t)    \
@@ -99,8 +101,6 @@
         .ssid.value = DEFAULT_WIFI_CLIENT_PROFILE_SSID, \
         .ssid.length = sizeof(DEFAULT_WIFI_CLIENT_PROFILE_SSID)-1, \
         .channel.channel = SL_WIFI_AUTO_CHANNEL, \
-        .channel.band = SL_WIFI_AUTO_BAND, \
-        .channel.bandwidth = SL_WIFI_AUTO_BANDWIDTH, \
         .channel_bitmap.channel_bitmap_2_4 = SL_WIFI_DEFAULT_CHANNEL_BITMAP, \
         .bssid = {{0}}, \
         .bss_type = SL_WIFI_BSS_TYPE_INFRASTRUCTURE, \
@@ -147,8 +147,6 @@
         .ssid.value = DEFAULT_WIFI_AP_PROFILE_SSID, \
         .ssid.length = sizeof(DEFAULT_WIFI_AP_PROFILE_SSID)-1, \
         .channel.channel = SL_WIFI_AUTO_CHANNEL, \
-        .channel.band = SL_WIFI_AUTO_BAND, \
-        .channel.bandwidth = SL_WIFI_AUTO_BANDWIDTH, \
         .security = SL_WIFI_WPA2, \
         .encryption = SL_WIFI_CCMP_ENCRYPTION, \
         .rate_protocol = SL_WIFI_RATE_PROTOCOL_AUTO, \

@@ -91,7 +91,7 @@ static sl_wifi_rts_threshold_t wifi_rts_threshold = {
   .rts_threshold = SLI_WIFI_RTS_THRESHOLD // Default RTS threshold value
 };
 
-// Maximum transmit power in deci-dBm for Everest (siwx3xx). Range -150 to 310 (-15.0 to 31.0 dBm).
+// Maximum transmit power in deci-dBm for siwx3xx. Range -150 to 310 (-15.0 to 31.0 dBm).
 static sl_wifi_max_tx_power_decidbm_t wifi_max_tx_power_decidbm = {
   .scan_tx_power = SLI_WIFI_TX_POWER_DECIDBM_MAX, // 31.0 dBm default
   .join_tx_power = SLI_WIFI_TX_POWER_DECIDBM_MAX  // 31.0 dBm default

@@ -399,6 +399,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_WIFI_RSP_SOCKET_CONFIG:
         case SLI_WIFI_RSP_SOCKET_CREATE:
         case SLI_WIFI_RSP_SELECT_REQUEST:
+        case SLI_WIFI_RSP_SOCKET_BYTES_AVAILABLE:
         case SLI_WIFI_RSP_TCP_ACK_INDICATION: {
           metadata->tx_info.packet_type = SLI_WIFI_COMMAND_ENGINE_SOCKET_COMMAND_PACKET;
           break;

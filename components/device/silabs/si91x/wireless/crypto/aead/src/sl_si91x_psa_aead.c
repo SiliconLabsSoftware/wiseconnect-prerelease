@@ -53,6 +53,7 @@
 #include "sl_constants.h"
 #include "sl_si91x_protocol_types.h"
 #include "sl_si91x_driver.h"
+#include <stdlib.h>
 #include <string.h>
 
 /**
@@ -439,8 +440,14 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
   size_t key_bits         = psa_get_key_bits(attributes);
   uint8_t tag_length      = PSA_AEAD_TAG_LENGTH(key_type, key_bits, alg);
 
+  if (ciphertext_length < tag_length) {
+    return PSA_ERROR_INVALID_ARGUMENT;
+  }
+
+  size_t plaintext_len = ciphertext_length - tag_length;
+
   // Check sufficient output buffer size.
-  if (plaintext_size < (ciphertext_length - tag_length)) {
+  if (plaintext_size < plaintext_len) {
     return PSA_ERROR_BUFFER_TOO_SMALL;
   }
 
@@ -451,12 +458,12 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
       sl_si91x_ccm_config_t config_ccm = { 0 };
       config_ccm.encrypt_decrypt       = SL_SI91X_CCM_DECRYPT;
       config_ccm.msg                   = ciphertext;
-      config_ccm.msg_length            = ciphertext_length - tag_length;
+      config_ccm.msg_length            = plaintext_len;
       config_ccm.nonce                 = nonce;
       config_ccm.nonce_length          = nonce_length;
       config_ccm.ad                    = additional_data;
       config_ccm.ad_length             = additional_data_length;
-      config_ccm.tag                   = (uint8_t *)ciphertext + (ciphertext_length - tag_length);
+      config_ccm.tag                   = (uint8_t *)ciphertext + plaintext_len;
       config_ccm.tag_length            = tag_length;
 
       sli_si91x_set_input_config_ccm(attributes, &config_ccm, key_buffer, key_buffer_size);
@@ -473,11 +480,20 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
 #endif /* SLI_PSA_DRIVER_FEATURE_CCM */
 #if defined(SLI_PSA_DRIVER_FEATURE_GCM)
     case PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_GCM, 0): {
+      /* Output is sized plaintext_len + SL_SI91X_TAG_SIZE: firmware appends a
+       * recomputed tag and does not verify the caller's tag. Extra space holds
+       * that append (SI91X-21944); memcmp below is the host check (SI91X-22167). */
+      uint8_t *output = (uint8_t *)malloc(plaintext_len + SL_SI91X_TAG_SIZE);
+      if (output == NULL) {
+        status = PSA_ERROR_INSUFFICIENT_MEMORY;
+        break;
+      }
+
       sl_si91x_gcm_config_t config_gcm = { 0 };
       config_gcm.encrypt_decrypt       = SL_SI91X_GCM_DECRYPT;
       config_gcm.dma_use               = SL_SI91X_GCM_DMA_ENABLE;
       config_gcm.msg                   = ciphertext;
-      config_gcm.msg_length            = ciphertext_length - tag_length;
+      config_gcm.msg_length            = plaintext_len;
       config_gcm.nonce                 = nonce;
       config_gcm.nonce_length          = nonce_length;
       config_gcm.ad                    = additional_data;
@@ -486,17 +502,36 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
       sli_si91x_set_input_config_gcm(attributes, &config_gcm, key_buffer, key_buffer_size);
 
       /* Calling sl_si91x_gcm() for GCM decryption */
-      si91x_status = sl_si91x_gcm(&config_gcm, plaintext);
+      si91x_status = sl_si91x_gcm(&config_gcm, output);
 
 #if !defined(SLI_SI917B0)
       free(config_gcm.key_config.a0.key);
 #endif
       status = convert_si91x_error_code_to_psa_status(si91x_status);
+      if (status == PSA_SUCCESS) {
+        if (memcmp(output + plaintext_len, ciphertext + plaintext_len, tag_length) != 0) {
+          if (plaintext_len > 0) {
+            memset(plaintext, 0, plaintext_len);
+          }
+          status = PSA_ERROR_INVALID_SIGNATURE;
+        } else if (plaintext_len > 0) {
+          memcpy(plaintext, output, plaintext_len);
+        }
+      }
+      memset(output, 0, plaintext_len + SL_SI91X_TAG_SIZE);
+      free(output);
       break;
     }
 #endif /* SLI_PSA_DRIVER_FEATURE_GCM */
 #if defined(SLI_PSA_DRIVER_FEATURE_CHACHAPOLY)
     case PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CHACHA20_POLY1305, 0): {
+      /* Same oversized output + host tag compare as GCM. */
+      uint8_t *output = (uint8_t *)malloc(plaintext_len + SL_SI91X_TAG_SIZE);
+      if (output == NULL) {
+        status = PSA_ERROR_INSUFFICIENT_MEMORY;
+        break;
+      }
+
       uint8_t temp_nonce[16] = { 0 };
       temp_nonce[0]          = 0x01;
       memcpy(temp_nonce + 4, nonce, 12);
@@ -505,7 +540,7 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
       config_chachapoly.dma_use         = SL_SI91X_CHACHAPOLY_DMA_ENABLE;
       config_chachapoly.chachapoly_mode = SL_SI91X_CHACHA20POLY1305_MODE;
       config_chachapoly.msg             = ciphertext;
-      config_chachapoly.msg_length      = ciphertext_length - tag_length;
+      config_chachapoly.msg_length      = plaintext_len;
       config_chachapoly.nonce           = temp_nonce;
       config_chachapoly.ad              = additional_data;
       config_chachapoly.ad_length       = additional_data_length;
@@ -513,10 +548,22 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
       sli_si91x_set_input_config_chachapoly(attributes, &config_chachapoly, key_buffer);
 
       /* Calling sl_si91x_chachapoly() for CHACHAPOLY decryption */
-      si91x_status = sl_si91x_chachapoly(&config_chachapoly, plaintext);
+      si91x_status = sl_si91x_chachapoly(&config_chachapoly, output);
 
       /* gets the si91x error codes and returns its equivalent psa_status codes */
       status = convert_si91x_error_code_to_psa_status(si91x_status);
+      if (status == PSA_SUCCESS) {
+        if (memcmp(output + plaintext_len, ciphertext + plaintext_len, tag_length) != 0) {
+          if (plaintext_len > 0) {
+            memset(plaintext, 0, plaintext_len);
+          }
+          status = PSA_ERROR_INVALID_SIGNATURE;
+        } else if (plaintext_len > 0) {
+          memcpy(plaintext, output, plaintext_len);
+        }
+      }
+      memset(output, 0, plaintext_len + SL_SI91X_TAG_SIZE);
+      free(output);
 
       break;
     }
@@ -532,7 +579,7 @@ psa_status_t sli_si91x_crypto_aead_decrypt(const psa_key_attributes_t *attribute
       break;
   }
   if (status == PSA_SUCCESS) {
-    *plaintext_length = ciphertext_length - tag_length;
+    *plaintext_length = plaintext_len;
   }
   return status;
 }

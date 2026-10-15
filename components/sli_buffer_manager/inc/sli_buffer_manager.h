@@ -38,7 +38,7 @@
  * @brief Initialize the buffer manager.
  * @param configuration Pointer to the configuration.
  */
-sl_status_t sli_buffer_manager_init(sli_buffer_manager_configuration_t *configuration);
+sl_status_t sli_buffer_manager_init(const sli_buffer_manager_configuration_t *configuration);
 
 /**
  * @brief Deinitialize the buffer manager.

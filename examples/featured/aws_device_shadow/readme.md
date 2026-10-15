@@ -126,7 +126,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    - After connecting all the boards, the setup should look like the image shown below:
     ![Figure: Setup](resources/readme/stm32_setup.png)
    - Connect the setup to the computer.
-  - Open the AWS DEVICE SHADOW µVision project - **aws_device_shadow.uvprojx** by navigating to **WiSeConnect SDK → examples → featured → aws_device_shadow → keil_project**. 
+  - **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
+  - Open the AWS DEVICE SHADOW µVision project - **aws_device_shadow.uvprojx** by navigating to **Gecko SDK → extension → wiseconnect → examples → featured → aws_device_shadow → keil_project**. 
 
 ## Application Build Environment
 

@@ -116,12 +116,12 @@ sl_sensor_apds9960_handle_t sl_si91x_apds9960_sensor_create(sl_sensor_bus_t bus,
   const sl_apds9960_sensor_impl_t *sensor_impl = find_implementation(id);
 
   if (sensor_impl == NULL) {
-    DEBUGOUT("no driver founded, apds9960 ID = %d", id);
+    SL_PRINT_STRING_ERROR("no driver founded, apds9960 ID = %d", id);
     return NULL;
   }
   sl_sensor_apds9960_t *p_sensor = (sl_sensor_apds9960_t *)pvPortMalloc(sizeof(sl_sensor_apds9960_t));
   if (p_sensor == NULL) {
-    DEBUGOUT("\r\n apds9960 sensor create failed:%u \r\n", sizeof(sl_sensor_apds9960_t));
+    SL_PRINT_STRING_ERROR("\r\n apds9960 sensor create failed:%u \r\n", sizeof(sl_sensor_apds9960_t));
     return NULL;
   }
   p_sensor->id            = id;
@@ -130,7 +130,7 @@ sl_sensor_apds9960_handle_t sl_si91x_apds9960_sensor_create(sl_sensor_bus_t bus,
   sl_apds9960_error_t ret = p_sensor->impl->init(bus);
   if (ret != RSI_OK) {
     free(p_sensor);
-    DEBUGOUT("apds9960 sensor init failed");
+    SL_PRINT_STRING_ERROR("apds9960 sensor init failed");
     return NULL;
   }
   p_sensor->is_apds9960_init = true;

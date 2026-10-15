@@ -129,7 +129,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
   
     ![Figure: Setup](resources/readme/stm32_setup.png)
   - Connect the setup to the computer.
-- Open the Wi-Fi Throughput µVision project - **wlan_throughput.uvprojx** by navigating to **WiSeConnect SDK → examples → wlan_throughput → Keil project**.
+- **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
+- Open the Wi-Fi Throughput µVision project - **wlan_throughput.uvprojx** by navigating to **Gecko SDK → extension → wiseconnect → examples → featured → wlan_throughput → keil_project**.
 
 ### Instructions for Simplicity Studio IDE and Silicon Labs Devices (SoC and NCP Modes)
 

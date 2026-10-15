@@ -22,9 +22,7 @@
 
 - This application contains an example code to demonstrate the PSA ECDSA functionality
 - This application uses hardware accelerators for key generation of SECPR1 curves and NWP execution for signature generation / verification
-- Key generation : HW accelerators for P192R1 and P256R1 ; SW implementation for P224R1
-- Sign and Verify Plain message : NWP execution for P224R1 and P256R1 ; SW implementation for P192R1
-- Sign and Verify with Wrapped message : NWP execution for P224R1 and P256R1 ; P192R1 not supported
+- Key generation, sign, and verify use the P-256 curve.
 
 ## Prerequisites/Setup Requirements
 
@@ -59,20 +57,6 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ### Application Configuration Parameters
 
-curve : SL_SI91X_ECC_SECP192R1
-
-| Macro | Size |
-|---------------| ------------------|
-| SL_SI91X_PRIVATE_KEY_SIZE | 24 |
-| SL_SI91X_PUBLIC_KEY_SIZE | 49 |
-
-curve : SL_SI91X_ECC_SECP224R1
-
-| Macro | Size |
-|---------------| ------------------|
-| SL_SI91X_PRIVATE_KEY_SIZE | 28 |
-| SL_SI91X_PUBLIC_KEY_SIZE | 57 |
-
 curve : SL_SI91X_ECC_SECP256R1
 
 | Macro | Size |
@@ -80,8 +64,8 @@ curve : SL_SI91X_ECC_SECP256R1
 | SL_SI91X_PRIVATE_KEY_SIZE | 32 |
 | SL_SI91X_PUBLIC_KEY_SIZE | 65 |
 
-- Default ecc curve is SEP256R1, can be changed to SECP192R1 or SECP224R1 by changing private key size in [`psa_ecdsa_app.c`](psa_ecdsa_app.c) : psa_set_key_bits();
-- Default private key size is 256 bits, can be changed to 192 bits or 224 bits
+- Default ecc curve is SECP256R1. P-192 and P-224 are not selectable with this Mbed TLS 4 package.
+- Default private key size is 256 bits
 - Default public key size is corresponding to 256 bits private key size
 - Default SHA hashing used is SHA256, can be changed to SHA384 or SHA512
 - To change the SHA algorithm, set the psa_key_algorithm to PSA_ALG_ECDSA(PSA_ALG_SHA_XXX) in [`psa_ecdsa_app.c`](psa_ecdsa_app.c)

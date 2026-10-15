@@ -119,7 +119,8 @@ sl_sensor_adc_handle_t sl_si91x_adc_sensor_create(UNUSED_PARAM sl_sensor_bus_t b
   }
   sl_adc_sensor_data_t *p_sensor = (sl_adc_sensor_data_t *)pvPortMalloc(sizeof(sl_adc_sensor_data_t));
   if (p_sensor == NULL) {
-    DEBUGOUT("\r\n ADC sensor create failed while memory allocation:%u \r\n", sizeof(sl_adc_sensor_data_t));
+    SL_PRINT_STRING_ERROR("\r\n ADC sensor create failed while memory allocation:%u \r\n",
+                          sizeof(sl_adc_sensor_data_t));
     return NULL;
   }
   p_sensor->channel = (uint8_t)channel;
@@ -127,16 +128,16 @@ sl_sensor_adc_handle_t sl_si91x_adc_sensor_create(UNUSED_PARAM sl_sensor_bus_t b
   if (!is_channel_init) {
     sl_status_t ret = sl_si91x_adc_channel_init(&adc_config->adc_ch_cfg, &adc_config->adc_cfg);
     if (ret != SL_STATUS_OK) {
-      DEBUGOUT("\r\n ADC sensor channels init failed, channel \r\n");
+      SL_PRINT_STRING_ERROR("\r\n ADC sensor channels init failed, channel \r\n");
       return NULL;
     }
     is_channel_init = true;
   }
   if (IS_MULTI_CHANNEL(channel)) {
-    DEBUGOUT("\r\n ADC - sensor created \r\n");
+    SL_PRINT_STRING_ERROR("\r\n ADC - sensor created \r\n");
     for (uint8_t ch_no = 0; ch_no < MAX_CHNL_NO; ch_no++) {
       if (BIT(ch_no) & channel) {
-        DEBUGOUT(" channel %d\r\n", ch_no);
+        SL_PRINT_STRING_ERROR(" channel %d\r\n", ch_no);
       }
       channel &= ~(BIT(ch_no));
       if (channel == 0) { // Printed all the channels
@@ -146,7 +147,7 @@ sl_sensor_adc_handle_t sl_si91x_adc_sensor_create(UNUSED_PARAM sl_sensor_bus_t b
   } else {
     // Channel is set as BIT(channel_number) as per design, so to get the actual channel number use log2
     uint8_t actual_channel = log2(channel);
-    DEBUGOUT("\r\n ADC - sensor created, channel %d\r\n", actual_channel);
+    SL_PRINT_STRING_ERROR("\r\n ADC - sensor created, channel %d\r\n", actual_channel);
   }
   p_sensor->is_init = true;
 
@@ -174,7 +175,7 @@ inline sl_status_t sl_si91x_adc_sensor_enable(sl_adc_sensor_data_t *p_sensor, UN
     if (p_sensor->channel & BIT(ch_no)) {
       sl_status_t ret = sl_si91x_adc_chnl_enable(ch_no);
       if (ret != SL_STATUS_OK) {
-        DEBUGOUT("\r\n ADC sensor enable failed \r\n");
+        SL_PRINT_STRING_ERROR("\r\n ADC sensor enable failed \r\n");
         return ret;
       }
     }
@@ -203,7 +204,7 @@ inline sl_status_t sl_si91x_adc_sensor_disable(sl_adc_sensor_data_t *p_sensor, U
     if (p_sensor->channel & BIT(ch_no)) {
       sl_status_t ret = sl_si91x_adc_chnl_disable(ch_no);
       if (ret != SL_STATUS_OK) {
-        DEBUGOUT("\r\n ADC sensor disable failed \r\n");
+        SL_PRINT_STRING_ERROR("\r\n ADC sensor disable failed \r\n");
         return ret;
       }
     }
@@ -237,7 +238,7 @@ sl_adc_error_t sl_si91x_adc_sensor_delete(sl_sensor_adc_handle_t *sensor)
   p_sensor->is_init = false;
   sl_status_t ret   = sl_si91x_adc_de_init(&adc_config->adc_cfg);
   if (ret != SL_STATUS_OK) {
-    DEBUGOUT("\r\n ADC sensor deinitialization failed\r\n");
+    SL_PRINT_STRING_ERROR("\r\n ADC sensor deinitialization failed\r\n");
     return ret;
   }
 
@@ -245,7 +246,7 @@ sl_adc_error_t sl_si91x_adc_sensor_delete(sl_sensor_adc_handle_t *sensor)
   // Stop ADC only when no ADC sensors are present
   ret = adc_stop(&adc_config->adc_cfg);
   if (ret != SL_STATUS_OK) {
-    DEBUGOUT("\r\n ADC sensor stop failed while deinitialization \r\n");
+    SL_PRINT_STRING_ERROR("\r\n ADC sensor stop failed while deinitialization \r\n");
     return ret;
   }
 #endif

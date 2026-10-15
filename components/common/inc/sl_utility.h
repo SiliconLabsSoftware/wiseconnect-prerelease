@@ -80,21 +80,23 @@ typedef struct {
 /**
  * @brief NWP wire format for a log record.
  *
- * Fixed by the NWP firmware, so it is spelled out here instead of reusing
- * @ref sl_log_event_t: the host structure carries a 64-bit event time (a
- * timestamp plus an epoch) and its args[] length follows SL_LOG_CONFIG_ARG, so
- * the two layouts no longer coincide. Sizing the receive path off the host
+ * Fixed by the NWP firmware (@c sl_log_entry_t), so it is spelled out here
+ * instead of reusing @ref sl_log_event_t. The NWP packs a 64-bit time in one
+ * field ([31:0] soc timer µs, [63:32] wrap count); the host splits that into
+ * timestamp + epoch. Host args[] length also follows SL_LOG_CONFIG_ARG, so the
+ * layouts are not interchangeable. Sizing the receive path off the host
  * structure would make every RX packet fail the length check and be dropped.
  *
- * Single source of truth for the wire layout, shared by both the NCP host path
- * (sl_utility.c) and the SiWx91x MCU platform path (sl_log_platform_specific.c).
- * The MCU log component pulls this header in through its wiseconnect_common
- * dependency, so the definition lives in exactly one place.
+ * Packed size is 28 bytes. Single source of truth for the wire layout, shared
+ * by both the NCP host path (sl_utility.c) and the SiWx91x MCU platform path
+ * (sl_log_platform_specific.c). The MCU log component pulls this header in
+ * through its wiseconnect_common dependency, so the definition lives in
+ * exactly one place.
  */
 typedef __PACKED_STRUCT
 {
-  /** @brief Timestamp on the NWP timebase, in microseconds */
-  uint32_t timestamp;
+  /** @brief NWP timebase: [31:0] µs, [63:32] wraps since NWP log init */
+  uint64_t timestamp;
   /** @brief Unique event identifier (pointer to format string or numeric ID) */
   uint32_t event_id;
   /** @brief Event arguments; the NWP always emits three slots */

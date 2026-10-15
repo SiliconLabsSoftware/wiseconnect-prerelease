@@ -142,6 +142,7 @@ A timer is run with a periodicity of **PUBLISH_PERIODICITY** milliseconds. The a
 - Simplicity Studio
 - Serial terminal for viewing the print [Tera term](https://tera-term.en.softonic.com/)
 - Download and install the Silicon Labs [Simplicity Connect App(formerly EFR Connect App)](https://www.silabs.com/developers/simplicity-connect-mobile-app ) from Play store/App store.
+- **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
 
 ### Setup Diagram
 

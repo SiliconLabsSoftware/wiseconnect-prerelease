@@ -392,6 +392,12 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 
 ## Test the Application
 
+> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+>
+> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+>
+> Replace **COM5** with the serial port your board uses on the host PC.
+
 - Compile and run the application.
 - Connect the I2C, SPI, and (ADC or SDC) sensors, based on the above pin configuration.
 
@@ -400,6 +406,7 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 - The sensor events should be observed on the Serial Terminal as per the given configuration.
 - Below are the console prints when BH1750 sensor is connected to I2C.
     ![Figure: Console prints for sensor BH1750](resources/readme/BH1750_console_prints.png)
+- **MQTT / AWS payloads (`SH_AWS_ENABLE=1`):** Numeric sensor fields are published as milli-scaled integers (no floating-point formatting). Accelerometer axes are labeled in **mg** (milli-G), temperature in **m°C**, light in **mlx**, and ADC samples in **mV**. Subscribers must use these units rather than the previous floating-point G / °C / lux values.
 
 >### Note:
 >#### General

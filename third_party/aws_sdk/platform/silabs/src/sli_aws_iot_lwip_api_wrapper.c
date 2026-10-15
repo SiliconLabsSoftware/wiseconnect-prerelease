@@ -46,8 +46,6 @@
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/error.h"
 #include "mbedtls/pk.h"
-#include "mbedtls/ctr_drbg.h"
-#include "mbedtls/entropy.h"
 #include "mbedtls/debug.h"
 #include "psa/crypto.h"
 
@@ -65,7 +63,6 @@ osSemaphoreId_t select_sem;
 #define SLI_MQTT_TLS_PORT 443
 
 #define ALPN_AMZN_MQTT_CA "x-amzn-mqtt-ca"
-#define SLI_TAG "aws_iot"
 
 #define SLI_DNS_TIMEOUT_MS 20000
 
@@ -90,8 +87,6 @@ volatile int dns_resolved=0;
 static ip_addr_t dns_query_response = { 0 };
 static uint8_t psa_crypto_initialized = 0;
 
-mbedtls_ctr_drbg_context ctr_drbg;
-mbedtls_entropy_context entropy;
 mbedtls_ssl_context ssl;
 mbedtls_ssl_config conf;
 mbedtls_x509_crt cacert;
@@ -110,17 +105,6 @@ void sli_mbedtls_debug_print(void *ctx, int level, const char *file, int line, c
 	fprintf((FILE *) ctx, "%s", str);
 }
 #endif
-
-// Initialize the hardware entropy source
-static int sli_mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen)
-{
-  (void)data;
-  for (size_t i = 0; i < len; i++) {
-    output[i] = rand() % 256;
-  }
-  *olen = len;
-  return 0;
-}
 
 // TLS send and receive mapping functions
 static int sli_ssl_send(void *ctx, const unsigned char *buf, size_t len)
@@ -367,30 +351,15 @@ IoT_Error_t iot_tls_connect(Network *pNetwork, TLSConnectParams *params)
     return status;
   }
 
-  // Initialize PSA crypto (required for sisdk mbedTLS components)
+  // Mbed TLS 4.x uses the PSA RNG; psa_crypto_init() is required before parse/handshake.
   if (!psa_crypto_initialized) {
-    status = psa_crypto_init();
-    if (status != PSA_SUCCESS) {
-      printf("\r\n[TLS] PSA crypto init failed: %ld\r\n", status);
-      // Continue anyway as some platforms may not need it
-    } else {
-      printf("\r\n[TLS] PSA crypto init SUCCESS\r\n");
-      psa_crypto_initialized = 1;
+    psa_status_t psa_status = psa_crypto_init();
+    if (psa_status != PSA_SUCCESS) {
+      printf("\r\n[TLS] PSA crypto init failed: %ld\r\n", (long)psa_status);
+      return NETWORK_SSL_INIT_ERROR;
     }
-  }
-
-  // Initialize mbedTLS entropy and random number generator
-  mbedtls_entropy_init(&entropy);
-  mbedtls_ctr_drbg_init(&ctr_drbg);
-  // Add an entropy source
-  status = mbedtls_entropy_add_source(&entropy, sli_mbedtls_hardware_poll, NULL, MBEDTLS_ENTROPY_MIN_HARDWARE, MBEDTLS_ENTROPY_SOURCE_STRONG);
-  if (status != 0) {
-    return NETWORK_MBEDTLS_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED;
-  }
-  // Seed entropy
-  status = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, (const unsigned char*)SLI_TAG, strlen(SLI_TAG));
-  if (status != 0) {
-    return NETWORK_MBEDTLS_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED;
+    printf("\r\n[TLS] PSA crypto init SUCCESS\r\n");
+    psa_crypto_initialized = 1;
   }
 
   // Initialize mbedTLS SSL context
@@ -409,7 +378,7 @@ IoT_Error_t iot_tls_connect(Network *pNetwork, TLSConnectParams *params)
     return NETWORK_X509_DEVICE_CRT_PARSE_ERROR;
   }
 
-  status = mbedtls_pk_parse_key(&pkey, (const unsigned char *)pNetwork->tlsConnectParams.pDevicePrivateKeyLocation, strlen(pNetwork->tlsConnectParams.pDevicePrivateKeyLocation)+1, (const unsigned char *)"", 0, mbedtls_ctr_drbg_random, NULL);
+  status = mbedtls_pk_parse_key(&pkey, (const unsigned char *)pNetwork->tlsConnectParams.pDevicePrivateKeyLocation, strlen(pNetwork->tlsConnectParams.pDevicePrivateKeyLocation)+1, (const unsigned char *)"", 0);
   if ( status != 0) {
     return NETWORK_PK_PRIVATE_KEY_PARSE_ERROR;
   }
@@ -432,8 +401,6 @@ IoT_Error_t iot_tls_connect(Network *pNetwork, TLSConnectParams *params)
   } else {
 	  mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
   }
-
-  mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
 
   mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
   status = mbedtls_ssl_conf_own_cert(&conf, &device_cert, &pkey);
@@ -631,8 +598,6 @@ IoT_Error_t iot_tls_destroy(Network *pNetwork)
   mbedtls_x509_crt_free(&cacert);
   mbedtls_x509_crt_free(&device_cert);
   mbedtls_pk_free(&pkey);
-  mbedtls_ctr_drbg_free(&ctr_drbg);
-  mbedtls_entropy_free(&entropy);
 
   if (errno)
     return FAILURE;

@@ -110,7 +110,8 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - After connecting all the boards, the setup should look like the image shown below:
       ![Figure: Setup](resources/readme/stm32_setup.png)
    	- Connect the setup to the computer.
-  - Open the POWERSAVE DEEP SLEEP µVision project - **power_save_deep_sleep.uvprojx** by navigating to **WiSeConnect SDK → examples → featured → low_power → power_save_deep_sleep → keil_project**. 
+  - **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
+  - Open the POWERSAVE DEEP SLEEP µVision project - **power_save_deep_sleep.uvprojx** by navigating to **Gecko SDK → extension → wiseconnect → examples → featured → low_power → power_save_deep_sleep → keil_project**. 
 
 ## Application Build Environment
 

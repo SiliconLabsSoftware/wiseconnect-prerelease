@@ -118,7 +118,8 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
    3. After connecting all the boards, the setup should look like the image shown below:
     ![Figure: Setup](resources/readme/stm32_setup.png)
    4. Connect the setup to the computer.
-5. Open the Powersave standby associated µVision project - **powersave_standby_associated.uvprojx** by navigating to **WiSeConnect SDK → examples → featured → powersave_standby_associated → keil_project**.
+5. **Note:** To compile Keil examples, download the Gecko SDK and place WiSeConnect under its `extension` folder as `gecko-sdk/extension/wiseconnect` (directory junction/symlink is fine). Open the `.uvprojx` from that path only.
+6. Open the Powersave standby associated µVision project - **powersave_standby_associated.uvprojx** by navigating to **Gecko SDK → extension → wiseconnect → examples → featured → low_power → powersave_standby_associated → keil_project**.
 
 ## Application Build Environment
 

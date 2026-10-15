@@ -138,13 +138,14 @@ sl_sensor_temperature_handle_t sl_si91x_temperature_sensor_create(sl_sensor_bus_
   const sl_temp_sensor_impl_t *sensor_impl = find_implementation(id);
 
   if (sensor_impl == NULL) {
-    DEBUGOUT("no driver founded, Temperature ID = %d", id);
+    SL_PRINT_STRING_ERROR("no driver founded, Temperature ID = %d", id);
     return NULL;
   }
 
   sl_sensor_temperature_t *p_sensor = (sl_sensor_temperature_t *)pvPortMalloc(sizeof(sl_sensor_temperature_t));
   if (p_sensor == NULL) {
-    DEBUGOUT("\r\n Temperature sensor HAL Memory allocation fail:%u \r\n", sizeof(sl_sensor_temperature_t));
+    SL_PRINT_STRING_ERROR("\r\n Temperature sensor HAL Memory allocation fail:%u \r\n",
+                          sizeof(sl_sensor_temperature_t));
     return NULL;
   }
 
@@ -155,7 +156,7 @@ sl_sensor_temperature_handle_t sl_si91x_temperature_sensor_create(sl_sensor_bus_
 
   if (ret != RSI_OK) {
     free(p_sensor);
-    DEBUGOUT("Temperature sensor init failed");
+    SL_PRINT_STRING_ERROR("Temperature sensor init failed");
     return NULL;
   }
 

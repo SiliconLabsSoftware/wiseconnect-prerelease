@@ -66,7 +66,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
  * Public_key in [`psa_asymmetric_key_storage_app.c`](psa_asymmetric_key_storage_app.c) is the public key generated and exported.
  * Default algo for asymmetric key generation is ECDH.
  * Default ecc curve is SEP256R1
- * Default key size is 256 bits - can choose between 192 and 256
+ * Default key size is 256 bits.
  * To change the ecc curve and key size, change the corresponding macro in [`psa_asymmetric_key_storage_app.c`](psa_asymmetric_key_storage_app.c) - psa_set_key_type() and change the KEY_MAX_SIZE to the corresponding length of public key generated.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).

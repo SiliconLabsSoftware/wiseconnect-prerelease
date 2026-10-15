@@ -11,7 +11,6 @@ component:
 - id: freertos
 - id: freertos_heap_3
 - id: memory_manager
-- id: mbedtls_slcrypto
 - id: psa_crypto
 - id: psa_driver
 - id: psa_crypto_trng

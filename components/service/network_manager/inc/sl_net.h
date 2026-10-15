@@ -31,12 +31,30 @@
 
 #include "sl_status.h"
 #include "sl_net_types.h"
+#include "sl_net_application_profile.h"
 
 /** 
  * \addtogroup NET_INTERFACE_FUNCTIONS Network Interface
  * 
- * @note To manage the network interface lifecycle correctly, it's important to use functions like sl_net_init(), sl_net_up(), sl_net_down(), and sl_net_deinit() as intended.
- *       Improper sequencing or combining sl_net_* and sl_wifi_* API functions without following the recommended order may lead to unpredictable or undefined behavior.
+ * @note To manage the network interface lifecycle correctly, use sl_net_init(), sl_net_up(),
+ *       sl_net_down(), and sl_net_deinit() as intended.
+ *       Improper sequencing or combining sl_net_* and sl_wifi_* API functions without following
+ *       the recommended order may lead to unpredictable or undefined behavior.
+ * @note Choosing an initialization model (SiWx91x):
+ *       - Prefer the sl_net_* lifecycle for WLAN station/AP applications that use network profiles,
+ *         credentials, and IP bring-up (typical Wi-Fi networking examples).
+ *       - Prefer sl_wifi_init() (typically with sl_wifi_default_event_handler) for BLE-centric or
+ *         WLAN+BLE applications that only need wireless/NWP bring-up and do not use the network
+ *         manager lifecycle (typical BLE and many WLAN+BLE examples). Custom event handlers are
+ *         allowed when required by the application.
+ *       - Do not call sl_wifi_init() in the same bring-up path after sl_net_init(); for Wi-Fi
+ *         interfaces, sl_net_init() initializes Wi-Fi internally.
+ *       - Do not call sl_net_init(), sl_net_up(), sl_net_down(), or sl_net_deinit() after an
+ *         application-called sl_wifi_init() outside the sl_net_* lifecycle. Pick one initialization
+ *         model for the whole lifecycle; tear down with sl_wifi_deinit() instead.
+ *       - Tear down with the matching API only (sl_net_deinit() vs sl_wifi_deinit()).
+ *       - WiSeConnect examples under different categories are not interchangeable templates for
+ *         initialization; copy the lifecycle model that matches the application type.
  * @note Stack overflows may occur if you invoke functions or use your own variables or data structures while handling callbacks.
  *       Please configure the stack size by modifying the pre-processor macro `SL_SI91X_EVENT_HANDLER_STACK_SIZE` as
  *       per your application's requirements. See [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-preprocessor-build-settings/list-of-preprocessor-build-settings)
@@ -718,56 +736,3 @@ sl_status_t sl_net_wifi_ap_up(sl_net_interface_t interface, sl_net_profile_id_t 
  * @return sl_status_t Status of the operation.
  */
 sl_status_t sl_net_wifi_ap_down(sl_net_interface_t interface);
-
-/***************************************************************************/ /**
- * @brief
- *   Apply an SDK application profile preset.
- *
- * @details
- *   Selects between Default and Neutral-less Matter switch opaque presets and applies
- *   the corresponding internal Wi-Fi configuration (advanced-config frames, scan timeouts,
- *   and scan-time overrides). Applications pass only the profile enum; preset values are
- *   internal to the SDK.
- *
- * @pre Pre-conditions:
- * - @ref sl_net_init should be called before this API.
- * - **Initial apply:** Call after @ref sl_net_init and before the first @ref sl_net_up / connect
- *   when configuring scan-related parameters ahead of connect.
- *
- * @param[in] interface
- *   Network interface identified by @ref sl_net_interface_t. Only Wi-Fi client interfaces
- *   (`SL_NET_WIFI_CLIENT_INTERFACE` or `SL_NET_WIFI_CLIENT_2_INTERFACE`) are supported.
- *
- * @param[in] profile
- *   Application profile of type @ref sl_net_application_profile_t.
- *
- * @return
- *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
- *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
- *
- * @note
- *   When selecting @ref SL_NET_APPLICATION_PROFILE_MATTER_NEUTRAL_LESS_SWITCH, **11n mode must
- *   already be enabled during Wi-Fi initialization** (for example via
- *   @c SL_WIFI_FEAT_DISABLE_11AX_SUPPORT in the device boot configuration). The Neutral-less
- *   switch profile does not enable 11n. If 11n is not enabled, this API returns an error.
- * @note
- *   Profile application invokes multiple internal Wi-Fi APIs sequentially. If any internal API
- *   fails, this function returns the corresponding error status. The SDK does **not** roll back
- *   configuration that was already applied before the failure. The application **must re-call**
- *   this API with the desired profile to complete configuration.
- * @note
- *   **Recovery reapply (required for non-default profiles):** Profile configuration
- *   (advanced-config and scan-timeout settings) is not retained across Wi-Fi disconnect
- *   or join failure. When using a profile other than @ref SL_NET_APPLICATION_PROFILE_DEFAULT,
- *   the application **must call this API again** with the same @a interface and @a profile
- *   after disconnect or join failure, **before** the next connect or auto-join retry.
- *   The SDK does not perform automatic reapply. This API is idempotent and safe to call
- *   multiple times with the same arguments. Re-calling this API also restores scan-timeout
- *   settings applied by the preset.
- * @note
- *   Once this API has been applied successfully, active and passive channel scan timeouts
- *   are owned by the profile preset. sl_wifi_configure_timeout() and
- *   sl_si91x_configure_timeout() return @c SL_STATUS_OK for those timeout types without
- *   changing the profile-managed values until Wi-Fi is deinitialized.
- ******************************************************************************/
-sl_status_t sl_net_set_application_profile(sl_net_interface_t interface, sl_net_application_profile_t profile);

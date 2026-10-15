@@ -48,6 +48,8 @@ provides:
   - name: si91x_iostream_transport
     allow_multiple: true
     condition: [si91x_log_iostream]
+  - name: iostream_console_support
+    allow_multiple: true
 requires:
   - name: sl_usart_iostream
   - name: syscalls

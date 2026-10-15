@@ -111,13 +111,18 @@ sl_status_t sl_net_wifi_client_up(sl_net_interface_t interface, sl_net_profile_i
   status = sl_net_get_profile(interface, profile_id, &profile);
   VERIFY_STATUS_AND_RETURN(status);
 
-  // Configure the client interface based on the band
-  if (profile.config.channel.band == SL_WIFI_BAND_2_4GHZ || profile.config.channel.band == SL_WIFI_AUTO_BAND) {
-    client_interface = SL_WIFI_CLIENT_2_4GHZ_INTERFACE;
-  } else if (profile.config.channel.band == SL_WIFI_BAND_5GHZ) {
-    client_interface = SL_WIFI_CLIENT_5GHZ_INTERFACE;
-  } else if (profile.config.channel.band == SL_WIFI_BAND_DUAL) {
-    client_interface = SL_WIFI_CLIENT_DUAL_INTERFACE;
+  // Configure the client interface from the band set at Wi-Fi init (profile channel.band is not supported)
+  switch (sli_wifi_get_band()) {
+    case SL_WIFI_BAND_MODE_5GHZ:
+      client_interface = SL_WIFI_CLIENT_5GHZ_INTERFACE;
+      break;
+    case SL_WIFI_DUAL_BAND_MODE:
+      client_interface = SL_WIFI_CLIENT_DUAL_INTERFACE;
+      break;
+    case SL_WIFI_BAND_MODE_2_4GHZ:
+    default:
+      client_interface = SL_WIFI_CLIENT_2_4GHZ_INTERFACE;
+      break;
   }
 
   // Connect to the Wi-Fi network
@@ -225,13 +230,18 @@ sl_status_t sl_net_wifi_ap_up(sl_net_interface_t interface, sl_net_profile_id_t 
   status = sl_net_set_profile(interface, profile_id, &profile);
   VERIFY_STATUS_AND_RETURN(status);
 
-  // Configure the ap_interface based on the band
-  if (profile.config.channel.band == SL_WIFI_BAND_2_4GHZ || profile.config.channel.band == SL_WIFI_AUTO_BAND) {
-    ap_interface = SL_WIFI_AP_2_4GHZ_INTERFACE;
-  } else if (profile.config.channel.band == SL_WIFI_BAND_5GHZ) {
-    ap_interface = SL_WIFI_AP_5GHZ_INTERFACE;
-  } else if (profile.config.channel.band == SL_WIFI_BAND_DUAL) {
-    ap_interface = SL_WIFI_AP_DUAL_INTERFACE;
+  // Configure the AP interface from the band set at Wi-Fi init (profile channel.band is not supported)
+  switch (sli_wifi_get_band()) {
+    case SL_WIFI_BAND_MODE_5GHZ:
+      ap_interface = SL_WIFI_AP_5GHZ_INTERFACE;
+      break;
+    case SL_WIFI_DUAL_BAND_MODE:
+      ap_interface = SL_WIFI_AP_DUAL_INTERFACE;
+      break;
+    case SL_WIFI_BAND_MODE_2_4GHZ:
+    default:
+      ap_interface = SL_WIFI_AP_2_4GHZ_INTERFACE;
+      break;
   }
   // Map the AP Interface with band
   if (interface == SL_NET_WIFI_AP_1_INTERFACE) {

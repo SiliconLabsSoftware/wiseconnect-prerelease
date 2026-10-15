@@ -502,6 +502,7 @@ typedef enum {
   SLI_WIFI_REQ_SET_SNI_EMBEDDED          = 0x6E,
   SLI_WIFI_REQ_EFUSE_READ                = 0x73,
   SLI_WIFI_REQ_SELECT_REQUEST            = 0x74,
+  SLI_WIFI_REQ_SOCKET_BYTES_AVAILABLE    = 0x75, ///< Query bytes available to read on a socket
   SLI_WIFI_REQ_WEBPAGE_CLEAR_ALL         = 0x7F,
   SLI_WIFI_REQ_RADIO                     = 0x81,
   SLI_WIFI_REQ_DISCOVER_SERVICE          = 0x8F,
@@ -650,6 +651,7 @@ typedef enum {
   SLI_WIFI_RSP_SET_SNI_EMBEDDED          = 0x6E,
   SLI_WIFI_RSP_EFUSE_READ                = 0x73,
   SLI_WIFI_RSP_SELECT_REQUEST            = 0x74,
+  SLI_WIFI_RSP_SOCKET_BYTES_AVAILABLE    = 0x75, ///< Bytes available to read on a socket
   SLI_WIFI_RSP_TX_TEST_MODE              = 0x7C,
   SLI_WIFI_RSP_WEBPAGE_CLEAR_ALL         = 0x7F,
   SLI_WIFI_RSP_RADIO                     = 0x81,

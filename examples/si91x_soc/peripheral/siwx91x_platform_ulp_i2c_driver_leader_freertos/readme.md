@@ -123,11 +123,17 @@ Ensure **RTE_Device_917.h** (under **$project/config/**) matches your pinmux for
 
 ## Test the Application
 
-> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+> **Note:** Use **`log_compact_decoder.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
 >
-> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+> `python log_compact_decoder.py --m4-out m4_firmware.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 10`
 >
-> Replace **COM5** with the serial port your board uses on the host PC.
+> Replace **COM4** with the serial port your board uses on the host PC.
+>
+> These flags are optional. Omit them to keep the defaults:
+>
+> - `--baud` — default `115200`. Use `921600` when NWP logging is enabled on UART.
+> - `--event-width` — default `56`. Longer EVENT names are clipped with `...`; the full text stays in MESSAGE.
+> - `--log-file` — also write the decoded lines to this path, as plain text.
 
 
 1. Flash the **follower** application with **OWN_I2C_ADDR** matching **FOLLOWER_I2C_ADDR** and behavior compatible with a **write (1024 B)** followed by **read (1024 B)** (echo or fixed pattern).

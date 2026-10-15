@@ -104,13 +104,12 @@ static const psa_ecc_family_t asymmetric_key_curve[] = { PSA_ECC_FAMILY_SECP_R1,
 static uint8_t secpr1_key_size_select;
 
 static const char *secpr1_key_size_string[] = {
-  "SECP192R1",
   "SECP256R1",
   "SECP384R1",
   "SECP521R1",
 };
 
-static const size_t secpr1_key_size[] = { 192, 256, 384, 521 };
+static const size_t secpr1_key_size[] = { 256, 384, 521 };
 
 /// ECC Montgomery key size selection
 static uint8_t montgomery_key_size_select;
@@ -194,7 +193,7 @@ void app_process_action(void)
   printf("\n\rCurrent ECC curve is %s.\n", asymmetric_key_curve_string[asymmetric_key_curve_select]);
 
   if (asymmetric_key_curve_select == 0) {
-    secpr1_key_size_select = 1;
+    secpr1_key_size_select = 0;
     selected_key_size      = secpr1_key_size[secpr1_key_size_select];
     selected_key_string    = secpr1_key_size_string[secpr1_key_size_select];
     printf("  + Current %s key length is %d-bit (%s).\n",

@@ -45,9 +45,7 @@ component:
 - id: mbedtls_ecdhe_key_exchange
 - id: mbedtls_sha256
 - id: mbedtls_sha512
-- id: mbedtls_hkdf
 - id: mbedtls_source
-- id: mbedtls_oid
 - id: mbedtls_rsa
 - id: mbedtls_cipher_cbc
 - id: mbedtls_ecdsa

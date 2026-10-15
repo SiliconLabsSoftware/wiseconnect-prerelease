@@ -3,7 +3,7 @@
  * @brief Top level application functions
  *******************************************************************************
  * # License
- * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * The licensor of this software is Silicon Laboratories Inc. Your use of this
@@ -24,7 +24,7 @@
 void app_init(void);
 
 /***************************************************************************/ /**
- * App process.
+ * App ticking function.
  ******************************************************************************/
 void app_process_action(void);
 

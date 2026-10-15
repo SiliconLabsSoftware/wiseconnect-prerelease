@@ -44,8 +44,25 @@ extern const sl_wifi_ap_configuration_t default_wifi_ap_configuration;
 
 /** \addtogroup WIFI_COMMON_API Common
  * 
- *  @note To manage the Wi-Fi interface lifecycle correctly, it's important to use functions like sl_wifi_init(), sl_wifi_connect(), sl_wifi_disconnect(), and sl_wifi_deinit() as intended.
- *        Improper sequencing or combining sl_wifi_* and sl_net_* API functions without following the recommended order may lead to unpredictable or undefined behavior.
+ *  @note When using the Wi-Fi (non–network-manager) model, manage the interface lifecycle with
+ *        sl_wifi_init(), sl_wifi_connect(), sl_wifi_disconnect(), and sl_wifi_deinit() as intended.
+ *        Improper sequencing or combining sl_wifi_* and sl_net_* API functions without following
+ *        the recommended order may lead to unpredictable or undefined behavior.
+ *  @note Choosing an initialization model (SiWx91x):
+ *        - Prefer sl_wifi_init() (typically with sl_wifi_default_event_handler) for BLE-centric or
+ *          WLAN+BLE applications that only need wireless/NWP bring-up and do not use the network
+ *          manager lifecycle (typical BLE and many WLAN+BLE examples). Custom event handlers are
+ *          allowed when required by the application.
+ *        - Prefer the sl_net_* lifecycle (sl_net_init(), sl_net_up(), sl_net_down(), sl_net_deinit())
+ *          for WLAN station/AP applications that use network profiles, credentials, and IP bring-up
+ *          (typical Wi-Fi networking examples). When using sl_net_init() on a Wi-Fi interface, do not
+ *          also call sl_wifi_init() in the same bring-up path.
+ *        - Do not call sl_net_init(), sl_net_up(), sl_net_down(), or sl_net_deinit() after an
+ *          application-called sl_wifi_init() outside the sl_net_* lifecycle. Pick one initialization
+ *          model for the whole lifecycle; tear down with sl_wifi_deinit() instead.
+ *        - Tear down with the matching API only (sl_wifi_deinit() vs sl_net_deinit()).
+ *        - WiSeConnect examples under different categories are not interchangeable templates for
+ *          initialization; copy the lifecycle model that matches the application type.
  *
  * \ingroup SL_WIFI_FUNCTIONS
  * @{ */
@@ -1180,8 +1197,9 @@ sl_status_t sl_wifi_wait_for_scan_results(sl_wifi_scan_result_t **scan_result_ar
 
 /** \addtogroup WIFI_CLIENT_API Client
  * 
- * @note To manage the Wi-Fi interface lifecycle correctly, it's important to use functions like sl_wifi_init(), sl_wifi_connect(), sl_wifi_disconnect(), and sl_wifi_deinit() as intended.
- *       Improper sequencing or combining sl_wifi_* and sl_net_* API functions without following the recommended order may lead to unpredictable or undefined behavior.
+ * @note For Wi-Fi / network-manager lifecycle and initialization-model guidance
+ *       (sl_wifi_* vs sl_net_*), see @ref WIFI_COMMON_API. Use matching init and
+ *       teardown APIs; do not mix models in the same bring-up path.
  *
  * \ingroup SL_WIFI_FUNCTIONS
  * @{ */
@@ -1463,10 +1481,10 @@ sl_status_t sl_wifi_set_advanced_client_configuration(sl_wifi_interface_t interf
  *
  * @note For BSS_MAX_IDLE_PERIOD: can be called after opermode set and before association.
  * @note Configuration is applied during the next association/reconnection.
- * @note After sl_net_set_application_profile() has been applied successfully,
+ * @note After sl_net_set_application_profile_config() has been applied successfully,
  *       @ref SL_WIFI_CHANNEL_ACTIVE_SCAN_TIMEOUT and @ref SL_WIFI_CHANNEL_PASSIVE_SCAN_TIMEOUT
  *       return @c SL_STATUS_OK without changing the profile-managed values (@a timeout_value is
- *       ignored). Use sl_net_set_application_profile() to change those scan timeouts.
+ *       ignored). Use sl_net_set_application_profile_config() to change those scan timeouts.
  ******************************************************************************/
 sl_status_t sl_wifi_configure_timeout(sl_wifi_interface_t interface,
                                       sl_wifi_timeout_type_t timeout_type,
@@ -1751,6 +1769,11 @@ sl_status_t sl_wifi_configure_multicast_filter(sl_wifi_multicast_filter_info_t *
 /** @} */
 
 /** \addtogroup WIFI_AP_API Access Point
+  *
+  * @note For Wi-Fi / network-manager lifecycle and initialization-model guidance
+  *       (sl_wifi_* vs sl_net_*), see @ref WIFI_COMMON_API. Use matching init and
+  *       teardown APIs; do not mix models in the same bring-up path.
+  *
   * \ingroup SL_WIFI_FUNCTIONS
   * @{ */
 // Access point functions

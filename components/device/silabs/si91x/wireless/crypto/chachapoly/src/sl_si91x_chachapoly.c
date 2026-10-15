@@ -38,6 +38,7 @@
 #if defined(SLI_MULTITHREAD_DEVICE_SI91X)
 #include "sl_si91x_crypto_thread.h"
 #endif
+#include <stddef.h>
 #include <string.h>
 
 #ifndef SL_SI91X_SIDE_BAND_CRYPTO
@@ -49,10 +50,9 @@ static sl_status_t sli_si91x_chachapoly_pending(sl_si91x_chachapoly_config_t *co
   sl_status_t status              = SL_STATUS_FAIL;
   sl_wifi_buffer_t *buffer        = NULL;
   sl_wifi_system_packet_t *packet = NULL;
-  sli_si91x_chachapoly_request_t *request =
-    (sli_si91x_chachapoly_request_t *)malloc(sizeof(sli_si91x_chachapoly_request_t));
-
-  SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
+  // Header only — msg is a FAM sent as a second fragment (avoids ~1.2KB staging buffer)
+  uint32_t header_length = sizeof(sli_si91x_chachapoly_request_t);
+  sli_si91x_chachapoly_request_t *request;
 
   // Only 32 bytes M4 OTA built-in key support is present
   if (config->key_config.b0.key_type == SL_SI91X_BUILT_IN_KEY) {
@@ -78,7 +78,10 @@ static sl_status_t sli_si91x_chachapoly_pending(sl_si91x_chachapoly_config_t *co
   }
 #endif
 
-  memset(request, 0, sizeof(sli_si91x_chachapoly_request_t));
+  request = (sli_si91x_chachapoly_request_t *)malloc(sizeof(*request));
+  SL_VERIFY_POINTER_OR_RETURN(request, SL_STATUS_ALLOCATION_FAILED);
+
+  memset(request, 0, header_length);
 
   request->algorithm_type       = CHACHAPOLY;
   request->algorithm_sub_type   = config->chachapoly_mode;
@@ -90,7 +93,6 @@ static sl_status_t sli_si91x_chachapoly_pending(sl_si91x_chachapoly_config_t *co
   request->header_length        = config->ad_length;
 
   memcpy(request->header_input, config->ad, config->ad_length);
-  memcpy(request->msg, config->msg, chunk_length);
 
 #if defined(SLI_SI917B0)
   request->key_info.key_type                         = config->key_config.b0.key_type;
@@ -121,17 +123,13 @@ static sl_status_t sli_si91x_chachapoly_pending(sl_si91x_chachapoly_config_t *co
 
 #endif
 
-  status = sli_wifi_send_command(
-    SLI_COMMON_REQ_ENCRYPT_CRYPTO,
-    SLI_WIFI_COMMON_CMD,
-    request,
-    (sizeof(sli_si91x_chachapoly_request_t) - SL_SI91X_MAX_DATA_SIZE_IN_BYTES_FOR_CHACHAPOLY + chunk_length),
-    SLI_WIFI_WAIT_FOR_RESPONSE(SLI_COMMON_RSP_ENCRYPT_CRYPTO_WAIT_TIME),
-    NULL,
-    (void **)&buffer);
+  status = sli_si91x_crypto_send_command(request, header_length, config->msg, chunk_length, (void **)&buffer);
 
-  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
-    sli_buffer_manager_free_buffer(buffer);
+  if (status != SL_STATUS_OK) {
+    free(request);
+    if (buffer != NULL) {
+      sli_buffer_manager_free_buffer(buffer);
+    }
   }
   VERIFY_STATUS_AND_RETURN(status);
 

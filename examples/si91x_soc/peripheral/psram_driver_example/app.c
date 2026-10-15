@@ -1,6 +1,6 @@
 /*******************************************************************************
- * @file  main.c
- * @brief
+ * @file  app.c
+ * @brief PSRAM driver example
  *******************************************************************************
  * # License
  * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
@@ -17,26 +17,18 @@
 
 /**===========================================================================
  * @brief : This file contains application code for demonstrating PSRAM Driver
- * usage. 
+ * usage.
  * @section Description :
- * The example writes and reads data to and from PSRAM using auto mode, 
+ * The example writes and reads data to and from PSRAM using auto mode,
  * manual blocking mode and DMA mode.
 ============================================================================**/
 
-//  ! INCLUDES
-
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
-#include "clock_update.h"
-#include "rsi_debug.h"
-#include "rsi_rom_clks.h"
+#include "app.h"
 #include "sl_log.h"
 #include "sl_si91x_psram_handle.h"
-#if defined(SL_SI91X_BOARD_INIT)
-#include "rsi_board.h"
-#endif // SL_SI91X_BOARD_INIT
 
 /* Private macro -------------------------------------------------------------*/
 #define READ_WRITE_LENGTH       256
@@ -65,23 +57,11 @@ const uint8_t testBuf[READ_WRITE_LENGTH] = {
   0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69
 };
 
-int main()
+void app_init(void)
 {
   sl_psram_return_type_t status = 0;
+  uint8_t status_flag           = 0;
 
-  uint8_t status_flag = 0;
-
-  SystemCoreClockUpdate();
-
-  /* Enable the DEBUG UART port for debug prints and Set up and initialize all required
-    blocks and functions related to the board hardware. */
-#if defined(SL_SI91X_BOARD_INIT)
-  RSI_Board_Init();
-#endif // SL_SI91X_BOARD_INIT
-
-  sl_log_init_stage1();
-  (void)sl_log_init_stage2();
-  /* Initialize debug UART */
   SL_PRINT_STRING_ERROR("\r\nPSRAM driver example started\r\n");
 
   /* Note: All status messages in this example — both success and failure — are
@@ -93,7 +73,7 @@ int main()
 
   status = sl_si91x_psram_uninit();
   status = sl_si91x_psram_init();
-  UNUSED_PARAMETER(status);
+  (void)status;
   /* Write and read in Auto mode ---------------------------------------------*/
 
   /// Auto Write to PSRAM base address
@@ -191,6 +171,10 @@ int main()
   SL_PRINT_STRING_ERROR("\r\n***************************************************"
                         "**********\r\n\n\n");
 
-  while (1)
-    ;
+  while (1) {
+  }
+}
+
+void app_process_action(void)
+{
 }

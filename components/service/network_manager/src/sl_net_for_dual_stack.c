@@ -705,11 +705,11 @@ static void sli_sta_link_down_on_tcpip(void *arg)
   SL_DEBUG_LOG_V2(DEBUG, "DHCP Link down\r\n");
   dhcp_stop(netif);
 #endif /* LWIP_IPV4 && LWIP_DHCP */
-#if SL_LWIP_ADAPTIVE_TIMERS
-  netif_stop_timers(netif);
-#endif
   netif_set_link_down(netif);
   netif_set_down(netif);
+#if SL_LWIP_LINK_DOWN_CLEANUP
+  netif_stop_timers(netif);
+#endif
 }
 
 static void set_sta_link_down(void)

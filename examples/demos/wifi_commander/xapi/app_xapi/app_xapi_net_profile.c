@@ -186,9 +186,7 @@ void app_wifi_cmd_net_profile_set_ap_channel(app_wifi_cmd_net_profile_set_ap_cha
   sl_net_wifi_ap_profile_t *default_ap_profile  = get_default_ap_profile();
   sl_wifi_ap_configuration_t *default_ap_config = (sl_wifi_ap_configuration_t *)&default_ap_profile->config;
 
-  default_ap_config->channel.channel   = cmd_input->channel;
-  default_ap_config->channel.band      = cmd_input->band;
-  default_ap_config->channel.bandwidth = cmd_input->bandwidth;
+  default_ap_config->channel.channel = cmd_input->channel;
 
   app_wifi_rsp_net_profile_set_ap_channel(SL_STATUS_OK);
   return;
@@ -205,9 +203,7 @@ void app_wifi_cmd_net_profile_set_client_channel(app_wifi_cmd_net_profile_set_cl
   sl_wifi_client_configuration_t *default_client_config =
     (sl_wifi_client_configuration_t *)&default_client_profile->config;
 
-  default_client_config->channel.channel   = cmd_input->channel;
-  default_client_config->channel.band      = cmd_input->band;
-  default_client_config->channel.bandwidth = cmd_input->bandwidth;
+  default_client_config->channel.channel = cmd_input->channel;
 
   app_wifi_rsp_net_profile_set_client_channel(SL_STATUS_OK);
   return;
@@ -398,10 +394,8 @@ void app_wifi_cmd_net_profile_get_ap_channel(const void *nil)
   sl_net_wifi_ap_profile_t *default_ap_profile  = get_default_ap_profile();
   sl_wifi_ap_configuration_t *default_ap_config = (sl_wifi_ap_configuration_t *)&default_ap_profile->config;
 
-  app_wifi_rsp_net_profile_get_ap_channel(SL_STATUS_OK,
-                                          default_ap_config->channel.channel,
-                                          default_ap_config->channel.band,
-                                          default_ap_config->channel.bandwidth);
+  /* channel.band / channel.bandwidth are not supported in profiles. */
+  app_wifi_rsp_net_profile_get_ap_channel(SL_STATUS_OK, default_ap_config->channel.channel, 0, 0);
   return;
 }
 
@@ -412,10 +406,8 @@ void app_wifi_cmd_net_profile_get_client_channel(const void *nil)
   sl_wifi_client_configuration_t *default_client_config =
     (sl_wifi_client_configuration_t *)&default_client_profile->config;
 
-  app_wifi_rsp_net_profile_get_client_channel(SL_STATUS_OK,
-                                              default_client_config->channel.channel,
-                                              default_client_config->channel.band,
-                                              default_client_config->channel.bandwidth);
+  /* channel.band / channel.bandwidth are not supported in profiles. */
+  app_wifi_rsp_net_profile_get_client_channel(SL_STATUS_OK, default_client_config->channel.channel, 0, 0);
   return;
 }
 
