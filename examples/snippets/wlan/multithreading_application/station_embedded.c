@@ -124,7 +124,7 @@ sl_mqtt_client_last_will_message_t last_will_message = {
 //static void application_start(void *argument);
 void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message, void *context);
 void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void *event_data, void *context);
-void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_info_t *error);
+void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error);
 void mqtt_client_cleanup(void);
 void print_char_buffer(char *buffer, uint32_t buffer_length);
 sl_status_t mqtt_example(void);
@@ -170,45 +170,32 @@ void print_char_buffer(char *buffer, uint32_t buffer_length)
   SL_DEBUG_LOG_V2(INFO, "\r\n");
 }
 
-void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_info_t *error)
+void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)
 {
   UNUSED_PARAMETER(client);
 
-  if (error == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "MQTT Error: event data is NULL\r\n");
-    return;
-  }
-
-  switch (error->error_status) {
+  switch (*error) {
     case SL_MQTT_CLIENT_RECEIVE_FAILED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed with status: 0x%lx\r\n", error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.\r\n");
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE:
       SL_DEBUG_LOG_V2(ERROR,
                       "MQTT Error: Received payload exceeds max size (%u bytes). "
-                      "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE. Failed with status: 0x%lx",
-                      SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE,
-                      error->status_code);
+                      "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE.",
+                      SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE);
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_MEMORY_ALLOCATION_FAILED:
-      SL_DEBUG_LOG_V2(ERROR,
-                      "MQTT Error: Failed to allocate memory for message reassembly with status: 0x%lx",
-                      error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Failed to allocate memory for message reassembly.");
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED:
-      SL_DEBUG_LOG_V2(ERROR,
-                      "MQTT Error: Data corruption detected during message reassembly with status: 0x%lx",
-                      error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Data corruption detected during message reassembly.");
       break;
 
     default:
-      SL_DEBUG_LOG_V2(ERROR,
-                      "Terminating program due to error: %d, status: 0x%lx\r\n",
-                      error->error_status,
-                      error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "Terminating program, Error: %d", *error);
       mqtt_client_cleanup();
       break;
   }
@@ -278,7 +265,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     }
 
     case SL_MQTT_CLIENT_ERROR_EVENT: {
-      mqtt_client_error_event_handler(client, (sl_mqtt_client_error_info_t *)event_data);
+      mqtt_client_error_event_handler(client, (sl_mqtt_client_error_status_t *)event_data);
       break;
     }
     default:

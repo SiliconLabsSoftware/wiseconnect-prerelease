@@ -168,7 +168,7 @@ sl_mqtt_client_last_will_message_t last_will_message = {
 
 void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message, void *context);
 void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void *event_data, void *context);
-void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_info_t *error);
+void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error);
 void mqtt_client_cleanup();
 void print_char_buffer(char *buffer, uint32_t buffer_length);
 sl_status_t mqtt_example();
@@ -536,12 +536,8 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
   SL_DEBUG_LOG_V2(INFO, "\r\n");
   print_char_buffer((char *)message->content, message->content_length);
   SL_DEBUG_LOG_V2(INFO, "\r\n");
-  uint32_t copy_len = message->content_length;
-  if (copy_len >= sizeof(msg)) {
-    copy_len = sizeof(msg) - 1;
-  }
-  memcpy(msg, message->content, copy_len);
-  msg[copy_len] = '\0';
+  strncpy(msg, (char *)message->content, message->content_length);
+  msg[message->content_length] = '\0';
   GLIB_clear(&glibContext);
   GLIB_drawBitmap(&glibContext,
                   SILABS_LOGO_POSITION_X,
@@ -569,7 +565,7 @@ void mqtt_client_message_handler(void *client, sl_mqtt_client_message_t *message
   GLIB_drawStringOnLine(&glibContext, TOPIC_TO_BE_SUBSCRIBED, currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
   GLIB_drawStringOnLine(&glibContext, "", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
   GLIB_drawStringOnLine(&glibContext, "Message:", currentLine++, GLIB_ALIGN_LEFT, 5, 5, true);
-  GLIB_drawStringOnLine(&glibContext, msg, currentLine, GLIB_ALIGN_LEFT, 5, 5, true);
+  GLIB_drawStringOnLine(&glibContext, (char *)message->content, currentLine, GLIB_ALIGN_LEFT, 5, 5, true);
   DMD_updateDisplay();
 }
 
@@ -582,45 +578,32 @@ void print_char_buffer(char *buffer, uint32_t buffer_length)
   }
 }
 
-void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_info_t *error)
+void mqtt_client_error_event_handler(void *client, sl_mqtt_client_error_status_t *error)
 {
   UNUSED_PARAMETER(client);
 
-  if (error == NULL) {
-    SL_DEBUG_LOG_V2(ERROR, "MQTT Error: event data is NULL\r\n");
-    return;
-  }
-
-  switch (error->error_status) {
+  switch (*error) {
     case SL_MQTT_CLIENT_RECEIVE_FAILED:
-      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed with status: 0x%lx\r\n", error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Message receive failed.\r\n");
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_PAYLOAD_TOO_LARGE:
       SL_DEBUG_LOG_V2(ERROR,
                       "MQTT Error: Received payload exceeds max size (%u bytes). "
-                      "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE. Failed with status: 0x%lx",
-                      SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE,
-                      error->status_code);
+                      "Increase SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE.",
+                      SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE);
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_MEMORY_ALLOCATION_FAILED:
-      SL_DEBUG_LOG_V2(ERROR,
-                      "MQTT Error: Failed to allocate memory for message reassembly with status: 0x%lx",
-                      error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Failed to allocate memory for message reassembly.");
       break;
 
     case SL_MQTT_CLIENT_RECEIVE_DATA_CORRUPTED:
-      SL_DEBUG_LOG_V2(ERROR,
-                      "MQTT Error: Data corruption detected during message reassembly with status: 0x%lx",
-                      error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "MQTT Error: Data corruption detected during message reassembly.");
       break;
 
     default:
-      SL_DEBUG_LOG_V2(ERROR,
-                      "Terminating program due to error: %d, status: 0x%lx\r\n",
-                      error->error_status,
-                      error->status_code);
+      SL_DEBUG_LOG_V2(ERROR, "Terminating program, Error: %d", *error);
       mqtt_client_cleanup();
       break;
   }
@@ -721,7 +704,7 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     }
 
     case SL_MQTT_CLIENT_ERROR_EVENT: {
-      mqtt_client_error_event_handler(client, (sl_mqtt_client_error_info_t *)event_data);
+      mqtt_client_error_event_handler(client, (sl_mqtt_client_error_status_t *)event_data);
       break;
     }
     default:
