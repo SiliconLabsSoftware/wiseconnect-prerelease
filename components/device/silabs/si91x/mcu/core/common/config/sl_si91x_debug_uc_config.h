@@ -54,6 +54,8 @@
 //   <SL_M4_UART1_INSTANCE=> UART1
 //   <SL_ULP_UART_INSTANCE=> ULP UART
 // <i> Default: ULP UART
+// <i> Note: Debug UC conflicts with IO Stream. If IO Stream is installed, uninstall
+// <i> it to use this instance selection, or configure the UART instance in IO Stream UC.
 #define SL_DEBUG_INSTANCE SL_ULP_UART_INSTANCE
 
 // <o SL_DEBUG_BAUD_RATE> Baud Rate (Baud/Second) <300-7372800>

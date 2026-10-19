@@ -579,8 +579,10 @@ SECTIONS
  ASSERT((__data_end__ % 4) == 0, "Data section must be word-multiple (Clang copy table)")
 {%- elif data_segment_in_psram %}
  _sidata = LOADADDR(.data);
+ {%- if flash_present %}
  __rom_start  = 0x{{ '%0x' % app_flash_start }};
  __rom_length = 0x{{ '%0x' % app_flash_size }};
+ {%- endif %}
 {%- endif %}
 
 {%- if flash_present and not text_segment_in_psram %}

@@ -211,7 +211,7 @@ rsi_error_t RSI_RTC_SetAlarmDateTime(RTC_Type *Cal, const RTC_TIME_CONFIG_T *ala
 
 /*==============================================*/
 /**
- * @fn				void RSI_RTC_AlamEnable(RTC_Type *Cal , boolean_t val)
+ * @fn				void RSI_RTC_AlarmEnable(RTC_Type *Cal , boolean_t val)
  * @brief   		This API is used to Enable alarm in RTC
  * @param[in] 		Cal : pointer to the rtc register instance
  * @param[in] 		val    : to enable or disable the alarm
@@ -221,10 +221,29 @@ rsi_error_t RSI_RTC_SetAlarmDateTime(RTC_Type *Cal, const RTC_TIME_CONFIG_T *ala
  * @return  		none
  */
 
-void RSI_RTC_AlamEnable(RTC_Type *Cal, boolean_t val)
+void RSI_RTC_AlarmEnable(RTC_Type *Cal, boolean_t val)
 {
   Cal->MCU_CAL_ALARM_PROG_2_b.ALARM_EN = (unsigned int)(val & 0x01);
   return;
+}
+
+/*==============================================*/
+/**
+ * @fn				void RSI_RTC_AlamEnable(RTC_Type *Cal , boolean_t val)
+ * @brief   		This API is used to Enable alarm in RTC
+ * @deprecated      This API is deprecated. Use \ref RSI_RTC_AlarmEnable() instead.
+ * @param[in] 		Cal : pointer to the rtc register instance
+ * @param[in] 		val    : to enable or disable the alarm
+ *           				- 0 : Disable the alarm
+ *            			- 1 : Enable the alarm
+ *
+ * @return  		none
+ * @note            Retained for backward compatibility.
+ */
+
+void RSI_RTC_AlamEnable(RTC_Type *Cal, boolean_t val)
+{
+  RSI_RTC_AlarmEnable(Cal, val);
 }
 
 /*==============================================*/

@@ -41,6 +41,9 @@
 #ifdef SL_CATALOG_SI91X_IOSTREAM_PRINTS_PRESENT
 #include "sl_si91x_iostream_log_config.h"
 #endif
+#if defined(SL_CATALOG_IOSTREAM_SI91X_PRESENT) || SL_SI91X_IOSTREAM_LOG_PRINTS_ENABLE
+#include "sl_iostream.h"
+#endif
 #if defined SL_UART
 #include "sl_uart.h"
 #endif
@@ -116,20 +119,21 @@ int _write(int file, const char *ptr, int len)
     osMutexAcquire(si91x_prints_mutex, osWaitForever);
   }
 #endif
-  for (int todo = 0; todo < len; todo++) {
 #ifdef DEBUG_SERIAL
+  for (int todo = 0; todo < len; todo++) {
     Serial_send(*ptr++);
-
-#else
-#if SL_SI91X_IOSTREAM_LOG_PRINTS_ENABLE
-    sl_iostream_write(SL_IOSTREAM_STDOUT, ptr, (size_t)len);
-#elif DEBUG_UART
-    Board_UARTPutChar(*ptr++);
-#else
-    (void)ptr;
-#endif
-#endif
   }
+#elif defined(SL_CATALOG_IOSTREAM_SI91X_PRESENT) || SL_SI91X_IOSTREAM_LOG_PRINTS_ENABLE
+  /* Route printf through IO Stream console (SL_USART_MODULE instance). */
+  (void)sl_iostream_write(SL_IOSTREAM_STDOUT, ptr, (size_t)len);
+#elif DEBUG_UART
+  for (int todo = 0; todo < len; todo++) {
+    Board_UARTPutChar(*ptr++);
+  }
+#else
+  (void)ptr;
+  (void)len;
+#endif
 #ifdef SL_CATALOG_KERNEL_PRESENT
   if (osKernelGetState() == osKernelRunning) {
     osMutexRelease(si91x_prints_mutex);

@@ -115,7 +115,9 @@ void RSI_RTC_Stop(RTC_Type *Cal);
 rsi_error_t RSI_RTC_SetDateTime(RTC_Type *Cal, const RTC_TIME_CONFIG_T *date);
 rsi_error_t RSI_RTC_GetDateTime(const RTC_Type *Cal, RTC_TIME_CONFIG_T *date);
 rsi_error_t RSI_RTC_SetAlarmDateTime(RTC_Type *Cal, const RTC_TIME_CONFIG_T *alarm);
-void RSI_RTC_AlamEnable(RTC_Type *Cal, boolean_t val);
+void RSI_RTC_AlarmEnable(RTC_Type *Cal, boolean_t val);
+/* Deprecated spelling retained for backward compatibility; use RSI_RTC_AlarmEnable(). */
+void RSI_RTC_AlamEnable(RTC_Type *Cal, boolean_t val) SL_DEPRECATED_API_WISECONNECT_4_2;
 rsi_error_t RSI_RTC_GetAlarmDateTime(const RTC_Type *Cal, RTC_TIME_CONFIG_T *alarm);
 void RSI_RTC_SetDayOfWeek(RTC_Type *Cal, RTC_DAY_OF_WEEK_T dayInWeek);
 void RSI_RTC_IntrUnMask(uint32_t intr);

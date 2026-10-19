@@ -5,6 +5,12 @@ description: >
   This component enables read/write operations using a variety of physical
   communication interfaces, or Streams. It provides standardized data transfer
   operations while abstracting the underlying interface for SiWx91x.
+  Configure the console UART instance in IO Stream UC: ULP UART (VCOM), USART0,
+  or UART1. Install the matching USART/UART/ULP_UART component for the selected
+  instance.
+
+  Note: Mutually exclusive with Debug UC (si91x_debug_uc). Use the IO Stream
+  UART instance dropdown instead of Debug UC when this component is installed.
 category: Device|Si91x|MCU|Service
 quality: production
 metadata:
@@ -53,5 +59,7 @@ provides:
 requires:
   - name: sl_usart_iostream
   - name: syscalls
+conflicts:
+  - name: si91x_debug_uc
 documentation:
   url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-services/iostream

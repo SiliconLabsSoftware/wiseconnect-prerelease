@@ -294,7 +294,7 @@ void initialize_m4_alarm(void)
   /*Set the RTC configuration*/
   RSI_RTC_SetDateTime(RTC, &rtc_configuration);
   /*Enable Alarm feature*/
-  RSI_RTC_AlamEnable(RTC, ENABLE);
+  RSI_RTC_AlarmEnable(RTC, ENABLE);
 
   /*Initialization of RTC CALIBRATION*/
   RSI_RTC_CalibInitilization();

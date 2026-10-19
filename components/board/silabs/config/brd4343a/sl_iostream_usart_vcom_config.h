@@ -75,20 +75,22 @@
 // <i> Default: SL_USART_FLOW_CONTROL_NONE
 #define SL_IOSTREAM_USART_VCOM_FLOW_CONTROL_TYPE SL_USART_FLOW_CONTROL_NONE
 
-// <q SL_SI91X_VCOM_ENABLE> VCOM enable
-// <i> Default: 1
-#define SL_SI91X_VCOM_ENABLE 1
-
 #define USART0_MODULE 0
 #define UART1_MODULE  1
 #ifndef ULP_UART_MODULE
 #define ULP_UART_MODULE 2
 #endif
-#if SL_SI91X_VCOM_ENABLE
+
+// <o SL_USART_MODULE> IO Stream UART instance
+//   <ULP_UART_MODULE=> ULP UART (VCOM)
+//   <USART0_MODULE=> USART0
+//   <UART1_MODULE=> UART1
+// <i> Select the UART instance used by the IO Stream console.
+// <i> ULP UART (VCOM): Board VCOM over USB (default).
+// <i> USART0 / UART1: Install the matching USART/UART component and configure TX/RX pins.
+// <i> Do not install Debug UC with IO Stream; the components conflict. Use this dropdown for instance selection.
+// <i> Default: ULP UART (VCOM)
 #define SL_USART_MODULE ULP_UART_MODULE
-#else
-#define SL_USART_MODULE USART0_MODULE
-#endif
 
 // <o SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE> Receive buffer size
 // <i> Default: 32
@@ -132,5 +134,13 @@
 #endif
 // [ULP_UART_SL_SI91X_IOSTREAM]$
 // <<< sl:end pin_tool >>>
+
+#if (SL_USART_MODULE == USART0_MODULE) && !defined(USART_MODULE)
+#warning \
+  "Configuration Error: USART component is required when IO Stream UART instance is USART0. Please ensure USART is installed."
+#elif (SL_USART_MODULE == UART1_MODULE) && !defined(UART_MODULE)
+#warning \
+  "Configuration Error: UART component is required when IO Stream UART instance is UART1. Please ensure UART1 is installed."
+#endif
 
 #endif

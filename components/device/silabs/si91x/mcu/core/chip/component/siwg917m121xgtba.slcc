@@ -111,6 +111,8 @@ template_contribution:
   value: 12
 tag:
 - device:opn:siwg917m121xgtba
+- device:ram:320k
+- device:psram:2048k
 toolchain_settings:
 - option: device_opn
   value: siwg917m121xgtba

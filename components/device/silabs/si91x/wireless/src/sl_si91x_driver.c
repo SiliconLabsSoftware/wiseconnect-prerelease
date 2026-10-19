@@ -390,12 +390,12 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
     // [0] SLI_BUFFER_MANAGER_CE_CMD_TX_POOL: Command Engine TX command buffers.
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 5,
+      .block_count = SLI_BUFFER_MANAGER_CE_CMD_TX_POOL_BLOCK_COUNT,
     },
     // [1] SLI_BUFFER_MANAGER_DATA_TX_POOL: Host TX data payload buffers (socket, transceiver, raw TX).
     {
       .block_size  = SLI_WIFI_BUFFER_BLOCK_SIZE,
-      .block_count = 5,
+      .block_count = SLI_BUFFER_MANAGER_DATA_TX_POOL_BLOCK_COUNT,
     },
     // [2] SLI_BUFFER_MANAGER_CE_METADATA_POOL: Command Engine packet metadata (sli_command_engine_metadata_t).
     {
@@ -412,17 +412,17 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
       .block_size = SLI_WIFI_BUFFER_BLOCK_SIZE,
 #ifndef SL_NCP_UART_INTERFACE
       // SPI (NCP) and AHB (SOC): HAL thread posts and reads one RX frame at a time.
-      .block_count = 5,
+      .block_count = SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL_BLOCK_COUNT,
 #else
       // NCP UART: the UART ISR/callback enqueues each frame and allocates the next RX
       // buffer before the HAL thread drains the queue; a larger pool avoids drops.
-      .block_count = 10,
+      .block_count = SLI_BUFFER_MANAGER_HAL_CMD_DATA_RX_POOL_UART_BLOCK_COUNT,
 #endif
     },
     // [5] SLI_BUFFER_MANAGER_QUEUE_NODE_POOL: Queue manager node buffers (sli_queue_node_t).
     {
       .block_size  = sizeof(sli_queue_node_t),
-      .block_count = 20,
+      .block_count = SLI_BUFFER_MANAGER_QUEUE_NODE_POOL_BLOCK_COUNT,
     },
   };
 
@@ -435,7 +435,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
 
   // Common pool: shared fallback for HYBRID allocations (same block size as CE TX pool, 4 blocks).
   config_buffer.common_pool_info.block_size  = default_buffer_configuration[0].block_size;
-  config_buffer.common_pool_info.block_count = 4;
+  config_buffer.common_pool_info.block_count = SLI_BUFFER_MANAGER_COMMON_POOL_BLOCK_COUNT;
 
   // Initialize the buffer manager
   status = sli_buffer_manager_init(&config_buffer);

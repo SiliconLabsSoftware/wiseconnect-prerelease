@@ -54,6 +54,7 @@ provides:
 - name: device_has_mpu
 - name: device_is_module
 - name: device_supports_external_psram
+- name: device_has_4096kb_flash
 requires:
 - name: sl_si91x_agents_md
 - name: rsilib_chip
@@ -134,6 +135,8 @@ template_contribution:
   value: 12
 tag:
 - device:opn:siwg917y110lgnba
+- device:flash:4096k
+- device:ram:320k
 toolchain_settings:
 - option: device_opn
   value: siwg917y110lgnba

@@ -571,7 +571,7 @@ sl_status_t sl_si91x_calendar_register_alarm_trigger_callback(calendar_callback_
     }
     // The function pointer is feeded to the static variable which is called in the IRQ handler
     alarm_callback = callback;
-    RSI_RTC_AlamEnable(RTC, true);
+    RSI_RTC_AlarmEnable(RTC, true);
     RSI_RTC_IntrUnMask(RTC_ALARM_INTR);
     NVIC_EnableIRQ(SLI_NVIC_ALARM);
     // When the trigger is enabled, the bit 16 is 0, so the comparision is to validate whether the
@@ -652,7 +652,7 @@ sl_status_t sl_si91x_calendar_unregister_alarm_trigger_callback(void)
   // one cannot register the callback if it is not none
   sl_status_t status;
   RSI_RTC_IntrMask(RTC_ALARM_INTR);
-  RSI_RTC_AlamEnable(RTC, false);
+  RSI_RTC_AlarmEnable(RTC, false);
   alarm_callback = NULL;
   // When the trigger is enabled, the bit 16 is 1, so the comparision is to validate whether the
   // trigger is disabled or not and return the error code accordingly

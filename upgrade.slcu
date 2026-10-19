@@ -192,6 +192,21 @@ upgrade:
           - id: iostream_retarget_stdio
             package: simplicity_sdk
             vendor: silabs
+      - trigger: si91x_log_backend_uart
+        description: >
+        status: automatic
+        remove:
+          - si91x_log_backend_uart
+        add:
+          - id: si91x_log_iostream_formatted
+            package: wiseconnect3_sdk
+            vendor: silabs
+          - id: iostream_rtt_si91x
+            package: wiseconnect3_sdk
+            vendor: silabs
+          - id: event_handler
+            package: simplicity_sdk
+            vendor: silabs
       - trigger: sl_si91x_littlefs_common_flash
         description: >
           Restore wireless components for common-flash LittleFS.

@@ -58,6 +58,7 @@ provides:
 - name: device_supports_psram
 - name: device_has_mpu
 - name: device_is_module
+- name: device_has_8192kb_flash
 requires:
 - name: sl_si91x_agents_md
 - name: rsilib_chip
@@ -153,6 +154,9 @@ template_contribution:
   value: 12
 tag:
 - device:opn:siwg917y121mgnba
+- device:flash:8192k
+- device:ram:320k
+- device:psram:2048k
 toolchain_settings:
 - option: device_opn
   value: siwg917y121mgnba

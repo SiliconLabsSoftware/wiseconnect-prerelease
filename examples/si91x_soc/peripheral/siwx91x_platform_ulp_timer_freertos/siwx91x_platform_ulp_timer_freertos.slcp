@@ -79,6 +79,15 @@ template_contribution:
 - name: user_files_ps2
   priority: 0
   value: sl_event_handler.*
+- name: user_files_ps2
+  priority: 0
+  value: sl_si91x_driver_gpio.*
+- name: user_files_ps2
+  priority: 0
+  value: sl_si91x_peripheral_gpio.*
+- name: user_files_ps2
+  priority: 0
+  value: sl_si91x_led_instances.*
 ui_hints:
   highlight:
   - path: readme.md

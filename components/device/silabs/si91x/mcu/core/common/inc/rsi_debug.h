@@ -66,6 +66,8 @@ void Board_UARTPutChar(uint8_t ch);
 void dummy_printf(const char *fmt, ...) SL_DEPRECATED_API_WISECONNECT_4_1;
 
 // Define debug macros based on configuration
+// IO Stream and Debug UC conflict. When IO Stream is present, console init is
+// owned by iostream (SL_USART_MODULE dropdown); do not call Board_Debug_Init.
 #if defined(IOSTREAM_USART) || SL_SI91X_IOSTREAM_LOG_PRINTS_ENABLE
 // SI91X IOStream prints configuration
 #if SL_SI91X_IOSTREAM_LOG_PRINTS_ENABLE
@@ -78,7 +80,7 @@ void dummy_printf(const char *fmt, ...) SL_DEPRECATED_API_WISECONNECT_4_1;
 #define DEBUGIN()
 
 #elif defined(DEBUG_UART)
-// Debug over UART configuration
+// Debug over UART configuration (Debug UC / DEBUG_UART without IO Stream)
 #define DEBUGINIT()   Board_Debug_Init()
 #define DEBUGOUT(...) printf(__VA_ARGS__)
 #define DEBUGSTR(str) Board_UARTPutSTR(str)

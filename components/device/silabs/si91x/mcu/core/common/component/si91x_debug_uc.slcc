@@ -4,7 +4,17 @@ metadata:
   sbom:
     license: MIT
 description: >
-  "Enables application-level print functionality on the SiWx91x platform. Allows configuration of the UART instance and sets the baud rate for debug output (only the baud rate is configured here, not in the chosen component). The same driver component must be installed for any selected UART/USART instance. Only TX/RX pin mapping is configurable within the component configuration. The selected UART/USART instance is dedicated for debug output and should not be used for other communication purposes."
+  Enables application-level print functionality on the SiWx91x platform. Allows
+  configuration of the UART instance (USART0, UART1, or ULP UART) and baud rate
+  for debug output (only the baud rate is configured here; pin mapping is in the
+  chosen UART/USART component). The same driver component must be installed for
+  the selected UART/USART instance. The selected instance is dedicated for debug
+  output and should not be used for other communication.
+
+  Note: Mutually exclusive with IO Stream (iostream_si91x). Board projects that
+  include IO Stream own the console UART via the IO Stream instance dropdown.
+  Uninstall IO Stream to use Debug UC instance selection, or keep IO Stream and
+  configure the instance there.
 label: Debug UC
 category: Device|Si91x|MCU|Common
 quality: production
@@ -15,6 +25,8 @@ provides:
   - name: si91x_debug_uc
 define:
   - name: DEBUG_UART_UC
+conflicts:
+  - name: iostream_si91x
 
 documentation:
   url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-preprocessor-build-settings/list-of-preprocessor-build-settings

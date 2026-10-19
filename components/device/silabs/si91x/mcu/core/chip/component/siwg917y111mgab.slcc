@@ -54,6 +54,7 @@ provides:
 - name: device_is_module
 - name: device_has_antenna
 - name: device_supports_external_psram
+- name: device_has_8192kb_flash
 requires:
 - name: sl_si91x_agents_md
 - name: rsilib_chip
@@ -133,6 +134,8 @@ template_contribution:
   value: 12
 tag:
 - device:opn:siwg917y111mgab
+- device:flash:8192k
+- device:ram:320k
 toolchain_settings:
 - option: device_opn
   value: siwg917y111mgab

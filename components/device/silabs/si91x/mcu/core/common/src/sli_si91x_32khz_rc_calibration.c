@@ -189,7 +189,7 @@ sl_status_t sli_si91x_calibration_initialization(void)
   sli_si91x_set_periodic_alarm(sli_si91x_get_calib_next_event_time_handler(DISABLE));
 
   // Enable alarm in RTC.
-  RSI_RTC_AlamEnable(RTC, true);
+  RSI_RTC_AlarmEnable(RTC, true);
   // Unmask the alarm interrupt.
   RSI_RTC_IntrUnMask(RTC_ALARM_INTR);
   // Enable the alarm IRQ.
