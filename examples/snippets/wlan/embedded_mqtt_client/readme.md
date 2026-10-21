@@ -25,7 +25,7 @@ In this application, SiWx91x is configured as a Wi-Fi station and connects to an
 
 The SDK supports receiving large incoming MQTT payloads through fragmentation and reassembly:
 
-- **Transparent to Application**: The SDK automatically handles the reassembly of fragmented MQTT messages. Applications receive complete messages in their message handler callback without any special handling required.
+- **Transparent to Application**: The SDK automatically reassembles fragmented MQTT messages, so applications receive complete messages in their handler callbacks without requiring any special handling.
 
 **Configuration:**
 

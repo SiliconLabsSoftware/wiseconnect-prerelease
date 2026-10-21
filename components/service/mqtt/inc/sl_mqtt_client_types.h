@@ -44,12 +44,12 @@
  * @brief Maximum allowed MQTT RX payload size for large message reassembly.
  * @note This defines the maximum payload size that the SDK will accept for reassembly.
  *       - Default: 8192 bytes (8 KB)
- *       - Users can override this value by defining SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE
- *         in their application or project configuration before including MQTT headers.
- *       - Set to 0 to disable large payload reassembly (fragmented messages will be discarded,
- *         but small messages that fit in a single chunk will still be received normally).
- *       - Memory is allocated dynamically (malloc) only when receiving large messages,
- *         and freed immediately after the message is delivered to the application.
+ *       - You override this value by defining SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE
+ *         in your application or project configuration before including MQTT headers.
+ *       - Set to 0 to disable large payload reassembly. Fragmented messages will be discarded,
+ *         but small messages that fit within a single chunk will still be received normally.
+ *       - Memory is allocated dynamically (using malloc) only when large messages are received
+ *          and is freed immediately after the message is delivered to the application.
  */
 #ifndef SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE
 #define SL_MQTT_CLIENT_MAX_RX_PAYLOAD_SIZE 8192

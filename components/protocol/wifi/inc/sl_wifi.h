@@ -1669,8 +1669,8 @@ sl_status_t sl_wifi_get_ap_client_count(sl_wifi_interface_t interface, uint32_t 
  * @note
  *   For POWER_SAVE_PROFILE with DEEP_SLEEP_WITHOUT_RAM_RETENTION, call [sl_net_deinit](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-deinit) before calling [sl_net_init](../wiseconnect-api-reference-guide-nwk-mgmt/net-interface-functions#sl-net-init).
  * @note
- *   To configure listen_interval in [sl_wifi_performance_profile_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-performance-profile-t), the SL_WIFI_JOIN_FEAT_PS_CMD_LISTEN_INTERVAL_VALID
- *   flag must be set using @ref sl_wifi_set_join_configuration() before connecting to the AP. Without this flag, the listen_interval value is ignored.
+ *   To configure listen_interval in [sl_wifi_performance_profile_t](../wiseconnect-api-reference-guide-si91x-driver/sl-wifi-performance-profile-t), set the SL_WIFI_JOIN_FEAT_PS_CMD_LISTEN_INTERVAL_VALID
+ *   flag using @ref sl_wifi_set_join_configuration() before connecting to the AP. Without this flag, the listen_interval value is ignored.
  * @note
  *   The listen interval configured through sl_wifi_set_performance_profile() must not be greater than the listen interval set using @ref sl_wifi_set_listen_interval_v2().
  *   The default listen interval configured in the WiSeConnect SDK is 1000 ms, which is the listen interval used when associating with the AP unless @ref sl_wifi_set_listen_interval_v2() sets a different value.
@@ -1702,7 +1702,7 @@ sl_status_t sl_wifi_set_performance_profile(const sl_wifi_performance_profile_t 
  *   flag must be set using @ref sl_wifi_set_join_configuration() before connecting to the AP. Without this flag, the listen_interval value is ignored.
  * @note
  *   The listen interval configured through sl_wifi_set_performance_profile_v2() must not be greater than the listen interval set using @ref sl_wifi_set_listen_interval_v2().
- *   The default listen interval configured in the WiSeConnect SDK is 1000 ms, which is the listen interval used when associating with the AP unless @ref sl_wifi_set_listen_interval_v2() sets a different value.
+ *   The default listen interval configured in the WiSeConnect SDK is 1000 ms. This interval is used when associating with the AP unless a different value is set by  @ref sl_wifi_set_listen_interval_v2(). 
  * @note
  *   For more details about connected and non-connected mode, see https://www.silabs.com/documents/public/application-notes/an1430-siwx917-soc-low-power.pdf.
  ******************************************************************************/

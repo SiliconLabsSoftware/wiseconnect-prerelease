@@ -52,36 +52,39 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Code Classifier Usage
 
-This application demonstrates the **Code Classifier** for PSRAM-based memory management: with **TEXT segment in PSRAM** and **DATA segment in PSRAM** installed, those components set the default layout (typically text and initialized data in PSRAM), while the classifier adds **selective** overrides (e.g. specific functions or data in internal RAM, BSS in PSRAM using **`SL_CODE_CLASS_FORCE_PSRAM`**, or DMA/time-critical sections as needed).
+This application demonstrates the **Code Classifier** for PSRAM-based memory management. When **TEXT segment in PSRAM** and **DATA segment in PSRAM** are installed, they define the default layout (typically text and initialized data in PSRAM). The classifier adds **selective** overrides (such as,  placing specific functions or data in internal RAM, placing the BSS segment in PSRAM using **`SL_CODE_CLASS_FORCE_PSRAM`**, or assigning DMA/time-critical sections as needed).
 
-The following classifier categories are available for use (for **reference** to help users categorize variables accordingly). **`SL_CODE_CLASS_FORCE_RAM`**, **`SL_CODE_CLASS_DMA_ACCESSIBLE`**, and **`SL_CODE_CLASS_TIME_CRITICAL`** all target **RAM** in today's link scripts; they differ by intent (performance, DMA, latency) so code stays self-documenting and linker scripts could later split alignment or regions without changing the macro API.
+The following classifier categories are available for use (for **reference** to help users categorize variables accordingly). The macros **`SL_CODE_CLASS_FORCE_RAM`**, **`SL_CODE_CLASS_DMA_ACCESSIBLE`**, and **`SL_CODE_CLASS_TIME_CRITICAL`** all currently target **RAM** in link scripts. They differ by intent (performance, DMA, or latency), which keeps code self-documenting and allows future linker script updates (such as splitting alignment or memory regions) without requiring changes to the macro API.
 
 - `SL_CODE_CLASS_FORCE_PSRAM`: Variables in external **PSRAM** for bulk storage.
 - `SL_CODE_CLASS_FORCE_RAM`: Frequently accessed variables in **internal RAM** (performance intent).
-- `SL_CODE_CLASS_DMA_ACCESSIBLE`: **DMA-accessible** placement (DMA-safe intent; same RAM class today).
-- `SL_CODE_CLASS_TIME_CRITICAL`: **Time-sensitive** access (latency intent; same RAM class today).
+- `SL_CODE_CLASS_DMA_ACCESSIBLE`: **DMA-accessible** placement (DMA-safe intent; currently the same RAM class).
+- `SL_CODE_CLASS_TIME_CRITICAL`: **Time-sensitive** access (latency intent; currently the same RAM class).
 
-### **Installing the Code Classifier Component**
+### Installing the Code Classifier Component
+
 To use this feature, the **Code Classifier Component** must be installed from the **Software Component Selection** in Simplicity Studio. 
 
 ## Memory Placement
 
-To optimize performance, memory placement is categorized as follows. In source, the macro's first argument is the **segment** name (`text`, `data`, ...); that expands to linker **section** names `<segment>_<component>_<class>` (e.g. `text_app_api_timecritical`), which the linker groups by prefix (`text_*`, `data_*`, ...). Use segment **`text`** for code and **`data`** for initialized data; the linker maps the resulting sections per your project's scripts.
+To optimize performance, memory placement is categorized as follows. In source code, the macro’s first argument is the segment name (`text`, `data`, and so on). This argument expands to linker section names in the form `<segment>_<component>_<class>` (for example, `text_app_api_timecritical`), which the linker groups by prefix (`text_*`, `data_*`, and so on). Use the text segment for code and data for initialized data. The linker then maps the resulting sections according to your project’s linker scripts.
 
-### **1. Text and Data to SRAM**
+### 1. Text and Data to SRAM
+
 - **All text and initialized data is placed in PSRAM** by default (when the corresponding PSRAM segment components are used).
 - The **Code Classifier** can be used to selectively move specific elements to RAM if required for performance optimization.
 - Section name prefixes from the macro relate to the PSRAM segment components as follows:
   - `text_*` → Used for **code** when the **TEXT segment in PSRAM** software component is installed.
   - `data_*` → Used for **initialized data** when the **DATA segment in PSRAM** software component is installed.
 
-### **2. BSS to PSRAM**
+### 2. BSS to PSRAM
+
 - The **default BSS section is placed in RAM** to ensure optimal execution.
 - If needed, **specific BSS variables can be placed in PSRAM** using the **Code Classifier**.
 - Use the following **prefix** for classification:
   - `bss_` → Used for **uninitialized data** to allocate the same to PSRAM if required.
 
-### **3. Customizing Memory Placement**
+### 3. Customizing Memory Placement
 
 Variables and functions can be explicitly placed into the desired memory regions using the **Code Classifier** macro `SL_SI91X_CODE_CLASSIFY`.
 

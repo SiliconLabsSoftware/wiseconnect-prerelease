@@ -2717,7 +2717,7 @@ Changes between V4.0.3 and V4.0.4 released June 22, 2006
 	+ Included the latest uIP version (1.0) in the demo/common/ethernet
 	  directory.
 
-Changes between V4.0.2 and V4.0.3 released June 7, 2006
+Changes between V4.0.3 and V4.0.3 released June 7, 2006
 
 	+ Added a port and demo application for the Cortex-M3 target using the IAR
 	  development tools.
@@ -2732,7 +2732,7 @@ Changes between V4.0.2 and V4.0.3 released June 7, 2006
 	  around (inconsistent to the description in the file).  This has been
 	  corrected.
 
-Changes between V4.0.1 and V4.0.2 released May 28, 2006
+Changes between V4.0.1 and V4.0.3 released May 28, 2006
 
 	+ Port and demo application added for the Tern Ethernet Engine controller.
 	+ Port and demo application added for MC9S12 using GCC, thanks to
