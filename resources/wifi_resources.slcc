@@ -56,3 +56,5 @@ config_file:
   file_id: aws_iot_config
   condition: ["aws_sdk"]
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

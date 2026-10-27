@@ -15,7 +15,8 @@ include:
   - path: app.h
   - path: empty_cpp_freertos.h
 component:
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
 - id: sl_main
 - id: status
 - id: syscalls

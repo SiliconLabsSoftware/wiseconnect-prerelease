@@ -1,6 +1,8 @@
-project_name: platform_siwx91x_i2c_driver_follower_freertos
+project_name: siwx91x_platform_i2c_driver_follower_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates how to use the I2C interface in a FreeRTOS environment on the SiWx91x SoC device utilizing blocking APIs.
+description: 'This example project demonstrates blocking I2C follower transfers on the SiWx91x SoC
+
+  under FreeRTOS. Data received from a leader is sent back and compared.
 
   '
 category: example|peripheral

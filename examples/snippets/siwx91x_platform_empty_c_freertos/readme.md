@@ -33,7 +33,7 @@ The project demonstrates an empty configuration that includes the essential init
 
 **FreeRTOS application structure**
 
-- The `.slcp` includes **`freertos_heap_4`**. **`app_init()`** calls **`empty_c_freertos_init()`** (declared in **`empty_c_freertos.h`**), which only **creates** the **`empty_c`** thread. **`app_process_action()`** does nothing; work is intended to live in RTOS tasks you add.
+- The `.slcp` includes **`freertos_heap_3`**. **`app_init()`** calls **`empty_c_freertos_init()`** (declared in **`empty_c_freertos.h`**), which only **creates** the **`empty_c`** thread. **`app_process_action()`** does nothing; work is intended to live in RTOS tasks you add.
 - **`empty_c_freertos.c`**: **`empty_c_freertos_init()`** registers **`empty_c_task`** via **`osThreadNew`** and **`osThreadAttr_t`** (thread name **`empty_c`**, stack **1024**, **`osPriorityLow1`**). The task loops forever with **`osDelay(1000)`**. **`osDelay`** counts **kernel ticks** (with a 1 kHz tick rate, **1000** ticks is typically about one second).
 
 ## Prerequisites/Setup Requirements

@@ -1,8 +1,8 @@
-# SiWx91x Platform PWM FreeRTOS
+# SiWx91x Platform - PWM FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform PWM FreeRTOS](#platform-siwx91x-pwm-freertos)
+- [SiWx91x Platform - PWM FreeRTOS](#platform-siwx91x-pwm-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

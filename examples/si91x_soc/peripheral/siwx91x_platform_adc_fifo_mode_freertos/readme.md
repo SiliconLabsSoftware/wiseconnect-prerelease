@@ -1,8 +1,8 @@
-# SiWx91x Platform ADC FIFO Mode FreeRTOS
+# SiWx91x Platform - ADC FIFO Mode FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform ADC FIFO Mode FreeRTOS](#platform-siwx91x-adc-fifo-mode-freertos)
+- [SiWx91x Platform - ADC FIFO Mode FreeRTOS](#platform-siwx91x-adc-fifo-mode-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

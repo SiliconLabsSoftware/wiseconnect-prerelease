@@ -38,6 +38,7 @@
 #include "sl_utility.h"
 #include "sl_constants.h"
 #include "sl_net_wifi_types.h"
+#include <stdio.h>
 #include <string.h>
 #include "cacert.pem.h"
 
@@ -195,6 +196,7 @@ void message_arrived(MessageData *md)
   memcpy(payload_log, md->message->payload, payload_len);
   payload_log[payload_len] = '\0';
   printf("Message: %s\r\n", payload_log);
+  fflush(stdout);
   halt = 1;
 }
 
@@ -396,7 +398,7 @@ int paho_mqtt_over_websocket_demo()
       app_status = status;
       return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
     } else {
-      SL_DEBUG_LOG_V2(DEBUG, "Receive Data Success\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Receive Data Success\r\n");
     }
   }
   return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);

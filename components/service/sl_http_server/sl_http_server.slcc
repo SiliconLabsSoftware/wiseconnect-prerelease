@@ -25,3 +25,5 @@ requires:
 - name: bsd_socket
 - name: sl_si91x_asynchronous_socket
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-http/

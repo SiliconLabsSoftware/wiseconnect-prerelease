@@ -1,8 +1,8 @@
-# SiWx91x Platform USART Asynchronous FreeRTOS
+# SiWx91x Platform - USART Asynchronous FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform USART Asynchronous FreeRTOS](#platform-siwx91x-usart-asynchronous-freertos)
+- [SiWx91x Platform - USART Asynchronous FreeRTOS](#platform-siwx91x-usart-asynchronous-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

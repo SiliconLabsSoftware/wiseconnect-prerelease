@@ -122,3 +122,6 @@ template_contribution:
           - "string"
           - "string"
           - "string"
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-nwk-mgmt/

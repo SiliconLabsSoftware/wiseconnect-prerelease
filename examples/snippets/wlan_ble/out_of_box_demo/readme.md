@@ -2,7 +2,7 @@
 
 ## High-Level Overview
 
-SiWG917 out-of-box demo: showcase WLAN, BLE, MCU peripherals, and NWP power save with minimal setup on the SiWG917 SoC and PSRAM boards.
+SiWG917 out-of-box demo: showcase WLAN, BLE, MCU peripherals, and NWP power save with minimal setup on the SiWG917 SoC boards.
 
 This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.
 
@@ -30,7 +30,7 @@ This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (ne
 
 ## Purpose/Scope
 
-The demo works with both the Wireless pro kit (WPK) and the SiWG917 dev kit. If the pro kit is used, the demo displays its status on the TFT-LCD display of the WPK baseboard. 
+The demo works with both the Wireless Pro Kit (WPK) and the SiWG917 dev kit. If the pro kit is used, the demo displays its status on the TFT-LCD display of the WPK baseboard. 
 The SiWG917 dev kit does not have an onboard display. All device activities for the pro and dev kits can be observed on the serial terminal prints. 
 
 SiWG917 establishes WLAN connectivity via BLE provisioning. SiWG917 then proceeds to ping [www.silabs.com](https://www.silabs.com) for 5 times, after which MQTT connectivity with a remote mosquitto broker [test.mosquitto.org](http://test.mosquitto.org) is established.
@@ -50,7 +50,7 @@ When BTN0 is pressed on the WPK baseboard or development kit, SiWG917 publishes 
 - A Wireless Access point with internet connectivity
 - **SoC Mode**:
   - Standalone
-    - BRD4002B Wireless pro kit mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
+    - BRD4002B Wireless Pro Kit Mainboard [SI-MB4002B](https://www.silabs.com/development-tools/wireless/wireless-pro-kit-mainboard?tab=overview)
     - Radio Boards
       - BRD4338A [SiWx917-RB4338A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-rb4338a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)
       - BRD4342A [SiWx917-RB4342A](https://www.silabs.com/development-tools/wireless/wi-fi/siwx91x-rb4342a-wifi-6-bluetooth-le-soc-radio-board?tab=overview)

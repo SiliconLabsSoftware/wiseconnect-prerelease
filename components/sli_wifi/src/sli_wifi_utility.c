@@ -616,7 +616,7 @@ void sli_handle_wifi_beacon(sl_wifi_system_packet_t *packet)
   sli_scan_info_t scan_info         = { 0 };
   uint16_t ies_length               = 0;
 
-  scan_info.rssi    = (~packet->desc[10]);
+  scan_info.rssi    = (uint8_t)(-(int8_t)packet->desc[10]);
   scan_info.channel = packet->desc[11];
 
   // Check for ESS bit and TBSS status bit in capability info

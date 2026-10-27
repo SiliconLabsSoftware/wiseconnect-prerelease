@@ -1,6 +1,8 @@
 project_name: siwx91x_platform_sysrtc_freertos
 package: platform_siwx91x_app
-description: 'Sysrtc example running under FreeRTOS on the SiWx91x SoC.
+description: 'This example project demonstrates the system RTC on the SiWx91x SoC under FreeRTOS,
+
+  handling compare, capture, and overflow events from a task.
 
   '
 category: example|peripheral

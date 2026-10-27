@@ -645,7 +645,7 @@ static sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
   SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
   uint8_t *bssid = NULL;
 
-  printf("%lu scan results:\r\n", scan_result->scan_count);
+  printf("%" PRIu32 " scan results:\r\n", scan_result->scan_count);
   if (scan_result->scan_count) {
     printf("   %s %24s %s", "SSID", "SECURITY", "NETWORK");
   }
@@ -754,7 +754,7 @@ sl_status_t wifi_get_signal_strength_command_handler(console_args_t *arguments)
   status = sl_wifi_get_signal_strength(interface, &signal_strength);
   VERIFY_STATUS_AND_RETURN(status);
 
-  printf("%ld", signal_strength);
+  printf("%" PRId32, signal_strength);
   return status;
 }
 
@@ -834,12 +834,12 @@ sl_status_t join_callback_handler(sl_wifi_event_t event,
 {
   UNUSED_PARAMETER(arg);
   if (SL_WIFI_CHECK_IF_EVENT_FAILED(event)) {
-    printf("F: Join Event received with %lu bytes payload\r\n", result_length);
+    printf("F: Join Event received with %" PRIu32 " bytes payload\r\n", result_length);
     callback_status = status_code;
     return status_code;
   }
 
-  printf("%c: Join Event received with %lu bytes payload\r\n", *result, result_length);
+  printf("%c: Join Event received with %" PRIu32 " bytes payload\r\n", *result, result_length);
 
   callback_status = SL_STATUS_OK;
   return SL_STATUS_OK;
@@ -986,13 +986,13 @@ sl_status_t wifi_get_statistics_command_handler(console_args_t *arguments)
   status = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &wifi_stats);
   VERIFY_STATUS_AND_RETURN(status);
 
-  printf("beacon_lost_count: %lu\r\n", wifi_stats.beacon_lost_count);
-  printf("beacon_rx_count: %lu\r\n", wifi_stats.beacon_rx_count);
-  printf("mcast_rx_count: %lu\r\n", wifi_stats.mcast_rx_count);
-  printf("mcast_tx_count: %lu\r\n", wifi_stats.mcast_tx_count);
-  printf("overrun_count: %lu\r\n", wifi_stats.overrun_count);
-  printf("ucast_rx_count: %lu\r\n", wifi_stats.ucast_rx_count);
-  printf("ucast_tx_count: %lu", wifi_stats.ucast_tx_count);
+  printf("beacon_lost_count: %" PRIu32 "\r\n", wifi_stats.beacon_lost_count);
+  printf("beacon_rx_count: %" PRIu32 "\r\n", wifi_stats.beacon_rx_count);
+  printf("mcast_rx_count: %" PRIu32 "\r\n", wifi_stats.mcast_rx_count);
+  printf("mcast_tx_count: %" PRIu32 "\r\n", wifi_stats.mcast_tx_count);
+  printf("overrun_count: %" PRIu32 "\r\n", wifi_stats.overrun_count);
+  printf("ucast_rx_count: %" PRIu32 "\r\n", wifi_stats.ucast_rx_count);
+  printf("ucast_tx_count: %" PRIu32, wifi_stats.ucast_tx_count);
   return status;
 }
 
@@ -1467,7 +1467,7 @@ sl_status_t wifi_get_ap_client_count_command_handler(console_args_t *arguments)
   status = sl_wifi_get_ap_client_count(interface, &client_list_count);
 
   if (status == SL_STATUS_OK) {
-    printf("Client count = %lu\r\n", client_list_count);
+    printf("Client count = %" PRIu32 "\r\n", client_list_count);
   }
 
   return status;
@@ -1548,7 +1548,7 @@ sl_status_t sl_wifi_get_advanced_scan_configuration_command_handler(console_args
            advanced_scan_configuration.active_channel_time,
            advanced_scan_configuration.passive_channel_time,
            (int)advanced_scan_configuration.trigger_level);
-    printf(" trigger level change: %lu enable multi probe: %d",
+    printf(" trigger level change: %" PRIu32 " enable multi probe: %d",
            advanced_scan_configuration.trigger_level_change,
            advanced_scan_configuration.enable_multi_probe);
   }
@@ -1581,7 +1581,7 @@ sl_status_t wifi_get_ap_configuration_command_handler(console_args_t *arguments)
          configuration.rate_protocol,
          configuration.options);
   printf("credential_id: "
-         "%luclient idle timeout: %lu",
+         "%" PRIu32 "client idle timeout: %" PRIu32,
          configuration.credential_id,
          configuration.client_idle_timeout);
   printf("dtim beacon count: %dmaximum client: %d", configuration.dtim_beacon_count, configuration.maximum_clients);

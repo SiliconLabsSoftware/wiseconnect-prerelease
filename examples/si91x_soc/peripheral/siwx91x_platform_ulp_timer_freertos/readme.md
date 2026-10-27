@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP Timer FreeRTOS
+# SiWx91x Platform - ULP Timer FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP Timer FreeRTOS](#siwx91x-platform-ulp-timer-freertos)
+- [SiWx91x Platform - ULP Timer FreeRTOS](#siwx91x-platform-ulp-timer-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

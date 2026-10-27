@@ -1,8 +1,8 @@
-# SiWx91x Platform Joystick FreeRTOS
+# SiWx91x Platform - Joystick FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform Joystick FreeRTOS](#siwx91x-platform-joystick-freertos)
+- [SiWx91x Platform - Joystick FreeRTOS](#siwx91x-platform-joystick-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

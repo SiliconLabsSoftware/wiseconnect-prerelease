@@ -34,12 +34,8 @@
 #include "sli_si91x_crypto_driver_functions.h"
 #include "psa/crypto.h"
 #include "sl_si91x_crypto.h"
+#include "sl_si91x_constants.h"
 #include "sl_status.h"
-
-#define SLI_SI91X_AEAD_NONCE_MAX_SIZE 16U
-#define SLI_SI91X_AEAD_AD_MAX_SIZE    128U
-#define SLI_SI91X_AEAD_TAG_MAX_SIZE   16U
-#define SLI_SI91X_CCM_TAG_MIN_SIZE    4U
 
 /** Driver multipart AEAD context (Si91x CCM).
  *  Populated progressively by encrypt_setup / set_nonce / set_lengths / update_ad.

@@ -1,8 +1,8 @@
-# SiWx91x Platform Simple Button FreeRTOS
+# SiWx91x Platform - Simple Button FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform Simple Button FreeRTOS](#platform-siwx91x-simple-button-freertos)
+- [SiWx91x Platform - Simple Button FreeRTOS](#platform-siwx91x-simple-button-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [About Example Code](#about-example-code)

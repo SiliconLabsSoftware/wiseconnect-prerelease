@@ -91,13 +91,6 @@ sl_status_t m4_powersave_command_handler(void)
 #if SL_SI91X_MCU_ALARM_BASED_WAKEUP
   initialize_m4_alarm();
 #endif
-
-#if (defined(SLI_SI91X_MCU_INTERFACE) && (SL_SI91X_TICKLESS_MODE == 0))
-  SL_DEBUG_LOG_V2(INFO, "M4 in sleep\r\n");
-  sl_si91x_power_manager_sleep();
-  SL_DEBUG_LOG_V2(INFO, "M4 wake up\r\n");
-#endif
-
   return SL_STATUS_OK;
 }
 
@@ -392,16 +385,6 @@ sl_status_t power_manager_get_current_state_handler(console_args_t *arguments)
 sl_status_t set_power_manager_sleep_handler(console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
-
-#if (defined(SLI_SI91X_MCU_INTERFACE) && (SL_SI91X_TICKLESS_MODE == 0))
-  // Call the sleep function.
-  sl_status_t status = sli_si91x_power_manager_sleep();
-  if (status != SL_STATUS_OK) {
-    // If status is not OK, display the error info.
-    SL_DEBUG_LOG_V2(ERROR, "sl_si91x_power_manager_sleep failed, Error Code: 0x%lX\r\n", status);
-    return status;
-  }
-#else
   osSemaphoreId_t wait_semaphore;
   wait_semaphore = osSemaphoreNew(1, 0, NULL);
   if (wait_semaphore == NULL) {
@@ -413,7 +396,6 @@ sl_status_t set_power_manager_sleep_handler(console_args_t *arguments)
   // Waiting for time_ms using semaphore to put M4 to sleep in tick less mode
   osSemaphoreAcquire(wait_semaphore, time_ms);
   SL_DEBUG_LOG_V2(INFO, "M4 wake up\r\n");
-#endif
   PRINT_AT_CMD_SUCCESS;
   return SL_STATUS_OK;
 }

@@ -1,6 +1,8 @@
 project_name: siwx91x_platform_ulp_adc_freertos
 package: platform_siwx91x_app
-description: 'ULP ADC example running under FreeRTOS on the SiWx91x SoC.
+description: 'This example project demonstrates the ultra-low-power ADC on the SiWx91x SoC under
+
+  FreeRTOS, sampling in FIFO or static mode across PS4 and PS2.
 
   '
 category: example|peripheral

@@ -1,8 +1,8 @@
-# SiWx91x Platform PSRAM Blinky FreeRTOS
+# SiWx91x Platform - PSRAM Blinky FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform PSRAM Blinky FreeRTOS](#siwx91x-platform-psram-blinky-freertos)
+- [SiWx91x Platform - PSRAM Blinky FreeRTOS](#siwx91x-platform-psram-blinky-freertos)
   - [Purpose/Scope](#purposescope)
   - [FreeRTOS Architecture](#freertos-architecture)
   - [Prerequisites/Setup Requirements](#prerequisitessetup-requirements)

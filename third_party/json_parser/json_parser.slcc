@@ -23,3 +23,6 @@ include:
 - path: include
   file_list:
     - path: jsmn.h
+
+documentation:
+  url: https://github.com/zserge/jsmn

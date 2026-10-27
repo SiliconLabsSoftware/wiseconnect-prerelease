@@ -1,6 +1,10 @@
-project_name: platform_siwx91x_uart_freertos
+project_name: siwx91x_platform_uart_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates the usage of UART transmit and receive in full duplex mode within a FreeRTOS environment on the SiWx91x SoC device.
+description: 'This example project demonstrates asynchronous full-duplex UART on the SiWx91x SoC
+
+  under FreeRTOS, sending data to a serial terminal and checking the looped-back
+
+  response.
 
   '
 category: example|peripheral

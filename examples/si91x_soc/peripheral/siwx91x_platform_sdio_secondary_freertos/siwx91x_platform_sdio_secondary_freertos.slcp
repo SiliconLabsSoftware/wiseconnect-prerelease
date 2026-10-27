@@ -1,6 +1,8 @@
-project_name: platform_siwx91x_sdio_secondary_freertos
+project_name: siwx91x_platform_sdio_secondary_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and usage of the SDIO Secondary interface on the SiWx917 SoC, showcasing its ability to transfer data between host and device using the SDIO protocol with semaphore-based synchronization.
+description: 'This example project demonstrates the SDIO secondary interface on the SiWx91x SoC
+
+  under FreeRTOS, reading and writing data for a host such as a Raspberry Pi.
 
   '
 category: example|peripheral

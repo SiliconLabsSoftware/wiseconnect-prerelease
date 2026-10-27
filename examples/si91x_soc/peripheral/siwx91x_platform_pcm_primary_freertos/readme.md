@@ -1,8 +1,8 @@
-# SiWx91x Platform PCM Primary FreeRTOS
+# SiWx91x Platform - PCM Primary FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform PCM Primary FreeRTOS](#siwx91x-platform-pcm-primary-freertos)
+- [SiWx91x Platform - PCM Primary FreeRTOS](#siwx91x-platform-pcm-primary-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

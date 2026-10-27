@@ -136,3 +136,6 @@ define:
 toolchain_settings:
   - option: llvm_compiler_option
     value: -Wno-format -Wno-varargs    
+
+documentation:
+  url: https://github.com/aws/aws-iot-device-sdk-embedded-C

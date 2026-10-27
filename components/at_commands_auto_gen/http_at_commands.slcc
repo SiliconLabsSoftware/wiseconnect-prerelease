@@ -110,3 +110,6 @@ template_contribution:
           - "uint32"  # request-id
           - "uint8"   # flush
           - "uint32"  # chunk-size
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-http

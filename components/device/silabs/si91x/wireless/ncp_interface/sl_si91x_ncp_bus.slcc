@@ -16,3 +16,6 @@ requires:
 - name: sl_si91x_host_control
 source:
 - path: sl_si91x_ncp_driver.c
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-ext-host-interface/

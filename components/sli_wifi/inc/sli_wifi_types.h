@@ -356,7 +356,7 @@ typedef struct sli_scan_info_s {
   struct sli_scan_info_s *next;
   uint8_t channel;                                 ///< Channel number of the AP
   uint8_t security_mode;                           ///< Security mode of the AP
-  uint8_t rssi;                                    ///< RSSI value of the AP
+  uint8_t rssi;                                    ///< Unsigned RSSI value of the AP (for example 76 means -76 dBm)
   uint8_t network_type;                            ///< AP network type
   uint8_t ssid[34];                                ///< SSID of the AP
   uint8_t bssid[SLI_WIFI_HARDWARE_ADDRESS_LENGTH]; ///< BSSID of the AP
@@ -967,5 +967,24 @@ typedef struct {
   uint8_t rx_ratio_in_buffer_pool;     ///< rx ratio
   uint8_t global_ratio_in_buffer_pool; ///< global ratio
 } sli_wifi_dynamic_pool;
+
+typedef uint8_t sli_siwx3xx_static_radio_priority_t;
+
+typedef struct {
+  uint8_t min;
+  uint8_t max;
+} sli_siwx3xx_dynamic_radio_priority_t;
+
+typedef struct {
+  uint8_t min;
+  uint8_t max;
+  uint8_t step;
+} sli_si31xx_step_dynamic_radio_priority_t;
+
+typedef struct {
+  sli_si31xx_step_dynamic_radio_priority_t station_beacon_reception_priority;
+  sli_siwx3xx_dynamic_radio_priority_t station_keep_alive_priority;
+  sli_siwx3xx_static_radio_priority_t station_data_transfer_priority;
+} sli_siwx3xx_dmp_configuration_t;
 
 #endif // SLI_WIFI_TYPES_H

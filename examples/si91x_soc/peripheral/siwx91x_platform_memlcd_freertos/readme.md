@@ -1,8 +1,8 @@
-# SiWx91x Platform MEMLCD FreeRTOS
+# SiWx91x Platform - MEMLCD FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform MEMLCD FreeRTOS](#siwx91x-platform-memlcd-freertos)
+- [SiWx91x Platform - MEMLCD FreeRTOS](#siwx91x-platform-memlcd-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

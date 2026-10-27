@@ -70,7 +70,7 @@
   * @def SL_WIFI_FEAT_SECURITY_OPEN
   * @brief Security type: Open.
   * @details
-  * This feature supports open security type in client mode.
+  * This feature supports open security type in client mode and AP mode.
   * 
   * @note It is recommended to enable this macro to configure the security type as open mode.
   */
@@ -205,6 +205,7 @@
    * @brief Configures the Access Point (AP) to operate in hidden mode.
    * @details If this bit is set, the AP is created in a hidden mode where its SSID is not broadcasted, making the AP less visible to clients.
    * This feature is valid only when the device is in AP mode.
+   * @note This feature is only supported on SiWx91x devices.
    */
 #define SL_WIFI_CUSTOM_FEAT_AP_IN_HIDDEN_MODE BIT(5)
 
@@ -636,7 +637,7 @@
  * @def SL_SI91X_FEAT_SECURITY_OPEN
  * @brief Security type: Open.
  * @details
- * This feature supports open security type in client mode.
+ * This feature supports open security type in client mode and AP mode.
  * 
  * @note It is recommended to enable this macro to configure the security type as open mode.
  */

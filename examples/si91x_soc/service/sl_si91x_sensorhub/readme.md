@@ -392,9 +392,9 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 
 ## Test the Application
 
-> **Note:** Use **`Log_script.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+> **Note:** Use **`log_compact_decoder.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
 >
-> `python Log_script.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+> `python log_compact_decoder.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
 >
 > Replace **COM5** with the serial port your board uses on the host PC.
 

@@ -29,7 +29,9 @@ component:
 - id: sl_main
 - id: slist
 - id: freertos
-- id: freertos_heap_4
+- id: freertos_heap_3
+- id: memory_manager
+- id: sl_si91x_memory_manager_psram
 - id: syscalls
 - id: sl_http_server
 - id: json_parser

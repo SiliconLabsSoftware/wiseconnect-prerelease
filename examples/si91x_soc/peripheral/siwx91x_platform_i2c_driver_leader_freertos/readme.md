@@ -1,8 +1,8 @@
-# SiWx91x Platform I2C DRIVER LEADER FreeRTOS
+# SiWx91x Platform - I2C Driver Leader FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform I2C DRIVER LEADER FreeRTOS](#platform-siwx91x-i2c-driver-leader-freertos)
+- [SiWx91x Platform - I2C Driver Leader FreeRTOS](#platform-siwx91x-i2c-driver-leader-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

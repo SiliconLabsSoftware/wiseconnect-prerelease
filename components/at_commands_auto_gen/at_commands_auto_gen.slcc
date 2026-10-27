@@ -19,3 +19,6 @@ template_file:
   - path: templates/console_argument_types.h.jinja
   - path: templates/console_command_database.c.jinja
   - path: templates/console_variable_table.c.jinja
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-overview/

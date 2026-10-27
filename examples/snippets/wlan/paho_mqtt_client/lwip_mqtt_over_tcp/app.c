@@ -38,6 +38,7 @@
 #include "sl_utility.h"
 #include "sl_constants.h"
 #include "sl_net_wifi_types.h"
+#include <stdio.h>
 #include <string.h>
 
 // Custom TLS certificates from resources/certificates
@@ -262,6 +263,7 @@ void message_arrived(MessageData *md)
     return;
   }
   printf("Message: %.*s\r\n", (int)md->message->payloadlen, (char *)md->message->payload);
+  fflush(stdout);
   //! process the received data
   halt = 1;
   return;
@@ -535,7 +537,7 @@ int paho_mqtt_demo()
       }
       return status;
     } else {
-      SL_DEBUG_LOG_V2(DEBUG, "Receive Data Success\r\n");
+      SL_DEBUG_LOG_V2(INFO, "Receive Data Success\r\n");
     }
   }
 

@@ -34,3 +34,6 @@ template_contribution:
       qos0: SL_MQTT_QOS_LEVEL_0
       qos1: SL_MQTT_QOS_LEVEL_1
       qos2: SL_MQTT_QOS_LEVEL_2
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-mqtt/

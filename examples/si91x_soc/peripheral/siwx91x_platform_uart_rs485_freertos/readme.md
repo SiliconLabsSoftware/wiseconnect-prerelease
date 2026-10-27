@@ -1,8 +1,8 @@
-# SiWx91x Platform UART RS485 FreeRTOS
+# SiWx91x Platform - UART RS485 FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform UART RS485 FreeRTOS](#platform-siwx91x-uart-rs485-freertos)
+- [SiWx91x Platform - UART RS485 FreeRTOS](#platform-siwx91x-uart-rs485-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)
@@ -262,7 +262,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-1. Compile and run the application on each board (master/slaves) after applying the **Application Build Environment** changes.
+1. Compile and run the application on each board (primary/secondaries) after applying the **Application Build Environment** changes.
 2. Connect three modules per the setup diagrams.
 3. When the application runs, the master sends to slaves and compares received data for correctness.
 4. Expected console output (example):

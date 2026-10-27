@@ -181,6 +181,12 @@
 #define SLI_SI91X_CCM_IV_BUFF_LEN  16  // SLI_SI91X_CCM_IV_MAX_SIZE + 3 Bytes for Padding.
 #define SLI_SI91X_CCM_AD_MAX_SIZE  128 // Limiting header length to 128.
 #define SLI_SI91X_CCM_MSG_MAX_SIZE 1200
+#define SLI_SI91X_CCM_TAG_MIN_SIZE 4U
+
+// AEAD defines
+#define SLI_SI91X_AEAD_NONCE_MAX_SIZE 16U
+#define SLI_SI91X_AEAD_AD_MAX_SIZE    128U
+#define SLI_SI91X_AEAD_TAG_MAX_SIZE   16U
 
 // GCM defines
 #define SLI_SI91X_GCM_IV_SIZE      12

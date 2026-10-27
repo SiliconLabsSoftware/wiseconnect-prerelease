@@ -1,6 +1,10 @@
-project_name: platform_siwx91x_adc_fifo_mode_freertos
+project_name: siwx91x_platform_adc_fifo_mode_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and usage of the ADC peripheral in FIFO mode on the SiWx91x SoC device, showcasing efficient multi-channel sampling through the FIFO buffer with FreeRTOS task management.
+description: 'This example project demonstrates the ADC in FIFO mode on the SiWx91x SoC under
+
+  FreeRTOS, sampling multiple channels into the FIFO and converting the 12-bit results
+
+  to input voltage.
 
   '
 category: example|peripheral

@@ -1,6 +1,8 @@
-project_name: platform_siwx91x_gspi_freertos
+project_name: siwx91x_platform_gspi_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates how to configure and use the GSPI interface in a FreeRTOS task  on the Si91x SoC device.
+description: 'This example project demonstrates GSPI full-duplex and half-duplex transfers on the
+
+  SiWx91x SoC under FreeRTOS, including DMA and non-DMA operation.
 
   '
 category: example|peripheral

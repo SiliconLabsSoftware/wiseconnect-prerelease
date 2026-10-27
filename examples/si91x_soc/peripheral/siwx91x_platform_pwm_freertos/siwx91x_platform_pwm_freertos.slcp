@@ -1,6 +1,8 @@
-project_name: platform_siwx91x_pwm_freertos
+project_name: siwx91x_platform_pwm_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and usage of the PWM peripheral on the SiWx91x SoC device, generating periodic pulse waveforms with configurable duty cycle, frequency, and alignment modes using FreeRTOS task management.
+description: 'This example project demonstrates PWM on the SiWx91x SoC under FreeRTOS, generating a
+
+  periodic pulse with a configurable duty cycle and frequency.
 
   '
 category: example|peripheral

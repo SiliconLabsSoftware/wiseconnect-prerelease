@@ -1,0 +1,79 @@
+project_name: siwx91x_platform_usart_sync_primary_freertos
+package: platform_siwx91x_app
+description: 'This example project demonstrates synchronous full-duplex USART in primary mode on the
+
+  SiWx91x SoC under FreeRTOS, exchanging a data block with a secondary for loopback
+
+  verification.
+
+  '
+category: example|peripheral
+quality: production
+label: SiWx91x Platform - USART Synchronous Primary FreeRTOS
+component:
+- id: freertos_heap_3
+- id: memory_manager
+- id: sl_main
+- id: status
+- id: syscalls
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_retarget_stdio
+- id: iostream_uart_si91x
+  instance:
+  - vcom
+- id: si91x_memory_default_config
+- id: sl_usart
+source:
+- path: app.c
+- path: usart_sync_primary_freertos.c
+include:
+- path: .
+  file_list:
+  - path: app.h
+  - path: usart_sync_primary_freertos.h
+define:
+- name: SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
+toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+other_file:
+- path: resources/readme/setupdiagram.png
+- path: resources/readme/image513d.png
+- path: resources/uc_screen/usart_uc.png
+- path: resources/readme/usart_master_console_output.png
+configuration:
+- name: SL_USART_MODE
+  value: SL_USART_MODE_SYNCHRONOUS_MASTER
+ui_hints:
+  highlight:
+  - path: readme.md
+    focus: true
+readme:
+- path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
+post_build:
+  profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.2.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2026.12.0

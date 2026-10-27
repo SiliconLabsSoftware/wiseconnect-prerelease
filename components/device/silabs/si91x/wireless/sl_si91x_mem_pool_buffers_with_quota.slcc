@@ -24,3 +24,5 @@ requires:
 - name: sl_si91x_wireless
 - name: log_none
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components#wireless

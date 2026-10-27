@@ -1021,7 +1021,7 @@ sl_status_t sli_wifi_get_signal_strength(sl_wifi_interface_t interface, int32_t 
   VERIFY_STATUS_AND_RETURN(status);
   const sl_wifi_system_packet_t *packet =
     (sl_wifi_system_packet_t *)sli_wifi_host_get_buffer_data((void *)buffer, 0, NULL);
-  *rssi = -(packet->data[0]);
+  *rssi = -(int32_t)packet->data[0];
   sli_buffer_manager_free_buffer(buffer);
   return SL_STATUS_OK;
 }

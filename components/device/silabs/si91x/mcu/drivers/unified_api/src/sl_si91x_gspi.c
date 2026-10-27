@@ -35,7 +35,9 @@
 #include "sl_si91x_gspi.h"
 #include "sl_si91x_gspi_config.h"
 #include "rsi_rom_clks.h"
-
+#include "si91x_device.h"
+#include <stddef.h>
+#include "sl_code_classification.h"
 /*******************************************************************************
  ***************************  DEFINES / MACROS   ********************************
  ******************************************************************************/
@@ -55,6 +57,11 @@
 #define GSPI_DEV_VERSION          2         // GSPI Developer version
 #define ODD_DIV_ENABLE            0         // Odd division enable for QSPI clock
 #define SWALLO_ENABLE             0         // Swallo enable for QSPI clock
+#define SLI_GSPI_INVALID_SLAVE_SELECT_NUMBER \
+  0xA5u //Sentinel value returned when no valid GSPI slave-select number is configured.
+#define SLI_GSPI_SLAVE_SELECT_NUMBER_MASK 0x03u // Mask used to extract the two-bit slave-select value.
+/* With CONFIG2 swap-read cleared, RX byte is in [7:0]. Use 24 if MSB lane needed. */
+#define GSPI_READ_FIFO_BYTE_SHIFT 0u
 
 /*******************************************************************************
  *************************** LOCAL VARIABLES   *******************************
@@ -279,6 +286,131 @@ static sl_status_t sli_si91x_gspi_configure_power_mode(sl_gspi_handle_t gspi_han
                           (int)__LINE__);
   }
   return status;
+}
+
+/***************************************************************************/ /**
+ * @brief      Polled register-level full-duplex GSPI transfer.
+ *
+ * @details    Programs GSPI registers for a synchronous full-duplex byte
+ *             transfer. TX is burst-filled into the FIFO (up to 16 bytes per
+ *             chunk) so SCK runs back-to-back with no per-byte software gap.
+ *             Placed in RAM via \c SL_CODE_RAM for low-latency use.
+ *
+ * @param[in]  gspi_handle  GSPI driver handle from \ref sl_si91x_gspi_init.
+ * @param[in]  data_out     Pointer to TX buffer (bytes to send).
+ * @param[out] data_in      Pointer to RX buffer (bytes received).
+ * @param[in]  data_length  Number of bytes to transfer (1..1024).
+ *
+ * @return     SL_STATUS_OK on success, or an error status from validation.
+ ******************************************************************************/
+SL_CODE_RAM
+sl_status_t sl_si91x_gspi_reg_transfer(sl_gspi_handle_t gspi_handle,
+                                       const void *data_out,
+                                       void *data_in,
+                                       uint32_t data_length)
+{
+  const uint8_t *tx  = (const uint8_t *)data_out; ///< Pointer to TX byte stream.
+  uint8_t *rx        = (uint8_t *)data_in;        ///< Pointer to RX byte stream.
+  uint32_t len       = data_length;               ///< Total bytes to transfer this call.
+  sl_status_t status = SL_STATUS_OK;              ///< Return status (OK unless validation fails).
+  uint32_t offset    = 0;                         ///< Bytes already transferred (chunk base).
+  uint8_t slave_sel  = 0;                         ///< Active slave index (CS0..CS3).
+
+  /// Reject NULL buffers or handle before touching hardware.
+  if ((data_in == NULL) || (data_out == NULL) || (gspi_handle == NULL)) {
+    return SL_STATUS_NULL_POINTER;
+  }
+  /// Ensure handle is a valid GSPI master driver instance.
+  if (!validate_gspi_handle(gspi_handle)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  /// MANUAL_RD_CNT is 10 bits (0..1023) => at most 1024 frames per transaction.
+  if ((data_length == MIN_DATA_LENGTH) || (data_length > 1024u)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  /// Do not start if another transfer is already active.
+  if (sl_si91x_gspi_get_status(gspi_handle).busy) {
+    return SL_STATUS_BUSY;
+  }
+
+  /// Slave index previously programmed by sl_si91x_gspi_set_slave_number().
+  slave_sel = RSI_GSPI_GetSlaveSelectNumber();
+  /// 0xA5 is the driver's "no slave selected" sentinel.
+  if (slave_sel == SLI_GSPI_INVALID_SLAVE_SELECT_NUMBER) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  /// Mask GSPI IRQ — this path is polled; ISR must not run mid-transfer.
+  GSPI0->GSPI_INTR_MASK = 0xFF;
+
+  /// Select which CSN line MANUAL_CSN will drive.
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_CSN_SELECT = (uint32_t)(slave_sel & SLI_GSPI_SLAVE_SELECT_NUMBER_MASK);
+
+  /// Reuse the programmed frame length on every FIFO push.
+  GSPI0->GSPI_WRITE_DATA2_b.USE_PREV_LENGTH = ENABLE;
+  /// Force 8-bit frames for this register-level API.
+  GSPI0->GSPI_WRITE_DATA2_b.GSPI_MANUAL_WRITE_DATA2 = 8;
+  /// Enable manual write path into the TX FIFO.
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_WR = ENABLE;
+  /// Full-duplex so each TX clock also captures an RX byte.
+  GSPI0->GSPI_CONFIG1_b.SPI_FULL_DUPLEX_EN = ENABLE;
+
+  /// Hardware expects (N-1) in MANUAL_RD_CNT for N frames.
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_RD_CNT = (len - 1u);
+  /// Arm manual read so RX FIFO fills while TX is clocked.
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_RD = ENABLE;
+
+  /// Assert CS (active-low: DISABLE drives the line low).
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_CSN = DISABLE;
+  /// Wait until status shows CS asserted (GSPI_MAN_CSN cleared).
+  while ((GSPI0->GSPI_STATUS & GSPI_MAN_CSN) != DISABLE) {
+  }
+
+  /// Transfer in chunks of at most 16 bytes (TX FIFO depth).
+  while (offset < len) {
+    uint32_t chunk = len - offset; ///< Bytes remaining in this outer iteration.
+    if (chunk > 16u) {
+      chunk = 16u; ///< Cap at FIFO depth so the burst fits in one fill.
+    }
+
+    /// Burst-fill TX FIFO — hardware clocks bytes back-to-back (no SW gap).
+    for (uint32_t i = 0; i < chunk; i++) {
+      /// Stall while TX FIFO is full.
+      while (GSPI0->GSPI_STATUS_b.FIFO_FULL_WFIFO_S != DISABLE) {
+      }
+      /// Push one TX byte into the write FIFO.
+      GSPI0->GSPI_WRITE_FIFO[0] = (uint32_t)tx[offset + i];
+    }
+
+    /// Wait until the controller finishes clocking the chunk (BUSY clears).
+    while (GSPI0->GSPI_STATUS_b.GSPI_BUSY != DISABLE) {
+    }
+
+    /// Drain the matching RX bytes from the read FIFO.
+    for (uint32_t i = 0; i < chunk; i++) {
+      /// Stall while RX FIFO reports empty.
+      while (GSPI0->GSPI_STATUS_b.FIFO_EMPTY_RFIFO_S != DISABLE) {
+      }
+      /// Store the low 8 bits of the 32-bit READ_FIFO word.
+      rx[offset + i] = (uint8_t)GSPI0->GSPI_READ_FIFO[0];
+    }
+
+    offset += chunk; ///< Advance to the next chunk (or finish).
+  }
+
+  /// Clear manual-read enable after the transfer.
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_RD = DISABLE;
+  /// Clear manual-write enable after the transfer.
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_WR = DISABLE;
+  /// Disable full-duplex after the transfer.
+  GSPI0->GSPI_CONFIG1_b.SPI_FULL_DUPLEX_EN = DISABLE;
+  /// Deassert CS (active-low: ENABLE drives the line high).
+  GSPI0->GSPI_CONFIG1_b.GSPI_MANUAL_CSN = ENABLE;
+  /// Wait until status shows CS deasserted (GSPI_MAN_CSN set).
+  while ((GSPI0->GSPI_STATUS & GSPI_MAN_CSN) == DISABLE) {
+  }
+
+  return status; ///< SL_STATUS_OK if all validation and transfer completed.
 }
 
 /*******************************************************************************

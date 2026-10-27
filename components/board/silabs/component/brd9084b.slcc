@@ -1,7 +1,7 @@
 id: brd9084b
 label: BRD9084B
 package: platform_siwx91x
-description: Board support for BRD9084B(SoC).
+description: Board support for BRD9084B(SoC) with 16MB external flash.
 category: Board|Radio Board
 quality: evaluation
 metadata:

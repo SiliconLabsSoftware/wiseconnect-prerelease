@@ -105,3 +105,6 @@ template_contribution:
     sl_net_dns_resolution_ip_type_t:
       ipv4: SL_NET_DNS_TYPE_IPV4
       ipv6: SL_NET_DNS_TYPE_IPV6
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-nwk-mgmt/

@@ -191,12 +191,12 @@ typedef enum { SLI_NONE, SLI_TKIP, SLI_CCMP } sli_si91x_encryption_mode_t;
 
 /// Scan information response structure
 typedef struct {
-  uint8_t rf_channel;                           ///< channel number of the scanned AP
-  uint8_t security_mode;                        ///<  security mode of the scanned AP
-  uint8_t rssi_val;                             ///< rssi value of the scanned AP
-  uint8_t network_type;                         ///< network type of the scanned AP
-  uint8_t ssid[SLI_SSID_LEN];                   ///< SSID of the scanned AP
-  uint8_t bssid[SLI_MAC_ADDR_LEN];              ///< BSSID of the scanned AP
+  uint8_t rf_channel;              ///< channel number of the scanned AP
+  uint8_t security_mode;           ///<  security mode of the scanned AP
+  uint8_t rssi_val;                ///< Unsigned RSSI value of the scanned AP (for example 76 means -76 dBm)
+  uint8_t network_type;            ///< network type of the scanned AP
+  uint8_t ssid[SLI_SSID_LEN];      ///< SSID of the scanned AP
+  uint8_t bssid[SLI_MAC_ADDR_LEN]; ///< BSSID of the scanned AP
   uint8_t reserved[SLI_SI91X_2BYTE_FIELD_SIZE]; ///< Reserved
 } sli_si91x_scan_info_t;
 
@@ -653,7 +653,7 @@ typedef struct {
   uint8_t sub_cmd; ///< sub_cmd from @ref sl_si91x_ta_m4_commands_t (main command is SLI_COMMON_REQ_TA_M4_COMMANDS)
   uint8_t input_data_size; ///< length of input_data
   uint8_t input_data
-    []; ///< Input data. In this input data first byte is reserved for enable(1) or Disable(0) sub_cmd of this structure.
+    []; ///< Input data. The first byte of the input data is reserved for enable(1) or Disable(0) sub_cmd of the structure.
 } SL_ATTRIBUTE_PACKED sli_si91x_ta_m4_handshake_parameters_t;
 #endif
 

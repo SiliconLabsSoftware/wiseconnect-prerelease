@@ -63,3 +63,6 @@ requires:
   - name: silabs_lwip_port_freertos
   - name: silabs_lwip_api
   - name: silabs_lwip_netif_ethernet
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components#wireless

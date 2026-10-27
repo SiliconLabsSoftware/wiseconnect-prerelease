@@ -1,8 +1,8 @@
-# SiWx91x Platform UART FreeRTOS
+# SiWx91x Platform - UART FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform UART FreeRTOS](#platform-siwx91x-uart-freertos)
+- [SiWx91x Platform - UART FreeRTOS](#platform-siwx91x-uart-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

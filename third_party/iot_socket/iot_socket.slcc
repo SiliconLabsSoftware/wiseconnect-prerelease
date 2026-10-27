@@ -35,3 +35,5 @@ include:
 requires:
 - name: bsd_socket
 
+documentation:
+  url: https://github.com/MDK-Packs/IoT_Socket

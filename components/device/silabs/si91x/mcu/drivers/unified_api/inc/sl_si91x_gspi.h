@@ -489,6 +489,47 @@ sl_status_t sl_si91x_gspi_transfer_data_blocking(sl_gspi_handle_t gspi_handle,
 
 /***************************************************************************/
 /**
+ * @brief Polled register-level full-duplex GSPI transfer.
+ *
+ * @details Performs a synchronous full-duplex byte transfer by programming the
+ *          GSPI registers directly. Flow:
+ *          - Validate buffers, handle, length, and busy state
+ *          - Mask GSPI interrupts (polled path)
+ *          - Select the active CSN, enable 8-bit frames, full-duplex, and
+ *            manual write/read with MANUAL_RD_CNT set to (length - 1)
+ *          - Assert CS and wait until status shows CS low
+ *          - In chunks of up to 16 bytes: burst-fill the TX FIFO, wait until
+ *            BUSY clears, then drain the matching RX bytes (low 8 bits)
+ *          - Disable manual write/read and full-duplex, deassert CS, and wait
+ *            until status shows CS high
+ *
+ *          TX is burst-filled so SCK runs back-to-back with no per-byte
+ *          software gap. Placed in RAM via \c SL_CODE_RAM. Does not take a
+ *          timeout.
+ *
+ * @pre Pre-conditions:
+ *      - \ref sl_si91x_gspi_init
+ *      - \ref sl_si91x_gspi_set_configuration
+ *      - \ref sl_si91x_gspi_set_slave_number
+ *
+ * @param[in] gspi_handle Pointer to the GSPI driver handle \ref sl_gspi_handle_t.
+ * @param[in] data_out Const pointer to TX buffer.
+ * @param[in] data_in Pointer to RX buffer.
+ * @param[in] data_length Number of bytes to transfer (1..1024).
+ *
+ * @return Status code indicating the result:
+ *         - SL_STATUS_OK  - Success.
+ *         - SL_STATUS_NULL_POINTER  - A required pointer was NULL.
+ *         - SL_STATUS_INVALID_PARAMETER  - Handle, length, or slave select invalid.
+ *         - SL_STATUS_BUSY  - Driver already has an active transfer.
+ ******************************************************************************/
+sl_status_t sl_si91x_gspi_reg_transfer(sl_gspi_handle_t gspi_handle,
+                                       const void *data_out,
+                                       void *data_in,
+                                       uint32_t data_length);
+
+/***************************************************************************/
+/**
  * @brief To set the primary state as active or inactive.
  * 
  * @details Sets the primary state (i.e., activate/deactivate).

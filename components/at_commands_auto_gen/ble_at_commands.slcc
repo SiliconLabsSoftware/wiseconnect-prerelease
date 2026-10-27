@@ -101,3 +101,6 @@ template_contribution:
         handler: ble_adv_start_command_handler
       91x-ble-adv-stop:
         handler: ble_adv_stop_command_handler
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-ble

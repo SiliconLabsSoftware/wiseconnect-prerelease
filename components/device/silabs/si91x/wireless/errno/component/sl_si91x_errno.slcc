@@ -17,3 +17,6 @@ source:
   - path: src/sl_si91x_errno.c
 provides:
   - name: sl_si91x_errno
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components#common-mcu-components

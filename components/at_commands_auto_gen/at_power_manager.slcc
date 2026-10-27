@@ -71,3 +71,6 @@ template_contribution:
         handler: set_power_manager_sleep_handler
       wifisys-standby:
         handler: set_power_manager_standby_handler
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-si91x-services/power-manager

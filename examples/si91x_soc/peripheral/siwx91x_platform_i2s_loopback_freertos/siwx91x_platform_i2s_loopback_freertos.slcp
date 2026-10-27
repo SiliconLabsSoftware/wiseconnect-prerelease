@@ -1,6 +1,10 @@
-project_name: platform_siwx91x_i2s_loopback_freertos
+project_name: siwx91x_platform_i2s_loopback_freertos
 package: platform_siwx91x_app
-description: "This application demonstrates how to configure and use the I2S loopback in a FreeRTOS task on the Si91x SoC device. \nIt allows you to send and receive audio data within the device using the I2S interface, \nenabling a loopback test to verify the functionality of the I2S peripheral.\n"
+description: 'This example project demonstrates a single I2S loopback transfer on the SiWx91x SoC
+
+  under FreeRTOS, transmitting and receiving in parallel and then comparing the buffers.
+
+  '
 category: example|peripheral
 quality: production
 label: SiWx91x Platform - I2S Loopback FreeRTOS

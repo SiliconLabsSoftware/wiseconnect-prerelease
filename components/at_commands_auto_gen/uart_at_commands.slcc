@@ -39,3 +39,6 @@ template_contribution:
 config_file:
   - path: config/uart_at_commands_config.h
     file_id: uart_at_commands_config
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-si91x-peripherals/uart

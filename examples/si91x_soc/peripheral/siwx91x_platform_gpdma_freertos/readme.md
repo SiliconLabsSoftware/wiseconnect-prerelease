@@ -1,8 +1,8 @@
-# SiWx91x Platform GPDMA FreeRTOS
+# SiWx91x Platform - GPDMA FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform GPDMA FreeRTOS](#siwx91x-platform-gpdma-freertos)
+- [SiWx91x Platform - GPDMA FreeRTOS](#siwx91x-platform-gpdma-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

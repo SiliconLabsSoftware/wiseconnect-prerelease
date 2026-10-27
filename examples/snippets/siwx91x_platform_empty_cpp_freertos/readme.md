@@ -33,7 +33,7 @@ The project demonstrates an empty configuration that includes the essential init
 
 **FreeRTOS application structure**
 
-- The `.slcp` includes **`freertos_heap_4`**. Top-level **`app.cpp`** implements **`app_init()`**, which calls **`empty_cpp_freertos_init()`** (declared in **`empty_cpp_freertos.h`** with **C linkage** so it matches the startup path). **`app_process_action()`** does nothing; work is intended to live in RTOS tasks you add.
+- The `.slcp` includes **`freertos_heap_3`**. Top-level **`app.cpp`** implements **`app_init()`**, which calls **`empty_cpp_freertos_init()`** (declared in **`empty_cpp_freertos.h`** with **C linkage** so it matches the startup path). **`app_process_action()`** does nothing; work is intended to live in RTOS tasks you add.
 - **`empty_cpp_freertos.cpp`**: **`empty_cpp_freertos_init()`** is **`extern "C"`** and registers **`empty_cpp_task`** with **`osThreadNew`**. Thread attributes use **`osThreadAttr_t`** (see **C++ notes** for why fields are assigned after **`{}`** instead of a partial designated initializer). The task loops forever with **`osDelay(1000)`**. **`osDelay`** counts **kernel ticks** (with a 1 kHz tick rate, **1000** ticks is typically about one second).
 
 ## Prerequisites/Setup Requirements

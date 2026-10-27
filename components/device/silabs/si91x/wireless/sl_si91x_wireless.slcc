@@ -365,3 +365,5 @@ template_contribution:
       authentication_association_timer: SL_SI91X_AUTHENTICATION_ASSOCIATION_TIMEOUT
       channel_active_timer: SL_SI91X_CHANNEL_ACTIVE_SCAN_TIMEOUT
       keep_alive_timer: SL_SI91X_KEEP_ALIVE_TIMEOUT
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components#wireless

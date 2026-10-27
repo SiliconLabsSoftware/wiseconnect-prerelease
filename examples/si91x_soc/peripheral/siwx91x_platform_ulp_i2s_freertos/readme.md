@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP I2S FreeRTOS
+# SiWx91x Platform - ULP I2S FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP I2S FreeRTOS](#siwx91x-platform-ulp-i2s-freertos)
+- [SiWx91x Platform - ULP I2S FreeRTOS](#siwx91x-platform-ulp-i2s-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

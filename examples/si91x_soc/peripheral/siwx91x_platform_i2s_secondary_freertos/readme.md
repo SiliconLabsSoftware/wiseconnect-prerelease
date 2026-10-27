@@ -1,8 +1,8 @@
-# SiWx91x Platform I2S SECONDARY FreeRTOS
+# SiWx91x Platform - I2S Secondary FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform I2S SECONDARY FreeRTOS](#platform-siwx91x-i2s-secondary-freertos)
+- [SiWx91x Platform - I2S Secondary FreeRTOS](#platform-siwx91x-i2s-secondary-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

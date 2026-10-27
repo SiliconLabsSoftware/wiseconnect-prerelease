@@ -262,3 +262,6 @@ template_contribution:
         handler: wifi_statistics_stop_command_handler
         arguments:
           - "uint8"   # interface
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-wi-fi/

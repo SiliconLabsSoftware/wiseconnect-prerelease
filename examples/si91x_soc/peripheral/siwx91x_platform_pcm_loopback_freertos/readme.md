@@ -1,8 +1,8 @@
-# SiWx91x Platform PCM Loopback FreeRTOS
+# SiWx91x Platform - PCM Loopback FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform PCM Loopback FreeRTOS](#siwx91x-platform-pcm-loopback-freertos)
+- [SiWx91x Platform - PCM Loopback FreeRTOS](#siwx91x-platform-pcm-loopback-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

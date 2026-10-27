@@ -1,8 +1,8 @@
-# SiWx91x Platform I2S Loopback FreeRTOS
+# SiWx91x Platform - I2S Loopback FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform I2S Loopback FreeRTOS](#platform-siwx91x-i2s-loopback-freertos)
+- [SiWx91x Platform - I2S Loopback FreeRTOS](#platform-siwx91x-i2s-loopback-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

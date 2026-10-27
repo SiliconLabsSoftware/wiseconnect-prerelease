@@ -35,3 +35,5 @@ template_contribution:
           - "uint16"    # timeout
           - "uint16"    # tcp-retry-count
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-si91x-driver-fw-upd/

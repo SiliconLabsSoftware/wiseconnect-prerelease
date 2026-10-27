@@ -1,8 +1,8 @@
-# SiWx91x Platform ADC Static Mode FreeRTOS
+# SiWx91x Platform - ADC Static Mode FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform ADC Static Mode FreeRTOS](#platform-siwx91x-adc-static-mode-freertos)
+- [SiWx91x Platform - ADC Static Mode FreeRTOS](#platform-siwx91x-adc-static-mode-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

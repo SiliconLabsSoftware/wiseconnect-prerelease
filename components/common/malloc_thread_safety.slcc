@@ -13,3 +13,6 @@ source:
   - path: "src/malloc_thread_safety.c"
 provides:
   - name: malloc_thread_safety
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components#common-mcu-components

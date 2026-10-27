@@ -55,3 +55,6 @@ toolchain_settings:
     value: -Wno-error=deprecated-declarations
   - option: llvm_compiler_option
     value: -Wno-error=deprecated-declarations
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-common/

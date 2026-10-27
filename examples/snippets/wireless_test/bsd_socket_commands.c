@@ -41,6 +41,7 @@
 #include "netdb.h"
 #include "sl_utility.h"
 #include <stdio.h>
+#include <inttypes.h>
 #include <string.h>
 #ifdef SLI_SI91X_LWIP_HOSTED_NETWORK_STACK
 #include "lwip/sockets.h"
@@ -84,7 +85,7 @@ sl_status_t wifi_bsd_socket_create_handler(console_args_t *arguments)
   int32_t socket_fd = socket(domain, type, protocol);
   VERIFY_BSD_STATUS(socket_fd);
 
-  printf("%ld", socket_fd);
+  printf("%" PRId32, socket_fd);
   return SL_STATUS_OK;
 }
 
@@ -131,7 +132,7 @@ sl_status_t wifi_bsd_socket_accept_handler(console_args_t *arguments)
   int32_t status = accept(socket_fd, ((struct sockaddr *)&remote_socket_address), &socket_length);
   VERIFY_BSD_STATUS(status);
 
-  printf(" Socket ID: %ld\r\n", status);
+  printf(" Socket ID: %" PRId32 "\r\n", status);
   if (socket_length == sizeof(struct sockaddr_in)) {
     const uint8_t *ip_address = (const uint8_t *)&remote_socket_address.sin_addr.s_addr;
     printf("%u.%u.", ip_address[0], ip_address[1]);
@@ -180,7 +181,7 @@ sl_status_t wifi_bsd_socket_send_handler(console_args_t *arguments)
 
   VERIFY_BSD_STATUS(status);
 
-  printf("%ld bytes sent", status);
+  printf("%" PRId32 " bytes sent", status);
 
   return SL_STATUS_OK;
 }
@@ -208,7 +209,7 @@ sl_status_t wifi_bsd_socket_send_to_handler(console_args_t *arguments)
   int32_t status = sendto(sock_fd, buffer, strlen(buffer), 0, (const struct sockaddr *)&address, sizeof(address));
   VERIFY_BSD_STATUS(status);
 
-  printf("%ld bytes sent", status);
+  printf("%" PRId32 " bytes sent", status);
 
   return SL_STATUS_OK;
 }
@@ -329,7 +330,7 @@ sl_status_t wifi_bsd_socket_get_opt_handler(console_args_t *arguments)
   int32_t socket_status = getsockopt(socket, SOL_SOCKET, option_name, &option_value, &length);
   VERIFY_BSD_STATUS(socket_status);
 
-  printf("%lu", option_value);
+  printf("%" PRId32, option_value);
 
   return SL_STATUS_OK;
 }

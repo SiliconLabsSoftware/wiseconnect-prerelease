@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP GPIO Transition FreeRTOS
+# SiWx91x Platform - ULP GPIO Transition FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP GPIO Transition FreeRTOS](#siwx91x-platform-ulp-gpio-transition-freertos)
+- [SiWx91x Platform - ULP GPIO Transition FreeRTOS](#siwx91x-platform-ulp-gpio-transition-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

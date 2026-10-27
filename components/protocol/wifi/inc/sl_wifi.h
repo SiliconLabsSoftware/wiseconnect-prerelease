@@ -1272,14 +1272,16 @@ sl_status_t sl_wifi_disconnect(sl_wifi_interface_t interface);
  *   @ref sl_wifi_connect should be called before this API.
  * @param[in] interface
  *   Wi-Fi interface as identified by @ref sl_wifi_interface_t
- * @param[in] rssi
- *   signal strength (RSSI) in dBm.
+ * @param[out] rssi
+ *   Signed signal strength (RSSI) in dBm. NWP returns an unsigned value; this API negates it once.
  * @return
  *   sl_status_t. See https://docs.silabs.com/gecko-platform/latest/platform-common/status for details.
  * @note
- *   The RSSI value is valid only when the Wi-Fi client is connected to an access point. If the Wi-Fi client is disconnected, the RSSI value will be 0xFF.
+ *   The RSSI value is valid only when the Wi-Fi client is connected to an access point. If the Wi-Fi client is disconnected, the NWP reports value 0xFF and this API returns -255.
  * @note
- *   The RSSI value is the average of the last four beacons received by the STA from the connected AP.
+ *   Unlike @ref sl_wifi_scan_result_t::rssi_val (unsigned value), this API returns signed dBm.
+ * @note
+ *   The RSSI value is the average of recent beacons received by the STA from the connected AP.
  ******************************************************************************/
 sl_status_t sl_wifi_get_signal_strength(sl_wifi_interface_t interface, int32_t *rssi);
 

@@ -1,6 +1,10 @@
-project_name: platform_siwx91x_adc_static_mode_freertos
+project_name: siwx91x_platform_adc_static_mode_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and usage of the ADC peripheral in static mode on the SiWx917 SoC, showcasing its ability to capture and process  analog input signals under fixed settings.
+description: 'This example project demonstrates the ADC in static mode on the SiWx91x SoC under
+
+  FreeRTOS, converting an analog input to a 12-bit result and the equivalent input
+
+  voltage.
 
   '
 category: example|peripheral

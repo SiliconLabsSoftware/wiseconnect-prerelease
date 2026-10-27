@@ -118,3 +118,6 @@ template_contribution:
         handler: mqtt_client_subinfo_command_handler
         arguments:
           - "uint8"   # client-instance-id
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-mqtt/mqtt-client

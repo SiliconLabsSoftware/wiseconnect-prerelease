@@ -94,9 +94,10 @@ void usart_example_init(void)
     }
     SL_PRINT_STRING_ERROR("USART configuration is successful \n");
     // Register user callback function
-    status = sl_si91x_usart_register_event_callback(callback_event);
+    status = sl_si91x_usart_multiple_instance_register_event_callback(USART_0, callback_event);
     if (status != SL_STATUS_OK) {
-      SL_PRINT_STRING_ERROR("sl_si91x_usart_register_event_callback: Error Code : %" PRIu32 " \n", (uint32_t)status);
+      SL_PRINT_STRING_ERROR("sl_si91x_usart_multiple_instance_register_event_callback: Error Code : %" PRIu32 " \n",
+                            (uint32_t)status);
       break;
     }
     SL_PRINT_STRING_ERROR("USART user event callback registered successfully \n");

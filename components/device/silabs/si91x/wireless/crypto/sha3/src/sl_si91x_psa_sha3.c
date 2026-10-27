@@ -61,7 +61,7 @@ static psa_status_t sli_si91x_get_sha3_params_from_alg(psa_algorithm_t alg, uint
       break;
 #endif
     default:
-      return PSA_ERROR_BAD_STATE;
+      return PSA_ERROR_NOT_SUPPORTED;
   }
   return PSA_SUCCESS;
 }
@@ -96,12 +96,12 @@ static psa_status_t sli_si91x_get_sha3_algo_from_digest_size(size_t digest_size,
 }
 #endif
 
-psa_status_t sli_si91x_crypto_hash_compute(psa_algorithm_t alg,
-                                           const uint8_t *input,
-                                           size_t input_length,
-                                           uint8_t *hash,
-                                           size_t hash_size,
-                                           size_t *hash_length)
+psa_status_t sli_si91x_crypto_sha3_hash_compute(psa_algorithm_t alg,
+                                                const uint8_t *input,
+                                                size_t input_length,
+                                                uint8_t *hash,
+                                                size_t hash_size,
+                                                size_t *hash_length)
 {
   psa_status_t status = PSA_ERROR_GENERIC_ERROR;
 
@@ -148,7 +148,7 @@ psa_status_t sli_si91x_crypto_hash_compute(psa_algorithm_t alg,
   return status;
 }
 
-psa_status_t sli_si91x_crypto_hash_setup(sli_si91x_crypto_sha_operation_t *operation, psa_algorithm_t alg)
+psa_status_t sli_si91x_crypto_sha3_hash_setup(sli_si91x_crypto_sha3_operation_t *operation, psa_algorithm_t alg)
 {
 #if defined(PSA_WANT_ALG_SHA3_224) || defined(PSA_WANT_ALG_SHA3_256) || defined(PSA_WANT_ALG_SHA3_384) \
   || defined(PSA_WANT_ALG_SHA3_512)
@@ -164,7 +164,7 @@ psa_status_t sli_si91x_crypto_hash_setup(sli_si91x_crypto_sha_operation_t *opera
     return PSA_ERROR_INVALID_ARGUMENT;
   }
 
-  memset(operation, 0, sizeof(sli_si91x_crypto_sha_operation_t));
+  memset(operation, 0, sizeof(sli_si91x_crypto_sha3_operation_t));
 
   status = sli_si91x_get_sha3_params_from_alg(alg, &sha_algo, &operation->digest_size);
   if (status != PSA_SUCCESS) {
@@ -188,9 +188,9 @@ psa_status_t sli_si91x_crypto_hash_setup(sli_si91x_crypto_sha_operation_t *opera
 #endif
 }
 
-psa_status_t sli_si91x_crypto_hash_update(sli_si91x_crypto_sha_operation_t *operation,
-                                          const uint8_t *input,
-                                          size_t input_length)
+psa_status_t sli_si91x_crypto_sha3_hash_update(sli_si91x_crypto_sha3_operation_t *operation,
+                                               const uint8_t *input,
+                                               size_t input_length)
 {
 #if defined(PSA_WANT_ALG_SHA3_224) || defined(PSA_WANT_ALG_SHA3_256) || defined(PSA_WANT_ALG_SHA3_384) \
   || defined(PSA_WANT_ALG_SHA3_512)
@@ -229,10 +229,10 @@ psa_status_t sli_si91x_crypto_hash_update(sli_si91x_crypto_sha_operation_t *oper
 #endif
 }
 
-psa_status_t sli_si91x_crypto_hash_finish(sli_si91x_crypto_sha_operation_t *operation,
-                                          uint8_t *hash,
-                                          size_t hash_size,
-                                          size_t *hash_length)
+psa_status_t sli_si91x_crypto_sha3_hash_finish(sli_si91x_crypto_sha3_operation_t *operation,
+                                               uint8_t *hash,
+                                               size_t hash_size,
+                                               size_t *hash_length)
 {
 #if defined(PSA_WANT_ALG_SHA3_224) || defined(PSA_WANT_ALG_SHA3_256) || defined(PSA_WANT_ALG_SHA3_384) \
   || defined(PSA_WANT_ALG_SHA3_512)
@@ -272,7 +272,7 @@ psa_status_t sli_si91x_crypto_hash_finish(sli_si91x_crypto_sha_operation_t *oper
 #endif
 }
 
-psa_status_t sli_si91x_crypto_hash_abort(sli_si91x_crypto_sha_operation_t *operation)
+psa_status_t sli_si91x_crypto_sha3_hash_abort(sli_si91x_crypto_sha3_operation_t *operation)
 {
 #if defined(PSA_WANT_ALG_SHA3_224) || defined(PSA_WANT_ALG_SHA3_256) || defined(PSA_WANT_ALG_SHA3_384) \
   || defined(PSA_WANT_ALG_SHA3_512)
@@ -281,7 +281,7 @@ psa_status_t sli_si91x_crypto_hash_abort(sli_si91x_crypto_sha_operation_t *opera
     return PSA_ERROR_INVALID_ARGUMENT;
   }
 
-  memset(operation, 0, sizeof(sli_si91x_crypto_sha_operation_t));
+  memset(operation, 0, sizeof(sli_si91x_crypto_sha3_operation_t));
   return PSA_SUCCESS;
 
 #else

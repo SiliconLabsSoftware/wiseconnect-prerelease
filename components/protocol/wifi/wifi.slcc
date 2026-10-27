@@ -35,3 +35,6 @@ requires:
 - name: sli_wifi
 - name: log_none
   condition: ["device_si91x"]
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-wi-fi/

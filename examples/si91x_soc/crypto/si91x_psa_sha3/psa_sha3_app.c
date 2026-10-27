@@ -106,13 +106,13 @@ void test_psa_sha3_224()
 
   ret = psa_hash_compute(PSA_ALG_SHA3_224, padded_msg, padded_len, hash_buf, sizeof(hash_buf), &hash_len);
 
-  printf("\n\r SHA3_224 STATUS - %ld", ret);
+  printf("\n\r SHA3_224 STATUS - %ld", (long)ret);
 
   // Compare with the expected result
   if (ret != 0) {
-    printf("\n SHA3_224 Operation Failed Status 0x%lx \n", ret);
+    printf("\n SHA3_224 Operation Failed Status 0x%lx \n", (unsigned long)ret);
   } else if (ret == 0 && memcmp(hash_buf, expected_sha3_224_hash, sizeof(expected_sha3_224_hash)) == 0) {
-    printf("\n SHA3_224 Operation Success Status 0x%lx \n", ret);
+    printf("\n SHA3_224 Operation Success Status 0x%lx \n", (unsigned long)ret);
   } else {
     printf("\n SHA3_224 Compare with expected value failed \n");
   }
@@ -149,13 +149,13 @@ void test_psa_sha3_256()
   printf("\n\r SHA3_256 padded_len=%u (orig=%u)", (unsigned)padded_len, (unsigned)strlen(test_msg));
 
   ret = psa_hash_compute(PSA_ALG_SHA3_256, padded_msg, padded_len, hash_buf, sizeof(hash_buf), &hash_len);
-  printf("\n\r SHA3_256 STATUS - %ld", ret);
+  printf("\n\r SHA3_256 STATUS - %ld", (long)ret);
 
   // Compare with the expected result
   if (ret != 0) {
-    printf("\n SHA3_256 Operation Failed Status 0x%lx \n", ret);
+    printf("\n SHA3_256 Operation Failed Status 0x%lx \n", (unsigned long)ret);
   } else if (ret == 0 && memcmp(hash_buf, expected_sha3_256_hash, sizeof(expected_sha3_256_hash)) == 0) {
-    printf("\n SHA3_256 Operation Success Status 0x%lx \n", ret);
+    printf("\n SHA3_256 Operation Success Status 0x%lx \n", (unsigned long)ret);
   } else {
     printf("\n SHA3_256 Compare with expected value failed \n");
   }
@@ -194,7 +194,7 @@ void test_psa_sha3_384()
 
   ret = psa_hash_compute(PSA_ALG_SHA3_384, padded_msg, padded_len, hash_buf, sizeof(hash_buf), &hash_len);
 
-  printf("\n\r SHA3_384 STATUS - %ld", ret);
+  printf("\n\r SHA3_384 STATUS - %ld", (long)ret);
 
   for (int i = 0; i < (int)hash_len; i++) {
     printf(" 0x%x", hash_buf[i]);
@@ -202,9 +202,9 @@ void test_psa_sha3_384()
 
   // Compare with the expected result
   if (ret != 0) {
-    printf("\n SHA3_384 Operation Failed Status 0x%lx \n", ret);
+    printf("\n SHA3_384 Operation Failed Status 0x%lx \n", (unsigned long)ret);
   } else if (ret == PSA_SUCCESS && memcmp(hash_buf, expected_sha3_384_hash, sizeof(expected_sha3_384_hash)) == 0) {
-    printf("\n SHA3_384 Operation Success Status 0x%lx \n", ret);
+    printf("\n SHA3_384 Operation Success Status 0x%lx \n", (unsigned long)ret);
   } else {
     printf("\n SHA3_384 Compare with expected value failed \n");
   }
@@ -244,13 +244,13 @@ void test_psa_sha3_512()
 
   ret = psa_hash_compute(PSA_ALG_SHA3_512, padded_msg, padded_len, hash_buf, sizeof(hash_buf), &hash_len);
 
-  printf("\n\r SHA3_512 STATUS - %ld", ret);
+  printf("\n\r SHA3_512 STATUS - %ld", (long)ret);
 
   // Compare with the expected result
   if (ret != 0) {
-    printf("\n SHA3_512 Operation Failed Status 0x%lx \n", ret);
+    printf("\n SHA3_512 Operation Failed Status 0x%lx \n", (unsigned long)ret);
   } else if (ret == PSA_SUCCESS && memcmp(hash_buf, expected_sha3_512_hash, sizeof(expected_sha3_512_hash)) == 0) {
-    printf("\n SHA3_512 Operation Success Status 0x%lx \n", ret);
+    printf("\n SHA3_512 Operation Success Status 0x%lx \n", (unsigned long)ret);
   } else {
     printf("\n SHA3_512 Compare with expected value failed \n");
   }
@@ -262,7 +262,7 @@ void psa_app_process_action()
   psa_status_t ret;
   ret = psa_crypto_init();
   if (ret != PSA_SUCCESS) {
-    printf("PSA Crypto Init failed with status : %ld\n", ret);
+    printf("PSA Crypto Init failed with status : %ld\n", (long)ret);
   } else {
     printf("PSA Crypto Init Success\n");
   }

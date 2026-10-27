@@ -31,8 +31,6 @@
 #ifndef SL_SI91X_PSA_SHA3_H
 #define SL_SI91X_PSA_SHA3_H
 
-#include "psa/crypto.h"
-
 // -----------------------------------------------------------------------------
 //                              Macros and Typedefs
 // -----------------------------------------------------------------------------
@@ -54,8 +52,9 @@
 typedef struct {
   size_t
     digest_size; ///< Expected digest length for the active hash, or \c SL_SI91X_SHA3_LEN_INVALID if the operation is invalid / failed
-} sli_si91x_crypto_sha_operation_t;
+} sli_si91x_crypto_sha3_operation_t;
 
+#include "psa/crypto.h"
 // -----------------------------------------------------------------------------
 //                          Public Function Declarations
 // -----------------------------------------------------------------------------
@@ -67,12 +66,12 @@ typedef struct {
  *       hash_compute entry point as defined in the PSA driver interface
  *       specification for transparent drivers.
  */
-psa_status_t sli_si91x_crypto_hash_compute(psa_algorithm_t alg,
-                                           const uint8_t *input,
-                                           size_t input_length,
-                                           uint8_t *hash,
-                                           size_t hash_size,
-                                           size_t *hash_length);
+psa_status_t sli_si91x_crypto_sha3_hash_compute(psa_algorithm_t alg,
+                                                const uint8_t *input,
+                                                size_t input_length,
+                                                uint8_t *hash,
+                                                size_t hash_size,
+                                                size_t *hash_length);
 
 /**
  * \brief Set up a multipart SHA3 hash operation.
@@ -81,7 +80,7 @@ psa_status_t sli_si91x_crypto_hash_compute(psa_algorithm_t alg,
  *       hash_setup entry point as defined in the PSA driver interface
  *       specification for transparent drivers.
  */
-psa_status_t sli_si91x_crypto_hash_setup(sli_si91x_crypto_sha_operation_t *operation, psa_algorithm_t alg);
+psa_status_t sli_si91x_crypto_sha3_hash_setup(sli_si91x_crypto_sha3_operation_t *operation, psa_algorithm_t alg);
 
 /**
  * \brief Feed input data into an ongoing multipart SHA3 hash operation.
@@ -90,9 +89,9 @@ psa_status_t sli_si91x_crypto_hash_setup(sli_si91x_crypto_sha_operation_t *opera
  *       hash_update entry point as defined in the PSA driver interface
  *       specification for transparent drivers.
  */
-psa_status_t sli_si91x_crypto_hash_update(sli_si91x_crypto_sha_operation_t *operation,
-                                          const uint8_t *input,
-                                          size_t input_length);
+psa_status_t sli_si91x_crypto_sha3_hash_update(sli_si91x_crypto_sha3_operation_t *operation,
+                                               const uint8_t *input,
+                                               size_t input_length);
 
 /**
  * \brief Finish a multipart SHA3 hash operation and produce the digest.
@@ -101,10 +100,10 @@ psa_status_t sli_si91x_crypto_hash_update(sli_si91x_crypto_sha_operation_t *oper
  *       hash_finish entry point as defined in the PSA driver interface
  *       specification for transparent drivers.
  */
-psa_status_t sli_si91x_crypto_hash_finish(sli_si91x_crypto_sha_operation_t *operation,
-                                          uint8_t *hash,
-                                          size_t hash_size,
-                                          size_t *hash_length);
+psa_status_t sli_si91x_crypto_sha3_hash_finish(sli_si91x_crypto_sha3_operation_t *operation,
+                                               uint8_t *hash,
+                                               size_t hash_size,
+                                               size_t *hash_length);
 
 /**
  * \brief Abort a multipart SHA3 hash operation and release associated resources.
@@ -113,6 +112,6 @@ psa_status_t sli_si91x_crypto_hash_finish(sli_si91x_crypto_sha_operation_t *oper
  *       hash_abort entry point as defined in the PSA driver interface
  *       specification for transparent drivers.
  */
-psa_status_t sli_si91x_crypto_hash_abort(sli_si91x_crypto_sha_operation_t *operation);
+psa_status_t sli_si91x_crypto_sha3_hash_abort(sli_si91x_crypto_sha3_operation_t *operation);
 
 #endif /* SL_SI91X_PSA_SHA3_H */

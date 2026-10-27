@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP ADC FreeRTOS
+# SiWx91x Platform - ULP ADC FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP ADC FreeRTOS](#siwx91x-platform-ulp-adc-freertos)
+- [SiWx91x Platform - ULP ADC FreeRTOS](#siwx91x-platform-ulp-adc-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

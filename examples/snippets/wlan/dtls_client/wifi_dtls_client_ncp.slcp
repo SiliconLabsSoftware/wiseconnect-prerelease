@@ -68,6 +68,7 @@ other_file:
 - path: resources/readme/server2.png
 - path: resources/readme/tls_client_output.png
 - path: resources/readme/tls_client_soc_ncp.png
+- path: resources/readme/stm32_setup.png
 ui_hints:
   highlight:
   - path: readme.md

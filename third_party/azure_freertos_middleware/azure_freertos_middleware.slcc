@@ -115,3 +115,5 @@ requires:
 - name: mqtt
 - name: coreMQTT
 
+documentation:
+  url: https://github.com/Azure/azure-iot-middleware-freertos

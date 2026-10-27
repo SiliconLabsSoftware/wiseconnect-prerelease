@@ -28,6 +28,7 @@
 #include "sl_wifi.h"
 #include <string.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 /******************************************************
  *                    Macros
@@ -79,7 +80,7 @@ sl_status_t wifi_iot_socket_create_handler(console_args_t *arguments)
   int32_t sock_fd = iotSocketCreate(domain, type, protocol);
   VERIFY_IOT_STATUS(sock_fd);
 
-  printf("%ld\r\n", sock_fd);
+  printf("%" PRId32 "\r\n", sock_fd);
 
   return SL_STATUS_OK;
 }
@@ -129,7 +130,7 @@ sl_status_t wifi_iot_socket_accept_handler(console_args_t *arguments)
   VERIFY_IOT_STATUS(iot_socket_status);
 
   // print client socket fd
-  printf("%ld\r\n", iot_socket_status);
+  printf("%" PRId32 "\r\n", iot_socket_status);
 
   return SL_STATUS_OK;
 }
@@ -155,7 +156,7 @@ sl_status_t wifi_iot_socket_send_handler(console_args_t *arguments)
   int32_t iot_socket_status = iotSocketSend(sock_fd, buffer, strlen((char *)buffer));
   VERIFY_IOT_STATUS(iot_socket_status);
 
-  printf("%ld bytes sent", iot_socket_status);
+  printf("%" PRId32 " bytes sent", iot_socket_status);
   return SL_STATUS_OK;
 }
 
@@ -214,7 +215,7 @@ sl_status_t wifi_iot_socket_get_opt_handler(console_args_t *arguments)
   int32_t iot_socket_status = iotSocketGetOpt(socket, option_id, &option_val, &length);
   VERIFY_IOT_STATUS(iot_socket_status);
 
-  printf("%lu", option_val);
+  printf("%" PRIu32, option_val);
 
   return SL_STATUS_OK;
 }
@@ -280,12 +281,12 @@ sl_status_t wifi_iot_socket_send_to_handler(console_args_t *arguments)
   int32_t iot_socket_status = iotSocketSendTo(sock_fd, buffer, length, ip->bytes, ip_length, port);
   VERIFY_IOT_STATUS(iot_socket_status);
 
-  printf("%ld bytes sent", iot_socket_status);
+  printf("%" PRId32 " bytes sent", iot_socket_status);
 
   return SL_STATUS_OK;
 }
 
 static inline void print_iot_status(const int32_t status)
 {
-  printf("Error:%ld", status);
+  printf("Error:%" PRId32, status);
 }

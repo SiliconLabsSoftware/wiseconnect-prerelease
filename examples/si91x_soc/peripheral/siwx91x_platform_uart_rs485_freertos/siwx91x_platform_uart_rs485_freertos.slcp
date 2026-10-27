@@ -1,6 +1,10 @@
-project_name: platform_siwx91x_uart_rs485_freertos
+project_name: siwx91x_platform_uart_rs485_freertos
 package: platform_siwx91x_app
-description: 'This application demonstrates the configuration and usage of the UART RS485 peripheral in multidrop mode on the SiWx91x SoC device, transmitting and receiving data with FreeRTOS and supporting hardware- and software-controlled half-duplex modes.
+description: 'This example project demonstrates UART RS485 multidrop operation on the SiWx91x SoC
+
+  under FreeRTOS, including hardware- and software-controlled half duplex and 9-bit
+
+  addressing.
 
   '
 category: example|peripheral

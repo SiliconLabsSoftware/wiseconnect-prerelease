@@ -1,8 +1,8 @@
-# SiWx91x Platform SYSRTC FreeRTOS
+# SiWx91x Platform - SYSRTC FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform SYSRTC FreeRTOS](#siwx91x-platform-sysrtc-freertos)
+- [SiWx91x Platform - SYSRTC FreeRTOS](#siwx91x-platform-sysrtc-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
     - [What is PRS?](#what-is-prs)

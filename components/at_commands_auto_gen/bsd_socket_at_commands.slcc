@@ -119,3 +119,6 @@ template_contribution:
           - "int32"
           - "string"
           - "uint32"
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-sockets/bsd-sockets

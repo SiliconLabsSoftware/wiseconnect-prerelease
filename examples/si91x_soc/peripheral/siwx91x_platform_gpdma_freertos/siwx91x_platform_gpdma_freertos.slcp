@@ -1,6 +1,10 @@
 project_name: siwx91x_platform_gpdma_freertos
 package: platform_siwx91x_app
-description: 'GPDMA memory-to-memory transfer example running under FreeRTOS on the SiWx91x SoC.
+description: 'This example project demonstrates GPDMA memory-to-memory transfers of different sizes
+
+  on the SiWx91x SoC under FreeRTOS, using both a predefined configuration and a
+
+  user-defined descriptor.
 
   '
 category: example|peripheral

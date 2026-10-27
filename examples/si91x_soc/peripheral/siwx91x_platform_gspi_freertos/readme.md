@@ -1,8 +1,8 @@
-# SiWx91x Platform GSPI FreeRTOS
+# SiWx91x Platform - GSPI FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform GSPI FreeRTOS](#platform-siwx91x-gspi-freertos)
+- [SiWx91x Platform - GSPI FreeRTOS](#platform-siwx91x-gspi-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

@@ -1,8 +1,8 @@
-# SiWx91x Platform I2C DRIVER FOLLOWER FreeRTOS
+# SiWx91x Platform - I2C Driver Follower FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform I2C DRIVER FOLLOWER FreeRTOS](#platform-siwx91x-i2c-driver-follower-freertos)
+- [SiWx91x Platform - I2C Driver Follower FreeRTOS](#platform-siwx91x-i2c-driver-follower-freertos)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)
   - [About Example Code](#about-example-code)

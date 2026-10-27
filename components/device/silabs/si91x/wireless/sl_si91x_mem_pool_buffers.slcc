@@ -23,3 +23,5 @@ requires:
 - name: mem_pool
 - name: sl_si91x_wireless
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components#wireless

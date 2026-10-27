@@ -1,8 +1,8 @@
-# SiWx91x Platform ULP I2C Driver Leader FreeRTOS
+# SiWx91x Platform - ULP I2C Driver Leader FreeRTOS
 
 ## Table of Contents
 
-- [SiWx91x Platform ULP I2C Driver Leader FreeRTOS](#siwx91x-platform-ulp-i2c-driver-leader-freertos)
+- [SiWx91x Platform - ULP I2C Driver Leader FreeRTOS](#siwx91x-platform-ulp-i2c-driver-leader-freertos)
   - [Table of Contents](#table-of-contents)
   - [Purpose/Scope](#purposescope)
   - [Overview](#overview)

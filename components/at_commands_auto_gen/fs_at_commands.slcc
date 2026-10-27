@@ -66,3 +66,6 @@ template_contribution:
         handler: fs_fremove_command_handler
         arguments:
           - "string"    # path
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-at-reference-guide-si91x-services/file-system
