@@ -38,22 +38,71 @@ extern "C" {
 // <<< Use Configuration Wizard in Context Menu >>>
 // <h>DMA Configuration
 
-// <e SL_GSPI_DMA_CONFIG_ENABLE> DMA
+// <e> GSPI DMA Enable
+// <i> Enable DMA for GSPI transfers.
 // <i> Default: 0
-#define SL_GSPI_DMA_CONFIG_ENABLE 0
+#define SL_GSPI_DMA_ENABLE 0
+
+// <o SL_GSPI_DMA_CONTROLLER> DMA Controller
+// <0=> UDMA
+// <1=> GPDMA
+// <i> Select the DMA controller for GSPI transfers.
+// <i> GPDMA peripheral codes: GSPI SRC (RX) = 10, DEST (TX) = 11.
+// <i> Default: 0
+#define SL_GSPI_DMA_CONTROLLER 0
+
+// <e> GPDMA Configuration
+// <i> Descriptor counts used when GPDMA is selected.
+// <i> Default: 0
+#define SL_GSPI_GPDMA_CONFIG_ENABLE 0
+
+// <o GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_TX> GPDMA Max Number of Descriptors TX <1-256>
+// <i> Each descriptor moves up to 4095 bytes.
+// <i> Default: 8
+#define GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_TX 8
+
+// <o GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_RX> GPDMA Max Number of Descriptors RX <1-256>
+// <i> Each descriptor moves up to 4095 bytes.
+// <i> Default: 8
+#define GSPI_GPDMA_MAX_NUMBER_OF_DESCRIPTORS_RX 8
+// </e>
 
 // <o SL_GSPI_AFULL_THRESHOLD> FIFO Threshold - Almost Full <0-14>
+// <i> RX DMA request level. With GPDMA: 0-7, RX burst = threshold + 1.
 // <i> Default: 5
 #define SL_GSPI_AFULL_THRESHOLD 5
 
 // <o SL_GSPI_AEMPTY_THRESHOLD> FIFO Threshold - Almost Empty <0-14>
+// <i> TX DMA request level. With GPDMA: 0-7, TX burst = threshold + 1.
 // <i> Default: 5
 #define SL_GSPI_AEMPTY_THRESHOLD 5
-
 // </e>
+
+#if SL_SI91X_GSPI_GPDMA_ENABLE && SL_GSPI_AFULL_THRESHOLD > 7
+#warning "GSPI AFULL Threshold must be less than 8 while using gpdma"
+#undef SL_GSPI_AFULL_THRESHOLD
+#define SL_GSPI_AFULL_THRESHOLD 7
+#endif
+
+#if SL_SI91X_GSPI_GPDMA_ENABLE && SL_GSPI_AEMPTY_THRESHOLD > 7
+#warning "GSPI AEMPTY Threshold must be less than 8 while using gpdma"
+#undef SL_GSPI_AEMPTY_THRESHOLD
+#define SL_GSPI_AEMPTY_THRESHOLD 7
+#endif
 
 // </h>
 // <<< end of configuration section >>>
+
+#if (SL_GSPI_DMA_ENABLE == 1) && (SL_GSPI_DMA_CONTROLLER == 1)
+#define SL_SI91X_GSPI_GPDMA_ENABLE 1
+#define SL_GSPI_DMA_CONFIG_ENABLE  0
+#elif (SL_GSPI_DMA_ENABLE == 1)
+#define SL_SI91X_GSPI_GPDMA_ENABLE 0
+#define SL_GSPI_DMA_CONFIG_ENABLE  1
+#else
+#define SL_SI91X_GSPI_GPDMA_ENABLE 0
+#define SL_GSPI_DMA_CONFIG_ENABLE  0
+#endif
 #if USER_CONFIGURATION_ENABLE
 // <<< sl:start pin_tool >>>
 // <gspi_master signal=SCK_,CS0_,MOSI_,MISO_> SL_GSPI_MASTER

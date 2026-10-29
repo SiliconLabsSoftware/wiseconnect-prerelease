@@ -48,6 +48,13 @@ extern "C" {
 #include "sl_si91x_debug_uc_config.h"
 #endif
 #include "base_types.h"
+#include "sl_component_catalog.h"
+#if defined(USART_MODULE)
+#include "sl_si91x_usart_common_config.h"
+#endif
+#if defined(UART_MODULE)
+#include "sl_si91x_uart_common_config.h"
+#endif
 
 /***************************************************************************/ /**
 * @addtogroup USART USART
@@ -320,6 +327,57 @@ typedef struct {
   sl_rs485_gpio_pin_config_t de;       ///< USART RS485 DE pin configs.
   sl_rs485_gpio_pin_config_t rs485_en; ///< USART RS485 RS485 EN pin configs.
 } sl_uart_rs485_pin_init_t;
+
+/*******************************************************************************
+******************************LOCAL FUNCTION PROTOTYPES*****************************
+******************************************************************************/
+
+#if (defined(UART_MODULE) || (defined(USART_MODULE)) && defined(SL_CATALOG_SL_SI91X_GPDMA_PRESENT))
+
+/***************************************************************************/
+/**
+ * @brief Callback function for USART GPDMA TX done.
+ * 
+ * @details This function is called when the USART GPDMA TX is done.
+ * @note
+ *   This function internally calls the UDMA TX done callback since both share same callback logic.
+ */
+void sli_si91x_usart_gpdma_tx_done_callback(void);
+
+/***************************************************************************/
+
+/**
+ * @brief Callback function for USART GPDMA RX done.
+ * 
+ * @details This function is called when the USART GPDMA RX is done.
+ * @note
+ *   This function internally calls the UDMA RX done callback since both share same callback logic.
+ */
+
+void sli_si91x_usart_gpdma_rx_done_callback(void);
+
+/***************************************************************************/
+
+/**
+ * @brief Callback function for UART1 GPDMA TX done.
+ * 
+ * @details This function is called when the UART1 GPDMA TX is done.
+ * @note
+ *   This function internally calls the UDMA TX done callback since both share same callback logic.
+ */
+void sli_si91x_uart1_gpdma_tx_done_callback(void);
+
+/***************************************************************************/
+/**
+ * @brief Callback function for UART1 GPDMA RX done.
+ * 
+ * @details This function is called when the UART1 GPDMA RX is done.
+ * @note
+ *   This function internally calls the UDMA RX done callback since both share same callback logic.
+ */
+void sli_si91x_uart1_gpdma_rx_done_callback(void);
+
+#endif
 
 /*******************************************************************************
 ******************************  PROTOTYPES  ************************************

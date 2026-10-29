@@ -35,6 +35,7 @@ requires:
   - name: udma_linker_config
   - name: sl_dma
   - name: log_none
+  - name: sl_gpdma
 
 documentation:
   url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart

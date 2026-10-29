@@ -84,6 +84,7 @@ component_path:
  - path: components/device/silabs/si91x/wireless/crypto/ccm
  - path: components/device/silabs/si91x/wireless/crypto/chachapoly
  - path: components/device/silabs/si91x/wireless/crypto/crypto_utility
+ - path: components/device/silabs/si91x/wireless/crypto/csr
  - path: components/device/silabs/si91x/wireless/crypto/ecdh
  - path: components/device/silabs/si91x/wireless/crypto/ecdsa
  - path: components/device/silabs/si91x/wireless/crypto/gcm

@@ -764,7 +764,13 @@ typedef enum {
   SL_WIFI_EAP_AES128_SHA    = (1 << 9),  ///< Wi-Fi EAP Client flag to use AES128-SHA Cipher for EAP connection
   SL_WIFI_EAP_RC4_SHA       = (1 << 10), ///< Wi-Fi EAP Client flag to use RC4-SHA Cipher for EAP connection
   SL_WIFI_EAP_DES_CBC3_SHA  = (1 << 11), ///< Wi-Fi EAP Client flag to use DES-CBC3-SHA Cipher for EAP connection
-  SL_WIFI_EAP_RC4_MD5       = (1 << 12)  ///< Wi-Fi EAP Client flag to use RC4-MD5 Cipher for EAP connection
+  SL_WIFI_EAP_RC4_MD5       = (1 << 12), ///< Wi-Fi EAP Client flag to use RC4-MD5 Cipher for EAP connection
+  SL_WIFI_EAP_ECDHE_ECDSA_AES128_SHA =
+    (1 << 15), ///< Wi-Fi EAP Client flag to use ECDHE-ECDSA-AES128-SHA for an on-device EC identity
+  SL_WIFI_EAP_ECDHE_ECDSA_AES256_SHA =
+    (1 << 16), ///< Wi-Fi EAP Client flag to use ECDHE-ECDSA-AES256-SHA for an on-device EC identity
+  SL_WIFI_EAP_ECDHE_ECDSA_AES128_SHA256 =
+    (1 << 17), ///< Wi-Fi EAP Client flag to use ECDHE-ECDSA-AES128-SHA256 for an on-device EC identity
 } sl_wifi_eap_client_flag_t;
 
 //! @cond Doxygen_Suppress

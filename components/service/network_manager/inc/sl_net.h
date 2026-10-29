@@ -32,6 +32,9 @@
 #include "sl_status.h"
 #include "sl_net_types.h"
 #include "sl_net_application_profile.h"
+#if defined(SLI_SI917) || defined(SLI_SI91X_MCU_INTERFACE)
+#include "sl_si91x_ec_identity.h"
+#endif
 
 /** 
  * \addtogroup NET_INTERFACE_FUNCTIONS Network Interface
@@ -481,11 +484,61 @@ sl_status_t sl_net_delete_profile(sl_net_interface_t interface, sl_net_profile_i
  * - The above mentioned Headers and Footers might vary 
  * - This API does not support the OPEN Security type for Wi-Fi client credentials.
  * - When configuring AP or client interfaces in open security mode, the credential ID must be set to `SL_NET_NO_CREDENTIAL_ID`.
+ * - On-device EC key generation uses @ref sl_net_generate_and_set_credential with @ref SL_NET_GENERATE_EC_PRIVATE_KEY.
+ * - EC client certificates must be installed with @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY(`key_id`) and @ref SL_NET_CERTIFICATE.
  ******************************************************************************/
 sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
                                   sl_net_credential_type_t type,
                                   const void *credential,
                                   uint32_t credential_length);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Generate an on-device EC private key and store it under a credential ID.
+ *
+ * @details
+ *   Phase-1 supports @ref SL_NET_GENERATE_EC_PRIVATE_KEY only. `id` must be
+ *   @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY(`key_id`); the low byte of `id`
+ *   is the host-supplied `key_id`. `credential` must point to an
+ *   sl_si91x_ec_generate_params_t object. On success the NWP fills
+ *   `spki` / `spki_len`. The private key never leaves the NWP.
+ *
+ *   The host does not soft-overwrite an existing key. If the slot is already
+ *   provisioned, firmware returns SL_STATUS_EC_IDENTITY_IN_USE
+ *   (SL_STATUS_EC_KEY_ALREADY_EXISTS). Call @ref sl_net_delete_credential
+ *   with @ref SL_NET_DELETE_EC_PRIVATE_KEY first, then regenerate.
+ *   sl_si91x_csr_sign returns SL_STATUS_EC_KEY_NOT_FOUND when the slot is empty.
+ *
+ *   Install the enterprise CA with @ref sl_net_set_credential,
+ *   @ref SL_NET_SIGNING_CERTIFICATE, and legacy
+ *   @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID. Install the EC client certificate
+ *   with @ref sl_net_set_credential, @ref SL_NET_CERTIFICATE, and
+ *   @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY(`key_id`). Sign a CSR TBS with
+ *   sl_si91x_csr_sign.
+ *
+ * @pre Pre-conditions:
+ * - @ref sl_net_init should be called before this API.
+ *
+ * @param[in] id
+ *   Must be @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY(`key_id`).
+ * @param[in] type
+ *   Must be @ref SL_NET_GENERATE_EC_PRIVATE_KEY.
+ * @param[in,out] credential
+ *   Pointer to sl_si91x_ec_generate_params_t. On success the NWP fills
+ *   `spki` / `spki_len`.
+ * @param[in] credential_length
+ *   Must be `sizeof(sl_si91x_ec_generate_params_t)`.
+ *
+ * @return
+ *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status)
+ *   and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes).
+ ******************************************************************************/
+#if defined(SLI_SI917) || defined(SLI_SI91X_MCU_INTERFACE) || defined(DOXYGEN)
+sl_status_t sl_net_generate_and_set_credential(sl_net_credential_id_t id,
+                                               sl_net_credential_type_t type,
+                                               void *credential,
+                                               uint32_t credential_length);
+#endif
 
 /***************************************************************************/ /**
  * @brief
@@ -529,6 +582,10 @@ sl_status_t sl_net_get_credential(sl_net_credential_id_t id,
  * @details
  *   This function deletes the network credential data for the specified credential ID and type.
  *   Once deleted, the credential cannot be used for network operations.
+ *
+ *   For on-device EC private keys, pass @ref SL_NET_DELETE_EC_PRIVATE_KEY and
+ *   @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY(`key_id`). After a successful
+ *   delete, a new key may be generated with @ref sl_net_generate_and_set_credential.
  * 
  * @pre Pre-conditions:
  * -
@@ -537,7 +594,7 @@ sl_status_t sl_net_get_credential(sl_net_credential_id_t id,
  * @param[in] id
  *   Network credential identifier as identified by @ref sl_net_credential_id_t.
  * 
- * @param[out] type
+ * @param[in] type
  *   Network credential type as identified by @ref sl_net_credential_type_t.
  * 
  * @return

@@ -151,9 +151,15 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
     - Mode: SSI mode/instance can be configurable. It can be configured Primary.
     - Rx Sample Delay: Receive Data (rxd) Sample Delay. This to delay the sample of the rxd input signal. Each value represents a single SSI clock delay on the sample of the rxd signal. The configuration range is from 0 to 63.
   - **SSI Primary(Primary) DMA Configuration**
-    - Primary DMA: DMA enable for SSI Primary mode. It will interface with a DMA Controller using an optional set of DMA signals.
-    - Tx FIFO Threshold: Transmit FIFO Threshold. It controls the level of entries (or below) at which the transmit FIFO controller triggers an interrupt. The configuration range from 0 to 15.
-    - Rx FIFO Threshold: Receive FIFO Threshold. It controls the level of entries (or below) at which the receive FIFO controller triggers an interrupt. The configuration range from 0 to 15.
+    - SSI Primary DMA Enable: Enable DMA for SSI Primary transfers. Disabled by default.
+    - DMA Controller: Select **UDMA** or **GPDMA**. The default is UDMA. Only one controller is used at a time.
+    - GPDMA Configuration: Enable this when GPDMA is selected. Set the maximum number of TX and RX descriptors (1 to 256, default 8). Each descriptor moves up to 4095 bytes.
+    - Tx FIFO Threshold: Transmit FIFO Threshold. It controls the level of entries (or below) 
+    at which the transmit FIFO controller triggers an interrupt. The configuration range from 
+    0 to 15 when using udma and 0-7 when using gpdma.
+    - Rx FIFO Threshold: Receive FIFO Threshold. It controls the level of entries (or below) 
+    at which the receive FIFO controller triggers an interrupt. The configuration range from 0 
+    to 15 when using udma ,0 to 7 when using GPDMA.    
 - Configuration files are generated in **config folder**. If the values are not changed, the code will run on default UC values.
 
 - Configure the following macros in the `ssi_primary_freertos.h` file and update/modify following macros, if required.

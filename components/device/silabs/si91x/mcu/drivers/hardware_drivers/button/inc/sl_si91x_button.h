@@ -76,6 +76,7 @@ typedef struct {
   uint8_t button_number;    ///< Button number (for identification).
   uint8_t pad;              ///< Pad byte (for alignment).
   uint8_t interrupt_config; ///< Interrupt configuration for the button.
+  uint8_t pad_mode;         ///< Pad mode from SL_BUTTON_*_PAD_MODE.
 } sl_button_t;
 
 /***************************************************************************/

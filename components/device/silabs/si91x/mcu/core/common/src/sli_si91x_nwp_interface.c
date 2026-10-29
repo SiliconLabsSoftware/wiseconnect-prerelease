@@ -41,6 +41,14 @@ static bool sli_si91x_packet_status = false;
 /* TX command in-progress flag. */
 static bool sli_si91x_tx_command_status = false;
 
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+/* Side-band crypto command in-progress flag. */
+static bool sli_si91x_side_band_crypto_status = false;
+#endif
+
+/* Number of callers that currently need the NWP awake. M4_WAKEUP_TA stays set until this hits zero. */
+static uint32_t sli_si91x_nwp_wake_refcount = 0;
+
 bool sli_si91x_get_flash_command_status(void)
 {
   return sli_si91x_packet_status;
@@ -61,6 +69,18 @@ void sli_si91x_update_tx_command_status(bool flag)
   sli_si91x_tx_command_status = flag;
 }
 
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+bool sli_si91x_get_side_band_crypto_command_status(void)
+{
+  return sli_si91x_side_band_crypto_status;
+}
+
+void sli_si91x_update_side_band_crypto_command_status(bool flag)
+{
+  sli_si91x_side_band_crypto_status = flag;
+}
+#endif
+
 // Unmask the specified NWP (TA) -> M4 P2P interrupts by clearing their mask bits.
 void unmask_ta_interrupt(uint32_t interrupt_no)
 {
@@ -77,10 +97,19 @@ void raise_m4_to_ta_interrupt(uint32_t interrupt_no)
   M4SS_P2P_INTR_SET_REG = interrupt_no;
 }
 
-// Request the NWP to wake up and block until it reports active.
+// Take one wake hold, then block until the NWP reports active.
+// The hold is released by sl_si91x_host_clear_sleep_indicator().
 sl_status_t sli_si91x_req_wakeup(void)
 {
+  uint32_t primask = __get_PRIMASK();
+
+  __disable_irq();
+  sli_si91x_nwp_wake_refcount++;
   P2P_STATUS_REG |= M4_WAKEUP_TA;
+  if (primask == 0U) {
+    __enable_irq();
+  }
+
   if (!(P2P_STATUS_REG & TA_IS_ACTIVE)) {
     //!TBD Need add timeout
     while (!(P2P_STATUS_REG & TA_IS_ACTIVE))
@@ -89,9 +118,21 @@ sl_status_t sli_si91x_req_wakeup(void)
   return SL_STATUS_OK;
 }
 
-// Clear the M4->NWP wakeup indicator so the NWP may sleep again.
+// Release one wake hold. The NWP may sleep only after the last holder releases.
+// A call with no outstanding hold still clears M4_WAKEUP_TA (PS2 wake cleanup).
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
 void sl_si91x_host_clear_sleep_indicator(void)
 {
-  P2P_STATUS_REG &= ~M4_WAKEUP_TA;
+  uint32_t primask = __get_PRIMASK();
+
+  __disable_irq();
+  if (sli_si91x_nwp_wake_refcount > 0U) {
+    sli_si91x_nwp_wake_refcount--;
+  }
+  if (sli_si91x_nwp_wake_refcount == 0U) {
+    P2P_STATUS_REG &= ~M4_WAKEUP_TA;
+  }
+  if (primask == 0U) {
+    __enable_irq();
+  }
 }

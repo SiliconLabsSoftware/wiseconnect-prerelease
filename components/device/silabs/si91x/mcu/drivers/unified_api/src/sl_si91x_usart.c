@@ -49,6 +49,9 @@
 #ifdef ULP_UART_MODULE
 #include "sl_si91x_ulp_uart_config.h"
 #endif
+#ifdef SL_CATALOG_SL_SI91X_GPDMA_PRESENT
+#include "sl_si91x_gpdma_peripheral_specific.h"
+#endif
 /*******************************************************************************
  ***************************  LOCAL MACROS   ********************************
  ******************************************************************************/
@@ -1344,6 +1347,60 @@ static uint8_t sli_si91x_usart_get_mode(uint8_t usart_module)
 {
   return USART_GetMode(usart_module);
 }
+
+#if (defined(UART_MODULE) || defined(USART_MODULE)) && defined(SL_CATALOG_SL_SI91X_GPDMA_PRESENT)
+
+/***************************************************************************/
+
+// Using udma event handlers since both have similar logic
+/**
+  * @brief Callback function for USART GPDMA TX done.
+  * 
+  * @details This function is called when the USART0/UART0 GPDMA TX is done.
+  */
+
+void sli_si91x_usart_gpdma_tx_done_callback(void)
+{
+  USART_UDMA_Tx_Event(UDMA_EVENT_XFER_DONE, 0U, gpdma_peripheral_channel_info[SL_USART_TX_PERIPHERAL_ID].resources);
+}
+
+/***************************************************************************/
+
+/**
+ * @brief Callback function for USART GPDMA RX done.
+ * 
+ * @details This function is called when the USART0/UART0 GPDMA RX is done.
+ */
+
+void sli_si91x_usart_gpdma_rx_done_callback(void)
+{
+  USART_UDMA_Rx_Event(UDMA_EVENT_XFER_DONE, 0U, gpdma_peripheral_channel_info[SL_USART_RX_PERIPHERAL_ID].resources);
+}
+
+/***************************************************************************/
+/**
+ * @brief Callback function for UART1 GPDMA TX done.
+ * 
+ * @details This function is called when the UART1 GPDMA TX is done.
+ */
+
+void sli_si91x_uart1_gpdma_tx_done_callback(void)
+{
+  USART_UDMA_Tx_Event(UDMA_EVENT_XFER_DONE, 0U, gpdma_peripheral_channel_info[SL_UART1_TX_PERIPHERAL_ID].resources);
+}
+
+/***************************************************************************/
+/**
+ * @brief Callback function for UART1 GPDMA RX done.
+ * 
+ * @details This function is called when the UART1 GPDMA RX is done.
+ */
+
+void sli_si91x_uart1_gpdma_rx_done_callback(void)
+{
+  USART_UDMA_Rx_Event(UDMA_EVENT_XFER_DONE, 0U, gpdma_peripheral_channel_info[SL_UART1_RX_PERIPHERAL_ID].resources);
+}
+#endif
 
 /*******************************************************************************
  * @brief

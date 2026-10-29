@@ -30,6 +30,7 @@
 #include "sli_net_credentials.h"
 #include "sli_net_common_utility.h"
 #include "sl_net_si91x.h"
+#include "sl_net.h"
 
 #define CRED_TYPE_CERT 0
 #define CRED_TYPE_CRED 1
@@ -39,12 +40,23 @@ sl_status_t sl_net_set_credential(sl_net_credential_id_t id,
                                   const void *credential,
                                   uint32_t credential_length)
 {
+  if ((type == SL_NET_GENERATE_EC_PRIVATE_KEY) || (type == SL_NET_DELETE_EC_PRIVATE_KEY)) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
 
   if (CRED_TYPE_CERT == sli_net_check_cred_type(type)) {
     return sli_si91x_set_credential(id, type, credential, credential_length);
   }
 
   return sli_net_set_credential(id, type, credential, credential_length);
+}
+
+sl_status_t sl_net_generate_and_set_credential(sl_net_credential_id_t id,
+                                               sl_net_credential_type_t type,
+                                               void *credential,
+                                               uint32_t credential_length)
+{
+  return sli_si91x_generate_and_set_credential(id, type, credential, credential_length);
 }
 
 sl_status_t sl_net_get_credential(sl_net_credential_id_t id,
@@ -63,6 +75,10 @@ sl_status_t sl_net_get_credential(sl_net_credential_id_t id,
 
 sl_status_t sl_net_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type)
 {
+  if (type == SL_NET_DELETE_EC_PRIVATE_KEY) {
+    return sli_si91x_delete_credential(id, type);
+  }
+
   if (CRED_TYPE_CERT == sli_net_check_cred_type(type)) {
     return sli_si91x_delete_credential(id, type);
   }

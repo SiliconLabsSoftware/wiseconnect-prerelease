@@ -31,6 +31,7 @@
 #ifndef SL_SI91X_GPDMA_H
 #define SL_SI91X_GPDMA_H
 
+/* Modified: track contiguous FIFO slots using a bitmap, first slot, and FIFO size. */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -89,6 +90,10 @@ typedef void (*sl_gpdma_callback_t)(); ///< Callback function type
   (sl_status_t)0x6A ///< Status code indicates that Memory buffer is not allocated for the given channel
 
 #define SL_GPDMA_MAX_CHANNEL_PRIORITY 3 ///< Maximum GPDMA channel priority
+
+#define SL_GPDMA_FIFO_SLOT_SIZE        8U    ///< FIFO entries in each slot
+#define SL_GPDMA_FIFO_SLOT_COUNT       8U    ///< Number of FIFO slots
+#define SL_GPDMA_FIFO_SLOT_UNALLOCATED 0xFFU ///< Channel has no FIFO slot
 
 #define SL_GPDMA_DATA_WIDTH_8  0x0 ///< Data width 8 bits
 #define SL_GPDMA_DATA_WIDTH_16 0x1 ///< Data width 16 bits
@@ -149,6 +154,112 @@ typedef void (*sl_gpdma_callback_t)(); ///< Callback function type
 
 #define SL_GPDMA_MAX_FIFO_SIZE 64 ///< Maximum FIFO size
 
+/* Hardware burst field 0 means 64 beats. */
+#define SL_GPDMA_BURST_BEATS_64 64U ///< Hardware burst field 0 means 64 beats.
+
+/**
+ * @brief Peripheral direction passed to @ref sl_si91x_gpdma_get_peripheral_channel_number.
+ *        Even IDs are TX. Odd IDs are RX.
+ */
+typedef enum {
+  SL_USART_TX_PERIPHERAL_ID         = 0,  ///< USART0/UART0 TX
+  SL_USART_RX_PERIPHERAL_ID         = 1,  ///< USART0/UART0 RX
+  SL_UART1_TX_PERIPHERAL_ID         = 2,  ///< UART1 TX
+  SL_UART1_RX_PERIPHERAL_ID         = 3,  ///< UART1 RX
+  SL_GSPI_TX_PERIPHERAL_ID          = 4,  ///< GSPI TX
+  SL_GSPI_RX_PERIPHERAL_ID          = 5,  ///< GSPI RX
+  SL_SSI_PRIMARY_TX_PERIPHERAL_ID   = 6,  ///< SSI0 TX
+  SL_SSI_PRIMARY_RX_PERIPHERAL_ID   = 7,  ///< SSI0 RX
+  SL_SSI_SECONDARY_TX_PERIPHERAL_ID = 8,  ///< SSI secondary TX
+  SL_SSI_SECONDARY_RX_PERIPHERAL_ID = 9,  ///< SSI secondary RX
+  SL_I2C_TX_PERIPHERAL_ID           = 10, ///< I2C0 TX
+  SL_I2C_RX_PERIPHERAL_ID           = 11, ///< I2C0 RX
+  INVALID_PERIPHERAL_ID,                  ///< Not a GPDMA peripheral ID
+} sl_gpdma_peripheral_id_t;
+
+static inline uint32_t sli_si91x_gpdma_width_bytes(uint32_t width_code)
+{
+  if (width_code == SL_GPDMA_DATA_WIDTH_32) {
+    return 4U;
+  }
+  if (width_code == SL_GPDMA_DATA_WIDTH_16) {
+    return 2U;
+  }
+  return 1U;
+}
+
+/* Byte multiple for every descriptor. Uses the burst when the whole transfer
+ * is a multiple of burst*width; otherwise the item width. */
+static inline uint32_t sli_si91x_gpdma_transfer_alignment(uint32_t transfer_size,
+                                                          uint32_t width_bytes,
+                                                          uint32_t burst_beats)
+{
+  uint32_t align = width_bytes;
+  uint32_t burst_bytes;
+
+  if ((align == 0U) || ((transfer_size % align) != 0U)) {
+    return 1U;
+  }
+  if (burst_beats == 0U) {
+    burst_beats = SL_GPDMA_BURST_BEATS_64;
+  }
+  burst_bytes = burst_beats * align;
+  if ((burst_beats > 1U) && (burst_bytes <= MAX_TRANSFER_PER_DESCRIPTOR) && ((transfer_size % burst_bytes) == 0U)) {
+    align = burst_bytes;
+  }
+  return align;
+}
+
+static inline uint32_t sli_si91x_gpdma_max_chunk(uint32_t align)
+{
+  uint32_t max_chunk;
+
+  if (align == 0U) {
+    align = 1U;
+  }
+  max_chunk = (MAX_TRANSFER_PER_DESCRIPTOR / align) * align;
+  if (max_chunk == 0U) {
+    max_chunk = align;
+  }
+  return max_chunk;
+}
+
+static inline uint32_t sli_si91x_gpdma_descriptor_count(uint32_t transfer_size, uint32_t align)
+{
+  uint32_t max_chunk;
+
+  if (transfer_size == 0U) {
+    return 0U;
+  }
+  max_chunk = sli_si91x_gpdma_max_chunk(align);
+  return (transfer_size + max_chunk - 1U) / max_chunk;
+}
+
+/* Descriptor `index` size. Every size is a multiple of align, at most one
+ * chunk, and the sizes sum to transfer_size. */
+static inline uint32_t sli_si91x_gpdma_descriptor_size(uint32_t transfer_size, uint32_t align, uint32_t index)
+{
+  uint32_t count;
+  uint32_t base;
+  uint32_t n_big;
+  uint32_t n_small;
+
+  if (align == 0U) {
+    align = 1U;
+  }
+  count = sli_si91x_gpdma_descriptor_count(transfer_size, align);
+  if ((count == 0U) || (index >= count)) {
+    return 0U;
+  }
+  base    = ((transfer_size / count) / align) * align;
+  n_big   = (transfer_size - (base * count)) / align;
+  n_small = count - n_big;
+  if (index < n_small) {
+    return base;
+  }
+  return base + align;
+}
+
 #define SL_GPDMA_MAX_CALLBACK_TYPE 3 ///< Maximum number of callback types
 
 /********************************************************************************************************************
@@ -193,13 +304,14 @@ typedef struct {
  * @brief Structure to hold GPDMA channel allocation data.
  * 
  * This structure defines the parameters related to the allocation of a GPDMA channel, including
- * callback functions, transfer type, descriptor memory location, number of descriptors, and FIFO size.
+ * callback functions, transfer type, descriptor memory location, number of descriptors, and FIFO slot.
  */
 typedef struct {
   sl_gpdma_callback_t gpdma_callback[4];          ///< Structure holding the DMA channel callback functions.
   sl_si91x_gpdma_descriptor_t *descriptor_memory; ///< Pointer to the descriptor memory for the channel.
   uint32_t link_list_mode_disable;                ///< Link list mode for the channel.
-  uint32_t fifo_size;                             ///< FIFO size for the channel.
+  uint32_t fifo_slot;                             ///< First slot 0-7, or SL_GPDMA_FIFO_SLOT_UNALLOCATED.
+  uint32_t fifo_size;                             ///< Inclusive FIFO size; entry count is fifo_size + 1.
   uint32_t number_of_descriptors;                 ///< Number of descriptors allocated for the channel.
   uint32_t max_transfer_Size;                     ///< Maximum transfer size for the channel.
 } sl_gpdma_channel_data_t;
@@ -207,19 +319,17 @@ typedef struct {
 /**
  * @brief Structure to hold GPDMA resource data.
  * 
- * This structure holds the resource data of GPDMA, including the number of allocated channels, channel priority bitmap, transfer type bitmap,
- * top FIFO, and transfer type.
+ * This structure holds the channel and FIFO slot allocation bitmaps and channel count.
  *
  * @details 
  * channel allocation bitmap: bit 0-7 for channel 0-7, 1 for unallocated and 0 for allocated
- * top_fifo: points to the FIFO from where FIFO is available               
+ * FIFO slot bitmap: bit 0-7 for slot 0-7, 1 for unallocated and 0 for allocated.
  **/
 
 typedef struct {
   uint32_t channel_allocation_bitmap; ///< Channel allocation bitmap
-  uint32_t top_fifo;                  ///< Top FIFO number
+  uint32_t fifo_slot_bitmap;          ///< One bit per 8-entry FIFO slot (1 means free)
   uint32_t no_of_allocated_channels;  ///< Number of allocated channels
-  const uint32_t max_fifo;            ///< Maximum FIFO size
 } sl_si91x_gpdma_resources_Data_t;
 
 /********************************************************************************************************************
@@ -496,13 +606,15 @@ sl_status_t sl_si91x_gpdma_build_descriptor(sl_si91x_gpdma_descriptor_t *pDescri
                                             uint32_t channel_number);
 
 /**
- * @brief Allocates a FIFO buffer of the specified size to a GPDMA channel
+ * @brief Allocates contiguous 8-entry FIFO slots to a GPDMA channel
  *
- * This function allocates a FIFO (First In, First Out) buffer of the specified size
- * to the selected GPDMA channel.
+ * This function selects the first free contiguous run and programs its start address as first_slot * 8.
+ * It reserves ceil((fifo_size + 1) / 8) slots. A resize may reuse the channel's current slots.
+ * If no contiguous run fits, the current allocation and hardware configuration are preserved.
  *
  * @param[in] channel_no The GPDMA channel number to allocate the FIFO for.
- * @param[in] fifo_size  The size of the FIFO buffer to allocate (in bytes).
+ * @param[in] fifo_size Inclusive FIFO size register value, 0-63. For example, 7 means 8 entries
+ *                     (one slot), 15 means 16 entries (two contiguous slots).
  * @return    Status of the operation.
  *           - SL_STATUS_OK: If the FIFO was successfully allocated.
  *           - SL_STATUS_INVALID_PARAMETER: If the channel number is invalid or the FIFO size is not supported.
@@ -522,7 +634,7 @@ sl_status_t sl_si91x_gpdma_allocate_fifo(uint32_t channel_no, uint32_t fifo_size
  * This function retrieves the FIFO buffer size configured for the specified GPDMA channel.
  *
  * @param[in] channel_no The GPDMA channel number to query
- * @param[out] fifo_size Pointer to store the retrieved FIFO size value
+ * @param[out] fifo_size Pointer to store the configured inclusive FIFO size value
  *
  * @return sl_status_t SL_STATUS_OK if successful,
  *                     SL_STATUS_INVALID_PARAMETER if channel number is invalid,
@@ -562,6 +674,17 @@ sl_status_t sl_si91x_gpdma_get_channel_status(uint32_t channel_number);
  * For more information on status codes, see [SL STATUS DOCUMENTATION](https://docs.silabs.com/gecko-platform/latest/platform-common/status).
  */
 sl_status_t sl_si91x_gpdma_deinit(void);
+
+/**
+ * @brief Channel allocated to a peripheral, after the first start on that ID.
+ *
+ * @param[in]  peripheral_id  A @ref sl_gpdma_peripheral_id_t value below @ref INVALID_PERIPHERAL_ID.
+ * @param[out] channel_number Allocated GPDMA channel.
+ * @return SL_STATUS_OK, SL_STATUS_NULL_POINTER, SL_STATUS_INVALID_PARAMETER,
+ *         or SL_STATUS_GPDMA_CHANNEL_NOT_ALLOCATED before the first start.
+ */
+sl_status_t sl_si91x_gpdma_get_peripheral_channel_number(sl_gpdma_peripheral_id_t peripheral_id,
+                                                         uint32_t *channel_number);
 
 /// @} end group GPDMA ********************************************************/
 

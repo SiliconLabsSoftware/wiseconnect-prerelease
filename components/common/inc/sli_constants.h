@@ -477,6 +477,7 @@ typedef enum {
   SLI_WIFI_REQ_SET_PROFILE               = 0x31,
   SLI_WIFI_REQ_GET_PROFILE               = 0x32,
   SLI_WIFI_REQ_DELETE_PROFILE            = 0x33,
+  SLI_WIFI_REQ_EC_IDENTITY               = 0x34, ///< On-device EC identity generate/delete (CSR sign uses crypto 0x76)
   SLI_WIFI_REQ_EVM_OFFSET                = 0x36,
   SLI_WIFI_REQ_EVM_WRITE                 = 0x37,
   SLI_WIFI_REQ_IPCONFV4                  = 0x41,
@@ -621,6 +622,7 @@ typedef enum {
   SLI_WIFI_RSP_SET_PROFILE               = 0x31,
   SLI_WIFI_RSP_GET_PROFILE               = 0x32,
   SLI_WIFI_RSP_DELETE_PROFILE            = 0x33,
+  SLI_WIFI_RSP_EC_IDENTITY               = 0x34, ///< On-device EC identity generate/delete (CSR sign uses crypto 0x76)
   SLI_WIFI_RSP_EVM_OFFSET                = 0x36,
   SLI_WIFI_RSP_EVM_WRITE                 = 0x37,
   SLI_WIFI_RSP_IPCONFV4                  = 0x41,

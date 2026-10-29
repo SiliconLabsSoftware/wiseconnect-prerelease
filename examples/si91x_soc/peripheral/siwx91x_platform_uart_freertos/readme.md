@@ -105,6 +105,11 @@ Configuration of UART at UC (Universal Configuration):
 
 - By default in UC, UART1 clock source will be configured to `ULP REF CLK`, select `INTF PLL CLK`.
 
+- **UART1 DMA Configuration**
+  - UART1 DMA Enable: DMA is enabled by default.
+  - DMA Controller: Select **UDMA** or **GPDMA**. The default is UDMA. Only one controller is used at a time.
+  - GPDMA Configuration: Enable this when GPDMA is selected. Set the maximum number of TX and RX descriptors (1 to 256, default 8). Each descriptor moves up to 4095 bytes. TX and RX FIFO thresholds are under this toggle.
+
 - Configure the following macros in [`uart_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/platform_siwx91x_uart_freertos/uart_freertos.c) if required:
 
 - `UART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive UART data. By default, it is set to 1024.

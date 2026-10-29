@@ -26,10 +26,12 @@
  *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- ******************************************************************************/
+ *****************************************************************************/
 
 #ifndef SL_SI91X_BUTTON_INIT_BTN0_CONFIG_H
 #define SL_SI91X_BUTTON_INIT_BTN0_CONFIG_H
+
+#include "sl_si91x_gpio.h"
 
 // <<< Use Configuration Wizard in Context Menu >>>
 
@@ -43,7 +45,23 @@
 // <i> Default: RISE_EDGE_AND_FALL_EDGE_INTERRUPT
 #define SL_BUTTON_CONFIG_INSTANCE_INTR RISE_EDGE_AND_FALL_EDGE_INTERRUPT
 
+// <h> Pin Settings
+// <i> Button is GPIO input. Programmable input options (PADCONFIG_P).
+
+// <o SL_BUTTON_BTN0_PAD_MODE> GPIO pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <GPIO_REPEATER=> Repeater
+// <i> Default: GPIO_HZ
+#ifndef SL_BUTTON_BTN0_PAD_MODE
+#define SL_BUTTON_BTN0_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
+
 // <<< end of configuration section >>>
+
 #if USER_CONFIGURATION_ENABLE
 // <<< sl:start pin_tool >>>
 // <gpio> SL_SI91X_BUTTON_0

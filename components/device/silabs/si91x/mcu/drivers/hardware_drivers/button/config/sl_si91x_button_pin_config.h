@@ -10,6 +10,7 @@
 #define SL_SI91X_BUTTON_PIN_CONFIG_H
 
 #include "em_device.h"
+#include "sl_si91x_gpio.h"
 #include "sl_si91x_button_instances.h"
 
 #define SL_SI91x_BUTTON_COUNT (2)
@@ -25,6 +26,14 @@
 #define SL_BUTTON_BTN1_PORT   RTE_BUTTON1_PORT
 #define SL_BUTTON_BTN1_NUMBER RTE_BUTTON1_NUMBER
 #define SL_BUTTON_BTN1_PAD    RTE_BUTTON1_PAD
+#endif
+
+// Default pad mode when board config has no Pin Settings (legacy packs).
+#ifndef SL_BUTTON_BTN0_PAD_MODE
+#define SL_BUTTON_BTN0_PAD_MODE GPIO_HZ
+#endif
+#ifndef SL_BUTTON_BTN1_PAD_MODE
+#define SL_BUTTON_BTN1_PAD_MODE GPIO_HZ
 #endif
 
 #endif // SL_SI91X_BUTTON_PIN_CONFIG_H

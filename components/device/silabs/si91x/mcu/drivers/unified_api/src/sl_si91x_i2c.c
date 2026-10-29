@@ -1174,8 +1174,10 @@ sl_i2c_status_t sl_i2c_driver_deinit(sl_i2c_instance_t i2c_instance)
 sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
 {
   sl_i2c_status_t status;
-  sl_si91x_gpio_pin_config_t scl_gpio_config = { { pin_init->scl_port, pin_init->scl_pin }, OUTPUT };
-  sl_si91x_gpio_pin_config_t sda_gpio_config = { { pin_init->sda_port, pin_init->sda_pin }, OUTPUT };
+  sl_si91x_gpio_pin_config_t scl_gpio_config;
+  sl_si91x_gpio_pin_config_t sda_gpio_config;
+  sl_si91x_gpio_driver_disable_state_t scl_pad_mode;
+  sl_si91x_gpio_driver_disable_state_t sda_pad_mode;
 
   do {
     // Validates the null pointer, if true returns error code
@@ -1186,6 +1188,22 @@ sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
                             (int)__LINE__);
       break;
     }
+
+    // Only GPIO_PULLUP is supported (default if unset).
+    scl_pad_mode = (pin_init->scl_pad_mode == 0U) ? GPIO_PULLUP
+                                                  : (sl_si91x_gpio_driver_disable_state_t)pin_init->scl_pad_mode;
+    sda_pad_mode = (pin_init->sda_pad_mode == 0U) ? GPIO_PULLUP
+                                                  : (sl_si91x_gpio_driver_disable_state_t)pin_init->sda_pad_mode;
+    if ((scl_pad_mode != GPIO_PULLUP) || (sda_pad_mode != GPIO_PULLUP)) {
+      status = SL_I2C_INVALID_PARAMETER;
+      SL_PRINT_STRING_ERROR("sl_si91x_i2c_pin_init: only GPIO_PULLUP pad mode is supported st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)status,
+                            (int)__LINE__);
+      break;
+    }
+
+    scl_gpio_config = (sl_si91x_gpio_pin_config_t){ { pin_init->scl_port, pin_init->scl_pin }, OUTPUT };
+    sda_gpio_config = (sl_si91x_gpio_pin_config_t){ { pin_init->sda_port, pin_init->sda_pin }, OUTPUT };
 
     // Power up and configure ULP GPIO clock if either pin is ULP
     if (((pin_init->scl_port == SL_GPIO_ULP_PORT) || (pin_init->sda_port == SL_GPIO_ULP_PORT))) {
@@ -1209,7 +1227,7 @@ sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
         sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode(&scl_gpio_config.port_pin, pin_init->scl_mux);
       }
       // Select ULP pad driver disable state for SCL pin, required to configure internal pull-up
-      sl_si91x_gpio_select_ulp_pad_driver_disable_state(pin_init->scl_pin, GPIO_PULLUP);
+      sl_si91x_gpio_select_ulp_pad_driver_disable_state(pin_init->scl_pin, scl_pad_mode);
     } else {
       if (pin_init->instance == SL_I2C0 || pin_init->instance == SL_I2C1) {
 #if defined(SLI_SI917)
@@ -1230,7 +1248,7 @@ sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
         sl_si91x_gpio_driver_set_ulp_peri_on_soc_pin_mode(&scl_gpio_config.port_pin, pin_init->scl_mux);
       }
       // Select pad driver disable state for SCL pin, required to configure internal pull-up
-      sl_si91x_gpio_select_pad_driver_disable_state((uint8_t)(pin_init->scl_pin), GPIO_PULLUP);
+      sl_si91x_gpio_select_pad_driver_disable_state((uint8_t)(pin_init->scl_pin), scl_pad_mode);
     }
 
     // Configure SDA pin
@@ -1248,7 +1266,7 @@ sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
         sl_si91x_gpio_driver_set_soc_peri_on_ulp_pin_mode(&sda_gpio_config.port_pin, pin_init->scl_mux);
       }
       // Select ULP pad driver disable state for SDA pin, required to configure internal pull-up
-      sl_si91x_gpio_select_ulp_pad_driver_disable_state(pin_init->sda_pin, GPIO_PULLUP);
+      sl_si91x_gpio_select_ulp_pad_driver_disable_state(pin_init->sda_pin, sda_pad_mode);
     } else {
       if (pin_init->instance == SL_I2C0 || pin_init->instance == SL_I2C1) {
 #if defined(SLI_SI917)
@@ -1269,7 +1287,7 @@ sl_i2c_status_t sl_si91x_i2c_pin_init(sl_i2c_pin_init_t *pin_init)
         sl_si91x_gpio_driver_set_ulp_peri_on_soc_pin_mode(&sda_gpio_config.port_pin, pin_init->sda_mux);
       }
       // Select pad driver disable state for SDA pin, required to configure internal pull-up
-      sl_si91x_gpio_select_pad_driver_disable_state((uint8_t)(pin_init->sda_pin), GPIO_PULLUP);
+      sl_si91x_gpio_select_pad_driver_disable_state((uint8_t)(pin_init->sda_pin), sda_pad_mode);
     }
     status = SL_I2C_SUCCESS;
   } while (false);

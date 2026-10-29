@@ -132,6 +132,9 @@ void sl_si91x_led_StackIndicateActivity(bool turnOn);
 *  .port = SL_LED_LED0_PORT,
 *  .pin = SL_LED_LED0_PIN,
 *  .led_number = SL_LED_LED0_NUMBER,
+*  .drive_strength = SL_LED_LED0_DRIVE_STRENGTH,
+*  .dout = SL_LED_LED0_DOUT,
+*  .slew_rate = SL_LED_LED0_SLEW_RATE,
 * };
 *
 * void led_init_instances(void)

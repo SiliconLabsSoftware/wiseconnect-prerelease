@@ -37,6 +37,10 @@
 #include "rsi_rom_ulpss_clk.h"
 #include "rsi_power_save.h"
 #include "rsi_spi.h"
+#if defined(SL_CATALOG_SSI_PRIMARY_PRESENT) || defined(SL_CATALOG_SSI_SECONDARY_PRESENT) \
+  || defined(SL_CATALOG_SSI_ULP_PRIMARY_PRESENT)
+#include "sl_si91x_ssi.h"
+#endif
 #ifdef SL_SI91X_SSI_DMA
 #include "sl_si91x_dma.h"
 #if (defined(SSI_ULP_MASTER_RX_DMA_Instance) && (SSI_ULP_MASTER_RX_DMA_Instance == 1))
@@ -73,6 +77,17 @@
 #define ULP_SSI_MASTER_BANK_OFFSET 0x800 // ULP Memory bank offset value.
 #define ULP_SSI_MASTER_BUF_MEMORY  (ULP_SRAM_START_ADDR + (1 * ULP_SSI_MASTER_BANK_OFFSET))
 #endif
+
+/* If any of the DMA configurations are enabled, then define the UDMA enabled used for selective inclusion 
+of udma apis if any ssi instance is using udma*/
+#if defined(SL_SSI_PRIMARY_DMA_CONFIG_ENABLE) && (SL_SSI_PRIMARY_DMA_CONFIG_ENABLE == 1)      \
+  || defined(SL_SSI_SECONDARY_DMA_CONFIG_ENABLE) && (SL_SSI_SECONDARY_DMA_CONFIG_ENABLE == 1) \
+  || defined(SL_SSI_ULP_PRIMARY_DMA_CONFIG_ENABLE) && (SL_SSI_ULP_PRIMARY_DMA_CONFIG_ENABLE == 1)
+
+#define SLI_SSI_UDMA_ENABLED 1
+#else
+#define SLI_SSI_UDMA_ENABLED 0
+#endif
 static uint8_t data_width_in_bytes = 0; // variable to store data width in bytes for current transfer
 static uint8_t ssi_slave_number    = 0; // variable to store current slave number
 #if !(defined(SSI_ULP_MASTER_RX_DMA_Instance) && (SSI_ULP_MASTER_RX_DMA_Instance == 1))
@@ -89,6 +104,47 @@ static sl_status_t SPI_Set_CS_Pin_State(uint8_t cs_gpio_mode_pin, uint8_t cs_gpi
 #endif
 static void SPI_Convert_Data_Width_To_Bytes(uint16_t data_width);
 static sl_status_t SPI_Set_Mode_Fault_Event(const SPI_RESOURCES *spi);
+#if SLI_SSI_GPDMA_EN
+/* num is frames. data_width is the DFS field (frame bits minus 1). */
+static sl_status_t ssi_gpdma_start(const SPI_RESOURCES *spi,
+                                   bool is_tx,
+                                   const void *mem,
+                                   uint32_t num,
+                                   uint16_t data_width)
+{
+  if (!SPI_USES_GPDMA(spi)) {
+    return SL_STATUS_OK;
+  }
+  uint8_t width_bytes                    = (data_width <= 7U) ? 1U : (data_width <= 15U) ? 2U : 4U;
+  sl_gpdma_peripheral_id_t peripheral_id = sli_si91x_gpdma_ssi_peripheral_id(spi, is_tx);
+  sl_gpdma_callback_t callback;
+  bool is_secondary = (spi->reg == SSISlave);
+
+  if (is_tx) {
+    spi->reg->DMACR_b.TDMAE    = 1;
+    spi->reg->DMATDLR_b.DMATDL = is_secondary ? SL_SSI_SECONDARY_GPDMA_TX_THRESHOLD : SL_SSI_PRIMARY_GPDMA_TX_THRESHOLD;
+    callback                   = is_secondary ? sli_si91x_ssi_secondary_gpdma_tx_done_callback
+                                              : sli_si91x_ssi_primary_gpdma_tx_done_callback;
+  } else {
+    spi->reg->DMACR_b.RDMAE    = 1;
+    spi->reg->DMARDLR_b.DMARDL = is_secondary ? SL_SSI_SECONDARY_GPDMA_RX_THRESHOLD : SL_SSI_PRIMARY_GPDMA_RX_THRESHOLD;
+    callback                   = is_secondary ? sli_si91x_ssi_secondary_gpdma_rx_done_callback
+                                              : sli_si91x_ssi_primary_gpdma_rx_done_callback;
+  }
+
+  return sli_si91x_gpdma_peripheral_start((void *)spi,
+                                          peripheral_id,
+                                          is_tx ? mem : (const void *)&spi->reg->DR,
+                                          is_tx ? (const void *)&spi->reg->DR : mem,
+                                          num * (uint32_t)width_bytes,
+                                          width_bytes,
+                                          callback);
+}
+#else
+#ifndef SPI_USES_GPDMA
+#define SPI_USES_GPDMA(spi) 0
+#endif
+#endif
 #ifdef SSI_DUAL_QUAD_COMPONENT
 static int32_t SPI_Configure_Dma_Transfer(const SPI_RESOURCES *spi,
                                           uint32_t num,
@@ -350,9 +406,20 @@ int32_t SPI_Initialize(ARM_SPI_SignalEvent_t cb_event,
       }
     }
   }
+
+#if SLI_SSI_GPDMA_EN
+  if (SPI_USES_GPDMA(spi)) {
+    sl_status_t status = sl_si91x_gpdma_init();
+    if ((status != SL_STATUS_OK) && (status != SL_STATUS_ALREADY_INITIALIZED)) {
+      return ARM_DRIVER_ERROR;
+    }
+  }
+#endif
+
   if ((spi->rx_dma != NULL) || (spi->tx_dma != NULL)) {
-// Enable DMA instance
-// DMA0 used for SSI_MASTER and SSI_SLAVE
+    // Enable DMA instance
+    // DMA0 used for SSI_MASTER and SSI_SLAVE
+
 #ifdef SL_SI91X_SSI_DMA
     sl_dma_init_t dma_init;
     dma_init.dma_number = DMA_INSTANCE;
@@ -381,13 +448,22 @@ int32_t SPI_Uninitialize(const SPI_RESOURCES *spi, UDMA_RESOURCES *udma)
 #ifdef SL_SI91X_SSI_DMA
   //Added to suppress unused variable warning
   (void)udma;
+#elif (SLI_SSI_UDMA_ENABLED == 0)
+  (void)udma;
 #endif
   spi->reg->SSIENR = SSI_DISABLE;
   // Clear SPI state
   spi->info->state = 0U;
 
+#if SLI_SSI_GPDMA_EN
+  if (SPI_USES_GPDMA(spi)) {
+    (void)sli_si91x_gpdma_peripheral_deinit(sli_si91x_gpdma_ssi_peripheral_id(spi, true));
+  }
+#endif
+#if SLI_SSI_UDMA_ENABLED
   if ((spi->rx_dma != NULL) || (spi->tx_dma != NULL)) {
-// Diasable DMA instance
+    // Diasable DMA instance
+
 #ifdef SL_SI91X_SSI_DMA
     if (sl_si91x_dma_unregister_callbacks(DMA_INSTANCE,
                                           (spi->tx_dma->channel + 1),
@@ -403,7 +479,7 @@ int32_t SPI_Uninitialize(const SPI_RESOURCES *spi, UDMA_RESOURCES *udma)
     UDMAx_Uninitialize(udma);
 #endif
   }
-
+#endif
   return ARM_DRIVER_OK;
 }
 
@@ -504,11 +580,17 @@ int32_t SPI_Transfer(const void *data_out,
   (void)udma;
   (void)udmaHandle;
   (void)chnl_info;
+#if (SLI_SSI_UDMA_ENABLED == 1)
   sl_status_t status;
-#else
-  volatile int32_t stat;
-#endif
   RSI_UDMA_CHA_CONFIG_DATA_T control = { 0 };
+#endif
+#elif (SLI_SSI_UDMA_ENABLED == 1)
+  volatile int32_t stat;
+#else
+  (void)udma;
+  (void)udmaHandle;
+  (void)chnl_info;
+#endif
   uint16_t data_width;
 
   if ((data_out == NULL) || (data_in == NULL) || (num == 0U)) {
@@ -544,8 +626,18 @@ int32_t SPI_Transfer(const void *data_out,
   } else {
     data_width = spi->reg->CTRLR0_b.DFS;
   }
-
+#if SLI_SSI_GPDMA_EN
+  if (SPI_USES_GPDMA(spi)) {
+    if (ssi_gpdma_start(spi, false, spi->xfer->rx_buf, num, data_width) != SL_STATUS_OK) {
+      return ARM_DRIVER_ERROR;
+    }
+    if (ssi_gpdma_start(spi, true, spi->xfer->tx_buf, num, data_width) != SL_STATUS_OK) {
+      return ARM_DRIVER_ERROR;
+    }
+  }
+#endif
   if ((spi->rx_dma != NULL) || (spi->tx_dma != NULL)) {
+#if SLI_SSI_UDMA_ENABLED
     if (spi->rx_dma != NULL) {
       control.transferType = UDMA_MODE_BASIC;
       control.nextBurst    = 0;
@@ -709,19 +801,23 @@ int32_t SPI_Transfer(const void *data_out,
 #endif
     }
 #if SL_SI91X_SSI_DMA
-    sl_si91x_dma_enable(DMA_INSTANCE);
+    if (!SPI_USES_GPDMA(spi)) {
+      sl_si91x_dma_enable(DMA_INSTANCE);
+    }
 #else
     UDMAx_DMAEnable(udma, udmaHandle);
 #endif
+#endif
   } else {
-    // Converts the data width into number of bytes to send/receive at once
-    SPI_Convert_Data_Width_To_Bytes(data_width);
-    // Total number of transfers according to the configured data width
-    spi->xfer->num = num * data_width_in_bytes;
+    if (!SPI_USES_GPDMA(spi)) {
+      // Converts the data width into number of bytes to send/receive at once
+      SPI_Convert_Data_Width_To_Bytes(data_width);
+      // Total number of transfers according to the configured data width
+      spi->xfer->num = num * data_width_in_bytes;
 
-    // Interrupt mode
-    /* spi->reg->IMR |= TXEIM | RXFIM; */
-    /*enabled below bits
+      // Interrupt mode
+      /* spi->reg->IMR |= TXEIM | RXFIM; */
+      /*enabled below bits
        Transmit FIFO Empty Interrupt Mask
        Transmit FIFO Overflow Interrupt Mask
        Receive FIFO Underflow Interrupt Mask
@@ -729,25 +825,26 @@ int32_t SPI_Transfer(const void *data_out,
        Receive FIFO Full Interrupt Mask
        */
 #if !(defined(SSI_ULP_MASTER_RX_DMA_Instance) && (SSI_ULP_MASTER_RX_DMA_Instance == 1))
-    // Down the CS pin for ULP primary to transfer the data.
+      // Down the CS pin for ULP primary to transfer the data.
 #ifndef SI917_MEMLCD
-    if (spi->instance_mode == SPI_ULP_MASTER_MODE) {
-      // Set CS0 pin state
-      if (spi->io.cs0 != NULL) {
-        SPI_Set_CS_Pin_State(cs0_gpio_mode_pin, cs0_gpio_port, CLR);
+      if (spi->instance_mode == SPI_ULP_MASTER_MODE) {
+        // Set CS0 pin state
+        if (spi->io.cs0 != NULL) {
+          SPI_Set_CS_Pin_State(cs0_gpio_mode_pin, cs0_gpio_port, CLR);
+        }
+        // Set CS1 pin state
+        if (spi->io.cs1 != NULL) {
+          SPI_Set_CS_Pin_State(cs1_gpio_mode_pin, cs1_gpio_port, CLR);
+        }
+        // Set CS2 pin state
+        if (spi->io.cs2 != NULL) {
+          SPI_Set_CS_Pin_State(cs2_gpio_mode_pin, cs2_gpio_port, CLR);
+        }
       }
-      // Set CS1 pin state
-      if (spi->io.cs1 != NULL) {
-        SPI_Set_CS_Pin_State(cs1_gpio_mode_pin, cs1_gpio_port, CLR);
-      }
-      // Set CS2 pin state
-      if (spi->io.cs2 != NULL) {
-        SPI_Set_CS_Pin_State(cs2_gpio_mode_pin, cs2_gpio_port, CLR);
-      }
+#endif
+#endif
+      spi->reg->IMR |= (TXEIM | TXOIM | RXUIM | RXOIM | RXFIM);
     }
-#endif
-#endif
-    spi->reg->IMR |= (TXEIM | TXOIM | RXUIM | RXOIM | RXFIM);
   }
   return ARM_DRIVER_OK;
 }
@@ -1353,7 +1450,8 @@ static int32_t SPI_Configure_Dma_Transfer(const SPI_RESOURCES *spi,
                                           uint16_t data_width,
                                           uint16_t xfer_type)
 {
-  int32_t status                          = SL_STATUS_OK;
+  int32_t status = SL_STATUS_OK;
+#if SLI_SSI_UDMA_ENABLED
   RSI_UDMA_CHA_CONFIG_DATA_T control_data = { 0 };
   sl_dma_xfer_t dma_transfer              = { 0 };
   uint32_t channel                        = 0;
@@ -1461,7 +1559,12 @@ static int32_t SPI_Configure_Dma_Transfer(const SPI_RESOURCES *spi,
   if (sl_si91x_dma_transfer(DMA_INSTANCE, channel, &dma_transfer)) {
     return ARM_DRIVER_ERROR;
   }
-
+#else
+  (void)spi;
+  (void)num;
+  (void)data_width;
+  (void)xfer_type;
+#endif
   return status;
 }
 #endif
@@ -1493,13 +1596,19 @@ int32_t SPI_Send(const void *data,
   (void)udma;
   (void)udmaHandle;
   (void)chnl_info;
+#if (SLI_SSI_UDMA_ENABLED == 1)
   sl_status_t status;
-#else
+  RSI_UDMA_CHA_CONFIG_DATA_T control = { 0 };
+#endif
+#elif (SLI_SSI_UDMA_ENABLED == 1)
   volatile int32_t stat;
+#else
+  (void)udma;
+  (void)udmaHandle;
+  (void)chnl_info;
 #endif
   uint16_t data_width;
-  RSI_UDMA_CHA_CONFIG_DATA_T control = { 0 };
-  dummy_data                         = 0;
+  dummy_data = 0;
 
   if ((data == NULL) || (num == 0U)) {
     return ARM_DRIVER_ERROR_PARAMETER;
@@ -1536,7 +1645,15 @@ int32_t SPI_Send(const void *data,
 
   spi->reg->SSIENR = SSI_ENABLE;
 
+#if SLI_SSI_GPDMA_EN
+  if (SPI_USES_GPDMA(spi)) {
+    if (ssi_gpdma_start(spi, true, spi->xfer->tx_buf, num, data_width) != SL_STATUS_OK) {
+      return ARM_DRIVER_ERROR;
+    }
+  }
+#endif
   if (spi->tx_dma != NULL) {
+#if SLI_SSI_UDMA_ENABLED
     control.transferType = UDMA_MODE_BASIC;
     control.nextBurst    = 0;
     if (num < 1024) {
@@ -1619,14 +1736,16 @@ int32_t SPI_Send(const void *data,
     UDMAx_ChannelEnable(spi->rx_dma->channel, udma, udmaHandle);
     UDMAx_DMAEnable(udma, udmaHandle);
 #endif
+#endif
   } else {
-    // Converts the data width into number of bytes to send/receive at once
-    SPI_Convert_Data_Width_To_Bytes(data_width);
-    // Total number of transfers according to the configured data width
-    spi->xfer->num = num * data_width_in_bytes;
+    if (!SPI_USES_GPDMA(spi)) {
+      // Converts the data width into number of bytes to send/receive at once
+      SPI_Convert_Data_Width_To_Bytes(data_width);
+      // Total number of transfers according to the configured data width
+      spi->xfer->num = num * data_width_in_bytes;
 
-    /* spi->reg->IMR |= (TXEIM | RXFIM); */
-    /*enabled below bits 
+      /* spi->reg->IMR |= (TXEIM | RXFIM); */
+      /*enabled below bits 
      Transmit FIFO Empty Interrupt Mask
      Transmit FIFO Overflow Interrupt Mask
      Receive FIFO Underflow Interrupt Mask
@@ -1635,24 +1754,25 @@ int32_t SPI_Send(const void *data,
      */
 #if !(defined(SSI_ULP_MASTER_RX_DMA_Instance) && (SSI_ULP_MASTER_RX_DMA_Instance == 1))
 #ifndef SI917_MEMLCD
-    // Down the CS pin for ULP primary to send the data.
-    if (spi->instance_mode == SPI_ULP_MASTER_MODE) {
-      // Set CS0 pin state
-      if (spi->io.cs0 != NULL) {
-        SPI_Set_CS_Pin_State(cs0_gpio_mode_pin, cs0_gpio_port, CLR);
+      // Down the CS pin for ULP primary to send the data.
+      if (spi->instance_mode == SPI_ULP_MASTER_MODE) {
+        // Set CS0 pin state
+        if (spi->io.cs0 != NULL) {
+          SPI_Set_CS_Pin_State(cs0_gpio_mode_pin, cs0_gpio_port, CLR);
+        }
+        // Set CS1 pin state
+        if (spi->io.cs1 != NULL) {
+          SPI_Set_CS_Pin_State(cs1_gpio_mode_pin, cs1_gpio_port, CLR);
+        }
+        // Set CS2 pin state
+        if (spi->io.cs2 != NULL) {
+          SPI_Set_CS_Pin_State(cs2_gpio_mode_pin, cs2_gpio_port, CLR);
+        }
       }
-      // Set CS1 pin state
-      if (spi->io.cs1 != NULL) {
-        SPI_Set_CS_Pin_State(cs1_gpio_mode_pin, cs1_gpio_port, CLR);
-      }
-      // Set CS2 pin state
-      if (spi->io.cs2 != NULL) {
-        SPI_Set_CS_Pin_State(cs2_gpio_mode_pin, cs2_gpio_port, CLR);
-      }
+#endif
+#endif
+      spi->reg->IMR |= (TXEIM | TXOIM);
     }
-#endif
-#endif
-    spi->reg->IMR |= (TXEIM | TXOIM);
   }
   return ARM_DRIVER_OK;
 }
@@ -1713,6 +1833,16 @@ int32_t SPI_Send_Command_Data(const void *data,
   // Converts the data width into number of bytes to send/receive at once
   SPI_Convert_Data_Width_To_Bytes(data_width);
 
+#if SLI_SSI_GPDMA_EN
+  if (SPI_USES_GPDMA(spi)) {
+    // Command phase must be queued in the TX FIFO ahead of the DMA-fed data phase
+    SPI_Command_Send(spi, instruction, address);
+    if (ssi_gpdma_start(spi, true, spi->xfer->tx_buf, num, data_width) != SL_STATUS_OK) {
+      return ARM_DRIVER_ERROR;
+    }
+    return ARM_DRIVER_OK;
+  }
+#endif
   if (spi->tx_dma != NULL) {
     RSI_UDMA_DATACONTEXT_T *pDrv = (RSI_UDMA_DATACONTEXT_T *)udmaHandle;
     uint32_t inst_len            = spi->reg->SPI_CTRLR0_b.INST_L;
@@ -1743,6 +1873,7 @@ int32_t SPI_Send_Command_Data(const void *data,
         spi->reg->DR = (address >> i) & 0xFF;
       }
       // Enable the DMA channel
+
       pDrv->base->CHNL_ENABLE_SET = SET_BIT(spi->tx_dma->channel);
     } else if (addr_len) {
       // Enable the DMA channel
@@ -1779,11 +1910,18 @@ int32_t SPI_Receive(void *data,
   (void)udma;
   (void)udmaHandle;
   (void)chnl_info;
+#if (SLI_SSI_UDMA_ENABLED == 1)
   sl_status_t status;
-#else
-  volatile int32_t stat;
-#endif
   RSI_UDMA_CHA_CONFIG_DATA_T control = { 0 };
+#endif
+#elif (SLI_SSI_UDMA_ENABLED == 1)
+  volatile int32_t stat;
+#else
+  (void)udma;
+  (void)udmaHandle;
+  (void)chnl_info;
+#endif
+
   uint16_t data_width;
   dummy_data = 0;
 
@@ -1831,7 +1969,22 @@ int32_t SPI_Receive(void *data,
 
   spi->reg->SSIENR = SSI_ENABLE;
 
+#if SLI_SSI_GPDMA_EN
+  if (SPI_USES_GPDMA(spi)) {
+    if (ssi_gpdma_start(spi, false, spi->xfer->rx_buf, num, data_width) != SL_STATUS_OK) {
+      return ARM_DRIVER_ERROR;
+    }
+    if ((spi->instance_mode == SPI_MASTER_MODE)) {
+      if (ssi_gpdma_start(spi, true, spi->xfer->rx_buf, num, data_width) != SL_STATUS_OK) {
+        sl_gpdma_peripheral_id_t peripheral_id = sli_si91x_gpdma_ssi_peripheral_id(spi, false);
+        sli_si91x_gpdma_peripheral_stop(peripheral_id);
+        return ARM_DRIVER_ERROR;
+      }
+    }
+  }
+#endif
   if ((spi->rx_dma != NULL) || (spi->tx_dma != NULL)) {
+#if SLI_SSI_UDMA_ENABLED
     if (spi->rx_dma != NULL) {
       control.transferType = UDMA_MODE_BASIC;
       control.nextBurst    = 0;
@@ -2008,16 +2161,18 @@ int32_t SPI_Receive(void *data,
 #else
     UDMAx_DMAEnable(udma, udmaHandle);
 #endif
+#endif
   } else {
-    // Converts the data width into number of bytes to send/receive at once
-    SPI_Convert_Data_Width_To_Bytes(data_width);
-    // Total number of transfers according to the configured data width
-    spi->xfer->num = num * data_width_in_bytes;
+    if (!SPI_USES_GPDMA(spi)) {
+      // Converts the data width into number of bytes to send/receive at once
+      SPI_Convert_Data_Width_To_Bytes(data_width);
+      // Total number of transfers according to the configured data width
+      spi->xfer->num = num * data_width_in_bytes;
 
-    // Interrupt mode
-    // RX Buffer not empty interrupt enable
-    /* spi->reg->IMR |= (TXEIM | RXFIM); */
-    /*enabled below bits 
+      // Interrupt mode
+      // RX Buffer not empty interrupt enable
+      /* spi->reg->IMR |= (TXEIM | RXFIM); */
+      /*enabled below bits 
      Transmit FIFO Empty Interrupt Mask
      Transmit FIFO Overflow Interrupt Mask
      Receive FIFO Underflow Interrupt Mask
@@ -2026,28 +2181,29 @@ int32_t SPI_Receive(void *data,
      */
 #if !(defined(SSI_ULP_MASTER_RX_DMA_Instance) && (SSI_ULP_MASTER_RX_DMA_Instance == 1))
 #ifndef SI917_MEMLCD
-    // Down the CS pin for ULP primary to receive the data.
-    if (spi->instance_mode == SPI_ULP_MASTER_MODE) {
-      // Set CS0 pin state
-      if (spi->io.cs0 != NULL) {
-        SPI_Set_CS_Pin_State(cs0_gpio_mode_pin, cs0_gpio_port, CLR);
+      // Down the CS pin for ULP primary to receive the data.
+      if (spi->instance_mode == SPI_ULP_MASTER_MODE) {
+        // Set CS0 pin state
+        if (spi->io.cs0 != NULL) {
+          SPI_Set_CS_Pin_State(cs0_gpio_mode_pin, cs0_gpio_port, CLR);
+        }
+        // Set CS1 pin state
+        if (spi->io.cs1 != NULL) {
+          SPI_Set_CS_Pin_State(cs1_gpio_mode_pin, cs1_gpio_port, CLR);
+        }
+        // Set CS2 pin state
+        if (spi->io.cs2 != NULL) {
+          SPI_Set_CS_Pin_State(cs2_gpio_mode_pin, cs2_gpio_port, CLR);
+        }
       }
-      // Set CS1 pin state
-      if (spi->io.cs1 != NULL) {
-        SPI_Set_CS_Pin_State(cs1_gpio_mode_pin, cs1_gpio_port, CLR);
-      }
-      // Set CS2 pin state
-      if (spi->io.cs2 != NULL) {
-        SPI_Set_CS_Pin_State(cs2_gpio_mode_pin, cs2_gpio_port, CLR);
-      }
-    }
 #endif
 #endif
-    spi->reg->IMR |= (RXUIM | RXOIM | RXFIM);
-    if ((spi->instance_mode == SPI_MASTER_MODE) || (spi->instance_mode == SPI_ULP_MASTER_MODE)) {
-      *(volatile uint8_t *)(&spi->reg->DR) = DUMMY_DATA; // dummy data
-      while (spi->reg->SR & BIT(0))
-        ;
+      spi->reg->IMR |= (RXUIM | RXOIM | RXFIM);
+      if ((spi->instance_mode == SPI_MASTER_MODE) || (spi->instance_mode == SPI_ULP_MASTER_MODE)) {
+        *(volatile uint8_t *)(&spi->reg->DR) = DUMMY_DATA; // dummy data
+        while (spi->reg->SR & BIT(0))
+          ;
+      }
     }
   }
   return ARM_DRIVER_OK;
@@ -2125,6 +2281,15 @@ int32_t SPI_Receive_Command_Data(void *data,
     SSI0->CTRLR1_b.NDF = num - 1;
   }
 
+#if SLI_SSI_GPDMA_EN
+  if (SPI_USES_GPDMA(spi)) {
+    if (ssi_gpdma_start(spi, false, spi->xfer->rx_buf, num, data_width) != SL_STATUS_OK) {
+      return ARM_DRIVER_ERROR;
+    }
+    SPI_Command_Send(spi, instruction, address);
+    return ARM_DRIVER_OK;
+  }
+#endif
   if (spi->rx_dma != NULL) {
     status = SPI_Configure_Dma_Transfer(spi, num, data_width, RECEIVE_ONLY);
     if (status == ARM_DRIVER_ERROR) {
@@ -2134,7 +2299,6 @@ int32_t SPI_Receive_Command_Data(void *data,
     if (spi->reg->CTRLR0_b.SPI_FRF == STANDARD_SPI_FORMAT) {
       SPI_Command_Send(spi, instruction, address);
     }
-
     sl_si91x_dma_channel_enable(DMA_INSTANCE, spi->rx_dma->channel + 1);
     sl_si91x_dma_enable(DMA_INSTANCE);
     if (spi->reg->CTRLR0_b.SPI_FRF != STANDARD_SPI_FORMAT) {

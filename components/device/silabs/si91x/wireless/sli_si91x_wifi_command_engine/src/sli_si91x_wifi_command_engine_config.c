@@ -302,6 +302,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         case SLI_WIFI_RSP_RADIO:
         case SLI_WIFI_RSP_EAP_CONFIG:
         case SLI_WIFI_RSP_SET_CERTIFICATE:
+        case SLI_WIFI_RSP_EC_IDENTITY:
         case SLI_WIFI_RSP_HOST_PSK:
         case SLI_WIFI_RSP_JOIN:
         case SLI_WIFI_RSP_SCAN:

@@ -37,6 +37,9 @@ sl_led_t const led_{{ inst | lower }} = {
   .port = SL_LED_{{ inst | upper }}_PORT,
   .pin = SL_LED_{{ inst | upper }}_PIN,
   .led_number = SL_LED_{{ inst | upper }}_NUMBER,
+  .drive_strength = SL_LED_{{ inst | upper }}_DRIVE_STRENGTH,
+  .dout = SL_LED_{{ inst | upper }}_DOUT,
+  .slew_rate = SL_LED_{{ inst | upper }}_SLEW_RATE,
 };
 {%- endfor %}
 

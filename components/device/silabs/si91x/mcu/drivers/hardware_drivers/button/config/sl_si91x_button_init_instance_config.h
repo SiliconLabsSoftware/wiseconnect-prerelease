@@ -9,6 +9,8 @@
 #ifndef SL_SI91X_BUTTON_INIT_INSTANCE_CONFIG_H
 #define SL_SI91X_BUTTON_INIT_INSTANCE_CONFIG_H
 
+#include "sl_si91x_gpio.h"
+
 #if USER_CONFIGURATION_ENABLE
 // <<< Use Configuration Wizard in Context Menu >>>
 
@@ -21,6 +23,21 @@
 // <RISE_EDGE_AND_FALL_EDGE_INTERRUPT => Rise edge and fall edge interrupt
 // <i> Default: RISE_EDGE_AND_FALL_EDGE_INTERRUPT
 #define SL_BUTTON_CONFIG_INSTANCE_INTR RISE_EDGE_AND_FALL_EDGE_INTERRUPT
+
+// <h> Pin Settings
+// <i> Button is GPIO input. Programmable input options (PADCONFIG_P).
+
+// <o SL_BUTTON_INSTANCE_PAD_MODE> GPIO pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <GPIO_REPEATER=> Repeater
+// <i> Default: GPIO_HZ
+#ifndef SL_BUTTON_INSTANCE_PAD_MODE
+#define SL_BUTTON_INSTANCE_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
 
 // <<< end of configuration section >>>
 

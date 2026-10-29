@@ -200,15 +200,17 @@ typedef struct {
  * mux, and pad settings for both SDA and SCL lines.
  */
 typedef struct {
-  uint8_t sda_port; ///< I2C SDA GPIO port.
-  uint8_t sda_pin;  ///< I2C SDA GPIO pin.
-  uint8_t sda_mux;  ///< I2C SDA GPIO mux.
-  uint8_t sda_pad;  ///< I2C SDA GPIO pad.
-  uint8_t scl_port; ///< I2C SCL GPIO port.
-  uint8_t scl_pin;  ///< I2C SCL GPIO pin.
-  uint8_t scl_mux;  ///< I2C SCL GPIO mux.
-  uint8_t scl_pad;  ///< I2C SCL GPIO pad.
-  uint8_t instance; ///< I2C instance.
+  uint8_t sda_port;     ///< I2C SDA GPIO port.
+  uint8_t sda_pin;      ///< I2C SDA GPIO pin.
+  uint8_t sda_mux;      ///< I2C SDA GPIO mux.
+  uint8_t sda_pad;      ///< I2C SDA GPIO pad.
+  uint8_t scl_port;     ///< I2C SCL GPIO port.
+  uint8_t scl_pin;      ///< I2C SCL GPIO pin.
+  uint8_t scl_mux;      ///< I2C SCL GPIO mux.
+  uint8_t scl_pad;      ///< I2C SCL GPIO pad.
+  uint8_t instance;     ///< I2C instance.
+  uint8_t scl_pad_mode; ///< I2C SCL pad mode.
+  uint8_t sda_pad_mode; ///< I2C SDA pad mode.
 } sl_i2c_pin_init_t;
 
 /**
@@ -506,7 +508,7 @@ sl_i2c_status_t sl_i2c_driver_transfer_data(sl_i2c_instance_t i2c_instance,
  *      I2S Master, I2S Slave, Micro-DMA Controller, Config Timer, Random-Number Generator, CRC Accelerator, SIO, QEI, MCPWM, and EFUSE) 
  *      must be powered down. Use the following API to power down the specific power domain if other peripherals are not being used:
  *      `sl_si91x_peri_efuse_power_down(power_down)`.
- *   2. Some peripherals (ULP Peripherals, UULP Peripherals, GPDMA, and SDIO-SPI) have separate domains that can be powered down independently. 
+ *   2. Some peripherals (ULP Peripherals, UULP Peripherals, and SDIO-SPI) have separate domains that can be powered down independently. 
  *      For additional details, see the Power Architecture section in the Hardware Reference Manual. The ULP_UART has a separate power domain 
  *      (ULPSS_PWRGATE_ULP_UART) that can be powered down independently. See the `rsi_power_save.h` file for all power gate definitions.
  * 

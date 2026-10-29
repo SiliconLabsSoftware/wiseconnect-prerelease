@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 #include "sl_si91x_i2c.h"
+#include "sl_si91x_gpio.h"
 /******************************************************************************/
 /******************************* I2C Configuration **************************/
 // <h> I2C2 (ULP_I2C) Configuration
@@ -60,6 +61,26 @@ extern "C" {
 #define SL_I2C_I2C2_INIT_DMA 0
 
 // </h> End I2C2 Configuration
+
+// <h> Pin Settings
+// <i> I2C SCL/SDA drivers are open-drain (HW/protocol wire-AND). Pad mode selects PADCONFIG_P.
+// <i> Pull-up is required for Fast-mode and High-speed mode.
+
+// <o SL_I2C_I2C2_SCL_MODE> SCL pad mode
+// <GPIO_PULLUP=> Pull-up
+// <i> Default: GPIO_PULLUP
+#ifndef SL_I2C_I2C2_SCL_MODE
+#define SL_I2C_I2C2_SCL_MODE GPIO_PULLUP
+#endif
+
+// <o SL_I2C_I2C2_SDA_MODE> SDA pad mode
+// <GPIO_PULLUP=> Pull-up
+// <i> Default: GPIO_PULLUP
+#ifndef SL_I2C_I2C2_SDA_MODE
+#define SL_I2C_I2C2_SDA_MODE GPIO_PULLUP
+#endif
+
+// </h>
 /******************************************************************************/
 // <<< end of configuration section >>>
 

@@ -40,6 +40,11 @@ extern "C" {
 #include "base_types.h"
 #include "sl_log_helper.h"
 
+#include "sl_component_catalog.h"
+#ifdef SL_CATALOG_SL_SI91X_GPDMA_PRESENT
+#include "sl_si91x_gpdma_peripheral_specific.h"
+#endif
+
 /***************************************************************************/
 /**
  * @addtogroup GSPI Generic SPI
@@ -672,6 +677,28 @@ int32_t sl_si91x_gspi_get_clock_division_factor(sl_gspi_handle_t gspi_handle);
  ******************************************************************************/
 uint32_t sl_si91x_gspi_get_frame_length(void);
 
+#if SLI_GSPI_GPDMA_EN
+
+/***************************************************************************/
+/**
+ * @brief To clear the busy flag and update the tx count
+ * 
+ * @details This API clears the busy flag, updates the tx count and calls the user callback function to notify the transfer completion.
+ * 
+ * @note This function internally calls the UDMA TX done callback since both have similar logic
+ */
+void sli_si91x_gspi_gpdma_tx_done_callback(void);
+
+/***************************************************************************/
+/**
+ * @brief To clear the busy flag and update the rx count
+ * 
+ * @details This API clears the busy flag, updates the rx count and calls the user callback function to notify the transfer completion.
+ * 
+ * @note This function internally calls the UDMA RX done callback since both have similar logic
+ */
+void sli_si91x_gspi_gpdma_rx_done_callback(void);
+#endif
 /***************************************************************************/
 /**
  * @brief To set the secondary number in multi-secondary operation.

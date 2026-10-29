@@ -842,28 +842,53 @@ sl_status_t wifi_get_network_info_handler(const console_args_t *arguments)
 {
   UNUSED_PARAMETER(arguments);
 
-  sl_status_t status                = 0;
-  sl_si91x_rsp_wireless_info_t info = { 0 };
+  if (!sl_si91x_is_device_initialized()) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
 
-  status = sl_wifi_get_wireless_info(&info);
+  sl_status_t status           = SL_STATUS_OK;
+  sl_net_interface_info_t info = { 0 };
+  sl_net_interface_t interface;
+  const sl_wifi_interface_info_t *wifi;
+  uint16_t oper_mode = si91x_init_configuration.boot_config.oper_mode;
+
+  // Same opermode gate as deprecated sl_wifi_get_wireless_info (client / AP only).
+  if ((oper_mode != SL_SI91X_CLIENT_MODE) && (oper_mode != SL_SI91X_ENTERPRISE_CLIENT_MODE)
+      && (oper_mode != SL_SI91X_ACCESS_POINT_MODE)) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  if (oper_mode == SL_SI91X_ACCESS_POINT_MODE) {
+    interface = SL_NET_WIFI_AP_INTERFACE;
+  } else {
+    interface = SL_NET_WIFI_CLIENT_INTERFACE;
+  }
+
+  status = sl_net_get_interface_info(interface, &info);
   VERIFY_STATUS_AND_RETURN(status);
 
+  wifi = &info.hw_info.wifi_info;
+
   PRINT_AT_CMD_SUCCESS;
-  AT_PRINTF("%s %u \"%s\" ", info.wlan_state ? "CONNECTED" : "DISCONNECTED", info.channel_number, info.ssid);
+  AT_PRINTF("%s %u \"%s\" ", wifi->wlan_state ? "CONNECTED" : "DISCONNECTED", wifi->channel_number, wifi->ssid);
 
   AT_PRINTF("%2X:%2X:%2X:%2X:%2X:%2X",
-            info.mac_address[0],
-            info.mac_address[1],
-            info.mac_address[2],
-            info.mac_address[3],
-            info.mac_address[4],
-            info.mac_address[5]);
+            wifi->mac_address[0],
+            wifi->mac_address[1],
+            wifi->mac_address[2],
+            wifi->mac_address[3],
+            wifi->mac_address[4],
+            wifi->mac_address[5]);
 
-  AT_PRINTF(" %u ", info.sec_type);
+  AT_PRINTF(" %u ", wifi->sec_type);
   for (uint8_t ii = 0; ii < 32; ii++) {
-    AT_PRINTF("%x", info.psk_pmk[ii]);
+    AT_PRINTF("%x", wifi->psk_pmk[ii]);
   }
-  AT_PRINTF(" %d.%d.%d.%d", info.ipv4_address[0], info.ipv4_address[1], info.ipv4_address[2], info.ipv4_address[3]);
+  AT_PRINTF(" %d.%d.%d.%d",
+            info.ipv4_address.bytes[0],
+            info.ipv4_address.bytes[1],
+            info.ipv4_address.bytes[2],
+            info.ipv4_address.bytes[3]);
 
   char temp_buffer[46] = { 0 };
   sl_inet_ntop6((const unsigned char *)(&info.ipv6_address), (char *)temp_buffer, sizeof(temp_buffer));

@@ -39,7 +39,8 @@ sl_button_t const button_{{ inst | lower }} = {
   #ifdef SL_BUTTON_{{ inst | upper }}_PAD
   .pad = SL_BUTTON_{{ inst | upper }}_PAD,
   #endif
-  .interrupt_config = SL_BUTTON_CONFIG_{{ inst | upper }}_INTR
+  .interrupt_config = SL_BUTTON_CONFIG_{{ inst | upper }}_INTR,
+  .pad_mode = SL_BUTTON_{{ inst | upper }}_PAD_MODE
 };
 {%- endfor %}
 

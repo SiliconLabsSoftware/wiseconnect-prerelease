@@ -33,6 +33,7 @@
 #endif // DEBUG_UART
 #include "sl_log_helper.h"
 #include "sl_si91x_clock_manager.h"
+#include "sl_si91x_gpio.h"
 /*******************************************************************************
  *******************************   DEFINES   ***********************************
  ******************************************************************************/
@@ -112,6 +113,22 @@ int8_t button_get_free_hp_context_index(void)
   return -1;
 }
 
+static void sli_si91x_button_apply_pad_mode(uint8_t port, uint8_t pin, uint8_t configured_mode)
+{
+  sl_si91x_gpio_driver_disable_state_t pad_mode = (sl_si91x_gpio_driver_disable_state_t)configured_mode;
+
+  // UULP pads do not use HP/ULP PADCONFIG_P; skip for UULP_VBAT.
+  if (port == UULP_VBAT) {
+    return;
+  }
+
+  if (port == ULP) {
+    sl_si91x_gpio_select_ulp_pad_driver_disable_state(pin, pad_mode);
+  } else {
+    sl_si91x_gpio_select_pad_driver_disable_state(pin, pad_mode);
+  }
+}
+
 void sl_si91x_button_init(const sl_button_t *handle)
 {
   sl_status_t status                              = SL_STATUS_OK;
@@ -130,6 +147,8 @@ void sl_si91x_button_init(const sl_button_t *handle)
                             __LINE__);
       break;
     }
+
+    sli_si91x_button_apply_pad_mode(handle->port, handle->pin, handle->pad_mode);
 
     // Enable button interrupt
     if (handle->port == UULP_VBAT) {

@@ -1158,6 +1158,56 @@ uint32_t sl_si91x_ssi_get_receiver_sample_delay(sl_ssi_handle_t ssi_handle)
 }
 
 /*==============================================*/
+
+/**
+ * @brief Callback function for SSI primary GPDMA TX done.
+ * 
+ * @details This function is called when the SSI primary GPDMA TX is done.
+ */
+void sli_si91x_ssi_primary_gpdma_tx_done_callback(void)
+{
+  SPI_UDMA_Tx_Event(UDMA_EVENT_XFER_DONE,
+                    0U,
+                    (SPI_RESOURCES *)gpdma_peripheral_channel_info[SL_SSI_PRIMARY_TX_PERIPHERAL_ID].resources);
+}
+
+/**
+ * @brief Callback function for SSI primary GPDMA RX done.
+ * 
+ * @details This function is called when the SSI primary GPDMA RX is done.
+ */
+void sli_si91x_ssi_primary_gpdma_rx_done_callback(void)
+{
+  SPI_UDMA_Rx_Event(UDMA_EVENT_XFER_DONE,
+                    0U,
+                    (SPI_RESOURCES *)gpdma_peripheral_channel_info[SL_SSI_PRIMARY_RX_PERIPHERAL_ID].resources);
+}
+
+/**
+ * @brief Callback function for SSI secondary GPDMA TX done.
+ * 
+ * @details This function is called when the SSI secondary GPDMA TX is done.
+ */
+void sli_si91x_ssi_secondary_gpdma_tx_done_callback(void)
+{
+  SPI_UDMA_Tx_Event(UDMA_EVENT_XFER_DONE,
+                    0U,
+                    (SPI_RESOURCES *)gpdma_peripheral_channel_info[SL_SSI_SECONDARY_TX_PERIPHERAL_ID].resources);
+}
+
+/**
+ * @brief Callback function for SSI secondary GPDMA RX done.
+ * 
+ * @details This function is called when the SSI secondary GPDMA RX is done.
+ */
+void sli_si91x_ssi_secondary_gpdma_rx_done_callback(void)
+{
+  SPI_UDMA_Rx_Event(UDMA_EVENT_XFER_DONE,
+                    0U,
+                    (SPI_RESOURCES *)gpdma_peripheral_channel_info[SL_SSI_SECONDARY_RX_PERIPHERAL_ID].resources);
+}
+
+/*==============================================*/
 /**
  * @fn     void callback_event_handler(uint32_t event)
  * @brief  SSI callback handler

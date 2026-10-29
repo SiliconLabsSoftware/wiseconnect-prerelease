@@ -138,7 +138,7 @@
 #define SL_STATUS_TRANSCEIVER_INVALID_CONFIG \
   ((sl_status_t)0x0B67) ///< Provided transceiver configuration parameters are invalid.
 
-// Partial IP configuration status codes (end of WiFi SDK space: 0x0B00–0x0B69).
+// Partial IP configuration status codes (WiFi SDK space: 0x0B00–0x0B6F).
 // Returned when a dual-stack (IPv4 + IPv6) profile is only partially configured.
 // Query the underlying per-family firmware error via sl_wifi_get_ip_config_failure_reason().
 // When both families fail, the aggregate return is the IPv4 error; use that API for IPv6 as well.
@@ -146,6 +146,19 @@
   ((sl_status_t)0x0B68) ///< IPv4 configured successfully but IPv6 configuration failed (dual-stack partial success).
 #define SL_STATUS_WIFI_IPV6_OK \
   ((sl_status_t)0x0B69) ///< IPv6 configured successfully but IPv4 configuration failed (dual-stack partial success).
+
+// Si91X EC identity (EAP-TLS) host-side errors
+#define SL_STATUS_EC_UNSUPPORTED_CURVE ((sl_status_t)0x0B6A) ///< Requested EC curve is not supported in this release.
+#define SL_STATUS_EC_UNSUPPORTED_SIG_ALG \
+  ((sl_status_t)0x0B6B) ///< Requested EC signature algorithm is not supported in this release.
+/// NWP SLI_KEY_NOT_PRESENT (278) mapped as 0x10000 + 278.
+#define SL_STATUS_EC_KEY_NOT_FOUND ((sl_status_t)0x10116) ///< No on-device EC key is present.
+/// NWP SLI_KEY_ALREADY_EXISTS (277) mapped as 0x10000 + 277.
+#define SL_STATUS_EC_IDENTITY_IN_USE ((sl_status_t)0x10115) ///< The requested EC identity slot is already provisioned.
+#define SL_STATUS_EC_KEY_ALREADY_EXISTS \
+  SL_STATUS_EC_IDENTITY_IN_USE ///< Alias: EC key already exists; delete then regenerate with sl_net_generate_and_set_credential.
+#define SL_STATUS_EC_IDENTITY_LIMIT ((sl_status_t)0x0B6E) ///< Maximum number of EC identities has been reached.
+#define SL_STATUS_EC_INVALID_STATE  ((sl_status_t)0x0B6F) ///< EC identity is not in a state that allows this operation.
 
 // Si91X Crypto Firmware Errors
 #define SL_STATUS_CRYPTO_INVALID_PARAMETER \

@@ -34,68 +34,42 @@
 /** @addtogroup SOC25
 * @{
 */
+/**
+ * @brief Configure one QEI pin mux (ULP / host-pad / HP), matching I2C pin init.
+ */
+static void qei_configure_pin(uint8_t pin, uint8_t port, uint8_t mux, uint8_t pad)
+{
+  if (pin > 63) {
+    RSI_EGPIO_UlpPadReceiverEnable((uint8_t)(pin - 64));
+    RSI_EGPIO_SetPinMux(EGPIO1, 0, (uint8_t)(pin - 64), 6);
+    RSI_EGPIO_PadSelectionEnable(pad);
+    RSI_EGPIO_SetPinMux(EGPIO, port, pin, mux);
+  } else if (pin >= 25 && pin <= 30) {
+    RSI_EGPIO_HostPadsGpioModeEnable(pin);
+    RSI_EGPIO_PadReceiverEnable(pin);
+    RSI_EGPIO_SetPinMux(EGPIO, port, pin, mux);
+  } else {
+    RSI_EGPIO_PadSelectionEnable(pad);
+    RSI_EGPIO_PadReceiverEnable(pin);
+    RSI_EGPIO_SetPinMux(EGPIO, port, pin, mux);
+  }
+}
+
 /*==============================================*/
 /**
  * @fn          void RSI_QEI_Enable(volatile QEI_Type *pstcQei)      
- * @brief	    Enables the clock to the QEI module
+ * @brief     Enables the clock to the QEI module
  * @param[in]   pstcQei - Pointer to the QEI register instance
- * @return 	    none
+ * @return      none
  */
 void RSI_QEI_Enable(QEI_Type *pstcQei)
 {
   UNUSED_PARAMETER(pstcQei);
-  // QEI Direction pin mux
-  if (RTE_QEI_DIR_PIN >= 25 && RTE_QEI_DIR_PIN <= 30) {
-    RSI_EGPIO_HostPadsGpioModeEnable(RTE_QEI_DIR_PIN);
-  } else if (RTE_QEI_DIR_PIN > 63) {
-    RSI_EGPIO_UlpPadReceiverEnable((uint8_t)(RTE_QEI_DIR_PIN - 64));
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, (uint8_t)(RTE_QEI_DIR_PIN - 64), 6);
-  }
-  RSI_EGPIO_PadSelectionEnable(RTE_QEI_DIR_PAD);
 
-  RSI_EGPIO_PadReceiverEnable(RTE_QEI_DIR_PIN);
-
-  RSI_EGPIO_SetPinMux(EGPIO, RTE_QEI_DIR_PORT, RTE_QEI_DIR_PIN, RTE_QEI_DIR_MUX);
-
-  // QEI Index pin mux
-  if (RTE_QEI_IDX_PIN >= 25 && RTE_QEI_IDX_PIN <= 30) {
-    RSI_EGPIO_HostPadsGpioModeEnable(RTE_QEI_IDX_PIN);
-  } else if (RTE_QEI_IDX_PIN > 63) {
-    RSI_EGPIO_UlpPadReceiverEnable((uint8_t)(RTE_QEI_IDX_PIN - 64));
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, (uint8_t)(RTE_QEI_IDX_PIN - 64), 6);
-  }
-  RSI_EGPIO_PadSelectionEnable(RTE_QEI_IDX_PAD);
-
-  RSI_EGPIO_PadReceiverEnable(RTE_QEI_IDX_PIN);
-
-  RSI_EGPIO_SetPinMux(EGPIO, RTE_QEI_IDX_PORT, RTE_QEI_IDX_PIN, RTE_QEI_IDX_MUX);
-
-  // QEI PhaseA pin mux
-  if (RTE_QEI_PHA_PIN >= 25 && RTE_QEI_PHA_PIN <= 30) {
-    RSI_EGPIO_HostPadsGpioModeEnable(RTE_QEI_PHA_PIN);
-  } else if (RTE_QEI_PHA_PIN > 63) {
-    RSI_EGPIO_UlpPadReceiverEnable((uint8_t)(RTE_QEI_PHA_PIN - 64));
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, (uint8_t)(RTE_QEI_PHA_PIN - 64), 6);
-  }
-  RSI_EGPIO_PadSelectionEnable(RTE_QEI_PHA_PAD);
-
-  RSI_EGPIO_PadReceiverEnable(RTE_QEI_PHA_PIN);
-
-  RSI_EGPIO_SetPinMux(EGPIO, RTE_QEI_PHA_PORT, RTE_QEI_PHA_PIN, RTE_QEI_PHA_MUX);
-
-  // QEI PhaseB pin mux
-  if (RTE_QEI_PHB_PIN >= 25 && RTE_QEI_PHB_PIN <= 30) {
-    RSI_EGPIO_HostPadsGpioModeEnable(RTE_QEI_PHB_PIN);
-  } else if (RTE_QEI_PHB_PIN > 63) {
-    RSI_EGPIO_UlpPadReceiverEnable((uint8_t)(RTE_QEI_PHB_PIN - 64));
-    RSI_EGPIO_SetPinMux(EGPIO1, 0, (uint8_t)(RTE_QEI_PHB_PIN - 64), 6);
-  }
-
-  RSI_EGPIO_PadSelectionEnable(RTE_QEI_PHB_PAD);
-
-  RSI_EGPIO_SetPinMux(EGPIO, RTE_QEI_PHB_PORT, RTE_QEI_PHB_PIN, RTE_QEI_PHB_MUX);
-
-  RSI_EGPIO_PadReceiverEnable(RTE_QEI_PHB_PIN);
+  qei_configure_pin(RTE_QEI_DIR_PIN, RTE_QEI_DIR_PORT, RTE_QEI_DIR_MUX, RTE_QEI_DIR_PAD);
+  qei_configure_pin(RTE_QEI_IDX_PIN, RTE_QEI_IDX_PORT, RTE_QEI_IDX_MUX, RTE_QEI_IDX_PAD);
+  qei_configure_pin(RTE_QEI_PHA_PIN, RTE_QEI_PHA_PORT, RTE_QEI_PHA_MUX, RTE_QEI_PHA_PAD);
+  qei_configure_pin(RTE_QEI_PHB_PIN, RTE_QEI_PHB_PORT, RTE_QEI_PHB_MUX, RTE_QEI_PHB_PAD);
 
   // QEI clock enable routine here
   RSI_CLK_PeripheralClkEnable2(M4CLK, QE_PCLK_ENABLE);
@@ -106,9 +80,9 @@ void RSI_QEI_Enable(QEI_Type *pstcQei)
 /*==============================================*/
 /**
  * @fn          void RSI_QEI_Disable(volatile QEI_Type *pstcQei)
- * @brief	    Disables the clock to the QEI module
+ * @brief     Disables the clock to the QEI module
  * @param[in]   pstcQei - Pointer to the QEI register instance
- * @return 	    none
+ * @return      none
  */
 void RSI_QEI_Disable(QEI_Type *pstcQei)
 {

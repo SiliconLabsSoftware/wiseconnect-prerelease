@@ -72,6 +72,20 @@ sl_status_t sli_si91x_set_credential(sl_net_credential_id_t id,
                                      uint32_t credential_length);
 
 /**
+ * @brief Generate and store an on-device EC private key for the given credential ID.
+ *
+ * @param[in] id Credential ID encoded with @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY.
+ * @param[in] type Must be @ref SL_NET_GENERATE_EC_PRIVATE_KEY.
+ * @param[in,out] credential Pointer to sl_si91x_ec_generate_params_t (SPKI filled on success).
+ * @param[in] credential_length Length of the credential data in bytes.
+ * @return Status of the operation.
+ */
+sl_status_t sli_si91x_generate_and_set_credential(sl_net_credential_id_t id,
+                                                  sl_net_credential_type_t type,
+                                                  void *credential,
+                                                  uint32_t credential_length);
+
+/**
  * @brief Retrieve a network credential.
  *
  * @param[in] id Credential ID to identify the credential.

@@ -1,0 +1,70 @@
+project_name: siwx91x_platform_littlefs_qspi_file_operations
+package: platform_siwx91x_app
+description: 'This example project demonstrates LittleFS file operations on QSPI flash, including
+
+  create, write, append, read, seek, truncate, and clear of myfile.txt.
+
+  '
+category: example|Service
+quality: production
+label: SiWx91x Platform - LittleFS QSPI File Operations
+component:
+- id: sl_main
+- id: freertos
+- id: freertos_heap_3
+- id: memory_manager
+- id: status
+- id: syscalls
+- id: wifi
+- id: network_manager
+- id: basic_network_config_manager
+- id: sl_si91x_internal_stack
+- id: si91x_memory_default_config
+- id: sl_si91x_littlefs
+source:
+- path: app.c
+- path: file_operations_example.c
+include:
+- path: .
+  file_list:
+  - path: app.h
+  - path: file_operations_example.h
+define:
+- name: SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
+toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+other_file:
+- path: resources/readme/setupdiagram.png
+- path: resources/readme/file_operations_output.png
+ui_hints:
+  highlight:
+  - path: readme.md
+    focus: true
+readme:
+- path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
+post_build:
+  profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.2.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2026.12.0

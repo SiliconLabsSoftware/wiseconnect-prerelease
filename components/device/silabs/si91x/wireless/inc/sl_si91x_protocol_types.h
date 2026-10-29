@@ -182,6 +182,7 @@
 #define SLI_SI91X_MAX_POSSIBLE_CHANNEL 24
 
 #define ATTESTATION 30
+#define CSR_SIGN    33 ///< Platform CSR TBS sign over ENCRYPT_CRYPTO
 
 #define NONCE_DATA_SIZE 32
 
@@ -228,6 +229,30 @@ typedef struct {
   sli_si91x_cert_info_t cert_info;                   ///< certificate information structure
   uint8_t certificate[SLI_SI91X_MAX_CERT_SEND_SIZE]; ///< certificate
 } sli_si91x_req_set_certificate_t;
+
+/// EC identity generate sub-command. CSR sign uses Platform ENCRYPT_CRYPTO.
+#define SLI_SI91X_EC_IDENTITY_SUBCMD_GENERATE 1
+/// EC identity delete sub-command.
+#define SLI_SI91X_EC_IDENTITY_SUBCMD_DELETE 2
+/// Maximum EC identity request payload length, in bytes. Unused for generate and delete.
+#define SLI_SI91X_EC_IDENTITY_MAX_PAYLOAD 512
+
+/// Packed EC identity request/response header. `key_id` is not SET_CERT `cert_index`.
+typedef struct {
+  uint8_t sub_cmd;  ///< Generate = 1, delete = 2
+  uint8_t reserved; ///< Reserved, set to 0
+  uint32_t key_id;  ///< Host-supplied EC identity identifier
+  uint8_t curve;    ///< sl_si91x_ec_curve_t
+  uint8_t sig_alg;  ///< sl_si91x_ec_sig_alg_t
+  uint16_t in_len;  ///< Input payload length
+  uint16_t out_len; ///< Output payload length (response)
+} SL_ATTRIBUTE_PACKED sli_si91x_ec_identity_req_hdr_t;
+
+/// EC identity command request (generate / delete)
+typedef struct {
+  sli_si91x_ec_identity_req_hdr_t hdr;                ///< Request header
+  uint8_t payload[SLI_SI91X_EC_IDENTITY_MAX_PAYLOAD]; ///< Unused for generate/delete
+} SL_ATTRIBUTE_PACKED sli_si91x_req_ec_identity_t;
 
 /// IPV4 ipconfig command request  structure
 typedef struct {
@@ -1163,6 +1188,18 @@ typedef struct {
   uint8_t *token_buf;        ///< Token buffer
 } sli_si91x_rsi_token_req_t;
 
+/// Platform CSR sign request (ENCRYPT_CRYPTO / CSR_SIGN) — side-band
+typedef struct {
+  uint16_t algorithm_type; ///< Must be CSR_SIGN
+  uint8_t sig_alg;         ///< sl_si91x_ec_sig_alg_t
+  uint8_t reserved;        ///< Reserved, set to 0
+  uint32_t key_id;         ///< Host-supplied EC identity identifier
+  uint16_t cri_der_len;    ///< Length of cri_der
+  uint8_t *cri_der;        ///< CertificationRequestInfo DER
+  uint8_t *signature;      ///< Output signature buffer
+  uint16_t *signature_len; ///< In/out signature length
+} sli_si91x_csr_sign_request_t;
+
 typedef struct {
   uint8_t algorithm_type;
   uint8_t algorithm_sub_type;
@@ -1357,6 +1394,16 @@ typedef struct {
   /// Message (flexible; sent as a second fragment, up to SLI_SI91X_ECDSA_MSG_MAX_SIZE)
   uint8_t msg[];
 } sl_si91x_ecdsa_request_t;
+
+/// Platform CSR sign request header (ENCRYPT_CRYPTO / CSR_SIGN).
+/// CRI DER is sent as a second fragment via sli_si91x_crypto_send_command().
+typedef struct {
+  uint16_t algorithm_type; ///< Must be CSR_SIGN
+  uint8_t sig_alg;         ///< sl_si91x_ec_sig_alg_t
+  uint8_t reserved;        ///< Reserved, set to 0
+  uint32_t key_id;         ///< Host-supplied EC identity identifier
+  uint16_t cri_der_len;    ///< Length of CRI DER payload fragment
+} SL_ATTRIBUTE_PACKED sli_si91x_csr_sign_request_t;
 
 typedef struct {
   uint8_t algorithm_type;

@@ -84,6 +84,7 @@ template_contribution:
       wifi_ap: SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID
       wifi_eap_client: SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID
       wifi_eap_server: SL_NET_WIFI_EAP_SERVER_CREDENTIAL_ID
+      wifi_eap_client_start: SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_START
       tls_client: SL_NET_TLS_CLIENT_CREDENTIAL_START
       tls_server: SL_NET_TLS_SERVER_CREDENTIAL_START
       mqtt_server: SL_NET_MQTT_SERVER_CREDENTIAL_START
@@ -102,6 +103,8 @@ template_contribution:
       eap_fast_client: SL_NET_PACK_FILE
       private_key_cbc_wrap: SL_NET_TLS_PRIVATE_KEY_CBC_WRAP
       private_key_ecb_wrap: SL_NET_TLS_PRIVATE_KEY_ECB_WRAP
+      generate_ec_private_key: SL_NET_GENERATE_EC_PRIVATE_KEY
+      delete_ec_private_key: SL_NET_DELETE_EC_PRIVATE_KEY
     sl_net_dns_resolution_ip_type_t:
       ipv4: SL_NET_DNS_TYPE_IPV4
       ipv6: SL_NET_DNS_TYPE_IPV6

@@ -109,6 +109,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Enable `USART0 SYNC Mode` in the UC.
 
+- **USART0 DMA Configuration**
+  - USART0 DMA Enable: DMA is enabled by default.
+  - DMA Controller: Select **UDMA** or **GPDMA**. The default is UDMA. Only one controller is used at a time.
+  - GPDMA Configuration: Enable this when GPDMA is selected. Set the maximum number of TX and RX descriptors (1 to 256, default 8). Each descriptor moves up to 4095 bytes. TX and RX FIFO thresholds are under this toggle.
+
 - Connect primary (this example) and a board flashed with the secondary example: primary clock pin (GPIO_8 or GPIO_25 depending on board) to secondary clock pin, primary TX (GPIO_30) to secondary RX, primary RX (GPIO_29) to secondary TX.
 
 - Configure the following macros in [`usart_sync_primary_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_usart_sync_primary_freertos/usart_sync_primary_freertos.c) if required:

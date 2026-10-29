@@ -191,8 +191,12 @@ void print_80211_packet(const uint8_t *packet, uint32_t packet_length, uint16_t 
  SOC-only: relies on command-status accessors*/
 bool sli_si91x_is_sdk_ok_to_sleep()
 {
-  return ((!sli_si91x_get_flash_command_status()) && (sl_si91x_is_device_initialized())
-          && (!sli_si91x_get_tx_command_status()));
+  bool ok_to_sleep = (!sli_si91x_get_flash_command_status()) && sl_si91x_is_device_initialized()
+                     && (!sli_si91x_get_tx_command_status());
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+  ok_to_sleep = ok_to_sleep && (!sli_si91x_get_side_band_crypto_command_status());
+#endif
+  return ok_to_sleep;
 }
 #endif
 

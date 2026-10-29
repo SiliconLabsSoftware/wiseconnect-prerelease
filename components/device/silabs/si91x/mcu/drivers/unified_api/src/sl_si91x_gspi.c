@@ -1092,6 +1092,28 @@ uint32_t sl_si91x_gspi_get_frame_length(void)
   return GSPI_GetFrameLength();
 }
 
+#if SLI_GSPI_GPDMA_EN
+/***************************************************************************
+* To clear the busy flag and update the tx count
+* It calls the user callback function to notify the transfer completion
+* It uses UDMA API since both have similar event handler logic
+***************************************************************************/
+void sli_si91x_gspi_gpdma_tx_done_callback(void)
+{
+  GSPI_UDMA_Tx_Event(UDMA_EVENT_XFER_DONE, 0U, gpdma_peripheral_channel_info[SL_GSPI_TX_PERIPHERAL_ID].resources);
+}
+
+/***************************************************************************
+* To clear the busy flag and update the rx count
+* It calls the user callback function to notify the transfer completion
+* It uses UDMA API since both have similar event handler logic
+***************************************************************************/
+void sli_si91x_gspi_gpdma_rx_done_callback(void)
+{
+  GSPI_UDMA_Rx_Event(UDMA_EVENT_XFER_DONE, 0U, gpdma_peripheral_channel_info[SL_GSPI_RX_PERIPHERAL_ID].resources);
+}
+#endif
+
 /*******************************************************************************
  * To set the slave state i.e., activate/de-activate the slave
  * It takes argument of boolean type either enable or disable

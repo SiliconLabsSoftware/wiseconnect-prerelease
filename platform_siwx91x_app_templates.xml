@@ -3,7 +3,7 @@
   <descriptors name="sl_si91x_ps0_state" label="SiWx91x Platform - PS0 STATE" description="Demonstrates the PS0 Low Power sleep with NWP shutdown.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps0_state/sl_si91x_ps0_state.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps0_state/siwx91x_platform_ps0_state.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -12,13 +12,13 @@
     <properties key="category" value="example|mcu powerstate" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps0_state/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps0_state/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="sl_si91x_ps1_state" label="SiWx91x Platform - PS1 STATE" description="Demonstrates the PS1 Low Power state with NWP shutdown.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps1_state/sl_si91x_ps1_state.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps1_state/siwx91x_platform_ps1_state.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -27,13 +27,13 @@
     <properties key="category" value="example|mcu powerstate" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps1_state/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps1_state/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="sl_si91x_ps4_state" label="SiWx91x Platform - PS4 STATE" description="Demonstrates the PS4 Low Power sleep and active state with NWP shutdown.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps4_state/sl_si91x_ps4_state.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps4_state/siwx91x_platform_ps4_state.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -42,13 +42,13 @@
     <properties key="category" value="example|mcu powerstate" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps4_state/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps4_state/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="sl_si91x_ps2_state" label="SiWx91x Platform - PS2 STATE" description="Demonstrates the PS2 Low Power sleep and active state with NWP shutdown.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps2_state/sl_si91x_ps2_state.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps2_state/siwx91x_platform_ps2_state.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -57,13 +57,13 @@
     <properties key="category" value="example|mcu powerstate" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps2_state/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps2_state/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="sl_si91x_ps3_state" label="SiWx91x Platform - PS3 STATE" description="Demonstrates the PS3 Low Power sleep and active state with NWP shutdown.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps3_state/sl_si91x_ps3_state.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps3_state/siwx91x_platform_ps3_state.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -72,7 +72,7 @@
     <properties key="category" value="example|mcu powerstate" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/sl_si91x_ps3_state/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/mcu_powerstate/siwx91x_platform_ps3_state/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="sl_si91x_i2c_driver_leader_using_transfer_api" label="SiWx91x Platform - I2C Driver-Leader Transfer" description="Demonstrates how to use I2C Peripheral, using transfer API.">
@@ -930,10 +930,10 @@
     <properties key="readmeFiles" value="examples/si91x_soc/peripheral/siwx91x_platform_psram_blinky_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC" />
   </descriptors>
-  <descriptors name="si91x_psa_sha" label="SiWx91x Platform - SoC PSA SHA" description="Demonstrates hashing using SHA.">
+  <descriptors name="si91x_psa_sha" label="SiWx91x Platform - PSA SHA FreeRTOS" description="Demonstrates hashing using SHA.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_sha/si91x_psa_sha.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_sha_freertos/siwx91x_platform_psa_sha_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -942,13 +942,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_sha/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_sha_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_sha3" label="SiWx91x Platform - SoC PSA SHA3" description="Demonstrates hashing using SHA3.">
+  <descriptors name="siwx91x_platform_psa_sha3_freertos" label="SiWx91x Platform - PSA SHA3 FreeRTOS" description="Demonstrates hashing using SHA3.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_sha3/si91x_psa_sha3.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_sha3_freertos/siwx91x_platform_psa_sha3_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -957,13 +957,28 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_sha3/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_sha3_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_multithread" label="SiWx91x Platform - SoC PSA Multithread" description="Demonstrate the use of thread-safe mechanism while using crypto accelerators">
+  <descriptors name="si91x_psa_multithread" label="SiWx91x Platform - PSA Multithread FreeRTOS" description="Demonstrate the use of thread-safe mechanism while using crypto accelerators">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_multithread/si91x_psa_multithread.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_multithread_freertos/siwx91x_platform_psa_multithread_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d"  />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="example|crypto" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_multithread_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="si91x_psa_gcm_large_data" label="SiWx91x Platform - PSA GCM Large Data FreeRTOS" description="Demonstrates how to to use PSA GCM Large Data">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_gcm_large_data_freertos/siwx91x_platform_psa_gcm_large_data_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -972,13 +987,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_multithread/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_gcm_large_data_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_gcm_large_data_example" label="SiWx91x Platform - SoC PSA GCM Large Data Example" description="Demonstrates how to to use PSA GCM Large Data Example">
+  <descriptors name="si91x_psa_aes_ctr_multipart" label="SiWx91x Platform - PSA AES Cipher Multipart FreeRTOS" description="Demonstrates how to to use PSA AES-CTR Cipher Multipart">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_gcm_large_data_example/si91x_psa_gcm_large_data_example.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_aes_ctr_multipart_freertos/siwx91x_platform_psa_aes_ctr_multipart_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -987,13 +1002,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_gcm_large_data_example/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_aes_ctr_multipart_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="si91x_psa_aes_ctr_multipart" label="SiWx91x Platform - SoC PSA AES-CTR Cipher Multipart" description="Demonstrates how to to use PSA AES-CTR Cipher Multipart">
+    </descriptors>
+    <descriptors name="si91x_psa_ecdsa" label="SiWx91x Platform - PSA ECDSA FreeRTOS" description="Demonstrates using ECDSA for signature generation and verification.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_aes_ctr_multipart/si91x_psa_aes_ctr_multipart.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_ecdsa_freertos/siwx91x_platform_psa_ecdsa_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1002,13 +1017,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_aes_ctr_multipart/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_ecdsa_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_ecdsa" label="SiWx91x Platform - SoC PSA ECDSA" description="Demonstrates using ECDSA for signature generation and verification.">
+  <descriptors name="si91x_psa_hmac" label="SiWx91x Platform - PSA HMAC FreeRTOS" description="Demonstrates how to to use PSA HMAC">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_ecdsa/si91x_psa_ecdsa.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_hmac_freertos/siwx91x_platform_psa_hmac_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1017,13 +1032,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_ecdsa/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_hmac_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_hmac" label="SiWx91x Platform - SoC PSA HMAC" description="Demonstrates how to to use PSA HMAC">
+  <descriptors name="si91x_psa_ecdh" label="SiWx91x Platform - PSA ECDH FreeRTOS" description="Demonstrates using ECDH for shared secret generation.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_hmac/si91x_psa_hmac.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_ecdh_freertos/siwx91x_platform_psa_ecdh_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1032,13 +1047,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_hmac/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_ecdh_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_ecdh" label="SiWx91x Platform - SoC PSA ECDH" description="Demonstrates using ECDH for shared secret generation.">
+  <descriptors name="si91x_psa_asymmetric_key_storage" label="SiWx91x Platform - PSA Asymmetric Key Storage FreeRTOS" description="Demonstrates how to to use PSA Asymmetric key storage">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_ecdh/si91x_psa_ecdh.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_asymmetric_key_storage_freertos/siwx91x_platform_psa_asymmetric_key_storage_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1047,13 +1062,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_ecdh/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_asymmetric_key_storage_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_asymmetric_key_storage" label="SiWx91x Platform - SoC PSA asymmetric key storage" description="Demonstrates how to to use PSA Asymmetric key storage">
+  <descriptors name="si91x_psa_aes" label="SiWx91x Platform - PSA AES Cipher FreeRTOS" description="Demonstrates how to to use PSA AES Cipher">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_asymmetric_key_storage/si91x_psa_asymmetric_key_storage.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_aes_freertos/siwx91x_platform_psa_aes_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1062,13 +1077,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_asymmetric_key_storage/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_aes_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_aes" label="SiWx91x Platform - SoC PSA AES Cipher" description="Demonstrates how to to use PSA AES Cipher">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_aes/si91x_psa_aes.slcp" />
+  <descriptors name="si91x_psa_cmac" label="SiWx91x Platform - PSA CMAC FreeRTOS" description="Demonstrates how to to use PSA CMAC">
+  <properties key="namespace" value="template.uc" />
+  <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_cmac_freertos/siwx91x_platform_psa_cmac_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1077,13 +1092,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_aes/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_cmac_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_cmac" label="SiWx91x Platform - SoC PSA CMAC" description="Demonstrates how to to use PSA CMAC">
+  <descriptors name="si91x_psa_chachapoly" label="SiWx91x Platform - PSA CHACHAPOLY FreeRTOS" description="Demonstrates how to to use PSA CHACHAPOLY">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_cmac/si91x_psa_cmac.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_chachapoly_freertos/siwx91x_platform_psa_chachapoly_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1092,13 +1107,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_cmac/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_chachapoly_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_chachapoly" label="SiWx91x Platform - SoC PSA CHACHAPOLY" description="Demonstrates how to to use PSA CHACHAPOLY">
+  <descriptors name="si91x_psa_symmetric_key_storage" label="SiWx91x Platform - PSA symmetric key storage FreeRTOS" description="Demonstrates how to to use PSA ITS">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_chachapoly/si91x_psa_chachapoly.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_symmetric_key_storage_freertos/siwx91x_platform_psa_symmetric_key_storage_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1107,13 +1122,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_chachapoly/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_symmetric_key_storage_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_symmetric_key_storage" label="SiWx91x Platform - SoC PSA symmetric key storage" description="Demonstrates how to to use PSA ITS">
+  <descriptors name="si91x_psa_gcm" label="SiWx91x Platform - PSA GCM FreeRTOS" description="Demonstrates how to to use PSA GCM">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_symmetric_key_storage/si91x_psa_symmetric_key_storage.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_gcm_freertos/siwx91x_platform_psa_gcm_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1122,13 +1137,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_symmetric_key_storage/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_gcm_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_gcm" label="SiWx91x Platform - SoC PSA GCM" description="Demonstrates how to to use PSA GCM">
+  <descriptors name="si91x_psa_ccm" label="SiWx91x Platform - PSA CCM FreeRTOS" description="Demonstrates how to to use PSA CCM">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_gcm/si91x_psa_gcm.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/siwx91x_platform_psa_ccm_freertos/siwx91x_platform_psa_ccm_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1137,28 +1152,13 @@
     <properties key="category" value="example|crypto" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_gcm/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/crypto/siwx91x_platform_psa_ccm_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="si91x_psa_ccm" label="SiWx91x Platform -  - SoC PSA CCM" description="Demonstrates how to to use PSA CCM">
+  <descriptors name="sl_si91x_sleeptimer" label="SiWx91x Platform - Sleeptimer" description="Demonstrates how to to use SleepTimer.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/crypto/si91x_psa_ccm/si91x_psa_ccm.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="example|crypto" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/crypto/si91x_psa_ccm/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="sl_si91x_sleeptimer" label="SiWx91x Platform - Sleep Timer" description="Demonstrates how to to use SleepTimer.">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_sleeptimer/sl_si91x_sleeptimer.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_sleeptimer/siwx91x_platform_sleeptimer.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1167,13 +1167,13 @@
     <properties key="category" value="example|peripheral" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_sleeptimer/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_sleeptimer/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_logger" label="SiWx91x Platform - Logger Example" description="Demonstrates how to use logger Service.">
+  <descriptors name="sl_si91x_logger" label="SiWx91x Platform - Debug Logger FreeRTOS" description="Demonstrates how to use logger Service.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_logger/sl_si91x_logger.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_debug_logger_freertos/siwx91x_platform_debug_logger_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1182,13 +1182,13 @@
     <properties key="category" value="example|service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_logger/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_debug_logger_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_littlefs_file_operations" label="SiWx91x Platform - LittleFS Basic File Operations" description="Demonstrates the usage of configures QSPI to perform basic file operations on the flash memory.">
+  <descriptors name="sl_si91x_littlefs_file_operations" label="SiWx91x Platform - LittleFS QSPI File Operations" description="Demonstrates the usage of configures QSPI to perform basic file operations on the flash memory.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_littlefs_file_operations/sl_si91x_littlefs_file_operations.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_littlefs_qspi_file_operations/siwx91x_platform_littlefs_qspi_file_operations.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd4339b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1197,13 +1197,13 @@
     <properties key="category" value="example|Service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_littlefs_file_operations/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_littlefs_qspi_file_operations/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_secure_storage" label="SiWx91x Platform - Secure Storage (SoC)" description="Demonstrates Secure Storage APIs with WiFi integration: single and multiple register operations, write key protection, bank-specific operations, and powersave standby associated mode.">
+  <descriptors name="sl_si91x_secure_storage" label="SiWx91x Platform - MCU Secure Storage FreeRTOS" description="Demonstrates Secure Storage APIs with WiFi integration: single and multiple register operations, write key protection, bank-specific operations, and powersave standby associated mode.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_secure_storage/sl_si91x_mcu_secure_storage.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_secure_storage_freertos/siwx91x_platform_secure_storage_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1212,13 +1212,13 @@
     <properties key="category" value="example|service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_secure_storage/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_secure_storage_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_sensorhub" label="SiWx91x Platform - Sensorhub" description="Demonstrates how to to use sensorhub.">
+  <descriptors name="sl_si91x_sensorhub" label="SiWx91x Platform - Sensorhub FreeRTOS" description="Demonstrates how to to use sensorhub.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_sensorhub/sl_si91x_sensorhub.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_sensorhub_freertos/siwx91x_platform_sensorhub_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1227,13 +1227,13 @@
     <properties key="category" value="example|si91x_soc|service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_sensorhub/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_sensorhub_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="sl_si91x_wdt_manager" label="SiWx91x Platform - WDT Manager" description="Demonstrates WDT manager integration with LED blinking and system hang recovery.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_wdt_manager/sl_si91x_wdt_manager.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_wdt_manager/siwx91x_platform_wdt_manager.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1242,13 +1242,13 @@
     <properties key="category" value="example|service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_wdt_manager/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_wdt_manager/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_file_system_common_flash" label="SiWx91x Platform - File System Common Flash" description="This example project demonstrates the usage of file system with littlefs library using QSPI.">
+  <descriptors name="sl_si91x_file_system_common_flash" label="SiWx91x Platform - LittleFS Common Flash FreeRTOS" description="This example project demonstrates the usage of file system with littlefs library using QSPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_littlefs_common_flash/sl_si91x_file_system_common_flash.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_littlefs_common_flash_freertos/siwx91x_platform_littlefs_common_flash_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1257,28 +1257,13 @@
     <properties key="category" value="example|Service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_littlefs_common_flash/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_littlefs_common_flash_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_memory_manager_heap3" label="SiWx91x Platform - Memory Manager Heap 3" description="Demonstrates Native Memory Manager with FreeRTOS Heap 3, including C library, Native, FreeRTOS allocator paths, and a memory pool.">
+  <descriptors name="sl_si91x_nvm3_dual_flash" label="SiWx91x Platform - NVM3 Dual Flash FreeRTOS" description="Demonstrates how to to use NVM3 in Si91x dual flash.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_memory_manager_heap3/sl_si91x_memory_manager_heap3.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="example|service" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_memory_manager_heap3/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="sl_si91x_nvm3_dual_flash" label="SiWx91x Platform - NVM3 Dual Flash" description="Demonstrates how to to use NVM3 in Si91x dual flash.">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_nvm3_dual_flash/sl_si91x_nvm3_dual_flash.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_nvm3_dual_flash_freertos/siwx91x_platform_nvm3_dual_flash_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd4339b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1287,13 +1272,13 @@
     <properties key="category" value="example|peripheral" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_nvm3_dual_flash/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_nvm3_dual_flash_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_power_manager_tickless_idle" label="SiWx91x Platform - Power Manager Tickless Idle" description="Demonstrates how to use Power Manager Service.">
+  <descriptors name="sl_si91x_power_manager_tickless_idle" label="SiWx91x Platform - Power Manager Tickless Idle FreeRTOS" description="Demonstrates how to use Power Manager Service.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/sl_si91x_power_manager_tickless_idle.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_power_manager_tickless_idle_freertos/siwx91x_platform_power_manager_tickless_idle_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1302,13 +1287,13 @@
     <properties key="category" value="example|service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_power_manager_tickless_idle_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_file_system" label="SiWx91x Platform - File System" description="Demonstrates the usage of file system with littlefs library using QSPI.">
+  <descriptors name="sl_si91x_file_system" label="SiWx91x Platform - LittleFS QSPI" description="Demonstrates the usage of file system with littlefs library using QSPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_littlefs/sl_si91x_littlefs.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_littlefs_qspi/siwx91x_platform_littlefs_qspi.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd4339b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1317,28 +1302,13 @@
     <properties key="category" value="example|Service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_littlefs/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_littlefs_qspi/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_logger_backend_example" label="SiWx91x Platform - Logger Backend Example" description="Demonstrates how to use logger Service with all existing backends.">
+  <descriptors name="sl_si91x_nvm3_common_flash" label="SiWx91x Platform - NVM3 Common Flash FreeRTOS" description="Testing NVM3 in Si91x common flash">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_logger_backend_example/sl_si91x_logger_backend_example.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="example|service" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_logger_backend_example/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="sl_si91x_nvm3_common_flash" label="SiWx91x Platform - Common Flash" description="Testing NVM3 in Si91x common flash">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_nvm3_common_flash/sl_si91x_nvm3_common_flash.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_nvm3_common_flash_freertos/siwx91x_platform_nvm3_common_flash_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1347,13 +1317,13 @@
     <properties key="category" value="Example|Service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_nvm3_common_flash/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_nvm3_common_flash_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_nvm3_psram" label="SiWx91x Platform - NVM3 PSRAM" description="Testing NVM3 in Si91x PSRAM">
+  <descriptors name="sl_si91x_nvm3_psram" label="SiWx91x Platform - NVM3 PSRAM FreeRTOS" description="Testing NVM3 in Si91x PSRAM">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/service/sl_si91x_nvm3_common_flash/sl_si91x_nvm3_psram.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_nvm3_common_flash_freertos/siwx91x_platform_nvm3_psram_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4342a brd4340a brd4339a brd4343q brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1362,13 +1332,13 @@
     <properties key="category" value="Example|Service" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/service/sl_si91x_nvm3_common_flash/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_nvm3_common_flash_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="siwx917_dev_kit" label="Wi-Fi - SiWx917 Dev Kit (BRD2605A/BRD2605B)" description="Demonstrates the features of the SiWx917 Dev Kit Board. This can be tested with the Simplicity Connect mobile app.">
+  <descriptors name="siwx917_dev_kit" label="SiWx91x Platform - Dev Kit Sensors FreeRTOS" description="Demonstrates the features of the SiWx917 Dev Kit Board. This can be tested with the Simplicity Connect mobile app.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/siwx917_dev_kit/siwx917_dev_kit.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/siwx91x_platform_dev_kit_sensors_freertos/siwx91x_platform_dev_kit_sensors_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1377,13 +1347,13 @@
     <properties key="category" value="Example|Wi-Fi" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/siwx917_dev_kit/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/siwx91x_platform_dev_kit_sensors_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_mutex" label="SiWx91x Platform - RTOS Mutex" description="Demonstrates how to use RTOS concept Mutex in an application.">
+  <descriptors name="sl_si91x_mutex" label="SiWx91x Platform - Mutex FreeRTOS" description="Demonstrates how to use RTOS concept Mutex in an application.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/cmsis-rtos/sl_si91x_mutex/sl_si91x_mutex.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/cmsis-rtos/siwx91x_platform_mutex_freertos/siwx91x_platform_mutex_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1392,13 +1362,13 @@
     <properties key="category" value="example|cmsis-rtos" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/cmsis-rtos/sl_si91x_mutex/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/cmsis-rtos/siwx91x_platform_mutex_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_msg_queue" label="SiWx91x Platform - RTOS Message Queue" description="Demonstrates how to use RTOS concept Message Queue in an application.">
+  <descriptors name="sl_si91x_msg_queue" label="SiWx91x Platform - Message Queue FreeRTOS" description="Demonstrates how to use RTOS concept Message Queue in an application.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/sl_si91x_msg_queue.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/cmsis-rtos/siwx91x_platform_msg_queue_freertos/siwx91x_platform_msg_queue_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1407,13 +1377,13 @@
     <properties key="category" value="example|cmsis-rtos" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/cmsis-rtos/sl_si91x_msg_queue/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/cmsis-rtos/siwx91x_platform_msg_queue_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="sl_si91x_m4_updater" label="SiWx91x Platform - SoC M4-FW Fallback Updater" description="M4 firmware updater for SOC FW Fallback example">
+  <descriptors name="sl_si91x_m4_updater" label="SiWx91x Platform - M4 Updater" description="M4 firmware updater for SOC FW Fallback example">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_m4_updater/sl_si91x_m4_updater.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_m4_updater/siwx91x_platform_m4_updater.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1422,13 +1392,13 @@
     <properties key="category" value="Example|si91x_soc" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_m4_updater/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_m4_updater/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Advanced" />
   </descriptors>
-  <descriptors name="sl_si91x_m4_updater_security" label="SiWx91x Platform - SoC M4-FW Fallback Updater Security" description="M4 firmware security updater for SOC FW Fallback example">
+  <descriptors name="sl_si91x_m4_updater_security" label="SiWx91x Platform - M4 Updater Security FreeRTOS" description="M4 firmware security updater for SOC FW Fallback example">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_m4_updater_security/sl_si91x_m4_updater_security.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_m4_updater_security_freertos/siwx91x_platform_m4_updater_security_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1437,13 +1407,13 @@
     <properties key="category" value="Example|si91x_soc" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_m4_updater_security/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_m4_updater_security_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Advanced" />
   </descriptors>
-  <descriptors name="sl_si91x_slot_b_fw" label="SiWx91x Platform - SoC FW Fallback SLOT-B FW" description="Wirelessly updates the M4 firmware from a remote TCP server">
+  <descriptors name="sl_si91x_slot_b_fw" label="SiWx91x Platform - Firmware Fallback Slot B FreeRTOS" description="Wirelessly updates the M4 firmware from a remote TCP server">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_slot_b_fw/sl_si91x_slot_b_fw.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_fw_fallback_slot_b_freertos/siwx91x_platform_fw_fallback_slot_b_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1452,13 +1422,13 @@
     <properties key="category" value="Example|si91x_soc" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_slot_b_fw/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_fw_fallback_slot_b_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Advanced" />
   </descriptors>
-  <descriptors name="sl_si91x_slot_a_fw" label="SiWx91x Platform - SoC FW Fallback SLOT-A FW" description="Wirelessly updates the M4 firmware from a remote TCP server">
+  <descriptors name="sl_si91x_slot_a_fw" label="SiWx91x Platform - Firmware Fallback Slot A FreeRTOS" description="Wirelessly updates the M4 firmware from a remote TCP server">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_slot_a_fw/sl_si91x_slot_a_fw.slcp" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_fw_fallback_slot_a_freertos/siwx91x_platform_fw_fallback_slot_a_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
@@ -1467,7 +1437,7 @@
     <properties key="category" value="Example|si91x_soc" />
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/sl_si91x_slot_a_fw/readme.md" />
+    <properties key="readmeFiles" value="examples/si91x_soc/soc_fw_fallback/siwx91x_platform_fw_fallback_slot_a_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Advanced" />
   </descriptors>
   <descriptors name="attestation" label="Crypto - Attestation" description="Demonstrates device attestation">
@@ -1544,6 +1514,36 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/siwx91x_platform_empty_cpp_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Platform SiWx91x Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="sl_si91x_memory_manager_heap3_freertos" label="SiWx91x Platform - Memory Manager Heap 3 FreeRTOS" description="Demonstrates Native Memory Manager with FreeRTOS Heap 3, including C library, Native, FreeRTOS allocator paths, and a memory pool.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_memory_manager_heap3_freertos/siwx91x_platform_memory_manager_heap3_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="example|service" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_memory_manager_heap3_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="sl_si91x_logger_backend" label="SiWx91x Platform - Logger Backend Routing FreeRTOS" description="Demonstrates how to use logger Service with all existing backends.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_logger_backend_routing_freertos/siwx91x_platform_logger_backend_routing_freertos.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="example|service" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_logger_backend_routing_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="siwx91x_platform_usart_sync_secondary_freertos" label="SiWx91x Platform - USART Synchronous Secondary FreeRTOS" description="Demonstrates the usage of USART secondary transmit and receive in synchronous full duplex mode within a FreeRTOS environment on the SiWx917 SoC device.">
     <properties key="namespace" value="template.uc" />

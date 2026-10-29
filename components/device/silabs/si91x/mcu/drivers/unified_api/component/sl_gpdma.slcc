@@ -16,10 +16,12 @@ config_file:
   - path: config/sl_si91x_gpdma_config.h
 source:
   - path: "src/sl_si91x_gpdma.c"
+  - path: "src/sl_si91x_gpdma_peripheral_specific.c"
 include:
   - path: "inc"
     file_list:
       - path: "sl_si91x_gpdma.h"
+      - path: "sl_si91x_gpdma_peripheral_specific.h"
 provides:
   - name: sl_gpdma
 requires:

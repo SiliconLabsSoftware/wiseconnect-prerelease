@@ -98,7 +98,7 @@ extern __INLINE void sl_si91x_sdio_secondary_clear_interrupts(uint32_t flags);
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************
  ******************************************************************************/
-static sl_status_t sl_si91x_gpdma_init();
+static sl_status_t sli_si91x_gpdma_init();
 static void sl_si91x_fill_rx_descriptors(uint8_t *data_buf, uint32_t length);
 static void sl_si91x_fill_tx_descriptors(uint8_t *data_buff, uint8_t num_of_blocks);
 static void sl_si91x_setup_rx_channel_desc(uint8_t *data_buf, uint32_t length);
@@ -552,7 +552,7 @@ void sl_si91x_setup_tx_channel_desc(uint8_t *data_buf, uint8_t num_of_blocks)
 /*******************************************************************************
  * Initialize the gpdma
  ******************************************************************************/
-sl_status_t sl_si91x_gpdma_init()
+sl_status_t sli_si91x_gpdma_init()
 {
   uint32_t memSize_t, *devMem_p;
   RSI_GPDMA_INIT_T GPDMAInit;
@@ -578,7 +578,7 @@ sl_status_t sl_si91x_gpdma_init()
   // Initialize driver
   GPDMAHandle = RSI_GPDMA_Init(devMem_p, &GPDMAInit);
   if (GPDMAHandle == NULL) {
-    SL_PRINT_STRING_ERROR("sl_si91x_gpdma_init: handle NULL,line no : %d\r\n", (int)__LINE__);
+    SL_PRINT_STRING_ERROR("sli_si91x_gpdma_init: handle NULL,line no : %d\r\n", (int)__LINE__);
     return SL_STATUS_NULL_POINTER;
   }
 
@@ -609,7 +609,7 @@ sl_status_t sl_si91x_sdio_secondary_init(void)
   // Initialize the SDIO secondary
   sl_si91x_sdio_secondary_peripheral_init();
   // Initialize the GPDMA
-  status = sl_si91x_gpdma_init();
+  status = sli_si91x_gpdma_init();
 
   // Return the status
   EFM_ASSERT(status == SL_STATUS_OK);

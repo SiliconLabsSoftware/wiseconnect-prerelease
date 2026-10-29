@@ -214,4 +214,3 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 ## Report Bugs / Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

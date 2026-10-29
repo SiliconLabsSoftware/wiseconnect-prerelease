@@ -102,7 +102,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 - Create N applications for N boards.
 - Each secondary board must use a unique address.
 - The primary sends to a selected secondary using 9-bit addressing.
-- Secondaries respond only when the address matches.
+- Secondary respond only when the address matches.
 - DE and ~RE must be controlled per board (especially slaves) to switch between send and receive.
 - **Hardware-controlled half duplex:** DE and ~RE switch automatically.
 - **Software-controlled half duplex:** DE and ~RE are toggled in software.
@@ -262,7 +262,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 
-1. Compile and run the application on each board (primary/secondaries) after applying the **Application Build Environment** changes.
+1. Compile and run the application on each board (primary/secondary) after applying the **Application Build Environment** changes.
 2. Connect three modules per the setup diagrams.
 3. When the application runs, the master sends to slaves and compares received data for correctness.
 4. Expected console output (example):

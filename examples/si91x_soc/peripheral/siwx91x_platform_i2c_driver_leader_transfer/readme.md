@@ -209,4 +209,3 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 ## Report Bugs/Support
 
 For issues and support, use the Silicon Labs Community or your normal support channel.
-

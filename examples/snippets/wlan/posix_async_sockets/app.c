@@ -4,7 +4,7 @@
  *
  * Modes (set APP_MODE):
  *   APP_MODE_TCP_CLIENT - SOCK_NONBLOCK connect + select(writefds) + SO_ERROR + TCP send
- *   APP_MODE_TCP_SERVER - listen + accept + sl_si91x_socket_get_available_bytes + recv(MSG_PEEK) verify one chunk + timed TCP recv throughput
+ *   APP_MODE_TCP_SERVER - listen + accept + sl_si91x_socket_get_available_bytes_count + recv(MSG_PEEK) verify one chunk + timed TCP recv throughput
  *   APP_MODE_UDP_SERVER - bind + select(readfds) + recvfrom
  *
  * Note: SOCK_NONBLOCK / dual RSP_SOCKET_CREATE (2x 0x42) applies to TCP client only.
@@ -377,8 +377,8 @@ static void tcp_server_transfer(void)
 
     uint32_t available_bytes = 0;
     // Si91x-only (not POSIX FIONREAD/ioctl); needs sl_si91x_asynchronous_socket in the .slcp.
-    if (sl_si91x_socket_get_available_bytes(client_socket, &available_bytes) < 0) {
-      SL_DEBUG_LOG_V2(ERROR, "sl_si91x_socket_get_available_bytes() failed, errno=%d\r\n", errno);
+    if (sl_si91x_socket_get_available_bytes_count(client_socket, &available_bytes) < 0) {
+      SL_DEBUG_LOG_V2(ERROR, "sl_si91x_socket_get_available_bytes_count() failed, errno=%d\r\n", errno);
       close(client_socket);
       SL_DEBUG_LOG_V2(INFO, "Waiting for next client\r\n");
       continue;

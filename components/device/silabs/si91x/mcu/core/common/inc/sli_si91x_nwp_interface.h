@@ -50,6 +50,14 @@ bool sli_si91x_get_tx_command_status(void);
 /* Set the TX command in-progress flag. */
 void sli_si91x_update_tx_command_status(bool flag);
 
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+/* True if a side-band crypto command is in progress. */
+bool sli_si91x_get_side_band_crypto_command_status(void);
+
+/* Set the side-band crypto command in-progress flag. */
+void sli_si91x_update_side_band_crypto_command_status(bool flag);
+#endif
+
 /* Unmask NWP -> M4 P2P interrupts. */
 void unmask_ta_interrupt(uint32_t interrupt_no);
 
@@ -59,10 +67,11 @@ void mask_ta_interrupt(uint32_t interrupt_no);
 /* Raise an M4 -> TA P2P interrupt. */
 void raise_m4_to_ta_interrupt(uint32_t interrupt_no);
 
-/* Wake the NWP and wait until it is active. */
+/* Take one NWP wake hold and wait until the NWP is active. */
 sl_status_t sli_si91x_req_wakeup(void);
 
-/* Clear the M4->NWP wakeup indicator so the NWP may sleep. */
+/* Release one NWP wake hold. M4_WAKEUP_TA is cleared only when no holds remain.
+ * A release with no outstanding hold still clears the bit. */
 void sl_si91x_host_clear_sleep_indicator(void);
 
 #endif // SLI_SI91X_NWP_INTERFACE_H

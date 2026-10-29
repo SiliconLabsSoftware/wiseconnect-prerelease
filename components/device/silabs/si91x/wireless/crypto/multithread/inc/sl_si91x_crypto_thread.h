@@ -88,6 +88,11 @@ extern osSemaphoreId_t crypto_ecdh_mutex;
 extern osSemaphoreId_t crypto_ecdsa_mutex;
 
 /**
+ * @brief Semaphore for CSR sign crypto operations.
+ */
+extern osSemaphoreId_t crypto_csr_sign_mutex;
+
+/**
  * @brief Semaphore for HMAC crypto operations.
  */
 extern osSemaphoreId_t crypto_hmac_mutex;

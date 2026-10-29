@@ -38,6 +38,10 @@ extern "C" {
 #include "sl_status.h"
 #include "SPI.h"
 #include "sl_log_helper.h"
+#include "sl_component_catalog.h"
+#ifdef SL_CATALOG_SL_SI91X_GPDMA_PRESENT
+#include "sl_si91x_gpdma_peripheral_specific.h"
+#endif
 
 /***************************************************************************/
 /**
@@ -46,6 +50,14 @@ extern "C" {
  * @{
  * 
  ******************************************************************************/
+
+/*******************************************************************************
+**************************   DEFINES/MACROS     ********************************
+******************************************************************************/
+#ifndef SLI_SSI_GPDMA_EN
+#define SLI_SSI_GPDMA_EN 0 ///< Defines whether gpdma is enabled for any ssi instance
+#endif
+
 // -----------------------------------------------------------------------------
 // Data Types
 
@@ -731,6 +743,41 @@ uint32_t sl_si91x_ssi_get_rx_fifo_threshold(sl_ssi_handle_t ssi_handle);
  * @return uint32_t The value of the receiver sample delay.
  ******************************************************************************/
 uint32_t sl_si91x_ssi_get_receiver_sample_delay(sl_ssi_handle_t ssi_handle);
+
+/***************************************************************************/
+/**
+ * @brief Callback function for SSI primary GPDMA TX done.
+ * 
+ * @details This function is called when the SSI primary GPDMA TX is done.
+ * @note This function internally calls udma tx event since both have similar logic
+ */
+void sli_si91x_ssi_primary_gpdma_tx_done_callback(void);
+
+/***************************************************************************/
+/**
+ * @brief Callback function for SSI primary GPDMA RX done.
+ * 
+ * @details This function is called when the SSI primary GPDMA RX is done.
+ * @note This function internally calls udma rx event since both have similar logic
+ */
+void sli_si91x_ssi_primary_gpdma_rx_done_callback(void);
+
+/**
+ * @brief Callback function for SSI secondary GPDMA TX done.
+ * 
+ * @details This function is called when the SSI secondary GPDMA TX is done.
+ * @note This function internally calls udma tx event since both have similar logic
+ */
+void sli_si91x_ssi_secondary_gpdma_tx_done_callback(void);
+
+/***************************************************************************/
+/**
+ * @brief Callback function for SSI secondary GPDMA RX done.
+ * 
+ * @details This function is called when the SSI secondary GPDMA RX is done.
+ * @note This function internally calls udma rx event since both have similar logic
+ */
+void sli_si91x_ssi_secondary_gpdma_rx_done_callback(void);
 
 /***************************************************************************/
 /**

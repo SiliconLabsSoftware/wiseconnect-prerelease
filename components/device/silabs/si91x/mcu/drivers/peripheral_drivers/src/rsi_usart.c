@@ -40,11 +40,21 @@
 #ifndef SL_SI91X_USART_DMA
 #include "rsi_rom_udma_wrapper.h"
 #endif
+#if defined(USART_MODULE) || defined(UART_MODULE)
+#include "sl_si91x_usart.h"
+#endif
 #ifdef SL_SI91X_USART_DMA
 #include "sl_si91x_dma.h"
 sl_dma_init_t dma_init;
 #define UART_DMA_INSTANCE     0
 #define ULP_UART_DMA_INSTANCE 1
+#endif
+#ifdef SL_CATALOG_SL_SI91X_GPDMA_PRESENT
+#include "sl_si91x_gpdma_peripheral_specific.h"
+#endif
+#if !defined(USART_MODULE) && !defined(UART_MODULE)
+/** ULP UART has no GPDMA request line. */
+#define SLI_USART_USES_GPDMA(usart) 0
 #endif
 
 #define USART_CONFIGURE_CLOCK_GPIO_PIN (uint8_t)1
@@ -72,6 +82,13 @@ sl_dma_init_t dma_init;
     usart->info->cb_event(event);        \
   }
 
+#if defined(SL_USART0_DMA_CONFIG_ENABLE) && (SL_USART0_DMA_CONFIG_ENABLE == 1) \
+  || defined(SL_UART1_DMA_CONFIG_ENABLE) && (SL_UART1_DMA_CONFIG_ENABLE == 1)  \
+  || defined(SL_ULPUART_DMA_CONFIG_ENABLE) && (SL_ULPUART_DMA_CONFIG_ENABLE == 1)
+#define SLI_USART_UDMA_ENABLED 1
+#else
+#define SLI_USART_UDMA_ENABLED 0
+#endif
 /*****************************************************************************
  * Private types/enumerations/variables
  ****************************************************************************/
@@ -284,7 +301,22 @@ if ((int_status & 0xF) == USART_MODEM_STATUS_INTR) {
   SIGNAL_USART_EVENT(usart, event);
 }
 }
+#ifndef SLI_USART_GPDMA_LINKED
+#define SLI_USART_GPDMA_LINKED 0
+#endif
+#if SLI_USART_GPDMA_LINKED
 
+static int32_t usart_gpdma_arm_status(sl_status_t status)
+{
+  if (status == SL_STATUS_OK) {
+    return ARM_DRIVER_OK;
+  }
+  if (status == SL_STATUS_INVALID_PARAMETER) {
+    return ARM_DRIVER_ERROR_PARAMETER;
+  }
+  return ARM_DRIVER_ERROR;
+}
+#endif
 ///////////////////////////////////////////////////////////////
 //                         Functions                         //
 ///////////////////////////////////////////////////////////////
@@ -468,15 +500,15 @@ int32_t USART_Initialize(ARM_USART_SignalEvent_t cb_event,
                          RSI_UDMA_HANDLE_T *udmaHandle,
                          uint32_t *mem)
 {
-#ifdef SL_SI91X_USART_DMA
+#if defined(SL_SI91X_USART_DMA) || (SLI_USART_UDMA_ENABLED == 0)
   //Added to suppress unused variable warning
   (void)udma;
   (void)UDMA_Table;
   (void)udmaHandle;
   (void)mem;
-
+#ifdef SL_SI91X_USART_DMA
   dma_init.dma_number = USART_get_udma_instance(usart);
-
+#endif
 #endif
   if (usart->info->flags & USART_FLAG_INITIALIZED) {
     // Driver is already initialized
@@ -527,15 +559,25 @@ int32_t USART_Initialize(ARM_USART_SignalEvent_t cb_event,
                                (uint16_t)usart->clock.divfact);
   }
   // DMA Initialize
+#if SLI_USART_GPDMA_LINKED
+  if (sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_NO_DIRECTION) != INVALID_PERIPHERAL_ID) {
+    sl_status_t status = sl_si91x_gpdma_init();
+    if ((status != SL_STATUS_OK) && (status != SL_STATUS_ALREADY_INITIALIZED)) {
+      return ARM_DRIVER_ERROR;
+    }
+  }
+#endif
+#if SLI_USART_UDMA_ENABLED
   if (usart->dma_tx || usart->dma_rx) {
 #ifdef SL_SI91X_USART_DMA
     if (sl_si91x_dma_init(&dma_init)) {
       return ARM_DRIVER_ERROR;
     }
 #else
-      *udmaHandle = UDMAx_Initialize(udma, UDMA_Table, udmaHandle, mem);
+    *udmaHandle = UDMAx_Initialize(udma, UDMA_Table, udmaHandle, mem);
 #endif
   }
+#endif
   //initialise
   usart->info->flags = USART_FLAG_INITIALIZED;
 
@@ -551,10 +593,12 @@ int32_t USART_Initialize(ARM_USART_SignalEvent_t cb_event,
  */
 int32_t USART_Uninitialize(const USART_RESOURCES *usart, const UDMA_RESOURCES *udma)
 {
-#ifdef SL_SI91X_USART_DMA
+#if defined(SL_SI91X_USART_DMA) || (SLI_USART_UDMA_ENABLED == 0)
   //Added to suppress unused variable warning
   (void)udma;
+#ifdef SL_SI91X_USART_DMA
   dma_init.dma_number = USART_get_udma_instance(usart);
+#endif
 #endif
   if ((usart->pREGS == UART0) || (usart->pREGS == USART0)) {
     RSI_CLK_PeripheralClkDisable(M4CLK, USART1_CLK);
@@ -563,6 +607,15 @@ int32_t USART_Uninitialize(const USART_RESOURCES *usart, const UDMA_RESOURCES *u
   } else if (usart->pREGS == ULP_UART) {
     RSI_ULPSS_PeripheralDisable(ULPCLK, ULP_UART_CLK);
   }
+#if SLI_USART_GPDMA_LINKED
+  sl_gpdma_peripheral_id_t gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_NO_DIRECTION);
+  if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+    if (sli_si91x_gpdma_peripheral_deinit(gpdma_peripheral_id) != SL_STATUS_OK) {
+      return ARM_DRIVER_ERROR;
+    }
+  }
+#endif
+#if SLI_USART_UDMA_ENABLED
   // DMA Uninitialize
   if (usart->dma_tx || usart->dma_rx) {
 #ifdef SL_SI91X_USART_DMA
@@ -577,10 +630,11 @@ int32_t USART_Uninitialize(const USART_RESOURCES *usart, const UDMA_RESOURCES *u
       return ARM_DRIVER_ERROR;
     }
 #else
-      //unintialise dma
-      UDMAx_Uninitialize(udma);
+    //unintialise dma
+    UDMAx_Uninitialize(udma);
 #endif
   }
+#endif
   // Reset USART status flags
   usart->info->flags = 0U;
   return ARM_DRIVER_OK;
@@ -600,18 +654,37 @@ int32_t USART_PowerControl(ARM_POWER_STATE state,
                            const UDMA_RESOURCES *udma,
                            RSI_UDMA_HANDLE_T udmaHandle)
 {
-#ifdef SL_SI91X_USART_DMA
+#if defined(SL_SI91X_USART_DMA) || (SLI_USART_UDMA_ENABLED == 0)
   //Added to suppress unused variable warning
   (void)udma;
   (void)udmaHandle;
-
+#ifdef SL_SI91X_USART_DMA
   dma_init.dma_number = USART_get_udma_instance(usart);
+#endif
 #endif
   switch (state) {
     case ARM_POWER_OFF:
       // Disable USART IRQ
       NVIC_DisableIRQ(usart->irq_num);
-
+#if SLI_USART_GPDMA_LINKED
+      sl_gpdma_peripheral_id_t gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_TX_DIRECTION);
+      if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+        if (usart->info->xfer.send_active) {
+          if (sli_si91x_gpdma_peripheral_stop(gpdma_peripheral_id) != SL_STATUS_OK) {
+            return ARM_DRIVER_ERROR;
+          }
+        }
+      }
+      gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_RX_DIRECTION);
+      if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+        if (usart->info->rx_status.rx_busy) {
+          if (sli_si91x_gpdma_peripheral_stop(gpdma_peripheral_id) != SL_STATUS_OK) {
+            return ARM_DRIVER_ERROR;
+          }
+        }
+      }
+#endif
+#if SLI_USART_UDMA_ENABLED
       // If DMA mode - disable TX DMA channel
       if ((usart->dma_tx) && (usart->info->xfer.send_active)) {
 #ifdef SL_SI91X_USART_DMA
@@ -619,19 +692,23 @@ int32_t USART_PowerControl(ARM_POWER_STATE state,
           return ARM_DRIVER_ERROR;
         }
 #else
-          UDMAx_ChannelDisable(usart->dma_tx->channel, udma, udmaHandle);
+        UDMAx_ChannelDisable(usart->dma_tx->channel, udma, udmaHandle);
 #endif
       }
       // If DMA mode - disable DMA channel
       if ((usart->dma_rx) && (usart->info->rx_status.rx_busy)) {
 #ifdef SL_SI91X_USART_DMA
-        if (sl_si91x_dma_channel_disable(dma_init.dma_number, usart->dma_rx->channel + 1)) {
-          return ARM_DRIVER_ERROR;
+
+        {
+          if (sl_si91x_dma_channel_disable(dma_init.dma_number, usart->dma_rx->channel + 1)) {
+            return ARM_DRIVER_ERROR;
+          }
         }
 #else
-          UDMAx_ChannelDisable(usart->dma_rx->channel, udma, udmaHandle);
+        UDMAx_ChannelDisable(usart->dma_rx->channel, udma, udmaHandle);
 #endif
       }
+#endif
       if ((usart->pREGS == UART0) || (usart->pREGS == USART0) || (usart->pREGS == UART1)) {
 #if defined(SLI_SI917)
         RSI_PS_M4ssPeriPowerDown(M4SS_PWRGATE_ULP_EFUSE_PERI);
@@ -710,21 +787,22 @@ int32_t USART_Send_Data(const void *data,
                         UDMA_Channel_Info *chnl_info,
                         RSI_UDMA_HANDLE_T udmaHandle)
 {
-#ifdef SL_SI91X_USART_DMA
+#if defined(SL_SI91X_USART_DMA) || (SLI_USART_UDMA_ENABLED == 0)
   //Added to suppress unused variable warning
   (void)udma;
   (void)chnl_info;
   (void)udmaHandle;
+#if SLI_USART_UDMA_ENABLED
   sl_status_t status;
-
+  RSI_UDMA_CHA_CFG_T chnl_cfg = { 0 };
+#endif
+#ifdef SL_SI91X_USART_DMA
   dma_init.dma_number = USART_get_udma_instance(usart);
-
+#endif
 #else
     int32_t stat;
 #endif
   uint32_t val = 0;
-
-  RSI_UDMA_CHA_CFG_T chnl_cfg = { 0 };
 
   if (data == NULL || num < 1) {
     return ARM_DRIVER_ERROR_PARAMETER;
@@ -750,7 +828,23 @@ int32_t USART_Send_Data(const void *data,
 
   usart->info->xfer.tx_num = num;
   usart->info->xfer.tx_cnt = 0U;
+
+#if SLI_USART_GPDMA_LINKED
+  sl_gpdma_peripheral_id_t gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_TX_DIRECTION);
+  if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+    return usart_gpdma_arm_status(sli_si91x_gpdma_peripheral_start(usart,
+                                                                   gpdma_peripheral_id,
+                                                                   usart->info->xfer.tx_buf,
+                                                                   (const void *)&usart->pREGS->THR,
+                                                                   num,
+                                                                   1U,
+                                                                   (gpdma_peripheral_id == SL_USART_TX_PERIPHERAL_ID)
+                                                                     ? sli_si91x_usart_gpdma_tx_done_callback
+                                                                     : sli_si91x_uart1_gpdma_tx_done_callback));
+  }
+#endif
   if (usart->dma_tx) {
+#if SLI_USART_UDMA_ENABLED
     //DMA
     chnl_cfg.altStruct = 0;
     chnl_cfg.burstReq  = 1;
@@ -782,6 +876,7 @@ int32_t USART_Send_Data(const void *data,
     uint32_t channel              = usart->dma_tx->channel + 1;
     uint32_t channel_priority     = chnl_cfg.channelPrioHigh;
     sl_dma_callback_t usart_tx_callback;
+
     //Initialize sl_dma callback structure
     usart_tx_callback.transfer_complete_cb = usart_transfer_complete_callback;
     usart_tx_callback.error_cb             = usart_error_callback;
@@ -814,30 +909,31 @@ int32_t USART_Send_Data(const void *data,
       return ARM_DRIVER_ERROR;
     }
 #else
-      stat = UDMAx_ChannelConfigure(udma,
-                                    usart->dma_tx->channel,
-                                    (uint32_t)(usart->info->xfer.tx_buf),
-                                    (uint32_t) & (usart->pREGS->THR),
-                                    num,
-                                    usart->dma_tx->control,
-                                    &chnl_cfg,
-                                    usart->dma_tx->cb_event,
-                                    chnl_info,
-                                    udmaHandle);
-      if (stat == -1) {
-        return ARM_DRIVER_ERROR;
-      }
+    stat = UDMAx_ChannelConfigure(udma,
+                                  usart->dma_tx->channel,
+                                  (uint32_t)(usart->info->xfer.tx_buf),
+                                  (uint32_t) & (usart->pREGS->THR),
+                                  num,
+                                  usart->dma_tx->control,
+                                  &chnl_cfg,
+                                  usart->dma_tx->cb_event,
+                                  chnl_info,
+                                  udmaHandle);
+    if (stat == -1) {
+      return ARM_DRIVER_ERROR;
+    }
 #endif
 #ifdef SL_SI91X_USART_DMA
     sl_si91x_dma_channel_enable(dma_init.dma_number, usart->dma_tx->channel + 1);
     sl_si91x_dma_enable(dma_init.dma_number);
 #else
-      UDMAx_ChannelEnable(usart->dma_tx->channel, udma, udmaHandle);
-      UDMAx_DMAEnable(udma, udmaHandle);
+    UDMAx_ChannelEnable(usart->dma_tx->channel, udma, udmaHandle);
+    UDMAx_DMAEnable(udma, udmaHandle);
+#endif
 #endif
   } else {
     // Fill TX FIFO
-    if (usart->pREGS->LSR & USART_LSR_THRE) {
+    if (usart->pREGS->LSR & USART_LSR_THRE && (!SLI_USART_USES_GPDMA(usart))) {
       val = 16U;
       while ((val--) && (usart->info->xfer.tx_cnt != usart->info->xfer.tx_num)) {
         usart->pREGS->THR = usart->info->xfer.tx_buf[usart->info->xfer.tx_cnt++];
@@ -867,20 +963,21 @@ int32_t USART_Receive_Data(const void *data,
                            UDMA_Channel_Info *chnl_info,
                            RSI_UDMA_HANDLE_T udmaHandle)
 {
-#ifdef SL_SI91X_USART_DMA
+#if defined(SL_SI91X_USART_DMA) || (SLI_USART_UDMA_ENABLED == 0)
   //Added to suppress unused variable warning
   (void)udma;
   (void)chnl_info;
   (void)udmaHandle;
+#if SLI_USART_UDMA_ENABLED
   sl_status_t status;
-
+  RSI_UDMA_CHA_CFG_T chnl_cfg = { 0 };
+#endif
+#ifdef SL_SI91X_USART_DMA
   dma_init.dma_number = USART_get_udma_instance(usart);
-
+#endif
 #else
     int32_t stat;
 #endif
-
-  RSI_UDMA_CHA_CFG_T chnl_cfg = { 0 };
 
   if (data == NULL || num < 1) {
     return ARM_DRIVER_ERROR_PARAMETER;
@@ -916,8 +1013,24 @@ int32_t USART_Receive_Data(const void *data,
 #endif
   usart->info->xfer.rx_cnt = 0U;
 
+#if SLI_USART_GPDMA_LINKED
+  sl_gpdma_peripheral_id_t gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_RX_DIRECTION);
+  if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+    return usart_gpdma_arm_status(sli_si91x_gpdma_peripheral_start(usart,
+                                                                   gpdma_peripheral_id,
+                                                                   (const void *)&usart->pREGS->RBR,
+                                                                   usart->info->xfer.rx_buf,
+                                                                   num,
+                                                                   1U,
+                                                                   (gpdma_peripheral_id == SL_USART_RX_PERIPHERAL_ID)
+                                                                     ? sli_si91x_usart_gpdma_rx_done_callback
+                                                                     : sli_si91x_uart1_gpdma_rx_done_callback));
+  }
+#endif
+
   // DMA mode
   if (usart->dma_rx) {
+#if SLI_USART_UDMA_ENABLED
     chnl_cfg.altStruct = 0;
     chnl_cfg.burstReq  = 1;
 
@@ -981,19 +1094,19 @@ int32_t USART_Receive_Data(const void *data,
       return ARM_DRIVER_ERROR;
     }
 #else
-      stat = UDMAx_ChannelConfigure(udma,
-                                    usart->dma_rx->channel,
-                                    (uint32_t) & (usart->pREGS->RBR),
-                                    (uint32_t)(usart->info->xfer.rx_buf),
-                                    num,
-                                    usart->dma_rx->control,
-                                    &chnl_cfg,
-                                    usart->dma_rx->cb_event,
-                                    chnl_info,
-                                    udmaHandle);
-      if (stat == -1) {
-        return ARM_DRIVER_ERROR;
-      }
+    stat = UDMAx_ChannelConfigure(udma,
+                                  usart->dma_rx->channel,
+                                  (uint32_t) & (usart->pREGS->RBR),
+                                  (uint32_t)(usart->info->xfer.rx_buf),
+                                  num,
+                                  usart->dma_rx->control,
+                                  &chnl_cfg,
+                                  usart->dma_rx->cb_event,
+                                  chnl_info,
+                                  udmaHandle);
+    if (stat == -1) {
+      return ARM_DRIVER_ERROR;
+    }
 #endif
 #ifdef SL_SI91X_USART_DMA
     sl_si91x_dma_channel_enable(dma_init.dma_number, usart->dma_rx->channel + 1);
@@ -1001,14 +1114,17 @@ int32_t USART_Receive_Data(const void *data,
       sl_si91x_dma_enable(dma_init.dma_number);
     }
 #else
-      UDMAx_ChannelEnable(usart->dma_rx->channel, udma, udmaHandle);
-      if (usart->sync_mode.en_usart_mode == 0) {
-        UDMAx_DMAEnable(udma, udmaHandle);
-      }
+    UDMAx_ChannelEnable(usart->dma_rx->channel, udma, udmaHandle);
+    if (usart->sync_mode.en_usart_mode == 0) {
+      UDMAx_DMAEnable(udma, udmaHandle);
+    }
+#endif
 #endif
   } else {
-    // Enable receive data available interrupt
-    usart->pREGS->IER |= USART_INTR_RX_DATA;
+    if (!SLI_USART_USES_GPDMA(usart)) {
+      // Enable receive data available interrupt
+      usart->pREGS->IER |= USART_INTR_RX_DATA;
+    }
   }
   return ARM_DRIVER_OK;
 }
@@ -1244,11 +1360,13 @@ int32_t USART_Control(uint32_t control,
                       const UDMA_RESOURCES *udma,
                       RSI_UDMA_HANDLE_T udmaHandle)
 {
-#ifdef SL_SI91X_USART_DMA
+#if defined(SL_SI91X_USART_DMA) || (SLI_USART_UDMA_ENABLED == 0)
   //Added to suppress unused variable warning
   (void)udma;
   (void)udmaHandle;
+#ifdef SL_SI91X_USART_DMA
   dma_init.dma_number = USART_get_udma_instance(usart);
+#endif
 #endif
   uint32_t mode    = 0;
   uint16_t fcr     = 0;
@@ -1305,17 +1423,28 @@ int32_t USART_Control(uint32_t control,
       }
 
       usart->pREGS->FCR = fcr;
-
+#if SLI_USART_GPDMA_LINKED
+      sl_gpdma_peripheral_id_t gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_TX_DIRECTION);
+      if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+        if (usart->info->xfer.send_active) {
+          if (sli_si91x_gpdma_peripheral_stop(gpdma_peripheral_id) != SL_STATUS_OK) {
+            return ARM_DRIVER_ERROR;
+          }
+        }
+      }
+#endif
       // If DMA mode - disable DMA channel
       if (usart->dma_tx && usart->info->xfer.send_active
           && (usart->pREGS == UART0 || usart->pREGS == USART0 || usart->pREGS == UART1 || usart->pREGS == ULP_UART)) {
+#if SLI_USART_UDMA_ENABLED
         // Disable DMA
 #ifdef SL_SI91X_USART_DMA
         if (sl_si91x_dma_channel_disable(dma_init.dma_number, usart->dma_tx->channel + 1)) {
           return ARM_DRIVER_ERROR;
         }
 #else
-          UDMAx_ChannelDisable(usart->dma_tx->channel, udma, udmaHandle);
+        UDMAx_ChannelDisable(usart->dma_tx->channel, udma, udmaHandle);
+#endif
 #endif
       }
       // Clear Send active flag
@@ -1336,16 +1465,29 @@ int32_t USART_Control(uint32_t control,
 
       usart->pREGS->FCR = fcr;
 
+#if SLI_USART_GPDMA_LINKED
+      gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_RX_DIRECTION);
+      if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+        if (usart->info->rx_status.rx_busy) {
+          if (sli_si91x_gpdma_peripheral_stop(gpdma_peripheral_id) != SL_STATUS_OK) {
+            return ARM_DRIVER_ERROR;
+          }
+        }
+      }
+#endif
+
       // If DMA mode - disable DMA channel
       if (usart->dma_rx && usart->info->rx_status.rx_busy
           && (usart->pREGS == UART0 || usart->pREGS == USART0 || usart->pREGS == UART1 || usart->pREGS == ULP_UART)) {
+#if SLI_USART_UDMA_ENABLED
         // Disable DMA
 #ifdef SL_SI91X_USART_DMA
         if (sl_si91x_dma_channel_disable(dma_init.dma_number, usart->dma_rx->channel + 1)) {
           return ARM_DRIVER_ERROR;
         }
 #else
-          UDMAx_ChannelDisable(usart->dma_rx->channel, udma, udmaHandle);
+        UDMAx_ChannelDisable(usart->dma_rx->channel, udma, udmaHandle);
+#endif
 #endif
       }
       // Clear RX busy status
@@ -1358,28 +1500,50 @@ int32_t USART_Control(uint32_t control,
       // Disable transmit holding register empty and
       // receive data available interrupts
       usart->pREGS->IER &= (uint32_t)(~(USART_INTR_THRE | USART_INTR_RX_DATA));
+#if SLI_USART_GPDMA_LINKED
+      gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_TX_DIRECTION);
+      if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+        if (usart->info->xfer.send_active) {
+          if (sli_si91x_gpdma_peripheral_stop(gpdma_peripheral_id) != SL_STATUS_OK) {
+            return ARM_DRIVER_ERROR;
+          }
+        }
+      }
+      gpdma_peripheral_id = sli_si91x_gpdma_usart_peripheral_id(usart, SL_GPDMA_RX_DIRECTION);
+      if (gpdma_peripheral_id != INVALID_PERIPHERAL_ID) {
+        if (usart->info->rx_status.rx_busy) {
+          if (sli_si91x_gpdma_peripheral_stop(gpdma_peripheral_id) != SL_STATUS_OK) {
+            return ARM_DRIVER_ERROR;
+          }
+        }
+      }
 
+#endif
       // If DMA mode - disable DMA channel
       if (usart->dma_tx != NULL && usart->info->xfer.send_active
           && (usart->pREGS == UART0 || usart->pREGS == USART0 || usart->pREGS == UART1 || usart->pREGS == ULP_UART)) {
+#if SLI_USART_UDMA_ENABLED
         // Disable DMA
 #ifdef SL_SI91X_USART_DMA
         if (sl_si91x_dma_channel_disable(dma_init.dma_number, usart->dma_tx->channel + 1)) {
           return ARM_DRIVER_ERROR;
         }
 #else
-          UDMAx_ChannelDisable(usart->dma_tx->channel, udma, udmaHandle);
+        UDMAx_ChannelDisable(usart->dma_tx->channel, udma, udmaHandle);
+#endif
 #endif
       }
       if (usart->dma_rx && usart->info->rx_status.rx_busy
           && (usart->pREGS == UART0 || usart->pREGS == USART0 || usart->pREGS == UART1 || usart->pREGS == ULP_UART)) {
         // Disable DMA
+#if SLI_USART_UDMA_ENABLED
 #ifdef SL_SI91X_USART_DMA
         if (sl_si91x_dma_channel_disable(dma_init.dma_number, usart->dma_rx->channel + 1)) {
           return ARM_DRIVER_ERROR;
         }
 #else
-          UDMAx_ChannelDisable(usart->dma_rx->channel, udma, udmaHandle);
+        UDMAx_ChannelDisable(usart->dma_rx->channel, udma, udmaHandle);
+#endif
 #endif
       }
 
@@ -1565,23 +1729,22 @@ int32_t USART_Control(uint32_t control,
     }
   }
   if ((usart->pREGS == UART0) || (usart->pREGS == USART0)) {
-    if (RTE_USART0_TX_FIFO_THRESHOLD == USART_TRIGGER_TX_EMPTY) {
-      // Set the TX FIFO threshold level
-      fcr |= USART_FIFO_TX_EMPTY;
-    }
-    if (RTE_USART0_RX_FIFO_THRESHOLD == USART_TRIGGER_RX_AEMPTY) {
-      // Set the RX FIFO threshold level
-      fcr |= USART_FIFO_RX_AEMPTY;
-    }
+
+#if defined(USART_MODULE)
+    fcr |= SL_USART_TX_FIFO_THRESHOLD_TO_FCR(
+      SL_USART0_TX_FIFO_THRESHOLD); //updates the usart fcr register based on threshold values for tx
+    fcr |= SL_USART_RX_FIFO_THRESHOLD_TO_FCR(
+      SL_USART0_RX_FIFO_THRESHOLD); //updates the usart fcr register based on threshold values for rx
+#endif
+
   } else if (usart->pREGS == UART1) {
-    if (RTE_UART1_TX_FIFO_THRESHOLD == USART_TRIGGER_TX_EMPTY) {
-      // Set the TX FIFO threshold level
-      fcr |= USART_FIFO_TX_EMPTY;
-    }
-    if (RTE_UART1_RX_FIFO_THRESHOLD == USART_TRIGGER_RX_AEMPTY) {
-      // Set the RX FIFO threshold level
-      fcr |= USART_FIFO_RX_AEMPTY;
-    }
+#if defined(UART_MODULE)
+    fcr |= SL_USART_TX_FIFO_THRESHOLD_TO_FCR(
+      SL_UART1_TX_FIFO_THRESHOLD); //updates the uart1 fcr register based on threshold values for tx
+    fcr |= SL_USART_RX_FIFO_THRESHOLD_TO_FCR(
+      SL_UART1_RX_FIFO_THRESHOLD); //updates the uart1 fcr register based on threshold values for rx
+#endif
+
   } else if (usart->pREGS == ULP_UART) {
     if (RTE_ULP_UART_TX_FIFO_THRESHOLD == USART_TRIGGER_TX_EMPTY) {
       // Set the TX FIFO threshold level

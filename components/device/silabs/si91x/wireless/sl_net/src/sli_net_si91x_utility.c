@@ -40,6 +40,9 @@
 #include "sli_wifi_utility.h"
 #include "sli_types.h"
 #include "sl_utility.h"
+#include "sl_si91x_ec_identity.h"
+#include "sl_si91x_protocol_types.h"
+#include <string.h>
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -54,6 +57,8 @@
 
 static uint8_t sli_get_certificate_index(sl_net_credential_id_t id)
 {
+  // TLS-style groups (including SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_START) encode
+  // the certificate index / key_id in the low byte.
   if ((id & SL_NET_CREDENTIAL_GROUP_MASK) != 0) {
     return ((uint8_t)id & 0xFF);
   }
@@ -66,6 +71,24 @@ static uint8_t sli_get_certificate_index(sl_net_credential_id_t id)
       break;
   }
   return -1;
+}
+
+static sl_status_t sli_si91x_ec_key_id_from_credential_id(sl_net_credential_id_t id, sl_si91x_ec_key_id_t *key_id)
+{
+  if (key_id == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if ((id & SL_NET_CREDENTIAL_GROUP_MASK) != SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_START) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  *key_id = (sl_si91x_ec_key_id_t)(id & 0xFF);
+  if (*key_id > SL_SI91X_EC_KEY_ID_MAX) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  return SL_STATUS_OK;
 }
 
 static sli_si91x_cert_type_t convert_to_si91x_cert_type(sl_net_credential_id_t id, sl_net_credential_type_t type)
@@ -86,6 +109,9 @@ static sli_si91x_cert_type_t convert_to_si91x_cert_type(sl_net_credential_id_t i
       }
 
       switch (id & SL_NET_CREDENTIAL_GROUP_MASK) {
+        case SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_START:
+          // Low byte is key_id / cert index for EC EAP client certificates.
+          return SLI_SI91X_EAP_CLIENT;
         case SL_NET_TLS_CLIENT_CREDENTIAL_START:
           return SLI_SI91X_TLS_CLIENT;
         case SL_NET_TLS_SERVER_CREDENTIAL_START:
@@ -166,6 +192,116 @@ sl_status_t sli_si91x_set_credential(sl_net_credential_id_t id,
   return status;
 }
 
+static sl_status_t sli_si91x_ec_identity_send(uint8_t sub_cmd,
+                                              sl_si91x_ec_key_id_t key_id,
+                                              sl_si91x_ec_curve_t curve,
+                                              sl_si91x_ec_sig_alg_t sig_alg,
+                                              uint8_t *out_payload,
+                                              uint16_t *out_len,
+                                              uint16_t out_max)
+{
+  sl_status_t status       = SL_STATUS_OK;
+  sl_wifi_buffer_t *buffer = NULL;
+  /* Generate/delete send a 12-byte header only; avoid stacking the unused 512-byte payload. */
+  sli_si91x_ec_identity_req_hdr_t req = { 0 };
+  const uint32_t request_length       = sizeof(req);
+
+  if (!sl_si91x_is_device_initialized()) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  req.sub_cmd  = sub_cmd;
+  req.reserved = 0;
+  req.key_id   = key_id;
+  req.curve    = (uint8_t)curve;
+  req.sig_alg  = (uint8_t)sig_alg;
+  req.in_len   = 0;
+  req.out_len  = 0;
+
+  status = sli_wifi_send_command(SLI_WIFI_REQ_EC_IDENTITY,
+                                 SLI_WIFI_WLAN_CMD,
+                                 &req,
+                                 request_length,
+                                 SLI_WIFI_WAIT_FOR_RESPONSE(SLI_WIFI_RSP_EC_IDENTITY_WAIT_TIME),
+                                 NULL,
+                                 (void **)&buffer);
+  if ((status != SL_STATUS_OK) && (buffer != NULL)) {
+    sli_buffer_manager_free_buffer(buffer);
+  }
+  VERIFY_STATUS_AND_RETURN(status);
+
+  /* Delete path: no SPKI output requested. */
+  if ((out_payload == NULL) || (out_len == NULL)) {
+    if (buffer != NULL) {
+      sli_buffer_manager_free_buffer(buffer);
+    }
+    return SL_STATUS_OK;
+  }
+
+  /* Generate path: NWP success includes header + SPKI; empty/missing is failure. */
+  if (buffer == NULL) {
+    return SL_STATUS_FAIL;
+  }
+
+  const sl_wifi_system_packet_t *packet = sli_wifi_host_get_buffer_data(buffer, 0, NULL);
+  if ((packet == NULL) || (packet->length < sizeof(sli_si91x_ec_identity_req_hdr_t))) {
+    *out_len = 0;
+    sli_buffer_manager_free_buffer(buffer);
+    return SL_STATUS_FAIL;
+  }
+
+  /* NWP generate response: 12-byte header + SPKI; out_len is authoritative. */
+  const sli_si91x_ec_identity_req_hdr_t *rsp_hdr = (const sli_si91x_ec_identity_req_hdr_t *)packet->data;
+  const uint8_t *src                             = packet->data + sizeof(sli_si91x_ec_identity_req_hdr_t);
+  uint16_t available_len                         = (uint16_t)(packet->length - sizeof(sli_si91x_ec_identity_req_hdr_t));
+
+  if ((rsp_hdr->out_len == 0) || (rsp_hdr->out_len > available_len) || (rsp_hdr->out_len > out_max)) {
+    *out_len = 0;
+    sli_buffer_manager_free_buffer(buffer);
+    return (rsp_hdr->out_len > out_max) ? SL_STATUS_INVALID_PARAMETER : SL_STATUS_FAIL;
+  }
+
+  memcpy(out_payload, src, rsp_hdr->out_len);
+  *out_len = rsp_hdr->out_len;
+  sli_buffer_manager_free_buffer(buffer);
+  return SL_STATUS_OK;
+}
+
+sl_status_t sli_si91x_generate_and_set_credential(sl_net_credential_id_t id,
+                                                  sl_net_credential_type_t type,
+                                                  void *credential,
+                                                  uint32_t credential_length)
+{
+  sl_status_t status;
+  sl_si91x_ec_key_id_t key_id;
+  sl_si91x_ec_generate_params_t *params = (sl_si91x_ec_generate_params_t *)credential;
+
+  if (type != SL_NET_GENERATE_EC_PRIVATE_KEY) {
+    return SL_STATUS_NOT_SUPPORTED;
+  }
+
+  status = sli_si91x_ec_key_id_from_credential_id(id, &key_id);
+  VERIFY_STATUS_AND_RETURN(status);
+
+  if ((params == NULL) || (credential_length != sizeof(sl_si91x_ec_generate_params_t))) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  if (params->curve != SL_SI91X_EC_CURVE_SECP256R1) {
+    return SL_STATUS_EC_UNSUPPORTED_CURVE;
+  }
+
+  // Host does not soft-overwrite; NWP returns SL_STATUS_EC_IDENTITY_IN_USE /
+  // SL_STATUS_EC_KEY_ALREADY_EXISTS if the slot is already provisioned.
+  params->spki_len = 0;
+  return sli_si91x_ec_identity_send(SLI_SI91X_EC_IDENTITY_SUBCMD_GENERATE,
+                                    key_id,
+                                    params->curve,
+                                    SL_SI91X_EC_SIG_ALG_ECDSA_SHA256,
+                                    params->spki,
+                                    &params->spki_len,
+                                    SL_SI91X_EC_MAX_SPKI_LEN);
+}
+
 sl_status_t sli_si91x_get_credential(sl_net_credential_id_t id,
                                      const sl_net_credential_type_t *type,
                                      const void *credential,
@@ -180,6 +316,22 @@ sl_status_t sli_si91x_get_credential(sl_net_credential_id_t id,
 
 sl_status_t sli_si91x_delete_credential(sl_net_credential_id_t id, sl_net_credential_type_t type)
 {
+  if (type == SL_NET_DELETE_EC_PRIVATE_KEY) {
+    sl_status_t status;
+    sl_si91x_ec_key_id_t key_id;
+
+    status = sli_si91x_ec_key_id_from_credential_id(id, &key_id);
+    VERIFY_STATUS_AND_RETURN(status);
+
+    return sli_si91x_ec_identity_send(SLI_SI91X_EC_IDENTITY_SUBCMD_DELETE,
+                                      key_id,
+                                      SL_SI91X_EC_CURVE_SECP256R1,
+                                      SL_SI91X_EC_SIG_ALG_ECDSA_SHA256,
+                                      NULL,
+                                      NULL,
+                                      0);
+  }
+
   sli_si91x_cert_type_t cert_type = convert_to_si91x_cert_type(id, type);
   uint8_t index                   = sli_get_certificate_index(id);
 

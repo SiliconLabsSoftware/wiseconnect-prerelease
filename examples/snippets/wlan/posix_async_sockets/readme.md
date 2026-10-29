@@ -31,7 +31,7 @@ This application demonstrates POSIX-style asynchronous socket usage on the SiWx9
 | Mode | Value | Flow |
 |------|-------|------|
 | `APP_MODE_TCP_CLIENT` | 0 | `SOCK_NONBLOCK` → `connect` → `select(writefds)` → `getsockopt(SO_ERROR)` → TCP send |
-| `APP_MODE_TCP_SERVER` | 1 | `bind`/`listen` → `select`+`accept` → `select` for data → `sl_si91x_socket_get_available_bytes` → `recv(MSG_PEEK)` + `recv`/`memcmp` (one chunk) → `select`+`recv` for remaining `DATA_TEST_DURATION_MS` → throughput summary |
+| `APP_MODE_TCP_SERVER` | 1 | `bind`/`listen` → `select`+`accept` → `select` for data → `sl_si91x_socket_get_available_bytes_count` → `recv(MSG_PEEK)` + `recv`/`memcmp` (one chunk) → `select`+`recv` for remaining `DATA_TEST_DURATION_MS` → throughput summary |
 | `APP_MODE_UDP_SERVER` | 2 | `bind` → `select(readfds)` → `recvfrom` |
 
 `SOCK_NONBLOCK` applies to **TCP client connect only**. TCP server listen and UDP do not require `SOCK_NONBLOCK`.
@@ -40,7 +40,7 @@ This application demonstrates POSIX-style asynchronous socket usage on the SiWx9
 
 After accepting a client and waiting for data with `select(readfds)`:
 
-1. `sl_si91x_socket_get_available_bytes()` — query how many bytes the NWP has ready without consuming them. This is a Si91x API, not POSIX `ioctl`/`FIONREAD`. The example therefore requires the `sl_si91x_asynchronous_socket` component (already in the `.slcp` files).
+1. `sl_si91x_socket_get_available_bytes_count()` — query how many bytes the NWP has ready without consuming them. This is a Si91x API, not POSIX `ioctl`/`FIONREAD`. The example therefore requires the `sl_si91x_asynchronous_socket` component (already in the `.slcp` files).
 2. `recv(..., MSG_PEEK)` then `recv(..., 0)` — peek one chunk, consume the same length, and `memcmp` to verify peek and consume match.
 3. Continue receiving for `DATA_TEST_DURATION_MS` using `select()` with the remaining time each iteration (or until peer close / error), print a throughput summary, then close the client and wait for the next connection. Keep the peer streaming for that full interval (for example iPerf `-t 5`); if the peer stops early, `select()` times out and the summary still prints.
 

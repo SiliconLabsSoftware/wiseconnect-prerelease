@@ -139,10 +139,12 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - **DMA Configuration**
 
-  - Enable/Disable the DMA configuration.
-  - Configure the FIFO thresholds (that is, **Almost Full** and **Almost Empty**). It can be configured between 0 to 15.
-  - It is recommended to have maximum depth for FIFO threshold. Almost Full refers to the RX FIFO and Almost Empty refers to TX FIFO.
-  - Configuration files are generated in **config folder**. If not changed, the code will run on default UC values.
+  - Enable or disable DMA for GSPI transfers. DMA is disabled by default.
+  - **DMA Controller**: Select **UDMA** or **GPDMA**. The default is UDMA. Only one controller is used at a time.
+  - **GPDMA Configuration**: Enable this when GPDMA is selected. Set the maximum number of TX and RX descriptors (1 to 256, default 8). Each descriptor moves up to 4095 bytes.
+  - Configure the FIFO thresholds (**Almost Full** and **Almost Empty**). The range is 0 to 14. With GPDMA, use 0 to 7. Almost Full refers to the RX FIFO and Almost Empty refers to the TX FIFO.
+  - Configuration files are generated in the **config** folder. If not changed, the code runs on the default UC values.
+  - Tx and Rx threshold should be same when using gpdma
 
 
 - Configure the following macros in [`gspi_freertos.c`](gspi_freertos.c) if required:

@@ -41,6 +41,7 @@ extern "C" {
 #if USER_CONFIGURATION_ENABLE
 
 #include "sl_si91x_i2c.h"
+#include "sl_si91x_gpio.h"
 /******************************************************************************/
 /******************************* I2C Configuration **************************/
 // <<< Use Configuration Wizard in Context Menu >>>
@@ -63,6 +64,24 @@ extern "C" {
 // <q SL_I2C_INSTANCE_INIT_DMA> DMA
 // <i> Default: 0
 #define SL_I2C_INSTANCE_INIT_DMA 0
+
+// </h>
+
+// <h> Pin Settings
+
+// <o SL_I2C_INSTANCE_SCL_MODE> SCL pad mode
+// <GPIO_PULLUP=> Pull-up
+// <i> Default: GPIO_PULLUP
+#ifndef SL_I2C_INSTANCE_SCL_MODE
+#define SL_I2C_INSTANCE_SCL_MODE GPIO_PULLUP
+#endif
+
+// <o SL_I2C_INSTANCE_SDA_MODE> SDA pad mode
+// <GPIO_PULLUP=> Pull-up
+// <i> Default: GPIO_PULLUP
+#ifndef SL_I2C_INSTANCE_SDA_MODE
+#define SL_I2C_INSTANCE_SDA_MODE GPIO_PULLUP
+#endif
 
 // </h>
 /******************************************************************************/

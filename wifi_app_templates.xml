@@ -4,7 +4,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/demos/wifi_commander/wifi_commander_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -19,7 +19,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/at_commands/at_commands_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd2911a brd2708a brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd2911a brd2708a brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -64,7 +64,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/embedded_mqtt_client/wifi_embedded_mqtt_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -109,7 +109,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/paho_mqtt_client/lwip_mqtt_over_tcp/wifi_lwip_mqtt_over_tcp_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -139,7 +139,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/paho_mqtt_client/mqtt_over_websocket/wifi_mqtt_over_websocket_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -199,7 +199,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/paho_mqtt_client/mqtt_over_tcp/wifi_mqtt_over_tcp_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -229,7 +229,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/multithreading_application/wifi_multithreading_application_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -304,7 +304,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_server/wifi_http_server_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -364,7 +364,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/embedded_mqtt_client_twt/wifi_embedded_mqtt_client_twt_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -409,7 +409,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_mode/wifi_concurrent_mode_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -499,7 +499,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_roaming/wifi_roaming_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -514,7 +514,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_soc_empty/wifi_soc_empty.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -529,7 +529,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_lwip_soc_empty/wifi_lwip_soc_empty.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -589,7 +589,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/lwip_tcp_client/wifi_lwip_tcp_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -649,7 +649,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/station_ping/wifi_station_ping_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -694,7 +694,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/data_transfer/wifi_data_transfer_application_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -739,7 +739,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/multithread_sockets/wifi_multithread_sockets_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -784,7 +784,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/enterprise_client/wifi_enterprise_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y110lgnba.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y121mgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -794,6 +794,51 @@
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/wlan/enterprise_client/readme.md" />
     <properties key="filters" value="Device\  Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="wifi_enterprise_ec_identity_psram" label="Wi-Fi - Enterprise EC Identity EAP-TLS (PSRAM)" description="Demonstrates on-device P-256 key generation, CSR TBS signing, and EAP-TLS client-certificate install for WPA2-Enterprise.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/enterprise_ec_identity/wifi_enterprise_ec_identity_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="evaluation" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/enterprise_ec_identity/readme.md" />
+    <properties key="filters" value="Device\  Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Intermediate" />
+  </descriptors>
+  <descriptors name="wifi_enterprise_ec_identity_ncp" label="Wi-Fi - Enterprise EC Identity EAP-TLS (NCP)" description="Demonstrates on-device P-256 key generation, CSR TBS signing, and EAP-TLS client-certificate install for WPA2-Enterprise.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/enterprise_ec_identity/wifi_enterprise_ec_identity_ncp.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
+    <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="evaluation" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/enterprise_ec_identity/readme.md" />
+    <properties key="filters" value="Device\ Type|NCP Wireless\ Technology|Wi-Fi Project\ Difficulty|Intermediate" />
+  </descriptors>
+  <descriptors name="wifi_enterprise_ec_identity_soc" label="Wi-Fi - Enterprise EC Identity EAP-TLS (SoC)" description="Demonstrates on-device P-256 key generation, CSR TBS signing, and EAP-TLS client-certificate install for WPA2-Enterprise.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan/enterprise_ec_identity/wifi_enterprise_ec_identity_soc.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y110lgnba.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y121mgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="evaluation" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan/enterprise_ec_identity/readme.md" />
+    <properties key="filters" value="Device\  Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Intermediate" />
   </descriptors>
   <descriptors name="wifi_station_ping_v6_uart_ncp" label="Wi-Fi - Station Ping V6(UART NCP)" description="Demonstrates how to send an ICMPv6 ping request.">
     <properties key="namespace" value="template.uc" />
@@ -829,7 +874,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/station_ping_v6/wifi_station_ping_v6_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -874,7 +919,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_net_dual_stack_nwp_m4/wifi_net_dual_stack_nwp_m4.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -934,7 +979,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/provisioning/wifi_provisioning_via_access_point_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -960,7 +1005,7 @@
     <properties key="readmeFiles" value="examples/snippets/wlan/provisioning/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="wifi_posix_async_sockets_soc" label="Wi-Fi - POSIX Async Sockets (SoC)" description="Demonstrates non-blocking TCP connect with select(writefds) and getsockopt(SO_ERROR); TCP server accept with sl_si91x_socket_get_available_bytes, recv(MSG_PEEK) verify, and recv drain; and UDP server select(readfds)+recvfrom">
+  <descriptors name="wifi_posix_async_sockets_soc" label="Wi-Fi - POSIX Async Sockets (SoC)" description="Demonstrates non-blocking TCP connect with select(writefds) and getsockopt(SO_ERROR); TCP server accept with sl_si91x_socket_get_available_bytes_count, recv(MSG_PEEK) verify, and recv drain; and UDP server select(readfds)+recvfrom">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/posix_async_sockets/wifi_posix_async_sockets_soc.slcp" />
@@ -975,7 +1020,7 @@
     <properties key="readmeFiles" value="examples/snippets/wlan/posix_async_sockets/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
-  <descriptors name="wifi_posix_async_sockets_ncp" label="Wi-Fi - POSIX Async Sockets (NCP)" description="Demonstrates non-blocking TCP connect with select(writefds) and getsockopt(SO_ERROR); TCP server accept with sl_si91x_socket_get_available_bytes, recv(MSG_PEEK) verify, and recv drain; and UDP server select(readfds)+recvfrom">
+  <descriptors name="wifi_posix_async_sockets_ncp" label="Wi-Fi - POSIX Async Sockets (NCP)" description="Demonstrates non-blocking TCP connect with select(writefds) and getsockopt(SO_ERROR); TCP server accept with sl_si91x_socket_get_available_bytes_count, recv(MSG_PEEK) verify, and recv drain; and UDP server select(readfds)+recvfrom">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/posix_async_sockets/wifi_posix_async_sockets_ncp.slcp" />
@@ -1024,7 +1069,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_http_server/wifi_concurrent_http_server_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1039,7 +1084,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/sntp_client/wifi_embedded_sntp_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1099,7 +1144,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/tcp_tx_on_periodic_wakeup/wifi_tcp_tx_on_periodic_wakeup_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1159,7 +1204,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi6_twt_use_case_demo/wifi6_twt_use_case_demo_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1219,7 +1264,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_otaf/wifi_http_otaf_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1294,7 +1339,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/dtls_client/wifi_dtls_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1369,7 +1414,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/calibration_app/wifi_calibration_app_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1429,7 +1474,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/mdns_discovery/wifi_mdns_discovery_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1474,7 +1519,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_client/wifi_http_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1504,7 +1549,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/select_app/wifi_select_app_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1534,7 +1579,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wifi_dual_network_mode/wifi_dual_network_mode.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y111mgaxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1594,7 +1639,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_http_server_provisioning/wifi_concurrent_http_server_provisioning_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd2911a brd2708a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd4338a brd2911a brd2708a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1639,7 +1684,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/ap_throughput/wifi_ap_throughput_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1729,7 +1774,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/user_gain_table/wifi_user_gain_table_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1759,7 +1804,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wlan_throughput_v6/wifi_wlan_throughput_v6_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1834,7 +1879,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/three_ssl_concurrent_client_sockets/wifi_three_ssl_client_sockets_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1864,7 +1909,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/websocket_client/wifi_websocket_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1894,7 +1939,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wps_pbc/wifi_wps_pbc_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1939,7 +1984,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/m4_firmware_update/wifi_m4_firmware_update_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1999,7 +2044,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/twt_use_case_remote_app/wifi_twt_use_case_remote_app_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2059,7 +2104,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/wlan_rf_test/wlan_rf_test_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2089,7 +2134,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/access_point/wifi_access_point_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y110lgnba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2134,7 +2179,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/cloud_apps/azure/wifi_azure_iot_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2209,7 +2254,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/cloud_apps/aws/mqtt/wifi_aws_mqtt_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2254,7 +2299,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/tls_client/wifi_tls_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2299,7 +2344,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/concurrent_mode_dual_ip/wifi_concurrent_mode_dual_ip_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4339a brd4339b brd4340b brd4343q brd9084b brd4343s brd4343a brd4343c" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd2911a brd2708a brd4342a brd4340a brd4339a brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s brd4343a brd4343c" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917y110lgnba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2389,7 +2434,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/wlan/http_otaf_twt/wifi_http_otaf_twt_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd4338a brd4342a brd4340a brd4339b brd4340b brd4343a brd4343q brd9084b brd4343s brd4343c" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd4338a brd4342a brd4340a brd4339b brd4340b brd4343a brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s brd4343c" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2404,7 +2449,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/flash_read_write/flash_read_write.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y121mgnxa.* .*siwg917y110lgaba.* .*siwg917y111mgaxa.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2419,7 +2464,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/aws_device_shadow/wifi_aws_device_shadow_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2524,7 +2569,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/wlan_throughput/wifi_wlan_throughput_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2554,7 +2599,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/power_save_deep_sleep/wifi_power_save_deep_sleep_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4339a brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4339a brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917y121mgnxa.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2584,7 +2629,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/twt_tcp_client/wifi_twt_tcp_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2629,7 +2674,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/powersave_standby_associated_tcp_client/wifi_powersave_standby_associated_tcp_client_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2719,7 +2764,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/low_power/powersave_standby_associated/wifi_powersave_standby_associated_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -2779,7 +2824,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/featured/firmware_update/wifi_firmware_update_soc.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084b brd4343s" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />

@@ -89,6 +89,7 @@ include:
   - path: sl_si91x_constants.h
   - path: sl_si91x_core_utilities.h
   - path: sl_si91x_driver.h
+  - path: sl_si91x_ec_identity.h
   - path: sli_si91x_driver.h
   - path: sl_si91x_host_interface.h
   - path: sl_si91x_iot_socket.h

@@ -32,8 +32,11 @@ template_contribution:
       event: driver_init
       include: "sl_si91x_sdio_secondary.h"
       handler: sl_si91x_sdio_secondary_init
+  - name: component_catalog
+    value: sl_si91x_sdio_secondary      
 conflicts:
-  - name: sl_hspi_secondary    
+  - name: sl_hspi_secondary 
+    
 
 documentation:
   url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/sdio

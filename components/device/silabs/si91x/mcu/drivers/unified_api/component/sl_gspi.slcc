@@ -40,5 +40,10 @@ requires:
   - name: sl_dma
   - name: log_none
 
+template_contribution:
+  - name: component_catalog
+    value: sl_si91x_gspi
+
+
 documentation:
   url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gspi

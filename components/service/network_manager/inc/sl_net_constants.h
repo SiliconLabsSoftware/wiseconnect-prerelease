@@ -164,7 +164,9 @@ typedef enum {
   SL_NET_EAP_CLIENT_CREDENTIAL,    ///< Wi-Fi EAP Credential.
   SL_NET_MQTT_CLIENT_CREDENTIAL,   ///< MQTT Client Credential.
   SL_NET_TLS_PRIVATE_KEY_CBC_WRAP, ///< CBC TLS Private Certificate Key.
-  SL_NET_TLS_PRIVATE_KEY_ECB_WRAP  ///< ECB TLS Private Certificate Key.
+  SL_NET_TLS_PRIVATE_KEY_ECB_WRAP, ///< ECB TLS Private Certificate Key.
+  SL_NET_GENERATE_EC_PRIVATE_KEY, ///< On-device EC private key generation. Use with @ref sl_net_generate_and_set_credential only.
+  SL_NET_DELETE_EC_PRIVATE_KEY, ///< On-device EC private key deletion. Use with @ref sl_net_delete_credential and @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY.
 } sl_net_credential_type_t;
 
 /**
@@ -205,8 +207,9 @@ typedef enum {
   SL_NET_WIFI_CLIENT_CREDENTIAL_ID_1   = 2, ///< Wi-Fi Client Credential Id 1.
   SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID = 3, ///< Wi-Fi Access Point Credential Id.
   ///< @note In case of `Basic Network Configuration Manager`, by default `default_wifi_ap_credential` from `sl_net_default_values.h` is used. User can choose to override this by setting the credential using @ref sl_net_set_credential.
-  SL_NET_WIFI_AP_CREDENTIAL_ID_1       = 4,        ///< Wi-Fi AP Credential Id 1.
-  SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID = 5,        ///< Wi-Fi EAP Client Credential Id.
+  SL_NET_WIFI_AP_CREDENTIAL_ID_1       = 4, ///< Wi-Fi AP Credential Id 1.
+  SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID = 5, ///< Wi-Fi EAP Client Credential Id (legacy).
+  ///< @note Use for EAP username/password, enterprise CA (@ref SL_NET_SIGNING_CERTIFICATE), and RSA private keys. Do not use for EC generate, EC client-certificate install, or EC delete — those require @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY.
   SL_NET_WIFI_EAP_SERVER_CREDENTIAL_ID = 6,        ///< Wi-Fi EAP Server Credential Id.
   SL_NET_USER_CREDENTIAL_ID            = 7,        ///< User Credential Id.
   SL_NET_TLS_CLIENT_CREDENTIAL_START   = (1 << 8), ///< TLS Client Credential Id.
@@ -215,6 +218,8 @@ typedef enum {
   SL_NET_MQTT_CLIENT_CREDENTIAL_START  = (4 << 8), ///< MQTT Client Credential Id.
   SL_NET_HTTP_SERVER_CREDENTIAL_START  = (5 << 8), ///< HTTP Server Credential Id.
   SL_NET_HTTP_CLIENT_CREDENTIAL_START  = (6 << 8), ///< HTTP Client Credential Id.
+  SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_START =
+    (7 << 8), ///< Wi-Fi EAP Client Credential Id group start (encodes `key_id` in the low byte).
 } sl_net_credential_id_t;
 
 /**
@@ -242,6 +247,30 @@ typedef enum {
  *   - In case of other types in @ref sl_net_credential_type_t, the valid values for x is only 0.
  */
 #define SL_NET_TLS_CLIENT_CREDENTIAL_ID(x) (SL_NET_TLS_CLIENT_CREDENTIAL_START + x)
+
+/**
+ * @def SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY(key_id)
+ * @brief Macro to encode an EAP client credential ID with a host-supplied EC `key_id`.
+ *
+ * @details
+ * Encodes `key_id` in the low byte of a credential ID in the
+ * @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_START group (TLS-style), analogous to
+ * @ref SL_NET_TLS_CLIENT_CREDENTIAL_ID.
+ *
+ * EC private-key generate (@ref sl_net_generate_and_set_credential with
+ * @ref SL_NET_GENERATE_EC_PRIVATE_KEY), EC client-certificate install
+ * (@ref sl_net_set_credential with @ref SL_NET_CERTIFICATE), and EC private-key
+ * delete (@ref sl_net_delete_credential with @ref SL_NET_DELETE_EC_PRIVATE_KEY)
+ * MUST use this macro. Valid `key_id` for SiWx91x Phase-1 is 0 only
+ * (SL_SI91X_EC_MAX_IDENTITIES is 1). `key_id` is not a SET_CERT
+ * cert_index and does not select among identities. The client certificate
+ * is stored in the existing EAP client certificate slot.
+ *
+ * Legacy @ref SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID (= 5) remains valid for CA,
+ * EAP username/password, and RSA credentials.
+ */
+#define SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_ID_KEY(key_id) \
+  ((sl_net_credential_id_t)(SL_NET_WIFI_EAP_CLIENT_CREDENTIAL_START + (key_id)))
 
 /**
  * @def SL_NET_TLS_SERVER_CREDENTIAL_ID(x)

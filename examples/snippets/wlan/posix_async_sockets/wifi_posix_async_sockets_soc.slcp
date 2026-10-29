@@ -5,7 +5,7 @@ label: Wi-Fi - POSIX Async Sockets (SoC)
 category: Example|Wi-Fi
 description: 'Demonstrates non-blocking TCP connect with select(writefds) and getsockopt(SO_ERROR);
 
-  TCP server accept with sl_si91x_socket_get_available_bytes, recv(MSG_PEEK) verify, and
+  TCP server accept with sl_si91x_socket_get_available_bytes_count, recv(MSG_PEEK) verify, and
 
   recv drain; and UDP server select(readfds)+recvfrom.
 
@@ -51,6 +51,8 @@ component:
   instance:
   - vcom
 toolchain_settings:
+- option: llvm_linker_option
+  value: -Wl,-u,_printf_float
 - option: gcc_compiler_option
   value: -Wall -Werror -Wno-error=deprecated-declarations
 - option: llvm_compiler_option

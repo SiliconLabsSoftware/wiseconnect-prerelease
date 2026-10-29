@@ -153,12 +153,8 @@ void sli_si91x_xtal_turn_on_request_from_m4_to_TA(void)
  */
 void sli_si91x_raise_xtal_interrupt_to_ta(uint16_t interrupt_no)
 {
-  //! Wake up NWP
-  P2P_STATUS_REG |= M4_WAKEUP_TA;
-
-  //!wait for NWP active
-  while (!(P2P_STATUS_REG & TA_IS_ACTIVE))
-    ;
+  //! Wake up NWP. The matching release is sl_si91x_host_clear_sleep_indicator() below.
+  (void)sli_si91x_req_wakeup();
 
   // Write the turn_on_xtal interrupt to NWP register
   M4SS_P2P_INTR_SET_REG = interrupt_no;
@@ -195,10 +191,8 @@ sl_status_t sli_si91x_M4_TA_Timesync(void)
 {
   sl_status_t status = SL_STATUS_FAIL;
   if (!M4_PS2_STATE_STATUS) {
-    P2P_STATUS_REG |= M4_WAKEUP_TA;
-
-    while (!(P2P_STATUS_REG & TA_IS_ACTIVE))
-      ; // Wait for NWP
+    // Wake up NWP. The matching release is sl_si91x_host_clear_sleep_indicator() below.
+    (void)sli_si91x_req_wakeup();
 
     M4SS_P2P_INTR_SET_REG = M4_REQ_TIME_STAMP_FROM_NWP;
 

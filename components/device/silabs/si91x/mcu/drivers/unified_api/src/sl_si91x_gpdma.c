@@ -27,6 +27,7 @@
 *
 ******************************************************************************/
 
+/* Modified: allocate and release contiguous 8-entry FIFO slots using a bitmap. */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,8 +35,14 @@ extern "C" {
 #include <stdint.h>
 #include <stdlib.h>
 #include "sl_si91x_gpdma.h"
+#include "sl_si91x_gpdma_peripheral_specific.h"
 #include <core_cm4.h>
 #include "rsi_rom_clks.h"
+#include "sl_common.h"
+#include "sl_component_catalog.h"
+/******************************************* EXTERNAL VARIABLES **************************
+*************************************************************************************
+*****************************************************************************/
 
 /*******************************************************************************
  ***********************  Global function Prototypes *************************
@@ -49,16 +56,31 @@ void sl_si91x_gpdma_irq_handler(void);
 static sl_si91x_gpdma_data_context_t gpdma_driver; // GPDMA driver context
 
 static sl_gpdma_channel_data_t sl_gpdma_channel_allocation_data_t[SL_GPDMA_MAX_CHANNEL + 1] = {
-  0
+  { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED }, { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED },
+  { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED }, { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED },
+  { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED }, { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED },
+  { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED }, { .fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED }
 }; // GPDMA channel data
 
 static sl_si91x_gpdma_resources_Data_t gpdma_resource_data = {
   // GPDMA resource data
-  .max_fifo                  = 64,       //maximum FIFO size is 64 bytes
-  .top_fifo                  = 0,        //top FIFO is 0 by default
+  .fifo_slot_bitmap          = 0xFFU,    //all eight FIFO slots are free
   .channel_allocation_bitmap = 0X00000FF //all the channels are unallocated by default
 };
 
+#if defined(SL_CATALOG_SL_SI91X_SDIO_SECONDARY_PRESENT) || defined(SL_CATALOG_SL_SI91X_HSPI_SECONDARY_PRESENT)
+/*******************************************************************************
+ * GPDMA Weak IRQ Handler when using SDIO/HSPI since they have their own gpdma irq handler
+ * 
+ * @param none
+ * @return none
+ ******************************************************************************/
+SL_WEAK void sl_si91x_gpdma_irq_handler(void)
+{          //GPDMA interrupt handler
+  __DMB(); //Ensure all memory accesses are complete before proceeding for global variable update.
+  RSI_GPDMA_InterruptHandler((void *)&gpdma_driver);
+}
+#else
 /*******************************************************************************
  * GPDMA IRQ Handler
  * 
@@ -70,7 +92,7 @@ void sl_si91x_gpdma_irq_handler(void)
   __DMB(); //Ensure all memory accesses are complete before proceeding for global variable update.
   RSI_GPDMA_InterruptHandler((void *)&gpdma_driver);
 }
-
+#endif
 /*******************************************************************************************************************
  **********************************   LOCAL STATIC FUNCTION PROTOTYPES   *******************************************
  *******************************************************************************************************************/
@@ -160,6 +182,9 @@ static void sli_si91x_gpdma_build_descriptor_list(sl_si91x_gpdma_descriptor_t *d
                                                   sl_si91x_gpdma_descriptor_t *desc_memory,
                                                   uint32_t transfer_size);
 
+/* FIFO mode and contiguous addresses follow the transfer type. */
+static void sli_si91x_gpdma_apply_transfer_type(sl_si91x_gpdma_descriptor_t *descriptor);
+
 /**
  * @brief Determines the position of a resource in a resource tracking variable
  *
@@ -210,7 +235,10 @@ static void sli_si91x_gpdma_hresp_callback(sl_si91x_gpdma_handle_t pDrv,
 
   (void)pDrv;
   (void)pDescriptor;
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_HRESP_ERROR_CB]();
+  sl_gpdma_callback_t callback = sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_HRESP_ERROR_CB];
+  if (callback != NULL) {
+    callback();
+  }
 }
 
 /*
@@ -223,7 +251,11 @@ void sli_si91x_gpdma_desc_fetch_done_callback(sl_si91x_gpdma_handle_t pDrv,
 {
   (void)pDrv;
   (void)pDescriptor;
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_DESCRIPTOR_FETCH_DONE_CB]();
+  sl_gpdma_callback_t callback =
+    sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_DESCRIPTOR_FETCH_DONE_CB];
+  if (callback != NULL) {
+    callback();
+  }
 }
 
 /*
@@ -238,7 +270,11 @@ static void sli_si91x_gpdma_transfer_done_callback(sl_si91x_gpdma_handle_t pDrv,
   (void)pDrv;
   (void)pDescriptor;
   sl_si91x_gpdma_resources_Data_t *pRes = sl_si91x_get_gpdma_resources();
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_TRANSFER_DONE_CB]();
+  sl_gpdma_callback_t callback =
+    sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_TRANSFER_DONE_CB];
+  if (callback != NULL) {
+    callback();
+  }
   pRes->channel_allocation_bitmap &= ~(1 << (channel_no));
 }
 
@@ -252,7 +288,11 @@ void sli_si91x_gpdma_gpdmac_error_callback(sl_si91x_gpdma_handle_t pDrv,
 {
   (void)pDrv;
   (void)pDescriptor;
-  sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_GPDMAC_ERROR_CB]();
+  sl_gpdma_callback_t callback =
+    sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_GPDMAC_ERROR_CB];
+  if (callback != NULL) {
+    callback();
+  }
 }
 
 /*
@@ -263,18 +303,56 @@ static void sli_si91x_gpdma_build_descriptor_list(sl_si91x_gpdma_descriptor_t *d
                                                   uint32_t transfer_size)
 {
   sl_si91x_gpdma_descriptor_t *descriptor_memory = desc_memory;
-  uint32_t no_of_descripotrs          = (transfer_size + MAX_TRANSFER_PER_DESCRIPTOR - 1) / MAX_TRANSFER_PER_DESCRIPTOR;
-  descriptor_memory[0].chnlCtrlConfig = descriptor->chnlCtrlConfig;
-  descriptor_memory[0].miscChnlCtrlConfig = descriptor->miscChnlCtrlConfig;
-  for (uint8_t i = 1; i < no_of_descripotrs; i++) {
-    descriptor_memory[i].chnlCtrlConfig                  = descriptor->chnlCtrlConfig;
-    descriptor_memory[i].miscChnlCtrlConfig              = descriptor->miscChnlCtrlConfig;
-    descriptor_memory[i - 1].pNextLink                   = (uint32_t *)(&descriptor[i]);
-    descriptor_memory[i].chnlCtrlConfig.srcAddContiguous = 1;
-    descriptor_memory[i].chnlCtrlConfig.dstAddContiguous = 1;
-    transfer_size -= MAX_TRANSFER_PER_DESCRIPTOR;
+  uint32_t align =
+    sli_si91x_gpdma_transfer_alignment(transfer_size,
+                                       sli_si91x_gpdma_width_bytes(descriptor->chnlCtrlConfig.srcDataWidth),
+                                       descriptor->miscChnlCtrlConfig.srcDataBurst);
+  uint32_t no_of_descripotrs = sli_si91x_gpdma_descriptor_count(transfer_size, align);
+
+  if (no_of_descripotrs == 0U) {
+    return;
   }
-  descriptor_memory[no_of_descripotrs - 1].chnlCtrlConfig.transSize = transfer_size;
+
+  // Sizes stay within one descriptor and on a multiple of the item width
+  // (and of the burst, when the transfer allows it). An even ceiling split
+  // can land off that multiple (4100 bytes at 4-byte width -> 2050).
+  for (uint32_t i = 0; i < no_of_descripotrs; i++) {
+    descriptor_memory[i].chnlCtrlConfig           = descriptor->chnlCtrlConfig;
+    descriptor_memory[i].miscChnlCtrlConfig       = descriptor->miscChnlCtrlConfig;
+    descriptor_memory[i].chnlCtrlConfig.transSize = sli_si91x_gpdma_descriptor_size(transfer_size, align, i);
+    if (i > 0) {
+      descriptor_memory[i - 1].pNextLink = (uint32_t *)(&descriptor_memory[i]);
+    }
+    sli_si91x_gpdma_apply_transfer_type(&descriptor_memory[i]);
+  }
+
+  // Terminate the chain explicitly: the last descriptor must have
+  // linkListOn = DISABLE and pNextLink = NULL, otherwise the GPDMA
+  // controller will fetch a phantom descriptor from stale / zero memory
+  // and either abort or transfer garbage after the legitimate chain.
+  descriptor_memory[no_of_descripotrs - 1].chnlCtrlConfig.linkListOn = SL_LINK_LIST_MODE_DISABLE;
+  descriptor_memory[no_of_descripotrs - 1].pNextLink                 = NULL;
+}
+
+/* Memory walks. A peripheral register stays in FIFO mode and does not walk. */
+static void sli_si91x_gpdma_apply_transfer_type(sl_si91x_gpdma_descriptor_t *descriptor)
+{
+  if (descriptor->chnlCtrlConfig.transType == SL_GPDMA_MEMORY_TO_PERIPHERAL) {
+    descriptor->chnlCtrlConfig.srcFifoMode      = SL_SOURCE_FIFO_MODE_DISABLE;
+    descriptor->chnlCtrlConfig.dstFifoMode      = SL_DESTINATION_FIFO_MODE_ENABLE;
+    descriptor->chnlCtrlConfig.srcAddContiguous = 1U;
+    descriptor->chnlCtrlConfig.dstAddContiguous = 0U;
+  } else if (descriptor->chnlCtrlConfig.transType == SL_GPDMA_PERIPHERAL_TO_MEMORY) {
+    descriptor->chnlCtrlConfig.srcFifoMode      = SL_SOURCE_FIFO_MODE_ENABLE;
+    descriptor->chnlCtrlConfig.dstFifoMode      = SL_DESTINATION_FIFO_MODE_DISABLE;
+    descriptor->chnlCtrlConfig.srcAddContiguous = 0U;
+    descriptor->chnlCtrlConfig.dstAddContiguous = 1U;
+  } else {
+    descriptor->chnlCtrlConfig.srcFifoMode      = SL_SOURCE_FIFO_MODE_DISABLE;
+    descriptor->chnlCtrlConfig.dstFifoMode      = SL_DESTINATION_FIFO_MODE_DISABLE;
+    descriptor->chnlCtrlConfig.srcAddContiguous = 1U;
+    descriptor->chnlCtrlConfig.dstAddContiguous = 1U;
+  }
 }
 
 /*
@@ -328,12 +406,16 @@ sl_status_t sl_si91x_gpdma_init()
 {
   sl_status_t status                  = SL_STATUS_OK;
   sl_si91x_gpdma_data_context_t *pDrv = sl_si91x_get_gpdma_handle();
-  pDrv->baseC                         = GPDMA_C;
-  pDrv->baseG                         = GPDMA_G;
-  pDrv->gpdmaCompCB                   = sli_si91x_gpdma_transfer_done_callback;
-  pDrv->gpdmaDescFetchCompCB          = sli_si91x_gpdma_desc_fetch_done_callback;
-  pDrv->gpdmaHrespErrorCB             = sli_si91x_gpdma_hresp_callback;
-  pDrv->gpdmaRpdmacErrorCB            = sli_si91x_gpdma_gpdmac_error_callback;
+  if (pDrv->baseC != NULL || pDrv->baseG != NULL) {
+    return SL_STATUS_ALREADY_INITIALIZED;
+  }
+
+  pDrv->baseC                = GPDMA_C;
+  pDrv->baseG                = GPDMA_G;
+  pDrv->gpdmaCompCB          = sli_si91x_gpdma_transfer_done_callback;
+  pDrv->gpdmaDescFetchCompCB = sli_si91x_gpdma_desc_fetch_done_callback;
+  pDrv->gpdmaHrespErrorCB    = sli_si91x_gpdma_hresp_callback;
+  pDrv->gpdmaRpdmacErrorCB   = sli_si91x_gpdma_gpdmac_error_callback;
 
   status = RSI_CLK_PeripheralClkEnable(M4CLK, RPDMA_CLK, ENABLE_STATIC_CLK);
   if (status != SL_STATUS_OK) {
@@ -365,8 +447,11 @@ sl_status_t sl_si91x_gpdma_deinit()
   pDrv->gpdmaHrespErrorCB               = NULL;
   pDrv->gpdmaRpdmacErrorCB              = NULL;
   pRes->channel_allocation_bitmap       = 0x000000FF;
-  pRes->top_fifo                        = 0;
+  pRes->fifo_slot_bitmap                = 0xFFU;
   memset(sl_gpdma_channel_allocation_data_t, 0, sizeof(sl_gpdma_channel_allocation_data_t));
+  for (uint32_t channel = 0; channel <= SL_GPDMA_MAX_CHANNEL; channel++) {
+    sl_gpdma_channel_allocation_data_t[channel].fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED;
+  }
   status = RSI_CLK_PeripheralClkDisable(M4CLK, RPDMA_CLK);
   if (status != SL_STATUS_OK) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_deinit: clock disable failed st=0x%04lX,line no : %d\r\n",
@@ -387,8 +472,11 @@ sl_status_t sl_si91x_gpdma_allocate_fifo(uint32_t channel_number, uint32_t fifo_
   sl_status_t status                    = SL_STATUS_OK;
   sl_si91x_gpdma_resources_Data_t *pRes = sl_si91x_get_gpdma_resources();
   sl_si91x_gpdma_data_context_t *pDrv   = sl_si91x_get_gpdma_handle();
-  uint32_t fifo_start_address           = 0;
-  if (channel_number > SL_GPDMA_MAX_CHANNEL || fifo_size == 0) {
+  uint32_t slot_count;
+  uint32_t slot_mask;
+  uint32_t free_slots = pRes->fifo_slot_bitmap;
+  sl_gpdma_channel_data_t *channel;
+  if (channel_number > SL_GPDMA_MAX_CHANNEL || fifo_size >= (SL_GPDMA_FIFO_SLOT_SIZE * SL_GPDMA_FIFO_SLOT_COUNT)) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_allocate_fifo: invalid param st=0x%04lX,line no : %d\r\n",
                           (unsigned long)SL_STATUS_INVALID_PARAMETER,
                           (int)__LINE__);
@@ -401,18 +489,30 @@ sl_status_t sl_si91x_gpdma_allocate_fifo(uint32_t channel_number, uint32_t fifo_
                           (int)__LINE__);
     return status;
   }
-  if (((fifo_size - 1) + pRes->top_fifo) > pRes->max_fifo) {
-    SL_PRINT_STRING_ERROR("sl_si91x_gpdma_allocate_fifo: fifo memory st=0x%04lX,line no : %d\r\n",
-                          (unsigned long)SL_STATUS_GPDMA_FIFO_MEMORY_NOT_AVAILABLE,
-                          (int)__LINE__);
-    return SL_STATUS_GPDMA_FIFO_MEMORY_NOT_AVAILABLE;
-  } else {
-    fifo_start_address = (unsigned int)((pRes->top_fifo) & 0x3F);
-    RSI_GPDMA_SET_CHANNEL_FIFO_SIZE((sl_si91x_gpdma_handle_t)pDrv, channel_number, fifo_size, fifo_start_address);
-    pRes->top_fifo += fifo_size;
-    sl_gpdma_channel_allocation_data_t[channel_number].fifo_size = fifo_size;
+  channel = &sl_gpdma_channel_allocation_data_t[channel_number];
+  // Consider the current run available during a resize, without changing it yet.
+  if (channel->fifo_slot != SL_GPDMA_FIFO_SLOT_UNALLOCATED) {
+    slot_count = (channel->fifo_size + SL_GPDMA_FIFO_SLOT_SIZE) / SL_GPDMA_FIFO_SLOT_SIZE;
+    free_slots |= ((1U << slot_count) - 1U) << channel->fifo_slot;
   }
-  return SL_STATUS_OK;
+
+  // FIFO_SIZE is inclusive: 7 requires one slot, 8..15 require two slots.
+  slot_count = (fifo_size + SL_GPDMA_FIFO_SLOT_SIZE) / SL_GPDMA_FIFO_SLOT_SIZE;
+  slot_mask  = (1U << slot_count) - 1U;
+  for (uint32_t slot = 0; slot + slot_count <= SL_GPDMA_FIFO_SLOT_COUNT; slot++) {
+    uint32_t run_mask = slot_mask << slot;
+    if ((free_slots & run_mask) == run_mask) {
+      RSI_GPDMA_SET_CHANNEL_FIFO_SIZE((sl_si91x_gpdma_handle_t)pDrv,
+                                      channel_number,
+                                      fifo_size,
+                                      slot * SL_GPDMA_FIFO_SLOT_SIZE);
+      pRes->fifo_slot_bitmap = free_slots & ~run_mask;
+      channel->fifo_slot     = slot;
+      channel->fifo_size     = fifo_size;
+      return SL_STATUS_OK;
+    }
+  }
+  return SL_STATUS_GPDMA_FIFO_MEMORY_NOT_AVAILABLE;
 }
 
 /*******************************************************************************
@@ -486,8 +586,12 @@ sl_status_t sl_si91x_gpdma_allocate_channel(uint32_t *channel_no, uint32_t prior
   sl_gpdma_channel_allocation_data_t[*channel_no].max_transfer_Size = max_transfer_size;
   pRes->channel_allocation_bitmap &= ~(1 << *channel_no);
   RSI_GPDMA_SET_CHANNEL_PRIORITY((sl_si91x_gpdma_handle_t)pDrv, *channel_no, priority);
-  status = sl_si91x_gpdma_allocate_fifo(*channel_no, 8);
+  // FIFO_SIZE 7 represents one fixed 8-entry slot.
+  status = sl_si91x_gpdma_allocate_fifo(*channel_no, 7);
   if (status != SL_STATUS_OK) {
+    pRes->channel_allocation_bitmap |= (1U << *channel_no);
+    sl_gpdma_channel_allocation_data_t[*channel_no].max_transfer_Size = 0;
+    RSI_GPDMA_SET_CHANNEL_PRIORITY((sl_si91x_gpdma_handle_t)pDrv, *channel_no, 0);
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_allocate_channel: allocate_fifo st=0x%04lX,line no : %d\r\n",
                           (unsigned long)status,
                           (int)__LINE__);
@@ -528,6 +632,13 @@ sl_status_t sl_si91x_gpdma_deallocate_channel(uint32_t channel_no)
   }
 
   pRes->channel_allocation_bitmap |= (1 << channel_no);
+  if (sl_gpdma_channel_allocation_data_t[channel_no].fifo_slot != SL_GPDMA_FIFO_SLOT_UNALLOCATED) {
+    uint32_t slot_count =
+      (sl_gpdma_channel_allocation_data_t[channel_no].fifo_size + SL_GPDMA_FIFO_SLOT_SIZE) / SL_GPDMA_FIFO_SLOT_SIZE;
+    pRes->fifo_slot_bitmap |= ((1U << slot_count) - 1U) << sl_gpdma_channel_allocation_data_t[channel_no].fifo_slot;
+    sl_gpdma_channel_allocation_data_t[channel_no].fifo_slot = SL_GPDMA_FIFO_SLOT_UNALLOCATED;
+  }
+  sl_gpdma_channel_allocation_data_t[channel_no].fifo_size                                         = 0;
   sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_HRESP_ERROR_CB]           = NULL;
   sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_DESCRIPTOR_FETCH_DONE_CB] = NULL;
   sl_gpdma_channel_allocation_data_t[channel_no].gpdma_callback[SL_GPDMA_TRANSFER_DONE_CB]         = NULL;
@@ -641,9 +752,9 @@ sl_status_t sl_si91x_gpdma_allocate_descriptor(sl_si91x_gpdma_descriptor_t *pDes
                                                uint32_t transfer_size,
                                                uint32_t channel_number)
 {
-  sl_status_t status                 = SL_STATUS_OK;
-  sl_si91x_gpdma_descriptor_t *pDesc = pDescriptor_memory;
-  uint32_t no_of_descripotrs         = (transfer_size + MAX_TRANSFER_PER_DESCRIPTOR - 1) / MAX_TRANSFER_PER_DESCRIPTOR;
+  sl_status_t status                                  = SL_STATUS_OK;
+  sl_si91x_gpdma_descriptor_t *pDesc                  = pDescriptor_memory;
+  uint32_t no_of_descripotrs                          = 0;
   sl_si91x_gpdma_descriptor_t sl_gpdma_default_config = {
     .chnlCtrlConfig.transSize         = (uint32_t)(MAX_TRANSFER_PER_DESCRIPTOR),
     .chnlCtrlConfig.transType         = SL_GPDMA_MEMORY_TO_MEMORY,
@@ -667,6 +778,11 @@ sl_status_t sl_si91x_gpdma_allocate_descriptor(sl_si91x_gpdma_descriptor_t *pDes
     .miscChnlCtrlConfig.memoryFillEn  = SL_MEMORY_FILL_DISABLE,
     .miscChnlCtrlConfig.memoryOneFill = SL_MEMORY_ZERO_FILL,
   };
+  no_of_descripotrs = sli_si91x_gpdma_descriptor_count(
+    transfer_size,
+    sli_si91x_gpdma_transfer_alignment(transfer_size,
+                                       sli_si91x_gpdma_width_bytes(sl_gpdma_default_config.chnlCtrlConfig.srcDataWidth),
+                                       sl_gpdma_default_config.miscChnlCtrlConfig.srcDataBurst));
   if (channel_number > SL_GPDMA_MAX_CHANNEL) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_allocate_descriptor: invalid channel st=0x%04lX,line no : %d\r\n",
                           (unsigned long)SL_STATUS_INVALID_PARAMETER,
@@ -746,10 +862,10 @@ sl_status_t sl_Si91x_gpdma_deallocate_descriptor(uint32_t channel_number)
 
 sl_status_t sl_si91x_gpdma_transfer(uint32_t channel_number, void *pSource, void *pDestination)
 {
-  sl_status_t status                       = SL_STATUS_OK;
-  sl_si91x_gpdma_data_context_t *pDrv      = sl_si91x_get_gpdma_handle();
-  sl_si91x_gpdma_descriptor_t *descriptors = sl_gpdma_channel_allocation_data_t[channel_number].descriptor_memory;
-  uint32_t number_of_descriptors           = sl_gpdma_channel_allocation_data_t[channel_number].number_of_descriptors;
+  sl_status_t status                  = SL_STATUS_OK;
+  sl_si91x_gpdma_data_context_t *pDrv = sl_si91x_get_gpdma_handle();
+  sl_si91x_gpdma_descriptor_t *descriptors;
+  uint32_t number_of_descriptors;
   if (pSource == NULL || pDestination == NULL) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_transfer: NULL src/dst st=0x%04lX,line no : %d\r\n",
                           (unsigned long)SL_STATUS_INVALID_PARAMETER,
@@ -762,18 +878,50 @@ sl_status_t sl_si91x_gpdma_transfer(uint32_t channel_number, void *pSource, void
                           (int)__LINE__);
     return SL_STATUS_INVALID_PARAMETER;
   }
-  status = sl_si91x_gpdma_get_channel_status(channel_number);
+  descriptors           = sl_gpdma_channel_allocation_data_t[channel_number].descriptor_memory;
+  number_of_descriptors = sl_gpdma_channel_allocation_data_t[channel_number].number_of_descriptors;
+  status                = sl_si91x_gpdma_get_channel_status(channel_number);
   if (status != SL_STATUS_GPDMA_CHANNEL_ALREADY_ALLOCATED) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_transfer: channel status st=0x%04lX,line no : %d\r\n",
                           (unsigned long)status,
                           (int)__LINE__);
     return status;
   }
-  for (uint32_t i = 0; i < number_of_descriptors; i++) {
-    descriptors[i].src  = (void *)((uintptr_t)pSource + i * MAX_TRANSFER_PER_DESCRIPTOR);
-    descriptors[i].dest = (void *)((uintptr_t)pDestination + i * MAX_TRANSFER_PER_DESCRIPTOR);
-  }
+  /* A transfer of 4095 bytes or less disables link-list mode and programs the
+   * channel registers directly. descriptor_memory stays NULL on that path. */
   if (sl_gpdma_channel_allocation_data_t[channel_number].link_list_mode_disable == false) {
+    if (descriptors == NULL) {
+      SL_PRINT_STRING_ERROR("sl_si91x_gpdma_transfer: NULL descriptor st=0x%04lX,line no : %d\r\n",
+                            (unsigned long)SL_STATUS_NULL_POINTER,
+                            (int)__LINE__);
+      return SL_STATUS_NULL_POINTER;
+    }
+    descriptors[0].src  = (void *)((uintptr_t)pSource);
+    descriptors[0].dest = (void *)((uintptr_t)pDestination);
+    // Use ">=" so that the boundary case (max_transfer_Size == MAX_TRANSFER_PER_DESCRIPTOR)
+    // also gets src/dest assigned here. The matching check on the GSPI side covers
+    // strictly smaller transfers via the descriptor template.
+    //
+    // The per-descriptor offset is the running sum of transSize so this works
+    // correctly even when bytes are distributed unevenly across descriptors
+    // (see sli_si91x_gpdma_build_descriptor_list).
+    if (sl_gpdma_channel_allocation_data_t[channel_number].max_transfer_Size >= MAX_TRANSFER_PER_DESCRIPTOR) {
+      uint32_t offset = 0;
+      for (uint32_t i = 0; i < number_of_descriptors; i++) {
+        uint32_t src_offset = offset;
+        uint32_t dst_offset = offset;
+        // Contiguous bits were set from the transfer type while building the list.
+        if (descriptors[i].chnlCtrlConfig.srcAddContiguous == 0U) {
+          src_offset = 0U;
+        }
+        if (descriptors[i].chnlCtrlConfig.dstAddContiguous == 0U) {
+          dst_offset = 0U;
+        }
+        descriptors[i].src  = (void *)((uintptr_t)pSource + src_offset);
+        descriptors[i].dest = (void *)((uintptr_t)pDestination + dst_offset);
+        offset += descriptors[i].chnlCtrlConfig.transSize;
+      }
+    }
     RSI_GPDMA_Enable_Link_List_Mode((void *)pDrv, channel_number);
 
     RSI_GPDMA_Link_List_Pointer_Register((void *)pDrv, descriptors, channel_number);
@@ -833,9 +981,9 @@ sl_status_t sl_si91x_gpdma_build_descriptor(sl_si91x_gpdma_descriptor_t *pDescri
   sl_status_t status                    = SL_STATUS_OK;
   sl_si91x_gpdma_data_context_t *pDrv   = sl_si91x_get_gpdma_handle();
   sl_si91x_gpdma_resources_Data_t *pRes = sl_si91x_get_gpdma_resources();
-  uint32_t no_of_descripotrs         = (transfer_size + MAX_TRANSFER_PER_DESCRIPTOR - 1) / MAX_TRANSFER_PER_DESCRIPTOR;
-  rsi_error_t error_status           = RSI_OK;
-  sl_si91x_gpdma_descriptor_t *pDesc = pDescriptor_memory;
+  uint32_t no_of_descripotrs            = 0;
+  rsi_error_t error_status              = RSI_OK;
+  sl_si91x_gpdma_descriptor_t *pDesc    = pDescriptor_memory;
   if (pDesc_config == NULL || pDescriptor_memory == NULL) {
     SL_PRINT_STRING_ERROR("sl_si91x_gpdma_build_descriptor: NULL arg st=0x%04lX,line no : %d\r\n",
                           (unsigned long)SL_STATUS_NULL_POINTER,
@@ -854,6 +1002,7 @@ sl_status_t sl_si91x_gpdma_build_descriptor(sl_si91x_gpdma_descriptor_t *pDescri
                           (int)__LINE__);
     return SL_STATUS_GPDMA_CHANNEL_NOT_ALLOCATED;
   }
+  sli_si91x_gpdma_apply_transfer_type(pDesc_config);
   if (pDesc_config->chnlCtrlConfig.linkListOn == false) {
     if (transfer_size > 4095) {
       SL_PRINT_STRING_ERROR("sl_si91x_gpdma_build_descriptor: transfer too large st=0x%04lX,line no : %d\r\n",
@@ -891,6 +1040,11 @@ sl_status_t sl_si91x_gpdma_build_descriptor(sl_si91x_gpdma_descriptor_t *pDescri
     return status;
   }
   sli_si91x_gpdma_build_descriptor_list(pDesc, pDescriptor_memory, transfer_size);
+  no_of_descripotrs = sli_si91x_gpdma_descriptor_count(
+    transfer_size,
+    sli_si91x_gpdma_transfer_alignment(transfer_size,
+                                       sli_si91x_gpdma_width_bytes(pDesc_config->chnlCtrlConfig.srcDataWidth),
+                                       pDesc_config->miscChnlCtrlConfig.srcDataBurst));
   sl_gpdma_channel_allocation_data_t[channel_number].number_of_descriptors = no_of_descripotrs;
   return status;
 }
@@ -914,7 +1068,40 @@ sl_status_t sl_si91x_get_channel_fifo_size(uint32_t channel_number, uint32_t *fi
                           (int)__LINE__);
     return SL_STATUS_GPDMA_CHANNEL_NOT_ALLOCATED;
   }
+  if (fifo_size == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
   *fifo_size = sl_gpdma_channel_allocation_data_t[channel_number].fifo_size;
+  return SL_STATUS_OK;
+}
+
+/*
+ 1. This function returns the channel number for the given peripheral ID.
+*/
+sl_status_t sl_si91x_gpdma_get_peripheral_channel_number(sl_gpdma_peripheral_id_t peripheral_id,
+                                                         uint32_t *channel_number)
+{
+  if (channel_number == NULL) {
+    SL_PRINT_STRING_ERROR("sl_si91x_gpdma_get_peripheral_channel_number: NULL channel st=0x%04lX,line no : %d\r\n",
+                          (unsigned long)SL_STATUS_NULL_POINTER,
+                          (int)__LINE__);
+    return SL_STATUS_NULL_POINTER;
+  }
+  if ((uint32_t)peripheral_id >= (uint32_t)INVALID_PERIPHERAL_ID) {
+    SL_PRINT_STRING_ERROR(
+      "sl_si91x_gpdma_get_peripheral_channel_number: invalid peripheral st=0x%04lX,line no : %d\r\n",
+      (unsigned long)SL_STATUS_INVALID_PARAMETER,
+      (int)__LINE__);
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+  if (gpdma_peripheral_channel_info[peripheral_id].channel_number == SL_GPDMA_CHANNEL_UNALLOCATED) {
+    SL_PRINT_STRING_ERROR(
+      "sl_si91x_gpdma_get_peripheral_channel_number: channel not allocated st=0x%04lX,line no : %d\r\n",
+      (unsigned long)SL_STATUS_GPDMA_CHANNEL_NOT_ALLOCATED,
+      (int)__LINE__);
+    return SL_STATUS_GPDMA_CHANNEL_NOT_ALLOCATED;
+  }
+  *channel_number = gpdma_peripheral_channel_info[peripheral_id].channel_number;
   return SL_STATUS_OK;
 }
 

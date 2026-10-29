@@ -75,15 +75,19 @@
 #include "rsi_wisemcu_hardware_setup.h"
 #include "sli_siwx917_soc.h"
 #endif
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+#include "sli_si91x_nwp_interface.h"
+#include "sli_si91x_ahb_bus.h"
+#endif
 #ifdef SLI_SI91X_ENABLE_BLE
 #include "rsi_common_apis.h"
 #endif
 
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
-#define SLI_SIDE_BAND_DONE (1 << 2) //! had to be redefined as this macro is not in .h
 rsi_m4ta_desc_t crypto_desc[2];
-extern osEventFlagsId_t ta_events;
 extern osMutexId_t side_band_crypto_mutex;
+/* Held after a timeout until SIDE_BAND_DONE. crypto_desc[] still points into it. */
+static sl_wifi_buffer_t *sli_side_band_timed_out_buffer = NULL;
 #endif
 
 #ifndef NULL
@@ -825,27 +829,64 @@ sl_status_t sl_si91x_driver_send_side_band_crypto(uint32_t command,
   // Acquire Mutex
   osMutexAcquire(side_band_crypto_mutex, 0xFFFFFFFFUL);
 
+  /* A previous timeout left crypto_desc[] pointing at this buffer. Wait for the NWP
+   * to finish before reusing the descriptors or freeing the memory. */
+  if (sli_side_band_timed_out_buffer != NULL) {
+    uint32_t done = osEventFlagsWait(ta_events, SLI_SI91X_SIDE_BAND_DONE, osFlagsWaitAny, osWaitForever);
+    if ((done & SLI_SI91X_SIDE_BAND_DONE) == 0U) {
+      osMutexRelease(side_band_crypto_mutex);
+      sli_buffer_manager_free_buffer(buffer);
+      return SL_STATUS_TIMEOUT;
+    }
+    sli_si91x_update_side_band_crypto_command_status(false);
+    sl_si91x_host_clear_sleep_indicator();
+    sli_buffer_manager_free_buffer(sli_side_band_timed_out_buffer);
+    sli_side_band_timed_out_buffer = NULL;
+  }
+
   // fill crypto desc
   crypto_desc[0].addr   = (uint32_t)packet->desc;
   crypto_desc[0].length = SL_HOST_DESC_LEN;
   crypto_desc[1].addr   = (uint32_t)packet->data;
   crypto_desc[1].length = SL_CRYPTO_PKT_LEN;
 
+  status = sli_si91x_req_wakeup();
+  if (status != SL_STATUS_OK) {
+    sl_si91x_host_clear_sleep_indicator();
+    osMutexRelease(side_band_crypto_mutex);
+    sli_buffer_manager_free_buffer(buffer);
+    return status;
+  }
+
+  /* Drop a stale SIDE_BAND_DONE so this wait cannot complete on the previous operation. */
+  (void)osEventFlagsClear(ta_events, SLI_SI91X_SIDE_BAND_DONE);
+
   //! Enter Critical Section
   __disable_irq();
+
+  /* Hold M4 out of sleep until the NWP reports SIDE_BAND_DONE, including after timeout. */
+  sli_si91x_update_side_band_crypto_command_status(true);
 
   sli_si91x_raise_side_band_interrupt_to_ta();
 
   //! Exit Critical Section
   __enable_irq();
 
-  result =
-    osEventFlagsWait(ta_events, SLI_SIDE_BAND_DONE, (osFlagsWaitAny), (wait_period & ~SLI_WIFI_WAIT_FOR_RESPONSE_BIT));
+  result = osEventFlagsWait(ta_events,
+                            SLI_SI91X_SIDE_BAND_DONE,
+                            (osFlagsWaitAny),
+                            (wait_period & ~SLI_WIFI_WAIT_FOR_RESPONSE_BIT));
+
   if (result == (uint32_t)osErrorTimeout || result == (uint32_t)osErrorResource) {
+    /* The NWP may still be writing the buffer. Keep the wake hold and the M4-sleep
+     * block until SIDE_BAND_DONE; the next call frees the buffer after that. */
+    sli_side_band_timed_out_buffer = buffer;
     osMutexRelease(side_band_crypto_mutex);
-    sli_buffer_manager_free_buffer(buffer);
     return SL_STATUS_TIMEOUT;
   }
+
+  sli_si91x_update_side_band_crypto_command_status(false);
+  sl_si91x_host_clear_sleep_indicator();
 
   /* TA returns a 16-bit frame status (e.g. 0xCC9A for tag mismatch). Named
    * sl_status codes set bit 16 (SL_STATUS_CRYPTO_INVALID_SIGNATURE = 0x1CC9A),
