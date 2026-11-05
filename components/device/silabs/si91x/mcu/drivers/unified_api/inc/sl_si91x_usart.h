@@ -404,6 +404,16 @@ void sli_si91x_uart1_gpdma_rx_done_callback(void);
  ******************************************************************************/
 sl_status_t sl_si91x_usart_init(usart_peripheral_t usart_instance, sl_usart_handle_t *usart_handle);
 
+/***************************************************************************/
+/**
+ * @brief Apply USART/UART/ULP UART UC Pin Settings (PADCONFIG_P pad modes).
+ *
+ * @details Called from sl_driver_init via event_handler contribution (after
+ *          GPIO driver init). Applies pad mode for every serial pin whose
+ *          pin_tool / PAD_MODE macros are defined in the project configs.
+ ******************************************************************************/
+void sli_si91x_usart_config_pads(void);
+
 /***************************************************************************/ /**
  * @brief Uninitialize the USART/UART module.
  * @details This function will disable the clocks for USART/UART module and also

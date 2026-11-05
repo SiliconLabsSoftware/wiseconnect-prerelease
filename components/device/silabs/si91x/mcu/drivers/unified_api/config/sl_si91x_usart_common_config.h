@@ -156,4 +156,5 @@
 
 // [USART0_SL_USART0]$
 // <<< sl:end pin_tool >>>
+
 #endif // SL_SI91X_USART_COMMON_CONFIG_H

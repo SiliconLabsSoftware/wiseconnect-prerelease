@@ -38,6 +38,7 @@ extern "C" {
 
 #include "sl_si91x_pcm.h"
 #include "sl_si91x_i2s.h"
+#include "sl_si91x_gpio.h"
 
 /******************************************************************************/
 /******************************* PCM1(ULP_PCM) Configuration **************************/
@@ -70,6 +71,55 @@ extern "C" {
 #define SL_ULP_PCM_MODE SL_I2S_MASTER
 
 // </e>
+
+// <h> Pin Settings
+// <i> ULP PCM reuses the ULP_I2S pins. SI917 pad electrical settings (PADCONFIG_P).
+// <i> DIN0 is a GPIO input. SCLK/WSCLK pad modes only take effect when those pins are assigned.
+
+// <o SL_ULP_PCM_SCLK_PAD_MODE> SCLK pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_ULP_PCM_SCLK_PAD_MODE
+#define SL_ULP_PCM_SCLK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_ULP_PCM_WSCLK_PAD_MODE> WSCLK pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_ULP_PCM_WSCLK_PAD_MODE
+#define SL_ULP_PCM_WSCLK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_ULP_PCM_DOUT0_PAD_MODE> DOUT0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_ULP_PCM_DOUT0_PAD_MODE
+#define SL_ULP_PCM_DOUT0_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_ULP_PCM_DIN0_PAD_MODE> DIN0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_ULP_PCM_DIN0_PAD_MODE
+#define SL_ULP_PCM_DIN0_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
+/******************************************************************************/
+// <<< end of configuration section >>>
+
 #if USER_CONFIGURATION_ENABLE
 // <<< sl:start pin_tool >>>
 // <i2s_ulp signal=DOUT0,DIN0> SL_ULP_I2S

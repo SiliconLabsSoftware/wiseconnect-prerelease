@@ -42,6 +42,7 @@ extern "C" {
 #if USER_CONFIGURATION_ENABLE
 
 #include "sl_si91x_ssi.h"
+#include "sl_si91x_gpio.h"
 // <<< Use Configuration Wizard in Context Menu >>>
 
 // <e> SSI Instance configuration
@@ -85,6 +86,50 @@ extern "C" {
 #define SL_SSI_INSTANCE_RECEIVE_SAMPLE_DELAY 0
 
 // </e>
+
+// <h> Pin Settings
+// <i> Pad mode (PADCONFIG_P). MOSI/MISO/SCK are always present.
+// <i> Optional CS0 and further CS/DATA pad modes: use None when pin is None;
+// <i> board/common configs define CS1-CS3/DATA2/DATA3 with the same pattern.
+
+// <o SL_SSI_INSTANCE_MOSI_PAD_MODE> MOSI pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_INSTANCE_MOSI_PAD_MODE
+#define SL_SSI_INSTANCE_MOSI_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_INSTANCE_MISO_PAD_MODE> MISO pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_INSTANCE_MISO_PAD_MODE
+#define SL_SSI_INSTANCE_MISO_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_INSTANCE_SCK_PAD_MODE> SCK pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_INSTANCE_SCK_PAD_MODE
+#define SL_SSI_INSTANCE_SCK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_INSTANCE_CS0_PAD_MODE> CS0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ (None if CS0 pin is None; Secondary typically uses Pull-up)
+#ifndef SL_SSI_INSTANCE_CS0_PAD_MODE
+#define SL_SSI_INSTANCE_CS0_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
 // <<< end of configuration section >>>
 
 #else

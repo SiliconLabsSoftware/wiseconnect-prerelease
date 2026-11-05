@@ -238,6 +238,15 @@ sl_status_t sl_si91x_i2s_init(uint32_t i2s_instance, sl_i2s_handle_t *i2s_handle
 
 /***************************************************************************/
 /**
+ * @brief Apply I2S/PCM UC Pin Settings (PADCONFIG_P pad modes).
+ *
+ * @details Called from sl_driver_init via event_handler contribution (after
+ *          GPIO driver init). Covers I2S0 and ULP I2S/PCM pin macros.
+ ******************************************************************************/
+void sli_si91x_i2s_config_pads(void);
+
+/***************************************************************************/
+/**
  * @brief To uninitialize the I2S peripheral. This API is deprecated; please use sl_si91x_i2s_deinit_v2() instead.
  * 
  * @details This API disables the DMA instance used for I2S transfer and powers down the I2S peripheral

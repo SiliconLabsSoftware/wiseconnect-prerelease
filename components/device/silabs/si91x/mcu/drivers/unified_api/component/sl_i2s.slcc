@@ -39,6 +39,14 @@ requires:
   - name: udma_linker_config
   - name: rsilib_i2s
   - name: cmsis_sai
+  - name: sl_gpio
   - name: log_none
 ui_hints:
   visibility: never
+template_contribution:
+  - name: event_handler
+    priority: -9000
+    value:
+      event: driver_init
+      handler: sli_si91x_i2s_config_pads
+      include: sl_si91x_i2s.h

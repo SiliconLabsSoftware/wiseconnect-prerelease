@@ -169,6 +169,7 @@ extern "C" {
   "USART peripheral pins are not configured. To configure, either install [ENABLE USER CONFIGURATION] component or define USER_CONFIGURATION_ENABLE macro to 1, then configure the pins as per the Custom board."
 
 #endif // USER_CONFIGURATION_ENABLE
+
 #ifdef __cplusplus
 }
 #endif

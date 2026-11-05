@@ -36,6 +36,7 @@ extern "C" {
 #endif
 
 #include "sl_si91x_gspi.h"
+#include "sl_si91x_gpio.h"
 
 // <<< Use Configuration Wizard in Context Menu >>>
 
@@ -70,6 +71,70 @@ extern "C" {
 #define SL_GSPI_SWAP_WRITE_DATA 0
 
 // </e>
+
+// </h>
+
+// <h> Pin Settings
+// <i> Pad mode (PADCONFIG_P). MOSI/MISO/SCK are always present.
+// <i> For CS0-CS2: select None when the pin_tool pin is None; pad mode is
+// <i> applied only when the pin is assigned and mode is not None.
+
+// <o SL_GSPI_MOSI_PAD_MODE> MOSI pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_GSPI_MOSI_PAD_MODE
+#define SL_GSPI_MOSI_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_GSPI_MISO_PAD_MODE> MISO pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_GSPI_MISO_PAD_MODE
+#define SL_GSPI_MISO_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_GSPI_SCK_PAD_MODE> SCK pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_GSPI_SCK_PAD_MODE
+#define SL_GSPI_SCK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_GSPI_CS0_PAD_MODE> CS0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ (use None if CS0 pin is None in pin tool)
+#ifndef SL_GSPI_CS0_PAD_MODE
+#define SL_GSPI_CS0_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_GSPI_CS1_PAD_MODE> CS1 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None (ignored unless CS1 pin is assigned in pin tool)
+#ifndef SL_GSPI_CS1_PAD_MODE
+#define SL_GSPI_CS1_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// <o SL_GSPI_CS2_PAD_MODE> CS2 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None (ignored unless CS2 pin is assigned in pin tool)
+#ifndef SL_GSPI_CS2_PAD_MODE
+#define SL_GSPI_CS2_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
 
 // </h>
 // <<< end of configuration section >>>

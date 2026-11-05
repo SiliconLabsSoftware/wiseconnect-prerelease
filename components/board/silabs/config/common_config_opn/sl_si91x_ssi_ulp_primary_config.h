@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 #include "sl_si91x_ssi.h"
+#include "sl_si91x_gpio.h"
 // <<< Use Configuration Wizard in Context Menu >>>
 
 // <e> SSI ULP Primary(ULP_Master) Configuration
@@ -70,6 +71,70 @@ extern "C" {
 #define SL_SSI_ULP_PRIMARY_RECEIVE_SAMPLE_DELAY 0
 
 // </e>
+
+// <h> Pin Settings
+// <i> Pad mode (PADCONFIG_P). MOSI/MISO/SCK are always present.
+// <i> For CS0-CS2: select None when the pin_tool pin is None; pad mode is
+// <i> applied only when the pin is assigned and mode is not None.
+
+// <o SL_SSI_ULP_PRIMARY_MOSI_PAD_MODE> MOSI pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_ULP_PRIMARY_MOSI_PAD_MODE
+#define SL_SSI_ULP_PRIMARY_MOSI_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_ULP_PRIMARY_MISO_PAD_MODE> MISO pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_ULP_PRIMARY_MISO_PAD_MODE
+#define SL_SSI_ULP_PRIMARY_MISO_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_ULP_PRIMARY_SCK_PAD_MODE> SCK pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_ULP_PRIMARY_SCK_PAD_MODE
+#define SL_SSI_ULP_PRIMARY_SCK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_ULP_PRIMARY_CS0_PAD_MODE> CS0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ (use None if CS0 pin is None in pin tool)
+#ifndef SL_SSI_ULP_PRIMARY_CS0_PAD_MODE
+#define SL_SSI_ULP_PRIMARY_CS0_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_ULP_PRIMARY_CS1_PAD_MODE> CS1 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None (ignored unless CS1 pin is assigned in pin tool)
+#ifndef SL_SSI_ULP_PRIMARY_CS1_PAD_MODE
+#define SL_SSI_ULP_PRIMARY_CS1_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// <o SL_SSI_ULP_PRIMARY_CS2_PAD_MODE> CS2 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None (ignored unless CS2 pin is assigned in pin tool)
+#ifndef SL_SSI_ULP_PRIMARY_CS2_PAD_MODE
+#define SL_SSI_ULP_PRIMARY_CS2_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// </h>
 // <<< end of configuration section >>>
 #if USER_CONFIGURATION_ENABLE
 // <<< sl:start pin_tool >>>
@@ -132,6 +197,7 @@ extern "C" {
   "ULP SSI peripheral pins are not configured. To configure, either install [ENABLE USER CONFIGURATION] component or define USER_CONFIGURATION_ENABLE macro to 1, then configure the pins as per the Custom board."
 
 #endif // USER_CONFIGURATION_ENABLE
+
 #ifdef __cplusplus
 }
 #endif

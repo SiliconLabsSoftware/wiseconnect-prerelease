@@ -37,6 +37,7 @@ extern "C" {
 
 #include "sl_si91x_usart.h"
 #include "sl_si91x_usart_common_config.h"
+#include "sl_si91x_gpio.h"
 
 // <<< Use Configuration Wizard in Context Menu >>>
 
@@ -97,6 +98,62 @@ extern "C" {
 
 // </h>  USART Configuration
 // </e>
+
+// <h> Pin Settings
+// <i> Pad mode (PADCONFIG_P). TX/RX are always present.
+// <i> For CLK/CTS/RTS: select None when the pin_tool pin is None; pad mode is
+// <i> applied only when the pin is assigned and mode is not None.
+// <i> RX pad pull-up matches legacy rsi_usart RX configuration.
+
+// <o SL_USART0_TX_PAD_MODE> TX pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_USART0_TX_PAD_MODE
+#define SL_USART0_TX_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_USART0_RX_PAD_MODE> RX pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_PULLUP
+#ifndef SL_USART0_RX_PAD_MODE
+#define SL_USART0_RX_PAD_MODE GPIO_PULLUP
+#endif
+
+// <o SL_USART0_CLK_PAD_MODE> CLK pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None (ignored unless CLK pin is assigned in pin tool)
+#ifndef SL_USART0_CLK_PAD_MODE
+#define SL_USART0_CLK_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// <o SL_USART0_CTS_PAD_MODE> CTS pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None (ignored unless CTS pin is assigned in pin tool)
+#ifndef SL_USART0_CTS_PAD_MODE
+#define SL_USART0_CTS_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// <o SL_USART0_RTS_PAD_MODE> RTS pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None (ignored unless RTS pin is assigned in pin tool)
+#ifndef SL_USART0_RTS_PAD_MODE
+#define SL_USART0_RTS_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// </h>
 
 #ifdef __cplusplus
 }

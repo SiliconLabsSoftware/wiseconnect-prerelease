@@ -31,6 +31,8 @@
 #include "sl_si91x_ssi.h"
 #include "rsi_rom_clks.h"
 #include "rsi_spi.h"
+#include "em_device.h" // Provides RTE_Device_917.h (HP/ULP/UULP_VBAT port macros)
+#include "sl_si91x_gpio.h"
 #ifdef SSI_INSTANCE_CONFIG
 #include "sl_ssi_instances.h"
 #elif SSI_CONFIG
@@ -78,7 +80,6 @@ static void sl_ssi_set_receive_sample_delay(sl_ssi_handle_t ssi_handle, uint32_t
 static boolean_t validate_ssi_handle(sl_ssi_handle_t ssi_handle);
 static sl_status_t sli_si91x_ssi_configure_power_mode(sl_ssi_handle_t ssi_handle, sl_ssi_power_state_t state);
 static uint8_t convert_handle_to_instance(sl_ssi_handle_t ssi_handle);
-
 /*******************************************************************************
  **********************  Local Function Definition****************************
  ******************************************************************************/
@@ -86,6 +87,116 @@ static uint8_t convert_handle_to_instance(sl_ssi_handle_t ssi_handle);
 /*******************************************************************************
 ***********************  Global function Definitions *************************
  ******************************************************************************/
+/*******************************************************************************
+ * Applies UC Pin Settings (pad mode) for all SSI instances present in the
+ * project. Intended to run from sl_driver_init (event_handler contribution),
+ * after sl_gpio_driver_init. A pin is touched only when the pin_tool macro is
+ * defined and PAD_MODE is not SL_GPIO_PAD_MODE_NONE.
+ ******************************************************************************/
+void sli_si91x_ssi_config_pads(void)
+{
+  /* Primary (master) */
+#if defined(SL_SSI_MASTER_MOSI_DATA0_PIN) && defined(SL_SSI_PRIMARY_MOSI_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_MOSI_DATA0_PORT,
+                                (uint8_t)SL_SSI_MASTER_MOSI_DATA0_PIN,
+                                (uint8_t)SL_SSI_PRIMARY_MOSI_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_MISO_DATA1_PIN) && defined(SL_SSI_PRIMARY_MISO_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_MISO_DATA1_PORT,
+                                (uint8_t)SL_SSI_MASTER_MISO_DATA1_PIN,
+                                (uint8_t)SL_SSI_PRIMARY_MISO_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_SCK__PIN) && defined(SL_SSI_PRIMARY_SCK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_SCK__PORT,
+                                (uint8_t)SL_SSI_MASTER_SCK__PIN,
+                                (uint8_t)SL_SSI_PRIMARY_SCK_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_DATA2_PIN) && defined(SL_SSI_PRIMARY_DATA2_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_DATA2_PORT,
+                                (uint8_t)SL_SSI_MASTER_DATA2_PIN,
+                                (uint8_t)SL_SSI_PRIMARY_DATA2_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_DATA3_PIN) && defined(SL_SSI_PRIMARY_DATA3_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_DATA3_PORT,
+                                (uint8_t)SL_SSI_MASTER_DATA3_PIN,
+                                (uint8_t)SL_SSI_PRIMARY_DATA3_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_CS0__PIN) && defined(SL_SSI_PRIMARY_CS0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_CS0__PORT,
+                                (uint8_t)SL_SSI_MASTER_CS0__PIN,
+                                (uint8_t)SL_SSI_PRIMARY_CS0_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_CS1__PIN) && defined(SL_SSI_PRIMARY_CS1_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_CS1__PORT,
+                                (uint8_t)SL_SSI_MASTER_CS1__PIN,
+                                (uint8_t)SL_SSI_PRIMARY_CS1_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_CS2__PIN) && defined(SL_SSI_PRIMARY_CS2_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_CS2__PORT,
+                                (uint8_t)SL_SSI_MASTER_CS2__PIN,
+                                (uint8_t)SL_SSI_PRIMARY_CS2_PAD_MODE);
+#endif
+#if defined(SL_SSI_MASTER_CS3__PIN) && defined(SL_SSI_PRIMARY_CS3_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_MASTER_CS3__PORT,
+                                (uint8_t)SL_SSI_MASTER_CS3__PIN,
+                                (uint8_t)SL_SSI_PRIMARY_CS3_PAD_MODE);
+#endif
+
+  /* Secondary (slave) */
+#if defined(SL_SSI_SLAVE_MOSI__PIN) && defined(SL_SSI_SECONDARY_MOSI_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_SLAVE_MOSI__PORT,
+                                (uint8_t)SL_SSI_SLAVE_MOSI__PIN,
+                                (uint8_t)SL_SSI_SECONDARY_MOSI_PAD_MODE);
+#endif
+#if defined(SL_SSI_SLAVE_MISO__PIN) && defined(SL_SSI_SECONDARY_MISO_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_SLAVE_MISO__PORT,
+                                (uint8_t)SL_SSI_SLAVE_MISO__PIN,
+                                (uint8_t)SL_SSI_SECONDARY_MISO_PAD_MODE);
+#endif
+#if defined(SL_SSI_SLAVE_SCK__PIN) && defined(SL_SSI_SECONDARY_SCK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_SLAVE_SCK__PORT,
+                                (uint8_t)SL_SSI_SLAVE_SCK__PIN,
+                                (uint8_t)SL_SSI_SECONDARY_SCK_PAD_MODE);
+#endif
+#if defined(SL_SSI_SLAVE_CS0__PIN) && defined(SL_SSI_SECONDARY_CS0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_SSI_SLAVE_CS0__PORT,
+                                (uint8_t)SL_SSI_SLAVE_CS0__PIN,
+                                (uint8_t)SL_SSI_SECONDARY_CS0_PAD_MODE);
+#endif
+
+  /* ULP primary */
+#if defined(SL_ULP_SSI_MOSI__PIN) && defined(SL_SSI_ULP_PRIMARY_MOSI_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_SSI_MOSI__PORT,
+                                (uint8_t)SL_ULP_SSI_MOSI__PIN,
+                                (uint8_t)SL_SSI_ULP_PRIMARY_MOSI_PAD_MODE);
+#endif
+#if defined(SL_ULP_SSI_MISO__PIN) && defined(SL_SSI_ULP_PRIMARY_MISO_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_SSI_MISO__PORT,
+                                (uint8_t)SL_ULP_SSI_MISO__PIN,
+                                (uint8_t)SL_SSI_ULP_PRIMARY_MISO_PAD_MODE);
+#endif
+#if defined(SL_ULP_SSI_SCK__PIN) && defined(SL_SSI_ULP_PRIMARY_SCK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_SSI_SCK__PORT,
+                                (uint8_t)SL_ULP_SSI_SCK__PIN,
+                                (uint8_t)SL_SSI_ULP_PRIMARY_SCK_PAD_MODE);
+#endif
+#if defined(SL_ULP_SSI_CS0__PIN) && defined(SL_SSI_ULP_PRIMARY_CS0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_SSI_CS0__PORT,
+                                (uint8_t)SL_ULP_SSI_CS0__PIN,
+                                (uint8_t)SL_SSI_ULP_PRIMARY_CS0_PAD_MODE);
+#endif
+#if defined(SL_ULP_SSI_CS1__PIN) && defined(SL_SSI_ULP_PRIMARY_CS1_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_SSI_CS1__PORT,
+                                (uint8_t)SL_ULP_SSI_CS1__PIN,
+                                (uint8_t)SL_SSI_ULP_PRIMARY_CS1_PAD_MODE);
+#endif
+#if defined(SL_ULP_SSI_CS2__PIN) && defined(SL_SSI_ULP_PRIMARY_CS2_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_SSI_CS2__PORT,
+                                (uint8_t)SL_ULP_SSI_CS2__PIN,
+                                (uint8_t)SL_SSI_ULP_PRIMARY_CS2_PAD_MODE);
+#endif
+}
+
 /*******************************************************************************
  * To configure clock with input clock config structure for SSI. It validates
  * the clock frequency validate_clock_parameters function. If the clock frequency

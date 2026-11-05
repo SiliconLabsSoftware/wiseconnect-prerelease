@@ -33,7 +33,16 @@ requires:
   - name: udma_linker_config
   - name: sl_dma
   - name: cmsis_usart
+  - name: sl_gpio
   - name: log_none
+
+template_contribution:
+  - name: event_handler
+    priority: -9000
+    value:
+      event: driver_init
+      handler: sli_si91x_usart_config_pads
+      include: sl_si91x_usart.h
 
 documentation:
   url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/usart

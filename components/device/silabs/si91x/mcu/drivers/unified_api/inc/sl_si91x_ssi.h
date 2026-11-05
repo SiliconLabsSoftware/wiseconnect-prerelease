@@ -269,6 +269,16 @@ sl_status_t sl_si91x_ssi_configure_clock(sl_ssi_clock_config_t *clock_config) SL
 
 /***************************************************************************/
 /**
+ * @brief Apply SSI UC Pin Settings (PADCONFIG_P pad modes).
+ *
+ * @details Called from sl_driver_init via event_handler contribution (after
+ *          GPIO driver init). Applies pad mode for every SSI pin whose
+ *          pin_tool / PAD_MODE macros are defined in the project configs.
+ ******************************************************************************/
+void sli_si91x_ssi_config_pads(void);
+
+/***************************************************************************/
+/**
  * @brief To initialize the SSI.
  * 
  * @details This API initializes the SSI. If DMA is enabled, it also initializes the DMA module.

@@ -240,6 +240,15 @@ sl_status_t sl_si91x_gspi_init(sl_gspi_instance_t instance, sl_gspi_handle_t *gs
 
 /***************************************************************************/
 /**
+ * @brief Apply GSPI UC Pin Settings (PADCONFIG_P pad modes).
+ *
+ * @details Called from sl_driver_init via event_handler contribution (after
+ *          GPIO driver init).
+ ******************************************************************************/
+void sli_si91x_gspi_config_pads(void);
+
+/***************************************************************************/
+/**
  * @brief To uninitialize the GSPI module.
  * 
  * @details This API uninitializes the GSPI module. If DMA is enabled, it also uninitializes the DMA module.

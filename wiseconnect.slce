@@ -25,6 +25,7 @@ component_path:
  - path: components/device/silabs/si91x/wireless
  - path: third_party/littlefs/component
  - path: third_party/tcose/component
+ - path: third_party/aws_iot_c_sdk
  - path: third_party/aws_sdk
  - path: components/board/silabs/component
  - path: components/device/silabs/si91x/host_interface
@@ -127,6 +128,8 @@ documentation:
    version: 2.9.3
  - docset: tcose
    version: 1.1.1
+ - docset: aws_sdk_202412_00
+   version: "202412.0.0"
  - docset: aws_sdk
    version: 3.1.0
  - docset: platform_siwx91x

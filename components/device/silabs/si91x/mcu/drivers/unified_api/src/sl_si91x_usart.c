@@ -30,6 +30,8 @@
 
 #include "sl_si91x_usart.h"
 #include "sl_si91x_clock_manager.h"
+#include "em_device.h"
+#include "sl_si91x_gpio.h"
 #if (SLI_SI91X_MCU_RS485_MODE == 1)
 #include "sl_gpio_board.h"
 #include "sl_si91x_driver_gpio.h"
@@ -1080,15 +1082,49 @@ sl_status_t sli_si91x_usart_set_non_uc_configuration(sl_usart_handle_t usart_han
   return status;
 }
 
-/*******************************************************************************
- * @brief
- * Configures the USART Tx and Rx lines
- *
- * @details
- * This functions configures the usart tx and rx lines for data transfer
- * Takes the argument config enable to decide Tx and Rx lines configure or not
- * Validate the error code return from drives and return SL_STATUS
- ********************************************************************************/
+void sli_si91x_usart_config_pads(void)
+{
+#if defined(SL_USART0_TX_PIN) && defined(SL_USART0_TX_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_USART0_TX_PORT, SL_USART0_TX_PIN, SL_USART0_TX_PAD_MODE);
+#endif
+#if defined(SL_USART0_RX_PIN) && defined(SL_USART0_RX_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_USART0_RX_PORT, SL_USART0_RX_PIN, SL_USART0_RX_PAD_MODE);
+#endif
+#if defined(SL_USART0_CLK_PIN) && defined(SL_USART0_CLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_USART0_CLK_PORT, SL_USART0_CLK_PIN, SL_USART0_CLK_PAD_MODE);
+#endif
+#if defined(SL_USART0_CTS_PIN) && defined(SL_USART0_CTS_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_USART0_CTS_PORT, SL_USART0_CTS_PIN, SL_USART0_CTS_PAD_MODE);
+#endif
+#if defined(SL_USART0_RTS_PIN) && defined(SL_USART0_RTS_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_USART0_RTS_PORT, SL_USART0_RTS_PIN, SL_USART0_RTS_PAD_MODE);
+#endif
+#if defined(SL_UART1_TX_PIN) && defined(SL_UART1_TX_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_UART1_TX_PORT, SL_UART1_TX_PIN, SL_UART1_TX_PAD_MODE);
+#endif
+#if defined(SL_UART1_RX_PIN) && defined(SL_UART1_RX_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_UART1_RX_PORT, SL_UART1_RX_PIN, SL_UART1_RX_PAD_MODE);
+#endif
+#if defined(SL_UART1_CTS_PIN) && defined(SL_UART1_CTS_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_UART1_CTS_PORT, SL_UART1_CTS_PIN, SL_UART1_CTS_PAD_MODE);
+#endif
+#if defined(SL_UART1_RTS_PIN) && defined(SL_UART1_RTS_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_UART1_RTS_PORT, SL_UART1_RTS_PIN, SL_UART1_RTS_PAD_MODE);
+#endif
+#if defined(SL_ULP_UART_TX_PIN) && defined(SL_ULP_UART_TX_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_ULP_UART_TX_PORT, SL_ULP_UART_TX_PIN, SL_ULP_UART_TX_PAD_MODE);
+#endif
+#if defined(SL_ULP_UART_RX_PIN) && defined(SL_ULP_UART_RX_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_ULP_UART_RX_PORT, SL_ULP_UART_RX_PIN, SL_ULP_UART_RX_PAD_MODE);
+#endif
+#if defined(SL_ULP_UART_CTS_PIN) && defined(SL_ULP_UART_CTS_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_ULP_UART_CTS_PORT, SL_ULP_UART_CTS_PIN, SL_ULP_UART_CTS_PAD_MODE);
+#endif
+#if defined(SL_ULP_UART_RTS_PIN) && defined(SL_ULP_UART_RTS_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode(SL_ULP_UART_RTS_PORT, SL_ULP_UART_RTS_PIN, SL_ULP_UART_RTS_PAD_MODE);
+#endif
+}
+
 static sl_status_t usart_set_tx_rx_configuration(sl_usart_handle_t usart_handle)
 {
   sl_status_t status = SL_STATUS_FAIL;

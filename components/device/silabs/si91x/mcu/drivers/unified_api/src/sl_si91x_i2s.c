@@ -33,6 +33,11 @@
 #include "clock_update.h"
 #include "sl_si91x_i2s.h"
 #include "sl_si91x_i2s_config.h"
+#ifdef SL_SI91X_PCM
+#include "sl_si91x_pcm_config.h" // PCM instance pin/pad macros (SL_I2S0_* / SL_PCM0_*)
+#endif
+#include "em_device.h" // Provides RTE_Device_917.h (HP/ULP/UULP_VBAT port macros)
+#include "sl_si91x_gpio.h"
 
 /*******************************************************************************
  ***************************  DEFINES / MACROS   ********************************
@@ -75,6 +80,84 @@ static uint32_t master_mode_ulp_i2s = 0;
 static sl_status_t convert_arm_to_sl_error_code(int32_t error);
 static void i2s0_callback_event_handler(uint32_t event);
 static void i2s1_callback_event_handler(uint32_t event);
+
+/* Local Function Definitions */
+
+/*******************************************************************************
+ * Applies the Pin Settings (pad mode) configured via the Configuration Wizard
+ * for the I2S0/ULP_I2S SCLK/WSCLK/DOUT0/DIN0 pins. PCM0/ULP_PCM reuse the
+ * I2S0/ULP_I2S physical pins. When both I2S and PCM pad-mode macros are
+ * defined, I2S macros take precedence. Invoked from sl_driver_init.
+ *
+ * @return    none
+ ******************************************************************************/
+void sli_si91x_i2s_config_pads(void)
+{
+#if defined(SL_I2S0_SCLK_PIN) && defined(SL_I2S0_SCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_SCLK_PORT, (uint8_t)SL_I2S0_SCLK_PIN, (uint8_t)SL_I2S0_SCLK_PAD_MODE);
+#elif defined(SL_I2S0_SCLK_PIN) && defined(SL_PCM0_SCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_SCLK_PORT, (uint8_t)SL_I2S0_SCLK_PIN, (uint8_t)SL_PCM0_SCLK_PAD_MODE);
+#endif
+#if defined(SL_I2S0_WSCLK_PIN) && defined(SL_I2S0_WSCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_WSCLK_PORT,
+                                (uint8_t)SL_I2S0_WSCLK_PIN,
+                                (uint8_t)SL_I2S0_WSCLK_PAD_MODE);
+#elif defined(SL_I2S0_WSCLK_PIN) && defined(SL_PCM0_WSCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_WSCLK_PORT,
+                                (uint8_t)SL_I2S0_WSCLK_PIN,
+                                (uint8_t)SL_PCM0_WSCLK_PAD_MODE);
+#endif
+#if defined(SL_I2S0_DOUT0_PIN) && defined(SL_I2S0_DOUT0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_DOUT0_PORT,
+                                (uint8_t)SL_I2S0_DOUT0_PIN,
+                                (uint8_t)SL_I2S0_DOUT0_PAD_MODE);
+#elif defined(SL_I2S0_DOUT0_PIN) && defined(SL_PCM0_DOUT0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_DOUT0_PORT,
+                                (uint8_t)SL_I2S0_DOUT0_PIN,
+                                (uint8_t)SL_PCM0_DOUT0_PAD_MODE);
+#endif
+#if defined(SL_I2S0_DIN0_PIN) && defined(SL_I2S0_DIN0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_DIN0_PORT, (uint8_t)SL_I2S0_DIN0_PIN, (uint8_t)SL_I2S0_DIN0_PAD_MODE);
+#elif defined(SL_I2S0_DIN0_PIN) && defined(SL_PCM0_DIN0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_I2S0_DIN0_PORT, (uint8_t)SL_I2S0_DIN0_PIN, (uint8_t)SL_PCM0_DIN0_PAD_MODE);
+#endif
+#if defined(SL_ULP_I2S_SCLK_PIN) && defined(SL_ULP_I2S_SCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_SCLK_PORT,
+                                (uint8_t)SL_ULP_I2S_SCLK_PIN,
+                                (uint8_t)SL_ULP_I2S_SCLK_PAD_MODE);
+#elif defined(SL_ULP_I2S_SCLK_PIN) && defined(SL_ULP_PCM_SCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_SCLK_PORT,
+                                (uint8_t)SL_ULP_I2S_SCLK_PIN,
+                                (uint8_t)SL_ULP_PCM_SCLK_PAD_MODE);
+#endif
+#if defined(SL_ULP_I2S_WSCLK_PIN) && defined(SL_ULP_I2S_WSCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_WSCLK_PORT,
+                                (uint8_t)SL_ULP_I2S_WSCLK_PIN,
+                                (uint8_t)SL_ULP_I2S_WSCLK_PAD_MODE);
+#elif defined(SL_ULP_I2S_WSCLK_PIN) && defined(SL_ULP_PCM_WSCLK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_WSCLK_PORT,
+                                (uint8_t)SL_ULP_I2S_WSCLK_PIN,
+                                (uint8_t)SL_ULP_PCM_WSCLK_PAD_MODE);
+#endif
+#if defined(SL_ULP_I2S_DOUT0_PIN) && defined(SL_ULP_I2S_DOUT0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_DOUT0_PORT,
+                                (uint8_t)SL_ULP_I2S_DOUT0_PIN,
+                                (uint8_t)SL_ULP_I2S_DOUT0_PAD_MODE);
+#elif defined(SL_ULP_I2S_DOUT0_PIN) && defined(SL_ULP_PCM_DOUT0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_DOUT0_PORT,
+                                (uint8_t)SL_ULP_I2S_DOUT0_PIN,
+                                (uint8_t)SL_ULP_PCM_DOUT0_PAD_MODE);
+#endif
+#if defined(SL_ULP_I2S_DIN0_PIN) && defined(SL_ULP_I2S_DIN0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_DIN0_PORT,
+                                (uint8_t)SL_ULP_I2S_DIN0_PIN,
+                                (uint8_t)SL_ULP_I2S_DIN0_PAD_MODE);
+#elif defined(SL_ULP_I2S_DIN0_PIN) && defined(SL_ULP_PCM_DIN0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_ULP_I2S_DIN0_PORT,
+                                (uint8_t)SL_ULP_I2S_DIN0_PIN,
+                                (uint8_t)SL_ULP_PCM_DIN0_PAD_MODE);
+#endif
+}
 
 /*******************************************************************************
  **********************  Local Function Definition****************************
@@ -136,6 +219,7 @@ sl_status_t sl_si91x_i2s_init(uint32_t i2s_instance, sl_i2s_handle_t *i2s_handle
       SL_PRINT_STRING_ERROR("sl_si91x_i2s_init: Initialize failed st=0x%04lX,line no : %d\r\n",
                             (unsigned long)status,
                             (int)__LINE__);
+      break;
     }
   } while (false);
 
@@ -502,7 +586,7 @@ sl_status_t sl_si91x_i2s_transmit_data(sl_i2s_handle_t i2s_handle, const void *d
 #ifdef SL_I2S0_CHANNEL
       resolution = I2S0->CHANNEL_CONFIG[SL_I2S0_CHANNEL].I2S_TCR_b.WLEN;
 #else
-      resolution = I2S0->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;
+      resolution                               = I2S0->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;
 #endif
     } else {
       resolution = I2S1->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;
@@ -565,7 +649,7 @@ sl_status_t sl_si91x_i2s_receive_data(sl_i2s_handle_t i2s_handle, const void *da
 #ifdef SL_I2S0_CHANNEL
       resolution = I2S0->CHANNEL_CONFIG[SL_I2S0_CHANNEL].I2S_RCR_b.WLEN;
 #else
-      resolution = I2S0->CHANNEL_CONFIG[0].I2S_RCR_b.WLEN;
+      resolution                               = I2S0->CHANNEL_CONFIG[0].I2S_RCR_b.WLEN;
 #endif
     } else {
       resolution = I2S1->CHANNEL_CONFIG[0].I2S_RCR_b.WLEN;
@@ -650,8 +734,8 @@ sl_status_t sl_si91x_i2s_transfer(sl_i2s_handle_t i2s_handle,
       tx_resolution = I2S0->CHANNEL_CONFIG[SL_I2S0_CHANNEL].I2S_TCR_b.WLEN;
       rx_resolution = I2S0->CHANNEL_CONFIG[SL_I2S0_CHANNEL].I2S_RCR_b.WLEN;
 #else
-      tx_resolution = I2S0->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;
-      rx_resolution = I2S0->CHANNEL_CONFIG[0].I2S_RCR_b.WLEN;
+      tx_resolution                            = I2S0->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;
+      rx_resolution                            = I2S0->CHANNEL_CONFIG[0].I2S_RCR_b.WLEN;
 #endif
     } else {
       tx_resolution = I2S1->CHANNEL_CONFIG[0].I2S_TCR_b.WLEN;

@@ -9,7 +9,7 @@ description: >
   signaling transfer completion via callback functions.
   This diriver can be configured as ULP-SSI using UC.
   SSI can be configured in master, slave and ULP master modes.
-  
+
   When you install this component, it will also be installing the  SSI  dependency component, 
   which is the SSI driver's implementation.
 
@@ -26,7 +26,7 @@ source:
 include:
   - path: "inc"
     file_list:
-    - path: "sl_si91x_ssi.h"
+      - path: "sl_si91x_ssi.h"
 config_file:
   - path: config/sl_si91x_ssi_config.h
     unless: [sl_ssi_instance]
@@ -49,3 +49,11 @@ requires:
   - name: sl_gpdma
 ui_hints:
   visibility: never
+template_contribution:
+  # After sl_gpio_driver_init (priority -9996); pad APIs need GPIO ready.
+  - name: event_handler
+    priority: -9000
+    value:
+      event: driver_init
+      handler: sli_si91x_ssi_config_pads
+      include: sl_si91x_ssi.h

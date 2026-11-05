@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 #include "sl_si91x_ssi.h"
+#include "sl_si91x_gpio.h"
 // <<< Use Configuration Wizard in Context Menu >>>
 
 // <e> SSI Secondary(Slave) Configuration
@@ -68,6 +69,52 @@ extern "C" {
 #define SL_SSI_SECONDARY_RECEIVE_SAMPLE_DELAY 0
 
 //</e>
+
+// <h> Pin Settings
+// <i> Pad mode (PADCONFIG_P). MOSI/MISO/SCK are always present.
+// <i> CS0: select None only if CS0 is unused; pad mode applies when pin is assigned.
+
+// <o SL_SSI_SECONDARY_MOSI_PAD_MODE> MOSI pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_SECONDARY_MOSI_PAD_MODE
+#define SL_SSI_SECONDARY_MOSI_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_SECONDARY_MISO_PAD_MODE> MISO pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_SECONDARY_MISO_PAD_MODE
+#define SL_SSI_SECONDARY_MISO_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_SECONDARY_SCK_PAD_MODE> SCK pad mode
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_SSI_SECONDARY_SCK_PAD_MODE
+#define SL_SSI_SECONDARY_SCK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_SSI_SECONDARY_CS0_PAD_MODE> CS0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ (preserves prior unified-API SSI secondary init behavior).
+// <i> For active-low slave CS idle-high, select Pull-up here or call
+// <i> SPI_Slave_Set_CS_Init_State() / RSI_SPI_Slave_Set_CS_Init_State() (as CPC does).
+// <i> Use None if CS0 pin is None in pin tool.
+#ifndef SL_SSI_SECONDARY_CS0_PAD_MODE
+#define SL_SSI_SECONDARY_CS0_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
 // <<< end of configuration section >>>
 #if USER_CONFIGURATION_ENABLE
 // <<< sl:start pin_tool >>>
@@ -129,6 +176,7 @@ extern "C" {
   "SSI Secondary peripheral pins are not configured. To configure, either install [ENABLE USER CONFIGURATION] component or define USER_CONFIGURATION_ENABLE macro to 1, then configure the pins as per the Custom board."
 
 #endif // USER_CONFIGURATION_ENABLE
+
 #ifdef __cplusplus
 }
 #endif

@@ -37,6 +37,13 @@ extern "C" {
 #include "sl_si91x_gpio_common.h"
 
 /*******************************************************************************
+ *******************************   DEFINES   ***********************************
+ ******************************************************************************/
+#ifndef SL_GPIO_PAD_MODE_NONE
+#define SL_GPIO_PAD_MODE_NONE 0xFFu
+#endif
+
+/*******************************************************************************
  ********************************   ENUMS   ************************************
  ******************************************************************************/
 ///@brief NPSS (or UULP) GPIO PIN MUX
@@ -379,6 +386,27 @@ void sl_si91x_gpio_select_pad_active_high_schmitt_trigger(uint8_t gpio_num, sl_s
  ******************************************************************************/
 void sl_si91x_gpio_select_pad_driver_disable_state(uint8_t gpio_num,
                                                    sl_si91x_gpio_driver_disable_state_t disable_state);
+
+/***************************************************************************/ /**
+ * @brief Apply PADCONFIG_P pad mode for an HP or ULP GPIO pin.
+ *
+ * @details Shared helper for peripheral Pin Settings (USART/SSI/GSPI/I2S/etc.).
+ *          No-ops when:
+ *          - @p mode is \ref SL_GPIO_PAD_MODE_NONE
+ *          - @p mode is not a valid \ref sl_si91x_gpio_driver_disable_state_t (0..3)
+ *          - @p port is invalid or \ref SL_GPIO_UULP_PORT
+ *          - @p pin has no PADCONFIG register
+ *          ULP (@ref SL_GPIO_ULP_PORT) uses
+ *          \ref sl_si91x_gpio_select_ulp_pad_driver_disable_state; HP domain
+ *          uses \ref sl_si91x_gpio_select_pad_driver_disable_state.
+ *
+ * @param[in] port  GPIO port (HP / PORT_A..D, or \ref SL_GPIO_ULP_PORT).
+ * @param[in] pin   GPIO pin number (absolute HP pin, or ULP pin 0..11).
+ * @param[in] mode  Pad mode (\ref sl_si91x_gpio_driver_disable_state_t) or
+ *                  \ref SL_GPIO_PAD_MODE_NONE to skip.
+ * @return    None
+ ******************************************************************************/
+void sl_si91x_gpio_config_pad_mode(uint8_t port, uint8_t pin, uint8_t mode);
 
 /***************************************************************************/ /**
  * @brief Select AND/OR of the group interrupt. If multiple interrupts

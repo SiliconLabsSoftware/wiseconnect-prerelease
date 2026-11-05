@@ -446,6 +446,43 @@ void sl_si91x_gpio_select_pad_driver_disable_state(uint8_t gpio_num, sl_si91x_gp
 }
 
 /*******************************************************************************
+ * Apply PADCONFIG_P pad mode for HP or ULP pins. Shared by peripheral Pin
+ * Settings.
+ * mode: SL_GPIO_PAD_MODE_NONE -> no-op; else must be 0..3 (Hi-Z/PU/PD/Repeater).
+ * port: SL_GPIO_ULP_PORT -> ULP pad API; ports 0..3 (HP domain) -> HP pad API;
+ *       UULP / invalid port -> no-op (no PADCONFIG_P path here).
+ ******************************************************************************/
+void sl_si91x_gpio_config_pad_mode(uint8_t port, uint8_t pin, uint8_t mode)
+{
+  if (mode == SL_GPIO_PAD_MODE_NONE) {
+    return;
+  }
+  // Reject values outside sl_si91x_gpio_driver_disable_state_t (0..3).
+  if (SL_GPIO_VALIDATE_DISABLE_STATE(mode) == 0) {
+    return;
+  }
+  if (SL_GPIO_VALIDATE_PORT(port) == 0) {
+    return;
+  }
+
+  if (port == SL_GPIO_ULP_PORT) {
+    if (SL_GPIO_VALIDATE_ULP_PIN(pin) == 0) {
+      return;
+    }
+    sl_si91x_gpio_select_ulp_pad_driver_disable_state(pin, (sl_si91x_gpio_driver_disable_state_t)mode);
+  } else if (port == SL_GPIO_UULP_PORT) {
+    // UULP has no PADCONFIG_P driver-disable path in this helper.
+    return;
+  } else {
+    // HP domain: pin_tool uses HP(=0) / PORT_A..D with absolute GPIO pin number.
+    if (SL_GPIO_VALIDATE_PIN(pin) == 0) {
+      return;
+    }
+    sl_si91x_gpio_select_pad_driver_disable_state(pin, (sl_si91x_gpio_driver_disable_state_t)mode);
+  }
+}
+
+/*******************************************************************************
  * The GPIO pins to work in different instances, requires this clock.
  * For GPIO HP instance, enable M4 clock of type @ref sl_si91x_gpio_select_clock_t.
  * For GPIO ULP/UULP instances, enable ULP clock of type

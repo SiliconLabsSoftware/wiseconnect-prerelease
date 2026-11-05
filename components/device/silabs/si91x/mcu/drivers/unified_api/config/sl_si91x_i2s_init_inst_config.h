@@ -41,6 +41,7 @@ extern "C" {
 
 #if USER_CONFIGURATION_ENABLE
 #include "sl_si91x_i2s.h"
+#include "sl_si91x_gpio.h"
 /******************************************************************************/
 /******************************* I2S Configuration **************************/
 // <<< Use Configuration Wizard in Context Menu >>>
@@ -80,6 +81,53 @@ extern "C" {
 #define SL_INSTANCE_SAMPLING_RATE SL_I2S_SAMPLING_RATE_8000
 
 // </e>
+
+// <h> Pin Settings
+// <i> SI917 pad electrical settings (PADCONFIG_P). DIN0 is a GPIO input.
+
+// <o SL_INSTANCE_SCLK_PAD_MODE> SCLK pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_INSTANCE_SCLK_PAD_MODE
+#define SL_INSTANCE_SCLK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_INSTANCE_WSCLK_PAD_MODE> WSCLK pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_INSTANCE_WSCLK_PAD_MODE
+#define SL_INSTANCE_WSCLK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_INSTANCE_DOUT0_PAD_MODE> DOUT0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_INSTANCE_DOUT0_PAD_MODE
+#define SL_INSTANCE_DOUT0_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_INSTANCE_DIN0_PAD_MODE> DIN0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_INSTANCE_DIN0_PAD_MODE
+#define SL_INSTANCE_DIN0_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
+/******************************************************************************/
+// <<< end of configuration section >>>
 #else
 
 #warning \

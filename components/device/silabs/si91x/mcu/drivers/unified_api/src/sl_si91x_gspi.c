@@ -34,6 +34,8 @@
 #include "clock_update.h"
 #include "sl_si91x_gspi.h"
 #include "sl_si91x_gspi_config.h"
+#include "sl_si91x_gspi_common_config.h"
+#include "sl_si91x_gpio.h"
 #include "rsi_rom_clks.h"
 #include "si91x_device.h"
 #include <stddef.h>
@@ -88,6 +90,44 @@ static void callback_event_handler(uint32_t event);
 /*******************************************************************************
  **********************  Local Function Definition****************************
  ******************************************************************************/
+
+/*******************************************************************************
+ * Applies Pin Settings for MOSI/MISO/SCK and optional CS0-CS2. Skips a pin
+ * when pin_tool left it as None (PIN undefined) or PAD_MODE is None.
+ ******************************************************************************/
+void sli_si91x_gspi_config_pads(void)
+{
+#if defined(SL_GSPI_MASTER_MOSI__PIN) && defined(SL_GSPI_MOSI_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_GSPI_MASTER_MOSI__PORT,
+                                (uint8_t)SL_GSPI_MASTER_MOSI__PIN,
+                                (uint8_t)SL_GSPI_MOSI_PAD_MODE);
+#endif
+#if defined(SL_GSPI_MASTER_MISO__PIN) && defined(SL_GSPI_MISO_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_GSPI_MASTER_MISO__PORT,
+                                (uint8_t)SL_GSPI_MASTER_MISO__PIN,
+                                (uint8_t)SL_GSPI_MISO_PAD_MODE);
+#endif
+#if defined(SL_GSPI_MASTER_SCK__PIN) && defined(SL_GSPI_SCK_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_GSPI_MASTER_SCK__PORT,
+                                (uint8_t)SL_GSPI_MASTER_SCK__PIN,
+                                (uint8_t)SL_GSPI_SCK_PAD_MODE);
+#endif
+#if defined(SL_GSPI_MASTER_CS0__PIN) && defined(SL_GSPI_CS0_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_GSPI_MASTER_CS0__PORT,
+                                (uint8_t)SL_GSPI_MASTER_CS0__PIN,
+                                (uint8_t)SL_GSPI_CS0_PAD_MODE);
+#endif
+#if defined(SL_GSPI_MASTER_CS1__PIN) && defined(SL_GSPI_CS1_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_GSPI_MASTER_CS1__PORT,
+                                (uint8_t)SL_GSPI_MASTER_CS1__PIN,
+                                (uint8_t)SL_GSPI_CS1_PAD_MODE);
+#endif
+#if defined(SL_GSPI_MASTER_CS2__PIN) && defined(SL_GSPI_CS2_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_GSPI_MASTER_CS2__PORT,
+                                (uint8_t)SL_GSPI_MASTER_CS2__PIN,
+                                (uint8_t)SL_GSPI_CS2_PAD_MODE);
+#endif
+}
 
 /*******************************************************************************
 ***********************  Global function Definitions *************************

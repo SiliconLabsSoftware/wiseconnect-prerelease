@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 #include "sl_si91x_i2s.h"
+#include "sl_si91x_gpio.h"
 /******************************************************************************/
 /******************************* I2S1(ULP_I2S) Configuration **************************/
 //  <e>ULP I2S UC Configuration
@@ -68,6 +69,55 @@ extern "C" {
 #define SL_ULP_I2S_SAMPLING_RATE SL_I2S_SAMPLING_RATE_8000
 
 // </e>
+
+// <h> Pin Settings
+// <i> Pad mode (PADCONFIG_P). DOUT0/DIN0 are always present; SCLK/WSCLK are
+// <i> optional in pin_tool. Select None when the pin is None; pad mode is
+// <i> applied only when the pin is assigned and mode is not None.
+
+// <o SL_ULP_I2S_SCLK_PAD_MODE> SCLK pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ (use None if SCLK pin is None in pin tool)
+#ifndef SL_ULP_I2S_SCLK_PAD_MODE
+#define SL_ULP_I2S_SCLK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_ULP_I2S_WSCLK_PAD_MODE> WSCLK pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ (use None if WSCLK pin is None in pin tool)
+#ifndef SL_ULP_I2S_WSCLK_PAD_MODE
+#define SL_ULP_I2S_WSCLK_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_ULP_I2S_DOUT0_PAD_MODE> DOUT0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_ULP_I2S_DOUT0_PAD_MODE
+#define SL_ULP_I2S_DOUT0_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_ULP_I2S_DIN0_PAD_MODE> DIN0 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_ULP_I2S_DIN0_PAD_MODE
+#define SL_ULP_I2S_DIN0_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
+/******************************************************************************/
+// <<< end of configuration section >>>
 
 // <<< sl:start pin_tool >>>
 // <i2s_ulp signal=(SCLK),(WSCLK),DOUT0,DIN0> SL_ULP_I2S
