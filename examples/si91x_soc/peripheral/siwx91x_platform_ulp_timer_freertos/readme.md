@@ -147,18 +147,11 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 ## Test the Application
 
-> **Note:** Use **`log_compact_decoder.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+> **Note:** Decode compact binary logs with **`log_compact_decoder.py`** from **`components/device/silabs/si91x/mcu/drivers/service/sl_log/scripts/`** (see **`log_compact_decoder_user_guide.md`** in the same folder). Match **`--max-args`** to **CONFIG_MAX_ARGS** in UC (default `3`). Optional **`--nwp-out nwp_logging_fw.out`** when you need NWP / core 1 logs.
 >
-> `python log_compact_decoder.py --m4-out m4_firmware.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 10`
+> **IO Stream UART (VCOM)** — **`--app-out`**, **`--port`**: `python log_compact_decoder.py --app-out app.out --port COM4 --max-args 3`
 >
-> Replace **COM4** with the serial port your board uses on the host PC.
->
-> These flags are optional. Omit them to keep the defaults:
->
-> - `--baud` — default `115200`. Use `921600` when NWP logging is enabled on UART.
-> - `--event-width` — default `56`. Longer EVENT names are clipped with `...`; the full text stays in MESSAGE.
-> - `--log-file` — also write the decoded lines to this path, as plain text.
-
+> **IO Stream RTT** — **`--source rtt`**, **`--app-out`** (`--device` optional, default `SiWG917M111M`; `pip install pylink-square`; optional **`--nwp-out`**): `python log_compact_decoder.py --source rtt --app-out app.out --max-args 3`
 
 Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) to:
 

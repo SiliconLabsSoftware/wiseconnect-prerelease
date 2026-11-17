@@ -23,6 +23,7 @@ include:
     - path: sli_hal_si91x_constants.h
     - path: sli_hal_si91x_packet.h
     - path: sli_hal_si91x.h
+    - path: sli_hal_si91x_log_helper.h
 
 define:
 - name: SL_WIFI_COMPONENT_INCLUDED

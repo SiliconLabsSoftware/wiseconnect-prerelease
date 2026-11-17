@@ -31,6 +31,7 @@
 #include "sli_hal_si91x_constants.h"
 #include "sl_si91x_types.h"
 #include "sl_constants.h"
+#include "sli_si91x_ahb_bus_log_helper.h"
 #include "sl_status.h"
 #include "sl_device.h"
 #include "sl_rsi_utility.h"
@@ -296,7 +297,7 @@ sl_status_t sli_m4_interrupt_isr(void)
   }
 #endif
   else {
-    SL_DEBUG_LOG_V2(ERROR, "\r\n INVALID INTERRUPT \r\n", 0);
+    SL_DEBUG_LOG_V2(ERROR, "[si91x_ahb_bus] INVALID INTERRUPT \r\n", 0);
     return SL_STATUS_FAIL;
   }
   return SL_STATUS_OK;

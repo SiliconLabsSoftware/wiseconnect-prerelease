@@ -82,6 +82,9 @@
 #ifdef SLI_SI91X_ENABLE_BLE
 #include "rsi_common_apis.h"
 #endif
+#include "sl_si91x_driver_log_helper.h"
+
+sl_log_level_t sl_log_si91x_driver_component_level = SL_LOG_SI91X_DRIVER_COMPONENT_LEVEL;
 
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
 rsi_m4ta_desc_t crypto_desc[2];
@@ -285,11 +288,11 @@ sl_status_t sl_si91x_driver_init_wifi_radio(const sl_wifi_device_configuration_t
   if (SL_WIFI_IGNORE_REGION != config->region_code) {
     // Set the device's region based on configuration
     status = sl_si91x_set_device_region(config->boot_config.oper_mode, config->band, config->region_code);
-    SL_DEBUG_LOG_V2(DEBUG, "Region code set to %d\r\n", config->region_code);
+    SL_DEBUG_LOG_V2(DEBUG, "[si91x_driver] Region code set to %d\r\n", config->region_code);
     VERIFY_STATUS_AND_RETURN(status);
   }
 #else
-  SL_DEBUG_LOG_V2(DEBUG, "Region code configuration skipped for Modules\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "[si91x_driver] Region code configuration skipped for Modules\r\n");
 #endif
 
   // Configure the RTS threshold for WLAN
@@ -521,7 +524,7 @@ sl_status_t sl_si91x_driver_init(const sl_wifi_device_configuration_t *config, s
   // In coex mode, 160 MHz SoC clock is not supported.
   // If 160 MHz is configured in coex mode, it will automatically fall back to 120 MHz.
   if ((boot_config.coex_mode) && (boot_config.custom_feature_bit_map & SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_160MHZ)) {
-    SL_DEBUG_LOG_V2(WARN, "\r\n 160 MHz clock is not supported in coex mode. Falling back to 120 MHz.\r\n");
+    SL_DEBUG_LOG_V2(WARN, "[si91x_driver] 160 MHz clock is not supported in coex mode. Falling back to 120 MHz.\r\n");
     // Clamp the configuration to 120 MHz
     boot_config.custom_feature_bit_map &= ~SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_160MHZ;
     boot_config.custom_feature_bit_map |= SL_SI91X_CUSTOM_FEAT_SOC_CLK_CONFIG_120MHZ;

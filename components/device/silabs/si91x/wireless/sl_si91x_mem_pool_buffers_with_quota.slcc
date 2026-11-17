@@ -19,6 +19,10 @@ provides:
 - name: sl_si91x_buffer_management
 source:
 - path: memory/mem_pool_buffer_quota.c
+include:
+- path: memory/inc
+  file_list:
+    - path: sl_si91x_mem_pool_quota_log_helper.h
 requires:
 - name: mem_pool
 - name: sl_si91x_wireless

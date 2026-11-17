@@ -146,3 +146,6 @@ template_contribution:
         - Setting `LOCAL_MTU_SIZE` larger than the buffer pool can satisfy — pairs may negotiate but data-length update can fail.
         - Writing handles obtained from a previous connection — handles are stable for the life of the database, but you must re-resolve indices into per-connection state on `event_disconnect` → `event_conn_status`.
     priority: -5306
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-gatt-server-component

@@ -19,6 +19,7 @@ include:
 - path: inc
   file_list:
     - path: sli_event_engine.h
+    - path: sli_event_engine_log_helper.h
 requires:
     - name: sli_queue_manager
     - name: sli_buffer_manager

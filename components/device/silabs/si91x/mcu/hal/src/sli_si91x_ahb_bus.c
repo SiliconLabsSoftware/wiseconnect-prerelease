@@ -32,11 +32,14 @@
 #include "sli_queue_manager.h"
 #include "sli_utility.h"
 #include "sl_constants.h"
+#include "sli_si91x_ahb_bus_log_helper.h"
 #include "sl_cmsis_utility.h"
 #include "rsi_power_save.h"
 #include "system_si91x.h"
 #include "sli_code_classification.h"
 #include <stddef.h>
+
+sl_log_level_t sl_log_si91x_ahb_bus_component_level = SL_LOG_SI91X_AHB_BUS_COMPONENT_LEVEL;
 
 rsi_m4ta_desc_t tx_desc[2];
 rsi_m4ta_desc_t rx_desc[2];
@@ -118,7 +121,7 @@ sl_status_t sli_si91x_submit_rx_pkt(uint32_t timeout)
                                               timeout,
                                               (sli_buffer_t *)&rx_pkt_buffer);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(DEBUG, "\r\n HEAP EXHAUSTED DURING ALLOCATION \r\n");
+    SL_DEBUG_LOG_V2(DEBUG, "[si91x_ahb_bus] HEAP EXHAUSTED DURING ALLOCATION \r\n");
     return SL_STATUS_ALLOCATION_FAILED;
   }
 
@@ -143,7 +146,7 @@ sl_status_t sli_submit_rx_buffer(uint32_t timeout)
 
   status = sli_si91x_submit_rx_pkt(timeout);
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\n RX Buffer submission failed with status: %d \r\n", status);
+    SL_DEBUG_LOG_V2(ERROR, "[si91x_ahb_bus] RX Buffer submission failed with status: %d \r\n", status);
   }
 
   unmask_ta_interrupt(RX_PKT_TRANSFER_DONE_INTERRUPT);
@@ -172,7 +175,7 @@ void sli_si91x_config_m4_dma_desc_on_reset(void)
 {
   while (!(P2P_STATUS_REG & TA_IS_ACTIVE))
     ;
-  SL_DEBUG_LOG_V2(INFO, "\r\nTA is in active state\r\n");
+  SL_DEBUG_LOG_V2(INFO, "[si91x_ahb_bus] TA is in active state\r\n");
   osDelay(SLI_SYSTEM_MS_TO_TICKS(100));
   M4_TX_DMA_DESC_REG = (uint32_t)&tx_desc;
   M4_RX_DMA_DESC_REG = (uint32_t)&rx_desc;

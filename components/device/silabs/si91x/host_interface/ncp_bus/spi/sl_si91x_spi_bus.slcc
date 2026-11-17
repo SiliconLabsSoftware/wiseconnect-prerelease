@@ -19,6 +19,7 @@ include:
 - path: .
   file_list:
   - path: sl_si91x_spi_bus.h
+  - path: sl_si91x_spi_bus_log_helper.h
 - path: ../../../wireless/inc
 - path: ../../../mcu/hal/sli_hal_si91x/inc
 requires:

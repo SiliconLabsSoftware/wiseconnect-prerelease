@@ -392,11 +392,11 @@ AWS ONLY begins by implementing the modifications and settings listed below.
 
 ## Test the Application
 
-> **Note:** Use **`log_compact_decoder.py`** from the **SiWx91x Platform Logger** example (`examples/si91x_soc/service/sl_si91x_logger/`) to decode structured console log output. Run:
+> **Note:** Decode compact binary logs with **`log_compact_decoder.py`** from **`components/device/silabs/si91x/mcu/drivers/service/sl_log/scripts/`** (see **`log_compact_decoder_user_guide.md`** in the same folder). Match **`--max-args`** to **CONFIG_MAX_ARGS** in UC (default `3`). Optional **`--nwp-out nwp_logging_fw.out`** when you need NWP / core 1 logs.
 >
-> `python log_compact_decoder.py --out firmware.out --descriptor SYSVIEW_CaptiveCore.txt --port COM5 --max-args 3`
+> **IO Stream UART (VCOM)** — **`--app-out`**, **`--port`**: `python log_compact_decoder.py --app-out app.out --port COM4 --max-args 3`
 >
-> Replace **COM5** with the serial port your board uses on the host PC.
+> **IO Stream RTT** — **`--source rtt`**, **`--app-out`** (`--device` optional, default `SiWG917M111M`; `pip install pylink-square`; optional **`--nwp-out`**): `python log_compact_decoder.py --source rtt --app-out app.out --max-args 3`
 
 - Compile and run the application.
 - Connect the I2C, SPI, and (ADC or SDC) sensors, based on the above pin configuration.

@@ -89,6 +89,7 @@ include:
   - path: sl_si91x_constants.h
   - path: sl_si91x_core_utilities.h
   - path: sl_si91x_driver.h
+  - path: sl_si91x_driver_log_helper.h
   - path: sl_si91x_ec_identity.h
   - path: sli_si91x_driver.h
   - path: sl_si91x_host_interface.h
@@ -100,6 +101,7 @@ include:
 - path: sl_net/inc
   file_list:
   - path: sli_net_utility.h
+  - path: sl_si91x_net_log_helper.h
   - path: sl_net_si91x_integration_handler.h
   - path: sl_net_si91x.h
   condition:

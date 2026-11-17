@@ -31,6 +31,7 @@
 #include "sl_si91x_driver.h"
 #include "sl_status.h"
 #include "sl_constants.h"
+#include "sl_sntp_log_helper.h"
 #include "sl_si91x_core_utilities.h"
 #include "cmsis_os2.h"
 #include "sli_wifi_utility.h"
@@ -43,6 +44,8 @@ typedef struct {
   uint8_t *data;
   uint16_t data_length;
 } sli_sntp_client_context_t;
+
+sl_log_level_t sl_log_sntp_component_level = SL_LOG_SNTP_COMPONENT_LEVEL;
 
 static osMutexId_t sntp_mutex;
 static sl_sntp_client_event_handler_t sntp_event_handler;
@@ -130,7 +133,8 @@ sl_status_t sli_si91x_sntp_event_handler(sli_command_engine_response_t *command_
   }
 
   if (command_engine_response->type != SLI_COMMAND_ENGINE_METADATA_RESPONSE) {
-    SL_DEBUG_LOG_V2(ERROR, "Expected meta data response, received packet only :( returning without handling");
+    SL_DEBUG_LOG_V2(ERROR,
+                    "[sl_sntp] Expected meta data response, received packet only :( returning without handling\r\n");
     return SL_STATUS_FAIL;
   }
 

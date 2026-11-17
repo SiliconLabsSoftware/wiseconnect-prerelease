@@ -32,11 +32,14 @@
 #include "sl_wifi_host_interface.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_constants.h"
+#include "sl_si91x_mem_pool_quota_log_helper.h"
 #include "cmsis_os2.h"
 #include "sl_cmsis_utility.h"
 #include "sl_core.h"
 #include <string.h>
 #include "sl_rsi_utility.h"
+
+sl_log_level_t sl_log_si91x_mem_pool_quota_component_level = SL_LOG_SI91X_MEM_POOL_QUOTA_COMPONENT_LEVEL;
 
 #define SLI_BUFFER_TYPE    4
 #define SLI_WATERMARKLEVEL 10
@@ -95,7 +98,7 @@ sl_status_t sli_si91x_host_deinit_buffer_manager(void)
 
   // If some buffers are still not freed, log an error and return failure
   if (!result) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\n Invalid operation, some buffers are not freed");
+    SL_DEBUG_LOG_V2(ERROR, "[sl_si91x_mem_pool_buffers_with_quota] Invalid operation, some buffers are not freed\r\n");
     return SL_STATUS_FAIL;
   }
 
@@ -193,7 +196,7 @@ static sl_status_t sl_si91x_check_for_valid_config(const sl_wifi_buffer_configur
   if (config->control_buffer_quota < SLI_WATERMARKLEVEL || config->rx_buffer_quota < SLI_WATERMARKLEVEL
       || config->tx_buffer_quota < SLI_WATERMARKLEVEL) {
     CORE_EXIT_CRITICAL();
-    SL_DEBUG_LOG_V2(WARN, "Quota for buffer types should be atleast 10");
+    SL_DEBUG_LOG_V2(WARN, "[sl_si91x_mem_pool_buffers_with_quota] Quota for buffer types should be atleast 10\r\n");
     return SL_STATUS_INVALID_PARAMETER;
   }
   CORE_EXIT_CRITICAL();

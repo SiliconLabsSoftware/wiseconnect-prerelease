@@ -60,6 +60,7 @@
 #include "sl_si91x_driver_gpio.h"
 //! I2C related files
 #include "rsi_ps_config.h"
+#include "i2c_leader_example.h"
 #endif
 
 #include "cmsis_os2.h"
@@ -108,9 +109,11 @@ extern rsi_ble_event_conn_status_t conn_event_to_app;
 #define MQTT_USERNAME       "username"
 #define MQTT_PASSWORD       "password"
 
-#define ENABLE_NWP_POWER_SAVE  0
-#define I2C_SENSOR_PERI_ENABLE 0
-#define LOW                    0
+#define ENABLE_NWP_POWER_SAVE 0
+
+#ifndef LOW
+#define LOW 0
+#endif
 
 #define MAX_TOKENS 10 //! Adjust the size based on your JSON structure
 
@@ -967,8 +970,12 @@ void wifi_app_mqtt_task(void)
           // Initialize I2C
           i2c_init();
           i2c_leader_example_process_action();
+          i2c_deinit();
 
-          snprintf(temp_string, sizeof(temp_string) - 1, "Current Temperature in Celsius: %.2f", sensor_data);
+          snprintf(temp_string,
+                   sizeof(temp_string) - 1,
+                   "Current Temperature in Celsius: %.2f",
+                   get_sensor_temperature());
 
           publish_QOS0.payload    = temp_string;
           publish_QOS0.payloadLen = strlen(temp_string);

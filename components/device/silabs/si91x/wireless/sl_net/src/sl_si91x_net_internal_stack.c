@@ -42,6 +42,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include "sli_wifi_utility.h"
+#include "sl_si91x_net_log_helper.h"
+
+#ifndef SL_NET_COMPONENT_INCLUDED
+sl_log_level_t sl_log_si91x_net_component_level = SL_LOG_SI91X_NET_COMPONENT_LEVEL;
+#endif
 // Define a bit mask for DHCP unicast offer
 #define SL_SI91X_DHCP_UNICAST_OFFER ((uint32_t)1U << 3)
 
@@ -75,7 +80,7 @@ static sl_status_t sli_send_client_ip_address_info_if_applicable(const sl_net_ip
 
     if (ip_info.flags != 0) {
       status = sli_wifi_send_ip_address_info(SL_WIFI_CLIENT_INTERFACE, &ip_info);
-      SL_DEBUG_LOG_V2(DEBUG, "sli_wifi_send_ip_address_info status: 0x%lX", status);
+      SL_DEBUG_LOG_V2(DEBUG, "[si91x_net] sli_wifi_send_ip_address_info status: 0x%lX\r\n", status);
     }
   }
 
@@ -132,13 +137,13 @@ static sl_status_t sli_configure_ipv4_address(sl_net_ip_configuration_t *ip_conf
     }
 
     sli_buffer_manager_free_buffer(buffer);
-    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv4 OK (vap_id=%u)", virtual_ap_id);
+    SL_DEBUG_LOG_V2(DEBUG, "[si91x_net] sli_net_configure_ip_address: IPv4 OK (vap_id=%u)\r\n", virtual_ap_id);
   } else {
     if (buffer != NULL) {
       sli_buffer_manager_free_buffer(buffer);
     }
     SL_DEBUG_LOG_V2(WARN,
-                    "sli_net_configure_ip_address: IPv4 failed (vap_id=%u, status=0x%lX)",
+                    "[si91x_net] sli_net_configure_ip_address: IPv4 failed (vap_id=%u, status=0x%lX)\r\n",
                     virtual_ap_id,
                     sli_ipv4_config_status);
   }
@@ -189,13 +194,13 @@ static sl_status_t sli_configure_ipv6_address(sl_net_ip_configuration_t *ip_conf
            sizeof(ipv6_response->gateway_address));
 
     sli_buffer_manager_free_buffer(buffer);
-    SL_DEBUG_LOG_V2(DEBUG, "sli_net_configure_ip_address: IPv6 OK (vap_id=%u)", virtual_ap_id);
+    SL_DEBUG_LOG_V2(DEBUG, "[si91x_net] sli_net_configure_ip_address: IPv6 OK (vap_id=%u)\r\n", virtual_ap_id);
   } else {
     if (buffer != NULL) {
       sli_buffer_manager_free_buffer(buffer);
     }
     SL_DEBUG_LOG_V2(WARN,
-                    "sli_net_configure_ip_address: IPv6 failed (vap_id=%u, status=0x%lX)",
+                    "[si91x_net] sli_net_configure_ip_address: IPv6 failed (vap_id=%u, status=0x%lX)\r\n",
                     virtual_ap_id,
                     sli_ipv6_config_status);
   }

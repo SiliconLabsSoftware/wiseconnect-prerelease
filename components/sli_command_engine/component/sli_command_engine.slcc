@@ -19,6 +19,7 @@ include:
 - path: inc
   file_list:
     - path: sli_command_engine.h
+    - path: sli_command_engine_log_helper.h
 requires:
     - name: sli_queue_manager
     - name: sli_routing_utility

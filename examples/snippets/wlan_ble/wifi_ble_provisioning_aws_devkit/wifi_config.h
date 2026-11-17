@@ -29,6 +29,8 @@
 
 #define RSI_APP_BUF_SIZE 1600
 
+#define I2C_SENSOR_PERI_ENABLE 0
+
 //! Enumeration for states in application
 typedef enum wifi_app_state_e {
   WIFI_APP_INITIAL_STATE          = 0,

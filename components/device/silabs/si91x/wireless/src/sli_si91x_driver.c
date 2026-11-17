@@ -60,6 +60,7 @@
 #include "sli_wifi_command_engine_config.h"
 #include "sli_wifi_constants.h"
 #include "sli_wifi_utility.h"
+#include "sl_si91x_driver_log_helper.h"
 
 #ifdef SL_SI91X_SIDE_BAND_CRYPTO
 extern osEventFlagsId_t ta_events;
@@ -471,7 +472,7 @@ static sl_status_t sli_si91x_check_thread_priority_order(void)
   if (event_engine_thread_priority > hal_thread_priority && hal_thread_priority > command_engine_thread_priority) {
     // clang-format off
     SL_DEBUG_LOG_V2(DEBUG,
-                    "\r\nevent_engine_thread_priority: %" PRIu32
+                    "[si91x_driver] event_engine_thread_priority: %" PRIu32
                     ", hal_thread_priority: %" PRIu32
                     ", command_engine_thread_priority: %" PRIu32
                     "\r\nThread priority order is correct \r\n",
@@ -483,7 +484,7 @@ static sl_status_t sli_si91x_check_thread_priority_order(void)
   }
   // clang-format off
     SL_DEBUG_LOG_V2(INFO,
-                    "\r\nevent_engine_thread_priority: %" PRIu32
+                    "[si91x_driver] event_engine_thread_priority: %" PRIu32
                     ", hal_thread_priority: %" PRIu32
                     ", command_engine_thread_priority: %" PRIu32
                     "Expected order is Event engine > HAL > Command engine\r\n",

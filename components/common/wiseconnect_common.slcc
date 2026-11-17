@@ -25,11 +25,13 @@ include:
     - path: sl_application_profile_types.h
     - path: sl_cmsis_utility.h
     - path: sl_constants.h
+    - path: sli_sdk_component_log_helper.h
     - path: sl_ieee802_types.h
     - path: sl_ip_types.h
     - path: sl_si91x_common_flash.h
     - path: sl_si91x_status.h
     - path: sl_utility.h
+    - path: sl_utility_log_helper.h
     - path: sli_constants.h
     - path: sli_power_profile.h
     - path: sli_types.h

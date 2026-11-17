@@ -17,6 +17,7 @@ include:
 - path: inc
   file_list:
     - path: sli_si91x_wifi_event_handler.h
+    - path: sli_si91x_wifi_event_handler_log_helper.h
 source:
 - path: src/sli_si91x_wifi_event_handler.c
 provides:

@@ -55,6 +55,7 @@ config_file:
 - path: defaults/aws_iot_config.h
   file_id: aws_iot_config
   condition: ["aws_sdk"]
-
+- path: defaults/sl_log_sdk_component_config.h
+  file_id: sl_log_sdk_component_config
 documentation:
   url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-about-sdk/application-components

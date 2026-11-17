@@ -814,28 +814,19 @@ static sl_status_t sli_send_chunked_http_request(sl_http_client_method_type_t se
     // Copy the original buffer into the new packet buffer with an offset and for a chunk size
     memcpy(packet_buffer->buffer, (http_client_request->buffer + *offset), *chunk_size);
 
-    if (send_request == SL_HTTP_GET) {
-      // HTTP Get request with custom driver command
-      status = sli_wifi_send_command_with_custom_desc(
-        SLI_WIFI_REQ_HTTP_CLIENT_GET,
-        SLI_SI91X_NETWORK_CMD,
-        packet_buffer,
-        (sizeof(sli_si91x_http_client_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + *chunk_size),
-        SLI_WIFI_RETURN_IMMEDIATELY,
-        request->context,
-        NULL,
-        packet_identifier);
-    } else if (send_request == SL_HTTP_POST) {
-      // HTTP POST request with custom driver command
-      status = sli_wifi_send_command_with_custom_desc(
-        SLI_WIFI_REQ_HTTP_CLIENT_POST,
-        SLI_SI91X_NETWORK_CMD,
-        packet_buffer,
-        (sizeof(sli_si91x_http_client_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + *chunk_size),
-        SLI_WIFI_RETURN_IMMEDIATELY,
-        request->context,
-        NULL,
-        packet_identifier);
+    if ((send_request == SL_HTTP_GET) || (send_request == SL_HTTP_POST)) {
+      // HTTP GET/POST request with custom driver command (command ID differs by method).
+      sli_wifi_custom_desc_command_params_t cmd_params = {
+        .command         = (send_request == SL_HTTP_GET) ? SLI_WIFI_REQ_HTTP_CLIENT_GET : SLI_WIFI_REQ_HTTP_CLIENT_POST,
+        .command_type    = SLI_SI91X_NETWORK_CMD,
+        .data            = packet_buffer,
+        .data_length     = (sizeof(sli_si91x_http_client_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + *chunk_size),
+        .wait_period     = SLI_WIFI_RETURN_IMMEDIATELY,
+        .sdk_context     = request->context,
+        .response_buffer = NULL,
+        .custom_host_desc = packet_identifier,
+      };
+      status = sli_wifi_send_command_with_custom_desc(&cmd_params);
     }
 
     // Increase the offset by chunk_size

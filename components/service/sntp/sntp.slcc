@@ -18,6 +18,7 @@ include:
 - path: inc
   file_list:
     - path: sl_sntp.h
+    - path: sl_sntp_log_helper.h
 
 define:
 - name: SLI_SI91X_INTERNAL_SNTP_CLIENT

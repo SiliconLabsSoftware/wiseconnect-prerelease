@@ -42,6 +42,7 @@
 #include "ble_config.h"
 #include "rsi_ble_common_config.h"
 #include <rsi_common_apis.h>
+#include "wifi_config.h"
 
 #if (defined(SLI_SI91X_MCU_INTERFACE) && I2C_SENSOR_PERI_ENABLE)
 #include "i2c_leader_example.h"

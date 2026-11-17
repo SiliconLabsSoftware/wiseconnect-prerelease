@@ -19,6 +19,7 @@ include:
   file_list:
     - path: sl_mqtt_client.h
     - path: sl_mqtt_client_types.h
+    - path: sl_mqtt_client_log_helper.h
 
 define:
 - name: SLI_SI91X_EMBEDDED_MQTT_CLIENT

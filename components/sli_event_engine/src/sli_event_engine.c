@@ -32,8 +32,11 @@
 #include "sli_event_engine.h"
 #include "sli_queue_manager.h"
 #include "sl_constants.h"
+#include "sli_event_engine_log_helper.h"
 #include "cmsis_os2.h"
 #include "sl_cmsis_utility.h"
+
+sl_log_level_t sl_log_event_engine_component_level = SL_LOG_EVENT_ENGINE_COMPONENT_LEVEL;
 
 /******************************************************
    *               Macro Definitions
@@ -131,7 +134,7 @@ static void sli_event_handler_thread(void *args)
   sl_status_t status       = SL_STATUS_FAIL;
   void *data               = NULL;
 
-  SL_DEBUG_LOG_V2(DEBUG, "Event Engine thread Started\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "[event_engine] Event Engine thread Started\r\n");
 
   while (1) {
     // Wait for any of the events
@@ -336,7 +339,7 @@ sl_status_t sli_event_engine_register_event(sli_queue_t *event_queue,
   }
 
   SL_DEBUG_LOG_V2(DEBUG,
-                  "Triggering : 0x%X event for event engine to register events\n",
+                  "[event_engine] Triggering : 0x%X event for event engine to register events\n",
                   SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT);
   // Signal event engine thread that a handler registration is pending
   sli_event_handler_set_event(event_engine_Id, SLI_EVENT_ENGINE_EVENT_HANDLER_REGISTRATION_EVENT);

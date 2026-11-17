@@ -164,6 +164,89 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface);
  * 
  * @return
  *   sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [WiSeConnect Status Codes](../wiseconnect-api-reference-guide-err-codes/wiseconnect-status-codes) for details.
+ *
+ *   Host-side validation and SDK helper functions return first. Remaining failures propagate from
+ *   profile lookup, [sl_wifi_connect](../wiseconnect-api-reference-guide-wi-fi/wifi-client-api#sl-wifi-connect) /
+ *   [sl_wifi_start_ap](../wiseconnect-api-reference-guide-wi-fi/wifi-ap-api#sl-wifi-start-ap), and IP configuration.
+ *
+ *   Definitive host returns on the @ref sl_net_up path:
+ *   - SL_STATUS_OK: Bring-up completed (connect/start-AP and IP configuration succeeded).
+ *   - SL_STATUS_WIFI_IPV4_OK: Offload/dual-stack IPCONF only; IPv4 OK and IPv6 failed (Wi-Fi remains
+ *     associated; IPv4 can be used). Not returned on the LwIP-only client path.
+ *   - SL_STATUS_WIFI_IPV6_OK: Offload/dual-stack IPCONF only; IPv6 OK and IPv4 failed (Wi-Fi remains
+ *     associated; IPv6 can be used). Not returned on the LwIP-only client path.
+ *   - SL_STATUS_NOT_SUPPORTED: Invalid/unsupported interface; WEP client security; unsupported
+ *     profile/credential path; LwIP-only AP bring-up.
+ *   - SL_STATUS_NOT_INITIALIZED: @ref sl_net_init not done, or Wi-Fi device not initialized.
+ *   - SL_STATUS_INVALID_PARAMETER: Empty SSID; unsupported band/AP start params; invalid auto-join args;
+ *     bypass mode with unsupported IP management; NVM profile id out of range.
+ *   - SL_STATUS_INVALID_INDEX: Invalid @p profile_id (basic/in-RAM profile store).
+ *   - SL_STATUS_INVALID_CONFIGURATION: AP profile not static IP; profile security/credential_id mismatch
+ *     when the profile is written back.
+ *   - SL_STATUS_WIFI_INTERFACE_NOT_UP: Wi-Fi interface not up for connect/start-AP.
+ *   - SL_STATUS_WIFI_UNKNOWN_SECURITY_TYPE: Unrecognized client security type.
+ *   - SL_STATUS_WIFI_INVALID_ENCRYPTION_METHOD: Invalid EAP encryption method.
+ *   - SL_STATUS_NOT_AVAILABLE: Join response not 'C' (STA connected) or not 'G' (AP started).
+ *   - SL_STATUS_TIMEOUT: Host wait expired on SCAN, JOIN, IPCONF, or related command. Call
+ *     @ref sl_net_deinit before retrying.
+ *   - SL_STATUS_ABORT: Auto-join wait aborted (for example, network manager deinitialized).
+ *   - SL_STATUS_NOT_FOUND: Requested Wi-Fi credential ID was not found.
+ *   - SL_STATUS_FAIL: Auto-join failed; credential lookup type mismatch; internal command-engine failure.
+ *   - SL_STATUS_WIFI_UNSUPPORTED: AP bring-up unsupported for this stack (LwIP-only, or bypass mode).
+ *   - SL_STATUS_SI91X_IP_ADDRESS_ERROR: LwIP-only path; IPv6 link-local never became preferred.
+ *
+ *   Firmware statuses returned via Wi-Fi connect / start-AP / IP configuration commands
+ *   (SCAN, optional TIMEOUT, HOST_PSK or SET_EAP_CFG, JOIN, optional INIT after join fail,
+ *   IPCONFV4 / IPCONFV6, APCONF, and optional HT_CAPABILITIES):
+ *   - SL_STATUS_SI91X_SCAN_ISSUED_IN_ASSOCIATED_STATE: Scan while already associated.
+ *   - SL_STATUS_SI91X_NO_AP_FOUND: No AP found during scan/join.
+ *   - SL_STATUS_SI91X_INVALID_PSK_IN_WEP_SECURITY: Firmware code 4 (`PSK_NOT_CONFIGURED`); PSK not
+ *     configured for join (host rejects WEP with SL_STATUS_NOT_SUPPORTED before JOIN).
+ *   - SL_STATUS_SI91X_INVALID_BAND: Invalid band.
+ *   - SL_STATUS_SI91X_DEAUTHENTICATION_RECEIVED_FROM_AP: Deauth during join.
+ *   - SL_STATUS_SI91X_ASSOCIATION_FAILED: Association failed during join.
+ *   - SL_STATUS_SI91X_INVALID_CHANNEL: Invalid channel.
+ *   - SL_STATUS_SI91X_JOIN_AUTHENTICATION_FAILED: Authentication failed during join.
+ *   - SL_STATUS_SI91X_BEACON_MISSED_FROM_AP_DURING_JOIN: Firmware code 15 (`REJOIN_LIMIT_OVER`).
+ *   - SL_STATUS_SI91X_EAP_CONFIG_NOT_DONE: EAP configuration not completed before scan/join.
+ *   - SL_STATUS_SI91X_MEMORY_FAILED_FROM_MODULE: Firmware memory allocation failed.
+ *   - SL_STATUS_SI91X_INSUFFICIENT_INFO: Insufficient/incorrect join information.
+ *   - SL_STATUS_SI91X_REJOIN_FAILURE: Rejoin failed.
+ *   - SL_STATUS_SI91X_FREQUENCY_NOT_SUPPORTED: Unsupported frequency/channel (APCONF).
+ *   - SL_STATUS_SI91X_EAP_CONFIG_FAILED: EAP configuration failed.
+ *   - SL_STATUS_SI91X_JOIN_TIMEOUT: Join timed out in firmware.
+ *   - SL_STATUS_SI91X_COMMAND_GIVEN_IN_INVALID_STATE: Command in invalid state (JOIN / IPCONF).
+ *   - SL_STATUS_SI91X_ACCESS_POINT_FAILED: Failed to form the access point.
+ *   - SL_STATUS_SI91X_INVALID_SCAN_INFO: Invalid scan parameters.
+ *   - SL_STATUS_SI91X_COMMAND_ISSUED_IN_REJOIN_STATE: Command issued while rejoin in progress.
+ *   - SL_STATUS_SI91X_WRONG_PARAMETERS: Incorrect parameters (JOIN / PSK / APCONF).
+ *   - SL_STATUS_SI91X_INVALID_PSK_LENGTH: PSK length invalid (HOST_PSK / APCONF).
+ *   - SL_STATUS_SI91X_INVALID_PMK_LEN: Invalid PMK length (HOST_PSK).
+ *   - SL_STATUS_SI91X_SSID_NOT_PRESENT_FOR_PMK_GENERATION: SSID missing for PMK generation.
+ *   - SL_STATUS_SI91X_COMMAND_ISSUED_WHILE_INTERNAL_OPERATION: Host command during internal operation
+ *     (for example auto-join).
+ *   - SL_STATUS_SI91X_MISSING_PSK_OR_PMK: PSK/PMK not provided for join.
+ *   - SL_STATUS_SI91X_INVALID_SECURITY_MODE_IN_JOIN_COMMAND: Invalid security mode in join.
+ *   - SL_STATUS_SI91X_MAX_BEACON_MISCOUNT: Deauth due to beacon miss during join.
+ *   - SL_STATUS_SI91X_DEAUTH_REQUEST_FROM_SUPPLICANT: Deauth from supplicant during join.
+ *   - SL_STATUS_SI91X_DEAUTH_REQUEST_FROM_FROM_AP: Deauth from AP after channel switch during join.
+ *   - SL_STATUS_SI91X_MISSED_SYNCHRONIZATION: Synchronization missed during join.
+ *   - SL_STATUS_SI91X_AUTHENTICATION_TIMEOUT: Authentication timed out during join.
+ *   - SL_STATUS_SI91X_ASSOCIATION_TIMEOUT: Association timed out during join.
+ *   - SL_STATUS_SI91X_SSID_MISMATCH: Scanned SSID does not match join SSID.
+ *   - SL_STATUS_SI91X_CLIENT_MAX_SUPPORTED_EXCEEDED: Max stations exceeded (APCONF).
+ *   - SL_STATUS_SI91X_HT_CAPABILITIES_NOT_SUPPORTED: HT capabilities not supported.
+ *   - SL_STATUS_SI91X_FIXED_DATA_RATE_NOT_SUPPORTED_BY_AP: Invalid/unsupported fixed rate (JOIN).
+ *   - SL_STATUS_SI91X_CONNECTED_AP_OR_STATION_CHANNEL_MISMATCH: Concurrent channel mismatch.
+ *   - SL_STATUS_SI91X_FOUR_WAY_HANDSHAKE_FAILED: 4-way handshake failed.
+ *   - SL_STATUS_SI91X_AP_HT_CAPS_NOT_ENABLED: AP HT capabilities not enabled for 40 MHz.
+ *   - SL_STATUS_SI91X_INVALID_BEACON_INTERVAL_OR_DTM_PERIOD: Invalid beacon/DTIM (APCONF).
+ *   - SL_STATUS_SI91X_SAE_FAILURE_DUE_TO_MULTIPLE_CONFIRM_FRAMES_FROM_AP: SAE failure (JOIN).
+ *   - SL_STATUS_SI91X_FEATURE_NOT_ENABLED: Required TCP/IP feature not enabled (IPCONF).
+ *   - SL_STATUS_SI91X_IP_CONFLICT_ERROR: Static IP conflict (IPCONF).
+ *   - SL_STATUS_SI91X_DHCP_HANDSHAKE_FAILURE: DHCP handshake failed (IPCONFV4).
+ *   - SL_STATUS_SI91X_CONCURRENT_IP_CREATION_ERROR: IPCONF network/interface mismatch.
+ *   - SL_STATUS_SI91X_TCP_IP_INIT_FAILED: TCP/IP stack init failed (IPCONF).
  * 
  * @note
  * By default, profile and credential configurations in sl_net_defaults.h are used by SDK.
@@ -171,8 +254,10 @@ sl_status_t sl_net_deinit(sl_net_interface_t interface);
  * To enable support for both IPv4 and IPv6, the ip.type in the profile should be set to (SL_IPV4|SL_IPV6).
  * @note
  * For a dual-stack profile, a partial-success return (`SL_STATUS_WIFI_IPV4_OK` or `SL_STATUS_WIFI_IPV6_OK`)
- * means at least one address family configured and the link is usable. If both families fail, the return
- * code is the IPv4 error only; call [sl_wifi_get_ip_config_failure_reason](../wiseconnect-api-reference-guide-wi-fi/wi-fi-common-api#sl-wifi-get-ip-config-failure-reason) to obtain per-family errors.
+ * means at least one address family configured, Wi-Fi remains associated, and that family can be used.
+ * If both families fail, the return code is the IPv4 error only; call
+ * [sl_wifi_get_ip_config_failure_reason](../wiseconnect-api-reference-guide-wi-fi/wi-fi-common-api#sl-wifi-get-ip-config-failure-reason)
+ * to obtain per-family errors.
  * @note
  * The user can define their profile and credential configurations for an interface by calling @ref sl_net_set_profile and @ref sl_net_set_credential APIs before calling @ref sl_net_up API.
  * @note
@@ -215,8 +300,10 @@ sl_status_t sl_net_up(sl_net_interface_t interface, sl_net_profile_id_t profile_
  * To enable support for both IPv4 and IPv6, the ip.type in the profile should be set to (SL_IPV4|SL_IPV6).
  * @note
  * For a dual-stack profile, a partial-success return (`SL_STATUS_WIFI_IPV4_OK` or `SL_STATUS_WIFI_IPV6_OK`)
- * means at least one address family configured and the link is usable. If both families fail, the return
- * code is the IPv4 error only; call [sl_wifi_get_ip_config_failure_reason](../wiseconnect-api-reference-guide-wi-fi/wi-fi-common-api#sl-wifi-get-ip-config-failure-reason) to obtain per-family errors.
+ * means at least one address family configured, Wi-Fi remains associated, and that family can be used.
+ * If both families fail, the return code is the IPv4 error only; call
+ * [sl_wifi_get_ip_config_failure_reason](../wiseconnect-api-reference-guide-wi-fi/wi-fi-common-api#sl-wifi-get-ip-config-failure-reason)
+ * to obtain per-family errors.
  * @note
  * The user can define their profile and credential configurations for an interface by calling @ref sl_net_set_profile and @ref sl_net_set_credential APIs before calling this API.
  * @note

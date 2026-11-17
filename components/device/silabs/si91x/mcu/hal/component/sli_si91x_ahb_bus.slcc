@@ -20,6 +20,7 @@ include:
   - path: inc
     file_list:
       - path: sli_si91x_ahb_bus.h
+      - path: sli_si91x_ahb_bus_log_helper.h
 requires:
   - name: wiseconnect_common
   - name: sli_queue_manager

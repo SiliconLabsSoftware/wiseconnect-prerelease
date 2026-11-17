@@ -38,6 +38,7 @@
 #include "sl_si91x_protocol_types.h"
 #ifdef SLI_SI91X_INTERNAL_MDNS
 #include "sl_mdns.h"
+#include "sl_si91x_net_log_helper.h"
 #endif
 extern sl_net_event_handler_t net_event_handler;
 
@@ -127,7 +128,7 @@ sl_status_t sl_si91x_default_handler(sl_net_event_t event, sl_wifi_buffer_t *buf
       break;
     }
     default: {
-      SL_DEBUG_LOG_V2(DEBUG, "\r\nUnsupported event\r\n");
+      SL_DEBUG_LOG_V2(DEBUG, "[si91x_net] Unsupported event\r\n");
       return SL_STATUS_FAIL; // Return failure for unsupported events
     }
   }

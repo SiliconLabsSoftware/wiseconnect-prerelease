@@ -19,6 +19,8 @@ source:
   condition: ["http_client"]
 include:
 - path: sl_net/inc
+  file_list:
+    - path: sl_si91x_net_log_helper.h
 - path: icmp
 - path: inc/http_client/inc
   condition: ["http_client"]

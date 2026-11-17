@@ -33,10 +33,13 @@
 #include "cmsis_os2.h"
 #include "sl_cmsis_utility.h"
 #include "sl_constants.h"
+#include "sli_command_engine_log_helper.h"
 #include "sl_core.h"
 #include "sli_command_engine.h"
 #include "sli_queue_manager.h"
 #include "sli_routing_utility.h"
+
+sl_log_level_t sl_log_command_engine_component_level = SL_LOG_COMMAND_ENGINE_COMPONENT_LEVEL;
 
 /******************************************************
   *               Macro Definitions
@@ -303,7 +306,7 @@ static void sli_command_engine_tx_ack_handle_failure(sli_command_engine_t *insta
   sl_status_t status = SL_STATUS_OK;
 
   SL_DEBUG_LOG_V2(ERROR,
-                  "TX ACK for FAILED packet - sending error event : %lu",
+                  "[command_engine] TX ACK for FAILED packet - sending error event : %lu\r\n",
                   (unsigned long)metadata->packet_status);
   (void)sli_command_engine_send_fatal_error_event(instance, error_status);
   /* Do not return if this fails — metadata was dequeued from tx_status and must still be detached
@@ -330,7 +333,10 @@ static void sli_command_engine_tx_ack_handle_failure(sli_command_engine_t *insta
   }
   if (SL_STATUS_OK != status) {
     // log the debug message and free the metadata
-    SL_DEBUG_LOG_V2(ERROR, "Failed to remove node from inflight packet queue in tx ack handle failure: %lu", status);
+    SL_DEBUG_LOG_V2(
+      ERROR,
+      "[command_engine] Failed to remove node from inflight packet queue in tx ack handle failure: %lu\r\n",
+      status);
     sli_command_engine_decrement_in_flight_and_set_tx_event(instance, queue_info);
     sli_buffer_manager_free_buffer(metadata);
     return;
@@ -365,7 +371,10 @@ static void sli_command_engine_tx_ack_handle_failure(sli_command_engine_t *insta
   status = sli_queue_manager_enqueue(packet_type_configuration->sync_response_queue, (void *)metadata);
   if (SL_STATUS_OK != status) {
     // log the debug message and free the metadata
-    SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue metadata to sync response queue in tx ack handle failure: %lu", status);
+    SL_DEBUG_LOG_V2(
+      ERROR,
+      "[command_engine] Failed to enqueue metadata to sync response queue in tx ack handle failure: %lu\r\n",
+      status);
     sli_buffer_manager_free_buffer(metadata);
     return;
   }
@@ -393,7 +402,7 @@ static void sli_command_engine_tx_ack_release_without_response(sli_command_engin
                                                       &queue_info,
                                                       &packet_type_configuration);
   if ((SL_STATUS_OK != status) || (NULL == queue_info) || (NULL == packet_type_configuration)) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to get dynamic packet info : %lu", (unsigned long)status);
+    SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to get dynamic packet info : %lu\r\n", (unsigned long)status);
     (void)sli_command_engine_send_fatal_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
     sli_buffer_manager_free_buffer(metadata);
     return;
@@ -401,7 +410,7 @@ static void sli_command_engine_tx_ack_release_without_response(sli_command_engin
 
   if (!SLI_COMMAND_ENGINE_EXPECT_PACKET_RESPONSE(metadata)) {
 
-    SL_DEBUG_LOG_V2(DEBUG, "Removing meta data : 0x%X", (unsigned int)metadata);
+    SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Removing meta data : 0x%X\r\n", (unsigned int)metadata);
     status = sli_queue_manager_remove_node_from_queue(&(queue_info->inflight_packet_queue),
                                                       rx_packet_identity_handler,
                                                       (const void *)metadata,
@@ -411,7 +420,7 @@ static void sli_command_engine_tx_ack_release_without_response(sli_command_engin
       return;
     }
     if (SL_STATUS_OK != status) {
-      SL_DEBUG_LOG_V2(ERROR, "Failed to remove node from inflight packet queue");
+      SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to remove node from inflight packet queue\r\n");
     }
     // metadata and detached_metadata are the same node, so free only one of them
     sli_buffer_manager_free_buffer(metadata);
@@ -501,7 +510,7 @@ static sl_status_t sli_command_engine_handle_packet_tx(
     status = sli_queue_manager_dequeue(&(queue_info->packet_queue), (void **)&metadata);
     if (SL_STATUS_OK != status) {
       // log the debug message and return the status
-      SL_DEBUG_LOG_V2(ERROR, "Failed to dequeue packet metadata : %lu", status);
+      SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to dequeue packet metadata : %lu\r\n", status);
       return status;
     }
 
@@ -552,7 +561,7 @@ static sl_status_t sli_command_engine_handle_packet_tx(
     sli_buffer_manager_free_buffer(metadata);
     // Notify error handler; keep CE thread running so further work and deinit can proceed.
     (void)sli_command_engine_send_fatal_error_event(instance, SLI_COMMAND_ENGINE_STATUS_COMMAND_TX_FAILED);
-    SL_DEBUG_LOG_V2(ERROR, "Failed to route packet from CE to destination: %lu", status);
+    SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to route packet from CE to destination: %lu\r\n", status);
     return SL_STATUS_OK;
   } else {
     // Immediate success (synchronous send). Data buffer no longer needed.
@@ -568,13 +577,13 @@ static sl_status_t sli_command_engine_handle_packet_tx(
       metadata->tx_info.data_packet_length = 0;
     }
 
-    SL_DEBUG_LOG_V2(DEBUG, "Adding meta data : 0x%X\r\n", (unsigned int)metadata);
+    SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Adding meta data : 0x%X\r\n", (unsigned int)metadata);
 
     // Move metadata to in-flight queue for response correlation
     status = sli_queue_manager_enqueue(&(queue_info->inflight_packet_queue), (void *)metadata);
     if (SL_STATUS_OK != status) {
       // log the debug message and return the status
-      SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue metadata to inflight queue : %lu", status);
+      SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to enqueue metadata to inflight queue : %lu\r\n", status);
       return status;
     }
 
@@ -671,7 +680,7 @@ static void sli_command_engine_thread(void *args)
   void *data                                                                = NULL; // Generic packet pointer
   osThreadId_t resp_thread_id;                                                      // Waiting thread for sync response
 
-  SL_DEBUG_LOG_V2(DEBUG, "%s task started\r\n", (uintptr_t)instance->config.name);
+  SL_DEBUG_LOG_V2(DEBUG, "[command_engine] %s task started\r\n", (uintptr_t)instance->config.name);
 
   while (1) {
     uint32_t wait_time = (events_received == 0) ? osWaitForever : 0;
@@ -696,7 +705,7 @@ static void sli_command_engine_thread(void *args)
 
     // ---------------- Dynamic packet type configuration requests ----------------
     if (events_received & SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT) {
-      SL_DEBUG_LOG_V2(DEBUG, "Handling : SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT.\r\n");
+      SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Handling : SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT.\r\n");
       events_received &= ~SLI_COMMAND_ENGINE_CONFIGURE_PACKET_TYPE_REQUEST_EVENT;
 
       // Drain all control requests (register/unregister)
@@ -759,16 +768,16 @@ static void sli_command_engine_thread(void *args)
 
     // ---------------- TX completion (ACK) handling ----------------
     if (events_received & SLI_COMMAND_ENGINE_PACKET_TX_ACK_EVENT) {
-      SL_DEBUG_LOG_V2(DEBUG, "Got TX ACK Event\r\n");
+      SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Got TX ACK Event\r\n");
       while (!SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&instance->tx_status_packet_queue)) {
         status = sli_queue_manager_dequeue(&(instance->tx_status_packet_queue), (void **)&metadata);
         if (SL_STATUS_OK != status) {
           // log the debug message and continue
-          SL_DEBUG_LOG_V2(ERROR, "TX ACK dequeue failed in CE thread: %lu", status);
+          SL_DEBUG_LOG_V2(ERROR, "[command_engine] TX ACK dequeue failed in CE thread: %lu\r\n", status);
           continue;
         }
         if (metadata->tx_status == SLI_COMMAND_ENGINE_PACKET_FLUSHED) {
-          SL_DEBUG_LOG_V2(DEBUG, "TX ACK for FLUSHED packet - freeing metadata");
+          SL_DEBUG_LOG_V2(DEBUG, "[command_engine] TX ACK for FLUSHED packet - freeing metadata\r\n");
           sli_buffer_manager_free_buffer(metadata);
         } else if ((sl_status_t)metadata->packet_status != SL_STATUS_OK) {
           sli_command_engine_tx_ack_handle_failure(instance, metadata);
@@ -787,7 +796,7 @@ static void sli_command_engine_thread(void *args)
       status = sli_queue_manager_dequeue(&(instance->rx_packet_queue), (void **)&data);
       if (SL_STATUS_OK != status) {
         // If dequeue fails, log the debug message and continue
-        SL_DEBUG_LOG_V2(ERROR, "Failed to dequeue RX packet in CE thread: %lu", status);
+        SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to dequeue RX packet in CE thread: %lu\r\n", status);
         //clear the RX event bit if no packet is available
         if (SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&(instance->rx_packet_queue))) {
           events_received &= ~(SLI_COMMAND_ENGINE_PACKET_RX_EVENT);
@@ -800,13 +809,13 @@ static void sli_command_engine_thread(void *args)
         events_received &= ~(SLI_COMMAND_ENGINE_PACKET_RX_EVENT);
       }
 
-      SL_DEBUG_LOG_V2(DEBUG, "Got RX Packet\r\n");
+      SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Got RX Packet\r\n");
 
       // Fill temporary RX metadata using user callback
       rx_metadata.tx_info.data_packet = data;
       status                          = instance->config.get_packet_metadata(instance, data, &rx_metadata);
       if (SL_STATUS_OK != status) {
-        SL_DEBUG_LOG_V2(WARN, "Unidentified Packet\r\n");
+        SL_DEBUG_LOG_V2(WARN, "[command_engine] Unidentified Packet\r\n");
         // If metadata extraction fails, free the data buffer and continue
         sli_buffer_manager_free_buffer(data);
         continue;
@@ -818,39 +827,39 @@ static void sli_command_engine_thread(void *args)
         sli_command_engine_get_dynamic_packet_info(instance, packet_type, &queue_info, &packet_type_configuration);
       if ((SL_STATUS_OK != status) || (NULL == queue_info) || (NULL == packet_type_configuration)) {
         // If not found, free the data buffer and continue
-        SL_DEBUG_LOG_V2(ERROR, "Unidentified Packet info\r\n");
+        SL_DEBUG_LOG_V2(ERROR, "[command_engine] Unidentified Packet info\r\n");
         sli_buffer_manager_free_buffer(data);
         continue;
       }
 
-      SL_DEBUG_LOG_V2(DEBUG, "Got Packet info\r\n");
+      SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Got Packet info\r\n");
       sl_status_t rx_handler_status = SL_STATUS_OK;
 
       // Call RX event handler if configured (e.g., for parsing/classification)
       if (NULL != packet_type_configuration->rx_event_handler) {
         rx_handler_status = packet_type_configuration->rx_event_handler(instance, packet_type, (void *)data);
         if (SL_STATUS_OK != rx_handler_status && SL_STATUS_IN_PROGRESS != rx_handler_status) {
-          SL_DEBUG_LOG_V2(ERROR, "RX packet handler error: %lu\n", rx_handler_status);
+          SL_DEBUG_LOG_V2(ERROR, "[command_engine] RX packet handler error: %lu\r\n", rx_handler_status);
           sli_buffer_manager_free_buffer(data);
-          SL_DEBUG_LOG_V2(ERROR, "RX packet handler error\r\n");
+          SL_DEBUG_LOG_V2(ERROR, "[command_engine] RX packet handler error\r\n");
           continue;
         }
       }
 
       sli_command_engine_response_t *response = NULL;
-      SL_DEBUG_LOG_V2(DEBUG, "Searching Packet metadata\r\n");
+      SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Searching Packet metadata\r\n");
 
       // Try to locate matching in-flight metadata for synchronous response
       status = sli_queue_manager_remove_node_from_queue(&(queue_info->inflight_packet_queue),
                                                         rx_packet_identity_handler,
                                                         (const void *)&rx_metadata,
                                                         (void **)&metadata);
-      SL_DEBUG_LOG_V2(DEBUG, "Search Packet metadata status : %lu\r\n", status);
+      SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Search Packet metadata status : %lu\r\n", status);
 
       if ((SL_STATUS_NOT_FOUND == status) || (SL_STATUS_EMPTY == status)) {
         // If not found, treat as async response: enqueue to async queue and signal event
         SL_DEBUG_LOG_V2(DEBUG,
-                        "Sending data pointer : 0x%X to async event handler for packet type : %u",
+                        "[command_engine] Sending data pointer : 0x%X to async event handler for packet type : %u\r\n",
                         (unsigned int)data,
                         packet_type);
 
@@ -861,7 +870,9 @@ static void sli_command_engine_thread(void *args)
 
         if (status != SL_STATUS_OK) {
           (void)sli_command_engine_send_fatal_error_event(instance, SLI_COMMAND_ENGINE_STATUS_MEMORY_ERROR);
-          SL_DEBUG_LOG_V2(ERROR, "Failed to allocate metadata for CE async response : %lu", status);
+          SL_DEBUG_LOG_V2(ERROR,
+                          "[command_engine] Failed to allocate metadata for CE async response : %lu\r\n",
+                          status);
           sli_buffer_manager_free_buffer(data);
           continue;
         }
@@ -872,14 +883,14 @@ static void sli_command_engine_thread(void *args)
         status = sli_queue_manager_enqueue(packet_type_configuration->async_response_queue, (void *)response);
         if (SL_STATUS_OK != status) {
           // On enqueue failure, send fatal error event
-          SL_DEBUG_LOG_V2(ERROR, "Async enqueue failed : %lu", status);
+          SL_DEBUG_LOG_V2(ERROR, "[command_engine] Async enqueue failed : %lu\r\n", status);
           sli_buffer_manager_free_buffer(response);
           sli_buffer_manager_free_buffer(data);
           continue;
         }
 
         SL_DEBUG_LOG_V2(DEBUG,
-                        "Triggering event 0x%lX on event Id : 0x%X.",
+                        "[command_engine] Triggering event 0x%lX on event Id : 0x%X.\r\n",
                         packet_type_configuration->async_response_event,
                         (unsigned int)packet_type_configuration->async_response_event_id);
 
@@ -887,7 +898,7 @@ static void sli_command_engine_thread(void *args)
         sli_command_engine_set_event(*(packet_type_configuration->async_response_event_id),
                                      packet_type_configuration->async_response_event);
       } else if (SL_STATUS_OK != status) {
-        SL_DEBUG_LOG_V2(ERROR, "Got error while dequeueing packet metadata : %lu\n", status);
+        SL_DEBUG_LOG_V2(ERROR, "[command_engine] Got error while dequeueing packet metadata : %lu\r\n", status);
         // Unexpected queue error, send fatal error event
         status = sli_command_engine_send_fatal_error_event(instance, SLI_COMMAND_ENGINE_STATUS_FATAL_ERROR);
         if (SL_STATUS_OK != status) {
@@ -907,7 +918,7 @@ static void sli_command_engine_thread(void *args)
           sli_command_engine_decrement_in_flight_and_set_tx_event(instance, queue_info);
           // Drop timed out response data and metadata
           SL_DEBUG_LOG_V2(WARN,
-                          "Packet timedout after : %lu ms\r\n",
+                          "[command_engine] Packet timedout after : %lu ms\r\n",
                           (unsigned long)SLI_SYSTEM_TICKS_TO_MS(metadata->tx_info.timeout));
           sli_buffer_manager_free_buffer(data);
           sli_buffer_manager_free_buffer(metadata);
@@ -950,13 +961,13 @@ static void sli_command_engine_thread(void *args)
             sli_buffer_manager_free_buffer(metadata);
             sli_buffer_manager_free_buffer(data);
             sli_buffer_manager_free_buffer(metadata_copy);
-            SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue metadata to inflight queue : %lu", status);
+            SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to enqueue metadata to inflight queue : %lu\r\n", status);
             continue;
           }
         }
 
         // Sync response: Complete metadata and enqueue for waiting thread
-        SL_DEBUG_LOG_V2(DEBUG, "Found meta data : 0x%X\r\n", (unsigned int)metadata);
+        SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Found meta data : 0x%X\r\n", (unsigned int)metadata);
         metadata->tx_info.data_packet        = data;
         metadata->tx_info.data_packet_length = rx_metadata.tx_info.data_packet_length;
 
@@ -970,7 +981,9 @@ static void sli_command_engine_thread(void *args)
 
           if (status != SL_STATUS_OK) {
             (void)sli_command_engine_send_fatal_error_event(instance, SLI_COMMAND_ENGINE_STATUS_MEMORY_ERROR);
-            SL_DEBUG_LOG_V2(ERROR, "Failed to allocate metadata for CE seq async response : %lu", status);
+            SL_DEBUG_LOG_V2(ERROR,
+                            "[command_engine] Failed to allocate metadata for CE seq async response : %lu\r\n",
+                            status);
             if (SL_STATUS_IN_PROGRESS == rx_handler_status) {
               sli_command_engine_metadata_t *detached_copy = NULL;
               sl_status_t rm_status = sli_queue_manager_remove_node_from_queue(&(queue_info->inflight_packet_queue),
@@ -981,9 +994,10 @@ static void sli_command_engine_thread(void *args)
                 sli_buffer_manager_free_buffer(detached_copy);
                 sli_command_engine_decrement_in_flight_and_set_tx_event(instance, queue_info);
               } else {
-                SL_DEBUG_LOG_V2(ERROR,
-                                "Failed to remove seq-async metadata_copy from inflight (rm_status=%lu)\n",
-                                (unsigned long)rm_status);
+                SL_DEBUG_LOG_V2(
+                  ERROR,
+                  "[command_engine] Failed to remove seq-async metadata_copy from inflight (rm_status=%lu)\r\n",
+                  (unsigned long)rm_status);
               }
             }
             sli_buffer_manager_free_buffer(metadata);
@@ -1010,21 +1024,23 @@ static void sli_command_engine_thread(void *args)
         }
 
         SL_DEBUG_LOG_V2(DEBUG,
-                        "Adding %u command packet to queue 0x%X",
+                        "[command_engine] Adding %u command packet to queue 0x%X\r\n",
                         rx_metadata.tx_info.packet_type,
                         (unsigned int)response_queue);
 
         if (SL_STATUS_OK != status) {
           // On enqueue failure, send fatal error event
           // log the debug message and continue
-          SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue metadata to sync response queue : %lu", status);
+          SL_DEBUG_LOG_V2(ERROR,
+                          "[command_engine] Failed to enqueue metadata to sync response queue : %lu\r\n",
+                          status);
           sli_buffer_manager_free_buffer(data);
           sli_buffer_manager_free_buffer(metadata);
           sli_buffer_manager_free_buffer(response);
           continue;
         }
         SL_DEBUG_LOG_V2(DEBUG,
-                        "Sending Event: 0x%X on event id : 0x%X for queue 0x%X",
+                        "[command_engine] Sending Event: 0x%X on event id : 0x%X for queue 0x%X\r\n",
                         (unsigned int)response_event,
                         (unsigned int)*(response_event_id),
                         (unsigned int)response_queue);
@@ -1238,7 +1254,7 @@ sl_status_t sli_command_engine_deinit(sli_command_engine_t *instance)
   }
 
   if (terminate_status != osOK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to terminate command engine thread after 3 retries");
+    SL_DEBUG_LOG_V2(ERROR, "[command_engine] Failed to terminate command engine thread after 3 retries\r\n");
   }
 
   // Clear stored thread id (thread has terminated)

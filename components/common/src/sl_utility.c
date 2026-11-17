@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include "sl_utility.h"
 #include "sl_constants.h"
+#include "sl_utility_log_helper.h"
 #include "sl_string.h"
 #include "cmsis_compiler.h"
 #include <string.h>
@@ -40,6 +41,8 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
+
+sl_log_level_t sl_log_utility_component_level = SL_LOG_UTILITY_COMPONENT_LEVEL;
 
 #if ((!defined(SLI_SI91X_MCU_INTERFACE)) && (defined(SL_CATALOG_LOG_COMPONENT_PRESENT)))
 #define SLI_UTILITY_NCP_SL_LOG_ENABLED 1
@@ -58,9 +61,30 @@
 
 #endif
 
+#if defined(SL_CATALOG_LOG_COMPONENT_PRESENT) && defined(__has_include)
+#if __has_include("sl_log_proprietary_config.h")
+#include "sl_log_proprietary_config.h"
+#endif
+#endif
+
+/* NWP component selection is supported only in a DEBUG compile-time build whose
+ * proprietary backend runs in Host Mode. Every operand is checked with defined()
+ * because an undefined macro evaluates to 0 in #if, which would make
+ * COMPILE_TIME == DEBUG true when neither is visible. */
+#if defined(SL_CATALOG_LOG_COMPONENT_PRESENT) && defined(SL_LOG_CONFIG_MODE) && defined(SL_LOG_CONFIG_MODE_HOST) \
+  && defined(SL_LOG_CONFIG_LEVEL_COMPILE_TIME) && defined(SL_LOG_CONFIG_LEVEL_DEBUG)                             \
+  && (SL_LOG_CONFIG_MODE == SL_LOG_CONFIG_MODE_HOST)                                                             \
+  && (SL_LOG_CONFIG_LEVEL_COMPILE_TIME == SL_LOG_CONFIG_LEVEL_DEBUG)
+#define SLI_NWP_LOG_COMPONENT_SELECTION_SUPPORTED 1
+#else
+#define SLI_NWP_LOG_COMPONENT_SELECTION_SUPPORTED 0
+#endif
+
 #define NWP_LOGGING_ENABLE  1
 #define NWP_TSF_GRANULARITY 10
 #define NWP_MAX_LOG_BUFFER  1024
+/** SDK SL_LOG_CONFIG_LEVEL_NONE. A component at this level emits no logs. */
+#define SLI_NWP_LOG_COMPONENT_DISABLED ((uint8_t)6)
 
 #ifdef SPRINTF_CHAR
 #define SPRINTF(x) strlen(sprintf /**/ x)
@@ -156,7 +180,7 @@ void print_mac_address(const sl_mac_address_t *mac_address)
            mac_address->octet[3],
            mac_address->octet[4],
            mac_address->octet[5]);
-  SL_DEBUG_LOG_V2(INFO, "%s\r\n", (uintptr_t)sl_util_mac_log);
+  SL_DEBUG_LOG_V2(INFO, "[sl_utility] %s\r\n", (uintptr_t)sl_util_mac_log);
 }
 
 // Helper function to convert IPv6 bytes to words
@@ -494,6 +518,17 @@ void sl_redirect_log(const char *format, ...)
   UNUSED_PARAMETER(format);
 }
 
+static uint8_t sli_nwp_component_level(const sli_nwp_log_config_t *config, uint8_t component_bit)
+{
+  if (config->apply_component_mask == 0U) {
+    return config->log_config_level;
+  }
+  if ((config->component_mask & component_bit) != 0U) {
+    return config->log_config_level;
+  }
+  return SLI_NWP_LOG_COMPONENT_DISABLED;
+}
+
 sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config)
 {
   if (!sl_si91x_is_device_initialized()) {
@@ -514,20 +549,23 @@ sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config)
     .tsf_granularity = NWP_TSF_GRANULARITY,
     .reserved_1 = 0,
     .component_log_level = {
-      .common_log_level = config->log_config_level,
-      .cm_pm_log_level = config->log_config_level,
-      .wlan_lmac_log_level = config->log_config_level,
-      .wlan_umac_log_level = config->log_config_level,
-      .wlan_netstack_log_level = config->log_config_level,
-      .bt_ble_ctrl_log_level = config->log_config_level,
-      .bt_ble_stack_log_level = config->log_config_level,
-      .btdm_log_level = config->log_config_level,
+      .common_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_COMMON),
+      .cm_pm_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_CM_PM),
+      .wlan_lmac_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_WLAN_LMAC),
+      .wlan_umac_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_WLAN_UMAC),
+      .wlan_netstack_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_WLAN_NETSTACK),
+      .bt_ble_ctrl_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_BT_BLE_CTRL),
+      .bt_ble_stack_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_BT_BLE_STACK),
+      .btdm_log_level = sli_nwp_component_level(config, SL_SI91X_NWP_LOG_COMPONENT_BTDM),
     },
     .reserved_2 = 0,
     .log_buffer_size = NWP_MAX_LOG_BUFFER
   };
 
   if (config->log_config_level == 0) {
+    log_config.logging_enable = 0;
+  }
+  if ((config->apply_component_mask != 0U) && (config->component_mask == 0U)) {
     log_config.logging_enable = 0;
   }
 
@@ -539,6 +577,26 @@ sl_status_t sli_nwp_log_configure(const sli_nwp_log_config_t *config)
                                  NULL,
                                  NULL);
   return status;
+}
+
+sl_status_t sl_si91x_nwp_log_set_component_mask(uint8_t component_mask)
+{
+#if SLI_NWP_LOG_COMPONENT_SELECTION_SUPPORTED
+  if (sl_log_get_loglevel() != (sl_log_level_t)SL_LOG_CONFIG_LEVEL_DEBUG) {
+    return SL_STATUS_INVALID_STATE;
+  }
+
+  sli_nwp_log_config_t config = {
+    .log_config_level     = (uint8_t)SL_LOG_CONFIG_LEVEL_DEBUG,
+    .apply_component_mask = 1U,
+    .component_mask       = component_mask,
+  };
+  sl_status_t status = sli_nwp_log_configure(&config);
+  return (status == SL_STATUS_IN_PROGRESS) ? SL_STATUS_OK : status;
+#else
+  UNUSED_PARAMETER(component_mask);
+  return SL_STATUS_NOT_SUPPORTED;
+#endif
 }
 
 #if SLI_UTILITY_NCP_SL_LOG_ENABLED

@@ -24,6 +24,7 @@ include:
     - path: sli_wifi_utility.h
     - path: sli_wifi_power_profile.h
     - path: sli_wifi_device_core_utilities.h
+    - path: sli_wifi_log_helper.h
 provides:
   - name: sli_wifi
   - name: sli_wifi_power_profile

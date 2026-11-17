@@ -295,9 +295,23 @@ extern void sl_debug_log(const char *format, ...);
 #define SLI_HOST_DBGLOG_LVL_ERROR 3
 #endif
 
+#ifndef SLI_HOST_DBGLOG_LVL_NONE
+#define SLI_HOST_DBGLOG_LVL_NONE 4
+#endif
+
 #ifndef SLI_HOST_CURRENT_DBGLOG_LEVEL
 #define SLI_HOST_CURRENT_DBGLOG_LEVEL SLI_HOST_DBGLOG_LVL_INFO
 #endif
+
+/* Map SL Log config tokens so sl_log_sdk_component_config.h is host-agnostic. */
+#define SL_LOG_CONFIG_LEVEL_DEBUG        SLI_HOST_DBGLOG_LVL_DEBUG
+#define SL_LOG_CONFIG_LEVEL_INFO         SLI_HOST_DBGLOG_LVL_INFO
+#define SL_LOG_CONFIG_LEVEL_WARN         SLI_HOST_DBGLOG_LVL_WARN
+#define SL_LOG_CONFIG_LEVEL_ERROR        SLI_HOST_DBGLOG_LVL_ERROR
+#define SL_LOG_CONFIG_LEVEL_NONE         SLI_HOST_DBGLOG_LVL_NONE
+#define SL_LOG_CONFIG_LEVEL_COMPILE_TIME SLI_HOST_CURRENT_DBGLOG_LEVEL
+
+typedef uint8_t sl_log_level_t;
 
 #define SL_DEBUG_LOG_V2(level, fmt, ...)                                \
   do {                                                                  \

@@ -21,6 +21,7 @@ include:
 - path: inc
   file_list:
     - path: sl_http_client.h
+    - path: sl_http_client_log_helper.h
 
 define:
 - name: SLI_SI91X_INTERNAL_HTTP_CLIENT

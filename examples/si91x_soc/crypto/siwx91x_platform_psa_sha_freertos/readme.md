@@ -69,6 +69,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 * To use software fallback instead of hardware accelerators:
   - Add mbedtls_shaxxx in component section of slcp file
   - Undefine the macro SLI_SHA_DEVICE_SI91X
+> **Note**: Multipart SHA is applicable only when sideband crypto (`SL_SI91X_SIDE_BAND_CRYPTO`) is enabled. Without sideband, only one-shot hashing is supported.
 
 > **Note**: For recommended settings, please refer the [recommendations guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/).
 

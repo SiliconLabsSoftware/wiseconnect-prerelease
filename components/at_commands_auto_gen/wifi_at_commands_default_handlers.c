@@ -127,3 +127,21 @@ __WEAK sl_status_t net_info_command_handler(console_args_t *arguments)
   UNUSED_PARAMETER(arguments);
   return SL_STATUS_NOT_SUPPORTED;
 }
+
+__WEAK sl_status_t wifi_twt_auto_command_handler(console_args_t *arguments)
+{
+  UNUSED_PARAMETER(arguments);
+  return SL_STATUS_NOT_SUPPORTED;
+}
+
+__WEAK sl_status_t wifi_enable_twt_command_handler(console_args_t *arguments)
+{
+  UNUSED_PARAMETER(arguments);
+  return SL_STATUS_NOT_SUPPORTED;
+}
+
+__WEAK sl_status_t wifi_disable_twt_command_handler(console_args_t *arguments)
+{
+  UNUSED_PARAMETER(arguments);
+  return SL_STATUS_NOT_SUPPORTED;
+}

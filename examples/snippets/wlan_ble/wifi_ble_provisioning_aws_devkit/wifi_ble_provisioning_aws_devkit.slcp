@@ -18,6 +18,7 @@ source:
 - path: ble_app.c
 - path: wifi_app.c
 - path: sensor_app.c
+- path: i2c_leader_example.c
 - path: sensors/humidity_sensor.c
 - path: sensors/light_sensor.c
 - path: sensors/motion_sensor.c
@@ -28,6 +29,7 @@ include:
   - path: app.h
   - path: ble_config.h
   - path: wifi_config.h
+  - path: i2c_leader_example.h
 - path: sensors
   file_list:
   - path: humidity_sensor.h
@@ -47,7 +49,7 @@ component:
 - id: syscalls
 - id: si91x_memory_default_config
 - id: wiseconnect_common
-- id: sl_i2c_peripheral
+- id: sl_i2c
 - id: ble
 - id: wifi
 - id: sl_si91x_internal_stack

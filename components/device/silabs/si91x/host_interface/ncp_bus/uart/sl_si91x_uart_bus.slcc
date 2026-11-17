@@ -18,6 +18,7 @@ include:
   - path: .
     file_list:
       - path: sl_si91x_uart_bus.h
+      - path: sl_si91x_uart_bus_log_helper.h
   - path: ../../../wireless/inc
   - path: ../../../mcu/hal/sli_hal_si91x/inc
 define:

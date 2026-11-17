@@ -85,8 +85,46 @@ To use this application, the following hardware, software, and project setup are
 - Embedded development environment. Use a supported Simplicity Studio release (see "Download and Install Simplicity Studio" in the *getting-started-with-siwx917-soc* guide in `release_package/docs/index.html`).
 - Python 3.8+ on the host if you plan to run `log_compact_decoder.py` (UART or IO Stream Compact decoding):
 
+  **Decoder arguments (compact backend):**
+
+  | Argument | When |
+  | --- | --- |
+  | `--app-out` | **Required** — application ELF with `.log_fmt` (core 0 / host). |
+  | `--port` | **Required** for **IO Stream UART (VCOM)** — VCOM (`COM4`, `/dev/ttyACM0`, …). Not used for RTT. |
+  | `--source rtt` | **Required** for **IO Stream RTT** with **`--app-out`** (requires `pylink-square`). |
+  | `--device` | **Optional** for RTT — J-Link target (default **`SiWG917M111M`**). |
+  | `--rtt-speed` | **Optional** for RTT — default **`auto`**; use **`1000`** (kHz) if J-Link fails to start the core. |
+  | `--nwp-out` | **Optional** — omit for host-only logs. Pass when you need NWP / core 1 logs (e.g. `nwp_logging_fw.out`). |
+  | `--max-args` | Match **CONFIG_MAX_ARGS** in UC for your project. This example's `.slcp` sets **`SL_LOG_CONFIG_ARG5`** (`5`); the command samples use **`--max-args 5`**. |
+
+  **IO Stream UART (VCOM)** — host only:
+
+  ```text
+  python log_compact_decoder.py --app-out app.out --port COM4 --max-args 5
+  ```
+
+  **IO Stream UART (VCOM)** — host + NWP (optional **`--nwp-out`**):
+
+  ```text
+  python log_compact_decoder.py --app-out app.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 5
+  ```
+
+  **IO Stream RTT** — host only (**`--device`** optional):
+
+  ```text
+  python log_compact_decoder.py --source rtt --app-out app.out --max-args 5
+  ```
+
+  **IO Stream RTT** — host + NWP (optional **`--nwp-out`**; optional **`--device`**):
+
+  ```text
+  python log_compact_decoder.py --source rtt --app-out app.out --nwp-out nwp_logging_fw.out --max-args 5
+  ```
+
+  The decoder may show only the header until logs arrive; press **Ctrl+C** to stop and print byte/record diagnostics. **`--component`** filters **NWP (core 1)** lines only — host / M4 lines always print. Details: `components/.../sl_log/scripts/log_compact_decoder_user_guide.md`.
+
   ```bash
-  pip install pyserial pyelftools colorama
+  pip install pyserial pyelftools pylink-square colorama
   ```
 
   `colorama` is optional; the script falls back to plain output without it.
@@ -117,7 +155,7 @@ Main files for this example:
 | --- | --- |
 | `app.c` / `app.h` | Standard WiSeConnect entry. `app_init()` calls `logger_example_init()`. |
 | `sl_si91x_logger_example.c/.h` | Creates the `application_start` FreeRTOS task, prints a line at each level once per second, handles the BTN0 ISR, and provides the FreeRTOS idle hook that calls `sl_log_flush()`. |
-| `log_compact_decoder.py` | Host-side decoder for the encoded UART / IO Stream compact streams. |
+| `components/device/silabs/si91x/mcu/drivers/service/sl_log/scripts/log_compact_decoder.py` | Host-side decoder for the encoded UART / IO Stream compact streams (run from the SDK **`components/.../sl_log/scripts/`** folder; user guide **`log_compact_decoder_user_guide.md`** is in the same path). |
 | `siwx91x_platform_logger_backend_routing_freertos.slcp` | Project descriptor. Selects the default backend (`si91x_log_iostream_formatted`); change one line to swap backends. |
 
 > `sl_log_init()` is invoked automatically during `sl_main` startup by the `si91x_log` component — your application code does not need to call it.
@@ -175,7 +213,7 @@ Open the project in Simplicity Studio and select the logger backend component in
 
    See [Logger Levels](#logger-levels) for runtime behaviour.
 
-2. **CONFIG_MAX_ARGS** -- maximum number of arguments accepted by a single `SL_PRINT_STRING_*` call (`SL_LOG_CONFIG_ARG`). Exceeding this at compile time produces an error (see [Limitations](#limitations) item 1). Selectable from 3 through 10; the UC default is 3.
+2. **CONFIG_MAX_ARGS** -- maximum number of arguments accepted by a single `SL_PRINT_STRING_*` call (`SL_LOG_CONFIG_ARG`). Exceeding this at compile time produces an error (see [Limitations](#limitations) item 1). Selectable from 3 through 10; the UC default is 3. This example's `.slcp` sets **`SL_LOG_CONFIG_ARG5`** (`5`); pass **`--max-args 5`** to `log_compact_decoder.py` unless you change UC.
 
 3. **No of Logs** -- size, in entries, of the logger's internal ring buffer (`SL_LOG_NUMBER_OF_EVENTS`, range 1-255). Older entries are overwritten when the buffer fills before `sl_log_flush()` runs. Default is 128.
 

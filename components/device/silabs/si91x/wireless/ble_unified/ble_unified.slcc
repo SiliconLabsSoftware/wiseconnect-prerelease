@@ -113,3 +113,5 @@ requires:
 - name: ble_unified_framework
 - name: cmsis_rtos2
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-ble-unified-component

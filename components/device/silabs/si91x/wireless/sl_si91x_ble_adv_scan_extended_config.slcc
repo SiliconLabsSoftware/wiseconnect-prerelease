@@ -168,3 +168,6 @@ template_contribution:
         - Setting `RSI_BLE_AE_MAX_ADV_SETS` higher than the controller supports — `rsi_ble_set_ae_params()` returns an error.
         - Using PHY combinations the controller doesn't expose (e.g. coded PHY when `RSI_BLE_DISABLE_CODED_PHY_FROM_HOST=1` in `gap_config.h`).
     priority: -5309
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-extended-ble-adv-scan-component

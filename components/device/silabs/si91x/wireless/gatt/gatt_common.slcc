@@ -88,3 +88,6 @@ template_contribution:
         - Toggling `RSI_BLE_GATT_ASYNC_ENABLE` off — the BLE Unified GATT Server/Client implementations rely on the async response/event model; turning it off effectively breaks them.
         - Disabling `RSI_BLE_MTU_EXCHANGE_FROM_HOST` if your throughput-sensitive service expects a specific MTU — without host-side exchange the controller may negotiate a smaller MTU than desired.
     priority: -5305
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-gatt-common-component

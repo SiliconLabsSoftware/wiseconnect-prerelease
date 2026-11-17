@@ -35,6 +35,7 @@
 #include <string.h>
 
 #include "sl_constants.h"
+#include "sl_net_log_helper.h"
 #define CRED_TYPE_CERT 0
 #define CRED_TYPE_CRED 1
 
@@ -69,7 +70,7 @@ sl_status_t sli_net_set_credential(sl_net_credential_id_t id,
     case SL_NET_WIFI_PSK: {
       // PSK must be between 8 and 63 characters long
       if ((credential_length < SL_WIFI_MIN_PSK_LENGTH) || (credential_length > (SL_WIFI_MAX_PSK_LENGTH - 1))) {
-        SL_DEBUG_LOG_V2(ERROR, "PSK: Invalid credential length: %ld\r\n", (long)credential_length);
+        SL_DEBUG_LOG_V2(ERROR, "[network_manager] PSK: Invalid credential length: %ld\r\n", (long)credential_length);
         return SL_STATUS_SI91X_INVALID_PSK_LENGTH;
       }
       break;
@@ -77,7 +78,7 @@ sl_status_t sli_net_set_credential(sl_net_credential_id_t id,
     case SL_NET_WIFI_PMK: {
       // PMK must be exactly 32 bytes in hex format
       if (credential_length != SL_WIFI_MAX_PMK_LENGTH) {
-        SL_DEBUG_LOG_V2(ERROR, "PMK: Invalid credential length: %ld\r\n", (long)credential_length);
+        SL_DEBUG_LOG_V2(ERROR, "[network_manager] PMK: Invalid credential length: %ld\r\n", (long)credential_length);
         return SL_STATUS_SI91X_INVALID_PMK_LEN;
       }
       break;

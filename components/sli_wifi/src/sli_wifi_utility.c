@@ -34,6 +34,7 @@
 #include "sli_wifi_types.h"
 #include "sl_core.h"
 #include "sl_constants.h"
+#include "sli_wifi_log_helper.h"
 #include "sl_wifi_credentials.h"
 #include "assert.h"
 #include <string.h>
@@ -147,7 +148,7 @@ sl_status_t sli_fw_status_storage_index_init(void)
 
 void sli_wifi_set_opermode(sl_wifi_operation_mode_t mode)
 {
-  initialized_opermode = mode;
+  initialized_opermode = (uint16_t)mode;
 }
 
 sl_status_t sli_wifi_set_listen_interval(sl_wifi_interface_t interface, sl_wifi_listen_interval_t listen_interval)
@@ -169,8 +170,9 @@ sl_status_t sli_wifi_set_listen_interval_v2(sl_wifi_interface_t interface, sl_wi
   UNUSED_PARAMETER(interface);
 
   if (listen_interval.listen_interval_multiplier < DEFAULT_LISTEN_INTERVAL_MULTIPLIER) {
-    SL_DEBUG_LOG_V2(WARN,
-                    "\r\n listen_interval_multiplier minimum value should be 1, Updating to the minimum value.\r\n");
+    SL_DEBUG_LOG_V2(
+      WARN,
+      "[sli_wifi] listen_interval_multiplier minimum value should be 1, Updating to the minimum value.\r\n");
     listen_interval.listen_interval_multiplier = DEFAULT_LISTEN_INTERVAL_MULTIPLIER;
   }
   client_listen_interval            = listen_interval.listen_interval;
@@ -606,6 +608,43 @@ sli_scan_info_t **sli_get_scan_info_database(void)
 
 static void sli_process_tag_info(const sli_wifi_data_tagged_info_t *info, sli_scan_info_t *scan_info);
 static void sli_store_scan_info_element(const sli_scan_info_t *info);
+static void sli_parse_beacon_information_elements(sli_wifi_data_tagged_info_t *info,
+                                                  uint16_t ies_length,
+                                                  sli_scan_info_t *scan_info);
+
+// Parse beacon/probe tagged IEs with a bounded iteration limit.
+// Kept outside sli_handle_wifi_beacon's switch to avoid Sonar nested-break (loop) and
+// nesting-depth (c:S134) findings. Fail-closed via done flag — no break/continue.
+static void sli_parse_beacon_information_elements(sli_wifi_data_tagged_info_t *info,
+                                                  uint16_t ies_length,
+                                                  sli_scan_info_t *scan_info)
+{
+  uint32_t ie_iteration_count = 0U;
+  // Upper bound: each IE uses at least SLI_WIFI_IE_ELEMENT_ID_LENGTH_OCTETS (Element ID + Length).
+  // Bound against the initial tagged-parameter length so valid long beacons are not truncated.
+  const uint32_t max_ie_iterations = SLI_WIFI_BEACON_IE_GUARD_MAX_ITERATIONS(ies_length);
+  // data_length is uint8_t; promote to uint16_t so element_length fits the MPDU slice in ies_length.
+  const uint16_t ie_header_length = (uint16_t)sizeof(sli_wifi_data_tagged_info_t);
+  bool parsing_complete           = false;
+
+  while ((ies_length != 0U) && !parsing_complete) {
+    if (++ie_iteration_count > max_ie_iterations) {
+      parsing_complete = true;
+    } else {
+      uint16_t element_length = 0U;
+      if (ies_length >= ie_header_length) {
+        element_length = (uint16_t)(ie_header_length + (uint16_t)info->data_length);
+      }
+      if ((ies_length < ie_header_length) || (element_length > ies_length)) {
+        parsing_complete = true;
+      } else {
+        sli_process_tag_info(info, scan_info);
+        ies_length = (uint16_t)(ies_length - element_length);
+        info       = (sli_wifi_data_tagged_info_t *)((uint8_t *)info + element_length);
+      }
+    }
+  }
+}
 
 // Function to Parse the Beacon and Probe response Frames
 // Extended scan reports WPA/WPA2 mixed APs correctly via wpa_vendor_ie_seen and both IE handlers
@@ -644,29 +683,7 @@ void sli_handle_wifi_beacon(sl_wifi_system_packet_t *packet)
       memcpy(scan_info.bssid, wifi_frame->bssid, SLI_WIFI_HARDWARE_ADDRESS_LENGTH);
       ies_length                        = packet->length - SLI_WIFI_MINIMUM_FRAME_LENGTH;
       sli_wifi_data_tagged_info_t *info = (sli_wifi_data_tagged_info_t *)wifi_frame->tagged_info;
-      uint32_t ie_guard                 = 0U;
-      // Upper bound for IE walks: each IE uses at least SLI_WIFI_IE_ELEMENT_ID_LENGTH_OCTETS (ID + Length).
-      // Tie the guard to the initial tagged-parameter length so valid long beacons are not truncated.
-      const uint16_t tagged_bytes_total      = ies_length;
-      const uint32_t max_ie_guard_iterations = SLI_WIFI_BEACON_IE_GUARD_MAX_ITERATIONS(tagged_bytes_total);
-
-      while (ies_length != 0U) {
-        if (++ie_guard > max_ie_guard_iterations) {
-          break;
-        }
-        // data_length is uint8_t; promote to uint16_t so step fits the MPDU slice in ies_length.
-        const uint16_t ie_hdr_len = (uint16_t)sizeof(sli_wifi_data_tagged_info_t);
-        if (ies_length < ie_hdr_len) {
-          break;
-        }
-        uint16_t step = (uint16_t)(ie_hdr_len + (uint16_t)info->data_length);
-        if (step > ies_length) {
-          break;
-        }
-        sli_process_tag_info(info, &scan_info);
-        ies_length = (uint16_t)(ies_length - step);
-        info       = (sli_wifi_data_tagged_info_t *)((uint8_t *)info + step);
-      }
+      sli_parse_beacon_information_elements(info, ies_length, &scan_info);
 
       // Ensure transient flag is never stored (defensive if more code sets it later)
       scan_info.wpa_vendor_ie_seen = false;
@@ -842,8 +859,12 @@ static void sli_process_rsn_element(const sli_wifi_data_tagged_info_t *info, sli
   const sli_wifi_cipher_suite_t *akms = (const sli_wifi_cipher_suite_t *)(akmslc + SLI_WIFI_LE16_FIELD_OCTETS);
   uint8_t wlan_gcs_oui[3]             = { 0x00, 0x0F, 0xAC };
 
-  SL_DEBUG_LOG_V2(DEBUG, "RSN OUI %02x:%02x:%02x.\r\n", rsn->gcs.cs_oui[0], rsn->gcs.cs_oui[1], rsn->gcs.cs_oui[2]);
-  SL_DEBUG_LOG_V2(DEBUG, "Pairwise cipher suite count: %u.\r\n", pcsc);
+  SL_DEBUG_LOG_V2(DEBUG,
+                  "[sli_wifi] RSN OUI %02x:%02x:%02x.\r\n",
+                  rsn->gcs.cs_oui[0],
+                  rsn->gcs.cs_oui[1],
+                  rsn->gcs.cs_oui[2]);
+  SL_DEBUG_LOG_V2(DEBUG, "[sli_wifi] Pairwise cipher suite count: %u.\r\n", pcsc);
 
   if (!memcmp(rsn->gcs.cs_oui, wlan_gcs_oui, 3)) {
     // If WPA vendor IE was also present, report WPA/WPA2 mixed (PSK); enterprise stays WPA2_ENTERPRISE
@@ -1009,18 +1030,14 @@ sl_wifi_event_t sli_wifi_convert_event_to_sl_wifi_event(uint32_t command, uint16
   }
 }
 
-sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
-                                                   sli_wifi_command_type_t command_type,
-                                                   const void *data,
-                                                   uint32_t data_length,
-                                                   sli_wifi_wait_period_t wait_period,
-                                                   void *sdk_context,
-                                                   void **response_buffer,
-                                                   uint8_t custom_host_desc)
+sl_status_t sli_wifi_send_command_with_custom_desc(const sli_wifi_custom_desc_command_params_t *params)
 {
-
   sl_wifi_system_packet_t *packet = NULL;
   sl_status_t status              = SL_STATUS_OK;
+
+  if (params == NULL) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
 
   // Allocate a buffer for the command with appropriate size
   status = sli_buffer_manager_allocate_buffer(SLI_BUFFER_MANAGER_CE_CMD_TX_POOL,
@@ -1030,16 +1047,21 @@ sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
   VERIFY_STATUS_AND_RETURN(status);
   // Clear the packet descriptor and copy the command data if available
   memset(packet->desc, 0, sizeof(packet->desc));
-  if (data != NULL) {
-    memcpy(packet->data, data, data_length);
+  if (params->data != NULL) {
+    memcpy(packet->data, params->data, params->data_length);
   }
 
   // Fill frame type
-  packet->length    = data_length & 0xFFF;
-  packet->command   = (uint16_t)command;
-  packet->unused[1] = custom_host_desc;
+  packet->length    = params->data_length & 0xFFF;
+  packet->command   = (uint16_t)params->command;
+  packet->unused[1] = params->custom_host_desc;
 
-  return sli_wifi_send_command_packet(command, command_type, packet, wait_period, sdk_context, response_buffer);
+  return sli_wifi_send_command_packet(params->command,
+                                      params->command_type,
+                                      packet,
+                                      params->wait_period,
+                                      params->sdk_context,
+                                      params->response_buffer);
 }
 
 sl_wifi_buffer_t *sli_wifi_get_response_buffer(sli_command_engine_response_t *response)

@@ -113,6 +113,11 @@ static const osThreadAttr_t thread_attributes = {
 };
 
 #ifndef SL_SI91X_WC_DEVICE_CONFIGURATION
+// Set to 1 to enable NWP logging for debug. Disabled by default to avoid impacting power-save measurements.
+#ifndef ENABLE_NWP_LOGGING
+#define ENABLE_NWP_LOGGING 0
+#endif
+
 static const sl_wifi_device_configuration_t station_init_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
@@ -138,7 +143,11 @@ static const sl_wifi_device_configuration_t station_init_configuration = {
                    .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENTION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_ENHANCED_MAX_PSP) },
+                   .config_feature_bit_map     = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | SL_SI91X_ENABLE_ENHANCED_MAX_PSP
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              ) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
@@ -166,7 +175,11 @@ static const sl_wifi_device_configuration_t station_init_configuration = {
                   .ext_tcp_ip_feature_bit_map = SL_SI91X_WC_EXTENDED_TCPIP_FEATURE_BITMAP,
                   .ble_feature_bit_map        = SL_SI91X_WC_BLE_FEATURE_BITMAP,
                   .ble_ext_feature_bit_map    = SL_SI91X_WC_EXTENDED_BLE_CUSTOM_FEATURE_BITMAP,
-                  .config_feature_bit_map     = SL_SI91X_WC_CONFIG_FEATURE_BITMAP,
+                  .config_feature_bit_map = (SL_SI91X_WC_CONFIG_FEATURE_BITMAP
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              ),
                 },
     .ta_pool = { .tx_ratio_in_buffer_pool     = SL_SI91X_WC_TX_POOL_RATIO,
                  .rx_ratio_in_buffer_pool     = SL_SI91X_WC_RX_POOL_RATIO,

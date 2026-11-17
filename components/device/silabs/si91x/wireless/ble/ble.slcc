@@ -143,3 +143,6 @@ template_contribution:
       2. **Create periodic sync:** `rsi_ble_ae_set_periodic_sync()` (create). Sync established and periodic adv reports are received in callbacks.
       3. **List management (as needed):** `rsi_ble_ae_read_periodic_adv_list_size()` to query list size; `rsi_ble_ae_dev_to_periodic_list()` to add/remove/clear devices. Use `rsi_ble_ae_set_periodic_sync()` (terminate/cancel) to stop sync.
   priority: -5300
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-ble-component

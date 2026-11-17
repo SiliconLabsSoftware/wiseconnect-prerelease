@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "sl_constants.h"
+#include "sli_si91x_wifi_command_engine_log_helper.h"
 #include "sl_status.h"
 #include "sli_wifi_command_engine_config.h"
 #include "sli_si91x_wifi_event_handler.h"
@@ -72,6 +73,8 @@
 #ifdef SLI_SI91X_INTERNAL_HTTP_CLIENT
 #include "sl_http_client.h"
 #endif
+
+sl_log_level_t sl_log_si91x_wifi_cmd_engine_component_level = SL_LOG_SI91X_WIFI_CMD_ENGINE_COMPONENT_LEVEL;
 
 /******************************************************
  *               Macro Definitions
@@ -261,9 +264,6 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
   metadata->tx_info.frame_id           = frame_type;
   metadata->packet_status              = frame_status;
 
-  SL_DEBUG_LOG_V2(DEBUG, "RX-> Q: %u, C: 0x%X, L: %u,", queue_id, frame_type, metadata->tx_info.data_packet_length);
-  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\r\n", frame_status);
-
   switch (queue_id) {
     case SLI_WLAN_MGMT_Q: {
       switch (frame_type) {
@@ -436,7 +436,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
         }
         default: {
           // frame_type doesn't match any known cases
-          SL_DEBUG_LOG_V2(DEBUG, "Unknown frame type: %u\r\n", frame_type);
+          SL_DEBUG_LOG_V2(DEBUG, "[si91x_wifi_cmd_engine] Unknown frame type: %u\r\n", frame_type);
           status = SL_STATUS_INVALID_INDEX;
           break;
         }
@@ -449,7 +449,7 @@ sl_status_t sli_si91x_wifi_command_engine_get_packet_metadata(const sli_command_
     }
     default: {
       // frame_type doesn't match any known cases
-      SL_DEBUG_LOG_V2(DEBUG, "Unknown Queue type: %x\r\n", queue_id);
+      SL_DEBUG_LOG_V2(DEBUG, "[si91x_wifi_cmd_engine] Unknown Queue type: %x\r\n", queue_id);
       status = SL_STATUS_INVALID_INDEX;
       break;
     }
@@ -523,14 +523,14 @@ static void sli_si91x_process_flush_one_metadata(sli_command_engine_metadata_t *
       uint32_t thread_flags_result =
         osThreadFlagsSet(tx_metadata->sync_resp_thread_id, packet_config->sync_response_event);
       if ((thread_flags_result & osFlagsError) != 0) {
-        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set thread flags for sync response\r\n");
+        SL_DEBUG_LOG_V2(WARN, "[si91x_wifi_cmd_engine] Warning: Failed to set thread flags for sync response\r\n");
       }
     } else if (packet_config->sync_response_event_id != NULL && packet_config->sync_response_event != 0) {
       // Fallback to event flags if thread ID is not available
       uint32_t event_flags_result =
         osEventFlagsSet(*packet_config->sync_response_event_id, packet_config->sync_response_event);
       if ((event_flags_result & osFlagsError) != 0) {
-        SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for sync response\r\n");
+        SL_DEBUG_LOG_V2(WARN, "[si91x_wifi_cmd_engine] Warning: Failed to set event flags for sync response\r\n");
       }
     }
   } else {
@@ -725,7 +725,7 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
     case SLI_WIFI_RSP_IPCONFV6:
       if (frame_status != SL_STATUS_OK
           && (!sli_is_command_in_flight_queue(instance, packet_type, SLI_WIFI_REQ_IPCONFV6))) {
-        SL_DEBUG_LOG_V2(WARN, "IPCONFV6 fail flush frame_status=0x%X", frame_status);
+        SL_DEBUG_LOG_V2(WARN, "[si91x_wifi_cmd_engine] IPCONFV6 fail flush frame_status=0x%X", frame_status);
         status = sli_flush_all_command_engine_static_queues(instance, frame_status);
         VERIFY_STATUS_AND_RETURN(status);
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
@@ -739,7 +739,7 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
     case SLI_WIFI_RSP_DISCONNECT:
       if (frame_status == SL_STATUS_OK
           && (SL_WIFI_CLIENT_VAP_ID == sli_wifi_get_vap_id_from_operation_mode(rx_packet))) {
-        SL_DEBUG_LOG_V2(INFO, "DISCONNECT client flush");
+        SL_DEBUG_LOG_V2(INFO, "[si91x_wifi_cmd_engine] DISCONNECT client flush");
         sli_reset_coex_current_performance_profile();
         status = sli_flush_all_command_engine_static_queues(instance, (uint16_t)SL_STATUS_WIFI_CONNECTION_LOST);
         VERIFY_STATUS_AND_RETURN(status);
@@ -777,7 +777,7 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
     case SLI_WIFI_RSP_AP_STOP:
       if (frame_status == SL_STATUS_OK) {
         uint8_t vap_id = SL_WIFI_AP_VAP_ID;
-        SL_DEBUG_LOG_V2(INFO, "AP_STOP flush sockets");
+        SL_DEBUG_LOG_V2(INFO, "[si91x_wifi_cmd_engine] AP_STOP flush sockets");
         status = sli_flush_all_socket_queues(instance, (uint16_t)SL_STATUS_SI91X_SOCKET_CLOSED, &vap_id, NULL);
         VERIFY_STATUS_AND_RETURN(status);
 
@@ -788,7 +788,7 @@ static sl_status_t sli_si91x_forward_wifi_events_for_network_operations(sli_comm
 #endif // SLI_SI91X_OFFLOAD_NETWORK_STACK
 
     case SLI_WIFI_RSP_MQTT_REMOTE_TERMINATE: {
-      SL_DEBUG_LOG_V2(INFO, "Received MQTT remote terminate, flushing the queues \r\n");
+      SL_DEBUG_LOG_V2(INFO, "[si91x_wifi_cmd_engine] Received MQTT remote terminate, flushing the queues \r\n");
       sli_command_engine_queue_info_t *network_queue_info                   = NULL;
       sli_command_engine_packet_type_configuration_t *network_packet_config = NULL;
       sl_status_t mqtt_lookup_status =
@@ -894,7 +894,7 @@ static sl_status_t sli_flush_socket_queues(sli_command_engine_t *instance,
     uint32_t event_result = osEventFlagsSet(*socket->socket_packet_type_configuration.sync_response_event_id,
                                             socket->socket_packet_type_configuration.sync_response_event);
     if ((event_result & osFlagsError) != 0) {
-      SL_DEBUG_LOG_V2(WARN, "Warning: Failed to set event flags for socket flush response\r\n");
+      SL_DEBUG_LOG_V2(WARN, "[si91x_wifi_cmd_engine] Warning: Failed to set event flags for socket flush response\r\n");
     }
   }
 
@@ -910,7 +910,7 @@ static sl_status_t sli_flush_all_socket_queues(sli_command_engine_t *instance,
     return SL_STATUS_INVALID_PARAMETER;
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "flush_all_socket_queues err=0x%X\r\n", (unsigned int)error_status);
+  SL_DEBUG_LOG_V2(DEBUG, "[si91x_wifi_cmd_engine] flush_all_socket_queues err=0x%X\r\n", (unsigned int)error_status);
   sl_status_t status                              = SL_STATUS_OK;
   sl_wifi_operation_mode_t current_operation_mode = sli_wifi_get_opermode();
 
@@ -951,7 +951,7 @@ static void sli_post_disconnect_event_to_network_manager(sl_net_interface_t inte
   message.interface                     = interface;
   message.event_flags                   = SLI_NET_DISCONNECT_Q_EVENT;
   if (osMessageQueuePut(sli_network_manager_request_queue, &message, SLI_NET_MSG_PRIO_NORMAL, 0) != osOK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to enqueue disconnect event for auto-join retry\r\n");
+    SL_DEBUG_LOG_V2(ERROR, "[si91x_wifi_cmd_engine] Failed to enqueue disconnect event for auto-join retry\r\n");
   }
 }
 

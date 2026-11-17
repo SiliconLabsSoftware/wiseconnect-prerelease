@@ -209,3 +209,6 @@ template_contribution:
         - Computing CCCD handles by guesswork — always discover descriptors via `rsi_ble_get_att_descriptors_async()` (or pull them from the cached profile list) instead of assuming `value_handle + 1`.
         - Forgetting MTU exchange: notifications larger than the negotiated MTU-3 are silently truncated. After `event_mtu` reports the peer MTU, gate large writes/notify-payloads accordingly.
     priority: -5307
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-gatt-client-component

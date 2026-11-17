@@ -30,6 +30,7 @@ include:
     file_list:
       - path: sli_buffer_manager.h
       - path: sli_buffer_manager_types.h
+      - path: sli_buffer_manager_log_helper.h
 provides:
   - name: sli_buffer_manager
 requires:

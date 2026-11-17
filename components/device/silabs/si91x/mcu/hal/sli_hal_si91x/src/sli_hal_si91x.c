@@ -42,6 +42,7 @@
 #include "cmsis_os2.h"
 #include "sl_cmsis_utility.h"
 #include "sli_wifi_utility.h"
+#include "sli_hal_si91x_log_helper.h"
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "rsi_m4.h"
@@ -49,6 +50,9 @@
 #include "sli_si91x_nwp_interface.h"
 #endif
 #include "sli_code_classification.h"
+
+sl_log_level_t sl_log_hal_si91x_component_level = SL_LOG_HAL_SI91X_COMPONENT_LEVEL;
+
 /******************************************************
  *               Structures and Typedefs
 ******************************************************/
@@ -68,7 +72,7 @@ typedef struct {
 #define SLI_HAL_SI91X_LOG_MESSAGE_ON_ERROR(return_value, expected_value, message) \
   do {                                                                            \
     if ((return_value) != (expected_value)) {                                     \
-      SL_DEBUG_LOG_V2(DEBUG, message, return_value);                              \
+      SL_DEBUG_LOG_V2(DEBUG, "[hal_si91x] " message, return_value);               \
     }                                                                             \
   } while (0)
 
@@ -259,7 +263,7 @@ static void sli_hal_si91x_handle_ble_tx_event(uint32_t *events_received)
     hal_packet->packet_status_handler(hal_packet->packet_type, status, hal_packet->context);
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "Packet Sent Attempt status: %d", status);
+  SL_DEBUG_LOG_V2(DEBUG, "[hal_si91x] Packet Sent Attempt status: %d\r\n", status);
   sli_buffer_manager_free_buffer(hal_packet);
 
   if (SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&ble_tx_queue_handle)) {
@@ -275,7 +279,7 @@ static void sli_hal_si91x_handle_wifi_tx_event(uint32_t *events_received)
   sl_status_t status                 = sli_queue_manager_dequeue(&wifi_tx_queue_handle, (void **)&hal_packet);
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(DEBUG, "Failed to dequeue tx packet");
+    SL_DEBUG_LOG_V2(DEBUG, "[hal_si91x] Failed to dequeue tx packet\r\n");
 
     if (SLI_QUEUE_MANAGER_IS_QUEUE_EMPTY(&wifi_tx_queue_handle)) {
       *events_received &= ~SLI_HAL_SI91X_WIFI_TX_EVENT;
@@ -289,7 +293,7 @@ static void sli_hal_si91x_handle_wifi_tx_event(uint32_t *events_received)
     hal_packet->packet_status_handler(hal_packet->packet_type, status, hal_packet->context);
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "Packet Sent Attempt status: %d", status);
+  SL_DEBUG_LOG_V2(DEBUG, "[hal_si91x] Packet Sent Attempt status: %d\r\n", status);
 
   // TX buffer ownership transfers with async HAL TX: release after TX attempt
   // so the command engine TX-ACK path only clears metadata pointers (see FLUSHED handling).
@@ -310,11 +314,17 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
 {
   const sl_wifi_system_packet_t *packet = (sl_wifi_system_packet_t *)&(rx_buffer->data[0]);
   uint8_t firmware_queue_id             = ((packet->desc[1] & 0xF0) >> 4); // Extract the queue ID
-  uint16_t frame_status                 = (uint16_t)(packet->desc[12] + (packet->desc[13] << 8));
-  rx_buffer->length                     = (uint16_t)(packet->length & 0x0FFF);
+#ifdef SL_LOG_COMPONENT_HAL_SI91X_DEBUG_ENABLED
+  uint16_t frame_status = (uint16_t)(packet->desc[12] + (packet->desc[13] << 8));
+#endif
+  rx_buffer->length = (uint16_t)(packet->length & 0x0FFF);
 
-  SL_DEBUG_LOG_V2(DEBUG, "H RX-> Q: %u, C: 0x%X, L: %lu,", firmware_queue_id, packet->command, rx_buffer->length);
-  SL_DEBUG_LOG_V2(DEBUG, " S: 0x%x.\r\n", frame_status);
+  SL_DEBUG_LOG_V2(DEBUG,
+                  "[hal_si91x] H RX-> Q: %u, C: 0x%X, L: %lu,",
+                  firmware_queue_id,
+                  packet->command,
+                  rx_buffer->length);
+  SL_DEBUG_LOG_V2(DEBUG, "S: 0x%x.\r\n", frame_status);
 
   if (SLI_HAL_SI91X_IS_FLASH_COMMAND(packet->command)) {
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -327,7 +337,7 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
   // to indicate that we can now send other commands
   if (SLI_HAL_SI91X_IS_GLOBAL_FRAME(packet->command)) {
     is_global_frame_pending = false;
-    SL_DEBUG_LOG_V2(DEBUG, "Global lock released: command 0x%x", (uint16_t)packet->command);
+    SL_DEBUG_LOG_V2(DEBUG, "[hal_si91x] Global lock released: command 0x%x\r\n", (uint16_t)packet->command);
   }
 
   uint16_t packet_type = 0;
@@ -346,7 +356,7 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
       packet_type = SLI_HAL_SI91X_NWP_LOG_PACKET;
       break;
     default:
-      SL_DEBUG_LOG_V2(ERROR, "Invalid firmware queue ID: %u", firmware_queue_id);
+      SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Invalid firmware queue ID: %u\r\n", firmware_queue_id);
       break;
   }
 
@@ -366,7 +376,7 @@ static void sli_hal_si91x_handle_rx_event(sl_wifi_buffer_t *rx_buffer,
 
 static void sli_hal_si91x_handle_thread_terminate_event(void)
 {
-  SL_DEBUG_LOG_V2(INFO, "HAL thread termination event received");
+  SL_DEBUG_LOG_V2(INFO, "[hal_si91x] HAL thread termination event received\r\n");
   uint32_t event_result;
   osStatus_t thread_suspend_status;
 
@@ -441,7 +451,7 @@ static void sli_hal_si91x_thread(const void *args)
       status = sli_submit_rx_buffer(delay);
 
       if (status != SL_STATUS_OK) {
-        SL_DEBUG_LOG_V2(ERROR, "Failed to submit RX buffer");
+        SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Failed to submit RX buffer\r\n");
         Is_rx_buffer_submitted = false;
       } else {
         Is_rx_buffer_submitted = true;
@@ -453,14 +463,18 @@ static void sli_hal_si91x_thread(const void *args)
 
 static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buffer)
 {
+#if defined(SLI_SI91X_MCU_INTERFACE) || defined(SL_LOG_COMPONENT_HAL_SI91X_DEBUG_ENABLED)
+  uint16_t frame_type = 0;
+#endif
+#ifdef SL_LOG_COMPONENT_HAL_SI91X_DEBUG_ENABLED
   uint8_t queue_id       = 0;
-  uint16_t frame_type    = 0;
   uint16_t packet_length = 0;
+#endif
 
   sl_status_t status = sli_si91x_req_wakeup();
 
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "Failed to wake up SI91X device");
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Failed to wake up SI91X device\r\n");
     return status; // Skip processing if wakeup failed
   }
 
@@ -468,21 +482,25 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
   // SOC-only: command-status accessors
   sli_si91x_update_tx_command_status(true);
 #endif
-  queue_id      = ((buffer->desc[1] & 0xF0) >> 4);                      // Extract the queue ID
-  frame_type    = (uint16_t)(buffer->desc[2] + (buffer->desc[3] << 8)); // Extract the frame type
+#if defined(SLI_SI91X_MCU_INTERFACE) || defined(SL_LOG_COMPONENT_HAL_SI91X_DEBUG_ENABLED)
+  frame_type = (uint16_t)(buffer->desc[2] + (buffer->desc[3] << 8)); // Extract the frame type
+#endif
+#ifdef SL_LOG_COMPONENT_HAL_SI91X_DEBUG_ENABLED
+  queue_id      = ((buffer->desc[1] & 0xF0) >> 4); // Extract the queue ID
   packet_length = (buffer->length & (~0xF000));
+#endif
 
   const uint8_t *data = ((buffer->length & 0XFFF) == 0) ? NULL : buffer->data;
   status              = sli_si91x_bus_write_frame(buffer, data, (buffer->length & 0XFFF));
   if (status != SL_STATUS_OK) {
-    SL_DEBUG_LOG_V2(ERROR, "\r\n BUS_WRITE_ERROR \r\n");
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] BUS_WRITE_ERROR\r\n");
   }
 #ifdef SLI_SI91X_MCU_INTERFACE
   if (frame_type == SLI_COMMON_REQ_SOFT_RESET) {
     sli_si91x_config_m4_dma_desc_on_reset();
   }
 #endif
-  SL_DEBUG_LOG_V2(DEBUG, "H TX-> Q: %u, C: 0x%X, L: %u.\r\n", queue_id, frame_type, packet_length);
+  SL_DEBUG_LOG_V2(DEBUG, "[hal_si91x] H TX-> Q: %u, C: 0x%X, L: %u.\r\n", queue_id, frame_type, packet_length);
 
   if ((status == SL_STATUS_OK) && SLI_HAL_SI91X_IS_FLASH_COMMAND(buffer->command)) {
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -493,7 +511,7 @@ static sl_status_t sli_hal_si91x_send_packet_to_bus(sl_wifi_system_packet_t *buf
 
   if (status == SL_STATUS_OK && SLI_HAL_SI91X_IS_GLOBAL_FRAME(buffer->command)) {
     is_global_frame_pending = true;
-    SL_DEBUG_LOG_V2(DEBUG, "Global lock set: command 0x%x", (uint16_t)buffer->command);
+    SL_DEBUG_LOG_V2(DEBUG, "[hal_si91x] Global lock set: command 0x%x\r\n", (uint16_t)buffer->command);
   }
 
   sl_si91x_host_clear_sleep_indicator();
@@ -552,7 +570,7 @@ sl_status_t sli_hal_si91x_init(void)
   if (sli_hal_si91x_events == NULL) {
     sli_cleanup_flags_and_queues();
 
-    SL_DEBUG_LOG_V2(ERROR, "Creation of HAL event flags failed");
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Creation of HAL event flags failed\r\n");
     return SL_STATUS_FAIL;
   }
 
@@ -579,7 +597,7 @@ sl_status_t sli_hal_si91x_init(void)
   if (NULL == hal_thread_ID) {
     sli_cleanup_flags_and_queues();
 
-    SL_DEBUG_LOG_V2(ERROR, "Creation of HAL thread failed");
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Creation of HAL thread failed\r\n");
     return SL_STATUS_FAIL;
   }
 
@@ -594,7 +612,7 @@ sl_status_t sli_hal_si91x_deinit(void)
 
   event_result = osEventFlagsSet(sli_hal_si91x_events, SLI_HAL_SI91X_THREAD_TERMINATE_EVENT);
   if ((int32_t)event_result < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Event flags set failed with status %lu", event_result);
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Event flags set failed with status %lu\r\n", event_result);
     return SL_STATUS_FAIL;
   }
 
@@ -603,17 +621,17 @@ sl_status_t sli_hal_si91x_deinit(void)
                                   osFlagsWaitAny,
                                   osWaitForever);
   if ((int32_t)event_result < 0) {
-    SL_DEBUG_LOG_V2(ERROR, "Event flags wait failed with status %lu", event_result);
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Event flags wait failed with status %lu\r\n", event_result);
     return SL_STATUS_FAIL;
   }
   if ((event_result & SLI_HAL_SI91X_THREAD_TERMINATE_ACKNOWLEDGE_EVENT) == 0U) {
-    SL_DEBUG_LOG_V2(ERROR, "Event flags wait returned unexpected event flags: 0x%lu", event_result);
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Event flags wait returned unexpected event flags: 0x%lu\r\n", event_result);
     return SL_STATUS_FAIL;
   }
 
   freertos_status = osThreadTerminate(hal_thread_ID);
   if (freertos_status != osOK) {
-    SL_DEBUG_LOG_V2(ERROR, "Thread termination failed with status %d", freertos_status);
+    SL_DEBUG_LOG_V2(ERROR, "[hal_si91x] Thread termination failed with status %d\r\n", freertos_status);
     return SL_STATUS_FAIL;
   }
   hal_thread_ID = NULL;

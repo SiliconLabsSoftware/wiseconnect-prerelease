@@ -196,3 +196,6 @@ template_contribution:
         - Configuring more peripherals/centrals in `gap_config.h` than the firmware's connection table supports — values are validated by the controller and excess configurations cause init to fail.
         - Updating connection parameters from inside a connection-event callback before the previous procedure has completed — use the `event_conn_update` callback to gate further updates.
     priority: -5303
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-gap-component

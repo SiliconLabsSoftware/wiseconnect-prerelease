@@ -30,12 +30,16 @@
 #include "sli_buffer_manager.h"
 #include "sl_status.h"
 #include "sl_constants.h"
+#include "sli_buffer_manager_log_helper.h"
 #include "stdlib.h"
 #include "string.h"
 #include "cmsis_os2.h"
 #include "sl_core.h"
 #include "sl_slist.h"
 #include "sl_cmsis_utility.h"
+
+sl_log_level_t sl_log_buffer_manager_component_level = SL_LOG_BUFFER_MANAGER_COMPONENT_LEVEL;
+
 #define SLI_MEM_POOL_BLOCK_SIZE(x)               \
   (x                                             \
    + sizeof(sli_buffer_manager_mempool_handler_t \
@@ -154,14 +158,14 @@ static bool sli_buffer_manager_are_all_pools_deallocated()
 {
   CORE_irqState_t state = CORE_EnterAtomic();
 
-  SL_DEBUG_LOG_V2(DEBUG, "Buffer Manager Pools Status:\r\n");
+  SL_DEBUG_LOG_V2(DEBUG, "[buffer_manager] Buffer Manager Pools Status:\r\n");
 
   // Dedicated pools
   for (uint8_t i = 0; i < SLI_MAX_MEMPOOL_HANDLERS_COUNT; i++) {
     const sli_buffer_manager_mempool_handler_t *handler = &dedicated_mempool_handlers[i];
     if (handler->mempool_memory != NULL) {
-      SL_DEBUG_LOG_V2(DEBUG, "Dedicated Pool %u: Max Buffers = %u", i, handler->max_buffer_count);
-      SL_DEBUG_LOG_V2(DEBUG, "Dedicated Pool %u: Allocated = %u", i, handler->allocated_buffer_count);
+      SL_DEBUG_LOG_V2(DEBUG, "[buffer_manager] Dedicated Pool %u: Max Buffers = %u", i, handler->max_buffer_count);
+      SL_DEBUG_LOG_V2(DEBUG, "[buffer_manager] Dedicated Pool %u: Allocated = %u", i, handler->allocated_buffer_count);
 
       if (handler->allocated_buffer_count > 0) {
         CORE_ExitAtomic(state);
@@ -170,22 +174,29 @@ static bool sli_buffer_manager_are_all_pools_deallocated()
     }
   }
 
-  SL_DEBUG_LOG_V2(DEBUG, "Common Pools (Queue Size: %u):\r\n", common_mempool_queue.size);
+  SL_DEBUG_LOG_V2(DEBUG, "[buffer_manager] Common Pools (Queue Size: %u):\r\n", common_mempool_queue.size);
 
   // There shall be atleast one common pool, no need to check for null in first iteration.
   sli_buffer_manager_mempool_handler_t *current = common_mempool_queue.head;
 
+#ifdef SL_LOG_COMPONENT_BUFFER_MANAGER_DEBUG_ENABLED
   uint8_t pool_idx = 0;
+#endif
   do {
-    SL_DEBUG_LOG_V2(DEBUG, "Common Pool %u: Max Buffers = %u", pool_idx, current->max_buffer_count);
-    SL_DEBUG_LOG_V2(DEBUG, "Common Pool %u: Allocated = %u", pool_idx, current->allocated_buffer_count);
+    SL_DEBUG_LOG_V2(DEBUG, "[buffer_manager] Common Pool %u: Max Buffers = %u", pool_idx, current->max_buffer_count);
+    SL_DEBUG_LOG_V2(DEBUG,
+                    "[buffer_manager] Common Pool %u: Allocated = %u",
+                    pool_idx,
+                    current->allocated_buffer_count);
 
     if (current->allocated_buffer_count > 0) {
       CORE_ExitAtomic(state);
       return false;
     }
     current = (sli_buffer_manager_mempool_handler_t *)current->next.node;
+#ifdef SL_LOG_COMPONENT_BUFFER_MANAGER_DEBUG_ENABLED
     pool_idx++;
+#endif
   } while (current != common_mempool_queue.head && current != NULL);
 
   CORE_ExitAtomic(state);

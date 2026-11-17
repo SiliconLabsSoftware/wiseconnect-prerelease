@@ -69,6 +69,11 @@
 *                    Constants
 ******************************************************/
 
+// Set to 1 to enable NWP logging for debug. Disabled by default to avoid impacting power-save measurements.
+#ifndef ENABLE_NWP_LOGGING
+#define ENABLE_NWP_LOGGING 0
+#endif
+
 #define CERTIFICATE_INDEX 0
 
 #define SUBSCRIBE_TO_TOPIC  "aws_status_555"     //! Subscribe Topic to receive the message from cloud.
@@ -193,12 +198,24 @@ static const sl_wifi_device_configuration_t client_init_configuration = {
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
 #ifdef SLI_SI91X_MCU_INTERFACE
-                   .config_feature_bit_map = 0
+                   .config_feature_bit_map = (0
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              )
 #else
 #if ENABLE_NWP_POWER_SAVE
-                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP)
+                   .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              )
 #else
-                   .config_feature_bit_map = 0
+                   .config_feature_bit_map = (0
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              )
 #endif
 #endif
   },

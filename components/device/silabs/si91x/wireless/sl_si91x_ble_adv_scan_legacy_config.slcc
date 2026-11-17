@@ -59,3 +59,6 @@ template_contribution:
 define:
   - name: SL_SI91X_SI917_BLE_ADV_SCAN_TYPE
     value: '0'
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-legacy-ble-adv-scan-component

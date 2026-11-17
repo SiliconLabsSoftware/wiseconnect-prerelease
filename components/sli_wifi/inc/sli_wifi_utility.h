@@ -195,14 +195,22 @@ uint32_t sl_wifi_host_elapsed_time(uint32_t starting_timestamp);
 /* Converts firmware/NWP response (command + frame_status) to common sl_wifi_event_t. Common API for all devices. */
 sl_wifi_event_t sli_wifi_convert_event_to_sl_wifi_event(uint32_t command, uint16_t frame_status);
 
-sl_status_t sli_wifi_send_command_with_custom_desc(uint32_t command,
-                                                   sli_wifi_command_type_t command_type,
-                                                   const void *data,
-                                                   uint32_t data_length,
-                                                   sli_wifi_wait_period_t wait_period,
-                                                   void *sdk_context,
-                                                   void **response_buffer,
-                                                   uint8_t custom_host_desc);
+/**
+ * @brief Parameters for @ref sli_wifi_send_command_with_custom_desc.
+ * @details Pointer fields must remain valid for the duration of the call.
+ */
+typedef struct {
+  uint32_t command;
+  sli_wifi_command_type_t command_type;
+  const void *data;
+  uint32_t data_length;
+  sli_wifi_wait_period_t wait_period;
+  void *sdk_context;
+  void **response_buffer;
+  uint8_t custom_host_desc;
+} sli_wifi_custom_desc_command_params_t;
+
+sl_status_t sli_wifi_send_command_with_custom_desc(const sli_wifi_custom_desc_command_params_t *params);
 
 #ifndef __ZEPHYR__
 /***************************************************************************/ /**

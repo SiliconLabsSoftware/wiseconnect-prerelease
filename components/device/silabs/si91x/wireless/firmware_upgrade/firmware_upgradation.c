@@ -267,15 +267,17 @@ static sl_status_t sli_send_http_otaf_chunked(const sli_si91x_http_otaf_request_
 
     memcpy(packet_buffer->buffer, (http_otaf->buffer + offset), chunk_size);
 
-    status = sli_wifi_send_command_with_custom_desc(
-      SLI_WIFI_REQ_HTTP_OTAF,
-      SLI_WIFI_WLAN_CMD,
-      packet_buffer,
-      (sizeof(sli_si91x_http_otaf_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + chunk_size),
-      (rem_length == chunk_size) ? SLI_WIFI_WAIT_FOR_OTAF_RESPONSE : SLI_WIFI_WAIT_FOR_COMMAND_RESPONSE,
-      NULL,
-      NULL,
-      packet_identifier);
+    sli_wifi_custom_desc_command_params_t cmd_params = {
+      .command      = SLI_WIFI_REQ_HTTP_OTAF,
+      .command_type = SLI_WIFI_WLAN_CMD,
+      .data         = packet_buffer,
+      .data_length  = (sizeof(sli_si91x_http_otaf_request_t) - SLI_SI91X_HTTP_BUFFER_LEN + chunk_size),
+      .wait_period  = (rem_length == chunk_size) ? SLI_WIFI_WAIT_FOR_OTAF_RESPONSE : SLI_WIFI_WAIT_FOR_COMMAND_RESPONSE,
+      .sdk_context  = NULL,
+      .response_buffer  = NULL,
+      .custom_host_desc = packet_identifier,
+    };
+    status = sli_wifi_send_command_with_custom_desc(&cmd_params);
 
     if ((status != SL_STATUS_OK) && (status != SL_STATUS_SI91X_HTTP_GET_CMD_IN_PROGRESS)) {
       break;

@@ -37,6 +37,7 @@ include:
   - path: sli_net_common_utility.h
   - path: sli_net_constants.h
   - path: sli_net_types.h
+  - path: sl_net_log_helper.h
 - path: inc
   file_list:
   - path: sl_net_for_lwip.h

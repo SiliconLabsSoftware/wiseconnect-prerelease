@@ -15,3 +15,6 @@ provides:
   - name: si91x_ble_adv_scan_default_config
 conflicts:
   - name: si91x_ble_extended_adv_scan_config
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-default-ble-adv-scan-component

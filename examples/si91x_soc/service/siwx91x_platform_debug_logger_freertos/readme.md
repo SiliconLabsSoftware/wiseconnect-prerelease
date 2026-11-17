@@ -261,14 +261,43 @@ Follow these steps to build and test the SiWx91x Logger example:
    - Flash the image to the SiWx91x device.
 
 4. **Decode and view logger output**
-   - To convert the encoded logger stream into readable text format, run the Python decoding script located in the example project folder.
-   - Sample command for converting raw log events to readable text is  **python log_compact_decoder.py --m4-out m4_firmware.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 10**.
-      Ex Command "python log_compact_decoder.py --m4-out m4_firmware.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 10"
-   - `--port` may be `COM4`, `COM5`, or the matching host device path.
-   - These flags are optional. Omit them to keep the defaults:
+   - Run `log_compact_decoder.py` from **`components/device/silabs/si91x/mcu/drivers/service/sl_log/scripts/`** in the WiSeConnect SDK (see **`log_compact_decoder_user_guide.md`** there). Set **`--max-args`** to match **CONFIG_MAX_ARGS** in UC (default `3`).
+   - **`--nwp-out`** is optional — omit for **host (M4) logs only**; add **`--nwp-out nwp_logging_fw.out`** when NWP / captive-core logs are on the same stream (match the NWP image you built).
+
+   **IO Stream UART (VCOM backend)** — **`--app-out`**, **`--port`** (e.g. `COM4`):
+
+   Host only:
+
+     ```text
+     python log_compact_decoder.py --app-out app.out --port COM4 --max-args 3
+     ```
+
+   Host + NWP (optional **`--nwp-out`**):
+
+     ```text
+     python log_compact_decoder.py --app-out app.out --nwp-out nwp_logging_fw.out --port COM4 --max-args 3
+     ```
+
+   **IO Stream RTT backend** — **`--source rtt`**, **`--app-out`** (requires `pip install pylink-square`; no **`--port`**; **`--device`** optional, default `SiWG917M111M`):
+
+   Host only:
+
+     ```text
+     python log_compact_decoder.py --source rtt --app-out app.out --max-args 3
+     ```
+
+   Host + NWP (optional **`--nwp-out`**):
+
+     ```text
+     python log_compact_decoder.py --source rtt --app-out app.out --nwp-out nwp_logging_fw.out --max-args 3
+     ```
+
+   - Other optional flags (defaults shown in `--help`):
      - `--baud` — default `115200`. Use `921600` when NWP logging is enabled on UART.
+     - `--rtt-speed` — default `auto` for RTT; use `1000` (kHz) if J-Link connect fails.
      - `--event-width` — default `56`. Longer EVENT names are clipped with `...`; the full text stays in MESSAGE.
      - `--log-file` — also write the decoded lines to this path, as plain text.
+   - If the decoder shows only the header until logs arrive, press **Ctrl+C** for byte/record diagnostics. **`--component`** filters NWP lines only; host / M4 lines always print (see **`log_compact_decoder_user_guide.md`**).
 
 5. ## Console Output
 

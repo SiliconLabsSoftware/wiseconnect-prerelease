@@ -7,6 +7,7 @@
 #include "sli_command_engine.h"
 #include "sl_cmsis_utility.h"
 #include "sl_constants.h"
+#include "sl_utility_log_helper.h"
 #include "sl_core.h"
 #include "cmsis_compiler.h"
 
@@ -87,7 +88,7 @@ static bool rx_packet_identity_handler(const sli_queue_t *handle, const void *da
   const sli_command_engine_metadata_t *metadata = (const sli_command_engine_metadata_t *)data;
 
   SL_DEBUG_LOG_V2(DEBUG,
-                  "Comparing expected packetID : %u with packetId of queue node : %u..!\n",
+                  "[sl_utility] Comparing expected packetID : %u with packetId of queue node : %u..!\r\n",
                   *packet_id,
                   metadata->tx_info.packet_id);
   if (*packet_id == metadata->tx_info.packet_id) {
@@ -127,13 +128,13 @@ static sl_status_t sli_wifi_driver_wait_response_on_thread(
   do {
     uint32_t remaining_time_ticks = sli_wifi_driver_get_remaining_wait_ticks(elapsed_time_ticks, wait_period_ticks);
     SL_DEBUG_LOG_V2(DEBUG,
-                    "Waiting on Thread Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
+                    "[sl_utility] Waiting on Thread Events: 0x%lX on event id : 0x%X for queue 0x%X\r\n",
                     packet_type_info->sync_response_event,
                     (unsigned int)packet_type_info->sync_response_event_id,
                     (unsigned int)packet_type_info->sync_response_queue);
     events = osThreadFlagsWait(packet_type_info->sync_response_event, osFlagsWaitAny, remaining_time_ticks);
     SL_DEBUG_LOG_V2(DEBUG,
-                    "Got Thread Events: 0x%lX for queue 0x%X\n",
+                    "[sl_utility] Got Thread Events: 0x%lX for queue 0x%X\r\n",
                     events,
                     (unsigned int)packet_type_info->sync_response_queue);
 
@@ -205,7 +206,7 @@ static sl_status_t sli_wifi_driver_wait_response_on_event(
   do {
     uint32_t remaining_time_ticks = sli_wifi_driver_get_remaining_wait_ticks(elapsed_time_ticks, wait_period_ticks);
     SL_DEBUG_LOG_V2(DEBUG,
-                    "Waiting on Events: 0x%lX on event id : 0x%X for queue 0x%X\n",
+                    "[sl_utility] Waiting on Events: 0x%lX on event id : 0x%X for queue 0x%X\r\n",
                     packet_type_info->sync_response_event,
                     (unsigned int)packet_type_info->sync_response_event_id,
                     (unsigned int)packet_type_info->sync_response_queue);
@@ -220,7 +221,7 @@ static sl_status_t sli_wifi_driver_wait_response_on_event(
     }
 
     SL_DEBUG_LOG_V2(DEBUG,
-                    "Got Events: 0x%lX for queue 0x%X\n",
+                    "[sl_utility] Got Events: 0x%lX for queue 0x%X\r\n",
                     events,
                     (unsigned int)packet_type_info->sync_response_queue);
 

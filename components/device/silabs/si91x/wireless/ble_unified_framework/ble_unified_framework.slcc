@@ -47,3 +47,5 @@ template_contribution:
         - Pushing events to the event loop without first registering an event handler (the `event_id` declared in `ble_events`) — the dispatcher will silently drop the message.
     priority: -5301
 
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-ble-siwx91x-component-guides/configuring-the-ble-unified-framework-component

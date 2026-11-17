@@ -19,6 +19,7 @@ include:
   file_list:
     - path: sl_http_server.h
     - path: sl_http_server_types.h
+    - path: sl_http_server_log_helper.h
 
 requires:
 - name: sl_si91x_socket

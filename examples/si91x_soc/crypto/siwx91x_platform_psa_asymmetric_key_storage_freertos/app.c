@@ -54,6 +54,11 @@ static const osThreadAttr_t thread_attributes = {
   .priority   = osPriorityLow,
 };
 
+// Set to 1 to enable NWP logging for debug. Disabled by default to avoid impacting power-save measurements.
+#ifndef ENABLE_NWP_LOGGING
+#define ENABLE_NWP_LOGGING 0
+#endif
+
 static const sl_wifi_device_configuration_t client_configuration = {
   .boot_option = LOAD_NWP_FW,
   .mac_address = NULL,
@@ -66,7 +71,8 @@ static const sl_wifi_device_configuration_t client_configuration = {
                                        | SL_WIFI_FEAT_WPS_DISABLE
 #endif
                                        ),
-                   .tcp_ip_feature_bit_map     = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT),
+                   .tcp_ip_feature_bit_map =
+                     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
                    .custom_feature_bit_map     = (SL_WIFI_SYSTEM_CUSTOM_FEAT_EXTENSION_VALID),
                    .ext_custom_feature_bit_map = (
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -79,10 +85,14 @@ static const sl_wifi_device_configuration_t client_configuration = {
 #endif
                      ),
                    .bt_feature_bit_map         = 0,
-                   .ext_tcp_ip_feature_bit_map = 0,
+                   .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
                    .ble_feature_bit_map        = 0,
                    .ble_ext_feature_bit_map    = 0,
-                   .config_feature_bit_map     = 0 },
+                   .config_feature_bit_map     = (0
+#if ENABLE_NWP_LOGGING
+                                              | SL_SI91X_ENABLE_NWP_LOGGING
+#endif
+                                              ) },
   .ta_pool         = { .tx_ratio_in_buffer_pool = 0, .rx_ratio_in_buffer_pool = 0, .global_ratio_in_buffer_pool = 0 },
   .efuse_data_type = SL_SI91X_EFUSE_MFG_SW_VERSION,
   .nwp_fw_image_number = SL_SI91X_NWP_FW_IMAGE_NUMBER_0
