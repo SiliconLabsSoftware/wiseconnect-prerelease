@@ -272,17 +272,6 @@ SECTIONS
 	{% endif %}
 {%- endif %}
 
-{%- if crash_manager_enable and crash_manager_backend_ram %}
-   .ram_crash_data (NOLOAD) :
-	{
-		. = ALIGN(4);
-		__crash_data_start__ = .;
-		KEEP(*(.ram_crash_data*))
-		. = ALIGN(4);
-		__crash_data_end__ = .;			
-	} > ram 
-{%- endif %}
-
 {%- if flash_present %}
 	/* Copy/zero tables after exidx; LONG() forward-reference __etext, .data, .bss */
 	.copy.table :
@@ -511,7 +500,20 @@ SECTIONS
 	{
 	} > rom :empty
 {%- endif %}
-	
+
+{%- if sl_diag_enable %}
+	/* SL Diagnostic retained region; must stay out of the .bss zero table.
+	   Keep it with .bss/.stack so ram_pre_code stays one contiguous PT_LOAD. */
+	.sl_diag_retained (NOLOAD) : ALIGN(4)
+	{
+		KEEP(*(.sl_diag_retained.noinit))
+	{%- if flash_present %}
+	} > ram :ram_pre_code
+	{%- else %}
+	} > ram
+	{%- endif %}
+{%- endif %}
+
 	.bss (NOLOAD) :
 	{
 		. = ALIGN(4);

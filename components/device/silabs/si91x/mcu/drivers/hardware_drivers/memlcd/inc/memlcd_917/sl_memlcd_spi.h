@@ -110,6 +110,33 @@ sl_status_t sli_memlcd_spi_tx(const void *data, unsigned len);
 
 /***************************************************************************/ /**
  * @brief
+ *   Bit-reverse one byte for MEMLCD SPI wire format.
+ *
+ * @param[in] value
+ *   Byte in framebuffer bit order.
+ *
+ * @return
+ *   Bit-reversed byte for the Sharp SPI wire protocol.
+ *****************************************************************************/
+uint8_t sli_memlcd_rbit_byte(uint8_t value);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Transmit one prepared buffer and wait for completion.
+ *
+ * @param[in] data
+ *   Pointer to wire-format bytes to send.
+ * @param[in] len
+ *   Number of bytes to transmit.
+ *
+ * @return
+ *   SL_STATUS_OK if the transfer completed successfully. On failure a
+ *   different status code is returned specifying the error.
+ *****************************************************************************/
+sl_status_t sli_memlcd_spi_transfer_and_wait(const uint8_t *data, unsigned len);
+
+/***************************************************************************/ /**
+ * @brief
  *   Wait for the SPI interface to complete all the pending transfers.
  *
  * @param[in] handle

@@ -1,0 +1,36 @@
+id: si91x_diag
+label: SL Diagnostic SiWx91x Integration
+package: platform_siwx91x
+description: >
+  SiWx91x platform integration for the SL Diagnostic (sl_diag) service.
+  Latches the SiWx91x reset cause and publishes the watchdog bits of
+  MCU_FSM_WAKEUP_STATUS_REG so sl_diag can classify a watchdog reset at boot.
+  The device uptime comes from the weak sl_diag default, which reads the Sleep
+  Timer when it is installed. Selected automatically when sl_diag is installed
+  on a SiWx91x device.
+category: Device|Si91x|MCU|Service
+quality: evaluation
+metadata:
+  sbom:
+    license: Zlib
+provides:
+  - name: si91x_diag
+requires:
+  - name: sl_diag
+  - name: component_catalog
+define:
+  - name: RESET_WDOG0
+    value: 0x00000020UL
+  - name: RESET_WDOG1
+    value: 0x00000040UL
+  - name: RESET_WDOG2
+    value: 0x00000100UL
+  - name: RESET_WDOG3
+    value: 0x00000200UL
+root_path: components/device/silabs/si91x/mcu/drivers/service/sl_diag
+include:
+  - path: inc
+    file_list:
+      - path: sli_si91x_diag.h
+source:
+  - path: src/sl_si91x_diag.c

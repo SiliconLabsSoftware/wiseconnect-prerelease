@@ -33,6 +33,13 @@
 #endif
 #include "rsi_rtc.h"
 #include "sl_log_helper.h"
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+#include "sl_diag.h"
+#include "sli_crash_capture.h"
+#endif
 /*******************************************************************************
  ***************************  DEFINES / MACROS   ********************************
  ******************************************************************************/
@@ -51,15 +58,58 @@
  *************************** LOCAL VARIABLES   *******************************
  ******************************************************************************/
 static watchdog_timer_callback_t timeout_callback_function_pointer = NULL;
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+// Generation of the watchdog-warning record sealed by the IRQ handler. Only
+// valid while warning_record_pending is true.
+static volatile bool warning_record_pending        = false;
+static volatile uint32_t warning_record_generation = 0u;
+#endif
 
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************
  ******************************************************************************/
 void WATCHDOG_TIMER_IRQHandler(void);
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+static void watchdog_seal_warning_record(uint32_t irq_status);
+#endif
 
 /*******************************************************************************
  **********************  Local Function Definition****************************
  ******************************************************************************/
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+/*******************************************************************************
+* @brief: Seals a watchdog-warning record and tracks it if it is new
+*
+* @details:
+* The SL_DIAG overwrite policy can keep an earlier record, such as a crash
+* record of a previous boot, or count this warning as a repeat of it. Only a
+* record with a new generation belongs to this warning, so only that record
+* may be cleared by sli_si91x_watchdog_discard_warning_record().
+*******************************************************************************/
+static void watchdog_seal_warning_record(uint32_t irq_status)
+{
+  sl_diag_info_t info;
+  bool had_record;
+  uint32_t previous_generation = 0u;
+
+  // sl_diag_get_info() zeroes info on failure, but generation is meaningful
+  // only when the call reports a record.
+  had_record = (sl_diag_get_info(&info) == SL_STATUS_OK);
+  if (had_record) {
+    previous_generation = info.generation;
+  }
+
+  sli_crash_capture_on_watchdog_warning(irq_status);
+
+  if (sl_diag_get_info(&info) != SL_STATUS_OK) {
+    return;
+  }
+  if (!had_record || (info.generation != previous_generation)) {
+    warning_record_generation = info.generation;
+    warning_record_pending    = true;
+  }
+}
+#endif
 
 /*******************************************************************************
 ***********************  Global function Definitions *************************
@@ -434,6 +484,48 @@ sl_watchdog_timer_version_t sl_si91x_watchdog_get_version()
   version.minor   = WATCHDOG_TIMER_MINOR_VERSION;
   return version;
 }
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+/*******************************************************************************
+* @brief: Clears the watchdog-warning record on restart when there is one slot
+*
+* @details:
+* With one diagnostic slot, clears the record only while it is still the one
+* sealed by the IRQ handler, so a record of another incident is never lost.
+* sl_diag_clear() has no generation argument and invalidates every slot, so
+* the generation is read again with interrupts masked and the clear runs only
+* when it still matches. A capture that could commit in that window is a
+* fault, which resets the device instead of returning here. A clear that
+* returns busy or abort, or a record that is still being written, stays
+* pending and the next restart retries it. With more than one slot the other
+* slot may hold an earlier record, so the warning record is kept.
+*******************************************************************************/
+void sli_si91x_watchdog_discard_warning_record(void)
+{
+#if (SL_DIAG_SLOT_COUNT == 1)
+  sl_diag_info_t info;
+  sl_status_t status;
+  uint32_t primask;
+
+  if (!warning_record_pending) {
+    return;
+  }
+  primask = __get_PRIMASK();
+  __disable_irq();
+  status = sl_diag_get_info(&info);
+  if (status == SL_STATUS_NOT_FOUND) {
+    warning_record_pending = false;
+  } else if ((status == SL_STATUS_OK) && (info.generation != warning_record_generation)) {
+    warning_record_pending = false;
+  } else if ((status == SL_STATUS_OK) && (sl_diag_clear(SL_DIAG_CLEAR_RECORD) == SL_STATUS_OK)) {
+    warning_record_pending = false;
+  }
+  __set_PRIMASK(primask);
+#else
+  warning_record_pending = false;
+#endif
+}
+#endif
+
 /*******************************************************************************
 * Interrupt handler for watchdog-timer
 *
@@ -442,8 +534,20 @@ sl_watchdog_timer_version_t sl_si91x_watchdog_get_version()
 *******************************************************************************/
 void WATCHDOG_TIMER_IRQHandler(void)
 {
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+  uint8_t wdt_irq_status = RSI_WWDT_GetIntrStatus();
+#endif
   // Clears interrupt
   RSI_WWDT_IntrClear();
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+  // Same point as the platform WDOG warning IRQ: the watchdog interrupt is
+  // pending. The timeout callback still runs after the seal.
+  if (wdt_irq_status != 0u) {
+    watchdog_seal_warning_record((uint32_t)wdt_irq_status);
+  }
+#endif
   // calling the timeout callback function
-  timeout_callback_function_pointer();
+  if (timeout_callback_function_pointer != NULL) {
+    timeout_callback_function_pointer();
+  }
 }

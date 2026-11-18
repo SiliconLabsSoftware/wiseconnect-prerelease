@@ -65,8 +65,8 @@ sl_status_t sli_routing_utility_route_queue_node(sli_routing_table_t *routing_ta
 SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SLI_ROUTING_UTILITY, SL_CODE_CLASS_TIME_CRITICAL)
 sl_status_t sli_routing_utility_route_packet(sli_routing_table_t *routing_table,
                                              uint16_t packet_type,
-                                             const void *packet,
+                                             void *packet,
                                              uint16_t packet_size,
-                                             const void *context);
+                                             void *context);
 
 #endif

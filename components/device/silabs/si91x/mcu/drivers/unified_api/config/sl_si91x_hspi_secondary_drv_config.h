@@ -27,6 +27,7 @@
 // <i> Default: 1024
 // <i> This option is available only if DMA is enabled
 #define SL_HSPI_DMA_BLOCK_SIZE 1024
+// </e>
 // <o SL_HSPI_TX_BUFFER_SIZE> TX Size <0-4096>
 // <i> Default: 1024
 // <i> This option is available only if DMA is enabled
@@ -35,8 +36,6 @@
 // <i> Default: 1024
 // <i> This option is available only if DMA is enabled
 #define SL_HSPI_RX_BUFFER_SIZE 1024
-// </e>
-
 // </h>
 // <<< end of configuration section >>>
 

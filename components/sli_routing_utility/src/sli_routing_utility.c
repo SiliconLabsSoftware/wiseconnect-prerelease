@@ -79,9 +79,9 @@ sl_status_t sli_routing_utility_route_queue_node(sli_routing_table_t *routing_ta
 
 sl_status_t sli_routing_utility_route_packet(sli_routing_table_t *routing_table,
                                              uint16_t packet_type,
-                                             const void *packet,
+                                             void *packet,
                                              uint16_t packet_size,
-                                             const void *context)
+                                             void *context)
 {
   sl_status_t status = SL_STATUS_FAIL;
 
@@ -94,19 +94,13 @@ sl_status_t sli_routing_utility_route_packet(sli_routing_table_t *routing_table,
 
   // Call the destination packet handler if it is not NULL
   if (entry->destination_packet_handler != NULL) {
-    status =
-      entry->destination_packet_handler((void *)packet, packet_size, entry->packet_status_handler, (void *)context);
-    if (PRINT_ERROR_LOGS) {
-      if (status == SL_STATUS_IN_PROGRESS) {
-        return status;
-      }
-    }
+    status = entry->destination_packet_handler(packet, packet_size, entry->packet_status_handler, context);
     VERIFY_STATUS_AND_RETURN(status);
   }
 
   // Enqueue the packet if the queue handle is not NULL
   if (entry->queue_handle != NULL) {
-    status = sli_queue_manager_enqueue(entry->queue_handle, (void *)packet);
+    status = sli_queue_manager_enqueue(entry->queue_handle, packet);
     VERIFY_STATUS_AND_RETURN(status);
 
     // Set the event flags

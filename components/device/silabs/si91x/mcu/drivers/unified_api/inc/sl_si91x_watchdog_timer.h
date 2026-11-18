@@ -41,10 +41,25 @@ extern "C" {
 #include "rsi_wwdt.h"
 #include "base_types.h"
 #include "sl_log_helper.h"
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT)
+#include "sl_diag.h"
+#endif
 /** @cond DO_NOT_INCLUDE_WITH_DOXYGEN */
 #ifndef UNUSED_VARIABLE
 #define UNUSED_VARIABLE(x) (void)(x)
 #endif // UNUSED_VARIABLE
+
+// SL_DIAG_ENABLE is false when SL_DIAG_PROFILE is Off, and the record APIs are
+// compiled out. Seal and clear run only while Crash Capture can store a record.
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+// Internal: with one diagnostic slot, clears the watchdog-warning record sealed
+// by the WDT IRQ handler once the timer has been restarted. With more than one
+// slot the record is kept, because sl_diag_clear() would drop every slot.
+void sli_si91x_watchdog_discard_warning_record(void);
+#endif
 /** @endcond */
 
 /***************************************************************************/
@@ -211,6 +226,14 @@ sl_status_t sl_si91x_watchdog_set_configuration(watchdog_timer_config_t *timer_c
  * @details This API registers a callback function to be called when the Watchdog Timer timeout interrupt occurs.
  *          Registering the callback also enables its interrupts. Before registering a new callback, the user must 
  *          unregister any previously registered callback using the \ref sl_si91x_watchdog_unregister_timeout_callback function.
+ * 
+ * @note With the Crash Capture component and SL_DIAG_PROFILE not Off, the watchdog-warning record is sealed
+ *       in the timeout interrupt, so it is captured only after a callback is registered. Register it before
+ *       the first watchdog timeout, which the Watchdog Manager does in its init. With one diagnostic slot,
+ *       \ref sl_si91x_watchdog_restart_timer discards that record after the interrupt, so only an unfed
+ *       timeout keeps it. With more than one slot the restart leaves the record in place, because
+ *       sl_diag_clear() would also drop the other slot. With the profile Off, the interrupt does not seal
+ *       or clear a record.
  * 
  * @param[in] on_timeout_callback Function pointer to the callback function to be called when the timer timeout interrupt occurs.
  * 
@@ -429,6 +452,12 @@ __STATIC_INLINE void sl_si91x_watchdog_stop_timer(void)
  * 
  * @details This API sets the restart bit of the Watchdog Timer when it is already enabled.
  *          It should be used for an already started WDT timer, not for starting a stopped timer.
+ *          With Crash Capture installed, SL_DIAG_PROFILE not Off, and one diagnostic slot,
+ *          it also clears the watchdog-warning record that the timeout interrupt sealed, when
+ *          that record is still the one from this warning. The restart prevents the watchdog
+ *          reset, so that record would describe a reset that did not happen. With more than
+ *          one slot the warning record is left in place, because sl_diag_clear() would also
+ *          drop the other slot. With the profile Off, the restart only kicks the timer.
  * 
  * @pre Pre-conditions:
  *      - \ref sl_si91x_watchdog_init_timer 
@@ -437,6 +466,9 @@ __STATIC_INLINE void sl_si91x_watchdog_stop_timer(void)
 __STATIC_INLINE void sl_si91x_watchdog_restart_timer(void)
 {
   RSI_WWDT_ReStart(MCU_WDT);
+#if defined(SL_CATALOG_CRASH_CAPTURE_COMPONENT_PRESENT) && SL_DIAG_ENABLE
+  sli_si91x_watchdog_discard_warning_record();
+#endif
 }
 
 /***************************************************************************/

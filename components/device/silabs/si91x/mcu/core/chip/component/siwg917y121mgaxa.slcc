@@ -62,6 +62,7 @@ provides:
 - name: device_supports_psram
 - name: device_has_mpu
 - name: device_is_module
+- name: device_has_dwt
 requires:
 - name: sl_si91x_agents_md
 - name: rsilib_chip

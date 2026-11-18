@@ -1,0 +1,81 @@
+project_name: siwx91x_platform_diag_crash_capture
+package: platform_siwx91x_app
+description: 'This example project demonstrates SL Diagnostic (sl_diag) with Crash Capture on the
+
+  SiWx91x SoC in a bare-metal configuration. Press BTN0 to raise a HardFault. Crash
+
+  Capture seals the CPU state into sl_diag and resets; the next boot prints the decoded
+
+  record and a raw hex dump over VCOM. The default profile is Crash Basic; change
+
+  SL_DIAG_PROFILE in the SL Diagnostic UC screen for Standard or higher.
+
+  '
+category: example|service
+quality: evaluation
+label: SiWx91x Platform - SL Diagnostic Crash Capture
+component:
+- id: sl_main
+- id: sl_diag
+- id: si91x_crash_capture
+- id: syscalls
+- id: si91x_memory_default_config
+- id: si91x_log
+- id: si91x_log_iostream_formatted
+- id: iostream_si91x
+- id: iostream_retarget_stdio
+- id: iostream_uart_si91x
+  instance:
+  - vcom
+- id: sl_si91x_button_917
+  instance:
+  - btn0
+source:
+- path: app.c
+- path: diag_crash_capture_app.c
+include:
+- path: .
+  file_list:
+  - path: app.h
+  - path: diag_crash_capture_app.h
+toolchain_settings:
+- option: gcc_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: llvm_compiler_option
+  value: -Wall -Werror -Wno-error=deprecated-declarations
+configuration:
+- name: SL_DIAG_PROFILE
+  value: SL_DIAG_PROFILE_CRASH_BASIC
+- name: SL_BUTTON_CONFIG_BTN0_INTR
+  value: FALL_EDGE_INTERRUPT
+define:
+- name: SYSCALLS_WRITE
+ui_hints:
+  highlight:
+  - path: readme.md
+    focus: true
+readme:
+- path: readme.md
+filter:
+- name: Device Type
+  value:
+  - SoC
+- name: MCU
+  value:
+  - 32-bit MCU
+- name: Level
+  value:
+  - Beginner
+- name: Wireless Technology
+  value:
+  - Wi-Fi
+post_build:
+  profile: wiseconnect_soc
+sdk_extension:
+- id: wiseconnect3_sdk
+  vendor: silabs
+  version: 4.2.0
+sdk:
+  id: simplicity_sdk
+  vendor: silabs
+  version: 2026.12.0

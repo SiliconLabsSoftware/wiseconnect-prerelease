@@ -53,6 +53,8 @@ component_path:
  - path: components/device/silabs/si91x/mcu/drivers/service/secure_storage/component
  - path: components/device/silabs/si91x/mcu/drivers/service/sensorhub/component
  - path: components/device/silabs/si91x/mcu/drivers/service/sl_log/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/sl_crash_capture/component
+ - path: components/device/silabs/si91x/mcu/drivers/service/sl_diag/component
  - path: components/device/silabs/si91x/mcu/drivers/service/sl_si91x_etm/component
  - path: components/device/silabs/si91x/mcu/drivers/service/sleeptimer/component
  - path: components/device/silabs/si91x/mcu/drivers/service/wdt_manager/component

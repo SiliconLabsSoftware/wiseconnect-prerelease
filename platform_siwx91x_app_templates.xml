@@ -514,7 +514,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/siwx91x_platform_mic/siwx91x_platform_mic.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -724,7 +724,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/siwx91x_platform_rgb_led/siwx91x_platform_rgb_led.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -829,7 +829,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/siwx91x_platform_psram_code_classifier/siwx91x_platform_psram_code_classifier.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4339a brd4340a brd4342a brd4343q brd4343s brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4339a brd4340a brd4342a brd4343q brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -919,7 +919,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/siwx91x_platform_psram_blinky_freertos/siwx91x_platform_psram_blinky_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4339a brd4340a brd4342a brd4343q brd4343s brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2708a brd2911a brd4339a brd4340a brd4342a brd4343q brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1186,6 +1186,21 @@
     <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_debug_logger_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="sl_si91x_diag_crash_capture" label="SiWx91x Platform - SL Diagnostic Crash Capture" description="Demonstrates SL Diagnostic (sl_diag) with Crash Capture. Press BTN0 to raise a HardFault; the next boot prints the retained crash record.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_diag_crash_capture/siwx91x_platform_diag_crash_capture.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4339d brd4340b brd4342a brd4343q brd4343s brd9084a brd9084b brd9084c brd9084d" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="example|service" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/si91x_soc/service/siwx91x_platform_diag_crash_capture/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|SiWx91x Platform Project\ Difficulty|Beginner" />
+  </descriptors>
   <descriptors name="sl_si91x_littlefs_file_operations" label="SiWx91x Platform - LittleFS QSPI File Operations" description="Demonstrates the usage of configures QSPI to perform basic file operations on the flash memory.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -1325,7 +1340,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/si91x_soc/service/siwx91x_platform_nvm3_common_flash_freertos/siwx91x_platform_nvm3_psram_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4342a brd4340a brd4339a brd4343q brd4343s brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4342a brd4340a brd4339a brd4343q brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1340,7 +1355,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/si91x_soc/siwx91x_platform_dev_kit_sensors_freertos/siwx91x_platform_dev_kit_sensors_freertos.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1475,7 +1490,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/sl_si91x_empty_c/sl_si91x_empty_c_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
     <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1490,7 +1505,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/snippets/sl_si91x_empty_cpp/sl_si91x_empty_cpp_ncp.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4180a brd4180b brd4186c brd4120a" />
     <properties key="partCompatibility" value=" mcu.arm.efr32.mg21.* mcu.arm.efr32.mg21.* mcu.arm.efr32.mg24.* mcu.arm.efr32.mg26.* mcu.arm.efr32.fg25.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
@@ -1685,7 +1700,7 @@
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
     <properties key="projectFilePaths" value="examples/si91x_soc/peripheral/siwx91x_platform_psram_driver/siwx91x_platform_psram_driver.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4339a brd4340a brd4342a brd4343q brd4343s brd4339d" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4339a brd4340a brd4342a brd4343q brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917y110lgnba.* .*siwg917y110lgnxa.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y111mgaxa.* .*siwg917y110lgaba.* .*siwg917y110lgaxa.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />

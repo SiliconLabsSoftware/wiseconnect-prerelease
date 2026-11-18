@@ -1,98 +1,98 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <demos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.silabs.com/ss/Demo.ecore">
-  <demo name="brd2605a.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd2605a.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd2605a" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd2605a/wifi_out_of_box_demo_soc-brd2605a.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd2605a/wifi_ble_soc_out_of_box_demo_freertos-brd2605a.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
-  <demo name="brd2605b.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd2605b.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd2605b" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd2605b/wifi_out_of_box_demo_soc-brd2605b.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd2605b/wifi_ble_soc_out_of_box_demo_freertos-brd2605b.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
-  <demo name="brd4338a.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd4338a.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd4338a" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4338a/wifi_out_of_box_demo_soc-brd4338a.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4338a/wifi_ble_soc_out_of_box_demo_freertos-brd4338a.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
-  <demo name="brd4342a.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd4342a.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd4342a" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4342a/wifi_out_of_box_demo_soc-brd4342a.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4342a/wifi_ble_soc_out_of_box_demo_freertos-brd4342a.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
-  <demo name="brd4343a.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd4343a.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd4343a" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4343a/wifi_out_of_box_demo_soc-brd4343a.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4343a/wifi_ble_soc_out_of_box_demo_freertos-brd4343a.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
-  <demo name="brd4343c.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd4343c.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd4343c" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4343c/wifi_out_of_box_demo_soc-brd4343c.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4343c/wifi_ble_soc_out_of_box_demo_freertos-brd4343c.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
-  <demo name="brd2708a.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd2708a.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd2708a" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd2708a/wifi_out_of_box_demo_soc-brd2708a.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd2708a/wifi_ble_soc_out_of_box_demo_freertos-brd2708a.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
-  <demo name="brd4343s.demo.wifi_out_of_box_demo_soc" label="Wi-Fi Coex - Out of Box Demo (SoC)">
+  <demo name="brd4343s.demo.wifi_ble_soc_out_of_box_demo_freertos" label="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS">
     <description>This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.</description>
-    <property key="demos.blurb" value="Wi-Fi Coex - Out of Box Demo (SoC)" />
+    <property key="demos.blurb" value="Wi-Fi Bluetooth LE - SoC Out of Box Demo FreeRTOS" />
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd4343s" />
-    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4343s/wifi_out_of_box_demo_soc-brd4343s.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
-    <property key="readmeFiles" value="examples/snippets/wlan_ble/out_of_box_demo/readme.md" />
+    <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4343s/wifi_ble_soc_out_of_box_demo_freertos-brd4343s.rps" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
+    <property key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_out_of_box_demo_freertos/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Intermediate" />
     <property key="core.quality" value="PRODUCTION" />
   </demo>
@@ -102,8 +102,8 @@
     <property key="core.partCompatibility" value=".*" />
     <property key="core.boardCompatibility" value="brd4338a" />
     <property key="demos.imageFile" value="asset://extension.wiseconnect_4.2.0/multi_protocol_siwx91x_app/brd4338a/wireless_test_soc-brd4338a.rps" />
-    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.77.rps" />
-    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.77" />
+    <property key="demos.firmwareFile" value="asset://extension.wiseconnect_4.2.0/connectivity_firmware/standard/SiWG917-B.2.17.6.0.0.82.rps" />
+    <property key="demos.firmwareFile.version" value="1711.2.17.6.0.0.82" />
     <property key="readmeFiles" value="examples/snippets/wireless_test/readme.md" />
     <property key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
     <property key="core.quality" value="PRODUCTION" />

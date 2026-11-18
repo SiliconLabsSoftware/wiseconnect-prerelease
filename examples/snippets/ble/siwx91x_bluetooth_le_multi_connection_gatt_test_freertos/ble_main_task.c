@@ -718,6 +718,11 @@ void rsi_ble_simple_central_on_adv_report_event(rsi_ble_event_adv_report_t *adv_
     return;
   }
 
+  //! Drop advertising reports once the maximum peripheral connections are reached
+  if (peripheral_task_instances >= RSI_BLE_MAX_NBR_PERIPHERALS) {
+    return;
+  }
+
   rsi_6byte_dev_address_to_ascii(remote_dev_addr, (uint8_t *)adv_report->dev_addr);
 
 #if (CONNECT_OPTION == CONN_BY_NAME)
@@ -756,9 +761,8 @@ void rsi_ble_simple_central_on_adv_report_event(rsi_ble_event_adv_report_t *adv_
       rsi_ble_app_set_event(RSI_APP_EVENT_ADV_REPORT);
     } else {
       //! wrong state
-      SL_DEBUG_LOG_V2(ERROR, "Connection identifier is wrong\r\n");
-      while (1)
-        ;
+      SL_DEBUG_LOG_V2(ERROR, "No free connection slot, ignoring adv report\r\n");
+      return;
     }
   }
   return;

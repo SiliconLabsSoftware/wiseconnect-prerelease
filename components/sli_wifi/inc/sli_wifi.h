@@ -285,8 +285,8 @@ sl_status_t sli_wifi_send_mac_data_frame_11ax(const sl_wifi_transmitter_test_bas
 /**
  * @brief Route an already-formed Wi-Fi data packet to firmware.
  *
- * @param[in] data Pointer to packet bytes; must not be modified through this pointer by this API
- *            (matches @c sli_routing_utility_route_packet's @c const void * packet parameter).
+ * @param[in] data Pointer to packet bytes passed to the routing path (handler/enqueue may mutate).
+ *            Matches @c sli_routing_utility_route_packet's @c void * packet parameter.
  *
  * @note Buffer-ownership contract: callers retain ownership of @a data on all return paths.
  *       On the Si91x port, @c sli_routing_utility_route_packet does NOT free the packet on success,
@@ -295,7 +295,7 @@ sl_status_t sli_wifi_send_mac_data_frame_11ax(const sl_wifi_transmitter_test_bas
  *       @ref sli_wifi_send_mac_data_frame_11bgn / @ref sli_wifi_send_mac_data_frame_11ax and the
  *       SiWx3xx 11ac/11be chunk-builders.
  */
-sl_status_t sli_wifi_send_data_packet(const void *data, uint16_t length, const void *context);
+sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, void *context);
 /**
  * @brief Send IP address information to firmware.
  *

@@ -614,7 +614,7 @@ sl_status_t sli_convert_si91x_status_to_sl_status(si91x_status_t si91x_status)
   }
 }
 
-sl_status_t sli_wifi_send_data_packet(const void *data, uint16_t length, const void *context)
+sl_status_t sli_wifi_send_data_packet(void *data, uint16_t length, void *context)
 {
   // Route (send) the packet via routing utility (may be async)
   sl_status_t status = sli_routing_utility_route_packet(&wifi_command_engine_routing_table,

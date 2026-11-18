@@ -46,6 +46,7 @@ provides:
 - name: device_arm
 - name: cortexm4
 - name: armv7em
+- name: device_has_dwt
 - name: device_has_stacked_flash
 - name: device_has_mvp
 - name: device_compute_mvp

@@ -1,0 +1,46 @@
+id: si91x_crash_capture
+label: Crash Capture SiWx91x
+package: platform_siwx91x
+description: >
+  SiWx91x Crash Capture. This is the Crash Capture implementation for SiWx91x.
+  Install this component instead of the platform Crash Capture component.
+  It seals faults, asserts, and watchdog warnings through sl_diag and resets
+  through the SiWx91x soft-reset sequence. Watchdog reset classification comes
+  from si91x_diag, so it is present when sl_diag is installed without this
+  component. Requires sl_diag with a profile other than Off.
+category: Device|Si91x|MCU|Service
+quality: evaluation
+metadata:
+  sbom:
+    license: Zlib
+provides:
+  - name: si91x_crash_capture
+  - name: crash_capture
+requires:
+  - name: sl_common
+  - name: sl_diag
+  - name: si91x_diag
+  - name: sl_si91x_soc_soft_reset
+  - name: log_none
+  - name: component_catalog
+  - name: cmsis_core
+  - name: device
+  - name: sleeptimer_si91x
+root_path: components/device/silabs/si91x/mcu/drivers/service/sl_crash_capture
+include:
+  - path: inc
+    file_list:
+      - path: sli_crash_capture.h
+source:
+  - path: src/sli_si91x_crash_capture.c
+template_contribution:
+  - name: event_handler
+    value:
+      event: service_init
+      include: sli_crash_capture.h
+      handler: sli_crash_capture_init
+    priority: 10000
+  - name: component_catalog
+    value: crash_capture_component
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/

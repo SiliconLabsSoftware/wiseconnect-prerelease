@@ -41,6 +41,14 @@
 #include "sli_wifi_constants.h"
 #include "sli_wifi.h"
 #include "sli_wifi_utility.h"
+#if defined(SL_CATALOG_LOG_COMPONENT_PRESENT) && defined(__has_include)
+#if __has_include("sl_log_proprietary_config.h")
+#include "sl_log_proprietary_config.h"
+#endif
+#endif
+#if ((!defined(SLI_SI91X_MCU_INTERFACE)) && (defined(SL_CATALOG_LOG_COMPONENT_PRESENT)))
+#include "cmsis_os2.h"
+#endif
 
 sl_log_level_t sl_log_utility_component_level = SL_LOG_UTILITY_COMPONENT_LEVEL;
 
@@ -51,7 +59,6 @@ sl_log_level_t sl_log_utility_component_level = SL_LOG_UTILITY_COMPONENT_LEVEL;
 #endif
 
 #if SLI_UTILITY_NCP_SL_LOG_ENABLED
-#include "cmsis_os2.h"
 /** Read index for sl_log_backend_write when writing one stacked sl_log_event_t (not a ring slot). */
 #define SLI_NWP_LOG_BACKEND_READ_INDEX (0U)
 /** Number of events passed to sl_log_backend_write per call when draining NWP RX records. */
@@ -59,12 +66,6 @@ sl_log_level_t sl_log_utility_component_level = SL_LOG_UTILITY_COMPONENT_LEVEL;
 
 /* sli_nwp_log_event_t (NWP wire format) is defined once in sl_utility.h. */
 
-#endif
-
-#if defined(SL_CATALOG_LOG_COMPONENT_PRESENT) && defined(__has_include)
-#if __has_include("sl_log_proprietary_config.h")
-#include "sl_log_proprietary_config.h"
-#endif
 #endif
 
 /* NWP component selection is supported only in a DEBUG compile-time build whose

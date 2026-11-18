@@ -46,6 +46,8 @@ requires:
   - name: sl_bjt_temperature_sensor 
   - name: sl_clock_manager
   - name: code_classification
+  - name: si91x_diag
+    condition: [sl_diag]
 template_contribution:
   - name: code_classification_components
     value: rsilib_chip

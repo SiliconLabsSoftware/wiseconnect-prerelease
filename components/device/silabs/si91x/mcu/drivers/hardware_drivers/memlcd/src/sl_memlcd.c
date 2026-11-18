@@ -29,6 +29,7 @@
  ******************************************************************************/
 
 #include "sl_memlcd.h"
+#include "sl_memlcd_display.h"
 #include "sl_sleeptimer.h"
 #include "em_device.h"
 #include "sl_ulp_timer_instances.h"
@@ -37,8 +38,8 @@
 #include "sl_si91x_peripheral_gpio.h"
 
 /*******************************************************************************
- ***************************  DEFINES / MACROS ********************************
- ******************************************************************************/
+  ***************************  DEFINES / MACROS ********************************
+  ******************************************************************************/
 
 #define SL_MEMLCD_SPI_CS_PORT RTE_MEMLCD_CS_PORT
 #define SL_MEMLCD_SPI_CS_PIN  RTE_MEMLCD_CS_PIN
@@ -56,9 +57,31 @@
 
 #define EGPIO_ULP_PORT 4
 
+#define SLI_MEMLCD_ROW_BYTES   ((SL_MEMLCD_DISPLAY_WIDTH * SL_MEMLCD_DISPLAY_BPP) / 8U)
+#define SLI_MEMLCD_DRAW_TX_MAX (2U + (SL_MEMLCD_DISPLAY_HEIGHT * (SLI_MEMLCD_ROW_BYTES + 2U)))
+
+static uint8_t draw_tx_buf[SLI_MEMLCD_DRAW_TX_MAX];
+
+static void sli_memlcd_tx_put16(uint8_t **dst, uint16_t value)
+{
+  const uint8_t *bytes = (const uint8_t *)&value;
+
+  *(*dst)++ = sli_memlcd_rbit_byte(bytes[0]);
+  *(*dst)++ = sli_memlcd_rbit_byte(bytes[1]);
+}
+
+static void sli_memlcd_tx_put_bytes(uint8_t **dst, const uint8_t *src, unsigned int len)
+{
+  unsigned int i;
+
+  for (i = 0U; i < len; i++) {
+    *(*dst)++ = sli_memlcd_rbit_byte(src[i]);
+  }
+}
+
 /*******************************************************************************
- ************************ Global function Prototypes ***************************
- ******************************************************************************/
+  ************************ Global function Prototypes ***************************
+  ******************************************************************************/
 
 #if defined(SL_MEMLCD_EXTCOMIN_PORT)
 typedef struct sl_sleeptimer_timer_handle sl_sleeptimer_timer_handle_t;
@@ -68,26 +91,35 @@ static void extcomin_toggle(sl_sleeptimer_timer_handle_t *handle, void *data);
 #endif
 
 static void delay_us(uint16_t time_us);
+static void memlcd_cs_as_gpio(void);
 
 /*******************************************************************************
- **************************** Global Variables *********************************
- ******************************************************************************/
+  **************************** Global Variables *********************************
+  ******************************************************************************/
 
 /** Memory lcd instance. This variable will be initialized in the
- *  @ref sl_memlcd_configure() function. */
+  *  @ref sl_memlcd_configure() function. */
 static sl_memlcd_t memlcd_instance;
 struct sl_memlcd_t *memlcd_post_wakeup_handle;
 
 /** Flag to monitor is this driver has been initialized. The memlcd_instance
- *  is only valid after initialized=true. */
+  *  is only valid after initialized=true. */
 static bool initialized = false;
 
+/* Restore MEMLCD CS as GPIO after SSI init (RTE pin, ULP port). */
+static void memlcd_cs_as_gpio(void)
+{
+  sl_gpio_set_pin_mode(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN, SL_GPIO_MODE_0, 0);
+  sl_si91x_gpio_set_pin_direction(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN, GPIO_OUTPUT);
+  sl_gpio_clear_pin_output(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN);
+}
+
 /*******************************************************************************
- * Function to generate delay
- *
- * @param time_us (uint16_t) time in second
- * @return none
- ******************************************************************************/
+  * Function to generate delay
+  *
+  * @param time_us (uint16_t) time in second
+  * @return none
+  ******************************************************************************/
 static void delay_us(uint16_t time_us)
 {
   uint32_t start_time;
@@ -104,15 +136,10 @@ static void delay_us(uint16_t time_us)
 
 sl_status_t sl_memlcd_configure(struct sl_memlcd_t *device)
 {
-  /* Initialize the SPI bus. */
-  sli_memlcd_spi_init(device->spi_freq);
+  sl_status_t status;
 
-  /* Setup GPIOs */
-  sl_gpio_set_pin_mode(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN, SL_GPIO_MODE_0, 0);
-  // Set output direction
-  sl_si91x_gpio_set_pin_direction(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN, GPIO_OUTPUT);
-  //clearing the GPIO pin
-  sl_gpio_clear_pin_output(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN);
+  /* Setup GPIOs before SPI init so CS/EXTCOMIN are stable at boot. */
+  memlcd_cs_as_gpio();
 
 #if defined(SL_MEMLCD_EXTCOMIN_PORT)
 #if (SL_SI91X_ACX_MODULE == 1)
@@ -134,6 +161,15 @@ sl_status_t sl_memlcd_configure(struct sl_memlcd_t *device)
   memlcd_instance = *device;
   initialized     = true;
   sl_memlcd_power_on(device, true);
+
+  /* Initialize SPI after display power/EXTCOMIN are up. */
+  status = sli_memlcd_spi_init(device->spi_freq);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+  /* SSI init may mux CS onto the block; restore GPIO CS. */
+  memlcd_cs_as_gpio();
+
   sl_memlcd_clear(device);
 
   return SL_STATUS_OK;
@@ -142,6 +178,7 @@ sl_status_t sl_memlcd_configure(struct sl_memlcd_t *device)
 sl_status_t sl_memlcd_refresh(const struct sl_memlcd_t *device)
 {
   sli_memlcd_spi_init(device->spi_freq);
+  memlcd_cs_as_gpio();
   return SL_STATUS_OK;
 }
 
@@ -212,8 +249,7 @@ sl_status_t sl_memlcd_clear(const struct sl_memlcd_t *device)
   /* SCS setup time */
   delay_us(device->setup_us);
   /* Send command */
-  sli_memlcd_spi_tx(&cmd, 2);
-  sli_memlcd_spi_wait();
+  (void)sli_memlcd_spi_tx(&cmd, 2);
 
   /* SCS hold time */
   delay_us(device->hold_us);
@@ -230,80 +266,76 @@ sl_status_t sl_memlcd_draw(const struct sl_memlcd_t *device,
                            unsigned int row_count)
 {
   unsigned int i;
-
   const uint8_t *p = data;
   uint16_t cmd;
-  int row_len;
+  const unsigned int row_len = ((unsigned int)device->width * (unsigned int)device->bpp) / 8U;
+  unsigned int row_stride;
+  unsigned int tx_len;
+  uint8_t *tx             = draw_tx_buf;
+  const uint8_t *tx_start = tx;
 #if defined(SL_MEMLCD_LPM013M126A)
   uint16_t reversed_row;
 #endif
 
-  row_len = (device->width * device->bpp) / 8;
+  /* Command header (2) plus each row: pixel bytes + 2-byte trailer. */
+  if (row_len == 0U) {
+    return SL_STATUS_FAIL;
+  }
+  row_stride = row_len + 2U;
+  if (row_count > ((SLI_MEMLCD_DRAW_TX_MAX - 2U) / row_stride)) {
+    return SL_STATUS_FAIL;
+  }
+  tx_len = 2U + (row_count * row_stride);
+
   row_start++;
 
-  sl_gpio_set_pin_output(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN);
-
-  delay_us(device->setup_us);
-
 #if defined(SL_MEMLCD_LPM013M126A)
-  /* LPM013M126A uses MSB first for the row address */
   reversed_row = SL_RBIT16(row_start);
-
-  /* Send update command and first line address */
-  /* CMD_UPDATE is only 6 bits and the address line is 10 bits */
-  cmd = CMD_UPDATE | reversed_row;
+  cmd          = CMD_UPDATE | reversed_row;
 #else
-  /* Send update command and first line address */
   cmd = CMD_UPDATE | (row_start << 8);
 #endif
+  sli_memlcd_tx_put16(&tx, cmd);
 
-  sli_memlcd_spi_tx(&cmd, 2);
-
-  /* Get start address to draw from */
   for (i = 0; i < row_count; i++) {
-    /* Send pixels for this line */
-
-    sli_memlcd_spi_tx(p, row_len);
-
+    sli_memlcd_tx_put_bytes(&tx, p, (unsigned int)row_len);
     p += row_len;
 
     if (i == (row_count - 1)) {
-      /* Dummy Data transfer at the end of update mode by multiple lines */
       cmd = 0xffff;
     } else {
 #if defined(SL_MEMLCD_LPM013M126A)
-      /* LPM013M126A uses MSB first for the row address*/
       reversed_row = SL_RBIT16(row_start + i + 1);
-
-      /* Send multiple line address */
-      /* Dummy data is only 6 bits and the address line is 10 bits */
-      cmd = 0x3f | reversed_row;
+      cmd          = 0x3f | reversed_row;
 #else
-      /* Dummy data is 8 bits and the address line is 8 bit */
       cmd = 0xff | ((row_start + i + 1) << 8);
 #endif
     }
 
-    sli_memlcd_spi_tx(&cmd, 2);
+    sli_memlcd_tx_put16(&tx, cmd);
   }
 
-  sli_memlcd_spi_wait();
-  delay_us(device->hold_us);
+  sl_gpio_set_pin_output(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN);
+  delay_us(device->setup_us);
 
+  if (sli_memlcd_spi_transfer_and_wait(tx_start, tx_len) != SL_STATUS_OK) {
+    sl_gpio_clear_pin_output(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN);
+    return SL_STATUS_FAIL;
+  }
+
+  delay_us(device->hold_us);
   sl_gpio_clear_pin_output(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN);
-  /* Clean up garbage RX data */
-  /* This is important when paired with others slaves */
   sli_memlcd_spi_rx_flush();
 
   return SL_STATUS_OK;
 }
 
 /*******************************************************************************
- * Function to re-initialize MEMLCD interface after sleep wakeup
- *
- * @param none
- * @return sl_status_t
- ******************************************************************************/
+  * Function to re-initialize MEMLCD interface after sleep wakeup
+  *
+  * @param none
+  * @return sl_status_t
+  ******************************************************************************/
 sl_status_t sl_memlcd_post_wakeup_init(void)
 {
   sl_status_t status = SL_STATUS_OK;
@@ -327,11 +359,7 @@ sl_status_t sl_memlcd_post_wakeup_init(void)
     return SL_STATUS_FAIL;
   }
 
-  sl_gpio_set_pin_mode(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN, SL_GPIO_MODE_0, 0);
-  // Set output direction
-  sl_si91x_gpio_set_pin_direction(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN, GPIO_OUTPUT);
-  //clearing the GPIO pin
-  sl_gpio_clear_pin_output(EGPIO_ULP_PORT, SL_MEMLCD_SPI_CS_PIN);
+  memlcd_cs_as_gpio();
 
 #if defined(SL_MEMLCD_EXTCOMIN_PORT)
 #if (SL_SI91X_ACX_MODULE == 1)
@@ -369,13 +397,13 @@ const sl_memlcd_t *sl_memlcd_get(void)
 }
 
 /**************************************************************************/ /**
- * @brief
- *   Inverse polarity across the Liquid Crystal cells in the display.
- *
- * @detail
- *   This function inverses the polarity across the Liquid Crystal cells
- *   in the LCD. Must be called at least every second.
- *****************************************************************************/
+  * @brief
+  *   Inverse polarity across the Liquid Crystal cells in the display.
+  *
+  * @detail
+  *   This function inverses the polarity across the Liquid Crystal cells
+  *   in the LCD. Must be called at least every second.
+  *****************************************************************************/
 #if defined(SL_MEMLCD_EXTCOMIN_PORT)
 static void extcomin_toggle(sl_sleeptimer_timer_handle_t *handle, void *data)
 {

@@ -390,23 +390,6 @@ SECTIONS
  {% endif %}
 {%- endif %}
 
-{%- if crash_manager_enable and crash_manager_backend_ram %}
-   .ram_crash_data (NOLOAD) :
-	{
-		. = ALIGN(4);
-		__crash_data_start__ = .;
-		KEEP(*(.ram_crash_data*))
-		. = ALIGN(4);
-		__crash_data_end__ = .;
-	{%- if psram_present and text_segment_in_psram %}
-	} > ram :NONE
-	{%- elif flash_present %}			
-	} > ram :ram_pre_code
-	{%- else %}
-	} > ram
-	{%- endif %}
-{%- endif %}
-
 {%- if flash_present and not text_segment_in_psram %}
 	.copy.table :
 	{
@@ -604,6 +587,24 @@ SECTIONS
 		_last_psram_location = .;
 	} > psram :NONE
 	{%- endif %}
+
+{%- if sl_diag_enable %}
+	/* SL Diagnostic retained region; must stay out of the .bss zero table.
+	   Keep it with .bss/.stack so ram_pre_code stays one contiguous PT_LOAD. */
+	.sl_diag_retained {%- if psram_present and psram_linker_config_enabled %} ALIGN(_last_ram_location, 4) {%- endif %} (NOLOAD) : ALIGN(4)
+	{
+		KEEP(*(.sl_diag_retained.noinit))
+	{%- if psram_present and psram_linker_config_enabled %}
+		_last_ram_location = .;
+	{%- endif %}
+	{%- if psram_present and text_segment_in_psram %}
+	} > ram :NONE
+	{%- elif flash_present %}
+	} > ram :ram_pre_code
+	{%- else %}
+	} > ram
+	{%- endif %}
+{%- endif %}
 
 	.bss {%- if psram_present and psram_linker_config_enabled and bss_segment_in_psram %} ALIGN(_last_psram_location, 8) {%- elif psram_present and psram_linker_config_enabled %} ALIGN(_last_ram_location, 8) {%- endif %} (NOLOAD) :
 	{

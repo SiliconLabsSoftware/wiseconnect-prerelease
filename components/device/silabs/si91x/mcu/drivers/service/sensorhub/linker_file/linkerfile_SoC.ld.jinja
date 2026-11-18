@@ -473,6 +473,14 @@ SECTIONS
   {
   } > rom :empty
 
+{%- if sl_diag_enable %}
+  /* SL Diagnostic retained region; must stay out of the .bss zero table */
+  .sl_diag_retained (NOLOAD) : ALIGN(4)
+  {
+    KEEP(*(.sl_diag_retained.noinit))
+  } > ram :ram_pre_code
+{%- endif %}
+
   .bss (NOLOAD) :
   {
     . = ALIGN(4);
@@ -957,6 +965,14 @@ SECTIONS
     __zero_table_start__ = .;
     __zero_table_end__ = .;
   } > ram AT> rom
+
+{%- if sl_diag_enable %}
+  /* SL Diagnostic retained region; must stay out of the .bss zero table */
+  .sl_diag_retained (NOLOAD) : ALIGN(4)
+  {
+    KEEP(*(.sl_diag_retained.noinit))
+  } > ram
+{%- endif %}
 
   .bss (NOLOAD) :
   {
