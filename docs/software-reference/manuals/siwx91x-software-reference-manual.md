@@ -388,7 +388,7 @@ The wakeup mode defines the bootloader sequence the SiWx917 will undergo once it
 >**Note:**
 >* rsi_deepsleep_soc.c file should compiled to SRAM.
 >
->* Refer to the [Wi-Fi - TCP Tx on Periodic Wakeup (SoC)](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/examples/snippets/wlan/tcp_tx_on_periodic_wakeup) example for a detailed >example of M4 sleep wakeup.
+>* Refer to the [Wi-Fi - TCP Tx on Periodic Wakeup (SoC)](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.3-content-for-docs/examples/snippets/wlan/tcp_tx_on_periodic_wakeup) example for a detailed >example of M4 sleep wakeup.
 >
 >* Enable SL_SI91X_ENABLE_LOWPWR_RET_LDO macro to optimize the deepsleep >power number. By default, it is disabled.
 >
@@ -715,9 +715,11 @@ For backend setup, UC settings (**General** and **DEBUG LOGGER Proprietary UC Co
 
 2. Lowest allowable power state is PS3 for **IO Stream RTT** and **Log Segger Systemview** backends when a debugger is connected. When using **Log Backend I/O Stream – Compact Binary Output** or **Log Backend I/O Stream – Formatted Output** over **IO Stream RTT**, or **Log Segger Systemview**, the logger prevents the device from entering sleep or active power states below PS3 while an active debugger connection is detected, so debug and log capture sessions can remain connected.
 
-3. For UART + BLE with TA logging at **LOG_LEVEL** **INFO** or **DEBUG**, use **Log Backend I/O Stream – Compact Binary Output** and `IOStream Si91x UART at 921600 baud`; lower baud rates cannot carry M4 + TA traffic and `most logs will be dropped`. If needed, reduce **LOG_LEVEL**, flush more often, or use **IO Stream RTT** with a log backend, or **Log Segger Systemview**.
+3. **IO Stream RTT** and **Log Segger Systemview** are not supported on encrypted SiWx91x SoC boards. On an encrypted board, the RTT viewer may show a garbage buffer name and missing or unreadable log text because debugger reads of flash-resident strings return ciphertext. Use UART (VCOM) logging on encrypted boards. RTT works as expected on plain (non-encrypted) boards.
 
-4. NWP (Captive Core) logging is not recommended for applications using the BLE Advertising Extension (AE) feature. Do not enable `SL_SI91X_ENABLE_NWP_LOGGING` in the `config_feature_bit_map` field of `sl_wifi_device_configuration_t` when BLE AE is enabled.
+4. For UART + BLE with TA logging at **LOG_LEVEL** **INFO** or **DEBUG**, use **Log Backend I/O Stream – Compact Binary Output** and `IOStream Si91x UART at 921600 baud`; lower baud rates cannot carry M4 + TA traffic and `most logs will be dropped`. If needed, reduce **LOG_LEVEL**, flush more often, or use **IO Stream RTT** with a log backend, or **Log Segger Systemview**.
+
+5. NWP (Captive Core) logging is not recommended for applications using the BLE Advertising Extension (AE) feature. Do not enable `SL_SI91X_ENABLE_NWP_LOGGING` in the `config_feature_bit_map` field of `sl_wifi_device_configuration_t` when BLE AE is enabled.
 
 ## Chip/Module Programming
 
@@ -951,6 +953,7 @@ The IO Stream module is a software platform component that facilitates input and
 > **Note:** 
 > 1. Ensure that the corresponding IO Stream component for your selected interface is installed.
 > 2. **IO Stream Log** does not support UART. To use `printf` or `DEBUGOUT` with UART, please refer to the IO Stream USART example.
+> 3. On encrypted SiWx91x SoC boards, **IO Stream RTT** is not supported for readable console or logger output. Use a UART/VCOM stream instead. RTT works as expected on plain (non-encrypted) boards.
 
 **IOSTREAM usage in Si91x:**
 
@@ -1129,7 +1132,7 @@ The Lite configuration is used for 4 MB SoC OPN where 1.3 MB is allocated for th
 The `SLI_SI91X_MCU_4MB_LITE_IMAGE` macro will be enabled if the **lite_image_for_4mb** component is installed.
 
 For low-power M4 sleep states such as PS2, PS3, and PS4, certain files must be run from RAM memory. Refer to [Power manager integration guide](
-https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) for more details.
+https://github.com/SiliconLabs/wiseconnect/blob/v4.1.3-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) for more details.
 
 #### SL_SI91X_ENABLE_GCC_LTO
 
@@ -1274,5 +1277,5 @@ For further assistance and support, please contact:
 | Getting Started with WiSeConnect | [Getting Started](http://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/) |
 | NVM3 - NVM Data Manager | [NVM3 Documentation](https://docs.silabs.com/gecko-platform/3.1/driver/api/group-nvm3) |
 | Third Generation NonVolatile Memory (NVM3) Data Storage | [NVM3 Application Note](https://www.silabs.com/documents/public/application-notes/an1135-using-third-generation-nonvolatile-memory.pdf) |
-| Power Manager Integration Guide | [Power Manager Integration Guide](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) |
+| Power Manager Integration Guide | [Power Manager Integration Guide](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.3-content-for-docs/examples/si91x_soc/service/sl_si91x_power_manager_tickless_idle/resources/power_manager_integration_guide/power_manager_integration.pdf) |
 | SiWx917 Reference Manual | Contact [Silicon Labs Sales](https://www.silabs.com/about-us/contact-sales) for access. |

@@ -11,9 +11,15 @@
  * File Description
  *
  */
-#ifndef SLI_SI91X_MCU_INTERFACE
 #include "sl_component_catalog.h"
 #include "sl_iostream.h"
+#ifdef SLI_SI91X_MCU_INTERFACE
+#include "sl_si91x_iostream_rtt.h"
+// SoC UART log TX depends on si91x_debug (rsi_debug.c): Board_UARTPutChar and
+// si91x_prints_mutex, which DEBUGINIT() initializes. Declare them here instead
+// of including rsi_debug.h so this file does not pick up DEBUGOUT/DEBUGINIT macros.
+void Board_UARTPutChar(uint8_t ch);
+#else
 #include "sl_iostream_handles.h"
 #if defined(SL_CATALOG_IOSTREAM_USART_PRESENT) || defined(SL_CATALOG_IOSTREAM_EUSART_PRESENT)
 #define SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT 1
@@ -30,13 +36,24 @@
 #include "cmsis_os2.h"
 #include "sl_utility.h"
 #include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
+#ifdef SLI_SI91X_MCU_INTERFACE
+extern osMutexId_t si91x_prints_mutex;
+#endif
 /******************************************************
  *                    Constants
  ******************************************************/
 
 #define BUFFER_SIZE 256
 bool end_of_cmd = false;
+
+#define SL_WIRELESS_TEST_LOG_OUTPUT_UART 0
+#define SL_WIRELESS_TEST_LOG_OUTPUT_RTT  1
+// SoC only: command input is always UART. Set this to SL_WIRELESS_TEST_LOG_OUTPUT_RTT
+// to send command responses to RTT Channel 0 (rebuild and flash after changing).
+// NCP builds always keep logs on RTT regardless of this macro.
+#define SL_WIRELESS_TEST_LOG_OUTPUT SL_WIRELESS_TEST_LOG_OUTPUT_UART
 
 #define MY_ARG_TYPE uart, spi, i2c, tcp
 
@@ -63,6 +80,9 @@ sl_status_t rtt_command_handler(console_args_t *arguments);
 extern void cache_uart_rx_data(const char character);
 
 static void print_command_args(const console_descriptive_command_t *command);
+#if defined(SLI_SI91X_MCU_INTERFACE) && (SL_WIRELESS_TEST_LOG_OUTPUT == SL_WIRELESS_TEST_LOG_OUTPUT_UART)
+static sl_status_t wireless_test_uart_log_write(void *context, const void *buffer, size_t buffer_length);
+#endif
 
 extern sl_status_t process_buffer_line(const console_database_t *command_database,
                                        console_args_t *args,
@@ -75,6 +95,14 @@ extern sl_status_t sl_board_enable_vcom(void);
 /******************************************************
  *               Variable Definitions
  ******************************************************/
+
+#if defined(SLI_SI91X_MCU_INTERFACE) && (SL_WIRELESS_TEST_LOG_OUTPUT == SL_WIRELESS_TEST_LOG_OUTPUT_UART)
+static sl_iostream_t wireless_test_uart_log_stream = {
+  .read    = NULL,
+  .write   = wireless_test_uart_log_write,
+  .context = NULL,
+};
+#endif
 
 /******************************************************
  *               Function Definitions
@@ -93,17 +121,50 @@ const osThreadAttr_t thread_attributes = {
 
 void app_init(void)
 {
-#ifndef SLI_SI91X_MCU_INTERFACE
-  // Force the log backend (log_backend_iostream_formatted) to write to RTT
-  // instead of vcom. sl_iostream_set_console_instance() picks UART over RTT by
-  // priority; without this override, SL_DEBUG_LOG_V2 output would land on vcom
-  // and corrupt the HCI byte stream.
   extern sl_iostream_t *sl_iostream_recommended_console_stream;
+#ifdef SLI_SI91X_MCU_INTERFACE
+#if (SL_WIRELESS_TEST_LOG_OUTPUT == SL_WIRELESS_TEST_LOG_OUTPUT_RTT)
+  sl_iostream_recommended_console_stream = sl_si91x_iostream_rtt_handle;
+#else
+  // Use the already initialized CLI UART for log TX. This stream deliberately
+  // does not initialize or own UART RX, so the CLI interrupt path remains intact.
+  sl_iostream_recommended_console_stream = &wireless_test_uart_log_stream;
+#endif
+#else
+  // NCP: keep logs on RTT so VCOM is not mixed with HCI/CLI transport bytes.
   extern sl_iostream_t *sl_iostream_rtt_handle;
   sl_iostream_recommended_console_stream = sl_iostream_rtt_handle;
 #endif
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
 }
+
+#if defined(SLI_SI91X_MCU_INTERFACE) && (SL_WIRELESS_TEST_LOG_OUTPUT == SL_WIRELESS_TEST_LOG_OUTPUT_UART)
+static sl_status_t wireless_test_uart_log_write(void *context, const void *buffer, size_t buffer_length)
+{
+  const uint8_t *data = (const uint8_t *)buffer;
+  bool mutex_acquired = false;
+
+  (void)context;
+
+  if ((buffer == NULL) && (buffer_length > 0)) {
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if ((osKernelGetState() == osKernelRunning) && (si91x_prints_mutex != NULL)) {
+    mutex_acquired = (osMutexAcquire(si91x_prints_mutex, osWaitForever) == osOK);
+  }
+
+  for (size_t index = 0; index < buffer_length; ++index) {
+    Board_UARTPutChar(data[index]);
+  }
+
+  if (mutex_acquired) {
+    osMutexRelease(si91x_prints_mutex);
+  }
+
+  return SL_STATUS_OK;
+}
+#endif
 
 #if defined(SLI_WIRELESS_TEST_NCP_VCOM_CLI_PRESENT)
 void iostream_usart_init()

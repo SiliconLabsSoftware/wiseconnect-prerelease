@@ -90,6 +90,15 @@
 #define SECURITY_TYPE   "security_type"
 #define PASSPHRASE      "passphrase"
 
+// Null-terminated SSID C-string: IEEE 802.11 max octets plus NUL
+#define WIFI_CLIENT_SSID_BUFFER_LEN (SL_WIFI_MAX_SSID_IE_OCTETS + 1)
+
+// Null-terminated PSK C-string (63 characters plus NUL)
+#define WIFI_CLIENT_PSK_BUFFER_LEN SL_WIFI_MAX_PSK_LENGTH
+
+// Buffer for security type strings such as "WPA3_Transition"
+#define WIFI_CLIENT_SECURITY_TYPE_BUFFER_LEN 32
+
 // Enumeration for states in the application
 typedef enum {
   PROVISIONING_INIT_STATE,
@@ -117,6 +126,7 @@ static sl_status_t ap_disconnected_event_handler(sl_wifi_event_t event,
 
 //Application start API
 static void application_start(void *argument);
+static void snapshot_provisioned_credentials(char *ssid, char *psk, char *sec);
 
 // Security type conversion functions
 static sl_wifi_security_t string_to_security_type(const char *security_type);
@@ -133,17 +143,22 @@ static sl_status_t wifi_scan_request_handler(sl_http_server_t *handle, sl_http_s
  *               Variable Definitions
  ******************************************************/
 
-static bool scan_complete                                      = false;
+// Shared across app thread, HTTP server thread, and Wi-Fi callbacks.
+// Scalar flags are volatile so LLVM/GCC LTO cannot hoist or dead-eliminate them.
+static volatile bool scan_complete                             = false;
 static bool disconnect_complete                                = false;
 static uint8_t retry                                           = 0;
 static sl_http_server_t server_handle                          = { 0 };
-static sl_status_t callback_status                             = SL_STATUS_OK;
-static app_state_t app_state                                   = PROVISIONING_INIT_STATE;
+static volatile sl_status_t callback_status                    = SL_STATUS_OK;
+static volatile app_state_t app_state                          = PROVISIONING_INIT_STATE;
 static sl_wifi_client_configuration_t provisioned_access_point = { 0 };
 
-char wifi_client_profile_ssid[33]; // SSID is limited to 32 characters plus null terminator
-char wifi_client_credential[64];   // Password is limited to 63 characters plus null terminator
-char wifi_client_security_type[32];
+// Written by the HTTP handler, read in CONNECTING_STATE. Do not mark volatile:
+// libc cannot take volatile char[]. Snapshot via volatile-qualified loads before use
+// so LLVM LTO cannot treat these BSS buffers as empty (sl_net_set_credential 0x21).
+static char wifi_client_profile_ssid[WIFI_CLIENT_SSID_BUFFER_LEN];
+static char wifi_client_credential[WIFI_CLIENT_PSK_BUFFER_LEN];
+static char wifi_client_security_type[WIFI_CLIENT_SECURITY_TYPE_BUFFER_LEN];
 
 static const osThreadAttr_t thread_attributes = {
   .name       = "app",
@@ -188,6 +203,23 @@ static const sl_http_server_handler_t provisioning_server_request_handlers[] = {
 void app_init(void)
 {
   osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
+}
+
+static void snapshot_provisioned_credentials(char *ssid, char *psk, char *sec)
+{
+  const volatile char *src_ssid = wifi_client_profile_ssid;
+  const volatile char *src_psk  = wifi_client_credential;
+  const volatile char *src_sec  = wifi_client_security_type;
+
+  for (uint32_t i = 0; i < sizeof(wifi_client_profile_ssid); i++) {
+    ssid[i] = src_ssid[i];
+  }
+  for (uint32_t i = 0; i < sizeof(wifi_client_credential); i++) {
+    psk[i] = src_psk[i];
+  }
+  for (uint32_t i = 0; i < sizeof(wifi_client_security_type); i++) {
+    sec[i] = src_sec[i];
+  }
 }
 
 static sl_status_t join_callback_handler(sl_wifi_event_t event,
@@ -308,16 +340,20 @@ static void application_start(void *argument)
         }
         SL_DEBUG_LOG_V2(INFO, "Wi-Fi client interface initialized\r\n");
 
-        sl_wifi_security_t sec_type = string_to_security_type(wifi_client_security_type);
+        char provisioned_ssid[sizeof(wifi_client_profile_ssid)];
+        char provisioned_psk[sizeof(wifi_client_credential)];
+        char provisioned_security[sizeof(wifi_client_security_type)];
+        snapshot_provisioned_credentials(provisioned_ssid, provisioned_psk, provisioned_security);
+
+        sl_wifi_security_t sec_type = string_to_security_type(provisioned_security);
         sl_wifi_credential_id_t id;
 
         if (sec_type == SL_WIFI_OPEN) {
           id = SL_NET_NO_CREDENTIAL_ID;
         } else {
           // Handle PSK-based security (WPA, WPA2, WPA3, etc.)
-          id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
-          status =
-            sl_net_set_credential(id, SL_NET_WIFI_PSK, wifi_client_credential, strlen((char *)wifi_client_credential));
+          id     = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+          status = sl_net_set_credential(id, SL_NET_WIFI_PSK, provisioned_psk, strlen(provisioned_psk));
           if (status != SL_STATUS_OK) {
             SL_DEBUG_LOG_V2(ERROR, "Failed to set Wi-Fi client credential: 0x%lx\r\n", status);
             return;
@@ -325,17 +361,15 @@ static void application_start(void *argument)
         }
 
         memset(&provisioned_access_point, 0, sizeof(provisioned_access_point));
-        provisioned_access_point.ssid.length = strlen((char *)wifi_client_profile_ssid);
-        memcpy(provisioned_access_point.ssid.value, wifi_client_profile_ssid, provisioned_access_point.ssid.length);
+        provisioned_access_point.ssid.length = strlen(provisioned_ssid);
+        memcpy(provisioned_access_point.ssid.value, provisioned_ssid, provisioned_access_point.ssid.length);
         provisioned_access_point.security      = sec_type;
         provisioned_access_point.encryption    = SL_WIFI_CCMP_ENCRYPTION;
         provisioned_access_point.credential_id = id;
 
-        wifi_client_profile_4.config.ssid.length = strlen((char *)wifi_client_profile_ssid);
-        memcpy(wifi_client_profile_4.config.ssid.value,
-               wifi_client_profile_ssid,
-               wifi_client_profile_4.config.ssid.length);
-        wifi_client_profile_4.config.security      = string_to_security_type(wifi_client_security_type);
+        wifi_client_profile_4.config.ssid.length = strlen(provisioned_ssid);
+        memcpy(wifi_client_profile_4.config.ssid.value, provisioned_ssid, wifi_client_profile_4.config.ssid.length);
+        wifi_client_profile_4.config.security      = string_to_security_type(provisioned_security);
         wifi_client_profile_4.config.credential_id = (wifi_client_profile_4.config.security == SL_WIFI_OPEN)
                                                        ? SL_NET_NO_CREDENTIAL_ID
                                                        : SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
@@ -580,7 +614,7 @@ static sl_status_t connect_data_handler(sl_http_server_t *handle, sl_http_server
             ssid_found = true;
           }
         } else if (memcmp(&received_data_buffer[tokens[a].start], PASSPHRASE, tokens[a].end - tokens[a].start) == 0) {
-          if (tokens[a].type == JSMN_STRING) {
+          if (tokens[a + 1].type == JSMN_STRING) {
             snprintf(wifi_client_credential,
                      sizeof(wifi_client_credential),
                      "%.*s",
@@ -590,12 +624,14 @@ static sl_status_t connect_data_handler(sl_http_server_t *handle, sl_http_server
           }
         } else if (memcmp(&received_data_buffer[tokens[a].start], SECURITY_TYPE, tokens[a].end - tokens[a].start)
                    == 0) {
-          snprintf(wifi_client_security_type,
-                   sizeof(wifi_client_security_type),
-                   "%.*s",
-                   tokens[a + 1].end - tokens[a + 1].start,
-                   received_data_buffer + tokens[a + 1].start);
-          security_type_found = true;
+          if (tokens[a + 1].type == JSMN_STRING) {
+            snprintf(wifi_client_security_type,
+                     sizeof(wifi_client_security_type),
+                     "%.*s",
+                     tokens[a + 1].end - tokens[a + 1].start,
+                     received_data_buffer + tokens[a + 1].start);
+            security_type_found = true;
+          }
         }
       }
     }

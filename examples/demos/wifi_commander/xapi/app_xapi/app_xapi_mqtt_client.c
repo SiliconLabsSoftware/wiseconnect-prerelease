@@ -128,9 +128,13 @@ void mqtt_client_event_handler(void *client, sl_mqtt_client_event_t event, void 
     }
 
     // An error occurred in the MQTT client
-    case SL_MQTT_CLIENT_ERROR_EVENT:
-      app_wifi_evt_mqtt_client_error_event((sl_mqtt_client_error_status_t)event_data);
+    case SL_MQTT_CLIENT_ERROR_EVENT: {
+      sl_mqtt_client_error_info_t *error = (sl_mqtt_client_error_info_t *)event_data;
+      if (error != NULL) {
+        app_wifi_evt_mqtt_client_error_event((uint16_t)error->error_status);
+      }
       break;
+    }
 
     // Default case for any unhandled events
     default:

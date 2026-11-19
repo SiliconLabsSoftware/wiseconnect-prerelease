@@ -586,8 +586,6 @@ static const size_t crypt_len_test_data = CHUNK_LENGTH + SL_SI91X_TAG_SIZE;
 
 unsigned char cipher_tag_buffer[CHUNK_COUNT][GCM_TEST_CT_MAX_LEN];
 unsigned char decryption_output[CHUNK_COUNT][GCM_TEST_CT_MAX_LEN];
-unsigned char encryption_tag[CHUNK_COUNT][SL_SI91X_TAG_SIZE];
-unsigned char decryption_tag[CHUNK_COUNT][SL_SI91X_TAG_SIZE];
 
 void test_psa_gcm()
 {
@@ -643,7 +641,6 @@ void test_psa_gcm()
       printf("\n Chunk-wise Encryption Failed with error: %" PRId32 "\n", status);
       SL_ASSERT(FALSE);
     }
-    memcpy(encryption_tag[chunk_no], cipher_tag_buffer[chunk_no] + CHUNK_LENGTH, SL_SI91X_TAG_SIZE);
     chunk_no++;
   }
 
@@ -664,21 +661,20 @@ void test_psa_gcm()
                               CHUNK_LENGTH,
                               &out_len);
 
-    if (status == 0 && memcmp(decryption_output[chunk_no], &msg_test_data[i], CHUNK_LENGTH) == 0) {
+    /* psa_aead_decrypt() authenticates the tag internally and returns
+     * PSA_ERROR_INVALID_SIGNATURE on mismatch; out_len covers the plaintext
+     * only, the tag is never written to this buffer. */
+    if (status == PSA_SUCCESS && out_len == CHUNK_LENGTH
+        && memcmp(decryption_output[chunk_no], &msg_test_data[i], CHUNK_LENGTH) == 0) {
       printf("\n Chunk-wise Decryption Success \n");
+    } else if (status == PSA_ERROR_INVALID_SIGNATURE) {
+      printf("\r\nGCM Authentication Failed !!\r\n");
+      SL_ASSERT(FALSE);
     } else {
       printf("\n Chunk-wise Decryption Failed with error: %" PRId32 "\n", status);
       SL_ASSERT(FALSE);
     }
-    memcpy(decryption_tag[chunk_no], decryption_output[chunk_no] + CHUNK_LENGTH, SL_SI91X_TAG_SIZE);
     chunk_no++;
-  }
-
-  for (int i = 0; i < CHUNK_COUNT; i++) {
-    if (memcmp(decryption_tag[i], encryption_tag[i], SL_SI91X_TAG_SIZE) != 0) {
-      printf("\r\nGCM Authentication Failed !!\r\n");
-      status = SL_STATUS_INVALID_SIGNATURE;
-    }
   }
 
   // Destroy plain key for AES GCM

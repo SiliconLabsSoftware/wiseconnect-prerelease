@@ -1,35 +1,5 @@
 <?xml version='1.0' encoding='ASCII'?>
 <model:MDescriptors xmlns:model="http://www.silabs.com/ss/Studio.ecore">
-  <descriptors name="crypto_hmac" label="Crypto - HMAC" description="Demonstrate the use of HMAC">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/crypto/hmac/crypto_hmac.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084b" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="Example|Wi-Fi" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/snippets/crypto/hmac/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="crypto_sha" label="Crypto - SHA" description="Hash the data using SHA">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/crypto/sha/crypto_sha.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084b" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="Example|Wi-Fi" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/snippets/crypto/sha/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
-  </descriptors>
   <descriptors name="attestation" label="Crypto - Attestation" description="Demonstrates device attestation">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -45,51 +15,6 @@
     <properties key="readmeFiles" value="examples/snippets/crypto/attestation/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless" />
   </descriptors>
-  <descriptors name="crypto_ecdsa" label="Crypto - ECDSA" description="Demonstrate the use of ECDSA APIs">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/crypto/ecdsa/crypto_ecdsa.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084b" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="Example|Wi-Fi" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/snippets/crypto/ecdsa/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="crypto_aes" label="Crypto - AES" description="Encrypt/decrypt the data using AES">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/crypto/aes/crypto_aes.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084b" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="Example|Wi-Fi" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/snippets/crypto/aes/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="crypto_gcm_cmac" label="Crypto - GCM_CMAC" description="Encrypt/decrypt the data using GCM, Compute MAC using CMAC">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/crypto/gcm_cmac/crypto_gcm_cmac.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084b" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="Example|Wi-Fi" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/snippets/crypto/gcm_cmac/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
-  </descriptors>
   <descriptors name="crypto_sha3" label="Crypto - SHA3" description="Hash the data using SHA3">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -103,21 +28,6 @@
     <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
     <properties key="sdkAndProtocolTags" value="" />
     <properties key="readmeFiles" value="examples/snippets/crypto/sha3/readme.md" />
-    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
-  </descriptors>
-  <descriptors name="crypto_ecdh" label="Crypto - ECDH" description="Demonstrate the use of ECDH APIs">
-    <properties key="namespace" value="template.uc" />
-    <properties key="keywords" value="universal\ configurator" />
-    <properties key="projectFilePaths" value="examples/snippets/crypto/ecdh/crypto_ecdh.slcp" />
-    <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2708a brd2911a brd4338a brd4343a brd4343b brd4343c brd4339b brd4340b brd4342a brd4343q brd4343s brd9084b" />
-    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y121mgnb.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y111mgnba.* .*siwg917y110lgnba.* .*siwg917y121mgnba.* .*siwg917y121mgnxa.* .*siwg917y111mgaba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
-    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
-    <properties key="toolchainCompatibility" value="gcc llvm" />
-    <properties key="quality" value="production" />
-    <properties key="category" value="Example|Wi-Fi" />
-    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
-    <properties key="sdkAndProtocolTags" value="" />
-    <properties key="readmeFiles" value="examples/snippets/crypto/ecdh/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
   <descriptors name="sl_si91x_slot_a_fw" label="SiWx91x Platform - SoC FW Fallback SLOT-A FW" description="Wirelessly updates the M4 firmware from a remote TCP server">

@@ -94,7 +94,7 @@ const osThreadAttr_t thread_attributes = {
   .cb_mem     = 0,
   .cb_size    = 0,
   .stack_mem  = 0,
-  .stack_size = 3072,
+  .stack_size = 3572,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
 };

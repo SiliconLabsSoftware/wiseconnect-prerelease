@@ -78,10 +78,10 @@ sl_status_t sl_si91x_app_get_active_slot_addresses(sl_si91x_active_slot_info_t *
 /******************************************************
   *               Variable Definitions
   ******************************************************/
-
+#define APP_THREAD_STACK_SIZE (4 * 1024) // 4KB stack size for the application thread
 static const osThreadAttr_t thread_attributes = {
   .name       = "app",
-  .stack_size = 3072,
+  .stack_size = APP_THREAD_STACK_SIZE,
   .priority   = osPriorityLow,
 };
 

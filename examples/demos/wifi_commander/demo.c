@@ -52,15 +52,15 @@
  ******************************************************/
 #define APP_MAJOR_VERSION   4
 #define APP_MINOR_VERSION   1
-#define APP_PATCH_VERSION   2
+#define APP_PATCH_VERSION   3
 #define FW_CHIP_ID          23
 #define FW_ROM_ID           17
 #define FW_MAJOR            2
 #define FW_MINOR            16
 #define FW_SECURITY_VERSION 5
-#define FW_PATCH_NUM        2
+#define FW_PATCH_NUM        3
 #define FW_CUSTOMER_ID      0
-#define FW_BUILD_NUM        2
+#define FW_BUILD_NUM        1
 
 /******************************************************
  *                   Enumerations

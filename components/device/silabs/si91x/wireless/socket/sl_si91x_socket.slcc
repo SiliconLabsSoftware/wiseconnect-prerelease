@@ -29,5 +29,6 @@ define:
 requires:
 - name: sl_si91x_wireless
 - name: sl_si91x_internal_stack
+  unless: [sl_si91x_network_dual_stack, sl_si91x_lwip_stack]
 - name: log_none
 

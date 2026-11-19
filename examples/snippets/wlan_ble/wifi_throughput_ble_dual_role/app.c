@@ -196,7 +196,7 @@ const osThreadAttr_t wlan_thread_attributes = {
   .cb_mem     = 0,
   .cb_size    = 0,
   .stack_mem  = 0,
-  .stack_size = 2048,
+  .stack_size = 3072,
   .priority   = osPriorityNormal,
   .tz_module  = 0,
 };

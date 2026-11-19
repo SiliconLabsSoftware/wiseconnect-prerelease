@@ -36,6 +36,9 @@ source:
 - path: sl_net/src/sli_net_si91x_utility.c
   condition:
   - sl_si91x_lwip_stack
+- path: sl_net/src/sli_net_si91x_utility.c
+  condition:
+  - sl_si91x_network_dual_stack
 - path: sl_net/src/sl_net_si91x_callback_framework.c
   condition:
   - network_manager
