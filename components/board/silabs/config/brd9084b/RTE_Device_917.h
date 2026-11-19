@@ -379,20 +379,15 @@
 //Pintool data
 #endif
 
-//     <o> USART0_IR_TX <0=>P0_48 <1=>P0_72
+//     <o> USART0_IR_TX <1=>P0_72
 //     <i> IR TX for USART0
 #ifndef USART0_IRTX_LOC
-#define RTE_IR_TX_PORT_ID 0
+#define RTE_IR_TX_PORT_ID 1 // retargeted: GPIO_48 reserved for external flash QSPI
 #if ((RTE_IR_TX_PORT_ID == 2))
 #error "Invalid USART0 RTE_USART0_IR_TX_PIN Pin Configuration!"
 #endif
 
-#if (RTE_IR_TX_PORT_ID == 0)
-#define RTE_USART0_IR_TX_PORT HP
-#define RTE_USART0_IR_TX_PIN  48
-#define RTE_USART0_IR_TX_MUX  2
-#define RTE_USART0_IR_TX_PAD  12
-#elif (RTE_IR_TX_PORT_ID == 1)
+#if (RTE_IR_TX_PORT_ID == 1)
 #define RTE_USART0_IR_TX_PORT HP
 #define RTE_USART0_IR_TX_PIN  72
 #define RTE_USART0_IR_TX_MUX  2
@@ -402,6 +397,8 @@
 #define RTE_USART0_IR_TX_PIN  26
 #define RTE_USART0_IR_TX_MUX  13
 #define RTE_USART0_IR_TX_PAD  0 //No pad
+#elif (RTE_IR_TX_PORT_ID == 0)
+#error "IR_TX Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid USART0 RTE_USART0_IR_TX_PIN Pin Configuration!"
 #endif
@@ -414,9 +411,7 @@
 #define RTE_USART0_IR_TX_PAD 0 //No pad
 #endif
 #if (USART0_IRTX_LOC == 23)
-#define RTE_USART0_IR_TX_PIN USART0_IRTX_PIN
-#define RTE_USART0_IR_TX_MUX 2
-#define RTE_USART0_IR_TX_PAD 12
+#error "USART0_IRTX Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 #if (USART0_IRTX_LOC == 24)
 #define RTE_USART0_IR_TX_PIN (USART0_IRTX_PIN + GPIO_MAX_PIN)
@@ -431,20 +426,15 @@
 //Pintool data
 #endif
 
-//     <o> USART0_IR_RX <0=>P0_47 <1=>P0_71 <2=>P0_64 <3=>P0_25
+//     <o> USART0_IR_RX <1=>P0_71 <2=>P0_64 <3=>P0_25
 //     <i> IR RX for USART0
 #ifndef USART0_IRRX_LOC
-#define RTE_IR_RX_PORT_ID 0
+#define RTE_IR_RX_PORT_ID 1 // retargeted: GPIO_47 reserved for external flash QSPI
 #if ((RTE_IR_RX_PORT_ID == 2))
 #error "Invalid USART0 RTE_USART0_IR_RX_PIN Pin Configuration!"
 #endif
 
-#if (RTE_IR_RX_PORT_ID == 0)
-#define RTE_USART0_IR_RX_PORT HP
-#define RTE_USART0_IR_RX_PIN  47
-#define RTE_USART0_IR_RX_MUX  2
-#define RTE_USART0_IR_RX_PAD  11
-#elif (RTE_IR_RX_PORT_ID == 1)
+#if (RTE_IR_RX_PORT_ID == 1)
 #define RTE_USART0_IR_RX_PORT HP
 #define RTE_USART0_IR_RX_PIN  71
 #define RTE_USART0_IR_RX_MUX  2
@@ -454,6 +444,8 @@
 #define RTE_USART0_IR_RX_PIN  25
 #define RTE_USART0_IR_RX_MUX  13
 #define RTE_USART0_IR_RX_PAD  0 //no pad
+#elif (RTE_IR_RX_PORT_ID == 0)
+#error "IR_RX Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid USART0 RTE_USART0_IR_RX_PIN Pin Configuration!"
 #endif
@@ -466,9 +458,7 @@
 #define RTE_USART0_IR_RX_PAD 0 //no pad
 #endif
 #if (USART0_IRRX_LOC == 27)
-#define RTE_USART0_IR_RX_PIN USART0_IRRX_PIN
-#define RTE_USART0_IR_RX_MUX 2
-#define RTE_USART0_IR_RX_PAD 11
+#error "USART0_IRRX Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 #if (USART0_IRRX_LOC == 28)
 #define RTE_USART0_IR_RX_PIN (USART0_IRRX_PIN + GPIO_MAX_PIN)
@@ -483,7 +473,7 @@
 //Pintool data
 #endif
 
-//     <o> USART0_RI <0=>P0_27  <1=>P0_46 <2=>P0_68
+//     <o> USART0_RI <0=>P0_27 <2=>P0_68
 //     <i> RI for USART0
 #ifndef USART0_RI_LOC
 #define RTE_RI_PORT_ID 0
@@ -494,10 +484,7 @@
 #define RTE_USART0_RI_MUX  2
 #define RTE_USART0_RI_PAD  0 //no pad
 #elif (RTE_RI_PORT_ID == 1)
-#define RTE_USART0_RI_PORT HP
-#define RTE_USART0_RI_PIN  46
-#define RTE_USART0_RI_MUX  2
-#define RTE_USART0_RI_PAD  10
+#error "RI Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid USART0 RTE_USART0_RI_PIN Pin Configuration!"
 #endif
@@ -510,9 +497,7 @@
 #define RTE_USART0_RI_PAD 0 //no pad
 #endif
 #if (USART0_RI_LOC == 31)
-#define RTE_USART0_RI_PIN USART0_RI_PIN
-#define RTE_USART0_RI_MUX 2
-#define RTE_USART0_RI_PAD 10
+#error "USART0_RI Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 #if (USART0_RI_LOC == 32)
 #define RTE_USART0_RI_PIN (USART0_RI_PIN + GPIO_MAX_PIN)
@@ -742,7 +727,7 @@
 //Pintool data
 #endif
 
-//     <o> UART1_CTS <0=>P0_11 <1=>P0_28 <2=>P0_51 <3=>P0_65 <4=>P0_71 <5=>P0_73 <6=>P0_32
+//     <o> UART1_CTS <0=>P0_11 <1=>P0_28 <3=>P0_65 <4=>P0_71 <5=>P0_73 <6=>P0_32
 //     <i> CTS of UART1
 #ifndef UART1_CTS_LOC
 #define RTE_UART1_CTS_PORT_ID 0
@@ -757,11 +742,6 @@
 #define RTE_UART1_CTS_PIN  28
 #define RTE_UART1_CTS_MUX  6
 #define RTE_UART1_CTS_PAD  0 //no pad
-#elif (RTE_UART1_CTS_PORT_ID == 2)
-#define RTE_UART1_CTS_PORT HP
-#define RTE_UART1_CTS_PIN  51
-#define RTE_UART1_CTS_MUX  9
-#define RTE_UART1_CTS_PAD  15
 #elif (RTE_UART1_CTS_PORT_ID == 3)
 #define RTE_UART1_CTS_PORT HP
 #define RTE_UART1_CTS_PIN  65
@@ -772,6 +752,8 @@
 #define RTE_UART1_CTS_PIN  71
 #define RTE_UART1_CTS_MUX  6
 #define RTE_UART1_CTS_PAD  29
+#elif (RTE_UART1_CTS_PORT_ID == 2)
+#error "UART1_CTS Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #else
 #error "Invalid UART1 RTE_UART1_CTS_PIN Pin Configuration!"
 #endif
@@ -789,9 +771,7 @@
 #define RTE_UART1_CTS_PAD 0 //no pad
 #endif
 #if (UART1_CTS_LOC == 12)
-#define RTE_UART1_CTS_PIN UART1_CTS_PIN
-#define RTE_UART1_CTS_MUX 9
-#define RTE_UART1_CTS_PAD 15
+#error "UART1_CTS Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #endif
 #if (UART1_CTS_LOC == 13)
 #define RTE_UART1_CTS_PIN (UART1_CTS_PIN + GPIO_MAX_PIN)
@@ -811,7 +791,7 @@
 //Pintool data
 #endif
 
-//     <o> UART1_RTS  <0=>P0_10 <1=>P0_27 <2=>P0_50 <3=>P0_64  <4=>P0_70 <5=>P0_72 <6=>P0_31
+//     <o> UART1_RTS  <0=>P0_10 <1=>P0_27 <3=>P0_64  <4=>P0_70 <5=>P0_72 <6=>P0_31
 //     <i> RTS of UART1
 #ifndef UART1_RTS_LOC
 #ifdef SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
@@ -830,11 +810,6 @@
 #define RTE_UART1_RTS_PIN  27
 #define RTE_UART1_RTS_MUX  6
 #define RTE_UART1_RTS_PAD  0 //no pad
-#elif (RTE_UART1_RTS_PORT_ID == 2)
-#define RTE_UART1_RTS_PORT HP
-#define RTE_UART1_RTS_PIN  50
-#define RTE_UART1_RTS_MUX  9
-#define RTE_UART1_RTS_PAD  14
 #elif (RTE_UART1_RTS_PORT_ID == 3)
 #define RTE_UART1_RTS_PORT HP
 #define RTE_UART1_RTS_PIN  70
@@ -845,6 +820,8 @@
 #define RTE_UART1_RTS_PIN  72
 #define RTE_UART1_RTS_MUX  9
 #define RTE_UART1_RTS_PAD  30
+#elif (RTE_UART1_RTS_PORT_ID == 2)
+#error "UART1_RTS Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #else
 #error "Invalid UART1 RTE_UART1_RTS_PIN Pin Configuration!"
 #endif
@@ -862,9 +839,7 @@
 #define RTE_UART1_RTS_PAD 0 //no pad
 #endif
 #if (UART1_RTS_LOC == 18)
-#define RTE_UART1_RTS_PIN UART1_RTS_PIN
-#define RTE_UART1_RTS_MUX 9
-#define RTE_UART1_RTS_PAD 14
+#error "UART1_RTS Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #endif
 #if (UART1_RTS_LOC == 19)
 #define RTE_UART1_RTS_PIN (UART1_RTS_PIN + GPIO_MAX_PIN)
@@ -932,10 +907,7 @@
 #define RTE_ULP_UART_TX_MUX  3
 #define RTE_ULP_UART_TX_PAD  8
 #elif (RTE_ULP_UART_TX_PORT_ID == 4)
-#define RTE_ULP_UART_TX_PORT RTE_ULP_PORT
-#define RTE_ULP_UART_TX_PIN  49
-#define RTE_ULP_UART_TX_MUX  3
-#define RTE_ULP_UART_TX_PAD  13
+#error "ULP_UART_TX Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid ULPSS UART RTE_ULP_UART_TX_PIN Pin Configuration!"
 #endif
@@ -956,8 +928,7 @@
 #define RTE_ULP_UART_TX_PAD 8
 #endif
 #if (ULP_UART_TX_LOC == 13)
-#define RTE_ULP_UART_TX_PIN ULP_UART_TX_PIN
-#define RTE_ULP_UART_TX_PAD 13
+#error "ULP_UART_TX Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -992,10 +963,7 @@
 #define RTE_ULP_UART_RX_MUX  3
 #define RTE_ULP_UART_RX_PAD  7
 #elif (RTE_ULP_UART_RX_PORT_ID == 5)
-#define RTE_ULP_UART_RX_PORT RTE_ULP_PORT
-#define RTE_ULP_UART_RX_PIN  47
-#define RTE_ULP_UART_RX_MUX  3
-#define RTE_ULP_UART_RX_PAD  11
+#error "ULP_UART_RX Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid ULPSS UART RTE_ULP_UART_RX_PIN Pin Configuration!"
 #endif
@@ -1016,8 +984,7 @@
 #define RTE_ULP_UART_RX_PAD 7
 #endif
 #if (ULP_UART_RX_LOC == 16)
-#define RTE_ULP_UART_RX_PIN ULP_UART_RX_PIN
-#define RTE_ULP_UART_RX_PAD 11
+#error "ULP_UART_RX Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -1047,10 +1014,7 @@
 #define RTE_ULP_UART_CTS_MUX  3
 #define RTE_ULP_UART_CTS_PAD  6
 #elif (RTE_ULP_UART_CTS_PORT_ID == 4)
-#define RTE_ULP_UART_CTS_PORT RTE_ULP_PORT
-#define RTE_ULP_UART_CTS_PIN  46
-#define RTE_ULP_UART_CTS_MUX  3
-#define RTE_ULP_UART_CTS_PAD  10
+#error "ULP_UART_CTS Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid ULPSS UART RTE_ULP_UART_CTS_PIN Pin Configuration!"
 #endif
@@ -1071,8 +1035,7 @@
 #define RTE_ULP_UART_CTS_PAD 6
 #endif
 #if (ULP_UART_CTS_LOC == 19)
-#define RTE_ULP_UART_CTS_PIN ULP_UART_CTS_PIN
-#define RTE_ULP_UART_CTS_PAD 10
+#error "ULP_UART_CTS Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -1097,10 +1060,7 @@
 #define RTE_ULP_UART_RTS_MUX  3
 #define RTE_ULP_UART_RTS_PAD  5
 #elif (RTE_ULP_UART_RTS_PORT_ID == 3)
-#define RTE_ULP_UART_RTS_PORT RTE_ULP_PORT
-#define RTE_ULP_UART_RTS_PIN  48
-#define RTE_ULP_UART_RTS_MUX  3
-#define RTE_ULP_UART_RTS_PAD  12
+#error "ULP_UART_RTS Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid ULPSS UART RTE_ULP_UART_RTS_PIN Pin Configuration!"
 #endif
@@ -1121,8 +1081,7 @@
 #define RTE_ULP_UART_RTS_PAD 5
 #endif
 #if (ULP_UART_RTS_LOC == 22)
-#define RTE_ULP_UART_RTS_PIN ULP_UART_RTS_PIN
-#define RTE_ULP_UART_RTS_PAD 12
+#error "ULP_UART_RTS Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -1410,7 +1369,7 @@
 #ifndef M4_SSI_CS3
 #define M4_SSI_CS3 0
 #endif
-// <o> SSI_MASTER_CS Pin <0=>GPIO_9 <1=>GPIO_28 <2=>GPIO_53 <3=>GPIO_10 <4=>GPIO_15 <5=>GPIO_50 <6=>GPIO_51
+// <o> SSI_MASTER_CS Pin <0=>GPIO_9 <1=>GPIO_28 <2=>GPIO_53 <3=>GPIO_10 <4=>GPIO_15
 #ifndef SSI_MASTER_CS0_LOC
 #define RTE_SSI_MASTER_CS0_PORT_ID 1
 
@@ -1477,7 +1436,7 @@
 
 //CS2
 #ifndef SSI_MASTER_CS2_LOC
-#define RTE_SSI_MASTER_CS2_PORT_ID 1
+#define RTE_SSI_MASTER_CS2_PORT_ID 0 // retargeted: GPIO_50 reserved for external flash QSPI
 #if (RTE_SSI_MASTER_CS2_PORT_ID == 0)
 #define RTE_SSI_MASTER_CS2        M4_SSI_CS2
 #define RTE_SSI_MASTER_CS2_PORT   HP
@@ -1485,11 +1444,7 @@
 #define RTE_SSI_MASTER_CS2_MODE   EGPIO_PIN_MUX_MODE3
 #define RTE_SSI_MASTER_CS2_PADSEL 8
 #elif (RTE_SSI_MASTER_CS2_PORT_ID == 1)
-#define RTE_SSI_MASTER_CS2        M4_SSI_CS2
-#define RTE_SSI_MASTER_CS2_PORT   HP
-#define RTE_SSI_MASTER_CS2_PIN    50
-#define RTE_SSI_MASTER_CS2_MODE   EGPIO_PIN_MUX_MODE3
-#define RTE_SSI_MASTER_CS2_PADSEL 14
+#error "SSI_MASTER_CS2 Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_MASTER_CS2 Pin Configuration!"
 #endif
@@ -1503,31 +1458,18 @@
 #define RTE_SSI_MASTER_CS2_PADSEL 8
 #endif
 #if (SSI_MASTER_CS2_LOC == 14)
-#define RTE_SSI_MASTER_CS2_PADSEL 14
+#error "SSI_MASTER_CS2 Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
 
 //CS3
+// GPIO_51 reserved for external flash QSPI
 #ifndef SSI_MASTER_CS3_LOC
-#define RTE_SSI_MASTER_CS3_PORT_ID 0
-#if (RTE_SSI_MASTER_CS3_PORT_ID == 0)
-#define RTE_SSI_MASTER_CS3        M4_SSI_CS3
-#define RTE_SSI_MASTER_CS3_PORT   HP
-#define RTE_SSI_MASTER_CS3_PIN    51
-#define RTE_SSI_MASTER_CS3_MODE   EGPIO_PIN_MUX_MODE3
-#define RTE_SSI_MASTER_CS3_PADSEL 15
-#else
-#error "Invalid SSI_MASTER_CS3 Pin Configuration!"
-#endif
+#define RTE_SSI_MASTER_CS3 0
 #else
 //Pintool data
-#define RTE_SSI_MASTER_CS3_PORT   HP
-#define RTE_SSI_MASTER_CS3_PIN    SSI_MASTER_CS3__PIN
-#define RTE_SSI_MASTER_CS3        1
-#define RTE_SSI_MASTER_CS3_MODE   EGPIO_PIN_MUX_MODE3
-#define RTE_SSI_MASTER_CS3_PADSEL 15
-//Pintool data
+#error "SSI_MASTER_CS3 Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #endif
 
 //     <o> RTE_SSI_MASTER_UDMA_RX_CH Channel <28=>28
@@ -1545,7 +1487,7 @@
 
 #define RTE_SSI_SLAVE_INPUT_CLOCK SSISLAVE_CLK
 
-// <o> SSI_SLAVE_MISO Pin <0=>Not Used <1=>GPIO_11  <2=>GPIO_28 <3=>GPIO_49 <4=>GPIO_57
+// <o> SSI_SLAVE_MISO Pin <0=>Not Used <1=>GPIO_11  <2=>GPIO_28 <4=>GPIO_57
 #ifndef SSI_SLAVE_MISO_LOC
 #define RTE_SSI_SLAVE_MISO_PORT_ID 2
 
@@ -1563,18 +1505,14 @@
 #define RTE_SSI_SLAVE_MISO_PIN    28
 #define RTE_SSI_SLAVE_MISO_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_MISO_PADSEL 0 //no pad
-#elif (RTE_SSI_SLAVE_MISO_PORT_ID == 3)
-#define RTE_SSI_SLAVE_MISO        1
-#define RTE_SSI_SLAVE_MISO_PORT   HP
-#define RTE_SSI_SLAVE_MISO_PIN    49
-#define RTE_SSI_SLAVE_MISO_MODE   EGPIO_PIN_MUX_MODE8
-#define RTE_SSI_SLAVE_MISO_PADSEL 13
 #elif (RTE_SSI_SLAVE_MISO_PORT_ID == 4)
 #define RTE_SSI_SLAVE_MISO        1
 #define RTE_SSI_SLAVE_MISO_PORT   HP
 #define RTE_SSI_SLAVE_MISO_PIN    57
 #define RTE_SSI_SLAVE_MISO_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_MISO_PADSEL 21
+#elif (RTE_SSI_SLAVE_MISO_PORT_ID == 3)
+#error "SSI_SLAVE_MISO Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_SLAVE_MISO Pin Configuration!"
 #endif
@@ -1591,7 +1529,7 @@
 #define RTE_SSI_SLAVE_MISO_PADSEL 0 //no pad
 #endif
 #if (SSI_SLAVE_MISO_LOC == 7)
-#define RTE_SSI_SLAVE_MISO_PADSEL 13
+#error "SSI_SLAVE_MISO Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 #if (SSI_SLAVE_MISO_LOC == 8)
 #define RTE_SSI_SLAVE_MISO_PADSEL 21
@@ -1599,7 +1537,7 @@
 //Pintool data
 #endif
 
-// <o> SSI_SLAVE_MOSI Pin <0=>Not Used <1=>GPIO_10 <2=>GPIO_27 <3=>GPIO_48 <4=>GPIO_56
+// <o> SSI_SLAVE_MOSI Pin <0=>Not Used <1=>GPIO_10 <2=>GPIO_27 <4=>GPIO_56
 #ifndef SSI_SLAVE_MOSI_LOC
 #ifdef SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
 #define RTE_SSI_SLAVE_MOSI_PORT_ID 2
@@ -1621,18 +1559,14 @@
 #define RTE_SSI_SLAVE_MOSI_PIN    27
 #define RTE_SSI_SLAVE_MOSI_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_MOSI_PADSEL 0 //no pad
-#elif (RTE_SSI_SLAVE_MOSI_PORT_ID == 3)
-#define RTE_SSI_SLAVE_MOSI        1
-#define RTE_SSI_SLAVE_MOSI_PORT   HP
-#define RTE_SSI_SLAVE_MOSI_PIN    48
-#define RTE_SSI_SLAVE_MOSI_MODE   EGPIO_PIN_MUX_MODE8
-#define RTE_SSI_SLAVE_MOSI_PADSEL 12
 #elif (RTE_SSI_SLAVE_MOSI_PORT_ID == 4)
 #define RTE_SSI_SLAVE_MOSI        1
 #define RTE_SSI_SLAVE_MOSI_PORT   HP
 #define RTE_SSI_SLAVE_MOSI_PIN    56
 #define RTE_SSI_SLAVE_MOSI_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_MOSI_PADSEL 20
+#elif (RTE_SSI_SLAVE_MOSI_PORT_ID == 3)
+#error "SSI_SLAVE_MOSI Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_SLAVE_MOSI Pin Configuration!"
 #endif
@@ -1649,7 +1583,7 @@
 #define RTE_SSI_SLAVE_MOSI_PADSEL 0 //no pad
 #endif
 #if (SSI_SLAVE_MOSI_LOC == 3)
-#define RTE_SSI_SLAVE_MOSI_PADSEL 12
+#error "SSI_SLAVE_MOSI Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 #if (SSI_SLAVE_MOSI_LOC == 4)
 #define RTE_SSI_SLAVE_MOSI_PADSEL 20
@@ -1657,7 +1591,7 @@
 //Pintool data
 #endif
 
-// <o> SSI_SLAVE_SCK Pin <0=>Not Used <1=>GPIO_8 <2=>GPIO_26 <3=>GPIO_47 <4=>GPIO_52
+// <o> SSI_SLAVE_SCK Pin <0=>Not Used <1=>GPIO_8 <2=>GPIO_26 <4=>GPIO_52
 #ifndef SSI_SLAVE_SCK_LOC
 #define RTE_SSI_SLAVE_SCK_PORT_ID 2
 
@@ -1675,18 +1609,14 @@
 #define RTE_SSI_SLAVE_SCK_PIN    26
 #define RTE_SSI_SLAVE_SCK_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_SCK_PADSEL 0 //no pad
-#elif (RTE_SSI_SLAVE_SCK_PORT_ID == 3)
-#define RTE_SSI_SLAVE_SCK        1
-#define RTE_SSI_SLAVE_SCK_PORT   HP
-#define RTE_SSI_SLAVE_SCK_PIN    47
-#define RTE_SSI_SLAVE_SCK_MODE   EGPIO_PIN_MUX_MODE8
-#define RTE_SSI_SLAVE_SCK_PADSEL 11
 #elif (RTE_SSI_SLAVE_SCK_PORT_ID == 4)
 #define RTE_SSI_SLAVE_SCK        1
 #define RTE_SSI_SLAVE_SCK_PORT   HP
 #define RTE_SSI_SLAVE_SCK_PIN    52
 #define RTE_SSI_SLAVE_SCK_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_SCK_PADSEL 16
+#elif (RTE_SSI_SLAVE_SCK_PORT_ID == 3)
+#error "SSI_SLAVE_SCK Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_SLAVE_SCK Pin Configuration!"
 #endif
@@ -1703,7 +1633,7 @@
 #define RTE_SSI_SLAVE_SCK_PADSEL 0 //no pad
 #endif
 #if (SSI_SLAVE_SCK_LOC == 11)
-#define RTE_SSI_SLAVE_SCK_PADSEL 11
+#error "SSI_SLAVE_SCK Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 #if (SSI_SLAVE_SCK_LOC == 12)
 #define RTE_SSI_SLAVE_SCK_PADSEL 16
@@ -1711,7 +1641,7 @@
 //Pintool data
 #endif
 
-// <o> SSI_SLAVE_CS Pin <0=>Not Used <1=>GPIO_9 <2=>GPIO_25 <3=>GPIO_46 <4=>GPIO_53
+// <o> SSI_SLAVE_CS Pin <0=>Not Used <1=>GPIO_9 <2=>GPIO_25 <4=>GPIO_53
 #ifndef SSI_SLAVE_CS0_LOC
 #define RTE_SSI_SLAVE_CS_PORT_ID 1
 
@@ -1729,18 +1659,14 @@
 #define RTE_SSI_SLAVE_CS_PIN    25
 #define RTE_SSI_SLAVE_CS_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_CS_PADSEL 0 //no pad
-#elif (RTE_SSI_SLAVE_CS_PORT_ID == 3)
-#define RTE_SSI_SLAVE_CS        1
-#define RTE_SSI_SLAVE_CS_PORT   HP
-#define RTE_SSI_SLAVE_CS_PIN    46
-#define RTE_SSI_SLAVE_CS_MODE   EGPIO_PIN_MUX_MODE8
-#define RTE_SSI_SLAVE_CS_PADSEL 10
 #elif (RTE_SSI_SLAVE_CS_PORT_ID == 4)
 #define RTE_SSI_SLAVE_CS        1
 #define RTE_SSI_SLAVE_CS_PORT   HP
 #define RTE_SSI_SLAVE_CS_PIN    53
 #define RTE_SSI_SLAVE_CS_MODE   EGPIO_PIN_MUX_MODE8
 #define RTE_SSI_SLAVE_CS_PADSEL 17
+#elif (RTE_SSI_SLAVE_CS_PORT_ID == 3)
+#error "SSI_SLAVE_CS Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_SLAVE_CS Pin Configuration!"
 #endif
@@ -1757,7 +1683,7 @@
 #define RTE_SSI_SLAVE_CS_PADSEL 0 //no pad
 #endif
 #if (SSI_SLAVE_CS0_LOC == 15)
-#define RTE_SSI_SLAVE_CS_PADSEL 10
+#error "SSI_SLAVE_CS0 Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 #if (SSI_SLAVE_CS0_LOC == 16)
 #define RTE_SSI_SLAVE_CS_PADSEL 17
@@ -1819,11 +1745,7 @@
 #define RTE_SSI_ULP_MASTER_MISO_MODE   1
 #define RTE_SSI_ULP_MASTER_MISO_PADSEL 3
 #elif (RTE_SSI_ULP_MASTER_MISO_PORT_ID == 4)
-#define RTE_SSI_ULP_MASTER_MISO        1
-#define RTE_SSI_ULP_MASTER_MISO_PORT   RTE_ULP_PORT
-#define RTE_SSI_ULP_MASTER_MISO_PIN    47
-#define RTE_SSI_ULP_MASTER_MISO_MODE   1
-#define RTE_SSI_ULP_MASTER_MISO_PADSEL 11
+#error "SSI_ULP_MASTER_MISO Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_ULP_MISO Pin Configuration!"
 #endif
@@ -1852,9 +1774,7 @@
 #define RTE_SSI_ULP_MASTER_MISO_PADSEL 3
 #endif
 #if (ULP_SSI_MISO_LOC == 16)
-#define RTE_SSI_ULP_MASTER_MISO_PIN    ULP_SSI_MISO__PIN
-#define RTE_SSI_ULP_MASTER_MISO_MODE   1
-#define RTE_SSI_ULP_MASTER_MISO_PADSEL 11
+#error "ULP_SSI_MISO Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -1887,11 +1807,7 @@
 #define RTE_SSI_ULP_MASTER_MOSI_MODE   1
 #define RTE_SSI_ULP_MASTER_MOSI_PADSEL 2
 #elif (RTE_SSI_ULP_MASTER_MOSI_PORT_ID == 4)
-#define RTE_SSI_ULP_MASTER_MOSI        1
-#define RTE_SSI_ULP_MASTER_MOSI_PORT   RTE_ULP_PORT
-#define RTE_SSI_ULP_MASTER_MOSI_PIN    49
-#define RTE_SSI_ULP_MASTER_MOSI_MODE   1
-#define RTE_SSI_ULP_MASTER_MOSI_PADSEL 13
+#error "SSI_ULP_MASTER_MOSI Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_ULP_MOSI Pin Configuration!"
 #endif
@@ -1920,9 +1836,7 @@
 #define RTE_SSI_ULP_MASTER_MOSI_PADSEL 2
 #endif
 #if (ULP_SSI_MOSI_LOC == 14)
-#define RTE_SSI_ULP_MASTER_MOSI_PIN    ULP_SSI_MOSI__PIN
-#define RTE_SSI_ULP_MASTER_MOSI_MODE   1
-#define RTE_SSI_ULP_MASTER_MOSI_PADSEL 13
+#error "ULP_SSI_MOSI Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -1961,11 +1875,7 @@
 #define RTE_SSI_ULP_MASTER_SCK_MODE   1
 #define RTE_SSI_ULP_MASTER_SCK_PADSEL 1
 #elif (RTE_SSI_ULP_MASTER_SCK_PORT_ID == 5)
-#define RTE_SSI_ULP_MASTER_SCK        1
-#define RTE_SSI_ULP_MASTER_SCK_PORT   RTE_ULP_PORT
-#define RTE_SSI_ULP_MASTER_SCK_PIN    46
-#define RTE_SSI_ULP_MASTER_SCK_MODE   1
-#define RTE_SSI_ULP_MASTER_SCK_PADSEL 10
+#error "SSI_ULP_MASTER_SCK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_ULP_SCK Pin Configuration!"
 #endif
@@ -1994,9 +1904,7 @@
 #define RTE_SSI_ULP_MASTER_SCK_PADSEL 1
 #endif
 #if (ULP_SSI_SCK_LOC == 18)
-#define RTE_SSI_ULP_MASTER_SCK_PIN    ULP_SSI_SCK__PIN
-#define RTE_SSI_ULP_MASTER_SCK_MODE   1
-#define RTE_SSI_ULP_MASTER_SCK_PADSEL 10
+#error "ULP_SSI_SCK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -2022,12 +1930,6 @@
 #define RTE_SSI_ULP_MASTER_CS0_PIN    (10 + GPIO_MAX_PIN)
 #define RTE_SSI_ULP_MASTER_CS0_MODE   1
 #define RTE_SSI_ULP_MASTER_CS0_PADSEL 0
-#elif (RTE_SSI_ULP_MASTER_CS0_PORT_ID == 3)
-#define RTE_SSI_ULP_MASTER_CS0        ULP_SSI_CS0
-#define RTE_SSI_ULP_MASTER_CS0_PORT   RTE_ULP_PORT
-#define RTE_SSI_ULP_MASTER_CS0_PIN    48
-#define RTE_SSI_ULP_MASTER_CS0_MODE   1
-#define RTE_SSI_ULP_MASTER_CS0_PADSEL 12
 #else
 #error "Change RTE_SSI_ULP_MASTER_CS_PORT_ID other than  '1' or'3' as per PACKAGE_TYPE"
 #endif
@@ -2046,9 +1948,7 @@
 #define RTE_SSI_ULP_MASTER_CS0_PADSEL 0
 #endif
 #if (ULP_SSI_CS0_LOC == 19)
-#define RTE_SSI_ULP_MASTER_CS0_PIN    ULP_SSI_CS0__PIN
-#define RTE_SSI_ULP_MASTER_CS0_MODE   1
-#define RTE_SSI_ULP_MASTER_CS0_PADSEL 12
+#error "ULP_SSI_CS0 Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -2066,6 +1966,8 @@
 #define RTE_SSI_ULP_MASTER_CS1_PORT   RTE_ULP_PORT
 #define RTE_SSI_ULP_MASTER_CS1_PIN    10
 #define RTE_SSI_ULP_MASTER_CS1_PADSEL 5
+#elif (RTE_SSI_ULP_MASTER_CS0_PORT_ID == 3)
+#error "SSI_ULP_MASTER_CS0 Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid SSI_ULP_CS1 Pin Configuration!"
 #endif
@@ -2170,7 +2072,7 @@
 #define I2S0_IRQHandler IRQ064_Handler
 /*I2S0 PINS*/
 
-//     <o> I2S0_SCLK <0=>P0_8 <1=>P0_25 <2=>P0_46 <3=>P0_52
+//     <o> I2S0_SCLK <0=>P0_8 <1=>P0_25 <3=>P0_52
 //     <i> SCLK of I2S0
 #ifndef I2S0_SCLK_LOC
 #define RTE_I2S0_SCLK_PORT_ID 1
@@ -2185,16 +2087,13 @@
 #define RTE_I2S0_SCLK_PIN  25
 #define RTE_I2S0_SCLK_MUX  7
 #define RTE_I2S0_SCLK_PAD  0 //no pad
-#elif (RTE_I2S0_SCLK_PORT_ID == 2)
-#define RTE_I2S0_SCLK_PORT HP
-#define RTE_I2S0_SCLK_PIN  46
-#define RTE_I2S0_SCLK_MUX  7
-#define RTE_I2S0_SCLK_PAD  10
 #elif (RTE_I2S0_SCLK_PORT_ID == 3)
 #define RTE_I2S0_SCLK_PORT HP
 #define RTE_I2S0_SCLK_PIN  52
 #define RTE_I2S0_SCLK_MUX  7
 #define RTE_I2S0_SCLK_PAD  16
+#elif (RTE_I2S0_SCLK_PORT_ID == 2)
+#error "I2S0_SCLK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid I2S0 RTE_I2S0_SCLK Pin Configuration!"
 #endif
@@ -2210,7 +2109,7 @@
 #define RTE_I2S0_SCLK_PAD 0 //no pad
 #endif
 #if (I2S0_SCLK_LOC == 2)
-#define RTE_I2S0_SCLK_PAD 10
+#error "I2S0_SCLK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 #if (I2S0_SCLK_LOC == 3)
 #define RTE_I2S0_SCLK_PAD 16
@@ -2218,7 +2117,7 @@
 //Pintool data
 #endif
 
-//     <o> I2S0_WSCLK <0=>P0_9 <1=>P0_26  <2=>P0_47  <3=>P0_53
+//     <o> I2S0_WSCLK <0=>P0_9 <1=>P0_26  <3=>P0_53
 //     <i> WSCLK for I2S0
 #ifndef I2S0_WSCLK_LOC
 #define RTE_I2S0_WSCLK_PORT_ID 1
@@ -2233,16 +2132,13 @@
 #define RTE_I2S0_WSCLK_PIN  26
 #define RTE_I2S0_WSCLK_MUX  7
 #define RTE_I2S0_WSCLK_PAD  0 //no pad
-#elif (RTE_I2S0_WSCLK_PORT_ID == 2)
-#define RTE_I2S0_WSCLK_PORT HP
-#define RTE_I2S0_WSCLK_PIN  47
-#define RTE_I2S0_WSCLK_MUX  7
-#define RTE_I2S0_WSCLK_PAD  11
 #elif (RTE_I2S0_WSCLK_PORT_ID == 3)
 #define RTE_I2S0_WSCLK_PORT HP
 #define RTE_I2S0_WSCLK_PIN  53
 #define RTE_I2S0_WSCLK_MUX  7
 #define RTE_I2S0_WSCLK_PAD  17
+#elif (RTE_I2S0_WSCLK_PORT_ID == 2)
+#error "I2S0_WSCLK Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid I2S0 RTE_I2S0_WSCLK Pin Configuration!"
 #endif
@@ -2258,7 +2154,7 @@
 #define RTE_I2S0_WSCLK_PAD 0
 #endif
 #if (I2S0_WSCLK_LOC == 6)
-#define RTE_I2S0_WSCLK_PAD 11
+#error "I2S0_WSCLK Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 #if (I2S0_WSCLK_LOC == 7)
 #define RTE_I2S0_WSCLK_PAD 17
@@ -2266,7 +2162,7 @@
 //Pintool data
 #endif
 
-//     <o> I2S0_DOUT0 <0=>P0_11 <1=>P0_28  <2=>P0_49  <3=>P0_57
+//     <o> I2S0_DOUT0 <0=>P0_11 <1=>P0_28  <3=>P0_57
 //     <i> DOUT0 for I2S0
 #ifndef I2S0_DOUT0_LOC
 #define RTE_I2S0_DOUT0_PORT_ID 1
@@ -2281,16 +2177,13 @@
 #define RTE_I2S0_DOUT0_PIN  28
 #define RTE_I2S0_DOUT0_MUX  7
 #define RTE_I2S0_DOUT0_PAD  0 // no pad
-#elif (RTE_I2S0_DOUT0_PORT_ID == 2)
-#define RTE_I2S0_DOUT0_PORT HP
-#define RTE_I2S0_DOUT0_PIN  49
-#define RTE_I2S0_DOUT0_MUX  7
-#define RTE_I2S0_DOUT0_PAD  13
 #elif (RTE_I2S0_DOUT0_PORT_ID == 3)
 #define RTE_I2S0_DOUT0_PORT HP
 #define RTE_I2S0_DOUT0_PIN  57
 #define RTE_I2S0_DOUT0_MUX  7
 #define RTE_I2S0_DOUT0_PAD  21
+#elif (RTE_I2S0_DOUT0_PORT_ID == 2)
+#error "I2S0_DOUT0 Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid I2S0 RTE_I2S0_DOUT0 Pin Configuration!"
 #endif
@@ -2306,7 +2199,7 @@
 #define RTE_I2S0_DOUT0_PAD 0
 #endif
 #if (I2S0_DOUT0_LOC == 10)
-#define RTE_I2S0_DOUT0_PAD 13
+#error "I2S0_DOUT0 Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 #if (I2S0_DOUT0_LOC == 11)
 #define RTE_I2S0_DOUT0_PAD 21
@@ -2314,7 +2207,7 @@
 //Pintool data
 #endif
 
-//     <o> I2S0_DIN0 <0=>P0_10 <1=>P0_27  <2=>P0_48  <3=>P0_56
+//     <o> I2S0_DIN0 <0=>P0_10 <1=>P0_27  <3=>P0_56
 //     <i> DIN0 for I2S0
 #ifndef I2S0_DIN0_LOC
 #define RTE_I2S0_DIN0_PORT_ID 1
@@ -2329,16 +2222,13 @@
 #define RTE_I2S0_DIN0_PIN  27
 #define RTE_I2S0_DIN0_MUX  7
 #define RTE_I2S0_DIN0_PAD  0 // no pad
-#elif (RTE_I2S0_DIN0_PORT_ID == 2)
-#define RTE_I2S0_DIN0_PORT HP
-#define RTE_I2S0_DIN0_PIN  48
-#define RTE_I2S0_DIN0_MUX  7
-#define RTE_I2S0_DIN0_PAD  12
 #elif (RTE_I2S0_DIN0_PORT_ID == 3)
 #define RTE_I2S0_DIN0_PORT HP
 #define RTE_I2S0_DIN0_PIN  56
 #define RTE_I2S0_DIN0_MUX  7
 #define RTE_I2S0_DIN0_PAD  20
+#elif (RTE_I2S0_DIN0_PORT_ID == 2)
+#error "I2S0_DIN0 Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid I2S0 RTE_I2S0_DIN0 Pin Configuration!"
 #endif
@@ -2354,7 +2244,7 @@
 #define RTE_I2S0_DIN0_PAD 0
 #endif
 #if (I2S0_DIN0_LOC == 14)
-#define RTE_I2S0_DIN0_PAD 12
+#error "I2S0_DIN0 Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 #if (I2S0_DIN0_LOC == 15)
 #define RTE_I2S0_DIN0_PAD 20
@@ -2362,7 +2252,7 @@
 //Pintool data
 #endif
 
-//     <o> I2S0_DOUT1 <0=>P0_7 <1=>P0_30 <2=>P0_51 <3=>P0_55
+//     <o> I2S0_DOUT1 <0=>P0_7 <1=>P0_30 <3=>P0_55
 //     <i> DOUT1 for I2S0
 #ifndef I2S0_DOUT1_LOC
 #ifdef SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
@@ -2381,16 +2271,13 @@
 #define RTE_I2S0_DOUT1_PIN  30
 #define RTE_I2S0_DOUT1_MUX  7
 #define RTE_I2S0_DOUT1_PAD  0 //no pad
-#elif (RTE_I2S0_DOUT1_PORT_ID == 2)
-#define RTE_I2S0_DOUT1_PORT HP
-#define RTE_I2S0_DOUT1_PIN  51
-#define RTE_I2S0_DOUT1_MUX  7
-#define RTE_I2S0_DOUT1_PAD  15
 #elif (RTE_I2S0_DOUT1_PORT_ID == 3)
 #define RTE_I2S0_DOUT1_PORT HP
 #define RTE_I2S0_DOUT1_PIN  55
 #define RTE_I2S0_DOUT1_MUX  7
 #define RTE_I2S0_DOUT1_PAD  19
+#elif (RTE_I2S0_DOUT1_PORT_ID == 2)
+#error "I2S0_DOUT1 Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #else
 #error "Invalid I2S0 RTE_I2S0_DOUT1 Pin Configuration!"
 #endif
@@ -2406,7 +2293,7 @@
 #define RTE_I2S0_DOUT1_PAD 0
 #endif
 #if (I2S0_DOUT1_LOC == 18)
-#define RTE_I2S0_DOUT1_PAD 15
+#error "I2S0_DOUT1 Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #endif
 #if (I2S0_DOUT1_LOC == 19)
 #define RTE_I2S0_DOUT1_PAD 19
@@ -2414,7 +2301,7 @@
 //Pintool data
 #endif
 
-//     <o> I2S0_DIN1 <0=>P0_6 <1=>P0_29 <2=>P0_50 <3=>P0_54
+//     <o> I2S0_DIN1 <0=>P0_6 <1=>P0_29 <3=>P0_54
 //     <i> DIN1 for I2S0
 #ifndef I2S0_DIN1_LOC
 #define RTE_I2S0_DIN1_PORT_ID 0
@@ -2429,16 +2316,13 @@
 #define RTE_I2S0_DIN1_PIN  29
 #define RTE_I2S0_DIN1_MUX  7
 #define RTE_I2S0_DIN1_PAD  0 //no pad
-#elif (RTE_I2S0_DIN1_PORT_ID == 2)
-#define RTE_I2S0_DIN1_PORT HP
-#define RTE_I2S0_DIN1_PIN  50
-#define RTE_I2S0_DIN1_MUX  7
-#define RTE_I2S0_DIN1_PAD  14
 #elif (RTE_I2S0_DIN1_PORT_ID == 3)
 #define RTE_I2S0_DIN1_PORT HP
 #define RTE_I2S0_DIN1_PIN  54
 #define RTE_I2S0_DIN1_MUX  7
 #define RTE_I2S0_DIN1_PAD  18
+#elif (RTE_I2S0_DIN1_PORT_ID == 2)
+#error "I2S0_DIN1 Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #else
 #error "Invalid I2S0 RTE_I2S0_DIN1 Pin Configuration!"
 #endif
@@ -2454,7 +2338,7 @@
 #define RTE_I2S0_DIN1_PAD 0
 #endif
 #if (I2S0_DIN1_LOC == 22)
-#define RTE_I2S0_DIN1_PAD 14
+#error "I2S0_DIN1 Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #endif
 #if (I2S0_DIN1_LOC == 23)
 #define RTE_I2S0_DIN1_PAD 18
@@ -2544,10 +2428,7 @@
 #define RTE_I2S1_SCLK_MUX  2
 #define RTE_I2S1_SCLK_PAD  8
 #elif (RTE_I2S1_SCLK_PORT_ID == 4)
-#define RTE_I2S1_SCLK_PORT RTE_ULP_PORT
-#define RTE_I2S1_SCLK_PIN  46
-#define RTE_I2S1_SCLK_MUX  2
-#define RTE_I2S1_SCLK_PAD  10
+#error "I2S1_SCLK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid I2S1 RTE_I2S1_SCLK Pin Configuration!"
 #endif
@@ -2564,8 +2445,7 @@
 #define RTE_I2S1_SCLK_PAD 8
 #endif
 #if (ULP_I2S_SCLK_LOC == 11)
-#define RTE_I2S1_SCLK_PIN ULP_I2S_SCLK_PIN
-#define RTE_I2S1_SCLK_PAD 10
+#error "ULP_I2S_SCLK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -2594,10 +2474,7 @@
 #define RTE_I2S1_WSCLK_MUX  2
 #define RTE_I2S1_WSCLK_PAD  5
 #elif (RTE_I2S1_WSCLK_PORT_ID == 4)
-#define RTE_I2S1_WSCLK_PORT RTE_ULP_PORT
-#define RTE_I2S1_WSCLK_PIN  48
-#define RTE_I2S1_WSCLK_MUX  2
-#define RTE_I2S1_WSCLK_PAD  12
+#error "I2S1_WSCLK Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid I2S1 RTE_I2S1_WSCLK Pin Configuration!"
 #endif
@@ -2618,8 +2495,7 @@
 #define RTE_I2S1_WSCLK_PAD 5
 #endif
 #if (ULP_I2S_WSCLK_LOC == 14)
-#define RTE_I2S1_WSCLK_PIN ULP_I2S_WSCLK_PIN
-#define RTE_I2S1_WSCLK_PAD 12
+#error "ULP_I2S_WSCLK Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -2648,10 +2524,7 @@
 #define RTE_I2S1_DOUT0_MUX  2
 #define RTE_I2S1_DOUT0_PAD  6
 #elif (RTE_I2S1_DOUT0_PORT_ID == 4)
-#define RTE_I2S1_DOUT0_PORT RTE_ULP_PORT
-#define RTE_I2S1_DOUT0_PIN  49
-#define RTE_I2S1_DOUT0_MUX  2
-#define RTE_I2S1_DOUT0_PAD  13
+#error "I2S1_DOUT0 Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid I2S1 RTE_I2S1_DOUT0 Pin Configuration!"
 #endif
@@ -2672,8 +2545,7 @@
 #define RTE_I2S1_DOUT0_PAD 6
 #endif
 #if (ULP_I2S_DOUT0_LOC == 17)
-#define RTE_I2S1_DOUT0_PIN ULP_I2S_DOUT0_PIN
-#define RTE_I2S1_DOUT0_PAD 13
+#error "ULP_I2S_DOUT0 Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -2707,10 +2579,7 @@
 #define RTE_I2S1_DIN0_MUX  2
 #define RTE_I2S1_DIN0_PAD  7
 #elif (RTE_I2S1_DIN0_PORT_ID == 5)
-#define RTE_I2S1_DIN0_PORT RTE_ULP_PORT
-#define RTE_I2S1_DIN0_PIN  47
-#define RTE_I2S1_DIN0_MUX  2
-#define RTE_I2S1_DIN0_PAD  11
+#error "I2S1_DIN0 Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid I2S1 RTE_I2S1_DIN0 Pin Configuration!"
 #endif
@@ -2731,8 +2600,7 @@
 #define RTE_I2S1_DIN0_PAD 7
 #endif
 #if (ULP_I2S_DIN0_LOC == 20)
-#define RTE_I2S1_DIN0_PIN ULP_I2S_DIN0_PIN
-#define RTE_I2S1_DIN0_PAD 11
+#error "ULP_I2S_DIN0 Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -2939,9 +2807,9 @@
 
 #define RTE_I2C1        1
 #define I2C1_IRQHandler IRQ061_Handler
-//   <o> I2C1_SCL Pin <0=>P0_6 <1=>P0_29  <2=>P0_50 <3=>P0_54 <4=>P0_64 <4=>P0_66 <4=>P0_70 <7=>P0_33
+//   <o> I2C1_SCL Pin <0=>P0_6 <1=>P0_29 <3=>P0_54 <4=>P0_64 <4=>P0_66 <4=>P0_70 <7=>P0_33
 #ifndef I2C1_SCL_LOC
-#define RTE_I2C1_SCL_PORT_ID 2
+#define RTE_I2C1_SCL_PORT_ID 0 // retargeted: GPIO_50 reserved for external flash QSPI
 
 #if (RTE_I2C1_SCL_PORT_ID == 0)
 #define RTE_I2C1_SCL_PORT HP
@@ -2955,12 +2823,6 @@
 #define RTE_I2C1_SCL_MUX  5
 #define RTE_I2C1_SCL_PAD  0 //no pad
 #define RTE_I2C1_SCL_REN  29
-#elif (RTE_I2C1_SCL_PORT_ID == 2)
-#define RTE_I2C1_SCL_PORT HP
-#define RTE_I2C1_SCL_PIN  50
-#define RTE_I2C1_SCL_MUX  5
-#define RTE_I2C1_SCL_PAD  14
-#define RTE_I2C1_SCL_REN  50
 #elif (RTE_I2C1_SCL_PORT_ID == 3)
 #define RTE_I2C1_SCL_PORT HP
 #define RTE_I2C1_SCL_PIN  54
@@ -2985,6 +2847,8 @@
 #define RTE_I2C1_SCL_MUX  11
 #define RTE_I2C1_SCL_PAD  9
 #define RTE_I2C1_SCL_REN  33
+#elif (RTE_I2C1_SCL_PORT_ID == 2)
+#error "I2C1_SCL Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #else
 #error "Invalid I2C1_SCL Pin Configuration!"
 #endif
@@ -3004,10 +2868,7 @@
 #define RTE_I2C1_SCL_REN 29
 #endif
 #if (I2C1_SCL_LOC == 2)
-#define RTE_I2C1_SCL_PIN I2C1_SCL_PIN
-#define RTE_I2C1_SCL_MUX 5
-#define RTE_I2C1_SCL_PAD 14
-#define RTE_I2C1_SCL_REN 50
+#error "I2C1_SCL Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #endif
 #if (I2C1_SCL_LOC == 3)
 #define RTE_I2C1_SCL_PIN I2C1_SCL_PIN
@@ -3036,9 +2897,9 @@
 //Pintool data
 #endif
 
-// <o> I2C1_SCL Pin <0=>P0_7 <1=>P0_30 <2=>P0_51 <3=>P0_55  <4=>P0_65 <4=>P0_67 <4=>P0_71 <7=>P0_34
+// <o> I2C1_SCL Pin <0=>P0_7 <1=>P0_30 <3=>P0_55  <4=>P0_65 <4=>P0_67 <4=>P0_71 <7=>P0_34
 #ifndef I2C1_SDA_LOC
-#define RTE_I2C1_SDA_PORT_ID 2
+#define RTE_I2C1_SDA_PORT_ID 0 // retargeted: GPIO_51 reserved for external flash QSPI
 
 #if (RTE_I2C1_SDA_PORT_ID == 0)
 #define RTE_I2C1_SDA_PORT HP
@@ -3052,12 +2913,6 @@
 #define RTE_I2C1_SDA_MUX  5
 #define RTE_I2C1_SDA_PAD  0 //no pad
 #define RTE_I2C1_SDA_REN  30
-#elif (RTE_I2C1_SDA_PORT_ID == 2)
-#define RTE_I2C1_SDA_PORT HP
-#define RTE_I2C1_SDA_PIN  51
-#define RTE_I2C1_SDA_MUX  5
-#define RTE_I2C1_SDA_PAD  15
-#define RTE_I2C1_SDA_REN  51
 #elif (RTE_I2C1_SDA_PORT_ID == 3)
 #define RTE_I2C1_SDA_PORT HP
 #define RTE_I2C1_SDA_PIN  55
@@ -3088,6 +2943,8 @@
 #define RTE_I2C1_SDA_MUX  11
 #define RTE_I2C1_SDA_PAD  9
 #define RTE_I2C1_SDA_REN  34
+#elif (RTE_I2C1_SDA_PORT_ID == 2)
+#error "I2C1_SDA Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #else
 #error "Invalid I2C1_SDA Pin Configuration!"
 #endif
@@ -3107,10 +2964,7 @@
 #define RTE_I2C1_SDA_REN 30
 #endif
 #if (I2C1_SDA_LOC == 8)
-#define RTE_I2C1_SDA_PIN I2C1_SDA_PIN
-#define RTE_I2C1_SDA_MUX 5
-#define RTE_I2C1_SDA_PAD 15
-#define RTE_I2C1_SDA_REN 51
+#error "I2C1_SDA Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #endif
 #if (I2C1_SDA_LOC == 9)
 #define RTE_I2C1_SDA_PIN I2C1_SDA_PIN
@@ -3199,11 +3053,7 @@
 #define RTE_I2C2_SCL_REN  15
 #define RTE_I2C2_SCL_PAD  8
 #elif (RTE_I2C2_SCL_PORT_ID == 6)
-#define RTE_I2C2_SCL_PORT RTE_ULP_PORT
-#define RTE_I2C2_SCL_PIN  46
-#define RTE_I2C2_SCL_MUX  4
-#define RTE_I2C2_SCL_REN  46
-#define RTE_I2C2_SCL_PAD  10
+#error "I2C2_SCL Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid I2C2_SCL Pin Configuration!"
 #endif
@@ -3247,9 +3097,7 @@
 #define RTE_I2C2_SCL_PAD 8
 #endif
 #if (ULP_I2C_SCL_LOC == 12)
-#define RTE_I2C2_SCL_PIN ULP_I2C_SCL_PIN
-#define RTE_I2C2_SCL_REN 46
-#define RTE_I2C2_SCL_PAD 10
+#error "ULP_I2C_SCL Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -3294,17 +3142,9 @@
 #define RTE_I2C2_SDA_REN  12
 #define RTE_I2C2_SDA_PAD  7
 #elif (RTE_I2C2_SDA_PORT_ID == 6)
-#define RTE_I2C2_SDA_PORT RTE_ULP_PORT
-#define RTE_I2C2_SDA_PIN  47
-#define RTE_I2C2_SDA_MUX  4
-#define RTE_I2C2_SDA_REN  47
-#define RTE_I2C2_SDA_PAD  11
+#error "I2C2_SDA Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #elif (RTE_I2C2_SDA_PORT_ID == 7)
-#define RTE_I2C2_SDA_PORT RTE_ULP_PORT
-#define RTE_I2C2_SDA_PIN  49
-#define RTE_I2C2_SDA_MUX  4
-#define RTE_I2C2_SDA_REN  49
-#define RTE_I2C2_SDA_PAD  13
+#error "I2C2_SDA Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid I2C2_SDA Pin Configuration!"
 #endif
@@ -3353,14 +3193,10 @@
 #define RTE_I2C2_SDA_PAD 7
 #endif
 #if (ULP_I2C_SDA_LOC == 16)
-#define RTE_I2C2_SDA_PIN ULP_I2C_SDA_PIN
-#define RTE_I2C2_SDA_REN 47
-#define RTE_I2C2_SDA_PAD 11
+#error "ULP_I2C_SDA Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 #if (ULP_I2C_SDA_LOC == 17)
-#define RTE_I2C2_SDA_PIN ULP_I2C_SDA_PIN
-#define RTE_I2C2_SDA_REN 49
-#define RTE_I2C2_SDA_PAD 13
+#error "ULP_I2C_SDA Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 //Pintool data
 #endif
@@ -3380,7 +3216,7 @@
 // <i> Configuration settings for Driver_GSPI_MASTER in component ::Drivers:GSPI
 #define RTE_GSPI_MASTER 1
 
-//     <o> GSPI_MASTER_CLK <0=>P0_8 <1=>P0_25 <2=>P0_46 <3=>P0_52
+//     <o> GSPI_MASTER_CLK <0=>P0_8 <1=>P0_25 <3=>P0_52
 //     <i> CLK of GSPI0
 #ifndef GSPI_MASTER_SCK_LOC
 #define RTE_GSPI_MASTER_CLK_PORT_ID 1
@@ -3395,16 +3231,13 @@
 #define RTE_GSPI_MASTER_CLK_PIN  25
 #define RTE_GSPI_MASTER_CLK_MUX  4
 #define RTE_GSPI_MASTER_CLK_PAD  0 //NO PAD
-#elif (RTE_GSPI_MASTER_CLK_PORT_ID == 2)
-#define RTE_GSPI_MASTER_CLK_PORT HP
-#define RTE_GSPI_MASTER_CLK_PIN  46
-#define RTE_GSPI_MASTER_CLK_MUX  4
-#define RTE_GSPI_MASTER_CLK_PAD  10
 #elif (RTE_GSPI_MASTER_CLK_PORT_ID == 3)
 #define RTE_GSPI_MASTER_CLK_PORT HP
 #define RTE_GSPI_MASTER_CLK_PIN  52
 #define RTE_GSPI_MASTER_CLK_MUX  4
 #define RTE_GSPI_MASTER_CLK_PAD  16
+#elif (RTE_GSPI_MASTER_CLK_PORT_ID == 2)
+#error "GSPI_MASTER_CLK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid GSPI0 RTE_GSPI_MASTER_CLK_PIN Pin Configuration!"
 #endif
@@ -3420,7 +3253,7 @@
 #define RTE_GSPI_MASTER_CLK_PAD 0
 #endif
 #if (GSPI_MASTER_SCK_LOC == 2)
-#define RTE_GSPI_MASTER_CLK_PAD 10
+#error "GSPI_MASTER_SCK Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 #if (GSPI_MASTER_SCK_LOC == 3)
 #define RTE_GSPI_MASTER_CLK_PAD 16
@@ -3428,7 +3261,7 @@
 //Pintool data
 #endif
 
-//   <o> GSPI_MASTER_CS0 Pin <0=>P0_9 <1=>P0_28 <2=>P0_49 <3=>P0_53
+//   <o> GSPI_MASTER_CS0 Pin <0=>P0_9 <1=>P0_28 <3=>P0_53
 //   <i> CS0 of GSPI0
 #ifndef GSPI_MASTER_CS0_LOC
 #define RTE_GSPI_MASTER_CS0_PORT_ID 1
@@ -3445,18 +3278,14 @@
 #define RTE_GSPI_MASTER_CS0_PIN  28
 #define RTE_GSPI_MASTER_CS0_MUX  4
 #define RTE_GSPI_MASTER_CS0_PAD  0 //NO PAD
-#elif (RTE_GSPI_MASTER_CS0_PORT_ID == 2)
-#define RTE_GSPI_MASTER_CS0      1
-#define RTE_GSPI_MASTER_CS0_PORT HP
-#define RTE_GSPI_MASTER_CS0_PIN  49
-#define RTE_GSPI_MASTER_CS0_MUX  4
-#define RTE_GSPI_MASTER_CS0_PAD  13
 #elif (RTE_GSPI_MASTER_CS0_PORT_ID == 3)
 #define RTE_GSPI_MASTER_CS0      1
 #define RTE_GSPI_MASTER_CS0_PORT HP
 #define RTE_GSPI_MASTER_CS0_PIN  53
 #define RTE_GSPI_MASTER_CS0_MUX  4
 #define RTE_GSPI_MASTER_CS0_PAD  17
+#elif (RTE_GSPI_MASTER_CS0_PORT_ID == 2)
+#error "GSPI_MASTER_CS0 Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid GSPI0 RTE_GSPI_MASTER_CS0_PIN Pin Configuration!"
 #endif
@@ -3473,7 +3302,7 @@
 #define RTE_GSPI_MASTER_CS0_PAD 0
 #endif
 #if (GSPI_MASTER_CS0_LOC == 6)
-#define RTE_GSPI_MASTER_CS0_PAD 13
+#error "GSPI_MASTER_CS0 Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 #if (GSPI_MASTER_CS0_LOC == 7)
 #define RTE_GSPI_MASTER_CS0_PAD 17
@@ -3481,7 +3310,7 @@
 //Pintool data
 #endif
 
-//   <o> GSPI_MASTER_CS1 Pin <0=>P0_10 <1=>P0_29 <2=>P0_50 <3=>P0_54
+//   <o> GSPI_MASTER_CS1 Pin <0=>P0_10 <1=>P0_29 <3=>P0_54
 //   <i> CS1 of GSPI0
 #ifndef GSPI_MASTER_CS1_LOC
 #define RTE_GSPI_MASTER_CS1_PORT_ID 1
@@ -3497,18 +3326,14 @@
 #define RTE_GSPI_MASTER_CS1_PIN  29
 #define RTE_GSPI_MASTER_CS1_MUX  4
 #define RTE_GSPI_MASTER_CS1_PAD  0 //NO PAD
-#elif (RTE_GSPI_MASTER_CS1_PORT_ID == 2)
-#define RTE_GSPI_MASTER_CS1      1
-#define RTE_GSPI_MASTER_CS1_PORT HP
-#define RTE_GSPI_MASTER_CS1_PIN  50
-#define RTE_GSPI_MASTER_CS1_MUX  4
-#define RTE_GSPI_MASTER_CS1_PAD  14
 #elif (RTE_GSPI_MASTER_CS1_PORT_ID == 3)
 #define RTE_GSPI_MASTER_CS1      1
 #define RTE_GSPI_MASTER_CS1_PORT HP
 #define RTE_GSPI_MASTER_CS1_PIN  54
 #define RTE_GSPI_MASTER_CS1_MUX  4
 #define RTE_GSPI_MASTER_CS1_PAD  18
+#elif (RTE_GSPI_MASTER_CS1_PORT_ID == 2)
+#error "GSPI_MASTER_CS1 Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #else
 #error "Invalid GSPI0 RTE_GSPI_MASTER_CS1_PIN Pin Configuration!"
 #endif
@@ -3525,7 +3350,7 @@
 #define RTE_GSPI_MASTER_CS1_PAD 0
 #endif
 #if (GSPI_MASTER_CS1_LOC == 10)
-#define RTE_GSPI_MASTER_CS1_PAD 14
+#error "GSPI_MASTER_CS1 Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #endif
 #if (GSPI_MASTER_CS1_LOC == 11)
 #define RTE_GSPI_MASTER_CS1_PAD 18
@@ -3533,7 +3358,7 @@
 //Pintool data
 #endif
 
-//   <o> GSPI_MASTER_CS2 Pin <0=>P0_15 <1=>P0_30 <2=>P0_51 <3=>P0_55
+//   <o> GSPI_MASTER_CS2 Pin <0=>P0_15 <1=>P0_30 <3=>P0_55
 //   <i> CS2 of GSPI0
 #ifndef GSPI_MASTER_CS2_LOC
 #define RTE_GSPI_MASTER_CS2_PORT_ID 1
@@ -3549,18 +3374,14 @@
 #define RTE_GSPI_MASTER_CS2_PIN  30
 #define RTE_GSPI_MASTER_CS2_MUX  4
 #define RTE_GSPI_MASTER_CS2_PAD  0 //NO PAD
-#elif (RTE_GSPI_MASTER_CS2_PORT_ID == 2)
-#define RTE_GSPI_MASTER_CS2      1
-#define RTE_GSPI_MASTER_CS2_PORT HP
-#define RTE_GSPI_MASTER_CS2_PIN  51
-#define RTE_GSPI_MASTER_CS2_MUX  4
-#define RTE_GSPI_MASTER_CS2_PAD  15
 #elif (RTE_GSPI_MASTER_CS2_PORT_ID == 3)
 #define RTE_GSPI_MASTER_CS2      1
 #define RTE_GSPI_MASTER_CS2_PORT HP
 #define RTE_GSPI_MASTER_CS2_PIN  55
 #define RTE_GSPI_MASTER_CS2_MUX  4
 #define RTE_GSPI_MASTER_CS2_PAD  19
+#elif (RTE_GSPI_MASTER_CS2_PORT_ID == 2)
+#error "GSPI_MASTER_CS2 Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #else
 #error "Invalid GSPI0 RTE_GSPI_MASTER_CS2_PIN Pin Configuration!"
 #endif
@@ -3577,7 +3398,7 @@
 #define RTE_GSPI_MASTER_CS2_PAD 0
 #endif
 #if (GSPI_MASTER_CS2_LOC == 14)
-#define RTE_GSPI_MASTER_CS2_PAD 15
+#error "GSPI_MASTER_CS2 Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #endif
 #if (GSPI_MASTER_CS2_LOC == 15)
 #define RTE_GSPI_MASTER_CS2_PAD 19
@@ -3585,7 +3406,7 @@
 //Pintool data
 #endif
 
-//     <o> GSPI_MASTER_MOSI <0=>P0_12 <1=>P0_27 <2=>P0_48 <3=>P0_57 <4=>P0_6
+//     <o> GSPI_MASTER_MOSI <0=>P0_12 <1=>P0_27 <3=>P0_57 <4=>P0_6
 //     <i> MOSI of GSPI0
 #ifndef GSPI_MASTER_MOSI_LOC
 #define RTE_GSPI_MASTER_MOSI_PORT_ID 1
@@ -3600,11 +3421,6 @@
 #define RTE_GSPI_MASTER_MOSI_PIN  27
 #define RTE_GSPI_MASTER_MOSI_MUX  4
 #define RTE_GSPI_MASTER_MOSI_PAD  0 //NO PAD
-#elif (RTE_GSPI_MASTER_MOSI_PORT_ID == 2)
-#define RTE_GSPI_MASTER_MOSI_PORT HP
-#define RTE_GSPI_MASTER_MOSI_PIN  48
-#define RTE_GSPI_MASTER_MOSI_MUX  4
-#define RTE_GSPI_MASTER_MOSI_PAD  12
 #elif (RTE_GSPI_MASTER_MOSI_PORT_ID == 3)
 #define RTE_GSPI_MASTER_MOSI_PORT HP
 #define RTE_GSPI_MASTER_MOSI_PIN  57
@@ -3615,6 +3431,8 @@
 #define RTE_GSPI_MASTER_MOSI_PIN  6
 #define RTE_GSPI_MASTER_MOSI_MUX  12
 #define RTE_GSPI_MASTER_MOSI_PAD  1
+#elif (RTE_GSPI_MASTER_MOSI_PORT_ID == 2)
+#error "GSPI_MASTER_MOSI Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid GSPI0 RTE_GSPI_MASTER_MOSI_PIN Pin Configuration!"
 #endif
@@ -3631,8 +3449,7 @@
 #define RTE_GSPI_MASTER_MOSI_PAD 0
 #endif
 #if (GSPI_MASTER_MOSI_LOC == 18)
-#define RTE_GSPI_MASTER_MOSI_MUX 4
-#define RTE_GSPI_MASTER_MOSI_PAD 12
+#error "GSPI_MASTER_MOSI Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 #if (GSPI_MASTER_MOSI_LOC == 19)
 #define RTE_GSPI_MASTER_MOSI_MUX 4
@@ -3645,7 +3462,7 @@
 //Pintool data
 #endif
 
-//     <o> GSPI_MASTER_MISO <0=>P0_11 <1=>P0_26 <2=>P0_47 <3=>P0_56
+//     <o> GSPI_MASTER_MISO <0=>P0_11 <1=>P0_26 <3=>P0_56
 //     <i> MISO of GSPI0
 #ifndef GSPI_MASTER_MISO_LOC
 #define RTE_GSPI_MASTER_MISO_PORT_ID 1
@@ -3660,16 +3477,13 @@
 #define RTE_GSPI_MASTER_MISO_PIN  26
 #define RTE_GSPI_MASTER_MISO_MUX  4
 #define RTE_GSPI_MASTER_MISO_PAD  0 //NO PAD
-#elif (RTE_GSPI_MASTER_MISO_PORT_ID == 2)
-#define RTE_GSPI_MASTER_MISO_PORT HP
-#define RTE_GSPI_MASTER_MISO_PIN  47
-#define RTE_GSPI_MASTER_MISO_MUX  4
-#define RTE_GSPI_MASTER_MISO_PAD  11
 #elif (RTE_GSPI_MASTER_MISO_PORT_ID == 3)
 #define RTE_GSPI_MASTER_MISO_PORT HP
 #define RTE_GSPI_MASTER_MISO_PIN  56
 #define RTE_GSPI_MASTER_MISO_MUX  4
 #define RTE_GSPI_MASTER_MISO_PAD  20
+#elif (RTE_GSPI_MASTER_MISO_PORT_ID == 2)
+#error "GSPI_MASTER_MISO Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid GSPI0 RTE_GSPI_MASTER_MISO_PIN Pin Configuration!"
 #endif
@@ -3685,7 +3499,7 @@
 #define RTE_GSPI_MASTER_MISO_PAD 0
 #endif
 #if (GSPI_MASTER_MISO_LOC == 23)
-#define RTE_GSPI_MASTER_MISO_PAD 11
+#error "GSPI_MASTER_MISO Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 #if (GSPI_MASTER_MISO_LOC == 24)
 #define RTE_GSPI_MASTER_MISO_PAD 20
@@ -4648,7 +4462,7 @@
 #define RTE_PWM_SLP_EVENT_TRIG_MUX 8
 #define RTE_PWM_SLP_EVENT_TRIG_PAD 30
 
-//PWM_TMR_EXT_TRIG_1 <0=>GPIO_27 <1=>GPIO_51 <2=>GPIO_70 <3=>GPIO_75
+//PWM_TMR_EXT_TRIG_1 <0=>GPIO_27 <2=>GPIO_70 <3=>GPIO_75
 #ifndef PWM_EXTTRIG1_LOC
 #define RTE_PWM_TMR_EXT_TRIG_1_PORT_ID 0
 
@@ -4657,11 +4471,6 @@
 #define RTE_PWM_TMR_EXT_TRIG_1_PIN  27
 #define RTE_PWM_TMR_EXT_TRIG_1_MUX  10
 #define RTE_PWM_TMR_EXT_TRIG_1_PAD  0 //no pad
-#elif (RTE_PWM_TMR_EXT_TRIG_1_PORT_ID == 1)
-#define RTE_PWM_TMR_EXT_TRIG_1_PORT HP
-#define RTE_PWM_TMR_EXT_TRIG_1_PIN  51
-#define RTE_PWM_TMR_EXT_TRIG_1_MUX  8
-#define RTE_PWM_TMR_EXT_TRIG_1_PAD  15
 #elif (RTE_PWM_TMR_EXT_TRIG_1_PORT_ID == 2)
 #define RTE_PWM_TMR_EXT_TRIG_1_PORT HP
 #define RTE_PWM_TMR_EXT_TRIG_1_PIN  70
@@ -4672,6 +4481,8 @@
 #define RTE_PWM_TMR_EXT_TRIG_1_PIN  75
 #define RTE_PWM_TMR_EXT_TRIG_1_MUX  8
 #define RTE_PWM_TMR_EXT_TRIG_1_PAD  33
+#elif (RTE_PWM_TMR_EXT_TRIG_1_PORT_ID == 1)
+#error "PWM_TMR_EXT_TRIG_1 Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #else
 #error "Invalid  RTE_PWM_TMR_EXT_TRIG_1_PIN Pin Configuration!"
 #endif
@@ -4684,9 +4495,7 @@
 #define RTE_PWM_TMR_EXT_TRIG_1_PAD 0 //no pad
 #endif
 #if (PWM_EXTTRIG1_LOC == 23)
-#define RTE_PWM_TMR_EXT_TRIG_1_PIN PWM_TMR_EXT_TRIG_1_PIN
-#define RTE_PWM_TMR_EXT_TRIG_1_MUX 8
-#define RTE_PWM_TMR_EXT_TRIG_1_PAD 15
+#error "PWM_EXTTRIG1 Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #endif
 #if (PWM_EXTTRIG1_LOC == 24)
 #define RTE_PWM_TMR_EXT_TRIG_1_PIN (PWM_TMR_EXT_TRIG_1_PIN + GPIO_MAX_PIN)
@@ -4778,9 +4587,7 @@
 #define RTE_PWM_TMR_EXT_TRIG_4_PAD 0 //no pad
 #endif
 #if (PWM_EXTTRIG4_LOC == 34)
-#define RTE_PWM_TMR_EXT_TRIG_4_PIN PWM_TMR_EXT_TRIG_4_PIN
-#define RTE_PWM_TMR_EXT_TRIG_4_MUX 8
-#define RTE_PWM_TMR_EXT_TRIG_4_PAD 14
+#error "PWM_EXTTRIG4 Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #endif
 #if (PWM_EXTTRIG4_LOC == 35)
 #define RTE_PWM_TMR_EXT_TRIG_4_PIN (PWM_TMR_EXT_TRIG_4_PIN + GPIO_MAX_PIN)
@@ -4791,7 +4598,7 @@
 
 //<> QEI (Quadrature Encode Interface)
 
-//QEI_DIR <0=>GPIO_11 <1=>GPIO_28 <2=>GPIO_49 <3=>GPIO_34 <4=>GPIO_57 <5=>GPIO_71 <6=>GPIO_75
+//QEI_DIR <0=>GPIO_11 <1=>GPIO_28 <3=>GPIO_34 <4=>GPIO_57 <5=>GPIO_71 <6=>GPIO_75
 #ifndef QEI_DIR_LOC
 #define RTE_QEI_DIR_PORT_ID 4
 
@@ -4805,11 +4612,6 @@
 #define RTE_QEI_DIR_PIN  28
 #define RTE_QEI_DIR_MUX  5
 #define RTE_QEI_DIR_PAD  0
-#elif (RTE_QEI_DIR_PORT_ID == 2)
-#define RTE_QEI_DIR_PORT HP
-#define RTE_QEI_DIR_PIN  49
-#define RTE_QEI_DIR_MUX  3
-#define RTE_QEI_DIR_PAD  13
 #elif (RTE_QEI_DIR_PORT_ID == 3)
 #define RTE_QEI_DIR_PORT HP
 #define RTE_QEI_DIR_PIN  34
@@ -4830,6 +4632,8 @@
 #define RTE_QEI_DIR_PIN  75
 #define RTE_QEI_DIR_MUX  3
 #define RTE_QEI_DIR_PAD  33
+#elif (RTE_QEI_DIR_PORT_ID == 2)
+#error "QEI_DIR Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid  RTE_QEI_DIR_PIN Pin Configuration!"
 #endif
@@ -4847,9 +4651,7 @@
 #define RTE_QEI_DIR_PAD 0
 #endif
 #if (QEI_DIR_LOC == 2)
-#define RTE_QEI_DIR_PIN QEI_DIR_PIN
-#define RTE_QEI_DIR_MUX 3
-#define RTE_QEI_DIR_PAD 13
+#error "QEI_DIR Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 #if (QEI_DIR_LOC == 3)
 #define RTE_QEI_DIR_PIN QEI_DIR_PIN
@@ -4874,7 +4676,7 @@
 //Pintool data
 #endif
 
-//QEI_IDX <0=>GPIO_8 <1=>GPIO_25 <2=>GPIO_46 <3=>GPIO_31 <4=>GPIO_52 <5=>GPIO_68 <6=>GPIO_64 <7=>GPIO_72
+//QEI_IDX <0=>GPIO_8 <1=>GPIO_25 <3=>GPIO_31 <4=>GPIO_52 <5=>GPIO_68 <6=>GPIO_64 <7=>GPIO_72
 #ifndef QEI_IDX_LOC
 #define RTE_QEI_IDX_PORT_ID 1
 
@@ -4888,11 +4690,6 @@
 #define RTE_QEI_IDX_PIN  25
 #define RTE_QEI_IDX_MUX  5
 #define RTE_QEI_IDX_PAD  0
-#elif (RTE_QEI_IDX_PORT_ID == 2)
-#define RTE_QEI_IDX_PORT HP
-#define RTE_QEI_IDX_PIN  46
-#define RTE_QEI_IDX_MUX  3
-#define RTE_QEI_IDX_PAD  10
 #elif (RTE_QEI_IDX_PORT_ID == 3)
 #define RTE_QEI_IDX_PORT HP
 #define RTE_QEI_IDX_PIN  31
@@ -4918,6 +4715,8 @@
 #define RTE_QEI_IDX_PIN  72
 #define RTE_QEI_IDX_MUX  3
 #define RTE_QEI_IDX_PAD  30
+#elif (RTE_QEI_IDX_PORT_ID == 2)
+#error "QEI_IDX Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #else
 #error "Invalid  RTE_QEI_IDX_PIN Pin Configuration!"
 #endif
@@ -4935,9 +4734,7 @@
 #define RTE_QEI_IDX_PAD 0
 #endif
 #if (QEI_IDX_LOC == 9)
-#define RTE_QEI_IDX_PIN QEI_IDX_PIN
-#define RTE_QEI_IDX_MUX 3
-#define RTE_QEI_IDX_PAD 10
+#error "QEI_IDX Pin Configuration not supported: GPIO_46 reserved for external flash QSPI"
 #endif
 #if (QEI_IDX_LOC == 10)
 #define RTE_QEI_IDX_PIN QEI_IDX_PIN
@@ -4967,7 +4764,7 @@
 //Pintool data
 #endif
 
-//QEI_PHA <0=>GPIO_9 <1=>GPIO_26 <2=>GPIO_47 <3=>GPIO_32 <4=>GPIO_53 <5=>GPIO_69 <6=>GPIO_65 <7=>GPIO_73
+//QEI_PHA <0=>GPIO_9 <1=>GPIO_26 <3=>GPIO_32 <4=>GPIO_53 <5=>GPIO_69 <6=>GPIO_65 <7=>GPIO_73
 #ifndef QEI_PHA_LOC
 #ifdef SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
 #define RTE_QEI_PHA_PORT_ID 1
@@ -4985,11 +4782,6 @@
 #define RTE_QEI_PHA_PIN  26
 #define RTE_QEI_PHA_MUX  5
 #define RTE_QEI_PHA_PAD  0
-#elif (RTE_QEI_PHA_PORT_ID == 2)
-#define RTE_QEI_PHA_PORT HP
-#define RTE_QEI_PHA_PIN  47
-#define RTE_QEI_PHA_MUX  3
-#define RTE_QEI_PHA_PAD  11
 #elif (RTE_QEI_PHA_PORT_ID == 3)
 #define RTE_QEI_PHA_PORT HP
 #define RTE_QEI_PHA_PIN  32
@@ -5015,6 +4807,8 @@
 #define RTE_QEI_PHA_PIN  73
 #define RTE_QEI_PHA_MUX  3
 #define RTE_QEI_PHA_PAD  31
+#elif (RTE_QEI_PHA_PORT_ID == 2)
+#error "QEI_PHA Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #else
 #error "Invalid  RTE_QEI_PHA_PIN Pin Configuration!"
 #endif
@@ -5032,9 +4826,7 @@
 #define RTE_QEI_PHA_PAD 0
 #endif
 #if (QEI_PHA_LOC == 17)
-#define RTE_QEI_PHA_PIN QEI_PHA_PIN
-#define RTE_QEI_PHA_MUX 3
-#define RTE_QEI_PHA_PAD 11
+#error "QEI_PHA Pin Configuration not supported: GPIO_47 reserved for external flash QSPI"
 #endif
 #if (QEI_PHA_LOC == 18)
 #define RTE_QEI_PHA_PIN QEI_PHA_PIN
@@ -5064,7 +4856,7 @@
 //Pintool data
 #endif
 
-//QEI_PHB <0=>GPIO_10 <1=>GPIO_27 <1=>GPIO_48 <1=>GPIO_33 <1=>GPIO_56 <1=>GPIO_70 <7=>GPIO_74
+//QEI_PHB <0=>GPIO_10 <1=>GPIO_27 <1=>GPIO_33 <1=>GPIO_56 <1=>GPIO_70 <7=>GPIO_74
 #ifndef QEI_PHB_LOC
 #ifdef SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER
 #define RTE_QEI_PHB_PORT_ID 1
@@ -5082,11 +4874,6 @@
 #define RTE_QEI_PHB_PIN  27
 #define RTE_QEI_PHB_MUX  5
 #define RTE_QEI_PHB_PAD  0
-#elif (RTE_QEI_PHB_PORT_ID == 2)
-#define RTE_QEI_PHB_PORT HP
-#define RTE_QEI_PHB_PIN  48
-#define RTE_QEI_PHB_MUX  3
-#define RTE_QEI_PHB_PAD  12
 #elif (RTE_QEI_PHB_PORT_ID == 3)
 #define RTE_QEI_PHB_PORT HP
 #define RTE_QEI_PHB_PIN  33
@@ -5107,6 +4894,8 @@
 #define RTE_QEI_PHB_PIN  74
 #define RTE_QEI_PHB_MUX  3
 #define RTE_QEI_PHB_PAD  32
+#elif (RTE_QEI_PHB_PORT_ID == 2)
+#error "QEI_PHB Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #else
 #error "Invalid  RTE_QEI_PHB_PIN Pin Configuration!"
 #endif
@@ -5124,9 +4913,7 @@
 #define RTE_QEI_PHB_PAD 0
 #endif
 #if (QEI_PHB_LOC == 25)
-#define RTE_QEI_PHB_PIN QEI_PHB_PIN
-#define RTE_QEI_PHB_MUX 3
-#define RTE_QEI_PHB_PAD 12
+#error "QEI_PHB Pin Configuration not supported: GPIO_48 reserved for external flash QSPI"
 #endif
 #if (QEI_PHB_LOC == 26)
 #define RTE_QEI_PHB_PIN QEI_PHB_PIN
@@ -5645,32 +5432,32 @@
 
 #define RTE_GPIO_46_PORT HP
 #define RTE_GPIO_46_PAD  10
-#define RTE_GPIO_46_PIN  46
+#define RTE_GPIO_46_PIN  46 // reserved: external flash QSPI
 #define RTE_GPIO_46_MODE 0
 
 #define RTE_GPIO_47_PORT HP
 #define RTE_GPIO_47_PAD  11
-#define RTE_GPIO_47_PIN  47
+#define RTE_GPIO_47_PIN  47 // reserved: external flash QSPI
 #define RTE_GPIO_47_MODE 0
 
 #define RTE_GPIO_48_PORT HP
 #define RTE_GPIO_48_PAD  12
-#define RTE_GPIO_48_PIN  48
+#define RTE_GPIO_48_PIN  48 // reserved: external flash QSPI
 #define RTE_GPIO_48_MODE 0
 
 #define RTE_GPIO_49_PORT HP
 #define RTE_GPIO_49_PAD  13
-#define RTE_GPIO_49_PIN  49
+#define RTE_GPIO_49_PIN  49 // reserved: external flash QSPI
 #define RTE_GPIO_49_MODE 0
 
 #define RTE_GPIO_50_PORT HP
 #define RTE_GPIO_50_PAD  14
-#define RTE_GPIO_50_PIN  50
+#define RTE_GPIO_50_PIN  50 // reserved: external flash QSPI
 #define RTE_GPIO_50_MODE 0
 
 #define RTE_GPIO_51_PORT HP
 #define RTE_GPIO_51_PAD  15
-#define RTE_GPIO_51_PIN  51
+#define RTE_GPIO_51_PIN  51 // reserved: external flash QSPI
 #define RTE_GPIO_51_MODE 0
 
 #define RTE_GPIO_52_PORT HP
@@ -5998,7 +5785,7 @@
 #define RTE_MEMLCD_ENABLE_DISPLAY_PIN  0  // Memlcd display enable pin
 #define RTE_MEMLCD_ENABLE_DISPLAY_PORT HP // Memlcd display enable port
 
-//   <o> UART0_RS485_RE Pin <0=>P0_28 <1=>P0_50 <2=>P0_66 <3=>P0_70  <4=>P0_74
+//   <o> UART0_RS485_RE Pin <0=>P0_28 <2=>P0_66 <3=>P0_70  <4=>P0_74
 #ifndef USART0_RE_LOC
 
 #define RTE_UART0_RS485_RE_PORT_ID 0
@@ -6007,11 +5794,6 @@
 #define RTE_UART0_RS485_RE_PORT 0
 #define RTE_UART0_RS485_RE_MUX  13
 #define RTE_UART0_RS485_RE_PAD  0
-#elif (RTE_UART0_RS485_RE_PORT_ID == 1)
-#define RTE_UART0_RS485_RE_PIN  50
-#define RTE_UART0_RS485_RE_PORT 0
-#define RTE_UART0_RS485_RE_MUX  2
-#define RTE_UART0_RS485_RE_PAD  14
 #elif (RTE_UART0_RS485_RE_PORT_ID == 2)
 #define RTE_UART0_RS485_RE_PIN  70
 #define RTE_UART0_RS485_RE_PORT 0
@@ -6022,6 +5804,8 @@
 #define RTE_UART0_RS485_RE_PORT 0
 #define RTE_UART0_RS485_RE_MUX  6
 #define RTE_UART0_RS485_RE_PAD  32
+#elif (RTE_UART0_RS485_RE_PORT_ID == 1)
+#error "UART0_RS485_RE Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #else
 #error "Invalid UART0_RS485_RE_PIN"
 #endif
@@ -6034,9 +5818,7 @@
 #define RTE_UART0_RS485_RE_PAD 0
 #endif
 #if (USART0_RE_LOC == 39)
-#define RTE_UART0_RS485_RE_PIN (USART0_RS485_RE_PIN)
-#define RTE_UART0_RS485_RE_MUX 2
-#define RTE_UART0_RS485_RE_PAD 14
+#error "USART0_RE Pin Configuration not supported: GPIO_50 reserved for external flash QSPI"
 #endif
 #if (USART0_RE_LOC == 40)
 #define RTE_UART0_RS485_RE_PIN (USART0_RS485_RE_PIN + GPIO_MAX_PIN)
@@ -6051,20 +5833,15 @@
 //Pintool data
 #endif
 
-// <o> UART0_RS485_DE Pin <0=>P0_29 <1=>P0_51 <2=>P0_67 <3=>P0_71  <4=>P0_75
+// <o> UART0_RS485_DE Pin <0=>P0_29 <2=>P0_67 <3=>P0_71  <4=>P0_75
 #ifndef USART0_DE_LOC
 
-#define RTE_UART0_RS485_DE_PORT_ID 1
+#define RTE_UART0_RS485_DE_PORT_ID 0 // retargeted: GPIO_51 reserved for external flash QSPI
 #if (RTE_UART0_RS485_DE_PORT_ID == 0)
 #define RTE_UART0_RS485_DE_PIN  29
 #define RTE_UART0_RS485_DE_PORT 0
 #define RTE_UART0_RS485_DE_MUX  13
 #define RTE_UART0_RS485_DE_PAD  0
-#elif (RTE_UART0_RS485_DE_PORT_ID == 1)
-#define RTE_UART0_RS485_DE_PIN  51
-#define RTE_UART0_RS485_DE_PORT 0
-#define RTE_UART0_RS485_DE_MUX  2
-#define RTE_UART0_RS485_DE_PAD  15
 #elif (RTE_UART0_RS485_DE_PORT_ID == 2)
 #define RTE_UART0_RS485_DE_PIN  71
 #define RTE_UART0_RS485_DE_PORT 0
@@ -6075,6 +5852,8 @@
 #define RTE_UART0_RS485_DE_PORT 0
 #define RTE_UART0_RS485_DE_MUX  6
 #define RTE_UART0_RS485_DE_PAD  33
+#elif (RTE_UART0_RS485_DE_PORT_ID == 1)
+#error "UART0_RS485_DE Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #else
 #error "Invalid UART0_RS485_DE_PIN"
 #endif
@@ -6087,9 +5866,7 @@
 #define RTE_UART0_RS485_DE_PAD 0
 #endif
 #if (USART0_DE_LOC == 43)
-#define RTE_UART0_RS485_DE_PIN (USART0_RS485_DE_PIN)
-#define RTE_UART0_RS485_DE_MUX 2
-#define RTE_UART0_RS485_DE_PAD 15
+#error "USART0_DE Pin Configuration not supported: GPIO_51 reserved for external flash QSPI"
 #endif
 #if (USART0_DE_LOC == 44)
 #define RTE_UART0_RS485_DE_PIN (USART0_RS485_DE_PIN + GPIO_MAX_PIN)
@@ -6104,7 +5881,7 @@
 //Pintool data
 #endif
 
-// <o> UART0_RS485_EN Pin <0=>P0_27 <1=>P0_49 <2=>P0_69 <3=>P0_73
+// <o> UART0_RS485_EN Pin <0=>P0_27 <2=>P0_69 <3=>P0_73
 #ifndef USART0_EN_LOC
 
 #define RTE_UART0_RS485_EN_PORT_ID 0
@@ -6113,11 +5890,6 @@
 #define RTE_UART0_RS485_EN_PORT 0
 #define RTE_UART0_RS485_EN_MUX  13
 #define RTE_UART0_RS485_EN_PAD  0
-#elif (RTE_UART0_RS485_EN_PORT_ID == 1)
-#define RTE_UART0_RS485_EN_PIN  49
-#define RTE_UART0_RS485_EN_PORT 0
-#define RTE_UART0_RS485_EN_MUX  2
-#define RTE_UART0_RS485_EN_PAD  13
 #elif (RTE_UART0_RS485_EN_PORT_ID == 2)
 #define RTE_UART0_RS485_EN_PIN  69
 #define RTE_UART0_RS485_EN_PORT 0
@@ -6128,6 +5900,8 @@
 #define RTE_UART0_RS485_EN_PORT 0
 #define RTE_UART0_RS485_EN_MUX  6
 #define RTE_UART0_RS485_EN_PAD  31
+#elif (RTE_UART0_RS485_EN_PORT_ID == 1)
+#error "UART0_RS485_EN Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #else
 #error "Invalid UART0_RS485_EN_PIN"
 #endif
@@ -6140,9 +5914,7 @@
 #define RTE_UART0_RS485_EN_PAD 0
 #endif
 #if (USART0_EN_LOC == 47)
-#define RTE_UART0_RS485_EN_PIN (USART0_RS485_EN_PIN)
-#define RTE_UART0_RS485_EN_MUX 2
-#define RTE_UART0_RS485_EN_PAD 13
+#error "USART0_EN Pin Configuration not supported: GPIO_49 reserved for external flash QSPI"
 #endif
 #if (USART0_EN_LOC == 48)
 #define RTE_UART0_RS485_EN_PIN (USART0_RS485_EN_PIN + GPIO_MAX_PIN)

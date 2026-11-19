@@ -37,6 +37,18 @@
 // User gain table related
 #define SLI_MAX_GAIN_TABLE_SIZE_WITH_SU_TB 160
 
+/// Worldwide (WW ceiling) power table size — one gain byte per rate/MCS entry in LMAC.
+/// Canonical value is @c SL_WIFI_WORLDWIDE_GAIN_TABLE_SIZE.
+#define SLI_WIFI_WORLDWIDE_GAIN_TABLE_SIZE SL_WIFI_WORLDWIDE_GAIN_TABLE_SIZE
+
+/// Gain-table command band for the worldwide table. 1 = 2.4 GHz.
+/// This encoding is not @c SL_WIFI_BAND_2_4GHZ.
+#define SLI_WIFI_WORLDWIDE_GAIN_TABLE_BAND_2_4GHZ 1
+
+/// Gain-table command bandwidth for the worldwide table. 0 = 20 MHz.
+/// This encoding is not @c SL_WIFI_BANDWIDTH_20MHz.
+#define SLI_WIFI_WORLDWIDE_GAIN_TABLE_BANDWIDTH_20MHZ 0
+
 // Shared Wi-Fi buffer block size (default 1640). Override via SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE=2324 in project defines.
 #ifndef SLI_WIFI_BUFFER_BLOCK_SIZE
 #if (SLI_WIFI_BUFFER_CONFIG_BLOCK_SIZE)
@@ -222,6 +234,8 @@ typedef enum { SLI_WIFI_NO_ENCRYPTION, SLI_WIFI_TKIP_ENCRYPTION, SLI_WIFI_CCMP_E
 /// Timeout value for Gain Table response command
 #define SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))
+/// Timeout value for Worldwide Gain Table response command
+#define SLI_WIFI_RSP_WORLDWIDE_GAIN_TABLE_WAIT_TIME SLI_WIFI_RSP_GAIN_TABLE_WAIT_TIME
 /// Timeout value for EAP Config response command
 #define SLI_WIFI_RSP_EAP_CONFIG_WAIT_TIME \
   ((SLI_WIFI_INTERNAL_COMMANDS_BASE_VALUE * SL_WIFI_INTERNAL_COMMANDS_TIMEOUT_SF) + (SLI_DEFAULT_TIMEOUT))

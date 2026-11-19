@@ -443,7 +443,8 @@ typedef enum {
   SLI_WIFI_REQ_FILTER_BCAST_PACKETS         = 0xC9, ///< Filter Broadcast Packets
   SLI_WIFI_REQ_WPS_METHOD                   = 0x72, ///< WPS Method
   SLI_WIFI_REQ_WPS_EXTENDED_CREDENTIALS     = 0x95, ///< Fetch additional WPS credential records
-  SLI_WIFI_REQ_GAIN_TABLE                   = 0x47, ///< Gain Table
+  SLI_WIFI_REQ_WORLDWIDE_GAIN_TABLE         = 0x66, ///< Worldwide Gain Table
+  SLI_WIFI_REQ_GAIN_TABLE                   = 0x47, ///< Region-based Gain Table
   SLI_WIFI_REQ_TIMEOUT                      = 0xEA, ///< Timeout
   SLI_WIFI_REQ_SET_REGION_AP                = 0xBD, ///< Set Region AP
   SLI_WIFI_REQ_11AX_PARAMS                  = 0xFF, ///< 11AX Parameters
@@ -583,7 +584,8 @@ typedef enum {
   SLI_WIFI_RSP_TWT_ASYNC                    = 0x71,
   SLI_WIFI_RSP_WPS_METHOD                   = 0x72, ///< WPS Method
   SLI_WIFI_RSP_WPS_EXTENDED_CREDENTIALS     = 0x95, ///< Fetch additional WPS credential records
-  SLI_WIFI_RSP_GAIN_TABLE                   = 0x47, ///< Gain Table
+  SLI_WIFI_RSP_WORLDWIDE_GAIN_TABLE         = 0x66, ///< Worldwide Gain Table
+  SLI_WIFI_RSP_GAIN_TABLE                   = 0x47, ///< Region-based Gain Table
   SLI_WIFI_RSP_TIMEOUT                      = 0xEA, ///< Timeout
   SLI_WIFI_RSP_11AX_PARAMS                  = 0xFF, ///< 11AX Parameters
   SLI_WIFI_RSP_ASYNCHRONOUS                 = 0xFF, ///< Asynchronous response (same value as 11AX_PARAMS)

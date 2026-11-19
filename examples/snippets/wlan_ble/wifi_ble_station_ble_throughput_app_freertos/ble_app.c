@@ -79,7 +79,6 @@ static volatile uint32_t ble_app_event_mask;
 static uint8_t str_remote_address[18];
 static uint8_t remote_dev_address[6];
 
-static rsi_ble_event_conn_update_t conn_update_complete;
 static rsi_ble_event_write_t app_ble_write_event;
 static uint16_t rsi_ble_att1_val_hndl;
 static uint16_t rsi_ble_att2_val_hndl;
@@ -645,14 +644,7 @@ void rsi_ble_app_task(void)
 
       case RSI_BLE_CONN_UPDATE_EVENT: {
         SL_DEBUG_LOG_V2(INFO, "Connection parameters update completed\r\n");
-        SL_DEBUG_LOG_V2(INFO,
-                        "Connection interval = %d, Latency = %d, Supervision Timeout = %d\r\n",
-                        conn_update_complete.conn_interval,
-                        conn_update_complete.conn_latency,
-                        conn_update_complete.timeout);
-
         rsi_ble_app_clear_event(RSI_BLE_CONN_UPDATE_EVENT);
-
       } break;
       case RSI_BLE_GATT_WRITE_EVENT: {
         //! event invokes when write event received

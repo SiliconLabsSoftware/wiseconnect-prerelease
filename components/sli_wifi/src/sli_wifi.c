@@ -2527,6 +2527,62 @@ sl_status_t sli_wifi_update_su_gain_table(uint8_t band,
   return status;
 }
 
+sl_status_t sli_wifi_update_worldwide_gain_table(uint8_t band,
+                                                 uint8_t bandwidth,
+                                                 const uint8_t *payload,
+                                                 uint16_t payload_length)
+{
+  sl_status_t status = SL_STATUS_OK;
+
+  if (payload == NULL) {
+    return SL_STATUS_INVALID_CONFIGURATION;
+  }
+
+  // LMAC Worldwide_table[] is a fixed 20-entry rate/MCS power table.
+  if (payload_length != SLI_WIFI_WORLDWIDE_GAIN_TABLE_SIZE) {
+    SL_DEBUG_LOG_V2(ERROR, "Wrong worldwide gain table size\r\n");
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  // Command encoding: band 1 is 2.4 GHz and bandwidth 0 is 20 MHz.
+  if ((band != SLI_WIFI_WORLDWIDE_GAIN_TABLE_BAND_2_4GHZ)
+      || (bandwidth != SLI_WIFI_WORLDWIDE_GAIN_TABLE_BANDWIDTH_20MHZ)) {
+    SL_DEBUG_LOG_V2(ERROR, "Wrong worldwide gain table band or bandwidth\r\n");
+    return SL_STATUS_INVALID_PARAMETER;
+  }
+
+  if (!sl_si91x_is_device_initialized()) {
+    return SL_STATUS_NOT_INITIALIZED;
+  }
+
+  // Dedicated Worldwide gain-table command 0x35; payload is LMAC Worldwide_table[20].
+  // Same header as the region path. Command ID selects the table; reserved stays 0.
+  // Module vs IC policy is enforced in LMAC (modules must fail).
+  sli_wifi_gain_table_info_t gain_table_info = { 0 };
+  gain_table_info.band                       = band;
+  gain_table_info.bandwidth                  = bandwidth;
+  gain_table_info.size                       = payload_length;
+  gain_table_info.x_offset                   = 0;
+  gain_table_info.y_offset                   = 0;
+  gain_table_info.gain_table_version         = 1;
+  gain_table_info.reserved                   = 0;
+
+  sli_wifi_command_payload_t fragments = {
+    .header         = &gain_table_info,
+    .header_length  = sizeof(gain_table_info),
+    .payload        = payload,
+    .payload_length = payload_length,
+  };
+  status = sli_wifi_send_command_with_payload(SLI_WIFI_REQ_WORLDWIDE_GAIN_TABLE,
+                                              SLI_WIFI_WLAN_CMD,
+                                              &fragments,
+                                              SLI_WIFI_RSP_WORLDWIDE_GAIN_TABLE_WAIT_TIME,
+                                              NULL,
+                                              NULL);
+  VERIFY_STATUS_AND_RETURN(status);
+  return status;
+}
+
 sl_status_t sli_wifi_set_11ax_config(const sl_wifi_11ax_config_params_t *config_11ax_params)
 {
   if (sli_wifi_get_opermode() == SL_WIFI_ACCESS_POINT_MODE) {

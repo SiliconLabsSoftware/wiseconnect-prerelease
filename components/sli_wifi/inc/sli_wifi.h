@@ -195,6 +195,10 @@ sl_status_t sli_wifi_update_su_gain_table(uint8_t band,
                                           uint16_t payload_length,
                                           uint8_t x_offset,
                                           uint8_t y_offset);
+sl_status_t sli_wifi_update_worldwide_gain_table(uint8_t band,
+                                                 uint8_t bandwidth,
+                                                 const uint8_t *payload,
+                                                 uint16_t payload_length);
 sl_status_t sli_wifi_set_11ax_config(const sl_wifi_11ax_config_params_t *config_11ax_params);
 sl_status_t sli_wifi_transceiver_set_channel(sl_wifi_interface_t interface, sl_wifi_transceiver_set_channel_t channel);
 sl_status_t sli_wifi_set_transceiver_parameters(sl_wifi_interface_t interface,

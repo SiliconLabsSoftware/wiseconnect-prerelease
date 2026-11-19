@@ -925,6 +925,98 @@ sl_status_t sl_wifi_update_su_gain_table(uint8_t band,
 
 /***************************************************************************/ /**
  * @brief
+ *   Assign the user configurable worldwide gain table entries to the module from the user.
+ * 
+ * @details
+ *   This function overwrites the default worldwide gain table present in the firmware. Customers can load the worldwide gain table for 2.4 GHz-20 MHz. This is a blocking API.
+ * 
+ * @param[in]  band
+ *    1 - 2.4 GHz
+ * 
+ * @param[in]  bandwidth
+ *    0 - 20 MHz
+ * 
+ * @param[in]  payload
+ *    Pass worldwide gain table entries in a given array format.
+ *    The gain array format is one gain value per rate, in this order: \n
+ *     | Index | Rate / MCS |
+ *     |-------|------------|
+ *     |  0    | 1 Mbps     |
+ *     |  1    | 2 Mbps     |
+ *     |  2    | 5.5 Mbps   |
+ *     |  3    | 11 Mbps    |
+ *     |  4    | 48 Mbps    |
+ *     |  5    | 24 Mbps    |
+ *     |  6    | 12 Mbps    |
+ *     |  7    | 6 Mbps     |
+ *     |  8    | 54 Mbps    |
+ *     |  9    | 36 Mbps    |
+ *     |  10   | 18 Mbps    |
+ *     |  11   | 9 Mbps     |
+ *     |  12   | MCS0       |
+ *     |  13   | MCS1       |
+ *     |  14   | MCS2       |
+ *     |  15   | MCS3       |
+ *     |  16   | MCS4       |
+ *     |  17   | MCS5       |
+ *     |  18   | MCS6       |
+ *     |  19   | MCS7       |
+ * 
+ * @param[in]  payload_length
+ *    Payload length (table size) is @ref SL_WIFI_WORLDWIDE_GAIN_TABLE_SIZE (20 bytes).
+ * 
+ * @return
+ *    sl_status_t. See [Status Codes](https://docs.silabs.com/gecko-platform/latest/platform-common/status) and [Additional Status Codes](../wiseconnect-api-reference-guide-err-codes/sl-additional-status-errors) for details.
+ * 
+ * @pre Pre-conditions:
+ *   @ref sl_wifi_init should be called before this API.
+ * 
+ * @note
+ * For IC parts,
+ *     This function is applicable in Transmit test mode (SL_WIFI_TRANSMIT_TEST_MODE) and end-to-end modes.
+ *     Use this function only in devices that have been certified with FCC/CE (ETSI)/MIC (TELEC)/ KC (KCC) certification with your own antenna. Silicon Labs disclaims any liability for non-compliant use of this function that could breach those or any other regulatory certifications.
+ *     To update the worldwide transmit power ceiling:
+ *       - Load the worldwide gain values at every boot via this function/API- sl_wifi_update_worldwide_gain_table().
+ *       - Since the firmware does not retain this information in flash memory, the application must invoke this API at every startup.
+ *       - The provided worldwide user gain table is copied into the firmware’s worldwide gain table.
+ *       - The device then uses this table as the transmit power ceiling in the Worldwide region, and as the upper bound when that table is compared with the region-based gain table for other regions.
+ *       - This API does not replace @ref sl_wifi_update_su_gain_table for region-based certified limits.
+ *     Below is the default worldwide gain table:
+ *       - Si917 IC (SiWx917Mxxxxx) OPNs:
+ *   | Index | Rate / MCS | Gain |
+ *   |-------|------------|------|
+ *   |  0    | 1 Mbps     |  44  |
+ *   |  1    | 2 Mbps     |  44  |
+ *   |  2    | 5.5 Mbps   |  44  |
+ *   |  3    | 11 Mbps    |  44  |
+ *   |  4    | 48 Mbps    |  42  |
+ *   |  5    | 24 Mbps    |  44  |
+ *   |  6    | 12 Mbps    |  44  |
+ *   |  7    | 6 Mbps     |  44  |
+ *   |  8    | 54 Mbps    |  40  |
+ *   |  9    | 36 Mbps    |  43  |
+ *   |  10   | 18 Mbps    |  44  |
+ *   |  11   | 9 Mbps     |  44  |
+ *   |  12   | MCS0       |  44  |
+ *   |  13   | MCS1       |  44  |
+ *   |  14   | MCS2       |  44  |
+ *   |  15   | MCS3       |  44  |
+ *   |  16   | MCS4       |  43  |
+ *   |  17   | MCS5       |  41  |
+ *   |  18   | MCS6       |  40  |
+ *   |  19   | MCS7       |  38  |
+ *
+ * For module parts,
+ *     This API will return `SL_STATUS_SI91X_FEATURE_NOT_AVAILABLE`.
+ *
+ ******************************************************************************/
+sl_status_t sl_wifi_update_worldwide_gain_table(uint8_t band,
+                                                uint8_t bandwidth,
+                                                const uint8_t *payload,
+                                                uint16_t payload_length);
+
+/***************************************************************************/ /**
+ * @brief
  *   Configure the 11ax params. This is a blocking API.
  * @details
  *   Configures 802.11ax (Wi-Fi 6) parameters for the device. This configuration

@@ -1334,6 +1334,14 @@ sl_status_t sl_wifi_update_su_gain_table(uint8_t band,
   return sli_wifi_update_su_gain_table(band, bandwidth, payload, payload_length, x_offset, y_offset);
 }
 
+sl_status_t sl_wifi_update_worldwide_gain_table(uint8_t band,
+                                                uint8_t bandwidth,
+                                                const uint8_t *payload,
+                                                uint16_t payload_length)
+{
+  return sli_wifi_update_worldwide_gain_table(band, bandwidth, payload, payload_length);
+}
+
 sl_status_t sl_wifi_set_11ax_config(uint8_t guard_interval)
 {
 #if !(SLI_SI91X_CONFIG_WIFI6_PARAMS)

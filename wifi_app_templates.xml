@@ -2610,6 +2610,21 @@
     <properties key="readmeFiles" value="examples/featured/low_power/wifi_power_save_deep_sleep_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
   </descriptors>
+  <descriptors name="wifi_soc_power_save_deep_sleep_freertos_psram" label="Wi-Fi - SoC Powersave Deep Sleep FreeRTOS (PSRAM)" description="Demonstrates how to enable Wi-Fi deep-sleep power save using Wi-Fi with PSRAM.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/featured/low_power/wifi_power_save_deep_sleep_freertos/wifi_soc_power_save_deep_sleep_freertos_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/featured/low_power/wifi_power_save_deep_sleep_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
   <descriptors name="wifi_host_power_save_deep_sleep_freertos_uart" label="Wi-Fi - Host Powersave Deep Sleep FreeRTOS (UART)" description="Demonstrates how to enable Wi-Fi deep-sleep power save using Wi-Fi with an external host connected over UART.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
@@ -2631,6 +2646,21 @@
     <properties key="projectFilePaths" value="examples/featured/low_power/wifi_twt_tcp_client_freertos/wifi_soc_twt_tcp_client_freertos.slcp" />
     <properties key="boardCompatibility" value="com.silabs.board.none brd2605a brd2605b brd2911a brd2708a brd4338a brd4342a brd4340a brd4343a brd4343b brd4343c brd4339b brd4340b brd4343q brd9084a brd9084b brd9084c brd9084d brd4343s" />
     <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917y111mgnba.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m100mgtba.* .*siwg917m110lgtba.* .*siwg917y110lgnba.* .*siwg917y110lgaba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.* .*siwg917y111mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/featured/low_power/wifi_twt_tcp_client_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Project\ Difficulty|Beginner" />
+  </descriptors>
+  <descriptors name="wifi_soc_twt_tcp_client_freertos_psram" label="Wi-Fi - SoC TWT TCP Client FreeRTOS (PSRAM)" description="Demonstrates how to set up a TWT session and send data over a TCP client socket using Wi-Fi with PSRAM.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/featured/low_power/wifi_twt_tcp_client_freertos/wifi_soc_twt_tcp_client_freertos_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
     <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
     <properties key="toolchainCompatibility" value="gcc llvm" />
     <properties key="quality" value="production" />

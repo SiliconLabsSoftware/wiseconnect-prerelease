@@ -35,6 +35,7 @@
 
 // <<< Use Configuration Wizard in Context Menu >>>
 
+// <h> Button settings
 // <o SL_BUTTON_CONFIG_INSTANCE_INTR> Button Interrupt Configuration
 // <HIGH_LEVEL_INTERRUPT => High level interrupt
 // <LOW_LEVEL_INTERRUPT => Low level interrupt
@@ -44,6 +45,7 @@
 // <RISE_EDGE_AND_FALL_EDGE_INTERRUPT => Rise edge and fall edge interrupt
 // <i> Default: RISE_EDGE_AND_FALL_EDGE_INTERRUPT
 #define SL_BUTTON_CONFIG_INSTANCE_INTR RISE_EDGE_AND_FALL_EDGE_INTERRUPT
+// </h>
 
 // <h> Pin Settings
 // <i> Button is GPIO input. Programmable input options (PADCONFIG_P).

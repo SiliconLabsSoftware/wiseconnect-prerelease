@@ -56,6 +56,15 @@
 #define SL_WIFI_MAX_CLIENT_COUNT 16
 
 /**
+ * @def SL_WIFI_WORLDWIDE_GAIN_TABLE_SIZE
+ * @brief Number of gain entries in the Worldwide (WW) TX power ceiling table.
+ *
+ * @details Payload length required by @ref sl_wifi_update_worldwide_gain_table.
+ *          Layout is one gain byte per rate/MCS index, from 1 Mbps through MCS7.
+ */
+#define SL_WIFI_WORLDWIDE_GAIN_TABLE_SIZE 20
+
+/**
  * @def SL_WIFI_MIN_HOST_STACK_PORT
  * @brief Lowest destination TCP/UDP port used for SiWx3xx dual-stack RX demux.
  *

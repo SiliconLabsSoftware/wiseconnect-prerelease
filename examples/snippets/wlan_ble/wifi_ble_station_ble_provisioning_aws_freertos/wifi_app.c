@@ -114,6 +114,7 @@ extern rsi_ble_event_conn_status_t conn_event_to_app;
 #define MQTT_TOPIC2               "si91x_status" //! Publish Topic to send the status from application to cloud
 #define MQTT_publish_QOS0_PAYLOAD "Hi from SiWx917"
 #define PUBLISH_PERIODICITY       (30000) //! Publish periodicity in milliseconds
+#define MQTT_SLEEP_STATE_DELAY_MS (200)   //! Brief delay before M4 sleep wait
 #define MQTT_USERNAME             "username"
 #define MQTT_PASSWORD             "password"
 
@@ -160,6 +161,14 @@ volatile uint8_t nvic_enable1[240];
 fd_set read_fds;
 volatile uint8_t check_for_recv_data = 0;
 extern volatile uint8_t select_given;
+/* Monotonic select-session id. 0 = disarmed; non-zero = armed.
+ * Async callbacks capture the value at entry and must still match before mutating
+ * handshake state (socket id is often reused as 0 across reconnects). */
+volatile uint32_t mqtt_select_generation = 0;
+/* Generation that stamped the latest check_for_recv_data / semaphore release.
+ * SELECT/SLEEP accept the signal only when this still equals mqtt_select_generation,
+ * so a post-recheck mutate after scrub cannot re-poison a new or disarmed session. */
+volatile uint32_t mqtt_recv_signal_gen = 0;
 
 int32_t status1            = RSI_SUCCESS;
 AWS_IoT_Client mqtt_client = { 0 };
@@ -196,6 +205,103 @@ void m4_sleep_wakeup(void);
 void wakeup_source_config(void);
 static sl_status_t show_scan_results();
 void wifi_app_set_event(uint32_t event_num);
+void async_socket_select(fd_set *fd_read, fd_set *fd_write, fd_set *fd_except, int32_t status);
+
+/* Always compiled (not gated on ENABLE_NWP_POWER_SAVE): handshake flags are
+ * shared with async select even when the SLEEP state machine is disabled. */
+static void wifi_app_drain_data_received_semaphore(void)
+{
+  if (data_received_semaphore != NULL) {
+    while (osSemaphoreAcquire(data_received_semaphore, 0) == osOK) {
+    }
+  }
+}
+
+/* True when check_for_recv_data was stamped by the currently armed select session. */
+static bool wifi_app_mqtt_recv_pending(void)
+{
+  uint8_t check_flag  = check_for_recv_data;
+  uint32_t signal_gen = mqtt_recv_signal_gen;
+  uint32_t select_gen = mqtt_select_generation;
+  return (check_flag != 0) && (signal_gen != 0) && (signal_gen == select_gen);
+}
+
+/* Drop a stale recv flag/token left by a late callback after scrub or re-arm.
+ * Observe+clear+drain run under osKernelLock so async_socket_select (bus/event
+ * task) cannot stamp a valid same-session signal between the stale check and
+ * the mutate (would leave select_given==1 with no yield/re-arm). */
+static void wifi_app_clear_stale_mqtt_recv_signal(void)
+{
+  int32_t lock        = osKernelLock();
+  uint32_t signal_gen = mqtt_recv_signal_gen;
+  uint32_t select_gen = mqtt_select_generation;
+
+  if (signal_gen == 0) {
+    /* Orphan check with no stamp (half-updated vs scrub) — drop flag/token. */
+    if (check_for_recv_data != 0) {
+      check_for_recv_data = 0;
+      wifi_app_drain_data_received_semaphore();
+    }
+    (void)osKernelRestoreLock(lock);
+    return;
+  }
+
+  if (signal_gen == select_gen) {
+    (void)osKernelRestoreLock(lock);
+    return; /* valid for the currently armed session — leave for recv_pending */
+  }
+
+  mqtt_recv_signal_gen = 0;
+  check_for_recv_data  = 0;
+  wifi_app_drain_data_received_semaphore();
+  (void)osKernelRestoreLock(lock);
+}
+
+/* Disarm select identity so in-flight async_socket_select callbacks are ignored. */
+static void wifi_app_disarm_mqtt_select(void)
+{
+  mqtt_select_generation = 0;
+  select_given           = 0;
+  wifi_app_drain_data_received_semaphore();
+}
+
+/* Scrub MQTT select handshake so reconnect does not inherit a stale
+ * check_for_recv_data flag or data_received_semaphore token. Without this,
+ * WIFI_APP_SLEEP_STATE can skip the PUBLISH_PERIODICITY wait and publish on
+ * every MQTT_SLEEP_STATE_DELAY_MS (~5 Hz) after the second Wi-Fi connect.
+ * Cleared under osKernelLock with the async stamp path so a
+ * late callback cannot interleave; stamped mqtt_recv_signal_gen still rejects
+ * any mutate that slips through after unlock. */
+static void wifi_app_reset_mqtt_select_handshake(void)
+{
+  int32_t lock = osKernelLock();
+  wifi_app_disarm_mqtt_select();
+  check_for_recv_data  = 0;
+  mqtt_recv_signal_gen = 0;
+  wifi_app_drain_data_received_semaphore();
+  check_for_recv_data  = 0;
+  mqtt_recv_signal_gen = 0;
+  (void)osKernelRestoreLock(lock);
+}
+
+/* Arm async select for the current MQTT socket. Returns select status. */
+static int32_t wifi_app_arm_mqtt_select(void)
+{
+  memset(&read_fds, 0, sizeof(fd_set));
+  FD_SET(mqtt_client.networkStack.socket_id, &read_fds);
+  SL_DEBUG_LOG_V2(INFO, " Socket ID: %d\r\n", mqtt_client.networkStack.socket_id);
+
+  /* Claim select_given and bump generation before select, then the caller must
+   * break this SM turn (inspired by wlan_ble_unified_coex_app arm-then-break;
+   * this sample also does RX-first SELECT and does not gate SLEEP on
+   * select_given — required for BLE mqtt_task reconnect). */
+  select_given = 1;
+  do {
+    mqtt_select_generation++;
+  } while (mqtt_select_generation == 0);
+
+  return sl_si91x_select(mqtt_client.networkStack.socket_id + 1, &read_fds, NULL, NULL, NULL, async_socket_select);
+}
 
 uint8_t conn_status;
 extern uint8_t magic_word;
@@ -460,13 +566,30 @@ void async_socket_select(fd_set *fd_read, fd_set *fd_write, fd_set *fd_except, i
   UNUSED_PARAMETER(fd_except);
   UNUSED_PARAMETER(fd_write);
 
+  /* Capture generation at entry; ignore if disarmed or scrubbed/replaced mid-callback. */
+  uint32_t gen_enter = mqtt_select_generation;
+  if (gen_enter == 0) {
+    return;
+  }
+
   if (status == (int32_t)SL_STATUS_OK) {
     //!Check the data pending on this particular socket descriptor
     if (FD_ISSET(mqtt_client.networkStack.socket_id, fd_read)) {
+      int32_t lock = osKernelLock();
+      if (mqtt_select_generation != gen_enter) {
+        (void)osKernelRestoreLock(lock);
+        return;
+      }
+      /* Stamp before flag so SELECT/SLEEP can reject a post-scrub mutate.
+       * Same lock as clear_stale/reset so observe+mutate cannot interleave. */
+      mqtt_recv_signal_gen = gen_enter;
       osSemaphoreRelease(data_received_semaphore);
       check_for_recv_data = 1;
+      (void)osKernelRestoreLock(lock);
     }
-    wifi_app_set_event(WIFI_APP_AWS_SELECT_CONNECT_STATE);
+    if (mqtt_select_generation == gen_enter) {
+      wifi_app_set_event(WIFI_APP_AWS_SELECT_CONNECT_STATE);
+    }
   }
 }
 /**
@@ -930,7 +1053,7 @@ void wifi_app_task(void)
           connected       = 0;
           yield           = 0;
           disconnect_flag = 0; // reset flag to allow disconnecting again
-          select_given    = 0;
+          wifi_app_reset_mqtt_select_handshake();
           osSemaphoreRelease(select_sem);
           wifi_app_send_to_ble(WIFI_APP_DISCONNECTION_NOTIFY, (uint8_t *)&disassosiated, 1);
           wifi_app_set_event(WIFI_APP_UNCONNECTED_STATE);
@@ -1008,6 +1131,8 @@ void wifi_app_mqtt_task(void)
 
     if (wifi_app_get_event() == WIFI_APP_DISCONN_NOTIFY_STATE) {
       SL_DEBUG_LOG_V2(INFO, "WLAN disconnect initiated\r\n");
+      /* Disarm before close so select responses from socket teardown are ignored. */
+      wifi_app_reset_mqtt_select_handshake();
       rc = aws_iot_mqtt_disconnect(&mqtt_client);
       if (SUCCESS != rc) {
         SL_DEBUG_LOG_V2(ERROR, "MQTT Disconnection error : %d\r\n", rc);
@@ -1020,6 +1145,8 @@ void wifi_app_mqtt_task(void)
     switch (wlan_app_cb.state) {
 
       case WIFI_APP_MQTT_INIT_STATE: {
+        /* Scrub prior-session select handshake before a new MQTT session. */
+        wifi_app_reset_mqtt_select_handshake();
         rc = aws_iot_mqtt_init(&mqtt_client, &mqttInitParams);
         if (SUCCESS != rc) {
           wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
@@ -1043,8 +1170,8 @@ void wifi_app_mqtt_task(void)
             wlan_app_cb.state = WIFI_APP_MQTT_INIT_STATE;
           }
         } else {
-          /* Reset select_given so we re-arm select for the new socket after connect/reconnect. */
-          select_given      = 0;
+          /* New socket: force re-arm of select on the next SELECT state entry. */
+          wifi_app_reset_mqtt_select_handshake();
           wlan_app_cb.state = WIFI_APP_MQTT_AUTO_RECONNECT_SET_STATE;
         }
         osSemaphoreRelease(rsi_mqtt_sem);
@@ -1084,60 +1211,89 @@ void wifi_app_mqtt_task(void)
           } else if (NETWORK_ATTEMPTING_RECONNECT == rc) {
             // If the client is attempting to reconnect we will skip the rest of the loop.
             continue;
+          } else {
+            wlan_app_cb.state = WIFI_APP_MQTT_SUBSCRIBE_STATE;
           }
-          wlan_app_cb.state = WIFI_APP_MQTT_SUBSCRIBE_STATE;
-        }
-        /* After successful subscribe, ensure we will re-register select for this socket. */
-        if (SUCCESS == rc) {
-          select_given = 0;
-        }
-        wlan_app_cb.state = WIFI_APP_AWS_SELECT_CONNECT_STATE;
+        } else {
+          /* Only enter SELECT after a successful subscribe. */
+          wifi_app_reset_mqtt_select_handshake();
+          wlan_app_cb.state = WIFI_APP_AWS_SELECT_CONNECT_STATE;
 #if ENABLE_NWP_POWER_SAVE
-        //! initiating power save in BLE mode
-        if (rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE) != RSI_SUCCESS) {
-          SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode \r\n");
-        }
+          //! initiating power save in BLE mode
+          if (rsi_bt_power_save_profile(PSP_MODE, PSP_TYPE) != RSI_SUCCESS) {
+            SL_DEBUG_LOG_V2(ERROR, " Failed to initiate power save in BLE mode \r\n");
+          }
 
-        sl_wifi_performance_profile_v2_t performance_profile = { .profile         = ASSOCIATED_POWER_SAVE_LOW_LATENCY,
-                                                                 .listen_interval = 1000 };
+          sl_wifi_performance_profile_v2_t performance_profile = { .profile         = ASSOCIATED_POWER_SAVE_LOW_LATENCY,
+                                                                   .listen_interval = 1000 };
 
-        sl_status_t status = sl_wifi_set_performance_profile_v2(&performance_profile);
-        if (status != SL_STATUS_OK) {
-          SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX\r\n", status);
-        }
-        SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled\r\n");
+          sl_status_t status = sl_wifi_set_performance_profile_v2(&performance_profile);
+          if (status != SL_STATUS_OK) {
+            SL_DEBUG_LOG_V2(ERROR, "Power save configuration Failed, Error Code : 0x%lX\r\n", status);
+          }
+          SL_DEBUG_LOG_V2(INFO, "Associated Power Save Enabled\r\n");
 #endif
+        }
 
         osSemaphoreRelease(rsi_mqtt_sem);
       } break;
 
       case WIFI_APP_AWS_SELECT_CONNECT_STATE: {
-        {
-
-          if (!select_given) {
-            memset(&read_fds, 0, sizeof(fd_set));
-
-            FD_SET(mqtt_client.networkStack.socket_id, &read_fds);
-            SL_DEBUG_LOG_V2(INFO, " Socket ID: %d\r\n", mqtt_client.networkStack.socket_id);
-
-            status1 =
-              sl_si91x_select(mqtt_client.networkStack.socket_id + 1, &read_fds, NULL, NULL, NULL, async_socket_select);
-            /* Set select_given = 1 only when select registration succeeds. */
-            if (status1 >= 0) {
-              select_given = 1;
-            }
-          }
-
-          if (check_for_recv_data) {
-            check_for_recv_data = 0;
-            select_given        = 0;
-            status1             = aws_iot_shadow_yield(&mqtt_client, 1);
-
-            wlan_app_cb.state = WIFI_APP_AWS_SELECT_CONNECT_STATE;
-          } else {
-            wlan_app_cb.state = WIFI_APP_MQTT_PUBLISH_STATE;
-          }
+        /* RX-first: arming while a valid recv is already pending immediately
+         * re-fires select and can skip M4 sleep forever.
+         * Intentionally differs from coex SELECT. */
+        bool recv_pending = wifi_app_mqtt_recv_pending();
+        if (check_for_recv_data && !recv_pending) {
+          /* Late callback stamped an old generation after scrub/re-arm. */
+          wifi_app_clear_stale_mqtt_recv_signal();
+          /* Valid same-session stamp may have landed during clear; prefer yield. */
+          recv_pending = wifi_app_mqtt_recv_pending();
         }
+
+        if (recv_pending) {
+          check_for_recv_data  = 0;
+          mqtt_recv_signal_gen = 0;
+          wifi_app_disarm_mqtt_select();
+          rc = aws_iot_shadow_yield(&mqtt_client, 1);
+          /* Drain any token released around yield so the next SLEEP waits full period. */
+          wifi_app_drain_data_received_semaphore();
+
+          /* Yield may run disconnectCallbackHandler(); if reconnect fails the
+           * socket is closed. Do not stay in SELECT forever — recover like
+           * PUBLISH does on network error (DISCONNECT → INIT → CONNECT). */
+          if ((SUCCESS != rc) && (NETWORK_ATTEMPTING_RECONNECT != rc) && (NETWORK_RECONNECTED != rc)) {
+            SL_DEBUG_LOG_V2(ERROR, "MQTT yield failed: %d\r\n", rc);
+            wlan_app_cb.state = WIFI_APP_MQTT_DISCONNECT;
+          } else {
+            wlan_app_cb.state = WIFI_APP_AWS_SELECT_CONNECT_STATE;
+          }
+          osSemaphoreRelease(rsi_mqtt_sem);
+          break;
+        }
+
+        if (!select_given) {
+          if (!aws_iot_mqtt_is_client_connected(&mqtt_client)) {
+            SL_DEBUG_LOG_V2(ERROR, "MQTT not connected; recovering via disconnect/reinit\r\n");
+            wlan_app_cb.state = WIFI_APP_MQTT_DISCONNECT;
+            osSemaphoreRelease(rsi_mqtt_sem);
+            break;
+          }
+
+          status1 = wifi_app_arm_mqtt_select();
+          if (status1 < 0) {
+            /* Closed/invalid socket after a failed reconnect: terminal for this
+             * session. Retrying the same fd with a short delay never recovers. */
+            SL_DEBUG_LOG_V2(ERROR, "MQTT select arm failed: %ld\r\n", (long)status1);
+            wifi_app_disarm_mqtt_select();
+            wlan_app_cb.state = WIFI_APP_MQTT_DISCONNECT;
+          } else {
+            wlan_app_cb.state = WIFI_APP_AWS_SELECT_CONNECT_STATE;
+          }
+          osSemaphoreRelease(rsi_mqtt_sem);
+          break;
+        }
+
+        wlan_app_cb.state = WIFI_APP_MQTT_PUBLISH_STATE;
         osSemaphoreRelease(rsi_mqtt_sem);
       } break;
 
@@ -1217,17 +1373,25 @@ void wifi_app_mqtt_task(void)
 
 #if ENABLE_NWP_POWER_SAVE
       case WIFI_APP_SLEEP_STATE: {
-        osDelay(200);
+        osDelay(MQTT_SLEEP_STATE_DELAY_MS);
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 
-        if (select_given == 1 && (check_for_recv_data != 1)) {
+        /* Intentionally do not require select_given==1 (coex still does). After
+         * BLE mqtt_task reconnect, a transient select_given==0 previously skipped
+         * this wait and flooded publishes at ~5 Hz. Ignore stale
+         * recv stamps that do not match the armed select generation. */
+        bool recv_pending = wifi_app_mqtt_recv_pending();
+        if (check_for_recv_data && !recv_pending) {
+          wifi_app_clear_stale_mqtt_recv_signal();
+          recv_pending = wifi_app_mqtt_recv_pending();
+        }
+        if (!recv_pending) {
           SL_DEBUG_LOG_V2(INFO, "M4 in sleep\r\n");
 #if (SL_SI91X_TICKLESS_MODE == 0)
           sli_si91x_power_manager_sleep();
 #else
-          if (osSemaphoreAcquire(data_received_semaphore, PUBLISH_PERIODICITY) == osOK) {
-          }
+          (void)osSemaphoreAcquire(data_received_semaphore, PUBLISH_PERIODICITY);
 #endif
           SL_DEBUG_LOG_V2(INFO, "M4 Wake up\r\n");
         }
@@ -1241,6 +1405,8 @@ void wifi_app_mqtt_task(void)
 #endif
 
       case WIFI_APP_MQTT_DISCONNECT: {
+        /* Disarm before close; generation is set to 0 so late callbacks are ignored. */
+        wifi_app_reset_mqtt_select_handshake();
         rc = aws_iot_mqtt_disconnect(&mqtt_client);
         if (SUCCESS != rc) {
           SL_DEBUG_LOG_V2(ERROR, "MQTT Disconnection error : %d\r\n", rc);

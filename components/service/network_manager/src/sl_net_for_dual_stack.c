@@ -157,9 +157,11 @@ static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
   if (len < LWIP_FRAME_ALIGNMENT) { /* 60 : LWIP frame alignment */
     len = LWIP_FRAME_ALIGNMENT;
   }
+#if LWIP_IPV6 || defined(SL_LOG_COMPONENT_NETWORK_MANAGER_DEBUG_ENABLED)
   // Drop packets originated from the same interface and is not destined for the said interface
   const uint8_t *src_mac = b + netif->hwaddr_len;
   const uint8_t *dst_mac = b;
+#endif
 
 #if LWIP_IPV6
   if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0)))

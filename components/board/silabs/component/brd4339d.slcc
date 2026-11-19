@@ -3,7 +3,7 @@ label: BRD4339D
 package: platform_siwx91x
 description: Board support for BRD4339D(SoC) with 8MB external flash.
 category: Board|Radio Board
-quality: evaluation
+quality: production
 metadata:
   sbom:
     license: Zlib

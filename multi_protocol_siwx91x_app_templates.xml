@@ -135,6 +135,21 @@
     <properties key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_station_ble_throughput_app_freertos/readme.md" />
     <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
   </descriptors>
+  <descriptors name="wifi_ble_soc_station_ble_throughput_app_freertos_psram" label="Wi-Fi Bluetooth LE - SoC Station BLE Throughput App FreeRTOS (PSRAM)" description="Demonstrates how to measure Wi-Fi throughput while Bluetooth LE remains connected using Wi-Fi and Bluetooth LE with PSRAM.">
+    <properties key="namespace" value="template.uc" />
+    <properties key="keywords" value="universal\ configurator" />
+    <properties key="projectFilePaths" value="examples/snippets/wlan_ble/wifi_ble_station_ble_throughput_app_freertos/wifi_ble_soc_station_ble_throughput_app_freertos_psram.slcp" />
+    <properties key="boardCompatibility" value="com.silabs.board.none brd4340a brd4342a brd4339a brd4343q brd4343s brd2708a" />
+    <properties key="partCompatibility" value=" .*si917.* .*siwg917m111mgtba.* .*siwg917y121mgnb.* .*siwg917y121mgnxa.* .*siwg917m141xgtba.* .*siwg917y111mgab.* .*siwg917y111mgnba.* .*siwg917y111mgnxa.* .*siwg917m121xgtba.* .*siwg917m111xgtba.* .*siwg917m110lgtba.* .*siwg917y121mgaba.* .*siwg917y121mgaxa.*" />
+    <properties key="ideCompatibility" value="makefile-ide simplicity-ide visual-studio-code generic-template" />
+    <properties key="toolchainCompatibility" value="gcc llvm" />
+    <properties key="quality" value="production" />
+    <properties key="category" value="Example|Wi-Fi_BLE" />
+    <properties key="stockConfigCompatibility" value="com.silabs.ss.framework.project.toolchain.core.default" />
+    <properties key="sdkAndProtocolTags" value="" />
+    <properties key="readmeFiles" value="examples/snippets/wlan_ble/wifi_ble_station_ble_throughput_app_freertos/readme.md" />
+    <properties key="filters" value="Device\ Type|SoC Wireless\ Technology|Wi-Fi Wireless\ Technology|Bluetooth Project\ Difficulty|Advanced" />
+  </descriptors>
   <descriptors name="wifi_ble_host_station_ble_throughput_app_freertos_spi" label="Wi-Fi Bluetooth LE - Host Station BLE Throughput App FreeRTOS (SPI)" description="Demonstrates how to measure Wi-Fi throughput while Bluetooth LE remains connected using Wi-Fi and Bluetooth LE with an external host connected over SPI.">
     <properties key="namespace" value="template.uc" />
     <properties key="keywords" value="universal\ configurator" />
