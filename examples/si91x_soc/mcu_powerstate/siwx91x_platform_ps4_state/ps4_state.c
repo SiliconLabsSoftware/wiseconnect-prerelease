@@ -40,7 +40,9 @@ void ps4_state_init(void)
   // Shutdown Wireless NWP.
   ps_wireless_shutdown();
   // PS4 state requirement is added, it transits to PS4 state.
-  sl_log_post_sleep_process(NULL);
+  // Do not call sl_log_post_sleep_process() here: logger already started ULP
+  // timer 3 at init; post_sleep would try to register it again and hit
+  // "timer is busy". Power-manager sleep/wake handles pre/post sleep.
   status = sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
 
   /* Note: All status messages in this example — both success and failure — are
@@ -75,8 +77,12 @@ void low_power_configuration(void)
 {
   // Disable OTHER_CLK which is enabled at Start-up
   RSI_CLK_PeripheralClkDisable3(M4CLK, M4_SOC_CLK_FOR_OTHER_ENABLE);
-  // Disable Timer clock which is enabled in Bootloader
+#ifndef SL_LOG_SI91X_PLATFORM_CORE
+  // Disable Timer clock which is enabled in Bootloader.
+  // Skip when Si91x logger platform core is present: it uses ULP timer 3, and
+  // sli_si91x_power_manager_sleep() must unregister it while the timer clock is on.
   RSI_ULPSS_TimerClkDisable(ULPCLK);
+#endif
   // Disabling LF_RC Clocks
   RSI_ULPSS_DisableRefClks(MCU_ULP_32KHZ_RC_CLK_EN);
   // Power-Down Button Calibration

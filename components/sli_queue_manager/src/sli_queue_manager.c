@@ -51,6 +51,7 @@ sl_status_t sli_queue_manager_init(sli_queue_t *handle, sli_buffer_manager_pool_
   return SL_STATUS_OK;
 }
 
+SL_TPUT_CLASSIFIER
 sl_status_t sli_queue_manager_enqueue_node(sli_queue_t *handle, sli_queue_node_t *node)
 {
   if (NULL == handle) {
@@ -77,6 +78,7 @@ sl_status_t sli_queue_manager_enqueue_node(sli_queue_t *handle, sli_queue_node_t
   return SL_STATUS_OK;
 }
 
+SL_TPUT_CLASSIFIER
 sl_status_t sli_queue_manager_enqueue(sli_queue_t *handle, void *data)
 {
   sl_status_t status     = SL_STATUS_OK;

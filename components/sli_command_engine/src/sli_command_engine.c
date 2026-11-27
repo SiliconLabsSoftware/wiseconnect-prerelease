@@ -815,7 +815,7 @@ static void sli_command_engine_thread(void *args)
       rx_metadata.tx_info.data_packet = data;
       status                          = instance->config.get_packet_metadata(instance, data, &rx_metadata);
       if (SL_STATUS_OK != status) {
-        SL_DEBUG_LOG_V2(WARN, "[command_engine] Unidentified Packet\r\n");
+        SL_DEBUG_LOG_V2(DEBUG, "[command_engine] Unidentified Packet\r\n");
         // If metadata extraction fails, free the data buffer and continue
         sli_buffer_manager_free_buffer(data);
         continue;
@@ -1465,6 +1465,7 @@ sl_status_t sli_command_engine_is_idle(sli_command_engine_t *instance)
 // Send (enqueue) a packet for transmission through the command engine.
 // Allocates a metadata container, copies TX info, selects the correct
 // dynamic queue, enqueues it, and signals the worker thread.
+SL_TPUT_CLASSIFIER
 sl_status_t sli_command_engine_send_packet(sli_command_engine_t *instance, sli_command_engine_tx_info_t *tx_info)
 {
   sl_status_t status                          = SL_STATUS_OK;

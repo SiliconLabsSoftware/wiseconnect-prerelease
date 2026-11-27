@@ -302,6 +302,8 @@ sl_status_t http_client_application(void)
   VERIFY_STATUS_AND_RETURN(status);
   SL_DEBUG_LOG_V2(INFO, "HTTP Client init success\r\n");
 
+  //! Must be called after init and before request_init. Different TLS options for a
+  //! later request on this handle require deinit/init before calling the setter again.
   sl_http_client_tcp_tls_advanced_options_t tcp_tls_opts = {
     .tcp_keepalive_initial_time_sec   = 120,
     .tcp_max_retry_count              = 5,

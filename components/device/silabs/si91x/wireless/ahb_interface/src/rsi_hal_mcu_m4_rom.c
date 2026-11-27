@@ -46,6 +46,11 @@
 #endif
 
 #include "cmsis_os2.h"
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+/* True from the moment a side-band crypto request times out until the NWP reports SIDE_BAND_DONE.
+ * Set by the driver with interrupts disabled; cleared only by the SIDE_BAND_CRYPTO_DONE ISR. */
+static volatile bool sli_si91x_side_band_crypto_timed_out = false;
+#endif
 
 static bool m4_is_using_xtal_without_ta_notification;
 static bool m4_using_xtal;
@@ -220,6 +225,28 @@ void sli_si91x_raise_side_band_interrupt_to_ta(void)
   // Write the packet pending interrupt to NWP register
   M4SS_P2P_INTR_SET_REG = SIDE_BAND_CRYPTO_INTR;
 }
+
+/**
+ * @fn           void sli_si91x_side_band_crypto_mark_timed_out(void)
+ * @brief        Record that a side-band crypto request timed out before the NWP finished.
+ *               The SIDE_BAND_CRYPTO_DONE ISR then releases the NWP wake hold and the
+ *               side-band in-progress flag when the NWP eventually completes.
+ * @note         Must be called with interrupts disabled, after checking that SIDE_BAND_DONE
+ *               has not been set, so the ISR cannot complete in between.
+ */
+void sli_si91x_side_band_crypto_mark_timed_out(void)
+{
+  sli_si91x_side_band_crypto_timed_out = true;
+}
+
+/**
+ * @fn           bool sli_si91x_side_band_crypto_is_timed_out(void)
+ * @brief        True while a timed-out side-band crypto request is still owned by the NWP.
+ */
+bool sli_si91x_side_band_crypto_is_timed_out(void)
+{
+  return sli_si91x_side_band_crypto_timed_out;
+}
 #endif
 
 /**
@@ -292,6 +319,13 @@ sl_status_t sli_m4_interrupt_isr(void)
   //! Below changes are requried for SIDE BAND CRYPTO
   else if (TASS_P2P_INTR_CLEAR & SIDE_BAND_CRYPTO_DONE) {
     osEventFlagsSet(ta_events, SLI_SI91X_SIDE_BAND_DONE);
+    /* If the requester already timed out, nobody is waiting: release the power holds here
+     * so the device can sleep. The driver frees the buffer on its next request. */
+    if (sli_si91x_side_band_crypto_timed_out) {
+      sli_si91x_side_band_crypto_timed_out = false;
+      sli_si91x_update_side_band_crypto_command_status(false);
+      sl_si91x_host_clear_sleep_indicator();
+    }
     // Clear the interrupt
     clear_ta_to_m4_interrupt(SIDE_BAND_CRYPTO_DONE);
   }

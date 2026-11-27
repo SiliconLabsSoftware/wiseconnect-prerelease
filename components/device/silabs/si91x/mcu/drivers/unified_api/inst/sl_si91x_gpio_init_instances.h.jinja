@@ -1,0 +1,41 @@
+/***************************************************************************/ /**
+ * @file sl_si91x_gpio_init_instances.h.jinja
+ * @brief Generated GPIO Init Input/Output instance declarations
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ ******************************************************************************/
+
+#ifndef SL_SI91X_GPIO_INIT_INSTANCES_H
+#define SL_SI91X_GPIO_INIT_INSTANCES_H
+
+#include "sl_si91x_driver_gpio.h"
+{% if si91x_gpio_input_instance is defined -%}
+{% for inst in si91x_gpio_input_instance -%}
+#include "sl_si91x_gpio_input_{{ inst | lower }}_config.h"
+{% endfor -%}
+{% endif -%}
+{% if si91x_gpio_output_instance is defined -%}
+{% for inst in si91x_gpio_output_instance -%}
+#include "sl_si91x_gpio_output_{{ inst | lower }}_config.h"
+{% endfor -%}
+{% endif %}
+
+{% if si91x_gpio_input_instance is defined -%}
+{% for inst in si91x_gpio_input_instance -%}
+extern const sl_si91x_gpio_configure_pin_t sl_si91x_gpio_input_{{ inst | lower }};
+{% endfor -%}
+{% endif -%}
+{% if si91x_gpio_output_instance is defined -%}
+{% for inst in si91x_gpio_output_instance -%}
+extern const sl_si91x_gpio_configure_pin_t sl_si91x_gpio_output_{{ inst | lower }};
+{% endfor -%}
+{% endif %}
+
+void sl_si91x_gpio_configure_pin_instances(void);
+
+#endif // SL_SI91X_GPIO_INIT_INSTANCES_H

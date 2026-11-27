@@ -1,0 +1,33 @@
+id: sl_si91x_gpio_init_input
+label: Input
+package: platform_siwx91x
+description: >
+  Instantiable GPIO input pin for SiWx917. Select a pin in Pin Tool and configure
+  input Pin Settings (pad mode: Hi-Z / pull-up / pull-down / repeater).
+  Applied automatically from sl_driver_init after the GPIO driver.
+category: Device|Si91x|MCU|Peripheral|GPIO Init
+quality: production
+metadata:
+  sbom:
+    license: Zlib
+root_path: "components/device/silabs/si91x/mcu/drivers/unified_api"
+instantiable:
+  prefix: pin
+config_file:
+  - path: config/sl_si91x_gpio_input_{{instance}}_config.h
+    file_id: si91x_gpio_input_config
+provides:
+  - name: sl_si91x_gpio_init_input
+    allow_multiple: true
+requires:
+  - name: sl_si91x_gpio_init_common
+template_contribution:
+  - name: si91x_gpio_input_instance
+    value: "{{instance}}"
+  - name: component_catalog
+    value: "sl_si91x_gpio_init_input_{{instance}}"
+tag:
+  - pin_tool:peripheral:gpio
+
+documentation:
+  url: https://docs.silabs.com/wiseconnect/latest/wiseconnect-api-reference-guide-si91x-peripherals/gpio

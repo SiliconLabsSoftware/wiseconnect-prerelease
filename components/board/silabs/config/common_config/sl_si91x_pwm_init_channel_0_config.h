@@ -91,7 +91,74 @@ extern "C" {
 #define SL_PWM_CHANNEL_0_EVENT 0
 
 // </h> End PWM CHANNEL_0 Configuration
-/******************************************************************************/
+
+// <h> Pin Settings
+// <i> SI917 pad electrical settings (PADCONFIG_P).
+// <i> For optional fault/trigger pins: select None when unused; pad mode is
+// <i> applied only when the pin is assigned and mode is not None.
+
+// <o SL_PWM_CHANNEL_0_OUT_H_PAD_MODE> Output H pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_PWM_CHANNEL_0_OUT_H_PAD_MODE
+#define SL_PWM_CHANNEL_0_OUT_H_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_PWM_CHANNEL_0_OUT_L_PAD_MODE> Output L pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_PWM_CHANNEL_0_OUT_L_PAD_MODE
+#define SL_PWM_CHANNEL_0_OUT_L_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_PWM_CHANNEL_0_FAULTA_PAD_MODE> Fault A pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None
+#ifndef SL_PWM_CHANNEL_0_FAULTA_PAD_MODE
+#define SL_PWM_CHANNEL_0_FAULTA_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// <o SL_PWM_CHANNEL_0_FAULTB_PAD_MODE> Fault B pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None
+#ifndef SL_PWM_CHANNEL_0_FAULTB_PAD_MODE
+#define SL_PWM_CHANNEL_0_FAULTB_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// <o SL_PWM_CHANNEL_0_TMR_EXT_TRIG_1_PAD_MODE> Ext Trigger 1 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None
+#ifndef SL_PWM_CHANNEL_0_TMR_EXT_TRIG_1_PAD_MODE
+#define SL_PWM_CHANNEL_0_TMR_EXT_TRIG_1_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// <o SL_PWM_CHANNEL_0_TMR_EXT_TRIG_2_PAD_MODE> Ext Trigger 2 pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: None
+#ifndef SL_PWM_CHANNEL_0_TMR_EXT_TRIG_2_PAD_MODE
+#define SL_PWM_CHANNEL_0_TMR_EXT_TRIG_2_PAD_MODE SL_GPIO_PAD_MODE_NONE
+#endif
+
+// </h>
+
 // <<< end of configuration section >>>
 // <<< sl:start pin_tool >>>
 // <pwm_ch0 signal=0H,0L,> SL_PWM_OUT_CHANNEL0

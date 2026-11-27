@@ -1476,6 +1476,19 @@ sl_status_t sl_mqtt_client_set_tcp_tls_advanced_configuration(sl_mqtt_client_t *
   SL_VERIFY_POINTER_OR_RETURN(client, SL_STATUS_WIFI_NULL_PTR_ARG);
   SL_VERIFY_POINTER_OR_RETURN(options, SL_STATUS_WIFI_NULL_PTR_ARG);
 
+  // Reject uninitialized, deinitialized, or non-active client handles.
+  if (mqtt_client == NULL || client != mqtt_client) {
+    return SL_STATUS_INVALID_HANDLE;
+  }
+
+  // Options are consumed at MQTT NWP init (connect from DISCONNECTED). Allow
+  // reconfiguration while idle after disconnect/failure so apps can set options
+  // before completing cleanup and reconnecting. Reject connected / in-progress states.
+  if (client->state != SL_MQTT_CLIENT_DISCONNECTED && client->state != SL_MQTT_CLIENT_TA_DISCONNECTED
+      && client->state != SL_MQTT_CLIENT_CONNECTION_FAILED) {
+    return SL_STATUS_INVALID_STATE;
+  }
+
   client->tcp_options            = *options;
   client->tcp_options_configured = true;
 

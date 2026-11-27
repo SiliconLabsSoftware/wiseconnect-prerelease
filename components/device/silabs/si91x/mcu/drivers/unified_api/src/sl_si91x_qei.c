@@ -29,6 +29,7 @@
 ******************************************************************************/
 #include "sl_si91x_qei.h"
 #include "sl_si91x_driver_gpio.h"
+#include "sl_si91x_gpio.h"
 #include "sl_gpio_board.h"
 
 /*******************************************************************************
@@ -390,6 +391,10 @@ sl_status_t sl_si91x_qei_init(sl_qei_init_t *qei_init)
                             (int)__LINE__);
       return status;
     }
+    sl_si91x_gpio_config_pad_mode(qei_init->dir.port, qei_init->dir.pin, qei_init->dir_pad_mode);
+    sl_si91x_gpio_config_pad_mode(qei_init->idx.port, qei_init->idx.pin, qei_init->idx_pad_mode);
+    sl_si91x_gpio_config_pad_mode(qei_init->phasea.port, qei_init->phasea.pin, qei_init->phasea_pad_mode);
+    sl_si91x_gpio_config_pad_mode(qei_init->phaseb.port, qei_init->phaseb.pin, qei_init->phaseb_pad_mode);
     // QEI clock enable
     RSI_CLK_PeripheralClkEnable2(M4CLK, QE_PCLK_ENABLE);
     status = SL_STATUS_OK;

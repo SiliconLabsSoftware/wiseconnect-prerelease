@@ -29,7 +29,7 @@ Demonstrate the Phase-1 EC identity APIs:
 
 ## Prerequisites/Set up Requirements
 
-Use the same hardware, FreeRADIUS, and WPA2-Enterprise AP setup as [Wi-Fi - Enterprise Client Mode](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/snippets/wlan/enterprise_client/readme.md).
+Use the same hardware, FreeRADIUS, and WPA2-Enterprise AP setup as [Wi-Fi - Enterprise Client Mode](https://github.com/SiliconLabs/wiseconnect/blob/v4.2.0-content-for-docs/examples/snippets/wlan/enterprise_client/readme.md).
 
 ## Application Build Environment
 

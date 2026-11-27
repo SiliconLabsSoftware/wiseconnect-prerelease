@@ -1,0 +1,55 @@
+/***************************************************************************/ /**
+ * @file sl_si91x_gpio_init_instances.c.jinja
+ * @brief Generated GPIO Init Input/Output instances
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2026 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ ******************************************************************************/
+
+#include "sl_si91x_gpio_init_instances.h"
+
+{% if si91x_gpio_input_instance is defined -%}
+{%- for inst in si91x_gpio_input_instance | sort %}
+const sl_si91x_gpio_configure_pin_t sl_si91x_gpio_input_{{ inst | lower }} = {
+  .port = SL_SI91X_GPIO_INPUT_{{ inst | upper }}_PORT,
+  .pin = SL_SI91X_GPIO_INPUT_{{ inst | upper }}_PIN,
+  .direction = GPIO_INPUT,
+  .pad_mode = SL_SI91X_GPIO_INPUT_{{ inst | upper }}_PAD_MODE,
+  .drive_strength = GPIO_FOUR_MILLI_AMPS,
+  .dout = GPIO_PIN_CLEAR,
+  .slew_rate = GPIO_SR_LOW,
+};
+{%- endfor %}
+{% endif -%}
+
+{% if si91x_gpio_output_instance is defined -%}
+{%- for inst in si91x_gpio_output_instance | sort %}
+const sl_si91x_gpio_configure_pin_t sl_si91x_gpio_output_{{ inst | lower }} = {
+  .port = SL_SI91X_GPIO_OUTPUT_{{ inst | upper }}_PORT,
+  .pin = SL_SI91X_GPIO_OUTPUT_{{ inst | upper }}_PIN,
+  .direction = GPIO_OUTPUT,
+  .pad_mode = GPIO_HZ,
+  .drive_strength = SL_SI91X_GPIO_OUTPUT_{{ inst | upper }}_DRIVE_STRENGTH,
+  .dout = SL_SI91X_GPIO_OUTPUT_{{ inst | upper }}_DOUT,
+  .slew_rate = SL_SI91X_GPIO_OUTPUT_{{ inst | upper }}_SLEW_RATE,
+};
+{%- endfor %}
+{% endif %}
+
+void sl_si91x_gpio_configure_pin_instances(void)
+{
+{% if si91x_gpio_input_instance is defined -%}
+  {%- for inst in si91x_gpio_input_instance %}
+  (void)sl_si91x_gpio_configure_pin(&sl_si91x_gpio_input_{{ inst | lower }});
+  {%- endfor %}
+{% endif -%}
+{% if si91x_gpio_output_instance is defined -%}
+  {%- for inst in si91x_gpio_output_instance %}
+  (void)sl_si91x_gpio_configure_pin(&sl_si91x_gpio_output_{{ inst | lower }});
+  {%- endfor %}
+{% endif -%}
+}

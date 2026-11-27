@@ -42,6 +42,12 @@ extern "C" {
 #ifndef SL_GPIO_PAD_MODE_NONE
 #define SL_GPIO_PAD_MODE_NONE 0xFFu
 #endif
+#ifndef SL_GPIO_DRIVE_STRENGTH_NONE
+#define SL_GPIO_DRIVE_STRENGTH_NONE 0xFFu
+#endif
+#ifndef SL_GPIO_SLEW_RATE_NONE
+#define SL_GPIO_SLEW_RATE_NONE 0xFFu
+#endif
 
 /*******************************************************************************
  ********************************   ENUMS   ************************************

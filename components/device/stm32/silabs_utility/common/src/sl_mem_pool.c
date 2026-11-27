@@ -35,6 +35,7 @@
 #include "sl_core.h"
 
 #include "sli_mem_pool.h"
+#include "sl_constants.h"
 
 #include <stddef.h>
 
@@ -79,6 +80,7 @@ void sli_mem_pool_create(sli_mem_pool_handle_t *mem_pool,
 /***************************************************************************//**
  * Allocates an object from a memory pool
  ******************************************************************************/
+SL_TPUT_CLASSIFIER
 void* sli_mem_pool_alloc(sli_mem_pool_handle_t *mem_pool)
 {
   CORE_DECLARE_IRQ_STATE;

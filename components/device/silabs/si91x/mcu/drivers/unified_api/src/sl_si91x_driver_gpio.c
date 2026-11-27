@@ -2640,3 +2640,91 @@ sl_status_t sl_si91x_gpio_driver_set_ulp_peri_on_soc_pin_mode(sl_gpio_t *gpio, s
   }
   return status;
 }
+
+/*******************************************************************************
+ * Configure one UC GPIO Init pin: direction + Pin Settings.
+ ******************************************************************************/
+sl_status_t sl_si91x_gpio_configure_pin(const sl_si91x_gpio_configure_pin_t *handle)
+{
+  sl_si91x_gpio_pin_config_t pin_config;
+  sl_status_t status;
+
+  if (handle == NULL) {
+    return SL_STATUS_NULL_POINTER;
+  }
+
+  if (handle->port == (uint8_t)SL_GPIO_ULP_PORT) {
+    status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
+  } else if (handle->port != (uint8_t)SL_GPIO_UULP_PORT) {
+    status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)M4CLK_GPIO);
+  } else {
+    status = SL_STATUS_OK;
+  }
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  pin_config.port_pin.port = handle->port;
+  pin_config.port_pin.pin  = handle->pin;
+
+  if (handle->direction == (uint8_t)GPIO_INPUT) {
+    pin_config.direction = GPIO_INPUT;
+    status               = sl_gpio_set_configuration(pin_config);
+    if (status != SL_STATUS_OK) {
+      return status;
+    }
+    // Pad mode: NONE / UULP -> no-op inside config_pad_mode.
+    sl_si91x_gpio_config_pad_mode(handle->port, handle->pin, handle->pad_mode);
+    return SL_STATUS_OK;
+  }
+
+  // Output: enable pad as INPUT first, preload DOUT, then switch to OUTPUT
+  // so the pin does not briefly drive the wrong level at boot.
+  pin_config.direction = GPIO_INPUT;
+  status               = sl_gpio_set_configuration(pin_config);
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  if (handle->dout == (uint8_t)GPIO_PIN_SET) {
+    sl_gpio_set_pin_output(handle->port, handle->pin);
+  } else {
+    sl_gpio_clear_pin_output(handle->port, handle->pin);
+  }
+
+  // Set the direction of the pin
+  if (handle->port == (uint8_t)SL_GPIO_UULP_PORT) {
+    status = sl_si91x_gpio_driver_set_uulp_npss_direction(handle->pin, GPIO_OUTPUT);
+  } else {
+    status = sl_si91x_gpio_driver_set_pin_direction(handle->port, handle->pin, GPIO_OUTPUT);
+  }
+  if (status != SL_STATUS_OK) {
+    return status;
+  }
+
+  // Drive / slew after the pad is live (UULP has no PADCONFIG path).
+  if (handle->port == (uint8_t)SL_GPIO_UULP_PORT) {
+    return SL_STATUS_OK;
+  }
+
+  if (handle->drive_strength != SL_GPIO_DRIVE_STRENGTH_NONE) {
+    if (handle->port == (uint8_t)SL_GPIO_ULP_PORT) {
+      sl_si91x_gpio_select_ulp_pad_driver_strength(handle->pin,
+                                                   (sl_si91x_gpio_driver_strength_select_t)handle->drive_strength);
+    } else {
+      sl_si91x_gpio_select_pad_driver_strength(handle->pin,
+                                               (sl_si91x_gpio_driver_strength_select_t)handle->drive_strength);
+    }
+  }
+
+  if (handle->slew_rate != SL_GPIO_SLEW_RATE_NONE) {
+    if (handle->port == (uint8_t)SL_GPIO_ULP_PORT) {
+      sl_si91x_gpio_select_ulp_pad_slew_rate(handle->pin, (sl_si91x_gpio_slew_rate_t)handle->slew_rate);
+    } else {
+      // Per absolute pin — do not use port-wide sl_gpio_driver_set_slew_rate.
+      PAD_REG(handle->pin)->GPIO_PAD_CONFIG_REG_b.PADCONFIG_SR = (sl_si91x_gpio_slew_rate_t)handle->slew_rate;
+    }
+  }
+
+  return SL_STATUS_OK;
+}

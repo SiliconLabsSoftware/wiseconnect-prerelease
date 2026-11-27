@@ -114,7 +114,7 @@ For details on the project folder structure, see the [WiSeConnect Examples](http
 
 - Connect the boards: primary clock (GPIO_8 or GPIO_25) to secondary clock, primary TX (GPIO_30) to secondary RX (GPIO_29), secondary TX (GPIO_30) to primary RX (GPIO_29). (Clock direction is from primary to secondary.)
 
-- Configure the following macros in [`usart_sync_secondary_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_usart_sync_secondary_freertos/usart_sync_secondary_freertos.c) if required:
+- Configure the following macros in [`usart_sync_secondary_freertos.c`](https://github.com/SiliconLabs/wiseconnect/blob/v4.2.0-content-for-docs/examples/si91x_soc/peripheral/siwx91x_platform_usart_sync_secondary_freertos/usart_sync_secondary_freertos.c) if required:
 
 - `USART_BUFFER_SIZE`: Defines the length (in bytes) of the buffer used to send and receive USART data. By default, it is set to 1024.
 

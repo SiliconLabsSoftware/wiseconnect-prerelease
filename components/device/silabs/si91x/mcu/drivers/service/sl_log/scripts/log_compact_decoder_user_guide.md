@@ -157,14 +157,23 @@ python log_compact_decoder.py --app-out app.out --nwp-out nwp_logging_fw.out --l
 
 The stream may interleave:
 
-- **Core 0 (host):** `sl_log_event_t`, no firmware timestamp. TS / DELTA columns use the PC receive time.
+- **Core 0 (host):** `sl_log_event_t` with a 64-bit firmware timestamp in microseconds (`timestamp` + `epoch`). Records logged before the host / NWP time sync carry `0`. In Host mode the M4 forwards NWP events in this same shape with `core_id` 1.
 - **Core 1 (NWP):** `sl_log_entry_t`, 64-bit firmware timestamp in microseconds.
 
-Host record size depends on `--max-args` (`4 + 4*N + 4` bytes); NWP compact entries use three argument slots.
+Host record size depends on `--max-args` (`12 + 4*N + 4` bytes); NWP compact entries use three argument slots.
+
+Firmware from SDKs that predate the `epoch` field has a 32-bit host timestamp. Those records still decode, but without their firmware time: TS / DELTA show the PC receive time instead.
+
+### GCC and LLVM builds
+
+Host event IDs are the link-time addresses of the format strings in `.log_fmt`, which compact logging keeps out of the flash image as a non-allocated section. GNU ld still assigns it a flash-range address (`0x08xxxxxx`). LLD always links non-allocated sections at address `0`, so an LLVM build sends section offsets as event IDs. The decoder reads the base address from `--app-out` and handles both; it prints `Host .log_fmt is linked at address 0 (LLVM/LLD build)` when it applies. For such a build, `--app-out` must be the ELF of the firmware on the board: event IDs are matched on exact format-string addresses, so records from a different build are dropped instead of shown as `<Unknown Event>`.
+
+With either toolchain, a `%s` argument is resolved only when it points to a constant string in the ELF. A pointer to a RAM buffer (for example one filled with `snprintf`) is printed as its address.
 
 ## Troubleshooting
 
 - **Decoder runs but prints no log lines** — Until the firmware emits compact records the console can stay quiet (header only); that is normal. Press **Ctrl+C** to stop: the script prints bytes received, discard counts, and hints (silent transport vs bytes with no valid records). Check log level, backend (compact binary, not formatted), `sl_log_flush()` in Host mode, `--max-args` vs UC, and `--source rtt` vs UART.
+- **Last log lines missing in Host mode, but printed in Console mode** — In Host mode logs are sent from the idle task. If an RTOS task function returns, FreeRTOS halts in `prvTaskExitError()` and the idle task never runs again, so the logs queued just before the return are never sent. End the task with `osThreadExit()` instead of `return`, including on error paths. See the **SL Debug Logger** limitations in the SiWx91x software reference manual.
 - **`JLink CDC UART port not found`** — Pass `--port` explicitly. The decoder lists the available ports.
 - **Garbled or `(null)` messages** — Wrong ELF, wrong `--max-args`, or the Formatted Output backend is on the target instead of Compact Binary Output.
 - **NWP lines show `no descriptor/nwp-out match`** — Add `--nwp-out`, or `--descriptor` for legacy NWP images.

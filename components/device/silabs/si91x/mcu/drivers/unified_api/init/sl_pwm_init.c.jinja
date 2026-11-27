@@ -29,6 +29,7 @@
  ******************************************************************************/
 
 #include "sl_si91x_pwm.h"
+#include "sl_si91x_gpio.h"
 #include "sl_pwm_board.h"
 #include "sl_si91x_pwm_common_config.h"
 {% for inst in pwm_instances %}
@@ -80,8 +81,48 @@ sl_pwm_fault_init_t sl_pwm_{{ inst }}_event_init = {
 
 
 
+/*******************************************************************************
+ * Applies UC Pin Settings (PADCONFIG_P) for each installed PWM instance.
+ ******************************************************************************/
+void sli_si91x_pwm_config_pads(void)
+{
+{% for inst in pwm_instances %}
+#if defined(SL_PWM_{{ inst | upper }}_PIN_H) && defined(SL_PWM_{{ inst | upper }}_OUT_H_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_PWM_{{ inst | upper }}_PORT_H,
+                                (uint8_t)SL_PWM_{{ inst | upper }}_PIN_H,
+                                (uint8_t)SL_PWM_{{ inst | upper }}_OUT_H_PAD_MODE);
+#endif
+#if defined(SL_PWM_{{ inst | upper }}_PIN_L) && defined(SL_PWM_{{ inst | upper }}_OUT_L_PAD_MODE)
+  sl_si91x_gpio_config_pad_mode((uint8_t)SL_PWM_{{ inst | upper }}_PORT_L,
+                                (uint8_t)SL_PWM_{{ inst | upper }}_PIN_L,
+                                (uint8_t)SL_PWM_{{ inst | upper }}_OUT_L_PAD_MODE);
+#endif
+#if defined(SL_PWM_{{ inst | upper }}_PIN) && defined(SL_PWM_{{ inst | upper }}_FAULTA_PAD_MODE)
+  /* Event pin (fault/ext-trig) uses the resolved SL_PWM_<inst>_PIN/PORT. */
+  if (SL_PWM_{{ inst | upper }}_EVENT == 1) {
+    sl_si91x_gpio_config_pad_mode((uint8_t)SL_PWM_{{ inst | upper }}_PORT,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_PIN,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_FAULTA_PAD_MODE);
+  } else if (SL_PWM_{{ inst | upper }}_EVENT == 2) {
+    sl_si91x_gpio_config_pad_mode((uint8_t)SL_PWM_{{ inst | upper }}_PORT,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_PIN,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_FAULTB_PAD_MODE);
+  } else if (SL_PWM_{{ inst | upper }}_EVENT == 3) {
+    sl_si91x_gpio_config_pad_mode((uint8_t)SL_PWM_{{ inst | upper }}_PORT,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_PIN,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_TMR_EXT_TRIG_1_PAD_MODE);
+  } else if (SL_PWM_{{ inst | upper }}_EVENT == 4) {
+    sl_si91x_gpio_config_pad_mode((uint8_t)SL_PWM_{{ inst | upper }}_PORT,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_PIN,
+                                  (uint8_t)SL_PWM_{{ inst | upper }}_TMR_EXT_TRIG_2_PAD_MODE);
+  }
+#endif
+{% endfor %}
+}
+
 void sl_pwm_init_instances(void)
 {
+  sli_si91x_pwm_config_pads();
 {% for inst in pwm_instances %}
 
   sl_si91x_pwm_init(&sl_pwm_{{ inst }}_init);

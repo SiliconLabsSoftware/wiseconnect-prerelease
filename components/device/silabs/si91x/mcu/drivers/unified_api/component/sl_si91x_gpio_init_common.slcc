@@ -1,0 +1,33 @@
+id: sl_si91x_gpio_init_common
+label: GPIO Init Core
+package: platform_siwx91x
+description: >
+  Core support for SiWx917 GPIO Init Input/Output. Applies all configured
+  instances from sl_driver_init via sl_si91x_gpio_configure_pin().
+  Installed automatically with GPIO Init Input or Output.
+category: Device|Si91x|MCU|Peripheral|GPIO Init
+quality: production
+metadata:
+  sbom:
+    license: Zlib
+root_path: "components/device/silabs/si91x/mcu/drivers/unified_api"
+provides:
+  - name: sl_si91x_gpio_init_common
+requires:
+  - name: sl_gpio
+  - name: log_none
+template_file:
+  - path: "inst/sl_si91x_gpio_init_instances.c.jinja"
+  - path: "inst/sl_si91x_gpio_init_instances.h.jinja"
+template_contribution:
+  - name: component_catalog
+    value: sl_si91x_gpio_init
+  # After sl_gpio_driver_init (-9996); pad APIs need GPIO ready.
+  - name: event_handler
+    priority: -8980
+    value:
+      event: driver_init
+      handler: sl_si91x_gpio_configure_pin_instances
+      include: sl_si91x_gpio_init_instances.h
+ui_hints:
+  visibility: never

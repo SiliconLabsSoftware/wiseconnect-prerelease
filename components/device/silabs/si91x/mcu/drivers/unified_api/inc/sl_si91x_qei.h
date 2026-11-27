@@ -74,6 +74,7 @@ extern "C" {
  ******************************************************************************/
 /** @brief Callback function type for QEI events. */
 typedef void (*sl_qei_callback_t)(void *callback_flag);
+
 /*******************************************************************************
  ***************************  Global  VARIABLES ********************************
  ******************************************************************************/
@@ -356,6 +357,10 @@ typedef struct {
   sl_gpio_pin_config_t idx;    ///< IDX GPIO configuration.
   sl_gpio_pin_config_t phasea; ///< PHASE_A GPIO configuration.
   sl_gpio_pin_config_t phaseb; ///< PHASE_B GPIO configuration.
+  uint8_t dir_pad_mode;        ///< DIR pad mode. SL_GPIO_PAD_MODE_NONE to skip.
+  uint8_t idx_pad_mode;        ///< IDX pad mode. SL_GPIO_PAD_MODE_NONE to skip.
+  uint8_t phasea_pad_mode;     ///< PHASE_A pad mode. SL_GPIO_PAD_MODE_NONE to skip.
+  uint8_t phaseb_pad_mode;     ///< PHASE_B pad mode. SL_GPIO_PAD_MODE_NONE to skip.
 } sl_qei_init_t;
 /*******************************************************************************
  *****************************   PROTOTYPES   **********************************

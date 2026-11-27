@@ -227,7 +227,10 @@ typedef enum {
  * @details
  *   This structure holds advanced TCP and TLS configuration parameters that can be
  *   applied to the MQTT client before connecting. Use @ref sl_mqtt_client_set_tcp_tls_advanced_configuration
- *   to apply these options after initializing the client and before calling connect.
+ *   to apply these options after initializing the client. Options may also be set while idle after
+ *   a failed connect or partial disconnect (@ref SL_MQTT_CLIENT_CONNECTION_FAILED /
+ *   @ref SL_MQTT_CLIENT_TA_DISCONNECTED) so they apply on the next connect from
+ *   @ref SL_MQTT_CLIENT_DISCONNECTED.
  *
  * @note The ssl_ciphers_bitmap and ssl_ext_ciphers_bitmap fields accept cipher suite bitmaps
  *   as defined in sl_si91x_socket_constants.h (e.g., SL_SI91X_TLS_DHE_RSA_WITH_AES_256_CBC_SHA256).

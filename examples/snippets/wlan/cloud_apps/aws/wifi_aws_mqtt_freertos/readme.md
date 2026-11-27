@@ -18,6 +18,7 @@ Demonstrates how to connect an AWS IoT thing to AWS IoT Core over MQTT using Wi-
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
+  - [Setup from Empty Project](#setup-from-empty-project)
   - [Application Build Environment](#application-build-environment)
     - [Configure the Application](#configure-the-application)
       - [Configure the following parameters in `app.c`:](#configure-the-following-parameters-in-appc)
@@ -157,6 +158,81 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - [Create a Studio project ](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#create-a-project)
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
+
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations and preprocessor defines.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Application Build Environment](#application-build-environment).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **System Calls** (`syscalls`)
+- **Default RAM Memory Configuration** (`si91x_memory_default_config`)
+
+### Wi-Fi / networking
+
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **Wi-Fi** (`wifi`)
+- **Offload Network Stack** (`sl_si91x_internal_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **Network Manager** (`network_manager`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+- **SiWx91x Asynchronous Socket** (`sl_si91x_asynchronous_socket`)
+- **AWS IoT Device SDK** (`aws_sdk`)
+- **SNTP Client** (`sntp`)
+
+### Power / wakeup
+
+- **Power Manager** (`sl_power_manager`)
+- **PM UULP GPIO** (`gpio_npss_component`)
+- **PM UULP Wireless Wakeup** (`wireless_wakeup_ulp_component`)
+- **PM UULP Calendar** (`calendar_ulp_component`)
+- **WRAP** (`sl_si91x_wrap`)
+
+### Console / logging
+
+- **Log - None** (`log_none`)
+- **SL Log Core** (`si91x_log`)
+- **Log Backend I/O Stream - Formatted Output** (`si91x_log_iostream_formatted`)
+- **IO Stream** (`iostream_si91x`)
+- **IO Stream Retarget STDIO** (`iostream_retarget_stdio`)
+- **IO Stream UART (SiWx91x)** (`iostream_uart_si91x`), instance: `vcom`
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+- `SL_ENABLE_GPIO_WAKEUP_SOURCE` = `1`
+- `ENABLE_NPSS_GPIO_2` = `1`
+- `SL_ENABLE_CALENDAR_WAKEUP_SOURCE` = `1`
+- `ENABLE_ALARM` = `1`
+- `ALARM_TIME_MSEC` = `30000`
+- `SL_SI91X_WRAP_KEY_BUFFER_SIZE` = `1696`
+
+### Preprocessor defines
+
+In the `.slcp` **Defines**, add:
+
+- `SLI_SI91X_INTERNAL_SNTP_CLIENT`
+
+### Feature-specific notes
+
+- Install **AWS IoT Device SDK**, **SNTP Client**, **SiWx91x Asynchronous Socket**, Power Manager / wakeup components, and **WRAP**.
+- Provision AWS endpoint, certificates, and thing credentials as described in Application Build Environment.
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 
 ## Application Build Environment
 
@@ -298,7 +374,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
  
 ### Setting up Security Certificates
 
-- The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/resources/certificates/).
+- The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.2.0-content-for-docs/resources/certificates/).
 
 - Copy the downloaded device certificate, private key from AWS, and also the certificate_to_array.py to the `<SDK>/resources/certificates`.
 
@@ -328,7 +404,7 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 - The Starfield Root CA certificate used by your Wi-Fi device to verify the AWS server is already included in the WiSeConnect SDK at `<SDK>/resources/certificates`; no additional setup is required.
 
 > **NOTE :**
-> Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website. The WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
+> Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website. The WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.2.0-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
 >
 > AWS has announced that there will be changes in their root CA chain. More details can be found in the reference link: (https://aws.amazon.com/blogs/security/acm-will-no-longer-cross-sign-certificates-with-starfield-class-2-starting-august-2024/)
 >

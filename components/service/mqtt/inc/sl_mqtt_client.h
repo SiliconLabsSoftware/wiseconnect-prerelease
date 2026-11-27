@@ -410,6 +410,18 @@ sl_status_t sl_mqtt_client_unsubscribe(sl_mqtt_client_t *client,
  *   sl_status_t - Status of the operation. For more details, see https://docs.silabs.com/gecko-platform/latest/platform-common/status.
  *   - SL_STATUS_OK: Operation successful.
  *   - SL_STATUS_WIFI_NULL_PTR_ARG: One or more input parameters are NULL.
+ *   - SL_STATUS_INVALID_HANDLE: The client is not the active initialized MQTT client.
+ *   - SL_STATUS_INVALID_STATE: The client is not in an idle state where options can be
+ *     stored for the next connect. Allowed states:
+ *     @ref SL_MQTT_CLIENT_DISCONNECTED, @ref SL_MQTT_CLIENT_TA_DISCONNECTED, and
+ *     @ref SL_MQTT_CLIENT_CONNECTION_FAILED. Late update after connect has started
+ *     (for example @ref SL_MQTT_CLIENT_CONNECTED or @ref SL_MQTT_CLIENT_TA_INIT) is rejected.
+ *
+ * @note
+ *   Options are applied only when firmware MQTT init runs on the next connect from
+ *   @ref SL_MQTT_CLIENT_DISCONNECTED. Reconfigure after a failed connect or partial
+ *   disconnect is supported so apps can set options, finish disconnect, then reconnect
+ *   without a full client deinit.
  ******************************************************************************/
 sl_status_t sl_mqtt_client_set_tcp_tls_advanced_configuration(sl_mqtt_client_t *client,
                                                               const sl_mqtt_client_tcp_tls_advanced_options_t *options);

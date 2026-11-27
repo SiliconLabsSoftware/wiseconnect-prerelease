@@ -18,6 +18,7 @@ Demonstrates how to provision Wi-Fi over Bluetooth LE and communicate with AWS I
     - [Create an application](#create-an-application)
     - [Configure the following parameters in `aws_iot_config.h` file present at `<project>/config`](#configure-the-following-parameters-in-aws_iot_configh-file-present-at-projectconfig)
     - [Prepare the AWS Certificate for the Si Connect Mobile App](#prepare-the-aws-certificate-for-the-si-connect-mobile-app)
+  - [Setup from Empty Project](#setup-from-empty-project)
   - [Test the Application](#test-the-application)
     - [Application Output](#application-output)
     - [MQTT Connection](#mqtt-connection)
@@ -173,6 +174,87 @@ During the mobile app provisioning flow, you will be prompted to provide the fol
 
 > **Note**: The Subscriber topic and Publisher topic field labels above are from the mobile app's perspective — the topic the mobile app subscribes to (to receive sensor data) and the topic the mobile app publishes to (to send LED commands). From the device firmware's perspective these are reversed: in `wifi_app.c`, the `MQTT_TOPIC1` is the topic to which the SiWx917 subscribes (to receive LED commands) and the `MQTT_TOPIC2` is the topic to which the SiWx917 publishes (to send sensor data).
 
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+The component and configuration list below is for the SoC project.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations and preprocessor defines.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Test the Application](#test-the-application).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **System Calls** (`syscalls`)
+- **Default RAM Memory Configuration** (`si91x_memory_default_config`)
+
+### Wi-Fi / networking
+
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **SL I2C Peripheral** (`sl_i2c_peripheral`)
+- **BLE** (`ble`)
+- **Wi-Fi** (`wifi`)
+- **Offload Network Stack** (`sl_si91x_internal_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **Network Manager** (`network_manager`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+- **SiWx91x Asynchronous Socket** (`sl_si91x_asynchronous_socket`)
+- **AWS IoT Device SDK** (`aws_sdk`)
+- **RGB LED** (`sl_si91x_rgb_led_917`), instance: `red`
+- **Si70xx Humidity and Temperature Sensor** (`sl_si70xx`)
+- **SSI** (`sl_ssi`)
+- **ICM40627 6-axis Inertial Sensor (IMU)** (`sl_icm40627`)
+- **GPIO** (`sl_gpio`)
+- **VEML6035** (`sl_veml6035`)
+- **I2C** (`i2c_instance`), instance: `i2c2`
+
+### Power / wakeup
+
+- **PM UULP GPIO** (`gpio_npss_component`)
+- **PM ULP SSI** (`ssi_ulp_component`)
+- **Power Manager** (`sl_power_manager`)
+
+### Console / logging
+
+- **Log - None** (`log_none`)
+- **SL Log Core** (`si91x_log`)
+- **Log Backend I/O Stream - Formatted Output** (`si91x_log_iostream_formatted`)
+- **IO Stream** (`iostream_si91x`)
+- **IO Stream Retarget STDIO** (`iostream_retarget_stdio`)
+- **IO Stream UART (SiWx91x)** (`iostream_uart_si91x`), instance: `vcom`
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+- `ENABLE_NPSS_GPIO_2` = `1`
+- `SL_ENABLE_GPIO_WAKEUP_SOURCE` = `1`
+- `SL_SSI_DEVICE_MODE` = `SL_SSI_ULP_MASTER_ACTIVE`
+- `SL_SPI_BAUD` = `500000`
+- `SL_ULP_TIMER_DIRECTION` = `1`
+
+### Preprocessor defines
+
+In the `.slcp` **Defines**, add:
+
+- `SLI_SI91X_SOCKETS`
+- `SENSOR_RESPONSE_BUFFER_SIZE` = `256`
+
+### Feature-specific notes
+
+- This application explains how to connect to a Wi-Fi access point using BLE provisioning functionality and then communicates with an AWS server using MQTT for devkit. Data will be continuously published until the device is disconnected from the access point
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 ## Test the Application
 
 The following instructions are provided in [here](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/) to:
@@ -253,7 +335,7 @@ After successfully connecting to Wi-Fi, the application establishes a connection
 
 ### Setting up Security Certificates
 
-The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/resources/scripts/).
+The WiSeConnect SDK provides a conversion script (written in Python 3) to make the conversion straightforward. The script is provided in the SDK `<SDK>/resources/scripts` directory and is called [certificate_to_array.py](https://github.com/SiliconLabs/wiseconnect/tree/v4.2.0-content-for-docs/resources/scripts/).
 
 1. Copy the downloaded device certificate, private key from AWS, and the certificate_to_array.py to `<SDK>/resources/certificates`.
 
@@ -292,7 +374,7 @@ The Starfield Root CA certificate used by your Wi-Fi device to verify the AWS se
   > Support for the SNI extension has been added to the AWS SDK, ensuring it is set by the client when connecting to an AWS server using TLS 1.3. This is handled internally by the AWS SDK and does not affect compatibility with other TLS versions.
 
   > **NOTE :**
-  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
+  > Amazon uses [Starfield Technologies](https://www.starfieldtech.com/) to secure the AWS website, the WiSeConnect SDK includes the [Starfield CA Certificate](https://github.com/SiliconLabs/wiseconnect/tree/v4.2.0-content-for-docs/resources/certificates/aws_starfield_ca.pem.h).
   >
   > AWS has announced that there will be changes in their root CA chain. More details can be found in the reference link: [here](https://aws.amazon.com/blogs/security/acm-will-no-longer-cross-sign-certificates-with-starfield-class-2-starting-august-2025/)
   >

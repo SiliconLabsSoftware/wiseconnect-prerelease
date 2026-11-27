@@ -257,6 +257,7 @@ static void sli_buffer_manager_notify_dedicated_pool_waiters_if_available(
  * @param wait_duration_ms Wait duration.
  * @return SL_STATUS_OK if the operation is successful.
  */
+SL_TPUT_CLASSIFIER
 static sl_status_t sli_buffer_manager_allocate_buffer_from_dedicated_pool(
   sli_internal_buffer_t **buffer,
   const sli_buffer_manager_pool_types_t pool_type,
@@ -401,6 +402,7 @@ static void sli_buffer_manager_notify_common_pool_waiters_if_available(void)
  * @param wait_duration_ms Wait duration.
  * @return SL_STATUS_OK if the operation is successful.
  */
+SL_TPUT_CLASSIFIER
 static sl_status_t sli_buffer_manager_allocate_buffer_from_common_pool(sli_internal_buffer_t **buffer,
                                                                        uint32_t start_time_ticks,
                                                                        const uint32_t wait_duration_ms)
@@ -793,6 +795,7 @@ sl_status_t sli_buffer_manager_deinit(void)
   return SL_STATUS_OK;
 }
 
+SL_TPUT_CLASSIFIER
 sl_status_t sli_buffer_manager_allocate_buffer(const sli_buffer_manager_pool_types_t pool_type,
                                                const sli_buffer_manager_allocation_types_t allocation_type,
                                                const uint32_t wait_duration_ms,

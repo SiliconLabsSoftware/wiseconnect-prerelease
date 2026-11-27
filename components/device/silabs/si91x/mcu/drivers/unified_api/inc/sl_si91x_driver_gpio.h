@@ -1361,6 +1361,39 @@ sl_status_t sl_si91x_gpio_driver_set_ulp_peri_on_soc_pin_mode(sl_gpio_t *gpio, s
 ///
 /// @} end group GPIO ********************************************************/
 
+/***************************************************************************/ /**
+ * @brief UC GPIO Init Input/Output instance configuration.
+ *
+ * @details Built by GPIO Init Input or Output components:
+ *          - GPIO_INPUT  → pad_mode (PADCONFIG_P)
+ *          - GPIO_OUTPUT → drive_strength, dout, slew_rate
+ *          UULP pads skip pad mode / strength / slew (no PADCONFIG path).
+ ******************************************************************************/
+typedef struct {
+  uint8_t port;           ///< Port from pin tool (HP / PORT_A..D / ULP / UULP_VBAT).
+  uint8_t pin;            ///< Pin from pin tool.
+  uint8_t direction;      ///< Pin direction (sl_si91x_gpio_direction_t: GPIO_INPUT / GPIO_OUTPUT).
+  uint8_t pad_mode;       ///< Input: pad mode (sl_si91x_gpio_driver_disable_state_t).
+  uint8_t drive_strength; ///< Output: drive strength (sl_si91x_gpio_driver_strength_select_t).
+  uint8_t dout;           ///< Output: initial level (sl_si91x_gpio_pin_value_t).
+  uint8_t slew_rate;      ///< Output: slew rate (sl_si91x_gpio_slew_rate_t).
+} sl_si91x_gpio_configure_pin_t;
+
+/***************************************************************************/ /**
+ * @brief Configure one GPIO pin from a UC GPIO Init Input/Output instance.
+ *
+ * @param[in] handle Pointer to instance configuration (must not be NULL).
+ *
+ * @return
+ *   - SL_STATUS_OK on success
+ *   - SL_STATUS_NULL_POINTER if handle is NULL
+ *
+ * @details For outputs: enables the pad as input, preloads DOUT, then switches
+ *          to output (avoids a boot glitch). HP slew is written per absolute
+ *          pin (PADCONFIG_SR), not for the whole port.
+ ******************************************************************************/
+sl_status_t sl_si91x_gpio_configure_pin(const sl_si91x_gpio_configure_pin_t *handle);
+
 #ifdef __cplusplus
 }
 #endif

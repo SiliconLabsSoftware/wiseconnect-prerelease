@@ -281,6 +281,28 @@ sl_si91x_host_timestamp_t sl_si91x_host_elapsed_time(uint32_t starting_timestamp
  */
 void *sl_si91x_host_get_buffer_data(sl_wifi_buffer_t *buffer, uint16_t offset, uint16_t *data_length);
 
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+/***************************************************************************/ /**
+ * @brief
+ *   Marks the in-flight side-band crypto request as timed out.
+ *
+ * @details
+ *   After this call the SIDE_BAND_CRYPTO_DONE interrupt handler releases the NWP wake hold and clears the
+ *   side-band in-progress flag when the NWP completes. Call with interrupts disabled, and only after
+ *   confirming the completion event has not already been signalled.
+ ******************************************************************************/
+void sli_si91x_side_band_crypto_mark_timed_out(void);
+
+/***************************************************************************/ /**
+ * @brief
+ *   Reports whether a timed-out side-band crypto request is still owned by the NWP.
+ *
+ * @return
+ *   Returns `true` until the NWP signals completion of the timed-out request, `false` otherwise.
+ ******************************************************************************/
+bool sli_si91x_side_band_crypto_is_timed_out(void);
+#endif
+
 #ifdef SLI_SI91X_OFFLOAD_NETWORK_STACK
 /**
  * @brief 

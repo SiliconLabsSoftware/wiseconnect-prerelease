@@ -15,10 +15,13 @@
 #include "sl_iostream.h"
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_iostream_rtt.h"
+#include "SEGGER_RTT.h"
 // SoC UART log TX depends on si91x_debug (rsi_debug.c): Board_UARTPutChar and
 // si91x_prints_mutex, which DEBUGINIT() initializes. Declare them here instead
 // of including rsi_debug.h so this file does not pick up DEBUGOUT/DEBUGINIT macros.
 void Board_UARTPutChar(uint8_t ch);
+/* Provided by the linker when -Wl,--wrap=_write is set (wireless_test_soc.slcp). */
+extern int __real__write(int file, char *ptr, int len);
 #else
 #include "sl_iostream_handles.h"
 #if defined(SL_CATALOG_IOSTREAM_USART_PRESENT) || defined(SL_CATALOG_IOSTREAM_EUSART_PRESENT)
@@ -165,6 +168,22 @@ static sl_status_t wireless_test_uart_log_write(void *context, const void *buffe
   }
 
   return SL_STATUS_OK;
+}
+#endif
+
+#if defined(SLI_SI91X_MCU_INTERFACE)
+/* Redirect printf to UART or RTT per SL_WIRELESS_TEST_LOG_OUTPUT. */
+int __wrap__write(int file, char *ptr, int len)
+{
+#if (SL_WIRELESS_TEST_LOG_OUTPUT == SL_WIRELESS_TEST_LOG_OUTPUT_RTT)
+  (void)file;
+  if ((ptr != NULL) && (len > 0)) {
+    (void)SEGGER_RTT_Write(0, ptr, (unsigned)len);
+  }
+  return len;
+#else
+  return __real__write(file, ptr, len);
+#endif
 }
 #endif
 

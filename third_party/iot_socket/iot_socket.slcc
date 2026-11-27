@@ -19,9 +19,10 @@ provides:
 - name: iot_socket
 source:
 - path: source/bsd_socket/iot_socket.c
-  condition: ["bsd_socket"]
+  condition: ["sl_si91x_internal_stack"]
 - path: source/lwip/iot_socket.c
-  condition: ["lwip"]
+  condition: ["silabs_lwip_api"]
+
 include:
 - path: include
 - path: silabs
@@ -34,6 +35,9 @@ include:
 
 requires:
 - name: bsd_socket
+  condition: ["sl_si91x_internal_stack"]
+- name: silabs_lwip_api
+  condition: ["silabs_lwip_api"]
 
 documentation:
   url: https://github.com/MDK-Packs/IoT_Socket

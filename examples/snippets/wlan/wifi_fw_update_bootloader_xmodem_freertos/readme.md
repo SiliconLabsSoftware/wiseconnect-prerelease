@@ -15,6 +15,7 @@ Demonstrates how to flash SiWx91x firmware from a host UART XMODEM bootloader us
   - [Software Requirements](#software-requirements)
   - [Setup Diagram](#setup-diagram)
 - [Getting Started](#getting-started)
+- [Setup from Empty Project](#setup-from-empty-project)
 - [Application Build Environment](#application-build-environment)
   - [App Configuration](#app-configuration)
 - [Test the Application](#test-the-application)
@@ -106,6 +107,59 @@ Refer to the instructions on the [WiSeConnect Getting Started](https://docs.sila
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+The component and configuration list below is for the SoC project.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Application Build Environment](#application-build-environment).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **Device Initialization** (`device_init`)
+
+### Wi-Fi / networking
+
+- **SPI Driver** (`spidrv`), instance: `exp`
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **Wi-Fi** (`wifi`)
+- **Offload Network Stack** (`sl_si91x_internal_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **SiWx91x NCP SPI bus interface** (`sl_si91x_spi_bus`)
+- **Network Manager** (`network_manager`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+
+### Console / logging
+
+- **IO Stream Retarget STDIO** (`iostream_retarget_stdio`)
+- **IO Stream RTT** (`iostream_rtt`)
+- **IO Stream Stdlib Config** (`iostream_stdlib_config`)
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+- `configUSE_POSIX_ERRNO` = `1`
+- `configTOTAL_HEAP_SIZE` = `51200`
+- `configTIMER_TASK_PRIORITY` = `55`
+
+### Feature-specific notes
+
+- Demonstrates firmware flashing of SiWx91x device using host uart xmodem bootloader.
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 ## Application Build Environment
 
 The application can be configured to suit your requirements and development environment.

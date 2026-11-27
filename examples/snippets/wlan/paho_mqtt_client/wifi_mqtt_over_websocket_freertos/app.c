@@ -278,7 +278,6 @@ int paho_mqtt_over_websocket_demo()
   int app_status             = 0;
   bool mqtt_connected        = false;
   bool topic_subscribed      = false;
-  uint16_t flags             = 0;
   mqtt_client_t *mqtt_client = NULL;
   MQTTMessage publish_msg;
   // Initialize MQTT client structure
@@ -312,23 +311,23 @@ int paho_mqtt_over_websocket_demo()
              (uint8_t *)mqtt_client->rx_buffer,
              MQTT_CLIENT_RX_BUFFER_SIZE);
 
-  // Connect to MQTT broker over WebSocket
-  status = NetworkConnect(mqtt_client->client.ipstack,
-                          flags,
-                          mqtt_client->server_ip,
-                          mqtt_client->server_port,
-                          mqtt_client->client_port,
-                          enable_ssl);
+  // Connect to MQTT broker over WebSocket (flags unused for WS; addr is host string)
+  status = sl_paho_network_connect(mqtt_client->client.ipstack,
+                                   0,
+                                   mqtt_client->server_ip,
+                                   mqtt_client->server_port,
+                                   mqtt_client->client_port,
+                                   enable_ssl);
 
-  if (status == NETWORK_ERROR_NULL_STRUCTURE) {
+  if (status == SL_NETWORK_ERR_NULL_STRUCTURE) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.\r\n");
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
-  } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
+  } else if (status == SL_NETWORK_ERR_NULL_ADDRESS) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.\r\n");
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);
-  } else if (status == NETWORK_ERROR_INVALID_TYPE) {
+  } else if (status == SL_NETWORK_ERR_INVALID_TYPE) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.\r\n");
     app_status = status;
     return mqtt_demo_cleanup(mqtt_client, topic_subscribed, mqtt_connected, app_status);

@@ -243,7 +243,7 @@ static void application_start(void *argument)
 int paho_mqtt_demo()
 {
   int status;
-  uint16_t flags             = 0;
+  uint8_t flags              = 0;
   int recv_failed            = 0; // Flag to indicate receive failure of data published on the subscribed topic
   mqtt_client_t *mqtt_client = NULL;
   MQTTMessage publish_msg;
@@ -287,22 +287,36 @@ int paho_mqtt_demo()
              (uint8_t *)mqtt_client->tcp_mqtt_rx_buffer,
              TCP_MQTT_CLIENT_RX_BUFFER_SIZE);
 
-  status = NetworkConnect(mqtt_client->client.ipstack,
-                          flags,
-                          (char *)&(mqtt_client->server_ip),
-                          mqtt_client->server_port,
-                          mqtt_client->client_port,
-                          enable_ssl);
+#ifdef SLI_SI91X_ENABLE_IPV6
+  flags  = SL_PAHO_NETWORK_FLAG_IPV6;
+  status = sl_paho_network_connect(mqtt_client->client.ipstack,
+                                   flags,
+                                   (char *)mqtt_client->server_ip.ip.v6.bytes,
+                                   mqtt_client->server_port,
+                                   mqtt_client->client_port,
+                                   enable_ssl);
+#else
+  flags  = SL_PAHO_NETWORK_FLAG_IPV4;
+  status = sl_paho_network_connect(mqtt_client->client.ipstack,
+                                   flags,
+                                   (char *)mqtt_client->server_ip.ip.v4.bytes,
+                                   mqtt_client->server_port,
+                                   mqtt_client->client_port,
+                                   enable_ssl);
+#endif
 
   do {
-    if (status == NETWORK_ERROR_NULL_STRUCTURE) {
+    if (status == SL_NETWORK_ERR_NULL_STRUCTURE) {
       SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.\r\n");
       break;
-    } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
+    } else if (status == SL_NETWORK_ERR_NULL_ADDRESS) {
       SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.\r\n");
       break;
-    } else if (status == NETWORK_ERROR_INVALID_TYPE) {
+    } else if (status == SL_NETWORK_ERR_INVALID_TYPE) {
       SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.\r\n");
+      break;
+    } else if (status == SL_NETWORK_ERR_INVALID_FLAGS) {
+      SL_DEBUG_LOG_V2(ERROR, "Error: Set exactly one of SL_PAHO_NETWORK_FLAG_IPV4 / IPV6.\r\n");
       break;
     } else if (status != 0) {
       SL_DEBUG_LOG_V2(ERROR, " TCP Connection Failed: %d\r\n", status);

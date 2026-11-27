@@ -66,4 +66,8 @@ template_contribution:
       event: iostream_instance_init_stage_2
       include: sl_log_iostream_recommends.h
       handler: sl_si91x_iostream_set_console_instance
-    priority: 9999      
+    priority: 9999
+
+documentation:
+  url: https://docs.silabs.com/gecko-platform/latest/platform-service/sl-log
+

@@ -10,6 +10,7 @@
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
+  - [Setup from Empty Project](#setup-from-empty-project)
   - [Application Build Environment](#application-build-environment)
   - [Test the Application](#test-the-application)
   - [Exploring Supported Features and Commands](#exploring-supported-features-and-commands)
@@ -66,6 +67,67 @@ Refer to the instructions here:
 - Create a Studio project.
 - Open the Wi-Fi Commander tool.
 
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+The component and configuration list below is for the SoC project.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations and preprocessor defines.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Application Build Environment](#application-build-environment).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **System Calls** (`syscalls`)
+- **Default RAM Memory Configuration** (`si91x_memory_default_config`)
+
+### Wi-Fi / networking
+
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **Wi-Fi** (`wifi`)
+- **Offload Network Stack** (`sl_si91x_internal_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **Network Manager** (`network_manager`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+- **RAM Execution** (`device_needs_ram_execution`)
+- **IoT Socket** (`iot_socket`)
+- **USART** (`sl_usart`)
+- **Application Timer** (`app_timer`)
+- **Soft Reset** (`sl_si91x_soc_soft_reset`)
+- **MQTT Client** (`mqtt`)
+
+### Power / wakeup
+
+- **ULP_UART** (`sl_ulp_uart`)
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+
+### Preprocessor defines
+
+In the `.slcp` **Defines**, add:
+
+- `SLI_SI91X_DBG_MIDDLEWARE_EN`
+- `SLI_SI91X_MCU_INTR_BASED_RX_ON_UART`
+- `APP_WIFI_API_FULL`
+
+### Feature-specific notes
+
+- Demonstrates to run all commands individually
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 ## Application Build Environment
 
 - The application uses the default Access Point (AP) configurations provided as below:

@@ -216,7 +216,10 @@ sl_status_t sl_http_client_set_tcp_tls_advanced_configuration(const sl_http_clie
     return SL_STATUS_INVALID_HANDLE;
   }
 
-  if (http_client_handle.client_state == HTTP_STATE_DEINITIALIZED) {
+  // Only allow configuration after init and before request_init. Request paths move
+  // to *_REQUEST_INITIALIZED / REQUEST_SENT and do not return to INITIALIZED, so
+  // different TLS options per request require deinit/init on this handle.
+  if (http_client_handle.client_state != HTTP_STATE_INITIALIZED) {
     return SL_STATUS_INVALID_STATE;
   }
 

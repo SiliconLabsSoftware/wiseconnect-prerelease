@@ -15,6 +15,7 @@ Demonstrates how to start a station client and transfer data to a TCP server wit
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
+  - [Setup from Empty Project](#setup-from-empty-project)
     - [Application Configuration Parameters](#application-configuration-parameters)
       - [Configure the following parameters in **app.c** to test LWIP app as per requirements](#configure-the-following-parameters-in-appc-to-test-lwip-app-as-per-requirements)
   - [Soc Mode:](#soc-mode)
@@ -155,6 +156,62 @@ The application can be configured to suit your requirements and development envi
     ```c
     #define NUMBER_OF_PACKETS   1000
     ```
+
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Application Build Environment](#application-build-environment).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **System Calls** (`syscalls`)
+- **Default RAM Memory Configuration** (`si91x_memory_default_config`)
+
+### Wi-Fi / networking
+
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **Wi-Fi** (`wifi`)
+- **LwIP Network Stack (Hosted)** (`sl_si91x_lwip_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **Network Manager** (`network_manager`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+
+### Power / wakeup
+
+- **Power Manager** (`sl_power_manager`)
+- **PM UULP Wireless Wakeup** (`wireless_wakeup_ulp_component`)
+
+### Console / logging
+
+- **SL Log Core** (`si91x_log`)
+- **Log Backend I/O Stream - Formatted Output** (`si91x_log_iostream_formatted`)
+- **IO Stream** (`iostream_si91x`)
+- **IO Stream Retarget STDIO** (`iostream_retarget_stdio`)
+- **IO Stream UART (SiWx91x)** (`iostream_uart_si91x`), instance: `vcom`
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+
+### Feature-specific notes
+
+- Use **LwIP Network Stack (Hosted)** instead of Offload Network Stack.
+- Configure STA credentials in `config/sl_net_default_values.h` and remote TCP server settings in `app.c`.
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 
 ## Soc Mode:
 

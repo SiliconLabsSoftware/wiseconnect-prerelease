@@ -336,3 +336,23 @@ typedef uint8_t sl_log_level_t;
 typedef uint32_t sl_duration_t;
 
 typedef void (*sli_event_handler_t)(void);
+
+/* Optional throughput classifier.
+ * Disabled by default (no RAM impact). Enable with:
+ *   -DSL_SI91X_ENABLE_TPUT_CLASSIFICATION=1
+ */
+#ifndef SL_SI91X_ENABLE_TPUT_CLASSIFICATION
+#define SL_SI91X_ENABLE_TPUT_CLASSIFICATION 0
+#endif
+
+#if SL_SI91X_ENABLE_TPUT_CLASSIFICATION
+#include "sli_code_classification.h"
+#endif
+
+#ifndef SL_TPUT_CLASSIFIER
+#if SL_SI91X_ENABLE_TPUT_CLASSIFICATION
+#define SL_TPUT_CLASSIFIER SL_CODE_CLASSIFY(SL_CODE_COMPONENT_SI91X_WIRELESS, SL_CODE_CLASS_TIME_CRITICAL)
+#else
+#define SL_TPUT_CLASSIFIER
+#endif
+#endif

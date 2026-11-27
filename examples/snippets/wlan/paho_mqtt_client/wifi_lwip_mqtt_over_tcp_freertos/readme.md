@@ -15,11 +15,14 @@ Demonstrates how to configure an MQTT client over TCP with the lwIP stack using 
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
+  - [Setup from Empty Project](#setup-from-empty-project)
   - [Application Build Environment](#application-build-environment)
     - [Neutral-less Matter Switch Profile (optional)](#neutral-less-matter-switch-profile-optional)
   - [Test the Application](#test-the-application)
     - [Procedure for executing the application when enabled with SSL](#procedure-for-executing-the-application-when-enabled-with-ssl)
     - [Procedure for MQTT over TLS on port 443 with ALPN (Mosquitto)](#procedure-for-mqtt-over-tls-on-port-443-with-alpn-mosquitto)
+  - [Network Connect Error Codes](#network-connect-error-codes)
+  - [MQTT Client Return Codes](#mqtt-client-return-codes)
   - [Additional Information](#additional-information)
     - [Steps to set up MQTT server](#steps-to-set-up-mqtt-server)
   - [Troubleshooting](#troubleshooting)
@@ -103,6 +106,93 @@ Refer to the instructions [here](https://docs.silabs.com/wiseconnect/latest/wise
 
 For details on the project folder structure, see the [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure) page.
 
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+The component and configuration list below is for the SoC project.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations and preprocessor defines.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Application Build Environment](#application-build-environment).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **System Calls** (`syscalls`)
+
+### Wi-Fi / networking
+
+- **MEMORY_MCU_ADVANCED_WIRELESS_BASIC** (`si91x_mem_config_3`)
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **Wi-Fi** (`wifi`)
+- **TLS Client** (`mbedtls_tls`)
+- **X.509** (`mbedtls_x509`)
+- **CTR-DRBG** (`mbedtls_random`)
+- **Ciphers** (`mbedtls_cipher`)
+- **Hashing and HMACs** (`mbedtls_hash`)
+- **ECDH** (`mbedtls_ecdh`)
+- **ECC** (`mbedtls_ecc`)
+- **ASN.1 Parsing** (`mbedtls_asn1`)
+- **ECDHE-Based Key Exchange** (`mbedtls_ecdhe_key_exchange`)
+- **SHA-256** (`mbedtls_sha256`)
+- **SHA-512** (`mbedtls_sha512`)
+- **Source Code** (`mbedtls_source`)
+- **RSA** (`mbedtls_rsa`)
+- **CBC Mode** (`mbedtls_cipher_cbc`)
+- **ECDSA** (`mbedtls_ecdsa`)
+- **CCM** (`mbedtls_ccm`)
+- **GCM** (`mbedtls_gcm`)
+- **AES Block Cipher** (`mbedtls_aes`)
+- **MD5** (`mbedtls_md5`)
+- **CMAC** (`mbedtls_cmac`)
+- **Configuration** (`mbedtls_config`)
+- **LwIP Network Stack (Hosted)** (`sl_si91x_lwip_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **Network Manager** (`network_manager`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+- **Paho MQTT Embedded** (`paho_mqtt_embedded`)
+
+### Console / logging
+
+- **Log - None** (`log_none`)
+- **SL Log Core** (`si91x_log`)
+- **Log Backend I/O Stream - Formatted Output** (`si91x_log_iostream_formatted`)
+- **IO Stream** (`iostream_si91x`)
+- **IO Stream Retarget STDIO** (`iostream_retarget_stdio`)
+- **IO Stream UART (SiWx91x)** (`iostream_uart_si91x`), instance: `vcom`
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+- `SL_MBEDTLS_SSL_IN_CONTENT_LEN` = `6384`
+- `SL_MBEDTLS_SSL_OUT_CONTENT_LEN` = `6384`
+- `SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED` = `1`
+- `SL_MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED` = `1`
+- `SL_MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED` = `1`
+- `MBEDTLS_SSL_CIPHERSUITES` = `MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`
+- `SL_SI91X_WRAP_KEY_BUFFER_SIZE` = `1696`
+
+### Preprocessor defines
+
+In the `.slcp` **Defines**, add:
+
+- `SLI_MBEDTLS_CONFIG_AUTOGEN_OVERRIDE_FILE` = `"sli_lwip_mqtt_mbedtls_config.h"`
+
+### Feature-specific notes
+
+- Demonstrates how SiWx91x device is configured as an MQTT client over TCP, connects to an MQTT broker, subscribes to a topic, and publishes messages on a particular MQTT topic using the Paho MQTT library with lwip support
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 ## Application Build Environment
 
 The application can be configured to suit your requirements and development environment. Review the following sections and make any changes needed.
@@ -501,6 +591,72 @@ Use this when the MQTT broker listens on port 443 and requires ALPN negotiation 
 > 4. Create server certificate signing request `openssl req -new -key server.key -out server.csr`
 > 5. Sign server certificate with CA `openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt`
 
+## Network Connect Error Codes
+
+This example uses `sl_paho_network_connect()`. Prefer it for new applications. `NetworkConnect()` remains available for legacy code.
+
+### NetworkConnect() (legacy)
+
+| Value | Meaning |
+|-------|---------|
+| 0 | Success |
+| -1 | Null `Network` structure |
+| -2 | Null address |
+| -3 | Invalid transport type |
+| -4 | TLS hostname required (`NETWORK_ERROR_TLS_HOSTNAME_REQUIRED`) |
+| Other negatives | Transport / TLS failure (values can overlap) |
+
+### sl_paho_network_connect() (recommended)
+
+| Range | Domain |
+|-------|--------|
+| 0 | Success |
+| -1 … -99 | Network (e.g. -1 null structure, -2 null address, -3 invalid type, -5 invalid flags) |
+| -101 … -199 | WebSocket |
+| -201 … -299 | TCP |
+| -301 … -399 | TLS (e.g. -301 hostname required) |
+
+Named constants are in `sl_paho_error_codes.h` (`SL_NETWORK_ERR_*`, `SL_NETWORK_TCP_ERR_*`, `SL_NETWORK_TLS_ERR_*`).
+
+## MQTT Client Return Codes
+
+Paho MQTT APIs used in this example return Eclipse Paho Embedded C codes.
+
+- Client API return codes (`SUCCESS`, `FAILURE`, `BUFFER_OVERFLOW`): [MQTTClient.h](https://github.com/eclipse-paho/paho.mqtt.embedded-c/blob/master/MQTTClient-C/src/MQTTClient.h)
+- CONNACK return codes from `MQTTConnect()`: [MQTTConnect.h](https://github.com/eclipse-paho/paho.mqtt.embedded-c/blob/master/MQTTPacket/src/MQTTConnect.h)
+
+### Client API return codes (`enum returnCode`)
+
+| Value | Name | Meaning |
+|-------|------|---------|
+| 0 | SUCCESS | Operation succeeded |
+| -1 | FAILURE | Generic failure |
+| -2 | BUFFER_OVERFLOW | Packet buffer too small |
+
+### MQTTConnect() CONNACK codes (`enum connack_return_codes`)
+
+| Value | Name | Meaning |
+|-------|------|---------|
+| 0 | MQTT_CONNECTION_ACCEPTED | Connection accepted |
+| 1 | MQTT_UNNACCEPTABLE_PROTOCOL | Unacceptable protocol version |
+| 2 | MQTT_CLIENTID_REJECTED | Client identifier rejected |
+| 3 | MQTT_SERVER_UNAVAILABLE | Server unavailable |
+| 4 | MQTT_BAD_USERNAME_OR_PASSWORD | Bad username or password |
+| 5 | MQTT_NOT_AUTHORIZED | Not authorized |
+
+### MQTT-related functions in this example
+
+| Function | Purpose |
+|----------|---------|
+| `MQTTClient()` | Initialize the Paho client |
+| `sl_paho_network_connect()` | Establish TCP/TLS transport over LwIP |
+| `MQTTConnect()` | Send CONNECT and wait for CONNACK |
+| `MQTTSubscribe()` | Subscribe to a topic |
+| `MQTTPublish()` | Publish a message |
+| `MQTTYield()` | Process inbound packets / keep-alive |
+| `MQTTUnsubscribe()` | Unsubscribe from a topic |
+| `MQTTDisconnect()` | Disconnect from the broker |
+
 ## Troubleshooting
 
 If you encounter issues while running this example, check the following:
@@ -514,6 +670,8 @@ If you encounter issues while running this example, check the following:
 - [WiSeConnect Getting Started Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-getting-started/)
 - [WiSeConnect Examples](https://docs.silabs.com/wiseconnect/latest/wiseconnect-examples/#example-folder-structure)
 - [WiSeConnect Recommended Settings Guide](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-prog-recommended-settings/)
+- [Paho Embedded C — MQTTClient.h return codes](https://github.com/eclipse-paho/paho.mqtt.embedded-c/blob/master/MQTTClient-C/src/MQTTClient.h)
+- [Paho Embedded C — MQTTConnect.h CONNACK codes](https://github.com/eclipse-paho/paho.mqtt.embedded-c/blob/master/MQTTPacket/src/MQTTConnect.h)
 
 ## Report Bugs and Get Support
 

@@ -15,12 +15,14 @@ SiWx91x Wireless Test CLI example: Exercise Wi-Fi and BLE features through a com
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Getting Started](#getting-started)
+  - [Setup from Empty Project](#setup-from-empty-project)
   - [Application Build Environment](#application-build-environment)
     - [CLI Command Input and Response Output](#cli-command-input-and-response-output)
     - [How to View UART Logs in Serial Debug Assistant](#how-to-view-uart-logs-in-serial-debug-assistant)
     - [How to View RTT Logs](#how-to-view-rtt-logs)
   - [Test the Application](#test-the-application)
   - [Troubleshooting](#troubleshooting)
+    - [RTT block address (`RTT read buffer could not be found`)](#rtt-block-address-rtt-read-buffer-could-not-be-found)
   - [Resources](#resources)
   - [Report Bugs and Get Support](#report-bugs-and-get-support)
 
@@ -80,7 +82,7 @@ The Wireless Test application is a Command-Line Interface (CLI) application desi
 - Simplicity Studio IDE - [Simplicity Studio IDE](https://www.silabs.com/developer-tools/simplicity-studio)
 - [Keil IDE](https://www.keil.com/) (to be used with STM32F411RE MCU)
 - A Serial terminal software such as [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in)
-- Optional, for RTT response output: J-Link RTT Viewer, Simplicity Commander RTT tab, or the Simplicity Studio RTT Console
+- Optional, for RTT response output: [Simplicity Commander](https://www.silabs.com/developers/simplicity-studio) RTT tab
 
 Note : The user can also use the Simplicity studio’s console window for sending and receiving the CLI command but it is recommended to use Serial Debug Assistant for ease of the command usage. CLI commands are always entered over UART/VCOM. In SoC mode, where command responses appear depends on `SL_WIRELESS_TEST_LOG_OUTPUT` (UART by default). In NCP mode, responses are on RTT.
 
@@ -129,6 +131,71 @@ For project folder structure details, see the [WiSeConnect Examples](https://doc
 
 
 
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+The component and configuration list below is for the SoC project.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations and preprocessor defines.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Application Build Environment](#application-build-environment).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **System Calls** (`syscalls`)
+- **Default RAM Memory Configuration** (`si91x_memory_default_config`)
+
+### Wi-Fi / networking
+
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **Wi-Fi** (`wifi`)
+- **BLE** (`ble`)
+- **Offload Network Stack** (`sl_si91x_internal_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **Network Manager** (`network_manager`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+- **RAM Execution** (`device_needs_ram_execution`)
+- **Console** (`console`)
+- **Console Variables** (`console_variables`)
+- **IoT Socket** (`iot_socket`)
+- **Soft Reset** (`sl_si91x_soc_soft_reset`)
+
+### Console / logging
+
+- **Log - None** (`log_none`)
+- **SL Log Core** (`si91x_log`)
+- **Log Backend I/O Stream - Formatted Output** (`si91x_log_iostream_formatted`)
+- **IO Stream RTT** (`iostream_rtt_si91x`)
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+- `NVM3_DEFAULT_MAX_OBJECT_SIZE` = `280`
+
+### Preprocessor defines
+
+In the `.slcp` **Defines**, add:
+
+- `SL_SI91X_CLI_CONSOLE_MAX_ARG_COUNT` = `30`
+- `SLI_SI91X_DBG_MIDDLEWARE_EN`
+- `SLI_SI91X_MCU_INTR_BASED_RX_ON_UART`
+
+### Feature-specific notes
+
+- Demonstrates to run all commands individually
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 ## Application Build Environment
 
 The application can be configured to suit your requirements and development environment.
@@ -146,7 +213,7 @@ CLI **commands are always typed on UART/VCOM** (Serial Debug Assistant).
 | Setting | Commands (input) | Responses (output) | When to use |
 |---------|------------------|--------------------|-------------|
 | `SL_WIRELESS_TEST_LOG_OUTPUT_UART` (**default**) | Serial Debug Assistant | Serial Debug Assistant | Backward compatible with earlier releases. Works on both plain and encrypted boards. Use this when RTT Viewer is not used, or when the SoC board is encrypted. |
-| `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` | Serial Debug Assistant | J-Link RTT Viewer, Simplicity Commander RTT tab, or Studio RTT Console | When you want formatted logger output on RTT Channel 0 on a **plain** (non-encrypted) board |
+| `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` | Serial Debug Assistant | Simplicity Commander RTT tab | When you want formatted logger output on RTT Channel 0 on a **plain** (non-encrypted) board |
 
 **Expected behavior on plain vs encrypted boards (SoC):**
 
@@ -158,8 +225,6 @@ CLI **commands are always typed on UART/VCOM** (Serial Debug Assistant).
 **Backward compatibility:** The SoC default is UART. If RTT logging is not required, leave `SL_WIRELESS_TEST_LOG_OUTPUT_UART` selected, rebuild, and flash. Command responses then appear in Serial Debug Assistant again. On encrypted boards, always use the UART default.
 
 Closing an RTT viewer does **not** automatically move output to UART. To return logs to UART, set `SL_WIRELESS_TEST_LOG_OUTPUT_UART`, rebuild, and flash.
-
-Do not add an `iostream_uart_si91x` VCOM logger instance to the SoC project. Reinitializing that UART for logging can stop the CLI from receiving commands.
 
 **NCP mode:** Command input stays on the host UART/VCOM path. Log and command responses are always routed to RTT so they do not mix with the HCI/CLI transport on VCOM. The `SL_WIRELESS_TEST_LOG_OUTPUT` macro applies to SoC builds only.
 
@@ -177,16 +242,9 @@ Use this path for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIREL
 
 ### How to View RTT Logs
 
-Use this section for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` on a **plain** (non-encrypted) board. For **NCP** builds, logs are already on RTT; skip the `demo.c` macro change and connect an RTT viewer as below.
+Use this section for **SoC** builds when `SL_WIRELESS_TEST_LOG_OUTPUT` is `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` on a **plain** (non-encrypted) board. For **NCP** builds, logs are already on RTT; skip the `demo.c` macro change and connect Simplicity Commander as below.
 
 > **Note:** On encrypted SoC boards, RTT response output is not supported. Leave `SL_WIRELESS_TEST_LOG_OUTPUT` set to `SL_WIRELESS_TEST_LOG_OUTPUT_UART` and use [How to View UART Logs in Serial Debug Assistant](#how-to-view-uart-logs-in-serial-debug-assistant) instead. Missing RTT responses or garbage buffer names on an encrypted board are expected.
-
-Before connecting RTT on SiWx91x, configure the host debugger with these settings (self-contained here so this section works when Simplicity Studio copies only this example). They match the SEGGER SystemView Backend guidance in the Si91x Logger Backend example in the WiseConnect SDK package at `examples/si91x_soc/service/sl_si91x_logger_backend_example/readme.md` (SEGGER SystemView Backend). Logger backend overview is also in `docs/software-reference/manuals/siwx91x-software-reference-manual.md` (SL Debug Logger) in the same SDK package.
-
-- Target device: **CORTEX-M4** (application core)
-- Interface: **SWD**
-- Number of cores: **2** (do not leave this on Auto)
-- Prefer resolving `_SEGGER_RTT` from the flashed application **ELF/OUT** (or set the control-block address from `arm-none-eabi-nm <image>.out | grep _SEGGER_RTT`)
 
 1. In `demo.c` (SoC only), set:
 
@@ -196,12 +254,12 @@ Before connecting RTT on SiWx91x, configure the host debugger with these setting
 
 2. Rebuild and flash the SoC application. Keep the USB/J-Link debug connection attached.
 3. Open Serial Debug Assistant on the board VCOM port and type commands there. Command **input** stays on UART.
-4. Open an RTT viewer on **Channel 0** using one of the following:
-   - **Simplicity Commander:** open the **RTT** tab, enable **Reset target on connect**, and click **Connect**.
-   - **Simplicity Studio:** start a debug session on the M4 application image, then open the RTT / Serial 1 console view.
-   - **J-Link RTT Viewer:** connect to the SiWx91x M4 core, select Channel 0, and start the session.
-5. Command responses and `SL_DEBUG_LOG_V2` lines appear in the RTT viewer as formatted logger text, for example `[I](S|<timestamp>) Ready`.
-6. If the board is reset while Commander RTT is open, quit Commander completely and open it again to restore the RTT session.
+4. Open **Simplicity Commander**, select the connected adapter, open the **RTT** tab, enable **Reset target on connect**, and click **Connect**.
+5. Command responses and logger output appear in the Commander RTT console, for example `Ready` and the `>` prompt. Continue typing commands in Serial Debug Assistant; command **input** stays on UART.
+
+> **Note:** With a recent Simplicity Commander release, RTT logs are found automatically after **Connect**. You do not need to set **RTT block address** manually. If Connect fails with `RTT read buffer could not be found`, update Simplicity Commander first, or see [RTT block address (`RTT read buffer could not be found`)](#rtt-block-address-rtt-read-buffer-could-not-be-found) under [Troubleshooting](#troubleshooting).
+
+> **Note:** If the board is reset while Commander RTT is open, quit Commander completely and open it again to restore the RTT session.
 
 ![RTT logs: commands in Serial Debug Assistant and responses in Simplicity Commander RTT](resources/readme/RTT_logs.png)
 
@@ -715,7 +773,7 @@ wifi_update_gain_table 1 0
 
 **Note:** To update the gain table, configure the gain_table_payload[] of sl_wifi_update_gain_table_command_handler in wifi_command.c file.
 
-**Note:** For changing the UART instance of the wireless_test example, see the VCOM section of the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.1.2-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
+**Note:** For changing the UART instance of the wireless_test example, see the VCOM section of the [Software Reference Manual](https://github.com/SiliconLabs/wiseconnect/blob/v4.2.0-content-for-docs/docs/software-reference/manuals/siwx91x-software-reference-manual.md).
 The changes needs to be configured in rsi_debug.c file and RTE_Device_917.h file. 
 
 
@@ -1290,7 +1348,7 @@ In the command handler, the arguments passed in the cli command are internally m
 If you encounter issues while running the Wireless Test application, check the following:
 
 - Use [Serial Debug Assistant](https://apps.microsoft.com/detail/9NBLGGH43HDM?rtc=1&hl=en-in&gl=in) or an equivalent serial terminal instead of the Simplicity Studio console for reliable CLI **input**. On SoC, command **responses** appear in that terminal only when `SL_WIRELESS_TEST_LOG_OUTPUT_UART` is selected.
-- If Serial Debug Assistant shows no `Ready` prompt or no command responses on SoC, confirm `SL_WIRELESS_TEST_LOG_OUTPUT` in `demo.c`. For UART output, rebuild with `SL_WIRELESS_TEST_LOG_OUTPUT_UART`. For RTT output (SoC opt-in on plain boards, or NCP), open an RTT viewer as described in [How to View RTT Logs](#how-to-view-rtt-logs).
+- If Serial Debug Assistant shows no `Ready` prompt or no command responses on SoC, confirm `SL_WIRELESS_TEST_LOG_OUTPUT` in `demo.c`. For UART output, rebuild with `SL_WIRELESS_TEST_LOG_OUTPUT_UART`. For RTT output (SoC opt-in on plain boards, or NCP), open Simplicity Commander as described in [How to View RTT Logs](#how-to-view-rtt-logs).
 - On an encrypted SoC board, if RTT shows no response to commands such as `help`, or shows garbage in the RTT read-buffer name, switch back to `SL_WIRELESS_TEST_LOG_OUTPUT_UART`. That behavior with `SL_WIRELESS_TEST_LOG_OUTPUT_RTT` on encrypted boards is expected.
 - Confirm that the correct serial port and baud rate are selected. In SoC UART mode, the `Ready` prompt appears after flashing, as shown in [Test the Application](#test-the-application).
 - Verify the default SSID and passphrase in `wifi_commands.c` (`SOFT_AP_SSID`, `SOFT_AP_PSK`), or update them to match your test network configuration.
@@ -1301,6 +1359,40 @@ If you encounter issues while running the Wireless Test application, check the f
 - For NCP mode, verify that the host interface (SPI or UART) matches the project variant and that the connectivity firmware on the NCP is up to date.
 - Run `set_region_configuration` with the correct region code before RF transmit tests if region-specific limits apply.
 - Use the `reset` command to recover the CLI state if a prior command leaves the module in an unexpected configuration.
+
+### RTT block address (`RTT read buffer could not be found`)
+
+Use these steps only if Simplicity Commander does not find RTT automatically after **Connect** (typically with an older Commander). Prefer updating Simplicity Commander first; with a recent Commander release, RTT logs are visible by default and you do not need to set **RTT block address** manually.
+
+After flashing, an older Simplicity Commander may fail to connect with an error similar to:
+
+```text
+ERROR: RTT read buffer could not be found within the timeout.
+The RTT control block could not be found in the RAM regions known to J-Link for the selected device.
+Try passing --blockaddress to the address of _SEGGER_RTT.
+RTT connection terminated.
+```
+
+If updating Commander does not resolve the error, set **RTT block address** in Commander to the `_SEGGER_RTT` address from the flashed build’s map file, then click **Connect** again.
+
+1. Open the application map file and search for `_SEGGER_RTT`. Copy the address shown next to that symbol (the value changes per build; do not reuse an address from another image).
+
+   Typical map file location for a Simplicity Studio / VS Code project:
+
+   `C:\Users\<username>\SimplicityStudio\v6_workspace\wireless_test_soc\cmake_gcc\build\base\wireless_test_soc.map`
+
+   Example map line:
+
+   ```text
+                   0x000077d4                _SEGGER_RTT
+   ```
+
+2. In Simplicity Commander **RTT** → **Connection Options**, paste that address into **RTT block address** (for example `0x000077d4`).
+3. Enable **Reset target on connect** and click **Connect**.
+
+![Simplicity Commander RTT block address set from _SEGGER_RTT](resources/readme/rtt_commander_block_address.png)
+
+Command responses then appear in the RTT console while you continue to enter CLI commands in Serial Debug Assistant.
 
 ## Resources
 

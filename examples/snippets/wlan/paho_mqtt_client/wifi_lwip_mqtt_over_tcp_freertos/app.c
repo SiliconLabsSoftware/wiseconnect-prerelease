@@ -347,7 +347,7 @@ static void application_start(void *argument)
 int paho_mqtt_demo()
 {
   int status;
-  uint16_t flags             = 0;
+  uint8_t flags              = 0;
   mqtt_client_t *mqtt_client = NULL;
   MQTTMessage publish_msg;
   sl_ip_address_t server_address = { 0 };
@@ -409,7 +409,7 @@ int paho_mqtt_demo()
     }
     configure_tls_certificates(&mqtt_client->client.ipstack->tls->cert_ctx);
     /* TLS requires a hostname for SNI and server cert verification. Call NetworkSetTlsHostname()
-   * before NetworkConnect(). See MQTTSi91x_lwip.h (NetworkSetTlsHostname, NETWORK_ERROR_TLS_HOSTNAME_REQUIRED). */
+   * before sl_paho_network_connect(). See MQTTSi91x_lwip.h / sl_paho_error_codes.h. */
     if (NetworkSetTlsHostname(mqtt_client->client.ipstack, MQTT_BROKER_TLS_HOSTNAME) != 0) {
       SL_DEBUG_LOG_V2(ERROR,
                       "Error: Invalid TLS hostname (NULL, empty, or longer than 255). Fix MQTT_BROKER_TLS_HOSTNAME.");
@@ -419,43 +419,40 @@ int paho_mqtt_demo()
     }
   }
 
-  status = NetworkConnect(mqtt_client->client.ipstack,
-                          flags,
-                          (char *)&(mqtt_client->server_ip),
-                          mqtt_client->server_port,
-                          mqtt_client->client_port,
-                          enable_ssl);
+#ifdef SLI_SI91X_ENABLE_IPV6
+  flags  = SL_PAHO_NETWORK_FLAG_IPV6;
+  status = sl_paho_network_connect(mqtt_client->client.ipstack,
+                                   flags,
+                                   (char *)mqtt_client->server_ip.ip.v6.bytes,
+                                   mqtt_client->server_port,
+                                   mqtt_client->client_port,
+                                   enable_ssl);
+#else
+  flags  = SL_PAHO_NETWORK_FLAG_IPV4;
+  status = sl_paho_network_connect(mqtt_client->client.ipstack,
+                                   flags,
+                                   (char *)mqtt_client->server_ip.ip.v4.bytes,
+                                   mqtt_client->server_port,
+                                   mqtt_client->client_port,
+                                   enable_ssl);
+#endif
 
-  if (status == NETWORK_ERROR_NULL_STRUCTURE) {
+  if (status == SL_NETWORK_ERR_NULL_STRUCTURE) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Network structure is NULL.\r\n");
-    if (mqtt_client->client.ipstack->tls) {
-      free(mqtt_client->client.ipstack->tls);
-      mqtt_client->client.ipstack->tls = NULL;
-    }
-    return status;
-  } else if (status == NETWORK_ERROR_NULL_ADDRESS) {
+  } else if (status == SL_NETWORK_ERR_NULL_ADDRESS) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Address is NULL.\r\n");
-    if (mqtt_client->client.ipstack->tls) {
-      free(mqtt_client->client.ipstack->tls);
-      mqtt_client->client.ipstack->tls = NULL;
-    }
-    return status;
-  } else if (status == NETWORK_ERROR_INVALID_TYPE) {
+  } else if (status == SL_NETWORK_ERR_INVALID_TYPE) {
     SL_DEBUG_LOG_V2(ERROR, "Error: Invalid transport type.\r\n");
-    if (mqtt_client->client.ipstack->tls) {
-      free(mqtt_client->client.ipstack->tls);
-      mqtt_client->client.ipstack->tls = NULL;
-    }
-    return status;
-  } else if (status == NETWORK_ERROR_TLS_HOSTNAME_REQUIRED) {
-    SL_DEBUG_LOG_V2(ERROR, "Error: TLS requires hostname. Call NetworkSetTlsHostname() before NetworkConnect().");
-    if (mqtt_client->client.ipstack->tls) {
-      free(mqtt_client->client.ipstack->tls);
-      mqtt_client->client.ipstack->tls = NULL;
-    }
-    return status;
+  } else if (status == SL_NETWORK_ERR_INVALID_FLAGS) {
+    SL_DEBUG_LOG_V2(ERROR, "Error: Set exactly one of SL_PAHO_NETWORK_FLAG_IPV4 / IPV6.\r\n");
+  } else if (status == SL_NETWORK_TLS_ERR_HOSTNAME_REQUIRED) {
+    SL_DEBUG_LOG_V2(ERROR,
+                    "Error: TLS requires hostname. Call NetworkSetTlsHostname() before sl_paho_network_connect().");
   } else if (status != 0) {
     SL_DEBUG_LOG_V2(ERROR, " TCP Connection Failed: %d", status);
+  }
+
+  if (status != 0) {
     if (mqtt_client->client.ipstack->tls) {
       free(mqtt_client->client.ipstack->tls);
       mqtt_client->client.ipstack->tls = NULL;

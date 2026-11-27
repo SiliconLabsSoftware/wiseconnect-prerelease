@@ -179,7 +179,7 @@ requires:
 - name: log_none
 - name: network_stack_common
 recommends:
-- id: '%extension-wiseconnect3_sdk%sl_si91x_internal_stack'
+- id: sl_si91x_internal_stack
   vendor: silabs
 template_contribution:
 - name: code_classification_components

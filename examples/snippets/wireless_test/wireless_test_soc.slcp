@@ -68,7 +68,13 @@ toolchain_settings:
   value: -Wall -Werror -Wno-error=deprecated-declarations
 - option: llvm_compiler_option
   value: -Wall -Werror -Wno-error=deprecated-declarations
+- option: gcc_linker_option
+  value: -Wl,--wrap=_write
+- option: llvm_linker_option
+  value: -Wl,--wrap=_write
 configuration:
+- name: SL_LOG_CONFIG_LEVEL_COMPILE_TIME
+  value: SL_LOG_CONFIG_LEVEL_INFO
 - name: SL_BOARD_ENABLE_VCOM
   value: '1'
 - name: NVM3_DEFAULT_MAX_OBJECT_SIZE
@@ -146,6 +152,7 @@ other_file:
 - path: resources/readme/cli_ble_ncp.png
 - path: resources/readme/configure_static_ip_address.png
 - path: resources/readme/RTT_logs.png
+- path: resources/readme/rtt_commander_block_address.png
 ui_hints:
   highlight:
   - path: readme.md

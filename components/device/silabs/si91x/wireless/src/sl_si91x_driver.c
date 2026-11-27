@@ -832,11 +832,18 @@ sl_status_t sl_si91x_driver_send_side_band_crypto(uint32_t command,
   // Acquire Mutex
   osMutexAcquire(side_band_crypto_mutex, 0xFFFFFFFFUL);
 
-  /* A previous timeout left crypto_desc[] pointing at this buffer. Wait for the NWP
-   * to finish before reusing the descriptors or freeing the memory. */
+  /* A previous timeout left crypto_desc[] pointing at this buffer. The completion ISR releases
+   * the power holds once the NWP finishes. Until then the descriptors and buffer are still owned
+   * by the NWP, so give it at most this request's own wait period before giving up. */
   if (sli_side_band_timed_out_buffer != NULL) {
-    uint32_t done = osEventFlagsWait(ta_events, SLI_SI91X_SIDE_BAND_DONE, osFlagsWaitAny, osWaitForever);
-    if ((done & SLI_SI91X_SIDE_BAND_DONE) == 0U) {
+    if (sli_si91x_side_band_crypto_is_timed_out()) {
+      (void)osEventFlagsWait(ta_events,
+                             SLI_SI91X_SIDE_BAND_DONE,
+                             osFlagsWaitAny,
+                             (wait_period & ~SLI_WIFI_WAIT_FOR_RESPONSE_BIT));
+    }
+    if (sli_si91x_side_band_crypto_is_timed_out()) {
+      /* NWP has not completed: do not reuse crypto_desc[] or free the outstanding buffer. */
       osMutexRelease(side_band_crypto_mutex);
       sli_buffer_manager_free_buffer(buffer);
       return SL_STATUS_TIMEOUT;
@@ -880,9 +887,24 @@ sl_status_t sl_si91x_driver_send_side_band_crypto(uint32_t command,
                             (osFlagsWaitAny),
                             (wait_period & ~SLI_WIFI_WAIT_FOR_RESPONSE_BIT));
 
+  bool timed_out = false;
   if (result == (uint32_t)osErrorTimeout || result == (uint32_t)osErrorResource) {
-    /* The NWP may still be writing the buffer. Keep the wake hold and the M4-sleep
-     * block until SIDE_BAND_DONE; the next call frees the buffer after that. */
+    /* SIDE_BAND_DONE may have landed right after the wait expired. Decide with interrupts
+     * disabled so the completion ISR cannot slip in between the check and the hand-off. */
+    __disable_irq();
+    if ((osEventFlagsGet(ta_events) & SLI_SI91X_SIDE_BAND_DONE) != 0U) {
+      /* Completed after all: consume the event and finish normally below. */
+      (void)osEventFlagsClear(ta_events, SLI_SI91X_SIDE_BAND_DONE);
+    } else {
+      /* The NWP may still be writing the buffer. Keep the buffer; the completion ISR now
+       * releases the wake hold and the M4-sleep block as soon as SIDE_BAND_DONE arrives. */
+      sli_si91x_side_band_crypto_mark_timed_out();
+      timed_out = true;
+    }
+    __enable_irq();
+  }
+
+  if (timed_out) {
     sli_side_band_timed_out_buffer = buffer;
     osMutexRelease(side_band_crypto_mutex);
     return SL_STATUS_TIMEOUT;

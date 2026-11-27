@@ -30,6 +30,8 @@
 #ifndef SL_SI91X_QEI_CONFIG_H
 #define SL_SI91X_QEI_CONFIG_H
 
+#include "sl_si91x_gpio.h"
+
 // <<< Use Configuration Wizard in Context Menu >>>
 #ifdef __cplusplus
 extern "C" {
@@ -72,6 +74,52 @@ extern "C" {
 #define SL_QEI_DELTA_TIME 1000000
 // </e>
 
+// <h> Pin Settings
+// <i> SI917 pad electrical settings (PADCONFIG_P).
+// <i> For DIR/IDX: select None when the pin_tool pin is None; pad mode is
+// <i> applied only when the pin is assigned and mode is not None.
+
+// <o SL_QEI_DIR_PAD_MODE> DIR pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_QEI_DIR_PAD_MODE
+#define SL_QEI_DIR_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_QEI_IDX_PAD_MODE> IDX pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_QEI_IDX_PAD_MODE
+#define SL_QEI_IDX_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_QEI_PHA_PAD_MODE> PHA pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_QEI_PHA_PAD_MODE
+#define SL_QEI_PHA_PAD_MODE GPIO_HZ
+#endif
+
+// <o SL_QEI_PHB_PAD_MODE> PHB pad mode
+// <SL_GPIO_PAD_MODE_NONE=> None
+// <GPIO_HZ=> Hi-Z
+// <GPIO_PULLUP=> Pull-up
+// <GPIO_PULLDOWN=> Pull-down
+// <i> Default: GPIO_HZ
+#ifndef SL_QEI_PHB_PAD_MODE
+#define SL_QEI_PHB_PAD_MODE GPIO_HZ
+#endif
+
+// </h>
 /******************************************************************************/
 // <<< end of configuration section >>>
 // <<< sl:start pin_tool >>>
@@ -161,6 +209,10 @@ sl_qei_init_t sl_qei_init = {
     .mux  = SL_SL91X_QEI_PHB_MUX,
     .pad  = SL_SL91X_QEI_PHB_PAD,
   },
+  .dir_pad_mode    = SL_QEI_DIR_PAD_MODE,
+  .idx_pad_mode    = SL_QEI_IDX_PAD_MODE,
+  .phasea_pad_mode = SL_QEI_PHA_PAD_MODE,
+  .phaseb_pad_mode = SL_QEI_PHB_PAD_MODE,
 };
 
 #ifdef __cplusplus

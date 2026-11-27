@@ -671,7 +671,7 @@ sl_status_t sl_http_client_write_chunked_data(const sl_http_client_t *client,
  * @details
  *   This function stores the provided advanced TCP and TLS configuration options in the HTTP client handle.
  *   The options are applied automatically when subsequent HTTP requests are sent via @ref sl_http_client_send_request.
- *   Call this function after @ref sl_http_client_init and before sending any requests.
+ *   Call this function after @ref sl_http_client_init and before @ref sl_http_client_request_init.
  *
  * @pre
  *   @ref sl_http_client_init should be called before this function.
@@ -685,8 +685,18 @@ sl_status_t sl_http_client_write_chunked_data(const sl_http_client_t *client,
  * @return
  *   sl_status_t - Status of the operation. For more details, see https://docs.silabs.com/gecko-platform/latest/platform-common/status.
  *   - SL_STATUS_OK: Operation successful.
- *   - SL_STATUS_INVALID_PARAMETER: One or more input parameters are NULL.
+ *   - SL_STATUS_NULL_POINTER: One or more input parameters are NULL.
  *   - SL_STATUS_INVALID_HANDLE: The provided client handle is invalid.
+ *   - SL_STATUS_INVALID_STATE: The client is not in the post-init idle state
+ *     (deinitialized, or a request has already been started via @ref sl_http_client_request_init /
+ *     @ref sl_http_client_send_request).
+ *
+ * @note
+ *   On a given handle, TCP/TLS advanced options can be set only once after init and before the
+ *   first request is initialized. After @ref sl_http_client_request_init the client leaves the
+ *   initialized state and does not return to it for later requests on the same handle. Multi-request
+ *   apps that need different TLS options per request must call @ref sl_http_client_deinit and
+ *   @ref sl_http_client_init again before reconfiguring.
  ******************************************************************************/
 sl_status_t sl_http_client_set_tcp_tls_advanced_configuration(const sl_http_client_t *client,
                                                               const sl_http_client_tcp_tls_advanced_options_t *options);

@@ -15,6 +15,7 @@ Demonstrates how to explore Wi-Fi, Bluetooth LE, MCU peripherals, and NWP power 
     - [Software Requirements](#software-requirements)
     - [Setup Diagram](#setup-diagram)
   - [Upgrade application binary](#upgrade-application-binary)
+  - [Setup from Empty Project](#setup-from-empty-project)
   - [Application build environment](#application-build-environment)
   - [Test the Application](#test-the-application)
     - [Application display](#application-display)
@@ -80,7 +81,7 @@ When BTN0 is pressed on the WPK baseboard or development kit, SiWG917 publishes 
 
 ## Upgrade application binary
 
-- Download the latest out-of-box demo binary from [the WiseConnect SDK GitHub repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/demos).
+- Download the latest out-of-box demo binary from [the WiseConnect SDK GitHub repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.2.0-content-for-docs/demos).
 
 - Follow the instructions on the [Developing for SiWx91x Host page](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#install-simplicity-studio) to:
 
@@ -90,6 +91,90 @@ When BTN0 is pressed on the WPK baseboard or development kit, SiWG917 publishes 
 
 After upgrading the application binary, proceed with the demo by referring to the next steps under [run the application](#run-the-application) section.
 
+## Setup from Empty Project
+
+Use this section when building the application from a minimal/empty template so you can see which software components and configurations the feature needs. Creating the example from **Example Projects & Demos** installs these automatically.
+
+The component and configuration list below is for the SoC project.
+
+1. In Simplicity Studio, create a **SiWx91x Platform - Empty C FreeRTOS** project for your board (or another minimal Wi-Fi SoC empty template if available).
+2. Open the project `.slcp` file, select the **Software Components** tab, and install the components below (search by label or component ID).
+3. Apply the listed configurations and preprocessor defines.
+4. Copy this example's `app.c` and `app.h` into the project (replace the empty-project sources).
+5. Configure credentials and application parameters as described in [Application build environment](#application-build-environment).
+6. Build, flash, and run.
+
+### Core / RTOS
+
+- **Default RAM Memory Configuration** (`si91x_memory_default_config`)
+- **System Calls** (`syscalls`)
+- **sl_main (System Init)** (`sl_main`)
+- **FreeRTOS** (`freertos`)
+- **FreeRTOS Heap 3** (`freertos_heap_3`)
+- **Memory Manager** (`memory_manager`)
+- **Singly-Linked List** (`slist`)
+
+### Wi-Fi / networking
+
+- **RSI User Configuration** (`rsilib_userconfig`)
+- **CLOCK UPDATE** (`rsilib_clock_update`)
+- **UDMA Linker Configuration** (`udma_linker_config`)
+- **Sleep Timer** (`sleeptimer`)
+- **Memory LCD SPI driver** (`memlcd_917`)
+- **CMSIS SPI** (`cmsis_spi`)
+- **GLIB driver for Memory LCD** (`dmd_memlcd`)
+- **GLIB Graphics Library** (`glib`)
+- **Button** (`sl_si91x_button_917`), instance: `btn0`
+- **MCU Subsystem** (`sl_si91x_mcu`)
+- **WiSeConnect Common Library** (`wiseconnect_common`)
+- **I2C** (`sl_i2c`)
+- **AWS IoT Device SDK** (`aws_sdk`)
+- **Network Manager** (`network_manager`)
+- **Wi-Fi** (`wifi`)
+- **SiWx91x Wireless Subsystem** (`sl_si91x_wireless`)
+- **BLE** (`ble`)
+- **Offload Network Stack** (`sl_si91x_internal_stack`)
+- **WiSeConnect Resources** (`wifi_resources`)
+- **SiWx91x Asynchronous Socket** (`sl_si91x_asynchronous_socket`)
+- **Basic Network Configuration Manager** (`basic_network_config_manager`)
+- **MQTT Client** (`mqtt`)
+
+### Power / wakeup
+
+- **Power Manager** (`sl_power_manager`)
+- **ULP Timer** (`sl_ulp_timer`)
+- **ULP Timer** (`ulp_timers_instance`), instance: `timer0`
+
+### Console / logging
+
+- **Debug Unit** (`si91x_debug`)
+- **Log - None** (`log_none`)
+- **SL Log Core** (`si91x_log`)
+- **Log Backend I/O Stream - Formatted Output** (`si91x_log_iostream_formatted`)
+- **IO Stream** (`iostream_si91x`)
+- **IO Stream Retarget STDIO** (`iostream_retarget_stdio`)
+- **IO Stream UART (SiWx91x)** (`iostream_uart_si91x`), instance: `vcom`
+- **Component Catalog** (`component_catalog`)
+
+### Required configurations
+
+In the `.slcp` **Configuration** view (and Board Control / wakeup components where applicable), set:
+
+- `SL_LOG_CONFIG_LEVEL_COMPILE_TIME` = `SL_LOG_CONFIG_LEVEL_INFO`
+- `SL_BOARD_ENABLE_VCOM` = `1`
+- `SL_BUTTON_CONFIG_BTN1_INTR` = `RISE_EDGE_AND_FALL_EDGE_INTERRUPT`
+
+### Preprocessor defines
+
+In the `.slcp` **Defines**, add:
+
+- `SPI_MULTI_SLAVE`
+
+### Feature-specific notes
+
+- This application demonstrates the WLAN, BLE, MCU peripheral features and NWP (network processor) powersave capabilities of SiWG917 with a ready to go, minimal software installation experience.
+
+> **Tip**: Prefer creating the sample from Example Projects when you only need to run the demo. Use this empty-project path when integrating the feature into your own application.
 ## Application build environment
 
 No additional application level changes are required to execute the OOB demo example.
@@ -119,7 +204,7 @@ To view the application prints on the console, refer to [link name](https://docs
 
     To upgrade to latest application binary, refer [upgrade application binary](#upgrade-application-binary) section.
 
-    Also, upgrade the connectivity firmware (NWP firmware) to the latest version to avoid compatibility issues with application binary. Download the latest connectivity firmware from [Wiseconnect github repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.1.2-content-for-docs/connectivity_firmware) and refer [Upgrade SiWx91x Connectivity Firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#upgrade-si-wx91x-connectivity-firmware)  to upgrade the connectivity firmware.
+    Also, upgrade the connectivity firmware (NWP firmware) to the latest version to avoid compatibility issues with application binary. Download the latest connectivity firmware from [Wiseconnect github repository](https://github.com/SiliconLabs/wiseconnect/tree/v4.2.0-content-for-docs/connectivity_firmware) and refer [Upgrade SiWx91x Connectivity Firmware](https://docs.silabs.com/wiseconnect/latest/wiseconnect-developers-guide-developing-for-silabs-hosts/#upgrade-si-wx91x-connectivity-firmware)  to upgrade the connectivity firmware.
 
     If the messages being displayed on the LCD display on WPK or the serial terminal prints indicate versioning information (Si917 OOB Demo v2.0 - as show in the following image)
 
